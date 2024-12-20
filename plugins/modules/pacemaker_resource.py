@@ -47,17 +47,14 @@ options:
         description:
           - Resource type name
         type: str
-        default: None
       standard:
         description:
           - Resource type standard
         type: str
-        default: None
       provider:
         description:
           - Resource type provider
         type: str
-        default: None
   resource_option:
     description:
       - Resource option to create
@@ -75,18 +72,15 @@ options:
         description:
           - Operation action to associate with resource
         type: str
-        default: None
       option:
         description:
           - Operation option to associate with action
         type: str
-        default: None
   meta:
     description:
       - List of meta to associate with resource
     type: list
     elements: str
-    default: None
   action:
     description:
       - Actions to associate with resource
@@ -97,18 +91,15 @@ options:
         description:
           - State to apply to resource
         type: str
-        default: None
         choices: [ clone, master ]
       option:
         description:
           - Option to associate with resource action
         type: str
-        default: None
   group:
     description:
       - Group to associate with resource
     type: str
-    default: None
   order:
     description:
     - Order to associate with resource
@@ -119,18 +110,15 @@ options:
         description:
           - Order state to associate with resource
         type: str
-        default: None
         choices: [ before, after ]
       resource_id:
         description:
           - Other resource to associate created resource based on order
         type: str
-        default: None
   bundle:
     description:
       - Bundle to associate with resource
     type: str
-    default: None
   disabled:
     description:
       - Argument to disable resource
@@ -181,13 +169,10 @@ from ansible.module_utils.basic import AnsibleModule
 def get_cluster_resource_status(module, name):
     cmd = "pcs status resources %s" % name
     rc, out, err = module.run_command(cmd)
-    if rc == 1:
-        module.fail_json(
-            msg="Command execution failed.\nCommand: `%s`\nError: %s" % (cmd, err))
     status = []
     for o in out.splitlines():
         status.append(o.split(':'))
-    return status
+    return rc, status
 
 
 def delete_cluster_resource(module, name):
@@ -209,33 +194,36 @@ def create_cluster_resource(module, name,
                             wait):
     cmd = "pcs resource create %s " % name
 
-    if resource_type.standard is not None:
-        cmd += "%s:" % resource_type.standard
-        cmd += "%s:" % resource_type.provider if resource_type.provider is not None else ""
-    cmd += "%s " % resource_type.name
+    if resource_type.get('standard') is not None:
+        cmd += "%s:" % resource_type.get('standard')
+        cmd += "%s:" % resource_type.get('provider') if resource_type.get('provider') is not None else ""
+    cmd += "%s " % resource_type.get('name')
 
-    cmd += "%s " % resource_option if resource_option is not None else ""
+    if resource_option is not None:
+        for option in resource_option:
+            cmd += "%s " % option
+
     if operation is not None:
         for op in operation:
-            cmd += "op %s " % op.action
-            cmd += "%s " % op.options if op.option is not None else ""
+            cmd += "op %s " % op.get('action')
+            cmd += "%s " % op.get('option') if op.get('option') is not None else ""
 
     if meta is not None:
         for m in meta:
             cmd += "meta %s " % m
 
-    if action is not None:
-        if action.option is not None:
-            cmd += "%s %s " % (action.state, action.option)
-        else:
-            cmd += "%s " % action.state
+    if action:
+        cmd += "%s " % action.get('state')
+        if action.get('option') is not None:
+            for option in action.get('option'):
+                cmd += "%s " % option
 
-    cmd += "--group %s " if group is not None else ""
-    cmd += "%s %s " % (order.state,
-                       order.resource_id) if order is not None else ""
+    cmd += "--group %s " % group if group is not None else ""
+    cmd += "%s %s " % (order.get('state'),
+                       order.get('resource_id')) if not order else ""
     cmd += "bundle %s " % bundle if bundle is not None else ""
     cmd += "--disabled " if disabled else ""
-    cmd += "--wait=%d" if wait > 0 else ""
+    cmd += "--wait=%d" % wait if wait > 0 else ""
 
     rc, out, err = module.run_command(cmd)
     if rc == 1:
@@ -254,28 +242,28 @@ def main():
         # TODO don't know if it makes sense to have this as "name"
         name=dict(type='str', aliases=['resource_id'], required=True),
         resource_type=dict(type='dict', aliases=['type'], options=dict(
-            name=dict(type='str', default="None"),
-            standard=dict(type='str', default="None"),
-            provider=dict(type='str', default="None"),
+            name=dict(type='str', default=None),
+            standard=dict(type='str', default=None),
+            provider=dict(type='str', default=None),
         )),
-        resource_option=dict(type='str', aliases=['option']),
+        resource_option=dict(type='list', elements='str', default=list(), aliases=['option']),
         operation=dict(type='list', elements='dict', default=list(), aliases=['op'], options=dict(
-            action=dict(type='str', default="None"),
-            option=dict(type='str', default="None"),
+            action=dict(type='str', default=None),
+            option=dict(type='str', default=None),
         )),
-        meta=dict(type='list', elements='str', default="None"),
+        meta=dict(type='list', elements='str', default=None),
         action=dict(type='dict', default=dict(), options=dict(
-            state=dict(type='str', default="None",
+            state=dict(type='str',
                        choices=['clone', 'master']),
-            option=dict(type='str', default="None"),
+            option=dict(type='list', elements='str', default=list()), #This should actually be a list of str
         )),
-        group=dict(type='str', default="None"),
+        group=dict(type='str', default=None),
         order=dict(type='dict', default=dict(), options=dict(
-            state=dict(type='str', default="None",
+            state=dict(type='str',
                        choices=['before', 'after']),
-            resource_id=dict(type='str', default="None"),
+            resource_id=dict(type='str', default=None),
         )),
-        bundle=dict(type='str', default="None"),
+        bundle=dict(type='str', default=None),
         disabled=dict(type='bool', default=False),
         wait=dict(type='int', default=300),
     )
@@ -288,7 +276,7 @@ def main():
     state = module.params['state']
     name = module.params['name']
     resource_type = module.params['resource_type']
-    resource_option = module.params['option']
+    resource_option = module.params['resource_option']
     operation = module.params['operation']
     meta = module.params['meta']
     action = module.params['action']
@@ -301,16 +289,16 @@ def main():
     if state in ['create']:
         if module.check_mode:
             module.exit_json(changed=True)
-        initial_cluster_resource_state = get_cluster_resource_status(
+        rc, initial_cluster_resource_state = get_cluster_resource_status(
             module, name)
-        if not initial_cluster_resource_state:
+        if rc:
             create_cluster_resource(module, name, resource_type, resource_option,
                                     operation, meta, action, group, order, bundle, disabled, wait)
         else:
             module.exit_json(changed=False, out=initial_cluster_resource_state)
-        final_cluster_resource_state = get_cluster_resource_status(
+        rc, final_cluster_resource_state = get_cluster_resource_status(
             module, name)
-        if final_cluster_resource_state:
+        if not rc:
             module.exit_json(changed=True, out=final_cluster_resource_state)
         else:
             module.fail_json(
@@ -318,26 +306,26 @@ def main():
 
     if state in ['status']:
         if module.check_mode:
-            module.exit_json(changed=True)
-        cluster_resource_state = get_cluster_resource_status(module, name)
-        if cluster_resource_state:
-            module.exit_json(changed=True, out=cluster_resource_state)
+            module.exit_json(changed=False)
+        rc, cluster_resource_state = get_cluster_resource_status(module, name)
+        if not rc:
+            module.exit_json(changed=False, out=cluster_resource_state)
         else:
             module.fail_json(
-                msg="Failed to obtain cluster resource status: %s" % cluster_resource_state)
+                msg="Failed to obtain cluster resource status")
 
     if state in ['delete']:
-        if module.check_mode:
-            module.exit_json(changed=True)
-        initial_cluster_resource_state = get_cluster_resource_status(
+        rc, initial_cluster_resource_state = get_cluster_resource_status(
             module, name)
-        if initial_cluster_resource_state:
+        if not rc:
+            if module.check_mode:
+                module.exit_json(changed=True)
             delete_cluster_resource(module, name)
         else:
             module.exit_json(changed=False, out=initial_cluster_resource_state)
-        final_cluster_resource_state = get_cluster_resource_status(
+        rc, final_cluster_resource_state = get_cluster_resource_status(
             module, name)
-        if final_cluster_resource_state:
+        if not rc:
             module.fail_json(
                 msg="Failed to delete cluster resource: %s" % final_cluster_resource_state)
         else:
