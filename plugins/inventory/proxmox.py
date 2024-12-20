@@ -275,7 +275,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         return self.session
 
     def _get_auth(self):
-
         validate_certs = self.get_option('validate_certs')
 
         if validate_certs is False:
@@ -283,24 +282,26 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             disable_warnings()
 
         if self.proxmox_password:
-
             credentials = urlencode({'username': self.proxmox_user, 'password': self.proxmox_password})
-
             a = self._get_session()
-
             ret = a.post('%s/api2/json/access/ticket' % self.proxmox_url, data=credentials)
-
             json = ret.json()
-
             self.headers = {
                 # only required for POST/PUT/DELETE methods, which we are not using currently
                 # 'CSRFPreventionToken': json['data']['CSRFPreventionToken'],
                 'Cookie': 'PVEAuthCookie={0}'.format(json['data']['ticket'])
             }
-
         else:
+            # Clean and format token components
+            user = self.proxmox_user.strip()
+            token_id = self.proxmox_token_id.strip()
+            token_secret = self.proxmox_token_secret.strip()
 
-            self.headers = {'Authorization': 'PVEAPIToken={0}!{1}={2}'.format(self.proxmox_user, self.proxmox_token_id, self.proxmox_token_secret)}
+            # Build token string without newlines
+            token = f'{user}!{token_id}={token_secret}'
+
+            # Set headers with clean token
+            self.headers = {'Authorization': f'PVEAPIToken={token}'}
 
     def _get_json(self, url, ignore_errors=None):
 
