@@ -55,7 +55,7 @@
 
   - assert:
       that:
-        - package_result.changed
+        - package_result is changed
 
   - name: Again install {{ package_name }} package using homebrew
     homebrew:
@@ -68,7 +68,7 @@
 
   - assert:
       that:
-        - not package_result.changed
+        - package_result is not changed
 
   - name: Uninstall {{ package_name }} package using homebrew
     homebrew:
@@ -81,7 +81,7 @@
 
   - assert:
       that:
-        - package_result.changed
+        - package_result is changed
 
   - name: Again uninstall {{ package_name }} package using homebrew
     homebrew:
@@ -94,4 +94,4 @@
 
   - assert:
       that:
-        - not package_result.changed
+        - package_result is not changed

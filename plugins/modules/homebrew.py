@@ -379,6 +379,20 @@ class Homebrew(object):
             )
             raise HomebrewException(self.message)
 
+    def _save_package_info(self, package_detail, package_name):
+        if bool(package_detail.get("installed")):
+            self.installed_packages.add(package_name)
+        if bool(package_detail.get("outdated")):
+            self.outdated_packages.add(package_name)
+
+    def _extract_package_name(self, package_detail, is_cask):
+        canonical_name = package_detail["token"] if is_cask else package_detail["name"]  # For ex: 'sqlite'
+        all_valid_names = set(package_detail.get("aliases", []))  # For ex: {'sqlite3'}
+        all_valid_names.add(canonical_name)
+
+        # Then make sure the user provided name resurface.
+        return (all_valid_names & set(self.packages)).pop()
+
     def _get_packages_info(self):
         cmd = [
             "{brew_path}".format(brew_path=self.brew_path),
@@ -397,16 +411,13 @@ class Homebrew(object):
 
         data = json.loads(out)
         for package_detail in data.get("formulae", []):
-            if bool(package_detail.get("installed")):
-                self.installed_packages.add(package_detail["name"])
-            if bool(package_detail.get("outdated")):
-                self.outdated_packages.add(package_detail["name"])
+            package_name = self._extract_package_name(package_detail, is_cask=False)
+            self._save_package_info(package_detail, package_name)
 
         for package_detail in data.get("casks", []):
-            if bool(package_detail.get("installed")):
-                self.installed_packages.add(package_detail["token"])
-            if bool(package_detail.get("outdated")):
-                self.outdated_packages.add(package_detail["token"])
+            package_name = self._extract_package_name(package_detail, is_cask=True)
+            self._save_package_info(package_detail, package_name)
+
     # /prep -------------------------------------------------------- }}}
 
     def run(self):
