@@ -142,7 +142,7 @@ def main():
             changed = True
 
             if not module.check_mode:
-                i0, i1, i2, resp_ctrls = mod.connection.modify_ext_s(
+                dummy, dummy, dummy, resp_ctrls = mod.connection.modify_ext_s(
                     dn=mod.dn,
                     modlist=mod.inc(),
                     serverctrls=mod.serverControls(),
