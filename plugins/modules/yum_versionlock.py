@@ -47,31 +47,31 @@ author:
 """
 
 EXAMPLES = r"""
-  - name: Prevent Apache / httpd from being updated
-    community.general.yum_versionlock:
-      state: present
-      name:
-        - httpd
+- name: Prevent Apache / httpd from being updated
+  community.general.yum_versionlock:
+    state: present
+    name:
+      - httpd
 
-  - name: Prevent Apache / httpd version 2.4.57-2 from being updated
-    community.general.yum_versionlock:
-      state: present
-      name:
-        - httpd-0:2.4.57-2.el9
+- name: Prevent Apache / httpd version 2.4.57-2 from being updated
+  community.general.yum_versionlock:
+    state: present
+    name:
+      - httpd-0:2.4.57-2.el9
 
-  - name: Prevent multiple packages from being updated
-    community.general.yum_versionlock:
-      state: present
-      name:
-        - httpd
-        - nginx
-        - haproxy
-        - curl
+- name: Prevent multiple packages from being updated
+  community.general.yum_versionlock:
+    state: present
+    name:
+      - httpd
+      - nginx
+      - haproxy
+      - curl
 
-  - name: Remove lock from Apache / httpd to be updated again
-    community.general.yum_versionlock:
-      state: absent
-      name: httpd
+- name: Remove lock from Apache / httpd to be updated again
+  community.general.yum_versionlock:
+    state: absent
+    name: httpd
 """
 
 RETURN = r"""
