@@ -1,0 +1,8 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+android_cmdline_temp_dir: "/tmp/cmdlinetools"
+android_sdk_location: "/tmp/androidsdk"
+commandline_tools_link: https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip

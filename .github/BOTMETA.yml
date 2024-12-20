@@ -309,6 +309,8 @@ files:
     maintainers: delineaKrehl tylerezimmerman
   $module_utils/:
     labels: module_utils
+  $module_utils/android_sdkmanager.py:
+    maintainers: shamilovstas
   $module_utils/btrfs.py:
     maintainers: gnfzdz
   $module_utils/cmd_runner_fmt.py:
@@ -420,6 +422,8 @@ files:
     ignore: DavidWittman jiuka
     labels: alternatives
     maintainers: mulby
+  $modules/android_sdk.py:
+    maintainers: shamilovstas
   $modules/ansible_galaxy_install.py:
     maintainers: russoz
   $modules/apache2_mod_proxy.py:

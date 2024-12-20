@@ -1,0 +1,86 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Include OS-specific variables
+  include_vars: '{{ ansible_os_family }}.yml'
+
+- name: Install dependencies
+  become: true
+  package:
+    name:
+      - "{{ openjdk_pkg }}"
+      - unzip
+    state: present
+  when: ansible_os_family != 'Darwin'
+
+- name: Install dependencies (OSX)
+  block:
+    - name: Find brew binary
+      command: which brew
+      register: brew_which
+    - name: Get owner of brew binary
+      stat:
+        path: "{{ brew_which.stdout }}"
+      register: brew_stat
+    - name: "Install package"
+      homebrew:
+        name:
+          - "{{ openjdk_pkg }}"
+          - unzip
+        state: present
+        update_homebrew: false
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+      environment:
+        HOMEBREW_NO_AUTO_UPDATE: "True"
+    - name: Symlink java
+      become: true
+      file:
+        src: "/usr/local/opt/openjdk@17/libexec/openjdk.jdk"
+        dest: "/Library/Java/JavaVirtualMachines/openjdk-17.jdk"
+        state: link
+  when:
+    - ansible_os_family == 'Darwin'
+
+- name: Create Android SDK directory
+  file:
+    path: "{{ android_sdk_location }}"
+    state: directory
+
+- name: Check that sdkmanager is installed
+  stat:
+    path: "{{ android_sdk_location }}/cmdline-tools/latest/bin/sdkmanager"
+  register: sdkmanager_installed
+
+- name: Install Android command line tools
+  when: not sdkmanager_installed.stat.exists
+  block:
+    - name: Create Android SDK dir structure
+      file:
+        path: "{{ item.path }}"
+        state: "{{ item.state }}"
+      with_items:
+        - { path: "{{ android_cmdline_temp_dir }}", state: "directory" }
+        - { path: "{{ android_sdk_location }}/cmdline-tools/latest", state: "directory" }
+
+    - name: Download Android command line tools
+      unarchive:
+        src: "{{ commandline_tools_link }}"
+        dest: "{{ android_cmdline_temp_dir }}"
+        remote_src: yes
+        creates: "{{ android_cmdline_temp_dir }}/cmdline-tools"
+      when: not sdkmanager_installed.stat.exists
+
+
+    - name: Fix directory structure
+      copy:
+        src: "{{ android_cmdline_temp_dir }}/cmdline-tools/"
+        dest: "{{ android_sdk_location }}/cmdline-tools/latest"
+        remote_src: yes
