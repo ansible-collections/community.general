@@ -13,7 +13,7 @@ DOCUMENTATION = """
 module: locale_gen
 short_description: Creates or removes locales
 description:
-- Manages locales in Ubuntu/Debian systems.
+- Manages locales in Ubuntu systems.
 author:
 - Augustus Kling (@AugustusKling)
 extends_documentation_fragment:
@@ -40,10 +40,14 @@ options:
 notes:
 - >
   If C(/etc/locale.gen) exists, the module will assume to be using the B(glibc) mechanism,
-  else if C(/var/lib/locales/supported.d/) exists it will assume to be using the B(Debian) mechanism,
+  else if C(/var/lib/locales/supported.d/) exists it will assume to be using the B(debian) mechanism,
   else it will raise an error.
 - When using glibc mechanism, it will manage locales by editing C(/etc/locale.gen) and running C(locale-gen).
-- When using Debian mechanism, it will manage locales by editing C(/var/lib/locales/supported.d/local) and then running C(locale-gen).
+- When using debian mechanism, it will manage locales by editing C(/var/lib/locales/supported.d/local) and then running C(locale-gen).
+- >
+  Please note that the code path that uses debian mechanism has not been tested for a while, because Ubuntu is already using the glibc mechanism.
+  There is no support for that, given our inability to test it.
+  Therefore, that mechanism is B(deprecated) and will be removed in community.general 13.0.0.
 - Currently the module is B(only supported for Ubuntu) systems.
 - This module requires the package C(locales) installed in Ubuntu systems.
 """
