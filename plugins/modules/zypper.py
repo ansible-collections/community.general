@@ -149,6 +149,13 @@ options:
     description:
       - When set to V(true), provide a simplified error output (parses only the C(<message>) tag text in the XML output).
     version_added: '10.2.0'
+  quiet:
+    type: bool
+    required: false
+    default: true
+    description:
+      - Adds C(--quiet) option to I(zypper) install/update command.
+    version_added: '10.2.0'
 notes:
   - When used with a C(loop:) each package will be processed individually, it is much more efficient to pass the list directly to the O(name)
     option.
@@ -202,6 +209,7 @@ EXAMPLES = r"""
     name: '*'
     state: latest
     simple_errors: true
+    quiet: false
 
 - name: Apply all available patches
   community.general.zypper:
@@ -360,8 +368,15 @@ def parse_zypper_xml(m, cmd, fail_not_found=True, packages=None):
             # run zypper again with the same command to complete update
             return parse_zypper_xml(m, cmd, fail_not_found=fail_not_found, packages=packages)
 
+        # apply simple_errors logic to rc 0,102,103,106 
+        if m.params['simple_errors']:
+            simple_errors = get_simple_errors(dom)
+            if simple_errors is not None:
+                stdout = simple_errors
+
         return packages, rc, stdout, stderr
 
+    # apply simple_errors logic to rc other than 0,102,103,106
     if m.params['simple_errors']:
         simple_errors = get_simple_errors(dom)
         if simple_errors is not None:
@@ -379,14 +394,16 @@ def get_simple_errors(dom):
 
     for x in message_xml_tags:
         simple_errors.append(x.firstChild.data)
-    return " ".join(simple_errors)
+    return " \n".join(simple_errors)
 
 
 def get_cmd(m, subcommand):
     "puts together the basic zypper command arguments with those passed to the module"
     is_install = subcommand in ['install', 'update', 'patch', 'dist-upgrade']
     is_refresh = subcommand == 'refresh'
-    cmd = [m.get_bin_path('zypper', required=True), '--quiet', '--non-interactive', '--xmlout']
+    cmd = [m.get_bin_path('zypper', required=True), '--non-interactive', '--xmlout']
+    if m.params['quiet']:
+        cmd.append('--quiet')
     if transactional_updates():
         cmd = [m.get_bin_path('transactional-update', required=True), '--continue', '--drop-if-no-change', '--quiet', 'run'] + cmd
     if m.params['extra_args_precommand']:
@@ -587,6 +604,7 @@ def main():
             replacefiles=dict(required=False, default=False, type='bool'),
             clean_deps=dict(required=False, default=False, type='bool'),
             simple_errors=dict(required=False, default=False, type='bool'),
+            quiet=dict(required=False, default=True, type='bool'),
         ),
         supports_check_mode=True
     )
