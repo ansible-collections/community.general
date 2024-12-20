@@ -368,7 +368,7 @@ def parse_zypper_xml(m, cmd, fail_not_found=True, packages=None):
             # run zypper again with the same command to complete update
             return parse_zypper_xml(m, cmd, fail_not_found=fail_not_found, packages=packages)
 
-        # apply simple_errors logic to rc 0,102,103,106 
+        # apply simple_errors logic to rc 0,102,103,106
         if m.params['simple_errors']:
             simple_errors = get_simple_errors(dom)
             if simple_errors is not None:
