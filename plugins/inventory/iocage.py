@@ -17,11 +17,10 @@ DOCUMENTATION = '''
         - iocage >= 1.8
     description:
         - Get inventory hosts from the iocage jail manager running on O(host).
-        - By default, O(host) is V(localhost). If O(host) is not
-          V(localhost) it is expected that the user running Ansible on
-          the controller is able to connect to the O(host) account
-          O(user) with SSH non-interactively and execute the command
-          C(iocage list).
+        - By default, O(host) is V(localhost). If O(host) is not V(localhost) it
+          is expected that the user running Ansible on the controller can
+          connect to the O(host) account O(user) with SSH non-interactively and
+          execute the command C(iocage list).
         - Uses a configuration file as an inventory source, it must end
           in C(.iocage.yml) or C(.iocage.yaml).
     extends_documentation_fragment:
