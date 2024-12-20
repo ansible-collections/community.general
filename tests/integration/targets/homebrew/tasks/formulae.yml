@@ -55,7 +55,7 @@
 
   - assert:
       that:
-        - package_result.changed
+        - package_result is changed
         - "package_result.msg == 'Package installed: gnu-tar'"
         - "package_result.changed_pkgs == ['gnu-tar']"
         - "package_result.unchanged_pkgs == []"
@@ -71,7 +71,7 @@
 
   - assert:
       that:
-        - not package_result.changed
+        - package_result is not changed
         - "package_result.msg == 'Package already installed: gnu-tar'"
         - "package_result.changed_pkgs == []"
         - "package_result.unchanged_pkgs == ['gnu-tar']"
@@ -87,7 +87,7 @@
 
   - assert:
       that:
-        - package_result.changed
+        - package_result is changed
         - "package_result.msg == 'Package unlinked: gnu-tar'"
         - "package_result.changed_pkgs == ['gnu-tar']"
         - "package_result.unchanged_pkgs == []"
@@ -103,7 +103,7 @@
 
   - assert:
       that:
-        - package_result.changed
+        - package_result is changed
         - "package_result.msg == 'Package linked: gnu-tar'"
         - "package_result.changed_pkgs == ['gnu-tar']"
         - "package_result.unchanged_pkgs == []"
@@ -119,7 +119,7 @@
 
   - assert:
       that:
-        - package_result.changed
+        - package_result is changed
         - "package_result.msg == 'Package uninstalled: gnu-tar'"
         - "package_result.changed_pkgs == ['gnu-tar']"
         - "package_result.unchanged_pkgs == []"
@@ -135,7 +135,7 @@
 
   - assert:
       that:
-        - not package_result.changed
+        - package_result is not changed
         - "package_result.msg == 'Package already uninstalled: gnu-tar'"
         - "package_result.changed_pkgs == []"
         - "package_result.unchanged_pkgs == ['gnu-tar']"
@@ -151,7 +151,7 @@
 
   - assert:
       that:
-        - package_result.changed
+        - package_result is changed
         - "package_result.msg == 'Package upgraded: gnu-tar'"
         - "package_result.changed_pkgs == ['gnu-tar']"
         - "package_result.unchanged_pkgs == []"
@@ -167,7 +167,7 @@
 
   - assert:
       that:
-        - not package_result.changed
+        - package_result is not changed
         - "package_result.msg == 'Package already upgraded: gnu-tar'"
         - "package_result.changed_pkgs == []"
         - "package_result.unchanged_pkgs == ['gnu-tar']"
@@ -205,7 +205,7 @@
 
   - assert:
       that:
-        - package_result.changed
+        - package_result is changed
         - "package_result.msg == 'Changed: 1, Unchanged: 1'"
         - "package_result.changed_pkgs == ['gnu-time']"
         - "package_result.unchanged_pkgs == ['gnu-tar']"
@@ -221,7 +221,7 @@
 
   - assert:
       that:
-        - not package_result.changed
+        - package_result is not changed
         - "package_result.msg == 'Changed: 0, Unchanged: 2'"
         - "package_result.changed_pkgs == []"
         - "package_result.unchanged_pkgs | sort == ['gnu-tar', 'gnu-time']"
@@ -237,7 +237,7 @@
 
   - assert:
       that:
-        - package_result.changed
+        - package_result is changed
         - "package_result.msg == 'Changed: 2, Unchanged: 0'"
         - "package_result.changed_pkgs | sort == ['gnu-tar', 'gnu-time']"
         - "package_result.unchanged_pkgs == []"
@@ -253,7 +253,7 @@
 
   - assert:
       that:
-        - package_result.changed
+        - package_result is changed
         - "package_result.msg == 'Changed: 2, Unchanged: 0'"
         - "package_result.changed_pkgs | sort == ['gnu-tar', 'gnu-time']"
         - "package_result.unchanged_pkgs == []"
@@ -269,7 +269,7 @@
 
   - assert:
       that:
-        - package_result.changed
+        - package_result is changed
         - "package_result.msg == 'Changed: 2, Unchanged: 0'"
         - "package_result.changed_pkgs | sort == ['gnu-tar', 'gnu-time']"
         - "package_result.unchanged_pkgs == []"
@@ -285,7 +285,7 @@
 
   - assert:
       that:
-        - not package_result.changed
+        - package_result is not changed
         - "package_result.msg == 'Changed: 0, Unchanged: 2'"
         - "package_result.changed_pkgs == []"
         - "package_result.unchanged_pkgs | sort == ['gnu-tar', 'gnu-time']"
@@ -301,7 +301,7 @@
 
   - assert:
       that:
-        - package_result.changed
+        - package_result is changed
         - "package_result.msg == 'Changed: 2, Unchanged: 0'"
         - "package_result.changed_pkgs | sort == ['gnu-tar', 'gnu-time']"
         - "package_result.unchanged_pkgs == []"
@@ -317,7 +317,49 @@
 
   - assert:
       that:
-        - not package_result.changed
+        - package_result is not changed
         - "package_result.msg == 'Changed: 0, Unchanged: 2'"
         - "package_result.changed_pkgs == []"
         - "package_result.unchanged_pkgs | sort == ['gnu-tar', 'gnu-time']"
+
+# Test alias handling with sqlite (that is aliased to sqlite3)
+- block:
+  - name: Make sure sqlite package is not installed
+    homebrew:
+      name: "sqlite"
+      state: absent
+      update_homebrew: false
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+
+  - name: Install sqlite package using alias (sqlite3)
+    homebrew:
+      name: "sqlite3"
+      state: present
+      update_homebrew: false
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+    register: install_result
+
+  - assert:
+      that:
+        - install_result is changed
+        - "install_result.msg == 'Package installed: sqlite3'"
+        - "install_result.changed_pkgs == ['sqlite3']"
+        - "install_result.unchanged_pkgs == []"
+
+  - name: Again install sqlite package using alias (sqlite3)
+    homebrew:
+      name: "sqlite3"
+      state: present
+      update_homebrew: false
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+    register: reinstall_result
+
+  - assert:
+      that:
+        - reinstall_result is not changed
+        - "reinstall_result.msg == 'Package already installed: sqlite3'"
+        - "reinstall_result.changed_pkgs == []"
+        - "reinstall_result.unchanged_pkgs == ['sqlite3']"
