@@ -88,41 +88,41 @@ requirements:
 """
 
 EXAMPLES = r"""
-  - name: Install "imagemin" Node.js package.
-    community.general.yarn:
-      name: imagemin
-      path: /app/location
+- name: Install "imagemin" Node.js package.
+  community.general.yarn:
+    name: imagemin
+    path: /app/location
 
-  - name: Install "imagemin" Node.js package on version 5.3.1
-    community.general.yarn:
-      name: imagemin
-      version: '5.3.1'
-      path: /app/location
+- name: Install "imagemin" Node.js package on version 5.3.1
+  community.general.yarn:
+    name: imagemin
+    version: '5.3.1'
+    path: /app/location
 
-  - name: Install "imagemin" Node.js package globally.
-    community.general.yarn:
-      name: imagemin
-      global: true
+- name: Install "imagemin" Node.js package globally.
+  community.general.yarn:
+    name: imagemin
+    global: true
 
-  - name: Remove the globally-installed package "imagemin".
-    community.general.yarn:
-      name: imagemin
-      global: true
-      state: absent
+- name: Remove the globally-installed package "imagemin".
+  community.general.yarn:
+    name: imagemin
+    global: true
+    state: absent
 
-  - name: Install "imagemin" Node.js package from custom registry.
-    community.general.yarn:
-      name: imagemin
-      registry: 'http://registry.mysite.com'
+- name: Install "imagemin" Node.js package from custom registry.
+  community.general.yarn:
+    name: imagemin
+    registry: 'http://registry.mysite.com'
 
-  - name: Install packages based on package.json.
-    community.general.yarn:
-      path: /app/location
+- name: Install packages based on package.json.
+  community.general.yarn:
+    path: /app/location
 
-  - name: Update all packages in package.json to their latest version.
-    community.general.yarn:
-      path: /app/location
-      state: latest
+- name: Update all packages in package.json to their latest version.
+  community.general.yarn:
+    path: /app/location
+    state: latest
 """
 
 RETURN = r"""
