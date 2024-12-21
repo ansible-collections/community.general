@@ -25,7 +25,7 @@ ACTION_GROUPS = {
         'doc_fragment': 'community.general.consul.actiongroup_consul',
     },
     'proxmox': {
-        'pattern': re.compile('^proxmox(|_.*)$'),
+        'pattern': re.compile('^proxmox(_.*)?$'),
         'exclusions': [],
         'doc_fragment': 'community.general.proxmox.actiongroup_proxmox',
     },
