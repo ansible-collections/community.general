@@ -640,13 +640,14 @@ class Connection(ConnectionBase):
 
     def put_file(self, in_path: str, out_path: str) -> None:
         """ transfer a file from local to remote """
+
         try:
             with open(in_path, "rb") as f:
                 data = f.read()
                 returncode, stdout, stderr = self.exec_command(f"/bin/sh -c 'cat > {out_path}'", in_data=data, sudoable=False)
             if returncode != 0:
                 raise AnsibleError(
-                'failed to transfer file from %s to %s!\n%s\n%s' % (in_path, out_path, stdout.decode('utf-8'), stderr.decode('utf-8')))
+                    'failed to transfer file from %s to %s!\n%s\n%s' % (in_path, out_path, stdout.decode('utf-8'), stderr.decode('utf-8')))
         except Exception as e:
             raise AnsibleError(
                 'error occurred while putting file from %s to %s!\n%s' % (in_path, out_path, str(e)))
