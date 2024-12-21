@@ -548,10 +548,10 @@ class Connection(ConnectionBase):
           returncode, stdout, stderr = self._ssh_exec_command(' '.join(cmd), in_data=data)
           if returncode != 0:
             raise AnsibleError(
-              'failed to transfer file from %s!\n%s\n%s' % (in_path, stdout.decode('utf-8'), stderr.decode('utf-8')))
+              'failed to transfer file from %s to %s!\n%s\n%s' % (in_path, out_path, stdout.decode('utf-8'), stderr.decode('utf-8')))
         except Exception as e:
             raise AnsibleError(
-                'error occurred while fetching file from %s!\n%s' % (in_path, e))
+                'error occurred while putting file from %s to %s!\n%s' % (in_path, out_path, e))
 
     def fetch_file(self, in_path: str, out_path: str) -> None:
         ''' save a remote file to the specified path '''
@@ -563,12 +563,12 @@ class Connection(ConnectionBase):
           returncode, stdout, stderr = self._ssh_exec_command(' '.join(cmd))
           if returncode != 0:
             raise AnsibleError(
-              'failed to transfer file from %s!\n%s\n%s' % (in_path, stdout.decode('utf-8'), stderr.decode('utf-8')))
-          with open(out_path, "wb") as out_f:
-            out_f.write(stdout)
+              'failed to transfer file from %s to %s!\n%s\n%s' % (in_path, out_path, stdout.decode('utf-8'), stderr.decode('utf-8')))
+          with open(out_path, "wb") as f:
+            f.write(stdout)
         except Exception as e:
             raise AnsibleError(
-                'error occurred while fetching file from %s!\n%s' % (in_path, e))
+                'error occurred while fetching file from %s to %s!\n%s' % (in_path, out_path, e))
 
     def _ssh_exec_command(self, cmd: str, in_data: bytes | None = None, sudoable: bool = True) -> tuple[int, bytes, bytes]:
         """ run a command on the remote host """
