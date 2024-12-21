@@ -43,7 +43,7 @@ def main():
             data = yaml.safe_load(f)
         action_groups = data['action_groups']
     except Exception as exc:
-        print(f'{meta_runtime}: cannot load action group: {exc}')
+        print(f'{meta_runtime}: cannot load action groups: {exc}')
         return
 
     for action_group in action_groups:
