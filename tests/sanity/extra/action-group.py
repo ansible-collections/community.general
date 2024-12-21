@@ -89,9 +89,9 @@ def main():
                     elif in_docs:
                         documentation.append(line)
             if in_docs:
-                print(f'{path}: cannot find DOCUMENTATION end' % (path))
+                print(f'{path}: cannot find DOCUMENTATION end')
             if not documentation:
-                print(f'{path}: cannot find DOCUMENTATION' % (path))
+                print(f'{path}: cannot find DOCUMENTATION')
                 continue
 
             try:
