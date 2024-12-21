@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 module: zfs
-short_description: Manage zfs
+short_description: Manage ZFS
 description:
   - Manages ZFS file systems, volumes, clones and snapshots.
 extends_documentation_fragment:
