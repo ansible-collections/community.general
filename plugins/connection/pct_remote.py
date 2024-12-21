@@ -215,14 +215,14 @@ DOCUMENTATION = r"""
         description:
           - Become command e.g. C(sudo)
         type: str
-        default: sudo
+        default: "sudo"
         vars:
           - name: become_command
       shell:
         description:
           - Shell to use inside the container e.g. C(sh)
         type: str
-        default: sh
+        default: "sh"
         vars:
           - name: shell
       vmid:
@@ -388,7 +388,7 @@ SSH_CONNECTION_CACHE: dict[str, paramiko.client.SSHClient] = {}
 
 
 class Connection(ConnectionBase):
-    ''' SSH based connections (paramiko) to Proxmox pct '''
+    """ SSH based connections (paramiko) to Proxmox pct """
 
     transport = 'community.general.pct_remote'
     _log_channel: str | None = None
@@ -405,6 +405,10 @@ class Connection(ConnectionBase):
 
         self._connected = True
         return self
+
+    def _set_log_channel(self, name: str) -> None:
+        """ Mimic paramiko.SSHClient.set_log_channel """
+        self._log_channel = name
 
     def _parse_proxy_command(self, port: int = 22) -> dict[str, t.Any]:
         proxy_command = self.get_option('proxy_command') or None
@@ -462,7 +466,6 @@ class Connection(ConnectionBase):
         if self.get_option('host_key_checking'):
             for ssh_known_hosts in ("/etc/ssh/ssh_known_hosts", "/etc/openssh/ssh_known_hosts"):
                 try:
-                    # TODO: check if we need to look at several possible locations, possible for loop
                     ssh.load_system_host_keys(ssh_known_hosts)
                     break
                 except IOError:
@@ -517,142 +520,7 @@ class Connection(ConnectionBase):
                 raise AnsibleConnectionFailure(msg)
             else:
                 raise AnsibleConnectionFailure(msg)
-
         return ssh
-
-    def exec_command(self, cmd: str, in_data: bytes | None = None, sudoable: bool = True) -> tuple[int, bytes, bytes]:
-        ''' execute a command inside the proxmox container '''
-        # Strip shell
-        detect_shell = r"^[a-z]* -c ['\"](.*(?=['\"]$))"
-        match = re.match(detect_shell, cmd)
-        if match:
-          cmd = match.group(1)
-        cmd = ['/usr/sbin/pct', 'exec', str(self.get_option('vmid')), '--', self.get_option('shell'), '-c', quote(cmd)]
-        if self.get_option('remote_user') != 'root':
-            cmd = [self.get_option('become_command')] + cmd
-        return self._ssh_exec_command(' '.join(cmd), in_data=in_data, sudoable=sudoable)
-
-    def put_file(self, in_path: str, out_path: str) -> None:
-        ''' transfer a file from local to remote '''
-        try:
-          with open(in_path, "wb") as f:
-            data = f.read()
-          cmd = ['/usr/sbin/pct', 'exec',
-                str(self.get_option('vmid')), '--', self.get_option('shell'), '-c', quote(f'cat > {out_path}')]
-          if self.get_option('remote_user') != 'root':
-              cmd = [self.get_option('become_command')] + cmd
-          returncode, stdout, stderr = self._ssh_exec_command(' '.join(cmd), in_data=data)
-          if returncode != 0:
-            raise AnsibleError(
-              'failed to transfer file from %s to %s!\n%s\n%s' % (in_path, out_path, stdout.decode('utf-8'), stderr.decode('utf-8')))
-        except Exception as e:
-            raise AnsibleError(
-                'error occurred while putting file from %s to %s!\n%s' % (in_path, out_path, e))
-
-    def fetch_file(self, in_path: str, out_path: str) -> None:
-        ''' save a remote file to the specified path '''
-        try:
-          cmd = ['/usr/sbin/pct', 'exec',
-                str(self.get_option('vmid')), '--', self.get_option('shell'), '-c', quote(f'cat {in_path}')]
-          if self.get_option('remote_user') != 'root':
-              cmd = [self.get_option('become_command')] + cmd
-          returncode, stdout, stderr = self._ssh_exec_command(' '.join(cmd))
-          if returncode != 0:
-            raise AnsibleError(
-              'failed to transfer file from %s to %s!\n%s\n%s' % (in_path, out_path, stdout.decode('utf-8'), stderr.decode('utf-8')))
-          with open(out_path, "wb") as f:
-            f.write(stdout)
-        except Exception as e:
-            raise AnsibleError(
-                'error occurred while fetching file from %s to %s!\n%s' % (in_path, out_path, e))
-
-    def _ssh_exec_command(self, cmd: str, in_data: bytes | None = None, sudoable: bool = True) -> tuple[int, bytes, bytes]:
-        """ run a command on the remote host """
-
-        super(Connection, self).exec_command(cmd, in_data=in_data, sudoable=sudoable)
-
-        bufsize = 4096
-
-        try:
-            self.ssh.get_transport().set_keepalive(5)
-            chan = self.ssh.get_transport().open_session()
-        except Exception as e:
-            text_e = to_text(e)
-            msg = u"Failed to open session"
-            if text_e:
-                msg += u": %s" % text_e
-            raise AnsibleConnectionFailure(to_native(msg))
-
-        # sudo usually requires a PTY (cf. requiretty option), therefore
-        # we give it one by default (pty=True in ansible.cfg), and we try
-        # to initialise from the calling environment when sudoable is enabled
-        if self.get_option('pty') and sudoable:
-            chan.get_pty(term=os.getenv('TERM', 'vt100'), width=int(os.getenv('COLUMNS', 0)), height=int(os.getenv('LINES', 0)))
-
-        display.vvv("EXEC %s" % cmd, host=self.get_option('remote_addr'))
-
-        cmd = to_bytes(cmd, errors='surrogate_or_strict')
-
-        no_prompt_out = b''
-        no_prompt_err = b''
-        become_output = b''
-
-        try:
-            chan.exec_command(cmd)
-            if self.become and self.become.expect_prompt():
-                passprompt = False
-                become_success = False
-                while not (become_success or passprompt):
-                    display.debug('Waiting for Privilege Escalation input')
-
-                    chunk = chan.recv(bufsize)
-                    display.debug("chunk is: %r" % chunk)
-                    if not chunk:
-                        if b'unknown user' in become_output:
-                            n_become_user = to_native(self.become.get_option('become_user'))
-                            raise AnsibleError('user %s does not exist' % n_become_user)
-                        else:
-                            break
-                            # raise AnsibleError('ssh connection closed waiting for password prompt')
-                    become_output += chunk
-
-                    # need to check every line because we might get lectured
-                    # and we might get the middle of a line in a chunk
-                    for line in become_output.splitlines(True):
-                        if self.become.check_success(line):
-                            become_success = True
-                            break
-                        elif self.become.check_password_prompt(line):
-                            passprompt = True
-                            break
-
-                if passprompt:
-                    if self.become:
-                        become_pass = self.become.get_option('become_pass')
-                        chan.sendall(to_bytes(become_pass, errors='surrogate_or_strict') + b'\n')
-                    else:
-                        raise AnsibleError("A password is required but none was supplied")
-                else:
-                    no_prompt_out += become_output
-                    no_prompt_err += become_output
-
-            if in_data:
-                for i in range(0, len(in_data), bufsize):
-                    chan.send(in_data[i:i + bufsize])
-                chan.shutdown_write()
-
-            exit_status = chan.recv_exit_status()
-
-            if exit_status != 0:
-                raise AnsibleError(f"Command failed with exit status {exit_status}: {to_text(stderr)}")
-
-        except socket.timeout:
-            raise AnsibleError('ssh timed out waiting for privilege escalation.\n' + to_text(become_output))
-
-        stdout = b''.join(chan.makefile('rb', bufsize))
-        stderr = b''.join(chan.makefile_stderr('rb', bufsize))
-
-        return (chan.recv_exit_status(), no_prompt_out + stdout, no_prompt_out + stderr)
 
     def _any_keys_added(self) -> bool:
         for hostname, keys in self.ssh._host_keys.items():
@@ -688,7 +556,138 @@ class Connection(ConnectionBase):
                     if added_this_time:
                         f.write("%s %s %s\n" % (hostname, keytype, key.get_base64()))
 
+    def _build_pct_command(self, cmd: str) -> str:
+        detect_shell = r"^[a-z]* -c ['\"](.*(?=['\"]$))"
+        match = re.match(detect_shell, cmd)
+        if match:
+          # Strip shell command
+          cmd = match.group(1)
+        cmd = ['/usr/sbin/pct', 'exec', str(self.get_option('vmid')), '--', self.get_option('shell'), '-c', quote(cmd)]
+        if self.get_option('remote_user') != 'root':
+            cmd = [self.get_option('become_command')] + cmd
+        return ' '.join(cmd)
+
+    def exec_command(self, cmd: str, in_data: bytes | None = None, sudoable: bool = True) -> tuple[int, bytes, bytes]:
+        """ run a command on inside the LXC container """
+
+        cmd = self._build_pct_command(cmd)
+
+        super(Connection, self).exec_command(cmd, in_data=in_data, sudoable=sudoable)
+
+        bufsize = 4096
+
+        try:
+            self.ssh.get_transport().set_keepalive(5)
+            chan = self.ssh.get_transport().open_session()
+        except Exception as e:
+            text_e = to_text(e)
+            msg = u"Failed to open session"
+            if text_e:
+                msg += u": %s" % text_e
+            raise AnsibleConnectionFailure(to_native(msg))
+
+        # sudo usually requires a PTY (cf. requiretty option), therefore
+        # we give it one by default (pty=True in ansible.cfg), and we try
+        # to initialise from the calling environment when sudoable is enabled
+        if self.get_option('pty') and sudoable:
+            chan.get_pty(term=os.getenv('TERM', 'vt100'), width=int(os.getenv('COLUMNS', 0)), height=int(os.getenv('LINES', 0)))
+
+        display.vvv("EXEC %s" % cmd, host=self.get_option('remote_addr'))
+
+        cmd = to_bytes(cmd, errors='surrogate_or_strict')
+
+        no_prompt_out = b''
+        no_prompt_err = b''
+        become_output = b''
+
+        try:
+            chan.exec_command(cmd)
+            if self.become and self.become.expect_prompt():
+                password_prompt = False
+                become_success = False
+                while not (become_success or password_prompt):
+                    display.debug('Waiting for Privilege Escalation input')
+
+                    chunk = chan.recv(bufsize)
+                    display.debug("chunk is: %r" % chunk)
+                    if not chunk:
+                        if b'unknown user' in become_output:
+                            n_become_user = to_native(self.become.get_option('become_user'))
+                            raise AnsibleError('user %s does not exist' % n_become_user)
+                        else:
+                            break
+                            # raise AnsibleError('ssh connection closed waiting for password prompt')
+                    become_output += chunk
+
+                    # need to check every line because we might get lectured
+                    # and we might get the middle of a line in a chunk
+                    for line in become_output.splitlines(True):
+                        if self.become.check_success(line):
+                            become_success = True
+                            break
+                        elif self.become.check_password_prompt(line):
+                            password_prompt = True
+                            break
+
+                if password_prompt:
+                    if self.become:
+                        become_pass = self.become.get_option('become_pass')
+                        chan.sendall(to_bytes(become_pass, errors='surrogate_or_strict') + b'\n')
+                    else:
+                        raise AnsibleError("A password is required but none was supplied")
+                else:
+                    no_prompt_out += become_output
+                    no_prompt_err += become_output
+
+            if in_data:
+                for i in range(0, len(in_data), bufsize):
+                    chan.send(in_data[i:i + bufsize])
+                chan.shutdown_write()
+
+            exit_status = chan.recv_exit_status()
+
+            if exit_status != 0:
+                raise AnsibleError(f"Command failed with exit status {exit_status}: {to_text(stderr)}")
+
+        except socket.timeout:
+            raise AnsibleError('ssh timed out waiting for privilege escalation.\n' + to_text(become_output))
+
+        stdout = b''.join(chan.makefile('rb', bufsize))
+        stderr = b''.join(chan.makefile_stderr('rb', bufsize))
+
+        return (chan.recv_exit_status(), no_prompt_out + stdout, no_prompt_out + stderr)
+
+    def put_file(self, in_path: str, out_path: str) -> None:
+        """ transfer a file from local to remote """
+
+        try:
+          with open(in_path, "wb") as f:
+            data = f.read()
+          returncode, stdout, stderr = self.exec_command(f'cat > {out_path}', in_data=data)
+          if returncode != 0:
+            raise AnsibleError(
+              'failed to transfer file from %s to %s!\n%s\n%s' % (in_path, out_path, stdout.decode('utf-8'), stderr.decode('utf-8')))
+        except Exception as e:
+            raise AnsibleError(
+                'error occurred while putting file from %s to %s!\n%s' % (in_path, out_path, e))
+
+    def fetch_file(self, in_path: str, out_path: str) -> None:
+        """ save a remote file to the specified path """
+
+        try:
+          returncode, stdout, stderr = self.exec_command(f'cat {in_path}')
+          if returncode != 0:
+            raise AnsibleError(
+              'failed to transfer file from %s to %s!\n%s\n%s' % (in_path, out_path, stdout.decode('utf-8'), stderr.decode('utf-8')))
+          with open(out_path, "wb") as f:
+            f.write(stdout)
+        except Exception as e:
+            raise AnsibleError(
+                'error occurred while fetching file from %s to %s!\n%s' % (in_path, out_path, e))
+
     def reset(self) -> None:
+        """ reset the connection """
+
         if not self._connected:
             return
         self.close()
