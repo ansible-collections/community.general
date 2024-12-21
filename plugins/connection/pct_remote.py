@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Based on paramiko_ssh.py (c) 2012, Michael DeHaan <michael.dehaan@gmail.com>
+# Derived from paramiko_ssh.py (c) 2012, Michael DeHaan <michael.dehaan@gmail.com>
 # Copyright (c) 2024 Nils Stein (@mietzen) <github.nstein@mailbox.org>
 # Copyright (c) 2024 Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
