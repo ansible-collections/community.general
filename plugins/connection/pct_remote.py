@@ -640,7 +640,7 @@ class Connection(ConnectionBase):
         try:
             with open(in_path, "rb") as f:
                 data = f.read()
-                returncode, stdout, stderr = self.exec_command(f"{self._play_context.executable} -c 'cat > {out_path}'", in_data=data, sudoable=False)
+                returncode, stdout, stderr = self.exec_command(f"{self._shell.executable} -c 'cat > {out_path}'", in_data=data, sudoable=False)
             if returncode != 0:
                 raise AnsibleError(
                     'failed to transfer file from %s to %s!\n%s\n%s' % (in_path, out_path, stdout.decode('utf-8'), stderr.decode('utf-8')))
@@ -652,7 +652,7 @@ class Connection(ConnectionBase):
         """ save a remote file to the specified path """
 
         try:
-            returncode, stdout, stderr = self.exec_command(f"{self._play_context.executable} -c 'cat {in_path}'", sudoable=False)
+            returncode, stdout, stderr = self.exec_command(f"{self._shell.executable} -c 'cat {in_path}'", sudoable=False)
             if returncode != 0:
                 raise AnsibleError(
                     'failed to transfer file from %s to %s!\n%s\n%s' % (in_path, out_path, stdout.decode('utf-8'), stderr.decode('utf-8')))
