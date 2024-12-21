@@ -308,14 +308,11 @@ import socket
 import tempfile
 import traceback
 import typing as t
-import uuid
 
-from ansible import constants as C
 from ansible.errors import (
     AnsibleAuthenticationFailure,
     AnsibleConnectionFailure,
     AnsibleError,
-    AnsibleFileNotFound,
 )
 from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
 from ansible.module_utils.compat.paramiko import PARAMIKO_IMPORT_ERR, paramiko
@@ -336,8 +333,6 @@ The %s key fingerprint is %s.
 Are you sure you want to continue connecting (yes/no)?
 """
 
-# SSH Options Regex
-SETTINGS_REGEX = re.compile(r'(\w+)(?:\s*=\s*|\s+)(.+)')
 
 MissingHostKeyPolicy: type = object
 if paramiko:
@@ -390,7 +385,6 @@ class MyAddPolicy(MissingHostKeyPolicy):
 # keep connection objects on a per host basis to avoid repeated attempts to reconnect
 
 SSH_CONNECTION_CACHE: dict[str, paramiko.client.SSHClient] = {}
-SFTP_CONNECTION_CACHE: dict[str, paramiko.sftp_client.SFTPClient] = {}
 
 
 class Connection(ConnectionBase):
@@ -411,10 +405,6 @@ class Connection(ConnectionBase):
 
         self._connected = True
         return self
-
-    def _set_log_channel(self, name: str) -> None:
-        """Mimic paramiko.SSHClient.set_log_channel"""
-        self._log_channel = name
 
     def _parse_proxy_command(self, port: int = 22) -> dict[str, t.Any]:
         proxy_command = self.get_option('proxy_command') or None
@@ -668,52 +658,6 @@ class Connection(ConnectionBase):
 
         return (chan.recv_exit_status(), no_prompt_out + stdout, no_prompt_out + stderr)
 
-    def _ssh_put_file(self, in_path: str, out_path: str) -> None:
-        """ transfer a file from local to remote """
-
-        super(Connection, self).put_file(in_path, out_path)
-
-        display.vvv("PUT %s TO %s" % (in_path, out_path), host=self.get_option('remote_addr'))
-
-        if not os.path.exists(to_bytes(in_path, errors='surrogate_or_strict')):
-            raise AnsibleFileNotFound("file or module does not exist: %s" % in_path)
-
-        try:
-            self.sftp = self.ssh.open_sftp()
-        except Exception as e:
-            raise AnsibleError("failed to open a SFTP connection (%s)" % e)
-
-        try:
-            self.sftp.put(to_bytes(in_path, errors='surrogate_or_strict'), to_bytes(out_path, errors='surrogate_or_strict'))
-        except IOError:
-            raise AnsibleError("failed to transfer file to %s" % out_path)
-
-    def _connect_sftp(self) -> paramiko.sftp_client.SFTPClient:
-
-        cache_key = "%s__%s__" % (self.get_option('remote_addr'), self.get_option('remote_user'))
-        if cache_key in SFTP_CONNECTION_CACHE:
-            return SFTP_CONNECTION_CACHE[cache_key]
-        else:
-            result = SFTP_CONNECTION_CACHE[cache_key] = self._connect().ssh.open_sftp()
-            return result
-
-    def _ssh_fetch_file(self, in_path: str, out_path: str) -> None:
-        """ save a remote file to the specified path """
-
-        super(Connection, self).fetch_file(in_path, out_path)
-
-        display.vvv("FETCH %s TO %s" % (in_path, out_path), host=self.get_option('remote_addr'))
-
-        try:
-            self.sftp = self._connect_sftp()
-        except Exception as e:
-            raise AnsibleError("failed to open a SFTP connection (%s)" % to_native(e))
-
-        try:
-            self.sftp.get(to_bytes(in_path, errors='surrogate_or_strict'), to_bytes(out_path, errors='surrogate_or_strict'))
-        except IOError:
-            raise AnsibleError("failed to transfer file from %s" % in_path)
-
     def _any_keys_added(self) -> bool:
 
         for hostname, keys in self.ssh._host_keys.items():
@@ -764,7 +708,6 @@ class Connection(ConnectionBase):
 
         cache_key = self._cache_key()
         SSH_CONNECTION_CACHE.pop(cache_key, None)
-        SFTP_CONNECTION_CACHE.pop(cache_key, None)
 
         if hasattr(self, 'sftp'):
             if self.sftp is not None:
