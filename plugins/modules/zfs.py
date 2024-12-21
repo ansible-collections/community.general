@@ -9,23 +9,20 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: zfs
-short_description: Manage zfs
+short_description: Manage ZFS
 description:
-  - Manages ZFS file systems, volumes, clones and snapshots
+  - Manages ZFS file systems, volumes, clones and snapshots.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
   check_mode:
     support: partial
     details:
-      - In certain situations it may report a task as changed that will not be reported
-        as changed when C(check_mode) is disabled.
-      - For example, this might occur when the zpool C(altroot) option is set or when
-        a size is written using human-readable notation, such as V(1M) or V(1024K),
-        instead of as an unqualified byte count, such as V(1048576).
+      - In certain situations it may report a task as changed that will not be reported as changed when C(check_mode) is disabled.
+      - For example, this might occur when the zpool C(altroot) option is set or when a size is written using human-readable notation, such as
+        V(1M) or V(1024K), instead of as an unqualified byte count, such as V(1048576).
   diff_mode:
     support: full
 options:
@@ -36,10 +33,9 @@ options:
     type: str
   state:
     description:
-      - Whether to create (V(present)), or remove (V(absent)) a
-        file system, snapshot or volume. All parents/children
-        will be created/destroyed as needed to reach the desired state.
-    choices: [ absent, present ]
+      - Whether to create (V(present)), or remove (V(absent)) a file system, snapshot or volume. All parents/children will be created/destroyed
+        as needed to reach the desired state.
+    choices: [absent, present]
     required: true
     type: str
   origin:
@@ -53,10 +49,10 @@ options:
     type: dict
     default: {}
 author:
-- Johan Wiren (@johanwiren)
-'''
+  - Johan Wiren (@johanwiren)
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a new file system called myfs in pool rpool with the setuid property turned off
   community.general.zfs:
     name: rpool/myfs
@@ -93,7 +89,7 @@ EXAMPLES = '''
   community.general.zfs:
     name: rpool/myfs
     state: absent
-'''
+"""
 
 import os
 
