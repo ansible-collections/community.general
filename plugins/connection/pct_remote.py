@@ -211,13 +211,6 @@ DOCUMENTATION = r"""
         cli:
           - name: private_key_file
             option: "--private-key"
-      become_command:
-        description:
-          - Become command e.g. C(sudo)
-        type: str
-        default: "sudo"
-        vars:
-          - name: become_command
       vmid:
         description:
           - LXC Container ID
@@ -552,8 +545,8 @@ class Connection(ConnectionBase):
 
     def _build_pct_command(self, cmd: str) -> str:
         cmd = ['/usr/sbin/pct', 'exec', str(self.get_option('vmid')), '--', cmd]
-        if self.get_option('remote_user') != 'root':
-            cmd = [self.get_option('become_command')] + cmd
+        if self.become:
+            cmd = [self.become.name] + cmd
         return ' '.join(cmd)
 
     def exec_command(self, cmd: str, in_data: bytes | None = None, sudoable: bool = True) -> tuple[int, bytes, bytes]:
