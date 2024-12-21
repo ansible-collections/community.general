@@ -218,13 +218,6 @@ DOCUMENTATION = r"""
         default: "sudo"
         vars:
           - name: become_command
-      shell:
-        description:
-          - Shell to use inside the container e.g. C(sh)
-        type: str
-        default: "sh"
-        vars:
-          - name: shell
       vmid:
         description:
           - LXC Container ID
@@ -303,7 +296,6 @@ EXAMPLES = r"""
 
 import fcntl
 import os
-import re
 import socket
 import tempfile
 import traceback
@@ -321,7 +313,6 @@ from ansible.plugins.connection import ConnectionBase
 from ansible.utils.display import Display
 from ansible.utils.path import makedirs_safe
 from binascii import hexlify
-from shlex import quote
 
 
 display = Display()
@@ -557,12 +548,7 @@ class Connection(ConnectionBase):
                         f.write("%s %s %s\n" % (hostname, keytype, key.get_base64()))
 
     def _build_pct_command(self, cmd: str) -> str:
-        detect_shell = r"^[a-z]* -c ['\"](.*(?=['\"]$))"
-        match = re.match(detect_shell, cmd)
-        if match:
-          # Strip shell command
-          cmd = match.group(1)
-        cmd = ['/usr/sbin/pct', 'exec', str(self.get_option('vmid')), '--', self.get_option('shell'), '-c', quote(cmd)]
+        cmd = ['/usr/sbin/pct', 'exec', str(self.get_option('vmid')), '--', cmd]
         if self.get_option('remote_user') != 'root':
             cmd = [self.get_option('become_command')] + cmd
         return ' '.join(cmd)
@@ -644,11 +630,6 @@ class Connection(ConnectionBase):
                     chan.send(in_data[i:i + bufsize])
                 chan.shutdown_write()
 
-            exit_status = chan.recv_exit_status()
-
-            if exit_status != 0:
-                raise AnsibleError(f"Command failed with exit status {exit_status}: {to_text(stderr)}")
-
         except socket.timeout:
             raise AnsibleError('ssh timed out waiting for privilege escalation.\n' + to_text(become_output))
 
@@ -661,29 +642,29 @@ class Connection(ConnectionBase):
         """ transfer a file from local to remote """
 
         try:
-          with open(in_path, "wb") as f:
-            data = f.read()
-          returncode, stdout, stderr = self.exec_command(f'cat > {out_path}', in_data=data)
-          if returncode != 0:
-            raise AnsibleError(
-              'failed to transfer file from %s to %s!\n%s\n%s' % (in_path, out_path, stdout.decode('utf-8'), stderr.decode('utf-8')))
+            with open(in_path, "rb") as f:
+                data = f.read()
+                returncode, stdout, stderr = self.exec_command(f"/bin/sh -c 'cat > {out_path}'", in_data=data, sudoable=False)
+            if returncode != 0:
+                raise AnsibleError(
+                    'failed to transfer file from %s to %s!\n%s\n%s' % (in_path, out_path, stdout.decode('utf-8'), stderr.decode('utf-8')))
         except Exception as e:
             raise AnsibleError(
-                'error occurred while putting file from %s to %s!\n%s' % (in_path, out_path, e))
+                'error occurred while putting file from %s to %s!\n%s' % (in_path, out_path, str(e)))
 
     def fetch_file(self, in_path: str, out_path: str) -> None:
         """ save a remote file to the specified path """
 
         try:
-          returncode, stdout, stderr = self.exec_command(f'cat {in_path}')
-          if returncode != 0:
-            raise AnsibleError(
-              'failed to transfer file from %s to %s!\n%s\n%s' % (in_path, out_path, stdout.decode('utf-8'), stderr.decode('utf-8')))
-          with open(out_path, "wb") as f:
-            f.write(stdout)
+            returncode, stdout, stderr = self.exec_command(f"'/bin/sh -c cat {in_path}'", sudoable=False)
+            if returncode != 0:
+                raise AnsibleError(
+                    'failed to transfer file from %s to %s!\n%s\n%s' % (in_path, out_path, stdout.decode('utf-8'), stderr.decode('utf-8')))
+            with open(out_path, "wb") as f:
+                f.write(stdout)
         except Exception as e:
             raise AnsibleError(
-                'error occurred while fetching file from %s to %s!\n%s' % (in_path, out_path, e))
+                'error occurred while fetching file from %s to %s!\n%s' % (in_path, out_path, str(e)))
 
     def reset(self) -> None:
         """ reset the connection """
