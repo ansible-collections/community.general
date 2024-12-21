@@ -526,12 +526,11 @@ class Connection(ConnectionBase):
     def exec_command(self, cmd: str, in_data: bytes | None = None, sudoable: bool = True) -> tuple[int, bytes, bytes]:
         ''' execute a command inside the proxmox container '''
         # Strip shell
-        detect_shell = r"(?<= -c ['\"]).*(?=['\"]$)"
+        detect_shell = r"^[a-z]* -c ['\"](.*(?=['\"]$))"
         match = re.match(detect_shell, cmd)
         if match:
-          cmd = match.group[0]
-        cmd = ['/usr/sbin/pct', 'exec',
-               str(self.get_option('vmid')), '--', str(self.get_option('shell')), '-c', quote(cmd)]
+          cmd = match.group(1)
+        cmd = ['/usr/sbin/pct', 'exec', str(self.get_option('vmid')), '--', self.get_option('shell'), '-c', quote(cmd)]
         if self.get_option('remote_user') != 'root':
             cmd = [self.get_option('become_command')] + cmd
         return self._ssh_exec_command(' '.join(cmd), in_data=in_data, sudoable=sudoable)
@@ -542,7 +541,7 @@ class Connection(ConnectionBase):
           with open(in_path, "wb") as f:
             data = f.read()
           cmd = ['/usr/sbin/pct', 'exec',
-                str(self.get_option('vmid')), '--', str(self.get_option('shell')), '-c', quote(f'cat > {out_path}')]
+                str(self.get_option('vmid')), '--', self.get_option('shell'), '-c', quote(f'cat > {out_path}')]
           if self.get_option('remote_user') != 'root':
               cmd = [self.get_option('become_command')] + cmd
           returncode, stdout, stderr = self._ssh_exec_command(' '.join(cmd), in_data=data)
@@ -557,7 +556,7 @@ class Connection(ConnectionBase):
         ''' save a remote file to the specified path '''
         try:
           cmd = ['/usr/sbin/pct', 'exec',
-                str(self.get_option('vmid')), '--', str(self.get_option('shell')), '-c', quote(f'cat {in_path}')]
+                str(self.get_option('vmid')), '--', self.get_option('shell'), '-c', quote(f'cat {in_path}')]
           if self.get_option('remote_user') != 'root':
               cmd = [self.get_option('become_command')] + cmd
           returncode, stdout, stderr = self._ssh_exec_command(' '.join(cmd))
