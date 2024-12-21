@@ -577,9 +577,6 @@ class Connection(ConnectionBase):
 
         super(Connection, self).exec_command(cmd, in_data=in_data, sudoable=sudoable)
 
-        if in_data:
-            raise AnsibleError("Internal Error: this module does not support optimized module pipelining")
-
         bufsize = 4096
 
         try:
@@ -644,6 +641,17 @@ class Connection(ConnectionBase):
                 else:
                     no_prompt_out += become_output
                     no_prompt_err += become_output
+
+            if in_data:
+                for i in range(0, len(in_data), bufsize):
+                    chan.send(in_data[i:i + bufsize])
+                chan.shutdown_write()
+
+            exit_status = chan.recv_exit_status()
+
+            if exit_status != 0:
+                raise AnsibleError(f"Command failed with exit status {exit_status}: {to_text(stderr)}")
+
         except socket.timeout:
             raise AnsibleError('ssh timed out waiting for privilege escalation.\n' + to_text(become_output))
 
