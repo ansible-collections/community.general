@@ -470,11 +470,8 @@ class Connection(ConnectionBase):
             ssh.load_system_host_keys()
 
         ssh_connect_kwargs = self._parse_proxy_command(port)
-
         ssh.set_missing_host_key_policy(MyAddPolicy(self))
-
         conn_password = self.get_option('password')
-
         allow_agent = True
 
         if conn_password is not None:
@@ -658,7 +655,6 @@ class Connection(ConnectionBase):
         return (chan.recv_exit_status(), no_prompt_out + stdout, no_prompt_out + stderr)
 
     def _any_keys_added(self) -> bool:
-
         for hostname, keys in self.ssh._host_keys.items():
             for keytype, key in keys.items():
                 added_this_time = getattr(key, '_added_by_ansible_this_time', False)
@@ -679,18 +675,14 @@ class Connection(ConnectionBase):
         makedirs_safe(path)
 
         with open(filename, 'w') as f:
-
             for hostname, keys in self.ssh._host_keys.items():
-
                 for keytype, key in keys.items():
-
                     # was f.write
                     added_this_time = getattr(key, '_added_by_ansible_this_time', False)
                     if not added_this_time:
                         f.write("%s %s %s\n" % (hostname, keytype, key.get_base64()))
 
             for hostname, keys in self.ssh._host_keys.items():
-
                 for keytype, key in keys.items():
                     added_this_time = getattr(key, '_added_by_ansible_this_time', False)
                     if added_this_time:
@@ -708,12 +700,7 @@ class Connection(ConnectionBase):
         cache_key = self._cache_key()
         SSH_CONNECTION_CACHE.pop(cache_key, None)
 
-        if hasattr(self, 'sftp'):
-            if self.sftp is not None:
-                self.sftp.close()
-
         if self.get_option('host_key_checking') and self.get_option('record_host_keys') and self._any_keys_added():
-
             # add any new SSH host keys -- warning -- this could be slow
             # (This doesn't acquire the connection lock because it needs
             # to exclude only other known_hosts writers, not connections
@@ -757,9 +744,7 @@ class Connection(ConnectionBase):
                 tmp_keyfile.close()
 
                 os.rename(tmp_keyfile.name, self.keyfile)
-
             except Exception:
-
                 # unable to save keys, including scenario when key was invalid
                 # and caught earlier
                 traceback.print_exc()
