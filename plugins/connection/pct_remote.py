@@ -211,6 +211,20 @@ DOCUMENTATION = r"""
         cli:
           - name: private_key_file
             option: "--private-key"
+      become_command:
+        description:
+          - Become command e.g. C(sudo)
+        type: str
+        default: sudo
+        vars:
+          - name: become_command
+      shell:
+        description:
+          - Shell to use inside the container e.g. C(sh)
+        type: str
+        default: sh
+        vars:
+          - name: shell
       vmid:
         description:
           - LXC Container ID
@@ -379,15 +393,6 @@ SSH_CONNECTION_CACHE: dict[str, paramiko.client.SSHClient] = {}
 SFTP_CONNECTION_CACHE: dict[str, paramiko.sftp_client.SFTPClient] = {}
 
 
-def become_command():
-    """Helper function to get become_command """
-    return os.getenv('ANSIBLE_BECOME_METHOD', default=C.DEFAULT_BECOME_METHOD)
-
-
-def shell():
-    return os.getenv('ANSIBLE_EXECUTABLE', default=C.DEFAULT_EXECUTABLE)
-
-
 class Connection(ConnectionBase):
     ''' SSH based connections (paramiko) to Proxmox pct '''
 
@@ -530,10 +535,15 @@ class Connection(ConnectionBase):
 
     def exec_command(self, cmd: str, in_data: bytes | None = None, sudoable: bool = True) -> tuple[int, bytes, bytes]:
         ''' execute a command inside the proxmox container '''
+        # Strip shell
+        detect_shell = r"(?<= -c ['\"]).*(?=['\"]$)"
+        match = re.match(detect_shell, cmd)
+        if match:
+          cmd = match.group[0]
         cmd = ['/usr/sbin/pct', 'exec',
-               str(self.get_option('vmid')), '--', shell(), '-c', quote(cmd)]
+               str(self.get_option('vmid')), '--', str(self.get_option('shell')), '-c', quote(cmd)]
         if self.get_option('remote_user') != 'root':
-            cmd = [become_command()] + cmd
+            cmd = [self.get_option('become_command')] + cmd
         return self._ssh_exec_command(' '.join(cmd), in_data=in_data, sudoable=sudoable)
 
     def put_file(self, in_path: str, out_path: str) -> None:
@@ -546,7 +556,7 @@ class Connection(ConnectionBase):
             cmd = ['/usr/sbin/pct', 'push',
                    str(self.get_option('vmid')), temp_file_path, out_path]
             if self.get_option('remote_user') != 'root':
-                cmd = [become_command()] + cmd
+                cmd = [self.get_option('become_command')] + cmd
             self._ssh_exec_command(' '.join(cmd))
         except Exception as e:
             raise AnsibleError(
@@ -563,7 +573,7 @@ class Connection(ConnectionBase):
             cmd = ['/usr/sbin/pct', 'pull',
                    str(self.get_option('vmid')), in_path, temp_file_path]
             if self.get_option('remote_user') != 'root':
-                cmd = [become_command()] + cmd
+                cmd = [self.get_option('become_command')] + cmd
             self._ssh_exec_command(' '.join(cmd))
             self._ssh_fetch_file(temp_file_path, out_path)
         except Exception as e:
