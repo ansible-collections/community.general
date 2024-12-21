@@ -607,8 +607,8 @@ class Connection(ConnectionBase):
             chan.exec_command(cmd)
             if self.become and self.become.expect_prompt():
                 passprompt = False
-                become_sucess = False
-                while not (become_sucess or passprompt):
+                become_success = False
+                while not (become_success or passprompt):
                     display.debug('Waiting for Privilege Escalation input')
 
                     chunk = chan.recv(bufsize)
@@ -626,7 +626,7 @@ class Connection(ConnectionBase):
                     # and we might get the middle of a line in a chunk
                     for line in become_output.splitlines(True):
                         if self.become.check_success(line):
-                            become_sucess = True
+                            become_success = True
                             break
                         elif self.become.check_password_prompt(line):
                             passprompt = True
