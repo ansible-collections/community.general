@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Based on paramiko_ssh.py (c) 2012, Michael DeHaan <michael.dehaan@gmail.com>
+# Derived from paramiko_ssh.py (c) 2012, Michael DeHaan <michael.dehaan@gmail.com>
 # Copyright (c) 2024 Nils Stein (@mietzen) <github.nstein@mailbox.org>
 # Copyright (c) 2024 Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -211,6 +211,20 @@ DOCUMENTATION = r"""
         cli:
           - name: private_key_file
             option: "--private-key"
+      become_command:
+        description:
+          - Become command e.g. C(sudo)
+        type: str
+        default: "sudo"
+        vars:
+          - name: become_command
+      shell:
+        description:
+          - Shell to use inside the container e.g. C(sh)
+        type: str
+        default: "sh"
+        vars:
+          - name: shell
       vmid:
         description:
           - LXC Container ID
@@ -294,14 +308,11 @@ import socket
 import tempfile
 import traceback
 import typing as t
-import uuid
 
-from ansible import constants as C
 from ansible.errors import (
     AnsibleAuthenticationFailure,
     AnsibleConnectionFailure,
     AnsibleError,
-    AnsibleFileNotFound,
 )
 from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
 from ansible.module_utils.compat.paramiko import PARAMIKO_IMPORT_ERR, paramiko
@@ -322,8 +333,6 @@ The %s key fingerprint is %s.
 Are you sure you want to continue connecting (yes/no)?
 """
 
-# SSH Options Regex
-SETTINGS_REGEX = re.compile(r'(\w+)(?:\s*=\s*|\s+)(.+)')
 
 MissingHostKeyPolicy: type = object
 if paramiko:
@@ -376,20 +385,10 @@ class MyAddPolicy(MissingHostKeyPolicy):
 # keep connection objects on a per host basis to avoid repeated attempts to reconnect
 
 SSH_CONNECTION_CACHE: dict[str, paramiko.client.SSHClient] = {}
-SFTP_CONNECTION_CACHE: dict[str, paramiko.sftp_client.SFTPClient] = {}
-
-
-def become_command():
-    """Helper function to get become_command """
-    return os.getenv('ANSIBLE_BECOME_METHOD', default=C.DEFAULT_BECOME_METHOD)
-
-
-def shell():
-    return os.getenv('ANSIBLE_EXECUTABLE', default=C.DEFAULT_EXECUTABLE)
 
 
 class Connection(ConnectionBase):
-    ''' SSH based connections (paramiko) to Proxmox pct '''
+    """ SSH based connections (paramiko) to Proxmox pct """
 
     transport = 'community.general.pct_remote'
     _log_channel: str | None = None
@@ -408,7 +407,7 @@ class Connection(ConnectionBase):
         return self
 
     def _set_log_channel(self, name: str) -> None:
-        """Mimic paramiko.SSHClient.set_log_channel"""
+        """ Mimic paramiko.SSHClient.set_log_channel """
         self._log_channel = name
 
     def _parse_proxy_command(self, port: int = 22) -> dict[str, t.Any]:
@@ -467,7 +466,6 @@ class Connection(ConnectionBase):
         if self.get_option('host_key_checking'):
             for ssh_known_hosts in ("/etc/ssh/ssh_known_hosts", "/etc/openssh/ssh_known_hosts"):
                 try:
-                    # TODO: check if we need to look at several possible locations, possible for loop
                     ssh.load_system_host_keys(ssh_known_hosts)
                     break
                 except IOError:
@@ -475,11 +473,8 @@ class Connection(ConnectionBase):
             ssh.load_system_host_keys()
 
         ssh_connect_kwargs = self._parse_proxy_command(port)
-
         ssh.set_missing_host_key_policy(MyAddPolicy(self))
-
         conn_password = self.get_option('password')
-
         allow_agent = True
 
         if conn_password is not None:
@@ -525,60 +520,59 @@ class Connection(ConnectionBase):
                 raise AnsibleConnectionFailure(msg)
             else:
                 raise AnsibleConnectionFailure(msg)
-
         return ssh
 
-    def exec_command(self, cmd: str, in_data: bytes | None = None, sudoable: bool = True) -> tuple[int, bytes, bytes]:
-        ''' execute a command inside the proxmox container '''
-        cmd = ['/usr/sbin/pct', 'exec',
-               str(self.get_option('vmid')), '--', shell(), '-c', quote(cmd)]
+    def _any_keys_added(self) -> bool:
+        for hostname, keys in self.ssh._host_keys.items():
+            for keytype, key in keys.items():
+                added_this_time = getattr(key, '_added_by_ansible_this_time', False)
+                if added_this_time:
+                    return True
+        return False
+
+    def _save_ssh_host_keys(self, filename: str) -> None:
+        """
+        not using the paramiko save_ssh_host_keys function as we want to add new SSH keys at the bottom so folks
+        don't complain about it :)
+        """
+
+        if not self._any_keys_added():
+            return
+
+        path = os.path.expanduser("~/.ssh")
+        makedirs_safe(path)
+
+        with open(filename, 'w') as f:
+            for hostname, keys in self.ssh._host_keys.items():
+                for keytype, key in keys.items():
+                    # was f.write
+                    added_this_time = getattr(key, '_added_by_ansible_this_time', False)
+                    if not added_this_time:
+                        f.write("%s %s %s\n" % (hostname, keytype, key.get_base64()))
+
+            for hostname, keys in self.ssh._host_keys.items():
+                for keytype, key in keys.items():
+                    added_this_time = getattr(key, '_added_by_ansible_this_time', False)
+                    if added_this_time:
+                        f.write("%s %s %s\n" % (hostname, keytype, key.get_base64()))
+
+    def _build_pct_command(self, cmd: str) -> str:
+        detect_shell = r"^[a-z]* -c ['\"](.*(?=['\"]$))"
+        match = re.match(detect_shell, cmd)
+        if match:
+          # Strip shell command
+          cmd = match.group(1)
+        cmd = ['/usr/sbin/pct', 'exec', str(self.get_option('vmid')), '--', self.get_option('shell'), '-c', quote(cmd)]
         if self.get_option('remote_user') != 'root':
-            cmd = [become_command()] + cmd
-        return self._ssh_exec_command(' '.join(cmd), in_data=in_data, sudoable=sudoable)
+            cmd = [self.get_option('become_command')] + cmd
+        return ' '.join(cmd)
 
-    def put_file(self, in_path: str, out_path: str) -> None:
-        ''' transfer a file from local to remote '''
-        temp_dir = '/tmp/ansible_pct_' + str(uuid.uuid4()).replace('-', '')[:6]
-        temp_file_path = f'{temp_dir}/{os.path.basename(in_path)}'
-        try:
-            self._ssh_exec_command(f'mkdir -p {temp_dir}')
-            self._ssh_put_file(in_path, temp_file_path)
-            cmd = ['/usr/sbin/pct', 'push',
-                   str(self.get_option('vmid')), temp_file_path, out_path]
-            if self.get_option('remote_user') != 'root':
-                cmd = [become_command()] + cmd
-            self._ssh_exec_command(' '.join(cmd))
-        except Exception as e:
-            raise AnsibleError(
-                'failed to transfer file to %s!\n%s' % (out_path, e))
-        finally:
-            self._ssh_exec_command(f'rm -rf {temp_dir}')
+    def exec_command(self, cmd: str, in_data: bytes | None = None, sudoable: bool = True) -> tuple[int, bytes, bytes]:
+        """ run a command on inside the LXC container """
 
-    def fetch_file(self, in_path: str, out_path: str) -> None:
-        ''' save a remote file to the specified path '''
-        temp_dir = '/tmp/ansible_pct_' + str(uuid.uuid4()).replace('-', '')[:6]
-        temp_file_path = f'{temp_dir}/{os.path.basename(in_path)}'
-        try:
-            self._ssh_exec_command(f'mkdir -p {temp_dir}')
-            cmd = ['/usr/sbin/pct', 'pull',
-                   str(self.get_option('vmid')), in_path, temp_file_path]
-            if self.get_option('remote_user') != 'root':
-                cmd = [become_command()] + cmd
-            self._ssh_exec_command(' '.join(cmd))
-            self._ssh_fetch_file(temp_file_path, out_path)
-        except Exception as e:
-            raise AnsibleError(
-                'failed to transfer file from %s!\n%s' % (in_path, e))
-        finally:
-            self._ssh_exec_command(f'rm -rf {temp_dir}')
-
-    def _ssh_exec_command(self, cmd: str, in_data: bytes | None = None, sudoable: bool = True) -> tuple[int, bytes, bytes]:
-        """ run a command on the remote host """
+        cmd = self._build_pct_command(cmd)
 
         super(Connection, self).exec_command(cmd, in_data=in_data, sudoable=sudoable)
-
-        if in_data:
-            raise AnsibleError("Internal Error: this module does not support optimized module pipelining")
 
         bufsize = 4096
 
@@ -609,9 +603,9 @@ class Connection(ConnectionBase):
         try:
             chan.exec_command(cmd)
             if self.become and self.become.expect_prompt():
-                passprompt = False
-                become_sucess = False
-                while not (become_sucess or passprompt):
+                password_prompt = False
+                become_success = False
+                while not (become_success or password_prompt):
                     display.debug('Waiting for Privilege Escalation input')
 
                     chunk = chan.recv(bufsize)
@@ -629,13 +623,13 @@ class Connection(ConnectionBase):
                     # and we might get the middle of a line in a chunk
                     for line in become_output.splitlines(True):
                         if self.become.check_success(line):
-                            become_sucess = True
+                            become_success = True
                             break
                         elif self.become.check_password_prompt(line):
-                            passprompt = True
+                            password_prompt = True
                             break
 
-                if passprompt:
+                if password_prompt:
                     if self.become:
                         become_pass = self.become.get_option('become_pass')
                         chan.sendall(to_bytes(become_pass, errors='surrogate_or_strict') + b'\n')
@@ -644,6 +638,17 @@ class Connection(ConnectionBase):
                 else:
                     no_prompt_out += become_output
                     no_prompt_err += become_output
+
+            if in_data:
+                for i in range(0, len(in_data), bufsize):
+                    chan.send(in_data[i:i + bufsize])
+                chan.shutdown_write()
+
+            exit_status = chan.recv_exit_status()
+
+            if exit_status != 0:
+                raise AnsibleError(f"Command failed with exit status {exit_status}: {to_text(stderr)}")
+
         except socket.timeout:
             raise AnsibleError('ssh timed out waiting for privilege escalation.\n' + to_text(become_output))
 
@@ -652,92 +657,37 @@ class Connection(ConnectionBase):
 
         return (chan.recv_exit_status(), no_prompt_out + stdout, no_prompt_out + stderr)
 
-    def _ssh_put_file(self, in_path: str, out_path: str) -> None:
+    def put_file(self, in_path: str, out_path: str) -> None:
         """ transfer a file from local to remote """
 
-        super(Connection, self).put_file(in_path, out_path)
-
-        display.vvv("PUT %s TO %s" % (in_path, out_path), host=self.get_option('remote_addr'))
-
-        if not os.path.exists(to_bytes(in_path, errors='surrogate_or_strict')):
-            raise AnsibleFileNotFound("file or module does not exist: %s" % in_path)
-
         try:
-            self.sftp = self.ssh.open_sftp()
+          with open(in_path, "wb") as f:
+            data = f.read()
+          returncode, stdout, stderr = self.exec_command(f'cat > {out_path}', in_data=data)
+          if returncode != 0:
+            raise AnsibleError(
+              'failed to transfer file from %s to %s!\n%s\n%s' % (in_path, out_path, stdout.decode('utf-8'), stderr.decode('utf-8')))
         except Exception as e:
-            raise AnsibleError("failed to open a SFTP connection (%s)" % e)
+            raise AnsibleError(
+                'error occurred while putting file from %s to %s!\n%s' % (in_path, out_path, e))
 
-        try:
-            self.sftp.put(to_bytes(in_path, errors='surrogate_or_strict'), to_bytes(out_path, errors='surrogate_or_strict'))
-        except IOError:
-            raise AnsibleError("failed to transfer file to %s" % out_path)
-
-    def _connect_sftp(self) -> paramiko.sftp_client.SFTPClient:
-
-        cache_key = "%s__%s__" % (self.get_option('remote_addr'), self.get_option('remote_user'))
-        if cache_key in SFTP_CONNECTION_CACHE:
-            return SFTP_CONNECTION_CACHE[cache_key]
-        else:
-            result = SFTP_CONNECTION_CACHE[cache_key] = self._connect().ssh.open_sftp()
-            return result
-
-    def _ssh_fetch_file(self, in_path: str, out_path: str) -> None:
+    def fetch_file(self, in_path: str, out_path: str) -> None:
         """ save a remote file to the specified path """
 
-        super(Connection, self).fetch_file(in_path, out_path)
-
-        display.vvv("FETCH %s TO %s" % (in_path, out_path), host=self.get_option('remote_addr'))
-
         try:
-            self.sftp = self._connect_sftp()
+          returncode, stdout, stderr = self.exec_command(f'cat {in_path}')
+          if returncode != 0:
+            raise AnsibleError(
+              'failed to transfer file from %s to %s!\n%s\n%s' % (in_path, out_path, stdout.decode('utf-8'), stderr.decode('utf-8')))
+          with open(out_path, "wb") as f:
+            f.write(stdout)
         except Exception as e:
-            raise AnsibleError("failed to open a SFTP connection (%s)" % to_native(e))
-
-        try:
-            self.sftp.get(to_bytes(in_path, errors='surrogate_or_strict'), to_bytes(out_path, errors='surrogate_or_strict'))
-        except IOError:
-            raise AnsibleError("failed to transfer file from %s" % in_path)
-
-    def _any_keys_added(self) -> bool:
-
-        for hostname, keys in self.ssh._host_keys.items():
-            for keytype, key in keys.items():
-                added_this_time = getattr(key, '_added_by_ansible_this_time', False)
-                if added_this_time:
-                    return True
-        return False
-
-    def _save_ssh_host_keys(self, filename: str) -> None:
-        """
-        not using the paramiko save_ssh_host_keys function as we want to add new SSH keys at the bottom so folks
-        don't complain about it :)
-        """
-
-        if not self._any_keys_added():
-            return
-
-        path = os.path.expanduser("~/.ssh")
-        makedirs_safe(path)
-
-        with open(filename, 'w') as f:
-
-            for hostname, keys in self.ssh._host_keys.items():
-
-                for keytype, key in keys.items():
-
-                    # was f.write
-                    added_this_time = getattr(key, '_added_by_ansible_this_time', False)
-                    if not added_this_time:
-                        f.write("%s %s %s\n" % (hostname, keytype, key.get_base64()))
-
-            for hostname, keys in self.ssh._host_keys.items():
-
-                for keytype, key in keys.items():
-                    added_this_time = getattr(key, '_added_by_ansible_this_time', False)
-                    if added_this_time:
-                        f.write("%s %s %s\n" % (hostname, keytype, key.get_base64()))
+            raise AnsibleError(
+                'error occurred while fetching file from %s to %s!\n%s' % (in_path, out_path, e))
 
     def reset(self) -> None:
+        """ reset the connection """
+
         if not self._connected:
             return
         self.close()
@@ -748,14 +698,8 @@ class Connection(ConnectionBase):
 
         cache_key = self._cache_key()
         SSH_CONNECTION_CACHE.pop(cache_key, None)
-        SFTP_CONNECTION_CACHE.pop(cache_key, None)
-
-        if hasattr(self, 'sftp'):
-            if self.sftp is not None:
-                self.sftp.close()
 
         if self.get_option('host_key_checking') and self.get_option('record_host_keys') and self._any_keys_added():
-
             # add any new SSH host keys -- warning -- this could be slow
             # (This doesn't acquire the connection lock because it needs
             # to exclude only other known_hosts writers, not connections
@@ -799,9 +743,7 @@ class Connection(ConnectionBase):
                 tmp_keyfile.close()
 
                 os.rename(tmp_keyfile.name, self.keyfile)
-
             except Exception:
-
                 # unable to save keys, including scenario when key was invalid
                 # and caught earlier
                 traceback.print_exc()
