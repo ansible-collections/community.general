@@ -211,13 +211,6 @@ DOCUMENTATION = r"""
         cli:
           - name: private_key_file
             option: "--private-key"
-      become_command:
-        description:
-          - Become command e.g. C(sudo)
-        type: str
-        default: "sudo"
-        vars:
-          - name: become_command
       vmid:
         description:
           - LXC Container ID
@@ -383,6 +376,9 @@ class Connection(ConnectionBase):
 
     transport = 'community.general.pct_remote'
     _log_channel: str | None = None
+
+    def __init__(self, play_context, new_stdin, *args, **kwargs):
+        super(Connection, self).__init__(play_context, new_stdin, *args, **kwargs)
 
     def _cache_key(self) -> str:
         return "%s__%s__" % (self.get_option('remote_addr'), self.get_option('remote_user'))
@@ -550,7 +546,7 @@ class Connection(ConnectionBase):
     def _build_pct_command(self, cmd: str) -> str:
         cmd = ['/usr/sbin/pct', 'exec', str(self.get_option('vmid')), '--', cmd]
         if self.get_option('remote_user') != 'root':
-            cmd = [self.get_option('become_command')] + cmd
+            cmd = [self.become.name] + cmd
         return ' '.join(cmd)
 
     def exec_command(self, cmd: str, in_data: bytes | None = None, sudoable: bool = True) -> tuple[int, bytes, bytes]:
@@ -644,7 +640,7 @@ class Connection(ConnectionBase):
         try:
             with open(in_path, "rb") as f:
                 data = f.read()
-                returncode, stdout, stderr = self.exec_command(f"/bin/sh -c 'cat > {out_path}'", in_data=data, sudoable=False)
+                returncode, stdout, stderr = self.exec_command(f"{self._shell.executable} -c 'cat > {out_path}'", in_data=data, sudoable=False)
             if returncode != 0:
                 raise AnsibleError(
                     'failed to transfer file from %s to %s!\n%s\n%s' % (in_path, out_path, stdout.decode('utf-8'), stderr.decode('utf-8')))
@@ -656,7 +652,7 @@ class Connection(ConnectionBase):
         """ save a remote file to the specified path """
 
         try:
-            returncode, stdout, stderr = self.exec_command(f"'/bin/sh -c cat {in_path}'", sudoable=False)
+            returncode, stdout, stderr = self.exec_command(f"{self._shell.executable} -c 'cat {in_path}'", sudoable=False)
             if returncode != 0:
                 raise AnsibleError(
                     'failed to transfer file from %s to %s!\n%s\n%s' % (in_path, out_path, stdout.decode('utf-8'), stderr.decode('utf-8')))
