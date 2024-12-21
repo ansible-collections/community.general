@@ -548,39 +548,37 @@ class Connection(ConnectionBase):
 
     def put_file(self, in_path: str, out_path: str) -> None:
         ''' transfer a file from local to remote '''
-        temp_dir = '/tmp/ansible_pct_' + str(uuid.uuid4()).replace('-', '')[:6]
-        temp_file_path = f'{temp_dir}/{os.path.basename(in_path)}'
         try:
-            self._ssh_exec_command(f'mkdir -p {temp_dir}')
-            self._ssh_put_file(in_path, temp_file_path)
-            cmd = ['/usr/sbin/pct', 'push',
-                   str(self.get_option('vmid')), temp_file_path, out_path]
-            if self.get_option('remote_user') != 'root':
-                cmd = [self.get_option('become_command')] + cmd
-            self._ssh_exec_command(' '.join(cmd))
+          with open(in_path, "wb") as f:
+            data = f.read()
+          cmd = ['/usr/sbin/pct', 'exec',
+                str(self.get_option('vmid')), '--', str(self.get_option('shell')), '-c', quote(f'cat > {out_path}')]
+          if self.get_option('remote_user') != 'root':
+              cmd = [self.get_option('become_command')] + cmd
+          returncode, stdout, stderr = self._ssh_exec_command(' '.join(cmd), in_data=data)
+          if returncode != 0:
+            raise AnsibleError(
+              'failed to transfer file from %s!\n%s\n%s' % (in_path, stdout.decode('utf-8'), stderr.decode('utf-8')))
         except Exception as e:
             raise AnsibleError(
-                'failed to transfer file to %s!\n%s' % (out_path, e))
-        finally:
-            self._ssh_exec_command(f'rm -rf {temp_dir}')
+                'error occurred while fetching file from %s!\n%s' % (in_path, e))
 
     def fetch_file(self, in_path: str, out_path: str) -> None:
         ''' save a remote file to the specified path '''
-        temp_dir = '/tmp/ansible_pct_' + str(uuid.uuid4()).replace('-', '')[:6]
-        temp_file_path = f'{temp_dir}/{os.path.basename(in_path)}'
         try:
-            self._ssh_exec_command(f'mkdir -p {temp_dir}')
-            cmd = ['/usr/sbin/pct', 'pull',
-                   str(self.get_option('vmid')), in_path, temp_file_path]
-            if self.get_option('remote_user') != 'root':
-                cmd = [self.get_option('become_command')] + cmd
-            self._ssh_exec_command(' '.join(cmd))
-            self._ssh_fetch_file(temp_file_path, out_path)
+          cmd = ['/usr/sbin/pct', 'exec',
+                str(self.get_option('vmid')), '--', str(self.get_option('shell')), '-c', quote(f'cat {in_path}')]
+          if self.get_option('remote_user') != 'root':
+              cmd = [self.get_option('become_command')] + cmd
+          returncode, stdout, stderr = self._ssh_exec_command(' '.join(cmd))
+          if returncode != 0:
+            raise AnsibleError(
+              'failed to transfer file from %s!\n%s\n%s' % (in_path, stdout.decode('utf-8'), stderr.decode('utf-8')))
+          with open(out_path, "wb") as out_f:
+            out_f.write(stdout)
         except Exception as e:
             raise AnsibleError(
-                'failed to transfer file from %s!\n%s' % (in_path, e))
-        finally:
-            self._ssh_exec_command(f'rm -rf {temp_dir}')
+                'error occurred while fetching file from %s!\n%s' % (in_path, e))
 
     def _ssh_exec_command(self, cmd: str, in_data: bytes | None = None, sudoable: bool = True) -> tuple[int, bytes, bytes]:
         """ run a command on the remote host """
