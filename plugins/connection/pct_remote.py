@@ -384,6 +384,9 @@ class Connection(ConnectionBase):
     transport = 'community.general.pct_remote'
     _log_channel: str | None = None
 
+    def __init__(self, play_context, new_stdin, *args, **kwargs):
+        super(Connection, self).__init__(play_context, new_stdin, *args, **kwargs)
+
     def _cache_key(self) -> str:
         return "%s__%s__" % (self.get_option('remote_addr'), self.get_option('remote_user'))
 
