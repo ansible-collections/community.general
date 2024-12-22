@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Derived from paramiko_ssh.py (c) 2012, Michael DeHaan <michael.dehaan@gmail.com>
+# Derived from ansible/plugins/connection/paramiko_ssh.py (c) 2012, Michael DeHaan <michael.dehaan@gmail.com>
 # Copyright (c) 2024 Nils Stein (@mietzen) <github.nstein@mailbox.org>
 # Copyright (c) 2024 Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -222,6 +222,7 @@ DOCUMENTATION = r"""
       - >
         When NOT using this plugin as root, you need to have a become mechanism,
         e.g. C(sudo), installed on Proxmox and setup so we can run it without prompting for the password.
+        Inside the container we need a shell e.g. C(sh) and C(cat), for this plugin to work.
 """
 
 EXAMPLES = r"""
@@ -330,7 +331,7 @@ class MyAddPolicy(MissingHostKeyPolicy):
     and also prompt for input.
 
     Policy for automatically adding the hostname and new host key to the
-    local L{HostKeys} object, and saving it.  This is used by L{SSHClient}.
+    local L{HostKeys} object, and saving it. This is used by L{SSHClient}.
     """
 
     def __init__(self, connection: Connection) -> None:
