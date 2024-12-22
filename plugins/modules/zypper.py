@@ -56,7 +56,7 @@ options:
       - V(latest) will make sure the latest version of the package is installed.
       - V(absent) will make sure the specified package is not installed.
       - V(dist-upgrade) will make sure the latest version of all installed packages from all enabled repositories is installed.
-      - When using V(dist-upgrade), O(name) should be V('*').
+      - When using V(dist-upgrade), O(name) should be V(*).
     required: false
     choices: [present, latest, absent, dist-upgrade, installed, removed]
     default: "present"
