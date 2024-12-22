@@ -4,6 +4,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 set -eux
 
+if grep -Fq 'NAME="Arch Linux"' /etc/os-release; then
+  exit 0
+fi
+
 ANSIBLE_ROLES_PATH=../ \
     ansible-playbook dependencies.yml -v "$@"
 
