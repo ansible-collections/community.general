@@ -31,7 +31,7 @@ options:
     type: str
   repo:
     description:
-      - URI of the repository or .repo file. Required when O(state=present).
+      - URI of the repository or full path of a C(.repo) file. Required when O(state=present).
     type: str
   state:
     description:
