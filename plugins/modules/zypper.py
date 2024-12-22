@@ -45,7 +45,7 @@ options:
       - Can include a version like V(name=1.0), V(name>3.4) or V(name<=2.7). If a version is given, V(oldpackage) is implied and zypper is allowed
         to update the package within the version range given.
       - You can also pass a url or a local path to a rpm file.
-      - When using O(state=latest), this can be '*', which updates all installed packages.
+      - When using O(state=latest), this can be V(*), which updates all installed packages.
     required: true
     aliases: ['pkg']
     type: list
