@@ -147,7 +147,7 @@ notes:
   - Beware that in case your XML elements are namespaced, you need to use the O(namespaces) parameter, see the examples.
   - Namespaces prefix should be used for all children of an element where namespace is defined, unless another namespace is defined for them.
 seealso:
-  - name: XML module development community wiki (no longer maintained)
+  - name: XML module development community wiki (archived)
     description: More information related to the development of this xml module.
     link: https://github.com/ansible/community/wiki/Module:-xml
   - name: Introduction to XPath
