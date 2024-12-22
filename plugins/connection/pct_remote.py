@@ -631,8 +631,13 @@ class Connection(ConnectionBase):
 
         stdout = b''.join(chan.makefile('rb', bufsize))
         stderr = b''.join(chan.makefile_stderr('rb', bufsize))
+        returncode = chan.recv_exit_status()
 
-        return (chan.recv_exit_status(), no_prompt_out + stdout, no_prompt_out + stderr)
+        if 'pct: not found' in stderr.decode('utf-8'):
+            raise AnsibleError(
+                'pct not found in path of host: %s' % (str(self.get_option('remote_addr'))))
+
+        return (returncode, no_prompt_out + stdout, no_prompt_out + stderr)
 
     def put_file(self, in_path: str, out_path: str) -> None:
         """ transfer a file from local to remote """
@@ -640,10 +645,18 @@ class Connection(ConnectionBase):
         try:
             with open(in_path, "rb") as f:
                 data = f.read()
-                returncode, stdout, stderr = self.exec_command(f"{self._shell.executable} -c 'cat > {out_path}'", in_data=data, sudoable=False)
+                returncode, stdout, stderr = self.exec_command(
+                    ' '.join([
+                        self._shell.executable, '-c',
+                        self._shell.quote(f'cat > {out_path}')]),
+                    in_data=data,
+                    sudoable=False)
             if returncode != 0:
+                if 'cat: not found' in stderr.decode('utf-8'):
+                    raise AnsibleError(
+                        'cat not found in path of container: %s' % (str(self.get_option('vmid'))))
                 raise AnsibleError(
-                    'failed to transfer file from %s to %s!\n%s\n%s' % (in_path, out_path, stdout.decode('utf-8'), stderr.decode('utf-8')))
+                    '%s\n%s' % (stdout.decode('utf-8'), stderr.decode('utf-8')))
         except Exception as e:
             raise AnsibleError(
                 'error occurred while putting file from %s to %s!\n%s' % (in_path, out_path, str(e)))
@@ -652,10 +665,17 @@ class Connection(ConnectionBase):
         """ save a remote file to the specified path """
 
         try:
-            returncode, stdout, stderr = self.exec_command(f"{self._shell.executable} -c 'cat {in_path}'", sudoable=False)
+            returncode, stdout, stderr = self.exec_command(
+                ' '.join([
+                    self._shell.executable, '-c',
+                    self._shell.quote(f'cat {in_path}')]),
+                sudoable=False)
             if returncode != 0:
+                if 'cat: not found' in stderr.decode('utf-8'):
+                    raise AnsibleError(
+                        'cat not found in path of container: %s' % (str(self.get_option('vmid'))))
                 raise AnsibleError(
-                    'failed to transfer file from %s to %s!\n%s\n%s' % (in_path, out_path, stdout.decode('utf-8'), stderr.decode('utf-8')))
+                    '%s\n%s' % (stdout.decode('utf-8'), stderr.decode('utf-8')))
             with open(out_path, "wb") as f:
                 f.write(stdout)
         except Exception as e:
