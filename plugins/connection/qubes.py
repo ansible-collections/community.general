@@ -118,7 +118,7 @@ class Connection(ConnectionBase):
 
         rc, stdout, stderr = self._qubes(cmd)
 
-        display.vvvvv("STDOUT %r STDERR %r" % (stderr, stderr))
+        display.vvvvv("STDOUT %r STDERR %r" % (stdout, stderr))
         return rc, stdout, stderr
 
     def put_file(self, in_path, out_path):
