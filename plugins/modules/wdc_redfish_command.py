@@ -8,14 +8,12 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: wdc_redfish_command
 short_description: Manages WDC UltraStar Data102 Out-Of-Band controllers using Redfish APIs
 version_added: 5.4.0
 description:
-  - Builds Redfish URIs locally and sends them to remote OOB controllers to
-    perform an action.
+  - Builds Redfish URIs locally and sends them to remote OOB controllers to perform an action.
   - Manages OOB controller firmware. For example, Firmware Activate, Update and Activate.
 extends_documentation_fragment:
   - community.general.attributes
@@ -38,11 +36,11 @@ options:
     elements: str
   baseuri:
     description:
-      - Base URI of OOB controller.  Must include this or O(ioms).
+      - Base URI of OOB controller. Must include this or O(ioms).
     type: str
   ioms:
     description:
-      - List of IOM FQDNs for the enclosure.  Must include this or O(baseuri).
+      - List of IOM FQDNs for the enclosure. Must include this or O(baseuri).
     type: list
     elements: str
   username:
@@ -90,14 +88,12 @@ options:
           - The password for retrieving the update image.
         type: str
 notes:
-  - In the inventory, you can specify baseuri or ioms.  See the EXAMPLES section.
-  - ioms is a list of FQDNs for the enclosure's IOMs.
-
-
+  - In the inventory, you can specify baseuri or ioms. See the EXAMPLES section.
+  - Ioms is a list of FQDNs for the enclosure's IOMs.
 author: Mike Moerk (@mikemoerk)
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Firmware Activate (required after SimpleUpdate to apply the new firmware)
   community.general.wdc_redfish_command:
     category: Update
@@ -188,16 +184,15 @@ EXAMPLES = '''
     category: Chassis
     resource_id: Enclosure
     command: PowerModeNormal
+"""
 
-'''
-
-RETURN = '''
+RETURN = r"""
 msg:
-    description: Message with action result or error description
-    returned: always
-    type: str
-    sample: "Action was successful"
-'''
+  description: Message with action result or error description.
+  returned: always
+  type: str
+  sample: "Action was successful"
+"""
 
 from ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils import WdcRedfishUtils
 from ansible.module_utils.basic import AnsibleModule
