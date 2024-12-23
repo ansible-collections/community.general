@@ -10,8 +10,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: usb_facts
 short_description: Allows listing information about USB devices
 version_added: 8.5.0
@@ -25,9 +24,9 @@ extends_documentation_fragment:
   - community.general.attributes.facts_module
 requirements:
   - lsusb binary on PATH (usually installed through the package usbutils and preinstalled on many systems)
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Get information about USB devices
   community.general.usb_facts:
 
@@ -35,9 +34,9 @@ EXAMPLES = '''
   ansible.builtin.debug:
     msg: "On bus {{ item.bus }} device {{ item.device }} with id {{ item.id }} is {{ item.name }}"
   loop: "{{ ansible_facts.usb_devices }}"
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 ansible_facts:
   description: Dictionary containing details of connected USB devices.
   returned: always
@@ -69,7 +68,7 @@ ansible_facts:
           returned: always
           type: str
           sample: Linux Foundation 2.0 root hub
-'''
+"""
 
 import re
 from ansible.module_utils.basic import AnsibleModule
