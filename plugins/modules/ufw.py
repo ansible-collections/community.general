@@ -68,7 +68,7 @@ options:
   insert_relative_to:
     description:
       - Allows to interpret the index in O(insert) relative to a position.
-      - V(zero) interprets the rule number as an absolute index (i.e. 1 is the first rule).
+      - V(zero) interprets the rule number as an absolute index (that is, 1 is the first rule).
       - V(first-ipv4) interprets the rule number relative to the index of the first IPv4 rule, or relative to the position where the first IPv4
         rule would be if there is currently none.
       - V(last-ipv4) interprets the rule number relative to the index of the last IPv4 rule, or relative to the position where the last IPv4 rule
