@@ -370,9 +370,7 @@ def parse_zypper_xml(m, cmd, fail_not_found=True, packages=None):
 
         # apply simple_errors logic to rc 0,102,103,106
         if m.params['simple_errors']:
-            simple_errors = get_simple_errors(dom)
-            if simple_errors is not None:
-                stdout = simple_errors
+            stdout = get_simple_errors(dom) or stdout
 
         return packages, rc, stdout, stderr
 
