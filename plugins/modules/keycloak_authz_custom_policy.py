@@ -36,6 +36,8 @@ attributes:
         support: full
     diff_mode:
         support: none
+    action_group:
+        version_added: 10.2.0
 
 options:
     state:
@@ -71,6 +73,7 @@ options:
 
 extends_documentation_fragment:
     - community.general.keycloak
+    - community.general.keycloak.actiongroup_keycloak
     - community.general.attributes
 
 author:
