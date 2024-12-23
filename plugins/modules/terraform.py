@@ -30,11 +30,11 @@ options:
     default: present
   binary_path:
     description:
-      - The path of a terraform binary to use, relative to the 'service_path' unless you supply an absolute path.
+      - The path of a C(terraform) binary to use, relative to the 'service_path' unless you supply an absolute path.
     type: path
   project_path:
     description:
-      - The path to the root of the Terraform directory with the vars.tf/main.tf/etc to use.
+      - The path to the root of the Terraform directory with the C(vars.tf)/C(main.tf)/etc to use.
     type: path
     required: true
   plugin_paths:

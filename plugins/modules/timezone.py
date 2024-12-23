@@ -33,14 +33,14 @@ options:
     description:
       - Name of the timezone for the system clock.
       - Default is to keep current setting.
-      - B(At least one of name and hwclock are required).
+      - B(At least one) of O(name) and O(hwclock) are required.
     type: str
   hwclock:
     description:
       - Whether the hardware clock is in UTC or in local timezone.
       - Default is to keep current setting.
       - Note that this option is recommended not to change and may fail to configure, especially on virtual environments such as AWS.
-      - B(At least one of name and hwclock are required).
+      - B(At least one) of O(name) and O(hwclock) are required.
       - I(Only used on Linux).
     type: str
     aliases: [rtc]
