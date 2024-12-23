@@ -23,6 +23,10 @@ description:
     - The names of module options are snake_cased versions of the camelCase ones found in the
       Keycloak API and its documentation at U(https://www.keycloak.org/docs-api/latest/rest-api/index.html).
 
+attributes:
+    action_group:
+        version_added: 10.2.0
+
 options:
     realm:
         type: str
@@ -32,6 +36,7 @@ options:
 
 extends_documentation_fragment:
     - community.general.keycloak
+    - community.general.keycloak.actiongroup_keycloak
     - community.general.attributes
     - community.general.attributes.info_module
 
