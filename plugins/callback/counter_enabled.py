@@ -71,7 +71,7 @@ class CallbackModule(CallbackBase):
         if not name:
             msg = u"play"
         else:
-            msg = u"PLAY [%s]" % name
+            msg = f"PLAY [{name}]"
 
         self._play = play
 
@@ -91,25 +91,17 @@ class CallbackModule(CallbackBase):
         for host in hosts:
             stat = stats.summarize(host)
 
-            self._display.display(u"%s : %s %s %s %s %s %s" % (
-                hostcolor(host, stat),
-                colorize(u'ok', stat['ok'], C.COLOR_OK),
-                colorize(u'changed', stat['changed'], C.COLOR_CHANGED),
-                colorize(u'unreachable', stat['unreachable'], C.COLOR_UNREACHABLE),
-                colorize(u'failed', stat['failures'], C.COLOR_ERROR),
-                colorize(u'rescued', stat['rescued'], C.COLOR_OK),
-                colorize(u'ignored', stat['ignored'], C.COLOR_WARN)),
+            self._display.display(
+                f"{hostcolor(host, stat)} : {colorize(u'ok', stat['ok'], C.COLOR_OK)} {colorize(u'changed', stat['changed'], C.COLOR_CHANGED)} "
+                f"{colorize(u'unreachable', stat['unreachable'], C.COLOR_UNREACHABLE)} {colorize(u'failed', stat['failures'], C.COLOR_ERROR)} "
+                f"{colorize(u'rescued', stat['rescued'], C.COLOR_OK)} {colorize(u'ignored', stat['ignored'], C.COLOR_WARN)}",
                 screen_only=True
             )
 
-            self._display.display(u"%s : %s %s %s %s %s %s" % (
-                hostcolor(host, stat, False),
-                colorize(u'ok', stat['ok'], None),
-                colorize(u'changed', stat['changed'], None),
-                colorize(u'unreachable', stat['unreachable'], None),
-                colorize(u'failed', stat['failures'], None),
-                colorize(u'rescued', stat['rescued'], None),
-                colorize(u'ignored', stat['ignored'], None)),
+            self._display.display(
+                f"{hostcolor(host, stat, False)} : {colorize(u'ok', stat['ok'], None)} {colorize(u'changed', stat['changed'], None)} "
+                f"{colorize(u'unreachable', stat['unreachable'], None)} {colorize(u'failed', stat['failures'], None)} "
+                f"{colorize(u'rescued', stat['rescued'], None)} {colorize(u'ignored', stat['ignored'], None)}",
                 log_only=True
             )
 
@@ -144,12 +136,12 @@ class CallbackModule(CallbackBase):
         # (shoulder surfing, logging stdout straight to a file, etc).
         if not task.no_log and C.DISPLAY_ARGS_TO_STDOUT:
             args = ', '.join(('%s=%s' % a for a in task.args.items()))
-            args = ' %s' % args
+            args = f' {args}'
         self._display.banner("TASK %d/%d [%s%s]" % (self._task_counter, self._task_total, task.get_name().strip(), args))
         if self._display.verbosity >= 2:
             path = task.get_path()
             if path:
-                self._display.display("task path: %s" % path, color=C.COLOR_DEBUG)
+                self._display.display(f"task path: {path}", color=C.COLOR_DEBUG)
         self._host_counter = self._previous_batch_total
         self._task_counter += 1
 
@@ -185,7 +177,7 @@ class CallbackModule(CallbackBase):
             self._clean_results(result._result, result._task.action)
 
             if self._run_is_verbose(result):
-                msg += " => %s" % (self._dump_results(result._result),)
+                msg += f" => {self._dump_results(result._result)}"
             self._display.display(msg, color=color)
 
     def v2_runner_on_failed(self, result, ignore_errors=False):
@@ -233,7 +225,7 @@ class CallbackModule(CallbackBase):
             else:
                 msg = "skipping: %d/%d [%s]" % (self._host_counter, self._host_total, result._host.get_name())
                 if self._run_is_verbose(result):
-                    msg += " => %s" % self._dump_results(result._result)
+                    msg += f" => {self._dump_results(result._result)}"
                 self._display.display(msg, color=C.COLOR_SKIP)
 
     def v2_runner_on_unreachable(self, result):

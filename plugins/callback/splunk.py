@@ -154,14 +154,14 @@ class SplunkHTTPCollectorSource(object):
 
         # This wraps the json payload in and outer json event needed by Splunk
         jsondata = json.dumps(data, cls=AnsibleJSONEncoder, sort_keys=True)
-        jsondata = '{"event":' + jsondata + "}"
+        jsondata = f'{{"event":{jsondata}}}'
 
         open_url(
             url,
             jsondata,
             headers={
                 'Content-type': 'application/json',
-                'Authorization': 'Splunk ' + authtoken
+                'Authorization': f"Splunk {authtoken}"
             },
             method='POST',
             validate_certs=validate_certs
