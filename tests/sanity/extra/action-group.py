@@ -24,6 +24,13 @@ ACTION_GROUPS = {
         ],
         'doc_fragment': 'community.general.consul.actiongroup_consul',
     },
+    'keycloak': {
+        'pattern': re.compile('^keycloak_.*$'),
+        'exclusions': [
+            'keycloak_realm_info',
+        ],
+        'doc_fragment': 'community.general.keycloak.actiongroup_keycloak',
+    },
     'proxmox': {
         'pattern': re.compile('^proxmox(_.*)?$'),
         'exclusions': [],
