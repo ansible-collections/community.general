@@ -9,12 +9,11 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: xenserver_facts
 short_description: Get facts reported on xenserver
 description:
-  - Reads data out of XenAPI, can be used instead of multiple xe commands.
+  - Reads data out of XenAPI, can be used instead of multiple C(xe) commands.
 author:
   - Andy Hill (@andyhky)
   - Tim Rupp (@caphrim007)
@@ -28,9 +27,9 @@ attributes:
     version_added: 3.3.0
     # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
 options: {}
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Gather facts from xenserver
   community.general.xenserver_facts:
 
@@ -48,7 +47,7 @@ EXAMPLES = '''
 #     "item": "Control domain on host: 10.0.13.22",
 #     "msg": "Control domain on host: 10.0.13.22"
 # }
-'''
+"""
 
 
 HAVE_XENAPI = False
