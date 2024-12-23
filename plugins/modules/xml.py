@@ -329,7 +329,7 @@ actions:
   description: A dictionary with the original xpath, namespaces and state.
   type: dict
   returned: success
-  sample: {xpath: xpath, namespaces: [namespace1, namespace2], state=present: null}
+  sample: {xpath: xpath, namespaces: [namespace1, namespace2], state: present}
 backup_file:
   description: The name of the backup file that was created.
   type: str
