@@ -139,7 +139,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             "Content-Type": "application/json",
         }
         resp = open_url(
-            self.api_host + '/identity/v1/oauth2/token',
+            f"{self.api_host}/identity/v1/oauth2/token",
             headers=headers,
             data=payload,
             method="POST"
@@ -155,16 +155,16 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self._authenticate()
         for stack_slug in self.stack_slugs:
             try:
-                workloads = self._stackpath_query_get_list(self.api_host + '/workload/v1/stacks/' + stack_slug + '/workloads')
+                workloads = self._stackpath_query_get_list(f"{self.api_host}/workload/v1/stacks/{stack_slug}/workloads")
             except Exception:
-                raise AnsibleError("Failed to get workloads from the StackPath API: %s" % traceback.format_exc())
+                raise AnsibleError(f"Failed to get workloads from the StackPath API: {traceback.format_exc()}")
             for workload in workloads:
                 try:
                     workload_instances = self._stackpath_query_get_list(
-                        self.api_host + '/workload/v1/stacks/' + stack_slug + '/workloads/' + workload["id"] + '/instances'
+                        f"{self.api_host}/workload/v1/stacks/{stack_slug}/workloads/{workload['id']}/instances"
                     )
                 except Exception:
-                    raise AnsibleError("Failed to get workload instances from the StackPath API: %s" % traceback.format_exc())
+                    raise AnsibleError(f"Failed to get workload instances from the StackPath API: {traceback.format_exc()}")
                 for instance in workload_instances:
                     if instance["phase"] == "RUNNING":
                         instance["stackSlug"] = stack_slug
@@ -184,7 +184,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def _populate(self, instances):
         for instance in instances:
             for group_key in self.group_keys:
-                group = group_key + "_" + instance[group_key]
+                group = f"{group_key}_{instance[group_key]}"
                 group = group.lower().replace(" ", "_").replace("-", "_")
                 self.inventory.add_group(group)
                 self.inventory.add_host(instance[self.hostname_key],
@@ -194,14 +194,14 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self._authenticate()
         headers = {
             "Content-Type": "application/json",
-            "Authorization": "Bearer " + self.auth_token,
+            "Authorization": f"Bearer {self.auth_token}",
         }
         next_page = True
         result = []
         cursor = '-1'
         while next_page:
             resp = open_url(
-                url + '?page_request.first=10&page_request.after=%s' % cursor,
+                f"{url}?page_request.first=10&page_request.after={cursor}",
                 headers=headers,
                 method="GET"
             )
@@ -251,10 +251,10 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self.stack_slugs = self.get_option('stack_slugs')
         if not self.stack_slugs:
             try:
-                stacks = self._stackpath_query_get_list(self.api_host + '/stack/v1/stacks')
+                stacks = self._stackpath_query_get_list(f"{self.api_host}/stack/v1/stacks")
                 self._get_stack_slugs(stacks)
             except Exception:
-                raise AnsibleError("Failed to get stack IDs from the Stackpath API: %s" % traceback.format_exc())
+                raise AnsibleError(f"Failed to get stack IDs from the Stackpath API: {traceback.format_exc()}")
 
         cache_key = self.get_cache_key(path)
         # false when refresh_cache or --flush-cache is used
@@ -283,4 +283,4 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             if cache_needs_update or (not cache and self.get_option('cache')):
                 self._cache[cache_key] = results
         except Exception:
-            raise AnsibleError("Failed to populate data: %s" % traceback.format_exc())
+            raise AnsibleError(f"Failed to populate data: {traceback.format_exc()}")

@@ -141,7 +141,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
             'User-Agent': "ansible-icinga2-inv",
             'Accept': "application/json",
         }
-        api_status_url = self.icinga2_url + "/status"
+        api_status_url = f"{self.icinga2_url}/status"
         request_args = {
             'headers': self.headers,
             'url_username': self.icinga2_user,
@@ -151,7 +151,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         open_url(api_status_url, **request_args)
 
     def _post_request(self, request_url, data=None):
-        self.display.vvv("Requested URL: %s" % request_url)
+        self.display.vvv(f"Requested URL: {request_url}")
         request_args = {
             'headers': self.headers,
             'url_username': self.icinga2_user,
@@ -160,42 +160,38 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         }
         if data is not None:
             request_args['data'] = json.dumps(data)
-        self.display.vvv("Request Args: %s" % request_args)
+        self.display.vvv(f"Request Args: {request_args}")
         try:
             response = open_url(request_url, **request_args)
         except HTTPError as e:
             try:
                 error_body = json.loads(e.read().decode())
-                self.display.vvv("Error returned: {0}".format(error_body))
+                self.display.vvv(f"Error returned: {error_body}")
             except Exception:
                 error_body = {"status": None}
             if e.code == 404 and error_body.get('status') == "No objects found.":
                 raise AnsibleParserError("Host filter returned no data. Please confirm your host_filter value is valid")
-            raise AnsibleParserError("Unexpected data returned: {0} -- {1}".format(e, error_body))
+            raise AnsibleParserError(f"Unexpected data returned: {e} -- {error_body}")
 
         response_body = response.read()
         json_data = json.loads(response_body.decode('utf-8'))
-        self.display.vvv("Returned Data: %s" % json.dumps(json_data, indent=4, sort_keys=True))
+        self.display.vvv(f"Returned Data: {json.dumps(json_data, indent=4, sort_keys=True)}")
         if 200 <= response.status <= 299:
             return json_data
         if response.status == 404 and json_data['status'] == "No objects found.":
             raise AnsibleParserError(
-                "API returned no data -- Response: %s - %s"
-                % (response.status, json_data['status']))
+                f"API returned no data -- Response: {response.status} - {json_data['status']}")
         if response.status == 401:
             raise AnsibleParserError(
-                "API was unable to complete query -- Response: %s - %s"
-                % (response.status, json_data['status']))
+                f"API was unable to complete query -- Response: {response.status} - {json_data['status']}")
         if response.status == 500:
             raise AnsibleParserError(
-                "API Response - %s - %s"
-                % (json_data['status'], json_data['errors']))
+                f"API Response - {json_data['status']} - {json_data['errors']}")
         raise AnsibleParserError(
-            "Unexpected data returned - %s - %s"
-            % (json_data['status'], json_data['errors']))
+            f"Unexpected data returned - {json_data['status']} - {json_data['errors']}")
 
     def _query_hosts(self, hosts=None, attrs=None, joins=None, host_filter=None):
-        query_hosts_url = "{0}/objects/hosts".format(self.icinga2_url)
+        query_hosts_url = f"{self.icinga2_url}/objects/hosts"
         self.headers['X-HTTP-Method-Override'] = 'GET'
         data_dict = dict()
         if hosts:
@@ -302,7 +298,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         if self.templar.is_template(self.icinga2_password):
             self.icinga2_password = self.templar.template(variable=self.icinga2_password, disable_lookups=False)
 
-        self.icinga2_url = self.icinga2_url.rstrip('/') + '/v1'
+        self.icinga2_url = f"{self.icinga2_url.rstrip('/')}/v1"
 
         # Not currently enabled
         # self.cache_key = self.get_cache_key(path)
