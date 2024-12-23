@@ -52,7 +52,6 @@ action_groups:
     - keycloak_group
     - keycloak_identity_provider
     - keycloak_realm
-    - keycloak_realm_info
     - keycloak_realm_key
     - keycloak_realm_keys_metadata_info
     - keycloak_realm_rolemapping

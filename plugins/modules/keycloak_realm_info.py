@@ -26,12 +26,7 @@ description:
       be returned that way by this module. You may pass single values for attributes when calling the module,
       and this will be translated into a list suitable for the API.
 
-attributes:
-    action_group:
-        version_added: 10.2.0
-
 extends_documentation_fragment:
-    - community.general.keycloak.actiongroup_keycloak
     - community.general.attributes
     - community.general.attributes.info_module
 
