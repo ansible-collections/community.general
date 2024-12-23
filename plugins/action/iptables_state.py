@@ -22,25 +22,33 @@ class ActionModule(ActionBase):
     _VALID_ARGS = frozenset(('path', 'state', 'table', 'noflush', 'counters', 'modprobe', 'ip_version', 'wait'))
     DEFAULT_SUDOABLE = True
 
-    MSG_ERROR__ASYNC_AND_POLL_NOT_ZERO = (
-        "This module doesn't support async>0 and poll>0 when its 'state' param "
-        "is set to 'restored'. To enable its rollback feature (that needs the "
-        "module to run asynchronously on the remote), please set task attribute "
-        "'poll' (=%s) to 0, and 'async' (=%s) to a value >2 and not greater than "
-        "'ansible_timeout' (=%s) (recommended).")
-    MSG_WARNING__NO_ASYNC_IS_NO_ROLLBACK = (
-        "Attempts to restore iptables state without rollback in case of mistake "
-        "may lead the ansible controller to loose access to the hosts and never "
-        "regain it before fixing firewall rules through a serial console, or any "
-        "other way except SSH. Please set task attribute 'poll' (=%s) to 0, and "
-        "'async' (=%s) to a value >2 and not greater than 'ansible_timeout' (=%s) "
-        "(recommended).")
-    MSG_WARNING__ASYNC_GREATER_THAN_TIMEOUT = (
-        "You attempt to restore iptables state with rollback in case of mistake, "
-        "but with settings that will lead this rollback to happen AFTER that the "
-        "controller will reach its own timeout. Please set task attribute 'poll' "
-        "(=%s) to 0, and 'async' (=%s) to a value >2 and not greater than "
-        "'ansible_timeout' (=%s) (recommended).")
+    @staticmethod
+    def msg_error__async_and_poll_not_zero(task_poll, task_async, max_timeout):
+        return (
+            "This module doesn't support async>0 and poll>0 when its 'state' param "
+            "is set to 'restored'. To enable its rollback feature (that needs the "
+            "module to run asynchronously on the remote), please set task attribute "
+            f"'poll' (={task_poll}) to 0, and 'async' (={task_async}) to a value >2 and not greater than "
+            f"'ansible_timeout' (={max_timeout}) (recommended).")
+
+    @staticmethod
+    def msg_warning__no_async_is_no_rollback(task_poll, task_async, max_timeout):
+        return (
+            "Attempts to restore iptables state without rollback in case of mistake "
+            "may lead the ansible controller to loose access to the hosts and never "
+            "regain it before fixing firewall rules through a serial console, or any "
+            f"other way except SSH. Please set task attribute 'poll' (={task_poll}) to 0, and "
+            f"'async' (={task_async}) to a value >2 and not greater than 'ansible_timeout' (={max_timeout}) "
+            "(recommended).")
+
+    @staticmethod
+    def msg_warning__async_greater_than_timeout(task_poll, task_async, max_timeout):
+        return (
+            "You attempt to restore iptables state with rollback in case of mistake, "
+            "but with settings that will lead this rollback to happen AFTER that the "
+            "controller will reach its own timeout. Please set task attribute 'poll' "
+            f"(={task_poll}) to 0, and 'async' (={task_async}) to a value >2 and not greater than "
+            f"'ansible_timeout' (={max_timeout}) (recommended).")
 
     def _async_result(self, async_status_args, task_vars, timeout):
         '''
@@ -95,18 +103,18 @@ class ActionModule(ActionBase):
             if module_args.get('state', None) == 'restored':
                 if not wrap_async:
                     if not check_mode:
-                        display.warning(self.MSG_WARNING__NO_ASYNC_IS_NO_ROLLBACK % (
+                        display.warning(self.msg_error__async_and_poll_not_zero(
                             task_poll,
                             task_async,
                             max_timeout))
                 elif task_poll:
-                    raise AnsibleActionFail(self.MSG_ERROR__ASYNC_AND_POLL_NOT_ZERO % (
+                    raise AnsibleActionFail(self.msg_warning__no_async_is_no_rollback(
                         task_poll,
                         task_async,
                         max_timeout))
                 else:
                     if task_async > max_timeout and not check_mode:
-                        display.warning(self.MSG_WARNING__ASYNC_GREATER_THAN_TIMEOUT % (
+                        display.warning(self.msg_warning__async_greater_than_timeout(
                             task_poll,
                             task_async,
                             max_timeout))
@@ -119,10 +127,10 @@ class ActionModule(ActionBase):
                     # remote and local sides (if not the same, make the loop
                     # longer on the controller); and set a backup file path.
                     module_args['_timeout'] = task_async
-                    module_args['_back'] = '%s/iptables.state' % async_dir
+                    module_args['_back'] = f'{async_dir}/iptables.state'
                     async_status_args = dict(mode='status')
-                    confirm_cmd = 'rm -f %s' % module_args['_back']
-                    starter_cmd = 'touch %s.starter' % module_args['_back']
+                    confirm_cmd = f"rm -f {module_args['_back']}"
+                    starter_cmd = f"touch {module_args['_back']}.starter"
                     remaining_time = max(task_async, max_timeout)
 
             # do work!
