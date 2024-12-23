@@ -75,14 +75,14 @@ class Connection(ConnectionBase):
         self.jexec_cmd = self._search_executable('jexec')
 
         if self.jail not in self.list_jails():
-            raise AnsibleError("incorrect jail name %s" % self.jail)
+            raise AnsibleError(f"incorrect jail name {self.jail}")
 
     @staticmethod
     def _search_executable(executable):
         try:
             return get_bin_path(executable)
         except ValueError:
-            raise AnsibleError("%s command not found in PATH" % executable)
+            raise AnsibleError(f"{executable} command not found in PATH")
 
     def list_jails(self):
         p = subprocess.Popen([self.jls_cmd, '-q', 'name'],
@@ -97,7 +97,7 @@ class Connection(ConnectionBase):
         """ connect to the jail; nothing to do here """
         super(Connection, self)._connect()
         if not self._connected:
-            display.vvv(u"ESTABLISH JAIL CONNECTION FOR USER: {0}".format(self._play_context.remote_user), host=self.jail)
+            display.vvv(f"ESTABLISH JAIL CONNECTION FOR USER: {self._play_context.remote_user}", host=self.jail)
             self._connected = True
 
     def _buffered_exec_command(self, cmd, stdin=subprocess.PIPE):
@@ -115,11 +115,11 @@ class Connection(ConnectionBase):
         if self._play_context.remote_user is not None:
             local_cmd += ['-U', self._play_context.remote_user]
             # update HOME since -U does not update the jail environment
-            set_env = 'HOME=~' + self._play_context.remote_user + ' '
+            set_env = f"HOME=~{self._play_context.remote_user} "
 
         local_cmd += [self.jail, self._play_context.executable, '-c', set_env + cmd]
 
-        display.vvv("EXEC %s" % (local_cmd,), host=self.jail)
+        display.vvv(f"EXEC {local_cmd}", host=self.jail)
         local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
         p = subprocess.Popen(local_cmd, shell=False, stdin=stdin,
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -153,7 +153,7 @@ class Connection(ConnectionBase):
     def put_file(self, in_path, out_path):
         """ transfer a file from local to jail """
         super(Connection, self).put_file(in_path, out_path)
-        display.vvv("PUT %s TO %s" % (in_path, out_path), host=self.jail)
+        display.vvv(f"PUT {in_path} TO {out_path}", host=self.jail)
 
         out_path = shlex_quote(self._prefix_login_path(out_path))
         try:
@@ -163,27 +163,27 @@ class Connection(ConnectionBase):
                 else:
                     count = ''
                 try:
-                    p = self._buffered_exec_command('dd of=%s bs=%s%s' % (out_path, BUFSIZE, count), stdin=in_file)
+                    p = self._buffered_exec_command(f'dd of={out_path} bs={BUFSIZE}{count}', stdin=in_file)
                 except OSError:
                     raise AnsibleError("jail connection requires dd command in the jail")
                 try:
                     stdout, stderr = p.communicate()
                 except Exception:
                     traceback.print_exc()
-                    raise AnsibleError("failed to transfer file %s to %s" % (in_path, out_path))
+                    raise AnsibleError(f"failed to transfer file {in_path} to {out_path}")
                 if p.returncode != 0:
-                    raise AnsibleError("failed to transfer file %s to %s:\n%s\n%s" % (in_path, out_path, to_native(stdout), to_native(stderr)))
+                    raise AnsibleError(f"failed to transfer file {in_path} to {out_path}:\n{to_native(stdout)}\n{to_native(stderr)}")
         except IOError:
-            raise AnsibleError("file or module does not exist at: %s" % in_path)
+            raise AnsibleError(f"file or module does not exist at: {in_path}")
 
     def fetch_file(self, in_path, out_path):
         """ fetch a file from jail to local """
         super(Connection, self).fetch_file(in_path, out_path)
-        display.vvv("FETCH %s TO %s" % (in_path, out_path), host=self.jail)
+        display.vvv(f"FETCH {in_path} TO {out_path}", host=self.jail)
 
         in_path = shlex_quote(self._prefix_login_path(in_path))
         try:
-            p = self._buffered_exec_command('dd if=%s bs=%s' % (in_path, BUFSIZE))
+            p = self._buffered_exec_command(f'dd if={in_path} bs={BUFSIZE}')
         except OSError:
             raise AnsibleError("jail connection requires dd command in the jail")
 
@@ -195,10 +195,10 @@ class Connection(ConnectionBase):
                     chunk = p.stdout.read(BUFSIZE)
             except Exception:
                 traceback.print_exc()
-                raise AnsibleError("failed to transfer file %s to %s" % (in_path, out_path))
+                raise AnsibleError(f"failed to transfer file {in_path} to {out_path}")
             stdout, stderr = p.communicate()
             if p.returncode != 0:
-                raise AnsibleError("failed to transfer file %s to %s:\n%s\n%s" % (in_path, out_path, to_native(stdout), to_native(stderr)))
+                raise AnsibleError(f"failed to transfer file {in_path} to {out_path}:\n{to_native(stdout)}\n{to_native(stderr)}")
 
     def close(self):
         """ terminate the connection; nothing to do here """

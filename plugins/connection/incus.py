@@ -93,14 +93,14 @@ class Connection(ConnectionBase):
         """ execute a command on the Incus host """
         super(Connection, self).exec_command(cmd, in_data=in_data, sudoable=sudoable)
 
-        self._display.vvv(u"EXEC {0}".format(cmd),
+        self._display.vvv(f"EXEC {cmd}",
                           host=self._instance())
 
         local_cmd = [
             self._incus_cmd,
             "--project", self.get_option("project"),
             "exec",
-            "%s:%s" % (self.get_option("remote"), self._instance()),
+            f"{self.get_option('remote')}:{self._instance()}",
             "--",
             self._play_context.executable, "-c", cmd]
 
@@ -114,12 +114,10 @@ class Connection(ConnectionBase):
         stderr = to_text(stderr)
 
         if stderr == "Error: Instance is not running.\n":
-            raise AnsibleConnectionFailure("instance not running: %s" %
-                                           self._instance())
+            raise AnsibleConnectionFailure(f"instance not running: {self._instance()}")
 
         if stderr == "Error: Instance not found\n":
-            raise AnsibleConnectionFailure("instance not found: %s" %
-                                           self._instance())
+            raise AnsibleConnectionFailure(f"instance not found: {self._instance()}")
 
         return process.returncode, stdout, stderr
 
@@ -127,20 +125,18 @@ class Connection(ConnectionBase):
         """ put a file from local to Incus """
         super(Connection, self).put_file(in_path, out_path)
 
-        self._display.vvv(u"PUT {0} TO {1}".format(in_path, out_path),
+        self._display.vvv(f"PUT {in_path} TO {out_path}",
                           host=self._instance())
 
         if not os.path.isfile(to_bytes(in_path, errors='surrogate_or_strict')):
-            raise AnsibleFileNotFound("input path is not a file: %s" % in_path)
+            raise AnsibleFileNotFound(f"input path is not a file: {in_path}")
 
         local_cmd = [
             self._incus_cmd,
             "--project", self.get_option("project"),
             "file", "push", "--quiet",
             in_path,
-            "%s:%s/%s" % (self.get_option("remote"),
-                          self._instance(),
-                          out_path)]
+            f"{self.get_option('remote')}:{self._instance()}/{out_path}"]
 
         local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
 
@@ -150,16 +146,14 @@ class Connection(ConnectionBase):
         """ fetch a file from Incus to local """
         super(Connection, self).fetch_file(in_path, out_path)
 
-        self._display.vvv(u"FETCH {0} TO {1}".format(in_path, out_path),
+        self._display.vvv(f"FETCH {in_path} TO {out_path}",
                           host=self._instance())
 
         local_cmd = [
             self._incus_cmd,
             "--project", self.get_option("project"),
             "file", "pull", "--quiet",
-            "%s:%s/%s" % (self.get_option("remote"),
-                          self._instance(),
-                          in_path),
+            f"{self.get_option('remote')}:{self._instance()}/{in_path}",
             out_path]
 
         local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
