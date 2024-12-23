@@ -39,10 +39,10 @@ attributes:
 options:
   state:
     description:
-      - V(enabled) reloads firewall and enables firewall on boot.
-      - V(disabled) unloads firewall and disables firewall on boot.
+      - V(enabled) enables firewall.
+      - V(disabled) disables firewall.
       - V(reloaded) reloads firewall.
-      - V(reset) disables and resets firewall to installation defaults.
+      - V(reset) resets firewall to installation defaults.
     type: str
     choices: [ disabled, enabled, reloaded, reset ]
   default:
