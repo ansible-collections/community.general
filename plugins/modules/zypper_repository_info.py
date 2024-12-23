@@ -10,72 +10,67 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: zypper_repository_info
 author: "Tobias Zeuch (@TobiasZeuch181)"
 version_added: 10.0.0
 short_description: List Zypper repositories
 description:
-    - List Zypper repositories on SUSE and openSUSE.
+  - List Zypper repositories on SUSE and openSUSE.
 extends_documentation_fragment:
-    - community.general.attributes
-    - community.general.attributes.info_module
+  - community.general.attributes
+  - community.general.attributes.info_module
 
 requirements:
-    - "zypper >= 1.0  (included in openSUSE >= 11.1 or SUSE Linux Enterprise Server/Desktop >= 11.0)"
-    - python-xml
+  - "zypper >= 1.0  (included in openSUSE >= 11.1 or SUSE Linux Enterprise Server/Desktop >= 11.0)"
+  - python-xml
 notes:
-    - "For info about packages, use the module M(ansible.builtin.package_facts)."
-'''
+  - "For info about packages, use the module M(ansible.builtin.package_facts)."
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: List registered repositories and store in variable repositories
   community.general.zypper_repository_info: {}
   register: repodatalist
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 repodatalist:
-    description:
-        - A list of repository descriptions like it is returned by the command C(zypper repos).
-    type: list
-    returned: always
-    elements: dict
-    contains:
-        alias:
-            description: The alias of the repository.
-            type: str
-        autorefresh:
-            description: Indicates, if autorefresh is enabled on the repository.
-            type: int
-        enabled:
-            description: indicates, if the repository is enabled
-            type: int
-        gpgcheck:
-            description: indicates, if the GPG signature of the repository meta data is checked
-            type: int
-        name:
-            description: the name of the repository
-            type: str
-        priority:
-            description: the priority of the repository
-            type: int
-        url:
-            description: The URL of the repository on the internet.
-            type: str
-    sample: [
-                {
-                    "alias": "SLE-Product-SLES",
-                    "autorefresh": "1",
-                    "enabled": "1",
-                    "gpgcheck": "1",
-                    "name": "SLE-Product-SLES",
-                    "priority": "99",
-                    "url": "http://repo:50000/repo/SUSE/Products/SLE-Product-SLES/15-SP2/x86_64/product"
-                }
-            ]
-'''
+  description:
+    - A list of repository descriptions like it is returned by the command C(zypper repos).
+  type: list
+  returned: always
+  elements: dict
+  contains:
+    alias:
+      description: The alias of the repository.
+      type: str
+      sample: "SLE-Product-SLES"
+    autorefresh:
+      description: Indicates, if autorefresh is enabled on the repository.
+      type: int
+      sample: "1"
+    enabled:
+      description: Indicates, if the repository is enabled.
+      type: int
+      sample: "1"
+    gpgcheck:
+      description: Indicates, if the GPG signature of the repository meta data is checked.
+      type: int
+      sample: "1"
+    name:
+      description: The name of the repository.
+      type: str
+      sample: "SLE-Product-SLES"
+    priority:
+      description: The priority of the repository.
+      type: int
+      sample: "99"
+    url:
+      description: The URL of the repository on the internet.
+      type: str
+      sample: "http://repo:50000/repo/SUSE/Products/SLE-Product-SLES/15-SP2/x86_64/product"
+"""
 
 
 from ansible_collections.community.general.plugins.module_utils import deps

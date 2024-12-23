@@ -18,143 +18,141 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: zypper
 author:
-    - "Patrick Callahan (@dirtyharrycallahan)"
-    - "Alexander Gubin (@alxgu)"
-    - "Thomas O'Donnell (@andytom)"
-    - "Robin Roth (@robinro)"
-    - "Andrii Radyk (@AnderEnder)"
+  - "Patrick Callahan (@dirtyharrycallahan)"
+  - "Alexander Gubin (@alxgu)"
+  - "Thomas O'Donnell (@andytom)"
+  - "Robin Roth (@robinro)"
+  - "Andrii Radyk (@AnderEnder)"
 short_description: Manage packages on SUSE and openSUSE
 description:
-    - Manage packages on SUSE and openSUSE using the zypper and rpm tools.
-    - Also supports transactional updates, by running zypper inside C(/sbin/transactional-update --continue --drop-if-no-change --quiet run).
+  - Manage packages on SUSE and openSUSE using the zypper and rpm tools.
+  - Also supports transactional updates, by running zypper inside C(/sbin/transactional-update --continue --drop-if-no-change --quiet run).
 extends_documentation_fragment:
-    - community.general.attributes
-    - community.general.attributes
+  - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: full
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
 options:
-    name:
-        description:
-        - Package name V(name) or package specifier or a list of either.
-        - Can include a version like V(name=1.0), V(name>3.4) or V(name<=2.7). If a version is given, V(oldpackage) is implied and zypper is allowed to
-          update the package within the version range given.
-        - You can also pass a url or a local path to a rpm file.
-        - When using O(state=latest), this can be '*', which updates all installed packages.
-        required: true
-        aliases: [ 'pkg' ]
-        type: list
-        elements: str
-    state:
-        description:
-          - V(present) will make sure the package is installed.
-            V(latest)  will make sure the latest version of the package is installed.
-            V(absent)  will make sure the specified package is not installed.
-            V(dist-upgrade) will make sure the latest version of all installed packages from all enabled repositories is installed.
-          - When using V(dist-upgrade), O(name) should be V('*').
-        required: false
-        choices: [ present, latest, absent, dist-upgrade, installed, removed ]
-        default: "present"
-        type: str
-    type:
-        description:
-          - The type of package to be operated on.
-        required: false
-        choices: [ package, patch, pattern, product, srcpackage, application ]
-        default: "package"
-        type: str
-    extra_args_precommand:
-       required: false
-       description:
-         - Add additional global target options to C(zypper).
-         - Options should be supplied in a single line as if given in the command line.
-       type: str
-    disable_gpg_check:
-        description:
-          - Whether to disable to GPG signature checking of the package
-            signature being installed. Has an effect only if O(state) is
-            V(present) or V(latest).
-        required: false
-        default: false
-        type: bool
-    disable_recommends:
-        description:
-          - Corresponds to the C(--no-recommends) option for I(zypper). Default behavior (V(true)) modifies zypper's default behavior; V(false) does
-            install recommended packages.
-        required: false
-        default: true
-        type: bool
-    force:
-        description:
-          - Adds C(--force) option to I(zypper). Allows to downgrade packages and change vendor or architecture.
-        required: false
-        default: false
-        type: bool
-    force_resolution:
-        description:
-          - Adds C(--force-resolution) option to I(zypper). Allows to (un)install packages with conflicting requirements (resolver will choose a solution).
-        required: false
-        default: false
-        type: bool
-        version_added: '0.2.0'
-    update_cache:
-        description:
-          - Run the equivalent of C(zypper refresh) before the operation. Disabled in check mode.
-        required: false
-        default: false
-        type: bool
-        aliases: [ "refresh" ]
-    oldpackage:
-        description:
-          - Adds C(--oldpackage) option to I(zypper). Allows to downgrade packages with less side-effects than force. This is implied as soon as a
-            version is specified as part of the package name.
-        required: false
-        default: false
-        type: bool
-    extra_args:
-        required: false
-        description:
-          - Add additional options to C(zypper) command.
-          - Options should be supplied in a single line as if given in the command line.
-        type: str
-    allow_vendor_change:
-        type: bool
-        required: false
-        default: false
-        description:
-          - Adds C(--allow_vendor_change) option to I(zypper) dist-upgrade command.
-        version_added: '0.2.0'
-    replacefiles:
-        type: bool
-        required: false
-        default: false
-        description:
-          - Adds C(--replacefiles) option to I(zypper) install/update command.
-        version_added: '0.2.0'
-    clean_deps:
-        type: bool
-        required: false
-        default: false
-        description:
-          - Adds C(--clean-deps) option to I(zypper) remove command.
-        version_added: '4.6.0'
+  name:
+    description:
+      - Package name V(name) or package specifier or a list of either.
+      - Can include a version like V(name=1.0), V(name>3.4) or V(name<=2.7). If a version is given, V(oldpackage) is implied and zypper is allowed
+        to update the package within the version range given.
+      - You can also pass a url or a local path to a rpm file.
+      - When using O(state=latest), this can be V(*), which updates all installed packages.
+    required: true
+    aliases: ['pkg']
+    type: list
+    elements: str
+  state:
+    description:
+      - V(present) will make sure the package is installed.
+      - V(latest) will make sure the latest version of the package is installed.
+      - V(absent) will make sure the specified package is not installed.
+      - V(dist-upgrade) will make sure the latest version of all installed packages from all enabled repositories is installed.
+      - When using V(dist-upgrade), O(name) should be V(*).
+    required: false
+    choices: [present, latest, absent, dist-upgrade, installed, removed]
+    default: "present"
+    type: str
+  type:
+    description:
+      - The type of package to be operated on.
+    required: false
+    choices: [package, patch, pattern, product, srcpackage, application]
+    default: "package"
+    type: str
+  extra_args_precommand:
+    required: false
+    description:
+      - Add additional global target options to C(zypper).
+      - Options should be supplied in a single line as if given in the command line.
+    type: str
+  disable_gpg_check:
+    description:
+      - Whether to disable to GPG signature checking of the package signature being installed. Has an effect only if O(state) is V(present) or
+        V(latest).
+    required: false
+    default: false
+    type: bool
+  disable_recommends:
+    description:
+      - Corresponds to the C(--no-recommends) option for I(zypper). Default behavior (V(true)) modifies zypper's default behavior; V(false) does
+        install recommended packages.
+    required: false
+    default: true
+    type: bool
+  force:
+    description:
+      - Adds C(--force) option to I(zypper). Allows to downgrade packages and change vendor or architecture.
+    required: false
+    default: false
+    type: bool
+  force_resolution:
+    description:
+      - Adds C(--force-resolution) option to I(zypper). Allows to (un)install packages with conflicting requirements (resolver will choose a solution).
+    required: false
+    default: false
+    type: bool
+    version_added: '0.2.0'
+  update_cache:
+    description:
+      - Run the equivalent of C(zypper refresh) before the operation. Disabled in check mode.
+    required: false
+    default: false
+    type: bool
+    aliases: ["refresh"]
+  oldpackage:
+    description:
+      - Adds C(--oldpackage) option to I(zypper). Allows to downgrade packages with less side-effects than force. This is implied as soon as a
+        version is specified as part of the package name.
+    required: false
+    default: false
+    type: bool
+  extra_args:
+    required: false
+    description:
+      - Add additional options to C(zypper) command.
+      - Options should be supplied in a single line as if given in the command line.
+    type: str
+  allow_vendor_change:
+    type: bool
+    required: false
+    default: false
+    description:
+      - Adds C(--allow_vendor_change) option to I(zypper) dist-upgrade command.
+    version_added: '0.2.0'
+  replacefiles:
+    type: bool
+    required: false
+    default: false
+    description:
+      - Adds C(--replacefiles) option to I(zypper) install/update command.
+    version_added: '0.2.0'
+  clean_deps:
+    type: bool
+    required: false
+    default: false
+    description:
+      - Adds C(--clean-deps) option to I(zypper) remove command.
+    version_added: '4.6.0'
 notes:
-  - When used with a C(loop:) each package will be processed individually,
-    it is much more efficient to pass the list directly to the O(name) option.
+  - When used with a C(loop:) each package will be processed individually, it is much more efficient to pass the list directly to the O(name)
+    option.
 # informational: requirements for nodes
 requirements:
-    - "zypper >= 1.0  # included in openSUSE >= 11.1 or SUSE Linux Enterprise Server/Desktop >= 11.0"
-    - python-xml
-    - rpm
-'''
+  - "zypper >= 1.0  # included in openSUSE >= 11.1 or SUSE Linux Enterprise Server/Desktop >= 11.0"
+  - python-xml
+  - rpm
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Install nmap
   community.general.zypper:
     name: nmap
@@ -228,7 +226,7 @@ EXAMPLES = '''
     state: present
   environment:
     ZYPP_LOCK_TIMEOUT: 20
-'''
+"""
 
 import os.path
 import xml
