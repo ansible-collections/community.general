@@ -1,0 +1,2 @@
+minor_changes:
+  - proxmox_backup - refactor permission checking to improve code readability and maintainability (https://github.com/ansible-collections/community.general/pull/9239).
