@@ -159,7 +159,8 @@ class CallbackModule(CallbackBase):
         smtp.quit()
 
     def subject_msg(self, multiline, failtype, linenr):
-        return '%s: %s' % (failtype, multiline.strip('\r\n').splitlines()[linenr])
+        msg = multiline.strip('\r\n').splitlines()[linenr]
+        return f'{failtype}: {msg}'
 
     def indent(self, multiline, indent=8):
         return re.sub('^', ' ' * indent, multiline, flags=re.MULTILINE)
@@ -227,10 +228,10 @@ class CallbackModule(CallbackBase):
             body += self.body_blob(result._result['exception'], 'exception')
         if result._result.get('warnings'):
             for i in range(len(result._result.get('warnings'))):
-                body += self.body_blob(result._result['warnings'][i], 'exception %d' % (i + 1))
+                body += self.body_blob(result._result['warnings'][i], f'exception {i + 1}')
         if result._result.get('deprecations'):
             for i in range(len(result._result.get('deprecations'))):
-                body += self.body_blob(result._result['deprecations'][i], 'exception %d' % (i + 1))
+                body += self.body_blob(result._result['deprecations'][i], f'exception {i + 1}')
 
         body += 'and a complete dump of the error:\n\n'
         body += self.indent(f'{failtype}: {json.dumps(result._result, cls=AnsibleJSONEncoder, indent=4)}')

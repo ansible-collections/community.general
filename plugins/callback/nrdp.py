@@ -134,7 +134,7 @@ class CallbackModule(CallbackBase):
         xmldata += "<checkresult type='service'>\n"
         xmldata += f"<hostname>{self.hostname}</hostname>\n"
         xmldata += f"<servicename>{self.servicename}</servicename>\n"
-        xmldata += "<state>%d</state>\n" % state
+        xmldata += f"<state>{state}</state>\n"
         xmldata += f"<output>{msg}</output>\n"
         xmldata += "</checkresult>\n"
         xmldata += "</checkresults>\n"
@@ -170,10 +170,9 @@ class CallbackModule(CallbackBase):
         critical = warning = 0
         for host in hosts:
             stat = stats.summarize(host)
-            gstats += "'%s_ok'=%d '%s_changed'=%d \
-                       '%s_unreachable'=%d '%s_failed'=%d " % \
-                (host, stat['ok'], host, stat['changed'],
-                 host, stat['unreachable'], host, stat['failures'])
+            gstats += (
+                f"'{host}_ok'={stat['ok']} '{host}_changed'={stat['changed']} '{host}_unreachable'={stat['unreachable']} '{host}_failed'={stat['failures']} "
+            )
             # Critical when failed tasks or unreachable host
             critical += stat['failures']
             critical += stat['unreachable']

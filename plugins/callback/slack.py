@@ -170,7 +170,8 @@ class CallbackModule(CallbackBase):
         title.append(f'\n\n*{self.playbook_name}*')
         msg_items = [' '.join(title)]
         if invocation_items:
-            msg_items.append('```\n%s\n```' % '\n'.join(invocation_items))
+            _inv_item = '\n'.join(invocation_items)
+            msg_items.append(f'```\n{_inv_item}\n```')
 
         msg = '\n'.join(msg_items)
 

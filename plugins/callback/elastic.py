@@ -166,7 +166,7 @@ class ElasticSource(object):
         args = None
 
         if not task.no_log and not hide_task_arguments:
-            args = ', '.join(('%s=%s' % a for a in task.args.items()))
+            args = ', '.join((f'{k}={v}' for k, v in task.args.items()))
 
         tasks_data[uuid] = TaskData(uuid, name, path, play_name, action, args)
 

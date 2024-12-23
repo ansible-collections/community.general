@@ -252,7 +252,7 @@ class CallbackModule(CallbackModule_default):
     def _display_progress(self, result=None):
         # Always rewrite the complete line
         sys.stdout.write(vt100.restore + vt100.reset + vt100.clearline + vt100.nolinewrap + vt100.underline)
-        sys.stdout.write('%s %d:' % (self.type, self.count[self.type]))
+        sys.stdout.write(f'{self.type} {self.count[self.type]}:')
         sys.stdout.write(vt100.reset)
         sys.stdout.flush()
 
@@ -274,7 +274,7 @@ class CallbackModule(CallbackModule_default):
         if not self.shown_title:
             self.shown_title = True
             sys.stdout.write(vt100.restore + vt100.reset + vt100.clearline + vt100.underline)
-            sys.stdout.write('%s %d: %s' % (self.type, self.count[self.type], self.task.get_name().strip()))
+            sys.stdout.write(f'{self.type} {self.count[self.type]}: {self.task.get_name().strip()}')
             sys.stdout.write(f"{vt100.restore + vt100.reset}\n{vt100.save}{vt100.clearline}")
             sys.stdout.flush()
         else:
@@ -341,7 +341,7 @@ class CallbackModule(CallbackModule_default):
         name = play.get_name().strip()
         if not name:
             name = 'unnamed'
-        sys.stdout.write('PLAY %d: %s' % (self.count['play'], name.upper()))
+        sys.stdout.write(f"PLAY {self.count['play']}: {name.upper()}")
         sys.stdout.write(f"{vt100.restore + vt100.reset}\n{vt100.save}{vt100.clearline}")
         sys.stdout.flush()
 
@@ -365,7 +365,7 @@ class CallbackModule(CallbackModule_default):
             self.count['task'] += 1
 
         # Write the next task on screen (behind the prompt is the previous output)
-        sys.stdout.write('%s %d.' % (self.type, self.count[self.type]))
+        sys.stdout.write(f'{self.type} {self.count[self.type]}.')
         sys.stdout.write(vt100.reset)
         sys.stdout.flush()
 
@@ -388,7 +388,7 @@ class CallbackModule(CallbackModule_default):
             self.count[self.type] += 1
 
         # Write the next task on screen (behind the prompt is the previous output)
-        sys.stdout.write('%s %d.' % (self.type, self.count[self.type]))
+        sys.stdout.write(f'{self.type} {self.count[self.type]}.')
         sys.stdout.write(vt100.reset)
         sys.stdout.flush()
 
