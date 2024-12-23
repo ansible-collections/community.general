@@ -124,4 +124,4 @@ class BecomeModule(BecomeBase):
 
         flags = self.get_option('become_flags')
         user = self.get_option('become_user')
-        return '%s %s %s -e %s ' % (exe, user, flags, self._build_success_command(cmd, shell))
+        return f'{exe} {user} {flags} -e {self._build_success_command(cmd, shell)} '

@@ -78,4 +78,4 @@ class BecomeModule(BecomeBase):
         become = self.get_option('become_exe')
 
         flags = self.get_option('become_flags')
-        return '%s %s %s' % (become, flags, shlex_quote(self._build_success_command(cmd, shell)))
+        return f'{become} {flags} {shlex_quote(self._build_success_command(cmd, shell))}'

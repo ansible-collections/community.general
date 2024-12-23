@@ -125,9 +125,9 @@ class BecomeModule(BecomeBase):
             flags += ' -n'
 
         become_user = self.get_option('become_user')
-        user = '-u %s' % (become_user) if become_user else ''
+        user = f'-u {become_user}' if become_user else ''
 
         success_cmd = self._build_success_command(cmd, shell, noexe=True)
         executable = getattr(shell, 'executable', shell.SHELL_FAMILY)
 
-        return '%s %s %s %s -c %s' % (become_exe, flags, user, executable, success_cmd)
+        return f'{become_exe} {flags} {user} {executable} -c {success_cmd}'

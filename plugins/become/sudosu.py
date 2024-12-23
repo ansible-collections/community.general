@@ -98,16 +98,16 @@ class BecomeModule(BecomeBase):
         flags = self.get_option('become_flags') or ''
         prompt = ''
         if self.get_option('become_pass'):
-            self.prompt = '[sudo via ansible, key=%s] password:' % self._id
+            self.prompt = f'[sudo via ansible, key={self._id}] password:'
             if flags:  # this could be simplified, but kept as is for now for backwards string matching
                 flags = flags.replace('-n', '')
-            prompt = '-p "%s"' % (self.prompt)
+            prompt = f'-p "{self.prompt}"'
 
         user = self.get_option('become_user') or ''
         if user:
-            user = '%s' % (user)
+            user = f'{user}'
 
         if self.get_option('alt_method'):
-            return ' '.join([becomecmd, flags, prompt, "su -l", user, "-c", self._build_success_command(cmd, shell, True)])
+            return f"{becomecmd} {flags} {prompt} su -l {user} -c {self._build_success_command(cmd, shell, True)}"
         else:
-            return ' '.join([becomecmd, flags, prompt, 'su -l', user, self._build_success_command(cmd, shell)])
+            return f"{becomecmd} {flags} {prompt} su -l {user} {self._build_success_command(cmd, shell)}"
