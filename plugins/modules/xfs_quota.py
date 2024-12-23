@@ -12,7 +12,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 DOCUMENTATION = r"""
----
 module: xfs_quota
 short_description: Manage quotas on XFS filesystems
 description:
@@ -85,7 +84,7 @@ options:
       - absent
 
 requirements:
-   - xfsprogs
+  - xfsprogs
 """
 
 EXAMPLES = r"""
@@ -109,40 +108,39 @@ EXAMPLES = r"""
     mountpoint: /home
     isoft: 1024
     ihard: 2048
-
 """
 
 RETURN = r"""
 bhard:
-    description: the current bhard setting in bytes
-    returned: always
-    type: int
-    sample: 1024
+  description: The current C(bhard) setting in bytes.
+  returned: always
+  type: int
+  sample: 1024
 bsoft:
-    description: the current bsoft setting in bytes
-    returned: always
-    type: int
-    sample: 1024
+  description: The current C(bsoft) setting in bytes.
+  returned: always
+  type: int
+  sample: 1024
 ihard:
-    description: the current ihard setting in bytes
-    returned: always
-    type: int
-    sample: 100
+  description: The current C(ihard) setting in bytes.
+  returned: always
+  type: int
+  sample: 100
 isoft:
-    description: the current isoft setting in bytes
-    returned: always
-    type: int
-    sample: 100
+  description: The current C(isoft) setting in bytes.
+  returned: always
+  type: int
+  sample: 100
 rtbhard:
-    description: the current rtbhard setting in bytes
-    returned: always
-    type: int
-    sample: 1024
+  description: The current C(rtbhard) setting in bytes.
+  returned: always
+  type: int
+  sample: 1024
 rtbsoft:
-    description: the current rtbsoft setting in bytes
-    returned: always
-    type: int
-    sample: 1024
+  description: The current C(rtbsoft) setting in bytes.
+  returned: always
+  type: int
+  sample: 1024
 """
 
 import grp
