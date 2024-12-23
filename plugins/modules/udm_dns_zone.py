@@ -31,7 +31,7 @@ options:
     default: "present"
     choices: [present, absent]
     description:
-      - Whether the dns zone is present or not.
+      - Whether the DNS zone is present or not.
   type:
     type: str
     required: true
