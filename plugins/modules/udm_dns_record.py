@@ -16,7 +16,7 @@ author:
   - Tobias Rüetschi (@keachi)
 short_description: Manage dns entries on a univention corporate server
 description:
-  - This module allows to manage dns records on a univention corporate server (UCS). It uses the python API of the UCS to create a new object
+  - This module allows to manage dns records on a univention corporate server (UCS). It uses the Python API of the UCS to create a new object
     or edit it.
 requirements:
   - Univention
