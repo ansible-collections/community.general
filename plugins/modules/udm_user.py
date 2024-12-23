@@ -16,7 +16,7 @@ author:
   - Tobias Rüetschi (@keachi)
 short_description: Manage posix users on a univention corporate server
 description:
-  - This module allows to manage posix users on a univention corporate server (UCS). It uses the python API of the UCS to create a new object
+  - This module allows to manage posix users on a univention corporate server (UCS). It uses the Python API of the UCS to create a new object
     or edit it.
 notes:
   - This module requires the deprecated L(crypt Python module, https://docs.python.org/3.12/library/crypt.html) library which was removed from
@@ -109,7 +109,7 @@ options:
     elements: str
   home_share:
     description:
-      - Home NFS share. Must be a LDAP DN, e.g. V(cn=home,cn=shares,ou=school,dc=example,dc=com).
+      - Home NFS share. Must be a LDAP DN, for example V(cn=home,cn=shares,ou=school,dc=example,dc=com).
     aliases: [homeShare]
     type: str
   home_share_path:

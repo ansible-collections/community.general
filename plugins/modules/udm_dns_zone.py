@@ -16,7 +16,7 @@ author:
   - Tobias Rüetschi (@keachi)
 short_description: Manage dns zones on a univention corporate server
 description:
-  - This module allows to manage dns zones on a univention corporate server (UCS). It uses the python API of the UCS to create a new object or
+  - This module allows to manage dns zones on a univention corporate server (UCS). It uses the Python API of the UCS to create a new object or
     edit it.
 extends_documentation_fragment:
   - community.general.attributes

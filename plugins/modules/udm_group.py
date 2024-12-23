@@ -16,7 +16,7 @@ author:
   - Tobias Rüetschi (@keachi)
 short_description: Manage of the posix group
 description:
-  - This module allows to manage user groups on a univention corporate server (UCS). It uses the python API of the UCS to create a new object
+  - This module allows to manage user groups on a univention corporate server (UCS). It uses the Python API of the UCS to create a new object
     or edit it.
 extends_documentation_fragment:
   - community.general.attributes
@@ -36,7 +36,7 @@ options:
   name:
     required: true
     description:
-      - Name of the posix group.
+      - Name of the POSIX group.
     type: str
   description:
     required: false
@@ -46,19 +46,19 @@ options:
   position:
     required: false
     description:
-      - Define the whole ldap position of the group, e.g. V(cn=g123m-1A,cn=classes,cn=schueler,cn=groups,ou=schule,dc=example,dc=com).
+      - Define the whole LDAP position of the group, for example V(cn=g123m-1A,cn=classes,cn=schueler,cn=groups,ou=schule,dc=example,dc=com).
     type: str
     default: ''
   ou:
     required: false
     description:
-      - LDAP OU, e.g. school for LDAP OU V(ou=school,dc=example,dc=com).
+      - LDAP OU, for example V(school) for LDAP OU V(ou=school,dc=example,dc=com).
     type: str
     default: ''
   subpath:
     required: false
     description:
-      - Subpath inside the OU, e.g. V(cn=classes,cn=students,cn=groups).
+      - Subpath inside the OU, for example V(cn=classes,cn=students,cn=groups).
     type: str
     default: "cn=groups"
 """
