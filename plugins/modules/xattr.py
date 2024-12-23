@@ -43,7 +43,7 @@ options:
     type: str
   state:
     description:
-      - defines which state you want to do.
+      - Defines which state you want to do.
       - V(read) retrieves the current value for a O(key).
       - V(present) sets O(path) to O(value), default if value is set.
       - V(all) dumps all data.
