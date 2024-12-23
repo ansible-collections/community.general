@@ -32,6 +32,34 @@ action_groups:
     - proxmox_template
     - proxmox_user_info
     - proxmox_vm_info
+  keycloak:
+    - keycloak_authentication
+    - keycloak_authentication_required_actions
+    - keycloak_authz_authorization_scope
+    - keycloak_authz_custom_policy
+    - keycloak_authz_permission
+    - keycloak_authz_permission_info
+    - keycloak_client
+    - keycloak_client_rolemapping
+    - keycloak_client_rolescope
+    - keycloak_clientscope
+    - keycloak_clientscope_type
+    - keycloak_clientsecret_info
+    - keycloak_clientsecret_regenerate
+    - keycloak_clienttemplate
+    - keycloak_component
+    - keycloak_component_info
+    - keycloak_group
+    - keycloak_identity_provider
+    - keycloak_realm
+    - keycloak_realm_key
+    - keycloak_realm_keys_metadata_info
+    - keycloak_realm_rolemapping
+    - keycloak_role
+    - keycloak_user
+    - keycloak_user_federation
+    - keycloak_user_rolemapping
+    - keycloak_userprofile
 plugin_routing:
   callback:
     actionable:

@@ -31,6 +31,10 @@ description:
       The Authorization Services paths and payloads have not officially been documented by the Keycloak project.
       U(https://www.puppeteers.net/blog/keycloak-authorization-services-rest-api-paths-and-payload/)
 
+attributes:
+    action_group:
+        version_added: 10.2.0
+
 options:
     name:
         description:
@@ -51,6 +55,7 @@ options:
 
 extends_documentation_fragment:
     - community.general.keycloak
+    - community.general.keycloak.actiongroup_keycloak
     - community.general.attributes
     - community.general.attributes.info_module
 
