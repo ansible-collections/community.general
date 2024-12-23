@@ -39,7 +39,7 @@ options:
     type: str
     required: true
     description:
-      - Name of the record, this is also the DNS record. E.g. www for www.example.com.
+      - Name of the record, this is also the DNS record. For example V(www) for www.example.com.
       - For PTR records this has to be the IP address.
   zone:
     type: str
