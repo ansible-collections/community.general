@@ -139,7 +139,7 @@ class CallbackModule(CallbackBase):
         if not task.no_log and C.DISPLAY_ARGS_TO_STDOUT:
             args = ', '.join(('{k}={v}' for k, v in task.args.items()))
             args = f' {args}'
-        self._display.banner(f"TASK {int(self._task_counter)}/{int(self._task_total)} [{task.get_name().strip()}{args}]")
+        self._display.banner(f"TASK {self._task_counter}/{self._task_total} [{task.get_name().strip()}{args}]")
         if self._display.verbosity >= 2:
             path = task.get_path()
             if path:
@@ -160,15 +160,15 @@ class CallbackModule(CallbackBase):
             return
         elif result._result.get('changed', False):
             if delegated_vars:
-                msg = f"changed: {int(self._host_counter)}/{int(self._host_total)} [{result._host.get_name()} -> {delegated_vars['ansible_host']}]"
+                msg = f"changed: {self._host_counter}/{self._host_total} [{result._host.get_name()} -> {delegated_vars['ansible_host']}]"
             else:
-                msg = f"changed: {int(self._host_counter)}/{int(self._host_total)} [{result._host.get_name()}]"
+                msg = f"changed: {self._host_counter}/{self._host_total} [{result._host.get_name()}]"
             color = C.COLOR_CHANGED
         else:
             if delegated_vars:
-                msg = f"ok: {int(self._host_counter)}/{int(self._host_total)} [{result._host.get_name()} -> {delegated_vars['ansible_host']}]"
+                msg = f"ok: {self._host_counter}/{self._host_total} [{result._host.get_name()} -> {delegated_vars['ansible_host']}]"
             else:
-                msg = f"ok: {int(self._host_counter)}/{int(self._host_total)} [{result._host.get_name()}]"
+                msg = f"ok: {self._host_counter}/{self._host_total} [{result._host.get_name()}]"
             color = C.COLOR_OK
 
         self._handle_warnings(result._result)
@@ -201,13 +201,13 @@ class CallbackModule(CallbackBase):
         else:
             if delegated_vars:
                 self._display.display(
-                    f"fatal: {int(self._host_counter)}/{int(self._host_total)} [{result._host.get_name()} -> "
+                    f"fatal: {self._host_counter}/{self._host_total} [{result._host.get_name()} -> "
                     f"{delegated_vars['ansible_host']}]: FAILED! => {self._dump_results(result._result)}",
                     color=C.COLOR_ERROR
                 )
             else:
                 self._display.display(
-                    f"fatal: {int(self._host_counter)}/{int(self._host_total)} [{result._host.get_name()}]: FAILED! => {self._dump_results(result._result)}",
+                    f"fatal: {self._host_counter}/{self._host_total} [{result._host.get_name()}]: FAILED! => {self._dump_results(result._result)}",
                     color=C.COLOR_ERROR
                 )
 
@@ -227,7 +227,7 @@ class CallbackModule(CallbackBase):
             if result._task.loop and 'results' in result._result:
                 self._process_items(result)
             else:
-                msg = f"skipping: {int(self._host_counter)}/{int(self._host_total)} [{result._host.get_name()}]"
+                msg = f"skipping: {self._host_counter}/{self._host_total} [{result._host.get_name()}]"
                 if self._run_is_verbose(result):
                     msg += f" => {self._dump_results(result._result)}"
                 self._display.display(msg, color=C.COLOR_SKIP)
@@ -241,12 +241,12 @@ class CallbackModule(CallbackBase):
         delegated_vars = result._result.get('_ansible_delegated_vars', None)
         if delegated_vars:
             self._display.display(
-                f"fatal: {int(self._host_counter)}/{int(self._host_total)} [{result._host.get_name()} -> "
+                f"fatal: {self._host_counter}/{self._host_total} [{result._host.get_name()} -> "
                 f"{delegated_vars['ansible_host']}]: UNREACHABLE! => {self._dump_results(result._result)}",
                 color=C.COLOR_UNREACHABLE
             )
         else:
             self._display.display(
-                f"fatal: {int(self._host_counter)}/{int(self._host_total)} [{result._host.get_name()}]: UNREACHABLE! => {self._dump_results(result._result)}",
+                f"fatal: {self._host_counter}/{self._host_total} [{result._host.get_name()}]: UNREACHABLE! => {self._dump_results(result._result)}",
                 color=C.COLOR_UNREACHABLE
             )
