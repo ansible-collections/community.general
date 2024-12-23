@@ -129,13 +129,13 @@ class ActionModule(ActionBase):
         if is_string(search_paths):
             search_paths = [search_paths]
 
-        # Error if we didn't get a list
-        err_msg = f"'search_paths' must be a string or flat list of strings, got {search_paths}"
         try:
             incorrect_type = any(not is_string(x) for x in search_paths)
             if not isinstance(search_paths, list) or incorrect_type:
                 raise TypeError
         except TypeError:
+            # Error if we didn't get a list
+            err_msg = f"'search_paths' must be a string or flat list of strings, got {search_paths}"
             raise AnsibleError(err_msg)
 
         full_path = find_command(shutdown_bin, search_paths)  # find the path to the shutdown command
