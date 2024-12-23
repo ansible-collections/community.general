@@ -400,7 +400,7 @@ class LookupModule(LookupBase):
             else:
                 domains.append(t)
 
-        # print "--- domain = {0} qtype={1} rdclass={2}".format(domain, qtype, rdclass)
+        # print "--- domain = {domain} qtype={qtype} rdclass={rdclass}"
 
         if port:
             myres.port = port

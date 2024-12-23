@@ -78,11 +78,13 @@ class ApiError(Exception):
 
 
 class ManifoldApiClient(object):
-    base_url = 'https://api.{api}.manifold.co/v1/{endpoint}'
     http_agent = 'python-manifold-ansible-1.0.0'
 
     def __init__(self, token):
         self._token = token
+
+    def _make_url(self, api, endpoint):
+        return f'https://api.{api}.manifold.co/v1/{endpoint}'
 
     def request(self, api, endpoint, *args, **kwargs):
         """
@@ -102,7 +104,7 @@ class ManifoldApiClient(object):
             'Accept': "*/*"  # Otherwise server doesn't set content-type header
         }
 
-        url = self.base_url.format(api=api, endpoint=endpoint)
+        url = self._make_url(api, endpoint)
 
         headers = default_headers
         arg_headers = kwargs.pop('headers', None)

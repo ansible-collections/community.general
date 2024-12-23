@@ -226,8 +226,7 @@ class LookupModule(LookupBase):
                 dest[key] += value
             else:
                 if (key in dest) and dest[key] != value:
-                    msg = "The key '{0}' with value '{1}' will be overwritten with value '{2}' from '{3}.{0}'".format(
-                        key, dest[key], value, ".".join(path))
+                    msg = f"The key '{key}' with value '{dest[key]}' will be overwritten with value '{value}' from '{'.'.join(path)}.{key}'"
 
                     if self._override == "error":
                         raise AnsibleError(msg)
