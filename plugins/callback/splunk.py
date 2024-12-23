@@ -154,7 +154,7 @@ class SplunkHTTPCollectorSource(object):
 
         # This wraps the json payload in and outer json event needed by Splunk
         jsondata = json.dumps(data, cls=AnsibleJSONEncoder, sort_keys=True)
-        jsondata = ('{"event":' f"{jsondata}" '}')
+        jsondata = '{"event":%s}' % jsondata
 
         open_url(
             url,
