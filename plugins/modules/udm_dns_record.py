@@ -45,7 +45,7 @@ options:
     type: str
     required: true
     description:
-      - Corresponding DNS zone for this record, e.g. example.com.
+      - Corresponding DNS zone for this record, for example V(example.com).
       - For PTR records this has to be the full reverse zone (for example V(1.1.192.in-addr.arpa)).
   type:
     type: str
