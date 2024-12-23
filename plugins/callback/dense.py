@@ -195,7 +195,7 @@ class CallbackModule(CallbackModule_default):
             self.disabled = True
 
     def __del__(self):
-        sys.stdout.write(f"{vt100.restore + vt100.reset}\n{vt100.save}{vt100.clearline}")
+        sys.stdout.write(f"{vt100.restore}{vt100.reset}\n{vt100.save}{vt100.clearline}")
 
     def _add_host(self, result, status):
         name = result._host.get_name()
@@ -275,7 +275,7 @@ class CallbackModule(CallbackModule_default):
             self.shown_title = True
             sys.stdout.write(vt100.restore + vt100.reset + vt100.clearline + vt100.underline)
             sys.stdout.write(f'{self.type} {self.count[self.type]}: {self.task.get_name().strip()}')
-            sys.stdout.write(f"{vt100.restore + vt100.reset}\n{vt100.save}{vt100.clearline}")
+            sys.stdout.write(f"{vt100.restore}{vt100.reset}\n{vt100.save}{vt100.clearline}")
             sys.stdout.flush()
         else:
             sys.stdout.write(vt100.restore + vt100.reset + vt100.clearline)
@@ -284,7 +284,7 @@ class CallbackModule(CallbackModule_default):
     def _display_results(self, result, status):
         # Leave the previous task on screen (as it has changes/errors)
         if self._display.verbosity == 0 and self.keep:
-            sys.stdout.write(f"{vt100.restore + vt100.reset}\n{vt100.save}{vt100.clearline}")
+            sys.stdout.write(f"{vt100.restore}{vt100.reset}\n{vt100.save}{vt100.clearline}")
         else:
             sys.stdout.write(vt100.restore + vt100.reset + vt100.clearline)
         self.keep = False
@@ -327,7 +327,7 @@ class CallbackModule(CallbackModule_default):
     def v2_playbook_on_play_start(self, play):
         # Leave the previous task on screen (as it has changes/errors)
         if self._display.verbosity == 0 and self.keep:
-            sys.stdout.write(f"{vt100.restore + vt100.reset}\n{vt100.save}{vt100.clearline}{vt100.bold}")
+            sys.stdout.write(f"{vt100.restore}{vt100.reset}\n{vt100.save}{vt100.clearline}{vt100.bold}")
         else:
             sys.stdout.write(vt100.restore + vt100.reset + vt100.clearline + vt100.bold)
 
@@ -342,13 +342,13 @@ class CallbackModule(CallbackModule_default):
         if not name:
             name = 'unnamed'
         sys.stdout.write(f"PLAY {self.count['play']}: {name.upper()}")
-        sys.stdout.write(f"{vt100.restore + vt100.reset}\n{vt100.save}{vt100.clearline}")
+        sys.stdout.write(f"{vt100.restore}{vt100.reset}\n{vt100.save}{vt100.clearline}")
         sys.stdout.flush()
 
     def v2_playbook_on_task_start(self, task, is_conditional):
         # Leave the previous task on screen (as it has changes/errors)
         if self._display.verbosity == 0 and self.keep:
-            sys.stdout.write(f"{vt100.restore + vt100.reset}\n{vt100.save}{vt100.clearline}{vt100.underline}")
+            sys.stdout.write(f"{vt100.restore}{vt100.reset}\n{vt100.save}{vt100.clearline}{vt100.underline}")
         else:
             # Do not clear line, since we want to retain the previous output
             sys.stdout.write(vt100.restore + vt100.reset + vt100.underline)
@@ -372,7 +372,7 @@ class CallbackModule(CallbackModule_default):
     def v2_playbook_on_handler_task_start(self, task):
         # Leave the previous task on screen (as it has changes/errors)
         if self._display.verbosity == 0 and self.keep:
-            sys.stdout.write(f"{vt100.restore + vt100.reset}\n{vt100.save}{vt100.clearline}{vt100.underline}")
+            sys.stdout.write(f"{vt100.restore}{vt100.reset}\n{vt100.save}{vt100.clearline}{vt100.underline}")
         else:
             sys.stdout.write(vt100.restore + vt100.reset + vt100.clearline + vt100.underline)
 
@@ -451,13 +451,13 @@ class CallbackModule(CallbackModule_default):
 
     def v2_playbook_on_no_hosts_remaining(self):
         if self._display.verbosity == 0 and self.keep:
-            sys.stdout.write(f"{vt100.restore + vt100.reset}\n{vt100.save}{vt100.clearline}")
+            sys.stdout.write(f"{vt100.restore}{vt100.reset}\n{vt100.save}{vt100.clearline}")
         else:
             sys.stdout.write(vt100.restore + vt100.reset + vt100.clearline)
         self.keep = False
 
         sys.stdout.write(f"{vt100.white + vt100.redbg}NO MORE HOSTS LEFT")
-        sys.stdout.write(f"{vt100.restore + vt100.reset}\n{vt100.save}{vt100.clearline}")
+        sys.stdout.write(f"{vt100.restore}{vt100.reset}\n{vt100.save}{vt100.clearline}")
         sys.stdout.flush()
 
     def v2_playbook_on_include(self, included_file):
@@ -465,7 +465,7 @@ class CallbackModule(CallbackModule_default):
 
     def v2_playbook_on_stats(self, stats):
         if self._display.verbosity == 0 and self.keep:
-            sys.stdout.write(f"{vt100.restore + vt100.reset}\n{vt100.save}{vt100.clearline}")
+            sys.stdout.write(f"{vt100.restore}{vt100.reset}\n{vt100.save}{vt100.clearline}")
         else:
             sys.stdout.write(vt100.restore + vt100.reset + vt100.clearline)
 
@@ -476,7 +476,7 @@ class CallbackModule(CallbackModule_default):
         sys.stdout.write(vt100.bold + vt100.underline)
         sys.stdout.write('SUMMARY')
 
-        sys.stdout.write(f"{vt100.restore + vt100.reset}\n{vt100.save}{vt100.clearline}")
+        sys.stdout.write(f"{vt100.restore}{vt100.reset}\n{vt100.save}{vt100.clearline}")
         sys.stdout.flush()
 
         hosts = sorted(stats.processed.keys())
