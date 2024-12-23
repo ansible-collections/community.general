@@ -138,7 +138,7 @@ class InventoryModule(BaseInventoryPlugin):
         try:
             response = open_url(url, headers=self.headers)
         except Exception as e:
-            self.display.warning("An error happened while fetching: %s" % url)
+            self.display.warning(f"An error happened while fetching: {url}")
             return None
 
         try:
@@ -245,8 +245,8 @@ class InventoryModule(BaseInventoryPlugin):
         }
 
         self.headers = {
-            'Authorization': "Bearer %s" % token,
-            'User-Agent': "ansible %s Python %s" % (ansible_version, python_version.split(' ', 1)[0]),
+            'Authorization': f"Bearer {token}",
+            'User-Agent': f"ansible {ansible_version} Python {python_version.split(' ', 1)[0]}",
             'Content-type': 'application/json'
         }
 
