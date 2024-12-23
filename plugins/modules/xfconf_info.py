@@ -124,7 +124,7 @@ version:
   returned: success
   type: str
   sample: 4.18.1
-  vesion_added: 10.2.0
+  version_added: 10.2.0
 """
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
