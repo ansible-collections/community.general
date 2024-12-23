@@ -1,4 +1,5 @@
 .azure-pipelines/scripts/publish-codecov.py replace-urlopen
+plugins/lookup/dependent.py validate-modules:unidiomatic-typecheck
 plugins/modules/consul_session.py validate-modules:parameter-state-invalid-choice
 plugins/modules/homectl.py import-3.11  # Uses deprecated stdlib library 'crypt'
 plugins/modules/iptables_state.py validate-modules:undocumented-parameter             # params _back and _timeout used by action plugin
