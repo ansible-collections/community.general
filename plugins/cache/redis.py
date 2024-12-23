@@ -131,7 +131,7 @@ class CacheModule(BaseCacheModule):
             connection = self._parse_connection(self.re_url_conn, uri)
             self._db = StrictRedis(*connection, **kw)
 
-        display.vv('Redis connection: %s' % self._db)
+        display.vv(f'Redis connection: {self._db}')
 
     @staticmethod
     def _parse_connection(re_patt, uri):
@@ -164,12 +164,12 @@ class CacheModule(BaseCacheModule):
                 pass  # password is optional
 
         sentinels = [self._parse_connection(self.re_sent_conn, shost) for shost in connections]
-        display.vv('\nUsing redis sentinels: %s' % sentinels)
+        display.vv(f'\nUsing redis sentinels: {sentinels}')
         scon = Sentinel(sentinels, **kw)
         try:
             return scon.master_for(self._sentinel_service_name, socket_timeout=0.2)
         except Exception as exc:
-            raise AnsibleError('Could not connect to redis sentinel: %s' % to_native(exc))
+            raise AnsibleError(f'Could not connect to redis sentinel: {to_native(exc)}')
 
     def _make_key(self, key):
         return self._prefix + key
