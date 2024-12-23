@@ -97,7 +97,7 @@ options:
     default: []
   network:
     description:
-      - The network reference name. The objects contains the known ip addresses for the authentication object (network/aaa).
+      - The network reference name. The objects contains the known IP addresses for the authentication object (network/aaa).
     type: str
     default: ""
   radius_groups:
