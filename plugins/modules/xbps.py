@@ -10,86 +10,78 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: xbps
 short_description: Manage packages with XBPS
 description:
-    - Manage packages with the XBPS package manager.
+  - Manage packages with the XBPS package manager.
 author:
-    - "Dino Occhialini (@dinoocch)"
-    - "Michael Aldridge (@the-maldridge)"
+  - "Dino Occhialini (@dinoocch)"
+  - "Michael Aldridge (@the-maldridge)"
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    name:
-        description:
-            - Name of the package to install, upgrade, or remove.
-        aliases: [pkg,package]
-        type: list
-        elements: str
-    state:
-        description:
-            - Desired state of the package.
-        default: "present"
-        choices: ["present", "absent", "latest", "installed", "removed"]
-        type: str
-    recurse:
-        description:
-            - When removing a package, also remove its dependencies, provided
-              that they are not required by other packages and were not
-              explicitly installed by a user.
-        type: bool
-        default: false
-    update_cache:
-        description:
-            - Whether or not to refresh the master package lists. This can be
-              run as part of a package installation or as a separate step.
-        type: bool
-        default: true
-    upgrade:
-        description:
-            - Whether or not to upgrade whole system
-        type: bool
-        default: false
-    upgrade_xbps:
-        description:
-            - Whether or not to upgrade the xbps package when necessary.
-              Before installing new packages,
-              xbps requires the user to update the xbps package itself.
-              Thus when this option is set to V(false),
-              upgrades and installations will fail when xbps is not up to date.
-        type: bool
-        default: true
-        version_added: '0.2.0'
-    root:
-        description:
-            - The full path for the target root directory.
-        type: path
-        version_added: '10.2.0'
-    repositories:
-        description:
-            - Repository URL(s) to prepend to the repository list for the
-              package installation.
-              The URL can be a URL to a repository for
-              remote repositories or a path for local repositories.
-        type: list
-        elements: str
-        version_added: '10.2.0'
-    accept_pubkey:
-        description:
-            - Whether or not repository signing keys should be automatically accepted.
-        type: bool
-        default: false
-        version_added: '10.2.0'
-'''
+  name:
+    description:
+      - Name of the package to install, upgrade, or remove.
+    aliases: [pkg, package]
+    type: list
+    elements: str
+  state:
+    description:
+      - Desired state of the package.
+    default: "present"
+    choices: ["present", "absent", "latest", "installed", "removed"]
+    type: str
+  recurse:
+    description:
+      - When removing a package, also remove its dependencies, provided that they are not required by other packages and were not explicitly installed
+        by a user.
+    type: bool
+    default: false
+  update_cache:
+    description:
+      - Whether or not to refresh the master package lists. This can be run as part of a package installation or as a separate step.
+    type: bool
+    default: true
+  upgrade:
+    description:
+      - Whether or not to upgrade whole system.
+    type: bool
+    default: false
+  upgrade_xbps:
+    description:
+      - Whether or not to upgrade the xbps package when necessary. Before installing new packages, xbps requires the user to update the xbps package
+        itself. Thus when this option is set to V(false), upgrades and installations will fail when xbps is not up to date.
+    type: bool
+    default: true
+    version_added: '0.2.0'
+  root:
+    description:
+      - The full path for the target root directory.
+    type: path
+    version_added: '10.2.0'
+  repositories:
+    description:
+      - Repository URL(s) to prepend to the repository list for the package installation. The URL can be a URL to a repository for remote repositories
+        or a path for local repositories.
+    type: list
+    elements: str
+    version_added: '10.2.0'
+  accept_pubkey:
+    description:
+      - Whether or not repository signing keys should be automatically accepted.
+    type: bool
+    default: false
+    version_added: '10.2.0'
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Install package foo (automatically updating the xbps package if needed)
   community.general.xbps:
     name: foo
@@ -151,20 +143,20 @@ EXAMPLES = '''
     state: present
     repositories: https://repo-default.voidlinux.org/current
     root: /mnt
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 msg:
-    description: Message about results
-    returned: success
-    type: str
-    sample: "System Upgraded"
+  description: Message about results.
+  returned: success
+  type: str
+  sample: "System Upgraded"
 packages:
-    description: Packages that are affected/would be affected
-    type: list
-    sample: ["ansible"]
-    returned: success
-'''
+  description: Packages that are affected/would be affected.
+  type: list
+  sample: ["ansible"]
+  returned: success
+"""
 
 
 import os
