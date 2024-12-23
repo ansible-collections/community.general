@@ -203,7 +203,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
             else:
                 # found vars, accumulate in hostvars for clean inventory set
-                pref_k = make_unsafe('vbox_' + k.strip().replace(' ', '_'))
+                pref_k = make_unsafe(f"vbox_{k.strip().replace(' ', '_')}")
                 leading_spaces = len(k) - len(k.lstrip(' '))
                 if 0 < leading_spaces <= 2:
                     if prevkey not in hostvars[current_host] or not isinstance(hostvars[current_host][prevkey], dict):

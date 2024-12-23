@@ -138,7 +138,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         sslopt = None if validate_certs else {'cert_reqs': ssl.CERT_NONE}
         self.conn = create_connection(
-            '{0}://{1}/api/'.format(proto, xoa_api_host), sslopt=sslopt)
+            f'{proto}://{xoa_api_host}/api/', sslopt=sslopt)
 
     CALL_TIMEOUT = 100
     """Number of 1/10ths of a second to wait before method call times out."""
@@ -162,8 +162,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 sleep(0.1)
                 waited += 1
 
-        raise AnsibleError(
-            'Method call {method} timed out after {timeout} seconds.'.format(method=method, timeout=self.CALL_TIMEOUT / 10))
+        raise AnsibleError(f'Method call {method} timed out after {self.CALL_TIMEOUT / 10} seconds.')
 
     def login(self, user, password):
         result = self.call('session.signIn', {
@@ -171,15 +170,13 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         })
 
         if 'error' in result:
-            raise AnsibleError(
-                'Could not connect: {0}'.format(result['error']))
+            raise AnsibleError(f"Could not connect: {result['error']}")
 
     def get_object(self, name):
         answer = self.call('xo.getAllObjects', {'filter': {'type': name}})
 
         if 'error' in answer:
-            raise AnsibleError(
-                'Could not request: {0}'.format(answer['error']))
+            raise AnsibleError(f"Could not request: {answer['error']}")
 
         return answer['result']
 
@@ -252,8 +249,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def _add_hosts(self, hosts, pools):
         for host in hosts.values():
             entry_name = host['uuid']
-            group_name = 'xo_host_{0}'.format(
-                clean_group_name(host['name_label']))
+            group_name = f"xo_host_{clean_group_name(host['name_label'])}"
             pool_name = self._pool_group_name_for_uuid(pools, host['$poolId'])
 
             self.inventory.add_group(group_name)
@@ -276,15 +272,13 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 entry_name, 'product_brand', host['productBrand'])
 
         for pool in pools.values():
-            group_name = 'xo_pool_{0}'.format(
-                clean_group_name(pool['name_label']))
+            group_name = f"xo_pool_{clean_group_name(pool['name_label'])}"
 
             self.inventory.add_group(group_name)
 
     def _add_pools(self, pools):
         for pool in pools.values():
-            group_name = 'xo_pool_{0}'.format(
-                clean_group_name(pool['name_label']))
+            group_name = f"xo_pool_{clean_group_name(pool['name_label'])}"
 
             self.inventory.add_group(group_name)
 
@@ -292,16 +286,13 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def _pool_group_name_for_uuid(self, pools, pool_uuid):
         for pool in pools:
             if pool == pool_uuid:
-                return 'xo_pool_{0}'.format(
-                    clean_group_name(pools[pool_uuid]['name_label']))
+                return f"xo_pool_{clean_group_name(pools[pool_uuid]['name_label'])}"
 
     # TODO: Refactor
     def _host_group_name_for_uuid(self, hosts, host_uuid):
         for host in hosts:
             if host == host_uuid:
-                return 'xo_host_{0}'.format(
-                    clean_group_name(hosts[host_uuid]['name_label']
-                                     ))
+                return f"xo_host_{clean_group_name(hosts[host_uuid]['name_label'])}"
 
     def _populate(self, objects):
         # Prepare general groups

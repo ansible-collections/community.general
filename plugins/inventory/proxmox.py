@@ -284,12 +284,12 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         if self.proxmox_password:
             credentials = urlencode({'username': self.proxmox_user, 'password': self.proxmox_password})
             a = self._get_session()
-            ret = a.post('%s/api2/json/access/ticket' % self.proxmox_url, data=credentials)
+            ret = a.post(f'{self.proxmox_url}/api2/json/access/ticket', data=credentials)
             json = ret.json()
             self.headers = {
                 # only required for POST/PUT/DELETE methods, which we are not using currently
                 # 'CSRFPreventionToken': json['data']['CSRFPreventionToken'],
-                'Cookie': 'PVEAuthCookie={0}'.format(json['data']['ticket'])
+                'Cookie': f"PVEAuthCookie={json['data']['ticket']}"
             }
         else:
             # Clean and format token components
@@ -341,23 +341,23 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         return make_unsafe(self._cache[self.cache_key][url])
 
     def _get_nodes(self):
-        return self._get_json("%s/api2/json/nodes" % self.proxmox_url)
+        return self._get_json(f"{self.proxmox_url}/api2/json/nodes")
 
     def _get_pools(self):
-        return self._get_json("%s/api2/json/pools" % self.proxmox_url)
+        return self._get_json(f"{self.proxmox_url}/api2/json/pools")
 
     def _get_lxc_per_node(self, node):
-        return self._get_json("%s/api2/json/nodes/%s/lxc" % (self.proxmox_url, node))
+        return self._get_json(f"{self.proxmox_url}/api2/json/nodes/{node}/lxc")
 
     def _get_qemu_per_node(self, node):
-        return self._get_json("%s/api2/json/nodes/%s/qemu" % (self.proxmox_url, node))
+        return self._get_json(f"{self.proxmox_url}/api2/json/nodes/{node}/qemu")
 
     def _get_members_per_pool(self, pool):
-        ret = self._get_json("%s/api2/json/pools/%s" % (self.proxmox_url, pool))
+        ret = self._get_json(f"{self.proxmox_url}/api2/json/pools/{pool}")
         return ret['members']
 
     def _get_node_ip(self, node):
-        ret = self._get_json("%s/api2/json/nodes/%s/network" % (self.proxmox_url, node))
+        ret = self._get_json(f"{self.proxmox_url}/api2/json/nodes/{node}/network")
 
         for iface in ret:
             try:
@@ -371,7 +371,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         if status_key not in properties or not properties[status_key] == 'running':
             return
 
-        ret = self._get_json("%s/api2/json/nodes/%s/lxc/%s/interfaces" % (self.proxmox_url, node, vmid), ignore_errors=[501])
+        ret = self._get_json(f"{self.proxmox_url}/api2/json/nodes/{node}/lxc/{vmid}/interfaces", ignore_errors=[501])
         if not ret:
             return
 
@@ -398,9 +398,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         try:
             ifaces = self._get_json(
-                "%s/api2/json/nodes/%s/%s/%s/agent/network-get-interfaces" % (
-                    self.proxmox_url, node, vmtype, vmid
-                )
+                f"{self.proxmox_url}/api2/json/nodes/{node}/{vmtype}/{vmid}/agent/network-get-interfaces"
             )['result']
 
             if "error" in ifaces:
@@ -418,7 +416,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 result.append({
                     'name': iface['name'],
                     'mac-address': iface['hardware-address'] if 'hardware-address' in iface else '',
-                    'ip-addresses': ["%s/%s" % (ip['ip-address'], ip['prefix']) for ip in iface['ip-addresses']] if 'ip-addresses' in iface else []
+                    'ip-addresses': [f"{ip['ip-address']}/{ip['prefix']}" for ip in iface['ip-addresses']] if 'ip-addresses' in iface else []
                 })
         except requests.HTTPError:
             pass
@@ -426,7 +424,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         return result
 
     def _get_vm_config(self, properties, node, vmid, vmtype, name):
-        ret = self._get_json("%s/api2/json/nodes/%s/%s/%s/config" % (self.proxmox_url, node, vmtype, vmid))
+        ret = self._get_json(f"{self.proxmox_url}/api2/json/nodes/{node}/{vmtype}/{vmid}/config")
 
         properties[self._fact('node')] = node
         properties[self._fact('vmid')] = vmid
@@ -442,13 +440,13 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             try:
                 # fixup disk images as they have no key
                 if config == 'rootfs' or config.startswith(('virtio', 'sata', 'ide', 'scsi')):
-                    value = ('disk_image=' + value)
+                    value = f"disk_image={value}"
 
                 # Additional field containing parsed tags as list
                 if config == 'tags':
                     stripped_value = value.strip()
                     if stripped_value:
-                        parsed_key = key + "_parsed"
+                        parsed_key = f"{key}_parsed"
                         properties[parsed_key] = [tag.strip() for tag in stripped_value.replace(',', ';').split(";")]
 
                 # The first field in the agent string tells you whether the agent is enabled
@@ -464,7 +462,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     if agent_enabled:
                         agent_iface_value = self._get_agent_network_interfaces(node, vmid, vmtype)
                         if agent_iface_value:
-                            agent_iface_key = self.to_safe('%s%s' % (key, "_interfaces"))
+                            agent_iface_key = self.to_safe(f'{key}_interfaces')
                             properties[agent_iface_key] = agent_iface_value
 
                 if config == 'lxc':
@@ -489,13 +487,13 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 return None
 
     def _get_vm_status(self, properties, node, vmid, vmtype, name):
-        ret = self._get_json("%s/api2/json/nodes/%s/%s/%s/status/current" % (self.proxmox_url, node, vmtype, vmid))
+        ret = self._get_json(f"{self.proxmox_url}/api2/json/nodes/{node}/{vmtype}/{vmid}/status/current")
         properties[self._fact('status')] = ret['status']
         if vmtype == 'qemu':
             properties[self._fact('qmpstatus')] = ret['qmpstatus']
 
     def _get_vm_snapshots(self, properties, node, vmid, vmtype, name):
-        ret = self._get_json("%s/api2/json/nodes/%s/%s/%s/snapshot" % (self.proxmox_url, node, vmtype, vmid))
+        ret = self._get_json(f"{self.proxmox_url}/api2/json/nodes/{node}/{vmtype}/{vmid}/snapshot")
         snapshots = [snapshot['name'] for snapshot in ret if snapshot['name'] != 'current']
         properties[self._fact('snapshots')] = snapshots
 
@@ -509,11 +507,11 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     def _fact(self, name):
         '''Generate a fact's full name from the common prefix and a name.'''
-        return self.to_safe('%s%s' % (self.facts_prefix, name.lower()))
+        return self.to_safe(f'{self.facts_prefix}{name.lower()}')
 
     def _group(self, name):
         '''Generate a group's full name from the common prefix and a name.'''
-        return self.to_safe('%s%s' % (self.group_prefix, name.lower()))
+        return self.to_safe(f'{self.group_prefix}{name.lower()}')
 
     def _can_add_host(self, name, properties):
         '''Ensure that a host satisfies all defined hosts filters. If strict mode is
@@ -525,7 +523,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 if not self._compose(host_filter, properties):
                     return False
             except Exception as e:  # pylint: disable=broad-except
-                message = "Could not evaluate host filter %s for host %s - %s" % (host_filter, name, to_native(e))
+                message = f"Could not evaluate host filter {host_filter} for host {name} - {to_native(e)}"
                 if self.strict:
                     raise AnsibleError(message)
                 display.warning(message)
@@ -566,8 +564,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         # add the host to the inventory
         self._add_host(name, properties)
-        node_type_group = self._group('%s_%s' % (node, ittype))
-        self.inventory.add_child(self._group('all_' + ittype), name)
+        node_type_group = self._group(f'{node}_{ittype}')
+        self.inventory.add_child(self._group(f"all_{ittype}"), name)
         self.inventory.add_child(node_type_group, name)
 
         item_status = item['status']
@@ -575,7 +573,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             if want_facts and ittype == 'qemu' and self.get_option('qemu_extended_statuses'):
                 # get more details about the status of the qemu VM
                 item_status = properties.get(self._fact('qmpstatus'), item_status)
-        self.inventory.add_child(self._group('all_%s' % (item_status, )), name)
+        self.inventory.add_child(self._group(f'all_{item_status}'), name)
 
         return name
 
@@ -586,7 +584,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             poolid = pool.get('poolid')
             if not poolid:
                 continue
-            pool_group = self._group('pool_' + poolid)
+            pool_group = self._group(f"pool_{poolid}")
             self.inventory.add_group(pool_group)
 
             for member in self._get_members_per_pool(poolid):
@@ -603,7 +601,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             default_groups.extend(['prelaunch', 'paused'])
 
         for group in default_groups:
-            self.inventory.add_group(self._group('all_%s' % (group)))
+            self.inventory.add_group(self._group(f'all_{group}'))
         nodes_group = self._group('nodes')
         if not self.exclude_nodes:
             self.inventory.add_group(nodes_group)
@@ -636,7 +634,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
             # add LXC/Qemu groups for the node
             for ittype in ('lxc', 'qemu'):
-                node_type_group = self._group('%s_%s' % (node['node'], ittype))
+                node_type_group = self._group(f"{node['node']}_{ittype}")
                 self.inventory.add_group(node_type_group)
 
             # get LXC containers and Qemu VMs for this node
@@ -665,7 +663,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             v = self.get_option(o)
             if self.templar.is_template(v):
                 v = self.templar.template(v, disable_lookups=False)
-            setattr(self, 'proxmox_%s' % o, v)
+            setattr(self, f'proxmox_{o}', v)
 
         # some more cleanup and validation
         self.proxmox_url = self.proxmox_url.rstrip('/')
