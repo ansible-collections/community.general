@@ -212,12 +212,15 @@ options:
         default: false
 extends_documentation_fragment:
     - community.general.keycloak
+    - community.general.keycloak.actiongroup_keycloak
     - community.general.attributes
 attributes:
     check_mode:
         support: full
     diff_mode:
         support: full
+    action_group:
+        version_added: 10.2.0
 notes:
     - The module does not modify the user ID of an existing user.
 author:

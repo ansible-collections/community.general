@@ -32,6 +32,10 @@ description:
   - "Note that this module returns the client secret. To avoid this showing up in the logs,
      please add C(no_log: true) to the task."
 
+attributes:
+  action_group:
+    version_added: 10.2.0
+
 options:
   realm:
     type: str
@@ -57,6 +61,7 @@ options:
 
 extends_documentation_fragment:
   - community.general.keycloak
+  - community.general.keycloak.actiongroup_keycloak
   - community.general.attributes
   - community.general.attributes.info_module
 

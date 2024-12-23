@@ -77,3 +77,13 @@ options:
         default: Ansible
         version_added: 5.4.0
 '''
+
+    ACTIONGROUP_KEYCLOAK = r"""
+options: {}
+attributes:
+  action_group:
+    description: Use C(group/community.general.keycloak) in C(module_defaults) to set defaults for this module.
+    support: full
+    membership:
+      - community.general.keycloak
+"""
