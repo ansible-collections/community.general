@@ -9,37 +9,35 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: utm_ca_host_key_cert_info
 
 author:
-    - Stephan Schwarz (@stearz)
+  - Stephan Schwarz (@stearz)
 
 short_description: Get info for a ca host_key_cert entry in Sophos UTM
 
 description:
-    - Get info for a ca host_key_cert entry in SOPHOS UTM.
-
+  - Get info for a ca host_key_cert entry in SOPHOS UTM.
 attributes:
-    check_mode:
-        version_added: 3.3.0
-        # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
+  check_mode:
+    version_added: 3.3.0
+    # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
 
 options:
-    name:
-        type: str
-        description:
-            - The name of the object. Will be used to identify the entry
-        required: true
+  name:
+    type: str
+    description:
+      - The name of the object. Will be used to identify the entry.
+    required: true
 
 extends_documentation_fragment:
-    - community.general.utm
-    - community.general.attributes
-    - community.general.attributes.info_module
-'''
+  - community.general.utm
+  - community.general.attributes
+  - community.general.attributes.info_module
+"""
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Get info for a ca host_key_cert entry
   community.general.utm_ca_host_key_cert_info:
     utm_host: sophos.host.name
@@ -47,42 +45,42 @@ EXAMPLES = """
     name: TestHostKeyCertEntry
 """
 
-RETURN = """
+RETURN = r"""
 result:
-    description: The utm object that was created
-    returned: success
-    type: complex
-    contains:
-        _ref:
-            description: The reference name of the object
-            type: str
-        _locked:
-            description: Whether or not the object is currently locked
-            type: bool
-        _type:
-            description: The type of the object
-            type: str
-        name:
-            description: The name of the object
-            type: str
-        ca:
-            description: A reference to an existing utm_ca_signing_ca or utm_ca_verification_ca object.
-            type: str
-        meta:
-            description: A reference to an existing utm_ca_meta_x509 object.
-            type: str
-        certificate:
-            description: The certificate in PEM format
-            type: str
-        comment:
-            description: Comment string (may be empty string)
-            type: str
-        encrypted:
-            description: If encryption is enabled
-            type: bool
-        key:
-            description: Private key in PEM format (may be empty string)
-            type: str
+  description: The utm object that was created.
+  returned: success
+  type: complex
+  contains:
+    _ref:
+      description: The reference name of the object.
+      type: str
+    _locked:
+      description: Whether or not the object is currently locked.
+      type: bool
+    _type:
+      description: The type of the object.
+      type: str
+    name:
+      description: The name of the object.
+      type: str
+    ca:
+      description: A reference to an existing utm_ca_signing_ca or utm_ca_verification_ca object.
+      type: str
+    meta:
+      description: A reference to an existing utm_ca_meta_x509 object.
+      type: str
+    certificate:
+      description: The certificate in PEM format.
+      type: str
+    comment:
+      description: Comment string (may be empty string).
+      type: str
+    encrypted:
+      description: If encryption is enabled.
+      type: bool
+    key:
+      description: Private key in PEM format (may be empty string).
+      type: str
 """
 
 from ansible_collections.community.general.plugins.module_utils.utm_utils import UTM, UTMModule
