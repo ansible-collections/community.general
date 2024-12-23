@@ -84,7 +84,7 @@ class AzureLogAnalyticsSource(object):
 
     def __build_signature(self, date, workspace_id, shared_key, content_length):
         # Build authorisation signature for Azure log analytics API call
-        sigs = f"POST\n{str(content_length)}\napplication/json\nx-ms-date:{date}\n/api/logs"
+        sigs = f"POST\n{content_length}\napplication/json\nx-ms-date:{date}\n/api/logs"
         utf8_sigs = sigs.encode('utf-8')
         decoded_shared_key = base64.b64decode(shared_key)
         hmac_sha256_sigs = hmac.new(
