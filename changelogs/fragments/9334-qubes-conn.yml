@@ -1,0 +1,2 @@
+bugfixes:
+  - qubes connection plugin - fix the printing of debug information (https://github.com/ansible-collections/community.general/pull/9334).
