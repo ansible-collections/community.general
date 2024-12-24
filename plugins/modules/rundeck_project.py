@@ -13,60 +13,59 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: rundeck_project
 
 short_description: Manage Rundeck projects
 description:
-    - Create and remove Rundeck projects through HTTP API.
+  - Create and remove Rundeck projects through HTTP API.
 author: "Loic Blot (@nerzhul)"
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    state:
-        type: str
-        description:
-            - Create or remove Rundeck project.
-        choices: ['present', 'absent']
-        default: 'present'
-    name:
-        type: str
-        description:
-            - Sets the project name.
-        required: true
-    api_token:
-        description:
-            - Sets the token to authenticate against Rundeck API.
-        aliases: ["token"]
-    client_cert:
-        version_added: '0.2.0'
-    client_key:
-        version_added: '0.2.0'
-    force:
-        version_added: '0.2.0'
-    force_basic_auth:
-        version_added: '0.2.0'
-    http_agent:
-        version_added: '0.2.0'
-    url_password:
-        version_added: '0.2.0'
-    url_username:
-        version_added: '0.2.0'
-    use_proxy:
-        version_added: '0.2.0'
-    validate_certs:
-        version_added: '0.2.0'
+  state:
+    type: str
+    description:
+      - Create or remove Rundeck project.
+    choices: ['present', 'absent']
+    default: 'present'
+  name:
+    type: str
+    description:
+      - Sets the project name.
+    required: true
+  api_token:
+    description:
+      - Sets the token to authenticate against Rundeck API.
+    aliases: ["token"]
+  client_cert:
+    version_added: '0.2.0'
+  client_key:
+    version_added: '0.2.0'
+  force:
+    version_added: '0.2.0'
+  force_basic_auth:
+    version_added: '0.2.0'
+  http_agent:
+    version_added: '0.2.0'
+  url_password:
+    version_added: '0.2.0'
+  url_username:
+    version_added: '0.2.0'
+  use_proxy:
+    version_added: '0.2.0'
+  validate_certs:
+    version_added: '0.2.0'
 extends_documentation_fragment:
   - ansible.builtin.url
   - community.general.attributes
   - community.general.rundeck
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a rundeck project
   community.general.rundeck_project:
     name: "Project_01"
@@ -83,22 +82,22 @@ EXAMPLES = '''
     url: "https://rundeck.example.org"
     api_token: "mytoken"
     state: absent
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 rundeck_response:
-    description: Rundeck response when a failure occurs
-    returned: failed
-    type: str
+  description: Rundeck response when a failure occurs.
+  returned: failed
+  type: str
 before:
-    description: dictionary containing project information before modification
-    returned: success
-    type: dict
+  description: Dictionary containing project information before modification.
+  returned: success
+  type: dict
 after:
-    description: dictionary containing project information after modification
-    returned: success
-    type: dict
-'''
+  description: Dictionary containing project information after modification.
+  returned: success
+  type: dict
+"""
 
 # import module snippets
 from ansible.module_utils.basic import AnsibleModule

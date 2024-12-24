@@ -9,17 +9,16 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: redis_info
 short_description: Gather information about Redis servers
 version_added: '0.2.0'
 description:
-- Gathers information and statistics about Redis servers.
+  - Gathers information and statistics about Redis servers.
 extends_documentation_fragment:
-- community.general.redis
-- community.general.attributes
-- community.general.attributes.info_module
+  - community.general.redis
+  - community.general.attributes
+  - community.general.attributes.info_module
 options:
   login_user:
     version_added: 7.5.0
@@ -36,11 +35,11 @@ options:
     type: bool
     version_added: 9.1.0
 seealso:
-- module: community.general.redis
+  - module: community.general.redis
 author: "Pavlo Bashynskyi (@levonet)"
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Get server information
   community.general.redis_info:
   register: result
@@ -57,9 +56,9 @@ EXAMPLES = r'''
 - name: Print server cluster information
   ansible.builtin.debug:
     var: result.cluster_info
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 info:
   description: The default set of server information sections U(https://redis.io/commands/info).
   returned: success
@@ -211,7 +210,7 @@ cluster:
      "cluster_stats_messages_received": 1483968,
      "total_cluster_links_buffer_limit_exceeded": 0
   }
-'''
+"""
 
 import traceback
 

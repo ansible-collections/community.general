@@ -8,16 +8,15 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: read_csv
 short_description: Read a CSV file
 description:
-- Read a CSV file and return a list or a dictionary, containing one dictionary per row.
+  - Read a CSV file and return a list or a dictionary, containing one dictionary per row.
 author:
-- Dag Wieers (@dagwieers)
+  - Dag Wieers (@dagwieers)
 extends_documentation_fragment:
-- community.general.attributes
+  - community.general.attributes
 attributes:
   check_mode:
     support: full
@@ -26,58 +25,57 @@ attributes:
 options:
   path:
     description:
-    - The CSV filename to read data from.
+      - The CSV filename to read data from.
     type: path
     required: true
-    aliases: [ filename ]
+    aliases: [filename]
   key:
     description:
-    - The column name used as a key for the resulting dictionary.
-    - If O(key) is unset, the module returns a list of dictionaries,
-      where each dictionary is a row in the CSV file.
+      - The column name used as a key for the resulting dictionary.
+      - If O(key) is unset, the module returns a list of dictionaries, where each dictionary is a row in the CSV file.
     type: str
   dialect:
     description:
-    - The CSV dialect to use when parsing the CSV file.
-    - Possible values include V(excel), V(excel-tab) or V(unix).
+      - The CSV dialect to use when parsing the CSV file.
+      - Possible values include V(excel), V(excel-tab) or V(unix).
     type: str
     default: excel
   fieldnames:
     description:
-    - A list of field names for every column.
-    - This is needed if the CSV does not have a header.
+      - A list of field names for every column.
+      - This is needed if the CSV does not have a header.
     type: list
     elements: str
   unique:
     description:
-    - Whether the O(key) used is expected to be unique.
+      - Whether the O(key) used is expected to be unique.
     type: bool
     default: true
   delimiter:
     description:
-    - A one-character string used to separate fields.
-    - When using this parameter, you change the default value used by O(dialect).
-    - The default value depends on the dialect used.
+      - A one-character string used to separate fields.
+      - When using this parameter, you change the default value used by O(dialect).
+      - The default value depends on the dialect used.
     type: str
   skipinitialspace:
     description:
-    - Whether to ignore any whitespaces immediately following the delimiter.
-    - When using this parameter, you change the default value used by O(dialect).
-    - The default value depends on the dialect used.
+      - Whether to ignore any whitespaces immediately following the delimiter.
+      - When using this parameter, you change the default value used by O(dialect).
+      - The default value depends on the dialect used.
     type: bool
   strict:
     description:
-    - Whether to raise an exception on bad CSV input.
-    - When using this parameter, you change the default value used by O(dialect).
-    - The default value depends on the dialect used.
+      - Whether to raise an exception on bad CSV input.
+      - When using this parameter, you change the default value used by O(dialect).
+      - The default value depends on the dialect used.
     type: bool
 seealso:
   - plugin: ansible.builtin.csvfile
     plugin_type: lookup
     description: Can be used to do selective lookups in CSV files from Jinja.
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 # Example CSV file with header
 #
 #   name,uid,gid
@@ -118,9 +116,9 @@ EXAMPLES = r'''
     delimiter: ';'
   register: users
   delegate_to: localhost
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 dict:
   description: The CSV content as a dictionary.
   returned: success
@@ -139,13 +137,13 @@ list:
   returned: success
   type: list
   sample:
-  - name: dag
-    uid: 500
-    gid: 500
-  - name: jeroen
-    uid: 501
-    gid: 500
-'''
+    - name: dag
+      uid: 500
+      gid: 500
+    - name: jeroen
+      uid: 501
+      gid: 500
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native

@@ -12,11 +12,11 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: rocketchat
 short_description: Send notifications to Rocket Chat
 description:
-    - The C(rocketchat) module sends notifications to Rocket Chat via the Incoming WebHook integration
+  - This module sends notifications to Rocket Chat through the Incoming WebHook integration.
 author: "Ramon de la Fuente (@ramondelafuente)"
 extends_documentation_fragment:
   - community.general.attributes
@@ -29,15 +29,12 @@ options:
   domain:
     type: str
     description:
-      - The domain for your environment without protocol. (For example
-        V(example.com) or V(chat.example.com).)
+      - The domain for your environment without protocol. (For example V(example.com) or V(chat.example.com)).
     required: true
   token:
     type: str
     description:
-      - Rocket Chat Incoming Webhook integration token.  This provides
-        authentication to Rocket Chat's Incoming webhook for posting
-        messages.
+      - Rocket Chat Incoming Webhook integration token. This provides authentication to Rocket Chat's Incoming webhook for posting messages.
     required: true
   protocol:
     type: str
@@ -54,8 +51,8 @@ options:
   channel:
     type: str
     description:
-      - Channel to send the message to. If absent, the message goes to the channel selected for the O(token)
-        specified during the creation of webhook.
+      - Channel to send the message to. If absent, the message goes to the channel selected for the O(token) specified during the creation of
+        webhook.
   username:
     type: str
     description:
@@ -69,8 +66,7 @@ options:
   icon_emoji:
     type: str
     description:
-      - Emoji for the message sender. The representation for the available emojis can be
-        got from Rocket Chat.
+      - Emoji for the message sender. The representation for the available emojis can be got from Rocket Chat.
       - For example V(:thumbsup:).
       - If O(icon_emoji) is set, O(icon_url) will not be used.
   link_names:
@@ -83,14 +79,13 @@ options:
       - 0
   validate_certs:
     description:
-      - If V(false), SSL certificates will not be validated. This should only be used
-        on personally controlled sites using self-signed certificates.
+      - If V(false), SSL certificates will not be validated. This should only be used on personally controlled sites using self-signed certificates.
     type: bool
     default: true
   color:
     type: str
     description:
-      - Allow text to use default colors - use the default of 'normal' to not send a custom color bar at the start of the message
+      - Allow text to use default colors - use the default of V(normal) to not send a custom color bar at the start of the message.
     default: 'normal'
     choices:
       - 'normal'
@@ -102,17 +97,17 @@ options:
     elements: dict
     description:
       - Define a list of attachments.
-'''
+"""
 
-EXAMPLES = """
-- name: Send notification message via Rocket Chat
+EXAMPLES = r"""
+- name: Send notification message through Rocket Chat
   community.general.rocketchat:
     token: thetoken/generatedby/rocketchat
     domain: chat.example.com
     msg: '{{ inventory_hostname }} completed'
   delegate_to: localhost
 
-- name: Send notification message via Rocket Chat all options
+- name: Send notification message through Rocket Chat all options
   community.general.rocketchat:
     domain: chat.example.com
     token: thetoken/generatedby/rocketchat
@@ -151,12 +146,12 @@ EXAMPLES = """
   delegate_to: localhost
 """
 
-RETURN = """
+RETURN = r"""
 changed:
-    description: A flag indicating if any change was made or not.
-    returned: success
-    type: bool
-    sample: false
+  description: A flag indicating if any change was made or not.
+  returned: success
+  type: bool
+  sample: false
 """
 
 from ansible.module_utils.basic import AnsibleModule

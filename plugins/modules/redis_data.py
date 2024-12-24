@@ -8,71 +8,69 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: redis_data
 short_description: Set key value pairs in Redis
 version_added: 3.7.0
 description:
-   - Set key value pairs in Redis database.
+  - Set key value pairs in Redis database.
 author: "Andreas Botzner (@paginabianca)"
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    key:
-        description:
-            - Database key.
-        required: true
-        type: str
-    value:
-        description:
-            - Value that key should be set to.
-        required: false
-        type: str
-    expiration:
-        description:
-            - Expiration time in milliseconds.
-              Setting this flag will always result in a change in the database.
-        required: false
-        type: int
-    non_existing:
-        description:
-            - Only set key if it does not already exist.
-        required: false
-        type: bool
-    existing:
-        description:
-            - Only set key if it already exists.
-        required: false
-        type: bool
-    keep_ttl:
-        description:
-            - Retain the time to live associated with the key.
-        required: false
-        type: bool
-    state:
-        description:
-            - State of the key.
-        default: present
-        type: str
-        choices:
-            - present
-            - absent
+  key:
+    description:
+      - Database key.
+    required: true
+    type: str
+  value:
+    description:
+      - Value that key should be set to.
+    required: false
+    type: str
+  expiration:
+    description:
+      - Expiration time in milliseconds. Setting this flag will always result in a change in the database.
+    required: false
+    type: int
+  non_existing:
+    description:
+      - Only set key if it does not already exist.
+    required: false
+    type: bool
+  existing:
+    description:
+      - Only set key if it already exists.
+    required: false
+    type: bool
+  keep_ttl:
+    description:
+      - Retain the time to live associated with the key.
+    required: false
+    type: bool
+  state:
+    description:
+      - State of the key.
+    default: present
+    type: str
+    choices:
+      - present
+      - absent
 
 extends_documentation_fragment:
   - community.general.redis.documentation
   - community.general.attributes
 
 seealso:
-    - module: community.general.redis_data_incr
-    - module: community.general.redis_data_info
-    - module: community.general.redis
-'''
+  - module: community.general.redis_data_incr
+  - module: community.general.redis_data_info
+  - module: community.general.redis
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Set key foo=bar on localhost with no username
   community.general.redis_data:
     login_host: localhost
@@ -116,9 +114,9 @@ EXAMPLES = '''
     login_password: supersecret
     key: foo
     state: absent
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 old_value:
   description: Value of key before setting.
   returned: on_success if O(state=present) and key exists in database.
@@ -134,7 +132,7 @@ msg:
   returned: always
   type: str
   sample: 'Set key: foo to bar'
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.redis import (

@@ -10,16 +10,15 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: redhat_subscription
 short_description: Manage registration and subscriptions to RHSM using C(subscription-manager)
 description:
-    - Manage registration and subscription to the Red Hat Subscription Management entitlement platform using the C(subscription-manager) command,
-      registering using D-Bus if possible.
+  - Manage registration and subscription to the Red Hat Subscription Management entitlement platform using the C(subscription-manager) command,
+    registering using D-Bus if possible.
 author: "Barnaby Court (@barnabycourt)"
 notes:
-    - |
+    - >-
       The module tries to use the D-Bus C(rhsm) service (part of C(subscription-manager))
       to register, starting from community.general 6.5.0: this is done so credentials
       (username, password, activation keys) can be passed to C(rhsm) in a secure way.
@@ -42,171 +41,161 @@ notes:
       already registered system, for example attaching pools to it (using O(pool_ids)),
       and modifying the C(syspurpose) attributes (using O(syspurpose)).
 requirements:
-    - subscription-manager
-    - Optionally the C(dbus) Python library; this is usually included in the OS
-      as it is used by C(subscription-manager).
+  - subscription-manager
+  - Optionally the C(dbus) Python library; this is usually included in the OS as it is used by C(subscription-manager).
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    state:
-        description:
-          - whether to register and subscribe (V(present)), or unregister (V(absent)) a system
-        choices: [ "present", "absent" ]
-        default: "present"
+  state:
+    description:
+      - Whether to register and subscribe (V(present)), or unregister (V(absent)) a system.
+    choices: ["present", "absent"]
+    default: "present"
+    type: str
+  username:
+    description:
+      - Access.redhat.com or Red Hat Satellite or Katello username.
+    type: str
+  password:
+    description:
+      - Access.redhat.com or Red Hat Satellite or Katello password.
+    type: str
+  token:
+    description:
+      - Sso.redhat.com API access token.
+    type: str
+    version_added: 6.3.0
+  server_hostname:
+    description:
+      - Specify an alternative Red Hat Subscription Management or Red Hat Satellite or Katello server.
+    type: str
+  server_insecure:
+    description:
+      - Enable or disable https server certificate verification when connecting to O(server_hostname).
+    type: str
+  server_prefix:
+    description:
+      - Specify the prefix when registering to the Red Hat Subscription Management or Red Hat Satellite or Katello server.
+    type: str
+    version_added: 3.3.0
+  server_port:
+    description:
+      - Specify the port when registering to the Red Hat Subscription Management or Red Hat Satellite or Katello server.
+    type: str
+    version_added: 3.3.0
+  rhsm_baseurl:
+    description:
+      - Specify CDN baseurl.
+    type: str
+  rhsm_repo_ca_cert:
+    description:
+      - Specify an alternative location for a CA certificate for CDN.
+    type: str
+  server_proxy_hostname:
+    description:
+      - Specify an HTTP proxy hostname.
+    type: str
+  server_proxy_scheme:
+    description:
+      - Specify an HTTP proxy scheme, for example V(http) or V(https).
+    type: str
+    version_added: 6.2.0
+  server_proxy_port:
+    description:
+      - Specify an HTTP proxy port.
+    type: str
+  server_proxy_user:
+    description:
+      - Specify a user for HTTP proxy with basic authentication.
+    type: str
+  server_proxy_password:
+    description:
+      - Specify a password for HTTP proxy with basic authentication.
+    type: str
+  auto_attach:
+    description:
+      - Upon successful registration, auto-consume available subscriptions.
+      - "Please note that the alias O(ignore:autosubscribe) was removed in community.general 9.0.0."
+    type: bool
+  activationkey:
+    description:
+      - Supply an activation key for use with registration.
+    type: str
+  org_id:
+    description:
+      - Organization ID to use in conjunction with activationkey.
+    type: str
+  environment:
+    description:
+      - Register with a specific environment in the destination org. Used with Red Hat Satellite or Katello.
+    type: str
+  pool_ids:
+    description:
+      - "Specify subscription pool IDs to consume.
+      - A pool ID may be specified as a C(string) - just the pool ID (for example V(0123456789abcdef0123456789abcdef)),
+        or as a C(dict) with the pool ID as the key, and a quantity as the value (for example V(0123456789abcdef0123456789abcdef: 2). If the
+        quantity is provided, it is used to consume multiple entitlements from a pool (the pool must support this)."
+    default: []
+    type: list
+    elements: raw
+  consumer_type:
+    description:
+      - The type of unit to register, defaults to system.
+    type: str
+  consumer_name:
+    description:
+      - Name of the system to register, defaults to the hostname.
+    type: str
+  consumer_id:
+    description:
+      - "References an existing consumer ID to resume using a previous registration for this system. If the system's identity certificate is
+        lost or corrupted, this option allows it to resume using its previous identity and subscriptions. The default is to not specify a consumer
+        ID so a new ID is created."
+    type: str
+  force_register:
+    description:
+      - Register the system even if it is already registered.
+    type: bool
+    default: false
+  release:
+    description:
+      - Set a release version.
+    type: str
+  syspurpose:
+    description:
+      - Set syspurpose attributes in file C(/etc/rhsm/syspurpose/syspurpose.json) and synchronize these attributes with RHSM server. Syspurpose
+        attributes help attach the most appropriate subscriptions to the system automatically. When C(syspurpose.json) file already contains some
+        attributes, then new attributes overwrite existing attributes. When some attribute is not listed in the new list of attributes, the existing
+        attribute will be removed from C(syspurpose.json) file. Unknown attributes are ignored.
+    type: dict
+    suboptions:
+      usage:
+        description: Syspurpose attribute usage.
         type: str
-    username:
-        description:
-            - access.redhat.com or Red Hat Satellite or Katello username
+      role:
+        description: Syspurpose attribute role.
         type: str
-    password:
-        description:
-            - access.redhat.com or Red Hat Satellite or Katello password
+      service_level_agreement:
+        description: Syspurpose attribute service_level_agreement.
         type: str
-    token:
-        description:
-            - sso.redhat.com API access token.
-        type: str
-        version_added: 6.3.0
-    server_hostname:
-        description:
-            - Specify an alternative Red Hat Subscription Management or Red Hat Satellite or Katello server.
-        type: str
-    server_insecure:
-        description:
-            - Enable or disable https server certificate verification when connecting to O(server_hostname).
-        type: str
-    server_prefix:
-        description:
-            - Specify the prefix when registering to the Red Hat Subscription Management or Red Hat Satellite or Katello server.
-        type: str
-        version_added: 3.3.0
-    server_port:
-        description:
-            - Specify the port when registering to the Red Hat Subscription Management or Red Hat Satellite or Katello server.
-        type: str
-        version_added: 3.3.0
-    rhsm_baseurl:
-        description:
-            - Specify CDN baseurl
-        type: str
-    rhsm_repo_ca_cert:
-        description:
-            - Specify an alternative location for a CA certificate for CDN
-        type: str
-    server_proxy_hostname:
-        description:
-            - Specify an HTTP proxy hostname.
-        type: str
-    server_proxy_scheme:
-        description:
-            - Specify an HTTP proxy scheme, for example V(http) or V(https).
-        type: str
-        version_added: 6.2.0
-    server_proxy_port:
-        description:
-            - Specify an HTTP proxy port.
-        type: str
-    server_proxy_user:
-        description:
-            - Specify a user for HTTP proxy with basic authentication
-        type: str
-    server_proxy_password:
-        description:
-            - Specify a password for HTTP proxy with basic authentication
-        type: str
-    auto_attach:
-        description:
-            - Upon successful registration, auto-consume available subscriptions
-            - |
-              Please note that the alias O(ignore:autosubscribe) was removed in
-              community.general 9.0.0.
-        type: bool
-    activationkey:
-        description:
-            - supply an activation key for use with registration
-        type: str
-    org_id:
-        description:
-            - Organization ID to use in conjunction with activationkey
-        type: str
-    environment:
-        description:
-            - Register with a specific environment in the destination org. Used with Red Hat Satellite or Katello
-        type: str
-    pool_ids:
-        description:
-            - |
-              Specify subscription pool IDs to consume.
-              A pool ID may be specified as a C(string) - just the pool ID (for example V(0123456789abcdef0123456789abcdef)),
-              or as a C(dict) with the pool ID as the key, and a quantity as the value (for example
-              V(0123456789abcdef0123456789abcdef: 2). If the quantity is provided, it is used to consume multiple
-              entitlements from a pool (the pool must support this).
-        default: []
+      addons:
+        description: Syspurpose attribute addons.
         type: list
-        elements: raw
-    consumer_type:
+        elements: str
+      sync:
         description:
-            - The type of unit to register, defaults to system
-        type: str
-    consumer_name:
-        description:
-            - Name of the system to register, defaults to the hostname
-        type: str
-    consumer_id:
-        description:
-            - |
-              References an existing consumer ID to resume using a previous registration
-              for this system. If the  system's identity certificate is lost or corrupted,
-              this option allows it to resume using its previous identity and subscriptions.
-              The default is to not specify a consumer ID so a new ID is created.
-        type: str
-    force_register:
-        description:
-            -  Register the system even if it is already registered
+          - When this option is V(true), then syspurpose attributes are synchronized with RHSM server immediately. When this option is V(false),
+            then syspurpose attributes will be synchronized with RHSM server by rhsmcertd daemon.
         type: bool
         default: false
-    release:
-        description:
-            - Set a release version
-        type: str
-    syspurpose:
-        description:
-            - Set syspurpose attributes in file C(/etc/rhsm/syspurpose/syspurpose.json)
-              and synchronize these attributes with RHSM server. Syspurpose attributes help attach
-              the most appropriate subscriptions to the system automatically. When C(syspurpose.json) file
-              already contains some attributes, then new attributes overwrite existing attributes.
-              When some attribute is not listed in the new list of attributes, the existing
-              attribute will be removed from C(syspurpose.json) file. Unknown attributes are ignored.
-        type: dict
-        suboptions:
-            usage:
-                description: Syspurpose attribute usage
-                type: str
-            role:
-                description: Syspurpose attribute role
-                type: str
-            service_level_agreement:
-                description: Syspurpose attribute service_level_agreement
-                type: str
-            addons:
-                description: Syspurpose attribute addons
-                type: list
-                elements: str
-            sync:
-                description:
-                    - When this option is V(true), then syspurpose attributes are synchronized with
-                      RHSM server immediately. When this option is V(false), then syspurpose attributes
-                      will be synchronized with RHSM server by rhsmcertd daemon.
-                type: bool
-                default: false
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Register as user (joe_user) with password (somepass) and auto-subscribe to available content.
   community.general.redhat_subscription:
     state: present
@@ -275,17 +264,15 @@ EXAMPLES = '''
         - addon1
         - addon2
       sync: true
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 subscribed_pool_ids:
-    description: List of pool IDs to which system is now subscribed
-    returned: success
-    type: dict
-    sample: {
-        "8a85f9815ab905d3015ab928c7005de4": "1"
-    }
-'''
+  description: List of pool IDs to which system is now subscribed.
+  returned: success
+  type: dict
+  sample: {"8a85f9815ab905d3015ab928c7005de4": "1"}
+"""
 
 from os.path import isfile
 from os import getuid, unlink

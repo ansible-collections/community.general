@@ -8,20 +8,16 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: rhsm_repository
 short_description: Manage RHSM repositories using the subscription-manager command
 description:
-  - Manage (Enable/Disable) RHSM repositories to the Red Hat Subscription
-    Management entitlement platform using the C(subscription-manager) command.
+  - Manage (Enable/Disable) RHSM repositories to the Red Hat Subscription Management entitlement platform using the C(subscription-manager) command.
 author: Giovanni Sciortino (@giovannisciortino)
 notes:
-  - In order to manage RHSM repositories the system must be already registered
-    to RHSM manually or using the Ansible M(community.general.redhat_subscription) module.
-  - It is possible to interact with C(subscription-manager) only as root,
-    so root permissions are required to successfully run this module.
-
+  - In order to manage RHSM repositories the system must be already registered to RHSM manually or using the Ansible M(community.general.redhat_subscription)
+    module.
+  - It is possible to interact with C(subscription-manager) only as root, so root permissions are required to successfully run this module.
 requirements:
   - subscription-manager
 extends_documentation_fragment:
@@ -34,31 +30,27 @@ attributes:
 options:
   state:
     description:
-      - If state is equal to present or disabled, indicates the desired
-        repository state.
-      - In community.general 10.0.0 the states V(present) and V(absent) have been
-        removed. Please use V(enabled) and V(disabled) instead.
+      - If state is equal to present or disabled, indicates the desired repository state.
+      - In community.general 10.0.0 the states V(present) and V(absent) have been removed. Please use V(enabled) and V(disabled) instead.
     choices: [enabled, disabled]
     default: "enabled"
     type: str
   name:
     description:
       - The ID of repositories to enable.
-      - To operate on several repositories this can accept a comma separated
-        list or a YAML list.
+      - To operate on several repositories this can accept a comma separated list or a YAML list.
     required: true
     type: list
     elements: str
   purge:
     description:
-      - Disable all currently enabled repositories that are not not specified in O(name).
-        Only set this to V(true) if passing in a list of repositories to the O(name) field.
-        Using this with C(loop) will most likely not have the desired result.
+      - Disable all currently enabled repositories that are not not specified in O(name). Only set this to V(true) if passing in a list of repositories
+        to the O(name) field. Using this with C(loop) will most likely not have the desired result.
     type: bool
     default: false
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Enable a RHSM repository
   community.general.rhsm_repository:
     name: rhel-7-server-rpms
@@ -77,16 +69,16 @@ EXAMPLES = '''
   community.general.rhsm_repository:
     name: rhel-7-server-rpms
     purge: true
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 repositories:
   description:
     - The list of RHSM repositories with their states.
     - When this module is used to change the repository states, this list contains the updated states after the changes.
   returned: success
   type: list
-'''
+"""
 
 import os
 from fnmatch import fnmatch
