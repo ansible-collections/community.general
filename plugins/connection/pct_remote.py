@@ -228,8 +228,20 @@ EXAMPLES = r"""
 # --------------------------------------------------------------
 # Setup sudo with passwordless access to pct for user 'ansible':
 # --------------------------------------------------------------
+#
+# Open a Proxmox root shell and execute:
+# $ useradd -d /opt/ansible-pct -r -m -s /bin/sh ansible
+# $ mkdir -p /opt/ansible-pct/.ssh
+# $ ssh-keygen -t ed25519 -C 'ansible' -N "" -f /opt/ansible-pct/.ssh/ansible <<< y > /dev/null
+# $ cat /opt/ansible-pct/.ssh/ansible
+# $ mv /opt/ansible-pct/.ssh/ansible.pub /opt/ansible-pct/.ssh/authorized-keys
+# $ rm /opt/ansible-pct/.ssh/ansible*
+# $ chown -R ansible:ansible /opt/ansible-pct/.ssh
+# $ chmod 700 /opt/ansible-pct/.ssh
+# $ chmod 600 /opt/ansible-pct/.ssh/authorized-keys
 # $ echo 'ansible ALL = (root) NOPASSWD: /usr/sbin/pct' > /etc/sudoers.d/ansible_pct
 #
+# Save the displayed private key and add it to your ssh-agent
 #
 # --------------------------------
 # Static inventory file: hosts.yml
