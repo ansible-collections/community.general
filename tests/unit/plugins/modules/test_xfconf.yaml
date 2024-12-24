@@ -21,10 +21,22 @@
     previous_value: '100'
     type: int
     value: '90'
+    version: "4.18.1"
   mocks:
     run_command:
-    - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/inactive_opacity]
+    - command: [/testbin/xfconf-query, --version]
       environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      rc: 0
+      out: &version-output |
+        xfconf-query 4.18.1
+
+        Copyright (c) 2008-2023
+            The Xfce development team. All rights reserved.
+
+        Please report bugs to <https://gitlab.xfce.org/xfce/xfconf>.
+      err: ""
+    - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/inactive_opacity]
+      environ: *env-def
       rc: 0
       out: "100\n"
       err: ""
@@ -45,8 +57,14 @@
     previous_value: '90'
     type: int
     value: '90'
+    version: "4.18.1"
   mocks:
     run_command:
+    - command: [/testbin/xfconf-query, --version]
+      environ: *env-def
+      rc: 0
+      out: *version-output
+      err: ""
     - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/inactive_opacity]
       environ: *env-def
       rc: 0
@@ -69,8 +87,14 @@
     previous_value: 'true'
     type: bool
     value: 'False'
+    version: "4.18.1"
   mocks:
     run_command:
+    - command: [/testbin/xfconf-query, --version]
+      environ: *env-def
+      rc: 0
+      out: *version-output
+      err: ""
     - command: [/testbin/xfconf-query, --channel, xfce4-session, --property, /general/SaveOnExit]
       environ: *env-def
       rc: 0
@@ -93,8 +117,14 @@
     previous_value: [Main, Work, Tmp]
     type: [string, string, string]
     value: [A, B, C]
+    version: "4.18.1"
   mocks:
     run_command:
+    - command: [/testbin/xfconf-query, --version]
+      environ: *env-def
+      rc: 0
+      out: *version-output
+      err: ""
     - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/workspace_names]
       environ: *env-def
       rc: 0
@@ -136,8 +166,14 @@
     previous_value: [A, B, C]
     type: [string, string, string]
     value: [A, B, C]
+    version: "4.18.1"
   mocks:
     run_command:
+    - command: [/testbin/xfconf-query, --version]
+      environ: *env-def
+      rc: 0
+      out: *version-output
+      err: ""
     - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/workspace_names]
       environ: *env-def
       rc: 0
@@ -177,8 +213,14 @@
     previous_value: [A, B, C]
     type:
     value:
+    version: "4.18.1"
   mocks:
     run_command:
+    - command: [/testbin/xfconf-query, --version]
+      environ: *env-def
+      rc: 0
+      out: *version-output
+      err: ""
     - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/workspace_names]
       environ: *env-def
       rc: 0

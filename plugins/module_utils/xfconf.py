@@ -7,10 +7,10 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 from ansible.module_utils.parsing.convert_bool import boolean
-from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt as fmt
+from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
 
 
-@fmt.unpack_args
+@cmd_runner_fmt.unpack_args
 def _values_fmt(values, value_types):
     result = []
     for value, value_type in zip(values, value_types):
@@ -25,14 +25,21 @@ def xfconf_runner(module, **kwargs):
         module,
         command='xfconf-query',
         arg_formats=dict(
-            channel=fmt.as_opt_val("--channel"),
-            property=fmt.as_opt_val("--property"),
-            force_array=fmt.as_bool("--force-array"),
-            reset=fmt.as_bool("--reset"),
-            create=fmt.as_bool("--create"),
-            list_arg=fmt.as_bool("--list"),
-            values_and_types=fmt.as_func(_values_fmt),
+            channel=cmd_runner_fmt.as_opt_val("--channel"),
+            property=cmd_runner_fmt.as_opt_val("--property"),
+            force_array=cmd_runner_fmt.as_bool("--force-array"),
+            reset=cmd_runner_fmt.as_bool("--reset"),
+            create=cmd_runner_fmt.as_bool("--create"),
+            list_arg=cmd_runner_fmt.as_bool("--list"),
+            values_and_types=_values_fmt,
+            version=cmd_runner_fmt.as_fixed("--version"),
         ),
         **kwargs
     )
     return runner
+
+
+def get_xfconf_version(runner):
+    with runner("version") as ctx:
+        rc, out, err = ctx.run()
+        return out.splitlines()[0].split()[1]
