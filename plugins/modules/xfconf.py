@@ -153,10 +153,17 @@ cmd:
     - string
     - --set
     - Pacific/Auckland
+version:
+  description:
+    - The version of the C(xfconf-query) command.
+  returned: success
+  type: str
+  sample: 4.18.1
+  version_added: 10.2.0
 """
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
-from ansible_collections.community.general.plugins.module_utils.xfconf import xfconf_runner
+from ansible_collections.community.general.plugins.module_utils.xfconf import xfconf_runner, get_xfconf_version
 
 
 class XFConfProperty(StateModuleHelper):
@@ -183,8 +190,8 @@ class XFConfProperty(StateModuleHelper):
 
     def __init_module__(self):
         self.runner = xfconf_runner(self.module)
-        self.does_not = 'Property "{0}" does not exist on channel "{1}".'.format(self.vars.property,
-                                                                                 self.vars.channel)
+        self.vars.version = get_xfconf_version(self.runner)
+        self.does_not = 'Property "{0}" does not exist on channel "{1}".'.format(self.vars.property, self.vars.channel)
         self.vars.set('previous_value', self._get())
         self.vars.set('type', self.vars.value_type)
         self.vars.set_meta('value', initial_value=self.vars.previous_value)
@@ -213,8 +220,7 @@ class XFConfProperty(StateModuleHelper):
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err
             self.vars.cmd = ctx.cmd
-            if self.verbosity >= 4:
-                self.vars.run_info = ctx.run_info
+            self.vars.set("run_info", ctx.run_info, verbosity=4)
         self.vars.value = None
 
     def state_present(self):
@@ -244,8 +250,7 @@ class XFConfProperty(StateModuleHelper):
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err
             self.vars.cmd = ctx.cmd
-            if self.verbosity >= 4:
-                self.vars.run_info = ctx.run_info
+            self.vars.set("run_info", ctx.run_info, verbosity=4)
 
         if not self.vars.is_array:
             self.vars.value = self.vars.value[0]
