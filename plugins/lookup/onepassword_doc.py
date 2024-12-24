@@ -55,7 +55,7 @@ class OnePassCLIv2Doc(OnePassCLIv2):
     def get_raw(self, item_id, vault=None, token=None):
         args = ["document", "get", item_id]
         if vault is not None:
-            args = [*args, "--vault={0}".format(vault)]
+            args = [*args, f"--vault={vault}"]
 
         if self.service_account_token:
             if vault is None:

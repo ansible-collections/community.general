@@ -115,10 +115,10 @@ class LookupModule(LookupBase):
 
         for term in terms:
             if not FQCN_RE.match(term):
-                raise AnsibleLookupError('"{term}" is not a FQCN'.format(term=term))
+                raise AnsibleLookupError(f'"{term}" is not a FQCN')
 
             try:
-                collection_pkg = import_module('ansible_collections.{fqcn}'.format(fqcn=term))
+                collection_pkg = import_module(f'ansible_collections.{term}')
             except ImportError:
                 # Collection not found
                 result.append(not_found)
@@ -127,7 +127,7 @@ class LookupModule(LookupBase):
             try:
                 data = load_collection_meta(collection_pkg, no_version=no_version)
             except Exception as exc:
-                raise AnsibleLookupError('Error while loading metadata for {fqcn}: {error}'.format(fqcn=term, error=exc))
+                raise AnsibleLookupError(f'Error while loading metadata for {term}: {exc}')
 
             result.append(data.get('version', no_version))
 

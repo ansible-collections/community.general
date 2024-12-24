@@ -104,7 +104,7 @@ class Etcd:
     def __init__(self, url, version, validate_certs):
         self.url = url
         self.version = version
-        self.baseurl = '%s/%s/keys' % (self.url, self.version)
+        self.baseurl = f'{self.url}/{self.version}/keys'
         self.validate_certs = validate_certs
 
     def _parse_node(self, node):
@@ -125,7 +125,7 @@ class Etcd:
         return path
 
     def get(self, key):
-        url = "%s/%s?recursive=true" % (self.baseurl, key)
+        url = f"{self.baseurl}/{key}?recursive=true"
         data = None
         value = {}
         try:

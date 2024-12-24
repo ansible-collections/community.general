@@ -315,7 +315,7 @@ class LookupModule(LookupBase):
                 )
                 self.realpass = 'pass: the standard unix password manager' in passoutput
             except (subprocess.CalledProcessError) as e:
-                raise AnsibleError('exit code {0} while running {1}. Error output: {2}'.format(e.returncode, e.cmd, e.output))
+                raise AnsibleError(f'exit code {e.returncode} while running {e.cmd}. Error output: {e.output}')
 
         return self.realpass
 
@@ -332,7 +332,7 @@ class LookupModule(LookupBase):
                 for param in params[1:]:
                     name, value = param.split('=', 1)
                     if name not in self.paramvals:
-                        raise AnsibleAssertionError('%s not in paramvals' % name)
+                        raise AnsibleAssertionError(f'{name} not in paramvals')
                     self.paramvals[name] = value
             except (ValueError, AssertionError) as e:
                 raise AnsibleError(e)
@@ -344,12 +344,12 @@ class LookupModule(LookupBase):
             except (ValueError, AssertionError) as e:
                 raise AnsibleError(e)
             if self.paramvals['missing'] not in ['error', 'warn', 'create', 'empty']:
-                raise AnsibleError("{0} is not a valid option for missing".format(self.paramvals['missing']))
+                raise AnsibleError(f"{self.paramvals['missing']} is not a valid option for missing")
             if not isinstance(self.paramvals['length'], int):
                 if self.paramvals['length'].isdigit():
                     self.paramvals['length'] = int(self.paramvals['length'])
                 else:
-                    raise AnsibleError("{0} is not a correct value for length".format(self.paramvals['length']))
+                    raise AnsibleError(f"{self.paramvals['length']} is not a correct value for length")
 
             if self.paramvals['create']:
                 self.paramvals['missing'] = 'create'
@@ -364,7 +364,7 @@ class LookupModule(LookupBase):
                 # Set PASSWORD_STORE_DIR
                 self.env['PASSWORD_STORE_DIR'] = self.paramvals['directory']
             elif self.is_real_pass():
-                raise AnsibleError('Passwordstore directory \'{0}\' does not exist'.format(self.paramvals['directory']))
+                raise AnsibleError(f"Passwordstore directory '{self.paramvals['directory']}' does not exist")
 
             # Set PASSWORD_STORE_UMASK if umask is set
             if self.paramvals.get('umask') is not None:
@@ -394,19 +394,19 @@ class LookupModule(LookupBase):
                         name, value = line.split(':', 1)
                         self.passdict[name.strip()] = value.strip()
             if (self.backend == 'gopass' or
-                    os.path.isfile(os.path.join(self.paramvals['directory'], self.passname + ".gpg"))
+                    os.path.isfile(os.path.join(self.paramvals['directory'], f"{self.passname}.gpg"))
                     or not self.is_real_pass()):
                 # When using real pass, only accept password as found if there is a .gpg file for it (might be a tree node otherwise)
                 return True
         except (subprocess.CalledProcessError) as e:
             # 'not in password store' is the expected error if a password wasn't found
             if 'not in the password store' not in e.output:
-                raise AnsibleError('exit code {0} while running {1}. Error output: {2}'.format(e.returncode, e.cmd, e.output))
+                raise AnsibleError(f'exit code {e.returncode} while running {e.cmd}. Error output: {e.output}')
 
         if self.paramvals['missing'] == 'error':
-            raise AnsibleError('passwordstore: passname {0} not found and missing=error is set'.format(self.passname))
+            raise AnsibleError(f'passwordstore: passname {self.passname} not found and missing=error is set')
         elif self.paramvals['missing'] == 'warn':
-            display.warning('passwordstore: passname {0} not found'.format(self.passname))
+            display.warning(f'passwordstore: passname {self.passname} not found')
 
         return False
 
@@ -433,11 +433,11 @@ class LookupModule(LookupBase):
 
             msg_lines = []
             subkey_exists = False
-            subkey_line = "{0}: {1}".format(subkey, newpass)
+            subkey_line = f"{subkey}: {newpass}"
             oldpass = None
 
             for line in self.passoutput:
-                if line.startswith("{0}: ".format(subkey)):
+                if line.startswith(f"{subkey}: "):
                     oldpass = self.passdict[subkey]
                     line = subkey_line
                     subkey_exists = True
@@ -449,9 +449,7 @@ class LookupModule(LookupBase):
 
             if self.paramvals["timestamp"] and self.paramvals["backup"] and oldpass and oldpass != newpass:
                 msg_lines.append(
-                    "lookup_pass: old subkey '{0}' password was {1} (Updated on {2})\n".format(
-                        subkey, oldpass, datetime
-                    )
+                    f"lookup_pass: old subkey '{subkey}' password was {oldpass} (Updated on {datetime})\n"
                 )
 
             msg = os.linesep.join(msg_lines)
@@ -464,12 +462,12 @@ class LookupModule(LookupBase):
                 if self.paramvals['preserve'] and self.passoutput[1:]:
                     msg += '\n'.join(self.passoutput[1:]) + '\n'
                 if self.paramvals['timestamp'] and self.paramvals['backup']:
-                    msg += "lookup_pass: old password was {0} (Updated on {1})\n".format(self.password, datetime)
+                    msg += f"lookup_pass: old password was {self.password} (Updated on {datetime})\n"
 
         try:
             check_output2([self.pass_cmd, 'insert', '-f', '-m', self.passname], input=msg, env=self.env)
         except (subprocess.CalledProcessError) as e:
-            raise AnsibleError('exit code {0} while running {1}. Error output: {2}'.format(e.returncode, e.cmd, e.output))
+            raise AnsibleError(f'exit code {e.returncode} while running {e.cmd}. Error output: {e.output}')
         return newpass
 
     def generate_password(self):
@@ -480,17 +478,17 @@ class LookupModule(LookupBase):
         subkey = self.paramvals["subkey"]
 
         if subkey != "password":
-            msg = "\n\n{0}: {1}".format(subkey, newpass)
+            msg = f"\n\n{subkey}: {newpass}"
         else:
             msg = newpass
 
         if self.paramvals['timestamp']:
-            msg += '\n' + "lookup_pass: First generated by ansible on {0}\n".format(datetime)
+            msg += f"\nlookup_pass: First generated by ansible on {datetime}\n"
 
         try:
             check_output2([self.pass_cmd, 'insert', '-f', '-m', self.passname], input=msg, env=self.env)
         except (subprocess.CalledProcessError) as e:
-            raise AnsibleError('exit code {0} while running {1}. Error output: {2}'.format(e.returncode, e.cmd, e.output))
+            raise AnsibleError(f'exit code {e.returncode} while running {e.cmd}. Error output: {e.output}')
 
         return newpass
 
@@ -505,16 +503,12 @@ class LookupModule(LookupBase):
             else:
                 if self.paramvals["missing_subkey"] == "error":
                     raise AnsibleError(
-                        "passwordstore: subkey {0} for passname {1} not found and missing_subkey=error is set".format(
-                            self.paramvals["subkey"], self.passname
-                        )
+                        f"passwordstore: subkey {self.paramvals['subkey']} for passname {self.passname} not found and missing_subkey=error is set"
                     )
 
                 if self.paramvals["missing_subkey"] == "warn":
                     display.warning(
-                        "passwordstore: subkey {0} for passname {1} not found".format(
-                            self.paramvals["subkey"], self.passname
-                        )
+                        f"passwordstore: subkey {self.paramvals['subkey']} for passname {self.passname} not found"
                     )
 
                 return None
@@ -524,7 +518,7 @@ class LookupModule(LookupBase):
         if self.get_option('lock') == type:
             tmpdir = os.environ.get('TMPDIR', '/tmp')
             user = os.environ.get('USER')
-            lockfile = os.path.join(tmpdir, '.{0}.passwordstore.lock'.format(user))
+            lockfile = os.path.join(tmpdir, f'.{user}.passwordstore.lock')
             with FileLock().lock_file(lockfile, tmpdir, self.lock_timeout):
                 self.locked = type
                 yield
@@ -538,7 +532,7 @@ class LookupModule(LookupBase):
         self.locked = None
         timeout = self.get_option('locktimeout')
         if not re.match('^[0-9]+[smh]$', timeout):
-            raise AnsibleError("{0} is not a correct value for locktimeout".format(timeout))
+            raise AnsibleError(f"{timeout} is not a correct value for locktimeout")
         unit_to_seconds = {"s": 1, "m": 60, "h": 3600}
         self.lock_timeout = int(timeout[:-1]) * unit_to_seconds[timeout[-1]]
 

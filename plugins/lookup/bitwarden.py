@@ -207,7 +207,7 @@ class Bitwarden(object):
                 continue
 
         if matches and not field_matches:
-            raise AnsibleError("field {field} does not exist in {search_value}".format(field=field, search_value=search_value))
+            raise AnsibleError(f"field {field} does not exist in {search_value}")
 
         return field_matches
 
