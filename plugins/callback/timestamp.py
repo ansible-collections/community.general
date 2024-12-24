@@ -85,7 +85,7 @@ def banner(self, msg, color=None, cows=True):
     msg = to_text(msg)
     if self.b_cowsay and cows:
         try:
-            self.banner_cowsay("%s @ %s" % (msg, timestamp))
+            self.banner_cowsay(f"{msg} @ {timestamp}")
             return
         except OSError:
             self.warning("somebody cleverly deleted cowsay or something during the PB run.  heh.")
@@ -98,7 +98,7 @@ def banner(self, msg, color=None, cows=True):
     if star_len <= 3:
         star_len = 3
     stars = "*" * star_len
-    self.display("\n%s %s %s" % (msg, stars, timestamp), color=color)
+    self.display(f"\n{msg} {stars} {timestamp}", color=color)
 
 
 class CallbackModule(Default):
