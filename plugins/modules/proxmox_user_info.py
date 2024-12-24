@@ -9,13 +9,12 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: proxmox_user_info
 short_description: Retrieve information about one or more Proxmox VE users
 version_added: 1.3.0
 description:
-  - Retrieve information about one or more Proxmox VE users
+  - Retrieve information about one or more Proxmox VE users.
 attributes:
   action_group:
     version_added: 9.0.0
@@ -40,9 +39,9 @@ extends_documentation_fragment:
   - community.general.proxmox.documentation
   - community.general.attributes
   - community.general.attributes.info_module
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: List existing users
   community.general.proxmox_user_info:
     api_host: helldorado
@@ -82,84 +81,84 @@ EXAMPLES = '''
     user: admin
     domain: pve
   register: proxmox_user_admin
-'''
+"""
 
 
-RETURN = '''
+RETURN = r"""
 proxmox_users:
-    description: List of users.
-    returned: always, but can be empty
-    type: list
-    elements: dict
-    contains:
-      comment:
-        description: Short description of the user.
-        returned: on success
-        type: str
-      domain:
-        description: User's authentication realm, also the right part of the user ID.
-        returned: on success
-        type: str
-      email:
-        description: User's email address.
-        returned: on success
-        type: str
-      enabled:
-        description: User's account state.
-        returned: on success
-        type: bool
-      expire:
-        description: Expiration date in seconds since EPOCH. Zero means no expiration.
-        returned: on success
-        type: int
-      firstname:
-        description: User's first name.
-        returned: on success
-        type: str
-      groups:
-        description: List of groups which the user is a member of.
-        returned: on success
-        type: list
-        elements: str
-      keys:
-        description: User's two factor authentication keys.
-        returned: on success
-        type: str
-      lastname:
-        description: User's last name.
-        returned: on success
-        type: str
-      tokens:
-        description: List of API tokens associated to the user.
-        returned: on success
-        type: list
-        elements: dict
-        contains:
-          comment:
-            description: Short description of the token.
-            returned: on success
-            type: str
-          expire:
-            description: Expiration date in seconds since EPOCH. Zero means no expiration.
-            returned: on success
-            type: int
-          privsep:
-            description: Describe if the API token is further restricted with ACLs or is fully privileged.
-            returned: on success
-            type: bool
-          tokenid:
-            description: Token name.
-            returned: on success
-            type: str
-      user:
-        description: User's login name, also the left part of the user ID.
-        returned: on success
-        type: str
-      userid:
-        description: Proxmox user ID, represented as user@realm.
-        returned: on success
-        type: str
-'''
+  description: List of users.
+  returned: always, but can be empty
+  type: list
+  elements: dict
+  contains:
+    comment:
+      description: Short description of the user.
+      returned: on success
+      type: str
+    domain:
+      description: User's authentication realm, also the right part of the user ID.
+      returned: on success
+      type: str
+    email:
+      description: User's email address.
+      returned: on success
+      type: str
+    enabled:
+      description: User's account state.
+      returned: on success
+      type: bool
+    expire:
+      description: Expiration date in seconds since EPOCH. Zero means no expiration.
+      returned: on success
+      type: int
+    firstname:
+      description: User's first name.
+      returned: on success
+      type: str
+    groups:
+      description: List of groups which the user is a member of.
+      returned: on success
+      type: list
+      elements: str
+    keys:
+      description: User's two factor authentication keys.
+      returned: on success
+      type: str
+    lastname:
+      description: User's last name.
+      returned: on success
+      type: str
+    tokens:
+      description: List of API tokens associated to the user.
+      returned: on success
+      type: list
+      elements: dict
+      contains:
+        comment:
+          description: Short description of the token.
+          returned: on success
+          type: str
+        expire:
+          description: Expiration date in seconds since EPOCH. Zero means no expiration.
+          returned: on success
+          type: int
+        privsep:
+          description: Describe if the API token is further restricted with ACLs or is fully privileged.
+          returned: on success
+          type: bool
+        tokenid:
+          description: Token name.
+          returned: on success
+          type: str
+    user:
+      description: User's login name, also the left part of the user ID.
+      returned: on success
+      type: str
+    userid:
+      description: Proxmox user ID, represented as user@realm.
+      returned: on success
+      type: str
+"""
 
 
 from ansible.module_utils.basic import AnsibleModule
