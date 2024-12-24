@@ -10,297 +10,285 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: udm_user
 author:
-    - Tobias Rüetschi (@keachi)
+  - Tobias Rüetschi (@keachi)
 short_description: Manage posix users on a univention corporate server
 description:
-    - "This module allows to manage posix users on a univention corporate
-       server (UCS).
-       It uses the python API of the UCS to create a new object or edit it."
+  - This module allows to manage posix users on a univention corporate server (UCS). It uses the Python API of the UCS to create a new object
+    or edit it.
 notes:
-    - This module requires the deprecated L(crypt Python module,
-      https://docs.python.org/3.12/library/crypt.html) library which was removed from Python 3.13.
-      For Python 3.13 or newer, you need to install L(legacycrypt, https://pypi.org/project/legacycrypt/).
+  - This module requires the deprecated L(crypt Python module, https://docs.python.org/3.12/library/crypt.html) library which was removed from
+    Python 3.13. For Python 3.13 or newer, you need to install L(legacycrypt, https://pypi.org/project/legacycrypt/).
 requirements:
-    - legacycrypt (on Python 3.13 or newer)
+  - legacycrypt (on Python 3.13 or newer)
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: partial
+  check_mode:
+    support: full
+  diff_mode:
+    support: partial
 options:
-    state:
-        default: "present"
-        choices: [ present, absent ]
-        description:
-            - Whether the user is present or not.
-        type: str
-    username:
-        required: true
-        description:
-            - User name
-        aliases: ['name']
-        type: str
-    firstname:
-        description:
-            - First name. Required if O(state=present).
-        type: str
-    lastname:
-        description:
-            - Last name. Required if O(state=present).
-        type: str
-    password:
-        description:
-            - Password. Required if O(state=present).
-        type: str
-    birthday:
-        description:
-            - Birthday
-        type: str
-    city:
-        description:
-            - City of users business address.
-        type: str
-    country:
-        description:
-            - Country of users business address.
-        type: str
-    department_number:
-        description:
-            - Department number of users business address.
-        aliases: [ departmentNumber ]
-        type: str
+  state:
+    default: "present"
+    choices: [present, absent]
     description:
-        description:
-            - Description (not gecos)
-        type: str
-    display_name:
-        description:
-            - Display name (not gecos)
-        aliases: [ displayName ]
-        type: str
-    email:
-        default: ['']
-        description:
-            - A list of e-mail addresses.
-        type: list
-        elements: str
-    employee_number:
-        description:
-            - Employee number
-        aliases: [ employeeNumber ]
-        type: str
-    employee_type:
-        description:
-            - Employee type
-        aliases: [ employeeType ]
-        type: str
-    gecos:
-        description:
-            - GECOS
-        type: str
-    groups:
-        default: []
-        description:
-            - "POSIX groups, the LDAP DNs of the groups will be found with the
-               LDAP filter for each group as $GROUP:
-               V((&(objectClass=posixGroup\\)(cn=$GROUP\\)\\))."
-        type: list
-        elements: str
-    home_share:
-        description:
-            - "Home NFS share. Must be a LDAP DN, e.g.
-               V(cn=home,cn=shares,ou=school,dc=example,dc=com)."
-        aliases: [ homeShare ]
-        type: str
-    home_share_path:
-        description:
-            - Path to home NFS share, inside the homeShare.
-        aliases: [ homeSharePath ]
-        type: str
-    home_telephone_number:
-        default: []
-        description:
-            - List of private telephone numbers.
-        aliases: [ homeTelephoneNumber ]
-        type: list
-        elements: str
-    homedrive:
-        description:
-            - Windows home drive, for example V("H:").
-        type: str
-    mail_alternative_address:
-        default: []
-        description:
-            - List of alternative e-mail addresses.
-        aliases: [ mailAlternativeAddress ]
-        type: list
-        elements: str
-    mail_home_server:
-        description:
-            - FQDN of mail server
-        aliases: [ mailHomeServer ]
-        type: str
-    mail_primary_address:
-        description:
-            - Primary e-mail address
-        aliases: [ mailPrimaryAddress ]
-        type: str
-    mobile_telephone_number:
-        default: []
-        description:
-            - Mobile phone number
-        aliases: [ mobileTelephoneNumber ]
-        type: list
-        elements: str
-    organisation:
-        description:
-            - Organisation
-        aliases: [ organization ]
-        type: str
-    overridePWHistory:
-        type: bool
-        default: false
-        description:
-            - Override password history
-        aliases: [ override_pw_history ]
-    overridePWLength:
-        type: bool
-        default: false
-        description:
-            - Override password check
-        aliases: [ override_pw_length ]
-    pager_telephonenumber:
-        default: []
-        description:
-            - List of pager telephone numbers.
-        aliases: [ pagerTelephonenumber ]
-        type: list
-        elements: str
-    phone:
-        description:
-            - List of telephone numbers.
-        type: list
-        elements: str
-        default: []
-    postcode:
-        description:
-            - Postal code of users business address.
-        type: str
-    primary_group:
-        description:
-            - Primary group. This must be the group LDAP DN.
-            - If not specified, it defaults to V(cn=Domain Users,cn=groups,$LDAP_BASE_DN).
-        aliases: [ primaryGroup ]
-        type: str
-    profilepath:
-        description:
-            - Windows profile directory
-        type: str
-    pwd_change_next_login:
-        choices: [ '0', '1' ]
-        description:
-            - Change password on next login.
-        aliases: [ pwdChangeNextLogin ]
-        type: str
-    room_number:
-        description:
-            - Room number of users business address.
-        aliases: [ roomNumber ]
-        type: str
-    samba_privileges:
-        description:
-            - "Samba privilege, like allow printer administration, do domain
-               join."
-        aliases: [ sambaPrivileges ]
-        type: list
-        elements: str
-        default: []
-    samba_user_workstations:
-        description:
-            - Allow the authentication only on this Microsoft Windows host.
-        aliases: [ sambaUserWorkstations ]
-        type: list
-        elements: str
-        default: []
-    sambahome:
-        description:
-            - Windows home path, for example V('\\\\$FQDN\\$USERNAME').
-        type: str
-    scriptpath:
-        description:
-            - Windows logon script.
-        type: str
-    secretary:
-        default: []
-        description:
-            - A list of superiors as LDAP DNs.
-        type: list
-        elements: str
-    serviceprovider:
-        default: ['']
-        description:
-            - Enable user for the following service providers.
-        type: list
-        elements: str
-    shell:
-        default: '/bin/bash'
-        description:
-            - Login shell
-        type: str
-    street:
-        description:
-            - Street of users business address.
-        type: str
-    title:
-        description:
-            - Title, for example V(Prof.).
-        type: str
-    unixhome:
-        description:
-            - Unix home directory
-            - If not specified, it defaults to C(/home/$USERNAME).
-        type: str
-    userexpiry:
-        description:
-            - Account expiry date, for example V(1999-12-31).
-            - If not specified, it defaults to the current day plus one year.
-        type: str
-    position:
-        default: ''
-        description:
-            - "Define the whole position of users object inside the LDAP tree,
-               for example V(cn=employee,cn=users,ou=school,dc=example,dc=com)."
-        type: str
-    update_password:
-        default: always
-        choices: [ always, on_create ]
-        description:
-            - "V(always) will update passwords if they differ.
-               V(on_create) will only set the password for newly created users."
-        type: str
-    ou:
-        default: ''
-        description:
-            - "Organizational Unit inside the LDAP Base DN, for example V(school) for
-               LDAP OU C(ou=school,dc=example,dc=com)."
-        type: str
-    subpath:
-        default: 'cn=users'
-        description:
-            - "LDAP subpath inside the organizational unit, for example
-               V(cn=teachers,cn=users) for LDAP container
-               C(cn=teachers,cn=users,dc=example,dc=com)."
-        type: str
-'''
+      - Whether the user is present or not.
+    type: str
+  username:
+    required: true
+    description:
+      - User name.
+    aliases: ['name']
+    type: str
+  firstname:
+    description:
+      - First name. Required if O(state=present).
+    type: str
+  lastname:
+    description:
+      - Last name. Required if O(state=present).
+    type: str
+  password:
+    description:
+      - Password. Required if O(state=present).
+    type: str
+  birthday:
+    description:
+      - Birthday.
+    type: str
+  city:
+    description:
+      - City of users business address.
+    type: str
+  country:
+    description:
+      - Country of users business address.
+    type: str
+  department_number:
+    description:
+      - Department number of users business address.
+    aliases: [departmentNumber]
+    type: str
+  description:
+    description:
+      - Description (not gecos).
+    type: str
+  display_name:
+    description:
+      - Display name (not gecos).
+    aliases: [displayName]
+    type: str
+  email:
+    default: ['']
+    description:
+      - A list of e-mail addresses.
+    type: list
+    elements: str
+  employee_number:
+    description:
+      - Employee number.
+    aliases: [employeeNumber]
+    type: str
+  employee_type:
+    description:
+      - Employee type.
+    aliases: [employeeType]
+    type: str
+  gecos:
+    description:
+      - GECOS.
+    type: str
+  groups:
+    default: []
+    description:
+      - 'POSIX groups, the LDAP DNs of the groups will be found with the LDAP filter for each group as $GROUP: V((&(objectClass=posixGroup\)(cn=$GROUP\)\)).'
+    type: list
+    elements: str
+  home_share:
+    description:
+      - Home NFS share. Must be a LDAP DN, for example V(cn=home,cn=shares,ou=school,dc=example,dc=com).
+    aliases: [homeShare]
+    type: str
+  home_share_path:
+    description:
+      - Path to home NFS share, inside the homeShare.
+    aliases: [homeSharePath]
+    type: str
+  home_telephone_number:
+    default: []
+    description:
+      - List of private telephone numbers.
+    aliases: [homeTelephoneNumber]
+    type: list
+    elements: str
+  homedrive:
+    description:
+      - Windows home drive, for example V("H:").
+    type: str
+  mail_alternative_address:
+    default: []
+    description:
+      - List of alternative e-mail addresses.
+    aliases: [mailAlternativeAddress]
+    type: list
+    elements: str
+  mail_home_server:
+    description:
+      - FQDN of mail server.
+    aliases: [mailHomeServer]
+    type: str
+  mail_primary_address:
+    description:
+      - Primary e-mail address.
+    aliases: [mailPrimaryAddress]
+    type: str
+  mobile_telephone_number:
+    default: []
+    description:
+      - Mobile phone number.
+    aliases: [mobileTelephoneNumber]
+    type: list
+    elements: str
+  organisation:
+    description:
+      - Organisation.
+    aliases: [organization]
+    type: str
+  overridePWHistory:
+    type: bool
+    default: false
+    description:
+      - Override password history.
+    aliases: [override_pw_history]
+  overridePWLength:
+    type: bool
+    default: false
+    description:
+      - Override password check.
+    aliases: [override_pw_length]
+  pager_telephonenumber:
+    default: []
+    description:
+      - List of pager telephone numbers.
+    aliases: [pagerTelephonenumber]
+    type: list
+    elements: str
+  phone:
+    description:
+      - List of telephone numbers.
+    type: list
+    elements: str
+    default: []
+  postcode:
+    description:
+      - Postal code of users business address.
+    type: str
+  primary_group:
+    description:
+      - Primary group. This must be the group LDAP DN.
+      - If not specified, it defaults to V(cn=Domain Users,cn=groups,$LDAP_BASE_DN).
+    aliases: [primaryGroup]
+    type: str
+  profilepath:
+    description:
+      - Windows profile directory.
+    type: str
+  pwd_change_next_login:
+    choices: ['0', '1']
+    description:
+      - Change password on next login.
+    aliases: [pwdChangeNextLogin]
+    type: str
+  room_number:
+    description:
+      - Room number of users business address.
+    aliases: [roomNumber]
+    type: str
+  samba_privileges:
+    description:
+      - Samba privilege, like allow printer administration, do domain join.
+    aliases: [sambaPrivileges]
+    type: list
+    elements: str
+    default: []
+  samba_user_workstations:
+    description:
+      - Allow the authentication only on this Microsoft Windows host.
+    aliases: [sambaUserWorkstations]
+    type: list
+    elements: str
+    default: []
+  sambahome:
+    description:
+      - Windows home path, for example V('\\\\$FQDN\\$USERNAME').
+    type: str
+  scriptpath:
+    description:
+      - Windows logon script.
+    type: str
+  secretary:
+    default: []
+    description:
+      - A list of superiors as LDAP DNs.
+    type: list
+    elements: str
+  serviceprovider:
+    default: ['']
+    description:
+      - Enable user for the following service providers.
+    type: list
+    elements: str
+  shell:
+    default: '/bin/bash'
+    description:
+      - Login shell.
+    type: str
+  street:
+    description:
+      - Street of users business address.
+    type: str
+  title:
+    description:
+      - Title, for example V(Prof.).
+    type: str
+  unixhome:
+    description:
+      - Unix home directory.
+      - If not specified, it defaults to C(/home/$USERNAME).
+    type: str
+  userexpiry:
+    description:
+      - Account expiry date, for example V(1999-12-31).
+      - If not specified, it defaults to the current day plus one year.
+    type: str
+  position:
+    default: ''
+    description:
+      - Define the whole position of users object inside the LDAP tree, for example V(cn=employee,cn=users,ou=school,dc=example,dc=com).
+    type: str
+  update_password:
+    default: always
+    choices: [always, on_create]
+    description:
+      - V(always) will update passwords if they differ. V(on_create) will only set the password for newly created users.
+    type: str
+  ou:
+    default: ''
+    description:
+      - Organizational Unit inside the LDAP Base DN, for example V(school) for LDAP OU C(ou=school,dc=example,dc=com).
+    type: str
+  subpath:
+    default: 'cn=users'
+    description:
+      - LDAP subpath inside the organizational unit, for example V(cn=teachers,cn=users) for LDAP container C(cn=teachers,cn=users,dc=example,dc=com).
+    type: str
+"""
 
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a user on a UCS
   community.general.udm_user:
     name: FooBar
@@ -325,10 +313,10 @@ EXAMPLES = '''
     firstname: Foo
     lastname: Bar
     position: 'cn=teachers,cn=users,ou=school,dc=school,dc=example,dc=com'
-'''
+"""
 
 
-RETURN = '''# '''
+RETURN = """# """
 
 from datetime import date, timedelta
 import traceback
