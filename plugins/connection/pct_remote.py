@@ -254,12 +254,12 @@ EXAMPLES = r"""
 #           ansible_host: 10.0.0.10
 #           proxmox_vmid: 100
 #           ansible_connection: community.general.pct_remote
-#           remote_user: ansible
+#           ansible_user: ansible
 #         container-2:
 #           ansible_host: 10.0.0.10
 #           proxmox_vmid: 200
 #           ansible_connection: community.general.pct_remote
-#           remote_user: ansible
+#           ansible_user: ansible
 #     proxmox:
 #       hosts:
 #         proxmox-1:
@@ -286,7 +286,7 @@ EXAMPLES = r"""
 # compose:
 #   ansible_host: "'10.0.0.10'"
 #   ansible_connection: "'community.general.pct_remote'"
-#   remote_user: "'ansible'"
+#   ansible_user: "'ansible'"
 #
 #
 # ----------------------
