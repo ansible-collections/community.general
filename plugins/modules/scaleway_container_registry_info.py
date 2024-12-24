@@ -11,8 +11,7 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: scaleway_container_registry_info
 short_description: Scaleway Container registry info module
 version_added: 5.8.0
@@ -46,18 +45,18 @@ options:
     description:
       - Name of the container registry.
     required: true
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Get a container registry info
   community.general.scaleway_container_registry_info:
     project_id: '{{ scw_project }}'
     region: fr-par
     name: my-awesome-container-registry
   register: container_registry_info_task
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 container_registry:
   description: The container registry information.
   returned: always
@@ -77,7 +76,7 @@ container_registry:
     status: ready
     status_message: ""
     updated_at: "2022-10-14T09:51:07.949716Z"
-'''
+"""
 
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
     SCALEWAY_REGIONS, scaleway_argument_spec, Scaleway,

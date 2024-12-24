@@ -8,8 +8,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: scaleway_organization_info
 short_description: Gather information about the Scaleway organizations available
 description:
@@ -27,20 +26,18 @@ extends_documentation_fragment:
   - community.general.scaleway
   - community.general.attributes
   - community.general.attributes.info_module
+"""
 
-'''
-
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Gather Scaleway organizations information
   community.general.scaleway_organization_info:
   register: result
 
 - ansible.builtin.debug:
     msg: "{{ result.scaleway_organization_info }}"
-'''
+"""
 
-RETURN = r'''
----
+RETURN = r"""
 scaleway_organization_info:
   description: Response from Scaleway API.
   returned: success
@@ -70,7 +67,7 @@ scaleway_organization_info:
             "warnings": []
         }
     ]
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible_collections.community.general.plugins.module_utils.scaleway import (

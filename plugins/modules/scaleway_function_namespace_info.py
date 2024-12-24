@@ -11,8 +11,7 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: scaleway_function_namespace_info
 short_description: Retrieve information on Scaleway Function namespace
 version_added: 6.0.0
@@ -46,18 +45,18 @@ options:
     description:
       - Name of the function namespace.
     required: true
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Get a function namespace info
   community.general.scaleway_function_namespace_info:
     project_id: '{{ scw_project }}'
     region: fr-par
     name: my-awesome-function-namespace
   register: function_namespace_info_task
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 function_namespace:
   description: The function namespace information.
   returned: always
@@ -66,7 +65,7 @@ function_namespace:
     description: ""
     environment_variables:
       MY_VAR: my_value
-    error_message: null
+    error_message:
     id: 531a1fd7-98d2-4a74-ad77-d398324304b8
     name: my-awesome-function-namespace
     organization_id: e04e3bdc-015c-4514-afde-9389e9be24b0
@@ -78,7 +77,7 @@ function_namespace:
       - key: MY_SECRET_VAR
         value: $argon2id$v=19$m=65536,t=1,p=2$tb6UwSPWx/rH5Vyxt9Ujfw$5ZlvaIjWwNDPxD9Rdght3NarJz4IETKjpvAU3mMSmFg
     status: pending
-'''
+"""
 
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
     SCALEWAY_REGIONS, scaleway_argument_spec, Scaleway,

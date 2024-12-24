@@ -11,8 +11,7 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: scaleway_function
 short_description: Scaleway Function management
 version_added: 6.0.0
@@ -97,8 +96,8 @@ options:
 
   runtime:
     description:
-      - Runtime of the function
-      - See U(https://www.scaleway.com/en/docs/compute/functions/reference-content/functions-lifecycle/) for all available runtimes
+      - Runtime of the function.
+      - See U(https://www.scaleway.com/en/docs/compute/functions/reference-content/functions-lifecycle/) for all available runtimes.
     type: str
     required: true
 
@@ -121,7 +120,8 @@ options:
   privacy:
     description:
       - Privacy policies define whether a function can be executed anonymously.
-      - Choose V(public) to enable anonymous execution, or V(private) to protect your function with an authentication mechanism provided by the Scaleway API.
+      - Choose V(public) to enable anonymous execution, or V(private) to protect your function with an authentication mechanism provided by the
+        Scaleway API.
     type: str
     default: public
     choices:
@@ -133,9 +133,9 @@ options:
       - Redeploy the function if update is required.
     type: bool
     default: false
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a function
   community.general.scaleway_function:
     namespace_id: '{{ scw_function_namespace }}'
@@ -155,9 +155,9 @@ EXAMPLES = '''
     region: fr-par
     state: absent
     name: my-awesome-function
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 function:
   description: The function information.
   returned: when O(state=present)
@@ -186,7 +186,7 @@ function:
         value: $argon2id$v=19$m=65536,t=1,p=2$tb6UwSPWx/rH5Vyxt9Ujfw$5ZlvaIjWwNDPxD9Rdght3NarJz4IETKjpvAU3mMSmFg
     status: created
     timeout: 300s
-'''
+"""
 
 from copy import deepcopy
 

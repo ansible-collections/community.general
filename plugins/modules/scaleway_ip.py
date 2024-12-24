@@ -11,17 +11,15 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: scaleway_ip
 short_description: Scaleway IP management module
 author: Remy Leone (@remyleone)
 description:
-    - This module manages IP on Scaleway account
-      U(https://developer.scaleway.com)
+  - This module manages IP on Scaleway account U(https://developer.scaleway.com).
 extends_documentation_fragment:
-    - community.general.scaleway
-    - community.general.attributes
+  - community.general.scaleway
+  - community.general.attributes
 
 attributes:
   check_mode:
@@ -33,7 +31,7 @@ options:
   state:
     type: str
     description:
-     - Indicate desired state of the IP.
+      - Indicate desired state of the IP.
     default: present
     choices:
       - present
@@ -42,13 +40,13 @@ options:
   organization:
     type: str
     description:
-      - Scaleway organization identifier
+      - Scaleway organization identifier.
     required: true
 
   region:
     type: str
     description:
-     - Scaleway region to use (for example par1).
+      - Scaleway region to use (for example par1).
     required: true
     choices:
       - ams1
@@ -63,21 +61,19 @@ options:
   id:
     type: str
     description:
-    - id of the Scaleway IP (UUID)
-
+      - Id of the Scaleway IP (UUID).
   server:
     type: str
     description:
-    - id of the server you want to attach an IP to.
-    - To unattach an IP don't specify this option
-
+      - Id of the server you want to attach an IP to.
+      - To unattach an IP don't specify this option.
   reverse:
     type: str
     description:
-    - Reverse to assign to the IP
-'''
+      - Reverse to assign to the IP.
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create an IP
   community.general.scaleway_ip:
     organization: '{{ scw_org }}'
@@ -90,9 +86,9 @@ EXAMPLES = '''
     id: '{{ ip_creation_task.scaleway_ip.id }}'
     state: absent
     region: par1
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 data:
     description: This is only present when O(state=present).
     returned: when O(state=present)
@@ -110,8 +106,8 @@ data:
             "address": "212.47.232.136"
         }
     ]
-    }
-'''
+  }
+"""
 
 from ansible_collections.community.general.plugins.module_utils.scaleway import SCALEWAY_LOCATION, scaleway_argument_spec, Scaleway
 from ansible.module_utils.basic import AnsibleModule
