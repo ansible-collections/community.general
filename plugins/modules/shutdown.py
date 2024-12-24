@@ -8,14 +8,14 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 module: shutdown
 short_description: Shut down a machine
 notes:
-  - E(PATH) is ignored on the remote node when searching for the C(shutdown) command. Use O(search_paths)
-    to specify locations to search if the default paths do not work.
-  - The O(msg) and O(delay) options are not supported when a shutdown command is not found in O(search_paths), instead
-    the module will attempt to shutdown the system by calling C(systemctl shutdown).
+  - E(PATH) is ignored on the remote node when searching for the C(shutdown) command. Use O(search_paths) to specify locations to search if the
+    default paths do not work.
+  - The O(msg) and O(delay) options are not supported when a shutdown command is not found in O(search_paths), instead the module will attempt
+    to shutdown the system by calling C(systemctl shutdown).
 description:
   - Shut downs a machine.
 version_added: "1.1.0"
@@ -47,20 +47,21 @@ options:
   search_paths:
     description:
       - Paths to search on the remote machine for the C(shutdown) command.
-      - I(Only) these paths will be searched for the C(shutdown) command. E(PATH) is ignored in the remote node when searching for the C(shutdown) command.
+      - I(Only) these paths will be searched for the C(shutdown) command. E(PATH) is ignored in the remote node when searching for the C(shutdown)
+        command.
     type: list
     elements: path
     default: ['/sbin', '/usr/sbin', '/usr/local/sbin']
 
 seealso:
-- module: ansible.builtin.reboot
+  - module: ansible.builtin.reboot
 author:
-    - Matt Davis (@nitzmahone)
-    - Sam Doran (@samdoran)
-    - Amin Vakil (@aminvakil)
-'''
+  - Matt Davis (@nitzmahone)
+  - Sam Doran (@samdoran)
+  - Amin Vakil (@aminvakil)
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Unconditionally shut down the machine with all defaults
   community.general.shutdown:
 
@@ -71,13 +72,13 @@ EXAMPLES = r'''
 - name: Shut down a machine with shutdown command in unusual place
   community.general.shutdown:
     search_paths:
-     - '/lib/molly-guard'
-'''
+      - '/lib/molly-guard'
+"""
 
-RETURN = r'''
+RETURN = r"""
 shutdown:
   description: V(true) if the machine has been shut down.
   returned: always
   type: bool
   sample: true
-'''
+"""

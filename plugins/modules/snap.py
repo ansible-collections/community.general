@@ -13,96 +13,87 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: snap
 short_description: Manages snaps
 description:
-    - Manages snaps packages.
+  - Manages snaps packages.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    name:
-        description:
-            - Name of the snaps to be installed.
-            - Any named snap accepted by the C(snap) command is valid.
-            - >
-              O(dangerous=true) may be necessary when installing `.snap` files. See O(dangerous) for more details.
-        required: true
-        type: list
-        elements: str
-    state:
-        description:
-            - Desired state of the package.
-            - >
-              When O(state=present) the module will use C(snap install) if the snap is not installed,
-              and C(snap refresh) if it is installed but from a different channel.
-        default: present
-        choices: [ absent, present, enabled, disabled ]
-        type: str
-    classic:
-        description:
-            - Install a snap that has classic confinement.
-            - This option corresponds to the C(--classic) argument of the C(snap install) command.
-            - This level of confinement is permissive, granting full system access,
-              similar to that of traditionally packaged applications that do not use sandboxing mechanisms.
-              This option can only be specified when the task involves a single snap.
-            - See U(https://snapcraft.io/docs/snap-confinement) for more details about classic confinement and confinement levels.
-
-        type: bool
-        required: false
-        default: false
-    channel:
-        description:
-            - Define which release of a snap is installed and tracked for updates.
-              This option can only be specified if there is a single snap in the task.
-            - If not passed, the C(snap) command will default to V(stable).
-            - If the value passed does not contain the C(track), it will default to C(latest).
-              For example, if V(edge) is passed, the module will assume the channel to be V(latest/edge).
-            - See U(https://snapcraft.io/docs/channels) for more details about snap channels.
-        type: str
-        required: false
-    options:
-        description:
-            - Set options with pattern C(key=value) or C(snap:key=value). If a snap name is given, the option will be applied
-              to that snap only. If the snap name is omitted, the options will be applied to all snaps listed in O(name). Options will
-              only be applied to active snaps.
-            - Options will only be applied when C(state) is set to V(present).
-              This is done after the necessary installation
-              or refresh (upgrade/downgrade) of all the snaps listed in O(name).
-            - See U(https://snapcraft.io/docs/configuration-in-snaps) for more details about snap configuration options.
-
-        required: false
-        type: list
-        elements: str
-        version_added: 4.4.0
-    dangerous:
-        description:
-            - Install the snap in dangerous mode, without validating its assertions and signatures.
-            - This is useful when installing local snaps that are either unsigned or have signatures that have not been acknowledged.
-            - See U(https://snapcraft.io/docs/install-modes) for more details about installation modes.
-        type: bool
-        required: false
-        default: false
-        version_added: 7.2.0
+  name:
+    description:
+      - Name of the snaps to be installed.
+      - Any named snap accepted by the C(snap) command is valid.
+      - O(dangerous=true) may be necessary when installing C(.snap) files. See O(dangerous) for more details.
+    required: true
+    type: list
+    elements: str
+  state:
+    description:
+      - Desired state of the package.
+      - When O(state=present) the module will use C(snap install) if the snap is not installed, and C(snap refresh) if it is installed but from
+        a different channel.
+    default: present
+    choices: [absent, present, enabled, disabled]
+    type: str
+  classic:
+    description:
+      - Install a snap that has classic confinement.
+      - This option corresponds to the C(--classic) argument of the C(snap install) command.
+      - This level of confinement is permissive, granting full system access, similar to that of traditionally packaged applications that do not
+        use sandboxing mechanisms. This option can only be specified when the task involves a single snap.
+      - See U(https://snapcraft.io/docs/snap-confinement) for more details about classic confinement and confinement levels.
+    type: bool
+    required: false
+    default: false
+  channel:
+    description:
+      - Define which release of a snap is installed and tracked for updates. This option can only be specified if there is a single snap in the
+        task.
+      - If not passed, the C(snap) command will default to V(stable).
+      - If the value passed does not contain the C(track), it will default to C(latest). For example, if V(edge) is passed, the module will assume
+        the channel to be V(latest/edge).
+      - See U(https://snapcraft.io/docs/channels) for more details about snap channels.
+    type: str
+    required: false
+  options:
+    description:
+      - Set options with pattern C(key=value) or C(snap:key=value). If a snap name is given, the option will be applied to that snap only. If
+        the snap name is omitted, the options will be applied to all snaps listed in O(name). Options will only be applied to active snaps.
+      - Options will only be applied when C(state) is set to V(present). This is done after the necessary installation or refresh (upgrade/downgrade)
+        of all the snaps listed in O(name).
+      - See U(https://snapcraft.io/docs/configuration-in-snaps) for more details about snap configuration options.
+    required: false
+    type: list
+    elements: str
+    version_added: 4.4.0
+  dangerous:
+    description:
+      - Install the snap in dangerous mode, without validating its assertions and signatures.
+      - This is useful when installing local snaps that are either unsigned or have signatures that have not been acknowledged.
+      - See U(https://snapcraft.io/docs/install-modes) for more details about installation modes.
+    type: bool
+    required: false
+    default: false
+    version_added: 7.2.0
 notes:
-  - Privileged operations, such as installing and configuring snaps, require root priviledges.
-    This is only the case if the user has not logged in to the Snap Store.
-
+  - Privileged operations, such as installing and configuring snaps, require root priviledges. This is only the case if the user has not logged
+    in to the Snap Store.
 author:
-    - Victor Carceler (@vcarceler) <vcarceler@iespuigcastellar.xeill.net>
-    - Stanislas Lange (@angristan) <angristan@pm.me>
+  - Victor Carceler (@vcarceler) <vcarceler@iespuigcastellar.xeill.net>
+  - Stanislas Lange (@angristan) <angristan@pm.me>
 
 seealso:
-    - module: community.general.snap_alias
-'''
+  - module: community.general.snap_alias
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # Install "foo" and "bar" snap
 - name: Install foo
   community.general.snap:
@@ -147,35 +138,35 @@ EXAMPLES = '''
   community.general.snap:
     name: foo
     channel: latest/edge
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 classic:
-    description: Whether or not the snaps were installed with the classic confinement
-    type: bool
-    returned: When snaps are installed
+  description: Whether or not the snaps were installed with the classic confinement.
+  type: bool
+  returned: When snaps are installed
 channel:
-    description: The channel the snaps were installed from
-    type: str
-    returned: When snaps are installed
+  description: The channel the snaps were installed from.
+  type: str
+  returned: When snaps are installed
 cmd:
-    description: The command that was executed on the host
-    type: str
-    returned: When changed is true
+  description: The command that was executed on the host.
+  type: str
+  returned: When changed is true
 snaps_installed:
-    description: The list of actually installed snaps
-    type: list
-    returned: When any snaps have been installed
+  description: The list of actually installed snaps.
+  type: list
+  returned: When any snaps have been installed
 snaps_removed:
-    description: The list of actually removed snaps
-    type: list
-    returned: When any snaps have been removed
+  description: The list of actually removed snaps.
+  type: list
+  returned: When any snaps have been removed
 options_changed:
-    description: The list of options set/changed in format C(snap:key=value).
-    type: list
-    returned: When any options have been changed/set
-    version_added: 4.4.0
-'''
+  description: The list of options set/changed in format C(snap:key=value).
+  type: list
+  returned: When any options have been changed/set
+  version_added: 4.4.0
+"""
 
 import re
 import json
