@@ -214,8 +214,7 @@ DOCUMENTATION = r"""
       vmid:
         description:
           - LXC Container ID
-        type: str
-        default: proxmox_vmid
+        type: int
         vars:
           - name: proxmox_vmid
     notes:
