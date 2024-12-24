@@ -118,10 +118,17 @@ value_array:
     - Main
     - Work
     - Tmp
+version:
+  description:
+    - The version of the C(xfconf-query) command.
+  returned: success
+  type: str
+  sample: 4.18.1
+  version_added: 10.2.0
 """
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
-from ansible_collections.community.general.plugins.module_utils.xfconf import xfconf_runner
+from ansible_collections.community.general.plugins.module_utils.xfconf import xfconf_runner, get_xfconf_version
 
 
 class XFConfInfo(ModuleHelper):
@@ -139,6 +146,7 @@ class XFConfInfo(ModuleHelper):
 
     def __init_module__(self):
         self.runner = xfconf_runner(self.module, check_rc=True)
+        self.vars.version = get_xfconf_version(self.runner)
         self.vars.set("list_arg", False, output=False)
         self.vars.set("is_array", False)
 
