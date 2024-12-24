@@ -73,7 +73,7 @@ except ImportError:
 
 # Getting MAC Address of system:
 def get_mac():
-    mac = "%012x" % getnode()
+    mac = f"{getnode():012x}"
     return ":".join(map(lambda index: mac[index:index + 2], range(int(len(mac) / 2))))
 
 
@@ -161,7 +161,7 @@ class CallbackModule(CallbackBase):
         if ninvalidKeys > 0:
             for key in invalidKeys:
                 del meta[key]
-            meta['__errors'] = 'These keys have been sanitized: ' + ', '.join(invalidKeys)
+            meta['__errors'] = f"These keys have been sanitized: {', '.join(invalidKeys)}"
         return meta
 
     def sanitizeJSON(self, data):

@@ -102,7 +102,7 @@ class CallbackModule(CallbackBase):
         """Display Playbook and play start messages"""
         self.play = play
         name = play.name
-        self.send_msg("Ansible starting play: %s" % (name))
+        self.send_msg(f"Ansible starting play: {name}")
 
     def playbook_on_stats(self, stats):
         name = self.play
@@ -118,7 +118,7 @@ class CallbackModule(CallbackBase):
 
         if failures or unreachable:
             out = self.debug
-            self.send_msg("%s: Failures detected \n%s \nHost: %s\n Failed at:\n%s" % (name, self.task, h, out))
+            self.send_msg(f"{name}: Failures detected \n{self.task} \nHost: {h}\n Failed at:\n{out}")
         else:
             out = self.debug
-            self.send_msg("Great! \n Playbook %s completed:\n%s \n Last task debug:\n %s" % (name, s, out))
+            self.send_msg(f"Great! \n Playbook {name} completed:\n{s} \n Last task debug:\n {out}")

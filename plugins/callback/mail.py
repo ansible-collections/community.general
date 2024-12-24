@@ -135,14 +135,14 @@ class CallbackModule(CallbackBase):
         if self.bcc:
             bcc_addresses = email.utils.getaddresses(self.bcc)
 
-        content = 'Date: %s\n' % email.utils.formatdate()
-        content += 'From: %s\n' % email.utils.formataddr(sender_address)
+        content = f'Date: {email.utils.formatdate()}\n'
+        content += f'From: {email.utils.formataddr(sender_address)}\n'
         if self.to:
-            content += 'To: %s\n' % ', '.join([email.utils.formataddr(pair) for pair in to_addresses])
+            content += f"To: {', '.join([email.utils.formataddr(pair) for pair in to_addresses])}\n"
         if self.cc:
-            content += 'Cc: %s\n' % ', '.join([email.utils.formataddr(pair) for pair in cc_addresses])
-        content += 'Message-ID: %s\n' % email.utils.make_msgid(domain=self.get_option('message_id_domain'))
-        content += 'Subject: %s\n\n' % subject.strip()
+            content += f"Cc: {', '.join([email.utils.formataddr(pair) for pair in cc_addresses])}\n"
+        content += f"Message-ID: {email.utils.make_msgid(domain=self.get_option('message_id_domain'))}\n"
+        content += f'Subject: {subject.strip()}\n\n'
         content += body
 
         addresses = to_addresses
@@ -159,23 +159,22 @@ class CallbackModule(CallbackBase):
         smtp.quit()
 
     def subject_msg(self, multiline, failtype, linenr):
-        return '%s: %s' % (failtype, multiline.strip('\r\n').splitlines()[linenr])
+        msg = multiline.strip('\r\n').splitlines()[linenr]
+        return f'{failtype}: {msg}'
 
     def indent(self, multiline, indent=8):
         return re.sub('^', ' ' * indent, multiline, flags=re.MULTILINE)
 
     def body_blob(self, multiline, texttype):
         ''' Turn some text output in a well-indented block for sending in a mail body '''
-        intro = 'with the following %s:\n\n' % texttype
-        blob = ''
-        for line in multiline.strip('\r\n').splitlines():
-            blob += '%s\n' % line
-        return intro + self.indent(blob) + '\n'
+        intro = f'with the following {texttype}:\n\n'
+        blob = "\n".join(multiline.strip('\r\n').splitlines())
+        return f"{intro}{self.indent(blob)}\n"
 
     def mail_result(self, result, failtype):
         host = result._host.get_name()
         if not self.sender:
-            self.sender = '"Ansible: %s" <root>' % host
+            self.sender = f'"Ansible: {host}" <root>'
 
         # Add subject
         if self.itembody:
@@ -191,31 +190,32 @@ class CallbackModule(CallbackBase):
         elif result._result.get('exception'):  # Unrelated exceptions are added to output :-/
             subject = self.subject_msg(result._result['exception'], failtype, -1)
         else:
-            subject = '%s: %s' % (failtype, result._task.name or result._task.action)
+            subject = f'{failtype}: {result._task.name or result._task.action}'
 
         # Make playbook name visible (e.g. in Outlook/Gmail condensed view)
-        body = 'Playbook: %s\n' % os.path.basename(self.playbook._file_name)
+        body = f'Playbook: {os.path.basename(self.playbook._file_name)}\n'
         if result._task.name:
-            body += 'Task: %s\n' % result._task.name
-        body += 'Module: %s\n' % result._task.action
-        body += 'Host: %s\n' % host
+            body += f'Task: {result._task.name}\n'
+        body += f'Module: {result._task.action}\n'
+        body += f'Host: {host}\n'
         body += '\n'
 
         # Add task information (as much as possible)
         body += 'The following task failed:\n\n'
         if 'invocation' in result._result:
-            body += self.indent('%s: %s\n' % (result._task.action, json.dumps(result._result['invocation']['module_args'], indent=4)))
+            body += self.indent(f"{result._task.action}: {json.dumps(result._result['invocation']['module_args'], indent=4)}\n")
         elif result._task.name:
-            body += self.indent('%s (%s)\n' % (result._task.name, result._task.action))
+            body += self.indent(f'{result._task.name} ({result._task.action})\n')
         else:
-            body += self.indent('%s\n' % result._task.action)
+            body += self.indent(f'{result._task.action}\n')
         body += '\n'
 
         # Add item / message
         if self.itembody:
             body += self.itembody
         elif result._result.get('failed_when_result') is True:
-            body += "due to the following condition:\n\n" + self.indent('failed_when:\n- ' + '\n- '.join(result._task.failed_when)) + '\n\n'
+            fail_cond = self.indent('failed_when:\n- ' + '\n- '.join(result._task.failed_when))
+            body += f"due to the following condition:\n\n{fail_cond}\n\n"
         elif result._result.get('msg'):
             body += self.body_blob(result._result['msg'], 'message')
 
@@ -228,13 +228,13 @@ class CallbackModule(CallbackBase):
             body += self.body_blob(result._result['exception'], 'exception')
         if result._result.get('warnings'):
             for i in range(len(result._result.get('warnings'))):
-                body += self.body_blob(result._result['warnings'][i], 'exception %d' % (i + 1))
+                body += self.body_blob(result._result['warnings'][i], f'exception {i + 1}')
         if result._result.get('deprecations'):
             for i in range(len(result._result.get('deprecations'))):
-                body += self.body_blob(result._result['deprecations'][i], 'exception %d' % (i + 1))
+                body += self.body_blob(result._result['deprecations'][i], f'exception {i + 1}')
 
         body += 'and a complete dump of the error:\n\n'
-        body += self.indent('%s: %s' % (failtype, json.dumps(result._result, cls=AnsibleJSONEncoder, indent=4)))
+        body += self.indent(f'{failtype}: {json.dumps(result._result, cls=AnsibleJSONEncoder, indent=4)}')
 
         self.mail(subject=subject, body=body)
 
@@ -257,4 +257,4 @@ class CallbackModule(CallbackBase):
     def v2_runner_item_on_failed(self, result):
         # Pass item information to task failure
         self.itemsubject = result._result['msg']
-        self.itembody += self.body_blob(json.dumps(result._result, cls=AnsibleJSONEncoder, indent=4), "failed item dump '%(item)s'" % result._result)
+        self.itembody += self.body_blob(json.dumps(result._result, cls=AnsibleJSONEncoder, indent=4), f"failed item dump '{result._result['item']}'")

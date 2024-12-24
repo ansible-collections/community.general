@@ -38,15 +38,15 @@ class CallbackModule(CallbackBase):
         self.play = None
 
     def v2_on_any(self, *args, **kwargs):
-        self._display.display("--- play: {0} task: {1} ---".format(getattr(self.play, 'name', None), self.task))
+        self._display.display(f"--- play: {getattr(self.play, 'name', None)} task: {self.task} ---")
 
         self._display.display("     --- ARGS ")
         for i, a in enumerate(args):
-            self._display.display('     %s: %s' % (i, a))
+            self._display.display(f'     {i}: {a}')
 
         self._display.display("      --- KWARGS ")
         for k in kwargs:
-            self._display.display('     %s: %s' % (k, kwargs[k]))
+            self._display.display(f'     {k}: {kwargs[k]}')
 
     def v2_playbook_on_play_start(self, play):
         self.play = play
