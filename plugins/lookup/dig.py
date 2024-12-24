@@ -453,12 +453,7 @@ class LookupModule(LookupBase):
                     raise AnsibleError("Lookup failed: %s" % str(err))
                 if not real_empty:
                     ret.append('NXDOMAIN')
-            except dns.resolver.NoAnswer as err:
-                if fail_on_error:
-                    raise AnsibleError("Lookup failed: %s" % str(err))
-                if not real_empty:
-                    ret.append("")
-            except dns.resolver.Timeout as err:
+            except (dns.resolver.NoAnswer, dns.resolver.Timeout, dns.resolver.NoNameservers) as err:
                 if fail_on_error:
                     raise AnsibleError("Lookup failed: %s" % str(err))
                 if not real_empty:

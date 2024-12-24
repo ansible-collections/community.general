@@ -1,0 +1,2 @@
+bugfixes:
+  - "dig lookup plugin - correctly handle ``NoNameserver`` exception (https://github.com/ansible-collections/community.general/pull/9363, https://github.com/ansible-collections/community.general/issues/9362)."
