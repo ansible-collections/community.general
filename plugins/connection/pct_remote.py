@@ -217,6 +217,13 @@ DOCUMENTATION = r"""
         type: int
         vars:
           - name: proxmox_vmid
+      proxmox_become_method:
+        description:
+          - Become command used in proxmox
+        type: str
+        default: sudo
+        vars:
+          - name: proxmox_become_method
     notes:
       - >
         When NOT using this plugin as root, you need to have a become mechanism,
@@ -558,7 +565,10 @@ class Connection(ConnectionBase):
     def _build_pct_command(self, cmd: str) -> str:
         cmd = ['/usr/sbin/pct', 'exec', str(self.get_option('vmid')), '--', cmd]
         if self.get_option('remote_user') != 'root':
-            cmd = [self.become.name] + cmd
+            cmd = [self.get_option('proxmox_become_method')] + cmd
+            display.vvv("Running as non root user: %s, trying to run pct with become method: %s" %
+                        (self.get_option('remote_user'), self.get_option('proxmox_become_method')),
+                        host=self.get_option('remote_addr'))
         return ' '.join(cmd)
 
     def exec_command(self, cmd: str, in_data: bytes | None = None, sudoable: bool = True) -> tuple[int, bytes, bytes]:
