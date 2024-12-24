@@ -72,7 +72,7 @@ class Connection(ConnectionBase):
             raise AnsibleError("Internal Error: this module does not support optimized module pipelining")
 
         # totally ignores privilege escalation
-        display.vvv("EXEC %s" % cmd, host=self.host)
+        display.vvv(f"EXEC {cmd}", host=self.host)
         p = self.client.command.run(cmd)[self.host]
         return p[0], p[1], p[2]
 
@@ -87,14 +87,14 @@ class Connection(ConnectionBase):
         """ transfer a file from local to remote """
 
         out_path = self._normalize_path(out_path, '/')
-        display.vvv("PUT %s TO %s" % (in_path, out_path), host=self.host)
+        display.vvv(f"PUT {in_path} TO {out_path}", host=self.host)
         self.client.local.copyfile.send(in_path, out_path)
 
     def fetch_file(self, in_path, out_path):
         """ fetch a file from remote to local """
 
         in_path = self._normalize_path(in_path, '/')
-        display.vvv("FETCH %s TO %s" % (in_path, out_path), host=self.host)
+        display.vvv(f"FETCH {in_path} TO {out_path}", host=self.host)
         # need to use a tmp dir due to difference of semantic for getfile
         # ( who take a # directory as destination) and fetch_file, who
         # take a file directly
