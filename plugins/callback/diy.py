@@ -828,9 +828,9 @@ class CallbackModule(Default):
         _callback_options = ['msg', 'msg_color']
 
         for option in _callback_options:
-            _option_name = '%s_%s' % (_callback_type, option)
+            _option_name = f'{_callback_type}_{option}'
             _option_template = variables.get(
-                self.DIY_NS + "_" + _option_name,
+                f"{self.DIY_NS}_{_option_name}",
                 self.get_option(_option_name)
             )
             _ret.update({option: self._template(
@@ -867,7 +867,7 @@ class CallbackModule(Default):
                   handler=None, result=None, stats=None, remove_attr_ref_loop=True):
         def _get_value(obj, attr=None, method=None):
             if attr:
-                return getattr(obj, attr, getattr(obj, "_" + attr, None))
+                return getattr(obj, attr, getattr(obj, f"_{attr}", None))
 
             if method:
                 _method = getattr(obj, method)

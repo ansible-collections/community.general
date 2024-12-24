@@ -209,7 +209,7 @@ class TaskData:
         if host.uuid in self.host_data:
             if host.status == 'included':
                 # concatenate task include output from multiple items
-                host.result = '%s\n%s' % (self.host_data[host.uuid].result, host.result)
+                host.result = f'{self.host_data[host.uuid].result}\n{host.result}'
             else:
                 return
 
@@ -347,7 +347,7 @@ class OpenTelemetrySource(object):
     def update_span_data(self, task_data, host_data, span, disable_logs, disable_attributes_in_logs):
         """ update the span with the given TaskData and HostData """
 
-        name = '[%s] %s: %s' % (host_data.name, task_data.play, task_data.name)
+        name = f'[{host_data.name}] {task_data.play}: {task_data.name}'
 
         message = 'success'
         res = {}
@@ -470,7 +470,7 @@ class OpenTelemetrySource(object):
     def get_error_message_from_results(results, action):
         for result in results:
             if result.get('failed', False):
-                return ('{0}({1}) - {2}').format(action, result.get('item', 'none'), OpenTelemetrySource.get_error_message(result))
+                return f"{action}({result.get('item', 'none')}) - {OpenTelemetrySource.get_error_message(result)}"
 
     @staticmethod
     def _last_line(text):
@@ -482,14 +482,14 @@ class OpenTelemetrySource(object):
         message = result.get('msg', 'failed')
         exception = result.get('exception')
         stderr = result.get('stderr')
-        return ('message: "{0}"\nexception: "{1}"\nstderr: "{2}"').format(message, exception, stderr)
+        return f"message: \"{message}\"\nexception: \"{exception}\"\nstderr: \"{stderr}\""
 
     @staticmethod
     def enrich_error_message_from_results(results, action):
         message = ""
         for result in results:
             if result.get('failed', False):
-                message = ('{0}({1}) - {2}\n{3}').format(action, result.get('item', 'none'), OpenTelemetrySource.enrich_error_message(result), message)
+                message = f"{action}({result.get('item', 'none')}) - {OpenTelemetrySource.enrich_error_message(result)}\n{message}"
         return message
 
 
@@ -535,8 +535,9 @@ class CallbackModule(CallbackBase):
         environment_variable = self.get_option('enable_from_environment')
         if environment_variable is not None and os.environ.get(environment_variable, 'false').lower() != 'true':
             self.disabled = True
-            self._display.warning("The `enable_from_environment` option has been set and {0} is not enabled. "
-                                  "Disabling the `opentelemetry` callback plugin.".format(environment_variable))
+            self._display.warning(
+                f"The `enable_from_environment` option has been set and {environment_variable} is not enabled. Disabling the `opentelemetry` callback plugin."
+            )
 
         self.hide_task_arguments = self.get_option('hide_task_arguments')
 
