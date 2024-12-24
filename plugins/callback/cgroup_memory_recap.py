@@ -114,7 +114,7 @@ class CallbackModule(CallbackBase):
             max_results = int(f.read().strip()) / 1024 / 1024
 
         self._display.banner('CGROUP MEMORY RECAP')
-        self._display.display('Execution Maximum: %0.2fMB\n\n' % max_results)
+        self._display.display(f'Execution Maximum: {max_results:0.2f}MB\n\n')
 
         for task, memory in self.task_results:
-            self._display.display('%s (%s): %0.2fMB' % (task.get_name(), task._uuid, memory))
+            self._display.display(f'{task.get_name()} ({task._uuid}): {memory:0.2f}MB')

@@ -84,18 +84,17 @@ class AzureLogAnalyticsSource(object):
 
     def __build_signature(self, date, workspace_id, shared_key, content_length):
         # Build authorisation signature for Azure log analytics API call
-        sigs = "POST\n{0}\napplication/json\nx-ms-date:{1}\n/api/logs".format(
-            str(content_length), date)
+        sigs = f"POST\n{content_length}\napplication/json\nx-ms-date:{date}\n/api/logs"
         utf8_sigs = sigs.encode('utf-8')
         decoded_shared_key = base64.b64decode(shared_key)
         hmac_sha256_sigs = hmac.new(
             decoded_shared_key, utf8_sigs, digestmod=hashlib.sha256).digest()
         encoded_hash = base64.b64encode(hmac_sha256_sigs).decode('utf-8')
-        signature = "SharedKey {0}:{1}".format(workspace_id, encoded_hash)
+        signature = f"SharedKey {workspace_id}:{encoded_hash}"
         return signature
 
     def __build_workspace_url(self, workspace_id):
-        return "https://{0}.ods.opinsights.azure.com/api/logs?api-version=2016-04-01".format(workspace_id)
+        return f"https://{workspace_id}.ods.opinsights.azure.com/api/logs?api-version=2016-04-01"
 
     def __rfc1123date(self):
         return now().strftime('%a, %d %b %Y %H:%M:%S GMT')

@@ -113,11 +113,11 @@ class CallbackModule(Default):
 
         # put changed and skipped into a header line
         if 'changed' in abridged_result:
-            dumped += 'changed=' + str(abridged_result['changed']).lower() + ' '
+            dumped += f"changed={str(abridged_result['changed']).lower()} "
             del abridged_result['changed']
 
         if 'skipped' in abridged_result:
-            dumped += 'skipped=' + str(abridged_result['skipped']).lower() + ' '
+            dumped += f"skipped={str(abridged_result['skipped']).lower()} "
             del abridged_result['skipped']
 
         # if we already have stdout, we don't need stdout_lines
