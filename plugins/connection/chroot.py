@@ -120,7 +120,7 @@ class Connection(ConnectionBase):
 
         # do some trivial checks for ensuring 'host' is actually a chroot'able dir
         if not os.path.isdir(self.chroot):
-            raise AnsibleError("%s is not a directory" % self.chroot)
+            raise AnsibleError(f"{self.chroot} is not a directory")
 
         chrootsh = os.path.join(self.chroot, 'bin/sh')
         # Want to check for a usable bourne shell inside the chroot.
@@ -128,7 +128,7 @@ class Connection(ConnectionBase):
         # gets really complicated really fast.  So we punt on finding that
         # out.  As long as it's a symlink we assume that it will work
         if not (is_executable(chrootsh) or (os.path.lexists(chrootsh) and os.path.islink(chrootsh))):
-            raise AnsibleError("%s does not look like a chrootable dir (/bin/sh missing)" % self.chroot)
+            raise AnsibleError(f"{self.chroot} does not look like a chrootable dir (/bin/sh missing)")
 
     def _connect(self):
         """ connect to the chroot """
@@ -161,7 +161,7 @@ class Connection(ConnectionBase):
         executable = self.get_option('executable')
         local_cmd = [self.chroot_cmd, self.chroot, executable, '-c', cmd]
 
-        display.vvv("EXEC %s" % local_cmd, host=self.chroot)
+        display.vvv(f"EXEC {local_cmd}", host=self.chroot)
         local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
         p = subprocess.Popen(local_cmd, shell=False, stdin=stdin,
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -195,7 +195,7 @@ class Connection(ConnectionBase):
     def put_file(self, in_path, out_path):
         """ transfer a file from local to chroot """
         super(Connection, self).put_file(in_path, out_path)
-        display.vvv("PUT %s TO %s" % (in_path, out_path), host=self.chroot)
+        display.vvv(f"PUT {in_path} TO {out_path}", host=self.chroot)
 
         out_path = shlex_quote(self._prefix_login_path(out_path))
         try:
@@ -205,27 +205,27 @@ class Connection(ConnectionBase):
                 else:
                     count = ''
                 try:
-                    p = self._buffered_exec_command('dd of=%s bs=%s%s' % (out_path, BUFSIZE, count), stdin=in_file)
+                    p = self._buffered_exec_command(f'dd of={out_path} bs={BUFSIZE}{count}', stdin=in_file)
                 except OSError:
                     raise AnsibleError("chroot connection requires dd command in the chroot")
                 try:
                     stdout, stderr = p.communicate()
                 except Exception:
                     traceback.print_exc()
-                    raise AnsibleError("failed to transfer file %s to %s" % (in_path, out_path))
+                    raise AnsibleError(f"failed to transfer file {in_path} to {out_path}")
                 if p.returncode != 0:
-                    raise AnsibleError("failed to transfer file %s to %s:\n%s\n%s" % (in_path, out_path, stdout, stderr))
+                    raise AnsibleError(f"failed to transfer file {in_path} to {out_path}:\n{stdout}\n{stderr}")
         except IOError:
-            raise AnsibleError("file or module does not exist at: %s" % in_path)
+            raise AnsibleError(f"file or module does not exist at: {in_path}")
 
     def fetch_file(self, in_path, out_path):
         """ fetch a file from chroot to local """
         super(Connection, self).fetch_file(in_path, out_path)
-        display.vvv("FETCH %s TO %s" % (in_path, out_path), host=self.chroot)
+        display.vvv(f"FETCH {in_path} TO {out_path}", host=self.chroot)
 
         in_path = shlex_quote(self._prefix_login_path(in_path))
         try:
-            p = self._buffered_exec_command('dd if=%s bs=%s' % (in_path, BUFSIZE))
+            p = self._buffered_exec_command(f'dd if={in_path} bs={BUFSIZE}')
         except OSError:
             raise AnsibleError("chroot connection requires dd command in the chroot")
 
@@ -237,10 +237,10 @@ class Connection(ConnectionBase):
                     chunk = p.stdout.read(BUFSIZE)
             except Exception:
                 traceback.print_exc()
-                raise AnsibleError("failed to transfer file %s to %s" % (in_path, out_path))
+                raise AnsibleError(f"failed to transfer file {in_path} to {out_path}")
             stdout, stderr = p.communicate()
             if p.returncode != 0:
-                raise AnsibleError("failed to transfer file %s to %s:\n%s\n%s" % (in_path, out_path, stdout, stderr))
+                raise AnsibleError(f"failed to transfer file {in_path} to {out_path}:\n{stdout}\n{stderr}")
 
     def close(self):
         """ terminate the connection; nothing to do here """
