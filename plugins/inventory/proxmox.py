@@ -222,7 +222,6 @@ from ansible.module_utils.common._collections_compat import MutableMapping
 
 from ansible.errors import AnsibleError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
-from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.six import string_types
 from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.utils.display import Display
@@ -523,7 +522,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 if not self._compose(host_filter, properties):
                     return False
             except Exception as e:  # pylint: disable=broad-except
-                message = f"Could not evaluate host filter {host_filter} for host {name} - {to_native(e)}"
+                message = f"Could not evaluate host filter {host_filter} for host {name} - {e}"
                 if self.strict:
                     raise AnsibleError(message)
                 display.warning(message)

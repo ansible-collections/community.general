@@ -153,7 +153,7 @@ class PlainTextSocketAppender(object):
                 self.open_connection()
                 return
             except Exception as e:
-                self._display.vvvv(f"Unable to connect to Logentries: {to_text(e)}")
+                self._display.vvvv(f"Unable to connect to Logentries: {e}")
 
             root_delay *= 2
             if root_delay > self.MAX_DELAY:
@@ -249,7 +249,7 @@ class CallbackModule(CallbackBase):
             self.use_tls = self.get_option('use_tls')
             self.flatten = self.get_option('flatten')
         except KeyError as e:
-            self._display.warning(f"Missing option for Logentries callback plugin: {to_text(e)}")
+            self._display.warning(f"Missing option for Logentries callback plugin: {e}")
             self.disabled = True
 
         try:

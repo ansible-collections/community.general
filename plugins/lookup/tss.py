@@ -325,12 +325,12 @@ class TSSClient(object):
                     if i['isFile']:
                         try:
                             file_content = i['itemValue'].content
-                            with open(os.path.join(file_download_path, f"{str(obj['id'])}_{i['slug']}"), "wb") as f:
+                            with open(os.path.join(file_download_path, f"{obj['id']}_{i['slug']}"), "wb") as f:
                                 f.write(file_content)
                         except ValueError:
-                            raise AnsibleOptionsError(f"Failed to download {str(i['slug'])}")
+                            raise AnsibleOptionsError(f"Failed to download {i['slug']}")
                         except AttributeError:
-                            display.warning(f"Could not read file content for {str(i['slug'])}")
+                            display.warning(f"Could not read file content for {i['slug']}")
                         finally:
                             i['itemValue'] = "*** Not Valid For Display ***"
                 else:

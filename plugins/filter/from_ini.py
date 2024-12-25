@@ -50,7 +50,6 @@ from ansible.errors import AnsibleFilterError
 from ansible.module_utils.six import string_types
 from ansible.module_utils.six.moves import StringIO
 from ansible.module_utils.six.moves.configparser import ConfigParser
-from ansible.module_utils.common.text.converters import to_native
 
 
 class IniParser(ConfigParser):
@@ -83,8 +82,7 @@ def from_ini(obj):
     try:
         parser.read_file(StringIO(obj))
     except Exception as ex:
-        raise AnsibleFilterError(f'from_ini failed to parse given string: '
-                                 f'{to_native(ex)}', orig_exc=ex)
+        raise AnsibleFilterError(f'from_ini failed to parse given string: {ex}', orig_exc=ex)
 
     return parser.as_dict()
 
