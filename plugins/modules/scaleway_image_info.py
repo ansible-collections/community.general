@@ -8,8 +8,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: scaleway_image_info
 short_description: Gather information about the Scaleway images available
 description:
@@ -37,9 +36,9 @@ options:
       - EMEA-FR-PAR2
       - waw1
       - EMEA-PL-WAW1
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Gather Scaleway images information
   community.general.scaleway_image_info:
     region: par1
@@ -47,14 +46,13 @@ EXAMPLES = r'''
 
 - ansible.builtin.debug:
     msg: "{{ result.scaleway_image_info }}"
-'''
+"""
 
-RETURN = r'''
----
+RETURN = r"""
 scaleway_image_info:
   description:
     - Response from Scaleway API.
-    - "For more details please refer to: U(https://developers.scaleway.com/en/products/instance/api/)."
+    - 'For more details please refer to: U(https://developers.scaleway.com/en/products/instance/api/).'
   returned: success
   type: list
   elements: dict
@@ -91,7 +89,7 @@ scaleway_image_info:
            "state": "available"
         }
     ]
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.scaleway import (

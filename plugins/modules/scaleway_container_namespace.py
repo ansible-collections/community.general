@@ -11,8 +11,7 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: scaleway_container_namespace
 short_description: Scaleway Container namespace management
 version_added: 6.0.0
@@ -24,7 +23,7 @@ extends_documentation_fragment:
   - community.general.scaleway_waitable_resource
   - community.general.attributes
 requirements:
-   - passlib[argon2] >= 1.7.4
+  - passlib[argon2] >= 1.7.4
 
 attributes:
   check_mode:
@@ -84,9 +83,9 @@ options:
       - Injected in containers at runtime.
     type: dict
     default: {}
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a container namespace
   community.general.scaleway_container_namespace:
     project_id: '{{ scw_project }}'
@@ -105,9 +104,9 @@ EXAMPLES = '''
     state: absent
     region: fr-par
     name: my-awesome-container-namespace
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 container_namespace:
   description: The container namespace information.
   returned: when O(state=present)
@@ -128,7 +127,7 @@ container_namespace:
       - key: MY_SECRET_VAR
         value: $argon2id$v=19$m=65536,t=1,p=2$tb6UwSPWx/rH5Vyxt9Ujfw$5ZlvaIjWwNDPxD9Rdght3NarJz4IETKjpvAU3mMSmFg
     status: pending
-'''
+"""
 
 from copy import deepcopy
 

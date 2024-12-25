@@ -9,12 +9,11 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: say
 short_description: Makes a computer to speak
 description:
-  - makes a computer speak! Amuse your friends, annoy your coworkers!
+  - Makes a computer speak! Amuse your friends, annoy your coworkers!
 notes:
   - In 2.5, this module has been renamed from C(osx_say) to M(community.general.say).
   - If you like this module, you may also be interested in the osx_say callback plugin.
@@ -37,19 +36,19 @@ options:
     description:
       - What voice to use.
     required: false
-requirements: [ say or espeak or espeak-ng ]
+requirements: [say or espeak or espeak-ng]
 author:
-    - "Ansible Core Team"
-    - "Michael DeHaan (@mpdehaan)"
-'''
+  - "Ansible Core Team"
+  - "Michael DeHaan (@mpdehaan)"
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Makes a computer to speak
   community.general.say:
     msg: '{{ inventory_hostname }} is all done'
     voice: Zarvox
   delegate_to: localhost
-'''
+"""
 import platform
 
 from ansible.module_utils.basic import AnsibleModule

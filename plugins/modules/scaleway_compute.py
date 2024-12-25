@@ -13,16 +13,15 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: scaleway_compute
 short_description: Scaleway compute management module
 author: Remy Leone (@remyleone)
 description:
-    - "This module manages compute instances on Scaleway."
+  - This module manages compute instances on Scaleway.
 extends_documentation_fragment:
-    - community.general.scaleway
-    - community.general.attributes
+  - community.general.scaleway
+  - community.general.attributes
 
 attributes:
   check_mode:
@@ -35,35 +34,33 @@ options:
   public_ip:
     type: str
     description:
-    - Manage public IP on a Scaleway server
-    - Could be Scaleway IP address UUID
-    - V(dynamic) Means that IP is destroyed at the same time the host is destroyed
-    - V(absent) Means no public IP at all
+      - Manage public IP on a Scaleway server.
+      - Could be Scaleway IP address UUID.
+      - V(dynamic) Means that IP is destroyed at the same time the host is destroyed.
+      - V(absent) Means no public IP at all.
     default: absent
 
   enable_ipv6:
     description:
-      - Enable public IPv6 connectivity on the instance
+      - Enable public IPv6 connectivity on the instance.
     default: false
     type: bool
 
   image:
     type: str
     description:
-      - Image identifier used to start the instance with
+      - Image identifier used to start the instance with.
     required: true
 
   name:
     type: str
     description:
-      - Name of the instance
-
+      - Name of the instance.
   organization:
     type: str
     description:
       - Organization identifier.
       - Exactly one of O(project) and O(organization) must be specified.
-
   project:
     type: str
     description:
@@ -74,7 +71,7 @@ options:
   state:
     type: str
     description:
-     - Indicate desired state of the instance.
+      - Indicate desired state of the instance.
     default: present
     choices:
       - present
@@ -87,14 +84,14 @@ options:
     type: list
     elements: str
     description:
-    - List of tags to apply to the instance (5 max)
+      - List of tags to apply to the instance (5 max).
     required: false
     default: []
 
   region:
     type: str
     description:
-    - Scaleway compute zone
+      - Scaleway compute zone.
     required: true
     choices:
       - ams1
@@ -109,38 +106,38 @@ options:
   commercial_type:
     type: str
     description:
-    - Commercial name of the compute node
+      - Commercial name of the compute node.
     required: true
 
   wait:
     description:
-    - Wait for the instance to reach its desired state before returning.
+      - Wait for the instance to reach its desired state before returning.
     type: bool
     default: false
 
   wait_timeout:
     type: int
     description:
-    - Time to wait for the server to reach the expected state
+      - Time to wait for the server to reach the expected state.
     required: false
     default: 300
 
   wait_sleep_time:
     type: int
     description:
-    - Time to wait before every attempt to check the state of the server
+      - Time to wait before every attempt to check the state of the server.
     required: false
     default: 3
 
   security_group:
     type: str
     description:
-    - Security group unique identifier
-    - If no value provided, the default security group or current security group will be used
+      - Security group unique identifier.
+      - If no value provided, the default security group or current security group will be used.
     required: false
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a server
   community.general.scaleway_compute:
     name: foobar
@@ -174,10 +171,10 @@ EXAMPLES = '''
     project: 951df375-e094-4d26-97c1-ba548eeb9c42
     region: ams1
     commercial_type: VC1S
-'''
+"""
 
-RETURN = '''
-'''
+RETURN = r"""
+"""
 
 import datetime
 import time
