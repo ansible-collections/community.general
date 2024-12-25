@@ -8,23 +8,21 @@ from __future__ import (absolute_import, division, print_function)
 
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: online_server_info
 short_description: Gather information about Online servers
 description:
   - Gather information about the servers.
-  - U(https://www.online.net/en/dedicated-server)
+  - U(https://www.online.net/en/dedicated-server).
 author:
   - "Remy Leone (@remyleone)"
 extends_documentation_fragment:
   - community.general.online
   - community.general.attributes
   - community.general.attributes.info_module
+"""
 
-'''
-
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Gather Online server information
   community.general.online_server_info:
     api_token: '0d1627e8-bbf0-44c5-a46f-5c4d3aef033f'
@@ -32,13 +30,13 @@ EXAMPLES = r'''
 
 - ansible.builtin.debug:
     msg: "{{ result.online_server_info }}"
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 online_server_info:
   description:
     - Response from Online API.
-    - "For more details please refer to: U(https://console.online.net/en/api/)."
+    - 'For more details please refer to: U(https://console.online.net/en/api/).'
   returned: success
   type: list
   elements: dict
@@ -130,7 +128,7 @@ online_server_info:
             "support": "Basic service level"
         }
     ]
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.online import (

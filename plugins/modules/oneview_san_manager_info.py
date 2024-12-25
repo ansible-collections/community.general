@@ -7,44 +7,42 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: oneview_san_manager_info
 short_description: Retrieve information about one or more of the OneView SAN Managers
 description:
-    - Retrieve information about one or more of the SAN Managers from OneView
+  - Retrieve information about one or more of the SAN Managers from OneView.
 requirements:
-    - hpOneView >= 2.0.1
+  - hpOneView >= 2.0.1
 author:
-    - Felipe Bulsoni (@fgbulsoni)
-    - Thiago Miotto (@tmiotto)
-    - Adriane Cardozo (@adriane-cardozo)
+  - Felipe Bulsoni (@fgbulsoni)
+  - Thiago Miotto (@tmiotto)
+  - Adriane Cardozo (@adriane-cardozo)
 attributes:
-    check_mode:
-        version_added: 3.3.0
-        # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
+  check_mode:
+    version_added: 3.3.0
+    # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
 options:
-    provider_display_name:
-      description:
-        - Provider Display Name.
-      type: str
-    params:
-      description:
-        - List of params to delimit, filter and sort the list of resources.
-        - "params allowed:
-           - V(start): The first item to return, using 0-based indexing.
-           - V(count): The number of resources to return.
-           - V(query): A general query string to narrow the list of resources returned.
-           - V(sort): The sort order of the returned data set."
-      type: dict
+  provider_display_name:
+    description:
+      - Provider Display Name.
+    type: str
+  params:
+    description:
+      - List of params to delimit, filter and sort the list of resources.
+      - 'Params allowed:'
+      - 'V(start): The first item to return, using 0-based indexing.'
+      - 'V(count): The number of resources to return.'
+      - 'V(query): A general query string to narrow the list of resources returned.'
+      - 'V(sort): The sort order of the returned data set.'
+    type: dict
 extends_documentation_fragment:
   - community.general.oneview
   - community.general.attributes
   - community.general.attributes.info_module
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Gather information about all SAN Managers
   community.general.oneview_san_manager_info:
     config: /etc/oneview/oneview_config.json
@@ -80,14 +78,14 @@ EXAMPLES = '''
 - name: Print fetched information about SAN Manager found by provider display name
   ansible.builtin.debug:
     msg: "{{ result.san_managers }}"
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 san_managers:
-    description: Has all the OneView information about the SAN Managers.
-    returned: Always, but can be null.
-    type: dict
-'''
+  description: Has all the OneView information about the SAN Managers.
+  returned: Always, but can be null.
+  type: dict
+"""
 
 from ansible_collections.community.general.plugins.module_utils.oneview import OneViewModuleBase
 

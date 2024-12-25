@@ -8,103 +8,99 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: open_iscsi
 author:
-    - Serge van Ginderachter (@srvg)
+  - Serge van Ginderachter (@srvg)
 short_description: Manage iSCSI targets with Open-iSCSI
 description:
-    - Discover targets on given portal, (dis)connect targets, mark targets to
-      manually or auto start, return device nodes of connected targets.
+  - Discover targets on given portal, (dis)connect targets, mark targets to manually or auto start, return device nodes of connected targets.
 requirements:
-    - open_iscsi library and tools (iscsiadm)
+  - open_iscsi library and tools (iscsiadm)
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    portal:
-        description:
-        - The domain name or IP address of the iSCSI target.
-        type: str
-        aliases: [ ip ]
-    port:
-        description:
-        - The port on which the iSCSI target process listens.
-        type: str
-        default: '3260'
-    target:
-        description:
-        - The iSCSI target name.
-        type: str
-        aliases: [ name, targetname ]
-    login:
-        description:
-        - Whether the target node should be connected.
-        - When O(target) is omitted, will login to all available.
-        type: bool
-        aliases: [ state ]
-    node_auth:
-        description:
-        - The value for C(node.session.auth.authmethod).
-        type: str
-        default: CHAP
-    node_user:
-        description:
-        - The value for C(node.session.auth.username).
-        type: str
-    node_pass:
-        description:
-        - The value for C(node.session.auth.password).
-        type: str
-    node_user_in:
-        description:
-        - The value for C(node.session.auth.username_in).
-        type: str
-        version_added: 3.8.0
-    node_pass_in:
-        description:
-        - The value for C(node.session.auth.password_in).
-        type: str
-        version_added: 3.8.0
-    auto_node_startup:
-        description:
-        - Whether the target node should be automatically connected at startup.
-        type: bool
-        aliases: [ automatic ]
-    auto_portal_startup:
-        description:
-        - Whether the target node portal should be automatically connected at startup.
-        type: bool
-        version_added: 3.2.0
-    discover:
-        description:
-        - Whether the list of target nodes on the portal should be
-          (re)discovered and added to the persistent iSCSI database.
-        - Keep in mind that C(iscsiadm) discovery resets configuration, like C(node.startup)
-          to manual, hence combined with O(auto_node_startup=true) will always return
-          a changed state.
-        type: bool
-        default: false
-    show_nodes:
-        description:
-        - Whether the list of nodes in the persistent iSCSI database should be returned by the module.
-        type: bool
-        default: false
-    rescan:
-        description:
-        - Rescan an established session for discovering new targets.
-        - When O(target) is omitted, will rescan all sessions.
-        type: bool
-        default: false
-        version_added: 4.1.0
-'''
+  portal:
+    description:
+      - The domain name or IP address of the iSCSI target.
+    type: str
+    aliases: [ip]
+  port:
+    description:
+      - The port on which the iSCSI target process listens.
+    type: str
+    default: '3260'
+  target:
+    description:
+      - The iSCSI target name.
+    type: str
+    aliases: [name, targetname]
+  login:
+    description:
+      - Whether the target node should be connected.
+      - When O(target) is omitted, will login to all available.
+    type: bool
+    aliases: [state]
+  node_auth:
+    description:
+      - The value for C(node.session.auth.authmethod).
+    type: str
+    default: CHAP
+  node_user:
+    description:
+      - The value for C(node.session.auth.username).
+    type: str
+  node_pass:
+    description:
+      - The value for C(node.session.auth.password).
+    type: str
+  node_user_in:
+    description:
+      - The value for C(node.session.auth.username_in).
+    type: str
+    version_added: 3.8.0
+  node_pass_in:
+    description:
+      - The value for C(node.session.auth.password_in).
+    type: str
+    version_added: 3.8.0
+  auto_node_startup:
+    description:
+      - Whether the target node should be automatically connected at startup.
+    type: bool
+    aliases: [automatic]
+  auto_portal_startup:
+    description:
+      - Whether the target node portal should be automatically connected at startup.
+    type: bool
+    version_added: 3.2.0
+  discover:
+    description:
+      - Whether the list of target nodes on the portal should be (re)discovered and added to the persistent iSCSI database.
+      - Keep in mind that C(iscsiadm) discovery resets configuration, like C(node.startup) to manual, hence combined with O(auto_node_startup=true)
+        will always return a changed state.
+    type: bool
+    default: false
+  show_nodes:
+    description:
+      - Whether the list of nodes in the persistent iSCSI database should be returned by the module.
+    type: bool
+    default: false
+  rescan:
+    description:
+      - Rescan an established session for discovering new targets.
+      - When O(target) is omitted, will rescan all sessions.
+    type: bool
+    default: false
+    version_added: 4.1.0
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Perform a discovery on sun.com and show available target nodes
   community.general.open_iscsi:
     show_nodes: true
@@ -144,7 +140,7 @@ EXAMPLES = r'''
   community.general.open_iscsi:
     rescan: true
     target: iqn.1986-03.com.sun:02:f8c1f9e0-c3ec-ec84-c9c9-8bfb0cd5de3d
-'''
+"""
 
 import glob
 import os

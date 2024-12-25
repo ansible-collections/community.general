@@ -8,36 +8,34 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: oneview_logical_interconnect_group_info
 short_description: Retrieve information about one or more of the OneView Logical Interconnect Groups
 description:
-    - Retrieve information about one or more of the Logical Interconnect Groups from OneView
+  - Retrieve information about one or more of the Logical Interconnect Groups from OneView.
 requirements:
-    - hpOneView >= 2.0.1
+  - hpOneView >= 2.0.1
 author:
-    - Felipe Bulsoni (@fgbulsoni)
-    - Thiago Miotto (@tmiotto)
-    - Adriane Cardozo (@adriane-cardozo)
+  - Felipe Bulsoni (@fgbulsoni)
+  - Thiago Miotto (@tmiotto)
+  - Adriane Cardozo (@adriane-cardozo)
 attributes:
-    check_mode:
-        version_added: 3.3.0
-        # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
+  check_mode:
+    version_added: 3.3.0
+    # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
 options:
-    name:
-      description:
-        - Logical Interconnect Group name.
-      type: str
+  name:
+    description:
+      - Logical Interconnect Group name.
+    type: str
 extends_documentation_fragment:
   - community.general.oneview
   - community.general.oneview.factsparams
   - community.general.attributes
   - community.general.attributes.info_module
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Gather information about all Logical Interconnect Groups
   community.general.oneview_logical_interconnect_group_info:
     hostname: 172.16.101.48
@@ -85,14 +83,14 @@ EXAMPLES = '''
 - name: Print fetched information about Logical Interconnect Group found by name
   ansible.builtin.debug:
     msg: "{{ result.logical_interconnect_groups }}"
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 logical_interconnect_groups:
-    description: Has all the OneView information about the Logical Interconnect Groups.
-    returned: Always, but can be null.
-    type: dict
-'''
+  description: Has all the OneView information about the Logical Interconnect Groups.
+  returned: Always, but can be null.
+  type: dict
+"""
 
 from ansible_collections.community.general.plugins.module_utils.oneview import OneViewModuleBase
 

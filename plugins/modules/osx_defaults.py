@@ -10,18 +10,16 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: osx_defaults
 author:
 # DO NOT RE-ADD GITHUB HANDLE!
-- Franck Nijhof (!UNKNOWN)
+  - Franck Nijhof (!UNKNOWN)
 short_description: Manage macOS user defaults
 description:
-  - osx_defaults allows users to read, write, and delete macOS user defaults from Ansible scripts.
-  - macOS applications and other programs use the defaults system to record user preferences and other
-    information that must be maintained when the applications are not running (such as default font for new
-    documents, or the position of an Info panel).
+  - This module allows users to read, write, and delete macOS user defaults from Ansible scripts.
+  - MacOS applications and other programs use the defaults system to record user preferences and other information that must be maintained when
+    the applications are not running (such as default font for new documents, or the position of an Info panel).
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -48,7 +46,7 @@ options:
     description:
       - The type of value to write.
     type: str
-    choices: [ array, bool, boolean, date, float, int, integer, string ]
+    choices: [array, bool, boolean, date, float, int, integer, string]
     default: string
   check_type:
     description:
@@ -72,7 +70,7 @@ options:
       - The state of the user defaults.
       - If set to V(list) will query the given parameter specified by O(key). Returns V(null) is nothing found or mis-spelled.
     type: str
-    choices: [ absent, list, present ]
+    choices: [absent, list, present]
     default: present
   path:
     description:
@@ -80,10 +78,10 @@ options:
     type: str
     default: /usr/bin:/usr/local/bin
 notes:
-    - Apple Mac caches defaults. You may need to logout and login to apply the changes.
-'''
+  - Apple Mac caches defaults. You may need to logout and login to apply the changes.
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Set boolean valued key for application domain
   community.general.osx_defaults:
     domain: com.apple.Safari
@@ -135,7 +133,7 @@ EXAMPLES = r'''
     domain: com.geekchimp.macable
     key: ExampleKeyToRemove
     state: absent
-'''
+"""
 
 from datetime import datetime
 import re
