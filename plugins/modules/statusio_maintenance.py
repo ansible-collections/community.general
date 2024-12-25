@@ -13,10 +13,9 @@ DOCUMENTATION = r"""
 module: statusio_maintenance
 short_description: Create maintenance windows for your status.io dashboard
 description:
-  - Creates a maintenance window for status.io.
-  - Deletes a maintenance window for status.io.
+  - Creates or deletes a maintenance window for status.io.
 notes:
-  - You can use the apiary API url (http://docs.statusio.apiary.io/) to capture API traffic.
+  - You can use the apiary API URL (U(http://docs.statusio.apiary.io/)) to capture API traffic.
   - Use start_date and start_time with minutes to set future maintenance window.
 author: Benjamin Copeland (@bhcopeland) <ben@copeland.me.uk>
 extends_documentation_fragment:
@@ -118,12 +117,12 @@ options:
     type: str
     description:
       - Date maintenance is expected to start (Month/Day/Year) (UTC).
-      - End Date is worked out from start_date + minutes.
+      - End Date is worked out from O(start_date) + O(minutes).
   start_time:
     type: str
     description:
       - Time maintenance is expected to start (Hour:Minutes) (UTC).
-      - End Time is worked out from start_time + minutes.
+      - End Time is worked out from O(start_time) + O(minutes).
 """
 
 EXAMPLES = r"""

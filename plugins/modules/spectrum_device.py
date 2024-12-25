@@ -115,7 +115,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 device:
-  description: Device data when state = present.
+  description: Device data when O(state=present).
   returned: success
   type: dict
   sample: {'model_handle': '0x1007ab', 'landscape': '0x100000', 'address': '10.10.5.1'}

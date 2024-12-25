@@ -11,8 +11,8 @@ short_description: Create, update or delete Spotinst AWS Elastigroups
 author: Spotinst (@talzur)
 description:
   - Can create, update, or delete Spotinst AWS Elastigroups Launch configuration is part of the elastigroup configuration, so no additional modules
-    are necessary for handling the launch configuration. You will have to have a credentials file in this location - <home>/.spotinst/credentials
-    The credentials file must contain a row that looks like this token = <YOUR TOKEN>.
+    are necessary for handling the launch configuration. You will have to have a credentials file in this location - C($HOME/.spotinst/credentials).
+    The credentials file must contain a row that looks like this C(token = <YOUR TOKEN>).
   - Full documentation available at U(https://help.spotinst.com/hc/en-us/articles/115003530285-Ansible-).
 requirements:
   - spotinst_sdk >= 1.0.38
@@ -308,7 +308,7 @@ options:
 
   tags:
     description:
-      - A list of tags to configure in the elastigroup. Please specify list of keys and values (key colon value);.
+      - A list of tags to configure in the elastigroup. Please specify list of keys and values (key colon value).
     type: list
     elements: dict
 
@@ -397,7 +397,8 @@ options:
 
   wait_timeout:
     description:
-      - How long the module should wait for instances before failing the action.; Only works if wait_for_instances is True.
+      - How long the module should wait for instances before failing the action.
+      - Only works if O(wait_for_instances=true).
     type: int
 
   do_not_update:

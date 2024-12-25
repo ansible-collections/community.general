@@ -51,7 +51,7 @@ options:
     default: /service
   service_src:
     description:
-      - Directory where services are defined, the source of symlinks to service_dir.
+      - Directory where services are defined, the source of symlinks to O(service_dir).
     type: str
     default: /etc/service
 """

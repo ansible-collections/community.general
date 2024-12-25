@@ -96,11 +96,11 @@ EXAMPLES = r"""
 
 RETURN = r"""
 stdout:
-  description: Stdout of C(swupd).
+  description: C(stdout) of C(swupd).
   returned: always
   type: str
 stderr:
-  description: Stderr of C(swupd).
+  description: C(stderr) of C(swupd).
   returned: always
   type: str
 """

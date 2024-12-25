@@ -79,25 +79,25 @@ options:
       name:
         description:
           - Attribute name OR hex ID.
-          - Currently defined names are:.
-          - C(App_Manufacturer) (C(0x230683)).
-          - C(CollectionsModelNameString) (C(0x12adb)).
-          - C(Condition) (C(0x1000a)).
-          - C(Criticality) (C(0x1290c)).
-          - C(DeviceType) (C(0x23000e)).
-          - C(isManaged) (C(0x1295d)).
-          - C(Model_Class) (C(0x11ee8)).
-          - C(Model_Handle) (C(0x129fa)).
-          - C(Model_Name) (C(0x1006e)).
-          - C(Modeltype_Handle) (C(0x10001)).
-          - C(Modeltype_Name) (C(0x10000)).
-          - C(Network_Address) (C(0x12d7f)).
-          - C(Notes) (C(0x11564)).
-          - C(ServiceDesk_Asset_ID) (C(0x12db9)).
-          - C(TopologyModelNameString) (C(0x129e7)).
-          - C(sysDescr) (C(0x10052)).
-          - C(sysName) (C(0x10b5b)).
-          - C(Vendor_Name) (C(0x11570)).
+          - Currently defined names are:
+          - C(App_Manufacturer) (C(0x230683));
+          - C(CollectionsModelNameString) (C(0x12adb));
+          - C(Condition) (C(0x1000a));
+          - C(Criticality) (C(0x1290c));
+          - C(DeviceType) (C(0x23000e));
+          - C(isManaged) (C(0x1295d));
+          - C(Model_Class) (C(0x11ee8));
+          - C(Model_Handle) (C(0x129fa));
+          - C(Model_Name) (C(0x1006e));
+          - C(Modeltype_Handle) (C(0x10001));
+          - C(Modeltype_Name) (C(0x10000));
+          - C(Network_Address) (C(0x12d7f));
+          - C(Notes) (C(0x11564));
+          - C(ServiceDesk_Asset_ID) (C(0x12db9));
+          - C(TopologyModelNameString) (C(0x129e7));
+          - C(sysDescr) (C(0x10052));
+          - C(sysName) (C(0x10b5b));
+          - C(Vendor_Name) (C(0x11570));
           - C(Description) (C(0x230017)).
           - Hex IDs are the direct identifiers in Spectrum and will always work.
           - 'To lookup hex IDs go to the UI: Locator -> Devices -> By Model Name -> <enter any model> -> Attributes tab.'

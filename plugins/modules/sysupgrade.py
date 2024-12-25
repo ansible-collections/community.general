@@ -13,7 +13,7 @@ module: sysupgrade
 short_description: Manage OpenBSD system upgrades
 version_added: 1.1.0
 description:
-  - Manage OpenBSD system upgrades using sysupgrade.
+  - Manage OpenBSD system upgrades using C(sysupgrade).
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -35,20 +35,20 @@ options:
     type: bool
   keep_files:
     description:
-      - Keep the files under /home/_sysupgrade.
+      - Keep the files under C(/home/_sysupgrade).
       - By default, the files will be deleted after the upgrade.
     default: false
     type: bool
   fetch_only:
     description:
-      - Fetch and verify files and create /bsd.upgrade but do not reboot.
+      - Fetch and verify files and create C(/bsd.upgrade) but do not reboot.
       - Set to V(false) if you want C(sysupgrade) to reboot. This will cause Ansible to error, as it expects the module to exit gracefully. See the examples.
     default: true
     type: bool
   installurl:
     description:
       - OpenBSD mirror top-level URL for fetching an upgrade.
-      - By default, the mirror URL is pulled from /etc/installurl.
+      - By default, the mirror URL is pulled from C(/etc/installurl).
     type: str
 author:
   - Andrew Klaus (@precurse)

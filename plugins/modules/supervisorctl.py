@@ -65,7 +65,7 @@ options:
   supervisorctl_path:
     type: path
     description:
-      - Path to supervisorctl executable.
+      - Path to C(supervisorctl) executable.
 notes:
   - When O(state=present), the module will call C(supervisorctl reread) then C(supervisorctl add) if the program/group does not exist.
   - When O(state=restarted), the module will call C(supervisorctl update) then call C(supervisorctl restart).
