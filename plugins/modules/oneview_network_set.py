@@ -90,7 +90,7 @@ EXAMPLES = r"""
 RETURN = r"""
 network_set:
   description: Has the facts about the Network Set.
-  returned: On state 'present', but can be null.
+  returned: On O(state=present), but can be null.
   type: dict
 """
 

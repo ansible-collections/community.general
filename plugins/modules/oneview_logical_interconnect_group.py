@@ -98,7 +98,7 @@ EXAMPLES = r"""
 RETURN = r"""
 logical_interconnect_group:
   description: Has the facts about the OneView Logical Interconnect Group.
-  returned: On state 'present'. Can be null.
+  returned: On O(state=present). Can be null.
   type: dict
 """
 

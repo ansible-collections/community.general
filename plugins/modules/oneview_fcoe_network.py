@@ -75,7 +75,7 @@ EXAMPLES = r"""
 RETURN = r"""
 fcoe_network:
   description: Has the facts about the OneView FCoE Networks.
-  returned: On (state=present). Can be null.
+  returned: On O(state=present). Can be null.
   type: dict
 """
 
