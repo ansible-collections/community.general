@@ -43,7 +43,7 @@ options:
     type: bool
   enabled:
     description:
-      - Is the repository enabled or disabled?.
+      - Is the repository enabled or disabled?
     type: bool
   origin:
     description:
