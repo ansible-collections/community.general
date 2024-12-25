@@ -11,8 +11,7 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: scaleway_function_info
 short_description: Retrieve information on Scaleway Function
 version_added: 6.0.0
@@ -46,18 +45,18 @@ options:
     description:
       - Name of the function.
     required: true
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Get a function info
   community.general.scaleway_function_info:
     namespace_id: '{{ scw_function_namespace }}'
     region: fr-par
     name: my-awesome-function
   register: function_info_task
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 function:
   description: The function information.
   returned: always
@@ -68,7 +67,7 @@ function:
     domain_name: fnansibletestfxamabuc-fn-ansible-test.functions.fnc.fr-par.scw.cloud
     environment_variables:
       MY_VAR: my_value
-    error_message: null
+    error_message:
     handler: handler.handle
     http_option: ""
     id: ceb64dc4-4464-4196-8e20-ecef705475d3
@@ -86,7 +85,7 @@ function:
         value: $argon2id$v=19$m=65536,t=1,p=2$tb6UwSPWx/rH5Vyxt9Ujfw$5ZlvaIjWwNDPxD9Rdght3NarJz4IETKjpvAU3mMSmFg
     status: created
     timeout: 300s
-'''
+"""
 
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
     SCALEWAY_REGIONS, scaleway_argument_spec, Scaleway

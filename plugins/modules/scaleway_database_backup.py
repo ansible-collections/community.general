@@ -12,17 +12,16 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: scaleway_database_backup
 short_description: Scaleway database backups management module
 version_added: 1.2.0
 author: Guillaume Rodriguez (@guillaume_ro_fr)
 description:
-    - "This module manages database backups on Scaleway account U(https://developer.scaleway.com)."
+  - This module manages database backups on Scaleway account U(https://developer.scaleway.com).
 extends_documentation_fragment:
-    - community.general.scaleway
-    - community.general.attributes
+  - community.general.scaleway
+  - community.general.attributes
 attributes:
   check_mode:
     support: full
@@ -31,118 +30,118 @@ attributes:
 options:
   state:
     description:
-        - Indicate desired state of the database backup.
-        - V(present) creates a backup.
-        - V(absent) deletes the backup.
-        - V(exported) creates a download link for the backup.
-        - V(restored) restores the backup to a new database.
+      - Indicate desired state of the database backup.
+      - V(present) creates a backup.
+      - V(absent) deletes the backup.
+      - V(exported) creates a download link for the backup.
+      - V(restored) restores the backup to a new database.
     type: str
     default: present
     choices:
-        - present
-        - absent
-        - exported
-        - restored
+      - present
+      - absent
+      - exported
+      - restored
 
   region:
     description:
-        - Scaleway region to use (for example V(fr-par)).
+      - Scaleway region to use (for example V(fr-par)).
     type: str
     required: true
     choices:
-        - fr-par
-        - nl-ams
-        - pl-waw
+      - fr-par
+      - nl-ams
+      - pl-waw
 
   id:
     description:
-        - UUID used to identify the database backup.
-        - Required for V(absent), V(exported) and V(restored) states.
+      - UUID used to identify the database backup.
+      - Required for V(absent), V(exported) and V(restored) states.
     type: str
 
   name:
     description:
-        - Name used to identify the database backup.
-        - Required for V(present) state.
-        - Ignored when O(state=absent), O(state=exported) or O(state=restored).
+      - Name used to identify the database backup.
+      - Required for V(present) state.
+      - Ignored when O(state=absent), O(state=exported) or O(state=restored).
     type: str
     required: false
 
   database_name:
     description:
-        - Name used to identify the database.
-        - Required for V(present) and V(restored) states.
-        - Ignored when O(state=absent) or O(state=exported).
+      - Name used to identify the database.
+      - Required for V(present) and V(restored) states.
+      - Ignored when O(state=absent) or O(state=exported).
     type: str
     required: false
 
   instance_id:
     description:
-        - UUID of the instance associated to the database backup.
-        - Required for V(present) and V(restored) states.
-        - Ignored when O(state=absent) or O(state=exported).
+      - UUID of the instance associated to the database backup.
+      - Required for V(present) and V(restored) states.
+      - Ignored when O(state=absent) or O(state=exported).
     type: str
     required: false
 
   expires_at:
     description:
-        - Expiration datetime of the database backup (ISO 8601 format).
-        - Ignored when O(state=absent), O(state=exported) or O(state=restored).
+      - Expiration datetime of the database backup (ISO 8601 format).
+      - Ignored when O(state=absent), O(state=exported) or O(state=restored).
     type: str
     required: false
 
   wait:
     description:
-        - Wait for the instance to reach its desired state before returning.
+      - Wait for the instance to reach its desired state before returning.
     type: bool
     default: false
 
   wait_timeout:
     description:
-        - Time to wait for the backup to reach the expected state.
+      - Time to wait for the backup to reach the expected state.
     type: int
     required: false
     default: 300
 
   wait_sleep_time:
     description:
-        - Time to wait before every attempt to check the state of the backup.
+      - Time to wait before every attempt to check the state of the backup.
     type: int
     required: false
     default: 3
-'''
+"""
 
-EXAMPLES = '''
-  - name: Create a backup
-    community.general.scaleway_database_backup:
-        name: 'my_backup'
-        state: present
-        region: 'fr-par'
-        database_name: 'my-database'
-        instance_id: '50968a80-2909-4e5c-b1af-a2e19860dddb'
+EXAMPLES = r"""
+- name: Create a backup
+  community.general.scaleway_database_backup:
+    name: 'my_backup'
+    state: present
+    region: 'fr-par'
+    database_name: 'my-database'
+    instance_id: '50968a80-2909-4e5c-b1af-a2e19860dddb'
 
-  - name: Export a backup
-    community.general.scaleway_database_backup:
-        id: '6ef1125a-037e-494f-a911-6d9c49a51691'
-        state: exported
-        region: 'fr-par'
+- name: Export a backup
+  community.general.scaleway_database_backup:
+    id: '6ef1125a-037e-494f-a911-6d9c49a51691'
+    state: exported
+    region: 'fr-par'
 
-  - name: Restore a backup
-    community.general.scaleway_database_backup:
-        id: '6ef1125a-037e-494f-a911-6d9c49a51691'
-        state: restored
-        region: 'fr-par'
-        database_name: 'my-new-database'
-        instance_id: '50968a80-2909-4e5c-b1af-a2e19860dddb'
+- name: Restore a backup
+  community.general.scaleway_database_backup:
+    id: '6ef1125a-037e-494f-a911-6d9c49a51691'
+    state: restored
+    region: 'fr-par'
+    database_name: 'my-new-database'
+    instance_id: '50968a80-2909-4e5c-b1af-a2e19860dddb'
 
-  - name: Remove a backup
-    community.general.scaleway_database_backup:
-        id: '6ef1125a-037e-494f-a911-6d9c49a51691'
-        state: absent
-        region: 'fr-par'
-'''
+- name: Remove a backup
+  community.general.scaleway_database_backup:
+    id: '6ef1125a-037e-494f-a911-6d9c49a51691'
+    state: absent
+    region: 'fr-par'
+"""
 
-RETURN = '''
+RETURN = r"""
 metadata:
     description: Backup metadata.
     returned: when O(state=present), O(state=exported), or O(state=restored)
@@ -164,7 +163,7 @@ metadata:
             "updated_at": "2020-08-06T12:42:10.581649Z"
         }
     }
-'''
+"""
 
 import datetime
 import time
