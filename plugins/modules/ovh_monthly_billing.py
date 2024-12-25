@@ -9,52 +9,51 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: ovh_monthly_billing
 author: Francois Lallart (@fraff)
 version_added: '0.2.0'
 short_description: Manage OVH monthly billing
 description:
-    - Enable monthly billing on OVH cloud instances (be aware OVH does not allow to disable it).
-requirements: [ "ovh" ]
+  - Enable monthly billing on OVH cloud instances (be aware OVH does not allow to disable it).
+requirements: ["ovh"]
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    project_id:
-        required: true
-        type: str
-        description:
-            - ID of the project, get it with U(https://api.ovh.com/console/#/cloud/project#GET)
-    instance_id:
-        required: true
-        type: str
-        description:
-            - ID of the instance, get it with U(https://api.ovh.com/console/#/cloud/project/%7BserviceName%7D/instance#GET)
-    endpoint:
-        type: str
-        description:
-            - The endpoint to use (for instance ovh-eu)
-    application_key:
-        type: str
-        description:
-            - The applicationKey to use
-    application_secret:
-        type: str
-        description:
-            - The application secret to use
-    consumer_key:
-        type: str
-        description:
-            - The consumer key to use
-'''
+  project_id:
+    required: true
+    type: str
+    description:
+      - ID of the project, get it with U(https://api.ovh.com/console/#/cloud/project#GET).
+  instance_id:
+    required: true
+    type: str
+    description:
+      - ID of the instance, get it with U(https://api.ovh.com/console/#/cloud/project/%7BserviceName%7D/instance#GET).
+  endpoint:
+    type: str
+    description:
+      - The endpoint to use (for instance V(ovh-eu)).
+  application_key:
+    type: str
+    description:
+      - The applicationKey to use.
+  application_secret:
+    type: str
+    description:
+      - The application secret to use.
+  consumer_key:
+    type: str
+    description:
+      - The consumer key to use.
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Basic usage, using auth from /etc/ovh.conf
   community.general.ovh_monthly_billing:
     project_id: 0c727a20aa144485b70c44dee9123b46
@@ -75,10 +74,10 @@ EXAMPLES = '''
     application_key: yourkey
     application_secret: yoursecret
     consumer_key: yourconsumerkey
-'''
+"""
 
-RETURN = '''
-'''
+RETURN = r"""
+"""
 
 import traceback
 

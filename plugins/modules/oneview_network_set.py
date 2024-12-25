@@ -7,46 +7,44 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: oneview_network_set
 short_description: Manage HPE OneView Network Set resources
 description:
-    - Provides an interface to manage Network Set resources. Can create, update, or delete.
+  - Provides an interface to manage Network Set resources. Can create, update, or delete.
 requirements:
-    - hpOneView >= 4.0.0
+  - hpOneView >= 4.0.0
 author:
-    - Felipe Bulsoni (@fgbulsoni)
-    - Thiago Miotto (@tmiotto)
-    - Adriane Cardozo (@adriane-cardozo)
+  - Felipe Bulsoni (@fgbulsoni)
+  - Thiago Miotto (@tmiotto)
+  - Adriane Cardozo (@adriane-cardozo)
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    state:
-      description:
-        - Indicates the desired state for the Network Set resource.
-            - V(present) will ensure data properties are compliant with OneView.
-            - V(absent) will remove the resource from OneView, if it exists.
-      type: str
-      default: present
-      choices: ['present', 'absent']
-    data:
-      description:
-        - List with the Network Set properties.
-      type: dict
-      required: true
+  state:
+    description:
+      - Indicates the desired state for the Network Set resource.
+      - V(present) will ensure data properties are compliant with OneView.
+      - V(absent) will remove the resource from OneView, if it exists.
+    type: str
+    default: present
+    choices: ['present', 'absent']
+  data:
+    description:
+      - List with the Network Set properties.
+    type: dict
+    required: true
 
 extends_documentation_fragment:
-    - community.general.oneview
-    - community.general.oneview.validateetag
-    - community.general.attributes
+  - community.general.oneview
+  - community.general.oneview.validateetag
+  - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a Network Set
   community.general.oneview_network_set:
     config: /etc/oneview/oneview_config.json
@@ -54,8 +52,8 @@ EXAMPLES = '''
     data:
       name: OneViewSDK Test Network Set
       networkUris:
-        - Test Ethernet Network_1                                       # can be a name
-        - /rest/ethernet-networks/e4360c9d-051d-4931-b2aa-7de846450dd8  # or a URI
+        - Test Ethernet Network_1                                      # can be a name
+        - /rest/ethernet-networks/e4360c9d-051d-4931-b2aa-7de846450dd8 # or a URI
   delegate_to: localhost
 
 - name: Update the Network Set name to 'OneViewSDK Test Network Set - Renamed' and change the associated networks
@@ -74,7 +72,7 @@ EXAMPLES = '''
     config: /etc/oneview/oneview_config.json
     state: absent
     data:
-        name: OneViewSDK Test Network Set - Renamed
+      name: OneViewSDK Test Network Set - Renamed
   delegate_to: localhost
 
 - name: Update the Network set with two scopes
@@ -87,14 +85,14 @@ EXAMPLES = '''
         - /rest/scopes/01SC123456
         - /rest/scopes/02SC123456
   delegate_to: localhost
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 network_set:
-    description: Has the facts about the Network Set.
-    returned: On state 'present', but can be null.
-    type: dict
-'''
+  description: Has the facts about the Network Set.
+  returned: On O(state=present), but can be null.
+  type: dict
+"""
 
 from ansible_collections.community.general.plugins.module_utils.oneview import OneViewModuleBase, OneViewModuleResourceNotFound
 
