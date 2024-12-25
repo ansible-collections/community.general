@@ -63,7 +63,7 @@ options:
     version_added: 5.6.0
 notes:
   - The changes are persistent across reboots.
-  - Not tested on any debian based system.
+  - Not tested on any Debian based system.
 requirements:
   - libselinux-python
   - policycoreutils-python
