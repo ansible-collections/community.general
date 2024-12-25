@@ -8,13 +8,11 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: redfish_command
 short_description: Manages Out-Of-Band controllers using Redfish APIs
 description:
-  - Builds Redfish URIs locally and sends them to remote OOB controllers to
-    perform an action.
+  - Builds Redfish URIs locally and sends them to remote OOB controllers to perform an action.
   - Manages OOB controller ex. reboot, log management.
   - Manages OOB controller users ex. add, remove, update.
   - Manages system power ex. on, off, graceful and forced reboot.
@@ -62,32 +60,32 @@ options:
     version_added: 2.3.0
   id:
     required: false
-    aliases: [ account_id ]
+    aliases: [account_id]
     description:
       - ID of account to delete/modify.
       - Can also be used in account creation to work around vendor issues where the ID of the new user is required in the POST request.
     type: str
   new_username:
     required: false
-    aliases: [ account_username ]
+    aliases: [account_username]
     description:
       - Username of account to add/delete/modify.
     type: str
   new_password:
     required: false
-    aliases: [ account_password ]
+    aliases: [account_password]
     description:
       - New password of account to add/modify.
     type: str
   roleid:
     required: false
-    aliases: [ account_roleid ]
+    aliases: [account_roleid]
     description:
       - Role of account to add/modify.
     type: str
   account_types:
     required: false
-    aliases: [ account_accounttypes ]
+    aliases: [account_accounttypes]
     description:
       - Array of account types to apply to a user account.
     type: list
@@ -95,7 +93,7 @@ options:
     version_added: '7.2.0'
   oem_account_types:
     required: false
-    aliases: [ account_oemaccounttypes ]
+    aliases: [account_oemaccounttypes]
     description:
       - Array of OEM account types to apply to a user account.
     type: list
@@ -109,15 +107,14 @@ options:
   timeout:
     description:
       - Timeout in seconds for HTTP requests to OOB controller.
-      - The default value for this parameter changed from V(10) to V(60)
-        in community.general 9.0.0.
+      - The default value for this parameter changed from V(10) to V(60) in community.general 9.0.0.
     type: int
     default: 60
   boot_override_mode:
     description:
       - Boot mode when using an override.
     type: str
-    choices: [ Legacy, UEFI ]
+    choices: [Legacy, UEFI]
     version_added: 3.5.0
   uefi_target:
     required: false
@@ -131,7 +128,7 @@ options:
     type: str
   update_username:
     required: false
-    aliases: [ account_updatename ]
+    aliases: [account_updatename]
     description:
       - New user name for updating account_username.
     type: str
@@ -219,11 +216,9 @@ options:
   update_custom_oem_header:
     required: false
     description:
-      - Optional OEM header, sent as separate form-data for
-        the Multipart HTTP push update.
-      - The header shall start with "Oem" according to DMTF
-        Redfish spec 12.6.2.2.
-      - For more details, see U(https://www.dmtf.org/sites/default/files/standards/documents/DSP0266_1.21.0.html)
+      - Optional OEM header, sent as separate form-data for the Multipart HTTP push update.
+      - The header shall start with "Oem" according to DMTF Redfish spec 12.6.2.2.
+      - For more details, see U(https://www.dmtf.org/sites/default/files/standards/documents/DSP0266_1.21.0.html).
       - If set, then O(update_custom_oem_params) is required too.
     type: str
     version_added: '10.1.0'
@@ -232,18 +227,15 @@ options:
     description:
       - Custom OEM properties for HTTP Multipart Push updates.
       - If set, then O(update_custom_oem_header) is required too.
-      - The properties will be passed raw without any validation or conversion by Ansible.
-        This means the content can be a file, a string, or any other data.
-        If the content is a dict that should be converted to JSON, then the
-        content must be converted to JSON before passing it to this module using the
-        P(ansible.builtin.to_json#filter) filter.
+      - The properties will be passed raw without any validation or conversion by Ansible. This means the content can be a file, a string, or
+        any other data. If the content is a dict that should be converted to JSON, then the content must be converted to JSON before passing it
+        to this module using the P(ansible.builtin.to_json#filter) filter.
     type: raw
     version_added: '10.1.0'
   update_custom_oem_mime_type:
     required: false
     description:
-      - MIME Type for custom OEM properties for HTTP Multipart
-        Push updates.
+      - MIME Type for custom OEM properties for HTTP Multipart Push updates.
     type: str
     version_added: '10.1.0'
   virtual_media:
@@ -299,10 +291,8 @@ options:
         type: str
   strip_etag_quotes:
     description:
-      - Removes surrounding quotes of etag used in C(If-Match) header
-        of C(PATCH) requests.
-      - Only use this option to resolve bad vendor implementation where
-        C(If-Match) only matches the unquoted etag string.
+      - Removes surrounding quotes of etag used in C(If-Match) header of C(PATCH) requests.
+      - Only use this option to resolve bad vendor implementation where C(If-Match) only matches the unquoted etag string.
     type: bool
     default: false
     version_added: 3.7.0
@@ -316,7 +306,7 @@ options:
     description:
       - Mode to apply when reseting to default.
     type: str
-    choices: [ ResetAll, PreserveNetworkAndUsers, PreserveNetwork ]
+    choices: [ResetAll, PreserveNetworkAndUsers, PreserveNetwork]
     version_added: 8.6.0
   wait:
     required: false
@@ -336,9 +326,8 @@ options:
     required: false
     description:
       - SSL/TLS Ciphers to use for the request.
-      - 'When a list is provided, all ciphers are joined in order with V(:).'
-      - See the L(OpenSSL Cipher List Format,https://www.openssl.org/docs/manmaster/man1/openssl-ciphers.html#CIPHER-LIST-FORMAT)
-        for more details.
+      - When a list is provided, all ciphers are joined in order with V(:).
+      - See the L(OpenSSL Cipher List Format,https://www.openssl.org/docs/manmaster/man1/openssl-ciphers.html#CIPHER-LIST-FORMAT) for more details.
       - The available ciphers is dependent on the Python and OpenSSL/LibreSSL versions.
     type: list
     elements: str
@@ -347,514 +336,512 @@ options:
 author:
   - "Jose Delarosa (@jose-delarosa)"
   - "T S Kushal (@TSKushal)"
-'''
+"""
 
-EXAMPLES = '''
-  - name: Restart system power gracefully
-    community.general.redfish_command:
-      category: Systems
-      command: PowerGracefulRestart
-      resource_id: 437XR1138R2
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
+EXAMPLES = r"""
+- name: Restart system power gracefully
+  community.general.redfish_command:
+    category: Systems
+    command: PowerGracefulRestart
+    resource_id: 437XR1138R2
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
 
-  - name: Turn system power off
-    community.general.redfish_command:
-      category: Systems
-      command: PowerForceOff
-      resource_id: 437XR1138R2
+- name: Turn system power off
+  community.general.redfish_command:
+    category: Systems
+    command: PowerForceOff
+    resource_id: 437XR1138R2
 
-  - name: Restart system power forcefully
-    community.general.redfish_command:
-      category: Systems
-      command: PowerForceRestart
-      resource_id: 437XR1138R2
+- name: Restart system power forcefully
+  community.general.redfish_command:
+    category: Systems
+    command: PowerForceRestart
+    resource_id: 437XR1138R2
 
-  - name: Shutdown system power gracefully
-    community.general.redfish_command:
-      category: Systems
-      command: PowerGracefulShutdown
-      resource_id: 437XR1138R2
+- name: Shutdown system power gracefully
+  community.general.redfish_command:
+    category: Systems
+    command: PowerGracefulShutdown
+    resource_id: 437XR1138R2
 
-  - name: Turn system power on
-    community.general.redfish_command:
-      category: Systems
-      command: PowerOn
-      resource_id: 437XR1138R2
+- name: Turn system power on
+  community.general.redfish_command:
+    category: Systems
+    command: PowerOn
+    resource_id: 437XR1138R2
 
-  - name: Reboot system power
-    community.general.redfish_command:
-      category: Systems
-      command: PowerReboot
-      resource_id: 437XR1138R2
+- name: Reboot system power
+  community.general.redfish_command:
+    category: Systems
+    command: PowerReboot
+    resource_id: 437XR1138R2
 
-  - name: Set one-time boot device to {{ bootdevice }}
-    community.general.redfish_command:
-      category: Systems
-      command: SetOneTimeBoot
-      resource_id: 437XR1138R2
-      bootdevice: "{{ bootdevice }}"
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
+- name: Set one-time boot device to {{ bootdevice }}
+  community.general.redfish_command:
+    category: Systems
+    command: SetOneTimeBoot
+    resource_id: 437XR1138R2
+    bootdevice: "{{ bootdevice }}"
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
 
-  - name: Set one-time boot device to UefiTarget of "/0x31/0x33/0x01/0x01"
-    community.general.redfish_command:
-      category: Systems
-      command: SetOneTimeBoot
-      resource_id: 437XR1138R2
-      bootdevice: "UefiTarget"
-      uefi_target: "/0x31/0x33/0x01/0x01"
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
+- name: Set one-time boot device to UefiTarget of "/0x31/0x33/0x01/0x01"
+  community.general.redfish_command:
+    category: Systems
+    command: SetOneTimeBoot
+    resource_id: 437XR1138R2
+    bootdevice: "UefiTarget"
+    uefi_target: "/0x31/0x33/0x01/0x01"
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
 
-  - name: Set one-time boot device to BootNext target of "Boot0001"
-    community.general.redfish_command:
-      category: Systems
-      command: SetOneTimeBoot
-      resource_id: 437XR1138R2
-      bootdevice: "UefiBootNext"
-      boot_next: "Boot0001"
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
+- name: Set one-time boot device to BootNext target of "Boot0001"
+  community.general.redfish_command:
+    category: Systems
+    command: SetOneTimeBoot
+    resource_id: 437XR1138R2
+    bootdevice: "UefiBootNext"
+    boot_next: "Boot0001"
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
 
-  - name: Set persistent boot device override
-    community.general.redfish_command:
-      category: Systems
-      command: EnableContinuousBootOverride
-      resource_id: 437XR1138R2
-      bootdevice: "{{ bootdevice }}"
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
+- name: Set persistent boot device override
+  community.general.redfish_command:
+    category: Systems
+    command: EnableContinuousBootOverride
+    resource_id: 437XR1138R2
+    bootdevice: "{{ bootdevice }}"
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
 
-  - name: Set one-time boot to BiosSetup
-    community.general.redfish_command:
-      category: Systems
-      command: SetOneTimeBoot
-      boot_next: BiosSetup
-      boot_override_mode: Legacy
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
+- name: Set one-time boot to BiosSetup
+  community.general.redfish_command:
+    category: Systems
+    command: SetOneTimeBoot
+    boot_next: BiosSetup
+    boot_override_mode: Legacy
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
 
-  - name: Disable persistent boot device override
-    community.general.redfish_command:
-      category: Systems
-      command: DisableBootOverride
+- name: Disable persistent boot device override
+  community.general.redfish_command:
+    category: Systems
+    command: DisableBootOverride
 
-  - name: Set system indicator LED to blink using security token for auth
-    community.general.redfish_command:
-      category: Systems
-      command: IndicatorLedBlink
-      resource_id: 437XR1138R2
-      baseuri: "{{ baseuri }}"
-      auth_token: "{{ result.session.token }}"
+- name: Set system indicator LED to blink using security token for auth
+  community.general.redfish_command:
+    category: Systems
+    command: IndicatorLedBlink
+    resource_id: 437XR1138R2
+    baseuri: "{{ baseuri }}"
+    auth_token: "{{ result.session.token }}"
 
-  - name: Add user
-    community.general.redfish_command:
-      category: Accounts
-      command: AddUser
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      new_username: "{{ new_username }}"
-      new_password: "{{ new_password }}"
-      roleid: "{{ roleid }}"
+- name: Add user
+  community.general.redfish_command:
+    category: Accounts
+    command: AddUser
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    new_username: "{{ new_username }}"
+    new_password: "{{ new_password }}"
+    roleid: "{{ roleid }}"
 
-  - name: Add user with specified account types
-    community.general.redfish_command:
-      category: Accounts
-      command: AddUser
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      new_username: "{{ new_username }}"
-      new_password: "{{ new_password }}"
-      roleid: "{{ roleid }}"
-      account_types:
+- name: Add user with specified account types
+  community.general.redfish_command:
+    category: Accounts
+    command: AddUser
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    new_username: "{{ new_username }}"
+    new_password: "{{ new_password }}"
+    roleid: "{{ roleid }}"
+    account_types:
       - Redfish
       - WebUI
 
-  - name: Add user using new option aliases
-    community.general.redfish_command:
-      category: Accounts
-      command: AddUser
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      account_username: "{{ account_username }}"
-      account_password: "{{ account_password }}"
-      account_roleid: "{{ account_roleid }}"
+- name: Add user using new option aliases
+  community.general.redfish_command:
+    category: Accounts
+    command: AddUser
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    account_username: "{{ account_username }}"
+    account_password: "{{ account_password }}"
+    account_roleid: "{{ account_roleid }}"
 
-  - name: Delete user
-    community.general.redfish_command:
-      category: Accounts
-      command: DeleteUser
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      account_username: "{{ account_username }}"
+- name: Delete user
+  community.general.redfish_command:
+    category: Accounts
+    command: DeleteUser
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    account_username: "{{ account_username }}"
 
-  - name: Disable user
-    community.general.redfish_command:
-      category: Accounts
-      command: DisableUser
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      account_username: "{{ account_username }}"
+- name: Disable user
+  community.general.redfish_command:
+    category: Accounts
+    command: DisableUser
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    account_username: "{{ account_username }}"
 
-  - name: Enable user
-    community.general.redfish_command:
-      category: Accounts
-      command: EnableUser
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      account_username: "{{ account_username }}"
+- name: Enable user
+  community.general.redfish_command:
+    category: Accounts
+    command: EnableUser
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    account_username: "{{ account_username }}"
 
-  - name: Add and enable user
-    community.general.redfish_command:
-      category: Accounts
-      command: AddUser,EnableUser
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      new_username: "{{ new_username }}"
-      new_password: "{{ new_password }}"
-      roleid: "{{ roleid }}"
+- name: Add and enable user
+  community.general.redfish_command:
+    category: Accounts
+    command: AddUser,EnableUser
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    new_username: "{{ new_username }}"
+    new_password: "{{ new_password }}"
+    roleid: "{{ roleid }}"
 
-  - name: Update user password
-    community.general.redfish_command:
-      category: Accounts
-      command: UpdateUserPassword
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      account_username: "{{ account_username }}"
-      account_password: "{{ account_password }}"
+- name: Update user password
+  community.general.redfish_command:
+    category: Accounts
+    command: UpdateUserPassword
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    account_username: "{{ account_username }}"
+    account_password: "{{ account_password }}"
 
-  - name: Update user role
-    community.general.redfish_command:
-      category: Accounts
-      command: UpdateUserRole
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      account_username: "{{ account_username }}"
-      roleid: "{{ roleid }}"
+- name: Update user role
+  community.general.redfish_command:
+    category: Accounts
+    command: UpdateUserRole
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    account_username: "{{ account_username }}"
+    roleid: "{{ roleid }}"
 
-  - name: Update user name
-    community.general.redfish_command:
-      category: Accounts
-      command: UpdateUserName
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      account_username: "{{ account_username }}"
-      account_updatename: "{{ account_updatename }}"
+- name: Update user name
+  community.general.redfish_command:
+    category: Accounts
+    command: UpdateUserName
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    account_username: "{{ account_username }}"
+    account_updatename: "{{ account_updatename }}"
 
-  - name: Update user name
-    community.general.redfish_command:
-      category: Accounts
-      command: UpdateUserName
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      account_username: "{{ account_username }}"
-      update_username: "{{ update_username }}"
+- name: Update user name
+  community.general.redfish_command:
+    category: Accounts
+    command: UpdateUserName
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    account_username: "{{ account_username }}"
+    update_username: "{{ update_username }}"
 
-  - name: Update AccountService properties
-    community.general.redfish_command:
-      category: Accounts
-      command: UpdateAccountServiceProperties
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      account_properties:
-        AccountLockoutThreshold: 5
-        AccountLockoutDuration: 600
+- name: Update AccountService properties
+  community.general.redfish_command:
+    category: Accounts
+    command: UpdateAccountServiceProperties
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    account_properties:
+      AccountLockoutThreshold: 5
+      AccountLockoutDuration: 600
 
-  - name: Update user AccountTypes
-    community.general.redfish_command:
-      category: Accounts
-      command: UpdateUserAccountTypes
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      account_username: "{{ account_username }}"
-      account_types:
-        - Redfish
-        - WebUI
+- name: Update user AccountTypes
+  community.general.redfish_command:
+    category: Accounts
+    command: UpdateUserAccountTypes
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    account_username: "{{ account_username }}"
+    account_types:
+      - Redfish
+      - WebUI
 
-  - name: Clear Manager Logs with a timeout of 20 seconds
-    community.general.redfish_command:
-      category: Manager
-      command: ClearLogs
-      resource_id: BMC
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      timeout: 20
+- name: Clear Manager Logs with a timeout of 20 seconds
+  community.general.redfish_command:
+    category: Manager
+    command: ClearLogs
+    resource_id: BMC
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    timeout: 20
 
-  - name: Create session
-    community.general.redfish_command:
-      category: Sessions
-      command: CreateSession
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-    register: result
+- name: Create session
+  community.general.redfish_command:
+    category: Sessions
+    command: CreateSession
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result
 
-  - name: Set chassis indicator LED to blink using security token for auth
-    community.general.redfish_command:
-      category: Chassis
-      command: IndicatorLedBlink
-      resource_id: 1U
-      baseuri: "{{ baseuri }}"
-      auth_token: "{{ result.session.token }}"
+- name: Set chassis indicator LED to blink using security token for auth
+  community.general.redfish_command:
+    category: Chassis
+    command: IndicatorLedBlink
+    resource_id: 1U
+    baseuri: "{{ baseuri }}"
+    auth_token: "{{ result.session.token }}"
 
-  - name: Delete session using security token created by CreateSesssion above
-    community.general.redfish_command:
-      category: Sessions
-      command: DeleteSession
-      baseuri: "{{ baseuri }}"
-      auth_token: "{{ result.session.token }}"
-      session_uri: "{{ result.session.uri }}"
+- name: Delete session using security token created by CreateSesssion above
+  community.general.redfish_command:
+    category: Sessions
+    command: DeleteSession
+    baseuri: "{{ baseuri }}"
+    auth_token: "{{ result.session.token }}"
+    session_uri: "{{ result.session.uri }}"
 
-  - name: Clear Sessions
-    community.general.redfish_command:
-      category: Sessions
-      command: ClearSessions
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
+- name: Clear Sessions
+  community.general.redfish_command:
+    category: Sessions
+    command: ClearSessions
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
 
-  - name: Simple update
-    community.general.redfish_command:
-      category: Update
-      command: SimpleUpdate
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      update_image_uri: https://example.com/myupdate.img
+- name: Simple update
+  community.general.redfish_command:
+    category: Update
+    command: SimpleUpdate
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    update_image_uri: https://example.com/myupdate.img
 
-  - name: Simple update with additional options
-    community.general.redfish_command:
-      category: Update
-      command: SimpleUpdate
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      update_image_uri: //example.com/myupdate.img
-      update_protocol: FTP
-      update_targets:
-        - /redfish/v1/UpdateService/FirmwareInventory/BMC
-      update_creds:
-        username: operator
-        password: supersecretpwd
+- name: Simple update with additional options
+  community.general.redfish_command:
+    category: Update
+    command: SimpleUpdate
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    update_image_uri: //example.com/myupdate.img
+    update_protocol: FTP
+    update_targets:
+      - /redfish/v1/UpdateService/FirmwareInventory/BMC
+    update_creds:
+      username: operator
+      password: supersecretpwd
 
-  - name: Multipart HTTP push update; timeout is 600 seconds to allow for a
-      large image transfer
-    community.general.redfish_command:
-      category: Update
-      command: MultipartHTTPPushUpdate
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      timeout: 600
-      update_image_file: ~/images/myupdate.img
+- name: Multipart HTTP push update; timeout is 600 seconds to allow for a large image transfer
+  community.general.redfish_command:
+    category: Update
+    command: MultipartHTTPPushUpdate
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    timeout: 600
+    update_image_file: ~/images/myupdate.img
 
-  - name: Multipart HTTP push with additional options; timeout is 600 seconds
-      to allow for a large image transfer
-    community.general.redfish_command:
-      category: Update
-      command: MultipartHTTPPushUpdate
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      timeout: 600
-      update_image_file: ~/images/myupdate.img
-      update_targets:
-        - /redfish/v1/UpdateService/FirmwareInventory/BMC
-      update_oem_params:
-        PreserveConfiguration: false
+- name: Multipart HTTP push with additional options; timeout is 600 seconds to allow for a large image transfer
+  community.general.redfish_command:
+    category: Update
+    command: MultipartHTTPPushUpdate
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    timeout: 600
+    update_image_file: ~/images/myupdate.img
+    update_targets:
+      - /redfish/v1/UpdateService/FirmwareInventory/BMC
+    update_oem_params:
+      PreserveConfiguration: false
 
-  - name: Multipart HTTP push with custom OEM options
-    vars:
-      oem_payload:
-        ImageType: BMC
-    community.general.redfish_command:
-      category: Update
-      command: MultipartHTTPPushUpdate
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      update_image_file: ~/images/myupdate.img
-      update_targets:
-        - /redfish/v1/UpdateService/FirmwareInventory/BMC
-      update_custom_oem_header: OemParameters
-      update_custom_oem_mime_type: "application/json"
-      update_custom_oem_params: "{{ oem_payload | to_json }}"
+- name: Multipart HTTP push with custom OEM options
+  vars:
+    oem_payload:
+      ImageType: BMC
+  community.general.redfish_command:
+    category: Update
+    command: MultipartHTTPPushUpdate
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    update_image_file: ~/images/myupdate.img
+    update_targets:
+      - /redfish/v1/UpdateService/FirmwareInventory/BMC
+    update_custom_oem_header: OemParameters
+    update_custom_oem_mime_type: "application/json"
+    update_custom_oem_params: "{{ oem_payload | to_json }}"
 
-  - name: Perform requested operations to continue the update
-    community.general.redfish_command:
-      category: Update
-      command: PerformRequestedOperations
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      update_handle: /redfish/v1/TaskService/TaskMonitors/735
+- name: Perform requested operations to continue the update
+  community.general.redfish_command:
+    category: Update
+    command: PerformRequestedOperations
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    update_handle: /redfish/v1/TaskService/TaskMonitors/735
 
-  - name: Insert Virtual Media
-    community.general.redfish_command:
-      category: Systems
-      command: VirtualMediaInsert
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      virtual_media:
-        image_url: 'http://example.com/images/SomeLinux-current.iso'
-        media_types:
-          - CD
-          - DVD
-      resource_id: 1
+- name: Insert Virtual Media
+  community.general.redfish_command:
+    category: Systems
+    command: VirtualMediaInsert
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    virtual_media:
+      image_url: 'http://example.com/images/SomeLinux-current.iso'
+      media_types:
+        - CD
+        - DVD
+    resource_id: 1
 
-  - name: Insert Virtual Media
-    community.general.redfish_command:
-      category: Manager
-      command: VirtualMediaInsert
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      virtual_media:
-        image_url: 'http://example.com/images/SomeLinux-current.iso'
-        media_types:
-          - CD
-          - DVD
-      resource_id: BMC
+- name: Insert Virtual Media
+  community.general.redfish_command:
+    category: Manager
+    command: VirtualMediaInsert
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    virtual_media:
+      image_url: 'http://example.com/images/SomeLinux-current.iso'
+      media_types:
+        - CD
+        - DVD
+    resource_id: BMC
 
-  - name: Eject Virtual Media
-    community.general.redfish_command:
-      category: Systems
-      command: VirtualMediaEject
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      virtual_media:
-        image_url: 'http://example.com/images/SomeLinux-current.iso'
-      resource_id: 1
+- name: Eject Virtual Media
+  community.general.redfish_command:
+    category: Systems
+    command: VirtualMediaEject
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    virtual_media:
+      image_url: 'http://example.com/images/SomeLinux-current.iso'
+    resource_id: 1
 
-  - name: Eject Virtual Media
-    community.general.redfish_command:
-      category: Manager
-      command: VirtualMediaEject
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      virtual_media:
-        image_url: 'http://example.com/images/SomeLinux-current.iso'
-      resource_id: BMC
+- name: Eject Virtual Media
+  community.general.redfish_command:
+    category: Manager
+    command: VirtualMediaEject
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    virtual_media:
+      image_url: 'http://example.com/images/SomeLinux-current.iso'
+    resource_id: BMC
 
-  - name: Restart manager power gracefully
-    community.general.redfish_command:
-      category: Manager
-      command: GracefulRestart
-      resource_id: BMC
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
+- name: Restart manager power gracefully
+  community.general.redfish_command:
+    category: Manager
+    command: GracefulRestart
+    resource_id: BMC
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
 
-  - name: Restart manager power gracefully and wait for it to be available
-    community.general.redfish_command:
-      category: Manager
-      command: GracefulRestart
-      resource_id: BMC
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      wait: True
+- name: Restart manager power gracefully and wait for it to be available
+  community.general.redfish_command:
+    category: Manager
+    command: GracefulRestart
+    resource_id: BMC
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    wait: true
 
-  - name: Restart manager power gracefully
-    community.general.redfish_command:
-      category: Manager
-      command: PowerGracefulRestart
-      resource_id: BMC
+- name: Restart manager power gracefully
+  community.general.redfish_command:
+    category: Manager
+    command: PowerGracefulRestart
+    resource_id: BMC
 
-  - name: Turn manager power off
-    community.general.redfish_command:
-      category: Manager
-      command: PowerForceOff
-      resource_id: BMC
+- name: Turn manager power off
+  community.general.redfish_command:
+    category: Manager
+    command: PowerForceOff
+    resource_id: BMC
 
-  - name: Restart manager power forcefully
-    community.general.redfish_command:
-      category: Manager
-      command: PowerForceRestart
-      resource_id: BMC
+- name: Restart manager power forcefully
+  community.general.redfish_command:
+    category: Manager
+    command: PowerForceRestart
+    resource_id: BMC
 
-  - name: Shutdown manager power gracefully
-    community.general.redfish_command:
-      category: Manager
-      command: PowerGracefulShutdown
-      resource_id: BMC
+- name: Shutdown manager power gracefully
+  community.general.redfish_command:
+    category: Manager
+    command: PowerGracefulShutdown
+    resource_id: BMC
 
-  - name: Turn manager power on
-    community.general.redfish_command:
-      category: Manager
-      command: PowerOn
-      resource_id: BMC
+- name: Turn manager power on
+  community.general.redfish_command:
+    category: Manager
+    command: PowerOn
+    resource_id: BMC
 
-  - name: Reboot manager power
-    community.general.redfish_command:
-      category: Manager
-      command: PowerReboot
-      resource_id: BMC
+- name: Reboot manager power
+  community.general.redfish_command:
+    category: Manager
+    command: PowerReboot
+    resource_id: BMC
 
-  - name: Factory reset manager to defaults
-    community.general.redfish_command:
-      category: Manager
-      command: ResetToDefaults
-      resource_id: BMC
-      reset_to_defaults_mode: ResetAll
+- name: Factory reset manager to defaults
+  community.general.redfish_command:
+    category: Manager
+    command: ResetToDefaults
+    resource_id: BMC
+    reset_to_defaults_mode: ResetAll
 
-  - name: Verify BIOS attributes
-    community.general.redfish_command:
-      category: Systems
-      command: VerifyBiosAttributes
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      bios_attributes:
-        SubNumaClustering: "Disabled"
-        WorkloadProfile: "Virtualization-MaxPerformance"
-'''
+- name: Verify BIOS attributes
+  community.general.redfish_command:
+    category: Systems
+    command: VerifyBiosAttributes
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    bios_attributes:
+      SubNumaClustering: "Disabled"
+      WorkloadProfile: "Virtualization-MaxPerformance"
+"""
 
-RETURN = '''
+RETURN = r"""
 msg:
-    description: Message with action result or error description
-    returned: always
-    type: str
-    sample: "Action was successful"
+  description: Message with action result or error description.
+  returned: always
+  type: str
+  sample: "Action was successful"
 return_values:
-    description: Dictionary containing command-specific response data from the action.
-    returned: on success
-    type: dict
-    version_added: 6.1.0
-    sample: {
-        "update_status": {
-            "handle": "/redfish/v1/TaskService/TaskMonitors/735",
-            "messages": [],
-            "resets_requested": [],
-            "ret": true,
-            "status": "New"
-        }
+  description: Dictionary containing command-specific response data from the action.
+  returned: on success
+  type: dict
+  version_added: 6.1.0
+  sample: {
+    "update_status": {
+      "handle": "/redfish/v1/TaskService/TaskMonitors/735",
+      "messages": [],
+      "resets_requested": [],
+      "ret": true,
+      "status": "New"
     }
-'''
+  }
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils
