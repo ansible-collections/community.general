@@ -57,7 +57,7 @@ options:
     description:
       - URL field, used when O(push_type=link).
 notes:
-  - Requires C(pushbullet.py) Python package on the remote host. You can install it through C(pip) with C($ pip install pushbullet.py).
+  - Requires C(pushbullet.py) Python package on the remote host. You can install it through C(pip) with C(pip install pushbullet.py).
   - See U(https://github.com/randomchars/pushbullet.py).
 """
 
