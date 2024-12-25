@@ -79,7 +79,7 @@ options:
       name:
         description:
           - Attribute name OR hex ID.
-          - Currently defined names are:
+          - 'Currently defined names are:'
           - C(App_Manufacturer) (C(0x230683));
           - C(CollectionsModelNameString) (C(0x12adb));
           - C(Condition) (C(0x1000a));
