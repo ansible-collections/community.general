@@ -1,0 +1,127 @@
+#!/usr/bin/python
+
+# Copyright (c) 2024, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+DOCUMENTATION = """
+module: systemd_creds_encrypt
+short_description: Systemd's systemd-creds encrypt plugin
+description:
+    - This module encrypts input using systemd's systemd-creds encrypt.
+author:
+    - Thomas Sjögren (@konstruktoid)
+version_added: '9.0.0'
+options:
+    name:
+        description:
+            - The credential name to embed in the encrypted credential data.
+        type: str
+        required: false
+    not_after:
+        description:
+            - The time when the credential shall not be used anymore.
+            - Takes a timestamp specification in the format described in
+              V(systemd.time(7\\)).
+        type: str
+        required: false
+    pretty:
+        description:
+            - Pretty print the output so that it may be pasted directly into a
+              unit file.
+        type: bool
+        required: false
+        default: false
+    secret:
+        description:
+            - The secret to encrypt.
+        type: str
+        required: true
+    timestamp:
+        description:
+            - The timestamp to embed into the encrypted credential.
+            - Takes a timestamp specification in the format described in
+              V(systemd.time(7\\)).
+        type: str
+        required: false
+    user:
+        description:
+            - A user name or numeric UID to encrypt the credential for.
+            - If set to the special string V(self) it sets the user to the user
+              of the calling process.
+            - Requires C(systemd) 256 or later.
+        type: str
+        required: false
+notes:
+  - C(systemd-creds) requires C(systemd) 250 or later.
+"""
+
+EXAMPLES = """
+- name: Encrypt secret
+  community.general.systemd_creds_encrypt:
+    name: db
+    not_after: +48hr
+    secret: access_token
+  register: encrypted_secret
+
+- name: Print the encrypted secret
+  ansible.builtin.debug:
+    msg: "{{ encrypted_secret }}"
+"""
+
+
+from ansible.module_utils.basic import AnsibleModule
+
+
+def main() -> None:
+    """Encrypt secret using systemd-creds."""
+    module = AnsibleModule(
+        argument_spec=dict(
+            name=dict(type="str", required=False),
+            not_after=dict(type="str", required=False),
+            pretty=dict(type="bool", required=False, default=False),
+            secret=dict(type="str", required=True, no_log=True),
+            timestamp=dict(type="str", required=False),
+            user=dict(type="str", required=False),
+        ),
+        supports_check_mode=True,
+    )
+
+    cmd = module.get_bin_path("systemd-creds", required=True)
+
+    name = module.params["name"]
+    not_after = module.params["not_after"]
+    pretty = module.params["pretty"]
+    secret = module.params["secret"]
+    timestamp = module.params["timestamp"]
+    user = module.params["user"]
+
+    stdin_secret = ["echo", "-n", secret]
+    encrypt_cmd = [cmd, "encrypt"]
+    if name:
+        encrypt_cmd.append("--name=" + name)
+    else:
+        encrypt_cmd.append("--name=")
+    if not_after:
+        encrypt_cmd.append("--not-after=" + not_after)
+    if pretty:
+        encrypt_cmd.append("--pretty")
+    if timestamp:
+        encrypt_cmd.append("--timestamp=" + timestamp)
+    if user:
+        encrypt_cmd.append("--uid=" + user)
+    encrypt_cmd.extend(["-", "-"])
+
+    rc, stdout, stderr = module.run_command(stdin_secret)
+    rc, stdout, stderr = module.run_command(encrypt_cmd, data=stdout)
+
+    module.exit_json(
+        changed=False,
+        msg=stdout,
+        rc=rc,
+        stderr=stderr,
+    )
+
+
+if __name__ == "__main__":
+    main()
