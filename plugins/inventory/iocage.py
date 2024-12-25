@@ -54,9 +54,8 @@ DOCUMENTATION = '''
             default: false
         env:
             description: O(user)'s environment on O(host).
-            type: list
-            elements: str
-            default: []
+            type: dict
+            default: {}
     notes:
       - You might want to test the command C(ssh user@host iocage list -l) on
         the controller before using this inventory plugin with O(user) specified
@@ -84,14 +83,14 @@ plugin: community.general.iocage
 host: 10.1.0.73
 user: admin
 env:
-  - CRYPTOGRAPHY_OPENSSL_NO_LEGACY=1
+  CRYPTOGRAPHY_OPENSSL_NO_LEGACY: 1
 
 # enable cache
 plugin: community.general.iocage
 host: 10.1.0.73
 user: admin
 env:
-  - CRYPTOGRAPHY_OPENSSL_NO_LEGACY=1
+  CRYPTOGRAPHY_OPENSSL_NO_LEGACY: 1
 cache: true
 
 # see inventory plugin ansible.builtin.constructed
@@ -99,7 +98,7 @@ plugin: community.general.iocage
 host: 10.1.0.73
 user: admin
 env:
-  - CRYPTOGRAPHY_OPENSSL_NO_LEGACY=1
+  CRYPTOGRAPHY_OPENSSL_NO_LEGACY: 1
 cache: true
 strict: false
 compose:
@@ -115,6 +114,7 @@ keyed_groups:
 '''
 
 import re
+import os
 from subprocess import Popen, PIPE
 
 from ansible.errors import AnsibleError, AnsibleParserError
@@ -177,12 +177,14 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         get_properties = self.get_option('get_properties')
 
         cmd = []
-        if host != 'localhost':
+        my_env = os.environ.copy()
+        if host == 'localhost':
+            my_env = my_env | env
+        else:
             user = self.get_option('user')
             cmd.append("ssh")
             cmd.append(f"{user}@{host}")
-        if env:
-            cmd.extend(env)
+            cmd.extend(['='.join([k, v]) for k, v in env.items()])
         cmd.append(self.IOCAGE)
 
         cmd_list = cmd.copy()
@@ -190,7 +192,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         cmd_list.append('--header')
         cmd_list.append('--long')
         try:
-            p = Popen(cmd_list, stdout=PIPE, stderr=PIPE)
+            p = Popen(cmd_list, stdout=PIPE, stderr=PIPE, env=my_env)
             stdout, stderr = p.communicate()
             if p.returncode != 0:
                 raise AnsibleError('Failed to run cmd=%s, rc=%s, stderr=%s' %
@@ -215,7 +217,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 cmd_get_properties.append("--all")
                 cmd_get_properties.append(f"{hostname}")
                 try:
-                    p = Popen(cmd_get_properties, stdout=PIPE, stderr=PIPE)
+                    p = Popen(cmd_get_properties, stdout=PIPE, stderr=PIPE, env=my_env)
                     stdout, stderr = p.communicate()
                     if p.returncode != 0:
                         raise AnsibleError('Failed to run cmd=%s, rc=%s, stderr=%s' %
