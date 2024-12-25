@@ -107,9 +107,9 @@ options:
     type: bool
   retention:
     description:
-      - Use custom retention options instead of those from the default cluster configuration (which is usually V("keep-all")).
+      - Use custom retention options instead of those from the default cluster configuration (which is usually V("keep-all=1")).
       - Always requires Datastore.Allocate permission at the storage endpoint.
-      - Specifying a retention time other than V(keep-all=1) might trigger pruning on the datastore, if an existing backup should be deleted target
+      - Specifying a retention time other than V(keep-all=1) might trigger pruning on the datastore, if an existing backup should be deleted
         due to your specified timeframe.
       - Deleting requires C(Datastore.Modify) or C(Datastore.Prune) permissions on the backup storage.
     type: str
