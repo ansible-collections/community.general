@@ -144,7 +144,7 @@ class LookupModule(LookupBase):
         ``variables`` are the variables to use.
         """
         templar.available_variables = variables or {}
-        expression = '{{%s}}' % expression
+        expression = "{0}{1}{2}".format("{{", expression, "}}")
         if _TEMPLAR_HAS_TEMPLATE_CACHE:
             return templar.template(expression, cache=False)
         return templar.template(expression)
