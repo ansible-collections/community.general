@@ -14,7 +14,7 @@ author: "David Moreau Simard (@dmsimard)"
 short_description: Manages Sensu client configuration
 description:
   - Manages Sensu client configuration.
-  - 'For more information, refer to the Sensu documentation: U(https://sensuapp.org/docs/latest/reference/clients.html).'
+  - 'For more information, refer to the Sensu documentation: U(https://sensuapp.org/docs/latest/reference/clients.html)'
 extends_documentation_fragment:
   - community.general.attributes
 attributes:

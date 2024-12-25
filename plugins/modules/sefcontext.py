@@ -34,14 +34,14 @@ options:
   ftype:
     description:
       - The file type that should have SELinux contexts applied.
-      - The following file type options are available:.
-      - V(a) for all files,.
-      - V(b) for block devices,.
-      - V(c) for character devices,.
-      - V(d) for directories,.
-      - V(f) for regular files,.
-      - V(l) for symbolic links,.
-      - V(p) for named pipes,.
+      - The following file type options are available:
+      - V(a) for all files,
+      - V(b) for block devices,
+      - V(c) for character devices,
+      - V(d) for directories,
+      - V(f) for regular files,
+      - V(l) for symbolic links,
+      - V(p) for named pipes,
       - V(s) for socket files.
     type: str
     choices: [a, b, c, d, f, l, p, s]
@@ -84,7 +84,7 @@ options:
     default: true
   ignore_selinux_state:
     description:
-      - Useful for scenarios (chrooted environment) that you can't get the real SELinux state.
+      - Useful for scenarios (chrooted environment) that you cannot get the real SELinux state.
     type: bool
     default: false
 notes:
@@ -94,7 +94,7 @@ notes:
   - The M(community.general.sefcontext) module does not modify existing files to the new SELinux context(s), so it is advisable to first create
     the SELinux file contexts before creating files, or run C(restorecon) manually for the existing files that require the new SELinux file contexts.
   - Not applying SELinux fcontexts to existing files is a deliberate decision as it would be unclear what reported changes would entail to, and
-    there's no guarantee that applying SELinux fcontext does not pick up other unrelated prior changes.
+    there is no guarantee that applying SELinux fcontext does not pick up other unrelated prior changes.
 requirements:
   - libselinux-python
   - policycoreutils-python

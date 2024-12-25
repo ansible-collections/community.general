@@ -14,7 +14,7 @@ author: "David Moreau Simard (@dmsimard)"
 short_description: Manages Sensu handler configuration
 description:
   - Manages Sensu handler configuration.
-  - 'For more information, refer to the Sensu documentation: U(https://sensuapp.org/docs/latest/reference/handlers.html).'
+  - 'For more information, refer to the Sensu documentation: U(https://sensuapp.org/docs/latest/reference/handlers.html)'
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -97,7 +97,7 @@ options:
     elements: str
     description:
       - An array of Sensu event handlers (names) to use for events using the handler set.
-      - 'NOTE: the handlers attribute is only required for handler sets (i.e. handlers configured with "type": "set").'
+      - 'NOTE: the handlers attribute is only required for handler sets (that is, handlers configured with O(type=set)).'
 notes:
   - Check mode is supported.
 """

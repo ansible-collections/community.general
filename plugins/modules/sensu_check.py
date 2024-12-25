@@ -15,8 +15,8 @@ short_description: Manage Sensu checks
 description:
   - Manage the checks that should be run on a machine by I(Sensu).
   - Most options do not have a default and will not be added to the check definition unless specified.
-  - All defaults except O(path), O(state), O(backup) and O(metric) are not managed by this module,.
-  - They are simply specified for your convenience.
+  - All defaults except O(path), O(state), O(backup) and O(metric) are not managed by this module,
+    they are simply specified for your convenience.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -46,8 +46,8 @@ options:
     default: /etc/sensu/conf.d/checks.json
   backup:
     description:
-      - Create a backup file (if yes), including the timestamp information so.
-      - You can get the original file back if you somehow clobbered it incorrectly.
+      - Create a backup file (if yes), including the timestamp information so
+        you can get the original file back if you somehow clobbered it incorrectly.
     type: bool
     default: false
   command:
@@ -110,7 +110,7 @@ options:
   publish:
     description:
       - Whether the check should be scheduled at all.
-      - You can still issue it via the sensu api.
+      - You can still issue it via the sensu API.
       - Default is V(false).
     type: bool
   occurrences:
@@ -124,8 +124,8 @@ options:
       - Number of seconds handlers should wait before taking second action.
   aggregate:
     description:
-      - Classifies the check as an aggregate check,.
-      - Making it available via the aggregate API.
+      - Classifies the check as an aggregate check,
+        making it available via the aggregate API.
       - Default is V(false).
     type: bool
   low_flap_threshold:

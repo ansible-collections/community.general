@@ -16,8 +16,8 @@ description:
   - Sends an email with a SendGrid account through their API, not through the SMTP service.
 notes:
   - This module is non-idempotent because it sends an email through the external API. It is idempotent only in the case that the module fails.
-  - Like the other notification modules, this one requires an external dependency to work. In this case, you'll need an active SendGrid account.
-  - In order to use api_key, cc, bcc, attachments, from_name, html_body, headers you must pip install sendgrid.
+  - Like the other notification modules, this one requires an external dependency to work. In this case, you will need an active SendGrid account.
+  - In order to use O(api_key), O(cc), O(bcc), O(attachments), O(from_name), O(html_body), and O(headers) you must C(pip install sendgrid).
 requirements:
   - sendgrid Python library 1.6.22 or lower (Sendgrid API V2 supported)
 extends_documentation_fragment:
