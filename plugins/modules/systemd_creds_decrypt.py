@@ -76,7 +76,7 @@ EXAMPLES = """
 from ansible.module_utils.basic import AnsibleModule
 
 
-def main() -> None:
+def main():
     """Encrypt secret using systemd-creds."""
     module = AnsibleModule(
         argument_spec=dict(
