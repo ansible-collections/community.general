@@ -61,13 +61,13 @@ class LookupModule(LookupBase):
 
         self.set_options(var_options=variables, direct=kwargs)
 
-        display.vvvv(u"keyring: %s" % keyring.get_keyring())
+        display.vvvv(f"keyring: {keyring.get_keyring()}")
         ret = []
         for term in terms:
             (servicename, username) = (term.split()[0], term.split()[1])
-            display.vvvv(u"username: %s, servicename: %s " % (username, servicename))
+            display.vvvv(f"username: {username}, servicename: {servicename} ")
             password = keyring.get_password(servicename, username)
             if password is None:
-                raise AnsibleError(u"servicename: %s for user %s not found" % (servicename, username))
+                raise AnsibleError(f"servicename: {servicename} for user {username} not found")
             ret.append(password.rstrip())
         return ret

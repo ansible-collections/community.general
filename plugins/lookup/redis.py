@@ -116,5 +116,5 @@ class LookupModule(LookupBase):
                 ret.append(to_text(res))
             except Exception as e:
                 # connection failed or key not found
-                raise AnsibleError('Encountered exception while fetching {0}: {1}'.format(term, e))
+                raise AnsibleError(f'Encountered exception while fetching {term}: {e}')
         return ret
