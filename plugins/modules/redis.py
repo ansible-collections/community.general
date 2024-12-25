@@ -58,11 +58,11 @@ options:
       - slave_mode
   db:
     description:
-      - The database to flush (used in db mode) [flush command].
+      - The database to flush (used in DB mode) [flush command].
     type: int
   flush_mode:
     description:
-      - Type of flush (all the dbs in a redis instance or a specific one) [flush command].
+      - Type of flush (all the DBs in a redis instance or a specific one) [flush command].
     default: all
     choices: [all, db]
     type: str
@@ -78,7 +78,7 @@ options:
 
 notes:
   - Requires the C(redis-py) Python package on the remote host. You can install it with pip
-    (pip install redis) or with a package manager. U(https://github.com/andymccurdy/redis-py).
+    (C(pip install redis)) or with a package manager. U(https://github.com/andymccurdy/redis-py).
   - If the redis master instance you are making replica of is password protected this needs to be in the C(redis.conf) in the C(masterauth) variable.
 seealso:
   - module: community.general.redis_info
