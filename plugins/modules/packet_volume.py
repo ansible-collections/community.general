@@ -69,7 +69,7 @@ options:
 
   plan:
     description:
-      - Storage_1 for standard tier, storage_2 for premium (performance) tier.
+      - V(storage_1) for standard tier, V(storage_2) for premium (performance) tier.
       - Tiers are described at U(https://www.packet.com/cloud/storage/).
     choices: ['storage_1', 'storage_2']
     default: 'storage_1'
