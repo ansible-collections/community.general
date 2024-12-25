@@ -99,8 +99,6 @@ options:
     type: dict
     description:
       - The servicenow definition scope, used to configure the Sensu Enterprise ServiceNow integration (Sensu Enterprise users only).
-notes:
-  - Check mode is supported.
 """
 
 EXAMPLES = r"""

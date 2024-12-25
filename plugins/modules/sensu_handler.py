@@ -98,8 +98,6 @@ options:
     description:
       - An array of Sensu event handlers (names) to use for events using the handler set.
       - 'NOTE: the handlers attribute is only required for handler sets (that is, handlers configured with O(type=set)).'
-notes:
-  - Check mode is supported.
 """
 
 EXAMPLES = r"""

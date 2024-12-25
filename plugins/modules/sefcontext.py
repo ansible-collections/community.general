@@ -34,7 +34,7 @@ options:
   ftype:
     description:
       - The file type that should have SELinux contexts applied.
-      - The following file type options are available:
+      - 'The following file type options are available:'
       - V(a) for all files,
       - V(b) for block devices,
       - V(c) for character devices,
