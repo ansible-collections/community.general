@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: pagerduty_change
 short_description: Track a code or infrastructure change as a PagerDuty change event
 version_added: 1.3.0
@@ -31,8 +31,7 @@ attributes:
 options:
   integration_key:
     description:
-      - The integration key that identifies the service the change was made to.
-        This can be found by adding an integration to a service in PagerDuty.
+      - The integration key that identifies the service the change was made to. This can be found by adding an integration to a service in PagerDuty.
     required: true
     type: str
   summary:
@@ -82,14 +81,14 @@ options:
     type: str
   validate_certs:
     description:
-      - If V(false), SSL certificates for the target URL will not be validated.
-        This should only be used on personally controlled sites using self-signed certificates.
+      - If V(false), SSL certificates for the target URL will not be validated. This should only be used on personally controlled sites using
+        self-signed certificates.
     required: false
     default: true
     type: bool
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Track the deployment as a PagerDuty change event
   community.general.pagerduty_change:
     integration_key: abc123abc123abc123abc123abc123ab
@@ -106,7 +105,7 @@ EXAMPLES = '''
     environment: production
     link_url: https://github.com/ansible-collections/community.general/pull/1269
     link_text: View changes on GitHub
-'''
+"""
 
 from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.basic import AnsibleModule

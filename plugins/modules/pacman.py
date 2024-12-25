@@ -12,172 +12,161 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = """
----
+DOCUMENTATION = r"""
 module: pacman
 short_description: Manage packages with I(pacman)
 description:
-    - Manage packages with the I(pacman) package manager, which is used by Arch Linux and its variants.
+  - Manage packages with the I(pacman) package manager, which is used by Arch Linux and its variants.
 author:
-    - Indrajit Raychaudhuri (@indrajitr)
-    - Aaron Bull Schaefer (@elasticdog) <aaron@elasticdog.com>
-    - Maxime de Roucy (@tchernomax)
-    - Jean Raby (@jraby)
+  - Indrajit Raychaudhuri (@indrajitr)
+  - Aaron Bull Schaefer (@elasticdog) <aaron@elasticdog.com>
+  - Maxime de Roucy (@tchernomax)
+  - Jean Raby (@jraby)
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: full
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
 options:
-    name:
-        description:
-            - Name or list of names of the package(s) or file(s) to install, upgrade, or remove.
-              Cannot be used in combination with O(upgrade).
-        aliases: [ package, pkg ]
-        type: list
-        elements: str
-
-    state:
-        description:
-          - Whether to install (V(present) or V(installed), V(latest)), or remove (V(absent) or V(removed)) a package.
-          - V(present) and V(installed) will simply ensure that a desired package is installed.
-          - V(latest) will update the specified package if it is not of the latest available version.
-          - V(absent) and V(removed) will remove the specified package.
-        default: present
-        choices: [ absent, installed, latest, present, removed ]
-        type: str
-
-    force:
-        description:
-            - When removing packages, forcefully remove them, without any checks.
-              Same as O(extra_args="--nodeps --nodeps").
-            - When combined with O(update_cache), force a refresh of all package databases.
-              Same as O(update_cache_extra_args="--refresh --refresh").
-        default: false
-        type: bool
-
-    remove_nosave:
-        description:
-            - When removing packages, do not save modified configuration files as C(.pacsave) files.
-              (passes C(--nosave) to pacman)
-        version_added: 4.6.0
-        default: false
-        type: bool
-
-    executable:
-        description:
-            - Path of the binary to use. This can either be C(pacman) or a pacman compatible AUR helper.
-            - Pacman compatibility is unfortunately ill defined, in particular, this modules makes
-              extensive use of the C(--print-format) directive which is known not to be implemented by
-              some AUR helpers (notably, C(yay)).
-            - Beware that AUR helpers might behave unexpectedly and are therefore not recommended.
-        default: pacman
-        type: str
-        version_added: 3.1.0
-
-    extra_args:
-        description:
-            - Additional option to pass to pacman when enforcing O(state).
-        default: ''
-        type: str
-
-    update_cache:
-        description:
-            - Whether or not to refresh the master package lists.
-            - This can be run as part of a package installation or as a separate step.
-            - If not specified, it defaults to V(false).
-            - Please note that this option only had an influence on the module's C(changed) state
-              if O(name) and O(upgrade) are not specified before community.general 5.0.0.
-              See the examples for how to keep the old behavior.
-        type: bool
-
-    update_cache_extra_args:
-        description:
-            - Additional option to pass to pacman when enforcing O(update_cache).
-        default: ''
-        type: str
-
-    upgrade:
-        description:
-            - Whether or not to upgrade the whole system.
-              Cannot be used in combination with O(name).
-            - If not specified, it defaults to V(false).
-        type: bool
-
-    upgrade_extra_args:
-        description:
-            - Additional option to pass to pacman when enforcing O(upgrade).
-        default: ''
-        type: str
-
-    reason:
-        description:
-            - The install reason to set for the packages.
-        choices: [ dependency, explicit ]
-        type: str
-        version_added: 5.4.0
-
-    reason_for:
-        description:
-            - Set the install reason for V(all) packages or only for V(new) packages.
-            - In case of O(state=latest) already installed packages which will be updated to a newer version are not counted as V(new).
-        default: new
-        choices: [ all, new ]
-        type: str
-        version_added: 5.4.0
-
-notes:
-  - When used with a C(loop:) each package will be processed individually,
-    it is much more efficient to pass the list directly to the O(name) option.
-  - To use an AUR helper (O(executable) option), a few extra setup steps might be required beforehand.
-    For example, a dedicated build user with permissions to install packages could be necessary.
-  - >
-    In the tests, while using C(yay) as the O(executable) option, the module failed to install AUR packages
-    with the error: C(error: target not found: <pkg>).
-"""
-
-RETURN = """
-packages:
+  name:
     description:
-        - A list of packages that have been changed.
-        - Before community.general 4.5.0 this was only returned when O(upgrade=true).
-          In community.general 4.5.0, it was sometimes omitted when the package list is empty,
-          but since community.general 4.6.0 it is always returned when O(name) is specified or
-          O(upgrade=true).
-    returned: success and O(name) is specified or O(upgrade=true)
+      - Name or list of names of the package(s) or file(s) to install, upgrade, or remove. Cannot be used in combination with O(upgrade).
+    aliases: [package, pkg]
     type: list
     elements: str
-    sample: [ package, other-package ]
 
-cache_updated:
+  state:
     description:
-        - The changed status of C(pacman -Sy).
-        - Useful when O(name) or O(upgrade=true) are specified next to O(update_cache=true).
-    returned: success, when O(update_cache=true)
+      - Whether to install (V(present) or V(installed), V(latest)), or remove (V(absent) or V(removed)) a package.
+      - V(present) and V(installed) will simply ensure that a desired package is installed.
+      - V(latest) will update the specified package if it is not of the latest available version.
+      - V(absent) and V(removed) will remove the specified package.
+    default: present
+    choices: [absent, installed, latest, present, removed]
+    type: str
+
+  force:
+    description:
+      - When removing packages, forcefully remove them, without any checks. Same as O(extra_args="--nodeps --nodeps").
+      - When combined with O(update_cache), force a refresh of all package databases. Same as O(update_cache_extra_args="--refresh --refresh").
+    default: false
     type: bool
-    sample: false
+
+  remove_nosave:
+    description:
+      - When removing packages, do not save modified configuration files as C(.pacsave) files. (passes C(--nosave) to pacman).
     version_added: 4.6.0
+    default: false
+    type: bool
 
-stdout:
+  executable:
     description:
-        - Output from pacman.
-    returned: success, when needed
+      - Path of the binary to use. This can either be C(pacman) or a pacman compatible AUR helper.
+      - Pacman compatibility is unfortunately ill defined, in particular, this modules makes extensive use of the C(--print-format) directive
+        which is known not to be implemented by some AUR helpers (notably, C(yay)).
+      - Beware that AUR helpers might behave unexpectedly and are therefore not recommended.
+    default: pacman
     type: str
-    sample: ":: Synchronizing package databases...  core is up to date :: Starting full system upgrade..."
-    version_added: 4.1.0
+    version_added: 3.1.0
 
-stderr:
+  extra_args:
     description:
-        - Error output from pacman.
-    returned: success, when needed
+      - Additional option to pass to pacman when enforcing O(state).
+    default: ''
     type: str
-    sample: "warning: libtool: local (2.4.6+44+gb9b44533-14) is newer than core (2.4.6+42+gb88cebd5-15)\nwarning ..."
-    version_added: 4.1.0
+
+  update_cache:
+    description:
+      - Whether or not to refresh the master package lists.
+      - This can be run as part of a package installation or as a separate step.
+      - If not specified, it defaults to V(false).
+      - Please note that this option only had an influence on the module's C(changed) state if O(name) and O(upgrade) are not specified before
+        community.general 5.0.0. See the examples for how to keep the old behavior.
+    type: bool
+
+  update_cache_extra_args:
+    description:
+      - Additional option to pass to pacman when enforcing O(update_cache).
+    default: ''
+    type: str
+
+  upgrade:
+    description:
+      - Whether or not to upgrade the whole system. Cannot be used in combination with O(name).
+      - If not specified, it defaults to V(false).
+    type: bool
+
+  upgrade_extra_args:
+    description:
+      - Additional option to pass to pacman when enforcing O(upgrade).
+    default: ''
+    type: str
+
+  reason:
+    description:
+      - The install reason to set for the packages.
+    choices: [dependency, explicit]
+    type: str
+    version_added: 5.4.0
+
+  reason_for:
+    description:
+      - Set the install reason for V(all) packages or only for V(new) packages.
+      - In case of O(state=latest) already installed packages which will be updated to a newer version are not counted as V(new).
+    default: new
+    choices: [all, new]
+    type: str
+    version_added: 5.4.0
+
+notes:
+  - When used with a C(loop:) each package will be processed individually, it is much more efficient to pass the list directly to the O(name)
+    option.
+  - To use an AUR helper (O(executable) option), a few extra setup steps might be required beforehand. For example, a dedicated build user with
+    permissions to install packages could be necessary.
+  - 'In the tests, while using C(yay) as the O(executable) option, the module failed to install AUR packages with the error: C(error: target not
+    found: <pkg>).'
 """
 
-EXAMPLES = """
+RETURN = r"""
+packages:
+  description:
+    - A list of packages that have been changed.
+    - Before community.general 4.5.0 this was only returned when O(upgrade=true). In community.general 4.5.0, it was sometimes omitted when the
+      package list is empty, but since community.general 4.6.0 it is always returned when O(name) is specified or O(upgrade=true).
+  returned: success and O(name) is specified or O(upgrade=true)
+  type: list
+  elements: str
+  sample: [package, other-package]
+
+cache_updated:
+  description:
+    - The changed status of C(pacman -Sy).
+    - Useful when O(name) or O(upgrade=true) are specified next to O(update_cache=true).
+  returned: success, when O(update_cache=true)
+  type: bool
+  sample: false
+  version_added: 4.6.0
+
+stdout:
+  description:
+    - Output from pacman.
+  returned: success, when needed
+  type: str
+  sample: ":: Synchronizing package databases...  core is up to date :: Starting full system upgrade..."
+  version_added: 4.1.0
+
+stderr:
+  description:
+    - Error output from pacman.
+  returned: success, when needed
+  type: str
+  sample: "warning: libtool: local (2.4.6+44+gb9b44533-14) is newer than core (2.4.6+42+gb88cebd5-15)\nwarning ..."
+  version_added: 4.1.0
+"""
+
+EXAMPLES = r"""
 - name: Install package foo from repo
   community.general.pacman:
     name: foo
