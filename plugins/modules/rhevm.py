@@ -118,12 +118,12 @@ options:
     default: true
   disks:
     description:
-      - This option uses complex arguments and is a list of disks with the options O(name), O(size), and O(domain).
+      - This option uses complex arguments and is a list of disks with the options V(name), V(size), and V(domain).
     type: list
     elements: str
   ifaces:
     description:
-      - This option uses complex arguments and is a list of interfaces with the options O(name) and O(vlan).
+      - This option uses complex arguments and is a list of interfaces with the options V(name) and V(vlan).
     type: list
     elements: str
     aliases: [interfaces, nics]
