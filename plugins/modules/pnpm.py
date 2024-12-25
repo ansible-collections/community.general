@@ -12,13 +12,12 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = """
----
+DOCUMENTATION = r"""
 module: pnpm
-short_description: Manage node.js packages with pnpm
+short_description: Manage Node.js packages with C(pnpm)
 version_added: 7.4.0
 description:
-  - Manage node.js packages with the L(pnpm package manager, https://pnpm.io/).
+  - Manage Node.js packages with the L(pnpm package manager, https://pnpm.io/).
 author:
   - "Aritra Sen (@aretrosen)"
   - "Chris Hoffman (@chrishoffman), creator of NPM Ansible module"
@@ -32,18 +31,18 @@ attributes:
 options:
   name:
     description:
-      - The name of a node.js library to install.
-      - All packages in package.json are installed if not provided.
+      - The name of a Node.js library to install.
+      - All packages in C(package.json) are installed if not provided.
     type: str
     required: false
   alias:
     description:
-      - Alias of the node.js library.
+      - Alias of the Node.js library.
     type: str
     required: false
   path:
     description:
-      - The base path to install the node.js libraries.
+      - The base path to install the Node.js libraries.
     type: path
     required: false
   version:
@@ -53,7 +52,7 @@ options:
     required: false
   global:
     description:
-      - Install the node.js library globally.
+      - Install the Node.js library globally.
     required: false
     default: false
     type: bool
@@ -97,7 +96,7 @@ options:
     type: bool
   state:
     description:
-      - Installation state of the named node.js library.
+      - Installation state of the named Node.js library.
       - If V(absent) is selected, a name option must be provided.
     type: str
     required: false
@@ -107,36 +106,36 @@ requirements:
   - Pnpm executable present in E(PATH).
 """
 
-EXAMPLES = """
-- name: Install "tailwindcss" node.js package.
+EXAMPLES = r"""
+- name: Install "tailwindcss" Node.js package.
   community.general.pnpm:
     name: tailwindcss
     path: /app/location
 
-- name: Install "tailwindcss" node.js package on version 3.3.2
+- name: Install "tailwindcss" Node.js package on version 3.3.2
   community.general.pnpm:
     name: tailwindcss
     version: 3.3.2
     path: /app/location
 
-- name: Install "tailwindcss" node.js package globally.
+- name: Install "tailwindcss" Node.js package globally.
   community.general.pnpm:
     name: tailwindcss
     global: true
 
-- name: Install "tailwindcss" node.js package as dev dependency.
+- name: Install "tailwindcss" Node.js package as dev dependency.
   community.general.pnpm:
     name: tailwindcss
     path: /app/location
     dev: true
 
-- name: Install "tailwindcss" node.js package as optional dependency.
+- name: Install "tailwindcss" Node.js package as optional dependency.
   community.general.pnpm:
     name: tailwindcss
     path: /app/location
     optional: true
 
-- name: Install "tailwindcss" node.js package version 0.1.3 as tailwind-1
+- name: Install "tailwindcss" Node.js package version 0.1.3 as tailwind-1
   community.general.pnpm:
     name: tailwindcss
     alias: tailwind-1
@@ -158,6 +157,7 @@ EXAMPLES = """
     path: /app/location
     state: latest
 """
+
 import json
 import os
 

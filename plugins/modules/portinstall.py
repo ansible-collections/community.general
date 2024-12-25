@@ -12,43 +12,42 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: portinstall
 short_description: Installing packages from FreeBSD's ports system
 description:
-    - Manage packages for FreeBSD using 'portinstall'.
+  - Manage packages for FreeBSD using C(portinstall).
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    name:
-        description:
-            - name of package to install/remove
-        aliases: [pkg]
-        required: true
-        type: str
-    state:
-        description:
-            - state of the package
-        choices: [ 'present', 'absent' ]
-        required: false
-        default: present
-        type: str
-    use_packages:
-        description:
-            - use packages instead of ports whenever available
-        type: bool
-        required: false
-        default: true
+  name:
+    description:
+      - Name of package to install/remove.
+    aliases: [pkg]
+    required: true
+    type: str
+  state:
+    description:
+      - State of the package.
+    choices: ['present', 'absent']
+    required: false
+    default: present
+    type: str
+  use_packages:
+    description:
+      - Use packages instead of ports whenever available.
+    type: bool
+    required: false
+    default: true
 author: "berenddeboer (@berenddeboer)"
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Install package foo
   community.general.portinstall:
     name: foo
@@ -63,7 +62,7 @@ EXAMPLES = '''
   community.general.portinstall:
     name: foo,bar
     state: absent
-'''
+"""
 
 import re
 

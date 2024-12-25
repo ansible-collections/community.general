@@ -10,15 +10,13 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: pkg5_publisher
 author: "Peter Oliver (@mavit)"
 short_description: Manages Solaris 11 Image Packaging System publishers
 description:
   - IPS packages are the native packages in Solaris 11 and higher.
-  - This modules will configure which publishers a client will download IPS
-    packages from.
+  - This modules will configure which publishers a client will download IPS packages from.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -31,18 +29,17 @@ options:
     description:
       - The publisher's name.
     required: true
-    aliases: [ publisher ]
+    aliases: [publisher]
     type: str
   state:
     description:
       - Whether to ensure that a publisher is present or absent.
     default: present
-    choices: [ present, absent ]
+    choices: [present, absent]
     type: str
   sticky:
     description:
-      - Packages installed from a sticky repository can only receive updates
-        from that repository.
+      - Packages installed from a sticky repository can only receive updates from that repository.
     type: bool
   enabled:
     description:
@@ -60,8 +57,8 @@ options:
       - Multiple values may be provided.
     type: list
     elements: str
-'''
-EXAMPLES = '''
+"""
+EXAMPLES = r"""
 - name: Fetch packages for the solaris publisher direct from Oracle
   community.general.pkg5_publisher:
     name: solaris
@@ -72,7 +69,7 @@ EXAMPLES = '''
   community.general.pkg5_publisher:
     name: site
     origin: 'https://pkg.example.com/site/'
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 

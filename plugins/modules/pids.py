@@ -7,9 +7,10 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: pids
-description: "Retrieves a list of PIDs of given process name in Ansible controller/controlled machines.Returns an empty list if no process in that name exists."
+description: "Retrieves a list of PIDs of given process name in Ansible controller/controlled machines.Returns an empty list if no process in
+  that name exists."
 short_description: Retrieves process IDs list if the process is running otherwise return empty list
 author:
   - Saranya Sridharan (@saranyasridharan)
@@ -35,13 +36,13 @@ options:
     type: bool
     default: false
     version_added: 3.0.0
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 # Pass the process name
 - name: Getting process IDs of the process
   community.general.pids:
-      name: python
+    name: python
   register: pids_of_python
 
 - name: Printing the process IDs obtained
@@ -52,15 +53,15 @@ EXAMPLES = r'''
   community.general.pids:
     pattern: python(2(\.7)?|3(\.6)?)?\s+myapp\.py
   register: myapp_pids
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 pids:
-  description: Process IDs of the given process
+  description: Process IDs of the given process.
   returned: list of none, one, or more process IDs
   type: list
-  sample: [100,200]
-'''
+  sample: [100, 200]
+"""
 
 import abc
 import re

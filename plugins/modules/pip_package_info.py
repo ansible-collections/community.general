@@ -9,33 +9,33 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: pip_package_info
 short_description: Pip package information
 description:
-  - Return information about installed pip packages
+  - Return information about installed pip packages.
 extends_documentation_fragment:
   - community.general.attributes
   - community.general.attributes.info_module
 options:
   clients:
     description:
-      - A list of the pip executables that will be used to get the packages.
-        They can be supplied with the full path or just the executable name, for example V(pip3.7).
+      - A list of the pip executables that will be used to get the packages. They can be supplied with the full path or just the executable name,
+        for example V(pip3.7).
     default: ['pip']
     required: false
     type: list
     elements: path
 requirements:
   - pip >= 20.3b1 (necessary for the C(--format) option)
-  - The requested pip executables must be installed on the target.
+  - The requested C(pip) executables must be installed on the target.
 author:
   - Matthew Jones (@matburt)
   - Brian Coca (@bcoca)
   - Adam Miller (@maxamillion)
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Just get the list from default pip
   community.general.pip_package_info:
 
@@ -46,16 +46,16 @@ EXAMPLES = '''
 - name: Get from specific paths (virtualenvs?)
   community.general.pip_package_info:
     clients: '/home/me/projec42/python/pip3.5'
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 packages:
-  description: a dictionary of installed package data
+  description: A dictionary of installed package data.
   returned: always
   type: dict
   contains:
     python:
-      description: A dictionary with each pip client which then contains a list of dicts with python package information
+      description: A dictionary with each pip client which then contains a list of dicts with python package information.
       returned: always
       type: dict
       sample:
@@ -91,7 +91,8 @@ packages:
                 ],
             },
         }
-'''
+"""
+
 import json
 import os
 

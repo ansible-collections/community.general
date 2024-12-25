@@ -8,12 +8,11 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: profitbricks_volume
 short_description: Create or destroy a volume
 description:
-  - Allows you to create or remove a volume from a ProfitBricks datacenter. This module has a dependency on profitbricks >= 1.0.0
+  - Allows you to create or remove a volume from a ProfitBricks datacenter. This module has a dependency on profitbricks >= 1.0.0.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -42,10 +41,10 @@ options:
     type: str
     required: false
     default: VIRTIO
-    choices: [ "IDE", "VIRTIO"]
+    choices: ["IDE", "VIRTIO"]
   image:
     description:
-      - The system image ID for the volume, e.g. a3eae284-a2fe-11e4-b187-5f1f641608c8. This can also be a snapshot image ID.
+      - The system image ID for the volume, for example V(a3eae284-a2fe-11e4-b187-5f1f641608c8). This can also be a snapshot image ID.
     type: str
   image_password:
     description:
@@ -64,11 +63,11 @@ options:
     type: str
     required: false
     default: HDD
-    choices: [ "HDD", "SSD" ]
+    choices: ["HDD", "SSD"]
   licence_type:
     description:
       - The licence type for the volume. This is used when the image is non-standard.
-      - "The available choices are: V(LINUX), V(WINDOWS), V(UNKNOWN), V(OTHER)."
+      - 'The available choices are: V(LINUX), V(WINDOWS), V(UNKNOWN), V(OTHER).'
     type: str
     required: false
     default: UNKNOWN
@@ -85,35 +84,35 @@ options:
     type: bool
   instance_ids:
     description:
-      - list of instance ids, currently only used when state='absent' to remove instances.
+      - List of instance ids, currently only used when state='absent' to remove instances.
     type: list
     elements: str
     default: []
   subscription_user:
     description:
-      - The ProfitBricks username. Overrides the PB_SUBSCRIPTION_ID environment variable.
+      - The ProfitBricks username. Overrides the E(PB_SUBSCRIPTION_ID) environment variable.
     type: str
     required: false
   subscription_password:
     description:
-      - THe ProfitBricks password. Overrides the PB_PASSWORD environment variable.
+      - THe ProfitBricks password. Overrides the E(PB_PASSWORD) environment variable.
     type: str
     required: false
   wait:
     description:
-      - wait for the datacenter to be created before returning
+      - Wait for the datacenter to be created before returning.
     required: false
     default: true
     type: bool
   wait_timeout:
     description:
-      - how long before wait gives up, in seconds
+      - How long before wait gives up, in seconds.
     type: int
     default: 600
   state:
     description:
-      - create or terminate datacenters
-      - "The available choices are: V(present), V(absent)."
+      - Create or terminate datacenters.
+      - 'The available choices are: V(present), V(absent).'
     type: str
     required: false
     default: 'present'
@@ -122,11 +121,11 @@ options:
       - Server name to attach the volume to.
     type: str
 
-requirements: [ "profitbricks" ]
+requirements: ["profitbricks"]
 author: Matt Baldwin (@baldwinSPC) <baldwin@stackpointcloud.com>
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create multiple volumes
   community.general.profitbricks_volume:
     datacenter: Tardis One
@@ -144,7 +143,7 @@ EXAMPLES = '''
       - 'vol02'
     wait_timeout: 500
     state: absent
-'''
+"""
 
 import re
 import time

@@ -8,13 +8,12 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: profitbricks
 short_description: Create, destroy, start, stop, and reboot a ProfitBricks virtual machine
 description:
-     - Create, destroy, update, start, stop, and reboot a ProfitBricks virtual machine. When the virtual machine is created it can optionally wait
-       for it to be 'running' before returning. This module has a dependency on profitbricks >= 1.0.0
+  - Create, destroy, update, start, stop, and reboot a ProfitBricks virtual machine. When the virtual machine is created it can optionally wait
+    for it to be 'running' before returning. This module has a dependency on profitbricks >= 1.0.0.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -34,7 +33,7 @@ options:
     type: str
   image:
     description:
-      - The system image ID for creating the virtual machine, e.g. a3eae284-a2fe-11e4-b187-5f1f641608c8.
+      - The system image ID for creating the virtual machine, for example V(a3eae284-a2fe-11e4-b187-5f1f641608c8).
     type: str
   image_password:
     description:
@@ -65,7 +64,7 @@ options:
       - The CPU family type to allocate to the virtual machine.
     type: str
     default: AMD_OPTERON
-    choices: [ "AMD_OPTERON", "INTEL_XEON" ]
+    choices: ["AMD_OPTERON", "INTEL_XEON"]
   volume_size:
     description:
       - The size in GB of the boot volume.
@@ -76,10 +75,10 @@ options:
       - The bus type for the volume.
     type: str
     default: VIRTIO
-    choices: [ "IDE", "VIRTIO"]
+    choices: ["IDE", "VIRTIO"]
   instance_ids:
     description:
-      - list of instance ids, currently only used when state='absent' to remove instances.
+      - List of instance ids, currently only used when state='absent' to remove instances.
     type: list
     elements: str
     default: []
@@ -93,7 +92,7 @@ options:
       - The datacenter location. Use only if you want to create the Datacenter or else this value is ignored.
     type: str
     default: us/las
-    choices: [ "us/las", "de/fra", "de/fkb" ]
+    choices: ["us/las", "de/fra", "de/fkb"]
   assign_public_ip:
     description:
       - This will assign the machine to the public LAN. If no LAN exists with public Internet access it is created.
@@ -106,47 +105,46 @@ options:
     default: 1
   subscription_user:
     description:
-      - The ProfitBricks username. Overrides the PB_SUBSCRIPTION_ID environment variable.
+      - The ProfitBricks username. Overrides the E(PB_SUBSCRIPTION_ID) environment variable.
     type: str
   subscription_password:
     description:
-      - THe ProfitBricks password. Overrides the PB_PASSWORD environment variable.
+      - THe ProfitBricks password. Overrides the E(PB_PASSWORD) environment variable.
     type: str
   wait:
     description:
-      - wait for the instance to be in state 'running' before returning
+      - Wait for the instance to be in state 'running' before returning.
     type: bool
     default: true
   wait_timeout:
     description:
-      - how long before wait gives up, in seconds
+      - How long before wait gives up, in seconds.
     type: int
     default: 600
   remove_boot_volume:
     description:
-      - remove the bootVolume of the virtual machine you're destroying.
+      - Remove the bootVolume of the virtual machine you are destroying.
     type: bool
     default: true
   state:
     description:
-      - create or terminate instances
+      - Create or terminate instances.
       - 'The choices available are: V(running), V(stopped), V(absent), V(present).'
     type: str
     default: 'present'
   disk_type:
     description:
-      - the type of disk to be allocated.
+      - The type of disk to be allocated.
     type: str
     choices: [SSD, HDD]
     default: HDD
 
 requirements:
-     - "profitbricks"
+  - "profitbricks"
 author: Matt Baldwin (@baldwinSPC) <baldwin@stackpointcloud.com>
-'''
+"""
 
-EXAMPLES = '''
-
+EXAMPLES = r"""
 # Note: These examples do not set authentication details, see the AWS Guide for details.
 
 # Provisioning example
@@ -192,7 +190,7 @@ EXAMPLES = '''
       - 'web003.stackpointcloud.com'
     wait_timeout: 500
     state: stopped
-'''
+"""
 
 import re
 import uuid
