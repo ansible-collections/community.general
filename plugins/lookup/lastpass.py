@@ -83,9 +83,9 @@ class LPass(object):
 
     def get_field(self, key, field):
         if field in ['username', 'password', 'url', 'notes', 'id', 'name']:
-            out, err = self._run(self._build_args("show", ["--{0}".format(field), key]))
+            out, err = self._run(self._build_args("show", [f"--{field}", key]))
         else:
-            out, err = self._run(self._build_args("show", ["--field={0}".format(field), key]))
+            out, err = self._run(self._build_args("show", [f"--field={field}", key]))
         return out.strip()
 
 
