@@ -8,37 +8,35 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: syspatch
 
 short_description: Manage OpenBSD system patches
 
 
 description:
-    - "Manage OpenBSD system patches using syspatch."
-
+  - Manage OpenBSD system patches using syspatch.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 
 options:
-    revert:
-        description:
-            - Revert system patches.
-        type: str
-        choices: [ all, one ]
+  revert:
+    description:
+      - Revert system patches.
+    type: str
+    choices: [all, one]
 
 author:
-    - Andrew Klaus (@precurse)
-'''
+  - Andrew Klaus (@precurse)
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Apply all available system patches
   community.general.syspatch:
 
@@ -58,20 +56,20 @@ EXAMPLES = '''
 - name: Reboot if patch requires it
   ansible.builtin.reboot:
   when: syspatch.reboot_needed
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 rc:
-  description: The command return code (0 means success)
+  description: The command return code (0 means success).
   returned: always
   type: int
 stdout:
-  description: syspatch standard output.
+  description: C(syspatch) standard output.
   returned: always
   type: str
   sample: "001_rip6cksum"
 stderr:
-  description: syspatch standard error.
+  description: C(syspatch) standard error.
   returned: always
   type: str
   sample: "syspatch: need root privileges"
@@ -80,7 +78,7 @@ reboot_needed:
   returned: always
   type: bool
   sample: true
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 

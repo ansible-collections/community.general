@@ -12,41 +12,40 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: swdepot
 short_description: Manage packages with swdepot package manager (HP-UX)
 description:
-    - Will install, upgrade and remove packages with swdepot package manager (HP-UX)
+  - Will install, upgrade and remove packages with swdepot package manager (HP-UX).
 notes: []
 author: "Raul Melo (@melodous)"
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    name:
-        description:
-            - package name.
-        aliases: [pkg]
-        required: true
-        type: str
-    state:
-        description:
-            - whether to install (V(present), V(latest)), or remove (V(absent)) a package.
-        required: true
-        choices: [ 'present', 'latest', 'absent']
-        type: str
-    depot:
-        description:
-            - The source repository from which install or upgrade a package.
-        type: str
-'''
+  name:
+    description:
+      - Package name.
+    aliases: [pkg]
+    required: true
+    type: str
+  state:
+    description:
+      - Whether to install (V(present), V(latest)), or remove (V(absent)) a package.
+    required: true
+    choices: ['present', 'latest', 'absent']
+    type: str
+  depot:
+    description:
+      - The source repository from which install or upgrade a package.
+    type: str
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Install a package
   community.general.swdepot:
     name: unzip-6.0
@@ -63,7 +62,7 @@ EXAMPLES = '''
   community.general.swdepot:
     name: unzip
     state: absent
-'''
+"""
 
 import re
 
