@@ -184,7 +184,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             user = self.get_option('user')
             cmd.append("ssh")
             cmd.append(f"{user}@{host}")
-            cmd.extend(['='.join([k, v]) for k, v in env.items()])
+            cmd.extend([f"{k}={v}" for k, v in env.items()])
         cmd.append(self.IOCAGE)
 
         cmd_list = cmd.copy()
