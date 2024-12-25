@@ -10,93 +10,86 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: sorcery
 short_description: Package manager for Source Mage GNU/Linux
 description:
-    - Manages "spells" on Source Mage GNU/Linux using I(sorcery) toolchain
+  - Manages "spells" on Source Mage GNU/Linux using I(sorcery) toolchain.
 author: "Vlad Glagolev (@vaygr)"
 notes:
-    - When all three components are selected, the update goes by the sequence --
-      Sorcery -> Grimoire(s) -> Spell(s); you cannot override it.
-    - Grimoire handling is supported since community.general 7.3.0.
+  - When all three components are selected, the update goes by the sequence -- Sorcery -> Grimoire(s) -> Spell(s); you cannot override it.
+  - Grimoire handling is supported since community.general 7.3.0.
 requirements:
-    - bash
+  - bash
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    name:
-        description:
-            - Name of the spell or grimoire.
-            - Multiple names can be given, separated by commas.
-            - Special value V(*) in conjunction with states V(latest) or
-              V(rebuild) will update or rebuild the whole system respectively
-            - The alias O(grimoire) was added in community.general 7.3.0.
-        aliases: ["spell", "grimoire"]
-        type: list
-        elements: str
+  name:
+    description:
+      - Name of the spell or grimoire.
+      - Multiple names can be given, separated by commas.
+      - Special value V(*) in conjunction with states V(latest) or V(rebuild) will update or rebuild the whole system respectively.
+      - The alias O(grimoire) was added in community.general 7.3.0.
+    aliases: ["spell", "grimoire"]
+    type: list
+    elements: str
 
-    repository:
-        description:
-            - Repository location.
-            - If specified, O(name) represents grimoire(s) instead of spell(s).
-            - Special value V(*) will pull grimoire from the official location.
-            - Only single item in O(name) in conjunction with V(*) can be used.
-            - O(state=absent) must be used with a special value V(*).
-        type: str
-        version_added: 7.3.0
+  repository:
+    description:
+      - Repository location.
+      - If specified, O(name) represents grimoire(s) instead of spell(s).
+      - Special value V(*) will pull grimoire from the official location.
+      - Only single item in O(name) in conjunction with V(*) can be used.
+      - O(state=absent) must be used with a special value V(*).
+    type: str
+    version_added: 7.3.0
 
-    state:
-        description:
-            - Whether to cast, dispel or rebuild a package.
-            - State V(cast) is an equivalent of V(present), not V(latest).
-            - State V(rebuild) implies cast of all specified spells, not only
-              those existed before.
-        choices: ["present", "latest", "absent", "cast", "dispelled", "rebuild"]
-        default: "present"
-        type: str
+  state:
+    description:
+      - Whether to cast, dispel or rebuild a package.
+      - State V(cast) is an equivalent of V(present), not V(latest).
+      - State V(rebuild) implies cast of all specified spells, not only those existed before.
+    choices: ["present", "latest", "absent", "cast", "dispelled", "rebuild"]
+    default: "present"
+    type: str
 
-    depends:
-        description:
-            - Comma-separated list of _optional_ dependencies to build a spell
-              (or make sure it is built) with; use V(+)/V(-) in front of dependency
-              to turn it on/off (V(+) is optional though).
-            - This option is ignored if O(name) parameter is equal to V(*) or
-              contains more than one spell.
-            - Providers must be supplied in the form recognized by Sorcery,
-              for example 'V(openssl(SSL\))'.
-        type: str
+  depends:
+    description:
+      - Comma-separated list of _optional_ dependencies to build a spell (or make sure it is built) with; use V(+)/V(-) in front of dependency
+        to turn it on/off (V(+) is optional though).
+      - This option is ignored if O(name) parameter is equal to V(*) or contains more than one spell.
+      - Providers must be supplied in the form recognized by Sorcery, for example 'V(openssl(SSL\))'.
+    type: str
 
-    update:
-        description:
-            - Whether or not to update sorcery scripts at the very first stage.
-        type: bool
-        default: false
+  update:
+    description:
+      - Whether or not to update sorcery scripts at the very first stage.
+    type: bool
+    default: false
 
-    update_cache:
-        description:
-            - Whether or not to update grimoire collection before casting spells.
-        type: bool
-        default: false
-        aliases: ["update_codex"]
+  update_cache:
+    description:
+      - Whether or not to update grimoire collection before casting spells.
+    type: bool
+    default: false
+    aliases: ["update_codex"]
 
-    cache_valid_time:
-        description:
-            - Time in seconds to invalidate grimoire collection on update.
-            - Especially useful for SCM and rsync grimoires.
-            - Makes sense only in pair with O(update_cache).
-        type: int
-        default: 0
-'''
+  cache_valid_time:
+    description:
+      - Time in seconds to invalidate grimoire collection on update.
+      - Especially useful for SCM and rsync grimoires.
+      - Makes sense only in pair with O(update_cache).
+    type: int
+    default: 0
+"""
 
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Make sure spell foo is installed
   community.general.sorcery:
     spell: foo
@@ -131,9 +124,9 @@ EXAMPLES = '''
     depends: "{{ item.depends | default(None) }}"
     state: present
   loop:
-    - { spell: 'vifm', depends: '+file,-gtk+2' }
-    - { spell: 'fwknop', depends: 'gpgme' }
-    - { spell: 'pv,tnftp,tor' }
+    - {spell: 'vifm', depends: '+file,-gtk+2'}
+    - {spell: 'fwknop', depends: 'gpgme'}
+    - {spell: 'pv,tnftp,tor'}
 
 - name: Install the latest version of spell foo using regular glossary
   community.general.sorcery:
@@ -184,11 +177,11 @@ EXAMPLES = '''
 - name: Update only Sorcery itself
   community.general.sorcery:
     update: true
-'''
+"""
 
 
-RETURN = '''
-'''
+RETURN = r"""
+"""
 
 
 import datetime
