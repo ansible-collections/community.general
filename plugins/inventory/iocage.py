@@ -179,7 +179,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         cmd = []
         my_env = os.environ.copy()
         if host == 'localhost':
-            my_env = my_env | env
+            my_env.update({str(k): str(v) for k, v in env.items()})
         else:
             user = self.get_option('user')
             cmd.append("ssh")
