@@ -79,8 +79,7 @@ class Hiera(object):
 
         pargs.extend(hiera_key)
 
-        rc, output, err = run_cmd("{0} -c {1} {2}".format(
-            self.hiera_bin, self.hiera_cfg, hiera_key[0]))
+        rc, output, err = run_cmd(f"{self.hiera_bin} -c {self.hiera_cfg} {hiera_key[0]}")
 
         return to_text(output.strip())
 

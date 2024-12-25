@@ -149,7 +149,7 @@ class LookupModule(LookupBase):
         ret = []
         for term in terms:
             if not isinstance(term, str):
-                raise AnsibleError("Non-string type '{0}' passed, only 'str' types are allowed!".format(type(term)))
+                raise AnsibleError(f"Non-string type '{type(term)}' passed, only 'str' types are allowed!")
 
             if not self._groups:  # consider only own variables
                 ret.append(self._merge_vars(term, initial_value, variables))
@@ -186,9 +186,9 @@ class LookupModule(LookupBase):
         return False
 
     def _merge_vars(self, search_pattern, initial_value, variables):
-        display.vvv("Merge variables with {0}: {1}".format(self._pattern_type, search_pattern))
+        display.vvv(f"Merge variables with {self._pattern_type}: {search_pattern}")
         var_merge_names = sorted([key for key in variables.keys() if self._var_matches(key, search_pattern)])
-        display.vvv("The following variables will be merged: {0}".format(var_merge_names))
+        display.vvv(f"The following variables will be merged: {var_merge_names}")
         prev_var_type = None
         result = None
 
@@ -226,8 +226,7 @@ class LookupModule(LookupBase):
                 dest[key] += value
             else:
                 if (key in dest) and dest[key] != value:
-                    msg = "The key '{0}' with value '{1}' will be overwritten with value '{2}' from '{3}.{0}'".format(
-                        key, dest[key], value, ".".join(path))
+                    msg = f"The key '{key}' with value '{dest[key]}' will be overwritten with value '{value}' from '{'.'.join(path)}.{key}'"
 
                     if self._override == "error":
                         raise AnsibleError(msg)

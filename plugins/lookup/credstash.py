@@ -137,8 +137,8 @@ class LookupModule(LookupBase):
             try:
                 ret.append(credstash.getSecret(term, version, region, table, context=context, **kwargs_pass))
             except credstash.ItemNotFound:
-                raise AnsibleError('Key {0} not found'.format(term))
+                raise AnsibleError(f'Key {term} not found')
             except Exception as e:
-                raise AnsibleError('Encountered exception while fetching {0}: {1}'.format(term, e))
+                raise AnsibleError(f'Encountered exception while fetching {term}: {e}')
 
         return ret
