@@ -10,19 +10,16 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: svr4pkg
 short_description: Manage Solaris SVR4 packages
 description:
-    - Manages SVR4 packages on Solaris 10 and 11.
-    - These were the native packages on Solaris <= 10 and are available
-      as a legacy feature in Solaris 11.
-    - Note that this is a very basic packaging system. It will not enforce
-      dependencies on install or remove.
+  - Manages SVR4 packages on Solaris 10 and 11.
+  - These were the native packages on Solaris <= 10 and are available as a legacy feature in Solaris 11.
+  - Note that this is a very basic packaging system. It will not enforce dependencies on install or remove.
 author: "Boyd Adamson (@brontitall)"
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
   check_mode:
     support: full
@@ -47,8 +44,9 @@ options:
   src:
     description:
       - Specifies the location to install the package from. Required when O(state=present).
-      - "Can be any path acceptable to the C(pkgadd) command's C(-d) option. For example: V(somefile.pkg), V(/dir/with/pkgs), V(http:/server/mypkgs.pkg)."
-      - If using a file or directory, they must already be accessible by the host. See the M(ansible.builtin.copy) module for a way to get them there.
+      - "Can be any path acceptable to the C(pkgadd) command's C(-d) option. For example: V(somefile.pkg), V(/dir/with/pkgs), V(http://server/mypkgs.pkg)."
+      - If using a file or directory, they must already be accessible by the host. See the M(ansible.builtin.copy) module for a way to get them
+        there.
     type: str
   proxy:
     description:
@@ -73,9 +71,9 @@ options:
     required: false
     type: bool
     default: false
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Install a package from an already copied file
   community.general.svr4pkg:
     name: CSWcommon
@@ -106,7 +104,7 @@ EXAMPLES = '''
     name: FIREFOX
     state: absent
     category: true
-'''
+"""
 
 
 import os
