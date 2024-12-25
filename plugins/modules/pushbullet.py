@@ -51,7 +51,7 @@ options:
   body:
     type: str
     description:
-      - Body of the notification, for example details of the fault you're alerting.
+      - Body of the notification, for example details of the fault you are alerting.
   url:
     type: str
     description:
