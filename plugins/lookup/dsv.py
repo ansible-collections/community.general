@@ -135,17 +135,17 @@ class LookupModule(LookupBase):
         result = []
 
         for term in terms:
-            display.debug("dsv_lookup term: %s" % term)
+            display.debug(f"dsv_lookup term: {term}")
             try:
                 path = term.lstrip("[/:]")
 
                 if path == "":
-                    raise AnsibleOptionsError("Invalid secret path: %s" % term)
+                    raise AnsibleOptionsError(f"Invalid secret path: {term}")
 
-                display.vvv(u"DevOps Secrets Vault GET /secrets/%s" % path)
+                display.vvv(f"DevOps Secrets Vault GET /secrets/{path}")
                 result.append(vault.get_secret_json(path))
             except SecretsVaultError as error:
                 raise AnsibleError(
-                    "DevOps Secrets Vault lookup failure: %s" % error.message
+                    f"DevOps Secrets Vault lookup failure: {error.message}"
                 )
         return result
