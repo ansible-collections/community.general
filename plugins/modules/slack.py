@@ -61,7 +61,7 @@ options:
       - Channel to send the message to. If absent, the message goes to the channel selected for the O(token).
   thread_id:
     description:
-      - Optional. Timestamp of parent message to thread this message. https://api.slack.com/docs/message-threading.
+      - Optional. Timestamp of parent message to thread this message, see U(https://api.slack.com/docs/message-threading).
     type: str
   message_id:
     description:
