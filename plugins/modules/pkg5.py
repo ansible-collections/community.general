@@ -8,11 +8,10 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: pkg5
 author:
-- Peter Oliver (@mavit)
+  - Peter Oliver (@mavit)
 short_description: Manages packages with the Solaris 11 Image Packaging System
 description:
   - IPS packages are the native packages in Solaris 11 and higher.
@@ -36,7 +35,7 @@ options:
   state:
     description:
       - Whether to install (V(present), V(latest)), or remove (V(absent)) a package.
-    choices: [ absent, latest, present, installed, removed, uninstalled ]
+    choices: [absent, latest, present, installed, removed, uninstalled]
     default: present
     type: str
   accept_licenses:
@@ -44,7 +43,7 @@ options:
       - Accept any licences.
     type: bool
     default: false
-    aliases: [ accept, accept_licences ]
+    aliases: [accept, accept_licences]
   be_name:
     description:
       - Creates a new boot environment with the given name.
@@ -60,8 +59,8 @@ options:
     type: bool
     default: false
     version_added: 9.0.0
-'''
-EXAMPLES = '''
+"""
+EXAMPLES = r"""
 - name: Install Vim
   community.general.pkg5:
     name: editor/vim
@@ -79,9 +78,9 @@ EXAMPLES = '''
 - name: Install several packages at once
   community.general.pkg5:
     name:
-    - /file/gnu-findutils
-    - /text/gnu-grep
-'''
+      - /file/gnu-findutils
+      - /text/gnu-grep
+"""
 
 import re
 

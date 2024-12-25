@@ -9,16 +9,15 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = """
----
+DOCUMENTATION = r"""
 module: pipx
 short_description: Manages applications installed with pipx
 version_added: 3.8.0
 description:
-- Manage Python applications installed in isolated virtualenvs using pipx.
+  - Manage Python applications installed in isolated virtualenvs using pipx.
 extends_documentation_fragment:
-- community.general.attributes
-- community.general.pipx
+  - community.general.attributes
+  - community.general.pipx
 attributes:
   check_mode:
     support: full
@@ -28,131 +27,128 @@ options:
   state:
     type: str
     choices:
-    - present
-    - absent
-    - install
-    - install_all
-    - uninstall
-    - uninstall_all
-    - inject
-    - uninject
-    - upgrade
-    - upgrade_shared
-    - upgrade_all
-    - reinstall
-    - reinstall_all
-    - latest
-    - pin
-    - unpin
+      - present
+      - absent
+      - install
+      - install_all
+      - uninstall
+      - uninstall_all
+      - inject
+      - uninject
+      - upgrade
+      - upgrade_shared
+      - upgrade_all
+      - reinstall
+      - reinstall_all
+      - latest
+      - pin
+      - unpin
     default: install
     description:
-    - Desired state for the application.
-    - The states V(present) and V(absent) are aliases to V(install) and V(uninstall), respectively.
-    - The state V(latest) is equivalent to executing the task twice, with state V(install) and then V(upgrade). It was added in community.general
-      5.5.0.
-    - The states V(install_all), V(uninject), V(upgrade_shared), V(pin) and V(unpin) are only available in C(pipx>=1.6.0), make sure to have a
-      compatible version when using this option. These states have been added in community.general 9.4.0.
+      - Desired state for the application.
+      - The states V(present) and V(absent) are aliases to V(install) and V(uninstall), respectively.
+      - The state V(latest) is equivalent to executing the task twice, with state V(install) and then V(upgrade). It was added in community.general
+        5.5.0.
+      - The states V(install_all), V(uninject), V(upgrade_shared), V(pin) and V(unpin) are only available in C(pipx>=1.6.0), make sure to have
+        a compatible version when using this option. These states have been added in community.general 9.4.0.
   name:
     type: str
     description:
-    - The name of the application. In C(pipx) documentation it is also referred to as the name of the virtual environment where the application
-      will be installed.
-    - If O(name) is a simple package name without version specifiers, then that name is used as the Python package name to be installed.
-    - Use O(source) for passing package specifications or installing from URLs or directories.
+      - The name of the application. In C(pipx) documentation it is also referred to as the name of the virtual environment where the application
+        will be installed.
+      - If O(name) is a simple package name without version specifiers, then that name is used as the Python package name to be installed.
+      - Use O(source) for passing package specifications or installing from URLs or directories.
   source:
     type: str
     description:
-    - Source for the package. This option is used when O(state=install) or O(state=latest), and it is ignored with other states.
-    - Use O(source) when installing a Python package with version specifier, or from a local path, from a VCS URL or compressed file.
-    - The value of this option is passed as-is to C(pipx).
-    - O(name) is still required when using O(source) to establish the application name without fetching the package from a remote source.
+      - Source for the package. This option is used when O(state=install) or O(state=latest), and it is ignored with other states.
+      - Use O(source) when installing a Python package with version specifier, or from a local path, from a VCS URL or compressed file.
+      - The value of this option is passed as-is to C(pipx).
+      - O(name) is still required when using O(source) to establish the application name without fetching the package from a remote source.
   install_apps:
     description:
-    - Add apps from the injected packages.
-    - Only used when O(state=inject).
+      - Add apps from the injected packages.
+      - Only used when O(state=inject).
     type: bool
     default: false
     version_added: 6.5.0
   install_deps:
     description:
-    - Include applications of dependent packages.
-    - Only used when O(state=install), O(state=latest), or O(state=inject).
+      - Include applications of dependent packages.
+      - Only used when O(state=install), O(state=latest), or O(state=inject).
     type: bool
     default: false
   inject_packages:
     description:
-    - Packages to be injected into an existing virtual environment.
-    - Only used when O(state=inject).
+      - Packages to be injected into an existing virtual environment.
+      - Only used when O(state=inject).
     type: list
     elements: str
   force:
     description:
-    - Force modification of the application's virtual environment. See C(pipx) for details.
-    - Only used when O(state=install), O(state=upgrade), O(state=upgrade_all), O(state=latest), or O(state=inject).
+      - Force modification of the application's virtual environment. See C(pipx) for details.
+      - Only used when O(state=install), O(state=upgrade), O(state=upgrade_all), O(state=latest), or O(state=inject).
     type: bool
     default: false
   include_injected:
     description:
-    - Upgrade the injected packages along with the application.
-    - Only used when O(state=upgrade), O(state=upgrade_all), or O(state=latest).
-    - This is used with O(state=upgrade) and O(state=latest) since community.general 6.6.0.
+      - Upgrade the injected packages along with the application.
+      - Only used when O(state=upgrade), O(state=upgrade_all), or O(state=latest).
+      - This is used with O(state=upgrade) and O(state=latest) since community.general 6.6.0.
     type: bool
     default: false
   index_url:
     description:
-    - Base URL of Python Package Index.
-    - Only used when O(state=install), O(state=upgrade), O(state=latest), or O(state=inject).
+      - Base URL of Python Package Index.
+      - Only used when O(state=install), O(state=upgrade), O(state=latest), or O(state=inject).
     type: str
   python:
     description:
-    - Python version to be used when creating the application virtual environment. Must be 3.6+.
-    - Only used when O(state=install), O(state=latest), O(state=reinstall), or O(state=reinstall_all).
+      - Python version to be used when creating the application virtual environment. Must be 3.6+.
+      - Only used when O(state=install), O(state=latest), O(state=reinstall), or O(state=reinstall_all).
     type: str
   system_site_packages:
     description:
-    - Give application virtual environment access to the system site-packages directory.
-    - Only used when O(state=install) or O(state=latest).
+      - Give application virtual environment access to the system site-packages directory.
+      - Only used when O(state=install) or O(state=latest).
     type: bool
     default: false
     version_added: 6.6.0
   editable:
     description:
-    - Install the project in editable mode.
+      - Install the project in editable mode.
     type: bool
     default: false
     version_added: 4.6.0
   pip_args:
     description:
-    - Arbitrary arguments to pass directly to C(pip).
+      - Arbitrary arguments to pass directly to C(pip).
     type: str
     version_added: 4.6.0
   suffix:
     description:
-    - Optional suffix for virtual environment and executable names.
-    - "B(Warning:) C(pipx) documentation states this is an B(experimental) feature subject to change."
+      - Optional suffix for virtual environment and executable names.
+      - B(Warning:) C(pipx) documentation states this is an B(experimental) feature subject to change.
     type: str
     version_added: 9.3.0
   global:
     version_added: 9.4.0
   spec_metadata:
     description:
-    - Spec metadata file for O(state=install_all).
-    - This content of the file is usually generated with C(pipx list --json), and it can be obtained with M(community.general.pipx_info) with
-      O(community.general.pipx_info#module:include_raw=true) and obtaining the content from the RV(community.general.pipx_info#module:raw_output).
+      - Spec metadata file for O(state=install_all).
+      - This content of the file is usually generated with C(pipx list --json), and it can be obtained with M(community.general.pipx_info) with
+        O(community.general.pipx_info#module:include_raw=true) and obtaining the content from the RV(community.general.pipx_info#module:raw_output).
     type: path
     version_added: 9.4.0
 notes:
-- >
-  This first implementation does not verify whether a specified version constraint has been installed or not.
-  Hence, when using version operators, C(pipx) module will always try to execute the operation,
-  even when the application was previously installed.
-  This feature will be added in the future.
+  - This first implementation does not verify whether a specified version constraint has been installed or not. Hence, when using version operators,
+    C(pipx) module will always try to execute the operation, even when the application was previously installed. This feature will be added in
+    the future.
 author:
-- "Alexei Znamensky (@russoz)"
+  - "Alexei Znamensky (@russoz)"
 """
 
-EXAMPLES = """
----
+EXAMPLES = r"""
 - name: Install tox
   community.general.pipx:
     name: tox
@@ -181,16 +177,16 @@ EXAMPLES = """
 - name: Install multiple packages from list
   vars:
     pipx_packages:
-    - pycowsay
-    - black
-    - tox
+      - pycowsay
+      - black
+      - tox
   community.general.pipx:
     name: "{{ item }}"
     state: latest
   with_items: "{{ pipx_packages }}"
 """
 
-RETURN = """
+RETURN = r"""
 version:
   description: Version of pipx.
   type: str
