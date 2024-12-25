@@ -13,7 +13,7 @@ DOCUMENTATION = r"""
 module: say
 short_description: Makes a computer to speak
 description:
-  - Makes a computer speak! Amuse your friends, annoy your coworkers!.
+  - Makes a computer speak! Amuse your friends, annoy your coworkers!
 notes:
   - In 2.5, this module has been renamed from C(osx_say) to M(community.general.say).
   - If you like this module, you may also be interested in the osx_say callback plugin.
