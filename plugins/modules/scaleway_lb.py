@@ -13,16 +13,15 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: scaleway_lb
 short_description: Scaleway load-balancer management module
 author: Remy Leone (@remyleone)
 description:
-    - "This module manages load-balancers on Scaleway."
+  - This module manages load-balancers on Scaleway.
 extends_documentation_fragment:
-    - community.general.scaleway
-    - community.general.attributes
+  - community.general.scaleway
+  - community.general.attributes
 
 attributes:
   check_mode:
@@ -53,7 +52,7 @@ options:
   state:
     type: str
     description:
-     - Indicate desired state of the instance.
+      - Indicate desired state of the instance.
     default: present
     choices:
       - present
@@ -62,7 +61,7 @@ options:
   region:
     type: str
     description:
-    - Scaleway zone.
+      - Scaleway zone.
     required: true
     choices:
       - nl-ams
@@ -74,30 +73,29 @@ options:
     elements: str
     default: []
     description:
-    - List of tags to apply to the load-balancer.
-
+      - List of tags to apply to the load-balancer.
   wait:
     description:
-    - Wait for the load-balancer to reach its desired state before returning.
+      - Wait for the load-balancer to reach its desired state before returning.
     type: bool
     default: false
 
   wait_timeout:
     type: int
     description:
-    - Time to wait for the load-balancer to reach the expected state.
+      - Time to wait for the load-balancer to reach the expected state.
     required: false
     default: 300
 
   wait_sleep_time:
     type: int
     description:
-    - Time to wait before every attempt to check the state of the load-balancer.
+      - Time to wait before every attempt to check the state of the load-balancer.
     required: false
     default: 3
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a load-balancer
   community.general.scaleway_lb:
     name: foobar
@@ -113,7 +111,7 @@ EXAMPLES = '''
     state: absent
     organization_id: 951df375-e094-4d26-97c1-ba548eeb9c42
     region: fr-par
-'''
+"""
 
 RETURNS = '''
 {
