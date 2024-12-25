@@ -213,6 +213,8 @@ files:
     maintainers: opoplawski
   $inventories/gitlab_runners.py:
     maintainers: morph027
+  $inventories/iocage.py:
+    maintainers: vbotka
   $inventories/icinga2.py:
     maintainers: BongoEADGC6
   $inventories/linode.py:
