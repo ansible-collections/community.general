@@ -7,15 +7,14 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: statsd
 short_description: Send metrics to StatsD
 version_added: 2.1.0
 description:
   - The C(statsd) module sends metrics to StatsD.
   - For more information, see U(https://statsd-metrics.readthedocs.io/en/latest/).
-  - Supported metric types are V(counter) and V(gauge).
-    Currently unupported metric types are V(timer), V(set), and V(gaugedelta).
+  - Supported metric types are V(counter) and V(gauge). Currently unupported metric types are V(timer), V(set), and V(gaugedelta).
 author: "Mark Mercado (@mamercad)"
 requirements:
   - statsd
@@ -80,9 +79,9 @@ options:
     default: false
     description:
       - If the metric is of type V(gauge), change the value by O(delta).
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Increment the metric my_counter by 1
   community.general.statsd:
     host: localhost
@@ -100,7 +99,7 @@ EXAMPLES = '''
     metric: my_gauge
     metric_type: gauge
     value: 7
-'''
+"""
 
 
 from ansible.module_utils.basic import (AnsibleModule, missing_required_lib)
