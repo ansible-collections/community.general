@@ -8,91 +8,85 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: redis
 short_description: Various redis commands, replica and flush
 description:
-   - Unified utility to interact with redis instances.
+  - Unified utility to interact with redis instances.
 extends_documentation_fragment:
-   - community.general.redis
-   - community.general.attributes
+  - community.general.redis
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    command:
-        description:
-            - The selected redis command
-            - V(config) ensures a configuration setting on an instance.
-            - V(flush) flushes all the instance or a specified db.
-            - V(replica) sets a redis instance in replica or master mode. (V(slave) is an alias for V(replica).)
-        choices: [ config, flush, replica, slave ]
-        type: str
-    tls:
-        default: false
-        version_added: 4.6.0
-    login_user:
-        version_added: 4.6.0
-    validate_certs:
-        version_added: 4.6.0
-    ca_certs:
-        version_added: 4.6.0
-    master_host:
-        description:
-            - The host of the master instance [replica command]
-        type: str
-    master_port:
-        description:
-            - The port of the master instance [replica command]
-        type: int
-    replica_mode:
-        description:
-            - The mode of the redis instance [replica command]
-            - V(slave) is an alias for V(replica).
-        default: replica
-        choices: [ master, replica, slave ]
-        type: str
-        aliases:
-            - slave_mode
-    db:
-        description:
-            - The database to flush (used in db mode) [flush command]
-        type: int
-    flush_mode:
-        description:
-            - Type of flush (all the dbs in a redis instance or a specific one)
-              [flush command]
-        default: all
-        choices: [ all, db ]
-        type: str
-    name:
-        description:
-            - A redis config key.
-        type: str
-    value:
-        description:
-            - A redis config value. When memory size is needed, it is possible
-              to specify it in the usual form of 1KB, 2M, 400MB where the base is 1024.
-              Units are case insensitive i.e. 1m = 1mb = 1M = 1MB.
-        type: str
+  command:
+    description:
+      - The selected redis command.
+      - V(config) ensures a configuration setting on an instance.
+      - V(flush) flushes all the instance or a specified db.
+      - V(replica) sets a redis instance in replica or master mode. (V(slave) is an alias for V(replica)).
+    choices: [config, flush, replica, slave]
+    type: str
+  tls:
+    default: false
+    version_added: 4.6.0
+  login_user:
+    version_added: 4.6.0
+  validate_certs:
+    version_added: 4.6.0
+  ca_certs:
+    version_added: 4.6.0
+  master_host:
+    description:
+      - The host of the master instance [replica command].
+    type: str
+  master_port:
+    description:
+      - The port of the master instance [replica command].
+    type: int
+  replica_mode:
+    description:
+      - The mode of the redis instance [replica command].
+      - V(slave) is an alias for V(replica).
+    default: replica
+    choices: [master, replica, slave]
+    type: str
+    aliases:
+      - slave_mode
+  db:
+    description:
+      - The database to flush (used in DB mode) [flush command].
+    type: int
+  flush_mode:
+    description:
+      - Type of flush (all the DBs in a redis instance or a specific one) [flush command].
+    default: all
+    choices: [all, db]
+    type: str
+  name:
+    description:
+      - A redis config key.
+    type: str
+  value:
+    description:
+      - A redis config value. When memory size is needed, it is possible to specify it in the usual form of 1KB, 2M, 400MB where the base is 1024.
+        Units are case insensitive, in other words 1m = 1mb = 1M = 1MB.
+    type: str
 
 notes:
-   - Requires the redis-py Python package on the remote host. You can
-     install it with pip (pip install redis) or with a package manager.
-     https://github.com/andymccurdy/redis-py
-   - If the redis master instance we are making replica of is password protected
-     this needs to be in the redis.conf in the masterauth variable
-
+  - Requires the C(redis-py) Python package on the remote host. You can install it with pip
+    (C(pip install redis)) or with a package manager. U(https://github.com/andymccurdy/redis-py).
+  - If the redis master instance you are making replica of is password protected this needs to be in the C(redis.conf) in the C(masterauth) variable.
 seealso:
-    - module: community.general.redis_info
-requirements: [ redis ]
+  - module: community.general.redis_info
+requirements: [redis]
 author: "Xabier Larrakoetxea (@slok)"
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Set local redis instance to be a replica of melee.island on port 6377
   community.general.redis:
     command: replica
@@ -142,7 +136,7 @@ EXAMPLES = '''
     ca_certs: /etc/redis/certs/ca.crt
     client_cert_file: /etc/redis/certs/redis.crt
     client_key_file: /etc/redis/certs/redis.key
-'''
+"""
 
 import traceback
 
