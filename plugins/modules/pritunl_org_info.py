@@ -8,32 +8,29 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = """
----
+DOCUMENTATION = r"""
 module: pritunl_org_info
 author: Florian Dambrine (@Lowess)
 version_added: 2.5.0
 short_description: List Pritunl Organizations using the Pritunl API
 description:
-    - A module to list Pritunl organizations using the Pritunl API.
+  - A module to list Pritunl organizations using the Pritunl API.
 extends_documentation_fragment:
-    - community.general.pritunl
-    - community.general.attributes
-    - community.general.attributes.info_module
+  - community.general.pritunl
+  - community.general.attributes
+  - community.general.attributes.info_module
 options:
-    organization:
-        type: str
-        required: false
-        aliases:
-            - org
-        default: null
-        description:
-            - Name of the Pritunl organization to search for.
-              If none provided, the module will return all Pritunl
-              organizations.
+  organization:
+    type: str
+    required: false
+    aliases:
+      - org
+    default: null
+    description:
+      - Name of the Pritunl organization to search for. If none provided, the module will return all Pritunl organizations.
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: List all existing Pritunl organizations
   community.general.pritunl_org_info:
 
@@ -42,7 +39,7 @@ EXAMPLES = """
     organization: MyOrg
 """
 
-RETURN = """
+RETURN = r"""
 organizations:
     description: List of Pritunl organizations.
     returned: success
