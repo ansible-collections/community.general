@@ -11,8 +11,7 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: scaleway_container
 short_description: Scaleway Container management
 version_added: 6.0.0
@@ -109,7 +108,8 @@ options:
   privacy:
     description:
       - Privacy policies define whether a container can be executed anonymously.
-      - Choose V(public) to enable anonymous execution, or V(private) to protect your container with an authentication mechanism provided by the Scaleway API.
+      - Choose V(public) to enable anonymous execution, or V(private) to protect your container with an authentication mechanism provided by the
+        Scaleway API.
     type: str
     default: public
     choices:
@@ -147,9 +147,9 @@ options:
       - Redeploy the container if update is required.
     type: bool
     default: false
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a container
   community.general.scaleway_container:
     namespace_id: '{{ scw_container_namespace }}'
@@ -169,9 +169,9 @@ EXAMPLES = '''
     state: absent
     region: fr-par
     name: my-awesome-container
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 container:
   description: The container information.
   returned: when O(state=present)
@@ -181,7 +181,7 @@ container:
     description: Container used for testing scaleway_container ansible module
     domain_name: cnansibletestgfogtjod-cn-ansible-test.functions.fnc.fr-par.scw.cloud
     environment_variables:
-        MY_VAR: my_value
+      MY_VAR: my_value
     error_message: null
     http_option: ""
     id: c9070eb0-d7a4-48dd-9af3-4fb139890721
@@ -201,7 +201,7 @@ container:
         value: $argon2id$v=19$m=65536,t=1,p=2$tb6UwSPWx/rH5Vyxt9Ujfw$5ZlvaIjWwNDPxD9Rdght3NarJz4IETKjpvAU3mMSmFg
     status: created
     timeout: 300s
-'''
+"""
 
 from copy import deepcopy
 
