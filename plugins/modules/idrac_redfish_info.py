@@ -8,13 +8,11 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: idrac_redfish_info
 short_description: Gather PowerEdge server information through iDRAC using Redfish APIs
 description:
-  - Builds Redfish URIs locally and sends them to remote iDRAC controllers to
-    get information back.
+  - Builds Redfish URIs locally and sends them to remote iDRAC controllers to get information back.
   - For use with Dell EMC iDRAC operations that require Redfish OEM extensions.
 extends_documentation_fragment:
   - community.general.attributes
@@ -33,8 +31,7 @@ options:
     required: true
     description:
       - List of commands to execute on iDRAC.
-      - V(GetManagerAttributes) returns the list of dicts containing iDRAC,
-        LifecycleController and System attributes.
+      - V(GetManagerAttributes) returns the list of dicts containing iDRAC, LifecycleController and System attributes.
     type: list
     elements: str
   baseuri:
@@ -62,67 +59,69 @@ options:
     type: int
 
 author: "Jose Delarosa (@jose-delarosa)"
-'''
+"""
 
-EXAMPLES = '''
-  - name: Get Manager attributes with a default of 20 seconds
-    community.general.idrac_redfish_info:
-      category: Manager
-      command: GetManagerAttributes
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      timeout: 20
-    register: result
+EXAMPLES = r"""
+- name: Get Manager attributes with a default of 20 seconds
+  community.general.idrac_redfish_info:
+    category: Manager
+    command: GetManagerAttributes
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    timeout: 20
+  register: result
 
-  # Examples to display the value of all or a single iDRAC attribute
-  - name: Store iDRAC attributes as a fact variable
-    ansible.builtin.set_fact:
-      idrac_attributes: "{{ result.redfish_facts.entries | selectattr('Id', 'defined') | selectattr('Id', 'equalto', 'iDRACAttributes') | list | first }}"
+# Examples to display the value of all or a single iDRAC attribute
+- name: Store iDRAC attributes as a fact variable
+  ansible.builtin.set_fact:
+    idrac_attributes: "{{ result.redfish_facts.entries | selectattr('Id', 'defined') | selectattr('Id', 'equalto', 'iDRACAttributes')
+      | list | first }}"
 
-  - name: Display all iDRAC attributes
-    ansible.builtin.debug:
-      var: idrac_attributes
+- name: Display all iDRAC attributes
+  ansible.builtin.debug:
+    var: idrac_attributes
 
-  - name: Display the value of 'Syslog.1.SysLogEnable' iDRAC attribute
-    ansible.builtin.debug:
-      var: idrac_attributes['Syslog.1.SysLogEnable']
+- name: Display the value of 'Syslog.1.SysLogEnable' iDRAC attribute
+  ansible.builtin.debug:
+    var: idrac_attributes['Syslog.1.SysLogEnable']
 
-  # Examples to display the value of all or a single LifecycleController attribute
-  - name: Store LifecycleController attributes as a fact variable
-    ansible.builtin.set_fact:
-      lc_attributes: "{{ result.redfish_facts.entries | selectattr('Id', 'defined') | selectattr('Id', 'equalto', 'LCAttributes') | list | first }}"
+# Examples to display the value of all or a single LifecycleController attribute
+- name: Store LifecycleController attributes as a fact variable
+  ansible.builtin.set_fact:
+    lc_attributes: "{{ result.redfish_facts.entries | selectattr('Id', 'defined') | selectattr('Id', 'equalto', 'LCAttributes')
+      | list | first }}"
 
-  - name: Display LifecycleController attributes
-    ansible.builtin.debug:
-      var: lc_attributes
+- name: Display LifecycleController attributes
+  ansible.builtin.debug:
+    var: lc_attributes
 
-  - name: Display the value of 'CollectSystemInventoryOnRestart' attribute
-    ansible.builtin.debug:
-      var: lc_attributes['LCAttributes.1.CollectSystemInventoryOnRestart']
+- name: Display the value of 'CollectSystemInventoryOnRestart' attribute
+  ansible.builtin.debug:
+    var: lc_attributes['LCAttributes.1.CollectSystemInventoryOnRestart']
 
-  # Examples to display the value of all or a single System attribute
-  - name: Store System attributes as a fact variable
-    ansible.builtin.set_fact:
-      system_attributes: "{{ result.redfish_facts.entries | selectattr('Id', 'defined') | selectattr('Id', 'equalto', 'SystemAttributes') | list | first }}"
+# Examples to display the value of all or a single System attribute
+- name: Store System attributes as a fact variable
+  ansible.builtin.set_fact:
+    system_attributes: "{{ result.redfish_facts.entries | selectattr('Id', 'defined') | selectattr('Id', 'equalto', 'SystemAttributes')
+      | list | first }}"
 
-  - name: Display System attributes
-    ansible.builtin.debug:
-      var: system_attributes
+- name: Display System attributes
+  ansible.builtin.debug:
+    var: system_attributes
 
-  - name: Display the value of 'PSRedPolicy'
-    ansible.builtin.debug:
-      var: system_attributes['ServerPwr.1.PSRedPolicy']
+- name: Display the value of 'PSRedPolicy'
+  ansible.builtin.debug:
+    var: system_attributes['ServerPwr.1.PSRedPolicy']
+"""
 
-'''
-
-RETURN = '''
+RETURN = r"""
 msg:
-    description: different results depending on task
-    returned: always
-    type: dict
-    sample: List of Manager attributes
-'''
+  description: Different results depending on task.
+  returned: always
+  type: dict
+  sample: List of Manager attributes
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils

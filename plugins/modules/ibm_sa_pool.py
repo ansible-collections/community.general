@@ -10,62 +10,60 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: ibm_sa_pool
 short_description: Handles pools on IBM Spectrum Accelerate Family storage systems
 
 description:
-    - "This module creates or deletes pools to be used on IBM Spectrum Accelerate Family storage systems"
-
+  - This module creates or deletes pools to be used on IBM Spectrum Accelerate Family storage systems.
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 
 options:
-    pool:
-        description:
-            - Pool name.
-        required: true
-        type: str
-    state:
-        description:
-            - Pool state.
-        default: "present"
-        choices: [ "present", "absent" ]
-        type: str
-    size:
-        description:
-            - Pool size in GB
-        required: false
-        type: str
-    snapshot_size:
-        description:
-            - Pool snapshot size in GB
-        required: false
-        type: str
-    domain:
-        description:
-            - Adds the pool to the specified domain.
-        required: false
-        type: str
-    perf_class:
-        description:
-            - Assigns a perf_class to the pool.
-        required: false
-        type: str
+  pool:
+    description:
+      - Pool name.
+    required: true
+    type: str
+  state:
+    description:
+      - Pool state.
+    default: "present"
+    choices: ["present", "absent"]
+    type: str
+  size:
+    description:
+      - Pool size in GB.
+    required: false
+    type: str
+  snapshot_size:
+    description:
+      - Pool snapshot size in GB.
+    required: false
+    type: str
+  domain:
+    description:
+      - Adds the pool to the specified domain.
+    required: false
+    type: str
+  perf_class:
+    description:
+      - Assigns a perf_class to the pool.
+    required: false
+    type: str
 
 extends_documentation_fragment:
   - community.general.ibm_storage
   - community.general.attributes
 
 author:
-    - Tzur Eliyahu (@tzure)
-'''
+  - Tzur Eliyahu (@tzure)
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create new pool.
   community.general.ibm_sa_pool:
     name: pool_name
@@ -82,9 +80,9 @@ EXAMPLES = '''
     username: admin
     password: secret
     endpoints: hostdev-system
-'''
-RETURN = '''
-'''
+"""
+RETURN = r"""
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.ibm_sa_utils import execute_pyxcli_command, \

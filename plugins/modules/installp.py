@@ -8,14 +8,13 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: installp
 author:
   - Kairo Araujo (@kairoaraujo)
 short_description: Manage packages on AIX
 description:
-  - Manage packages using 'installp' on AIX
+  - Manage packages using 'installp' on AIX.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -26,32 +25,32 @@ attributes:
 options:
   accept_license:
     description:
-    - Whether to accept the license for the package(s).
+      - Whether to accept the license for the package(s).
     type: bool
     default: false
   name:
     description:
-    - One or more packages to install or remove.
-    - Use V(all) to install all packages available on informed O(repository_path).
+      - One or more packages to install or remove.
+      - Use V(all) to install all packages available on informed O(repository_path).
     type: list
     elements: str
     required: true
-    aliases: [ pkg ]
+    aliases: [pkg]
   repository_path:
     description:
-    - Path with AIX packages (required to install).
+      - Path with AIX packages (required to install).
     type: path
   state:
     description:
-    - Whether the package needs to be present on or absent from the system.
+      - Whether the package needs to be present on or absent from the system.
     type: str
-    choices: [ absent, present ]
+    choices: [absent, present]
     default: present
 notes:
-- If the package is already installed, even the package/fileset is new, the module will not install it.
-'''
+  - If the package is already installed, even the package/fileset is new, the module will not install it.
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Install package foo
   community.general.installp:
     name: foo
@@ -84,9 +83,9 @@ EXAMPLES = r'''
   community.general.installp:
     name: bos.sysmgt.nim.master
     state: absent
-'''
+"""
 
-RETURN = r''' # '''
+RETURN = r""" # """
 
 import os
 import re

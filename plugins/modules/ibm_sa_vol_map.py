@@ -10,65 +10,61 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: ibm_sa_vol_map
 short_description: Handles volume mapping on IBM Spectrum Accelerate Family storage systems
 
 description:
-    - "This module maps volumes to or unmaps them from the hosts on
-        IBM Spectrum Accelerate Family storage systems."
-
+  - This module maps volumes to or unmaps them from the hosts on IBM Spectrum Accelerate Family storage systems.
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 
 options:
-    vol:
-        description:
-            - Volume name.
-        required: true
-        type: str
-    state:
-        default: "present"
-        choices: [ "present", "absent" ]
-        description:
-            - When the state is present the volume is mapped.
-                When the state is absent, the volume is meant to be unmapped.
-        type: str
+  vol:
+    description:
+      - Volume name.
+    required: true
+    type: str
+  state:
+    default: "present"
+    choices: ["present", "absent"]
+    description:
+      - When the state is present the volume is mapped. When the state is absent, the volume is meant to be unmapped.
+    type: str
 
-    cluster:
-        description:
-            - Maps the volume to a cluster.
-        required: false
-        type: str
-    host:
-        description:
-            - Maps the volume to a host.
-        required: false
-        type: str
-    lun:
-        description:
-            - The LUN identifier.
-        required: false
-        type: str
-    override:
-        description:
-            - Overrides the existing volume mapping.
-        required: false
-        type: str
+  cluster:
+    description:
+      - Maps the volume to a cluster.
+    required: false
+    type: str
+  host:
+    description:
+      - Maps the volume to a host.
+    required: false
+    type: str
+  lun:
+    description:
+      - The LUN identifier.
+    required: false
+    type: str
+  override:
+    description:
+      - Overrides the existing volume mapping.
+    required: false
+    type: str
 
 extends_documentation_fragment:
   - community.general.ibm_storage
   - community.general.attributes
 
 author:
-    - Tzur Eliyahu (@tzure)
-'''
+  - Tzur Eliyahu (@tzure)
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Map volume to host.
   community.general.ibm_sa_vol_map:
     vol: volume_name
@@ -96,9 +92,9 @@ EXAMPLES = '''
     password: secret
     endpoints: hostdev-system
     state: absent
-'''
-RETURN = '''
-'''
+"""
+RETURN = r"""
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.ibm_sa_utils import (execute_pyxcli_command,

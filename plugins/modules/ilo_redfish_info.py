@@ -6,14 +6,12 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: ilo_redfish_info
 short_description: Gathers server information through iLO using Redfish APIs
 version_added: 4.2.0
 description:
-  - Builds Redfish URIs locally and sends them to iLO to
-    get information back.
+  - Builds Redfish URIs locally and sends them to iLO to get information back.
   - For use with HPE iLO operations that require Redfish OEM extensions.
 extends_documentation_fragment:
   - community.general.attributes
@@ -54,51 +52,51 @@ options:
     default: 10
     type: int
 author:
-    - "Bhavya B (@bhavya06)"
-'''
+  - "Bhavya B (@bhavya06)"
+"""
 
-EXAMPLES = '''
-  - name: Get iLO Sessions
-    community.general.ilo_redfish_info:
-      category: Sessions
-      command: GetiLOSessions
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-    register: result_sessions
-'''
+EXAMPLES = r"""
+- name: Get iLO Sessions
+  community.general.ilo_redfish_info:
+    category: Sessions
+    command: GetiLOSessions
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result_sessions
+"""
 
-RETURN = '''
+RETURN = r"""
 ilo_redfish_info:
-    description: Returns iLO sessions.
-    type: dict
-    contains:
-        GetiLOSessions:
-            description: Returns the iLO session msg and whether the function executed successfully.
-            type: dict
-            contains:
-                ret:
-                    description: Check variable to see if the information was successfully retrieved.
-                    type: bool
-                msg:
-                    description: Information of all active iLO sessions.
-                    type: list
-                    elements: dict
-                    contains:
-                        Description:
-                            description: Provides a description of the resource.
-                            type: str
-                        Id:
-                            description: The sessionId.
-                            type: str
-                        Name:
-                            description: The name of the resource.
-                            type: str
-                        UserName:
-                            description: Name to use to log in to the management processor.
-                            type: str
-    returned: always
-'''
+  description: Returns iLO sessions.
+  type: dict
+  contains:
+    GetiLOSessions:
+      description: Returns the iLO session msg and whether the function executed successfully.
+      type: dict
+      contains:
+        ret:
+          description: Check variable to see if the information was successfully retrieved.
+          type: bool
+        msg:
+          description: Information of all active iLO sessions.
+          type: list
+          elements: dict
+          contains:
+            Description:
+              description: Provides a description of the resource.
+              type: str
+            Id:
+              description: The sessionId.
+              type: str
+            Name:
+              description: The name of the resource.
+              type: str
+            UserName:
+              description: Name to use to log in to the management processor.
+              type: str
+  returned: always
+"""
 
 CATEGORY_COMMANDS_ALL = {
     "Sessions": ["GetiLOSessions"]

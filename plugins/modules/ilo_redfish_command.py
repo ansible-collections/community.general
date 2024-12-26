@@ -6,14 +6,12 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: ilo_redfish_command
 short_description: Manages Out-Of-Band controllers using Redfish APIs
 version_added: 6.6.0
 description:
-  - Builds Redfish URIs locally and sends them to remote OOB controllers to
-    perform an action.
+  - Builds Redfish URIs locally and sends them to remote OOB controllers to perform an action.
 attributes:
   check_mode:
     support: none
@@ -62,35 +60,35 @@ options:
     type: int
 author:
   - Varni H P (@varini-hp)
-'''
+"""
 
-EXAMPLES = '''
-  - name: Wait for iLO Reboot Completion
-    community.general.ilo_redfish_command:
-      category: Systems
-      command: WaitforiLORebootCompletion
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-'''
+EXAMPLES = r"""
+- name: Wait for iLO Reboot Completion
+  community.general.ilo_redfish_command:
+    category: Systems
+    command: WaitforiLORebootCompletion
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+"""
 
-RETURN = '''
+RETURN = r"""
 ilo_redfish_command:
-    description: Returns the status of the operation performed on the iLO.
-    type: dict
-    contains:
-        WaitforiLORebootCompletion:
-            description: Returns the output msg and whether the function executed successfully.
-            type: dict
-            contains:
-                ret:
-                    description: Return True/False based on whether the operation was performed successfully.
-                    type: bool
-                msg:
-                    description: Status of the operation performed on the iLO.
-                    type: str
-    returned: always
-'''
+  description: Returns the status of the operation performed on the iLO.
+  type: dict
+  contains:
+    WaitforiLORebootCompletion:
+      description: Returns the output msg and whether the function executed successfully.
+      type: dict
+      contains:
+        ret:
+          description: Return V(true)/V(false) based on whether the operation was performed successfully.
+          type: bool
+        msg:
+          description: Status of the operation performed on the iLO.
+          type: str
+  returned: always
+"""
 
 # More will be added as module features are expanded
 CATEGORY_COMMANDS_ALL = {
