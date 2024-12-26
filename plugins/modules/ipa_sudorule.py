@@ -7,13 +7,12 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: ipa_sudorule
 author: Thomas Krahn (@Nosmoht)
 short_description: Manage FreeIPA sudo rule
 description:
-- Add, modify or delete sudo rule within IPA server using IPA API.
+  - Add, modify or delete sudo rule within IPA server using IPA API.
 attributes:
   check_mode:
     support: full
@@ -22,83 +21,83 @@ attributes:
 options:
   cn:
     description:
-    - Canonical name.
-    - Can not be changed as it is the unique identifier.
+      - Canonical name.
+      - Can not be changed as it is the unique identifier.
     required: true
     aliases: ['name']
     type: str
   cmdcategory:
     description:
-    - Command category the rule applies to.
+      - Command category the rule applies to.
     choices: ['all']
     type: str
   cmd:
     description:
-    - List of commands assigned to the rule.
-    - If an empty list is passed all commands will be removed from the rule.
-    - If option is omitted commands will not be checked or changed.
+      - List of commands assigned to the rule.
+      - If an empty list is passed all commands will be removed from the rule.
+      - If option is omitted commands will not be checked or changed.
     type: list
     elements: str
   cmdgroup:
     description:
-    - List of command groups assigned to the rule.
-    - If an empty list is passed all command groups will be removed from the rule.
-    - If option is omitted command groups will not be checked or changed.
+      - List of command groups assigned to the rule.
+      - If an empty list is passed all command groups will be removed from the rule.
+      - If option is omitted command groups will not be checked or changed.
     type: list
     elements: str
     version_added: 2.0.0
   deny_cmd:
     description:
-    - List of denied commands assigned to the rule.
-    - If an empty list is passed all commands will be removed from the rule.
-    - If option is omitted commands will not be checked or changed.
+      - List of denied commands assigned to the rule.
+      - If an empty list is passed all commands will be removed from the rule.
+      - If option is omitted commands will not be checked or changed.
     type: list
     elements: str
     version_added: 8.1.0
   deny_cmdgroup:
     description:
-    - List of denied command groups assigned to the rule.
-    - If an empty list is passed all command groups will be removed from the rule.
-    - If option is omitted command groups will not be checked or changed.
+      - List of denied command groups assigned to the rule.
+      - If an empty list is passed all command groups will be removed from the rule.
+      - If option is omitted command groups will not be checked or changed.
     type: list
     elements: str
     version_added: 8.1.0
   description:
     description:
-    - Description of the sudo rule.
+      - Description of the sudo rule.
     type: str
   host:
     description:
-    - List of hosts assigned to the rule.
-    - If an empty list is passed all hosts will be removed from the rule.
-    - If option is omitted hosts will not be checked or changed.
-    - Option O(hostcategory) must be omitted to assign hosts.
+      - List of hosts assigned to the rule.
+      - If an empty list is passed all hosts will be removed from the rule.
+      - If option is omitted hosts will not be checked or changed.
+      - Option O(hostcategory) must be omitted to assign hosts.
     type: list
     elements: str
   hostcategory:
     description:
-    - Host category the rule applies to.
-    - If V(all) is passed one must omit O(host) and O(hostgroup).
-    - Option O(host) and O(hostgroup) must be omitted to assign V(all).
+      - Host category the rule applies to.
+      - If V(all) is passed one must omit O(host) and O(hostgroup).
+      - Option O(host) and O(hostgroup) must be omitted to assign V(all).
     choices: ['all']
     type: str
   hostgroup:
     description:
-    - List of host groups assigned to the rule.
-    - If an empty list is passed all host groups will be removed from the rule.
-    - If option is omitted host groups will not be checked or changed.
-    - Option O(hostcategory) must be omitted to assign host groups.
+      - List of host groups assigned to the rule.
+      - If an empty list is passed all host groups will be removed from the rule.
+      - If option is omitted host groups will not be checked or changed.
+      - Option O(hostcategory) must be omitted to assign host groups.
     type: list
     elements: str
   runasextusers:
     description:
-      - List of external RunAs users
+      - List of external RunAs users.
     type: list
     elements: str
     version_added: 2.3.0
   runasusercategory:
     description:
-    - RunAs User category the rule applies to.
+      - RunAs User category the rule applies to.
     choices: ['all']
     type: str
   runasgroupcategory:
@@ -113,21 +112,21 @@ options:
     elements: str
   user:
     description:
-    - List of users assigned to the rule.
-    - If an empty list is passed all users will be removed from the rule.
-    - If option is omitted users will not be checked or changed.
+      - List of users assigned to the rule.
+      - If an empty list is passed all users will be removed from the rule.
+      - If option is omitted users will not be checked or changed.
     type: list
     elements: str
   usercategory:
     description:
-    - User category the rule applies to.
+      - User category the rule applies to.
     choices: ['all']
     type: str
   usergroup:
     description:
-    - List of user groups assigned to the rule.
-    - If an empty list is passed all user groups will be removed from the rule.
-    - If option is omitted user groups will not be checked or changed.
+      - List of user groups assigned to the rule.
+      - If an empty list is passed all user groups will be removed from the rule.
+      - If option is omitted user groups will not be checked or changed.
     type: list
     elements: str
   state:
@@ -138,18 +137,18 @@ options:
 extends_documentation_fragment:
   - community.general.ipa.documentation
   - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = r'''
-- name: Ensure sudo rule is present that's allows all every body to execute any command on any host without being asked for a password.
+EXAMPLES = r"""
+- name: Ensure sudo rule is present that's allows all every body to execute any command on any host without being asked
+    for a password.
   community.general.ipa_sudorule:
     name: sudo_all_nopasswd
     cmdcategory: all
     description: Allow to run every command with sudo without password
     hostcategory: all
     sudoopt:
-    - '!authenticate'
+      - '!authenticate'
     usercategory: all
     ipa_host: ipa.example.com
     ipa_user: admin
@@ -161,13 +160,13 @@ EXAMPLES = r'''
     description: Allow developers to run every command with sudo on all database server
     cmdcategory: all
     host:
-    - db01.example.com
+      - db01.example.com
     hostgroup:
-    - db-server
+      - db-server
     sudoopt:
-    - '!authenticate'
+      - '!authenticate'
     usergroup:
-    - developers
+      - developers
     ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
@@ -177,25 +176,25 @@ EXAMPLES = r'''
     name: sudo_operations_all
     description: Allow operators to run any commands that is part of operations-cmdgroup on any host as user root.
     cmdgroup:
-    - operations-cmdgroup
+      - operations-cmdgroup
     hostcategory: all
     runasextusers:
-    - root
+      - root
     sudoopt:
-    - '!authenticate'
+      - '!authenticate'
     usergroup:
-    - operators
+      - operators
     ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 sudorule:
-  description: Sudorule as returned by IPA
+  description: Sudorule as returned by IPA.
   returned: always
   type: dict
-'''
+"""
 
 import traceback
 

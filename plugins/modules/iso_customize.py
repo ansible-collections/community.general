@@ -9,8 +9,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: iso_customize
 short_description: Add/remove/change files in ISO file
 description:
@@ -34,25 +33,25 @@ attributes:
 options:
   src_iso:
     description:
-    - This is the path of source ISO file.
+      - This is the path of source ISO file.
     type: path
     required: true
   dest_iso:
     description:
-    - The path of the customized ISO file.
+      - The path of the customized ISO file.
     type: path
     required: true
   delete_files:
     description:
-    - Absolute paths for files inside the ISO file that should be removed.
+      - Absolute paths for files inside the ISO file that should be removed.
     type: list
     required: false
     elements: str
     default: []
   add_files:
     description:
-    - Allows to add and replace files in the ISO file.
-    - Will create intermediate folders inside the ISO file when they do not exist.
+      - Allows to add and replace files in the ISO file.
+      - Will create intermediate folders inside the ISO file when they do not exist.
     type: list
     required: false
     elements: dict
@@ -60,23 +59,22 @@ options:
     suboptions:
       src_file:
         description:
-        - The path with file name on the machine the module is executed on.
+          - The path with file name on the machine the module is executed on.
         type: path
         required: true
       dest_file:
         description:
-        - The absolute path of the file inside the ISO file.
+          - The absolute path of the file inside the ISO file.
         type: str
         required: true
 notes:
-- The C(pycdlib) library states it supports Python 2.7 and 3.4+.
-- >
-  The function C(add_file) in pycdlib will overwrite the existing file in ISO with type ISO9660 / Rock Ridge 1.12 / Joliet / UDF.
-  But it will not overwrite the existing file in ISO with Rock Ridge 1.09 / 1.10.
-  So we take workaround "delete the existing file and then add file for ISO with Rock Ridge".
-'''
+  - The C(pycdlib) library states it supports Python 2.7 and 3.4+.
+  - The function C(add_file) in pycdlib will overwrite the existing file in ISO with type ISO9660 / Rock Ridge 1.12 / Joliet
+    / UDF. But it will not overwrite the existing file in ISO with Rock Ridge 1.09 / 1.10. So we take workaround "delete the
+    existing file and then add file for ISO with Rock Ridge".
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: "Customize ISO file"
   community.general.iso_customize:
     src_iso: "/path/to/ubuntu-22.04-desktop-amd64.iso"
@@ -89,9 +87,9 @@ EXAMPLES = r'''
       - src_file: "/path/to/ubuntu.seed"
         dest_file: "/preseed/ubuntu.seed"
   register: customize_iso_result
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 src_iso:
   description: Path of source ISO file.
   returned: on success
@@ -102,7 +100,7 @@ dest_iso:
   returned: on success
   type: str
   sample: "/path/to/customized.iso"
-'''
+"""
 
 import os
 

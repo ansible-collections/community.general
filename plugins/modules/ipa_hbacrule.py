@@ -7,8 +7,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: ipa_hbacrule
 author: Thomas Krahn (@Nosmoht)
 short_description: Manage FreeIPA HBAC rule
@@ -22,99 +21,98 @@ attributes:
 options:
   cn:
     description:
-    - Canonical name.
-    - Can not be changed as it is the unique identifier.
+      - Canonical name.
+      - Can not be changed as it is the unique identifier.
     required: true
     aliases: ["name"]
     type: str
   description:
-    description: Description
+    description: Description.
     type: str
   host:
     description:
-    - List of host names to assign.
-    - If an empty list is passed all hosts will be removed from the rule.
-    - If option is omitted hosts will not be checked or changed.
+      - List of host names to assign.
+      - If an empty list is passed all hosts will be removed from the rule.
+      - If option is omitted hosts will not be checked or changed.
     required: false
     type: list
     elements: str
   hostcategory:
-    description: Host category
+    description: Host category.
     choices: ['all']
     type: str
   hostgroup:
     description:
-    - List of hostgroup names to assign.
-    - If an empty list is passed all hostgroups will be removed. from the rule
-    - If option is omitted hostgroups will not be checked or changed.
+      - List of hostgroup names to assign.
+      - If an empty list is passed all hostgroups will be removed from the rule.
+      - If option is omitted hostgroups will not be checked or changed.
     type: list
     elements: str
   service:
     description:
-    - List of service names to assign.
-    - If an empty list is passed all services will be removed from the rule.
-    - If option is omitted services will not be checked or changed.
+      - List of service names to assign.
+      - If an empty list is passed all services will be removed from the rule.
+      - If option is omitted services will not be checked or changed.
     type: list
     elements: str
   servicecategory:
-    description: Service category
+    description: Service category.
     choices: ['all']
     type: str
   servicegroup:
     description:
-    - List of service group names to assign.
-    - If an empty list is passed all assigned service groups will be removed from the rule.
-    - If option is omitted service groups will not be checked or changed.
+      - List of service group names to assign.
+      - If an empty list is passed all assigned service groups will be removed from the rule.
+      - If option is omitted service groups will not be checked or changed.
     type: list
     elements: str
   sourcehost:
     description:
-    - List of source host names to assign.
-    - If an empty list if passed all assigned source hosts will be removed from the rule.
-    - If option is omitted source hosts will not be checked or changed.
+      - List of source host names to assign.
+      - If an empty list if passed all assigned source hosts will be removed from the rule.
+      - If option is omitted source hosts will not be checked or changed.
     type: list
     elements: str
   sourcehostcategory:
-    description: Source host category
+    description: Source host category.
     choices: ['all']
     type: str
   sourcehostgroup:
     description:
-    - List of source host group names to assign.
-    - If an empty list if passed all assigned source host groups will be removed from the rule.
-    - If option is omitted source host groups will not be checked or changed.
+      - List of source host group names to assign.
+      - If an empty list if passed all assigned source host groups will be removed from the rule.
+      - If option is omitted source host groups will not be checked or changed.
     type: list
     elements: str
   state:
-    description: State to ensure
+    description: State to ensure.
     default: "present"
-    choices: ["absent",  "disabled", "enabled","present"]
+    choices: ["absent", "disabled", "enabled", "present"]
     type: str
   user:
     description:
-    - List of user names to assign.
-    - If an empty list if passed all assigned users will be removed from the rule.
-    - If option is omitted users will not be checked or changed.
+      - List of user names to assign.
+      - If an empty list if passed all assigned users will be removed from the rule.
+      - If option is omitted users will not be checked or changed.
     type: list
     elements: str
   usercategory:
-    description: User category
+    description: User category.
     choices: ['all']
     type: str
   usergroup:
     description:
-    - List of user group names to assign.
-    - If an empty list if passed all assigned user groups will be removed from the rule.
-    - If option is omitted user groups will not be checked or changed.
+      - List of user group names to assign.
+      - If an empty list if passed all assigned user groups will be removed from the rule.
+      - If option is omitted user groups will not be checked or changed.
     type: list
     elements: str
 extends_documentation_fragment:
   - community.general.ipa.documentation
   - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Ensure rule to allow all users to access any host from any host
   community.general.ipa_hbacrule:
     name: allow_all
@@ -132,9 +130,9 @@ EXAMPLES = r'''
     name: allow_all_developers_access_to_db
     description: Allow all developers to access any database from any host
     hostgroup:
-    - db-server
+      - db-server
     usergroup:
-    - developers
+      - developers
     state: present
     ipa_host: ipa.example.com
     ipa_user: admin
@@ -147,14 +145,14 @@ EXAMPLES = r'''
     ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 hbacrule:
   description: HBAC rule as returned by IPA API.
   returned: always
   type: dict
-'''
+"""
 
 import traceback
 

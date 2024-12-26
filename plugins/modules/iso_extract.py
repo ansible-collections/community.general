@@ -11,8 +11,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 author:
   - Jeroen Hoekx (@jhoekx)
   - Matt Robinson (@ribbons)
@@ -21,12 +20,10 @@ module: iso_extract
 short_description: Extract files from an ISO image
 description:
   - This module has two possible ways of operation.
-  - If 7zip is installed on the system, this module extracts files from an ISO
-    into a temporary directory and copies files to a given destination,
-    if needed.
-  - If the user has mount-capabilities (CAP_SYS_ADMIN on Linux) this module
-    mounts the ISO image to a temporary location, and copies files to a given
-    destination, if needed.
+  - If 7zip is installed on the system, this module extracts files from an ISO into a temporary directory and copies files
+    to a given destination, if needed.
+  - If the user has mount-capabilities (CAP_SYS_ADMIN on Linux) this module mounts the ISO image to a temporary location,
+    and copies files to a given destination, if needed.
 requirements:
   - Either 7z (from C(7zip) or C(p7zip) package)
   - Or mount capabilities (root-access, or CAP_SYS_ADMIN capability on Linux)
@@ -40,60 +37,59 @@ attributes:
 options:
   image:
     description:
-    - The ISO image to extract files from.
+      - The ISO image to extract files from.
     type: path
     required: true
-    aliases: [ path, src ]
+    aliases: [path, src]
   dest:
     description:
-    - The destination directory to extract files to.
+      - The destination directory to extract files to.
     type: path
     required: true
   files:
     description:
-    - A list of files to extract from the image.
-    - Extracting directories does not work.
+      - A list of files to extract from the image.
+      - Extracting directories does not work.
     type: list
     elements: str
     required: true
   force:
     description:
-    - If V(true), which will replace the remote file when contents are different than the source.
-    - If V(false), the file will only be extracted and copied if the destination does not already exist.
+      - If V(true), which will replace the remote file when contents are different than the source.
+      - If V(false), the file will only be extracted and copied if the destination does not already exist.
     type: bool
     default: true
   executable:
     description:
-    - The path to the C(7z) executable to use for extracting files from the ISO.
-    - If not provided, it will assume the value V(7z).
+      - The path to the C(7z) executable to use for extracting files from the ISO.
+      - If not provided, it will assume the value V(7z).
     type: path
   password:
     description:
-    - Password used to decrypt files from the ISO.
-    - Will only be used if 7z is used.
-    - The password is used as a command line argument to 7z. This is a B(potential security risk) that
-      allows passwords to be revealed if someone else can list running processes on the same machine
-      in the right moment.
+      - Password used to decrypt files from the ISO.
+      - Will only be used if 7z is used.
+      - The password is used as a command line argument to 7z. This is a B(potential security risk) that allows passwords
+        to be revealed if someone else can list running processes on the same machine in the right moment.
     type: str
     version_added: 10.1.0
 notes:
-- Only the file checksum (content) is taken into account when extracting files
-  from the ISO image. If O(force=false), only checks the presence of the file.
-'''
+  - Only the file checksum (content) is taken into account when extracting files from the ISO image. If O(force=false), only
+    checks the presence of the file.
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Extract kernel and ramdisk from a LiveCD
   community.general.iso_extract:
     image: /tmp/rear-test.iso
     dest: /tmp/virt-rear/
     files:
-    - isolinux/kernel
-    - isolinux/initrd.cgz
-'''
+      - isolinux/kernel
+      - isolinux/initrd.cgz
+"""
 
-RETURN = r'''
+RETURN = r"""
 #
-'''
+"""
 
 import os.path
 import shutil

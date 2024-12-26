@@ -8,13 +8,12 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: jenkins_build
 short_description: Manage jenkins builds
 version_added: 2.2.0
 description:
-    - Manage Jenkins builds with Jenkins REST API.
+  - Manage Jenkins builds with Jenkins REST API.
 requirements:
   - "python-jenkins >= 0.4.12"
 author:
@@ -64,7 +63,7 @@ options:
     type: str
   user:
     description:
-       - User to authenticate with the Jenkins server.
+      - User to authenticate with the Jenkins server.
     type: str
   detach:
     description:
@@ -79,9 +78,9 @@ options:
     default: 10
     type: int
     version_added: 7.4.0
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a jenkins build using basic authentication
   community.general.jenkins_build:
     name: "test-check"
@@ -108,10 +107,9 @@ EXAMPLES = '''
     user: Jenkins
     token: abcdefghijklmnopqrstuvwxyz123456
     url: http://localhost:8080
-'''
+"""
 
-RETURN = '''
----
+RETURN = r"""
 name:
   description: Name of the jenkins job.
   returned: success
@@ -136,7 +134,7 @@ build_info:
   description: Build info of the jenkins job.
   returned: success
   type: dict
-'''
+"""
 
 import traceback
 from time import sleep

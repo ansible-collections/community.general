@@ -7,8 +7,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: ipa_config
 author: Fran Fitzpatrick (@fxfitz)
 short_description: Manage Global FreeIPA Configuration Settings
@@ -115,10 +114,9 @@ options:
 extends_documentation_fragment:
   - community.general.ipa.documentation
   - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Ensure password plugin features DC:Disable Last Success and KDC:Disable Lockout are enabled
   community.general.ipa_config:
     ipaconfigstring: ["KDC:Disable Last Success", "KDC:Disable Lockout"]
@@ -221,14 +219,14 @@ EXAMPLES = r'''
     ipa_host: localhost
     ipa_user: admin
     ipa_pass: supersecret
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 config:
   description: Configuration as returned by IPA API.
   returned: always
   type: dict
-'''
+"""
 
 import traceback
 

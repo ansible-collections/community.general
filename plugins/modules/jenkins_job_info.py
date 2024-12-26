@@ -9,8 +9,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: jenkins_job_info
 short_description: Get information about Jenkins jobs
 description:
@@ -51,18 +50,18 @@ options:
   user:
     type: str
     description:
-       - User to authenticate with the Jenkins server.
+      - User to authenticate with the Jenkins server.
   validate_certs:
     description:
-       - If set to V(false), the SSL certificates will not be validated.
-       - This should only set to V(false) used on personally controlled sites using self-signed certificates.
+      - If set to V(false), the SSL certificates will not be validated.
+      - This should only set to V(false) used on personally controlled sites using self-signed certificates.
     default: true
     type: bool
 author:
   - "Chris St. Pierre (@stpierre)"
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # Get all Jenkins jobs anonymously
 - community.general.jenkins_job_info:
     user: admin
@@ -122,24 +121,23 @@ EXAMPLES = '''
     token: 126df5c60d66c66e3b75b11104a16a8a
     url: https://jenkins.example.com
   register: my_jenkins_job_info
-'''
+"""
 
-RETURN = '''
----
+RETURN = r"""
 jobs:
-  description: All jobs found matching the specified criteria
+  description: All jobs found matching the specified criteria.
   returned: success
   type: list
   sample:
     [
-        {
-            "name": "test-job",
-            "fullname": "test-folder/test-job",
-            "url": "http://localhost:8080/job/test-job/",
-            "color": "blue"
-        },
+      {
+        "name": "test-job",
+        "fullname": "test-folder/test-job",
+        "url": "http://localhost:8080/job/test-job/",
+        "color": "blue"
+      },
     ]
-'''
+"""
 
 import ssl
 import fnmatch

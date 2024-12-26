@@ -8,8 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: ipa_getkeytab
 short_description: Manage keytab file in FreeIPA
 version_added: 9.5.0
@@ -82,7 +81,8 @@ options:
   state:
     description:
       - The state of the keytab file.
-      - V(present) only check for existence of a file, if you want to recreate keytab with other parameters you should set O(force=true).
+      - V(present) only check for existence of a file, if you want to recreate keytab with other parameters you should set
+        O(force=true).
     type: str
     default: present
     choices: ["present", "absent"]
@@ -95,9 +95,9 @@ requirements:
   - Managed host is FreeIPA client
 extends_documentation_fragment:
   - community.general.attributes
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Get Kerberos ticket using default principal
   community.general.krb_ticket:
     password: "{{ aldpro_admin_password }}"
@@ -121,7 +121,7 @@ EXAMPLES = r'''
     principal: HTTP/freeipa-dc02.ipa.test
     ipa_host: freeipa-dc01.ipa.test
     force: true
-'''
+"""
 
 import os
 

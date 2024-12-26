@@ -9,8 +9,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: iso_create
 short_description: Generate ISO file with specified files or folders
 description:
@@ -31,60 +30,60 @@ attributes:
     support: none
 
 options:
-   src_files:
-     description:
-     - This is a list of absolute paths of source files or folders which will be contained in the new generated ISO file.
-     - Will fail if specified file or folder in O(src_files) does not exist on local machine.
-     - 'Note: With all ISO9660 levels from 1 to 3, all file names are restricted to uppercase letters, numbers and
-       underscores (_). File names are limited to 31 characters, directory nesting is limited to 8 levels, and path
-       names are limited to 255 characters.'
-     type: list
-     required: true
-     elements: path
-   dest_iso:
-     description:
-     - The absolute path with file name of the new generated ISO file on local machine.
-     - Will create intermediate folders when they does not exist.
-     type: path
-     required: true
-   interchange_level:
-     description:
-     - The ISO9660 interchange level to use, it dictates the rules on the names of files.
-     - Levels and valid values V(1), V(2), V(3), V(4) are supported.
-     - The default value is level V(1), which is the most conservative, level V(3) is recommended.
-     - ISO9660 file names at interchange level V(1) cannot have more than 8 characters or 3 characters in the extension.
-     type: int
-     default: 1
-     choices: [1, 2, 3, 4]
-   vol_ident:
-     description:
-     - The volume identification string to use on the new generated ISO image.
-     type: str
-   rock_ridge:
-     description:
-     - Whether to make this ISO have the Rock Ridge extensions or not.
-     - Valid values are V(1.09), V(1.10) or V(1.12), means adding the specified Rock Ridge version to the ISO.
-     - If unsure, set V(1.09) to ensure maximum compatibility.
-     - If not specified, then not add Rock Ridge extension to the ISO.
-     type: str
-     choices: ['1.09', '1.10', '1.12']
-   joliet:
-     description:
-     - Support levels and valid values are V(1), V(2), or V(3).
-     - Level V(3) is by far the most common.
-     - If not specified, then no Joliet support is added.
-     type: int
-     choices: [1, 2, 3]
-   udf:
-     description:
-     - Whether to add UDF support to this ISO.
-     - If set to V(true), then version 2.60 of the UDF spec is used.
-     - If not specified or set to V(false), then no UDF support is added.
-     type: bool
-     default: false
-'''
+  src_files:
+    description:
+      - This is a list of absolute paths of source files or folders which will be contained in the new generated ISO file.
+      - Will fail if specified file or folder in O(src_files) does not exist on local machine.
+      - 'Note: With all ISO9660 levels from 1 to 3, all file names are restricted to uppercase letters, numbers and underscores
+        (_). File names are limited to 31 characters, directory nesting is limited to 8 levels, and path names are limited
+        to 255 characters.'
+    type: list
+    required: true
+    elements: path
+  dest_iso:
+    description:
+      - The absolute path with file name of the new generated ISO file on local machine.
+      - Will create intermediate folders when they does not exist.
+    type: path
+    required: true
+  interchange_level:
+    description:
+      - The ISO9660 interchange level to use, it dictates the rules on the names of files.
+      - Levels and valid values V(1), V(2), V(3), V(4) are supported.
+      - The default value is level V(1), which is the most conservative, level V(3) is recommended.
+      - ISO9660 file names at interchange level V(1) cannot have more than 8 characters or 3 characters in the extension.
+    type: int
+    default: 1
+    choices: [1, 2, 3, 4]
+  vol_ident:
+    description:
+      - The volume identification string to use on the new generated ISO image.
+    type: str
+  rock_ridge:
+    description:
+      - Whether to make this ISO have the Rock Ridge extensions or not.
+      - Valid values are V(1.09), V(1.10) or V(1.12), means adding the specified Rock Ridge version to the ISO.
+      - If unsure, set V(1.09) to ensure maximum compatibility.
+      - If not specified, then not add Rock Ridge extension to the ISO.
+    type: str
+    choices: ['1.09', '1.10', '1.12']
+  joliet:
+    description:
+      - Support levels and valid values are V(1), V(2), or V(3).
+      - Level V(3) is by far the most common.
+      - If not specified, then no Joliet support is added.
+    type: int
+    choices: [1, 2, 3]
+  udf:
+    description:
+      - Whether to add UDF support to this ISO.
+      - If set to V(true), then version 2.60 of the UDF spec is used.
+      - If not specified or set to V(false), then no UDF support is added.
+    type: bool
+    default: false
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Create an ISO file
   community.general.iso_create:
     src_files:
@@ -109,46 +108,46 @@ EXAMPLES = r'''
     interchange_level: 3
     joliet: 3
     vol_ident: WIN_AUTOINSTALL
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 source_file:
-    description: Configured source files or directories list.
-    returned: on success
-    type: list
-    elements: path
-    sample: ["/path/to/file.txt", "/path/to/folder"]
+  description: Configured source files or directories list.
+  returned: on success
+  type: list
+  elements: path
+  sample: ["/path/to/file.txt", "/path/to/folder"]
 created_iso:
-    description: Created iso file path.
-    returned: on success
-    type: str
-    sample: "/path/to/test.iso"
+  description: Created iso file path.
+  returned: on success
+  type: str
+  sample: "/path/to/test.iso"
 interchange_level:
-    description: Configured interchange level.
-    returned: on success
-    type: int
-    sample: 3
+  description: Configured interchange level.
+  returned: on success
+  type: int
+  sample: 3
 vol_ident:
-    description: Configured volume identification string.
-    returned: on success
-    type: str
-    sample: "OEMDRV"
+  description: Configured volume identification string.
+  returned: on success
+  type: str
+  sample: "OEMDRV"
 joliet:
-    description: Configured Joliet support level.
-    returned: on success
-    type: int
-    sample: 3
+  description: Configured Joliet support level.
+  returned: on success
+  type: int
+  sample: 3
 rock_ridge:
-    description: Configured Rock Ridge version.
-    returned: on success
-    type: str
-    sample: "1.09"
+  description: Configured Rock Ridge version.
+  returned: on success
+  type: str
+  sample: "1.09"
 udf:
-    description: Configured UDF support.
-    returned: on success
-    type: bool
-    sample: false
-'''
+  description: Configured UDF support.
+  returned: on success
+  type: bool
+  sample: false
+"""
 
 import os
 import traceback

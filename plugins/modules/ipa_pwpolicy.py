@@ -7,152 +7,153 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: ipa_pwpolicy
 author: Adralioh (@adralioh)
 short_description: Manage FreeIPA password policies
 description:
-- Add, modify, or delete a password policy using the IPA API.
+  - Add, modify, or delete a password policy using the IPA API.
 version_added: 2.0.0
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    group:
-        description:
-        - Name of the group that the policy applies to.
-        - If omitted, the global policy is used.
-        aliases: ["name"]
-        type: str
-    state:
-        description: State to ensure.
-        default: "present"
-        choices: ["absent", "present"]
-        type: str
-    maxpwdlife:
-        description: Maximum password lifetime (in days).
-        type: str
-    minpwdlife:
-        description: Minimum password lifetime (in hours).
-        type: str
-    historylength:
-        description:
-        - Number of previous passwords that are remembered.
-        - Users cannot reuse remembered passwords.
-        type: str
-    minclasses:
-        description: Minimum number of character classes.
-        type: str
-    minlength:
-        description: Minimum password length.
-        type: str
-    priority:
-        description:
-        - Priority of the policy.
-        - High number means lower priority.
-        - Required when C(cn) is not the global policy.
-        type: str
-    maxfailcount:
-        description: Maximum number of consecutive failures before lockout.
-        type: str
-    failinterval:
-        description: Period (in seconds) after which the number of failed login attempts is reset.
-        type: str
-    lockouttime:
-        description: Period (in seconds) for which users are locked out.
-        type: str
-    gracelimit:
-        description: Maximum number of LDAP logins after password expiration.
-        type: int
-        version_added: 8.2.0
-    maxrepeat:
-        description: Maximum number of allowed same consecutive characters in the new password.
-        type: int
-        version_added: 8.2.0
-    maxsequence:
-        description: Maximum length of monotonic character sequences in the new password. An example of a monotonic sequence of length 5 is V(12345).
-        type: int
-        version_added: 8.2.0
-    dictcheck:
-        description: Check whether the password (with possible modifications) matches a word in a dictionary (using cracklib).
-        type: bool
-        version_added: 8.2.0
-    usercheck:
-        description: Check whether the password (with possible modifications) contains the user name in some form (if the name has > 3 characters).
-        type: bool
-        version_added: 8.2.0
+  group:
+    description:
+      - Name of the group that the policy applies to.
+      - If omitted, the global policy is used.
+    aliases: ["name"]
+    type: str
+  state:
+    description: State to ensure.
+    default: "present"
+    choices: ["absent", "present"]
+    type: str
+  maxpwdlife:
+    description: Maximum password lifetime (in days).
+    type: str
+  minpwdlife:
+    description: Minimum password lifetime (in hours).
+    type: str
+  historylength:
+    description:
+      - Number of previous passwords that are remembered.
+      - Users cannot reuse remembered passwords.
+    type: str
+  minclasses:
+    description: Minimum number of character classes.
+    type: str
+  minlength:
+    description: Minimum password length.
+    type: str
+  priority:
+    description:
+      - Priority of the policy.
+      - High number means lower priority.
+      - Required when C(cn) is not the global policy.
+    type: str
+  maxfailcount:
+    description: Maximum number of consecutive failures before lockout.
+    type: str
+  failinterval:
+    description: Period (in seconds) after which the number of failed login attempts is reset.
+    type: str
+  lockouttime:
+    description: Period (in seconds) for which users are locked out.
+    type: str
+  gracelimit:
+    description: Maximum number of LDAP logins after password expiration.
+    type: int
+    version_added: 8.2.0
+  maxrepeat:
+    description: Maximum number of allowed same consecutive characters in the new password.
+    type: int
+    version_added: 8.2.0
+  maxsequence:
+    description: Maximum length of monotonic character sequences in the new password. An example of a monotonic sequence of
+      length 5 is V(12345).
+    type: int
+    version_added: 8.2.0
+  dictcheck:
+    description: Check whether the password (with possible modifications) matches a word in a dictionary (using cracklib).
+    type: bool
+    version_added: 8.2.0
+  usercheck:
+    description: Check whether the password (with possible modifications) contains the user name in some form (if the name
+      has > 3 characters).
+    type: bool
+    version_added: 8.2.0
 extends_documentation_fragment:
   - community.general.ipa.documentation
   - community.general.attributes
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Modify the global password policy
   community.general.ipa_pwpolicy:
-      maxpwdlife: '90'
-      minpwdlife: '1'
-      historylength: '8'
-      minclasses: '3'
-      minlength: '16'
-      maxfailcount: '6'
-      failinterval: '60'
-      lockouttime: '600'
-      ipa_host: ipa.example.com
-      ipa_user: admin
-      ipa_pass: topsecret
+    maxpwdlife: '90'
+    minpwdlife: '1'
+    historylength: '8'
+    minclasses: '3'
+    minlength: '16'
+    maxfailcount: '6'
+    failinterval: '60'
+    lockouttime: '600'
+    ipa_host: ipa.example.com
+    ipa_user: admin
+    ipa_pass: topsecret
 
 - name: Ensure the password policy for the group admins is present
   community.general.ipa_pwpolicy:
-      group: admins
-      state: present
-      maxpwdlife: '60'
-      minpwdlife: '24'
-      historylength: '16'
-      minclasses: '4'
-      priority: '10'
-      minlength: '6'
-      maxfailcount: '4'
-      failinterval: '600'
-      lockouttime: '1200'
-      gracelimit: 3
-      maxrepeat: 3
-      maxsequence: 3
-      dictcheck: true
-      usercheck: true
-      ipa_host: ipa.example.com
-      ipa_user: admin
-      ipa_pass: topsecret
+    group: admins
+    state: present
+    maxpwdlife: '60'
+    minpwdlife: '24'
+    historylength: '16'
+    minclasses: '4'
+    priority: '10'
+    minlength: '6'
+    maxfailcount: '4'
+    failinterval: '600'
+    lockouttime: '1200'
+    gracelimit: 3
+    maxrepeat: 3
+    maxsequence: 3
+    dictcheck: true
+    usercheck: true
+    ipa_host: ipa.example.com
+    ipa_user: admin
+    ipa_pass: topsecret
 
 - name: Ensure that the group sysops does not have a unique password policy
   community.general.ipa_pwpolicy:
-      group: sysops
-      state: absent
-      ipa_host: ipa.example.com
-      ipa_user: admin
-      ipa_pass: topsecret
-'''
+    group: sysops
+    state: absent
+    ipa_host: ipa.example.com
+    ipa_user: admin
+    ipa_pass: topsecret
+"""
 
-RETURN = r'''
+RETURN = r"""
 pwpolicy:
-    description: Password policy as returned by IPA API.
-    returned: always
-    type: dict
-    sample:
-        cn: ['admins']
-        cospriority: ['10']
-        dn: 'cn=admins,cn=EXAMPLE.COM,cn=kerberos,dc=example,dc=com'
-        krbmaxpwdlife: ['60']
-        krbminpwdlife: ['24']
-        krbpwdfailurecountinterval: ['600']
-        krbpwdhistorylength: ['16']
-        krbpwdlockoutduration: ['1200']
-        krbpwdmaxfailure: ['4']
-        krbpwdmindiffchars: ['4']
-        objectclass: ['top', 'nscontainer', 'krbpwdpolicy']
-'''
+  description: Password policy as returned by IPA API.
+  returned: always
+  type: dict
+  sample:
+    cn: ['admins']
+    cospriority: ['10']
+    dn: 'cn=admins,cn=EXAMPLE.COM,cn=kerberos,dc=example,dc=com'
+    krbmaxpwdlife: ['60']
+    krbminpwdlife: ['24']
+    krbpwdfailurecountinterval: ['600']
+    krbpwdhistorylength: ['16']
+    krbpwdlockoutduration: ['1200']
+    krbpwdmaxfailure: ['4']
+    krbpwdmindiffchars: ['4']
+    objectclass: ['top', 'nscontainer', 'krbpwdpolicy']
+"""
 
 import traceback
 

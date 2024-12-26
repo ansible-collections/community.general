@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: ipa_otpconfig
 author: justchris1 (@justchris1)
 short_description: Manage FreeIPA OTP Configuration Settings
@@ -41,10 +40,9 @@ options:
 extends_documentation_fragment:
   - community.general.ipa.documentation
   - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Ensure the TOTP authentication window is set to 300 seconds
   community.general.ipa_otpconfig:
     ipatokentotpauthwindow: '300'
@@ -72,14 +70,14 @@ EXAMPLES = r'''
     ipa_host: localhost
     ipa_user: admin
     ipa_pass: supersecret
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 otpconfig:
   description: OTP configuration as returned by IPA API.
   returned: always
   type: dict
-'''
+"""
 
 import traceback
 

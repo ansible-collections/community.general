@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: jenkins_node
 short_description: Manage Jenkins nodes
 version_added: 10.0.0
@@ -25,8 +24,7 @@ attributes:
   check_mode:
     support: partial
     details:
-      - Check mode is unable to show configuration changes for a node that is not yet
-        present.
+      - Check mode is unable to show configuration changes for a node that is not yet present.
   diff_mode:
     support: none
 options:
@@ -50,8 +48,8 @@ options:
     type: str
   state:
     description:
-      - Specifies whether the Jenkins node should be V(present) (created), V(absent)
-        (deleted), V(enabled) (online) or V(disabled) (offline).
+      - Specifies whether the Jenkins node should be V(present) (created), V(absent) (deleted), V(enabled) (online) or V(disabled)
+        (offline).
     default: present
     choices: ['enabled', 'disabled', 'present', 'absent']
     type: str
@@ -66,18 +64,15 @@ options:
     elements: str
   offline_message:
     description:
-      - Specifies the offline reason message to be set when configuring the Jenkins node
-        state.
-      - If O(offline_message) is given and requested O(state) is not V(disabled), an
-        error will be raised.
-      - Internally O(offline_message) is set via the V(toggleOffline) API, so updating
-        the message when the node is already offline (current state V(disabled)) is not
-        possible. In this case, a warning will be issued.
+      - Specifies the offline reason message to be set when configuring the Jenkins node state.
+      - If O(offline_message) is given and requested O(state) is not V(disabled), an error will be raised.
+      - Internally O(offline_message) is set using the V(toggleOffline) API, so updating the message when the node is already
+        offline (current state V(disabled)) is not possible. In this case, a warning will be issued.
     type: str
     version_added: 10.0.0
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a Jenkins node using token authentication
   community.general.jenkins_node:
     url: http://localhost:8080
@@ -105,12 +100,11 @@ EXAMPLES = '''
   community.general.jenkins_node:
     name: my-node
     state: disabled
-    offline_message: >
+    offline_message: >-
       This node is offline for some reason.
-'''
+"""
 
-RETURN = '''
----
+RETURN = r"""
 url:
   description: URL used to connect to the Jenkins server.
   returned: success
@@ -151,7 +145,7 @@ configured:
   description: Whether or not the Jenkins node was configured by the task.
   returned: success
   type: bool
-'''
+"""
 
 import sys
 import traceback
