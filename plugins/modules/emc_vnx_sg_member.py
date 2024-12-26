@@ -12,52 +12,50 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: emc_vnx_sg_member
 
 short_description: Manage storage group member on EMC VNX
 
 
 description:
-    - "This module manages the members of an existing storage group."
-
+  - This module manages the members of an existing storage group.
 extends_documentation_fragment:
-    - community.general.emc.emc_vnx
-    - community.general.attributes
+  - community.general.emc.emc_vnx
+  - community.general.attributes
 
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 
 options:
-    name:
-        description:
-            - Name of the Storage group to manage.
-        required: true
-        type: str
-    lunid:
-        description:
-            - Lun id to be added.
-        required: true
-        type: int
-    state:
-        description:
-        - Indicates the desired lunid state.
-        - V(present) ensures specified lunid is present in the Storage Group.
-        - V(absent) ensures specified lunid is absent from Storage Group.
-        default: present
-        choices: [ "present", "absent"]
-        type: str
+  name:
+    description:
+      - Name of the Storage group to manage.
+    required: true
+    type: str
+  lunid:
+    description:
+      - Lun id to be added.
+    required: true
+    type: int
+  state:
+    description:
+      - Indicates the desired lunid state.
+      - V(present) ensures specified O(lunid) is present in the Storage Group.
+      - V(absent) ensures specified O(lunid) is absent from Storage Group.
+    default: present
+    choices: ["present", "absent"]
+    type: str
 
 
 author:
-    - Luca 'remix_tj' Lorenzetto (@remixtj)
-'''
+  - Luca 'remix_tj' Lorenzetto (@remixtj)
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Add lun to storage group
   community.general.emc_vnx_sg_member:
     name: sg01
@@ -75,14 +73,14 @@ EXAMPLES = '''
     sp_password: sysadmin
     lunid: 100
     state: absent
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 hluid:
-    description: LUNID that hosts attached to the storage group will see.
-    type: int
-    returned: success
-'''
+  description: LUNID that hosts attached to the storage group will see.
+  type: int
+  returned: success
+"""
 
 import traceback
 
