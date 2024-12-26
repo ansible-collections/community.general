@@ -7,13 +7,11 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: oneandone_private_network
 short_description: Configure 1&1 private networking
 description:
-  - Create, remove, reconfigure, update a private network.
-    This module has a dependency on 1and1 >= 1.0.
+  - Create, remove, reconfigure, update a private network. This module has a dependency on 1and1 >= 1.0.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -28,7 +26,7 @@ options:
     type: str
     required: false
     default: 'present'
-    choices: [ "present", "absent", "update" ]
+    choices: ["present", "absent", "update"]
   auth_token:
     description:
       - Authenticating API token provided by 1&1.
@@ -39,8 +37,7 @@ options:
     type: str
   api_url:
     description:
-      - Custom API URL. Overrides the
-        ONEANDONE_API_URL environment variable.
+      - Custom API URL. Overrides the E(ONEANDONE_API_URL) environment variable.
     type: str
     required: false
   name:
@@ -53,16 +50,16 @@ options:
     type: str
   datacenter:
     description:
-      - The identifier of the datacenter where the private network will be created
+      - The identifier of the datacenter where the private network will be created.
     type: str
     choices: [US, ES, DE, GB]
   network_address:
     description:
-      - Set a private network space, i.e. 192.168.1.0
+      - Set a private network space, for example V(192.168.1.0).
     type: str
   subnet_mask:
     description:
-      - Set the netmask for the private network, i.e. 255.255.255.0
+      - Set the netmask for the private network, for example V(255.255.255.0).
     type: str
   add_members:
     description:
@@ -78,30 +75,30 @@ options:
     default: []
   wait:
     description:
-      - wait for the instance to be in state 'running' before returning
+      - Wait for the instance to be in state 'running' before returning.
     required: false
     default: true
     type: bool
   wait_timeout:
     description:
-      - how long before wait gives up, in seconds
+      - How long before wait gives up, in seconds.
     type: int
     default: 600
   wait_interval:
     description:
-      - Defines the number of seconds to wait when using the _wait_for methods
+      - Defines the number of seconds to wait when using the _wait_for methods.
     type: int
     default: 5
 
 requirements:
-     - "1and1"
+  - "1and1"
 
 author:
   - Amel Ajdinovic (@aajdinov)
   - Ethan Devenport (@edevenport)
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a private network
   community.general.oneandone_private_network:
     auth_token: oneandone_private_api_key
@@ -131,7 +128,7 @@ EXAMPLES = '''
     state: update
     private_network: backup_network
     add_members:
-     - server identifier (id or name)
+      - server identifier (id or name)
 
 - name: Remove members from the private network
   community.general.oneandone_private_network:
@@ -139,16 +136,16 @@ EXAMPLES = '''
     state: update
     private_network: backup_network
     remove_members:
-     - server identifier (id or name)
-'''
+      - server identifier (id or name)
+"""
 
-RETURN = '''
+RETURN = r"""
 private_network:
-    description: Information about the private network.
-    type: dict
-    sample: '{"name": "backup_network", "id": "55726DEDA20C99CF6F2AF8F18CAC9963"}'
-    returned: always
-'''
+  description: Information about the private network.
+  type: dict
+  sample: '{"name": "backup_network", "id": "55726DEDA20C99CF6F2AF8F18CAC9963"}'
+  returned: always
+"""
 
 import os
 from ansible.module_utils.basic import AnsibleModule

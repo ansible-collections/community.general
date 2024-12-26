@@ -8,12 +8,11 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: one_service
 short_description: Deploy and manage OpenNebula services
 description:
-  - Manage OpenNebula services
+  - Manage OpenNebula services.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -30,11 +29,13 @@ options:
     type: str
   api_username:
     description:
-      - Name of the user to login into the OpenNebula OneFlow API server. If not set then the value of the E(ONEFLOW_USERNAME) environment variable is used.
+      - Name of the user to login into the OpenNebula OneFlow API server. If not set then the value of the E(ONEFLOW_USERNAME) environment variable
+        is used.
     type: str
   api_password:
     description:
-      - Password of the user to login into OpenNebula OneFlow API server. If not set then the value of the E(ONEFLOW_PASSWORD) environment variable is used.
+      - Password of the user to login into OpenNebula OneFlow API server. If not set then the value of the E(ONEFLOW_PASSWORD) environment variable
+        is used.
     type: str
   template_name:
     description:
@@ -54,8 +55,8 @@ options:
     type: str
   unique:
     description:
-      - Setting O(unique=true) will make sure that there is only one service instance running with a name set with O(service_name) when
-        instantiating a service from a template specified with O(template_id) or O(template_name). Check examples below.
+      - Setting O(unique=true) will make sure that there is only one service instance running with a name set with O(service_name) when instantiating
+        a service from a template specified with O(template_id) or O(template_name). Check examples below.
     type: bool
     default: false
   state:
@@ -67,7 +68,8 @@ options:
     type: str
   mode:
     description:
-      - Set permission mode of a service instance in octet format, for example V(0600) to give owner C(use) and C(manage) and nothing to group and others.
+      - Set permission mode of a service instance in octet format, for example V(0600) to give owner C(use) and C(manage) and nothing to group
+        and others.
     type: str
   owner_id:
     description:
@@ -106,10 +108,10 @@ options:
     type: bool
     default: false
 author:
-    - "Milan Ilic (@ilicmilan)"
-'''
+  - "Milan Ilic (@ilicmilan)"
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Instantiate a new service
   community.general.one_service:
     template_id: 90
@@ -178,57 +180,57 @@ EXAMPLES = '''
     role: foo
     cardinality: 7
     wait: true
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 service_id:
-    description: service id
-    type: int
-    returned: success
-    sample: 153
+  description: Service id.
+  type: int
+  returned: success
+  sample: 153
 service_name:
-    description: service name
-    type: str
-    returned: success
-    sample: app1
+  description: Service name.
+  type: str
+  returned: success
+  sample: app1
 group_id:
-    description: service's group id
-    type: int
-    returned: success
-    sample: 1
+  description: Service's group id.
+  type: int
+  returned: success
+  sample: 1
 group_name:
-    description: service's group name
-    type: str
-    returned: success
-    sample: one-users
+  description: Service's group name.
+  type: str
+  returned: success
+  sample: one-users
 owner_id:
-    description: service's owner id
-    type: int
-    returned: success
-    sample: 143
+  description: Service's owner id.
+  type: int
+  returned: success
+  sample: 143
 owner_name:
-    description: service's owner name
-    type: str
-    returned: success
-    sample: ansible-test
+  description: Service's owner name.
+  type: str
+  returned: success
+  sample: ansible-test
 state:
-    description: state of service instance
-    type: str
-    returned: success
-    sample: RUNNING
+  description: State of service instance.
+  type: str
+  returned: success
+  sample: RUNNING
 mode:
-    description: service's mode
-    type: int
-    returned: success
-    sample: 660
+  description: Service's mode.
+  type: int
+  returned: success
+  sample: 660
 roles:
-    description: list of dictionaries of roles, each role is described by name, cardinality, state and nodes ids
-    type: list
-    returned: success
-    sample:
-      - {"cardinality": 1,"name": "foo","state": "RUNNING", "ids": [ 123, 456 ]}
-      - {"cardinality": 2,"name": "bar","state": "RUNNING", "ids": [ 452, 567, 746 ]}
-'''
+  description: List of dictionaries of roles, each role is described by name, cardinality, state and nodes ids.
+  type: list
+  returned: success
+  sample:
+    - {"cardinality": 1, "name": "foo", "state": "RUNNING", "ids": [123, 456]}
+    - {"cardinality": 2, "name": "bar", "state": "RUNNING", "ids": [452, 567, 746]}
+"""
 
 import os
 from ansible.module_utils.basic import AnsibleModule

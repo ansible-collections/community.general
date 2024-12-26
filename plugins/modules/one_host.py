@@ -10,87 +10,85 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: one_host
 
 short_description: Manages OpenNebula Hosts
 
 
 requirements:
-    - pyone
+  - pyone
 
 description:
-    - "Manages OpenNebula Hosts"
-
+  - Manages OpenNebula Hosts.
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 
 options:
-    name:
-        description:
-            - Hostname of the machine to manage.
-        required: true
-        type: str
-    state:
-        description:
-            - Takes the host to the desired lifecycle state.
-            - If V(absent) the host will be deleted from the cluster.
-            - If V(present) the host will be created in the cluster (includes V(enabled), V(disabled) and V(offline) states).
-            - If V(enabled) the host is fully operational.
-            - V(disabled), e.g. to perform maintenance operations.
-            - V(offline), host is totally offline.
-        choices:
-            - absent
-            - present
-            - enabled
-            - disabled
-            - offline
-        default: present
-        type: str
-    im_mad_name:
-        description:
-            - The name of the information manager, this values are taken from the oned.conf with the tag name IM_MAD (name)
-        default: kvm
-        type: str
-    vmm_mad_name:
-        description:
-            - The name of the virtual machine manager mad name, this values are taken from the oned.conf with the tag name VM_MAD (name)
-        default: kvm
-        type: str
-    cluster_id:
-        description:
-            - The cluster ID.
-        default: 0
-        type: int
-    cluster_name:
-        description:
-            - The cluster specified by name.
-        type: str
-    labels:
-        description:
-            - The labels for this host.
-        type: list
-        elements: str
-    template:
-        description:
-            - The template or attribute changes to merge into the host template.
-        aliases:
-            - attributes
-        type: dict
+  name:
+    description:
+      - Hostname of the machine to manage.
+    required: true
+    type: str
+  state:
+    description:
+      - Takes the host to the desired lifecycle state.
+      - If V(absent) the host will be deleted from the cluster.
+      - If V(present) the host will be created in the cluster (includes V(enabled), V(disabled) and V(offline) states).
+      - If V(enabled) the host is fully operational.
+      - V(disabled), for example to perform maintenance operations.
+      - V(offline), host is totally offline.
+    choices:
+      - absent
+      - present
+      - enabled
+      - disabled
+      - offline
+    default: present
+    type: str
+  im_mad_name:
+    description:
+      - The name of the information manager, this values are taken from the oned.conf with the tag name IM_MAD (name).
+    default: kvm
+    type: str
+  vmm_mad_name:
+    description:
+      - The name of the virtual machine manager mad name, this values are taken from the oned.conf with the tag name VM_MAD (name).
+    default: kvm
+    type: str
+  cluster_id:
+    description:
+      - The cluster ID.
+    default: 0
+    type: int
+  cluster_name:
+    description:
+      - The cluster specified by name.
+    type: str
+  labels:
+    description:
+      - The labels for this host.
+    type: list
+    elements: str
+  template:
+    description:
+      - The template or attribute changes to merge into the host template.
+    aliases:
+      - attributes
+    type: dict
 
 extends_documentation_fragment:
-    - community.general.opennebula
-    - community.general.attributes
+  - community.general.opennebula
+  - community.general.attributes
 
 author:
-    - Rafael del Valle (@rvalle)
-'''
+  - Rafael del Valle (@rvalle)
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a new host in OpenNebula
   community.general.one_host:
     name: host1
@@ -102,15 +100,15 @@ EXAMPLES = '''
     name: host2
     cluster_name: default
     template:
-        LABELS:
-            - gold
-            - ssd
-        RESERVED_CPU: -100
-'''
+      LABELS:
+        - gold
+        - ssd
+      RESERVED_CPU: -100
+"""
 
 # TODO: pending setting guidelines on returned values
-RETURN = '''
-'''
+RETURN = r"""
+"""
 
 # TODO: Documentation on valid state transitions is required to properly implement all valid cases
 # TODO: To be coherent with CLI this module should also provide "flush" functionality
