@@ -9,8 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: lxd_container
 short_description: Manage LXD instances
 description:
@@ -19,198 +18,180 @@ author: "Hiroaki Nakamura (@hnakamur)"
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-        version_added: 6.4.0
-    diff_mode:
-        support: full
-        version_added: 6.4.0
+  check_mode:
+    support: full
+    version_added: 6.4.0
+  diff_mode:
+    support: full
+    version_added: 6.4.0
 options:
-    name:
-        description:
-          - Name of an instance.
-        type: str
-        required: true
-    project:
-        description:
-          - 'Project of an instance.
-            See U(https://documentation.ubuntu.com/lxd/en/latest/projects/).'
-        required: false
-        type: str
-        version_added: 4.8.0
-    architecture:
-        description:
-          - 'The architecture for the instance (for example V(x86_64) or V(i686)).
-            See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/instances/instance_get).'
-        type: str
-        required: false
-    config:
-        description:
-          - 'The config for the instance (for example V({"limits.cpu": "2"})).
-            See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/instances/instance_get).'
-          - If the instance already exists and its "config" values in metadata
-            obtained from the LXD API U(https://documentation.ubuntu.com/lxd/en/latest/api/#/instances/instance_get)
-            are different, then this module tries to apply the configurations
-            U(https://documentation.ubuntu.com/lxd/en/latest/api/#/instances/instance_put).
-          - The keys starting with C(volatile.) are ignored for this comparison when O(ignore_volatile_options=true).
-        type: dict
-        required: false
-    ignore_volatile_options:
-        description:
-          - If set to V(true), options starting with C(volatile.) are ignored. As a result,
-            they are reapplied for each execution.
-          - This default behavior can be changed by setting this option to V(false).
-          - The default value changed from V(true) to V(false) in community.general 6.0.0.
-        type: bool
-        required: false
-        default: false
-        version_added: 3.7.0
-    profiles:
-        description:
-          - Profile to be used by the instance.
-        type: list
-        elements: str
-    devices:
-        description:
-          - 'The devices for the instance
-            (for example V({ "rootfs": { "path": "/dev/kvm", "type": "unix-char" }})).
-            See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/instances/instance_get).'
-        type: dict
-        required: false
-    ephemeral:
-        description:
-          - Whether or not the instance is ephemeral (for example V(true) or V(false)).
-            See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/instances/instance_get).
-        required: false
-        type: bool
-    source:
-        description:
-          - 'The source for the instance
-            (for example V({ "type": "image", "mode": "pull", "server": "https://cloud-images.ubuntu.com/releases/",
-            "protocol": "simplestreams", "alias": "22.04" })).'
-          - 'See U(https://documentation.ubuntu.com/lxd/en/latest/api/) for complete API documentation.'
-          - 'Note that C(protocol) accepts two choices: V(lxd) or V(simplestreams).'
-        required: false
-        type: dict
-    state:
-        choices:
-          - started
-          - stopped
-          - restarted
-          - absent
-          - frozen
-        description:
-          - Define the state of an instance.
-        required: false
-        default: started
-        type: str
-    target:
-        description:
-          - For cluster deployments. Will attempt to create an instance on a target node.
-            If the instance exists elsewhere in a cluster, then it will not be replaced or moved.
-            The name should respond to same name of the node you see in C(lxc cluster list).
-        type: str
-        required: false
-        version_added: 1.0.0
-    timeout:
-        description:
-          - A timeout for changing the state of the instance.
-          - This is also used as a timeout for waiting until IPv4 addresses
-            are set to the all network interfaces in the instance after
-            starting or restarting.
-        required: false
-        default: 30
-        type: int
-    type:
-        description:
-          - Instance type can be either V(virtual-machine) or V(container).
-        required: false
-        default: container
-        choices:
-          - container
-          - virtual-machine
-        type: str
-        version_added: 4.1.0
-    wait_for_ipv4_addresses:
-        description:
-          - If this is V(true), the C(lxd_container) waits until IPv4 addresses
-            are set to the all network interfaces in the instance after
-            starting or restarting.
-        required: false
-        default: false
-        type: bool
-    wait_for_container:
-        description:
-            - If set to V(true), the tasks will wait till the task reports a
-              success status when performing container operations.
-        default: false
-        type: bool
-        version_added: 4.4.0
-    force_stop:
-        description:
-          - If this is V(true), the C(lxd_container) forces to stop the instance
-            when it stops or restarts the instance.
-        required: false
-        default: false
-        type: bool
-    url:
-        description:
-          - The unix domain socket path or the https URL for the LXD server.
-        required: false
-        default: unix:/var/lib/lxd/unix.socket
-        type: str
-    snap_url:
-        description:
-          - The unix domain socket path when LXD is installed by snap package manager.
-        required: false
-        default: unix:/var/snap/lxd/common/lxd/unix.socket
-        type: str
-    client_key:
-        description:
-          - The client certificate key file path.
-          - If not specified, it defaults to C(${HOME}/.config/lxc/client.key).
-        required: false
-        aliases: [ key_file ]
-        type: path
-    client_cert:
-        description:
-          - The client certificate file path.
-          - If not specified, it defaults to C(${HOME}/.config/lxc/client.crt).
-        required: false
-        aliases: [ cert_file ]
-        type: path
-    trust_password:
-        description:
-          - The client trusted password.
-          - 'You need to set this password on the LXD server before
-            running this module using the following command:
-            C(lxc config set core.trust_password <some random password>).
-            See U(https://www.stgraber.org/2016/04/18/lxd-api-direct-interaction/).'
-          - If trust_password is set, this module send a request for
-            authentication before sending any requests.
-        required: false
-        type: str
+  name:
+    description:
+      - Name of an instance.
+    type: str
+    required: true
+  project:
+    description:
+      - Project of an instance.
+      - See U(https://documentation.ubuntu.com/lxd/en/latest/projects/).
+    required: false
+    type: str
+    version_added: 4.8.0
+  architecture:
+    description:
+      - The architecture for the instance (for example V(x86_64) or V(i686)).
+      - See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/instances/instance_get).
+    type: str
+    required: false
+  config:
+    description:
+      - 'The config for the instance (for example V({"limits.cpu": "2"})).
+      - See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/instances/instance_get).'
+      - If the instance already exists and its "config" values in metadata obtained from the LXD API
+        U(https://documentation.ubuntu.com/lxd/en/latest/api/#/instances/instance_get)
+        are different, then this module tries to apply the configurations U(https://documentation.ubuntu.com/lxd/en/latest/api/#/instances/instance_put).
+      - The keys starting with C(volatile.) are ignored for this comparison when O(ignore_volatile_options=true).
+    type: dict
+    required: false
+  ignore_volatile_options:
+    description:
+      - If set to V(true), options starting with C(volatile.) are ignored. As a result, they are reapplied for each execution.
+      - This default behavior can be changed by setting this option to V(false).
+      - The default value changed from V(true) to V(false) in community.general 6.0.0.
+    type: bool
+    required: false
+    default: false
+    version_added: 3.7.0
+  profiles:
+    description:
+      - Profile to be used by the instance.
+    type: list
+    elements: str
+  devices:
+    description:
+      - 'The devices for the instance (for example V({ "rootfs": { "path": "/dev/kvm", "type": "unix-char" }})).
+      - See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/instances/instance_get).'
+    type: dict
+    required: false
+  ephemeral:
+    description:
+      - Whether or not the instance is ephemeral (for example V(true) or V(false)).
+      - See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/instances/instance_get).
+    required: false
+    type: bool
+  source:
+    description:
+      - 'The source for the instance (for example V({ "type": "image", "mode": "pull", "server": "https://cloud-images.ubuntu.com/releases/",
+        "protocol": "simplestreams", "alias": "22.04" })).'
+      - See U(https://documentation.ubuntu.com/lxd/en/latest/api/) for complete API documentation.
+      - 'Note that C(protocol) accepts two choices: V(lxd) or V(simplestreams).'
+    required: false
+    type: dict
+  state:
+    choices:
+      - started
+      - stopped
+      - restarted
+      - absent
+      - frozen
+    description:
+      - Define the state of an instance.
+    required: false
+    default: started
+    type: str
+  target:
+    description:
+      - For cluster deployments. Will attempt to create an instance on a target node. If the instance exists elsewhere in a cluster, then it will
+        not be replaced or moved. The name should respond to same name of the node you see in C(lxc cluster list).
+    type: str
+    required: false
+    version_added: 1.0.0
+  timeout:
+    description:
+      - A timeout for changing the state of the instance.
+      - This is also used as a timeout for waiting until IPv4 addresses are set to the all network interfaces in the instance after starting or
+        restarting.
+    required: false
+    default: 30
+    type: int
+  type:
+    description:
+      - Instance type can be either V(virtual-machine) or V(container).
+    required: false
+    default: container
+    choices:
+      - container
+      - virtual-machine
+    type: str
+    version_added: 4.1.0
+  wait_for_ipv4_addresses:
+    description:
+      - If this is V(true), the C(lxd_container) waits until IPv4 addresses are set to the all network interfaces in the instance after starting
+        or restarting.
+    required: false
+    default: false
+    type: bool
+  wait_for_container:
+    description:
+      - If set to V(true), the tasks will wait till the task reports a success status when performing container operations.
+    default: false
+    type: bool
+    version_added: 4.4.0
+  force_stop:
+    description:
+      - If this is V(true), the C(lxd_container) forces to stop the instance when it stops or restarts the instance.
+    required: false
+    default: false
+    type: bool
+  url:
+    description:
+      - The unix domain socket path or the https URL for the LXD server.
+    required: false
+    default: unix:/var/lib/lxd/unix.socket
+    type: str
+  snap_url:
+    description:
+      - The unix domain socket path when LXD is installed by snap package manager.
+    required: false
+    default: unix:/var/snap/lxd/common/lxd/unix.socket
+    type: str
+  client_key:
+    description:
+      - The client certificate key file path.
+      - If not specified, it defaults to C(${HOME}/.config/lxc/client.key).
+    required: false
+    aliases: [key_file]
+    type: path
+  client_cert:
+    description:
+      - The client certificate file path.
+      - If not specified, it defaults to C(${HOME}/.config/lxc/client.crt).
+    required: false
+    aliases: [cert_file]
+    type: path
+  trust_password:
+    description:
+      - The client trusted password.
+      - 'You need to set this password on the LXD server before running this module using the following command: C(lxc config set core.trust_password
+        <some random password>). See U(https://www.stgraber.org/2016/04/18/lxd-api-direct-interaction/).'
+      - If trust_password is set, this module send a request for authentication before sending any requests.
+    required: false
+    type: str
 notes:
-  - Instances can be a container or a virtual machine, both of them must have unique name. If you attempt to create an instance
-    with a name that already existed in the users namespace the module will
-    simply return as "unchanged".
-  - There are two ways to run commands inside a container or virtual machine, using the command
-    module or using the ansible lxd connection plugin bundled in Ansible >=
-    2.1, the later requires python to be installed in the instance which can
-    be done with the command module.
-  - You can copy a file from the host to the instance
-    with the Ansible M(ansible.builtin.copy) and M(ansible.builtin.template) module
-    and the P(community.general.lxd#connection) connection plugin.
-    See the example below.
-  - You can copy a file in the created instance to the localhost
-    with C(command=lxc file pull instance_name/dir/filename filename).
-    See the first example below.
-  - linuxcontainers.org has phased out LXC/LXD support with March 2024
+  - Instances can be a container or a virtual machine, both of them must have unique name. If you attempt to create an instance with a name that
+    already existed in the users namespace the module will simply return as "unchanged".
+  - There are two ways to run commands inside a container or virtual machine, using the command module or using the ansible lxd connection plugin
+    bundled in Ansible >= 2.1, the later requires python to be installed in the instance which can be done with the command module.
+  - You can copy a file from the host to the instance with the Ansible M(ansible.builtin.copy) and M(ansible.builtin.template) module and the
+    P(community.general.lxd#connection) connection plugin. See the example below.
+  - You can copy a file in the created instance to the localhost with C(command=lxc file pull instance_name/dir/filename filename). See the first
+    example below.
+  - Linuxcontainers.org has phased out LXC/LXD support with March 2024
     (U(https://discuss.linuxcontainers.org/t/important-notice-for-lxd-users-image-server/18479)).
     Currently only Ubuntu is still providing images.
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # An example for creating a Ubuntu container and install python
 - hosts: localhost
   connection: local
@@ -279,7 +260,7 @@ EXAMPLES = '''
         source:
           type: image
           mode: pull
-          # Provides Ubuntu minimal images
+         # Provides Ubuntu minimal images
           server: https://cloud-images.ubuntu.com/minimal/releases/
           protocol: simplestreams
           alias: "22.04"
@@ -400,12 +381,12 @@ EXAMPLES = '''
           protocol: simplestreams
           type: image
           mode: pull
-          server: [...] # URL to the image server
+          server: ['...'] # URL to the image server
           alias: debian/11
         timeout: 600
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 addresses:
   description: Mapping from the network device name to a list of IPv4 addresses in the instance.
   returned: when state is started or restarted
@@ -426,7 +407,8 @@ actions:
   returned: success
   type: list
   sample: ["create", "start"]
-'''
+"""
+
 import copy
 import datetime
 import os
