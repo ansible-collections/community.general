@@ -1,0 +1,2 @@
+minor_changes:
+  - inventory/cobbler.py - fix a few typos, simplify required library imports, request full rendered variables for Cobbler system, allow end user to specify extra groups to add systems to in Ansible inventory, should not change currently expected behavior (https://github.com/ansible-collections/community.general/issues/9419)
