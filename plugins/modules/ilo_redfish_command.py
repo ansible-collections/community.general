@@ -82,7 +82,7 @@ ilo_redfish_command:
       type: dict
       contains:
         ret:
-          description: Return True/False based on whether the operation was performed successfully.
+          description: Return V(true)/V(false) based on whether the operation was performed successfully.
           type: bool
         msg:
           description: Status of the operation performed on the iLO.
