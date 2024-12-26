@@ -8,13 +8,12 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 author:
-    - Jeroen Hoekx (@jhoekx)
-    - Alexander Bulimov (@abulimov)
-    - Raoul Baudach (@unkaputtbar112)
-    - Ziga Kern (@zigaSRC)
+  - Jeroen Hoekx (@jhoekx)
+  - Alexander Bulimov (@abulimov)
+  - Raoul Baudach (@unkaputtbar112)
+  - Ziga Kern (@zigaSRC)
 module: lvol
 short_description: Configure LVM logical volumes
 description:
@@ -31,75 +30,69 @@ options:
     type: str
     required: true
     description:
-    - The volume group this logical volume is part of.
+      - The volume group this logical volume is part of.
   lv:
     type: str
     description:
-    - The name of the logical volume.
+      - The name of the logical volume.
   size:
     type: str
     description:
-    - The size of the logical volume, according to lvcreate(8) --size, by
-      default in megabytes or optionally with one of [bBsSkKmMgGtTpPeE] units; or
-      according to lvcreate(8) --extents as a percentage of [VG|PVS|FREE|ORIGIN];
-      Float values must begin with a digit.
-    - When resizing, apart from specifying an absolute size you may, according to
-      lvextend(8)|lvreduce(8) C(--size), specify the amount to extend the logical volume with
-      the prefix V(+) or the amount to reduce the logical volume by with prefix V(-).
-    - Resizing using V(+) or V(-) was not supported prior to community.general 3.0.0.
-    - Please note that when using V(+), V(-), or percentage of FREE, the module is B(not idempotent).
+      - The size of the logical volume, according to lvcreate(8) C(--size), by default in megabytes or optionally with one of [bBsSkKmMgGtTpPeE]
+        units; or according to lvcreate(8) --extents as a percentage of [VG|PVS|FREE|ORIGIN]; Float values must begin with a digit.
+      - When resizing, apart from specifying an absolute size you may, according to lvextend(8)|lvreduce(8) C(--size), specify the amount to extend
+        the logical volume with the prefix V(+) or the amount to reduce the logical volume by with prefix V(-).
+      - Resizing using V(+) or V(-) was not supported prior to community.general 3.0.0.
+      - Please note that when using V(+), V(-), or percentage of FREE, the module is B(not idempotent).
   state:
     type: str
     description:
-    - Control if the logical volume exists. If V(present) and the
-      volume does not already exist then the O(size) option is required.
-    choices: [ absent, present ]
+      - Control if the logical volume exists. If V(present) and the volume does not already exist then the O(size) option is required.
+    choices: [absent, present]
     default: present
   active:
     description:
-    - Whether the volume is active and visible to the host.
+      - Whether the volume is active and visible to the host.
     type: bool
     default: true
   force:
     description:
-    - Shrink or remove operations of volumes requires this switch. Ensures that
-      that filesystems get never corrupted/destroyed by mistake.
+      - Shrink or remove operations of volumes requires this switch. Ensures that that filesystems get never corrupted/destroyed by mistake.
     type: bool
     default: false
   opts:
     type: str
     description:
-    - Free-form options to be passed to the lvcreate command.
+      - Free-form options to be passed to the lvcreate command.
   snapshot:
     type: str
     description:
-    - The name of a snapshot volume to be configured. When creating a snapshot volume, the O(lv) parameter specifies the origin volume.
+      - The name of a snapshot volume to be configured. When creating a snapshot volume, the O(lv) parameter specifies the origin volume.
   pvs:
     type: list
     elements: str
     description:
-    - List of physical volumes (for example V(/dev/sda, /dev/sdb)).
+      - List of physical volumes (for example V(/dev/sda, /dev/sdb)).
   thinpool:
     type: str
     description:
-    - The thin pool volume name. When you want to create a thin provisioned volume, specify a thin pool volume name.
+      - The thin pool volume name. When you want to create a thin provisioned volume, specify a thin pool volume name.
   shrink:
     description:
-    - Shrink if current size is higher than size requested.
+      - Shrink if current size is higher than size requested.
     type: bool
     default: true
   resizefs:
     description:
-    - Resize the underlying filesystem together with the logical volume.
-    - Supported for C(ext2), C(ext3), C(ext4), C(reiserfs) and C(XFS) filesystems.
-      Attempts to resize other filesystem types will fail.
+      - Resize the underlying filesystem together with the logical volume.
+      - Supported for C(ext2), C(ext3), C(ext4), C(reiserfs) and C(XFS) filesystems. Attempts to resize other filesystem types will fail.
     type: bool
     default: false
 notes:
   - You must specify lv (when managing the state of logical volumes) or thinpool (when managing a thin provisioned volume).
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a logical volume of 512m
   community.general.lvol:
     vg: firefly
@@ -233,7 +226,7 @@ EXAMPLES = '''
     lv: test
     thinpool: testpool
     size: 128g
-'''
+"""
 
 import re
 import shlex
