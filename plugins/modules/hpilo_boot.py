@@ -14,8 +14,8 @@ module: hpilo_boot
 author: Dag Wieers (@dagwieers)
 short_description: Boot system using specific media through HP iLO interface
 description:
-  - 'This module boots a system through its HP iLO interface. The boot media can be one of: cdrom, floppy, hdd, network or
-    usb.'
+  - 'This module boots a system through its HP iLO interface. The boot media can be one of: V(cdrom), V(floppy), V(hdd),
+    V(network), or V(usb).'
   - This module requires the hpilo python module.
 extends_documentation_fragment:
   - community.general.attributes

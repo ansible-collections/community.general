@@ -36,7 +36,7 @@ options:
     type: str
   drain:
     description:
-      - Wait until the server has no active connections or until the timeout determined by wait_interval and wait_retries
+      - Wait until the server has no active connections or until the timeout determined by O(wait_interval) and O(wait_retries)
         is reached.
       - Continue only after the status changes to C(MAINT).
       - This overrides the shutdown_sessions option.

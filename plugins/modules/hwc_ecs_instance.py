@@ -134,7 +134,7 @@ options:
       - Specifies the initial login password of the administrator account for logging in to an ECS using password authentication.
         The Linux administrator is root, and the Windows administrator is Administrator. Password complexity requirements,
         consists of 8 to 26 characters. The password must contain at least three of the following character types 'uppercase
-        letters, lowercase letters, digits, and special characters (!@$%^-_=+[{}]:,./?)'. The password cannot contain the
+        letters, lowercase letters, digits, and special characters (V(!@$%^-_=+[{}]:,./?))'. The password cannot contain the
         username or the username in reverse. The Windows ECS password cannot contain the username, the username in reverse,
         or more than two consecutive characters in the username.
     type: str
