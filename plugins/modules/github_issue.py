@@ -10,7 +10,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: github_issue
 short_description: View GitHub issue
 description:
@@ -40,24 +40,24 @@ options:
     type: int
   action:
     description:
-        - Get various details about issue depending upon action specified.
+      - Get various details about issue depending upon action specified.
     default: 'get_status'
     choices:
-        - 'get_status'
+      - get_status
     type: str
 author:
-    - Abhijeet Kasurde (@Akasurde)
-'''
+  - Abhijeet Kasurde (@Akasurde)
+"""
 
-RETURN = '''
+RETURN = r"""
 issue_status:
-    description: State of the GitHub issue
-    type: str
-    returned: success
-    sample: open, closed
-'''
+  description: State of the GitHub issue.
+  type: str
+  returned: success
+  sample: open, closed
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Check if GitHub issue is closed or not
   community.general.github_issue:
     organization: ansible
@@ -70,7 +70,7 @@ EXAMPLES = '''
   ansible.builtin.debug:
     msg: Do something when issue 23642 is open
   when: r.issue_status == 'open'
-'''
+"""
 
 import json
 

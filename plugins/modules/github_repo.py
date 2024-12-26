@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: github_repo
 short_description: Manage your repositories on Github
 version_added: 2.2.0
@@ -26,81 +25,82 @@ attributes:
 options:
   username:
     description:
-    - Username used for authentication.
-    - This is only needed when not using O(access_token).
+      - Username used for authentication.
+      - This is only needed when not using O(access_token).
     type: str
     required: false
   password:
     description:
-    - Password used for authentication.
-    - This is only needed when not using O(access_token).
+      - Password used for authentication.
+      - This is only needed when not using O(access_token).
     type: str
     required: false
   access_token:
     description:
-    - Token parameter for authentication.
-    - This is only needed when not using O(username) and O(password).
+      - Token parameter for authentication.
+      - This is only needed when not using O(username) and O(password).
     type: str
     required: false
   name:
     description:
-    - Repository name.
+      - Repository name.
     type: str
     required: true
   description:
     description:
-    - Description for the repository.
-    - Defaults to empty if O(force_defaults=true), which is the default in this module.
-    - Defaults to empty if O(force_defaults=false) when creating a new repository.
-    - This is only used when O(state) is V(present).
+      - Description for the repository.
+      - Defaults to empty if O(force_defaults=true), which is the default in this module.
+      - Defaults to empty if O(force_defaults=false) when creating a new repository.
+      - This is only used when O(state) is V(present).
     type: str
     required: false
   private:
     description:
-    - Whether the repository should be private or not.
-    - Defaults to V(false) if O(force_defaults=true), which is the default in this module.
-    - Defaults to V(false) if O(force_defaults=false) when creating a new repository.
-    - This is only used when O(state=present).
+      - Whether the repository should be private or not.
+      - Defaults to V(false) if O(force_defaults=true), which is the default in this module.
+      - Defaults to V(false) if O(force_defaults=false) when creating a new repository.
+      - This is only used when O(state=present).
     type: bool
     required: false
   state:
     description:
-    - Whether the repository should exist or not.
+      - Whether the repository should exist or not.
     type: str
     default: present
-    choices: [ absent, present ]
+    choices: [absent, present]
     required: false
   organization:
     description:
-    - Organization for the repository.
-    - When O(state=present), the repository will be created in the current user profile.
+      - Organization for the repository.
+      - When O(state=present), the repository will be created in the current user profile.
     type: str
     required: false
   api_url:
     description:
-    - URL to the GitHub API if not using github.com but you own instance.
+      - URL to the GitHub API if not using github.com but you own instance.
     type: str
     default: 'https://api.github.com'
     version_added: "3.5.0"
   force_defaults:
     description:
-    - Overwrite current O(description) and O(private) attributes with defaults if set to V(true), which currently is the default.
-    - The default for this option will be deprecated in a future version of this collection, and eventually change to V(false).
+      - Overwrite current O(description) and O(private) attributes with defaults if set to V(true), which currently is the
+        default.
+      - The default for this option will be deprecated in a future version of this collection, and eventually change to V(false).
     type: bool
     default: true
     required: false
     version_added: 4.1.0
 requirements:
-- PyGithub>=1.54
+  - PyGithub>=1.54
 notes:
-- For Python 3, PyGithub>=1.54 should be used.
-- "For Python 3.5, PyGithub==1.54 should be used. More information: U(https://pygithub.readthedocs.io/en/latest/changes.html#version-1-54-november-30-2020)."
-- "For Python 2.7, PyGithub==1.45 should be used. More information: U(https://pygithub.readthedocs.io/en/latest/changes.html#version-1-45-december-29-2019)."
+  - For Python 3, PyGithub>=1.54 should be used.
+  - 'For Python 3.5, PyGithub==1.54 should be used. More information: U(https://pygithub.readthedocs.io/en/latest/changes.html#version-1-54-november-30-2020).'
+  - 'For Python 2.7, PyGithub==1.45 should be used. More information: U(https://pygithub.readthedocs.io/en/latest/changes.html#version-1-45-december-29-2019).'
 author:
-- Álvaro Torres Cogollo (@atorrescogollo)
-'''
+  - Álvaro Torres Cogollo (@atorrescogollo)
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a Github repository
   community.general.github_repo:
     access_token: mytoken
@@ -120,14 +120,14 @@ EXAMPLES = '''
     name: myrepo
     state: absent
   register: result
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 repo:
   description: Repository information as JSON. See U(https://docs.github.com/en/rest/reference/repos#get-a-repository).
   returned: success and O(state=present)
   type: dict
-'''
+"""
 
 import traceback
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib

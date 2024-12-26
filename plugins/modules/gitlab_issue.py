@@ -12,7 +12,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: gitlab_issue
 short_description: Create, update, or delete GitLab issues
 version_added: '8.1.0'
@@ -97,10 +97,10 @@ options:
       - A title for the issue. The title is used as a unique identifier to ensure idempotency.
     type: str
     required: true
-'''
+"""
 
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create Issue
   community.general.gitlab_issue:
     api_url: https://gitlab.com
@@ -109,10 +109,10 @@ EXAMPLES = '''
     title: "Ansible demo Issue"
     description: "Demo Issue description"
     labels:
-        - Ansible
-        - Demo
+      - Ansible
+      - Demo
     assignee_ids:
-        - testassignee
+      - testassignee
     state_filter: "opened"
     state: present
 
@@ -124,9 +124,9 @@ EXAMPLES = '''
     title: "Ansible demo Issue"
     state_filter: "opened"
     state: absent
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 msg:
   description: Success or failure message.
   returned: always
@@ -137,7 +137,7 @@ issue:
   description: API object.
   returned: success
   type: dict
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.api import basic_auth_argument_spec
