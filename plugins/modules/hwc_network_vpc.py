@@ -12,123 +12,120 @@ __metaclass__ = type
 # Documentation
 ###############################################################################
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: hwc_network_vpc
 description:
-    - Represents an vpc resource.
+  - Represents an vpc resource.
 short_description: Creates a Huawei Cloud VPC
 author: Huawei Inc. (@huaweicloud)
 requirements:
-    - requests >= 2.18.4
-    - keystoneauth1 >= 3.6.0
+  - requests >= 2.18.4
+  - keystoneauth1 >= 3.6.0
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    state:
+  state:
+    description:
+      - Whether the given object should exist in VPC.
+    type: str
+    choices: ['present', 'absent']
+    default: 'present'
+  timeouts:
+    description:
+      - The timeouts for each operations.
+    type: dict
+    default: {}
+    suboptions:
+      create:
         description:
-            - Whether the given object should exist in vpc.
+          - The timeout for create operation.
         type: str
-        choices: ['present', 'absent']
-        default: 'present'
-    timeouts:
+        default: '15m'
+      update:
         description:
-            - The timeouts for each operations.
-        type: dict
-        default: {}
-        suboptions:
-            create:
-                description:
-                    - The timeout for create operation.
-                type: str
-                default: '15m'
-            update:
-                description:
-                    - The timeout for update operation.
-                type: str
-                default: '15m'
-            delete:
-                description:
-                    - The timeout for delete operation.
-                type: str
-                default: '15m'
-    name:
-        description:
-            - The name of vpc.
+          - The timeout for update operation.
         type: str
-        required: true
-    cidr:
+        default: '15m'
+      delete:
         description:
-            - The range of available subnets in the vpc.
+          - The timeout for delete operation.
         type: str
-        required: true
+        default: '15m'
+  name:
+    description:
+      - The name of vpc.
+    type: str
+    required: true
+  cidr:
+    description:
+      - The range of available subnets in the VPC.
+    type: str
+    required: true
 extends_documentation_fragment:
   - community.general.hwc
   - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a vpc
   community.general.hwc_network_vpc:
-      identity_endpoint: "{{ identity_endpoint }}"
-      user: "{{ user }}"
-      password: "{{ password }}"
-      domain: "{{ domain }}"
-      project: "{{ project }}"
-      region: "{{ region }}"
-      name: "vpc_1"
-      cidr: "192.168.100.0/24"
-      state: present
-'''
+    identity_endpoint: "{{ identity_endpoint }}"
+    user: "{{ user }}"
+    password: "{{ password }}"
+    domain: "{{ domain }}"
+    project: "{{ project }}"
+    region: "{{ region }}"
+    name: "vpc_1"
+    cidr: "192.168.100.0/24"
+    state: present
+"""
 
-RETURN = '''
-    id:
-        description:
-            - the id of vpc.
-        type: str
-        returned: success
-    name:
-        description:
-            - the name of vpc.
-        type: str
-        returned: success
-    cidr:
-        description:
-            - the range of available subnets in the vpc.
-        type: str
-        returned: success
-    status:
-        description:
-            - the status of vpc.
-        type: str
-        returned: success
-    routes:
-        description:
-            - the route information.
-        type: complex
-        returned: success
-        contains:
-            destination:
-                description:
-                    - the destination network segment of a route.
-                type: str
-                returned: success
-            next_hop:
-                description:
-                    - the next hop of a route. If the route type is peering,
-                      it will provide VPC peering connection ID.
-                type: str
-                returned: success
-    enable_shared_snat:
-        description:
-            - show whether the shared snat is enabled.
-        type: bool
-        returned: success
-'''
+RETURN = r"""
+id:
+  description:
+    - The id of vpc.
+  type: str
+  returned: success
+name:
+  description:
+    - The name of vpc.
+  type: str
+  returned: success
+cidr:
+  description:
+    - The range of available subnets in the vpc.
+  type: str
+  returned: success
+status:
+  description:
+    - The status of vpc.
+  type: str
+  returned: success
+routes:
+  description:
+    - The route information.
+  type: complex
+  returned: success
+  contains:
+    destination:
+      description:
+        - The destination network segment of a route.
+      type: str
+      returned: success
+    next_hop:
+      description:
+        - The next hop of a route. If the route type is peering, it will provide VPC peering connection ID.
+      type: str
+      returned: success
+enable_shared_snat:
+  description:
+    - Show whether the shared snat is enabled.
+  type: bool
+  returned: success
+"""
 
 ###############################################################################
 # Imports

@@ -12,105 +12,90 @@ __metaclass__ = type
 # Documentation
 ###############################################################################
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: hwc_vpc_security_group_rule
 description:
-    - vpc security group management.
-short_description: Creates a resource of Vpc/SecurityGroupRule in Huawei Cloud
+  - VPC security group management.
+short_description: Creates a resource of VPC/SecurityGroupRule in Huawei Cloud
 notes:
-    - If O(id) option is provided, it takes precedence over
-      O(security_group_id) for security group rule selection.
-    - O(security_group_id) is used for security group rule selection. If more
-      than one security group rule with this options exists, execution is
-      aborted.
-    - No parameter support updating. If one of option is changed, the module
-      will create a new resource.
+  - If O(id) option is provided, it takes precedence over O(security_group_id) for security group rule selection.
+  - O(security_group_id) is used for security group rule selection. If more than one security group rule with this options
+    exists, execution is aborted.
+  - No parameter support updating. If one of option is changed, the module will create a new resource.
 version_added: '0.2.0'
 author: Huawei Inc. (@huaweicloud)
 requirements:
-    - keystoneauth1 >= 3.6.0
+  - keystoneauth1 >= 3.6.0
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    state:
-        description:
-            - Whether the given object should exist in Huawei Cloud.
-        type: str
-        choices: ['present', 'absent']
-        default: 'present'
-    direction:
-        description:
-            - Specifies the direction of access control. The value can be
-              egress or ingress.
-        type: str
-        required: true
-    security_group_id:
-        description:
-            - Specifies the security group rule ID, which uniquely identifies
-              the security group rule.
-        type: str
-        required: true
+  state:
     description:
-        description:
-            - Provides supplementary information about the security group rule.
-              The value is a string of no more than 255 characters that can
-              contain letters and digits.
-        type: str
-        required: false
-    ethertype:
-        description:
-            - Specifies the IP protocol version. The value can be IPv4 or IPv6.
-              If you do not set this parameter, IPv4 is used by default.
-        type: str
-        required: false
-    port_range_max:
-        description:
-            - Specifies the end port number. The value ranges from 1 to 65535.
-              If the protocol is not icmp, the value cannot be smaller than the
-              port_range_min value. An empty value indicates all ports.
-        type: int
-        required: false
-    port_range_min:
-        description:
-            - Specifies the start port number. The value ranges from 1 to
-              65535. The value cannot be greater than the port_range_max value.
-              An empty value indicates all ports.
-        type: int
-        required: false
-    protocol:
-        description:
-            - Specifies the protocol type. The value can be icmp, tcp, or udp.
-              If the parameter is left blank, the security group supports all
-              protocols.
-        type: str
-        required: false
-    remote_group_id:
-        description:
-            - Specifies the ID of the peer security group. The value is
-              exclusive with parameter remote_ip_prefix.
-        type: str
-        required: false
-    remote_ip_prefix:
-        description:
-            - Specifies the remote IP address. If the access control direction
-              is set to egress, the parameter specifies the source IP address.
-              If the access control direction is set to ingress, the parameter
-              specifies the destination IP address. The value can be in the
-              CIDR format or IP addresses. The parameter is exclusive with
-              parameter remote_group_id.
-        type: str
-        required: false
+      - Whether the given object should exist in Huawei Cloud.
+    type: str
+    choices: ['present', 'absent']
+    default: 'present'
+  direction:
+    description:
+      - Specifies the direction of access control. The value can be egress or ingress.
+    type: str
+    required: true
+  security_group_id:
+    description:
+      - Specifies the security group rule ID, which uniquely identifies the security group rule.
+    type: str
+    required: true
+  description:
+    description:
+      - Provides supplementary information about the security group rule. The value is a string of no more than 255 characters
+        that can contain letters and digits.
+    type: str
+    required: false
+  ethertype:
+    description:
+      - Specifies the IP protocol version. The value can be IPv4 or IPv6. If you do not set this parameter, IPv4 is used by
+        default.
+    type: str
+    required: false
+  port_range_max:
+    description:
+      - Specifies the end port number. The value ranges from 1 to 65535. If the protocol is not icmp, the value cannot be
+        smaller than the port_range_min value. An empty value indicates all ports.
+    type: int
+    required: false
+  port_range_min:
+    description:
+      - Specifies the start port number. The value ranges from 1 to 65535. The value cannot be greater than the port_range_max
+        value. An empty value indicates all ports.
+    type: int
+    required: false
+  protocol:
+    description:
+      - Specifies the protocol type. The value can be icmp, tcp, or udp. If the parameter is left blank, the security group
+        supports all protocols.
+    type: str
+    required: false
+  remote_group_id:
+    description:
+      - Specifies the ID of the peer security group. The value is exclusive with parameter remote_ip_prefix.
+    type: str
+    required: false
+  remote_ip_prefix:
+    description:
+      - Specifies the remote IP address. If the access control direction is set to egress, the parameter specifies the source
+        IP address. If the access control direction is set to ingress, the parameter specifies the destination IP address.
+        The value can be in the CIDR format or IP addresses. The parameter is exclusive with parameter remote_group_id.
+    type: str
+    required: false
 extends_documentation_fragment:
   - community.general.hwc
   - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 # create a security group rule
 - name: Create a security group
   hwc_vpc_security_group:
@@ -125,72 +110,62 @@ EXAMPLES = '''
     security_group_id: "{{ sg.id }}"
     port_range_min: 22
     remote_ip_prefix: "0.0.0.0/0"
-'''
+"""
 
-RETURN = '''
-    direction:
-        description:
-            - Specifies the direction of access control. The value can be
-              egress or ingress.
-        type: str
-        returned: success
-    security_group_id:
-        description:
-            - Specifies the security group rule ID, which uniquely identifies
-              the security group rule.
-        type: str
-        returned: success
-    description:
-        description:
-            - Provides supplementary information about the security group rule.
-              The value is a string of no more than 255 characters that can
-              contain letters and digits.
-        type: str
-        returned: success
-    ethertype:
-        description:
-            - Specifies the IP protocol version. The value can be IPv4 or IPv6.
-              If you do not set this parameter, IPv4 is used by default.
-        type: str
-        returned: success
-    port_range_max:
-        description:
-            - Specifies the end port number. The value ranges from 1 to 65535.
-              If the protocol is not icmp, the value cannot be smaller than the
-              port_range_min value. An empty value indicates all ports.
-        type: int
-        returned: success
-    port_range_min:
-        description:
-            - Specifies the start port number. The value ranges from 1 to
-              65535. The value cannot be greater than the port_range_max value.
-              An empty value indicates all ports.
-        type: int
-        returned: success
-    protocol:
-        description:
-            - Specifies the protocol type. The value can be icmp, tcp, or udp.
-              If the parameter is left blank, the security group supports all
-              protocols.
-        type: str
-        returned: success
-    remote_group_id:
-        description:
-            - Specifies the ID of the peer security group. The value is
-              exclusive with parameter remote_ip_prefix.
-        type: str
-        returned: success
-    remote_ip_prefix:
-        description:
-            - Specifies the remote IP address. If the access control direction
-              is set to egress, the parameter specifies the source IP address.
-              If the access control direction is set to ingress, the parameter
-              specifies the destination IP address. The value can be in the
-              CIDR format or IP addresses. The parameter is exclusive with
-              parameter remote_group_id.
-        type: str
-        returned: success
-'''
+RETURN = r"""
+direction:
+  description:
+    - Specifies the direction of access control. The value can be egress or ingress.
+  type: str
+  returned: success
+security_group_id:
+  description:
+    - Specifies the security group rule ID, which uniquely identifies the security group rule.
+  type: str
+  returned: success
+description:
+  description:
+    - Provides supplementary information about the security group rule. The value is a string of no more than 255 characters
+      that can contain letters and digits.
+  type: str
+  returned: success
+ethertype:
+  description:
+    - Specifies the IP protocol version. The value can be IPv4 or IPv6. If you do not set this parameter, IPv4 is used by
+      default.
+  type: str
+  returned: success
+port_range_max:
+  description:
+    - Specifies the end port number. The value ranges from 1 to 65535. If the protocol is not icmp, the value cannot be smaller
+      than the port_range_min value. An empty value indicates all ports.
+  type: int
+  returned: success
+port_range_min:
+  description:
+    - Specifies the start port number. The value ranges from 1 to 65535. The value cannot be greater than the port_range_max
+      value. An empty value indicates all ports.
+  type: int
+  returned: success
+protocol:
+  description:
+    - Specifies the protocol type. The value can be icmp, tcp, or udp. If the parameter is left blank, the security group
+      supports all protocols.
+  type: str
+  returned: success
+remote_group_id:
+  description:
+    - Specifies the ID of the peer security group. The value is exclusive with parameter remote_ip_prefix.
+  type: str
+  returned: success
+remote_ip_prefix:
+  description:
+    - Specifies the remote IP address. If the access control direction is set to egress, the parameter specifies the source
+      IP address. If the access control direction is set to ingress, the parameter specifies the destination IP address. The
+      value can be in the CIDR format or IP addresses. The parameter is exclusive with parameter remote_group_id.
+  type: str
+  returned: success
+"""
 
 from ansible_collections.community.general.plugins.module_utils.hwc_utils import (
     Config, HwcClientException, HwcModule, are_different_dicts, build_path,

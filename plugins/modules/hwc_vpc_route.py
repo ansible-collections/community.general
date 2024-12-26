@@ -12,60 +12,59 @@ __metaclass__ = type
 # Documentation
 ###############################################################################
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: hwc_vpc_route
 description:
-    - vpc route management.
-short_description: Creates a resource of Vpc/Route in Huawei Cloud
+  - VPC route management.
+short_description: Creates a resource of VPC/Route in Huawei Cloud
 notes:
-    - If O(id) option is provided, it takes precedence over O(destination), O(vpc_id), O(type), and O(next_hop) for route selection.
-    - O(destination), O(vpc_id), O(type) and O(next_hop) are used for route selection. If more than one route with this options exists, execution is aborted.
-    - No parameter support updating. If one of option is changed, the module will create a new resource.
+  - If O(id) option is provided, it takes precedence over O(destination), O(vpc_id), O(type), and O(next_hop) for route selection.
+  - O(destination), O(vpc_id), O(type) and O(next_hop) are used for route selection. If more than one route with this options
+    exists, execution is aborted.
+  - No parameter support updating. If one of option is changed, the module will create a new resource.
 version_added: '0.2.0'
 author: Huawei Inc. (@huaweicloud)
 requirements:
-    - keystoneauth1 >= 3.6.0
+  - keystoneauth1 >= 3.6.0
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    state:
-        description:
-            - Whether the given object should exist in Huawei Cloud.
-        type: str
-        choices: ['present', 'absent']
-        default: 'present'
-    destination:
-        description:
-            - Specifies the destination IP address or CIDR block.
-        type: str
-        required: true
-    next_hop:
-        description:
-            - Specifies the next hop. The value is VPC peering connection ID.
-        type: str
-        required: true
-    vpc_id:
-        description:
-            - Specifies the VPC ID to which route is added.
-        type: str
-        required: true
-    type:
-        description:
-            - Specifies the type of route.
-        type: str
-        required: false
-        default: 'peering'
+  state:
+    description:
+      - Whether the given object should exist in Huawei Cloud.
+    type: str
+    choices: ['present', 'absent']
+    default: 'present'
+  destination:
+    description:
+      - Specifies the destination IP address or CIDR block.
+    type: str
+    required: true
+  next_hop:
+    description:
+      - Specifies the next hop. The value is VPC peering connection ID.
+    type: str
+    required: true
+  vpc_id:
+    description:
+      - Specifies the VPC ID to which route is added.
+    type: str
+    required: true
+  type:
+    description:
+      - Specifies the type of route.
+    type: str
+    required: false
+    default: 'peering'
 extends_documentation_fragment:
   - community.general.hwc
   - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 # create a peering connect
 - name: Create a local vpc
   hwc_network_vpc:
@@ -91,35 +90,35 @@ EXAMPLES = '''
     vpc_id: "{{ vpc1.id }}"
     destination: "192.168.0.0/16"
     next_hop: "{{ connect.id }}"
-'''
+"""
 
-RETURN = '''
-    id:
-        description:
-            - UUID of the route.
-        type: str
-        returned: success
-    destination:
-        description:
-            - Specifies the destination IP address or CIDR block.
-        type: str
-        returned: success
-    next_hop:
-        description:
-            - Specifies the next hop. The value is VPC peering connection ID.
-        type: str
-        returned: success
-    vpc_id:
-        description:
-            - Specifies the VPC ID to which route is added.
-        type: str
-        returned: success
-    type:
-        description:
-            - Specifies the type of route.
-        type: str
-        returned: success
-'''
+RETURN = r"""
+id:
+  description:
+    - UUID of the route.
+  type: str
+  returned: success
+destination:
+  description:
+    - Specifies the destination IP address or CIDR block.
+  type: str
+  returned: success
+next_hop:
+  description:
+    - Specifies the next hop. The value is VPC peering connection ID.
+  type: str
+  returned: success
+vpc_id:
+  description:
+    - Specifies the VPC ID to which route is added.
+  type: str
+  returned: success
+type:
+  description:
+    - Specifies the type of route.
+  type: str
+  returned: success
+"""
 
 from ansible_collections.community.general.plugins.module_utils.hwc_utils import (
     Config, HwcClientException, HwcModule, are_different_dicts, build_path,

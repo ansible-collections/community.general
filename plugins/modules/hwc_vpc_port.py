@@ -12,110 +12,105 @@ __metaclass__ = type
 # Documentation
 ###############################################################################
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: hwc_vpc_port
 description:
-    - vpc port management.
-short_description: Creates a resource of Vpc/Port in Huawei Cloud
+  - VPC port management.
+short_description: Creates a resource of VPC/Port in Huawei Cloud
 version_added: '0.2.0'
 author: Huawei Inc. (@huaweicloud)
 requirements:
-    - keystoneauth1 >= 3.6.0
+  - keystoneauth1 >= 3.6.0
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    state:
+  state:
+    description:
+      - Whether the given object should exist in Huawei Cloud.
+    type: str
+    choices: ['present', 'absent']
+    default: 'present'
+  timeouts:
+    description:
+      - The timeouts for each operations.
+    type: dict
+    default: {}
+    suboptions:
+      create:
         description:
-            - Whether the given object should exist in Huawei Cloud.
+          - The timeouts for create operation.
         type: str
-        choices: ['present', 'absent']
-        default: 'present'
-    timeouts:
+        default: '15m'
+  subnet_id:
+    description:
+      - Specifies the ID of the subnet to which the port belongs.
+    type: str
+    required: true
+  admin_state_up:
+    description:
+      - Specifies the administrative state of the port.
+    type: bool
+    required: false
+  allowed_address_pairs:
+    description:
+      - Specifies a set of zero or more allowed address pairs.
+    required: false
+    type: list
+    elements: dict
+    suboptions:
+      ip_address:
         description:
-            - The timeouts for each operations.
-        type: dict
-        default: {}
-        suboptions:
-            create:
-                description:
-                    - The timeouts for create operation.
-                type: str
-                default: '15m'
-    subnet_id:
-        description:
-            - Specifies the ID of the subnet to which the port belongs.
-        type: str
-        required: true
-    admin_state_up:
-        description:
-            - Specifies the administrative state of the port.
-        type: bool
-        required: false
-    allowed_address_pairs:
-        description:
-            - Specifies a set of zero or more allowed address pairs.
-        required: false
-        type: list
-        elements: dict
-        suboptions:
-            ip_address:
-                description:
-                    - Specifies the IP address. It cannot set it to 0.0.0.0.
-                      Configure an independent security group for the port if a
-                      large CIDR block (subnet mask less than 24) is configured
-                      for parameter allowed_address_pairs.
-                type: str
-                required: false
-            mac_address:
-                description:
-                    - Specifies the MAC address.
-                type: str
-                required: false
-    extra_dhcp_opts:
-        description:
-            - Specifies the extended option of DHCP.
-        type: list
-        elements: dict
-        required: false
-        suboptions:
-            name:
-                description:
-                    - Specifies the option name.
-                type: str
-                required: false
-            value:
-                description:
-                    - Specifies the option value.
-                type: str
-                required: false
-    ip_address:
-        description:
-            - Specifies the port IP address.
+          - Specifies the IP address. It cannot set it to 0.0.0.0. Configure an independent security group for the port if
+            a large CIDR block (subnet mask less than 24) is configured for parameter allowed_address_pairs.
         type: str
         required: false
-    name:
+      mac_address:
         description:
-            - Specifies the port name. The value can contain no more than 255
-              characters.
+          - Specifies the MAC address.
         type: str
         required: false
-    security_groups:
+  extra_dhcp_opts:
+    description:
+      - Specifies the extended option of DHCP.
+    type: list
+    elements: dict
+    required: false
+    suboptions:
+      name:
         description:
-            - Specifies the ID of the security group.
-        type: list
-        elements: str
+          - Specifies the option name.
+        type: str
         required: false
+      value:
+        description:
+          - Specifies the option value.
+        type: str
+        required: false
+  ip_address:
+    description:
+      - Specifies the port IP address.
+    type: str
+    required: false
+  name:
+    description:
+      - Specifies the port name. The value can contain no more than 255 characters.
+    type: str
+    required: false
+  security_groups:
+    description:
+      - Specifies the ID of the security group.
+    type: list
+    elements: str
+    required: false
 extends_documentation_fragment:
   - community.general.hwc
   - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 # create a port
 - name: Create vpc
   hwc_network_vpc:
@@ -134,76 +129,73 @@ EXAMPLES = '''
   community.general.hwc_vpc_port:
     subnet_id: "{{ subnet.id }}"
     ip_address: "192.168.100.33"
-'''
+"""
 
-RETURN = '''
-    subnet_id:
-        description:
-            - Specifies the ID of the subnet to which the port belongs.
-        type: str
-        returned: success
-    admin_state_up:
-        description:
-            - Specifies the administrative state of the port.
-        type: bool
-        returned: success
-    allowed_address_pairs:
-        description:
-            - Specifies a set of zero or more allowed address pairs.
-        type: list
-        returned: success
-        contains:
-            ip_address:
-                description:
-                    - Specifies the IP address. It cannot set it to 0.0.0.0.
-                      Configure an independent security group for the port if a
-                      large CIDR block (subnet mask less than 24) is configured
-                      for parameter allowed_address_pairs.
-                type: str
-                returned: success
-            mac_address:
-                description:
-                    - Specifies the MAC address.
-                type: str
-                returned: success
-    extra_dhcp_opts:
-        description:
-            - Specifies the extended option of DHCP.
-        type: list
-        returned: success
-        contains:
-            name:
-                description:
-                    - Specifies the option name.
-                type: str
-                returned: success
-            value:
-                description:
-                    - Specifies the option value.
-                type: str
-                returned: success
+RETURN = r"""
+subnet_id:
+  description:
+    - Specifies the ID of the subnet to which the port belongs.
+  type: str
+  returned: success
+admin_state_up:
+  description:
+    - Specifies the administrative state of the port.
+  type: bool
+  returned: success
+allowed_address_pairs:
+  description:
+    - Specifies a set of zero or more allowed address pairs.
+  type: list
+  returned: success
+  contains:
     ip_address:
-        description:
-            - Specifies the port IP address.
-        type: str
-        returned: success
-    name:
-        description:
-            - Specifies the port name. The value can contain no more than 255
-              characters.
-        type: str
-        returned: success
-    security_groups:
-        description:
-            - Specifies the ID of the security group.
-        type: list
-        returned: success
+      description:
+        - Specifies the IP address. It cannot set it to 0.0.0.0. Configure an independent security group for the port if a
+          large CIDR block (subnet mask less than 24) is configured for parameter allowed_address_pairs.
+      type: str
+      returned: success
     mac_address:
-        description:
-            - Specifies the port MAC address.
-        type: str
-        returned: success
-'''
+      description:
+        - Specifies the MAC address.
+      type: str
+      returned: success
+extra_dhcp_opts:
+  description:
+    - Specifies the extended option of DHCP.
+  type: list
+  returned: success
+  contains:
+    name:
+      description:
+        - Specifies the option name.
+      type: str
+      returned: success
+    value:
+      description:
+        - Specifies the option value.
+      type: str
+      returned: success
+ip_address:
+  description:
+    - Specifies the port IP address.
+  type: str
+  returned: success
+name:
+  description:
+    - Specifies the port name. The value can contain no more than 255 characters.
+  type: str
+  returned: success
+security_groups:
+  description:
+    - Specifies the ID of the security group.
+  type: list
+  returned: success
+mac_address:
+  description:
+    - Specifies the port MAC address.
+  type: str
+  returned: success
+"""
 
 from ansible_collections.community.general.plugins.module_utils.hwc_utils import (
     Config, HwcClientException, HwcClientException404, HwcModule,
