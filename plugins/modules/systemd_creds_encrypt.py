@@ -16,7 +16,7 @@ description:
     - This module encrypts input using systemd's systemd-creds encrypt.
 author:
     - Thomas Sjögren (@konstruktoid)
-version_added: '9.0.0'
+version_added: '10.2.0'
 options:
     name:
         description:
