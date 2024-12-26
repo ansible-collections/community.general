@@ -9,8 +9,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: selinux_permissive
 short_description: Change permissive domain in SELinux policy
 description:
@@ -25,20 +24,20 @@ attributes:
 options:
   domain:
     description:
-        - The domain that will be added or removed from the list of permissive domains.
+      - The domain that will be added or removed from the list of permissive domains.
     type: str
     required: true
-    aliases: [ name ]
+    aliases: [name]
   permissive:
     description:
-        - Indicate if the domain should or should not be set as permissive.
+      - Indicate if the domain should or should not be set as permissive.
     type: bool
     required: true
   no_reload:
     description:
-        - Disable reloading of the SELinux policy after making change to a domain's permissive setting.
-        - The default is V(false), which causes policy to be reloaded when a domain changes state.
-        - Reloading the policy does not work on older versions of the C(policycoreutils-python) library, for example in EL 6."
+      - Disable reloading of the SELinux policy after making change to a domain's permissive setting.
+      - The default is V(false), which causes policy to be reloaded when a domain changes state.
+      - Reloading the policy does not work on older versions of the C(policycoreutils-python) library, for example in EL 6.".
     type: bool
     default: false
   store:
@@ -47,18 +46,18 @@ options:
     type: str
     default: ''
 notes:
-    - Requires a recent version of SELinux and C(policycoreutils-python) (EL 6 or newer).
-requirements: [ policycoreutils-python ]
+  - Requires a recent version of SELinux and C(policycoreutils-python) (EL 6 or newer).
+requirements: [policycoreutils-python]
 author:
-- Michael Scherer (@mscherer) <misc@zarb.org>
-'''
+  - Michael Scherer (@mscherer) <misc@zarb.org>
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Change the httpd_t domain to permissive
   community.general.selinux_permissive:
     name: httpd_t
     permissive: true
-'''
+"""
 
 import traceback
 
