@@ -8,13 +8,12 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: sensu_handler
 author: "David Moreau Simard (@dmsimard)"
 short_description: Manages Sensu handler configuration
 description:
-  - Manages Sensu handler configuration
+  - Manages Sensu handler configuration.
   - 'For more information, refer to the Sensu documentation: U(https://sensuapp.org/docs/latest/reference/handlers.html)'
 extends_documentation_fragment:
   - community.general.attributes
@@ -27,8 +26,8 @@ options:
   state:
     type: str
     description:
-      - Whether the handler should be present or not
-    choices: [ 'present', 'absent' ]
+      - Whether the handler should be present or not.
+    choices: ['present', 'absent']
     default: present
   name:
     type: str
@@ -38,8 +37,8 @@ options:
   type:
     type: str
     description:
-      - The handler type
-    choices: [ 'pipe', 'tcp', 'udp', 'transport', 'set' ]
+      - The handler type.
+    choices: ['pipe', 'tcp', 'udp', 'transport', 'set']
   filter:
     type: str
     description:
@@ -98,12 +97,10 @@ options:
     elements: str
     description:
       - An array of Sensu event handlers (names) to use for events using the handler set.
-      - 'NOTE: the handlers attribute is only required for handler sets (i.e. handlers configured with "type": "set").'
-notes:
-  - Check mode is supported
-'''
+      - 'NOTE: the handlers attribute is only required for handler sets (that is, handlers configured with O(type=set)).'
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # Configure a handler that sends event data as STDIN (pipe)
 - name: Configure IRC Sensu handler
   community.general.sensu_handler:
@@ -146,25 +143,25 @@ EXAMPLES = '''
     owner: "sensu"
     group: "sensu"
     mode: "0600"
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 config:
-  description: Effective handler configuration, when state is present
+  description: Effective handler configuration, when state is present.
   returned: success
   type: dict
   sample: {'name': 'irc', 'type': 'pipe', 'command': '/usr/local/bin/notify-irc.sh'}
 file:
-  description: Path to the handler configuration file
+  description: Path to the handler configuration file.
   returned: success
   type: str
   sample: "/etc/sensu/conf.d/handlers/irc.json"
 name:
-  description: Name of the handler
+  description: Name of the handler.
   returned: success
   type: str
   sample: "irc"
-'''
+"""
 
 import json
 import os

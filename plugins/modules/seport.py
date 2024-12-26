@@ -8,14 +8,13 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: seport
 short_description: Manages SELinux network port type definitions
 description:
-    - Manages SELinux network port type definitions.
+  - Manages SELinux network port type definitions.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
   check_mode:
     support: full
@@ -34,7 +33,7 @@ options:
       - Protocol for the specified port.
     type: str
     required: true
-    choices: [ tcp, udp ]
+    choices: [tcp, udp]
   setype:
     description:
       - SELinux type for the specified port.
@@ -44,7 +43,7 @@ options:
     description:
       - Desired boolean value.
     type: str
-    choices: [ absent, present ]
+    choices: [absent, present]
     default: present
   reload:
     description:
@@ -53,26 +52,26 @@ options:
     default: true
   ignore_selinux_state:
     description:
-    - Run independent of selinux runtime state
+      - Run independent of selinux runtime state.
     type: bool
     default: false
   local:
     description:
-    - Work with local modifications only.
+      - Work with local modifications only.
     type: bool
     default: false
     version_added: 5.6.0
 notes:
-   - The changes are persistent across reboots.
-   - Not tested on any debian based system.
+  - The changes are persistent across reboots.
+  - Not tested on any Debian based system.
 requirements:
-- libselinux-python
-- policycoreutils-python
+  - libselinux-python
+  - policycoreutils-python
 author:
-- Dan Keder (@dankeder)
-'''
+  - Dan Keder (@dankeder)
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Allow Apache to listen on tcp port 8888
   community.general.seport:
     ports: 8888
@@ -110,7 +109,7 @@ EXAMPLES = r'''
     setype: ssh_port_t
     state: absent
     local: true
-'''
+"""
 
 import traceback
 
