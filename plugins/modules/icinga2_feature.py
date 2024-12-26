@@ -13,39 +13,38 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: icinga2_feature
 
 short_description: Manage Icinga2 feature
 description:
-    - This module can be used to enable or disable an Icinga2 feature.
+  - This module can be used to enable or disable an Icinga2 feature.
 author: "Loic Blot (@nerzhul)"
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    name:
-      type: str
-      description:
+  name:
+    type: str
+    description:
       - This is the feature name to enable or disable.
-      required: true
-    state:
-      type: str
-      description:
+    required: true
+  state:
+    type: str
+    description:
       - If set to V(present) and feature is disabled, then feature is enabled.
       - If set to V(present) and feature is already enabled, then nothing is changed.
       - If set to V(absent) and feature is enabled, then feature is disabled.
       - If set to V(absent) and feature is already disabled, then nothing is changed.
-      choices: [ "present", "absent" ]
-      default: present
-'''
+    choices: ["present", "absent"]
+    default: present
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Enable ido-pgsql feature
   community.general.icinga2_feature:
     name: ido-pgsql
@@ -55,11 +54,11 @@ EXAMPLES = '''
   community.general.icinga2_feature:
     name: api
     state: absent
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 #
-'''
+"""
 
 import re
 from ansible.module_utils.basic import AnsibleModule
