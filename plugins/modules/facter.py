@@ -8,36 +8,34 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: facter
 short_description: Runs the discovery program C(facter) on the remote system
 description:
-    - Runs the C(facter) discovery program
-      (U(https://github.com/puppetlabs/facter)) on the remote system, returning
-      JSON data that can be useful for inventory purposes.
+  - Runs the C(facter) discovery program (U(https://github.com/puppetlabs/facter)) on the remote system, returning JSON data
+    that can be useful for inventory purposes.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    arguments:
-        description:
-            - Specifies arguments for facter.
-        type: list
-        elements: str
+  arguments:
+    description:
+      - Specifies arguments for facter.
+    type: list
+    elements: str
 requirements:
-    - facter
-    - ruby-json
+  - facter
+  - ruby-json
 author:
-    - Ansible Core Team
-    - Michael DeHaan
-'''
+  - Ansible Core Team
+  - Michael DeHaan
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # Example command-line invocation
 # ansible www.example.net -m facter
 
@@ -47,11 +45,11 @@ EXAMPLES = '''
 - name: Execute facter with arguments
   community.general.facter:
     arguments:
-        - -p
-        - system_uptime
-        - timezone
-        - is_virtual
-'''
+      - -p
+      - system_uptime
+      - timezone
+      - is_virtual
+"""
 import json
 
 from ansible.module_utils.basic import AnsibleModule

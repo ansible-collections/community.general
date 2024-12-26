@@ -10,12 +10,11 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: dnsimple
 short_description: Interface with dnsimple.com (a DNS hosting service)
 description:
-   - "Manages domains and records via the DNSimple API, see the docs: U(http://developer.dnsimple.com/)."
+  - 'Manages domains and records using the DNSimple API, see the docs: U(http://developer.dnsimple.com/).'
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -27,8 +26,8 @@ options:
   account_email:
     description:
       - Account email. If omitted, the environment variables E(DNSIMPLE_EMAIL) and E(DNSIMPLE_API_TOKEN) will be looked for.
-      - "If those aren't found, a C(.dnsimple) file will be looked for, see: U(https://github.com/mikemaccana/dnsimple-python#getting-started)."
-      - "C(.dnsimple) config files are only supported in dnsimple-python<2.0.0"
+      - "If those variables are not found, a C(.dnsimple) file will be looked for, see: U(https://github.com/mikemaccana/dnsimple-python#getting-started)."
+      - C(.dnsimple) config files are only supported in dnsimple-python<2.0.0.
     type: str
   account_api_token:
     description:
@@ -36,9 +35,9 @@ options:
     type: str
   domain:
     description:
-      - Domain to work with. Can be the domain name (e.g. "mydomain.com") or the numeric ID of the domain in DNSimple.
+      - Domain to work with. Can be the domain name (for example V(mydomain.com)) or the numeric ID of the domain in DNSimple.
       - If omitted, a list of domains will be returned.
-      - If domain is present but the domain doesn't exist, it will be created.
+      - If domain is present but the domain does not exist, it will be created.
     type: str
   record:
     description:
@@ -52,7 +51,8 @@ options:
   type:
     description:
       - The type of DNS record to create.
-    choices: [ 'A', 'ALIAS', 'CNAME', 'MX', 'SPF', 'URL', 'TXT', 'NS', 'SRV', 'NAPTR', 'PTR', 'AAAA', 'SSHFP', 'HINFO', 'POOL', 'CAA' ]
+    choices: ['A', 'ALIAS', 'CNAME', 'MX', 'SPF', 'URL', 'TXT', 'NS', 'SRV', 'NAPTR', 'PTR', 'AAAA', 'SSHFP', 'HINFO', 'POOL',
+      'CAA']
     type: str
   ttl:
     description:
@@ -70,8 +70,8 @@ options:
     type: int
   state:
     description:
-      - whether the record should exist or not.
-    choices: [ 'present', 'absent' ]
+      - Whether the record should exist or not.
+    choices: ['present', 'absent']
     default: present
     type: str
   solo:
@@ -91,9 +91,9 @@ options:
 requirements:
   - "dnsimple >= 2.0.0"
 author: "Alex Coomans (@drcapulet)"
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Authenticate using email and API token and fetch all domains
   community.general.dnsimple:
     account_email: test@example.com
@@ -149,7 +149,7 @@ EXAMPLES = '''
     value: example.com
     state: absent
   delegate_to: localhost
-'''
+"""
 
 RETURN = r"""# """
 

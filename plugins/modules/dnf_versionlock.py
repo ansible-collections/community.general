@@ -7,37 +7,32 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: dnf_versionlock
 version_added: '4.0.0'
 short_description: Locks package versions in C(dnf) based systems
 description:
-- Locks package versions using the C(versionlock) plugin in C(dnf) based
-  systems. This plugin takes a set of name and versions for packages and
-  excludes all other versions of those packages. This allows you to for example
-  protect packages from being updated by newer versions. The state of the
-  plugin that reflects locking of packages is the C(locklist).
+  - Locks package versions using the C(versionlock) plugin in C(dnf) based systems. This plugin takes a set of name and versions
+    for packages and excludes all other versions of those packages. This allows you to for example protect packages from being
+    updated by newer versions. The state of the plugin that reflects locking of packages is the C(locklist).
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
   check_mode:
     support: partial
     details:
-      - The logics of the C(versionlock) plugin for corner cases could be
-        confusing, so please take in account that this module will do its best to
-        give a C(check_mode) prediction on what is going to happen. In case of
-        doubt, check the documentation of the plugin.
-      - Sometimes the module could predict changes in C(check_mode) that will not
-        be such because C(versionlock) concludes that there is already a entry in
-        C(locklist) that already matches.
+      - The logics of the C(versionlock) plugin for corner cases could be confusing, so please take in account that this module
+        will do its best to give a C(check_mode) prediction on what is going to happen. In case of doubt, check the documentation
+        of the plugin.
+      - Sometimes the module could predict changes in C(check_mode) that will not be such because C(versionlock) concludes
+        that there is already a entry in C(locklist) that already matches.
   diff_mode:
     support: none
 options:
   name:
     description:
-      - Package name spec to add or exclude to or delete from the C(locklist)
-        using the format expected by the C(dnf repoquery) command.
+      - Package name spec to add or exclude to or delete from the C(locklist) using the format expected by the C(dnf repoquery)
+        command.
       - This parameter is mutually exclusive with O(state=clean).
     type: list
     required: false
@@ -45,43 +40,34 @@ options:
     default: []
   raw:
     description:
-        - Do not resolve package name specs to NEVRAs to find specific version
-          to lock to. Instead the package name specs are used as they are. This
-          enables locking to not yet available versions of the package.
+      - Do not resolve package name specs to NEVRAs to find specific version to lock to. Instead the package name specs are
+        used as they are. This enables locking to not yet available versions of the package.
     type: bool
     default: false
   state:
     description:
-        - Whether to add (V(present) or V(excluded)) to or remove (V(absent) or
-          V(clean)) from the C(locklist).
-        - V(present) will add a package name spec to the C(locklist). If there is a
-          installed package that matches, then only that version will be added.
-          Otherwise, all available package versions will be added.
-        - V(excluded) will add a package name spec as excluded to the
-          C(locklist). It means that packages represented by the package name
-          spec will be excluded from transaction operations. All available
-          package versions will be added.
-        - V(absent) will delete entries in the C(locklist) that match the
-          package name spec.
-        - V(clean) will delete all entries in the C(locklist). This option is
-          mutually exclusive with O(name).
-    choices: [ 'absent', 'clean', 'excluded', 'present' ]
+      - Whether to add (V(present) or V(excluded)) to or remove (V(absent) or V(clean)) from the C(locklist).
+      - V(present) will add a package name spec to the C(locklist). If there is a installed package that matches, then only
+        that version will be added. Otherwise, all available package versions will be added.
+      - V(excluded) will add a package name spec as excluded to the C(locklist). It means that packages represented by the
+        package name spec will be excluded from transaction operations. All available package versions will be added.
+      - V(absent) will delete entries in the C(locklist) that match the package name spec.
+      - V(clean) will delete all entries in the C(locklist). This option is mutually exclusive with O(name).
+    choices: ['absent', 'clean', 'excluded', 'present']
     type: str
     default: present
 notes:
-  - In an ideal world, the C(versionlock) plugin would have a dry-run option to
-    know for sure what is going to happen. So far we have to work with a best
-    guess as close as possible to the behaviour inferred from its code.
-  - For most of cases where you want to lock and unlock specific versions of a
-    package, this works fairly well.
+  - In an ideal world, the C(versionlock) plugin would have a dry-run option to know for sure what is going to happen. So
+    far we have to work with a best guess as close as possible to the behaviour inferred from its code.
+  - For most of cases where you want to lock and unlock specific versions of a package, this works fairly well.
 requirements:
   - dnf
   - dnf-plugin-versionlock
 author:
   - Roberto Moreda (@moreda) <moreda@allenta.com>
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Prevent installed nginx from being updated
   community.general.dnf_versionlock:
     name: nginx
@@ -113,34 +99,34 @@ EXAMPLES = r'''
 - name: Delete all entries in the locklist of versionlock
   community.general.dnf_versionlock:
     state: clean
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 locklist_pre:
-    description: Locklist before module execution.
-    returned: success
-    type: list
-    elements: str
-    sample: [ 'bash-0:4.4.20-1.el8_4.*', '!bind-32:9.11.26-4.el8_4.*' ]
+  description: Locklist before module execution.
+  returned: success
+  type: list
+  elements: str
+  sample: ['bash-0:4.4.20-1.el8_4.*', '!bind-32:9.11.26-4.el8_4.*']
 locklist_post:
-    description: Locklist after module execution.
-    returned: success and (not check mode or state is clean)
-    type: list
-    elements: str
-    sample: [ 'bash-0:4.4.20-1.el8_4.*' ]
+  description: Locklist after module execution.
+  returned: success and (not check mode or state is clean)
+  type: list
+  elements: str
+  sample: ['bash-0:4.4.20-1.el8_4.*']
 specs_toadd:
-    description: Package name specs meant to be added by versionlock.
-    returned: success
-    type: list
-    elements: str
-    sample: [ 'bash' ]
+  description: Package name specs meant to be added by versionlock.
+  returned: success
+  type: list
+  elements: str
+  sample: ['bash']
 specs_todelete:
-    description: Package name specs meant to be deleted by versionlock.
-    returned: success
-    type: list
-    elements: str
-    sample: [ 'bind' ]
-'''
+  description: Package name specs meant to be deleted by versionlock.
+  returned: success
+  type: list
+  elements: str
+  sample: ['bind']
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 import fnmatch

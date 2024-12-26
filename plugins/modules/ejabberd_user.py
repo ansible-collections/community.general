@@ -9,51 +9,50 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: ejabberd_user
 author: "Peter Sprygada (@privateip)"
 short_description: Manages users for ejabberd servers
 requirements:
-    - ejabberd with mod_admin_extra
+  - ejabberd with mod_admin_extra
 description:
-    - This module provides user management for ejabberd servers
+  - This module provides user management for ejabberd servers.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    username:
-        type: str
-        description:
-            - the name of the user to manage
-        required: true
-    host:
-        type: str
-        description:
-            - the ejabberd host associated with this username
-        required: true
-    password:
-        type: str
-        description:
-            - the password to assign to the username
-        required: false
-    state:
-        type: str
-        description:
-            - describe the desired state of the user to be managed
-        required: false
-        default: 'present'
-        choices: [ 'present', 'absent' ]
+  username:
+    type: str
+    description:
+      - The name of the user to manage.
+    required: true
+  host:
+    type: str
+    description:
+      - The ejabberd host associated with this username.
+    required: true
+  password:
+    type: str
+    description:
+      - The password to assign to the username.
+    required: false
+  state:
+    type: str
+    description:
+      - Describe the desired state of the user to be managed.
+    required: false
+    default: 'present'
+    choices: ['present', 'absent']
 notes:
-    - Password parameter is required for state == present only
-    - Passwords must be stored in clear text for this release
-    - The ejabberd configuration file must include mod_admin_extra as a module.
-'''
-EXAMPLES = '''
+  - Password parameter is required for O(state=present) only.
+  - Passwords must be stored in clear text for this release.
+  - The ejabberd configuration file must include mod_admin_extra as a module.
+"""
+EXAMPLES = r"""
 # Example playbook entries using the ejabberd_user module to manage users state.
 
 - name: Create a user if it does not exist
@@ -67,7 +66,7 @@ EXAMPLES = '''
     username: test
     host: server
     state: absent
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt

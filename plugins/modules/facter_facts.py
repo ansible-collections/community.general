@@ -9,47 +9,45 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: facter_facts
 short_description: Runs the discovery program C(facter) on the remote system and return Ansible facts
 version_added: 8.0.0
 description:
-    - Runs the C(facter) discovery program
-      (U(https://github.com/puppetlabs/facter)) on the remote system, returning Ansible facts from the
-      JSON data that can be useful for inventory purposes.
+  - Runs the C(facter) discovery program (U(https://github.com/puppetlabs/facter)) on the remote system, returning Ansible
+    facts from the JSON data that can be useful for inventory purposes.
 extends_documentation_fragment:
-    - community.general.attributes
-    - community.general.attributes.facts
-    - community.general.attributes.facts_module
+  - community.general.attributes
+  - community.general.attributes.facts
+  - community.general.attributes.facts_module
 options:
-    arguments:
-        description:
-            - Specifies arguments for facter.
-        type: list
-        elements: str
+  arguments:
+    description:
+      - Specifies arguments for facter.
+    type: list
+    elements: str
 requirements:
-    - facter
-    - ruby-json
+  - facter
+  - ruby-json
 author:
-    - Ansible Core Team
-    - Michael DeHaan
-'''
+  - Ansible Core Team
+  - Michael DeHaan
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Execute facter no arguments
   community.general.facter_facts:
 
 - name: Execute facter with arguments
   community.general.facter_facts:
     arguments:
-        - -p
-        - system_uptime
-        - timezone
-        - is_virtual
-'''
+      - -p
+      - system_uptime
+      - timezone
+      - is_virtual
+"""
 
-RETURN = r'''
+RETURN = r"""
 ansible_facts:
   description: Dictionary with one key C(facter).
   returned: always
@@ -59,7 +57,7 @@ ansible_facts:
       description: Dictionary containing facts discovered in the remote system.
       returned: always
       type: dict
-'''
+"""
 
 import json
 

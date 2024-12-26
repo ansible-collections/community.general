@@ -9,8 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: datadog_monitor
 short_description: Manages Datadog monitors
 description:
@@ -21,181 +20,181 @@ requirements: [datadog]
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    api_key:
-        description:
-          - Your Datadog API key.
-        required: true
-        type: str
-    api_host:
-        description:
-          - The URL to the Datadog API. Default value is V(https://api.datadoghq.com).
-          - This value can also be set with the E(DATADOG_HOST) environment variable.
-        required: false
-        type: str
-        version_added: '0.2.0'
-    app_key:
-        description:
-          - Your Datadog app key.
-        required: true
-        type: str
-    state:
-        description:
-          - The designated state of the monitor.
-        required: true
-        choices: ['present', 'absent', 'mute', 'unmute']
-        type: str
-    tags:
-        description:
-          - A list of tags to associate with your monitor when creating or updating.
-          - This can help you categorize and filter monitors.
-        type: list
-        elements: str
-    type:
-        description:
-          - The type of the monitor.
-          - The types V(query alert), V(trace-analytics alert) and V(rum alert) were added in community.general 2.1.0.
-          - The type V(composite) was added in community.general 3.4.0.
-          - The type V(event-v2 alert) was added in community.general 4.8.0.
-        choices:
-            - metric alert
-            - service check
-            - event alert
-            - event-v2 alert
-            - process alert
-            - log alert
-            - query alert
-            - trace-analytics alert
-            - rum alert
-            - composite
-        type: str
-    query:
-        description:
-          - The monitor query to notify on.
-          - Syntax varies depending on what type of monitor you are creating.
-        type: str
-    name:
-        description:
-          - The name of the alert.
-        required: true
-        type: str
-    notification_message:
-        description:
-          - A message to include with notifications for this monitor.
-          - Email notifications can be sent to specific users by using the same '@username' notation as events.
-          - Monitor message template variables can be accessed by using double square brackets, i.e '[[' and ']]'.
-        type: str
-    silenced:
-        type: dict
-        description:
-          - Dictionary of scopes to silence, with timestamps or None.
-          - Each scope will be muted until the given POSIX timestamp or forever if the value is None.
-    notify_no_data:
-        description:
-          - Whether this monitor will notify when data stops reporting.
-        type: bool
-        default: false
-    no_data_timeframe:
-        description:
-          - The number of minutes before a monitor will notify when data stops reporting.
-          - Must be at least 2x the monitor timeframe for metric alerts or 2 minutes for service checks.
-          - If not specified, it defaults to 2x timeframe for metric, 2 minutes for service.
-        type: str
-    timeout_h:
-        description:
-          - The number of hours of the monitor not reporting data before it will automatically resolve from a triggered state.
-        type: str
-    renotify_interval:
-        description:
-          - The number of minutes after the last notification before a monitor will re-notify on the current status.
-          - It will only re-notify if it is not resolved.
-        type: str
-    escalation_message:
-        description:
-          - A message to include with a re-notification. Supports the '@username' notification we allow elsewhere.
-          - Not applicable if O(renotify_interval=none).
-        type: str
-    notify_audit:
-        description:
-          - Whether tagged users will be notified on changes to this monitor.
-        type: bool
-        default: false
-    thresholds:
-        type: dict
-        description:
-          - A dictionary of thresholds by status.
-          - Only available for service checks and metric alerts.
-          - Because each of them can have multiple thresholds, we do not define them directly in the query.
-          - "If not specified, it defaults to: V({'ok': 1, 'critical': 1, 'warning': 1})."
-    locked:
-        description:
-          - Whether changes to this monitor should be restricted to the creator or admins.
-        type: bool
-        default: false
-    require_full_window:
-        description:
-          - Whether this monitor needs a full window of data before it gets evaluated.
-          - We highly recommend you set this to False for sparse metrics, otherwise some evaluations will be skipped.
-        type: bool
-    new_host_delay:
-        description:
-          - A positive integer representing the number of seconds to wait before evaluating the monitor for new hosts.
-          - This gives the host time to fully initialize.
-        type: str
-    evaluation_delay:
-        description:
-          - Time to delay evaluation (in seconds).
-          - Effective for sparse values.
-        type: str
-    id:
-        description:
-          - The ID of the alert.
-          - If set, will be used instead of the name to locate the alert.
-        type: str
-    include_tags:
-        description:
-          - Whether notifications from this monitor automatically inserts its triggering tags into the title.
-        type: bool
-        default: true
-        version_added: 1.3.0
-    priority:
-        description:
-          - Integer from 1 (high) to 5 (low) indicating alert severity.
-        type: int
-        version_added: 4.6.0
-    notification_preset_name:
-        description:
-          - Toggles the display of additional content sent in the monitor notification.
-        choices:
-            - show_all
-            - hide_query
-            - hide_handles
-            - hide_all
-        type: str
-        version_added: 7.1.0
-    renotify_occurrences:
-        description:
-            - The number of times re-notification messages should be sent on the current status at the provided re-notification interval.
-        type: int
-        version_added: 7.1.0
-    renotify_statuses:
-        description:
-            - The types of monitor statuses for which re-notification messages are sent.
-        choices:
-            - alert
-            - warn
-            - no data
-        type: list
-        elements: str
-        version_added: 7.1.0
+  api_key:
+    description:
+      - Your Datadog API key.
+    required: true
+    type: str
+  api_host:
+    description:
+      - The URL to the Datadog API. Default value is V(https://api.datadoghq.com).
+      - This value can also be set with the E(DATADOG_HOST) environment variable.
+    required: false
+    type: str
+    version_added: '0.2.0'
+  app_key:
+    description:
+      - Your Datadog app key.
+    required: true
+    type: str
+  state:
+    description:
+      - The designated state of the monitor.
+    required: true
+    choices: ['present', 'absent', 'mute', 'unmute']
+    type: str
+  tags:
+    description:
+      - A list of tags to associate with your monitor when creating or updating.
+      - This can help you categorize and filter monitors.
+    type: list
+    elements: str
+  type:
+    description:
+      - The type of the monitor.
+      - The types V(query alert), V(trace-analytics alert) and V(rum alert) were added in community.general 2.1.0.
+      - The type V(composite) was added in community.general 3.4.0.
+      - The type V(event-v2 alert) was added in community.general 4.8.0.
+    choices:
+      - metric alert
+      - service check
+      - event alert
+      - event-v2 alert
+      - process alert
+      - log alert
+      - query alert
+      - trace-analytics alert
+      - rum alert
+      - composite
+    type: str
+  query:
+    description:
+      - The monitor query to notify on.
+      - Syntax varies depending on what type of monitor you are creating.
+    type: str
+  name:
+    description:
+      - The name of the alert.
+    required: true
+    type: str
+  notification_message:
+    description:
+      - A message to include with notifications for this monitor.
+      - Email notifications can be sent to specific users by using the same '@username' notation as events.
+      - Monitor message template variables can be accessed by using double square brackets, in other words C([[) and C(]]).
+    type: str
+  silenced:
+    type: dict
+    description:
+      - Dictionary of scopes to silence, with timestamps or None.
+      - Each scope will be muted until the given POSIX timestamp or forever if the value is None.
+  notify_no_data:
+    description:
+      - Whether this monitor will notify when data stops reporting.
+    type: bool
+    default: false
+  no_data_timeframe:
+    description:
+      - The number of minutes before a monitor will notify when data stops reporting.
+      - Must be at least 2x the monitor timeframe for metric alerts or 2 minutes for service checks.
+      - If not specified, it defaults to 2x timeframe for metric, 2 minutes for service.
+    type: str
+  timeout_h:
+    description:
+      - The number of hours of the monitor not reporting data before it will automatically resolve from a triggered state.
+    type: str
+  renotify_interval:
+    description:
+      - The number of minutes after the last notification before a monitor will re-notify on the current status.
+      - It will only re-notify if it is not resolved.
+    type: str
+  escalation_message:
+    description:
+      - A message to include with a re-notification. Supports the '@username' notification we allow elsewhere.
+      - Not applicable if O(renotify_interval=none).
+    type: str
+  notify_audit:
+    description:
+      - Whether tagged users will be notified on changes to this monitor.
+    type: bool
+    default: false
+  thresholds:
+    type: dict
+    description:
+      - A dictionary of thresholds by status.
+      - Only available for service checks and metric alerts.
+      - Because each of them can have multiple thresholds, we do not define them directly in the query.
+      - "If not specified, it defaults to: V({'ok': 1, 'critical': 1, 'warning': 1})."
+  locked:
+    description:
+      - Whether changes to this monitor should be restricted to the creator or admins.
+    type: bool
+    default: false
+  require_full_window:
+    description:
+      - Whether this monitor needs a full window of data before it gets evaluated.
+      - We highly recommend you set this to False for sparse metrics, otherwise some evaluations will be skipped.
+    type: bool
+  new_host_delay:
+    description:
+      - A positive integer representing the number of seconds to wait before evaluating the monitor for new hosts.
+      - This gives the host time to fully initialize.
+    type: str
+  evaluation_delay:
+    description:
+      - Time to delay evaluation (in seconds).
+      - Effective for sparse values.
+    type: str
+  id:
+    description:
+      - The ID of the alert.
+      - If set, will be used instead of the name to locate the alert.
+    type: str
+  include_tags:
+    description:
+      - Whether notifications from this monitor automatically inserts its triggering tags into the title.
+    type: bool
+    default: true
+    version_added: 1.3.0
+  priority:
+    description:
+      - Integer from V(1) (high) to V(5) (low) indicating alert severity.
+    type: int
+    version_added: 4.6.0
+  notification_preset_name:
+    description:
+      - Toggles the display of additional content sent in the monitor notification.
+    choices:
+      - show_all
+      - hide_query
+      - hide_handles
+      - hide_all
+    type: str
+    version_added: 7.1.0
+  renotify_occurrences:
+    description:
+      - The number of times re-notification messages should be sent on the current status at the provided re-notification
+        interval.
+    type: int
+    version_added: 7.1.0
+  renotify_statuses:
+    description:
+      - The types of monitor statuses for which re-notification messages are sent.
+    choices:
+      - alert
+      - warn
+      - no data
+    type: list
+    elements: str
+    version_added: 7.1.0
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a metric monitor
   community.general.datadog_monitor:
     type: "metric alert"
@@ -239,7 +238,8 @@ EXAMPLES = '''
     api_host: https://api.datadoghq.eu
     api_key: "9775a026f1ca7d1c6c5af9d94d9595a4"
     app_key: "87ce4a24b5553d2e482ea8a8500e71b8ad4554ff"
-'''
+"""
+
 import traceback
 
 # Import Datadog

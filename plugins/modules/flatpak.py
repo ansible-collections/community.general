@@ -10,8 +10,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: flatpak
 short_description: Manage flatpaks
 description:
@@ -34,66 +33,60 @@ attributes:
 options:
   executable:
     description:
-    - The path to the C(flatpak) executable to use.
-    - By default, this module looks for the C(flatpak) executable on the path.
+      - The path to the C(flatpak) executable to use.
+      - By default, this module looks for the C(flatpak) executable on the path.
     type: path
     default: flatpak
   method:
     description:
-    - The installation method to use.
-    - Defines if the C(flatpak) is supposed to be installed globally for the whole V(system)
-      or only for the current V(user).
+      - The installation method to use.
+      - Defines if the C(flatpak) is supposed to be installed globally for the whole V(system) or only for the current V(user).
     type: str
-    choices: [ system, user ]
+    choices: [system, user]
     default: system
   name:
     description:
-    - The name of the flatpak to manage. To operate on several packages this
-      can accept a list of packages.
-    - When used with O(state=present), O(name) can be specified as a URL to a
-      C(flatpakref) file or the unique reverse DNS name that identifies a flatpak.
-    - Both C(https://) and C(http://) URLs are supported.
-    - When supplying a reverse DNS name, you can use the O(remote) option to specify on what remote
-      to look for the flatpak. An example for a reverse DNS name is C(org.gnome.gedit).
-    - When used with O(state=absent) or O(state=latest), it is recommended to specify the name in
-      the reverse DNS format.
-    - When supplying a URL with O(state=absent) or O(state=latest), the module will try to match the
-      installed flatpak based on the name of the flatpakref to remove or update it. However, there
-      is no guarantee that the names of the flatpakref file and the reverse DNS name of the
-      installed flatpak do match.
+      - The name of the flatpak to manage. To operate on several packages this can accept a list of packages.
+      - When used with O(state=present), O(name) can be specified as a URL to a C(flatpakref) file or the unique reverse DNS
+        name that identifies a flatpak.
+      - Both C(https://) and C(http://) URLs are supported.
+      - When supplying a reverse DNS name, you can use the O(remote) option to specify on what remote to look for the flatpak.
+        An example for a reverse DNS name is C(org.gnome.gedit).
+      - When used with O(state=absent) or O(state=latest), it is recommended to specify the name in the reverse DNS format.
+      - When supplying a URL with O(state=absent) or O(state=latest), the module will try to match the installed flatpak based
+        on the name of the flatpakref to remove or update it. However, there is no guarantee that the names of the flatpakref
+        file and the reverse DNS name of the installed flatpak do match.
     type: list
     elements: str
     required: true
   no_dependencies:
     description:
-    - If installing runtime dependencies should be omitted or not
-    - This parameter is primarily implemented for integration testing this module.
-      There might however be some use cases where you would want to have this, like when you are
-      packaging your own flatpaks.
+      - If installing runtime dependencies should be omitted or not.
+      - This parameter is primarily implemented for integration testing this module. There might however be some use cases
+        where you would want to have this, like when you are packaging your own flatpaks.
     type: bool
     default: false
     version_added: 3.2.0
   remote:
     description:
-    - The flatpak remote (repository) to install the flatpak from.
-    - By default, V(flathub) is assumed, but you do need to add the flathub flatpak_remote before
-      you can use this.
-    - See the M(community.general.flatpak_remote) module for managing flatpak remotes.
+      - The flatpak remote (repository) to install the flatpak from.
+      - By default, V(flathub) is assumed, but you do need to add the flathub flatpak_remote before you can use this.
+      - See the M(community.general.flatpak_remote) module for managing flatpak remotes.
     type: str
     default: flathub
   state:
     description:
-    - Indicates the desired package state.
-    - The value V(latest) is supported since community.general 8.6.0.
-    choices: [ absent, present, latest ]
+      - Indicates the desired package state.
+      - The value V(latest) is supported since community.general 8.6.0.
+    choices: [absent, present, latest]
     type: str
     default: present
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Install the spotify flatpak
   community.general.flatpak:
-    name:  https://s3.amazonaws.com/alexlarsson/spotify-repo/spotify.flatpakref
+    name: https://s3.amazonaws.com/alexlarsson/spotify-repo/spotify.flatpakref
     state: present
 
 - name: Install the gedit flatpak package without dependencies (not recommended)
@@ -123,7 +116,7 @@ EXAMPLES = r'''
 
 - name: Update the spotify flatpak
   community.general.flatpak:
-    name:  https://s3.amazonaws.com/alexlarsson/spotify-repo/spotify.flatpakref
+    name: https://s3.amazonaws.com/alexlarsson/spotify-repo/spotify.flatpakref
     state: latest
 
 - name: Update the gedit flatpak package without dependencies (not recommended)
@@ -164,35 +157,35 @@ EXAMPLES = r'''
       - org.inkscape.Inkscape
       - org.mozilla.firefox
     state: absent
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 command:
-  description: The exact flatpak command that was executed
+  description: The exact flatpak command that was executed.
   returned: When a flatpak command has been executed
   type: str
   sample: "/usr/bin/flatpak install --user --nontinteractive flathub org.gnome.Calculator"
 msg:
-  description: Module error message
+  description: Module error message.
   returned: failure
   type: str
   sample: "Executable '/usr/local/bin/flatpak' was not found on the system."
 rc:
-  description: Return code from flatpak binary
+  description: Return code from flatpak binary.
   returned: When a flatpak command has been executed
   type: int
   sample: 0
 stderr:
-  description: Error output from flatpak binary
+  description: Error output from flatpak binary.
   returned: When a flatpak command has been executed
   type: str
   sample: "error: Error searching remote flathub: Can't find ref org.gnome.KDE"
 stdout:
-  description: Output from flatpak binary
+  description: Output from flatpak binary.
   returned: When a flatpak command has been executed
   type: str
   sample: "org.gnome.Calendar/x86_64/stable\tcurrent\norg.gnome.gitg/x86_64/stable\tcurrent\n"
-'''
+"""
 
 from ansible.module_utils.six.moves.urllib.parse import urlparse
 from ansible.module_utils.basic import AnsibleModule

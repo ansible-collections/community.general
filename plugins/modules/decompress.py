@@ -9,18 +9,17 @@ from __future__ import (absolute_import, division, print_function)
 
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: decompress
 short_description: Decompresses compressed files
 version_added: 10.1.0
 description:
-    - Decompresses compressed files.
-    - The source (compressed) file and destination (decompressed) files are on the remote host.
-    - Source file can be deleted after decompression.
+  - Decompresses compressed files.
+  - The source (compressed) file and destination (decompressed) files are on the remote host.
+  - Source file can be deleted after decompression.
 extends_documentation_fragment:
-    - ansible.builtin.files
-    - community.general.attributes
+  - ansible.builtin.files
+  - community.general.attributes
 attributes:
   check_mode:
     support: full
@@ -36,17 +35,17 @@ options:
     description:
       - The file name of the destination file where the compressed file will be decompressed.
       - If the destination file exists, it will be truncated and overwritten.
-      - If not specified, the destination filename will be derived from O(src) by removing the compression format
-        extension. For example, if O(src) is V(/path/to/file.txt.gz) and O(format) is V(gz), O(dest) will be
-        V(/path/to/file.txt). If the O(src) file does not have an extension for the current O(format), the O(dest)
-        filename will be made by appending C(_decompressed) to the O(src) filename. For instance, if O(src) is
-        V(/path/to/file.myextension), the (dest) filename will be V(/path/to/file.myextension_decompressed).
+      - If not specified, the destination filename will be derived from O(src) by removing the compression format extension.
+        For example, if O(src) is V(/path/to/file.txt.gz) and O(format) is V(gz), O(dest) will be V(/path/to/file.txt). If
+        the O(src) file does not have an extension for the current O(format), the O(dest) filename will be made by appending
+        C(_decompressed) to the O(src) filename. For instance, if O(src) is V(/path/to/file.myextension), the (dest) filename
+        will be V(/path/to/file.myextension_decompressed).
     type: path
   format:
     description:
       - The type of compression to use to decompress.
     type: str
-    choices: [ gz, bz2, xz ]
+    choices: [gz, bz2, xz]
     default: gz
   remove:
     description:
@@ -54,12 +53,13 @@ options:
     type: bool
     default: false
 requirements:
-    - Requires C(lzma) (standard library of Python 3) or L(backports.lzma, https://pypi.org/project/backports.lzma/) (Python 2) if using C(xz) format.
+  - Requires C(lzma) (standard library of Python 3) or L(backports.lzma, https://pypi.org/project/backports.lzma/) (Python
+    2) if using C(xz) format.
 author:
   - Stanislav Shamilov (@shamilovstas)
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Decompress file /path/to/file.txt.gz into /path/to/file.txt (gz compression is used by default)
   community.general.decompress:
     src: /path/to/file.txt.gz
@@ -80,15 +80,15 @@ EXAMPLES = r'''
     src: /path/to/file.txt.gz
     dest: /path/to/file.txt
     remove: true
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 dest:
-  description: Path to decompressed file
+  description: Path to decompressed file.
   type: str
   returned: success
   sample: /path/to/file.txt
-'''
+"""
 
 import bz2
 import filecmp

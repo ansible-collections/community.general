@@ -9,14 +9,13 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: easy_install
 short_description: Installs Python libraries
 description:
-    - Installs Python libraries, optionally in a C(virtualenv)
+  - Installs Python libraries, optionally in a C(virtualenv).
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
   check_mode:
     support: full
@@ -31,31 +30,25 @@ options:
   virtualenv:
     type: str
     description:
-      - An optional O(virtualenv) directory path to install into. If the
-        O(virtualenv) does not exist, it is created automatically.
+      - An optional O(virtualenv) directory path to install into. If the O(virtualenv) does not exist, it is created automatically.
   virtualenv_site_packages:
     description:
-      - Whether the virtual environment will inherit packages from the
-        global site-packages directory.  Note that if this setting is
-        changed on an already existing virtual environment it will not
-        have any effect, the environment must be deleted and newly
-        created.
+      - Whether the virtual environment will inherit packages from the global site-packages directory. Note that if this setting
+        is changed on an already existing virtual environment it will not have any effect, the environment must be deleted
+        and newly created.
     type: bool
     default: false
   virtualenv_command:
     type: str
     description:
-      - The command to create the virtual environment with. For example
-        V(pyvenv), V(virtualenv), V(virtualenv2).
+      - The command to create the virtual environment with. For example V(pyvenv), V(virtualenv), V(virtualenv2).
     default: virtualenv
   executable:
     type: str
     description:
-      - The explicit executable or a pathname to the executable to be used to
-        run easy_install for a specific version of Python installed in the
-        system. For example V(easy_install-3.3), if there are both Python 2.7
-        and 3.3 installations in the system and you want to run easy_install
-        for the Python 3.3 installation.
+      - The explicit executable or a pathname to the executable to be used to run easy_install for a specific version of Python
+        installed in the system. For example V(easy_install-3.3), if there are both Python 2.7 and 3.3 installations in the
+        system and you want to run easy_install for the Python 3.3 installation.
     default: easy_install
   state:
     type: str
@@ -64,17 +57,14 @@ options:
     choices: [present, latest]
     default: present
 notes:
-    - Please note that the C(easy_install) module can only install Python
-      libraries. Thus this module is not able to remove libraries. It is
-      generally recommended to use the M(ansible.builtin.pip) module which you can first install
-      using M(community.general.easy_install).
-    - Also note that C(virtualenv) must be installed on the remote host if the
-      O(virtualenv) parameter is specified.
-requirements: [ "virtualenv" ]
+  - Please note that the C(easy_install) module can only install Python libraries. Thus this module is not able to remove
+    libraries. It is generally recommended to use the M(ansible.builtin.pip) module which you can first install using M(community.general.easy_install).
+  - Also note that C(virtualenv) must be installed on the remote host if the O(virtualenv) parameter is specified.
+requirements: ["virtualenv"]
 author: "Matt Wright (@mattupstate)"
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Install or update pip
   community.general.easy_install:
     name: pip
@@ -84,7 +74,7 @@ EXAMPLES = '''
   community.general.easy_install:
     name: bottle
     virtualenv: /webapps/myapp/venv
-'''
+"""
 
 import os
 import os.path

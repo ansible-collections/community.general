@@ -10,13 +10,12 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: django_manage
 short_description: Manages a Django application
 description:
-  - Manages a Django application using the C(manage.py) application frontend to C(django-admin). With the
-    O(virtualenv) parameter, all management commands will be executed by the given C(virtualenv) installation.
+  - Manages a Django application using the C(manage.py) application frontend to C(django-admin). With the O(virtualenv) parameter,
+    all management commands will be executed by the given C(virtualenv) installation.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -27,17 +26,18 @@ attributes:
 options:
   command:
     description:
-      - The name of the Django management command to run. The commands listed below are built in this module and have some basic parameter validation.
+      - The name of the Django management command to run. The commands listed below are built in this module and have some
+        basic parameter validation.
       - V(collectstatic) - Collects the static files into C(STATIC_ROOT).
       - V(createcachetable) - Creates the cache tables for use with the database cache backend.
       - V(flush) - Removes all data from the database.
       - V(loaddata) - Searches for and loads the contents of the named O(fixtures) into the database.
       - V(migrate) - Synchronizes the database state with models and migrations.
       - V(test) - Runs tests for all installed apps.
-      - Other commands can be entered, but will fail if they are unknown to Django. Other commands that may
-        prompt for user input should be run with the C(--noinput) flag.
-      - Support for the values V(cleanup), V(syncdb), V(validate) was removed in community.general 9.0.0.
-        See note about supported versions of Django.
+      - Other commands can be entered, but will fail if they are unknown to Django. Other commands that may prompt for user
+        input should be run with the C(--noinput) flag.
+      - Support for the values V(cleanup), V(syncdb), V(validate) was removed in community.general 9.0.0. See note about supported
+        versions of Django.
     type: str
     required: true
   project_path:
@@ -53,8 +53,8 @@ options:
     required: false
   pythonpath:
     description:
-      - A directory to add to the Python path. Typically used to include the settings module if it is located
-        external to the application directory.
+      - A directory to add to the Python path. Typically used to include the settings module if it is located external to
+        the application directory.
       - This would be equivalent to adding O(pythonpath)'s value to the E(PYTHONPATH) environment variable.
     type: path
     required: false
@@ -84,8 +84,7 @@ options:
     type: bool
   database:
     description:
-      - The database to target. Used by the V(createcachetable), V(flush), V(loaddata), V(syncdb),
-        and V(migrate) commands.
+      - The database to target. Used by the V(createcachetable), V(flush), V(loaddata), V(syncdb), and V(migrate) commands.
     type: str
     required: false
   failfast:
@@ -107,14 +106,13 @@ options:
     type: bool
   merge:
     description:
-      - Will run out-of-order or missing migrations as they are not rollback migrations, you can only use this
-        parameter with V(migrate) command.
+      - Will run out-of-order or missing migrations as they are not rollback migrations, you can only use this parameter with
+        V(migrate) command.
     required: false
     type: bool
   link:
     description:
-      - Will create links to the files instead of copying them, you can only use this parameter with
-        V(collectstatic) command.
+      - Will create links to the files instead of copying them, you can only use this parameter with V(collectstatic) command.
     required: false
     type: bool
   testrunner:
@@ -132,20 +130,17 @@ options:
     version_added: 5.8.0
 
 notes:
-  - >
-    B(ATTENTION): Support for Django releases older than 4.1 has been removed in
-    community.general version 9.0.0. While the module allows for free-form commands
-    does not verify the version of Django being used, it is B(strongly recommended)
-    to use a more recent version of Django.
+  - 'B(ATTENTION): Support for Django releases older than 4.1 has been removed in community.general version 9.0.0. While the
+    module allows for free-form commands, not verifying the version of Django being used, it is B(strongly recommended) to
+    use a more recent version of the framework.'
   - Please notice that Django 4.1 requires Python 3.8 or greater.
-  - This module will not create a virtualenv if the O(virtualenv) parameter is specified and a virtual environment
-    does not already exist at the given location. This behavior changed in community.general version 9.0.0.
+  - This module will not create a virtualenv if the O(virtualenv) parameter is specified and a virtual environment does not
+    already exist at the given location. This behavior changed in community.general version 9.0.0.
   - The recommended way to create a virtual environment in Ansible is by using M(ansible.builtin.pip).
-  - This module assumes English error messages for the V(createcachetable) command to detect table existence,
-    unfortunately.
+  - This module assumes English error messages for the V(createcachetable) command to detect table existence, unfortunately.
   - To be able to use the V(collectstatic) command, you must have enabled C(staticfiles) in your settings.
-  - Your C(manage.py) application must be executable (C(rwxr-xr-x)), and must have a valid shebang,
-    for example C(#!/usr/bin/env python), for invoking the appropriate Python interpreter.
+  - Your C(manage.py) application must be executable (C(rwxr-xr-x)), and must have a valid shebang, for example C(#!/usr/bin/env
+    python), for invoking the appropriate Python interpreter.
 seealso:
   - name: django-admin and manage.py Reference
     description: Reference for C(django-admin) or C(manage.py) commands.
@@ -156,13 +151,13 @@ seealso:
   - name: What Python version can I use with Django?
     description: From the Django FAQ, the response to Python requirements for the framework.
     link: https://docs.djangoproject.com/en/dev/faq/install/#what-python-version-can-i-use-with-django
-requirements: [ "django >= 4.1" ]
+requirements: ["django >= 4.1"]
 author:
   - Alexei Znamensky (@russoz)
   - Scott Anderson (@tastychutney)
-'''
+"""
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Run cleanup on the application installed in django_dir
   community.general.django_manage:
     command: clearsessions

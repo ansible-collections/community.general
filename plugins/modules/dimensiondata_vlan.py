@@ -10,8 +10,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: dimensiondata_vlan
 short_description: Manage a VLAN in a Cloud Control network domain
 extends_documentation_fragment:
@@ -45,32 +44,34 @@ options:
     type: str
   private_ipv4_base_address:
     description:
-        - The base address for the VLAN's IPv4 network (e.g. 192.168.1.0).
+      - The base address for the VLAN's IPv4 network (for example V(192.168.1.0)).
     type: str
     default: ''
   private_ipv4_prefix_size:
     description:
-        - The size of the IPv4 address space, e.g 24.
-        - Required, if O(private_ipv4_base_address) is specified.
+      - The size of the IPv4 address space, for example V(24).
+      - Required, if O(private_ipv4_base_address) is specified.
     type: int
     default: 0
   state:
     description:
       - The desired state for the target VLAN.
-      - V(readonly) ensures that the state is only ever read, not modified (the module will fail if the resource does not exist).
+      - V(readonly) ensures that the state is only ever read, not modified (the module will fail if the resource does not
+        exist).
     choices: [present, absent, readonly]
     default: present
     type: str
   allow_expand:
     description:
-      - Permit expansion of the target VLAN's network if the module parameters specify a larger network than the VLAN currently possesses.
+      - Permit expansion of the target VLAN's network if the module parameters specify a larger network than the VLAN currently
+        possesses.
       - If V(false), the module will fail under these conditions.
       - This is intended to prevent accidental expansion of a VLAN's network (since this operation is not reversible).
     type: bool
     default: false
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Add or update VLAN
   community.general.dimensiondata_vlan:
     region: na
@@ -100,59 +101,59 @@ EXAMPLES = '''
     name: my_vlan_1
     state: absent
     wait: true
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 vlan:
-    description: Dictionary describing the VLAN.
-    returned: On success when O(state=present)
-    type: complex
-    contains:
-        id:
-            description: VLAN ID.
-            type: str
-            sample: "aaaaa000-a000-4050-a215-2808934ccccc"
-        name:
-            description: VLAN name.
-            type: str
-            sample: "My VLAN"
-        description:
-            description: VLAN description.
-            type: str
-            sample: "My VLAN description"
-        location:
-            description: Datacenter location.
-            type: str
-            sample: NA3
-        private_ipv4_base_address:
-            description: The base address for the VLAN's private IPV4 network.
-            type: str
-            sample: 192.168.23.0
-        private_ipv4_prefix_size:
-            description: The prefix size for the VLAN's private IPV4 network.
-            type: int
-            sample: 24
-        private_ipv4_gateway_address:
-            description: The gateway address for the VLAN's private IPV4 network.
-            type: str
-            sample: 192.168.23.1
-        private_ipv6_base_address:
-            description: The base address for the VLAN's IPV6 network.
-            type: str
-            sample: 2402:9900:111:1195:0:0:0:0
-        private_ipv6_prefix_size:
-            description: The prefix size for the VLAN's IPV6 network.
-            type: int
-            sample: 64
-        private_ipv6_gateway_address:
-            description: The gateway address for the VLAN's IPV6 network.
-            type: str
-            sample: 2402:9900:111:1195:0:0:0:1
-        status:
-            description: VLAN status.
-            type: str
-            sample: NORMAL
-'''
+  description: Dictionary describing the VLAN.
+  returned: On success when O(state=present)
+  type: complex
+  contains:
+    id:
+      description: VLAN ID.
+      type: str
+      sample: "aaaaa000-a000-4050-a215-2808934ccccc"
+    name:
+      description: VLAN name.
+      type: str
+      sample: "My VLAN"
+    description:
+      description: VLAN description.
+      type: str
+      sample: "My VLAN description"
+    location:
+      description: Datacenter location.
+      type: str
+      sample: NA3
+    private_ipv4_base_address:
+      description: The base address for the VLAN's private IPV4 network.
+      type: str
+      sample: 192.168.23.0
+    private_ipv4_prefix_size:
+      description: The prefix size for the VLAN's private IPV4 network.
+      type: int
+      sample: 24
+    private_ipv4_gateway_address:
+      description: The gateway address for the VLAN's private IPV4 network.
+      type: str
+      sample: 192.168.23.1
+    private_ipv6_base_address:
+      description: The base address for the VLAN's IPV6 network.
+      type: str
+      sample: 2402:9900:111:1195:0:0:0:0
+    private_ipv6_prefix_size:
+      description: The prefix size for the VLAN's IPV6 network.
+      type: int
+      sample: 64
+    private_ipv6_gateway_address:
+      description: The gateway address for the VLAN's IPV6 network.
+      type: str
+      sample: 2402:9900:111:1195:0:0:0:1
+    status:
+      description: VLAN status.
+      type: str
+      sample: NORMAL
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.dimensiondata import DimensionDataModule, UnknownNetworkError
