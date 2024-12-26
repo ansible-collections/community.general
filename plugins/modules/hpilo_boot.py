@@ -9,14 +9,13 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: hpilo_boot
 author: Dag Wieers (@dagwieers)
 short_description: Boot system using specific media through HP iLO interface
 description:
-  - "This module boots a system through its HP iLO interface. The boot media
-    can be one of: cdrom, floppy, hdd, network or usb."
+  - 'This module boots a system through its HP iLO interface. The boot media can be one of: V(cdrom), V(floppy), V(hdd),
+    V(network), or V(usb).'
   - This module requires the hpilo python module.
 extends_documentation_fragment:
   - community.general.attributes
@@ -43,33 +42,32 @@ options:
     type: str
   media:
     description:
-      - The boot media to boot the system from
-    choices: [ "cdrom", "floppy", "rbsu", "hdd", "network", "normal", "usb" ]
+      - The boot media to boot the system from.
+    choices: ["cdrom", "floppy", "rbsu", "hdd", "network", "normal", "usb"]
     type: str
   image:
     description:
-      - The URL of a cdrom, floppy or usb boot media image.
-        protocol://username:password@hostname:port/filename
-      - protocol is either 'http' or 'https'
-      - username:password is optional
-      - port is optional
+      - The URL of a cdrom, floppy or usb boot media image in the form V(protocol://username:password@hostname:port/filename).
+      - V(protocol) is either V(http) or V(https).
+      - V(username:password) is optional.
+      - V(port) is optional.
     type: str
   state:
     description:
       - The state of the boot media.
-      - "no_boot: Do not boot from the device"
-      - "boot_once: Boot from the device once and then notthereafter"
-      - "boot_always: Boot from the device each time the server is rebooted"
-      - "connect: Connect the virtual media device and set to boot_always"
-      - "disconnect: Disconnects the virtual media device and set to no_boot"
-      - "poweroff: Power off the server"
+      - "V(no_boot): Do not boot from the device"
+      - "V(boot_once): Boot from the device once and then notthereafter"
+      - "V(boot_always): Boot from the device each time the server is rebooted"
+      - "V(connect): Connect the virtual media device and set to boot_always"
+      - "V(disconnect): Disconnects the virtual media device and set to no_boot"
+      - "V(poweroff): Power off the server"
     default: boot_once
     type: str
-    choices: [ "boot_always", "boot_once", "connect", "disconnect", "no_boot", "poweroff" ]
+    choices: ["boot_always", "boot_once", "connect", "disconnect", "no_boot", "poweroff"]
   force:
     description:
-    - Whether to force a reboot (even when the system is already booted).
-    - As a safeguard, without force, hpilo_boot will refuse to reboot a server that is already running.
+      - Whether to force a reboot (even when the system is already booted).
+      - As a safeguard, without force, hpilo_boot will refuse to reboot a server that is already running.
     default: false
     type: bool
   ssl_version:
@@ -77,16 +75,16 @@ options:
       - Change the ssl_version used.
     default: TLSv1
     type: str
-    choices: [ "SSLv3", "SSLv23", "TLSv1", "TLSv1_1", "TLSv1_2" ]
+    choices: ["SSLv3", "SSLv23", "TLSv1", "TLSv1_1", "TLSv1_2"]
 requirements:
-- python-hpilo
+  - python-hpilo
 notes:
-- To use a USB key image you need to specify floppy as boot media.
-- This module ought to be run from a system that can access the HP iLO
-  interface directly, either by using C(local_action) or using C(delegate_to).
-'''
+  - To use a USB key image you need to specify floppy as boot media.
+  - This module ought to be run from a system that can access the HP iLO interface directly, either by using C(local_action)
+    or using C(delegate_to).
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Task to boot a system using an ISO from an HP iLO interface only if the system is an HP server
   community.general.hpilo_boot:
     host: YOUR_ILO_ADDRESS
@@ -104,11 +102,11 @@ EXAMPLES = r'''
     password: YOUR_ILO_PASSWORD
     state: poweroff
   delegate_to: localhost
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 # Default return values
-'''
+"""
 
 import time
 import traceback

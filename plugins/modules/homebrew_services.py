@@ -14,47 +14,46 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = """
----
+DOCUMENTATION = r"""
 module: homebrew_services
 author:
-    - "Kit Ham (@kitizz)"
+  - "Kit Ham (@kitizz)"
 requirements:
-    - homebrew must already be installed on the target system
+  - homebrew must already be installed on the target system
 short_description: Services manager for Homebrew
 version_added: 9.3.0
 description:
-    - Manages daemons and services via Homebrew.
+  - Manages daemons and services using Homebrew.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    name:
-        description:
-            - An installed homebrew package whose service is to be updated.
-        aliases: [ 'formula' ]
-        type: str
-        required: true
-    path:
-        description:
-            - "A V(:) separated list of paths to search for C(brew) executable.
-              Since a package (I(formula) in homebrew parlance) location is prefixed relative to the actual path of C(brew) command,
-              providing an alternative C(brew) path enables managing different set of packages in an alternative location in the system."
-        default: '/usr/local/bin:/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin'
-        type: path
-    state:
-        description:
-            - State of the package's service.
-        choices: [ 'present', 'absent', 'restarted' ]
-        default: present
-        type: str
+  name:
+    description:
+      - An installed homebrew package whose service is to be updated.
+    aliases: ['formula']
+    type: str
+    required: true
+  path:
+    description:
+      - A V(:) separated list of paths to search for C(brew) executable. Since a package (I(formula) in homebrew parlance)
+        location is prefixed relative to the actual path of C(brew) command, providing an alternative C(brew) path enables
+        managing different set of packages in an alternative location in the system.
+    default: '/usr/local/bin:/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin'
+    type: path
+  state:
+    description:
+      - State of the package's service.
+    choices: ['present', 'absent', 'restarted']
+    default: present
+    type: str
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Install foo package
   community.general.homebrew:
     name: foo
@@ -76,19 +75,19 @@ EXAMPLES = """
     service_state: absent
 """
 
-RETURN = """
+RETURN = r"""
 pid:
-    description:
-      - If the service is now running, this is the PID of the service, otherwise -1.
-    returned: success
-    type: int
-    sample: 1234
+  description:
+    - If the service is now running, this is the PID of the service, otherwise -1.
+  returned: success
+  type: int
+  sample: 1234
 running:
-    description:
-      - Whether the service is running after running this command.
-    returned: success
-    type: bool
-    sample: true
+  description:
+    - Whether the service is running after running this command.
+  returned: success
+  type: bool
+  sample: true
 """
 
 import json

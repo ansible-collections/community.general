@@ -13,79 +13,75 @@ __metaclass__ = type
 # Documentation
 ###############################################################################
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: hwc_vpc_peering_connect
 description:
-    - vpc peering management.
-short_description: Creates a resource of Vpc/PeeringConnect in Huawei Cloud
+  - VPC peering management.
+short_description: Creates a resource of VPC/PeeringConnect in Huawei Cloud
 version_added: '0.2.0'
 author: Huawei Inc. (@huaweicloud)
 requirements:
-    - keystoneauth1 >= 3.6.0
+  - keystoneauth1 >= 3.6.0
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    state:
-        description:
-            - Whether the given object should exist in Huawei Cloud.
-        type: str
-        choices: ['present', 'absent']
-        default: 'present'
-    timeouts:
-        description:
-            - The timeouts for each operations.
-        type: dict
-        default: {}
-        suboptions:
-            create:
-                description:
-                    - The timeouts for create operation.
-                type: str
-                default: '15m'
-    local_vpc_id:
-        description:
-            - Specifies the ID of local VPC.
-        type: str
-        required: true
-    name:
-        description:
-            - Specifies the name of the VPC peering connection. The value can
-              contain 1 to 64 characters.
-        type: str
-        required: true
-    peering_vpc:
-        description:
-            - Specifies information about the peering VPC.
-        type: dict
-        required: true
-        suboptions:
-            vpc_id:
-                description:
-                    - Specifies the ID of peering VPC.
-                type: str
-                required: true
-            project_id:
-                description:
-                    - Specifies the ID of the project which the peering vpc
-                      belongs to.
-                type: str
-                required: false
+  state:
     description:
+      - Whether the given object should exist in Huawei Cloud.
+    type: str
+    choices: ['present', 'absent']
+    default: 'present'
+  timeouts:
+    description:
+      - The timeouts for each operations.
+    type: dict
+    default: {}
+    suboptions:
+      create:
         description:
-            - The description of vpc peering connection.
+          - The timeouts for create operation.
+        type: str
+        default: '15m'
+  local_vpc_id:
+    description:
+      - Specifies the ID of local VPC.
+    type: str
+    required: true
+  name:
+    description:
+      - Specifies the name of the VPC peering connection. The value can contain 1 to 64 characters.
+    type: str
+    required: true
+  peering_vpc:
+    description:
+      - Specifies information about the peering VPC.
+    type: dict
+    required: true
+    suboptions:
+      vpc_id:
+        description:
+          - Specifies the ID of peering VPC.
+        type: str
+        required: true
+      project_id:
+        description:
+          - Specifies the ID of the project which the peering vpc belongs to.
         type: str
         required: false
+  description:
+    description:
+      - The description of vpc peering connection.
+    type: str
+    required: false
 extends_documentation_fragment:
   - community.general.hwc
   - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 # create a peering connect
 - name: Create a local vpc
   hwc_network_vpc:
@@ -103,43 +99,41 @@ EXAMPLES = '''
     name: "ansible_network_peering_test"
     peering_vpc:
       vpc_id: "{{ vpc2.id }}"
-'''
+"""
 
-RETURN = '''
-    local_vpc_id:
-        description:
-            - Specifies the ID of local VPC.
-        type: str
-        returned: success
-    name:
-        description:
-            - Specifies the name of the VPC peering connection. The value can
-              contain 1 to 64 characters.
-        type: str
-        returned: success
-    peering_vpc:
-        description:
-            - Specifies information about the peering VPC.
-        type: dict
-        returned: success
-        contains:
-            vpc_id:
-                description:
-                    - Specifies the ID of peering VPC.
-                type: str
-                returned: success
-            project_id:
-                description:
-                    - Specifies the ID of the project which the peering vpc
-                      belongs to.
-                type: str
-                returned: success
-    description:
-        description:
-            - The description of vpc peering connection.
-        type: str
-        returned: success
-'''
+RETURN = r"""
+local_vpc_id:
+  description:
+    - Specifies the ID of local VPC.
+  type: str
+  returned: success
+name:
+  description:
+    - Specifies the name of the VPC peering connection. The value can contain 1 to 64 characters.
+  type: str
+  returned: success
+peering_vpc:
+  description:
+    - Specifies information about the peering VPC.
+  type: dict
+  returned: success
+  contains:
+    vpc_id:
+      description:
+        - Specifies the ID of peering VPC.
+      type: str
+      returned: success
+    project_id:
+      description:
+        - Specifies the ID of the project which the peering vpc belongs to.
+      type: str
+      returned: success
+description:
+  description:
+    - The description of vpc peering connection.
+  type: str
+  returned: success
+"""
 
 from ansible_collections.community.general.plugins.module_utils.hwc_utils import (
     Config, HwcClientException, HwcClientException404, HwcModule,

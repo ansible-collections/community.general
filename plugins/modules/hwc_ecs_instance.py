@@ -12,230 +12,207 @@ __metaclass__ = type
 # Documentation
 ###############################################################################
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: hwc_ecs_instance
 description:
-    - instance management.
+  - Instance management.
 short_description: Creates a resource of Ecs/Instance in Huawei Cloud
 version_added: '0.2.0'
 author: Huawei Inc. (@huaweicloud)
 requirements:
-    - keystoneauth1 >= 3.6.0
+  - keystoneauth1 >= 3.6.0
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    state:
-        description:
-            - Whether the given object should exist in Huawei Cloud.
-        type: str
-        choices: ['present', 'absent']
-        default: 'present'
-    timeouts:
-        description:
-            - The timeouts for each operations.
-        type: dict
-        default: {}
-        suboptions:
-            create:
-                description:
-                    - The timeouts for create operation.
-                type: str
-                default: '30m'
-            update:
-                description:
-                    - The timeouts for update operation.
-                type: str
-                default: '30m'
-            delete:
-                description:
-                    - The timeouts for delete operation.
-                type: str
-                default: '30m'
-    availability_zone:
-        description:
-            - Specifies the name of the AZ where the ECS is located.
-        type: str
-        required: true
-    flavor_name:
-        description:
-            - Specifies the name of the system flavor.
-        type: str
-        required: true
-    image_id:
-        description:
-            - Specifies the ID of the system image.
-        type: str
-        required: true
-    name:
-        description:
-            - Specifies the ECS name. Value requirements consists of 1 to 64
-              characters, including letters, digits, underscores (V(_)), hyphens
-              (V(-)), periods (V(.)).
-        type: str
-        required: true
-    nics:
-        description:
-            - Specifies the NIC information of the ECS. Constraints the
-              network of the NIC must belong to the VPC specified by vpc_id. A
-              maximum of 12 NICs can be attached to an ECS.
-        type: list
-        elements: dict
-        required: true
-        suboptions:
-            ip_address:
-                description:
-                    - Specifies the IP address of the NIC. The value is an IPv4
-                      address. Its value must be an unused IP
-                      address in the network segment of the subnet.
-                type: str
-                required: true
-            subnet_id:
-                description:
-                    - Specifies the ID of subnet.
-                type: str
-                required: true
-    root_volume:
-        description:
-            - Specifies the configuration of the ECS's system disks.
-        type: dict
-        required: true
-        suboptions:
-            volume_type:
-                description:
-                    - Specifies the ECS system disk type.
-                    - SATA is common I/O disk type.
-                    - SAS is high I/O disk type.
-                    - SSD is ultra-high I/O disk type.
-                    - co-p1 is high I/O (performance-optimized I) disk type.
-                    - uh-l1 is ultra-high I/O (latency-optimized) disk type.
-                    - NOTE is For HANA, HL1, and HL2 ECSs, use co-p1 and uh-l1
-                      disks. For other ECSs, do not use co-p1 or uh-l1 disks.
-                type: str
-                required: true
-            size:
-                description:
-                    - Specifies the system disk size, in GB. The value range is
-                      1 to 1024. The system disk size must be
-                      greater than or equal to the minimum system disk size
-                      supported by the image (min_disk attribute of the image).
-                      If this parameter is not specified or is set to 0, the
-                      default system disk size is the minimum value of the
-                      system disk in the image (min_disk attribute of the
-                      image).
-                type: int
-                required: false
-            snapshot_id:
-                description:
-                    - Specifies the snapshot ID or ID of the original data disk
-                      contained in the full-ECS image.
-                type: str
-                required: false
-    vpc_id:
-        description:
-            - Specifies the ID of the VPC to which the ECS belongs.
-        type: str
-        required: true
-    admin_pass:
-        description:
-            - Specifies the initial login password of the administrator account
-              for logging in to an ECS using password authentication. The Linux
-              administrator is root, and the Windows administrator is
-              Administrator. Password complexity requirements, consists of 8 to
-              26 characters. The password must contain at least three of the
-              following character types 'uppercase letters, lowercase letters,
-              digits, and special characters (!@$%^-_=+[{}]:,./?)'. The password
-              cannot contain the username or the username in reverse. The
-              Windows ECS password cannot contain the username, the username in
-              reverse, or more than two consecutive characters in the username.
-        type: str
-        required: false
-    data_volumes:
-        description:
-            - Specifies the data disks of ECS instance.
-        type: list
-        elements: dict
-        required: false
-        suboptions:
-            volume_id:
-                description:
-                    - Specifies the disk ID.
-                type: str
-                required: true
-            device:
-                description:
-                    - Specifies the disk device name.
-                type: str
-                required: false
+  state:
     description:
+      - Whether the given object should exist in Huawei Cloud.
+    type: str
+    choices: ['present', 'absent']
+    default: 'present'
+  timeouts:
+    description:
+      - The timeouts for each operations.
+    type: dict
+    default: {}
+    suboptions:
+      create:
         description:
-            - Specifies the description of an ECS, which is a null string by
-              default. Can contain a maximum of 85 characters. Cannot contain
-              special characters, such as < and >.
+          - The timeouts for create operation.
+        type: str
+        default: '30m'
+      update:
+        description:
+          - The timeouts for update operation.
+        type: str
+        default: '30m'
+      delete:
+        description:
+          - The timeouts for delete operation.
+        type: str
+        default: '30m'
+  availability_zone:
+    description:
+      - Specifies the name of the AZ where the ECS is located.
+    type: str
+    required: true
+  flavor_name:
+    description:
+      - Specifies the name of the system flavor.
+    type: str
+    required: true
+  image_id:
+    description:
+      - Specifies the ID of the system image.
+    type: str
+    required: true
+  name:
+    description:
+      - Specifies the ECS name. Value requirements consists of 1 to 64 characters, including letters, digits, underscores
+        (V(_)), hyphens (V(-)), periods (V(.)).
+    type: str
+    required: true
+  nics:
+    description:
+      - Specifies the NIC information of the ECS. Constraints the network of the NIC must belong to the VPC specified by vpc_id.
+        A maximum of 12 NICs can be attached to an ECS.
+    type: list
+    elements: dict
+    required: true
+    suboptions:
+      ip_address:
+        description:
+          - Specifies the IP address of the NIC. The value is an IPv4 address. Its value must be an unused IP address in the
+            network segment of the subnet.
+        type: str
+        required: true
+      subnet_id:
+        description:
+          - Specifies the ID of subnet.
+        type: str
+        required: true
+  root_volume:
+    description:
+      - Specifies the configuration of the ECS's system disks.
+    type: dict
+    required: true
+    suboptions:
+      volume_type:
+        description:
+          - Specifies the ECS system disk type.
+          - SATA is common I/O disk type.
+          - SAS is high I/O disk type.
+          - SSD is ultra-high I/O disk type.
+          - Co-p1 is high I/O (performance-optimized I) disk type.
+          - Uh-l1 is ultra-high I/O (latency-optimized) disk type.
+          - NOTE is For HANA, HL1, and HL2 ECSs, use co-p1 and uh-l1 disks. For other ECSs, do not use co-p1 or uh-l1 disks.
+        type: str
+        required: true
+      size:
+        description:
+          - Specifies the system disk size, in GB. The value range is 1 to 1024. The system disk size must be greater than
+            or equal to the minimum system disk size supported by the image (min_disk attribute of the image). If this parameter
+            is not specified or is set to 0, the default system disk size is the minimum value of the system disk in the image
+            (min_disk attribute of the image).
+        type: int
+        required: false
+      snapshot_id:
+        description:
+          - Specifies the snapshot ID or ID of the original data disk contained in the full-ECS image.
         type: str
         required: false
-    eip_id:
+  vpc_id:
+    description:
+      - Specifies the ID of the VPC to which the ECS belongs.
+    type: str
+    required: true
+  admin_pass:
+    description:
+      - Specifies the initial login password of the administrator account for logging in to an ECS using password authentication.
+        The Linux administrator is root, and the Windows administrator is Administrator. Password complexity requirements,
+        consists of 8 to 26 characters. The password must contain at least three of the following character types 'uppercase
+        letters, lowercase letters, digits, and special characters (V(!@$%^-_=+[{}]:,./?))'. The password cannot contain the
+        username or the username in reverse. The Windows ECS password cannot contain the username, the username in reverse,
+        or more than two consecutive characters in the username.
+    type: str
+    required: false
+  data_volumes:
+    description:
+      - Specifies the data disks of ECS instance.
+    type: list
+    elements: dict
+    required: false
+    suboptions:
+      volume_id:
         description:
-            - Specifies the ID of the elastic IP address assigned to the ECS.
-              Only elastic IP addresses in the DOWN state can be
-              assigned.
+          - Specifies the disk ID.
+        type: str
+        required: true
+      device:
+        description:
+          - Specifies the disk device name.
         type: str
         required: false
-    enable_auto_recovery:
-        description:
-            - Specifies whether automatic recovery is enabled on the ECS.
-        type: bool
-        required: false
-    enterprise_project_id:
-        description:
-            - Specifies the ID of the enterprise project to which the ECS
-              belongs.
-        type: str
-        required: false
-    security_groups:
-        description:
-            - Specifies the security groups of the ECS. If this
-              parameter is left blank, the default security group is bound to
-              the ECS by default.
-        type: list
-        elements: str
-        required: false
-    server_metadata:
-        description:
-            - Specifies the metadata of ECS to be created.
-        type: dict
-        required: false
-    server_tags:
-        description:
-            - Specifies the tags of an ECS. When you create ECSs, one ECS
-              supports up to 10 tags.
-        type: dict
-        required: false
-    ssh_key_name:
-        description:
-            - Specifies the name of the SSH key used for logging in to the ECS.
-        type: str
-        required: false
-    user_data:
-        description:
-            - Specifies the user data to be injected during the ECS creation
-              process. Text, text files, and gzip files can be injected.
-              The content to be injected must be encoded with
-              base64. The maximum size of the content to be injected (before
-              encoding) is 32 KB. For Linux ECSs, this parameter does not take
-              effect when adminPass is used.
-        type: str
-        required: false
+  description:
+    description:
+      - Specifies the description of an ECS, which is a null string by default. Can contain a maximum of 85 characters. Cannot
+        contain special characters, such as V(<) and V(>).
+    type: str
+    required: false
+  eip_id:
+    description:
+      - Specifies the ID of the elastic IP address assigned to the ECS. Only elastic IP addresses in the DOWN state can be
+        assigned.
+    type: str
+    required: false
+  enable_auto_recovery:
+    description:
+      - Specifies whether automatic recovery is enabled on the ECS.
+    type: bool
+    required: false
+  enterprise_project_id:
+    description:
+      - Specifies the ID of the enterprise project to which the ECS belongs.
+    type: str
+    required: false
+  security_groups:
+    description:
+      - Specifies the security groups of the ECS. If this parameter is left blank, the default security group is bound to
+        the ECS by default.
+    type: list
+    elements: str
+    required: false
+  server_metadata:
+    description:
+      - Specifies the metadata of ECS to be created.
+    type: dict
+    required: false
+  server_tags:
+    description:
+      - Specifies the tags of an ECS. When you create ECSs, one ECS supports up to 10 tags.
+    type: dict
+    required: false
+  ssh_key_name:
+    description:
+      - Specifies the name of the SSH key used for logging in to the ECS.
+    type: str
+    required: false
+  user_data:
+    description:
+      - Specifies the user data to be injected during the ECS creation process. Text, text files, and gzip files can be injected.
+        The content to be injected must be encoded with base64. The maximum size of the content to be injected (before encoding)
+        is 32 KB. For Linux ECSs, this parameter does not take effect when adminPass is used.
+    type: str
+    required: false
 extends_documentation_fragment:
   - community.general.hwc
   - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 # create an ecs instance
 - name: Create a vpc
   hwc_network_vpc:
@@ -285,238 +262,216 @@ EXAMPLES = '''
     vpc_id: "{{ vpc.id }}"
     root_volume:
       volume_type: "SAS"
-'''
+"""
 
-RETURN = '''
-    availability_zone:
-        description:
-            - Specifies the name of the AZ where the ECS is located.
-        type: str
-        returned: success
-    flavor_name:
-        description:
-            - Specifies the name of the system flavor.
-        type: str
-        returned: success
-    image_id:
-        description:
-            - Specifies the ID of the system image.
-        type: str
-        returned: success
-    name:
-        description:
-            - Specifies the ECS name. Value requirements "Consists of 1 to 64
-              characters, including letters, digits, underscores (V(_)), hyphens
-              (V(-)), periods (V(.)).".
-        type: str
-        returned: success
-    nics:
-        description:
-            - Specifies the NIC information of the ECS. The
-              network of the NIC must belong to the VPC specified by vpc_id. A
-              maximum of 12 NICs can be attached to an ECS.
-        type: list
-        returned: success
-        contains:
-            ip_address:
-                description:
-                    - Specifies the IP address of the NIC. The value is an IPv4
-                      address. Its value must be an unused IP
-                      address in the network segment of the subnet.
-                type: str
-                returned: success
-            subnet_id:
-                description:
-                    - Specifies the ID of subnet.
-                type: str
-                returned: success
-            port_id:
-                description:
-                    - Specifies the port ID corresponding to the IP address.
-                type: str
-                returned: success
-    root_volume:
-        description:
-            - Specifies the configuration of the ECS's system disks.
-        type: dict
-        returned: success
-        contains:
-            volume_type:
-                description:
-                    - Specifies the ECS system disk type.
-                    - SATA is common I/O disk type.
-                    - SAS is high I/O disk type.
-                    - SSD is ultra-high I/O disk type.
-                    - co-p1 is high I/O (performance-optimized I) disk type.
-                    - uh-l1 is ultra-high I/O (latency-optimized) disk type.
-                    - NOTE is For HANA, HL1, and HL2 ECSs, use co-p1 and uh-l1
-                      disks. For other ECSs, do not use co-p1 or uh-l1 disks.
-                type: str
-                returned: success
-            size:
-                description:
-                    - Specifies the system disk size, in GB. The value range is
-                      1 to 1024. The system disk size must be
-                      greater than or equal to the minimum system disk size
-                      supported by the image (min_disk attribute of the image).
-                      If this parameter is not specified or is set to 0, the
-                      default system disk size is the minimum value of the
-                      system disk in the image (min_disk attribute of the
-                      image).
-                type: int
-                returned: success
-            snapshot_id:
-                description:
-                    - Specifies the snapshot ID or ID of the original data disk
-                      contained in the full-ECS image.
-                type: str
-                returned: success
-            device:
-                description:
-                    - Specifies the disk device name.
-                type: str
-                returned: success
-            volume_id:
-                description:
-                    - Specifies the disk ID.
-                type: str
-                returned: success
-    vpc_id:
-        description:
-            - Specifies the ID of the VPC to which the ECS belongs.
-        type: str
-        returned: success
-    admin_pass:
-        description:
-            - Specifies the initial login password of the administrator account
-              for logging in to an ECS using password authentication. The Linux
-              administrator is root, and the Windows administrator is
-              Administrator. Password complexity requirements consists of 8 to
-              26 characters. The password must contain at least three of the
-              following character types "uppercase letters, lowercase letters,
-              digits, and special characters (!@$%^-_=+[{}]:,./?)". The password
-              cannot contain the username or the username in reverse. The
-              Windows ECS password cannot contain the username, the username in
-              reverse, or more than two consecutive characters in the username.
-        type: str
-        returned: success
-    data_volumes:
-        description:
-            - Specifies the data disks of ECS instance.
-        type: list
-        returned: success
-        contains:
-            volume_id:
-                description:
-                    - Specifies the disk ID.
-                type: str
-                returned: success
-            device:
-                description:
-                    - Specifies the disk device name.
-                type: str
-                returned: success
-    description:
-        description:
-            - Specifies the description of an ECS, which is a null string by
-              default. Can contain a maximum of 85 characters. Cannot contain
-              special characters, such as < and >.
-        type: str
-        returned: success
-    eip_id:
-        description:
-            - Specifies the ID of the elastic IP address assigned to the ECS.
-              Only elastic IP addresses in the DOWN state can be assigned.
-        type: str
-        returned: success
-    enable_auto_recovery:
-        description:
-            - Specifies whether automatic recovery is enabled on the ECS.
-        type: bool
-        returned: success
-    enterprise_project_id:
-        description:
-            - Specifies the ID of the enterprise project to which the ECS
-              belongs.
-        type: str
-        returned: success
-    security_groups:
-        description:
-            - Specifies the security groups of the ECS. If this parameter is left
-              blank, the default security group is bound to the ECS by default.
-        type: list
-        returned: success
-    server_metadata:
-        description:
-            - Specifies the metadata of ECS to be created.
-        type: dict
-        returned: success
-    server_tags:
-        description:
-            - Specifies the tags of an ECS. When you create ECSs, one ECS
-              supports up to 10 tags.
-        type: dict
-        returned: success
-    ssh_key_name:
-        description:
-            - Specifies the name of the SSH key used for logging in to the ECS.
-        type: str
-        returned: success
-    user_data:
-        description:
-            - Specifies the user data to be injected during the ECS creation
-              process. Text, text files, and gzip files can be injected.
-              The content to be injected must be encoded with base64. The maximum
-              size of the content to be injected (before encoding) is 32 KB. For
-              Linux ECSs, this parameter does not take effect when adminPass is
-              used.
-        type: str
-        returned: success
-    config_drive:
-        description:
-            - Specifies the configuration driver.
-        type: str
-        returned: success
-    created:
-        description:
-            - Specifies the time when an ECS was created.
-        type: str
-        returned: success
-    disk_config_type:
-        description:
-            - Specifies the disk configuration type. MANUAL is The image
-              space is not expanded. AUTO is the image space of the system disk
-              will be expanded to be as same as the flavor.
-        type: str
-        returned: success
-    host_name:
-        description:
-            - Specifies the host name of the ECS.
-        type: str
-        returned: success
-    image_name:
-        description:
-            - Specifies the image name of the ECS.
-        type: str
-        returned: success
-    power_state:
-        description:
-            - Specifies the power status of the ECS.
-        type: int
-        returned: success
-    server_alias:
-        description:
-            - Specifies the ECS alias.
-        type: str
-        returned: success
-    status:
-        description:
-            - Specifies the ECS status. Options are ACTIVE, REBOOT, HARD_REBOOT,
-              REBUILD, MIGRATING, BUILD, SHUTOFF, RESIZE, VERIFY_RESIZE, ERROR,
-              and DELETED.
-        type: str
-        returned: success
-'''
+RETURN = r"""
+availability_zone:
+  description:
+    - Specifies the name of the AZ where the ECS is located.
+  type: str
+  returned: success
+flavor_name:
+  description:
+    - Specifies the name of the system flavor.
+  type: str
+  returned: success
+image_id:
+  description:
+    - Specifies the ID of the system image.
+  type: str
+  returned: success
+name:
+  description:
+    - Specifies the ECS name. Value requirements "Consists of 1 to 64 characters, including letters, digits, underscores (V(_)),
+      hyphens (V(-)), periods (V(.)).".
+  type: str
+  returned: success
+nics:
+  description:
+    - Specifies the NIC information of the ECS. The network of the NIC must belong to the VPC specified by vpc_id. A maximum
+      of 12 NICs can be attached to an ECS.
+  type: list
+  returned: success
+  contains:
+    ip_address:
+      description:
+        - Specifies the IP address of the NIC. The value is an IPv4 address. Its value must be an unused IP address in the
+          network segment of the subnet.
+      type: str
+      returned: success
+    subnet_id:
+      description:
+        - Specifies the ID of subnet.
+      type: str
+      returned: success
+    port_id:
+      description:
+        - Specifies the port ID corresponding to the IP address.
+      type: str
+      returned: success
+root_volume:
+  description:
+    - Specifies the configuration of the ECS's system disks.
+  type: dict
+  returned: success
+  contains:
+    volume_type:
+      description:
+        - Specifies the ECS system disk type.
+        - SATA is common I/O disk type.
+        - SAS is high I/O disk type.
+        - SSD is ultra-high I/O disk type.
+        - Co-p1 is high I/O (performance-optimized I) disk type.
+        - Uh-l1 is ultra-high I/O (latency-optimized) disk type.
+        - NOTE is For HANA, HL1, and HL2 ECSs, use co-p1 and uh-l1 disks. For other ECSs, do not use co-p1 or uh-l1 disks.
+      type: str
+      returned: success
+    size:
+      description:
+        - Specifies the system disk size, in GB. The value range is 1 to 1024. The system disk size must be greater than or
+          equal to the minimum system disk size supported by the image (min_disk attribute of the image). If this parameter
+          is not specified or is set to 0, the default system disk size is the minimum value of the system disk in the image
+          (min_disk attribute of the image).
+      type: int
+      returned: success
+    snapshot_id:
+      description:
+        - Specifies the snapshot ID or ID of the original data disk contained in the full-ECS image.
+      type: str
+      returned: success
+    device:
+      description:
+        - Specifies the disk device name.
+      type: str
+      returned: success
+    volume_id:
+      description:
+        - Specifies the disk ID.
+      type: str
+      returned: success
+vpc_id:
+  description:
+    - Specifies the ID of the VPC to which the ECS belongs.
+  type: str
+  returned: success
+admin_pass:
+  description:
+    - Specifies the initial login password of the administrator account for logging in to an ECS using password authentication.
+      The Linux administrator is root, and the Windows administrator is Administrator. Password complexity requirements consists
+      of 8 to 26 characters. The password must contain at least three of the following character types "uppercase letters,
+      lowercase letters, digits, and special characters (!@$%^-_=+[{}]:,./?)". The password cannot contain the username or
+      the username in reverse. The Windows ECS password cannot contain the username, the username in reverse, or more than
+      two consecutive characters in the username.
+  type: str
+  returned: success
+data_volumes:
+  description:
+    - Specifies the data disks of ECS instance.
+  type: list
+  returned: success
+  contains:
+    volume_id:
+      description:
+        - Specifies the disk ID.
+      type: str
+      returned: success
+    device:
+      description:
+        - Specifies the disk device name.
+      type: str
+      returned: success
+description:
+  description:
+    - Specifies the description of an ECS, which is a null string by default. Can contain a maximum of 85 characters. Cannot
+      contain special characters, such as < and >.
+  type: str
+  returned: success
+eip_id:
+  description:
+    - Specifies the ID of the elastic IP address assigned to the ECS. Only elastic IP addresses in the DOWN state can be assigned.
+  type: str
+  returned: success
+enable_auto_recovery:
+  description:
+    - Specifies whether automatic recovery is enabled on the ECS.
+  type: bool
+  returned: success
+enterprise_project_id:
+  description:
+    - Specifies the ID of the enterprise project to which the ECS belongs.
+  type: str
+  returned: success
+security_groups:
+  description:
+    - Specifies the security groups of the ECS. If this parameter is left blank, the default security group is bound to the
+      ECS by default.
+  type: list
+  returned: success
+server_metadata:
+  description:
+    - Specifies the metadata of ECS to be created.
+  type: dict
+  returned: success
+server_tags:
+  description:
+    - Specifies the tags of an ECS. When you create ECSs, one ECS supports up to 10 tags.
+  type: dict
+  returned: success
+ssh_key_name:
+  description:
+    - Specifies the name of the SSH key used for logging in to the ECS.
+  type: str
+  returned: success
+user_data:
+  description:
+    - Specifies the user data to be injected during the ECS creation process. Text, text files, and gzip files can be injected.
+      The content to be injected must be encoded with base64. The maximum size of the content to be injected (before encoding)
+      is 32 KB. For Linux ECSs, this parameter does not take effect when adminPass is used.
+  type: str
+  returned: success
+config_drive:
+  description:
+    - Specifies the configuration driver.
+  type: str
+  returned: success
+created:
+  description:
+    - Specifies the time when an ECS was created.
+  type: str
+  returned: success
+disk_config_type:
+  description:
+    - Specifies the disk configuration type. MANUAL is The image space is not expanded. AUTO is the image space of the system
+      disk will be expanded to be as same as the flavor.
+  type: str
+  returned: success
+host_name:
+  description:
+    - Specifies the host name of the ECS.
+  type: str
+  returned: success
+image_name:
+  description:
+    - Specifies the image name of the ECS.
+  type: str
+  returned: success
+power_state:
+  description:
+    - Specifies the power status of the ECS.
+  type: int
+  returned: success
+server_alias:
+  description:
+    - Specifies the ECS alias.
+  type: str
+  returned: success
+status:
+  description:
+    - Specifies the ECS status. Options are ACTIVE, REBOOT, HARD_REBOOT, REBUILD, MIGRATING, BUILD, SHUTOFF, RESIZE, VERIFY_RESIZE,
+      ERROR, and DELETED.
+  type: str
+  returned: success
+"""
 
 from ansible_collections.community.general.plugins.module_utils.hwc_utils import (
     Config, HwcClientException, HwcModule, are_different_dicts, build_path,

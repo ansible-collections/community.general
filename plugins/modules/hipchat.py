@@ -9,12 +9,11 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: hipchat
 short_description: Send a message to Hipchat
 description:
-   - Send a message to a Hipchat room, with options to control the formatting.
+  - Send a message to a Hipchat room, with options to control the formatting.
 extends_documentation_fragment:
   - community.general.attributes
 deprecated:
@@ -40,8 +39,7 @@ options:
   msg_from:
     type: str
     description:
-      - Name the message will appear to be sent from. Max length is 15
-        characters - above this it will be truncated.
+      - Name the message will appear to be sent from. Max length is 15 characters - above this it will be truncated.
     default: Ansible
     aliases: [from]
   msg:
@@ -54,13 +52,13 @@ options:
     description:
       - Background color for the message.
     default: yellow
-    choices: [ "yellow", "red", "green", "purple", "gray", "random" ]
+    choices: ["yellow", "red", "green", "purple", "gray", "random"]
   msg_format:
     type: str
     description:
       - Message format.
     default: text
-    choices: [ "text", "html" ]
+    choices: ["text", "html"]
   notify:
     description:
       - If true, a notification will be triggered for users in the room.
@@ -68,23 +66,23 @@ options:
     default: true
   validate_certs:
     description:
-      - If V(false), SSL certificates will not be validated. This should only be used
-        on personally controlled sites using self-signed certificates.
+      - If V(false), SSL certificates will not be validated. This should only be used on personally controlled sites using
+        self-signed certificates.
     type: bool
     default: true
   api:
     type: str
     description:
-      - API url if using a self-hosted hipchat server. For Hipchat API version
-        2 use the default URI with C(/v2) instead of C(/v1).
+      - API url if using a self-hosted hipchat server. For Hipchat API version 2 use the default URI with C(/v2) instead of
+        C(/v1).
     default: 'https://api.hipchat.com/v1'
 
 author:
-- Shirou Wakayama (@shirou)
-- Paul Bourdel (@pb8226)
-'''
+  - Shirou Wakayama (@shirou)
+  - Paul Bourdel (@pb8226)
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Send a message to a Hipchat room
   community.general.hipchat:
     room: notif
@@ -96,7 +94,7 @@ EXAMPLES = '''
     token: OAUTH2_TOKEN
     room: notify
     msg: Ansible task finished
-'''
+"""
 
 # ===========================================
 # HipChat module specific support methods.

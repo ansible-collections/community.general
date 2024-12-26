@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: honeybadger_deployment
 author: "Benjamin Curtis (@stympy)"
 short_description: Notify Honeybadger.io about app deployments
@@ -31,20 +30,20 @@ options:
   environment:
     type: str
     description:
-      - The environment name, typically 'production', 'staging', etc.
+      - The environment name, typically V(production), V(staging), and so on.
     required: true
   user:
     type: str
     description:
-      - The username of the person doing the deployment
+      - The username of the person doing the deployment.
   repo:
     type: str
     description:
-      - URL of the project repository
+      - URL of the project repository.
   revision:
     type: str
     description:
-      - A hash, number, tag, or other identifier showing what revision was deployed
+      - A hash, number, tag, or other identifier showing what revision was deployed.
   url:
     type: str
     description:
@@ -52,14 +51,13 @@ options:
     default: "https://api.honeybadger.io/v1/deploys"
   validate_certs:
     description:
-      - If V(false), SSL certificates for the target url will not be validated. This should only be used
-        on personally controlled sites using self-signed certificates.
+      - If V(false), SSL certificates for the target url will not be validated. This should only be used on personally controlled
+        sites using self-signed certificates.
     type: bool
     default: true
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Notify Honeybadger.io about an app deployment
   community.general.honeybadger_deployment:
     token: AAAAAA
@@ -67,9 +65,9 @@ EXAMPLES = '''
     user: ansible
     revision: b6826b8
     repo: 'git@github.com:user/repo.git'
-'''
+"""
 
-RETURN = '''# '''
+RETURN = """# """
 
 import traceback
 

@@ -12,99 +12,90 @@ __metaclass__ = type
 # Documentation
 ###############################################################################
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: hwc_vpc_subnet
 description:
-    - subnet management.
-short_description: Creates a resource of Vpc/Subnet in Huawei Cloud
+  - Subnet management.
+short_description: Creates a resource of VPC/Subnet in Huawei Cloud
 version_added: '0.2.0'
 author: Huawei Inc. (@huaweicloud)
 requirements:
-    - keystoneauth1 >= 3.6.0
+  - keystoneauth1 >= 3.6.0
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    state:
+  state:
+    description:
+      - Whether the given object should exist in Huawei Cloud.
+    type: str
+    choices: ['present', 'absent']
+    default: 'present'
+  timeouts:
+    description:
+      - The timeouts for each operations.
+    type: dict
+    default: {}
+    suboptions:
+      create:
         description:
-            - Whether the given object should exist in Huawei Cloud.
+          - The timeouts for create operation.
         type: str
-        choices: ['present', 'absent']
-        default: 'present'
-    timeouts:
+        default: '15m'
+      update:
         description:
-            - The timeouts for each operations.
-        type: dict
-        default: {}
-        suboptions:
-            create:
-                description:
-                    - The timeouts for create operation.
-                type: str
-                default: '15m'
-            update:
-                description:
-                    - The timeouts for update operation.
-                type: str
-                default: '15m'
-    cidr:
-        description:
-            - Specifies the subnet CIDR block. The value must be within the VPC
-              CIDR block and be in CIDR format. The subnet mask cannot be
-              greater than 28. Cannot be changed after creating the subnet.
+          - The timeouts for update operation.
         type: str
-        required: true
-    gateway_ip:
-        description:
-            - Specifies the gateway of the subnet. The value must be an IP
-              address in the subnet. Cannot be changed after creating the subnet.
-        type: str
-        required: true
-    name:
-        description:
-            - Specifies the subnet name. The value is a string of 1 to 64
-              characters that can contain letters, digits, underscores (V(_)),
-              hyphens (V(-)), and periods (V(.)).
-        type: str
-        required: true
-    vpc_id:
-        description:
-            - Specifies the ID of the VPC to which the subnet belongs. Cannot
-              be changed after creating the subnet.
-        type: str
-        required: true
-    availability_zone:
-        description:
-            - Specifies the AZ to which the subnet belongs. Cannot be changed
-              after creating the subnet.
-        type: str
-        required: false
-    dhcp_enable:
-        description:
-            - Specifies whether DHCP is enabled for the subnet. The value can
-              be true (enabled) or false(disabled), and default value is true.
-              If this parameter is set to false, newly created ECSs cannot
-              obtain IP addresses, and usernames and passwords cannot be
-              injected using Cloud-init.
-        type: bool
-        required: false
-    dns_address:
-        description:
-            - Specifies the DNS server addresses for subnet. The address
-              in the head will be used first.
-        type: list
-        elements: str
-        required: false
+        default: '15m'
+  cidr:
+    description:
+      - Specifies the subnet CIDR block. The value must be within the VPC CIDR block and be in CIDR format. The subnet mask
+        cannot be greater than 28. Cannot be changed after creating the subnet.
+    type: str
+    required: true
+  gateway_ip:
+    description:
+      - Specifies the gateway of the subnet. The value must be an IP address in the subnet. Cannot be changed after creating
+        the subnet.
+    type: str
+    required: true
+  name:
+    description:
+      - Specifies the subnet name. The value is a string of 1 to 64 characters that can contain letters, digits, underscores
+        (V(_)), hyphens (V(-)), and periods (V(.)).
+    type: str
+    required: true
+  vpc_id:
+    description:
+      - Specifies the ID of the VPC to which the subnet belongs. Cannot be changed after creating the subnet.
+    type: str
+    required: true
+  availability_zone:
+    description:
+      - Specifies the AZ to which the subnet belongs. Cannot be changed after creating the subnet.
+    type: str
+    required: false
+  dhcp_enable:
+    description:
+      - Specifies whether DHCP is enabled for the subnet. The value can be true (enabled) or false(disabled), and default
+        value is true. If this parameter is set to false, newly created ECSs cannot obtain IP addresses, and usernames and
+        passwords cannot be injected using Cloud-init.
+    type: bool
+    required: false
+  dns_address:
+    description:
+      - Specifies the DNS server addresses for subnet. The address in the head will be used first.
+    type: list
+    elements: str
+    required: false
 extends_documentation_fragment:
   - community.general.hwc
   - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 # create subnet
 - name: Create vpc
   hwc_network_vpc:
@@ -118,55 +109,49 @@ EXAMPLES = '''
     gateway_ip: "192.168.100.32"
     name: "ansible_network_subnet_test"
     dhcp_enable: true
-'''
+"""
 
-RETURN = '''
-    cidr:
-        description:
-            - Specifies the subnet CIDR block. The value must be within the VPC
-              CIDR block and be in CIDR format. The subnet mask cannot be
-              greater than 28.
-        type: str
-        returned: success
-    gateway_ip:
-        description:
-            - Specifies the gateway of the subnet. The value must be an IP
-              address in the subnet.
-        type: str
-        returned: success
-    name:
-        description:
-            - Specifies the subnet name. The value is a string of 1 to 64
-              characters that can contain letters, digits, underscores (V(_)),
-              hyphens (V(-)), and periods (V(.)).
-        type: str
-        returned: success
-    vpc_id:
-        description:
-            - Specifies the ID of the VPC to which the subnet belongs.
-        type: str
-        returned: success
-    availability_zone:
-        description:
-            - Specifies the AZ to which the subnet belongs.
-        type: str
-        returned: success
-    dhcp_enable:
-        description:
-            - Specifies whether DHCP is enabled for the subnet. The value can
-              be true (enabled) or false(disabled), and default value is true.
-              If this parameter is set to false, newly created ECSs cannot
-              obtain IP addresses, and usernames and passwords cannot be
-              injected using Cloud-init.
-        type: bool
-        returned: success
-    dns_address:
-        description:
-            - Specifies the DNS server addresses for subnet. The address
-              in the head will be used first.
-        type: list
-        returned: success
-'''
+RETURN = r"""
+cidr:
+  description:
+    - Specifies the subnet CIDR block. The value must be within the VPC CIDR block and be in CIDR format. The subnet mask
+      cannot be greater than 28.
+  type: str
+  returned: success
+gateway_ip:
+  description:
+    - Specifies the gateway of the subnet. The value must be an IP address in the subnet.
+  type: str
+  returned: success
+name:
+  description:
+    - Specifies the subnet name. The value is a string of 1 to 64 characters that can contain letters, digits, underscores
+      (V(_)), hyphens (V(-)), and periods (V(.)).
+  type: str
+  returned: success
+vpc_id:
+  description:
+    - Specifies the ID of the VPC to which the subnet belongs.
+  type: str
+  returned: success
+availability_zone:
+  description:
+    - Specifies the AZ to which the subnet belongs.
+  type: str
+  returned: success
+dhcp_enable:
+  description:
+    - Specifies whether DHCP is enabled for the subnet. The value can be true (enabled) or false(disabled), and default value
+      is true. If this parameter is set to false, newly created ECSs cannot obtain IP addresses, and usernames and passwords
+      cannot be injected using Cloud-init.
+  type: bool
+  returned: success
+dns_address:
+  description:
+    - Specifies the DNS server addresses for subnet. The address in the head will be used first.
+  type: list
+  returned: success
+"""
 
 from ansible_collections.community.general.plugins.module_utils.hwc_utils import (
     Config, HwcClientException, HwcClientException404, HwcModule,

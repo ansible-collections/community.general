@@ -8,23 +8,21 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: haproxy
 short_description: Enable, disable, and set weights for HAProxy backend servers using socket commands
 author:
-    - Ravi Bhure (@ravibhure)
+  - Ravi Bhure (@ravibhure)
 description:
-    - Enable, disable, drain and set weights for HAProxy backend servers using socket commands.
+  - Enable, disable, drain and set weights for HAProxy backend servers using socket commands.
 notes:
-    - Enable, disable and drain commands are restricted and can only be issued on
-      sockets configured for level 'admin'. For example, you can add the line
-      'stats socket /var/run/haproxy.sock level admin' to the general section of
-      haproxy.cfg. See U(http://haproxy.1wt.eu/download/1.5/doc/configuration.txt).
-    - Depends on netcat (C(nc)) being available; you need to install the appropriate
-      package for your operating system before this module can be used.
+  - Enable, disable and drain commands are restricted and can only be issued on sockets configured for level C(admin). For
+    example, you can add the line C(stats socket /var/run/haproxy.sock level admin) to the general section of C(haproxy.cfg).
+    See U(http://haproxy.1wt.eu/download/1.5/doc/configuration.txt).
+  - Depends on netcat (C(nc)) being available; you need to install the appropriate package for your operating system before
+    this module can be used.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
   check_mode:
     support: none
@@ -38,8 +36,8 @@ options:
     type: str
   drain:
     description:
-      - Wait until the server has no active connections or until the timeout
-        determined by wait_interval and wait_retries is reached.
+      - Wait until the server has no active connections or until the timeout determined by O(wait_interval) and O(wait_retries)
+        is reached.
       - Continue only after the status changes to C(MAINT).
       - This overrides the shutdown_sessions option.
     type: bool
@@ -51,10 +49,9 @@ options:
     required: true
   shutdown_sessions:
     description:
-      - When disabling a server, immediately terminate all the sessions attached
-        to the specified server.
-      - This can be used to terminate long-running sessions after a server is put
-        into maintenance mode. Overridden by the drain option.
+      - When disabling a server, immediately terminate all the sessions attached to the specified server.
+      - This can be used to terminate long-running sessions after a server is put into maintenance mode. Overridden by the
+        drain option.
     type: bool
     default: false
   socket:
@@ -65,11 +62,11 @@ options:
   state:
     description:
       - Desired state of the provided backend host.
-      - Note that V(drain) state is supported only by HAProxy version 1.5 or later.
-        When used on versions < 1.5, it will be ignored.
+      - Note that V(drain) state is supported only by HAProxy version 1.5 or later. When used on versions < 1.5, it will be
+        ignored.
     type: str
     required: true
-    choices: [ disabled, drain, enabled ]
+    choices: [disabled, drain, enabled]
   agent:
     description:
       - Disable/enable agent checks (depending on O(state) value).
@@ -89,8 +86,8 @@ options:
     default: false
   wait:
     description:
-      - Wait until the server reports a status of C(UP) when O(state=enabled),
-        status of C(MAINT) when O(state=disabled) or status of C(DRAIN) when O(state=drain).
+      - Wait until the server reports a status of C(UP) when O(state=enabled), status of C(MAINT) when O(state=disabled) or
+        status of C(DRAIN) when O(state=drain).
     type: bool
     default: false
   wait_interval:
@@ -106,14 +103,12 @@ options:
   weight:
     description:
       - The value passed in argument.
-      - If the value ends with the V(%) sign, then the new weight will be
-        relative to the initially configured weight.
-      - Relative weights are only permitted between 0 and 100% and absolute
-        weights are permitted between 0 and 256.
+      - If the value ends with the V(%) sign, then the new weight will be relative to the initially configured weight.
+      - Relative weights are only permitted between 0 and 100% and absolute weights are permitted between 0 and 256.
     type: str
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Disable server in 'www' backend pool
   community.general.haproxy:
     state: disabled
@@ -168,7 +163,8 @@ EXAMPLES = r'''
     socket: /var/run/haproxy.sock
     shutdown_sessions: true
 
-- name: Disable server without backend pool name (apply to all available backend pool) but fail when the backend host is not found
+- name: Disable server without backend pool name (apply to all available backend pool) but fail when the backend host is
+    not found
   community.general.haproxy:
     state: disabled
     host: '{{ inventory_hostname }}'
@@ -187,7 +183,8 @@ EXAMPLES = r'''
     backend: www
     wait: true
 
-- name: Enable server in 'www' backend pool wait until healthy. Retry 10 times with intervals of 5 seconds to retrieve the health
+- name: Enable server in 'www' backend pool wait until healthy. Retry 10 times with intervals of 5 seconds to retrieve the
+    health
   community.general.haproxy:
     state: enabled
     host: '{{ inventory_hostname }}'
@@ -210,7 +207,7 @@ EXAMPLES = r'''
     host: '{{ inventory_hostname }}'
     socket: /var/run/haproxy.sock
     backend: www
-'''
+"""
 
 import csv
 import socket

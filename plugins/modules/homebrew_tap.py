@@ -13,56 +13,53 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: homebrew_tap
 author:
-    - "Indrajit Raychaudhuri (@indrajitr)"
-    - "Daniel Jaouen (@danieljaouen)"
+  - "Indrajit Raychaudhuri (@indrajitr)"
+  - "Daniel Jaouen (@danieljaouen)"
 short_description: Tap a Homebrew repository
 description:
-    - Tap external Homebrew repositories.
+  - Tap external Homebrew repositories.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    name:
-        description:
-            - The GitHub user/organization repository to tap.
-        required: true
-        aliases: ['tap']
-        type: list
-        elements: str
-    url:
-        description:
-            - The optional git URL of the repository to tap. The URL is not
-              assumed to be on GitHub, and the protocol doesn't have to be HTTP.
-              Any location and protocol that git can handle is fine.
-            - O(name) option may not be a list of multiple taps (but a single
-              tap instead) when this option is provided.
-        required: false
-        type: str
-    state:
-        description:
-            - state of the repository.
-        choices: [ 'present', 'absent' ]
-        required: false
-        default: 'present'
-        type: str
-    path:
-        description:
-            - "A V(:) separated list of paths to search for C(brew) executable."
-        default: '/usr/local/bin:/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin'
-        type: path
-        version_added: '2.1.0'
-requirements: [ homebrew ]
-'''
+  name:
+    description:
+      - The GitHub user/organization repository to tap.
+    required: true
+    aliases: ['tap']
+    type: list
+    elements: str
+  url:
+    description:
+      - The optional git URL of the repository to tap. The URL is not assumed to be on GitHub, and the protocol does not have
+        to be HTTP. Any location and protocol that git can handle is fine.
+      - O(name) option may not be a list of multiple taps (but a single tap instead) when this option is provided.
+    required: false
+    type: str
+  state:
+    description:
+      - State of the repository.
+    choices: ['present', 'absent']
+    required: false
+    default: 'present'
+    type: str
+  path:
+    description:
+      - A V(:) separated list of paths to search for C(brew) executable.
+    default: '/usr/local/bin:/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin'
+    type: path
+    version_added: '2.1.0'
+requirements: [homebrew]
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Tap a Homebrew repository, state present
   community.general.homebrew_tap:
     name: homebrew/dupes
@@ -81,7 +78,7 @@ EXAMPLES = r'''
   community.general.homebrew_tap:
     name: telemachus/brew
     url: 'https://bitbucket.org/telemachus/brew'
-'''
+"""
 
 import re
 

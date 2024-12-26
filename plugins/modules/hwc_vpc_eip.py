@@ -12,126 +12,110 @@ __metaclass__ = type
 # Documentation
 ###############################################################################
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: hwc_vpc_eip
 description:
-    - elastic ip management.
-short_description: Creates a resource of Vpc/EIP in Huawei Cloud
+  - Elastic IP management.
+short_description: Creates a resource of VPC/EIP in Huawei Cloud
 version_added: '0.2.0'
 author: Huawei Inc. (@huaweicloud)
 requirements:
-    - keystoneauth1 >= 3.6.0
+  - keystoneauth1 >= 3.6.0
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    state:
+  state:
+    description:
+      - Whether the given object should exist in Huawei Cloud.
+    type: str
+    choices: ['present', 'absent']
+    default: 'present'
+  timeouts:
+    description:
+      - The timeouts for each operations.
+    type: dict
+    default: {}
+    suboptions:
+      create:
         description:
-            - Whether the given object should exist in Huawei Cloud.
+          - The timeouts for create operation.
         type: str
-        choices: ['present', 'absent']
-        default: 'present'
-    timeouts:
+        default: '5m'
+      update:
         description:
-            - The timeouts for each operations.
-        type: dict
-        default: {}
-        suboptions:
-            create:
-                description:
-                    - The timeouts for create operation.
-                type: str
-                default: '5m'
-            update:
-                description:
-                    - The timeouts for update operation.
-                type: str
-                default: '5m'
-    type:
+          - The timeouts for update operation.
+        type: str
+        default: '5m'
+  type:
+    description:
+      - Specifies the EIP type.
+    type: str
+    required: true
+  dedicated_bandwidth:
+    description:
+      - Specifies the dedicated bandwidth object.
+    type: dict
+    required: false
+    suboptions:
+      charge_mode:
         description:
-            - Specifies the EIP type.
+          - Specifies whether the bandwidth is billed by traffic or by bandwidth size. The value can be bandwidth or traffic.
+            If this parameter is left blank or is null character string, default value bandwidth is used. For IPv6 addresses,
+            the default parameter value is bandwidth outside China and is traffic in China.
         type: str
         required: true
-    dedicated_bandwidth:
+      name:
         description:
-            - Specifies the dedicated bandwidth object.
-        type: dict
-        required: false
-        suboptions:
-            charge_mode:
-                description:
-                    - Specifies whether the bandwidth is billed by traffic or
-                      by bandwidth size. The value can be bandwidth or traffic.
-                      If this parameter is left blank or is null character
-                      string, default value bandwidth is used. For IPv6
-                      addresses, the default parameter value is bandwidth
-                      outside China and is traffic in China.
-                type: str
-                required: true
-            name:
-                description:
-                    - Specifies the bandwidth name. The value is a string of 1
-                      to 64 characters that can contain letters, digits,
-                      underscores (V(_)), hyphens (V(-)), and periods (V(.)).
-                type: str
-                required: true
-            size:
-                description:
-                    - Specifies the bandwidth size. The value ranges from 1
-                      Mbit/s to 2000 Mbit/s by default. (The specific range may
-                      vary depending on the configuration in each region. You
-                      can see the bandwidth range of each region on the
-                      management console.) The minimum unit for bandwidth
-                      adjustment varies depending on the bandwidth range. The
-                      details are as follows.
-                    - The minimum unit is 1 Mbit/s if the allowed bandwidth
-                      size ranges from 0 to 300 Mbit/s (with 300 Mbit/s
-                      included).
-                    - The minimum unit is 50 Mbit/s if the allowed bandwidth
-                      size ranges 300 Mbit/s to 1000 Mbit/s (with 1000 Mbit/s
-                      included).
-                    - The minimum unit is 500 Mbit/s if the allowed bandwidth
-                      size is greater than 1000 Mbit/s.
-                type: int
-                required: true
-    enterprise_project_id:
-        description:
-            - Specifies the enterprise project ID.
+          - Specifies the bandwidth name. The value is a string of 1 to 64 characters that can contain letters, digits, underscores
+            (V(_)), hyphens (V(-)), and periods (V(.)).
         type: str
-        required: false
-    ip_version:
+        required: true
+      size:
         description:
-            - The value can be 4 (IPv4 address) or 6 (IPv6 address). If this
-              parameter is left blank, an IPv4 address will be assigned.
+          - Specifies the bandwidth size. The value ranges from 1 Mbit/s to 2000 Mbit/s by default. (The specific range may
+            vary depending on the configuration in each region. You can see the bandwidth range of each region on the management
+            console.) The minimum unit for bandwidth adjustment varies depending on the bandwidth range. The details are as
+            follows.
+          - The minimum unit is 1 Mbit/s if the allowed bandwidth size ranges from 0 to 300 Mbit/s (with 300 Mbit/s included).
+          - The minimum unit is 50 Mbit/s if the allowed bandwidth size ranges 300 Mbit/s to 1000 Mbit/s (with 1000 Mbit/s
+            included).
+          - The minimum unit is 500 Mbit/s if the allowed bandwidth size is greater than 1000 Mbit/s.
         type: int
-        required: false
-    ipv4_address:
-        description:
-            - Specifies the obtained IPv4 EIP. The system automatically assigns
-              an EIP if you do not specify it.
-        type: str
-        required: false
-    port_id:
-        description:
-            - Specifies the port ID. This parameter is returned only when a
-              private IP address is bound with the EIP.
-        type: str
-        required: false
-    shared_bandwidth_id:
-        description:
-            - Specifies the ID of shared bandwidth.
-        type: str
-        required: false
+        required: true
+  enterprise_project_id:
+    description:
+      - Specifies the enterprise project ID.
+    type: str
+    required: false
+  ip_version:
+    description:
+      - The value can be 4 (IPv4 address) or 6 (IPv6 address). If this parameter is left blank, an IPv4 address will be assigned.
+    type: int
+    required: false
+  ipv4_address:
+    description:
+      - Specifies the obtained IPv4 EIP. The system automatically assigns an EIP if you do not specify it.
+    type: str
+    required: false
+  port_id:
+    description:
+      - Specifies the port ID. This parameter is returned only when a private IP address is bound with the EIP.
+    type: str
+    required: false
+  shared_bandwidth_id:
+    description:
+      - Specifies the ID of shared bandwidth.
+    type: str
+    required: false
 extends_documentation_fragment:
   - community.general.hwc
   - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 # create an eip and bind it to a port
 - name: Create vpc
   hwc_network_vpc:
@@ -159,107 +143,91 @@ EXAMPLES = '''
       name: "ansible_test_dedicated_bandwidth"
       size: 1
     port_id: "{{ port.id }}"
-'''
+"""
 
-RETURN = '''
-    type:
-        description:
-            - Specifies the EIP type.
-        type: str
-        returned: success
-    dedicated_bandwidth:
-        description:
-            - Specifies the dedicated bandwidth object.
-        type: dict
-        returned: success
-        contains:
-            charge_mode:
-                description:
-                    - Specifies whether the bandwidth is billed by traffic or
-                      by bandwidth size. The value can be bandwidth or traffic.
-                      If this parameter is left blank or is null character
-                      string, default value bandwidth is used. For IPv6
-                      addresses, the default parameter value is bandwidth
-                      outside China and is traffic in China.
-                type: str
-                returned: success
-            name:
-                description:
-                    - Specifies the bandwidth name. The value is a string of 1
-                      to 64 characters that can contain letters, digits,
-                      underscores (V(_)), hyphens (V(-)), and periods (V(.)).
-                type: str
-                returned: success
-            size:
-                description:
-                    - Specifies the bandwidth size. The value ranges from 1
-                      Mbit/s to 2000 Mbit/s by default. (The specific range may
-                      vary depending on the configuration in each region. You
-                      can see the bandwidth range of each region on the
-                      management console.) The minimum unit for bandwidth
-                      adjustment varies depending on the bandwidth range. The
-                      details are as follows:.
-                    - The minimum unit is 1 Mbit/s if the allowed bandwidth
-                      size ranges from 0 to 300 Mbit/s (with 300 Mbit/s
-                      included).
-                    - The minimum unit is 50 Mbit/s if the allowed bandwidth
-                      size ranges 300 Mbit/s to 1000 Mbit/s (with 1000 Mbit/s
-                      included).
-                    - The minimum unit is 500 Mbit/s if the allowed bandwidth
-                      size is greater than 1000 Mbit/s.
-                type: int
-                returned: success
-            id:
-                description:
-                    - Specifies the ID of dedicated bandwidth.
-                type: str
-                returned: success
-    enterprise_project_id:
-        description:
-            - Specifies the enterprise project ID.
-        type: str
-        returned: success
-    ip_version:
-        description:
-            - The value can be 4 (IPv4 address) or 6 (IPv6 address). If this
-              parameter is left blank, an IPv4 address will be assigned.
-        type: int
-        returned: success
-    ipv4_address:
-        description:
-            - Specifies the obtained IPv4 EIP. The system automatically assigns
-              an EIP if you do not specify it.
-        type: str
-        returned: success
-    port_id:
-        description:
-            - Specifies the port ID. This parameter is returned only when a
-              private IP address is bound with the EIP.
-        type: str
-        returned: success
-    shared_bandwidth_id:
-        description:
-            - Specifies the ID of shared bandwidth.
-        type: str
-        returned: success
-    create_time:
-        description:
-            - Specifies the time (UTC time) when the EIP was assigned.
-        type: str
-        returned: success
-    ipv6_address:
-        description:
-            - Specifies the obtained IPv6 EIP.
-        type: str
-        returned: success
-    private_ip_address:
-        description:
-            - Specifies the private IP address bound with the EIP. This
-              parameter is returned only when a private IP address is bound
-              with the EIP.
-        type: str
-        returned: success
-'''
+RETURN = r"""
+type:
+  description:
+    - Specifies the EIP type.
+  type: str
+  returned: success
+dedicated_bandwidth:
+  description:
+    - Specifies the dedicated bandwidth object.
+  type: dict
+  returned: success
+  contains:
+    charge_mode:
+      description:
+        - Specifies whether the bandwidth is billed by traffic or by bandwidth size. The value can be bandwidth or traffic.
+          If this parameter is left blank or is null character string, default value bandwidth is used. For IPv6 addresses,
+          the default parameter value is bandwidth outside China and is traffic in China.
+      type: str
+      returned: success
+    name:
+      description:
+        - Specifies the bandwidth name. The value is a string of 1 to 64 characters that can contain letters, digits, underscores
+          (V(_)), hyphens (V(-)), and periods (V(.)).
+      type: str
+      returned: success
+    size:
+      description:
+        - Specifies the bandwidth size. The value ranges from 1 Mbit/s to 2000 Mbit/s by default. (The specific range may
+          vary depending on the configuration in each region. You can see the bandwidth range of each region on the management
+          console.) The minimum unit for bandwidth adjustment varies depending on the bandwidth range. The details are as
+          follows:.
+        - The minimum unit is 1 Mbit/s if the allowed bandwidth size ranges from 0 to 300 Mbit/s (with 300 Mbit/s included).
+        - The minimum unit is 50 Mbit/s if the allowed bandwidth size ranges 300 Mbit/s to 1000 Mbit/s (with 1000 Mbit/s included).
+        - The minimum unit is 500 Mbit/s if the allowed bandwidth size is greater than 1000 Mbit/s.
+      type: int
+      returned: success
+    id:
+      description:
+        - Specifies the ID of dedicated bandwidth.
+      type: str
+      returned: success
+enterprise_project_id:
+  description:
+    - Specifies the enterprise project ID.
+  type: str
+  returned: success
+ip_version:
+  description:
+    - The value can be 4 (IPv4 address) or 6 (IPv6 address). If this parameter is left blank, an IPv4 address will be assigned.
+  type: int
+  returned: success
+ipv4_address:
+  description:
+    - Specifies the obtained IPv4 EIP. The system automatically assigns an EIP if you do not specify it.
+  type: str
+  returned: success
+port_id:
+  description:
+    - Specifies the port ID. This parameter is returned only when a private IP address is bound with the EIP.
+  type: str
+  returned: success
+shared_bandwidth_id:
+  description:
+    - Specifies the ID of shared bandwidth.
+  type: str
+  returned: success
+create_time:
+  description:
+    - Specifies the time (UTC time) when the EIP was assigned.
+  type: str
+  returned: success
+ipv6_address:
+  description:
+    - Specifies the obtained IPv6 EIP.
+  type: str
+  returned: success
+private_ip_address:
+  description:
+    - Specifies the private IP address bound with the EIP. This parameter is returned only when a private IP address is bound
+      with the EIP.
+  type: str
+  returned: success
+"""
 
 from ansible_collections.community.general.plugins.module_utils.hwc_utils import (
     Config, HwcClientException, HwcClientException404, HwcModule,
