@@ -8,60 +8,55 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: memset_zone
 author: "Simon Weald (@glitchcrab)"
 short_description: Creates and deletes Memset DNS zones
 notes:
-  - Zones can be thought of as a logical group of domains, all of which share the
-    same DNS records (i.e. they point to the same IP). An API key generated via the
-    Memset customer control panel is needed with the following minimum scope -
-    C(dns.zone_create), C(dns.zone_delete), C(dns.zone_list).
+  - Zones can be thought of as a logical group of domains, all of which share the same DNS records (in other words they point to the same IP). An API key
+    generated using the Memset customer control panel is needed with the following minimum scope - C(dns.zone_create), C(dns.zone_delete), C(dns.zone_list).
 description:
   - Manage DNS zones in a Memset account.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    state:
-        required: true
-        description:
-            - Indicates desired state of resource.
-        type: str
-        choices: [ absent, present ]
-    api_key:
-        required: true
-        description:
-            - The API key obtained from the Memset control panel.
-        type: str
-    name:
-        required: true
-        description:
-            - The zone nickname; usually the same as the main domain. Ensure this
-              value has at most 250 characters.
-        type: str
-        aliases: [ nickname ]
-    ttl:
-        description:
-            - The default TTL for all records created in the zone. This must be a
-              valid int from U(https://www.memset.com/apidocs/methods_dns.html#dns.zone_create).
-        type: int
-        default: 0
-        choices: [ 0, 300, 600, 900, 1800, 3600, 7200, 10800, 21600, 43200, 86400 ]
-    force:
-        required: false
-        default: false
-        type: bool
-        description:
-            - Forces deletion of a zone and all zone domains/zone records it contains.
-'''
+  state:
+    required: true
+    description:
+      - Indicates desired state of resource.
+    type: str
+    choices: [absent, present]
+  api_key:
+    required: true
+    description:
+      - The API key obtained from the Memset control panel.
+    type: str
+  name:
+    required: true
+    description:
+      - The zone nickname; usually the same as the main domain. Ensure this value has at most 250 characters.
+    type: str
+    aliases: [nickname]
+  ttl:
+    description:
+      - The default TTL for all records created in the zone. This must be a valid int from U(https://www.memset.com/apidocs/methods_dns.html#dns.zone_create).
+    type: int
+    default: 0
+    choices: [0, 300, 600, 900, 1800, 3600, 7200, 10800, 21600, 43200, 86400]
+  force:
+    required: false
+    default: false
+    type: bool
+    description:
+      - Forces deletion of a zone and all zone domains/zone records it contains.
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # Create the zone 'test'
 - name: Create zone
   community.general.memset_zone:
@@ -79,40 +74,40 @@ EXAMPLES = '''
     api_key: 5eb86c9196ab03919abcf03857163741
     force: true
   delegate_to: localhost
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 memset_api:
-  description: Zone info from the Memset API
+  description: Zone info from the Memset API.
   returned: when state == present
   type: complex
   contains:
     domains:
-      description: List of domains in this zone
+      description: List of domains in this zone.
       returned: always
       type: list
       sample: []
     id:
-      description: Zone id
+      description: Zone id.
       returned: always
       type: str
       sample: "b0bb1ce851aeea6feeb2dc32fe83bf9c"
     nickname:
-      description: Zone name
+      description: Zone name.
       returned: always
       type: str
       sample: "example.com"
     records:
-      description: List of DNS records for domains in this zone
+      description: List of DNS records for domains in this zone.
       returned: always
       type: list
       sample: []
     ttl:
-      description: Default TTL for domains in this zone
+      description: Default TTL for domains in this zone.
       returned: always
       type: int
       sample: 300
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.memset import check_zone
