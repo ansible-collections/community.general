@@ -10,11 +10,10 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: omapi_host
 short_description: Setup OMAPI hosts
-description: Manage OMAPI hosts into compatible DHCPd servers
+description: Manage OMAPI hosts into compatible DHCPd servers.
 requirements:
   - pypureomapi
 author:
@@ -22,65 +21,64 @@ author:
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    state:
-        description:
-            - Create or remove OMAPI host.
-        type: str
-        required: true
-        choices: [ absent, present ]
-    hostname:
-        description:
-            - Sets the host lease hostname (mandatory if state=present).
-        type: str
-        aliases: [ name ]
-    host:
-        description:
-            - Sets OMAPI server host to interact with.
-        type: str
-        default: localhost
-    port:
-        description:
-            - Sets the OMAPI server port to interact with.
-        type: int
-        default: 7911
-    key_name:
-        description:
-            - Sets the TSIG key name for authenticating against OMAPI server.
-        type: str
-        required: true
-    key:
-        description:
-            - Sets the TSIG key content for authenticating against OMAPI server.
-        type: str
-        required: true
-    macaddr:
-        description:
-            - Sets the lease host MAC address.
-        type: str
-        required: true
-    ip:
-        description:
-            - Sets the lease host IP address.
-        type: str
-    statements:
-        description:
-            - Attach a list of OMAPI DHCP statements with host lease (without ending semicolon).
-        type: list
-        elements: str
-        default: []
-    ddns:
-        description:
-            - Enable dynamic DNS updates for this host.
-        type: bool
-        default: false
-
-'''
-EXAMPLES = r'''
+  state:
+    description:
+      - Create or remove OMAPI host.
+    type: str
+    required: true
+    choices: [absent, present]
+  hostname:
+    description:
+      - Sets the host lease hostname (mandatory if O(state=present)).
+    type: str
+    aliases: [name]
+  host:
+    description:
+      - Sets OMAPI server host to interact with.
+    type: str
+    default: localhost
+  port:
+    description:
+      - Sets the OMAPI server port to interact with.
+    type: int
+    default: 7911
+  key_name:
+    description:
+      - Sets the TSIG key name for authenticating against OMAPI server.
+    type: str
+    required: true
+  key:
+    description:
+      - Sets the TSIG key content for authenticating against OMAPI server.
+    type: str
+    required: true
+  macaddr:
+    description:
+      - Sets the lease host MAC address.
+    type: str
+    required: true
+  ip:
+    description:
+      - Sets the lease host IP address.
+    type: str
+  statements:
+    description:
+      - Attach a list of OMAPI DHCP statements with host lease (without ending semicolon).
+    type: list
+    elements: str
+    default: []
+  ddns:
+    description:
+      - Enable dynamic DNS updates for this host.
+    type: bool
+    default: false
+"""
+EXAMPLES = r"""
 - name: Add a host using OMAPI
   community.general.omapi_host:
     key_name: defomapi
@@ -91,8 +89,8 @@ EXAMPLES = r'''
     ip: 192.168.88.99
     ddns: true
     statements:
-    - filename "pxelinux.0"
-    - next-server 1.1.1.1
+      - filename "pxelinux.0"
+      - next-server 1.1.1.1
     state: present
 
 - name: Remove a host using OMAPI
@@ -102,35 +100,35 @@ EXAMPLES = r'''
     host: 10.1.1.1
     macaddr: 00:66:ab:dd:11:44
     state: absent
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 lease:
-    description: dictionary containing host information
-    returned: success
-    type: complex
-    contains:
-        ip-address:
-            description: IP address, if there is.
-            returned: success
-            type: str
-            sample: '192.168.1.5'
-        hardware-address:
-            description: MAC address
-            returned: success
-            type: str
-            sample: '00:11:22:33:44:55'
-        hardware-type:
-            description: hardware type, generally '1'
-            returned: success
-            type: int
-            sample: 1
-        name:
-            description: hostname
-            returned: success
-            type: str
-            sample: 'mydesktop'
-'''
+  description: Dictionary containing host information.
+  returned: success
+  type: complex
+  contains:
+    ip-address:
+      description: IP address, if there is.
+      returned: success
+      type: str
+      sample: '192.168.1.5'
+    hardware-address:
+      description: MAC address.
+      returned: success
+      type: str
+      sample: '00:11:22:33:44:55'
+    hardware-type:
+      description: Hardware type, generally V(1).
+      returned: success
+      type: int
+      sample: 1
+    name:
+      description: Hostname.
+      returned: success
+      type: str
+      sample: 'mydesktop'
+"""
 
 import binascii
 import socket
