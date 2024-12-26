@@ -9,6 +9,7 @@
     - ansible_systemd.version | int >= 250
   block:
     - name: Encrypt secret
+      become: true
       community.general.systemd_creds_encrypt:
         name: db
         not_after: +48hr
@@ -16,7 +17,7 @@
       register: encrypted_secret
 
     - name: Assert encrypted secret output is base64 encoded
-      assert:
+      ansible.builtin.assert:
         that:
           - encrypted_secret.msg | b64decode
         fail_msg: "Encrypted secret is not base64 encoded"
@@ -27,13 +28,14 @@
         msg: "{{ encrypted_secret }}"
 
     - name: Assert that SetCredentialEncrypted message is not in the output
-      assert:
+      ansible.builtin.assert:
         that:
           - '"SetCredentialEncrypted" not in encrypted_secret.msg'
         fail_msg: "SetCredentialEncrypted is in the output"
         success_msg: "SetCredentialEncrypted is not in the output"
 
     - name: Encrypt secret
+      become: true
       community.general.systemd_creds_encrypt:
         name: web
         not_after: +5y
@@ -46,7 +48,7 @@
         msg: "{{ pretty_encrypted_secret }}"
 
     - name: Assert that SetCredentialEncrypted message is in the output
-      assert:
+      ansible.builtin.assert:
         that:
           - '"SetCredentialEncrypted=web: " in pretty_encrypted_secret.msg'
         fail_msg: "SetCredentialEncrypted is not in the output"
