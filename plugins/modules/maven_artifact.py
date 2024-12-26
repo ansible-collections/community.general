@@ -11,171 +11,165 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: maven_artifact
 short_description: Downloads an Artifact from a Maven Repository
 description:
-    - Downloads an artifact from a maven repository given the maven coordinates provided to the module.
-    - Can retrieve snapshots or release versions of the artifact and will resolve the latest available
-      version if one is not available.
+  - Downloads an artifact from a maven repository given the maven coordinates provided to the module.
+  - Can retrieve snapshots or release versions of the artifact and will resolve the latest available version if one is not available.
 author: "Chris Schmidt (@chrisisbeef)"
 requirements:
-    - lxml
-    - boto if using a S3 repository (V(s3://...))
+  - lxml
+  - boto if using a S3 repository (V(s3://...))
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    group_id:
-        type: str
-        description:
-            - The Maven groupId coordinate.
-        required: true
-    artifact_id:
-        type: str
-        description:
-            - The maven artifactId coordinate.
-        required: true
-    version:
-        type: str
-        description:
-            - The maven version coordinate.
-            - Mutually exclusive with O(version_by_spec).
-    version_by_spec:
-        type: str
-        description:
-            - The maven dependency version ranges.
-            - See supported version ranges on U(https://cwiki.apache.org/confluence/display/MAVENOLD/Dependency+Mediation+and+Conflict+Resolution)
-            - The range type V((,1.0],[1.2,\)) and V((,1.1\),(1.1,\)) is not supported.
-            - Mutually exclusive with O(version).
-        version_added: '0.2.0'
-    classifier:
-        type: str
-        description:
-            - The maven classifier coordinate.
-        default: ''
-    extension:
-        type: str
-        description:
-            - The maven type/extension coordinate.
-        default: jar
-    repository_url:
-        type: str
-        description:
-            - The URL of the Maven Repository to download from.
-            - Use V(s3://...) if the repository is hosted on Amazon S3.
-            - Use V(file://...) if the repository is local.
-        default: https://repo1.maven.org/maven2
-    username:
-        type: str
-        description:
-            - The username to authenticate as to the Maven Repository. Use AWS secret key of the repository is hosted on S3.
-        aliases: [ "aws_secret_key" ]
-    password:
-        type: str
-        description:
-            - The password to authenticate with to the Maven Repository. Use AWS secret access key of the repository is hosted on S3.
-        aliases: [ "aws_secret_access_key" ]
-    headers:
-        description:
-            - Add custom HTTP headers to a request in hash/dict format.
-        type: dict
-    force_basic_auth:
-        description:
-          - httplib2, the library used by the uri module only sends authentication information when a webservice
-            responds to an initial request with a 401 status. Since some basic auth services do not properly
-            send a 401, logins will fail. This option forces the sending of the Basic authentication header
-            upon initial request.
-        default: false
-        type: bool
-        version_added: '0.2.0'
-    dest:
-        type: path
-        description:
-            - The path where the artifact should be written to.
-            - If file mode or ownerships are specified and destination path already exists, they affect the downloaded file.
-        required: true
-    state:
-        type: str
-        description:
-            - The desired state of the artifact.
-        default: present
-        choices: [present,absent]
-    timeout:
-        type: int
-        description:
-            - Specifies a timeout in seconds for the connection attempt.
-        default: 10
-    validate_certs:
-        description:
-            - If V(false), SSL certificates will not be validated. This should only be set to V(false) when no other option exists.
-        type: bool
-        default: true
-    client_cert:
-        description:
-            - PEM formatted certificate chain file to be used for SSL client authentication.
-            - This file can also include the key as well, and if the key is included, O(client_key) is not required.
-        type: path
-        version_added: '1.3.0'
-    client_key:
-        description:
-            - PEM formatted file that contains your private key to be used for SSL client authentication.
-            - If O(client_cert) contains both the certificate and key, this option is not required.
-        type: path
-        version_added: '1.3.0'
-    keep_name:
-        description:
-            - If V(true), the downloaded artifact's name is preserved, i.e the version number remains part of it.
-            - This option only has effect when O(dest) is a directory and O(version) is set to V(latest) or O(version_by_spec)
-              is defined.
-        type: bool
-        default: false
-    verify_checksum:
-        type: str
-        description:
-            - If V(never), the MD5/SHA1 checksum will never be downloaded and verified.
-            - If V(download), the MD5/SHA1 checksum will be downloaded and verified only after artifact download. This is the default.
-            - If V(change), the MD5/SHA1 checksum will be downloaded and verified if the destination already exist,
-              to verify if they are identical. This was the behaviour before 2.6. Since it downloads the checksum before (maybe)
-              downloading the artifact, and since some repository software, when acting as a proxy/cache, return a 404 error
-              if the artifact has not been cached yet, it may fail unexpectedly.
-              If you still need it, you should consider using V(always) instead - if you deal with a checksum, it is better to
-              use it to verify integrity after download.
-            - V(always) combines V(download) and V(change).
-        required: false
-        default: 'download'
-        choices: ['never', 'download', 'change', 'always']
-    checksum_alg:
-        type: str
-        description:
-            - If V(md5), checksums will use the MD5 algorithm. This is the default.
-            - If V(sha1), checksums will use the SHA1 algorithm. This can be used on systems configured to use
-              FIPS-compliant algorithms, since MD5 will be blocked on such systems.
-        default: 'md5'
-        choices: ['md5', 'sha1']
-        version_added: 3.2.0
-    unredirected_headers:
-        type: list
-        elements: str
-        version_added: 5.2.0
-        description:
-            - A list of headers that should not be included in the redirection. This headers are sent to the C(fetch_url) function.
-            - On ansible-core version 2.12 or later, the default of this option is V([Authorization, Cookie]).
-            - Useful if the redirection URL does not need to have sensitive headers in the request.
-            - Requires ansible-core version 2.12 or later.
-    directory_mode:
-        type: str
-        description:
-            - Filesystem permission mode applied recursively to O(dest) when it is a directory.
+  group_id:
+    type: str
+    description:
+      - The Maven groupId coordinate.
+    required: true
+  artifact_id:
+    type: str
+    description:
+      - The maven artifactId coordinate.
+    required: true
+  version:
+    type: str
+    description:
+      - The maven version coordinate.
+      - Mutually exclusive with O(version_by_spec).
+  version_by_spec:
+    type: str
+    description:
+      - The maven dependency version ranges.
+      - See supported version ranges on U(https://cwiki.apache.org/confluence/display/MAVENOLD/Dependency+Mediation+and+Conflict+Resolution).
+      - The range type V((,1.0],[1.2,\)) and V((,1.1\),(1.1,\)) is not supported.
+      - Mutually exclusive with O(version).
+    version_added: '0.2.0'
+  classifier:
+    type: str
+    description:
+      - The maven classifier coordinate.
+    default: ''
+  extension:
+    type: str
+    description:
+      - The maven type/extension coordinate.
+    default: jar
+  repository_url:
+    type: str
+    description:
+      - The URL of the Maven Repository to download from.
+      - Use V(s3://...) if the repository is hosted on Amazon S3.
+      - Use V(file://...) if the repository is local.
+    default: https://repo1.maven.org/maven2
+  username:
+    type: str
+    description:
+      - The username to authenticate as to the Maven Repository. Use AWS secret key of the repository is hosted on S3.
+    aliases: ["aws_secret_key"]
+  password:
+    type: str
+    description:
+      - The password to authenticate with to the Maven Repository. Use AWS secret access key of the repository is hosted on S3.
+    aliases: ["aws_secret_access_key"]
+  headers:
+    description:
+      - Add custom HTTP headers to a request in hash/dict format.
+    type: dict
+  force_basic_auth:
+    description:
+      - Httplib2, the library used by the uri module only sends authentication information when a webservice responds to an initial request with
+        a 401 status. Since some basic auth services do not properly send a 401, logins will fail. This option forces the sending of the Basic
+        authentication header upon initial request.
+    default: false
+    type: bool
+    version_added: '0.2.0'
+  dest:
+    type: path
+    description:
+      - The path where the artifact should be written to.
+      - If file mode or ownerships are specified and destination path already exists, they affect the downloaded file.
+    required: true
+  state:
+    type: str
+    description:
+      - The desired state of the artifact.
+    default: present
+    choices: [present, absent]
+  timeout:
+    type: int
+    description:
+      - Specifies a timeout in seconds for the connection attempt.
+    default: 10
+  validate_certs:
+    description:
+      - If V(false), SSL certificates will not be validated. This should only be set to V(false) when no other option exists.
+    type: bool
+    default: true
+  client_cert:
+    description:
+      - PEM formatted certificate chain file to be used for SSL client authentication.
+      - This file can also include the key as well, and if the key is included, O(client_key) is not required.
+    type: path
+    version_added: '1.3.0'
+  client_key:
+    description:
+      - PEM formatted file that contains your private key to be used for SSL client authentication.
+      - If O(client_cert) contains both the certificate and key, this option is not required.
+    type: path
+    version_added: '1.3.0'
+  keep_name:
+    description:
+      - If V(true), the downloaded artifact's name is preserved, in other words the version number remains part of it.
+      - This option only has effect when O(dest) is a directory and O(version) is set to V(latest) or O(version_by_spec) is defined.
+    type: bool
+    default: false
+  verify_checksum:
+    type: str
+    description:
+      - If V(never), the MD5/SHA1 checksum will never be downloaded and verified.
+      - If V(download), the MD5/SHA1 checksum will be downloaded and verified only after artifact download. This is the default.
+      - If V(change), the MD5/SHA1 checksum will be downloaded and verified if the destination already exist, to verify if they are identical.
+        This was the behaviour before 2.6. Since it downloads the checksum before (maybe) downloading the artifact, and since some repository
+        software, when acting as a proxy/cache, return a 404 error if the artifact has not been cached yet, it may fail unexpectedly. If you still
+        need it, you should consider using V(always) instead - if you deal with a checksum, it is better to use it to verify integrity after download.
+      - V(always) combines V(download) and V(change).
+    required: false
+    default: 'download'
+    choices: ['never', 'download', 'change', 'always']
+  checksum_alg:
+    type: str
+    description:
+      - If V(md5), checksums will use the MD5 algorithm. This is the default.
+      - If V(sha1), checksums will use the SHA1 algorithm. This can be used on systems configured to use FIPS-compliant algorithms, since MD5
+        will be blocked on such systems.
+    default: 'md5'
+    choices: ['md5', 'sha1']
+    version_added: 3.2.0
+  unredirected_headers:
+    type: list
+    elements: str
+    version_added: 5.2.0
+    description:
+      - A list of headers that should not be included in the redirection. This headers are sent to the C(fetch_url) function.
+      - On ansible-core version 2.12 or later, the default of this option is V([Authorization, Cookie]).
+      - Useful if the redirection URL does not need to have sensitive headers in the request.
+      - Requires ansible-core version 2.12 or later.
+  directory_mode:
+    type: str
+    description:
+      - Filesystem permission mode applied recursively to O(dest) when it is a directory.
 extends_documentation_fragment:
-    - ansible.builtin.files
-    - community.general.attributes
-'''
+  - ansible.builtin.files
+  - community.general.attributes
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Download the latest version of the JUnit framework artifact from Maven Central
   community.general.maven_artifact:
     group_id: junit
@@ -236,7 +230,7 @@ EXAMPLES = '''
     artifact_id: junit
     version_by_spec: "[3.8,4.0)"
     dest: /tmp/
-'''
+"""
 
 import hashlib
 import os
