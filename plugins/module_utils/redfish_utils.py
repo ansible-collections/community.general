@@ -3951,3 +3951,21 @@ class RedfishUtils(object):
                 "rsp_uri": rsp_uri
             }
         return res
+
+    def get_accountservice_properties(self):
+        # Find the AccountService resource
+        response = self.get_request(self.root_uri + self.service_root)
+        if response['ret'] is False:
+            return response
+        data = response['data']
+        accountservice_uri = data.get("AccountService", {}).get("@odata.id")
+        if accountservice_uri is None:
+            return {'ret': False, 'msg': "AccountService resource not found"}
+
+        response = self.get_request(self.root_uri + accountservice_uri)
+        if response['ret'] is False:
+            return response
+        return {
+            'ret': True,
+            'entries': response['data']
+        }

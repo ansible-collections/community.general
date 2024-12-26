@@ -199,6 +199,14 @@ EXAMPLES = r"""
     username: "{{ username }}"
     password: "{{ password }}"
 
+- name: Get configuration of the AccountService
+  community.general.redfish_info:
+    category: Accounts
+    command: GetAccountServiceConfig
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+
 - name: Get default system inventory and user information
   community.general.redfish_info:
     category: Systems,Accounts
@@ -396,7 +404,7 @@ CATEGORY_COMMANDS_ALL = {
                 "GetBiosAttributes", "GetBootOrder", "GetBootOverride", "GetVirtualMedia", "GetBiosRegistries"],
     "Chassis": ["GetFanInventory", "GetPsuInventory", "GetChassisPower",
                 "GetChassisThermals", "GetChassisInventory", "GetHealthReport", "GetHPEThermalConfig", "GetHPEFanPercentMin"],
-    "Accounts": ["ListUsers"],
+    "Accounts": ["ListUsers", "GetAccountServiceConfig"],
     "Sessions": ["GetSessions"],
     "Update": ["GetFirmwareInventory", "GetFirmwareUpdateCapabilities", "GetSoftwareInventory",
                "GetUpdateStatus"],
@@ -569,6 +577,8 @@ def main():
             for command in command_list:
                 if command == "ListUsers":
                     result["user"] = rf_utils.list_users()
+                elif command == "GetAccountServiceConfig":
+                    result["accountservice_config"] = rf_utils.get_accountservice_properties()
 
         elif category == "Update":
             # execute only if we find UpdateService resources
