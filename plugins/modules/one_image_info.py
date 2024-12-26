@@ -30,8 +30,8 @@ options:
   name:
     description:
       - A O(name) of the image whose facts will be gathered.
-      - If the O(name) begins with V(~) the O(name) will be used as regex pattern.
-      - Which restricts the list of images (whose facts will be returned) whose names match specified regex.
+      - If the O(name) begins with V(~) the O(name) will be used as regex pattern,
+        which restricts the list of images (whose facts will be returned) whose names match specified regex.
       - Also, if the O(name) begins with V(~*) case-insensitive matching will be performed.
       - See examples for more details.
     type: str

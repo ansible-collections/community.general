@@ -46,7 +46,7 @@ options:
       field:
         type: str
         description:
-          - The name of the field to search for within this item (optional, defaults to "password" (or "document" if the item has an attachment).
+          - The name of the field to search for within this item (optional, defaults to V(password), or V(document) if the item has an attachment).
       section:
         type: str
         description:

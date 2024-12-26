@@ -50,9 +50,9 @@ requirements:
   - "pyodbc"
 
 notes:
-  - Like the command module, this module always returns V(changed=yes) whether or not the query would change the database.
-  - 'To alter this behavior you can use C(changed_when): [yes or no].'
-  - For details about return values (description and row_count) see U(https://github.com/mkleehammer/pyodbc/wiki/Cursor).
+  - Like the command module, this module always returns V(changed=true) whether or not the query would change the database.
+  - 'To alter this behavior you can use C(changed_when): [true or false].'
+  - For details about return values (RV(description) and RV(row_count)) see U(https://github.com/mkleehammer/pyodbc/wiki/Cursor).
 """
 
 EXAMPLES = r"""
@@ -78,7 +78,7 @@ description:
   type: list
   elements: dict
 row_count:
-  description: "The number of rows selected or modified according to the cursor defaults to -1. See notes."
+  description: "The number of rows selected or modified according to the cursor defaults to V(-1). See notes."
   returned: success
   type: str
 """

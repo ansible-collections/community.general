@@ -34,7 +34,7 @@ options:
     choices: [absent, present]
   hostname:
     description:
-      - Sets the host lease hostname (mandatory if state=present).
+      - Sets the host lease hostname (mandatory if O(state=present)).
     type: str
     aliases: [name]
   host:
