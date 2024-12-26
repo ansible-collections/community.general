@@ -8,21 +8,19 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: listen_ports_facts
 author:
-    - Nathan Davison (@ndavison)
+  - Nathan Davison (@ndavison)
 description:
-    - Gather facts on processes listening on TCP and UDP ports using the C(netstat) or C(ss) commands.
-    - This module currently supports Linux only.
+  - Gather facts on processes listening on TCP and UDP ports using the C(netstat) or C(ss) commands.
+  - This module currently supports Linux only.
 requirements:
   - netstat or ss
 short_description: Gather facts on processes listening on TCP and UDP ports
 notes:
-  - |
-    C(ss) returns all processes for each listen address and port.
-    This plugin will return each of them, so multiple entries for the same listen address and port are likely in results.
+  - C(ss) returns all processes for each listen address and port.
+  - This plugin will return each of them, so multiple entries for the same listen address and port are likely in results.
 extends_documentation_fragment:
   - community.general.attributes
   - community.general.attributes.facts
@@ -31,7 +29,7 @@ options:
   command:
     description:
       - Override which command to use for fetching listen ports.
-      - 'By default module will use first found supported command on the system (in alphanumerical order).'
+      - By default module will use first found supported command on the system (in alphanumerical order).
     type: str
     choices:
       - netstat
@@ -39,15 +37,15 @@ options:
     version_added: 4.1.0
   include_non_listening:
     description:
-        - Show both listening and non-listening sockets (for TCP this means established connections).
-        - Adds the return values RV(ansible_facts.tcp_listen[].state), RV(ansible_facts.udp_listen[].state),
-          RV(ansible_facts.tcp_listen[].foreign_address), and RV(ansible_facts.udp_listen[].foreign_address) to the returned facts.
+      - Show both listening and non-listening sockets (for TCP this means established connections).
+      - Adds the return values RV(ansible_facts.tcp_listen[].state), RV(ansible_facts.udp_listen[].state), RV(ansible_facts.tcp_listen[].foreign_address),
+        and RV(ansible_facts.udp_listen[].foreign_address) to the returned facts.
     type: bool
     default: false
     version_added: 5.4.0
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Gather facts on listening ports
   community.general.listen_ports_facts:
 
@@ -77,11 +75,11 @@ EXAMPLES = r'''
   community.general.listen_ports_facts:
     command: 'netstat'
     include_non_listening: true
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 ansible_facts:
-  description: Dictionary containing details of TCP and UDP ports with listening servers
+  description: Dictionary containing details of TCP and UDP ports with listening servers.
   returned: always
   type: complex
   contains:
@@ -189,7 +187,7 @@ ansible_facts:
           returned: always
           type: str
           sample: "root"
-'''
+"""
 
 import re
 import platform

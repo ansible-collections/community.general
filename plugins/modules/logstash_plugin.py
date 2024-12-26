@@ -8,53 +8,51 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: logstash_plugin
 short_description: Manage Logstash plugins
 description:
-    - Manages Logstash plugins.
+  - Manages Logstash plugins.
 author: Loic Blot (@nerzhul)
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    name:
-        type: str
-        description:
-            - Install plugin with that name.
-        required: true
-    state:
-        type: str
-        description:
-            - Apply plugin state.
-        choices: ["present", "absent"]
-        default: present
-    plugin_bin:
-        type: path
-        description:
-            - Specify logstash-plugin to use for plugin management.
-        default: /usr/share/logstash/bin/logstash-plugin
-    proxy_host:
-        type: str
-        description:
-            - Proxy host to use during plugin installation.
-    proxy_port:
-        type: str
-        description:
-            - Proxy port to use during plugin installation.
-    version:
-        type: str
-        description:
-            - Specify plugin Version of the plugin to install.
-              If plugin exists with previous version, it will NOT be updated.
-'''
+  name:
+    type: str
+    description:
+      - Install plugin with that name.
+    required: true
+  state:
+    type: str
+    description:
+      - Apply plugin state.
+    choices: ["present", "absent"]
+    default: present
+  plugin_bin:
+    type: path
+    description:
+      - Specify logstash-plugin to use for plugin management.
+    default: /usr/share/logstash/bin/logstash-plugin
+  proxy_host:
+    type: str
+    description:
+      - Proxy host to use during plugin installation.
+  proxy_port:
+    type: str
+    description:
+      - Proxy port to use during plugin installation.
+  version:
+    type: str
+    description:
+      - Specify plugin Version of the plugin to install. If plugin exists with previous version, it will NOT be updated.
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Install Logstash beats input plugin
   community.general.logstash_plugin:
     state: present
@@ -77,7 +75,7 @@ EXAMPLES = '''
     name: logstash-input-beats
   environment:
     LS_JAVA_OPTS: "-Xms256m -Xmx256m"
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 
