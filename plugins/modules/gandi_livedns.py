@@ -65,7 +65,7 @@ options:
     elements: str
   domain:
     description:
-      - The name of the Domain to work with (for example, "example.com").
+      - The name of the Domain to work with (for example, V(example.com)).
     required: true
     type: str
 """
