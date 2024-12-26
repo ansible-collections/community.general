@@ -12,7 +12,7 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 module: keycloak_realm_keys_metadata_info
 
-short_description: Allows obtaining Keycloak realm keys metadata vusingia Keycloak API
+short_description: Allows obtaining Keycloak realm keys metadata using Keycloak API
 
 version_added: 9.3.0
 
