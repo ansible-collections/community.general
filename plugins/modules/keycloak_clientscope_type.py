@@ -9,29 +9,24 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: keycloak_clientscope_type
 
-short_description: Set the type of aclientscope in realm or client via Keycloak API
+short_description: Set the type of aclientscope in realm or client using Keycloak API
 
 version_added: 6.6.0
 
 description:
-  - This module allows you to set the type (optional, default) of clientscopes
-    via the Keycloak REST API. It requires access to the REST API via OpenID
-    Connect; the user connecting and the client being used must have the
-    requisite access rights. In a default Keycloak installation, admin-cli and
-    an admin user would work, as would a separate client definition with the
-    scope tailored to your needs and a user having the expected roles.
-
+  - This module allows you to set the type (optional, default) of clientscopes using the Keycloak REST API. It requires access to the REST API using
+    OpenID Connect; the user connecting and the client being used must have the requisite access rights. In a default Keycloak installation, admin-cli
+    and an admin user would work, as would a separate client definition with the scope tailored to your needs and a user having the expected roles.
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: full
-    action_group:
-        version_added: 10.2.0
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
+  action_group:
+    version_added: 10.2.0
 
 options:
   realm:
@@ -66,9 +61,9 @@ extends_documentation_fragment:
 
 author:
   - Simon Pahl (@simonpahl)
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Set default client scopes on realm level
   community.general.keycloak_clientscope_type:
     auth_client_id: admin-cli
@@ -91,42 +86,33 @@ EXAMPLES = '''
     default_clientscopes: ['profile', 'roles']
     optional_clientscopes: ['phone']
   delegate_to: localhost
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 msg:
-    description: Message as to what action was taken.
-    returned: always
-    type: str
-    sample: ""
+  description: Message as to what action was taken.
+  returned: always
+  type: str
+  sample: ""
 proposed:
-    description: Representation of proposed client-scope types mapping.
-    returned: always
-    type: dict
-    sample: {
-      default_clientscopes: ["profile", "role"],
-      optional_clientscopes: []
-    }
+  description: Representation of proposed client-scope types mapping.
+  returned: always
+  type: dict
+  sample: {default_clientscopes: ["profile", "role"], optional_clientscopes: []}
 existing:
-    description:
-      - Representation of client scopes before module execution.
-    returned: always
-    type: dict
-    sample: {
-      default_clientscopes: ["profile", "role"],
-      optional_clientscopes: ["phone"]
-    }
+  description:
+    - Representation of client scopes before module execution.
+  returned: always
+  type: dict
+  sample: {default_clientscopes: ["profile", "role"], optional_clientscopes: ["phone"]}
 end_state:
-    description:
-      - Representation of client scopes after module execution.
-      - The sample is truncated.
-    returned: on success
-    type: dict
-    sample: {
-      default_clientscopes: ["profile", "role"],
-      optional_clientscopes: []
-    }
-'''
+  description:
+    - Representation of client scopes after module execution.
+    - The sample is truncated.
+  returned: on success
+  type: dict
+  sample: {default_clientscopes: ["profile", "role"], optional_clientscopes: []}
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 
