@@ -7,84 +7,82 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: ipa_vault
 author: Juan Manuel Parrilla (@jparrill)
 short_description: Manage FreeIPA vaults
 description:
-- Add, modify and delete vaults and secret vaults.
-- KRA service should be enabled to use this module.
+  - Add, modify and delete vaults and secret vaults.
+  - KRA service should be enabled to use this module.
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    cn:
-        description:
-        - Vault name.
-        - Can not be changed as it is the unique identifier.
-        required: true
-        aliases: ["name"]
-        type: str
+  cn:
     description:
-        description:
-        - Description.
-        type: str
-    ipavaulttype:
-        description:
-        - Vault types are based on security level.
-        default: "symmetric"
-        choices: ["asymmetric", "standard", "symmetric"]
-        aliases: ["vault_type"]
-        type: str
-    ipavaultpublickey:
-        description:
-        - Public key.
-        aliases: ["vault_public_key"]
-        type: str
-    ipavaultsalt:
-        description:
-        - Vault Salt.
-        aliases: ["vault_salt"]
-        type: str
-    username:
-        description:
-        - Any user can own one or more user vaults.
-        - Mutually exclusive with service.
-        aliases: ["user"]
-        type: list
-        elements: str
-    service:
-        description:
-        - Any service can own one or more service vaults.
-        - Mutually exclusive with user.
-        type: str
-    state:
-        description:
-        - State to ensure.
-        default: "present"
-        choices: ["absent", "present"]
-        type: str
-    replace:
-        description:
-        - Force replace the existent vault on IPA server.
-        type: bool
-        default: false
-        choices: ["True", "False"]
-    validate_certs:
-        description:
-        - Validate IPA server certificates.
-        type: bool
-        default: true
+      - Vault name.
+      - Can not be changed as it is the unique identifier.
+    required: true
+    aliases: ["name"]
+    type: str
+  description:
+    description:
+      - Description.
+    type: str
+  ipavaulttype:
+    description:
+      - Vault types are based on security level.
+    default: "symmetric"
+    choices: ["asymmetric", "standard", "symmetric"]
+    aliases: ["vault_type"]
+    type: str
+  ipavaultpublickey:
+    description:
+      - Public key.
+    aliases: ["vault_public_key"]
+    type: str
+  ipavaultsalt:
+    description:
+      - Vault Salt.
+    aliases: ["vault_salt"]
+    type: str
+  username:
+    description:
+      - Any user can own one or more user vaults.
+      - Mutually exclusive with O(service).
+    aliases: ["user"]
+    type: list
+    elements: str
+  service:
+    description:
+      - Any service can own one or more service vaults.
+      - Mutually exclusive with O(user).
+    type: str
+  state:
+    description:
+      - State to ensure.
+    default: "present"
+    choices: ["absent", "present"]
+    type: str
+  replace:
+    description:
+      - Force replace the existent vault on IPA server.
+    type: bool
+    default: false
+    choices: ["True", "False"]
+  validate_certs:
+    description:
+      - Validate IPA server certificates.
+    type: bool
+    default: true
 extends_documentation_fragment:
   - community.general.ipa.documentation
   - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Ensure vault is present
   community.general.ipa_vault:
     name: vault01
@@ -128,14 +126,14 @@ EXAMPLES = r'''
     ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 vault:
-  description: Vault as returned by IPA API
+  description: Vault as returned by IPA API.
   returned: always
   type: dict
-'''
+"""
 
 import traceback
 
