@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: gitlab_project_badge
 short_description: Manage project badges on GitLab Server
 version_added: 6.1.0
@@ -57,9 +56,9 @@ options:
       - A badge is identified by this URL.
     required: true
     type: str
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Add a badge to a GitLab Project
   community.general.gitlab_project_badge:
     api_url: 'https://example.gitlab.com'
@@ -77,9 +76,9 @@ EXAMPLES = r'''
     state: absent
     link_url: 'https://example.gitlab.com/%{project_path}'
     image_url: 'https://example.gitlab.com/%{project_path}/badges/%{default_branch}/pipeline.svg'
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 badge:
   description: The badge information.
   returned: when O(state=present)
@@ -91,7 +90,7 @@ badge:
     rendered_link_url: 'http://example.com/ci_status.svg?project=example-org/example-project&ref=master'
     rendered_image_url: 'https://shields.io/my/badge'
     kind: project
-'''
+"""
 
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule

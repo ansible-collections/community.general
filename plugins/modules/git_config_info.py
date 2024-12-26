@@ -10,8 +10,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: git_config_info
 author:
   - Guenther Grill (@guenhter)
@@ -19,8 +18,7 @@ version_added: 8.1.0
 requirements: ['git']
 short_description: Read git configuration
 description:
-  - The M(community.general.git_config_info) module reads the git configuration
-    by invoking C(git config).
+  - The M(community.general.git_config_info) module reads the git configuration by invoking C(git config).
 extends_documentation_fragment:
   - community.general.attributes
   - community.general.attributes.info_module
@@ -44,12 +42,12 @@ options:
       - If set to V(system), the system git config is used. O(path) is ignored.
       - If set to V(local), O(path) must be set to the repo to read from.
       - If set to V(file), O(path) must be set to the config file to read from.
-    choices: [ "global", "system", "local", "file" ]
+    choices: ["global", "system", "local", "file"]
     default: "system"
     type: str
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Read a system wide config
   community.general.git_config_info:
     name: core.editor
@@ -81,14 +79,13 @@ EXAMPLES = '''
   community.general.git_config_info:
     scope: file
     path: /etc/gitconfig
-'''
+"""
 
-RETURN = '''
----
+RETURN = r"""
 config_value:
-  description: >
-    When O(name) is set, a string containing the value of the setting in name. If O(name) is not set, empty.
-    If a config key such as V(push.pushoption) has more then one entry, just the first one is returned here.
+  description: >-
+    When O(name) is set, a string containing the value of the setting in name. If O(name) is not set, empty. If a config key
+    such as V(push.pushoption) has more then one entry, just the first one is returned here.
   returned: success if O(name) is set
   type: str
   sample: "vim"
@@ -97,8 +94,8 @@ config_values:
   description:
     - This is a dictionary mapping a git configuration setting to a list of its values.
     - When O(name) is not set, all configuration settings are returned here.
-    - When O(name) is set, only the setting specified in O(name) is returned here.
-      If that setting is not set, the key will still be present, and its value will be an empty list.
+    - When O(name) is set, only the setting specified in O(name) is returned here. If that setting is not set, the key will
+      still be present, and its value will be an empty list.
   returned: success
   type: dict
   sample:
@@ -106,7 +103,7 @@ config_values:
     color.ui: ["auto"]
     push.pushoption: ["merge_request.create", "merge_request.draft"]
     alias.remotev: ["remote -v"]
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 

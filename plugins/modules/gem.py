@@ -9,8 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: gem
 short_description: Manage Ruby gems
 description:
@@ -49,38 +48,37 @@ options:
   repository:
     type: str
     description:
-      - The repository from which the gem will be installed
+      - The repository from which the gem will be installed.
     required: false
     aliases: [source]
   user_install:
     description:
-      - Install gem in user's local gems cache or for all users
+      - Install gem in user's local gems cache or for all users.
     required: false
     type: bool
     default: true
   executable:
     type: path
     description:
-    - Override the path to the gem executable
+      - Override the path to the gem executable.
     required: false
   install_dir:
     type: path
     description:
-    - Install the gems into a specific directory.
-      These gems will be independent from the global installed ones.
-      Specifying this requires user_install to be false.
+      - Install the gems into a specific directory. These gems will be independent from the global installed ones. Specifying
+        this requires user_install to be false.
     required: false
   bindir:
     type: path
     description:
-    - Install executables into a specific directory.
+      - Install executables into a specific directory.
     version_added: 3.3.0
   norc:
     type: bool
     default: true
     description:
-    - Avoid loading any C(.gemrc) file. Ignored for RubyGems prior to 2.5.2.
-    - The default changed from V(false) to V(true) in community.general 6.0.0.
+      - Avoid loading any C(.gemrc) file. Ignored for RubyGems prior to 2.5.2.
+      - The default changed from V(false) to V(true) in community.general 6.0.0.
     version_added: 3.3.0
   env_shebang:
     description:
@@ -108,7 +106,7 @@ options:
   build_flags:
     type: str
     description:
-      - Allow adding build flags for gem compilation
+      - Allow adding build flags for gem compilation.
     required: false
   force:
     description:
@@ -117,11 +115,11 @@ options:
     default: false
     type: bool
 author:
-    - "Ansible Core Team"
-    - "Johan Wiren (@johanwiren)"
-'''
+  - "Ansible Core Team"
+  - "Johan Wiren (@johanwiren)"
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Install version 1.0 of vagrant
   community.general.gem:
     name: vagrant
@@ -138,7 +136,7 @@ EXAMPLES = '''
     name: rake
     gem_source: /path/to/gems/rake-1.0.gem
     state: present
-'''
+"""
 
 import re
 

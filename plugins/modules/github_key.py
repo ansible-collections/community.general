@@ -9,7 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: github_key
 short_description: Manage GitHub access keys
 description:
@@ -29,7 +29,7 @@ options:
     type: str
   name:
     description:
-      - SSH key name
+      - SSH key name.
     required: true
     type: str
   pubkey:
@@ -44,34 +44,36 @@ options:
     type: str
   force:
     description:
-      - The default is V(true), which will replace the existing remote key
-        if it is different than O(pubkey). If V(false), the key will only be
-        set if no key with the given O(name) exists.
+      - The default is V(true), which will replace the existing remote key if it is different than O(pubkey). If V(false),
+        the key will only be set if no key with the given O(name) exists.
     type: bool
     default: true
 
 author: Robert Estelle (@erydo)
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 deleted_keys:
-    description: An array of key objects that were deleted. Only present on state=absent
-    type: list
-    returned: When state=absent
-    sample: [{'id': 0, 'key': 'BASE64 encoded key', 'url': 'http://example.com/github key', 'created_at': 'YYYY-MM-DDTHH:MM:SZ', 'read_only': false}]
+  description: An array of key objects that were deleted. Only present on state=absent.
+  type: list
+  returned: When state=absent
+  sample: [{'id': 0, 'key': 'BASE64 encoded key', 'url': 'http://example.com/github key', 'created_at': 'YYYY-MM-DDTHH:MM:SZ',
+        'read_only': false}]
 matching_keys:
-    description: An array of keys matching the specified name. Only present on state=present
-    type: list
-    returned: When state=present
-    sample: [{'id': 0, 'key': 'BASE64 encoded key', 'url': 'http://example.com/github key', 'created_at': 'YYYY-MM-DDTHH:MM:SZ', 'read_only': false}]
+  description: An array of keys matching the specified name. Only present on state=present.
+  type: list
+  returned: When state=present
+  sample: [{'id': 0, 'key': 'BASE64 encoded key', 'url': 'http://example.com/github key', 'created_at': 'YYYY-MM-DDTHH:MM:SZ',
+        'read_only': false}]
 key:
-    description: Metadata about the key just created. Only present on state=present
-    type: dict
-    returned: success
-    sample: {'id': 0, 'key': 'BASE64 encoded key', 'url': 'http://example.com/github key', 'created_at': 'YYYY-MM-DDTHH:MM:SZ', 'read_only': false}
-'''
+  description: Metadata about the key just created. Only present on state=present.
+  type: dict
+  returned: success
+  sample: {'id': 0, 'key': 'BASE64 encoded key', 'url': 'http://example.com/github key', 'created_at': 'YYYY-MM-DDTHH:MM:SZ',
+    'read_only': false}
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Read SSH public key to authorize
   ansible.builtin.shell: cat /home/foo/.ssh/id_rsa.pub
   register: ssh_pub_key
@@ -89,7 +91,7 @@ EXAMPLES = '''
     name: Access Key for Some Machine
     token: '{{ github_access_token }}'
     pubkey: "{{ lookup('ansible.builtin.file', '/home/foo/.ssh/id_rsa.pub') }}"
-'''
+"""
 
 import datetime
 import json

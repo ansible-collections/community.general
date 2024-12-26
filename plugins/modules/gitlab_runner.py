@@ -10,33 +10,31 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: gitlab_runner
 short_description: Create, modify and delete GitLab Runners
 description:
   - Register, update and delete runners on GitLab Server side with the GitLab API.
   - All operations are performed using the GitLab API v4.
-  - For details, consult the full API documentation at U(https://docs.gitlab.com/ee/api/runners.html)
-    and U(https://docs.gitlab.com/ee/api/users.html#create-a-runner-linked-to-a-user).
-  - A valid private API token is required for all operations. You can create as many tokens as you like using the GitLab web interface at
-    U(https://$GITLAB_URL/profile/personal_access_tokens).
-  - A valid registration token is required for registering a new runner.
-    To create shared runners, you need to ask your administrator to give you this token.
-    It can be found at U(https://$GITLAB_URL/admin/runners/).
-  - This module does not handle the C(gitlab-runner) process part, but only manages the runner on GitLab Server side through its API.
-    Once the module has created the runner, you may use the generated token to run C(gitlab-runner register) command
+  - For details, consult the full API documentation at U(https://docs.gitlab.com/ee/api/runners.html) and
+    U(https://docs.gitlab.com/ee/api/users.html#create-a-runner-linked-to-a-user).
+  - A valid private API token is required for all operations. You can create as many tokens as you like using the GitLab web
+    interface at U(https://$GITLAB_URL/profile/personal_access_tokens).
+  - A valid registration token is required for registering a new runner. To create shared runners, you need to ask your administrator
+    to give you this token. It can be found at U(https://$GITLAB_URL/admin/runners/).
+  - This module does not handle the C(gitlab-runner) process part, but only manages the runner on GitLab Server side through
+    its API. Once the module has created the runner, you may use the generated token to run C(gitlab-runner register) command.
 notes:
   - To create a new runner at least the O(api_token), O(description) and O(api_url) options are required.
-  - Runners need to have unique descriptions, since this attribute is used as key for idempotency
+  - Runners need to have unique descriptions, since this attribute is used as key for idempotency.
 author:
   - Samy Coenen (@SamyCoenen)
   - Guillaume Martinez (@Lunik)
 requirements:
-  - python-gitlab >= 1.5.0 for legacy runner registration workflow
-    (runner registration token - U(https://docs.gitlab.com/runner/register/#register-with-a-runner-registration-token-deprecated))
-  - python-gitlab >= 4.0.0 for new runner registration workflow
-    (runner authentication token - U(https://docs.gitlab.com/runner/register/#register-with-a-runner-authentication-token))
+  - python-gitlab >= 1.5.0 for legacy runner registration workflow (runner registration token -
+    U(https://docs.gitlab.com/runner/register/#register-with-a-runner-registration-token-deprecated))
+  - python-gitlab >= 4.0.0 for new runner registration workflow (runner authentication token -
+    U(https://docs.gitlab.com/runner/register/#register-with-a-runner-authentication-token))
 extends_documentation_fragment:
   - community.general.auth_basic
   - community.general.gitlab
@@ -73,7 +71,8 @@ options:
       - name
   state:
     description:
-      - Make sure that the runner with the same name exists with the same configuration or delete the runner with the same name.
+      - Make sure that the runner with the same name exists with the same configuration or delete the runner with the same
+        name.
     required: false
     default: present
     choices: ["present", "absent"]
@@ -118,12 +117,12 @@ options:
   access_level:
     description:
       - Determines if a runner can pick up jobs only from protected branches.
-      - If O(access_level_on_creation) is not explicitly set to V(true), this option is ignored on registration and
-        is only applied on updates.
+      - If O(access_level_on_creation) is not explicitly set to V(true), this option is ignored on registration and is only
+        applied on updates.
       - If set to V(not_protected), runner can pick up jobs from both protected and unprotected branches.
       - If set to V(ref_protected), runner can pick up jobs only from protected branches.
-      - Before community.general 8.0.0 the default was V(ref_protected). This was changed to no default in community.general 8.0.0.
-        If this option is not specified explicitly, GitLab will use V(not_protected) on creation, and the value set
+      - Before community.general 8.0.0 the default was V(ref_protected). This was changed to no default in community.general
+        8.0.0. If this option is not specified explicitly, GitLab will use V(not_protected) on creation, and the value set
         will not be changed on any updates.
     required: false
     choices: ["not_protected", "ref_protected"]
@@ -156,9 +155,9 @@ options:
     default: []
     type: list
     elements: str
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create an instance-level runner
   community.general.gitlab_runner:
     api_url: https://gitlab.example.com/
@@ -234,31 +233,31 @@ EXAMPLES = '''
     state: present
     project: mygroup/mysubgroup/myproject
   register: runner # Register module output to run C(gitlab-runner register) command in another task
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 msg:
-  description: Success or failure message
+  description: Success or failure message.
   returned: always
   type: str
   sample: "Success"
 
 result:
-  description: json parsed response from the server
+  description: JSON-parsed response from the server.
   returned: always
   type: dict
 
 error:
-  description: the error message returned by the GitLab API
+  description: The error message returned by the GitLab API.
   returned: failed
   type: str
   sample: "400: path is already in use"
 
 runner:
-  description: API object
+  description: API object.
   returned: always
   type: dict
-'''
+"""
 
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule

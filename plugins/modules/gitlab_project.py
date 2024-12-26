@@ -9,8 +9,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: gitlab_project
 short_description: Creates/updates/deletes GitLab Projects
 description:
@@ -179,8 +178,7 @@ options:
     default: true
   lfs_enabled:
     description:
-      - Enable Git large file systems to manages large files such
-        as audio, video, and graphics files.
+      - Enable Git large file systems to manages large files such as audio, video, and graphics files.
     type: bool
     required: false
     default: false
@@ -331,9 +329,9 @@ options:
       - If an wiki for this project should be available or not.
     type: bool
     default: true
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Create GitLab Project
   community.general.gitlab_project:
     api_url: https://gitlab.example.com/
@@ -378,9 +376,9 @@ EXAMPLES = r'''
     api_password: "{{ initial_root_password }}"
     name: my_second_project
     group: "10481470"
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 msg:
   description: Success or failure message.
   returned: always
@@ -388,12 +386,12 @@ msg:
   sample: "Success"
 
 result:
-  description: json parsed response from the server.
+  description: JSON-parsed response from the server.
   returned: always
   type: dict
 
 error:
-  description: the error message returned by the GitLab API.
+  description: The error message returned by the GitLab API.
   returned: failed
   type: str
   sample: "400: path is already in use"
@@ -402,7 +400,7 @@ project:
   description: API object.
   returned: always
   type: dict
-'''
+"""
 
 
 from ansible.module_utils.api import basic_auth_argument_spec

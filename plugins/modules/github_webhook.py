@@ -8,12 +8,11 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: github_webhook
 short_description: Manage GitHub webhooks
 description:
-  - "Create and delete GitHub webhooks"
+  - Create and delete GitHub webhooks.
 requirements:
   - "PyGithub >= 1.3.5"
 extends_documentation_fragment:
@@ -26,22 +25,22 @@ attributes:
 options:
   repository:
     description:
-      - Full name of the repository to configure a hook for
+      - Full name of the repository to configure a hook for.
     type: str
     required: true
     aliases:
       - repo
   url:
     description:
-      - URL to which payloads will be delivered
+      - URL to which payloads will be delivered.
     type: str
     required: true
   content_type:
     description:
-      - The media type used to serialize the payloads
+      - The media type used to serialize the payloads.
     type: str
     required: false
-    choices: [ form, json ]
+    choices: [form, json]
     default: form
   secret:
     description:
@@ -50,61 +49,57 @@ options:
     required: false
   insecure_ssl:
     description:
-      - >
-        Flag to indicate that GitHub should skip SSL verification when calling
-        the hook.
+      - Flag to indicate that GitHub should skip SSL verification when calling the hook.
     required: false
     type: bool
     default: false
   events:
     description:
-      - >
-        A list of GitHub events the hook is triggered for. Events are listed at
-        U(https://developer.github.com/v3/activity/events/types/). Required
-        unless O(state=absent)
+      - A list of GitHub events the hook is triggered for. Events are listed at U(https://developer.github.com/v3/activity/events/types/).
+        Required unless O(state=absent).
     required: false
     type: list
     elements: str
   active:
     description:
-      - Whether or not the hook is active
+      - Whether or not the hook is active.
     required: false
     type: bool
     default: true
   state:
     description:
-      - Whether the hook should be present or absent
+      - Whether the hook should be present or absent.
     type: str
     required: false
-    choices: [ absent, present ]
+    choices: [absent, present]
     default: present
   user:
     description:
-      - User to authenticate to GitHub as
+      - User to authenticate to GitHub as.
     type: str
     required: true
   password:
     description:
-      - Password to authenticate to GitHub with
+      - Password to authenticate to GitHub with.
     type: str
     required: false
   token:
     description:
-      - Token to authenticate to GitHub with
+      - Token to authenticate to GitHub with.
     type: str
     required: false
   github_url:
     description:
-      - Base URL of the GitHub API
+      - Base URL of the GitHub API.
     type: str
     required: false
     default: https://api.github.com
 
 author:
   - "Chris St. Pierre (@stpierre)"
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a new webhook that triggers on push (password auth)
   community.general.github_webhook:
     repository: ansible/ansible
@@ -135,16 +130,15 @@ EXAMPLES = '''
     state: absent
     user: "{{ github_user }}"
     password: "{{ github_password }}"
-'''
+"""
 
-RETURN = '''
----
+RETURN = r"""
 hook_id:
-  description: The GitHub ID of the hook created/updated
+  description: The GitHub ID of the hook created/updated.
   returned: when state is 'present'
   type: int
   sample: 6206
-'''
+"""
 
 import traceback
 

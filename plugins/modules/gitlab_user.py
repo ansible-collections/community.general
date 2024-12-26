@@ -10,8 +10,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: gitlab_user
 short_description: Creates/updates/deletes/blocks/unblocks GitLab Users
 description:
@@ -88,13 +87,8 @@ options:
     type: str
   access_level:
     description:
-      - The access level to the group. One of the following can be used.
-      - guest
-      - reporter
-      - developer
-      - master (alias for maintainer)
-      - maintainer
-      - owner
+      - The access level to the group.
+      - The value V(master) is an alias for V(maintainer).
     default: guest
     type: str
     choices: ["guest", "reporter", "developer", "master", "maintainer", "owner"]
@@ -128,7 +122,7 @@ options:
     suboptions:
       provider:
         description:
-          - The name of the external identity provider
+          - The name of the external identity provider.
         type: str
       extern_uid:
         description:
@@ -143,9 +137,9 @@ options:
     type: bool
     default: false
     version_added: 3.3.0
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: "Delete GitLab User"
   community.general.gitlab_user:
     api_url: https://gitlab.example.com/
@@ -179,8 +173,8 @@ EXAMPLES = '''
     password: mysecretpassword
     email: me@example.com
     identities:
-    - provider: Keycloak
-      extern_uid: f278f95c-12c7-4d51-996f-758cc2eb11bc
+      - provider: Keycloak
+        extern_uid: f278f95c-12c7-4d51-996f-758cc2eb11bc
     state: present
     group: super_group/mon_group
     access_level: owner
@@ -198,31 +192,31 @@ EXAMPLES = '''
     api_token: "{{ access_token }}"
     username: myusername
     state: unblocked
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 msg:
-  description: Success or failure message
+  description: Success or failure message.
   returned: always
   type: str
   sample: "Success"
 
 result:
-  description: json parsed response from the server
+  description: JSON-parsed response from the server.
   returned: always
   type: dict
 
 error:
-  description: the error message returned by the GitLab API
+  description: The error message returned by the GitLab API.
   returned: failed
   type: str
   sample: "400: path is already in use"
 
 user:
-  description: API object
+  description: API object.
   returned: always
   type: dict
-'''
+"""
 
 
 from ansible.module_utils.api import basic_auth_argument_spec
