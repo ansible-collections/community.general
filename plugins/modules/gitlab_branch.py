@@ -7,7 +7,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: gitlab_branch
 short_description: Create or delete a branch
 version_added: 4.2.0
@@ -50,10 +50,10 @@ options:
       - Reference branch to create from.
       - This must be specified if O(state=present).
     type: str
-'''
+"""
 
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create branch branch2 from main
   community.general.gitlab_branch:
     api_url: https://gitlab.com
@@ -70,11 +70,10 @@ EXAMPLES = '''
     project: "group1/project1"
     branch: branch2
     state: absent
+"""
 
-'''
-
-RETURN = '''
-'''
+RETURN = r"""
+"""
 
 import traceback
 

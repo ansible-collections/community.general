@@ -9,21 +9,21 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = """
----
+DOCUMENTATION = r"""
 module: gconftool2
 author:
-- Kenneth D. Evensen (@kevensen)
+  - Kenneth D. Evensen (@kevensen)
 short_description: Edit GNOME Configurations
 description:
-- This module allows for the manipulation of GNOME 2 Configuration via gconftool-2.  Please see the gconftool-2(1) man pages for more details.
+  - This module allows for the manipulation of GNOME 2 Configuration using C(gconftool-2). Please see the gconftool-2(1) man pages
+    for more details.
 seealso:
-- name: C(gconftool-2) command manual page
-  description: Manual page for the command.
-  link: https://help.gnome.org/admin//system-admin-guide/2.32/gconf-6.html.en
+  - name: C(gconftool-2) command manual page
+    description: Manual page for the command.
+    link: https://help.gnome.org/admin//system-admin-guide/2.32/gconf-6.html.en
 
 extends_documentation_fragment:
-- community.general.attributes
+  - community.general.attributes
 attributes:
   check_mode:
     support: full
@@ -33,36 +33,37 @@ options:
   key:
     type: str
     description:
-    - A GConf preference key is an element in the GConf repository that corresponds to an application preference.
+      - A GConf preference key is an element in the GConf repository that corresponds to an application preference.
     required: true
   value:
     type: str
     description:
-    - Preference keys typically have simple values such as strings, integers, or lists of strings and integers. This is ignored unless O(state=present).
+      - Preference keys typically have simple values such as strings, integers, or lists of strings and integers. This is
+        ignored unless O(state=present).
   value_type:
     type: str
     description:
-    - The type of value being set. This is ignored unless O(state=present).
+      - The type of value being set. This is ignored unless O(state=present).
     choices: [bool, float, int, string]
   state:
     type: str
     description:
-    - The action to take upon the key/value.
+      - The action to take upon the key/value.
     required: true
     choices: [absent, present]
   config_source:
     type: str
     description:
-    - Specify a configuration source to use rather than the default path.
+      - Specify a configuration source to use rather than the default path.
   direct:
     description:
-    - Access the config database directly, bypassing server.  If O(direct) is specified then the O(config_source) must be specified as well.
+      - Access the config database directly, bypassing server. If O(direct) is specified then the O(config_source) must be
+        specified as well.
     type: bool
     default: false
 """
 
-EXAMPLES = """
----
+EXAMPLES = r"""
 - name: Change the widget font to "Serif 12"
   community.general.gconftool2:
     key: "/desktop/gnome/interface/font_name"
@@ -70,8 +71,7 @@ EXAMPLES = """
     value: "Serif 12"
 """
 
-RETURN = """
----
+RETURN = r"""
 key:
   description: The key specified in the module parameters.
   returned: success
@@ -84,15 +84,15 @@ value_type:
   sample: string
 value:
   description:
-  - The value of the preference key after executing the module or V(null) if key is removed.
-  - From community.general 7.0.0 onwards it returns V(null) for a non-existent O(key), and returned V("") before that.
+    - The value of the preference key after executing the module or V(null) if key is removed.
+    - From community.general 7.0.0 onwards it returns V(null) for a non-existent O(key), and returned V("") before that.
   returned: success
   type: str
   sample: "Serif 12"
 previous_value:
   description:
-  - The value of the preference key before executing the module.
-  - From community.general 7.0.0 onwards it returns V(null) for a non-existent O(key), and returned V("") before that.
+    - The value of the preference key before executing the module.
+    - From community.general 7.0.0 onwards it returns V(null) for a non-existent O(key), and returned V("") before that.
   returned: success
   type: str
   sample: "Serif 12"

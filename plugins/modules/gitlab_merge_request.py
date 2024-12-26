@@ -12,7 +12,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: gitlab_merge_request
 short_description: Create, update, or delete GitLab merge requests
 version_added: 7.1.0
@@ -21,8 +21,7 @@ description:
   - When a single merge request does exist, it will be updated if the provided parameters are different.
   - When a single merge request does exist and O(state=absent), the merge request will be deleted.
   - When multiple merge requests are detected, the task fails.
-  - Existing merge requests are matched based on O(title), O(source_branch), O(target_branch),
-    and O(state_filter) filters.
+  - Existing merge requests are matched based on O(title), O(source_branch), O(target_branch), and O(state_filter) filters.
 author:
   - zvaraondrej (@zvaraondrej)
 requirements:
@@ -102,10 +101,10 @@ options:
       - Comma separated list of reviewers usernames omitting V(@) character.
       - Set to empty string to unassign all reviewers.
     type: str
-'''
+"""
 
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create Merge Request from branch1 to branch2
   community.general.gitlab_merge_request:
     api_url: https://gitlab.com
@@ -117,7 +116,7 @@ EXAMPLES = '''
     description: "Demo MR description"
     labels: "Ansible,Demo"
     state_filter: "opened"
-    remove_source_branch: True
+    remove_source_branch: true
     state: present
 
 - name: Delete Merge Request from branch1 to branch2
@@ -130,9 +129,9 @@ EXAMPLES = '''
     title: "Ansible demo MR"
     state_filter: "opened"
     state: absent
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 msg:
   description: Success or failure message.
   returned: always
@@ -143,7 +142,7 @@ mr:
   description: API object.
   returned: success
   type: dict
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.api import basic_auth_argument_spec
