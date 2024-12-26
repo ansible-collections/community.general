@@ -9,21 +9,18 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: gunicorn
 short_description: Run gunicorn with various settings
 description:
-    - Starts gunicorn with the parameters specified. Common settings for gunicorn
-      configuration are supported. For additional configuration use a config file
-      See U(https://gunicorn-docs.readthedocs.io/en/latest/settings.html) for more
-      options. It's recommended to always use the chdir option to avoid problems
-      with the location of the app.
+  - Starts gunicorn with the parameters specified. Common settings for gunicorn configuration are supported. For additional
+    configuration use a config file See U(https://gunicorn-docs.readthedocs.io/en/latest/settings.html) for more options.
+    It's recommended to always use the chdir option to avoid problems with the location of the app.
 requirements: [gunicorn]
 author:
-    - "Alejandro Gomez (@agmezr)"
+  - "Alejandro Gomez (@agmezr)"
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
   check_mode:
     support: none
@@ -40,37 +37,36 @@ options:
     type: path
     aliases: ['virtualenv']
     description:
-      - 'Path to the virtualenv directory.'
+      - Path to the virtualenv directory.
   config:
     type: path
     description:
-      - 'Path to the gunicorn configuration file.'
+      - Path to the gunicorn configuration file.
     aliases: ['conf']
   chdir:
     type: path
     description:
-      - 'Chdir to specified directory before apps loading.'
+      - Chdir to specified directory before apps loading.
   pid:
     type: path
     description:
-      - 'A filename to use for the PID file. If not set and not found on the configuration file a tmp
-         pid file will be created to check a successful run of gunicorn.'
+      - A filename to use for the PID file. If not set and not found on the configuration file a tmp pid file will be created
+        to check a successful run of gunicorn.
   worker:
     type: str
     choices: ['sync', 'eventlet', 'gevent', 'tornado ', 'gthread', 'gaiohttp']
     description:
-      - 'The type of workers to use. The default class (sync) should handle most "normal" types of workloads.'
+      - The type of workers to use. The default class (sync) should handle most "normal" types of workloads.
   user:
     type: str
     description:
-      -  'Switch worker processes to run as this user.'
+      - Switch worker processes to run as this user.
 notes:
-  - If not specified on config file, a temporary error log will be created on /tmp dir.
-    Please make sure you have write access in /tmp dir. Not needed but will help you to
-    identify any problem with configuration.
-'''
+  - If not specified on config file, a temporary error log will be created on /tmp dir. Please make sure you have write access
+    in /tmp dir. Not needed but will help you to identify any problem with configuration.
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Simple gunicorn run example
   community.general.gunicorn:
     app: 'wsgi'
@@ -96,15 +92,15 @@ EXAMPLES = '''
     venv: '/workspace/example/venv'
     pid: '/workspace/example/gunicorn.pid'
     user: 'ansible'
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 gunicorn:
-    description: process id of gunicorn
-    returned: changed
-    type: str
-    sample: "1234"
-'''
+  description: Process id of gunicorn.
+  returned: changed
+  type: str
+  sample: "1234"
+"""
 
 import os
 import time

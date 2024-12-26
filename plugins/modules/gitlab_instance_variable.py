@@ -10,7 +10,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 module: gitlab_instance_variable
 short_description: Creates, updates, or deletes GitLab instance variables
 version_added: 7.1.0
@@ -18,8 +18,8 @@ description:
   - Creates a instance variable if it does not exist.
   - When a instance variable does exist, its value will be updated if the values are different.
   - Support for instance variables requires GitLab >= 13.0.
-  - Variables which are not mentioned in the modules options, but are present on the GitLab instance,
-    will either stay (O(purge=false)) or will be deleted (O(purge=true)).
+  - Variables which are not mentioned in the modules options, but are present on the GitLab instance, will either stay (O(purge=false))
+    or will be deleted (O(purge=true)).
 author:
   - Benedikt Braunger (@benibr)
 requirements:
@@ -78,12 +78,12 @@ options:
         description:
           - Whether a variable is an environment variable (V(env_var)) or a file (V(file)).
         type: str
-        choices: [ "env_var", "file" ]
+        choices: ["env_var", "file"]
         default: env_var
-'''
+"""
 
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Set or update some CI/CD variables
   community.general.gitlab_instance_variable:
     api_url: https://gitlab.com
@@ -105,9 +105,9 @@ EXAMPLES = r'''
     state: absent
     variables:
       - name: ACCESS_KEY_ID
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 instance_variable:
   description: Four lists of the variablenames which were added, updated, removed or exist.
   returned: always
@@ -133,7 +133,7 @@ instance_variable:
       returned: always
       type: list
       sample: ['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.api import basic_auth_argument_spec

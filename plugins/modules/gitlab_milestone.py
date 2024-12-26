@@ -7,7 +7,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: gitlab_milestone
 short_description: Creates/updates/deletes GitLab Milestones belonging to project or group
 version_added: 8.3.0
@@ -83,10 +83,10 @@ options:
           - Milestone's description.
         type: str
         default: null
-'''
+"""
 
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # same project's task can be executed for group
 - name: Create one milestone
   community.general.gitlab_milestone:
@@ -169,9 +169,9 @@ EXAMPLES = '''
     milestones:
       - title: milestone-abc123
       - title: milestone-two
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 milestones:
   description: Four lists of the milestones which were added, updated, removed or exist.
   returned: success
@@ -201,7 +201,7 @@ milestones_obj:
   description: API object.
   returned: success
   type: dict
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.api import basic_auth_argument_spec
