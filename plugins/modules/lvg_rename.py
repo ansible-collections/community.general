@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 author:
   - Laszlo Szomor (@lszomor)
 module: lvg_rename
@@ -27,23 +26,23 @@ version_added: 7.1.0
 options:
   vg:
     description:
-    - The name or UUID of the source VG.
-    - See V(vgrename(8\)) for valid values.
+      - The name or UUID of the source VG.
+      - See V(vgrename(8\)) for valid values.
     type: str
     required: true
   vg_new:
     description:
-    - The new name of the VG.
-    - See V(lvm(8\)) for valid names.
+      - The new name of the VG.
+      - See V(lvm(8\)) for valid names.
     type: str
     required: true
 seealso:
-- module: community.general.lvg
+  - module: community.general.lvg
 notes:
   - This module does not modify VG renaming-related configurations like C(fstab) entries or boot parameters.
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Rename a VG by name
   community.general.lvg_rename:
     vg: vg_orig_name
@@ -53,7 +52,7 @@ EXAMPLES = r'''
   community.general.lvg_rename:
     vg_uuid: SNgd0Q-rPYa-dPB8-U1g6-4WZI-qHID-N7y9Vj
     vg_new: vg_new_name
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 

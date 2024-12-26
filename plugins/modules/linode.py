@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: linode
 short_description: Manage instances on the Linode Public Cloud
 description:
@@ -24,34 +23,32 @@ attributes:
 options:
   state:
     description:
-     - Indicate desired state of the resource
-    choices: [ absent, active, deleted, present, restarted, started, stopped ]
+      - Indicate desired state of the resource.
+    choices: [absent, active, deleted, present, restarted, started, stopped]
     default: present
     type: str
   api_key:
     description:
-     - Linode API key.
-     - E(LINODE_API_KEY) environment variable can be used instead.
+      - Linode API key.
+      - E(LINODE_API_KEY) environment variable can be used instead.
     type: str
     required: true
   name:
     description:
-     - Name to give the instance (alphanumeric, dashes, underscore).
-     - To keep sanity on the Linode Web Console, name is prepended with C(LinodeID-).
+      - Name to give the instance (alphanumeric, dashes, underscore).
+      - To keep sanity on the Linode Web Console, name is prepended with C(LinodeID-).
     required: true
     type: str
   displaygroup:
     description:
-     - Add the instance to a Display Group in Linode Manager.
+      - Add the instance to a Display Group in Linode Manager.
     type: str
     default: ''
   linode_id:
     description:
-     - Unique ID of a linode server. This value is read-only in the sense that
-       if you specify it on creation of a Linode it will not be used. The
-       Linode API generates these IDs and we can those generated value here to
-       reference a Linode more specifically. This is useful for idempotence.
-    aliases: [ lid ]
+      - Unique ID of a linode server. This value is read-only in the sense that if you specify it on creation of a Linode it will not be used.
+        The Linode API generates these IDs and we can those generated value here to reference a Linode more specifically. This is useful for idempotence.
+    aliases: [lid]
     type: int
   additional_disks:
     description:
@@ -61,119 +58,118 @@ options:
     elements: dict
   alert_bwin_enabled:
     description:
-    - Set status of bandwidth in alerts.
+      - Set status of bandwidth in alerts.
     type: bool
   alert_bwin_threshold:
     description:
-    - Set threshold in MB of bandwidth in alerts.
+      - Set threshold in MB of bandwidth in alerts.
     type: int
   alert_bwout_enabled:
     description:
-    - Set status of bandwidth out alerts.
+      - Set status of bandwidth out alerts.
     type: bool
   alert_bwout_threshold:
     description:
-    - Set threshold in MB of bandwidth out alerts.
+      - Set threshold in MB of bandwidth out alerts.
     type: int
   alert_bwquota_enabled:
     description:
-    - Set status of bandwidth quota alerts as percentage of network transfer quota.
+      - Set status of bandwidth quota alerts as percentage of network transfer quota.
     type: bool
   alert_bwquota_threshold:
     description:
-    - Set threshold in MB of bandwidth quota alerts.
+      - Set threshold in MB of bandwidth quota alerts.
     type: int
   alert_cpu_enabled:
     description:
-    - Set status of receiving CPU usage alerts.
+      - Set status of receiving CPU usage alerts.
     type: bool
   alert_cpu_threshold:
     description:
-    - Set percentage threshold for receiving CPU usage alerts. Each CPU core adds 100% to total.
+      - Set percentage threshold for receiving CPU usage alerts. Each CPU core adds 100% to total.
     type: int
   alert_diskio_enabled:
     description:
-    - Set status of receiving disk IO alerts.
+      - Set status of receiving disk IO alerts.
     type: bool
   alert_diskio_threshold:
     description:
-    - Set threshold for average IO ops/sec over 2 hour period.
+      - Set threshold for average IO ops/sec over 2 hour period.
     type: int
   backupweeklyday:
     description:
-    - Day of the week to take backups.
+      - Day of the week to take backups.
     type: int
   backupwindow:
     description:
-    - The time window in which backups will be taken.
+      - The time window in which backups will be taken.
     type: int
   plan:
     description:
-     - plan to use for the instance (Linode plan)
+      - Plan to use for the instance (Linode plan).
     type: int
   payment_term:
     description:
-     - payment term to use for the instance (payment term in months)
+      - Payment term to use for the instance (payment term in months).
     default: 1
-    choices: [ 1, 12, 24 ]
+    choices: [1, 12, 24]
     type: int
   password:
     description:
-     - root password to apply to a new server (auto generated if missing)
+      - Root password to apply to a new server (auto generated if missing).
     type: str
   private_ip:
     description:
-    - Add private IPv4 address when Linode is created.
-    - Default is V(false).
+      - Add private IPv4 address when Linode is created.
+      - Default is V(false).
     type: bool
   ssh_pub_key:
     description:
-     - SSH public key applied to root user
+      - SSH public key applied to root user.
     type: str
   swap:
     description:
-     - swap size in MB
+      - Swap size in MB.
     default: 512
     type: int
   distribution:
     description:
-     - distribution to use for the instance (Linode Distribution)
+      - Distribution to use for the instance (Linode Distribution).
     type: int
   datacenter:
     description:
-     - datacenter to create an instance in (Linode Datacenter)
+      - Datacenter to create an instance in (Linode Datacenter).
     type: int
   kernel_id:
     description:
-     - kernel to use for the instance (Linode Kernel)
+      - Kernel to use for the instance (Linode Kernel).
     type: int
   wait:
     description:
-     - wait for the instance to be in state V(running) before returning
+      - Wait for the instance to be in state V(running) before returning.
     type: bool
     default: true
   wait_timeout:
     description:
-     - how long before wait gives up, in seconds
+      - How long before wait gives up, in seconds.
     default: 300
     type: int
   watchdog:
     description:
-    - Set status of Lassie watchdog.
+      - Set status of Lassie watchdog.
     type: bool
     default: true
 requirements:
-    - linode-python
+  - linode-python
 author:
-- Vincent Viallet (@zbal)
+  - Vincent Viallet (@zbal)
 notes:
   - Please note, linode-python does not have python 3 support.
   - This module uses the now deprecated v3 of the Linode API.
   - Please review U(https://www.linode.com/api/linode) for determining the required parameters.
-'''
+"""
 
-EXAMPLES = '''
-
+EXAMPLES = r"""
 - name: Create a new Linode
   community.general.linode:
     name: linode-test1
@@ -185,97 +181,97 @@ EXAMPLES = '''
 
 - name: Create a server with a private IP Address
   community.general.linode:
-     module: linode
-     api_key: 'longStringFromLinodeApi'
-     name: linode-test1
-     plan: 1
-     datacenter: 2
-     distribution: 99
-     password: 'superSecureRootPassword'
-     private_ip: true
-     ssh_pub_key: 'ssh-rsa qwerty'
-     swap: 768
-     wait: true
-     wait_timeout: 600
-     state: present
+    module: linode
+    api_key: 'longStringFromLinodeApi'
+    name: linode-test1
+    plan: 1
+    datacenter: 2
+    distribution: 99
+    password: 'superSecureRootPassword'
+    private_ip: true
+    ssh_pub_key: 'ssh-rsa qwerty'
+    swap: 768
+    wait: true
+    wait_timeout: 600
+    state: present
   delegate_to: localhost
   register: linode_creation
 
 - name: Fully configure new server
   community.general.linode:
-     api_key: 'longStringFromLinodeApi'
-     name: linode-test1
-     plan: 4
-     datacenter: 2
-     distribution: 99
-     kernel_id: 138
-     password: 'superSecureRootPassword'
-     private_ip: true
-     ssh_pub_key: 'ssh-rsa qwerty'
-     swap: 768
-     wait: true
-     wait_timeout: 600
-     state: present
-     alert_bwquota_enabled: true
-     alert_bwquota_threshold: 80
-     alert_bwin_enabled: true
-     alert_bwin_threshold: 10
-     alert_cpu_enabled: true
-     alert_cpu_threshold: 210
-     alert_bwout_enabled: true
-     alert_bwout_threshold: 10
-     alert_diskio_enabled: true
-     alert_diskio_threshold: 10000
-     backupweeklyday: 1
-     backupwindow: 2
-     displaygroup: 'test'
-     additional_disks:
+    api_key: 'longStringFromLinodeApi'
+    name: linode-test1
+    plan: 4
+    datacenter: 2
+    distribution: 99
+    kernel_id: 138
+    password: 'superSecureRootPassword'
+    private_ip: true
+    ssh_pub_key: 'ssh-rsa qwerty'
+    swap: 768
+    wait: true
+    wait_timeout: 600
+    state: present
+    alert_bwquota_enabled: true
+    alert_bwquota_threshold: 80
+    alert_bwin_enabled: true
+    alert_bwin_threshold: 10
+    alert_cpu_enabled: true
+    alert_cpu_threshold: 210
+    alert_bwout_enabled: true
+    alert_bwout_threshold: 10
+    alert_diskio_enabled: true
+    alert_diskio_threshold: 10000
+    backupweeklyday: 1
+    backupwindow: 2
+    displaygroup: 'test'
+    additional_disks:
       - {Label: 'disk1', Size: 2500, Type: 'raw'}
       - {Label: 'newdisk', Size: 2000}
-     watchdog: true
+    watchdog: true
   delegate_to: localhost
   register: linode_creation
 
 - name: Ensure a running server (create if missing)
   community.general.linode:
-     api_key: 'longStringFromLinodeApi'
-     name: linode-test1
-     plan: 1
-     datacenter: 2
-     distribution: 99
-     password: 'superSecureRootPassword'
-     ssh_pub_key: 'ssh-rsa qwerty'
-     swap: 768
-     wait: true
-     wait_timeout: 600
-     state: present
+    api_key: 'longStringFromLinodeApi'
+    name: linode-test1
+    plan: 1
+    datacenter: 2
+    distribution: 99
+    password: 'superSecureRootPassword'
+    ssh_pub_key: 'ssh-rsa qwerty'
+    swap: 768
+    wait: true
+    wait_timeout: 600
+    state: present
   delegate_to: localhost
   register: linode_creation
 
 - name: Delete a server
   community.general.linode:
-     api_key: 'longStringFromLinodeApi'
-     name: linode-test1
-     linode_id: "{{ linode_creation.instance.id }}"
-     state: absent
+    api_key: 'longStringFromLinodeApi'
+    name: linode-test1
+    linode_id: "{{ linode_creation.instance.id }}"
+    state: absent
   delegate_to: localhost
 
 - name: Stop a server
   community.general.linode:
-     api_key: 'longStringFromLinodeApi'
-     name: linode-test1
-     linode_id: "{{ linode_creation.instance.id }}"
-     state: stopped
+    api_key: 'longStringFromLinodeApi'
+    name: linode-test1
+    linode_id: "{{ linode_creation.instance.id }}"
+    state: stopped
   delegate_to: localhost
 
 - name: Reboot a server
   community.general.linode:
-     api_key: 'longStringFromLinodeApi'
-     name: linode-test1
-     linode_id: "{{ linode_creation.instance.id }}"
-     state: restarted
+    api_key: 'longStringFromLinodeApi'
+    name: linode-test1
+    linode_id: "{{ linode_creation.instance.id }}"
+    state: restarted
   delegate_to: localhost
-'''
+"""
 
 import time
 import traceback

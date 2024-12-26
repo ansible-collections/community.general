@@ -8,40 +8,39 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: locale_gen
 short_description: Creates or removes locales
 description:
-    - Manages locales by editing /etc/locale.gen and invoking locale-gen.
+  - Manages locales by editing /etc/locale.gen and invoking C(locale-gen).
 author:
-    - Augustus Kling (@AugustusKling)
+  - Augustus Kling (@AugustusKling)
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    name:
-        type: list
-        elements: str
-        description:
-            - Name and encoding of the locales, such as V(en_GB.UTF-8).
-            - Before community.general 9.3.0, this was a string. Using a string still works.
-        required: true
-    state:
-        type: str
-        description:
-            - Whether the locale shall be present.
-        choices: [ absent, present ]
-        default: present
+  name:
+    type: list
+    elements: str
+    description:
+      - Name and encoding of the locales, such as V(en_GB.UTF-8).
+      - Before community.general 9.3.0, this was a string. Using a string still works.
+    required: true
+  state:
+    type: str
+    description:
+      - Whether the locale shall be present.
+    choices: [absent, present]
+    default: present
 notes:
-    - This module does not support RHEL-based systems.
-'''
+  - This module does not support RHEL-based systems.
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Ensure a locale exists
   community.general.locale_gen:
     name: de_CH.UTF-8
@@ -53,7 +52,7 @@ EXAMPLES = '''
       - en_GB.UTF-8
       - nl_NL.UTF-8
     state: present
-'''
+"""
 
 import os
 import re

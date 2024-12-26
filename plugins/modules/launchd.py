@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: launchd
 author:
   - Martin Migasiewicz (@martinm82)
@@ -20,57 +19,52 @@ description:
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
-    check_mode:
-      support: full
-    diff_mode:
-      support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    name:
-      description:
+  name:
+    description:
       - Name of the service.
-      type: str
-      required: true
-    plist:
-      description:
+    type: str
+    required: true
+  plist:
+    description:
       - Name of the V(.plist) file for the service.
       - Defaults to V({name}.plist).
-      type: str
-      version_added: 10.1.0
-    state:
-      description:
-      - V(started)/V(stopped) are idempotent actions that will not run
-        commands unless necessary.
-      - Launchd does not support V(restarted) nor V(reloaded) natively.
-        These will trigger a stop/start (restarted) or an unload/load
-        (reloaded).
-      - V(restarted) unloads and loads the service before start to ensure
-        that the latest job definition (plist) is used.
-      - V(reloaded) unloads and loads the service to ensure that the latest
-        job definition (plist) is used. Whether a service is started or
-        stopped depends on the content of the definition file.
-      type: str
-      choices: [ reloaded, restarted, started, stopped, unloaded ]
-    enabled:
-      description:
+    type: str
+    version_added: 10.1.0
+  state:
+    description:
+      - V(started)/V(stopped) are idempotent actions that will not run commands unless necessary.
+      - Launchd does not support V(restarted) nor V(reloaded) natively. These will trigger a stop/start (restarted) or an unload/load (reloaded).
+      - V(restarted) unloads and loads the service before start to ensure that the latest job definition (plist) is used.
+      - V(reloaded) unloads and loads the service to ensure that the latest job definition (plist) is used. Whether a service is started or stopped
+        depends on the content of the definition file.
+    type: str
+    choices: [reloaded, restarted, started, stopped, unloaded]
+  enabled:
+    description:
       - Whether the service should start on boot.
-      - B(At least one of state and enabled are required.)
-      type: bool
-    force_stop:
-      description:
+      - B(At least one of state and enabled are required).
+    type: bool
+  force_stop:
+    description:
       - Whether the service should not be restarted automatically by launchd.
-      - Services might have the 'KeepAlive' attribute set to true in a launchd configuration.
-        In case this is set to true, stopping a service will cause that launchd starts the service again.
-      - Set this option to V(true) to let this module change the 'KeepAlive' attribute to V(false).
-      type: bool
-      default: false
+      - Services might have the 'KeepAlive' attribute set to true in a launchd configuration. In case this is set to true, stopping a service
+        will cause that launchd starts the service again.
+      - Set this option to V(true) to let this module change the C(KeepAlive) attribute to V(false).
+    type: bool
+    default: false
 notes:
-- A user must privileged to manage services using this module.
+  - A user must privileged to manage services using this module.
 requirements:
-- A system managed by launchd
-- The plistlib python library
-'''
+  - A system managed by launchd
+  - The plistlib Python library
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Make sure spotify webhelper is started
   community.general.launchd:
     name: com.spotify.webhelper
@@ -112,11 +106,11 @@ EXAMPLES = r'''
     name: com.openssh.sshd
     plist: ssh.plist
     state: restarted
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 status:
-    description: Metadata about service status
+    description: Metadata about service status.
     returned: always
     type: dict
     sample:
@@ -126,7 +120,7 @@ status:
             "previous_pid": "82636",
             "previous_state": "running"
         }
-'''
+"""
 
 import os
 import plistlib
