@@ -14,20 +14,19 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: nagios
 short_description: Perform common tasks in Nagios related to downtime and notifications
 description:
-  - "The C(nagios) module has two basic functions: scheduling downtime and toggling alerts for services or hosts."
+  - 'The C(nagios) module has two basic functions: scheduling downtime and toggling alerts for services or hosts.'
   - The C(nagios) module is not idempotent.
   - All actions require the O(host) parameter to be given explicitly. In playbooks you can use the C({{inventory_hostname}}) variable to refer
     to the host the playbook is currently running on.
-  - You can specify multiple services at once by separating them with commas, .e.g. O(services=httpd,nfs,puppet).
-  - When specifying what service to handle there is a special service value, O(host), which will handle alerts/downtime/acknowledge for the I(host itself),
-    for example O(services=host). This keyword may not be given with other services at the same time.
-    B(Setting alerts/downtime/acknowledge for a host does not affect alerts/downtime/acknowledge for any of the services running on it.)
-    To schedule downtime for all services on particular host use keyword "all", for example O(services=all).
+  - You can specify multiple services at once by separating them with commas, for example O(services=httpd,nfs,puppet).
+  - When specifying what service to handle there is a special service value, O(host), which will handle alerts/downtime/acknowledge for the I(host
+    itself), for example O(services=host). This keyword may not be given with other services at the same time. B(Setting alerts/downtime/acknowledge
+    for a host does not affect alerts/downtime/acknowledge for any of the services running on it.) To schedule downtime for all services on particular
+    host use keyword "all", for example O(services=all).
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -41,9 +40,8 @@ options:
       - Action to take.
       - The V(acknowledge) and V(forced_check) actions were added in community.general 1.2.0.
     required: true
-    choices: [ "downtime", "delete_downtime", "enable_alerts", "disable_alerts", "silence", "unsilence",
-               "silence_nagios", "unsilence_nagios", "command", "servicegroup_service_downtime",
-               "servicegroup_host_downtime", "acknowledge", "forced_check" ]
+    choices: ["downtime", "delete_downtime", "enable_alerts", "disable_alerts", "silence", "unsilence", "silence_nagios", "unsilence_nagios",
+      "command", "servicegroup_service_downtime", "servicegroup_host_downtime", "acknowledge", "forced_check"]
     type: str
   host:
     description:
@@ -51,18 +49,16 @@ options:
     type: str
   cmdfile:
     description:
-      - Path to the nagios I(command file) (FIFO pipe).
-        Only required if auto-detection fails.
+      - Path to the nagios I(command file) (FIFO pipe). Only required if auto-detection fails.
     type: str
   author:
     description:
-     - Author to leave downtime comments as.
-       Only used when O(action) is V(downtime) or V(acknowledge).
+      - Author to leave downtime comments as. Only used when O(action) is V(downtime) or V(acknowledge).
     type: str
     default: Ansible
   comment:
     description:
-     - Comment when O(action) is V(downtime) or V(acknowledge).
+      - Comment when O(action) is V(downtime) or V(acknowledge).
     type: str
     default: Scheduling downtime
   start:
@@ -79,8 +75,8 @@ options:
   services:
     description:
       - What to manage downtime/alerts for. Separate multiple services with commas.
-      - "B(Required) option when O(action) is one of: V(downtime), V(acknowledge), V(forced_check), V(enable_alerts), V(disable_alerts)."
-    aliases: [ "service" ]
+      - 'B(Required) option when O(action) is one of: V(downtime), V(acknowledge), V(forced_check), V(enable_alerts), V(disable_alerts).'
+    aliases: ["service"]
     type: str
   servicegroup:
     description:
@@ -94,9 +90,9 @@ options:
     type: str
 
 author: "Tim Bielawa (@tbielawa)"
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Set 30 minutes of apache downtime
   community.general.nagios:
     action: downtime
@@ -245,7 +241,7 @@ EXAMPLES = '''
   community.general.nagios:
     action: command
     command: DISABLE_FAILURE_PREDICTION
-'''
+"""
 
 import time
 import os.path

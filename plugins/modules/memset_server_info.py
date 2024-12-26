@@ -8,48 +8,45 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: memset_server_info
 author: "Simon Weald (@glitchcrab)"
 short_description: Retrieve server information
 notes:
-    - An API key generated via the Memset customer control panel is needed with the
-      following minimum scope - C(server.info).
+  - An API key generated using the Memset customer control panel is needed with the following minimum scope - C(server.info).
 description:
-    - Retrieve server information.
+  - Retrieve server information.
 extends_documentation_fragment:
-    - community.general.attributes
-    - community.general.attributes.info_module
+  - community.general.attributes
+  - community.general.attributes.info_module
 attributes:
-    check_mode:
-        version_added: 3.3.0
-        # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
+  check_mode:
+    version_added: 3.3.0
+    # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
 options:
-    api_key:
-        required: true
-        type: str
-        description:
-            - The API key obtained from the Memset control panel.
-    name:
-        required: true
-        type: str
-        description:
-            - The server product name (that is, C(testyaa1)).
-'''
+  api_key:
+    required: true
+    type: str
+    description:
+      - The API key obtained from the Memset control panel.
+  name:
+    required: true
+    type: str
+    description:
+      - The server product name (that is, C(testyaa1)).
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Get details for testyaa1
   community.general.memset_server_info:
     name: testyaa1
     api_key: 5eb86c9896ab03919abcf03857163741
   delegate_to: localhost
-'''
+"""
 
-RETURN = '''
----
+RETURN = r"""
 memset_api:
-  description: Info from the Memset API
+  description: Info from the Memset API.
   returned: always
   type: complex
   contains:
@@ -59,7 +56,7 @@ memset_api:
       type: bool
       sample: true
     control_panel:
-      description: Whether the server has a control panel (i.e. cPanel).
+      description: Whether the server has a control panel (for example cPanel).
       returned: always
       type: str
       sample: 'cpanel'
@@ -103,7 +100,7 @@ memset_api:
         }
       }
     firewall_type:
-      description: The type of firewall the server has (i.e. self-managed, managed).
+      description: The type of firewall the server has (for example self-managed, managed).
       returned: always
       type: str
       sample: 'managed'
@@ -113,7 +110,7 @@ memset_api:
       type: str
       sample: 'testyaa1.miniserver.com'
     ignore_monitoring_off:
-      description: When true, Memset won't remind the customer that monitoring is disabled.
+      description: When true, Memset does not remind the customer that monitoring is disabled.
       returned: always
       type: bool
       sample: true
@@ -136,7 +133,7 @@ memset_api:
       type: bool
       sample: true
     monitoring_level:
-      description: The server's monitoring level (i.e. basic).
+      description: The server's monitoring level (for example V(basic)).
       returned: always
       type: str
       sample: 'basic'
@@ -149,7 +146,7 @@ memset_api:
       description: The network zone(s) the server is in.
       returned: always
       type: list
-      sample: [ 'reading' ]
+      sample: ['reading']
     nickname:
       description: Customer-set nickname for the server.
       returned: always
@@ -196,7 +193,7 @@ memset_api:
       type: str
       sample: 'GBP'
     renewal_price_vat:
-      description: VAT rate for renewal payments
+      description: VAT rate for renewal payments.
       returned: always
       type: str
       sample: '20'
@@ -206,7 +203,7 @@ memset_api:
       type: str
       sample: '2013-04-10'
     status:
-      description: Current status of the server (i.e. live, onhold).
+      description: Current status of the server (for example live, onhold).
       returned: always
       type: str
       sample: 'LIVE'
@@ -216,7 +213,7 @@ memset_api:
       type: str
       sample: 'managed'
     type:
-      description: What this server is (i.e. dedicated)
+      description: What this server is (for example V(dedicated)).
       returned: always
       type: str
       sample: 'miniserver'
@@ -233,7 +230,7 @@ memset_api:
       returned: always
       type: str
       sample: 'basic'
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.memset import memset_api_call

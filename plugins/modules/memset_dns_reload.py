@@ -8,53 +8,47 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: memset_dns_reload
 author: "Simon Weald (@glitchcrab)"
 short_description: Request reload of Memset's DNS infrastructure,
 notes:
-  - DNS reload requests are a best-effort service provided by Memset; these generally
-    happen every 15 minutes by default, however you can request an immediate reload if
-    later tasks rely on the records being created. An API key generated via the
-    Memset customer control panel is required with the following minimum scope -
-    C(dns.reload). If you wish to poll the job status to wait until the reload has
-    completed, then C(job.status) is also required.
+  - DNS reload requests are a best-effort service provided by Memset; these generally happen every 15 minutes by default, however you can request
+    an immediate reload if later tasks rely on the records being created. An API key generated using the Memset customer control panel is required
+    with the following minimum scope - C(dns.reload). If you wish to poll the job status to wait until the reload has completed, then C(job.status)
+    is also required.
 description:
   - Request a reload of Memset's DNS infrastructure, and optionally poll until it finishes.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    api_key:
-        required: true
-        type: str
-        description:
-            - The API key obtained from the Memset control panel.
-    poll:
-        default: false
-        type: bool
-        description:
-            - Boolean value, if set will poll the reload job's status and return
-              when the job has completed (unless the 30 second timeout is reached first).
-              If the timeout is reached then the task will not be marked as failed, but
-              stderr will indicate that the polling failed.
-'''
+  api_key:
+    required: true
+    type: str
+    description:
+      - The API key obtained from the Memset control panel.
+  poll:
+    default: false
+    type: bool
+    description:
+      - Boolean value, if set will poll the reload job's status and return when the job has completed (unless the 30 second timeout is reached
+        first). If the timeout is reached then the task will not be marked as failed, but stderr will indicate that the polling failed.
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Submit DNS reload and poll
   community.general.memset_dns_reload:
     api_key: 5eb86c9196ab03919abcf03857163741
     poll: true
   delegate_to: localhost
-'''
+"""
 
-RETURN = '''
----
+RETURN = r"""
 memset_api:
   description: Raw response from the Memset API.
   returned: always
@@ -85,7 +79,7 @@ memset_api:
       returned: always
       type: str
       sample: "dns"
-'''
+"""
 
 from time import sleep
 
