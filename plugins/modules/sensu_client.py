@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: sensu_client
 author: "David Moreau Simard (@dmsimard)"
 short_description: Manages Sensu client configuration
@@ -27,8 +26,8 @@ options:
   state:
     type: str
     description:
-      - Whether the client should be present or not
-    choices: [ 'present', 'absent' ]
+      - Whether the client should be present or not.
+    choices: ['present', 'absent']
     default: present
   name:
     type: str
@@ -49,7 +48,8 @@ options:
       - The subscriptions array items must be strings.
   safe_mode:
     description:
-      - If safe mode is enabled for the client. Safe mode requires local check definitions in order to accept a check request and execute the check.
+      - If safe mode is enabled for the client. Safe mode requires local check definitions in order to accept a check request and execute the
+        check.
     type: bool
     default: false
   redact:
@@ -99,11 +99,9 @@ options:
     type: dict
     description:
       - The servicenow definition scope, used to configure the Sensu Enterprise ServiceNow integration (Sensu Enterprise users only).
-notes:
-  - Check mode is supported
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # Minimum possible configuration
 - name: Configure Sensu client
   community.general.sensu_client:
@@ -146,20 +144,20 @@ EXAMPLES = '''
 - name: Delete the Sensu client configuration
   community.general.sensu_client:
     state: "absent"
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 config:
-  description: Effective client configuration, when state is present
+  description: Effective client configuration, when state is present.
   returned: success
   type: dict
   sample: {'name': 'client', 'subscriptions': ['default']}
 file:
-  description: Path to the client configuration file
+  description: Path to the client configuration file.
   returned: success
   type: str
   sample: "/etc/sensu/conf.d/client.json"
-'''
+"""
 
 import json
 import os

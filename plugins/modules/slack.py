@@ -15,11 +15,11 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = """
+DOCUMENTATION = r"""
 module: slack
 short_description: Send Slack notifications
 description:
-  - The M(community.general.slack) module sends notifications to U(http://slack.com) via the Incoming WebHook integration
+  - The M(community.general.slack) module sends notifications to U(http://slack.com) via the Incoming WebHook integration.
 author: "Ramon de la Fuente (@ramondelafuente)"
 extends_documentation_fragment:
   - community.general.attributes
@@ -32,51 +32,42 @@ options:
   domain:
     type: str
     description:
-      - Slack (sub)domain for your environment without protocol. (For example
-        V(example.slack.com).) In Ansible 1.8 and beyond, this is deprecated and may
-        be ignored.  See token documentation for information.
+      - Slack (sub)domain for your environment without protocol. (For example V(example.slack.com).) In Ansible 1.8 and beyond, this is deprecated
+        and may be ignored. See token documentation for information.
   token:
     type: str
     description:
-      - Slack integration token. This authenticates you to the slack service.
-        Make sure to use the correct type of token, depending on what method you use.
-      - "Webhook token:
-        Prior to Ansible 1.8, a token looked like V(3Ffe373sfhRE6y42Fg3rvf4GlK).  In
-        Ansible 1.8 and above, Ansible adapts to the new slack API where tokens look
-        like V(G922VJP24/D921DW937/3Ffe373sfhRE6y42Fg3rvf4GlK).  If tokens
-        are in the new format then slack will ignore any value of domain.  If
-        the token is in the old format the domain is required.  Ansible has no
-        control of when slack will get rid of the old API.  When slack does
-        that the old format will stop working.  ** Please keep in mind the tokens
-        are not the API tokens but are the webhook tokens.  In slack these are
-        found in the webhook URL which are obtained under the apps and integrations.
-        The incoming webhooks can be added in that area.  In some cases this may
-        be locked by your Slack admin and you must request access.  It is there
-        that the incoming webhooks can be added.  The key is on the end of the
-        URL given to you in that section."
-      - "WebAPI token:
-        Slack WebAPI requires a personal, bot or work application token. These tokens start with V(xoxp-), V(xoxb-)
-        or V(xoxa-), for example V(xoxb-1234-56789abcdefghijklmnop). WebAPI token is required if you intend to receive thread_id.
-        See Slack's documentation (U(https://api.slack.com/docs/token-types)) for more information."
+      - Slack integration token. This authenticates you to the slack service. Make sure to use the correct type of token, depending on what method
+        you use.
+      - 'Webhook token: Prior to Ansible 1.8, a token looked like V(3Ffe373sfhRE6y42Fg3rvf4GlK). In Ansible 1.8 and above, Ansible adapts to the
+        new slack API where tokens look like V(G922VJP24/D921DW937/3Ffe373sfhRE6y42Fg3rvf4GlK). If tokens are in the new format then slack will
+        ignore any value of domain. If the token is in the old format the domain is required. Ansible has no control of when slack will get rid
+        of the old API. When slack does that the old format will stop working. ** Please keep in mind the tokens are not the API tokens but are
+        the webhook tokens. In slack these are found in the webhook URL which are obtained under the apps and integrations. The incoming webhooks
+        can be added in that area. In some cases this may be locked by your Slack admin and you must request access. It is there that the incoming
+        webhooks can be added. The key is on the end of the URL given to you in that section.'
+      - "WebAPI token: Slack WebAPI requires a personal, bot or work application token. These tokens start with V(xoxp-), V(xoxb-) or V(xoxa-),
+        for example V(xoxb-1234-56789abcdefghijklmnop). WebAPI token is required if you intend to receive thread_id. See Slack's documentation
+        (U(https://api.slack.com/docs/token-types)) for more information."
     required: true
   msg:
     type: str
     description:
-      - Message to send. Note that the module does not handle escaping characters.
-        Plain-text angle brackets and ampersands should be converted to HTML entities (e.g. & to &amp;) before sending.
-        See Slack's documentation (U(https://api.slack.com/docs/message-formatting)) for more.
+      - Message to send. Note that the module does not handle escaping characters. Plain-text angle brackets and ampersands should be converted
+        to HTML entities (for example C(&) to C(&amp;)) before sending. See Slack's documentation (U(https://api.slack.com/docs/message-formatting)) for more.
   channel:
     type: str
     description:
       - Channel to send the message to. If absent, the message goes to the channel selected for the O(token).
   thread_id:
     description:
-      - Optional. Timestamp of parent message to thread this message. https://api.slack.com/docs/message-threading
+      - Optional. Timestamp of parent message to thread this message, see U(https://api.slack.com/docs/message-threading).
     type: str
   message_id:
     description:
       - Optional. Message ID to edit, instead of posting a new message.
-      - If supplied O(channel) must be in form of C(C0xxxxxxx). use C({{ slack_response.channel }}) to get RV(ignore:channel) from previous task run.
+      - If supplied O(channel) must be in form of C(C0xxxxxxx). use C({{ slack_response.channel }}) to get RV(ignore:channel) from previous task
+        run.
       - The token needs history scope to get information on the message to edit (C(channels:history,groups:history,mpim:history,im:history)).
       - Corresponds to C(ts) in the Slack API (U(https://api.slack.com/messaging/modifying)).
     type: str
@@ -107,14 +98,13 @@ options:
   parse:
     type: str
     description:
-      - Setting for the message parser at Slack
+      - Setting for the message parser at Slack.
     choices:
       - 'full'
       - 'none'
   validate_certs:
     description:
-      - If V(false), SSL certificates will not be validated. This should only be used
-        on personally controlled sites using self-signed certificates.
+      - If V(false), SSL certificates will not be validated. This should only be used on personally controlled sites using self-signed certificates.
     type: bool
     default: true
   color:
@@ -140,11 +130,10 @@ options:
     type: str
     description:
       - Setting for automatically prepending a V(#) symbol on the passed in O(channel).
-      - The V(auto) method prepends a V(#) unless O(channel) starts with one of V(#), V(@), V(C0), V(GF), V(G0), V(CP).
-        These prefixes only cover a small set of the prefixes that should not have a V(#) prepended.
-        Since an exact condition which O(channel) values must not have the V(#) prefix is not known,
-        the value V(auto) for this option will be deprecated in the future. It is best to explicitly set
-        O(prepend_hash=always) or O(prepend_hash=never) to obtain the needed behavior.
+      - The V(auto) method prepends a V(#) unless O(channel) starts with one of V(#), V(@), V(C0), V(GF), V(G0), V(CP). These prefixes only cover
+        a small set of the prefixes that should not have a V(#) prepended. Since an exact condition which O(channel) values must not have the
+        V(#) prefix is not known, the value V(auto) for this option will be deprecated in the future. It is best to explicitly set O(prepend_hash=always)
+        or O(prepend_hash=never) to obtain the needed behavior.
     choices:
       - 'always'
       - 'never'
@@ -153,7 +142,7 @@ options:
     version_added: 6.1.0
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Send notification message via Slack
   community.general.slack:
     token: thetoken/generatedby/slack
@@ -215,14 +204,14 @@ EXAMPLES = """
             Display my system load on host A and B
       - type: context
         elements:
-        - type: mrkdwn
-          text: |-
-            *System A*
-            load average: 0,74, 0,66, 0,63
-        - type: mrkdwn
-          text: |-
-            *System B*
-            load average: 5,16, 4,64, 2,43
+          - type: mrkdwn
+            text: |-
+              *System A*
+              load average: 0,74, 0,66, 0,63
+          - type: mrkdwn
+            text: |-
+              *System B*
+              load average: 5,16, 4,64, 2,43
 
 - name: Send a message with a link using Slack markup
   community.general.slack:
