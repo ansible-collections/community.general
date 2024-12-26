@@ -7,18 +7,17 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = """
----
+DOCUMENTATION = r"""
 module: django_command
 author:
-- Alexei Znamensky (@russoz)
+  - Alexei Znamensky (@russoz)
 short_description: Run Django admin commands
 version_added: 9.0.0
 description:
-- This module allows the execution of arbitrary Django admin commands.
+  - This module allows the execution of arbitrary Django admin commands.
 extends_documentation_fragment:
-- community.general.attributes
-- community.general.django
+  - community.general.attributes
+  - community.general.django
 attributes:
   check_mode:
     support: none
@@ -27,18 +26,17 @@ attributes:
 options:
   command:
     description:
-    - Django admin command. It must be a valid command accepted by C(python -m django) at the target system.
+      - Django admin command. It must be a valid command accepted by C(python -m django) at the target system.
     type: str
     required: true
   extra_args:
     type: list
     elements: str
     description:
-    - List of extra arguments passed to the django admin command.
+      - List of extra arguments passed to the django admin command.
 """
 
-EXAMPLES = """
----
+EXAMPLES = r"""
 - name: Check the project
   community.general.django_command:
     command: check
@@ -52,8 +50,7 @@ EXAMPLES = """
     venv: /home/joedoe/project/fancysite/venv
 """
 
-RETURN = """
----
+RETURN = r"""
 run_info:
   description: Command-line execution information.
   type: dict
