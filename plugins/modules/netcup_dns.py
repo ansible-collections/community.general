@@ -178,7 +178,7 @@ records:
       type: str
       sample: 127.0.0.1
     priority:
-      description: The record priority (only relevant if type=MX).
+      description: The record priority (only relevant if RV(records[].type=MX)).
       returned: success
       type: int
       sample: 0
