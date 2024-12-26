@@ -8,13 +8,12 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: ipa_dnszone
 author: Fran Fitzpatrick (@fxfitz)
 short_description: Manage FreeIPA DNS Zones
 description:
-  - Add and delete an IPA DNS Zones using IPA API
+  - Add and delete an IPA DNS Zones using IPA API.
 attributes:
   check_mode:
     support: full
@@ -23,11 +22,11 @@ attributes:
 options:
   zone_name:
     description:
-    - The DNS zone name to which needs to be managed.
+      - The DNS zone name to which needs to be managed.
     required: true
     type: str
   state:
-    description: State to ensure
+    description: State to ensure.
     required: false
     default: present
     choices: ["absent", "present"]
@@ -44,10 +43,9 @@ options:
 extends_documentation_fragment:
   - community.general.ipa.documentation
   - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Ensure dns zone is present
   community.general.ipa_dnszone:
     ipa_host: spider.example.com
@@ -78,14 +76,14 @@ EXAMPLES = r'''
     state: present
     zone_name: example.com
     allowsyncptr: true
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 zone:
   description: DNS zone as returned by IPA API.
   returned: always
   type: dict
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.ipa import IPAClient, ipa_argument_spec
