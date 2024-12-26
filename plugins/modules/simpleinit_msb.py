@@ -11,8 +11,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: simpleinit_msb
 short_description: Manage services on Source Mage GNU/Linux
 version_added: 7.5.0
@@ -38,24 +37,21 @@ options:
   state:
     type: str
     required: false
-    choices: [ running, started, stopped, restarted, reloaded ]
+    choices: [running, started, stopped, restarted, reloaded]
     description:
-      - V(started)/V(stopped) are idempotent actions that will not run
-        commands unless necessary.  V(restarted) will always bounce the
-        service.  V(reloaded) will always reload.
+      - V(started)/V(stopped) are idempotent actions that will not run commands unless necessary. V(restarted) will always bounce the service.
+        V(reloaded) will always reload.
       - At least one of O(state) and O(enabled) are required.
-      - Note that V(reloaded) will start the
-        service if it is not already started, even if your chosen init
-        system would not normally.
+      - Note that V(reloaded) will start the service if it is not already started, even if your chosen init system would not normally.
   enabled:
     type: bool
     required: false
     description:
       - Whether the service should start on boot.
       - At least one of O(state) and O(enabled) are required.
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Example action to start service httpd, if not running
   community.general.simpleinit_msb:
     name: httpd
@@ -80,7 +76,7 @@ EXAMPLES = '''
   community.general.simpleinit_msb:
     name: httpd
     enabled: true
-'''
+"""
 
 import os
 import re
