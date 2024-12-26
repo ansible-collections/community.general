@@ -13,7 +13,7 @@ author: "Arie Bregman (@bregman-arie)"
 short_description: Manage network namespaces
 requirements: [ip]
 description:
-  - Create or delete network namespaces using the ip command.
+  - Create or delete network namespaces using the C(ip) command.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
