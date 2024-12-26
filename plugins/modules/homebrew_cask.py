@@ -11,8 +11,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: homebrew_cask
 author:
   - "Indrajit Raychaudhuri (@indrajitr)"
@@ -31,60 +30,59 @@ attributes:
 options:
   name:
     description:
-    - Name of cask to install or remove.
-    aliases: [ 'cask', 'package', 'pkg' ]
+      - Name of cask to install or remove.
+    aliases: ['cask', 'package', 'pkg']
     type: list
     elements: str
   path:
     description:
-    - "':' separated list of paths to search for 'brew' executable."
+      - "':' separated list of paths to search for 'brew' executable."
     default: '/usr/local/bin:/opt/homebrew/bin'
     type: path
   state:
     description:
-    - State of the cask.
-    choices: [ 'absent', 'installed', 'latest', 'present', 'removed', 'uninstalled', 'upgraded' ]
+      - State of the cask.
+    choices: ['absent', 'installed', 'latest', 'present', 'removed', 'uninstalled', 'upgraded']
     default: present
     type: str
   sudo_password:
     description:
-    - The sudo password to be passed to SUDO_ASKPASS.
+      - The sudo password to be passed to E(SUDO_ASKPASS).
     required: false
     type: str
   update_homebrew:
     description:
-    - Update homebrew itself first.
-    - Note that C(brew cask update) is a synonym for C(brew update).
+      - Update homebrew itself first.
+      - Note that C(brew cask update) is a synonym for C(brew update).
     type: bool
     default: false
   install_options:
     description:
-    - Options flags to install a package.
-    aliases: [ 'options' ]
+      - Options flags to install a package.
+    aliases: ['options']
     type: list
     elements: str
   accept_external_apps:
     description:
-    - Allow external apps.
+      - Allow external apps.
     type: bool
     default: false
   upgrade_all:
     description:
-    - Upgrade all casks.
-    - Mutually exclusive with C(upgraded) state.
+      - Upgrade all casks.
+      - Mutually exclusive with C(upgraded) state.
     type: bool
     default: false
-    aliases: [ 'upgrade' ]
+    aliases: ['upgrade']
   greedy:
     description:
-    - Upgrade casks that auto update.
-    - Passes C(--greedy) to C(brew outdated --cask) when checking
-      if an installed cask has a newer version available,
-      or to C(brew upgrade --cask) when upgrading all casks.
+      - Upgrade casks that auto update.
+      - Passes C(--greedy) to C(brew outdated --cask) when checking if an installed cask has a newer version available, or
+        to C(brew upgrade --cask) when upgrading all casks.
     type: bool
     default: false
-'''
-EXAMPLES = '''
+"""
+EXAMPLES = r"""
 - name: Install cask
   community.general.homebrew_cask:
     name: alfred
@@ -151,7 +149,7 @@ EXAMPLES = '''
     name: wireshark
     state: present
     sudo_password: "{{ ansible_become_pass }}"
-'''
+"""
 
 import os
 import re
