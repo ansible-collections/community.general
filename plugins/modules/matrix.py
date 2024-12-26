@@ -45,7 +45,7 @@ options:
   token:
     type: str
     description:
-      - Authentication token for the API call. If provided, user_id and password are not required.
+      - Authentication token for the API call. If provided, O(user_id) and O(password) are not required.
   user_id:
     type: str
     description:
