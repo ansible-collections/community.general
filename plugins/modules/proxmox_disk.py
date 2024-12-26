@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: proxmox_disk
 short_description: Management of a disk of a Qemu(KVM) VM in a Proxmox VE cluster
 version_added: 5.7.0
@@ -38,31 +37,21 @@ options:
     description:
       - The disk key (V(unused[n]), V(ide[n]), V(sata[n]), V(scsi[n]) or V(virtio[n])) you want to operate on.
       - Disk buses (IDE, SATA and so on) have fixed ranges of V(n) that accepted by Proxmox API.
-      - >
-        For IDE: 0-3;
-        for SCSI: 0-30;
-        for SATA: 0-5;
-        for VirtIO: 0-15;
-        for Unused: 0-255.
+      - 'For IDE: 0-3; for SCSI: 0-30; for SATA: 0-5; for VirtIO: 0-15; for Unused: 0-255.'
     type: str
     required: true
   state:
     description:
       - Indicates desired state of the disk.
-      - >
-        O(state=present) can be used to create, replace disk or update options in existing disk. It will create missing
-        disk or update options in existing one by default. See the O(create) parameter description to control behavior
-        of this option.
+      - O(state=present) can be used to create, replace disk or update options in existing disk. It will create missing disk or update options
+        in existing one by default. See the O(create) parameter description to control behavior of this option.
       - Some updates on options (like O(cache)) are not being applied instantly and require VM restart.
-      - >
-        Use O(state=detached) to detach existing disk from VM but do not remove it entirely.
-        When O(state=detached) and disk is V(unused[n]) it will be left in same state (not removed).
-      - >
-        O(state=moved) may be used to change backing storage for the disk in bounds of the same VM
-        or to send the disk to another VM (using the same backing storage).
-      - >
-        O(state=resized) intended to change the disk size. As of Proxmox 7.2 you can only increase the disk size
-        because shrinking disks is not supported by the PVE API and has to be done manually.
+      - Use O(state=detached) to detach existing disk from VM but do not remove it entirely. When O(state=detached) and disk is V(unused[n]) it
+        will be left in same state (not removed).
+      - O(state=moved) may be used to change backing storage for the disk in bounds of the same VM or to send the disk to another VM (using the
+        same backing storage).
+      - O(state=resized) intended to change the disk size. As of Proxmox 7.2 you can only increase the disk size because shrinking disks is not
+        supported by the PVE API and has to be done manually.
       - To entirely remove the disk from backing storage use O(state=absent).
     type: str
     choices: ['present', 'resized', 'detached', 'moved', 'absent']
@@ -84,10 +73,8 @@ options:
   size:
     description:
       - Desired volume size in GB to allocate when O(state=present) (specify O(size) without suffix).
-      - >
-        New (or additional) size of volume when O(state=resized). With the V(+) sign
-        the value is added to the actual size of the volume
-        and without it, the value is taken as an absolute one.
+      - New (or additional) size of volume when O(state=resized). With the V(+) sign the value is added to the actual size of the volume and without
+        it, the value is taken as an absolute one.
     type: str
   bwlimit:
     description:
@@ -176,8 +163,8 @@ options:
   import_from:
     description:
       - Import volume from this existing one.
-      - Volume string format
-      - C(<STORAGE>:<VMID>/<FULL_NAME>) or C(<ABSOLUTE_PATH>/<FULL_NAME>)
+      - Volume string format.
+      - V(<STORAGE>:<VMID>/<FULL_NAME>) or V(<ABSOLUTE_PATH>/<FULL_NAME>).
       - Attention! Only root can use absolute paths.
       - This parameter is mutually exclusive with O(size).
       - Increase O(timeout) parameter when importing large disk images or using slow storage.
@@ -223,7 +210,7 @@ options:
     type: int
   iothread:
     description:
-      - Whether to use iothreads for this drive (only for SCSI and VirtIO)
+      - Whether to use iothreads for this drive (only for SCSI and VirtIO).
     type: bool
   mbps:
     description:
@@ -262,10 +249,9 @@ options:
     description:
       - The ISO image to be mounted on the specified in O(disk) CD-ROM.
       - O(media=cdrom) needs to be specified for this option to work.
-      - "Image string format:"
-      - V(<STORAGE>:iso/<ISO_NAME>) to mount ISO.
-      - V(cdrom) to use physical CD/DVD drive.
-      - V(none) to unmount image from existent CD-ROM or create empty CD-ROM drive.
+      - Use V(<STORAGE>:iso/<ISO_NAME>) to mount ISO.
+      - Use V(cdrom) to access the physical CD/DVD drive.
+      - Use V(none) to unmount image from existent CD-ROM or create empty CD-ROM drive.
     type: str
     version_added: 8.1.0
   queues:
@@ -330,9 +316,9 @@ extends_documentation_fragment:
   - community.general.proxmox.actiongroup_proxmox
   - community.general.proxmox.documentation
   - community.general.attributes
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create new disk in VM (do not rewrite in case it exists already)
   community.general.proxmox_disk:
     api_host: node1
@@ -437,9 +423,9 @@ EXAMPLES = '''
     media: cdrom
     iso_image: local:iso/favorite_distro_amd64.iso
     state: present
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 vmid:
   description: The VM vmid.
   returned: success
@@ -450,7 +436,7 @@ msg:
   returned: always
   type: str
   sample: "Disk scsi3 created in VM 101"
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.proxmox import (proxmox_auth_argument_spec,

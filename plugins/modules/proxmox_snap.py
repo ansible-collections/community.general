@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: proxmox_snap
 short_description: Snapshot management of instances in Proxmox VE cluster
 version_added: 2.0.0
@@ -35,8 +34,8 @@ options:
     type: str
   state:
     description:
-     - Indicate desired state of the instance snapshot.
-     - The V(rollback) value was added in community.general 4.8.0.
+      - Indicate desired state of the instance snapshot.
+      - The V(rollback) value was added in community.general 4.8.0.
     choices: ['present', 'absent', 'rollback']
     default: present
     type: str
@@ -51,7 +50,8 @@ options:
       - Allows to snapshot a container even if it has configured mountpoints.
       - Temporarily disables all configured mountpoints, takes snapshot, and finally restores original configuration.
       - If running, the container will be stopped and restarted to apply config changes.
-      - Due to restrictions in the Proxmox API this option can only be used authenticating as V(root@pam) with O(api_password), API tokens do not work either.
+      - Due to restrictions in the Proxmox API this option can only be used authenticating as V(root@pam) with O(api_password), API tokens do
+        not work either.
       - See U(https://pve.proxmox.com/pve-docs/api-viewer/#/nodes/{node}/lxc/{vmid}/config) (PUT tab) for more details.
     default: false
     type: bool
@@ -80,23 +80,23 @@ options:
     description:
       - Remove old snapshots if there are more than O(retention) snapshots.
       - If O(retention) is set to V(0), all snapshots will be kept.
-      - This is only used when O(state=present) and when an actual snapshot is created.
-        If no snapshot is created, all existing snapshots will be kept.
+      - This is only used when O(state=present) and when an actual snapshot is created. If no snapshot is created, all existing snapshots will
+        be kept.
     default: 0
     type: int
     version_added: 7.1.0
 
 notes:
   - Requires proxmoxer and requests modules on host. These modules can be installed with pip.
-requirements: [ "proxmoxer", "requests" ]
+requirements: ["proxmoxer", "requests"]
 author: Jeffrey van Pelt (@Thulium-Drake)
 extends_documentation_fragment:
   - community.general.proxmox.actiongroup_proxmox
   - community.general.proxmox.documentation
   - community.general.attributes
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Create new container snapshot
   community.general.proxmox_snap:
     api_user: root@pam
@@ -143,9 +143,9 @@ EXAMPLES = r'''
     vmid: 100
     state: rollback
     snapname: pre-updates
-'''
+"""
 
-RETURN = r'''#'''
+RETURN = r"""#"""
 
 import time
 

@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: proxmox_nic
 short_description: Management of a NIC of a Qemu(KVM) VM in a Proxmox VE cluster
 version_added: 3.1.0
@@ -52,8 +51,8 @@ options:
     description:
       - The NIC emulator model.
     type: str
-    choices: ['e1000', 'e1000-82540em', 'e1000-82544gc', 'e1000-82545em', 'i82551', 'i82557b', 'i82559er', 'ne2k_isa', 'ne2k_pci', 'pcnet',
-              'rtl8139', 'virtio', 'vmxnet3']
+    choices: ['e1000', 'e1000-82540em', 'e1000-82544gc', 'e1000-82545em', 'i82551', 'i82557b', 'i82559er', 'ne2k_isa', 'ne2k_pci', 'pcnet', 'rtl8139',
+      'virtio', 'vmxnet3']
     default: virtio
   mtu:
     description:
@@ -99,9 +98,9 @@ extends_documentation_fragment:
   - community.general.proxmox.actiongroup_proxmox
   - community.general.proxmox.documentation
   - community.general.attributes
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create NIC net0 targeting the vm by name
   community.general.proxmox_nic:
     api_user: root@pam
@@ -131,20 +130,20 @@ EXAMPLES = '''
     name: my_vm
     interface: net0
     state: absent
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 vmid:
   description: The VM vmid.
   returned: success
   type: int
   sample: 115
 msg:
-  description: A short message
+  description: A short message.
   returned: always
   type: str
   sample: "Nic net0 unchanged on VM with vmid 103"
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.proxmox import (proxmox_auth_argument_spec, ProxmoxAnsible)

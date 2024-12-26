@@ -9,8 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: proxmox_storage_info
 short_description: Retrieve information about one or more Proxmox VE storages
 version_added: 2.2.0
@@ -37,10 +36,10 @@ extends_documentation_fragment:
   - community.general.attributes.info_module
 notes:
   - Storage specific options can be returned by this module, please look at the documentation at U(https://pve.proxmox.com/wiki/Storage).
-'''
+"""
 
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: List existing storages
   community.general.proxmox_storage_info:
     api_host: helldorado
@@ -69,10 +68,10 @@ EXAMPLES = '''
     api_token_secret: "{{ token_secret | default(omit) }}"
     storage: lvm2
   register: proxmox_storage_lvm
-'''
+"""
 
 
-RETURN = '''
+RETURN = r"""
 proxmox_storages:
   description: List of storage pools.
   returned: on success
@@ -80,41 +79,41 @@ proxmox_storages:
   elements: dict
   contains:
     content:
-      description: Proxmox content types available in this storage
+      description: Proxmox content types available in this storage.
       returned: on success
       type: list
       elements: str
     digest:
-      description: Storage's digest
+      description: Storage's digest.
       returned: on success
       type: str
     nodes:
-      description: List of nodes associated to this storage
+      description: List of nodes associated to this storage.
       returned: on success, if storage is not local
       type: list
       elements: str
     path:
-      description: Physical path to this storage
+      description: Physical path to this storage.
       returned: on success
       type: str
     prune-backups:
-      description: Backup retention options
+      description: Backup retention options.
       returned: on success
       type: list
       elements: dict
     shared:
-      description: Is this storage shared
+      description: Is this storage shared.
       returned: on success
       type: bool
     storage:
-      description: Storage name
+      description: Storage name.
       returned: on success
       type: str
     type:
-      description: Storage type
+      description: Storage type.
       returned: on success
       type: str
-'''
+"""
 
 
 from ansible.module_utils.basic import AnsibleModule

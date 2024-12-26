@@ -9,13 +9,12 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: proxmox_group_info
 short_description: Retrieve information about one or more Proxmox VE groups
 version_added: 1.3.0
 description:
-  - Retrieve information about one or more Proxmox VE groups
+  - Retrieve information about one or more Proxmox VE groups.
 attributes:
   action_group:
     version_added: 9.0.0
@@ -31,10 +30,10 @@ extends_documentation_fragment:
   - community.general.proxmox.documentation
   - community.general.attributes
   - community.general.attributes.info_module
-'''
+"""
 
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: List existing groups
   community.general.proxmox_group_info:
     api_host: helldorado
@@ -53,30 +52,30 @@ EXAMPLES = '''
     api_token_secret: "{{ token_secret | default(omit) }}"
     group: admin
   register: proxmox_group_admin
-'''
+"""
 
 
-RETURN = '''
+RETURN = r"""
 proxmox_groups:
-    description: List of groups.
-    returned: always, but can be empty
-    type: list
-    elements: dict
-    contains:
-      comment:
-        description: Short description of the group.
-        returned: on success, can be absent
-        type: str
-      groupid:
-        description: Group name.
-        returned: on success
-        type: str
-      users:
-        description: List of users in the group.
-        returned: on success
-        type: list
-        elements: str
-'''
+  description: List of groups.
+  returned: always, but can be empty
+  type: list
+  elements: dict
+  contains:
+    comment:
+      description: Short description of the group.
+      returned: on success, can be absent
+      type: str
+    groupid:
+      description: Group name.
+      returned: on success
+      type: str
+    users:
+      description: List of users in the group.
+      returned: on success
+      type: list
+      elements: str
+"""
 
 
 from ansible.module_utils.basic import AnsibleModule

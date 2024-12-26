@@ -10,8 +10,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: proxmox_backup
 author: "Raphael Grieger (@IamLunchbox) <r.grieger@hotmail.com>"
 short_description: Start a VM backup in Proxmox VE cluster
@@ -42,11 +41,9 @@ options:
   change_detection_mode:
     description:
       - Set the change detection mode (available from Proxmox VE 8.3).
-      - >
-        Is only used when backing up containers,
-        Proxmox silently ignores this option when applied to kvm guests.
+      - It is only used when backing up containers, Proxmox silently ignores this option when applied to kvm guests.
     type: str
-    choices: ["legacy",  "data", "metadata"]
+    choices: ["legacy", "data", "metadata"]
   compress:
     description:
       - Enable additional compression of the backup archive.
@@ -63,13 +60,9 @@ options:
     description:
       - Specify the description of the backup.
       - Needs to be a single line, newline and backslash need to be escaped as V(\\n) and V(\\\\) respectively.
-      - >
-        If you need variable interpolation, you can set the content as usual
-        through ansible jinja templating and/or let Proxmox substitute templates.
-      - >
-        Proxmox currently supports V({{cluster}}), V({{guestname}}),
-        V({{node}}), and V({{vmid}}) as templating variables.
-        Since this is also a jinja delimiter, you need to set these values as raw jinja.
+      - If you need variable interpolation, you can set the content as usual through ansible jinja templating and/or let Proxmox substitute templates.
+      - Proxmox currently supports V({{cluster}}), V({{guestname}}), V({{node}}), and V({{vmid}}) as templating variables. Since this is also
+        a jinja delimiter, you need to set these values as raw jinja.
     default: "{{guestname}}"
     type: str
   fleecing:
@@ -93,13 +86,13 @@ options:
     description:
       - Determine which notification system to use.
     type: str
-    choices: ["auto","legacy-sendmail", "notification-system"]
+    choices: ["auto", "legacy-sendmail", "notification-system"]
     default: auto
   performance_tweaks:
     description:
       - Enable other performance-related settings.
       - Must be entered as a string, containing comma separated key-value pairs.
-      - "For example: V(max-workers=2,pbs-entries-max=2)."
+      - 'For example: V(max-workers=2,pbs-entries-max=2).'
     type: str
   pool:
     description:
@@ -110,19 +103,14 @@ options:
   protected:
     description:
       - Marks backups as protected.
-      - >
-        "Might fail, when the PBS backend has verify enabled
-         due to this bug: U(https://bugzilla.proxmox.com/show_bug.cgi?id=4289)"
+      - '"Might fail, when the PBS backend has verify enabled due to this bug: U(https://bugzilla.proxmox.com/show_bug.cgi?id=4289)".'
     type: bool
   retention:
     description:
-      - >
-        Use custom retention options instead of those from the default cluster
-        configuration (which is usually V("keep-all")).
+      - Use custom retention options instead of those from the default cluster configuration (which is usually V("keep-all=1")).
       - Always requires Datastore.Allocate permission at the storage endpoint.
-      - >
-        Specifying a retention time other than V(keep-all=1) might trigger pruning on the datastore,
-        if an existing backup should be deleted target due to your specified timeframe.
+      - Specifying a retention time other than V(keep-all=1) might trigger pruning on the datastore, if an existing backup should be deleted
+        due to your specified timeframe.
       - Deleting requires C(Datastore.Modify) or C(Datastore.Prune) permissions on the backup storage.
     type: str
   storage:
@@ -153,9 +141,9 @@ extends_documentation_fragment:
   - community.general.proxmox.actiongroup_proxmox
   - community.general.proxmox.documentation
   - community.general.attributes
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Backup all vms in the Proxmox cluster to storage mypbs
   community.general.proxmox_backup:
     api_user: root@pam
@@ -204,9 +192,9 @@ EXAMPLES = r'''
     vmids:
       - 100
       - 101
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 backups:
   description: List of nodes and their task IDs.
   returned: on success
@@ -223,13 +211,12 @@ backups:
       type: str
       choices: ["unknown", "success", "failed"]
     upid:
-      description: >
-        Proxmox cluster UPID, which is needed to lookup task info.
-        Returns OK, when a cluster node did not create a task after being called,
-        e.g. due to no matching targets.
+      description: >-
+        Proxmox cluster UPID, which is needed to lookup task info. Returns OK, when a cluster node did not create a task after being called, for
+        example due to no matching targets.
       returned: on success
       type: str
-'''
+"""
 
 import time
 

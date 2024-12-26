@@ -9,12 +9,11 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: proxmox_template
 short_description: Management of OS templates in Proxmox VE cluster
 description:
-  - allows you to upload/delete templates in Proxmox VE cluster
+  - Allows you to upload/delete templates in Proxmox VE cluster.
 attributes:
   check_mode:
     support: none
@@ -34,7 +33,7 @@ options:
     type: path
   url:
     description:
-      - URL to file to download
+      - URL to file to download.
       - Exactly one of O(src) or O(url) is required for O(state=present).
     type: str
     version_added: 10.1.0
@@ -68,7 +67,7 @@ options:
     default: false
   state:
     description:
-     - Indicate desired state of the template.
+      - Indicate desired state of the template.
     type: str
     choices: ['present', 'absent']
     default: present
@@ -80,9 +79,9 @@ extends_documentation_fragment:
   - community.general.proxmox.actiongroup_proxmox
   - community.general.proxmox.documentation
   - community.general.attributes
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Upload new openvz template with minimal options
   community.general.proxmox_template:
     node: uk-mc02
@@ -148,7 +147,7 @@ EXAMPLES = '''
     storage: local
     content_type: vztmpl
     template: ubuntu-20.04-standard_20.04-1_amd64.tar.gz
-'''
+"""
 
 import os
 import time

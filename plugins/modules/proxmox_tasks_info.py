@@ -9,8 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: proxmox_tasks_info
 short_description: Retrieve information about one or more Proxmox VE tasks
 version_added: 3.8.0
@@ -36,10 +35,10 @@ extends_documentation_fragment:
   - community.general.proxmox.documentation
   - community.general.attributes
   - community.general.attributes.info_module
-'''
+"""
 
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: List tasks on node01
   community.general.proxmox_tasks_info:
     api_host: proxmoxhost
@@ -60,66 +59,66 @@ EXAMPLES = '''
     task: 'UPID:node01:00003263:16167ACE:621EE230:srvreload:networking:root@pam:'
     node: node01
   register: proxmox_tasks
-'''
+"""
 
 
-RETURN = '''
+RETURN = r"""
 proxmox_tasks:
-    description: List of tasks.
-    returned: on success
-    type: list
-    elements: dict
-    contains:
-      id:
-        description: ID of the task.
-        returned: on success
-        type: str
-      node:
-        description: Node name.
-        returned: on success
-        type: str
-      pid:
-        description: PID of the task.
-        returned: on success
-        type: int
-      pstart:
-        description: pastart of the task.
-        returned: on success
-        type: int
-      starttime:
-        description: Starting time of the task.
-        returned: on success
-        type: int
-      type:
-        description: Type of the task.
-        returned: on success
-        type: str
-      upid:
-        description: UPID of the task.
-        returned: on success
-        type: str
-      user:
-        description: User that owns the task.
-        returned: on success
-        type: str
-      endtime:
-        description: Endtime of the task.
-        returned: on success, can be absent
-        type: int
-      status:
-        description: Status of the task.
-        returned: on success, can be absent
-        type: str
-      failed:
-        description: If the task failed.
-        returned: when status is defined
-        type: bool
+  description: List of tasks.
+  returned: on success
+  type: list
+  elements: dict
+  contains:
+    id:
+      description: ID of the task.
+      returned: on success
+      type: str
+    node:
+      description: Node name.
+      returned: on success
+      type: str
+    pid:
+      description: PID of the task.
+      returned: on success
+      type: int
+    pstart:
+      description: Pastart of the task.
+      returned: on success
+      type: int
+    starttime:
+      description: Starting time of the task.
+      returned: on success
+      type: int
+    type:
+      description: Type of the task.
+      returned: on success
+      type: str
+    upid:
+      description: UPID of the task.
+      returned: on success
+      type: str
+    user:
+      description: User that owns the task.
+      returned: on success
+      type: str
+    endtime:
+      description: Endtime of the task.
+      returned: on success, can be absent
+      type: int
+    status:
+      description: Status of the task.
+      returned: on success, can be absent
+      type: str
+    failed:
+      description: If the task failed.
+      returned: when status is defined
+      type: bool
 msg:
-    description: Short message.
-    returned: on failure
-    type: str
-    sample: 'Task: UPID:xyz:xyz does not exist on node: proxmoxnode'
-'''
+  description: Short message.
+  returned: on failure
+  type: str
+  sample: 'Task: UPID:xyz:xyz does not exist on node: proxmoxnode'
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.proxmox import (

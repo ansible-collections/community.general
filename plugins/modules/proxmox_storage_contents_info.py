@@ -10,8 +10,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = """
----
+DOCUMENTATION = r"""
 module: proxmox_storage_contents_info
 short_description: List content from a Proxmox VE storage
 version_added: 8.2.0
@@ -51,7 +50,7 @@ extends_documentation_fragment:
 """
 
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: List existing storages
   community.general.proxmox_storage_contents_info:
     api_host: helldorado
@@ -65,7 +64,7 @@ EXAMPLES = """
 """
 
 
-RETURN = """
+RETURN = r"""
 proxmox_storage_content:
   description: Content of of storage attached to a node.
   type: list
