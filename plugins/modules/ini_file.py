@@ -12,19 +12,18 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: ini_file
 short_description: Tweak settings in INI files
 extends_documentation_fragment:
   - files
   - community.general.attributes
 description:
-  - Manage (add, remove, change) individual settings in an INI-style file without having
-    to manage the file as a whole with, say, M(ansible.builtin.template) or M(ansible.builtin.assemble).
-  - Adds missing sections if they don't exist.
-  - This module adds missing ending newlines to files to keep in line with the POSIX standard, even when
-    no other modifications need to be applied.
+  - Manage (add, remove, change) individual settings in an INI-style file without having to manage the file as a whole with,
+    say, M(ansible.builtin.template) or M(ansible.builtin.assemble).
+  - Adds missing sections if they do not exist.
+  - This module adds missing ending newlines to files to keep in line with the POSIX standard, even when no other modifications
+    need to be applied.
 attributes:
   check_mode:
     support: full
@@ -36,11 +35,10 @@ options:
       - Path to the INI-style file; this file is created if required.
     type: path
     required: true
-    aliases: [ dest ]
+    aliases: [dest]
   section:
     description:
-      - Section name in INI file. This is added if O(state=present) automatically when
-        a single value is being set.
+      - Section name in INI file. This is added if O(state=present) automatically when a single value is being set.
       - If being omitted, the O(option) will be placed before the first O(section).
       - Omitting O(section) is also required if the config format does not support sections.
     type: str
@@ -91,28 +89,27 @@ options:
     version_added: 3.6.0
   backup:
     description:
-      - Create a backup file including the timestamp information so you can get
-        the original file back if you somehow clobbered it incorrectly.
+      - Create a backup file including the timestamp information so you can get the original file back if you somehow clobbered
+        it incorrectly.
     type: bool
     default: false
   state:
     description:
       - If set to V(absent) and O(exclusive) set to V(true) all matching O(option) lines are removed.
-      - If set to V(absent) and O(exclusive) set to V(false) the specified O(option=value) lines are removed,
-        but the other O(option)s with the same name are not touched.
-      - If set to V(present) and O(exclusive) set to V(false) the specified O(option=values) lines are added,
-        but the other O(option)s with the same name are not touched.
-      - If set to V(present) and O(exclusive) set to V(true) all given O(option=values) lines will be
-        added and the other O(option)s with the same name are removed.
+      - If set to V(absent) and O(exclusive) set to V(false) the specified O(option=value) lines are removed, but the other
+        O(option)s with the same name are not touched.
+      - If set to V(present) and O(exclusive) set to V(false) the specified O(option=values) lines are added, but the other
+        O(option)s with the same name are not touched.
+      - If set to V(present) and O(exclusive) set to V(true) all given O(option=values) lines will be added and the other
+        O(option)s with the same name are removed.
     type: str
-    choices: [ absent, present ]
+    choices: [absent, present]
     default: present
   exclusive:
     description:
-      - If set to V(true) (default), all matching O(option) lines are removed when O(state=absent),
-        or replaced when O(state=present).
-      - If set to V(false), only the specified O(value)/O(values) are added when O(state=present),
-        or removed when O(state=absent), and existing ones are not modified.
+      - If set to V(true) (default), all matching O(option) lines are removed when O(state=absent), or replaced when O(state=present).
+      - If set to V(false), only the specified O(value)/O(values) are added when O(state=present), or removed when O(state=absent),
+        and existing ones are not modified.
     type: bool
     default: true
     version_added: 3.6.0
@@ -141,27 +138,27 @@ options:
   modify_inactive_option:
     description:
       - By default the module replaces a commented line that matches the given option.
-      - Set this option to V(false) to avoid this. This is useful when you want to keep commented example
-        C(key=value) pairs for documentation purposes.
+      - Set this option to V(false) to avoid this. This is useful when you want to keep commented example C(key=value) pairs
+        for documentation purposes.
     type: bool
     default: true
     version_added: 8.0.0
   follow:
     description:
-    - This flag indicates that filesystem links, if they exist, should be followed.
-    - O(follow=true) can modify O(path) when combined with parameters such as O(mode).
+      - This flag indicates that filesystem links, if they exist, should be followed.
+      - O(follow=true) can modify O(path) when combined with parameters such as O(mode).
     type: bool
     default: false
     version_added: 7.1.0
 notes:
-   - While it is possible to add an O(option) without specifying a O(value), this makes no sense.
-   - As of community.general 3.2.0, UTF-8 BOM markers are discarded when reading files.
+  - While it is possible to add an O(option) without specifying a O(value), this makes no sense.
+  - As of community.general 3.2.0, UTF-8 BOM markers are discarded when reading files.
 author:
-    - Jan-Piet Mens (@jpmens)
-    - Ales Nosek (@noseka1)
-'''
+  - Jan-Piet Mens (@jpmens)
+  - Ales Nosek (@noseka1)
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Ensure "fav=lemonade is in section "[drinks]" in specified file
   community.general.ini_file:
     path: /etc/conf
@@ -257,7 +254,7 @@ EXAMPLES = r'''
     value: xxxxxxxxxxxxxxxxxxxx
     mode: '0600'
     state: present
-'''
+"""
 
 import io
 import os
