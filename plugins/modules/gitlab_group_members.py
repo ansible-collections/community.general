@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: gitlab_group_members
 short_description: Manage group members on GitLab Server
 description:
@@ -81,16 +80,16 @@ options:
     type: str
   purge_users:
     description:
-      - Adds/remove users of the given access_level to match the given O(gitlab_user)/O(gitlab_users_access) list.
-        If omitted do not purge orphaned members.
+      - Adds/remove users of the given access_level to match the given O(gitlab_user)/O(gitlab_users_access) list. If omitted
+        do not purge orphaned members.
       - Is only used when O(state=present).
     type: list
     elements: str
     choices: ['guest', 'reporter', 'developer', 'maintainer', 'owner']
     version_added: 3.6.0
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Add a user to a GitLab Group
   community.general.gitlab_group_members:
     api_url: 'https://gitlab.example.com'
@@ -152,9 +151,9 @@ EXAMPLES = r'''
       - name: user2
         access_level: maintainer
     state: absent
-'''
+"""
 
-RETURN = r''' # '''
+RETURN = r""" # """
 
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule
