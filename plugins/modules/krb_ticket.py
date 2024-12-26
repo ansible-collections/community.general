@@ -8,8 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: krb_ticket
 short_description: Kerberos utils for managing tickets
 version_added: 10.0.0
@@ -56,8 +55,9 @@ options:
   lifetime:
     description:
       - Requests a ticket with the lifetime, if the O(lifetime) is not specified, the default ticket lifetime is used.
-      - Specifying a ticket lifetime longer than the maximum ticket lifetime (configured by each site) will not override the configured maximum ticket lifetime.
-      - "The value for O(lifetime) must be followed by one of the following suffixes: V(s) - seconds, V(m) - minutes, V(h) - hours, V(d) - days."
+      - Specifying a ticket lifetime longer than the maximum ticket lifetime (configured by each site) will not override the configured maximum
+        ticket lifetime.
+      - 'The value for O(lifetime) must be followed by one of the following suffixes: V(s) - seconds, V(m) - minutes, V(h) - hours, V(d) - days.'
       - You cannot mix units; a value of V(3h30m) will result in an error.
       - See U(https://web.mit.edu/kerberos/krb5-1.12/doc/basic/date_format.html) for reference.
     type: str
@@ -73,7 +73,8 @@ options:
   renewable:
     description:
       - Requests renewable tickets, with a total lifetime equal to O(renewable).
-      - "The value for O(renewable) must be followed by one of the following delimiters: V(s) - seconds, V(m) - minutes, V(h) - hours, V(d) - days."
+      - 'The value for O(renewable) must be followed by one of the following delimiters: V(s) - seconds, V(m) - minutes, V(h) - hours, V(d) -
+        days.'
       - You cannot mix units; a value of V(3h30m) will result in an error.
       - See U(https://web.mit.edu/kerberos/krb5-1.12/doc/basic/date_format.html) for reference.
     type: str
@@ -125,9 +126,9 @@ requirements:
   - krb5-user and krb5-config packages
 extends_documentation_fragment:
   - community.general.attributes
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Get Kerberos ticket using default principal
   community.general.krb_ticket:
     password: some_password
@@ -179,7 +180,7 @@ EXAMPLES = r'''
   community.general.krb_ticket:
     state: absent
     kdestroy_all: true
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
