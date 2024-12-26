@@ -103,7 +103,6 @@ def main():
     transcode = module.params["transcode"]
     user = module.params["user"]
 
-    stdin_secret = ["echo", "-n", secret]
     decrypt_cmd = [cmd, "decrypt"]
     if name:
         decrypt_cmd.append("--name=" + name)
@@ -121,8 +120,7 @@ def main():
         decrypt_cmd.append("--uid=" + user)
     decrypt_cmd.extend(["-", "-"])
 
-    rc, stdout, stderr = module.run_command(stdin_secret)
-    rc, stdout, stderr = module.run_command(decrypt_cmd, data=stdout)
+    rc, stdout, stderr = module.run_command(decrypt_cmd, data=secret)
 
     module.exit_json(
         changed=False,

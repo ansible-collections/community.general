@@ -63,6 +63,7 @@ notes:
 
 EXAMPLES = """
 - name: Encrypt secret
+  become: true
   community.general.systemd_creds_encrypt:
     name: db
     not_after: +48hr
@@ -101,7 +102,6 @@ def main():
     timestamp = module.params["timestamp"]
     user = module.params["user"]
 
-    stdin_secret = ["echo", "-n", secret]
     encrypt_cmd = [cmd, "encrypt"]
     if name:
         encrypt_cmd.append("--name=" + name)
@@ -117,8 +117,7 @@ def main():
         encrypt_cmd.append("--uid=" + user)
     encrypt_cmd.extend(["-", "-"])
 
-    rc, stdout, stderr = module.run_command(stdin_secret)
-    rc, stdout, stderr = module.run_command(encrypt_cmd, data=stdout)
+    rc, stdout, stderr = module.run_command(encrypt_cmd, data=secret)
 
     module.exit_json(
         changed=False,
