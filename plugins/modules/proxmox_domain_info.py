@@ -9,8 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: proxmox_domain_info
 short_description: Retrieve information about one or more Proxmox VE domains
 version_added: 1.3.0
@@ -31,10 +30,10 @@ extends_documentation_fragment:
   - community.general.proxmox.documentation
   - community.general.attributes
   - community.general.attributes.info_module
-'''
+"""
 
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: List existing domains
   community.general.proxmox_domain_info:
     api_host: helldorado
@@ -53,33 +52,33 @@ EXAMPLES = '''
     api_token_secret: "{{ token_secret | default(omit) }}"
     domain: pve
   register: proxmox_domain_pve
-'''
+"""
 
 
-RETURN = '''
+RETURN = r"""
 proxmox_domains:
-    description: List of authentication domains.
-    returned: always, but can be empty
-    type: list
-    elements: dict
-    contains:
-      comment:
-        description: Short description of the realm.
-        returned: on success
-        type: str
-      realm:
-        description: Realm name.
-        returned: on success
-        type: str
-      type:
-        description: Realm type.
-        returned: on success
-        type: str
-      digest:
-        description: Realm hash.
-        returned: on success, can be absent
-        type: str
-'''
+  description: List of authentication domains.
+  returned: always, but can be empty
+  type: list
+  elements: dict
+  contains:
+    comment:
+      description: Short description of the realm.
+      returned: on success
+      type: str
+    realm:
+      description: Realm name.
+      returned: on success
+      type: str
+    type:
+      description: Realm type.
+      returned: on success
+      type: str
+    digest:
+      description: Realm hash.
+      returned: on success, can be absent
+      type: str
+"""
 
 
 from ansible.module_utils.basic import AnsibleModule
