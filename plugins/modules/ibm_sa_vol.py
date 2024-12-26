@@ -10,52 +10,50 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: ibm_sa_vol
 short_description: Handle volumes on IBM Spectrum Accelerate Family storage systems
 
 description:
-    - "This module creates or deletes volumes to be used on IBM Spectrum Accelerate Family storage systems."
-
+  - This module creates or deletes volumes to be used on IBM Spectrum Accelerate Family storage systems.
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 
 options:
-    vol:
-        description:
-            - Volume name.
-        required: true
-        type: str
-    pool:
-        description:
-            - Volume pool.
-        required: false
-        type: str
-    state:
-        description:
-            - Volume state.
-        default: "present"
-        choices: [ "present", "absent" ]
-        type: str
-    size:
-        description:
-            - Volume size.
-        required: false
-        type: str
+  vol:
+    description:
+      - Volume name.
+    required: true
+    type: str
+  pool:
+    description:
+      - Volume pool.
+    required: false
+    type: str
+  state:
+    description:
+      - Volume state.
+    default: "present"
+    choices: ["present", "absent"]
+    type: str
+  size:
+    description:
+      - Volume size.
+    required: false
+    type: str
 
 extends_documentation_fragment:
   - community.general.ibm_storage
   - community.general.attributes
 
 author:
-    - Tzur Eliyahu (@tzure)
-'''
+  - Tzur Eliyahu (@tzure)
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a new volume.
   community.general.ibm_sa_vol:
     vol: volume_name
@@ -73,9 +71,9 @@ EXAMPLES = '''
     username: admin
     password: secret
     endpoints: hostdev-system
-'''
-RETURN = '''
-'''
+"""
+RETURN = r"""
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.ibm_sa_utils import execute_pyxcli_command, \
