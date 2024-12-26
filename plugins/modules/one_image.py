@@ -8,82 +8,81 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: one_image
 short_description: Manages OpenNebula images
 description:
-  - Manages OpenNebula images
+  - Manages OpenNebula images.
 requirements:
   - pyone
 extends_documentation_fragment:
   - community.general.opennebula
   - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    id:
-        description:
-            - A O(id) of the image you would like to manage.
-        type: int
-    name:
-        description:
-            - A O(name) of the image you would like to manage.
-            - Required if O(create=true).
-        type: str
-    state:
-        description:
-            - V(present) - state that is used to manage the image.
-            - V(absent) - delete the image.
-            - V(cloned) - clone the image.
-            - V(renamed) - rename the image to the O(new_name).
-        choices: ["present", "absent", "cloned", "renamed"]
-        default: present
-        type: str
-    enabled:
-        description:
-            - Whether the image should be enabled or disabled.
-        type: bool
-    new_name:
-        description:
-            - A name that will be assigned to the existing or new image.
-            - In the case of cloning, by default O(new_name) will take the name of the origin image with the prefix 'Copy of'.
-        type: str
-    persistent:
-        description:
-            - Whether the image should be persistent or non-persistent.
-        type: bool
-        version_added: 9.5.0
-    create:
-        description:
-            - Whether the image should be created if not present.
-            - This is ignored if O(state=absent).
-        type: bool
-        version_added: 10.0.0
-    template:
-        description:
-            - Use with O(create=true) to specify image template.
-        type: str
-        version_added: 10.0.0
-    datastore_id:
-        description:
-            - Use with O(create=true) to specify datastore for image.
-        type: int
-        version_added: 10.0.0
-    wait_timeout:
-        description:
-            - Seconds to wait until image is ready, deleted or cloned.
-        type: int
-        default: 60
-        version_added: 10.0.0
+  id:
+    description:
+      - A O(id) of the image you would like to manage.
+    type: int
+  name:
+    description:
+      - A O(name) of the image you would like to manage.
+      - Required if O(create=true).
+    type: str
+  state:
+    description:
+      - V(present) - state that is used to manage the image.
+      - V(absent) - delete the image.
+      - V(cloned) - clone the image.
+      - V(renamed) - rename the image to the O(new_name).
+    choices: ["present", "absent", "cloned", "renamed"]
+    default: present
+    type: str
+  enabled:
+    description:
+      - Whether the image should be enabled or disabled.
+    type: bool
+  new_name:
+    description:
+      - A name that will be assigned to the existing or new image.
+      - In the case of cloning, by default O(new_name) will take the name of the origin image with the prefix 'Copy of'.
+    type: str
+  persistent:
+    description:
+      - Whether the image should be persistent or non-persistent.
+    type: bool
+    version_added: 9.5.0
+  create:
+    description:
+      - Whether the image should be created if not present.
+      - This is ignored if O(state=absent).
+    type: bool
+    version_added: 10.0.0
+  template:
+    description:
+      - Use with O(create=true) to specify image template.
+    type: str
+    version_added: 10.0.0
+  datastore_id:
+    description:
+      - Use with O(create=true) to specify datastore for image.
+    type: int
+    version_added: 10.0.0
+  wait_timeout:
+    description:
+      - Seconds to wait until image is ready, deleted or cloned.
+    type: int
+    default: 60
+    version_added: 10.0.0
 author:
-    - "Milan Ilic (@ilicmilan)"
-'''
+  - "Milan Ilic (@ilicmilan)"
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Fetch the IMAGE by id
   community.general.one_image:
     id: 45
@@ -147,228 +146,228 @@ EXAMPLES = '''
     create: true
     datastore_id: 100
     wait_timeout: 900
-    template: |
+    template: |-
       PATH = "https://192.0.2.200/repo/tipa_image.raw"
       TYPE = "OS"
       SIZE = 82048
       FORMAT = "raw"
       PERSISTENT = "Yes"
       DEV_PREFIX = "vd"
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 id:
-    description: image id
-    type: int
-    returned: when O(state=present), O(state=cloned), or O(state=renamed)
-    sample: 153
+  description: Image id.
+  type: int
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  sample: 153
 name:
-    description: image name
-    type: str
-    returned: when O(state=present), O(state=cloned), or O(state=renamed)
-    sample: app1
+  description: Image name.
+  type: str
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  sample: app1
 group_id:
-    description: image's group id
-    type: int
-    returned: when O(state=present), O(state=cloned), or O(state=renamed)
-    sample: 1
+  description: Image's group id.
+  type: int
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  sample: 1
 group_name:
-    description: image's group name
-    type: str
-    returned: when O(state=present), O(state=cloned), or O(state=renamed)
-    sample: one-users
+  description: Image's group name.
+  type: str
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  sample: one-users
 owner_id:
-    description: image's owner id
-    type: int
-    returned: when O(state=present), O(state=cloned), or O(state=renamed)
-    sample: 143
+  description: Image's owner id.
+  type: int
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  sample: 143
 owner_name:
-    description: image's owner name
-    type: str
-    returned: when O(state=present), O(state=cloned), or O(state=renamed)
-    sample: ansible-test
+  description: Image's owner name.
+  type: str
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  sample: ansible-test
 state:
-    description: state of image instance
-    type: str
-    returned: when O(state=present), O(state=cloned), or O(state=renamed)
-    sample: READY
+  description: State of image instance.
+  type: str
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  sample: READY
 used:
-    description: is image in use
-    type: bool
-    returned: when O(state=present), O(state=cloned), or O(state=renamed)
-    sample: true
+  description: Is image in use.
+  type: bool
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  sample: true
 running_vms:
-    description: count of running vms that use this image
-    type: int
-    returned: when O(state=present), O(state=cloned), or O(state=renamed)
-    sample: 7
+  description: Count of running vms that use this image.
+  type: int
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  sample: 7
 permissions:
-    description: The image's permissions.
-    type: dict
-    returned: when O(state=present), O(state=cloned), or O(state=renamed)
-    version_added: 9.5.0
-    contains:
-        owner_u:
-            description: The image's owner USAGE permissions.
-            type: str
-            sample: 1
-        owner_m:
-            description: The image's owner MANAGE permissions.
-            type: str
-            sample: 0
-        owner_a:
-            description: The image's owner ADMIN permissions.
-            type: str
-            sample: 0
-        group_u:
-            description: The image's group USAGE permissions.
-            type: str
-            sample: 0
-        group_m:
-            description: The image's group MANAGE permissions.
-            type: str
-            sample: 0
-        group_a:
-            description: The image's group ADMIN permissions.
-            type: str
-            sample: 0
-        other_u:
-            description: The image's other users USAGE permissions.
-            type: str
-            sample: 0
-        other_m:
-            description: The image's other users MANAGE permissions.
-            type: str
-            sample: 0
-        other_a:
-            description: The image's other users ADMIN permissions
-            type: str
-            sample: 0
-    sample:
-        owner_u: 1
-        owner_m: 0
-        owner_a: 0
-        group_u: 0
-        group_m: 0
-        group_a: 0
-        other_u: 0
-        other_m: 0
-        other_a: 0
+  description: The image's permissions.
+  type: dict
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  version_added: 9.5.0
+  contains:
+    owner_u:
+      description: The image's owner USAGE permissions.
+      type: str
+      sample: 1
+    owner_m:
+      description: The image's owner MANAGE permissions.
+      type: str
+      sample: 0
+    owner_a:
+      description: The image's owner ADMIN permissions.
+      type: str
+      sample: 0
+    group_u:
+      description: The image's group USAGE permissions.
+      type: str
+      sample: 0
+    group_m:
+      description: The image's group MANAGE permissions.
+      type: str
+      sample: 0
+    group_a:
+      description: The image's group ADMIN permissions.
+      type: str
+      sample: 0
+    other_u:
+      description: The image's other users USAGE permissions.
+      type: str
+      sample: 0
+    other_m:
+      description: The image's other users MANAGE permissions.
+      type: str
+      sample: 0
+    other_a:
+      description: The image's other users ADMIN permissions.
+      type: str
+      sample: 0
+  sample:
+    owner_u: 1
+    owner_m: 0
+    owner_a: 0
+    group_u: 0
+    group_m: 0
+    group_a: 0
+    other_u: 0
+    other_m: 0
+    other_a: 0
 type:
-    description: The image's type.
-    type: str
-    sample: 0
-    returned: when O(state=present), O(state=cloned), or O(state=renamed)
-    version_added: 9.5.0
+  description: The image's type.
+  type: str
+  sample: 0
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  version_added: 9.5.0
 disk_type:
-    description: The image's format type.
-    type: str
-    sample: 0
-    returned: when O(state=present), O(state=cloned), or O(state=renamed)
-    version_added: 9.5.0
+  description: The image's format type.
+  type: str
+  sample: 0
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  version_added: 9.5.0
 persistent:
-    description: The image's persistence status (1 means true, 0 means false).
-    type: int
-    sample: 1
-    returned: when O(state=present), O(state=cloned), or O(state=renamed)
-    version_added: 9.5.0
+  description: The image's persistence status (1 means true, 0 means false).
+  type: int
+  sample: 1
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  version_added: 9.5.0
 source:
-    description: The image's source.
-    type: str
-    sample: /var/lib/one//datastores/100/somerandomstringxd
-    returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  description: The image's source.
+  type: str
+  sample: /var/lib/one//datastores/100/somerandomstringxd
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
 path:
-    description: The image's filesystem path.
-    type: str
-    sample: /var/tmp/hello.qcow2
-    returned: when O(state=present), O(state=cloned), or O(state=renamed)
-    version_added: 9.5.0
+  description: The image's filesystem path.
+  type: str
+  sample: /var/tmp/hello.qcow2
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  version_added: 9.5.0
 fstype:
-    description: The image's filesystem type.
-    type: str
-    sample: ext4
-    returned: when O(state=present), O(state=cloned), or O(state=renamed)
-    version_added: 9.5.0
+  description: The image's filesystem type.
+  type: str
+  sample: ext4
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  version_added: 9.5.0
 size:
-    description: The image's size in MegaBytes.
-    type: int
-    sample: 10000
-    returned: when O(state=present), O(state=cloned), or O(state=renamed)
-    version_added: 9.5.0
+  description: The image's size in MegaBytes.
+  type: int
+  sample: 10000
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  version_added: 9.5.0
 cloning_ops:
-    description: The image's cloning operations per second.
-    type: int
-    sample: 0
-    returned: when O(state=present), O(state=cloned), or O(state=renamed)
-    version_added: 9.5.0
+  description: The image's cloning operations per second.
+  type: int
+  sample: 0
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  version_added: 9.5.0
 cloning_id:
-    description: The image's cloning ID.
-    type: int
-    sample: -1
-    returned: when O(state=present), O(state=cloned), or O(state=renamed)
-    version_added: 9.5.0
+  description: The image's cloning ID.
+  type: int
+  sample: -1
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  version_added: 9.5.0
 target_snapshot:
-    description: The image's target snapshot.
-    type: int
-    sample: 1
-    returned: when O(state=present), O(state=cloned), or O(state=renamed)
-    version_added: 9.5.0
+  description: The image's target snapshot.
+  type: int
+  sample: 1
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  version_added: 9.5.0
 datastore_id:
-    description: The image's datastore ID.
-    type: int
-    sample: 100
-    returned: when O(state=present), O(state=cloned), or O(state=renamed)
-    version_added: 9.5.0
+  description: The image's datastore ID.
+  type: int
+  sample: 100
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  version_added: 9.5.0
 datastore:
-    description: The image's datastore name.
-    type: int
-    sample: image_datastore
-    returned: when O(state=present), O(state=cloned), or O(state=renamed)
-    version_added: 9.5.0
+  description: The image's datastore name.
+  type: int
+  sample: image_datastore
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  version_added: 9.5.0
 vms:
-    description: The image's list of vm ID's.
-    type: list
-    elements: int
-    returned: when O(state=present), O(state=cloned), or O(state=renamed)
-    sample:
-        - 1
-        - 2
-        - 3
-    version_added: 9.5.0
+  description: The image's list of vm ID's.
+  type: list
+  elements: int
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  sample:
+    - 1
+    - 2
+    - 3
+  version_added: 9.5.0
 clones:
-    description: The image's list of clones ID's.
-    type: list
-    elements: int
-    returned: when O(state=present), O(state=cloned), or O(state=renamed)
-    sample:
-        - 1
-        - 2
-        - 3
-    version_added: 9.5.0
+  description: The image's list of clones ID's.
+  type: list
+  elements: int
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  sample:
+    - 1
+    - 2
+    - 3
+  version_added: 9.5.0
 app_clones:
-    description: The image's list of app_clones ID's.
-    type: list
-    elements: int
-    returned: when O(state=present), O(state=cloned), or O(state=renamed)
-    sample:
-        - 1
-        - 2
-        - 3
-    version_added: 9.5.0
+  description: The image's list of app_clones ID's.
+  type: list
+  elements: int
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  sample:
+    - 1
+    - 2
+    - 3
+  version_added: 9.5.0
 snapshots:
-    description: The image's list of snapshots.
-    type: list
-    returned: when O(state=present), O(state=cloned), or O(state=renamed)
-    version_added: 9.5.0
-    sample:
-      - date: 123123
-        parent: 1
-        size: 10228
-        allow_orphans: 1
-        children: 0
-        active: 1
-        name: SampleName
-'''
+  description: The image's list of snapshots.
+  type: list
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  version_added: 9.5.0
+  sample:
+    - date: 123123
+      parent: 1
+      size: 10228
+      allow_orphans: 1
+      children: 0
+      active: 1
+      name: SampleName
+"""
 
 
 from ansible_collections.community.general.plugins.module_utils.opennebula import OpenNebulaModule
