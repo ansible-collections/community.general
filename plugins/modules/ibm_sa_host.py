@@ -10,66 +10,61 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: ibm_sa_host
 short_description: Adds hosts to or removes them from IBM Spectrum Accelerate Family storage systems
 
 description:
-    - "This module adds hosts to or removes them from IBM Spectrum Accelerate Family storage systems."
-
+  - This module adds hosts to or removes them from IBM Spectrum Accelerate Family storage systems.
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 
 options:
-    host:
-        description:
-            - Host name.
-        required: true
-        type: str
-    state:
-        description:
-            - Host state.
-        default: "present"
-        choices: [ "present", "absent" ]
-        type: str
-    cluster:
-        description:
-            - The name of the cluster to include the host.
-        required: false
-        type: str
-    domain:
-        description:
-            - The domains the cluster will be attached to.
-                To include more than one domain,
-                separate domain names with commas.
-                To include all existing domains, use an asterisk ("*").
-        required: false
-        type: str
-    iscsi_chap_name:
-        description:
-            - The host's CHAP name identifier
-        required: false
-        type: str
-    iscsi_chap_secret:
-        description:
-            - The password of the initiator used to
-                authenticate to the system when CHAP is enable
-        required: false
-        type: str
+  host:
+    description:
+      - Host name.
+    required: true
+    type: str
+  state:
+    description:
+      - Host state.
+    default: "present"
+    choices: ["present", "absent"]
+    type: str
+  cluster:
+    description:
+      - The name of the cluster to include the host.
+    required: false
+    type: str
+  domain:
+    description:
+      - The domains the cluster will be attached to. To include more than one domain, separate domain names with commas. To
+        include all existing domains, use an asterisk (V(*)).
+    required: false
+    type: str
+  iscsi_chap_name:
+    description:
+      - The host's CHAP name identifier.
+    required: false
+    type: str
+  iscsi_chap_secret:
+    description:
+      - The password of the initiator used to authenticate to the system when CHAP is enable.
+    required: false
+    type: str
 
 extends_documentation_fragment:
   - community.general.ibm_storage
   - community.general.attributes
 
 author:
-    - Tzur Eliyahu (@tzure)
-'''
+  - Tzur Eliyahu (@tzure)
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Define new host.
   community.general.ibm_sa_host:
     host: host_name
@@ -85,9 +80,9 @@ EXAMPLES = '''
     username: admin
     password: secret
     endpoints: hostdev-system
-'''
-RETURN = '''
-'''
+"""
+RETURN = r"""
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.ibm_sa_utils import execute_pyxcli_command, \
