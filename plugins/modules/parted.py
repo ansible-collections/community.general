@@ -9,21 +9,18 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 author:
- - Fabrizio Colonna (@ColOfAbRiX)
+  - Fabrizio Colonna (@ColOfAbRiX)
 module: parted
 short_description: Configure block device partitions
 description:
-  - This module allows configuring block device partition using the C(parted)
-    command line tool. For a full description of the fields and the options
-    check the GNU parted manual.
+  - This module allows configuring block device partition using the C(parted) command line tool. For a full description of the fields and the
+    options check the GNU parted manual.
 requirements:
   - This module requires C(parted) version 1.8.3 and above.
   - Option O(align) (except V(undefined)) requires C(parted) 2.1 or above.
-  - If the version of C(parted) is below 3.1, it requires a Linux version running
-    the C(sysfs) file system C(/sys/).
+  - If the version of C(parted) is below 3.1, it requires a Linux version running the C(sysfs) file system C(/sys/).
   - Requires the C(resizepart) command when using the O(resize) parameter.
 extends_documentation_fragment:
   - community.general.attributes
@@ -36,15 +33,14 @@ options:
   device:
     description:
       - The block device (disk) where to operate.
-      - Regular files can also be partitioned, but it is recommended to create a
-        loopback device using C(losetup) to easily access its partitions.
+      - Regular files can also be partitioned, but it is recommended to create a loopback device using C(losetup) to easily access its partitions.
     type: str
     required: true
   align:
     description:
       - Set alignment for newly created partitions. Use V(undefined) for parted default alignment.
     type: str
-    choices: [ cylinder, minimal, none, optimal, undefined ]
+    choices: [cylinder, minimal, none, optimal, undefined]
     default: optimal
   number:
     description:
@@ -53,46 +49,40 @@ options:
     type: int
   unit:
     description:
-      - Selects the current default unit that Parted will use to display
-        locations and capacities on the disk and to interpret those given by the
-        user if they are not suffixed by an unit.
+      - Selects the current default unit that Parted will use to display locations and capacities on the disk and to interpret those given by
+        the user if they are not suffixed by an unit.
       - When fetching information about a disk, it is recommended to always specify a unit.
     type: str
-    choices: [ s, B, KB, KiB, MB, MiB, GB, GiB, TB, TiB, '%', cyl, chs, compact ]
+    choices: [s, B, KB, KiB, MB, MiB, GB, GiB, TB, TiB, '%', cyl, chs, compact]
     default: KiB
   label:
     description:
       - Disk label type or partition table to use.
-      - If O(device) already contains a different label, it will be changed to O(label)
-        and any previous partitions will be lost.
+      - If O(device) already contains a different label, it will be changed to O(label) and any previous partitions will be lost.
       - A O(name) must be specified for a V(gpt) partition table.
     type: str
-    choices: [ aix, amiga, bsd, dvh, gpt, loop, mac, msdos, pc98, sun ]
+    choices: [aix, amiga, bsd, dvh, gpt, loop, mac, msdos, pc98, sun]
     default: msdos
   part_type:
     description:
       - May be specified only with O(label=msdos) or O(label=dvh).
       - Neither O(part_type) nor O(name) may be used with O(label=sun).
     type: str
-    choices: [ extended, logical, primary ]
+    choices: [extended, logical, primary]
     default: primary
   part_start:
     description:
-      - Where the partition will start as offset from the beginning of the disk,
-        that is, the "distance" from the start of the disk. Negative numbers
-        specify distance from the end of the disk.
-      - The distance can be specified with all the units supported by parted
-        (except compat) and it is case sensitive, for example V(10GiB), V(15%).
+      - Where the partition will start as offset from the beginning of the disk, that is, the "distance" from the start of the disk. Negative
+        numbers specify distance from the end of the disk.
+      - The distance can be specified with all the units supported by parted (except compat) and it is case sensitive, for example V(10GiB), V(15%).
       - Using negative values may require setting of O(fs_type) (see notes).
     type: str
     default: 0%
   part_end:
     description:
-      - Where the partition will end as offset from the beginning of the disk,
-        that is, the "distance" from the start of the disk. Negative numbers
+      - Where the partition will end as offset from the beginning of the disk, that is, the "distance" from the start of the disk. Negative numbers
         specify distance from the end of the disk.
-      - The distance can be specified with all the units supported by parted
-        (except compat) and it is case sensitive, for example V(10GiB), V(15%).
+      - The distance can be specified with all the units supported by parted (except compat) and it is case sensitive, for example V(10GiB), V(15%).
     type: str
     default: 100%
   name:
@@ -108,7 +98,7 @@ options:
       - Whether to create or delete a partition.
       - If set to V(info) the module will only return the device information.
     type: str
-    choices: [ absent, present, info ]
+    choices: [absent, present, info]
     default: info
   fs_type:
     description:
@@ -124,18 +114,15 @@ options:
     version_added: '1.3.0'
 
 notes:
-  - When fetching information about a new disk and when the version of parted
-    installed on the system is before version 3.1, the module queries the kernel
-    through C(/sys/) to obtain disk information. In this case the units CHS and
-    CYL are not supported.
-  - Negative O(part_start) start values were rejected if O(fs_type) was not given.
-    This bug was fixed in parted 3.2.153. If you want to use negative O(part_start),
-    specify O(fs_type) as well or make sure your system contains newer parted.
-'''
+  - When fetching information about a new disk and when the version of parted installed on the system is before version 3.1, the module queries
+    the kernel through C(/sys/) to obtain disk information. In this case the units CHS and CYL are not supported.
+  - Negative O(part_start) start values were rejected if O(fs_type) was not given. This bug was fixed in parted 3.2.153. If you want to use negative
+    O(part_start), specify O(fs_type) as well or make sure your system contains newer parted.
+"""
 
-RETURN = r'''
+RETURN = r"""
 partition_info:
-  description: Current partition information
+  description: Current partition information.
   returned: success
   type: complex
   contains:
@@ -146,7 +133,7 @@ partition_info:
       description: List of device partitions.
       type: list
     script:
-      description: parted script executed by module
+      description: Parted script executed by module.
       type: str
   sample: {
       "disk": {
@@ -177,9 +164,9 @@ partition_info:
       }],
       "script": "unit KiB print "
     }
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Create a new ext4 primary partition
   community.general.parted:
     device: /dev/sdb
@@ -204,7 +191,7 @@ EXAMPLES = r'''
   community.general.parted:
     device: /dev/sdb
     number: 2
-    flags: [ lvm ]
+    flags: [lvm]
     state: present
     part_start: 1GiB
 
@@ -235,7 +222,7 @@ EXAMPLES = r'''
     part_end: "100%"
     resize: true
     state: present
-'''
+"""
 
 
 from ansible.module_utils.basic import AnsibleModule
