@@ -8,71 +8,59 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: pacemaker_cluster
 short_description: Manage pacemaker clusters
 author:
   - Mathieu Bultel (@matbu)
 description:
-  - This module can manage a pacemaker cluster and nodes from Ansible using
-    the pacemaker cli.
+  - This module can manage a pacemaker cluster and nodes from Ansible using the pacemaker CLI.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
-    check_mode:
-      support: full
-    diff_mode:
-      support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    state:
-      description:
-        - Indicate desired state of the cluster
-      choices: [ cleanup, offline, online, restart ]
-      type: str
-    node:
-      description:
-        - Specify which node of the cluster you want to manage. None == the
-          cluster status itself, 'all' == check the status of all nodes.
-      type: str
-    timeout:
-      description:
-        - Timeout when the module should considered that the action has failed
-      default: 300
-      type: int
-    force:
-      description:
-        - Force the change of the cluster state
-      type: bool
-      default: true
-'''
-EXAMPLES = '''
----
+  state:
+    description:
+      - Indicate desired state of the cluster.
+    choices: [cleanup, offline, online, restart]
+    type: str
+  node:
+    description:
+      - Specify which node of the cluster you want to manage. V(null) == the cluster status itself, V(all) == check the status of all nodes.
+    type: str
+  timeout:
+    description:
+      - Timeout when the module should considered that the action has failed.
+    default: 300
+    type: int
+  force:
+    description:
+      - Force the change of the cluster state.
+    type: bool
+    default: true
+"""
+
+EXAMPLES = r"""
 - name: Set cluster Online
   hosts: localhost
   gather_facts: false
   tasks:
-  - name: Get cluster state
-    community.general.pacemaker_cluster:
-      state: online
-'''
+    - name: Get cluster state
+      community.general.pacemaker_cluster:
+        state: online
+"""
 
-RETURN = '''
-changed:
-    description: true if the cluster state has changed
-    type: bool
-    returned: always
+RETURN = r"""
 out:
-    description: The output of the current state of the cluster. It return a
-                 list of the nodes state.
-    type: str
-    sample: 'out: [["  overcloud-controller-0", " Online"]]}'
-    returned: always
-rc:
-    description: exit code of the module
-    type: bool
-    returned: always
-'''
+  description: The output of the current state of the cluster. It returns a list of the nodes state.
+  type: str
+  sample: 'out: [["  overcloud-controller-0", " Online"]]}'
+  returned: always
+"""
 
 import time
 

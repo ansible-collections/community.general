@@ -8,84 +8,83 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: pacman_key
 author:
-    - George Rawlinson (@grawlinson)
+  - George Rawlinson (@grawlinson)
 version_added: "3.2.0"
 short_description: Manage pacman's list of trusted keys
 description:
-    - Add or remove gpg keys from the pacman keyring.
+  - Add or remove gpg keys from the pacman keyring.
 notes:
-    - Use full-length key ID (40 characters).
-    - Keys will be verified when using O(data), O(file), or O(url) unless O(verify) is overridden.
-    - Keys will be locally signed after being imported into the keyring.
-    - If the key ID exists in the keyring, the key will not be added unless O(force_update) is specified.
-    - O(data), O(file), O(url), and O(keyserver) are mutually exclusive.
+  - Use full-length key ID (40 characters).
+  - Keys will be verified when using O(data), O(file), or O(url) unless O(verify) is overridden.
+  - Keys will be locally signed after being imported into the keyring.
+  - If the key ID exists in the keyring, the key will not be added unless O(force_update) is specified.
+  - O(data), O(file), O(url), and O(keyserver) are mutually exclusive.
 requirements:
-    - gpg
-    - pacman-key
+  - gpg
+  - pacman-key
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    id:
-        description:
-            - The 40 character identifier of the key.
-            - Including this allows check mode to correctly report the changed state.
-            - Do not specify a subkey ID, instead specify the primary key ID.
-        required: true
-        type: str
-    data:
-        description:
-            - The keyfile contents to add to the keyring.
-            - Must be of C(PGP PUBLIC KEY BLOCK) type.
-        type: str
-    file:
-        description:
-            - The path to a keyfile on the remote server to add to the keyring.
-            - Remote file must be of C(PGP PUBLIC KEY BLOCK) type.
-        type: path
-    url:
-        description:
-            - The URL to retrieve keyfile from.
-            - Remote file must be of C(PGP PUBLIC KEY BLOCK) type.
-        type: str
-    keyserver:
-        description:
-            - The keyserver used to retrieve key from.
-        type: str
-    verify:
-        description:
-            - Whether or not to verify the keyfile's key ID against specified key ID.
-        type: bool
-        default: true
-    force_update:
-        description:
-            - This forces the key to be updated if it already exists in the keyring.
-        type: bool
-        default: false
-    keyring:
-        description:
-            - The full path to the keyring folder on the remote server.
-            - If not specified, module will use pacman's default (V(/etc/pacman.d/gnupg)).
-            - Useful if the remote system requires an alternative gnupg directory.
-        type: path
-        default: /etc/pacman.d/gnupg
-    state:
-        description:
-            - Ensures that the key is present (added) or absent (revoked).
-        default: present
-        choices: [ absent, present ]
-        type: str
-'''
+  id:
+    description:
+      - The 40 character identifier of the key.
+      - Including this allows check mode to correctly report the changed state.
+      - Do not specify a subkey ID, instead specify the primary key ID.
+    required: true
+    type: str
+  data:
+    description:
+      - The keyfile contents to add to the keyring.
+      - Must be of C(PGP PUBLIC KEY BLOCK) type.
+    type: str
+  file:
+    description:
+      - The path to a keyfile on the remote server to add to the keyring.
+      - Remote file must be of C(PGP PUBLIC KEY BLOCK) type.
+    type: path
+  url:
+    description:
+      - The URL to retrieve keyfile from.
+      - Remote file must be of C(PGP PUBLIC KEY BLOCK) type.
+    type: str
+  keyserver:
+    description:
+      - The keyserver used to retrieve key from.
+    type: str
+  verify:
+    description:
+      - Whether or not to verify the keyfile's key ID against specified key ID.
+    type: bool
+    default: true
+  force_update:
+    description:
+      - This forces the key to be updated if it already exists in the keyring.
+    type: bool
+    default: false
+  keyring:
+    description:
+      - The full path to the keyring folder on the remote server.
+      - If not specified, module will use pacman's default (V(/etc/pacman.d/gnupg)).
+      - Useful if the remote system requires an alternative gnupg directory.
+    type: path
+    default: /etc/pacman.d/gnupg
+  state:
+    description:
+      - Ensures that the key is present (added) or absent (revoked).
+    default: present
+    choices: [absent, present]
+    type: str
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Import a key via local file
   community.general.pacman_key:
     id: 01234567890ABCDE01234567890ABCDE12345678
@@ -119,9 +118,9 @@ EXAMPLES = '''
   community.general.pacman_key:
     id: 01234567890ABCDE01234567890ABCDE12345678
     state: absent
-'''
+"""
 
-RETURN = r''' # '''
+RETURN = r""" # """
 
 import os.path
 import tempfile
