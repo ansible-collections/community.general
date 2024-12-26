@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: discord
 short_description: Send Discord messages
 version_added: 3.1.0
@@ -18,7 +17,7 @@ description:
 author: Christian Wollinger (@cwollinger)
 seealso:
   - name: API documentation
-    description: Documentation for Discord API
+    description: Documentation for Discord API.
     link: https://discord.com/developers/docs/resources/webhook#execute-webhook
 extends_documentation_fragment:
   - community.general.attributes
@@ -31,13 +30,13 @@ options:
   webhook_id:
     description:
       - The webhook ID.
-      - "Format from Discord webhook URL: C(/webhooks/{webhook.id}/{webhook.token})."
+      - 'Format from Discord webhook URL: C(/webhooks/{webhook.id}/{webhook.token}).'
     required: true
     type: str
   webhook_token:
     description:
       - The webhook token.
-      - "Format from Discord webhook URL: C(/webhooks/{webhook.id}/{webhook.token})."
+      - 'Format from Discord webhook URL: C(/webhooks/{webhook.id}/{webhook.token}).'
     required: true
     type: str
   content:
@@ -62,13 +61,13 @@ options:
     description:
       - Send messages as Embeds to the Discord channel.
       - Embeds can have a colored border, embedded images, text fields and more.
-      - "Allowed parameters are described in the Discord Docs: U(https://discord.com/developers/docs/resources/channel#embed-object)"
+      - 'Allowed parameters are described in the Discord Docs: U(https://discord.com/developers/docs/resources/channel#embed-object).'
       - At least one of O(content) and O(embeds) must be specified.
     type: list
     elements: dict
-'''
+"""
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Send a message to the Discord channel
   community.general.discord:
     webhook_id: "00000"
@@ -119,7 +118,7 @@ EXAMPLES = """
         timestamp: "{{ ansible_date_time.iso8601 }}"
 """
 
-RETURN = """
+RETURN = r"""
 http_code:
   description:
     - Response Code returned by Discord API.

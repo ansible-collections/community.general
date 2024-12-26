@@ -9,53 +9,39 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 module: dconf
 author:
-    - "Branko Majic (@azaghal)"
+  - "Branko Majic (@azaghal)"
 short_description: Modify and read dconf database
 description:
-  - This module allows modifications and reading of C(dconf) database. The module
-    is implemented as a wrapper around C(dconf) tool. Please see the dconf(1) man
-    page for more details.
-  - Since C(dconf) requires a running D-Bus session to change values, the module
-    will try to detect an existing session and reuse it, or run the tool via
-    C(dbus-run-session).
+  - This module allows modifications and reading of C(dconf) database. The module is implemented as a wrapper around C(dconf)
+    tool. Please see the dconf(1) man page for more details.
+  - Since C(dconf) requires a running D-Bus session to change values, the module will try to detect an existing session and
+    reuse it, or run the tool using C(dbus-run-session).
 requirements:
-  - Optionally the C(gi.repository) Python library (usually included in the OS
-    on hosts which have C(dconf)); this will become a non-optional requirement
-    in a future major release of community.general.
+  - Optionally the C(gi.repository) Python library (usually included in the OS on hosts which have C(dconf)); this will become
+    a non-optional requirement in a future major release of community.general.
 notes:
-  - This module depends on C(psutil) Python library (version 4.0.0 and upwards),
-    C(dconf), C(dbus-send), and C(dbus-run-session) binaries. Depending on
-    distribution you are using, you may need to install additional packages to
-    have these available.
-  - This module uses the C(gi.repository) Python library when available for
-    accurate comparison of values in C(dconf) to values specified in Ansible
-    code. C(gi.repository) is likely to be present on most systems which have
-    C(dconf) but may not be present everywhere. When it is missing, a simple
-    string comparison between values is used, and there may be false positives,
-    that is, Ansible may think that a value is being changed when it is not.
-    This fallback will be removed in a future version of this module, at which
-    point the module will stop working on hosts without C(gi.repository).
-  - Detection of existing, running D-Bus session, required to change settings
-    via C(dconf), is not 100% reliable due to implementation details of D-Bus
-    daemon itself. This might lead to running applications not picking-up
-    changes on the fly if options are changed via Ansible and
-    C(dbus-run-session).
-  - Keep in mind that the C(dconf) CLI tool, which this module wraps around,
-    utilises an unusual syntax for the values (GVariant). For example, if you
-    wanted to provide a string value, the correct syntax would be
-    O(value="'myvalue'") - with single quotes as part of the Ansible parameter
-    value.
-  - When using loops in combination with a value like
-    V("[('xkb', 'us'\), ('xkb', 'se'\)]"), you need to be aware of possible
-    type conversions. Applying a filter V({{ item.value | string }})
-    to the parameter variable can avoid potential conversion problems.
-  - The easiest way to figure out exact syntax/value you need to provide for a
-    key is by making the configuration change in application affected by the
-    key, and then having a look at value set via commands C(dconf dump
-    /path/to/dir/) or C(dconf read /path/to/key).
+  - This module depends on C(psutil) Python library (version 4.0.0 and upwards), C(dconf), C(dbus-send), and C(dbus-run-session)
+    binaries. Depending on distribution you are using, you may need to install additional packages to have these available.
+  - This module uses the C(gi.repository) Python library when available for accurate comparison of values in C(dconf) to values
+    specified in Ansible code. C(gi.repository) is likely to be present on most systems which have C(dconf) but may not be
+    present everywhere. When it is missing, a simple string comparison between values is used, and there may be false positives,
+    that is, Ansible may think that a value is being changed when it is not. This fallback will be removed in a future version
+    of this module, at which point the module will stop working on hosts without C(gi.repository).
+  - Detection of existing, running D-Bus session, required to change settings using C(dconf), is not 100% reliable due to implementation
+    details of D-Bus daemon itself. This might lead to running applications not picking-up changes on-the-fly if options are
+    changed using Ansible and C(dbus-run-session).
+  - Keep in mind that the C(dconf) CLI tool, which this module wraps around, utilises an unusual syntax for the values (GVariant).
+    For example, if you wanted to provide a string value, the correct syntax would be O(value="'myvalue'") - with single quotes
+    as part of the Ansible parameter value.
+  - When using loops in combination with a value like V("[('xkb', 'us'\), ('xkb', 'se'\)]"), you need to be aware of possible
+    type conversions. Applying a filter V({{ item.value | string }}) to the parameter variable can avoid potential conversion
+    problems.
+  - The easiest way to figure out exact syntax/value you need to provide for a key is by making the configuration change in
+    application affected by the key, and then having a look at value set using commands C(dconf dump /path/to/dir/) or C(dconf
+    read /path/to/key).
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -73,30 +59,27 @@ options:
     type: raw
     required: false
     description:
-      - Value to set for the specified dconf key. Value should be specified in
-        GVariant format. Due to complexity of this format, it is best to have a
-        look at existing values in the dconf database.
+      - Value to set for the specified dconf key. Value should be specified in GVariant format. Due to complexity of this
+        format, it is best to have a look at existing values in the dconf database.
       - Required for O(state=present).
-      - Although the type is specified as "raw", it should typically be
-        specified as a string. However, boolean values in particular are
-        handled properly even when specified as booleans rather than strings
-        (in fact, handling booleans properly is why the type of this parameter
-        is "raw").
+      - Although the type is specified as "raw", it should typically be specified as a string. However, boolean values in
+        particular are handled properly even when specified as booleans rather than strings (in fact, handling booleans properly
+        is why the type of this parameter is "raw").
   state:
     type: str
     required: false
     default: present
-    choices: [ 'read', 'present', 'absent' ]
+    choices: ['read', 'present', 'absent']
     description:
       - The action to take upon the key/value.
-'''
+"""
 
 RETURN = r"""
 value:
-    description: value associated with the requested key
-    returned: success, state was "read"
-    type: str
-    sample: "'Default'"
+  description: Value associated with the requested key.
+  returned: success, state was "read"
+  type: str
+  sample: "'Default'"
 """
 
 EXAMPLES = r"""
