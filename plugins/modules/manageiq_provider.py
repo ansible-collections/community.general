@@ -9,7 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: manageiq_provider
 short_description: Management of provider in ManageIQ
 extends_documentation_fragment:
@@ -19,7 +19,6 @@ extends_documentation_fragment:
 author: Daniel Korn (@dkorn)
 description:
   - The manageiq_provider module supports adding, updating, and deleting provider in ManageIQ.
-
 attributes:
   check_mode:
     support: none
@@ -30,7 +29,9 @@ options:
   state:
     type: str
     description:
-      - absent - provider should not exist, present - provider should be present, refresh - provider will be refreshed
+      - V(absent) - provider should not exist,
+      - V(present) - provider should be present,
+      - V(refresh) - provider will be refreshed.
     choices: ['absent', 'present', 'refresh']
     default: 'present'
   name:
@@ -47,30 +48,30 @@ options:
     default: 'default'
   provider_region:
     type: str
-    description: The provider region name to connect to (e.g. AWS region for Amazon).
+    description: The provider region name to connect to (for example AWS region for Amazon).
   host_default_vnc_port_start:
     type: str
-    description: The first port in the host VNC range. defaults to None.
+    description: The first port in the host VNC range.
   host_default_vnc_port_end:
     type: str
-    description: The last port in the host VNC range. defaults to None.
+    description: The last port in the host VNC range.
   subscription:
     type: str
-    description: Microsoft Azure subscription ID. defaults to None.
+    description: Microsoft Azure subscription ID.
   project:
     type: str
-    description: Google Compute Engine Project ID. defaults to None.
+    description: Google Compute Engine Project ID.
   azure_tenant_id:
     type: str
     description: Tenant ID. defaults to None.
-    aliases: [ keystone_v3_domain_id ]
+    aliases: [keystone_v3_domain_id]
   tenant_mapping_enabled:
     type: bool
     default: false
-    description: Whether to enable mapping of existing tenants. defaults to False.
+    description: Whether to enable mapping of existing tenants.
   api_version:
     type: str
-    description: The OpenStack Keystone API version. defaults to None.
+    description: The OpenStack Keystone API version.
     choices: ['v2', 'v3']
 
   provider:
@@ -79,32 +80,32 @@ options:
     suboptions:
       hostname:
         type: str
-        description: The provider's api hostname.
+        description: The provider's API hostname.
         required: true
       port:
         type: int
-        description: The provider's api port.
+        description: The provider's API port.
       userid:
         type: str
-        description: Provider's api endpoint authentication userid. defaults to None.
+        description: Provider's API endpoint authentication userid.
       password:
         type: str
-        description: Provider's api endpoint authentication password. defaults to None.
+        description: Provider's API endpoint authentication password.
       auth_key:
         type: str
-        description: Provider's api endpoint authentication bearer token. defaults to None.
+        description: Provider's API endpoint authentication bearer token.
       validate_certs:
-        description: Whether SSL certificates should be verified for HTTPS requests (deprecated). defaults to True.
+        description: Whether SSL certificates should be verified for HTTPS requests (deprecated).
         type: bool
         default: true
-        aliases: [ verify_ssl ]
+        aliases: [verify_ssl]
       security_protocol:
         type: str
-        description: How SSL certificates should be used for HTTPS requests. defaults to None.
-        choices: ['ssl-with-validation','ssl-with-validation-custom-ca','ssl-without-validation','non-ssl']
+        description: How SSL certificates should be used for HTTPS requests.
+        choices: ['ssl-with-validation', 'ssl-with-validation-custom-ca', 'ssl-without-validation', 'non-ssl']
       certificate_authority:
         type: str
-        description: The CA bundle string with custom certificates. defaults to None.
+        description: The CA bundle string with custom certificates.
       path:
         type: str
         description:
@@ -125,39 +126,38 @@ options:
         type: str
         description:
           - TODO needs documentation.
-
   metrics:
     description: Metrics endpoint connection information.
     type: dict
     suboptions:
       hostname:
         type: str
-        description: The provider's api hostname.
+        description: The provider's API hostname.
         required: true
       port:
         type: int
-        description: The provider's api port.
+        description: The provider's API port.
       userid:
         type: str
-        description: Provider's api endpoint authentication userid. defaults to None.
+        description: Provider's API endpoint authentication userid.
       password:
         type: str
-        description: Provider's api endpoint authentication password. defaults to None.
+        description: Provider's API endpoint authentication password.
       auth_key:
         type: str
-        description: Provider's api endpoint authentication bearer token. defaults to None.
+        description: Provider's API endpoint authentication bearer token.
       validate_certs:
-        description: Whether SSL certificates should be verified for HTTPS requests (deprecated). defaults to True.
+        description: Whether SSL certificates should be verified for HTTPS requests (deprecated).
         type: bool
         default: true
-        aliases: [ verify_ssl ]
+        aliases: [verify_ssl]
       security_protocol:
         type: str
-        choices: ['ssl-with-validation','ssl-with-validation-custom-ca','ssl-without-validation','non-ssl']
-        description: How SSL certificates should be used for HTTPS requests. defaults to None.
+        choices: ['ssl-with-validation', 'ssl-with-validation-custom-ca', 'ssl-without-validation', 'non-ssl']
+        description: How SSL certificates should be used for HTTPS requests.
       certificate_authority:
         type: str
-        description: The CA bundle string with custom certificates. defaults to None.
+        description: The CA bundle string with custom certificates.
       path:
         type: str
         description: Database name for oVirt metrics. Defaults to V(ovirt_engine_history).
@@ -177,35 +177,34 @@ options:
         type: str
         description:
           - TODO needs documentation.
-
   alerts:
     description: Alerts endpoint connection information.
     type: dict
     suboptions:
       hostname:
         type: str
-        description: The provider's api hostname.
+        description: The provider's API hostname.
         required: true
       port:
         type: int
-        description: The provider's api port.
+        description: The provider's API port.
       userid:
         type: str
-        description: Provider's api endpoint authentication userid. defaults to None.
+        description: Provider's API endpoint authentication userid. defaults to None.
       password:
         type: str
-        description: Provider's api endpoint authentication password. defaults to None.
+        description: Provider's API endpoint authentication password. defaults to None.
       auth_key:
         type: str
-        description: Provider's api endpoint authentication bearer token. defaults to None.
+        description: Provider's API endpoint authentication bearer token. defaults to None.
       validate_certs:
         type: bool
         description: Whether SSL certificates should be verified for HTTPS requests (deprecated). defaults to True.
         default: true
-        aliases: [ verify_ssl ]
+        aliases: [verify_ssl]
       security_protocol:
         type: str
-        choices: ['ssl-with-validation','ssl-with-validation-custom-ca','ssl-without-validation', 'non-ssl']
+        choices: ['ssl-with-validation', 'ssl-with-validation-custom-ca', 'ssl-without-validation', 'non-ssl']
         description: How SSL certificates should be used for HTTPS requests. defaults to None.
       certificate_authority:
         type: str
@@ -230,7 +229,6 @@ options:
         type: str
         description:
           - TODO needs documentation.
-
   ssh_keypair:
     description: SSH key pair used for SSH connections to all hosts in this provider.
     type: dict
@@ -250,10 +248,10 @@ options:
           - Whether certificates should be verified for connections.
         type: bool
         default: true
-        aliases: [ verify_ssl ]
+        aliases: [verify_ssl]
       security_protocol:
         type: str
-        choices: ['ssl-with-validation','ssl-with-validation-custom-ca','ssl-without-validation', 'non-ssl']
+        choices: ['ssl-with-validation', 'ssl-with-validation-custom-ca', 'ssl-without-validation', 'non-ssl']
         description:
           - TODO needs documentation.
       certificate_authority:
@@ -288,9 +286,9 @@ options:
         type: int
         description:
           - TODO needs documentation.
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a new provider in ManageIQ ('Hawkular' metrics)
   community.general.manageiq_provider:
     name: 'EngLab'
@@ -507,10 +505,10 @@ EXAMPLES = '''
       hostname: 'gce.example.com'
       auth_key: 'google_json_key'
       validate_certs: 'false'
-'''
+"""
 
-RETURN = '''
-'''
+RETURN = r"""
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.manageiq import ManageIQ, manageiq_argument_spec
