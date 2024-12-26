@@ -9,47 +9,45 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: kernel_blacklist
 author:
-    - Matthias Vogelgesang (@matze)
+  - Matthias Vogelgesang (@matze)
 short_description: Blacklist kernel modules
 description:
-    - Add or remove kernel modules from blacklist.
+  - Add or remove kernel modules from blacklist.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: full
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
 options:
-    name:
-        type: str
-        description:
-            - Name of kernel module to black- or whitelist.
-        required: true
-    state:
-        type: str
-        description:
-            - Whether the module should be present in the blacklist or absent.
-        choices: [ absent, present ]
-        default: present
-    blacklist_file:
-        type: str
-        description:
-            - If specified, use this blacklist file instead of
-              C(/etc/modprobe.d/blacklist-ansible.conf).
-        default: /etc/modprobe.d/blacklist-ansible.conf
-'''
+  name:
+    type: str
+    description:
+      - Name of kernel module to black- or whitelist.
+    required: true
+  state:
+    type: str
+    description:
+      - Whether the module should be present in the blacklist or absent.
+    choices: [absent, present]
+    default: present
+  blacklist_file:
+    type: str
+    description:
+      - If specified, use this blacklist file instead of C(/etc/modprobe.d/blacklist-ansible.conf).
+    default: /etc/modprobe.d/blacklist-ansible.conf
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Blacklist the nouveau driver module
   community.general.kernel_blacklist:
     name: nouveau
     state: present
-'''
+"""
 
 import os
 import re
