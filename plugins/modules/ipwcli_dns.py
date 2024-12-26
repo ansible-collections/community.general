@@ -8,127 +8,124 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: ipwcli_dns
 
-short_description: Manage DNS Records for Ericsson IPWorks via ipwcli
+short_description: Manage DNS Records for Ericsson IPWorks using C(ipwcli)
 
 version_added: '0.2.0'
 
 description:
-    - "Manage DNS records for the Ericsson IPWorks DNS server. The module will use the ipwcli to deploy the DNS records."
-
+  - Manage DNS records for the Ericsson IPWorks DNS server. The module will use the C(ipwcli) to deploy the DNS records.
 requirements:
-   - ipwcli (installed on Ericsson IPWorks)
+  - ipwcli (installed on Ericsson IPWorks)
 
 notes:
-    - To make the DNS record changes effective, you need to run C(update dnsserver) on the ipwcli.
-
+  - To make the DNS record changes effective, you need to run C(update dnsserver) on the ipwcli.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 
 options:
-    dnsname:
-        description:
-            - Name of the record.
-        required: true
-        type: str
-    type:
-        description:
-            - Type of the record.
-        required: true
-        type: str
-        choices: [ NAPTR, SRV, A, AAAA ]
-    container:
-        description:
-            - Sets the container zone for the record.
-        required: true
-        type: str
-    address:
-        description:
-            - The IP address for the A or AAAA record.
-            - Required for O(type=A) or O(type=AAAA).
-        type: str
-    ttl:
-        description:
-            - Sets the TTL of the record.
-        type: int
-        default: 3600
-    state:
-        description:
-            - Whether the record should exist or not.
-        type: str
-        choices: [ absent, present ]
-        default: present
-    priority:
-        description:
-            - Sets the priority of the SRV record.
-        type: int
-        default: 10
-    weight:
-        description:
-            - Sets the weight of the SRV record.
-        type: int
-        default: 10
-    port:
-        description:
-            - Sets the port of the SRV record.
-            - Required for O(type=SRV).
-        type: int
-    target:
-        description:
-            - Sets the target of the SRV record.
-            - Required for O(type=SRV).
-        type: str
-    order:
-        description:
-            - Sets the order of the NAPTR record.
-            - Required for O(type=NAPTR).
-        type: int
-    preference:
-        description:
-            - Sets the preference of the NAPTR record.
-            - Required for O(type=NAPTR).
-        type: int
-    flags:
-        description:
-            - Sets one of the possible flags of NAPTR record.
-            - Required for O(type=NAPTR).
-        type: str
-        choices: ['S', 'A', 'U', 'P']
-    service:
-        description:
-            - Sets the service of the NAPTR record.
-            - Required for O(type=NAPTR).
-        type: str
-    replacement:
-        description:
-            - Sets the replacement of the NAPTR record.
-            - Required for O(type=NAPTR).
-        type: str
-    username:
-        description:
-            - Username to login on ipwcli.
-        type: str
-        required: true
-    password:
-        description:
-            - Password to login on ipwcli.
-        type: str
-        required: true
+  dnsname:
+    description:
+      - Name of the record.
+    required: true
+    type: str
+  type:
+    description:
+      - Type of the record.
+    required: true
+    type: str
+    choices: [NAPTR, SRV, A, AAAA]
+  container:
+    description:
+      - Sets the container zone for the record.
+    required: true
+    type: str
+  address:
+    description:
+      - The IP address for the A or AAAA record.
+      - Required for O(type=A) or O(type=AAAA).
+    type: str
+  ttl:
+    description:
+      - Sets the TTL of the record.
+    type: int
+    default: 3600
+  state:
+    description:
+      - Whether the record should exist or not.
+    type: str
+    choices: [absent, present]
+    default: present
+  priority:
+    description:
+      - Sets the priority of the SRV record.
+    type: int
+    default: 10
+  weight:
+    description:
+      - Sets the weight of the SRV record.
+    type: int
+    default: 10
+  port:
+    description:
+      - Sets the port of the SRV record.
+      - Required for O(type=SRV).
+    type: int
+  target:
+    description:
+      - Sets the target of the SRV record.
+      - Required for O(type=SRV).
+    type: str
+  order:
+    description:
+      - Sets the order of the NAPTR record.
+      - Required for O(type=NAPTR).
+    type: int
+  preference:
+    description:
+      - Sets the preference of the NAPTR record.
+      - Required for O(type=NAPTR).
+    type: int
+  flags:
+    description:
+      - Sets one of the possible flags of NAPTR record.
+      - Required for O(type=NAPTR).
+    type: str
+    choices: ['S', 'A', 'U', 'P']
+  service:
+    description:
+      - Sets the service of the NAPTR record.
+      - Required for O(type=NAPTR).
+    type: str
+  replacement:
+    description:
+      - Sets the replacement of the NAPTR record.
+      - Required for O(type=NAPTR).
+    type: str
+  username:
+    description:
+      - Username to login on ipwcli.
+    type: str
+    required: true
+  password:
+    description:
+      - Password to login on ipwcli.
+    type: str
+    required: true
 
 author:
-    - Christian Wollinger (@cwollinger)
-'''
+  - Christian Wollinger (@cwollinger)
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create A record
   community.general.ipwcli_dns:
     dnsname: example.com
@@ -157,14 +154,14 @@ EXAMPLES = '''
     service: 'SIP+D2T'
     replacement: '_sip._tcp.test.example.com.'
     flags: S
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 record:
-    description: The created record from the input params
-    type: str
-    returned: always
-'''
+  description: The created record from the input params.
+  type: str
+  returned: always
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 

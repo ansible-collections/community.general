@@ -7,37 +7,36 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: ip_netns
 author: "Arie Bregman (@bregman-arie)"
 short_description: Manage network namespaces
-requirements: [ ip ]
+requirements: [ip]
 description:
-    - Create or delete network namespaces using the ip command.
+  - Create or delete network namespaces using the C(ip) command.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    name:
-        required: false
-        description:
-            - Name of the namespace
-        type: str
-    state:
-        required: false
-        default: "present"
-        choices: [ present, absent ]
-        description:
-            - Whether the namespace should exist
-        type: str
-'''
+  name:
+    required: false
+    description:
+      - Name of the namespace.
+    type: str
+  state:
+    required: false
+    default: "present"
+    choices: [present, absent]
+    description:
+      - Whether the namespace should exist.
+    type: str
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a namespace named mario
   community.general.ip_netns:
     name: mario
@@ -47,11 +46,11 @@ EXAMPLES = '''
   community.general.ip_netns:
     name: luigi
     state: absent
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 # Default return values
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_text

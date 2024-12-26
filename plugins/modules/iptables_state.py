@@ -9,8 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: iptables_state
 short_description: Save iptables state into a file or restore it from a file
 version_added: '1.1.0'
@@ -19,26 +18,17 @@ extends_documentation_fragment:
   - community.general.attributes
   - community.general.attributes.flow
 description:
-  - C(iptables) is used to set up, maintain, and inspect the tables of IP
-    packet filter rules in the Linux kernel.
-  - This module handles the saving and/or loading of rules. This is the same
-    as the behaviour of the C(iptables-save) and C(iptables-restore) (or
-    C(ip6tables-save) and C(ip6tables-restore) for IPv6) commands which this
-    module uses internally.
-  - Modifying the state of the firewall remotely may lead to loose access to
-    the host in case of mistake in new ruleset. This module embeds a rollback
-    feature to avoid this, by telling the host to restore previous rules if a
-    cookie is still there after a given delay, and all this time telling the
-    controller to try to remove this cookie on the host through a new
-    connection.
+  - C(iptables) is used to set up, maintain, and inspect the tables of IP packet filter rules in the Linux kernel.
+  - This module handles the saving and/or loading of rules. This is the same as the behaviour of the C(iptables-save) and
+    C(iptables-restore) (or C(ip6tables-save) and C(ip6tables-restore) for IPv6) commands which this module uses internally.
+  - Modifying the state of the firewall remotely may lead to loose access to the host in case of mistake in new ruleset. This
+    module embeds a rollback feature to avoid this, by telling the host to restore previous rules if a cookie is still there
+    after a given delay, and all this time telling the controller to try to remove this cookie on the host through a new connection.
 notes:
-  - The rollback feature is not a module option and depends on task's
-    attributes. To enable it, the module must be played asynchronously, i.e.
-    by setting task attributes C(poll) to V(0), and C(async) to a value less
-    or equal to C(ANSIBLE_TIMEOUT). If C(async) is greater, the rollback will
-    still happen if it shall happen, but you will experience a connection
-    timeout instead of more relevant info returned by the module after its
-    failure.
+  - The rollback feature is not a module option and depends on task's attributes. To enable it, the module must be played
+    asynchronously, in other words by setting task attributes C(poll) to V(0), and C(async) to a value less or equal to C(ANSIBLE_TIMEOUT).
+    If C(async) is greater, the rollback will still happen if it shall happen, but you will experience a connection timeout
+    instead of more relevant info returned by the module after its failure.
 attributes:
   check_mode:
     support: full
@@ -59,22 +49,18 @@ options:
     description:
       - Which version of the IP protocol this module should apply to.
     type: str
-    choices: [ ipv4, ipv6 ]
+    choices: [ipv4, ipv6]
     default: ipv4
   modprobe:
     description:
-      - Specify the path to the C(modprobe) program internally used by iptables
-        related commands to load kernel modules.
-      - By default, V(/proc/sys/kernel/modprobe) is inspected to determine the
-        executable's path.
+      - Specify the path to the C(modprobe) program internally used by iptables related commands to load kernel modules.
+      - By default, V(/proc/sys/kernel/modprobe) is inspected to determine the executable's path.
     type: path
   noflush:
     description:
       - For O(state=restored), ignored otherwise.
-      - If V(false), restoring iptables rules from a file flushes (deletes)
-        all previous contents of the respective table(s). If V(true), the
-        previous rules are left untouched (but policies are updated anyway,
-        for all built-in chains).
+      - If V(false), restoring iptables rules from a file flushes (deletes) all previous contents of the respective table(s).
+        If V(true), the previous rules are left untouched (but policies are updated anyway, for all built-in chains).
     type: bool
     default: false
   path:
@@ -85,29 +71,26 @@ options:
     required: true
   state:
     description:
-      - Whether the firewall state should be saved (into a file) or restored
-        (from a file).
+      - Whether the firewall state should be saved (into a file) or restored (from a file).
     type: str
-    choices: [ saved, restored ]
+    choices: [saved, restored]
     required: true
   table:
     description:
-      - When O(state=restored), restore only the named table even if the input
-        file contains other tables. Fail if the named table is not declared in
-        the file.
-      - When O(state=saved), restrict output to the specified table. If not
-        specified, output includes all active tables.
+      - When O(state=restored), restore only the named table even if the input file contains other tables. Fail if the named
+        table is not declared in the file.
+      - When O(state=saved), restrict output to the specified table. If not specified, output includes all active tables.
     type: str
-    choices: [ filter, nat, mangle, raw, security ]
+    choices: [filter, nat, mangle, raw, security]
   wait:
     description:
-      - Wait N seconds for the xtables lock to prevent instant failure in case
-        multiple instances of the program are running concurrently.
+      - Wait N seconds for the xtables lock to prevent instant failure in case multiple instances of the program are running
+        concurrently.
     type: int
 requirements: [iptables, ip6tables]
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 # This will apply to all loaded/active IPv4 tables.
 - name: Save current state of the firewall in system file
   community.general.iptables_state:
@@ -151,9 +134,9 @@ EXAMPLES = r'''
 - name: show current state of the firewall
   ansible.builtin.debug:
     var: iptables_state.initial_state
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 applied:
   description: Whether or not the wanted state has been successfully restored.
   type: bool
@@ -235,7 +218,7 @@ tables:
       ]
     }
   returned: always
-'''
+"""
 
 
 import re
