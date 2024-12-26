@@ -9,62 +9,60 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: imgadm
 short_description: Manage SmartOS images
 description:
-    - Manage SmartOS virtual machine images through imgadm(1M)
+  - Manage SmartOS virtual machine images through imgadm(1M).
 author: Jasper Lievisse Adriaanse (@jasperla)
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    force:
-        required: false
-        type: bool
-        description:
-          - Force a given operation (where supported by imgadm(1M)).
-    pool:
-        required: false
-        default: zones
-        description:
-          - zpool to import to or delete images from.
-        type: str
-    source:
-        required: false
-        description:
-          - URI for the image source.
-        type: str
-    state:
-        required: true
-        choices: [ present, absent, deleted, imported, updated, vacuumed ]
-        description:
-          - State the object operated on should be in. V(imported) is an alias for
-            for V(present) and V(deleted) for V(absent). When set to V(vacuumed)
-            and O(uuid=*), it will remove all unused images.
-        type: str
+  force:
+    required: false
+    type: bool
+    description:
+      - Force a given operation (where supported by imgadm(1M)).
+  pool:
+    required: false
+    default: zones
+    description:
+      - The zpool to import to or delete images from.
+    type: str
+  source:
+    required: false
+    description:
+      - URI for the image source.
+    type: str
+  state:
+    required: true
+    choices: [present, absent, deleted, imported, updated, vacuumed]
+    description:
+      - State the object operated on should be in. V(imported) is an alias for for V(present) and V(deleted) for V(absent).
+        When set to V(vacuumed) and O(uuid=*), it will remove all unused images.
+    type: str
 
-    type:
-        required: false
-        choices: [ imgapi, docker, dsapi ]
-        default: imgapi
-        description:
-          - Type for image sources.
-        type: str
+  type:
+    required: false
+    choices: [imgapi, docker, dsapi]
+    default: imgapi
+    description:
+      - Type for image sources.
+    type: str
 
-    uuid:
-        required: false
-        description:
-          - Image UUID. Can either be a full UUID or V(*) for all images.
-        type: str
-'''
+  uuid:
+    required: false
+    description:
+      - Image UUID. Can either be a full UUID or V(*) for all images.
+    type: str
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Import an image
   community.general.imgadm:
     uuid: '70e3ae72-96b6-11e6-9056-9737fd4d0764'
@@ -100,25 +98,25 @@ EXAMPLES = '''
   community.general.imgadm:
     source: 'https://docker.io'
     state: absent
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 source:
-    description: Source that is managed.
-    returned: When not managing an image.
-    type: str
-    sample: https://datasets.project-fifo.net
+  description: Source that is managed.
+  returned: When not managing an image.
+  type: str
+  sample: https://datasets.project-fifo.net
 uuid:
-    description: UUID for an image operated on.
-    returned: When not managing an image source.
-    type: str
-    sample: 70e3ae72-96b6-11e6-9056-9737fd4d0764
+  description: UUID for an image operated on.
+  returned: When not managing an image source.
+  type: str
+  sample: 70e3ae72-96b6-11e6-9056-9737fd4d0764
 state:
-    description: State of the target, after execution.
-    returned: success
-    type: str
-    sample: 'present'
-'''
+  description: State of the target, after execution.
+  returned: success
+  type: str
+  sample: 'present'
+"""
 
 import re
 
