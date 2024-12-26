@@ -160,7 +160,8 @@ RETURN = r"""
 records:
   description: List containing all records.
   returned: success
-  type: complex
+  type: list
+  elements: dict
   contains:
     name:
       description: The record name.
