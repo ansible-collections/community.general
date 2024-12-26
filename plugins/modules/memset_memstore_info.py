@@ -8,107 +8,104 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: memset_memstore_info
 author: "Simon Weald (@glitchcrab)"
 short_description: Retrieve Memstore product usage information
 notes:
-    - An API key generated via the Memset customer control panel is needed with the
-      following minimum scope - C(memstore.usage).
+  - An API key generated using the Memset customer control panel is needed with the following minimum scope - C(memstore.usage).
 description:
-    - Retrieve Memstore product usage information.
+  - Retrieve Memstore product usage information.
 extends_documentation_fragment:
-    - community.general.attributes
-    - community.general.attributes.info_module
+  - community.general.attributes
+  - community.general.attributes.info_module
 attributes:
-    check_mode:
-        version_added: 3.3.0
-        # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
+  check_mode:
+    version_added: 3.3.0
+    # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
 options:
-    api_key:
-        required: true
-        type: str
-        description:
-            - The API key obtained from the Memset control panel.
-    name:
-        required: true
-        type: str
-        description:
-            - The Memstore product name (that is, C(mstestyaa1)).
-'''
+  api_key:
+    required: true
+    type: str
+    description:
+      - The API key obtained from the Memset control panel.
+  name:
+    required: true
+    type: str
+    description:
+      - The Memstore product name (that is, V(mstestyaa1)).
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Get usage for mstestyaa1
   community.general.memset_memstore_info:
     name: mstestyaa1
     api_key: 5eb86c9896ab03919abcf03857163741
   delegate_to: localhost
-'''
+"""
 
-RETURN = '''
----
+RETURN = r"""
 memset_api:
-  description: Info from the Memset API
+  description: Info from the Memset API.
   returned: always
   type: complex
   contains:
     cdn_bandwidth:
-      description: Dictionary of CDN bandwidth facts
+      description: Dictionary of CDN bandwidth facts.
       returned: always
       type: complex
       contains:
         bytes_out:
-          description: Outbound CDN bandwidth for the last 24 hours in bytes
+          description: Outbound CDN bandwidth for the last 24 hours in bytes.
           returned: always
           type: int
           sample: 1000
         requests:
-          description: Number of requests in the last 24 hours
+          description: Number of requests in the last 24 hours.
           returned: always
           type: int
           sample: 10
         bytes_in:
-          description: Inbound CDN bandwidth for the last 24 hours in bytes
+          description: Inbound CDN bandwidth for the last 24 hours in bytes.
           returned: always
           type: int
           sample: 1000
     containers:
-      description: Number of containers
+      description: Number of containers.
       returned: always
       type: int
       sample: 10
     bytes:
-      description: Space used in bytes
+      description: Space used in bytes.
       returned: always
       type: int
       sample: 3860997965
     objs:
-      description: Number of objects
+      description: Number of objects.
       returned: always
       type: int
       sample: 1000
     bandwidth:
-      description: Dictionary of CDN bandwidth facts
+      description: Dictionary of CDN bandwidth facts.
       returned: always
       type: complex
       contains:
         bytes_out:
-          description: Outbound bandwidth for the last 24 hours in bytes
+          description: Outbound bandwidth for the last 24 hours in bytes.
           returned: always
           type: int
           sample: 1000
         requests:
-          description: Number of requests in the last 24 hours
+          description: Number of requests in the last 24 hours.
           returned: always
           type: int
           sample: 10
         bytes_in:
-          description: Inbound bandwidth for the last 24 hours in bytes
+          description: Inbound bandwidth for the last 24 hours in bytes.
           returned: always
           type: int
           sample: 1000
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.memset import memset_api_call

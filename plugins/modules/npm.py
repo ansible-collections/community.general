@@ -8,8 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: npm
 short_description: Manage node.js packages with npm
 description:
@@ -83,7 +82,7 @@ options:
     required: false
     type: str
     default: present
-    choices: [ "present", "absent", "latest" ]
+    choices: ["present", "absent", "latest"]
   no_optional:
     description:
       - Use the C(--no-optional) flag when installing.
@@ -103,10 +102,10 @@ options:
     default: false
     version_added: 9.5.0
 requirements:
-    - npm installed in bin path (recommended /usr/local/bin)
-'''
+  - npm installed in bin path (recommended /usr/local/bin)
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Install "coffee-script" node.js package.
   community.general.npm:
     name: coffee-script
@@ -153,7 +152,7 @@ EXAMPLES = r'''
     path: /app/location
     executable: /opt/nvm/v0.10.1/bin/npm
     state: present
-'''
+"""
 
 import json
 import os
