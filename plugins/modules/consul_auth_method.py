@@ -9,14 +9,13 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = """
+DOCUMENTATION = r"""
 module: consul_auth_method
 short_description: Manipulate Consul auth methods
 version_added: 8.3.0
 description:
- - Allows the addition, modification and deletion of auth methods in a consul
-   cluster via the agent. For more details on using and configuring ACLs,
-   see U(https://www.consul.io/docs/guides/acl.html).
+  - Allows the addition, modification and deletion of auth methods in a Consul cluster using the agent. For more details on
+    using and configuring ACLs, see U(https://www.consul.io/docs/guides/acl.html).
 author:
   - Florian Apolloner (@apollo13)
 extends_documentation_fragment:
@@ -77,7 +76,7 @@ options:
     type: dict
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Create an auth method
   community.general.consul_auth_method:
     name: test
@@ -103,9 +102,9 @@ EXAMPLES = """
     token: "{{ consul_management_token }}"
 """
 
-RETURN = """
+RETURN = r"""
 auth_method:
-  description: The auth method as returned by the consul HTTP API.
+  description: The auth method as returned by the Consul HTTP API.
   returned: always
   type: dict
   sample:
@@ -126,10 +125,10 @@ auth_method:
     Name: test
     Type: jwt
 operation:
-    description: The operation performed.
-    returned: changed
-    type: str
-    sample: update
+  description: The operation performed.
+  returned: changed
+  type: str
+  sample: update
 """
 
 import re
