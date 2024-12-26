@@ -43,7 +43,7 @@ options:
     type: str
   timeout:
     description:
-      - 'Timeout setting: 30s, 1m, 1h and so on'
+      - 'Timeout setting: V(30s), V(1m), V(1h) and so on.'
     default: 1m
     type: str
   plugin_bin:
