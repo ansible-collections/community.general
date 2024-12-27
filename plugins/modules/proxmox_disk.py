@@ -844,11 +844,8 @@ def main():
 
     if state == 'present':
         try:
-            success, message = proxmox.create_disk(disk, vmid, vm, vm_config)
-            if success:
-                module.exit_json(changed=True, vmid=vmid, msg=message)
-            else:
-                module.exit_json(changed=False, vmid=vmid, msg=message)
+            changed, message = proxmox.create_disk(disk, vmid, vm, vm_config)
+            module.exit_json(changed=changed, vmid=vmid, msg=message)
         except Exception as e:
             module.fail_json(vmid=vmid, msg='Unable to create/update disk %s in VM %s: %s' % (disk, vmid, str(e)))
 
@@ -865,21 +862,15 @@ def main():
 
     elif state == 'moved':
         try:
-            success, message = proxmox.move_disk(disk, vmid, vm, vm_config)
-            if success:
-                module.exit_json(changed=True, vmid=vmid, msg=message)
-            else:
-                module.exit_json(changed=False, vmid=vmid, msg=message)
+            changed, message = proxmox.move_disk(disk, vmid, vm, vm_config)
+            module.exit_json(changed=changed, vmid=vmid, msg=message)
         except Exception as e:
             module.fail_json(msg="Failed to move disk %s in VM %s with exception: %s" % (disk, vmid, str(e)))
 
     elif state == 'resized':
         try:
-            success, message = proxmox.resize_disk(disk, vmid, vm, vm_config)
-            if success:
-                module.exit_json(changed=True, vmid=vmid, msg=message)
-            else:
-                module.exit_json(changed=False, vmid=vmid, msg=message)
+            changed, message = proxmox.resize_disk(disk, vmid, vm, vm_config)
+            module.exit_json(changed=changed, vmid=vmid, msg=message)
         except Exception as e:
             module.fail_json(msg="Failed to resize disk %s in VM %s with exception: %s" % (disk, vmid, str(e)))
 
