@@ -1,0 +1,3 @@
+deprecated_features:
+  - purestorage doc_fragments - modules using this were removed in community.general 3.0.0 (https://github.com/ansible-collections/community.general/pull/9432).
+  - pure module_utils - modules using this were removed in community.general 3.0.0 (https://github.com/ansible-collections/community.general/pull/9432).
