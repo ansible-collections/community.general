@@ -9,62 +9,59 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: circonus_annotation
-short_description: Create an annotation in circonus
+short_description: Create an annotation in Circonus
 description:
-    - Create an annotation event with a given category, title and description. Optionally start, end or durations can be provided
+  - Create an annotation event with a given category, title and description. Optionally start, end or durations can be provided.
 author: "Nick Harring (@NickatEpic)"
 requirements:
-    - requests (either >= 2.0.0 for Python 3, or >= 1.0.0 for Python 2)
-notes:
-    - Check mode isn't supported.
+  - requests (either >= 2.0.0 for Python 3, or >= 1.0.0 for Python 2)
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    api_key:
-        type: str
-        description:
-           - Circonus API key
-        required: true
-    category:
-        type: str
-        description:
-           - Annotation Category
-        required: true
+  api_key:
+    type: str
     description:
-        type: str
-        description:
-            - Description of annotation
-        required: true
-    title:
-        type: str
-        description:
-            - Title of annotation
-        required: true
-    start:
-        type: int
-        description:
-            - Unix timestamp of event start
-            - If not specified, it defaults to "now".
-    stop:
-        type: int
-        description:
-            - Unix timestamp of event end
-            - If not specified, it defaults to "now" + O(duration).
-    duration:
-        type: int
-        description:
-            - Duration in seconds of annotation
-        default: 0
-'''
-EXAMPLES = '''
+      - Circonus API key.
+    required: true
+  category:
+    type: str
+    description:
+      - Annotation Category.
+    required: true
+  description:
+    type: str
+    description:
+      - Description of annotation.
+    required: true
+  title:
+    type: str
+    description:
+      - Title of annotation.
+    required: true
+  start:
+    type: int
+    description:
+      - Unix timestamp of event start.
+      - If not specified, it defaults to "now".
+  stop:
+    type: int
+    description:
+      - Unix timestamp of event end.
+      - If not specified, it defaults to "now" + O(duration).
+  duration:
+    type: int
+    description:
+      - Duration in seconds of annotation.
+    default: 0
+"""
+EXAMPLES = r"""
 - name: Create a simple annotation event with a source, defaults to start and end time of now
   community.general.circonus_annotation:
     api_key: XXXXXXXXXXXXXXXXX
@@ -88,66 +85,67 @@ EXAMPLES = '''
     category: This category groups like annotations
     start_time: 1395940006
     end_time: 1395954407
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 annotation:
-    description: details about the created annotation
-    returned: success
-    type: complex
-    contains:
-        _cid:
-            description: annotation identifier
-            returned: success
-            type: str
-            sample: /annotation/100000
-        _created:
-            description: creation timestamp
-            returned: success
-            type: int
-            sample: 1502236928
-        _last_modified:
-            description: last modification timestamp
-            returned: success
-            type: int
-            sample: 1502236928
-        _last_modified_by:
-            description: last modified by
-            returned: success
-            type: str
-            sample: /user/1000
-        category:
-            description: category of the created annotation
-            returned: success
-            type: str
-            sample: alerts
-        title:
-            description: title of the created annotation
-            returned: success
-            type: str
-            sample: WARNING
-        description:
-            description: description of the created annotation
-            returned: success
-            type: str
-            sample: Host is down.
-        start:
-            description: timestamp, since annotation applies
-            returned: success
-            type: int
-            sample: Host is down.
-        stop:
-            description: timestamp, since annotation ends
-            returned: success
-            type: str
-            sample: Host is down.
-        rel_metrics:
-            description: Array of metrics related to this annotation, each metrics is a string.
-            returned: success
-            type: list
-            sample:
-                - 54321_kbps
-'''
+  description: Details about the created annotation.
+  returned: success
+  type: complex
+  contains:
+    _cid:
+      description: Annotation identifier.
+      returned: success
+      type: str
+      sample: /annotation/100000
+    _created:
+      description: Creation timestamp.
+      returned: success
+      type: int
+      sample: 1502236928
+    _last_modified:
+      description: Last modification timestamp.
+      returned: success
+      type: int
+      sample: 1502236928
+    _last_modified_by:
+      description: Last modified by.
+      returned: success
+      type: str
+      sample: /user/1000
+    category:
+      description: Category of the created annotation.
+      returned: success
+      type: str
+      sample: alerts
+    title:
+      description: Title of the created annotation.
+      returned: success
+      type: str
+      sample: WARNING
+    description:
+      description: Description of the created annotation.
+      returned: success
+      type: str
+      sample: Host is down.
+    start:
+      description: Timestamp, since annotation applies.
+      returned: success
+      type: int
+      sample: Host is down.
+    stop:
+      description: Timestamp, since annotation ends.
+      returned: success
+      type: str
+      sample: Host is down.
+    rel_metrics:
+      description: Array of metrics related to this annotation, each metrics is a string.
+      returned: success
+      type: list
+      sample:
+        - 54321_kbps
+"""
+
 import json
 import time
 import traceback

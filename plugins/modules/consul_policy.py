@@ -9,14 +9,13 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = """
+DOCUMENTATION = r"""
 module: consul_policy
 short_description: Manipulate Consul policies
 version_added: 7.2.0
 description:
- - Allows the addition, modification and deletion of policies in a consul
-   cluster via the agent. For more details on using and configuring ACLs,
-   see U(https://www.consul.io/docs/guides/acl.html).
+  - Allows the addition, modification and deletion of policies in a Consul cluster using the agent. For more details on using
+    and configuring ACLs, see U(https://www.consul.io/docs/guides/acl.html).
 author:
   - Håkon Lerring (@Hakon)
 extends_documentation_fragment:
@@ -49,8 +48,7 @@ options:
     elements: str
   name:
     description:
-      - The name that should be associated with the policy, this is opaque
-        to Consul.
+      - The name that should be associated with the policy, this is opaque to Consul.
     required: true
     type: str
   description:
@@ -63,19 +61,19 @@ options:
       - Rule document that should be associated with the current policy.
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Create a policy with rules
   community.general.consul_policy:
     host: consul1.example.com
     token: some_management_acl
     name: foo-access
     rules: |
-        key "foo" {
-            policy = "read"
-        }
-        key "private/foo" {
-            policy = "deny"
-        }
+      key "foo" {
+          policy = "read"
+      }
+      key "private/foo" {
+          policy = "deny"
+      }
 
 - name: Update the rules associated to a policy
   community.general.consul_policy:
@@ -83,15 +81,15 @@ EXAMPLES = """
     token: some_management_acl
     name: foo-access
     rules: |
-        key "foo" {
-            policy = "read"
-        }
-        key "private/foo" {
-            policy = "deny"
-        }
-        event "bbq" {
-            policy = "write"
-        }
+      key "foo" {
+          policy = "read"
+      }
+      key "private/foo" {
+          policy = "deny"
+      }
+      event "bbq" {
+          policy = "write"
+      }
 
 - name: Remove a policy
   community.general.consul_policy:
@@ -101,28 +99,28 @@ EXAMPLES = """
     state: absent
 """
 
-RETURN = """
+RETURN = r"""
 policy:
-    description: The policy as returned by the consul HTTP API.
-    returned: always
-    type: dict
-    sample:
-        CreateIndex: 632
-        Description: Testing
-        Hash: rj5PeDHddHslkpW7Ij4OD6N4bbSXiecXFmiw2SYXg2A=
-        Name: foo-access
-        Rules: |-
-          key "foo" {
-              policy = "read"
-          }
-          key "private/foo" {
-              policy = "deny"
-          }
+  description: The policy as returned by the Consul HTTP API.
+  returned: always
+  type: dict
+  sample:
+    CreateIndex: 632
+    Description: Testing
+    Hash: rj5PeDHddHslkpW7Ij4OD6N4bbSXiecXFmiw2SYXg2A=
+    Name: foo-access
+    Rules: |-
+      key "foo" {
+          policy = "read"
+      }
+      key "private/foo" {
+          policy = "deny"
+      }
 operation:
-    description: The operation performed.
-    returned: changed
-    type: str
-    sample: update
+  description: The operation performed.
+  returned: changed
+  type: str
+  sample: update
 """
 
 from ansible.module_utils.basic import AnsibleModule

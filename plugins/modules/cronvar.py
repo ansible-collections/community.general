@@ -17,8 +17,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: cronvar
 short_description: Manage variables in crontabs
 description:
@@ -49,14 +48,13 @@ options:
     type: str
   insertbefore:
     description:
-      - Used with O(state=present). If specified, the variable will be inserted
-        just before the variable specified.
+      - Used with O(state=present). If specified, the variable will be inserted just before the variable specified.
     type: str
   state:
     description:
       - Whether to ensure that the variable is present or absent.
     type: str
-    choices: [ absent, present ]
+    choices: [absent, present]
     default: present
   user:
     description:
@@ -71,18 +69,17 @@ options:
     type: str
   backup:
     description:
-      - If set, create a backup of the crontab before it is modified.
-        The location of the backup is returned in the C(backup) variable by this module.
-      # TODO: C() above should be RV(), but return values have not been documented!
+      - If set, create a backup of the crontab before it is modified. The location of the backup is returned in the C(backup)
+        variable by this module.
     type: bool
     default: false
 requirements:
   - cron
 author:
-- Doug Luce (@dougluce)
-'''
+  - Doug Luce (@dougluce)
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Ensure entry like "EMAIL=doug@ansibmod.con.com" exists
   community.general.cronvar:
     name: EMAIL
@@ -99,7 +96,7 @@ EXAMPLES = r'''
     value: /var/log/yum-autoupdate.log
     user: root
     cron_file: ansible_yum-autoupdate
-'''
+"""
 
 import os
 import platform

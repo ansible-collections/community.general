@@ -9,17 +9,15 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: consul_agent_service
-short_description: Add, modify and delete services within a consul cluster
+short_description: Add, modify and delete services within a Consul cluster
 version_added: 9.1.0
 description:
- - Allows the addition, modification and deletion of services in a consul
-   cluster via the agent.
- - There are currently no plans to create services and checks in one.
-   This is because the Consul API does not provide checks for a service and
-   the checks themselves do not match the module parameters.
-   Therefore, only a service without checks can be created in this module.
+  - Allows the addition, modification and deletion of services in a Consul cluster using the agent.
+  - There are currently no plans to create services and checks in one. This is because the Consul API does not provide checks
+    for a service and the checks themselves do not match the module parameters. Therefore, only a service without checks can
+    be created in this module.
 author:
   - Michael Ilg (@Ilgmi)
 extends_documentation_fragment:
@@ -43,13 +41,12 @@ options:
     type: str
   name:
     description:
-      - Unique name for the service on a node, must be unique per node,
-        required if registering a service.
+      - Unique name for the service on a node, must be unique per node, required if registering a service.
     type: str
   id:
     description:
-      - Specifies a unique ID for this service. This must be unique per agent. This defaults to the O(name) parameter if not provided.
-        If O(state=absent), defaults to the service name if supplied.
+      - Specifies a unique ID for this service. This must be unique per agent. This defaults to the O(name) parameter if not
+        provided. If O(state=absent), defaults to the service name if supplied.
     type: str
   tags:
     description:
@@ -58,36 +55,33 @@ options:
     elements: str
   address:
     description:
-      - The address to advertise that the service will be listening on.
-        This value will be passed as the C(address) parameter to Consul's
-        C(/v1/agent/service/register) API method, so refer to the Consul API
-        documentation for further details.
+      - The address to advertise that the service will be listening on. This value will be passed as the C(address) parameter
+        to Consul's C(/v1/agent/service/register) API method, so refer to the Consul API documentation for further details.
     type: str
   meta:
     description:
-      - Optional meta data used for filtering.
-        For keys, the characters C(A-Z), C(a-z), C(0-9), C(_), C(-) are allowed.
-        Not allowed characters are replaced with underscores.
+      - Optional meta data used for filtering. For keys, the characters C(A-Z), C(a-z), C(0-9), C(_), C(-) are allowed. Not
+        allowed characters are replaced with underscores.
     type: dict
   service_port:
     description:
-      - The port on which the service is listening. Can optionally be supplied for
-        registration of a service, that is if O(name) or O(id) is set.
+      - The port on which the service is listening. Can optionally be supplied for registration of a service, that is if O(name)
+        or O(id) is set.
     type: int
   enable_tag_override:
     description:
-      - Specifies to disable the anti-entropy feature for this service's tags.
-        If EnableTagOverride is set to true then external agents can update this service in the catalog and modify the tags.
+      - Specifies to disable the anti-entropy feature for this service's tags. If C(EnableTagOverride) is set to true then external
+        agents can update this service in the catalog and modify the tags.
     type: bool
-    default: False
+    default: false
   weights:
     description:
-      - Specifies weights for the service
+      - Specifies weights for the service.
     type: dict
     suboptions:
       passing:
         description:
-        - Weights for passing.
+          - Weights for passing.
         type: int
         default: 1
       warning:
@@ -96,10 +90,10 @@ options:
         type: int
         default: 1
     default: {"passing": 1, "warning": 1}
-'''
+"""
 
-EXAMPLES = '''
-- name: Register nginx service with the local consul agent
+EXAMPLES = r"""
+- name: Register nginx service with the local Consul agent
   community.general.consul_agent_service:
     host: consul1.example.com
     token: some_management_acl
@@ -162,33 +156,33 @@ EXAMPLES = '''
     tags:
       - prod
       - worker
-'''
+"""
 
-RETURN = """
+RETURN = r"""
 service:
-    description: The service as returned by the consul HTTP API.
-    returned: always
-    type: dict
-    sample:
-        ID: nginx
-        Service: nginx
-        Address: localhost
-        Port: 80
-        Tags:
-            - http
-        Meta:
-            - nginx_version: 1.23.3
-        Datacenter: dc1
-        Weights:
-            Passing: 1
-            Warning: 1
-        ContentHash: 61a245cd985261ac
-        EnableTagOverride: false
+  description: The service as returned by the Consul HTTP API.
+  returned: always
+  type: dict
+  sample:
+    ID: nginx
+    Service: nginx
+    Address: localhost
+    Port: 80
+    Tags:
+      - http
+    Meta:
+      - nginx_version: 1.23.3
+    Datacenter: dc1
+    Weights:
+      Passing: 1
+      Warning: 1
+    ContentHash: 61a245cd985261ac
+    EnableTagOverride: false
 operation:
-    description: The operation performed.
-    returned: changed
-    type: str
-    sample: update
+  description: The operation performed.
+  returned: changed
+  type: str
+  sample: update
 """
 
 from ansible.module_utils.basic import AnsibleModule

@@ -9,7 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: clc_modify_server
 short_description: Modify servers in CenturyLink Cloud
 description:
@@ -30,7 +30,7 @@ options:
     elements: str
   cpu:
     description:
-      - How many CPUs to update on the server
+      - How many CPUs to update on the server.
     type: str
   memory:
     description:
@@ -38,23 +38,19 @@ options:
     type: str
   anti_affinity_policy_id:
     description:
-      - The anti affinity policy id to be set for a hyper scale server.
-        This is mutually exclusive with 'anti_affinity_policy_name'
+      - The anti affinity policy id to be set for a hyper scale server. This is mutually exclusive with O(anti_affinity_policy_name).
     type: str
   anti_affinity_policy_name:
     description:
-      - The anti affinity policy name to be set for a hyper scale server.
-        This is mutually exclusive with 'anti_affinity_policy_id'
+      - The anti affinity policy name to be set for a hyper scale server. This is mutually exclusive with O(anti_affinity_policy_id).
     type: str
   alert_policy_id:
     description:
-      - The alert policy id to be associated to the server.
-        This is mutually exclusive with 'alert_policy_name'
+      - The alert policy id to be associated to the server. This is mutually exclusive with O(alert_policy_name).
     type: str
   alert_policy_name:
     description:
-      - The alert policy name to be associated to the server.
-        This is mutually exclusive with 'alert_policy_id'
+      - The alert policy name to be associated to the server. This is mutually exclusive with O(alert_policy_id).
     type: str
   state:
     description:
@@ -68,95 +64,89 @@ options:
     type: bool
     default: true
 requirements:
-    - python = 2.7
-    - requests >= 2.5.0
-    - clc-sdk
+  - requests >= 2.5.0
+  - clc-sdk
 author: "CLC Runner (@clc-runner)"
 notes:
-    - To use this module, it is required to set the below environment variables which enables access to the
-      Centurylink Cloud
-          - CLC_V2_API_USERNAME, the account login id for the centurylink cloud
-          - CLC_V2_API_PASSWORD, the account password for the centurylink cloud
-    - Alternatively, the module accepts the API token and account alias. The API token can be generated using the
-      CLC account login and password via the HTTP api call @ https://api.ctl.io/v2/authentication/login
-          - CLC_V2_API_TOKEN, the API token generated from https://api.ctl.io/v2/authentication/login
-          - CLC_ACCT_ALIAS, the account alias associated with the centurylink cloud
-    - Users can set CLC_V2_API_URL to specify an endpoint for pointing to a different CLC environment.
-'''
+  - To use this module, it is required to set the below environment variables which enables access to the Centurylink Cloud.
+  - E(CLC_V2_API_USERNAME), the account login id for the Centurylink Cloud.
+  - E(CLC_V2_API_PASSWORD), the account password for the Centurylink Cloud.
+  - Alternatively, the module accepts the API token and account alias. The API token can be generated using the CLC account
+    login and password using the HTTP API call @ https://api.ctl.io/v2/authentication/login
+  - E(CLC_V2_API_TOKEN), the API token generated from https://api.ctl.io/v2/authentication/login
+  - E(CLC_ACCT_ALIAS), the account alias associated with the Centurylink Cloud.
+  - Users can set E(CLC_V2_API_URL) to specify an endpoint for pointing to a different CLC environment.
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # Note - You must set the CLC_V2_API_USERNAME And CLC_V2_API_PASSWD Environment variables before running these examples
 
 - name: Set the cpu count to 4 on a server
   community.general.clc_modify_server:
     server_ids:
-        - UC1TESTSVR01
-        - UC1TESTSVR02
+      - UC1TESTSVR01
+      - UC1TESTSVR02
     cpu: 4
     state: present
 
 - name: Set the memory to 8GB on a server
   community.general.clc_modify_server:
     server_ids:
-        - UC1TESTSVR01
-        - UC1TESTSVR02
+      - UC1TESTSVR01
+      - UC1TESTSVR02
     memory: 8
     state: present
 
 - name: Set the anti affinity policy on a server
   community.general.clc_modify_server:
     server_ids:
-        - UC1TESTSVR01
-        - UC1TESTSVR02
+      - UC1TESTSVR01
+      - UC1TESTSVR02
     anti_affinity_policy_name: 'aa_policy'
     state: present
 
 - name: Remove the anti affinity policy on a server
   community.general.clc_modify_server:
     server_ids:
-        - UC1TESTSVR01
-        - UC1TESTSVR02
+      - UC1TESTSVR01
+      - UC1TESTSVR02
     anti_affinity_policy_name: 'aa_policy'
     state: absent
 
 - name: Add the alert policy on a server
   community.general.clc_modify_server:
     server_ids:
-        - UC1TESTSVR01
-        - UC1TESTSVR02
+      - UC1TESTSVR01
+      - UC1TESTSVR02
     alert_policy_name: 'alert_policy'
     state: present
 
 - name: Remove the alert policy on a server
   community.general.clc_modify_server:
     server_ids:
-        - UC1TESTSVR01
-        - UC1TESTSVR02
+      - UC1TESTSVR01
+      - UC1TESTSVR02
     alert_policy_name: 'alert_policy'
     state: absent
 
 - name: Ret the memory to 16GB and cpu to 8 core on a lust if servers
   community.general.clc_modify_server:
     server_ids:
-        - UC1TESTSVR01
-        - UC1TESTSVR02
+      - UC1TESTSVR01
+      - UC1TESTSVR02
     cpu: 8
     memory: 16
     state: present
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 server_ids:
-    description: The list of server ids that are changed
-    returned: success
-    type: list
-    sample:
-        [
-            "UC1TEST-SVR01",
-            "UC1TEST-SVR02"
-        ]
+  description: The list of server ids that are changed.
+  returned: success
+  type: list
+  sample: ["UC1TEST-SVR01", "UC1TEST-SVR02"]
 servers:
-    description: The list of server objects that are changed
+    description: The list of server objects that are changed.
     returned: success
     type: list
     sample:
@@ -312,7 +302,7 @@ servers:
               "type":"standard"
            }
         ]
-'''
+"""
 
 __version__ = '${version}'
 

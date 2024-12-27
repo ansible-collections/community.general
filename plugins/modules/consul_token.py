@@ -9,14 +9,13 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = """
+DOCUMENTATION = r"""
 module: consul_token
 short_description: Manipulate Consul tokens
 version_added: 8.3.0
 description:
- - Allows the addition, modification and deletion of tokens in a consul
-   cluster via the agent. For more details on using and configuring ACLs,
-   see U(https://www.consul.io/docs/guides/acl.html).
+  - Allows the addition, modification and deletion of tokens in a Consul cluster using the agent. For more details on using
+    and configuring ACLs, see U(https://www.consul.io/docs/guides/acl.html).
 author:
   - Florian Apolloner (@apollo13)
 extends_documentation_fragment:
@@ -42,13 +41,11 @@ options:
     type: str
   accessor_id:
     description:
-      - Specifies a UUID to use as the token's Accessor ID.
-        If not specified a UUID will be generated for this field.
+      - Specifies a UUID to use as the token's Accessor ID. If not specified a UUID will be generated for this field.
     type: str
   secret_id:
     description:
-      - Specifies a UUID to use as the token's Secret ID.
-        If not specified a UUID will be generated for this field.
+      - Specifies a UUID to use as the token's Secret ID. If not specified a UUID will be generated for this field.
     type: str
   description:
     description:
@@ -125,7 +122,7 @@ options:
         description:
           - The datacenters the token will be effective.
           - If an empty array (V([])) is specified, the token will valid in all datacenters.
-          - including those which do not yet exist but may in the future.
+          - Including those which do not yet exist but may in the future.
         type: list
         elements: str
   node_identities:
@@ -151,18 +148,16 @@ options:
         required: true
   local:
     description:
-      - If true, indicates that the token should not be replicated globally
-        and instead be local to the current datacenter.
+      - If true, indicates that the token should not be replicated globally and instead be local to the current datacenter.
     type: bool
   expiration_ttl:
     description:
-      - This is a convenience field and if set will initialize the C(expiration_time).
-        Can be specified in the form of V(60s) or V(5m) (that is, 60 seconds or 5 minutes,
-        respectively). Ingored when the token is updated!
+      - This is a convenience field and if set will initialize the C(expiration_time). Can be specified in the form of V(60s)
+        or V(5m) (that is, 60 seconds or 5 minutes, respectively). Ingored when the token is updated!
     type: str
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Create / Update a token by accessor_id
   community.general.consul_token:
     state: present
@@ -186,26 +181,26 @@ EXAMPLES = """
     token: 8adddd91-0bd6-d41d-ae1a-3b49cfa9a0e8
 """
 
-RETURN = """
+RETURN = r"""
 token:
-    description: The token as returned by the consul HTTP API.
-    returned: always
-    type: dict
-    sample:
-        AccessorID: 07a7de84-c9c7-448a-99cc-beaf682efd21
-        CreateIndex: 632
-        CreateTime: "2024-01-14T21:53:01.402749174+01:00"
-        Description: Testing
-        Hash: rj5PeDHddHslkpW7Ij4OD6N4bbSXiecXFmiw2SYXg2A=
-        Local: false
-        ModifyIndex: 633
-        SecretID: bd380fba-da17-7cee-8576-8d6427c6c930
-        ServiceIdentities: [{"ServiceName": "test"}]
+  description: The token as returned by the Consul HTTP API.
+  returned: always
+  type: dict
+  sample:
+    AccessorID: 07a7de84-c9c7-448a-99cc-beaf682efd21
+    CreateIndex: 632
+    CreateTime: "2024-01-14T21:53:01.402749174+01:00"
+    Description: Testing
+    Hash: rj5PeDHddHslkpW7Ij4OD6N4bbSXiecXFmiw2SYXg2A=
+    Local: false
+    ModifyIndex: 633
+    SecretID: bd380fba-da17-7cee-8576-8d6427c6c930
+    ServiceIdentities: ["ServiceName": "test"]
 operation:
-    description: The operation performed.
-    returned: changed
-    type: str
-    sample: update
+  description: The operation performed.
+  returned: changed
+  type: str
+  sample: update
 """
 
 from ansible.module_utils.basic import AnsibleModule

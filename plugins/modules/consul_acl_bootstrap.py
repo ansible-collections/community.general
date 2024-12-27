@@ -9,13 +9,13 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = """
+DOCUMENTATION = r"""
 module: consul_acl_bootstrap
 short_description: Bootstrap ACLs in Consul
 version_added: 8.3.0
 description:
- - Allows bootstrapping of ACLs in a Consul cluster, see
-   U(https://developer.hashicorp.com/consul/api-docs/acl#bootstrap-acls) for details.
+  - Allows bootstrapping of ACLs in a Consul cluster, see U(https://developer.hashicorp.com/consul/api-docs/acl#bootstrap-acls)
+    for details.
 author:
   - Florian Apolloner (@apollo13)
 extends_documentation_fragment:
@@ -40,35 +40,33 @@ options:
     type: str
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Bootstrap the ACL system
   community.general.consul_acl_bootstrap:
     bootstrap_secret: 22eaeed1-bdbd-4651-724e-42ae6c43e387
 """
 
-RETURN = """
+RETURN = r"""
 result:
-    description:
-      - The bootstrap result as returned by the consul HTTP API.
-      - "B(Note:) If O(bootstrap_secret) has been specified the C(SecretID) and
-          C(ID) will not contain the secret but C(VALUE_SPECIFIED_IN_NO_LOG_PARAMETER).
-          If you pass O(bootstrap_secret), make sure your playbook/role does not depend
-          on this return value!"
-    returned: changed
-    type: dict
-    sample:
-      AccessorID: 834a5881-10a9-a45b-f63c-490e28743557
-      CreateIndex: 25
-      CreateTime: '2024-01-21T20:26:27.114612038+01:00'
-      Description: Bootstrap Token (Global Management)
-      Hash: X2AgaFhnQGRhSSF/h0m6qpX1wj/HJWbyXcxkEM/5GrY=
-      ID: VALUE_SPECIFIED_IN_NO_LOG_PARAMETER
-      Local: false
-      ModifyIndex: 25
-      Policies:
+  description:
+    - The bootstrap result as returned by the Consul HTTP API.
+    - B(Note:) If O(bootstrap_secret) has been specified the C(SecretID) and C(ID) will not contain the secret but C(VALUE_SPECIFIED_IN_NO_LOG_PARAMETER).
+      If you pass O(bootstrap_secret), make sure your playbook/role does not depend on this return value!
+  returned: changed
+  type: dict
+  sample:
+    AccessorID: 834a5881-10a9-a45b-f63c-490e28743557
+    CreateIndex: 25
+    CreateTime: '2024-01-21T20:26:27.114612038+01:00'
+    Description: Bootstrap Token (Global Management)
+    Hash: X2AgaFhnQGRhSSF/h0m6qpX1wj/HJWbyXcxkEM/5GrY=
+    ID: VALUE_SPECIFIED_IN_NO_LOG_PARAMETER
+    Local: false
+    ModifyIndex: 25
+    Policies:
       - ID: 00000000-0000-0000-0000-000000000001
         Name: global-management
-      SecretID: VALUE_SPECIFIED_IN_NO_LOG_PARAMETER
+    SecretID: VALUE_SPECIFIED_IN_NO_LOG_PARAMETER
 """
 
 from ansible.module_utils.basic import AnsibleModule

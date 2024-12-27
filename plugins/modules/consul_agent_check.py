@@ -9,20 +9,17 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: consul_agent_check
-short_description: Add, modify, and delete checks within a consul cluster
+short_description: Add, modify, and delete checks within a Consul cluster
 version_added: 9.1.0
 description:
- - Allows the addition, modification and deletion of checks in a consul
-   cluster via the agent. For more details on using and configuring Checks,
-   see U(https://developer.hashicorp.com/consul/api-docs/agent/check).
- - Currently, there is no complete way to retrieve the script, interval or TTL
-   metadata for a registered check. Without this metadata it is not possible to
-   tell if the data supplied with ansible represents a change to a check. As a
-   result this does not attempt to determine changes and will always report a
-   changed occurred. An API method is planned to supply this metadata so at that
-   stage change management will be added.
+  - Allows the addition, modification and deletion of checks in a Consul cluster using the agent. For more details on using
+    and configuring Checks, see U(https://developer.hashicorp.com/consul/api-docs/agent/check).
+  - Currently, there is no complete way to retrieve the script, interval or TTL metadata for a registered check. Without this
+    metadata it is not possible to tell if the data supplied with ansible represents a change to a check. As a result this
+    does not attempt to determine changes and will always report a changed occurred. An API method is planned to supply this
+    metadata so at that stage change management will be added.
 author:
   - Michael Ilg (@Ilgmi)
 extends_documentation_fragment:
@@ -34,13 +31,13 @@ attributes:
   check_mode:
     support: full
     details:
-      - The result is the object as it is defined in the module options and not the object structure of the consul API.
-        For a better overview of what the object structure looks like,
-        take a look at U(https://developer.hashicorp.com/consul/api-docs/agent/check#list-checks).
+      - The result is the object as it is defined in the module options and not the object structure of the Consul API. For
+        a better overview of what the object structure looks like, take a look at U(https://developer.hashicorp.com/consul/api-docs/agent/check#list-checks).
   diff_mode:
     support: partial
     details:
-      - In check mode the diff will show the object as it is defined in the module options and not the object structure of the consul API.
+      - In check mode the diff will show the object as it is defined in the module options and not the object structure of
+        the Consul API.
 options:
   state:
     description:
@@ -50,18 +47,18 @@ options:
     type: str
   name:
     description:
-    - Required name for the service check.
+      - Required name for the service check.
     type: str
   id:
     description:
-      - Specifies a unique ID for this check on the node. This defaults to the O(name) parameter, but it may be necessary to provide
-        an ID for uniqueness. This value will return in the response as "CheckId".
+      - Specifies a unique ID for this check on the node. This defaults to the O(name) parameter, but it may be necessary
+        to provide an ID for uniqueness. This value will return in the response as "CheckId".
     type: str
   interval:
     description:
-      - The interval at which the service check will be run.
-        This is a number with a V(s) or V(m) suffix to signify the units of seconds or minutes, for example V(15s) or V(1m).
-        If no suffix is supplied V(s) will be used by default, for example V(10) will be V(10s).
+      - The interval at which the service check will be run. This is a number with a V(s) or V(m) suffix to signify the units
+        of seconds or minutes, for example V(15s) or V(1m). If no suffix is supplied V(s) will be used by default, for example
+        V(10) will be V(10s).
       - Required if one of the parameters O(args), O(http), or O(tcp) is specified.
     type: str
   notes:
@@ -77,46 +74,41 @@ options:
     elements: str
   ttl:
     description:
-      - Checks can be registered with a TTL instead of a O(args) and O(interval)
-        this means that the service will check in with the agent before the
-        TTL expires. If it doesn't the check will be considered failed.
-        Required if registering a check and the script an interval are missing
-        Similar to the interval this is a number with a V(s) or V(m) suffix to
-        signify the units of seconds or minutes, for example V(15s) or V(1m).
-        If no suffix is supplied V(s) will be used by default, for example V(10) will be V(10s).
+      - Checks can be registered with a TTL instead of a O(args) and O(interval) this means that the service will check in
+        with the agent before the TTL expires. If it does not the check will be considered failed. Required if registering
+        a check and the script an interval are missing Similar to the interval this is a number with a V(s) or V(m) suffix
+        to signify the units of seconds or minutes, for example V(15s) or V(1m). If no suffix is supplied V(s) will be used
+        by default, for example V(10) will be V(10s).
       - Mutually exclusive with O(args), O(tcp) and O(http).
     type: str
   tcp:
     description:
-      - Checks can be registered with a TCP port. This means that consul
-        will check if the connection attempt to that port is successful (that is, the port is currently accepting connections).
-        The format is V(host:port), for example V(localhost:80).
+      - Checks can be registered with a TCP port. This means that Consul will check if the connection attempt to that port
+        is successful (that is, the port is currently accepting connections). The format is V(host:port), for example V(localhost:80).
       - Requires O(interval) to be provided.
       - Mutually exclusive with O(args), O(ttl) and O(http).
     type: str
     version_added: '1.3.0'
   http:
     description:
-      - Checks can be registered with an HTTP endpoint. This means that consul
-        will check that the http endpoint returns a successful HTTP status.
+      - Checks can be registered with an HTTP endpoint. This means that Consul will check that the http endpoint returns a
+        successful HTTP status.
       - Requires O(interval) to be provided.
       - Mutually exclusive with O(args), O(ttl) and O(tcp).
     type: str
   timeout:
     description:
-      - A custom HTTP check timeout. The consul default is 10 seconds.
-        Similar to the interval this is a number with a V(s) or V(m) suffix to
-        signify the units of seconds or minutes, for example V(15s) or V(1m).
-        If no suffix is supplied V(s) will be used by default, for example V(10) will be V(10s).
+      - A custom HTTP check timeout. The Consul default is 10 seconds. Similar to the interval this is a number with a V(s)
+        or V(m) suffix to signify the units of seconds or minutes, for example V(15s) or V(1m). If no suffix is supplied V(s)
+        will be used by default, for example V(10) will be V(10s).
     type: str
   service_id:
     description:
-      - The ID for the service, must be unique per node. If O(state=absent),
-        defaults to the service name if supplied.
+      - The ID for the service, must be unique per node. If O(state=absent), defaults to the service name if supplied.
     type: str
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Register tcp check for service 'nginx'
   community.general.consul_agent_check:
     name: nginx_tcp_check
@@ -138,24 +130,24 @@ EXAMPLES = '''
     state: absent
     id: nginx_http_check
     service_id: "{{ nginx_service.ID }}"
-'''
+"""
 
-RETURN = """
+RETURN = r"""
 check:
-    description: The check as returned by the consul HTTP API.
-    returned: always
-    type: dict
-    sample:
-        CheckID: nginx_check
-        ServiceID: nginx
-        Interval: 30s
-        Type: http
-        Notes: Nginx Check
+  description: The check as returned by the Consul HTTP API.
+  returned: always
+  type: dict
+  sample:
+    CheckID: nginx_check
+    ServiceID: nginx
+    Interval: 30s
+    Type: http
+    Notes: Nginx Check
 operation:
-    description: The operation performed.
-    returned: changed
-    type: str
-    sample: update
+  description: The operation performed.
+  returned: changed
+  type: str
+  sample: update
 """
 
 from ansible.module_utils.basic import AnsibleModule

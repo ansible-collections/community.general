@@ -9,15 +9,14 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: campfire
 short_description: Send a message to Campfire
 description:
-   - Send a message to Campfire.
-   - Messages with newlines will result in a "Paste" message being sent.
+  - Send a message to Campfire.
+  - Messages with newlines will result in a "Paste" message being sent.
 extends_documentation_fragment:
-   - community.general.attributes
+  - community.general.attributes
 attributes:
   check_mode:
     support: none
@@ -49,22 +48,17 @@ options:
     description:
       - Send a notification sound before the message.
     required: false
-    choices: ["56k", "bell", "bezos", "bueller", "clowntown",
-              "cottoneyejoe", "crickets", "dadgummit", "dangerzone",
-              "danielsan", "deeper", "drama", "greatjob", "greyjoy",
-              "guarantee", "heygirl", "horn", "horror",
-              "inconceivable", "live", "loggins", "makeitso", "noooo",
-              "nyan", "ohmy", "ohyeah", "pushit", "rimshot",
-              "rollout", "rumble", "sax", "secret", "sexyback",
-              "story", "tada", "tmyk", "trololo", "trombone", "unix",
-              "vuvuzela", "what", "whoomp", "yeah", "yodel"]
+    choices: ["56k", "bell", "bezos", "bueller", "clowntown", "cottoneyejoe", "crickets", "dadgummit", "dangerzone", "danielsan",
+      "deeper", "drama", "greatjob", "greyjoy", "guarantee", "heygirl", "horn", "horror", "inconceivable", "live", "loggins",
+      "makeitso", "noooo", "nyan", "ohmy", "ohyeah", "pushit", "rimshot", "rollout", "rumble", "sax", "secret", "sexyback",
+      "story", "tada", "tmyk", "trololo", "trombone", "unix", "vuvuzela", "what", "whoomp", "yeah", "yodel"]
 
 # informational: requirements for nodes
-requirements: [ ]
+requirements: []
 author: "Adam Garside (@fabulops)"
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Send a message to Campfire
   community.general.campfire:
     subscription: foo
@@ -79,7 +73,7 @@ EXAMPLES = '''
     room: 123
     notify: loggins
     msg: Task completed ... with feeling.
-'''
+"""
 
 try:
     from html import escape as html_escape

@@ -8,14 +8,13 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: consul_session
-short_description: Manipulate consul sessions
+short_description: Manipulate Consul sessions
 description:
- - Allows the addition, modification and deletion of sessions in a consul
-   cluster. These sessions can then be used in conjunction with key value pairs
-   to implement distributed locks. In depth documentation for working with
-   sessions can be found at http://www.consul.io/docs/internals/sessions.html
+  - Allows the addition, modification and deletion of sessions in a Consul cluster. These sessions can then be used in conjunction
+    with key value pairs to implement distributed locks. In depth documentation for working with sessions can be found at
+    U(http://www.consul.io/docs/internals/sessions.html).
 author:
   - Steve Gargan (@sgargan)
   - Håkon Lerring (@Hakon)
@@ -25,78 +24,68 @@ extends_documentation_fragment:
   - community.general.consul.token
   - community.general.attributes
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
-    action_group:
-        version_added: 8.3.0
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
+  action_group:
+    version_added: 8.3.0
 options:
-    id:
-        description:
-          - ID of the session, required when O(state) is either V(info) or
-            V(remove).
-        type: str
-    state:
-        description:
-          - Whether the session should be present i.e. created if it doesn't
-            exist, or absent, removed if present. If created, the O(id) for the
-            session is returned in the output. If V(absent), O(id) is
-            required to remove the session. Info for a single session, all the
-            sessions for a node or all available sessions can be retrieved by
-            specifying V(info), V(node) or V(list) for the O(state); for V(node)
-            or V(info), the node O(name) or session O(id) is required as parameter.
-        choices: [ absent, info, list, node, present ]
-        type: str
-        default: present
-    name:
-        description:
-          - The name that should be associated with the session. Required when
-            O(state=node) is used.
-        type: str
-    delay:
-        description:
-          - The optional lock delay that can be attached to the session when it
-            is created. Locks for invalidated sessions ar blocked from being
-            acquired until this delay has expired. Durations are in seconds.
-        type: int
-        default: 15
-    node:
-        description:
-          - The name of the node that with which the session will be associated.
-            by default this is the name of the agent.
-        type: str
-    datacenter:
-        description:
-          - The name of the datacenter in which the session exists or should be
-            created.
-        type: str
-    checks:
-        description:
-          - Checks that will be used to verify the session health. If
-            all the checks fail, the session will be invalidated and any locks
-            associated with the session will be release and can be acquired once
-            the associated lock delay has expired.
-        type: list
-        elements: str
-    behavior:
-        description:
-          - The optional behavior that can be attached to the session when it
-            is created. This controls the behavior when a session is invalidated.
-        choices: [ delete, release ]
-        type: str
-        default: release
-    ttl:
-        description:
-          - Specifies the duration of a session in seconds (between 10 and 86400).
-        type: int
-        version_added: 5.4.0
-    token:
-        version_added: 5.6.0
-'''
+  id:
+    description:
+      - ID of the session, required when O(state) is either V(info) or V(remove).
+    type: str
+  state:
+    description:
+      - Whether the session should be present, in other words it should be created if it does not exist, or absent, removed if present. If created,
+        the O(id) for the session is returned in the output. If V(absent), O(id) is required to remove the session. Info for
+        a single session, all the sessions for a node or all available sessions can be retrieved by specifying V(info), V(node)
+        or V(list) for the O(state); for V(node) or V(info), the node O(name) or session O(id) is required as parameter.
+    choices: [absent, info, list, node, present]
+    type: str
+    default: present
+  name:
+    description:
+      - The name that should be associated with the session. Required when O(state=node) is used.
+    type: str
+  delay:
+    description:
+      - The optional lock delay that can be attached to the session when it is created. Locks for invalidated sessions ar
+        blocked from being acquired until this delay has expired. Durations are in seconds.
+    type: int
+    default: 15
+  node:
+    description:
+      - The name of the node that with which the session will be associated. By default this is the name of the agent.
+    type: str
+  datacenter:
+    description:
+      - The name of the datacenter in which the session exists or should be created.
+    type: str
+  checks:
+    description:
+      - Checks that will be used to verify the session health. If all the checks fail, the session will be invalidated and
+        any locks associated with the session will be release and can be acquired once the associated lock delay has expired.
+    type: list
+    elements: str
+  behavior:
+    description:
+      - The optional behavior that can be attached to the session when it is created. This controls the behavior when a session
+        is invalidated.
+    choices: [delete, release]
+    type: str
+    default: release
+  ttl:
+    description:
+      - Specifies the duration of a session in seconds (between 10 and 86400).
+    type: int
+    version_added: 5.4.0
+  token:
+    version_added: 5.6.0
+"""
 
-EXAMPLES = '''
-- name: Register basic session with consul
+EXAMPLES = r"""
+- name: Register basic session with Consul
   community.general.consul_session:
     name: session1
 
@@ -123,8 +112,8 @@ EXAMPLES = '''
 - name: Register session with a ttl
   community.general.consul_session:
     name: session-with-ttl
-    ttl: 600  # sec
-'''
+    ttl: 600 # sec
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.consul import (

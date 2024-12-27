@@ -9,14 +9,13 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = """
+DOCUMENTATION = r"""
 module: consul_role
 short_description: Manipulate Consul roles
 version_added: 7.5.0
 description:
- - Allows the addition, modification and deletion of roles in a consul
-   cluster via the agent. For more details on using and configuring ACLs,
-   see U(https://www.consul.io/docs/guides/acl.html).
+  - Allows the addition, modification and deletion of roles in a Consul cluster using the agent. For more details on using and
+    configuring ACLs, see U(https://www.consul.io/docs/guides/acl.html).
 author:
   - Håkon Lerring (@Hakon)
 extends_documentation_fragment:
@@ -42,7 +41,7 @@ options:
     type: str
   state:
     description:
-      - whether the role should be present or absent.
+      - Whether the role should be present or absent.
     choices: ['present', 'absent']
     default: present
     type: str
@@ -98,9 +97,9 @@ options:
         description:
           - The name of the node.
           - Must not be longer than 256 characters, must start and end with a lowercase alphanumeric character.
-          - May only contain lowercase alphanumeric characters as well as - and _.
-          - This suboption has been renamed from O(service_identities[].name) to O(service_identities[].service_name)
-            in community.general 8.3.0. The old name can still be used.
+          - May only contain lowercase alphanumeric characters as well as V(-) and V(_).
+          - This suboption has been renamed from O(service_identities[].name) to O(service_identities[].service_name) in community.general
+            8.3.0. The old name can still be used.
         type: str
         required: true
         aliases:
@@ -110,7 +109,7 @@ options:
           - The datacenters the policies will be effective.
           - This will result in effective policy only being valid in this datacenter.
           - If an empty array (V([])) is specified, the policies will valid in all datacenters.
-          - including those which do not yet exist but may in the future.
+          - Including those which do not yet exist but may in the future.
         type: list
         elements: str
   node_identities:
@@ -125,9 +124,9 @@ options:
         description:
           - The name of the node.
           - Must not be longer than 256 characters, must start and end with a lowercase alphanumeric character.
-          - May only contain lowercase alphanumeric characters as well as - and _.
-          - This suboption has been renamed from O(node_identities[].name) to O(node_identities[].node_name)
-            in community.general 8.3.0. The old name can still be used.
+          - May only contain lowercase alphanumeric characters as well as V(-) and V(_).
+          - This suboption has been renamed from O(node_identities[].name) to O(node_identities[].node_name) in community.general
+            8.3.0. The old name can still be used.
         type: str
         required: true
         aliases:
@@ -140,7 +139,7 @@ options:
         required: true
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Create a role with 2 policies
   community.general.consul_role:
     host: consul1.example.com
@@ -177,28 +176,28 @@ EXAMPLES = """
     state: absent
 """
 
-RETURN = """
+RETURN = r"""
 role:
-    description: The role object.
-    returned: success
-    type: dict
-    sample:
-        {
-            "CreateIndex": 39,
-            "Description": "",
-            "Hash": "Trt0QJtxVEfvTTIcdTUbIJRr6Dsi6E4EcwSFxx9tCYM=",
-            "ID": "9a300b8d-48db-b720-8544-a37c0f5dafb5",
-            "ModifyIndex": 39,
-            "Name": "foo-role",
-            "Policies": [
-                {"ID": "b1a00172-d7a1-0e66-a12e-7a4045c4b774", "Name": "foo-access"}
-            ]
-        }
+  description: The role object.
+  returned: success
+  type: dict
+  sample:
+      {
+          "CreateIndex": 39,
+          "Description": "",
+          "Hash": "Trt0QJtxVEfvTTIcdTUbIJRr6Dsi6E4EcwSFxx9tCYM=",
+          "ID": "9a300b8d-48db-b720-8544-a37c0f5dafb5",
+          "ModifyIndex": 39,
+          "Name": "foo-role",
+          "Policies": [
+              {"ID": "b1a00172-d7a1-0e66-a12e-7a4045c4b774", "Name": "foo-access"}
+          ]
+      }
 operation:
-    description: The operation performed on the role.
-    returned: changed
-    type: str
-    sample: update
+  description: The operation performed on the role.
+  returned: changed
+  type: str
+  sample: update
 """
 
 from ansible.module_utils.basic import AnsibleModule

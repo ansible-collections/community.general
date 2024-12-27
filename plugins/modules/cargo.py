@@ -11,7 +11,6 @@ __metaclass__ = type
 
 
 DOCUMENTATION = r"""
----
 module: cargo
 short_description: Manage Rust packages with cargo
 version_added: 4.3.0
@@ -39,16 +38,12 @@ options:
     elements: str
     required: true
   path:
-    description:
-      ->
-      The base path where to install the Rust packages. Cargo automatically appends
-      V(/bin). In other words, V(/usr/local) will become V(/usr/local/bin).
+    description: The base path where to install the Rust packages. Cargo automatically appends V(/bin). In other words,
+      V(/usr/local) will become V(/usr/local/bin).
     type: path
   version:
-    description:
-      ->
-      The version to install. If O(name) contains multiple values, the module will
-      try to install all of them in this version.
+    description: The version to install. If O(name) contains multiple values, the module will try to install all of them
+      in this version.
     type: str
     required: false
   locked:
@@ -65,7 +60,7 @@ options:
     required: false
     type: str
     default: present
-    choices: [ "present", "absent", "latest" ]
+    choices: ["present", "absent", "latest"]
   directory:
     description:
       - Path to the source directory to install the Rust package from.
@@ -74,7 +69,7 @@ options:
     required: false
     version_added: 9.1.0
 requirements:
-    - cargo installed
+  - cargo installed
 """
 
 EXAMPLES = r"""
