@@ -8,13 +8,13 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: bitbucket_pipeline_known_host
 short_description: Manages Bitbucket pipeline known hosts
 description:
   - Manages Bitbucket pipeline known hosts under the "SSH Keys" menu.
-  - The host fingerprint will be retrieved automatically, but in case of an error, one can use O(key) field to specify it manually.
+  - The host fingerprint will be retrieved automatically, but in case of an error, one can use O(key) field to specify it
+    manually.
 author:
   - Evgeniy Krysanov (@catcombo)
 extends_documentation_fragment:
@@ -36,7 +36,7 @@ options:
   workspace:
     description:
       - The repository owner.
-      - "B(Note:) O(ignore:username) used to be an alias of this option. Since community.general 6.0.0 it is an alias of O(user)."
+      - B(Note:) O(ignore:username) used to be an alias of this option. Since community.general 6.0.0 it is an alias of O(user).
     type: str
     required: true
   name:
@@ -53,12 +53,12 @@ options:
       - Indicates desired state of the record.
     type: str
     required: true
-    choices: [ absent, present ]
+    choices: [absent, present]
 notes:
   - Check mode is supported.
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Create known hosts from the list
   community.general.bitbucket_pipeline_known_host:
     repository: 'bitbucket-repo'
@@ -83,9 +83,9 @@ EXAMPLES = r'''
     name: bitbucket.org
     key: '{{lookup("file", "bitbucket.pub") }}'
     state: absent
-'''
+"""
 
-RETURN = r''' # '''
+RETURN = r""" # """
 
 import socket
 
