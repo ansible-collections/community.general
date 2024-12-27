@@ -14,8 +14,7 @@ __metaclass__ = type
 class ModuleDocFragment(object):
 
     # Dimension Data doc fragment
-    DOCUMENTATION = r'''
-
+    DOCUMENTATION = r"""
 options:
   region:
     description:
@@ -48,4 +47,4 @@ options:
       - This should only be used on private instances of the CloudControl API that use self-signed certificates.
     type: bool
     default: true
-'''
+"""

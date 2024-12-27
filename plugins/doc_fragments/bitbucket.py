@@ -11,7 +11,7 @@ __metaclass__ = type
 class ModuleDocFragment(object):
 
     # Standard documentation fragment
-    DOCUMENTATION = r'''
+    DOCUMENTATION = r"""
 options:
   client_id:
     description:
@@ -30,7 +30,7 @@ options:
       - O(ignore:username) is an alias of O(user) since community.general 6.0.0. It was an alias of O(workspace) before.
     type: str
     version_added: 4.0.0
-    aliases: [ username ]
+    aliases: [username]
   password:
     description:
       - The App password.
@@ -41,4 +41,4 @@ notes:
   - Bitbucket OAuth consumer key and secret can be obtained from Bitbucket profile -> Settings -> Access Management -> OAuth.
   - Bitbucket App password can be created from Bitbucket profile -> Personal Settings -> App passwords.
   - If both OAuth and Basic Auth credentials are passed, OAuth credentials take precedence.
-'''
+"""

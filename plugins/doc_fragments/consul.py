@@ -15,7 +15,7 @@ class ModuleDocFragment:
 options:
   host:
     description:
-      - Host of the consul agent, defaults to V(localhost).
+      - Host of the Consul agent.
     default: localhost
     type: str
   port:
@@ -25,18 +25,18 @@ options:
     default: 8500
   scheme:
     description:
-      - The protocol scheme on which the consul agent is running.
-        Defaults to V(http) and can be set to V(https) for secure connections.
+      - The protocol scheme on which the Consul agent is running. Defaults to V(http) and can be set to V(https) for secure
+        connections.
     default: http
     type: str
   validate_certs:
     type: bool
     description:
-      - Whether to verify the TLS certificate of the consul agent.
+      - Whether to verify the TLS certificate of the Consul agent.
     default: true
   ca_path:
     description:
-      - The CA bundle to use for https connections
+      - The CA bundle to use for https connections.
     type: str
 """
 

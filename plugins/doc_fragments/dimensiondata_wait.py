@@ -14,8 +14,7 @@ __metaclass__ = type
 class ModuleDocFragment(object):
 
     # Dimension Data ("wait-for-completion" parameters) doc fragment
-    DOCUMENTATION = r'''
-
+    DOCUMENTATION = r"""
 options:
   wait:
     description:
@@ -34,4 +33,4 @@ options:
       - Only applicable if O(wait=true).
     type: int
     default: 2
-'''
+"""

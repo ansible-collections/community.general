@@ -8,7 +8,7 @@ __metaclass__ = type
 
 
 class ModuleDocFragment(object):
-    DOCUMENTATION = r'''
+    DOCUMENTATION = r"""
 options:
   venv:
     description:
@@ -43,20 +43,19 @@ options:
 
 notes:
   - The C(django-admin) command is always executed using the C(C) locale, and the option C(--no-color) is always passed.
-
 seealso:
   - name: django-admin and manage.py in official Django documentation
     description: >-
-      Refer to this documentation for the builtin commands and options of C(django-admin).
-      Please make sure that you select the right version of Django in the version selector on that page.
+      Refer to this documentation for the builtin commands and options of C(django-admin). Please make sure that you select
+      the right version of Django in the version selector on that page.
     link: https://docs.djangoproject.com/en/5.0/ref/django-admin/
-'''
+"""
 
-    DATABASE = r'''
+    DATABASE = r"""
 options:
   database:
     description:
       - Specify the database to be used.
     type: str
     default: default
-'''
+"""
