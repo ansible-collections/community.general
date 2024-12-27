@@ -80,6 +80,7 @@ options:
           - Support for raw values requires GitLab >= 15.7.
         type: bool
         default: false
+        version_added: 10.2.0
       variable_type:
         description:
           - Whether a variable is an environment variable (V(env_var)) or a file (V(file)).
