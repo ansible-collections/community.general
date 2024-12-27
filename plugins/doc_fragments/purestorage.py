@@ -10,16 +10,6 @@ __metaclass__ = type
 
 class ModuleDocFragment(object):
 
-    # Standard Pure Storage documentation fragment
-    DOCUMENTATION = r"""
-options: {}
-# See separate platform section for more details
-requirements:
-  - See separate platform section for more details
-notes:
-  - 'Ansible modules are available for the following Pure Storage products: FlashArray, FlashBlade.'
-"""
-
     # Documentation fragment for FlashBlade
     FB = r"""
 options:
