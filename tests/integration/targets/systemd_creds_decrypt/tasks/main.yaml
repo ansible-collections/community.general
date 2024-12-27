@@ -34,7 +34,7 @@
     - name: Assert that the decrypted secret is the same as the original secret
       ansible.builtin.assert:
         that:
-          - decrypted_secret.msg.strip() == 'access_token'
+          - decrypted_secret.msg == 'access_token'
         fail_msg: "Decrypted secret is not the same as the original secret"
         success_msg: "Decrypted secret is the same as the original secret"
 
@@ -53,6 +53,6 @@
     - name: Assert that the decrypted secret is the same as the original secret
       ansible.builtin.assert:
         that:
-          - decrypted_secret_hex.msg == '6163636573735f746f6b656e0a'
+          - decrypted_secret_hex.msg == '6163636573735f746f6b656e'
         fail_msg: "Decrypted secret is not the same as the original secret"
         success_msg: "Decrypted secret is the same as the original secret"
