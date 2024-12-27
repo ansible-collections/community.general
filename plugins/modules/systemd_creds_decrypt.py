@@ -17,6 +17,17 @@ description:
 author:
     - Thomas Sjögren (@konstruktoid)
 version_added: '10.2.0'
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+    details:
+      - This action does not modify state.
+  diff_mode:
+    support: N/A
+    details:
+      - This action does not modify state.
 options:
     name:
         description:
@@ -74,7 +85,13 @@ EXAMPLES = """
 
 RETURN = r"""
 value:
-    description: The decrypted secret.
+    description:
+      - The decrypted secret.
+      - Note that Ansible only supports returning UTF-8 encoded strings.
+        If the decrypted secret is binary data, or a string encoded in another
+        way, use O(transcode=base64) or O(transcode=hex) to circument this
+        restriction. You then need to decode the data when using it, for
+        example using the P(ansible.builtin.b64decode#filter) filter.
     type: str
     returned: always
     sample: "access_token"

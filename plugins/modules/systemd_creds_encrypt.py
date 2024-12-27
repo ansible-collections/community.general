@@ -17,6 +17,17 @@ description:
 author:
     - Thomas Sjögren (@konstruktoid)
 version_added: '10.2.0'
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+    details:
+      - This action does not modify state.
+  diff_mode:
+    support: N/A
+    details:
+      - This action does not modify state.
 options:
     name:
         description:
