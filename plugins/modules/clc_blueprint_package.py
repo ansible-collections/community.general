@@ -9,7 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: clc_blueprint_package
 short_description: Deploys a blue print package on a set of servers in CenturyLink Cloud
 description:
@@ -41,7 +41,7 @@ options:
     required: false
   state:
     description:
-      - Whether to install or uninstall the package. Currently it supports only "present" for install action.
+      - Whether to install or uninstall the package. Currently it supports only V(present) for install action.
     type: str
     required: false
     default: present
@@ -53,45 +53,39 @@ options:
     default: 'True'
     required: false
 requirements:
-    - python = 2.7
-    - requests >= 2.5.0
-    - clc-sdk
+  - requests >= 2.5.0
+  - clc-sdk
 author: "CLC Runner (@clc-runner)"
 notes:
-    - To use this module, it is required to set the below environment variables which enables access to the
-      Centurylink Cloud
-          - CLC_V2_API_USERNAME, the account login id for the centurylink cloud
-          - CLC_V2_API_PASSWORD, the account password for the centurylink cloud
-    - Alternatively, the module accepts the API token and account alias. The API token can be generated using the
-      CLC account login and password via the HTTP api call @ https://api.ctl.io/v2/authentication/login
-          - CLC_V2_API_TOKEN, the API token generated from https://api.ctl.io/v2/authentication/login
-          - CLC_ACCT_ALIAS, the account alias associated with the centurylink cloud
-    - Users can set CLC_V2_API_URL to specify an endpoint for pointing to a different CLC environment.
-'''
+  - To use this module, it is required to set the below environment variables which enables access to the Centurylink Cloud.
+  - E(CLC_V2_API_USERNAME), the account login id for the Centurylink Cloud.
+  - E(CLC_V2_API_PASSWORD), the account password for the Centurylink Cloud.
+  - Alternatively, the module accepts the API token and account alias. The API token can be generated using the CLC account
+    login and password using the HTTP API call @ https://api.ctl.io/v2/authentication/login
+  - E(CLC_V2_API_TOKEN), the API token generated from https://api.ctl.io/v2/authentication/login
+  - E(CLC_ACCT_ALIAS), the account alias associated with the Centurylink Cloud.
+  - Users can set E(CLC_V2_API_URL) to specify an endpoint for pointing to a different CLC environment.
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # Note - You must set the CLC_V2_API_USERNAME And CLC_V2_API_PASSWD Environment variables before running these examples
 
 - name: Deploy package
   community.general.clc_blueprint_package:
-        server_ids:
-            - UC1TEST-SERVER1
-            - UC1TEST-SERVER2
-        package_id: 77abb844-579d-478d-3955-c69ab4a7ba1a
-        package_params: {}
-'''
+    server_ids:
+      - UC1TEST-SERVER1
+      - UC1TEST-SERVER2
+    package_id: 77abb844-579d-478d-3955-c69ab4a7ba1a
+    package_params: {}
+"""
 
-RETURN = '''
+RETURN = r"""
 server_ids:
-    description: The list of server ids that are changed
-    returned: success
-    type: list
-    sample:
-        [
-            "UC1TEST-SERVER1",
-            "UC1TEST-SERVER2"
-        ]
-'''
+  description: The list of server ids that are changed.
+  returned: success
+  type: list
+  sample: ["UC1TEST-SERVER1", "UC1TEST-SERVER2"]
+"""
 
 __version__ = '${version}'
 
