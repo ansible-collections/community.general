@@ -72,12 +72,20 @@ EXAMPLES = """
     msg: "{{ decrypted_secret }}"
 """
 
+RETURN = r"""
+value:
+    description: The decrypted secret.
+    type: str
+    returned: always
+    sample: "access_token"
+"""
+
 
 from ansible.module_utils.basic import AnsibleModule
 
 
 def main():
-    """Encrypt secret using systemd-creds."""
+    """Decrypt secret using systemd-creds."""
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(type="str", required=False),

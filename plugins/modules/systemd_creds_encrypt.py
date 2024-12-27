@@ -75,6 +75,13 @@ EXAMPLES = """
     msg: "{{ encrypted_secret }}"
 """
 
+RETURN = r"""
+value:
+    description: The Base64 encoded encrypted secret.
+    type: str
+    returned: always
+    sample: "WhQZht+JQJax1aZemmGLxmAAAA..."
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 
