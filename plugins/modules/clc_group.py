@@ -10,11 +10,11 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: clc_group
 short_description: Create/delete Server Groups at Centurylink Cloud
 description:
-  - Create or delete Server Groups at Centurylink Centurylink Cloud
+  - Create or delete Server Groups at Centurylink Centurylink Cloud.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -25,12 +25,12 @@ attributes:
 options:
   name:
     description:
-      - The name of the Server Group
+      - The name of the Server Group.
     type: str
     required: true
   description:
     description:
-      - A description of the Server Group
+      - A description of the Server Group.
     type: str
     required: false
   parent:
@@ -40,13 +40,13 @@ options:
     required: false
   location:
     description:
-      - Datacenter to create the group in. If location is not provided, the group gets created in the default datacenter
-        associated with the account
+      - Datacenter to create the group in. If location is not provided, the group gets created in the default datacenter associated
+        with the account.
     type: str
     required: false
   state:
     description:
-      - Whether to create or delete the group
+      - Whether to create or delete the group.
     type: str
     default: present
     choices: ['present', 'absent']
@@ -57,27 +57,22 @@ options:
     default: true
     required: false
 requirements:
-    - python = 2.7
-    - requests >= 2.5.0
-    - clc-sdk
+  - requests >= 2.5.0
+  - clc-sdk
 author: "CLC Runner (@clc-runner)"
 notes:
-    - To use this module, it is required to set the below environment variables which enables access to the
-      Centurylink Cloud
-          - CLC_V2_API_USERNAME, the account login id for the centurylink cloud
-          - CLC_V2_API_PASSWORD, the account password for the centurylink cloud
-    - Alternatively, the module accepts the API token and account alias. The API token can be generated using the
-      CLC account login and password via the HTTP api call @ https://api.ctl.io/v2/authentication/login
-          - CLC_V2_API_TOKEN, the API token generated from https://api.ctl.io/v2/authentication/login
-          - CLC_ACCT_ALIAS, the account alias associated with the centurylink cloud
-    - Users can set CLC_V2_API_URL to specify an endpoint for pointing to a different CLC environment.
-'''
+  - To use this module, it is required to set the below environment variables which enables access to the Centurylink Cloud.
+  - E(CLC_V2_API_USERNAME), the account login id for the Centurylink Cloud.
+  - E(CLC_V2_API_PASSWORD), the account password for the Centurylink Cloud.
+  - Alternatively, the module accepts the API token and account alias. The API token can be generated using the CLC account
+    login and password using the HTTP API call @ https://api.ctl.io/v2/authentication/login
+  - E(CLC_V2_API_TOKEN), the API token generated from https://api.ctl.io/v2/authentication/login
+  - E(CLC_ACCT_ALIAS), the account alias associated with the Centurylink Cloud.
+  - Users can set E(CLC_V2_API_URL) to specify an endpoint for pointing to a different CLC environment.
+"""
 
-EXAMPLES = '''
-
+EXAMPLES = r"""
 # Create a Server Group
-
----
 - name: Create Server Group
   hosts: localhost
   gather_facts: false
@@ -110,11 +105,11 @@ EXAMPLES = '''
     - name: Debug
       ansible.builtin.debug:
         var: clc
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 group:
-    description: The group information
+    description: The group information.
     returned: success
     type: dict
     sample:
@@ -209,7 +204,7 @@ group:
            "status":"active",
            "type":"default"
         }
-'''
+"""
 
 __version__ = '${version}'
 
