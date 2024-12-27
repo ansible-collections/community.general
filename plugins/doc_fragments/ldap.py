@@ -16,8 +16,8 @@ class ModuleDocFragment(object):
 options:
   bind_dn:
     description:
-      - A DN to bind with. If this is omitted, it tries a SASL bind with the EXTERNAL mechanism as default.
-      - If this is blank, it uses an anonymous bind.
+      - A DN to bind with. Try to use a SASL bind with the EXTERNAL mechanism as default when this parameter is omitted.
+      - Use an anonymous bind if the parameter is blank.
     type: str
   bind_pw:
     description:
