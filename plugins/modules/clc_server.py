@@ -201,7 +201,6 @@ options:
     type: bool
     default: true
 requirements:
-  - python = 2.7
   - requests >= 2.5.0
   - clc-sdk
 author: "CLC Runner (@clc-runner)"
@@ -210,7 +209,7 @@ notes:
   - E(CLC_V2_API_USERNAME), the account login id for the Centurylink Cloud.
   - E(CLC_V2_API_PASSWORD), the account password for the Centurylink Cloud.
   - Alternatively, the module accepts the API token and account alias. The API token can be generated using the CLC account
-    login and password using the HTTP api call @ https://api.ctl.io/v2/authentication/login
+    login and password using the HTTP API call @ https://api.ctl.io/v2/authentication/login
   - E(CLC_V2_API_TOKEN), the API token generated from https://api.ctl.io/v2/authentication/login
   - E(CLC_ACCT_ALIAS), the account alias associated with the Centurylink Cloud.
   - Users can set E(CLC_V2_API_URL) to specify an endpoint for pointing to a different CLC environment.
