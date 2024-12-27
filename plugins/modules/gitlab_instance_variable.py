@@ -77,7 +77,7 @@ options:
       raw:
         description:
           - Whether variable value is raw or not.
-          - Support for raw values requires GitLab >= 15.7
+          - Support for raw values requires GitLab >= 15.7.
         type: bool
         default: false
       variable_type:
