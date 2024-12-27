@@ -9,59 +9,55 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: bzr
 author:
-- André Paramés (@andreparames)
+  - André Paramés (@andreparames)
 short_description: Deploy software (or files) from bzr branches
 description:
-    - Manage C(bzr) branches to deploy files or software.
+  - Manage C(bzr) branches to deploy files or software.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
   check_mode:
     support: none
   diff_mode:
     support: none
 options:
-    name:
-        description:
-            - SSH or HTTP protocol address of the parent branch.
-        aliases: [ parent ]
-        required: true
-        type: str
-    dest:
-        description:
-            - Absolute path of where the branch should be cloned to.
-        required: true
-        type: path
-    version:
-        description:
-            - What version of the branch to clone.  This can be the
-              bzr revno or revid.
-        default: head
-        type: str
-    force:
-        description:
-            - If V(true), any modified files in the working
-              tree will be discarded.
-        type: bool
-        default: false
-    executable:
-        description:
-            - Path to bzr executable to use. If not supplied,
-              the normal mechanism for resolving binary paths will be used.
-        type: str
-'''
+  name:
+    description:
+      - SSH or HTTP protocol address of the parent branch.
+    aliases: [parent]
+    required: true
+    type: str
+  dest:
+    description:
+      - Absolute path of where the branch should be cloned to.
+    required: true
+    type: path
+  version:
+    description:
+      - What version of the branch to clone. This can be the bzr revno or revid.
+    default: head
+    type: str
+  force:
+    description:
+      - If V(true), any modified files in the working tree will be discarded.
+    type: bool
+    default: false
+  executable:
+    description:
+      - Path to bzr executable to use. If not supplied, the normal mechanism for resolving binary paths will be used.
+    type: str
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Checkout
   community.general.bzr:
     name: bzr+ssh://foosball.example.org/path/to/branch
     dest: /srv/checkout
     version: 22
-'''
+"""
 
 import os
 import re

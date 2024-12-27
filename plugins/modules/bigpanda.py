@@ -8,13 +8,13 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: bigpanda
 author: "Hagai Kariti (@hkariti)"
 short_description: Notify BigPanda about deployments
 description:
-   - Notify BigPanda when deployments start and end (successfully or not). Returns a deployment object containing all the parameters for future module calls.
+  - Notify BigPanda when deployments start and end (successfully or not). Returns a deployment object containing all the parameters
+    for future module calls.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -26,7 +26,7 @@ options:
   component:
     type: str
     description:
-      - "The name of the component being deployed. Ex: billing"
+      - 'The name of the component being deployed. Ex: V(billing).'
     required: true
     aliases: ['name']
   version:
@@ -55,7 +55,7 @@ options:
   env:
     type: str
     description:
-      - The environment name, typically 'production', 'staging', etc.
+      - The environment name, typically V(production), V(staging), and so on.
     required: false
   owner:
     type: str
@@ -75,27 +75,27 @@ options:
     default: "https://api.bigpanda.io"
   validate_certs:
     description:
-      - If V(false), SSL certificates for the target url will not be validated. This should only be used
-        on personally controlled sites using self-signed certificates.
+      - If V(false), SSL certificates for the target url will not be validated. This should only be used on personally controlled
+        sites using self-signed certificates.
     required: false
     default: true
     type: bool
   deployment_message:
     type: str
     description:
-    - Message about the deployment.
+      - Message about the deployment.
     version_added: '0.2.0'
   source_system:
     type: str
     description:
-    - Source system used in the requests to the API
+      - Source system used in the requests to the API.
     default: ansible
 
 # informational: requirements for nodes
-requirements: [ ]
-'''
+requirements: []
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Notify BigPanda about a deployment
   community.general.bigpanda:
     component: myapp
@@ -128,7 +128,7 @@ EXAMPLES = '''
     token: '{{ deployment.token }}'
     state: finished
   delegate_to: localhost
-'''
+"""
 
 # ===========================================
 # Module execution.

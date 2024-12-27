@@ -8,16 +8,15 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 author:
-    - Joris Weijters (@molekuul)
+  - Joris Weijters (@molekuul)
 module: aix_inittab
-short_description: Manages the inittab on AIX
+short_description: Manages the C(inittab) on AIX
 description:
-    - Manages the inittab on AIX.
+  - Manages the C(inittab) on AIX.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
   check_mode:
     support: full
@@ -26,56 +25,56 @@ attributes:
 options:
   name:
     description:
-    - Name of the inittab entry.
+      - Name of the C(inittab) entry.
     type: str
     required: true
-    aliases: [ service ]
+    aliases: [service]
   runlevel:
     description:
-    - Runlevel of the entry.
+      - Runlevel of the entry.
     type: str
     required: true
   action:
     description:
-    - Action what the init has to do with this entry.
+      - Action what the init has to do with this entry.
     type: str
     choices:
-    - boot
-    - bootwait
-    - hold
-    - initdefault
-    - 'off'
-    - once
-    - ondemand
-    - powerfail
-    - powerwait
-    - respawn
-    - sysinit
-    - wait
+      - boot
+      - bootwait
+      - hold
+      - initdefault
+      - 'off'
+      - once
+      - ondemand
+      - powerfail
+      - powerwait
+      - respawn
+      - sysinit
+      - wait
   command:
     description:
-    - What command has to run.
+      - What command has to run.
     type: str
     required: true
   insertafter:
     description:
-    - After which inittabline should the new entry inserted.
+      - After which inittabline should the new entry inserted.
     type: str
   state:
     description:
-    - Whether the entry should be present or absent in the inittab file.
+      - Whether the entry should be present or absent in the inittab file.
     type: str
-    choices: [ absent, present ]
+    choices: [absent, present]
     default: present
 notes:
   - The changes are persistent across reboots.
   - You need root rights to read or adjust the inittab with the C(lsitab), C(chitab), C(mkitab) or C(rmitab) commands.
   - Tested on AIX 7.1.
 requirements:
-- itertools
-'''
+  - itertools
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # Add service startmyservice to the inittab, directly after service existingservice.
 - name: Add startmyservice to inittab
   community.general.aix_inittab:
@@ -105,25 +104,25 @@ EXAMPLES = '''
     command: echo hello
     state: absent
   become: true
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 name:
-    description: Name of the adjusted inittab entry
-    returned: always
-    type: str
-    sample: startmyservice
+  description: Name of the adjusted C(inittab) entry.
+  returned: always
+  type: str
+  sample: startmyservice
 msg:
-    description: Action done with the inittab entry
-    returned: changed
-    type: str
-    sample: changed inittab entry startmyservice
+  description: Action done with the C(inittab) entry.
+  returned: changed
+  type: str
+  sample: changed inittab entry startmyservice
 changed:
-    description: Whether the inittab changed or not
-    returned: always
-    type: bool
-    sample: true
-'''
+  description: Whether the C(inittab) changed or not.
+  returned: always
+  type: bool
+  sample: true
+"""
 
 # Import necessary libraries
 try:
