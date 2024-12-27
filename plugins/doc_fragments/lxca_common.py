@@ -10,7 +10,7 @@ __metaclass__ = type
 
 class ModuleDocFragment(object):
     # Standard Pylxca documentation fragment
-    DOCUMENTATION = r'''
+    DOCUMENTATION = r"""
 author:
   - Naval Patel (@navalkp)
   - Prashant Bhosale (@prabhosa)
@@ -18,19 +18,19 @@ author:
 options:
   login_user:
     description:
-    - The username for use in HTTP basic authentication.
+      - The username for use in HTTP basic authentication.
     type: str
     required: true
 
   login_password:
     description:
-    - The password for use in HTTP basic authentication.
+      - The password for use in HTTP basic authentication.
     type: str
     required: true
 
   auth_url:
     description:
-    - lxca HTTPS full web address.
+      - Lxca HTTPS full web address.
     type: str
     required: true
 
@@ -40,4 +40,4 @@ requirements:
 notes:
   - Additional detail about pylxca can be found at U(https://github.com/lenovo/pylxca).
   - Playbooks using these modules can be found at U(https://github.com/lenovo/ansible.lenovo-lxca).
-'''
+"""
