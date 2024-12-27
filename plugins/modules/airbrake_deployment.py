@@ -9,15 +9,14 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: airbrake_deployment
 author:
-- "Bruce Pennypacker (@bpennypacker)"
-- "Patrick Humpal (@phumpal)"
+  - "Bruce Pennypacker (@bpennypacker)"
+  - "Patrick Humpal (@phumpal)"
 short_description: Notify airbrake about app deployments
 description:
-   - Notify airbrake about app deployments (see U(https://airbrake.io/docs/api/#deploys-v4)).
+  - Notify airbrake about app deployments (see U(https://airbrake.io/docs/api/#deploys-v4)).
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -28,7 +27,7 @@ attributes:
 options:
   project_id:
     description:
-      - Airbrake PROJECT_ID
+      - Airbrake PROJECT_ID.
     required: true
     type: str
     version_added: '0.2.0'
@@ -40,27 +39,27 @@ options:
     version_added: '0.2.0'
   environment:
     description:
-      - The airbrake environment name, typically 'production', 'staging', etc.
+      - The airbrake environment name, typically v(production), V(staging), and so on.
     required: true
     type: str
   user:
     description:
-      - The username of the person doing the deployment
+      - The username of the person doing the deployment.
     required: false
     type: str
   repo:
     description:
-      - URL of the project repository
+      - URL of the project repository.
     required: false
     type: str
   revision:
     description:
-      - A hash, number, tag, or other identifier showing what revision from version control was deployed
+      - A hash, number, tag, or other identifier showing what revision from version control was deployed.
     required: false
     type: str
   version:
     description:
-      - A string identifying what version was deployed
+      - A string identifying what version was deployed.
     required: false
     type: str
     version_added: '1.0.0'
@@ -72,16 +71,16 @@ options:
     type: str
   validate_certs:
     description:
-      - If V(false), SSL certificates for the target url will not be validated. This should only be used
-        on personally controlled sites using self-signed certificates.
+      - If V(false), SSL certificates for the target url will not be validated. This should only be used on personally controlled
+        sites using self-signed certificates.
     required: false
     default: true
     type: bool
 
 requirements: []
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Notify airbrake about an app deployment
   community.general.airbrake_deployment:
     project_id: '12345'
@@ -98,7 +97,7 @@ EXAMPLES = '''
     user: ansible
     revision: 'e54dd3a01f2c421b558ef33b5f79db936e2dcf15'
     version: '0.2.0'
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url

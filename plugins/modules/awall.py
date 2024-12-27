@@ -9,15 +9,14 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: awall
 short_description: Manage awall policies
 author: Ted Trask (@tdtrask) <ttrask01@yahoo.com>
 description:
   - This modules allows for enable/disable/activate of C(awall) policies.
-  - Alpine Wall (C(awall)) generates a firewall configuration from the enabled policy files
-    and activates the configuration on the system.
+  - Alpine Wall (C(awall)) generates a firewall configuration from the enabled policy files and activates the configuration
+    on the system.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -35,7 +34,7 @@ options:
     description:
       - Whether the policies should be enabled or disabled.
     type: str
-    choices: [ disabled, enabled ]
+    choices: [disabled, enabled]
     default: enabled
   activate:
     description:
@@ -45,29 +44,29 @@ options:
     type: bool
     default: false
 notes:
-    - At least one of O(name) and O(activate) is required.
-'''
+  - At least one of O(name) and O(activate) is required.
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Enable "foo" and "bar" policy
   community.general.awall:
-    name: [ foo bar ]
+    name: [foo bar]
     state: enabled
 
 - name: Disable "foo" and "bar" policy and activate new rules
   community.general.awall:
     name:
-    - foo
-    - bar
+      - foo
+      - bar
     state: disabled
     activate: false
 
 - name: Activate currently enabled firewall rules
   community.general.awall:
     activate: true
-'''
+"""
 
-RETURN = ''' # '''
+RETURN = """ # """
 
 import re
 from ansible.module_utils.basic import AnsibleModule
