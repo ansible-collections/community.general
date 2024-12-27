@@ -11,7 +11,7 @@ __metaclass__ = type
 class ModuleDocFragment(object):
 
     # Standard files documentation fragment
-    DOCUMENTATION = r'''
+    DOCUMENTATION = r"""
 options:
   url:
     type: str
@@ -29,4 +29,4 @@ options:
     description:
       - Rundeck User API Token.
     required: true
-'''
+"""
