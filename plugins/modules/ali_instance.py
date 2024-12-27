@@ -24,243 +24,240 @@ from __future__ import (absolute_import, division, print_function)
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: ali_instance
-short_description: Create, Start, Stop, Restart or Terminate an Instance in ECS; Add or Remove Instance to/from a Security Group
+short_description: Create, Start, Stop, Restart or Terminate an Instance in ECS; Add or Remove Instance to/from a Security
+  Group
 description:
-    - Create, start, stop, restart, modify or terminate ecs instances.
-    - Add or remove ecs instances to/from security group.
+  - Create, start, stop, restart, modify or terminate ECS instances.
+  - Add or remove ecs instances to/from security group.
 attributes:
-    check_mode:
-      support: none
-    diff_mode:
-      support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    state:
-      description:
-        - The state of the instance after operating.
-      default: 'present'
-      choices: ['present', 'running', 'stopped', 'restarted', 'absent']
-      type: str
-    availability_zone:
-      description:
-        - Aliyun availability zone ID in which to launch the instance.
-          If it is not specified, it will be allocated by system automatically.
-      aliases: ['alicloud_zone', 'zone_id']
-      type: str
-    image_id:
-      description:
-        - Image ID used to launch instances. Required when O(state=present) and creating new ECS instances.
-      aliases: ['image']
-      type: str
-    instance_type:
-      description:
-        - Instance type used to launch instances. Required when O(state=present) and creating new ECS instances.
-      aliases: ['type']
-      type: str
-    security_groups:
-      description:
-        - A list of security group IDs.
-      aliases: ['group_ids']
-      type: list
-      elements: str
-    vswitch_id:
-      description:
-        - The subnet ID in which to launch the instances (VPC).
-      aliases: ['subnet_id']
-      type: str
-    instance_name:
-      description:
-        - The name of ECS instance, which is a string of 2 to 128 Chinese or English characters. It must begin with an
-          uppercase/lowercase letter or a Chinese character and can contain numerals, ".", "_" or "-".
-          It cannot begin with http:// or https://.
-      aliases: ['name']
-      type: str
+  state:
     description:
-      description:
-        - The description of ECS instance, which is a string of 2 to 256 characters. It cannot begin with http:// or https://.
-      type: str
-    internet_charge_type:
-      description:
-        - Internet charge type of ECS instance.
-      default: 'PayByBandwidth'
-      choices: ['PayByBandwidth', 'PayByTraffic']
-      type: str
-    max_bandwidth_in:
-      description:
-        - Maximum incoming bandwidth from the public network, measured in Mbps (Megabits per second).
-      default: 200
-      type: int
-    max_bandwidth_out:
-      description:
-        - Maximum outgoing bandwidth to the public network, measured in Mbps (Megabits per second).
-          Required when O(allocate_public_ip=true). Ignored when O(allocate_public_ip=false).
-      default: 0
-      type: int
-    host_name:
-      description:
-        - Instance host name. Ordered hostname is not supported.
-      type: str
-    unique_suffix:
-      description:
-        - Specifies whether to add sequential suffixes to the host_name.
-          The sequential suffix ranges from 001 to 999.
-      default: false
-      type: bool
-      version_added: '0.2.0'
-    password:
-      description:
-        - The password to login instance. After rebooting instances, modified password will take effect.
-      type: str
-    system_disk_category:
-      description:
-        - Category of the system disk.
-      default: 'cloud_efficiency'
-      choices: ['cloud_efficiency', 'cloud_ssd']
-      type: str
-    system_disk_size:
-      description:
-        - Size of the system disk, in GB. The valid values are 40~500.
-      default: 40
-      type: int
-    system_disk_name:
-      description:
-        - Name of the system disk.
-      type: str
-    system_disk_description:
-      description:
-        - Description of the system disk.
-      type: str
-    count:
-      description:
-        - The number of the new instance. An integer value which indicates how many instances that match O(count_tag)
-          should be running. Instances are either created or terminated based on this value.
-      default: 1
-      type: int
-    count_tag:
-      description:
-      - O(count) determines how many instances based on a specific tag criteria should be present.
-        This can be expressed in multiple ways and is shown in the EXAMPLES section.
-        The specified count_tag must already exist or be passed in as the O(tags) option.
-        If it is not specified, it will be replaced by O(instance_name).
-      type: str
-    allocate_public_ip:
-      description:
-        - Whether allocate a public ip for the new instance.
-      default: false
-      aliases: [ 'assign_public_ip' ]
-      type: bool
-    instance_charge_type:
-      description:
-        - The charge type of the instance.
-      choices: ['PrePaid', 'PostPaid']
-      default: 'PostPaid'
-      type: str
-    period:
-      description:
-        - The charge duration of the instance, in months. Required when O(instance_charge_type=PrePaid).
-        - The valid value are [1-9, 12, 24, 36].
-      default: 1
-      type: int
-    auto_renew:
-      description:
-        - Whether automate renew the charge of the instance.
-      type: bool
-      default: false
-    auto_renew_period:
-      description:
-        - The duration of the automatic renew the charge of the instance. Required when O(auto_renew=true).
-      choices: [1, 2, 3, 6, 12]
-      type: int
-    instance_ids:
-      description:
-        - A list of instance ids. It is required when need to operate existing instances.
-          If it is specified, O(count) will lose efficacy.
-      type: list
-      elements: str
-    force:
-      description:
-        - Whether the current operation needs to be execute forcibly.
-      default: false
-      type: bool
-    tags:
-      description:
-        - A hash/dictionaries of instance tags, to add to the new instance or for starting/stopping instance by tag. V({"key":"value"})
-      aliases: ["instance_tags"]
-      type: dict
-      version_added: '0.2.0'
-    purge_tags:
-      description:
-        - Delete any tags not specified in the task that are on the instance.
-          If True, it means you have to specify all the desired tags on each task affecting an instance.
-      default: false
-      type: bool
-      version_added: '0.2.0'
-    key_name:
-      description:
-        - The name of key pair which is used to access ECS instance in SSH.
-      required: false
-      type: str
-      aliases: ['keypair']
-    user_data:
-      description:
-        - User-defined data to customize the startup behaviors of an ECS instance and to pass data into an ECS instance.
-          It only will take effect when launching the new ECS instances.
-      required: false
-      type: str
-    ram_role_name:
-      description:
-        - The name of the instance RAM role.
-      type: str
-      version_added: '0.2.0'
-    spot_price_limit:
-      description:
-        - The maximum hourly price for the preemptible instance. This parameter supports a maximum of three decimal
-          places and takes effect when the SpotStrategy parameter is set to SpotWithPriceLimit.
-      type: float
-      version_added: '0.2.0'
-    spot_strategy:
-      description:
-        - The bidding mode of the pay-as-you-go instance. This parameter is valid when InstanceChargeType is set to PostPaid.
-      choices: ['NoSpot', 'SpotWithPriceLimit', 'SpotAsPriceGo']
-      default: 'NoSpot'
-      type: str
-      version_added: '0.2.0'
-    period_unit:
-      description:
-        - The duration unit that you will buy the resource. It is valid when O(instance_charge_type=PrePaid).
-      choices: ['Month', 'Week']
-      default: 'Month'
-      type: str
-      version_added: '0.2.0'
-    dry_run:
-      description:
-        - Specifies whether to send a dry-run request.
-        - If O(dry_run=true), Only a dry-run request is sent and no instance is created. The system checks whether the
-          required parameters are set, and validates the request format, service permissions, and available ECS instances.
-          If the validation fails, the corresponding error code is returned. If the validation succeeds, the DryRunOperation error code is returned.
-        - If O(dry_run=false), A request is sent. If the validation succeeds, the instance is created.
-      default: false
-      type: bool
-      version_added: '0.2.0'
-    include_data_disks:
-      description:
-        - Whether to change instance disks charge type when changing instance charge type.
-      default: true
-      type: bool
-      version_added: '0.2.0'
+      - The state of the instance after operating.
+    default: 'present'
+    choices: ['present', 'running', 'stopped', 'restarted', 'absent']
+    type: str
+  availability_zone:
+    description:
+      - Aliyun availability zone ID in which to launch the instance. If it is not specified, it will be allocated by system
+        automatically.
+    aliases: ['alicloud_zone', 'zone_id']
+    type: str
+  image_id:
+    description:
+      - Image ID used to launch instances. Required when O(state=present) and creating new ECS instances.
+    aliases: ['image']
+    type: str
+  instance_type:
+    description:
+      - Instance type used to launch instances. Required when O(state=present) and creating new ECS instances.
+    aliases: ['type']
+    type: str
+  security_groups:
+    description:
+      - A list of security group IDs.
+    aliases: ['group_ids']
+    type: list
+    elements: str
+  vswitch_id:
+    description:
+      - The subnet ID in which to launch the instances (VPC).
+    aliases: ['subnet_id']
+    type: str
+  instance_name:
+    description:
+      - The name of ECS instance, which is a string of 2 to 128 Chinese or English characters. It must begin with an uppercase/lowercase
+        letter or a Chinese character and can contain numerals, V(.), V(_) or V(-). It cannot begin with V(http://) or V(https://).
+    aliases: ['name']
+    type: str
+  description:
+    description:
+      - The description of ECS instance, which is a string of 2 to 256 characters. It cannot begin with V(http://) or V(https://).
+    type: str
+  internet_charge_type:
+    description:
+      - Internet charge type of ECS instance.
+    default: 'PayByBandwidth'
+    choices: ['PayByBandwidth', 'PayByTraffic']
+    type: str
+  max_bandwidth_in:
+    description:
+      - Maximum incoming bandwidth from the public network, measured in Mbps (Megabits per second).
+    default: 200
+    type: int
+  max_bandwidth_out:
+    description:
+      - Maximum outgoing bandwidth to the public network, measured in Mbps (Megabits per second). Required when O(allocate_public_ip=true).
+        Ignored when O(allocate_public_ip=false).
+    default: 0
+    type: int
+  host_name:
+    description:
+      - Instance host name. Ordered hostname is not supported.
+    type: str
+  unique_suffix:
+    description:
+      - Specifies whether to add sequential suffixes to the host_name. The sequential suffix ranges from 001 to 999.
+    default: false
+    type: bool
+    version_added: '0.2.0'
+  password:
+    description:
+      - The password to login instance. After rebooting instances, modified password will take effect.
+    type: str
+  system_disk_category:
+    description:
+      - Category of the system disk.
+    default: 'cloud_efficiency'
+    choices: ['cloud_efficiency', 'cloud_ssd']
+    type: str
+  system_disk_size:
+    description:
+      - Size of the system disk, in GB. The valid values are V(40)~V(500).
+    default: 40
+    type: int
+  system_disk_name:
+    description:
+      - Name of the system disk.
+    type: str
+  system_disk_description:
+    description:
+      - Description of the system disk.
+    type: str
+  count:
+    description:
+      - The number of the new instance. An integer value which indicates how many instances that match O(count_tag) should
+        be running. Instances are either created or terminated based on this value.
+    default: 1
+    type: int
+  count_tag:
+    description:
+      - O(count) determines how many instances based on a specific tag criteria should be present. This can be expressed in
+        multiple ways and is shown in the EXAMPLES section. The specified count_tag must already exist or be passed in as
+        the O(tags) option. If it is not specified, it will be replaced by O(instance_name).
+    type: str
+  allocate_public_ip:
+    description:
+      - Whether allocate a public IP for the new instance.
+    default: false
+    aliases: ['assign_public_ip']
+    type: bool
+  instance_charge_type:
+    description:
+      - The charge type of the instance.
+    choices: ['PrePaid', 'PostPaid']
+    default: 'PostPaid'
+    type: str
+  period:
+    description:
+      - The charge duration of the instance, in months. Required when O(instance_charge_type=PrePaid).
+      - The valid value are [V(1-9), V(12), V(24), V(36)].
+    default: 1
+    type: int
+  auto_renew:
+    description:
+      - Whether automate renew the charge of the instance.
+    type: bool
+    default: false
+  auto_renew_period:
+    description:
+      - The duration of the automatic renew the charge of the instance. Required when O(auto_renew=true).
+    choices: [1, 2, 3, 6, 12]
+    type: int
+  instance_ids:
+    description:
+      - A list of instance ids. It is required when need to operate existing instances. If it is specified, O(count) will
+        lose efficacy.
+    type: list
+    elements: str
+  force:
+    description:
+      - Whether the current operation needs to be execute forcibly.
+    default: false
+    type: bool
+  tags:
+    description:
+      - A hash/dictionaries of instance tags, to add to the new instance or for starting/stopping instance by tag. V({"key":"value"}).
+    aliases: ["instance_tags"]
+    type: dict
+    version_added: '0.2.0'
+  purge_tags:
+    description:
+      - Delete any tags not specified in the task that are on the instance. If V(true), it means you have to specify all the
+        desired tags on each task affecting an instance.
+    default: false
+    type: bool
+    version_added: '0.2.0'
+  key_name:
+    description:
+      - The name of key pair which is used to access ECS instance in SSH.
+    required: false
+    type: str
+    aliases: ['keypair']
+  user_data:
+    description:
+      - User-defined data to customize the startup behaviors of an ECS instance and to pass data into an ECS instance. It
+        only will take effect when launching the new ECS instances.
+    required: false
+    type: str
+  ram_role_name:
+    description:
+      - The name of the instance RAM role.
+    type: str
+    version_added: '0.2.0'
+  spot_price_limit:
+    description:
+      - The maximum hourly price for the preemptible instance. This parameter supports a maximum of three decimal places and
+        takes effect when the SpotStrategy parameter is set to SpotWithPriceLimit.
+    type: float
+    version_added: '0.2.0'
+  spot_strategy:
+    description:
+      - The bidding mode of the pay-as-you-go instance. This parameter is valid when O(instance_charge_type=PostPaid).
+    choices: ['NoSpot', 'SpotWithPriceLimit', 'SpotAsPriceGo']
+    default: 'NoSpot'
+    type: str
+    version_added: '0.2.0'
+  period_unit:
+    description:
+      - The duration unit that you will buy the resource. It is valid when O(instance_charge_type=PrePaid).
+    choices: ['Month', 'Week']
+    default: 'Month'
+    type: str
+    version_added: '0.2.0'
+  dry_run:
+    description:
+      - Specifies whether to send a dry-run request.
+      - If O(dry_run=true), Only a dry-run request is sent and no instance is created. The system checks whether the required
+        parameters are set, and validates the request format, service permissions, and available ECS instances. If the validation
+        fails, the corresponding error code is returned. If the validation succeeds, the DryRunOperation error code is returned.
+      - If O(dry_run=false), a request is sent. If the validation succeeds, the instance is created.
+    default: false
+    type: bool
+    version_added: '0.2.0'
+  include_data_disks:
+    description:
+      - Whether to change instance disks charge type when changing instance charge type.
+    default: true
+    type: bool
+    version_added: '0.2.0'
 author:
-    - "He Guimin (@xiaozhu36)"
+  - "He Guimin (@xiaozhu36)"
 requirements:
-    - "Python >= 3.6"
-    - "footmark >= 1.19.0"
+  - "Python >= 3.6"
+  - "footmark >= 1.19.0"
 extends_documentation_fragment:
-    - community.general.alicloud
-    - community.general.attributes
-'''
+  - community.general.alicloud
+  - community.general.attributes
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # basic provisioning example vpc network
 - name: Basic provisioning example
   hosts: localhost
@@ -298,7 +295,7 @@ EXAMPLES = '''
         internet_charge_type: '{{ internet_charge_type }}'
         max_bandwidth_out: '{{ max_bandwidth_out }}'
         tags:
-            Name: created_one
+          Name: created_one
         host_name: '{{ host_name }}'
         password: '{{ password }}'
 
@@ -316,11 +313,11 @@ EXAMPLES = '''
         internet_charge_type: '{{ internet_charge_type }}'
         max_bandwidth_out: '{{ max_bandwidth_out }}'
         tags:
-            Name: created_one
-            Version: 0.1
+          Name: created_one
+          Version: 0.1
         count: 2
         count_tag:
-            Name: created_one
+          Name: created_one
         host_name: '{{ host_name }}'
         password: '{{ password }}'
 
@@ -348,278 +345,278 @@ EXAMPLES = '''
         alicloud_region: '{{ alicloud_region }}'
         instance_ids: '{{ instance_ids }}'
         security_groups: '{{ security_groups }}'
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 instances:
-    description: List of ECS instances
-    returned: always
-    type: complex
-    contains:
-        availability_zone:
-            description: The availability zone of the instance is in.
-            returned: always
-            type: str
-            sample: cn-beijing-a
-        block_device_mappings:
-            description: Any block device mapping entries for the instance.
-            returned: always
-            type: complex
-            contains:
-                device_name:
-                    description: The device name exposed to the instance (for example, /dev/xvda).
-                    returned: always
-                    type: str
-                    sample: /dev/xvda
-                attach_time:
-                    description: The time stamp when the attachment initiated.
-                    returned: always
-                    type: str
-                    sample: "2018-06-25T04:08:26Z"
-                delete_on_termination:
-                    description: Indicates whether the volume is deleted on instance termination.
-                    returned: always
-                    type: bool
-                    sample: true
-                status:
-                    description: The attachment state.
-                    returned: always
-                    type: str
-                    sample: in_use
-                volume_id:
-                    description: The ID of the cloud disk.
-                    returned: always
-                    type: str
-                    sample: d-2zei53pjsi117y6gf9t6
-        cpu:
-            description: The CPU core count of the instance.
-            returned: always
-            type: int
-            sample: 4
-        creation_time:
-            description: The time the instance was created.
-            returned: always
-            type: str
-            sample: "2018-06-25T04:08Z"
-        description:
-            description: The instance description.
-            returned: always
-            type: str
-            sample: "my ansible instance"
-        eip:
-            description: The attribution of EIP associated with the instance.
-            returned: always
-            type: complex
-            contains:
-                allocation_id:
-                    description: The ID of the EIP.
-                    returned: always
-                    type: str
-                    sample: eip-12345
-                internet_charge_type:
-                    description: The internet charge type of the EIP.
-                    returned: always
-                    type: str
-                    sample: "paybybandwidth"
-                ip_address:
-                    description: EIP address.
-                    returned: always
-                    type: str
-                    sample: 42.10.2.2
-        expired_time:
-            description: The time the instance will expire.
-            returned: always
-            type: str
-            sample: "2099-12-31T15:59Z"
-        gpu:
-            description: The attribution of instance GPU.
-            returned: always
-            type: complex
-            contains:
-                amount:
-                    description: The count of the GPU.
-                    returned: always
-                    type: int
-                    sample: 0
-                spec:
-                    description: The specification of the GPU.
-                    returned: always
-                    type: str
-                    sample: ""
-        host_name:
-            description: The host name of the instance.
-            returned: always
-            type: str
-            sample: iZ2zewaoZ
-        id:
-            description: Alias of instance_id.
-            returned: always
-            type: str
-            sample: i-abc12345
-        instance_id:
-            description: ECS instance resource ID.
-            returned: always
-            type: str
-            sample: i-abc12345
-        image_id:
-            description: The ID of the image used to launch the instance.
-            returned: always
-            type: str
-            sample: m-0011223344
-        inner_ip_address:
-            description: The inner IPv4 address of the classic instance.
-            returned: always
-            type: str
-            sample: 10.0.0.2
-        instance_charge_type:
-            description: The instance charge type.
-            returned: always
-            type: str
-            sample: PostPaid
-        instance_name:
-            description: The name of the instance.
-            returned: always
-            type: str
-            sample: my-ecs
-        instance_type:
-            description: The instance type of the running instance.
-            returned: always
-            type: str
-            sample: ecs.sn1ne.xlarge
-        instance_type_family:
-            description: The instance type family of the instance belongs.
-            returned: always
-            type: str
-            sample: ecs.sn1ne
-        internet_charge_type:
-            description: The billing method of the network bandwidth.
-            returned: always
-            type: str
-            sample: PayByBandwidth
-        internet_max_bandwidth_in:
-            description: Maximum incoming bandwidth from the internet network.
-            returned: always
-            type: int
-            sample: 200
-        internet_max_bandwidth_out:
-            description: Maximum incoming bandwidth from the internet network.
-            returned: always
-            type: int
-            sample: 20
-        io_optimized:
-            description: Indicates whether the instance is optimized for EBS I/O.
-            returned: always
-            type: bool
-            sample: false
-        memory:
-            description: Memory size of the instance.
-            returned: always
-            type: int
-            sample: 8192
-        network_interfaces:
-            description: One or more network interfaces for the instance.
-            returned: always
-            type: complex
-            contains:
-                mac_address:
-                    description: The MAC address.
-                    returned: always
-                    type: str
-                    sample: "00:11:22:33:44:55"
-                network_interface_id:
-                    description: The ID of the network interface.
-                    returned: always
-                    type: str
-                    sample: eni-01234567
-                primary_ip_address:
-                    description: The primary IPv4 address of the network interface within the vswitch.
-                    returned: always
-                    type: str
-                    sample: 10.0.0.1
-        osname:
-            description: The operation system name of the instance owned.
-            returned: always
-            type: str
-            sample: CentOS
-        ostype:
-            description: The operation system type of the instance owned.
-            returned: always
-            type: str
-            sample: linux
-        private_ip_address:
-            description: The IPv4 address of the network interface within the subnet.
-            returned: always
-            type: str
-            sample: 10.0.0.1
-        public_ip_address:
-            description: The public IPv4 address assigned to the instance or eip address
-            returned: always
-            type: str
-            sample: 43.0.0.1
-        resource_group_id:
-            description: The id of the resource group to which the instance belongs.
-            returned: always
-            type: str
-            sample: my-ecs-group
-        security_groups:
-            description: One or more security groups for the instance.
-            returned: always
-            type: list
-            elements: dict
-            contains:
-                group_id:
-                  description: The ID of the security group.
-                  returned: always
-                  type: str
-                  sample: sg-0123456
-                group_name:
-                  description: The name of the security group.
-                  returned: always
-                  type: str
-                  sample: my-security-group
-        status:
-            description: The current status of the instance.
-            returned: always
-            type: str
-            sample: running
-        tags:
-            description: Any tags assigned to the instance.
-            returned: always
-            type: dict
-            sample:
-        user_data:
-            description: User-defined data.
-            returned: always
-            type: dict
-            sample:
-        vswitch_id:
-            description: The ID of the vswitch in which the instance is running.
-            returned: always
-            type: str
-            sample: vsw-dew00abcdef
-        vpc_id:
-            description: The ID of the VPC the instance is in.
-            returned: always
-            type: str
-            sample: vpc-0011223344
-        spot_price_limit:
-          description:
-            - The maximum hourly price for the preemptible instance.
-          returned: always
-          type: float
-          sample: 0.97
-        spot_strategy:
-          description:
-             - The bidding mode of the pay-as-you-go instance.
+  description: List of ECS instances.
+  returned: always
+  type: complex
+  contains:
+    availability_zone:
+      description: The availability zone of the instance is in.
+      returned: always
+      type: str
+      sample: cn-beijing-a
+    block_device_mappings:
+      description: Any block device mapping entries for the instance.
+      returned: always
+      type: complex
+      contains:
+        device_name:
+          description: The device name exposed to the instance.
           returned: always
           type: str
-          sample: NoSpot
+          sample: /dev/xvda
+        attach_time:
+          description: The time stamp when the attachment initiated.
+          returned: always
+          type: str
+          sample: "2018-06-25T04:08:26Z"
+        delete_on_termination:
+          description: Indicates whether the volume is deleted on instance termination.
+          returned: always
+          type: bool
+          sample: true
+        status:
+          description: The attachment state.
+          returned: always
+          type: str
+          sample: in_use
+        volume_id:
+          description: The ID of the cloud disk.
+          returned: always
+          type: str
+          sample: d-2zei53pjsi117y6gf9t6
+    cpu:
+      description: The CPU core count of the instance.
+      returned: always
+      type: int
+      sample: 4
+    creation_time:
+      description: The time the instance was created.
+      returned: always
+      type: str
+      sample: "2018-06-25T04:08Z"
+    description:
+      description: The instance description.
+      returned: always
+      type: str
+      sample: "my ansible instance"
+    eip:
+      description: The attribution of EIP associated with the instance.
+      returned: always
+      type: complex
+      contains:
+        allocation_id:
+          description: The ID of the EIP.
+          returned: always
+          type: str
+          sample: eip-12345
+        internet_charge_type:
+          description: The internet charge type of the EIP.
+          returned: always
+          type: str
+          sample: "paybybandwidth"
+        ip_address:
+          description: EIP address.
+          returned: always
+          type: str
+          sample: 42.10.2.2
+    expired_time:
+      description: The time the instance will expire.
+      returned: always
+      type: str
+      sample: "2099-12-31T15:59Z"
+    gpu:
+      description: The attribution of instance GPU.
+      returned: always
+      type: complex
+      contains:
+        amount:
+          description: The count of the GPU.
+          returned: always
+          type: int
+          sample: 0
+        spec:
+          description: The specification of the GPU.
+          returned: always
+          type: str
+          sample: ""
+    host_name:
+      description: The host name of the instance.
+      returned: always
+      type: str
+      sample: iZ2zewaoZ
+    id:
+      description: Alias of instance_id.
+      returned: always
+      type: str
+      sample: i-abc12345
+    instance_id:
+      description: ECS instance resource ID.
+      returned: always
+      type: str
+      sample: i-abc12345
+    image_id:
+      description: The ID of the image used to launch the instance.
+      returned: always
+      type: str
+      sample: m-0011223344
+    inner_ip_address:
+      description: The inner IPv4 address of the classic instance.
+      returned: always
+      type: str
+      sample: 10.0.0.2
+    instance_charge_type:
+      description: The instance charge type.
+      returned: always
+      type: str
+      sample: PostPaid
+    instance_name:
+      description: The name of the instance.
+      returned: always
+      type: str
+      sample: my-ecs
+    instance_type:
+      description: The instance type of the running instance.
+      returned: always
+      type: str
+      sample: ecs.sn1ne.xlarge
+    instance_type_family:
+      description: The instance type family of the instance belongs.
+      returned: always
+      type: str
+      sample: ecs.sn1ne
+    internet_charge_type:
+      description: The billing method of the network bandwidth.
+      returned: always
+      type: str
+      sample: PayByBandwidth
+    internet_max_bandwidth_in:
+      description: Maximum incoming bandwidth from the internet network.
+      returned: always
+      type: int
+      sample: 200
+    internet_max_bandwidth_out:
+      description: Maximum incoming bandwidth from the internet network.
+      returned: always
+      type: int
+      sample: 20
+    io_optimized:
+      description: Indicates whether the instance is optimized for EBS I/O.
+      returned: always
+      type: bool
+      sample: false
+    memory:
+      description: Memory size of the instance.
+      returned: always
+      type: int
+      sample: 8192
+    network_interfaces:
+      description: One or more network interfaces for the instance.
+      returned: always
+      type: complex
+      contains:
+        mac_address:
+          description: The MAC address.
+          returned: always
+          type: str
+          sample: "00:11:22:33:44:55"
+        network_interface_id:
+          description: The ID of the network interface.
+          returned: always
+          type: str
+          sample: eni-01234567
+        primary_ip_address:
+          description: The primary IPv4 address of the network interface within the vswitch.
+          returned: always
+          type: str
+          sample: 10.0.0.1
+    osname:
+      description: The operation system name of the instance owned.
+      returned: always
+      type: str
+      sample: CentOS
+    ostype:
+      description: The operation system type of the instance owned.
+      returned: always
+      type: str
+      sample: linux
+    private_ip_address:
+      description: The IPv4 address of the network interface within the subnet.
+      returned: always
+      type: str
+      sample: 10.0.0.1
+    public_ip_address:
+      description: The public IPv4 address assigned to the instance or eip address.
+      returned: always
+      type: str
+      sample: 43.0.0.1
+    resource_group_id:
+      description: The id of the resource group to which the instance belongs.
+      returned: always
+      type: str
+      sample: my-ecs-group
+    security_groups:
+      description: One or more security groups for the instance.
+      returned: always
+      type: list
+      elements: dict
+      contains:
+        group_id:
+          description: The ID of the security group.
+          returned: always
+          type: str
+          sample: sg-0123456
+        group_name:
+          description: The name of the security group.
+          returned: always
+          type: str
+          sample: my-security-group
+    status:
+      description: The current status of the instance.
+      returned: always
+      type: str
+      sample: running
+    tags:
+      description: Any tags assigned to the instance.
+      returned: always
+      type: dict
+      sample:
+    user_data:
+      description: User-defined data.
+      returned: always
+      type: dict
+      sample:
+    vswitch_id:
+      description: The ID of the vswitch in which the instance is running.
+      returned: always
+      type: str
+      sample: vsw-dew00abcdef
+    vpc_id:
+      description: The ID of the VPC the instance is in.
+      returned: always
+      type: str
+      sample: vpc-0011223344
+    spot_price_limit:
+      description:
+        - The maximum hourly price for the preemptible instance.
+      returned: always
+      type: float
+      sample: 0.97
+    spot_strategy:
+      description:
+        - The bidding mode of the pay-as-you-go instance.
+      returned: always
+      type: str
+      sample: NoSpot
 ids:
-    description: List of ECS instance IDs
-    returned: always
-    type: list
-    sample: [i-12345er, i-3245fs]
-'''
+  description: List of ECS instance IDs.
+  returned: always
+  type: list
+  sample: [i-12345er, i-3245fs]
+"""
 
 import re
 import time

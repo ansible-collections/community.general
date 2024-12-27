@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: bitbucket_pipeline_key_pair
 short_description: Manages Bitbucket pipeline SSH key pair
 description:
@@ -33,7 +32,7 @@ options:
   workspace:
     description:
       - The repository owner.
-      - "B(Note:) O(ignore:username) used to be an alias of this option. Since community.general 6.0.0 it is an alias of O(user)."
+      - B(Note:) O(ignore:username) used to be an alias of this option. Since community.general 6.0.0 it is an alias of O(user).
     type: str
     required: true
   public_key:
@@ -49,12 +48,12 @@ options:
       - Indicates desired state of the key pair.
     type: str
     required: true
-    choices: [ absent, present ]
+    choices: [absent, present]
 notes:
   - Check mode is supported.
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Create or update SSH key pair
   community.general.bitbucket_pipeline_key_pair:
     repository: 'bitbucket-repo'
@@ -68,9 +67,9 @@ EXAMPLES = r'''
     repository: bitbucket-repo
     workspace: bitbucket_workspace
     state: absent
-'''
+"""
 
-RETURN = r''' # '''
+RETURN = r""" # """
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.source_control.bitbucket import BitbucketHelper

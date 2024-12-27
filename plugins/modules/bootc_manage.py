@@ -8,34 +8,32 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: bootc_manage
 version_added: 9.3.0
 author:
-- Ryan Cook (@cooktheryan)
+  - Ryan Cook (@cooktheryan)
 short_description: Bootc Switch and Upgrade
 description:
-    - This module manages the switching and upgrading of C(bootc).
+  - This module manages the switching and upgrading of C(bootc).
 options:
-    state:
-        description:
-            - 'Control to apply the latest image or switch the image.'
-            - 'B(Note:) This will not reboot the system.'
-            - 'Please use M(ansible.builtin.reboot) to reboot the system.'
-        required: true
-        type: str
-        choices: ['switch', 'latest']
-    image:
-        description:
-            - 'The image to switch to.'
-            - 'This is required when O(state=switch).'
-        required: false
-        type: str
+  state:
+    description:
+      - Control whether to apply the latest image or switch the image.
+      - B(Note:) This will not reboot the system.
+      - Please use M(ansible.builtin.reboot) to reboot the system.
+    required: true
+    type: str
+    choices: ['switch', 'latest']
+  image:
+    description:
+      - The image to switch to.
+      - This is required when O(state=switch).
+    required: false
+    type: str
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 # Switch to a different image
 - name: Provide image to switch to a different image and retain the current running image
   community.general.bootc_manage:
@@ -46,10 +44,10 @@ EXAMPLES = '''
 - name: Apply updates of the current running image
   community.general.bootc_manage:
     state: latest
-'''
+"""
 
-RETURN = '''
-'''
+RETURN = r"""
+"""
 
 
 from ansible.module_utils.basic import AnsibleModule

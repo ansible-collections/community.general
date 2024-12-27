@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: alerta_customer
 short_description: Manage customers in Alerta
 version_added: 4.8.0
@@ -18,7 +17,7 @@ description:
 author: Christian Wollinger (@cwollinger)
 seealso:
   - name: API documentation
-    description: Documentation for Alerta API
+    description: Documentation for Alerta API.
     link: https://docs.alerta.io/api/reference.html#customers
 extends_documentation_fragment:
   - community.general.attributes
@@ -60,11 +59,11 @@ options:
       - Whether the customer should exist or not.
       - Both O(customer) and O(match) identify a customer that should be added or removed.
     type: str
-    choices: [ absent, present ]
+    choices: [absent, present]
     default: present
-'''
+"""
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Create customer
   community.general.alerta_customer:
     alerta_url: https://alerta.example.com
@@ -83,7 +82,7 @@ EXAMPLES = """
     state: absent
 """
 
-RETURN = """
+RETURN = r"""
 msg:
   description:
     - Success or failure message.

@@ -9,10 +9,9 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 author:
-    - Alain Dejoux (@adejoux)
+  - Alain Dejoux (@adejoux)
 module: aix_lvol
 short_description: Configure AIX LVM logical volumes
 description:
@@ -27,58 +26,58 @@ attributes:
 options:
   vg:
     description:
-    - The volume group this logical volume is part of.
+      - The volume group this logical volume is part of.
     type: str
     required: true
   lv:
     description:
-    - The name of the logical volume.
+      - The name of the logical volume.
     type: str
     required: true
   lv_type:
     description:
-    - The type of the logical volume.
+      - The type of the logical volume.
     type: str
     default: jfs2
   size:
     description:
-    - The size of the logical volume with one of the [MGT] units.
+      - The size of the logical volume with one of the [MGT] units.
     type: str
   copies:
     description:
-    - The number of copies of the logical volume.
-    - Maximum copies are 3.
+      - The number of copies of the logical volume.
+      - Maximum copies are 3.
     type: int
     default: 1
   policy:
     description:
-    - Sets the interphysical volume allocation policy.
-    - V(maximum) allocates logical partitions across the maximum number of physical volumes.
-    - V(minimum) allocates logical partitions across the minimum number of physical volumes.
+      - Sets the interphysical volume allocation policy.
+      - V(maximum) allocates logical partitions across the maximum number of physical volumes.
+      - V(minimum) allocates logical partitions across the minimum number of physical volumes.
     type: str
-    choices: [ maximum, minimum ]
+    choices: [maximum, minimum]
     default: maximum
   state:
     description:
-    - Control if the logical volume exists. If V(present) and the
-      volume does not already exist then the O(size) option is required.
+      - Control if the logical volume exists. If V(present) and the volume does not already exist then the O(size) option
+        is required.
     type: str
-    choices: [ absent, present ]
+    choices: [absent, present]
     default: present
   opts:
     description:
-    - Free-form options to be passed to the mklv command.
+      - Free-form options to be passed to the mklv command.
     type: str
     default: ''
   pvs:
     description:
-    - A list of physical volumes, for example V(hdisk1,hdisk2).
+      - A list of physical volumes, for example V(hdisk1,hdisk2).
     type: list
     elements: str
     default: []
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Create a logical volume of 512M
   community.general.aix_lvol:
     vg: testvg
@@ -90,7 +89,7 @@ EXAMPLES = r'''
     vg: testvg
     lv: test2lv
     size: 512M
-    pvs: [ hdisk1, hdisk2 ]
+    pvs: [hdisk1, hdisk2]
 
 - name: Create a logical volume of 512M mirrored
   community.general.aix_lvol:
@@ -124,15 +123,15 @@ EXAMPLES = r'''
     vg: testvg
     lv: testlv
     state: absent
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 msg:
   type: str
   description: A friendly message describing the task result.
   returned: always
   sample: Logical volume testlv created.
-'''
+"""
 
 import re
 

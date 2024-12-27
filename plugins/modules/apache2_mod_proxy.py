@@ -9,19 +9,17 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: apache2_mod_proxy
 author: Olivier Boukili (@oboukili)
 short_description: Set and/or get members' attributes of an Apache httpd 2.4 mod_proxy balancer pool
 description:
-  - Set and/or get members' attributes of an Apache httpd 2.4 mod_proxy balancer
-    pool, using HTTP POST and GET requests. The httpd mod_proxy balancer-member
-    status page has to be enabled and accessible, as this module relies on parsing
-    this page. This module supports ansible check_mode, and requires BeautifulSoup
-    python module.
+  - Set and/or get members' attributes of an Apache httpd 2.4 mod_proxy balancer pool, using HTTP POST and GET requests. The
+    httpd mod_proxy balancer-member status page has to be enabled and accessible, as this module relies on parsing this page.
 extends_documentation_fragment:
   - community.general.attributes
+requirements:
+  - Python package C(BeautifulSoup).
 attributes:
   check_mode:
     support: full
@@ -31,28 +29,25 @@ options:
   balancer_url_suffix:
     type: str
     description:
-      - Suffix of the balancer pool url required to access the balancer pool
-        status page (e.g. balancer_vhost[:port]/balancer_url_suffix).
+      - Suffix of the balancer pool URL required to access the balancer pool status page (for example V(balancer_vhost[:port]/balancer_url_suffix)).
     default: /balancer-manager/
   balancer_vhost:
     type: str
     description:
-      - (ipv4|ipv6|fqdn):port of the Apache httpd 2.4 mod_proxy balancer pool.
+      - (IPv4|IPv6|FQDN):port of the Apache httpd 2.4 mod_proxy balancer pool.
     required: true
   member_host:
     type: str
     description:
-      - (ipv4|ipv6|fqdn) of the balancer member to get or to set attributes to.
-        Port number is autodetected and should not be specified here.
-        If undefined, apache2_mod_proxy module will return a members list of
-        dictionaries of all the current balancer pool members' attributes.
+      - (IPv4|IPv6|FQDN) of the balancer member to get or to set attributes to. Port number is autodetected and should not
+        be specified here. If undefined, apache2_mod_proxy module will return a members list of dictionaries of all the current
+        balancer pool members' attributes.
   state:
     type: str
     description:
-      - Desired state of the member host.
-        (absent|disabled),drained,hot_standby,ignore_errors can be
-        simultaneously invoked by separating them with a comma (e.g. state=drained,ignore_errors).
-      - 'Accepted state values: ["present", "absent", "enabled", "disabled", "drained", "hot_standby", "ignore_errors"]'
+      - Desired state of the member host. (absent|disabled),drained,hot_standby,ignore_errors can be simultaneously invoked
+        by separating them with a comma (for example V(state=drained,ignore_errors)).
+      - 'Accepted state values: [V(present), V(absent), V(enabled), V(disabled), V(drained), V(hot_standby), V(ignore_errors)].'
   tls:
     description:
       - Use https to access balancer management page.
@@ -63,9 +58,9 @@ options:
       - Validate ssl/tls certificates.
     type: bool
     default: true
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Get all current balancer pool members attributes
   community.general.apache2_mod_proxy:
     balancer_vhost: 10.0.0.2
@@ -110,98 +105,98 @@ EXAMPLES = '''
     member_host: '{{ member.host }}'
     state: absent
   delegate_to: myloadbalancernode
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 member:
-    description: specific balancer member information dictionary, returned when apache2_mod_proxy module is invoked with member_host parameter.
-    type: dict
-    returned: success
-    sample:
-      {"attributes":
-            {"Busy": "0",
-            "Elected": "42",
-            "Factor": "1",
-            "From": "136K",
-            "Load": "0",
-            "Route": null,
-            "RouteRedir": null,
-            "Set": "0",
-            "Status": "Init Ok ",
-            "To": " 47K",
-            "Worker URL": null
-        },
-        "balancer_url": "http://10.10.0.2/balancer-manager/",
-        "host": "10.10.0.20",
-        "management_url": "http://10.10.0.2/lb/?b=mywsbalancer&w=http://10.10.0.20:8080/ws&nonce=8925436c-79c6-4841-8936-e7d13b79239b",
-        "path": "/ws",
-        "port": 8080,
-        "protocol": "http",
-        "status": {
-            "disabled": false,
-            "drained": false,
-            "hot_standby": false,
-            "ignore_errors": false
-        }
+  description: specific balancer member information dictionary, returned when apache2_mod_proxy module is invoked with C(member_host) parameter.
+  type: dict
+  returned: success
+  sample:
+    {"attributes":
+          {"Busy": "0",
+          "Elected": "42",
+          "Factor": "1",
+          "From": "136K",
+          "Load": "0",
+          "Route": null,
+          "RouteRedir": null,
+          "Set": "0",
+          "Status": "Init Ok ",
+          "To": " 47K",
+          "Worker URL": null
+      },
+      "balancer_url": "http://10.10.0.2/balancer-manager/",
+      "host": "10.10.0.20",
+      "management_url": "http://10.10.0.2/lb/?b=mywsbalancer&w=http://10.10.0.20:8080/ws&nonce=8925436c-79c6-4841-8936-e7d13b79239b",
+      "path": "/ws",
+      "port": 8080,
+      "protocol": "http",
+      "status": {
+          "disabled": false,
+          "drained": false,
+          "hot_standby": false,
+          "ignore_errors": false
       }
+    }
 members:
-    description: list of member (defined above) dictionaries, returned when apache2_mod_proxy is invoked with no member_host and state args.
-    returned: success
-    type: list
-    sample:
-      [{"attributes": {
-            "Busy": "0",
-            "Elected": "42",
-            "Factor": "1",
-            "From": "136K",
-            "Load": "0",
-            "Route": null,
-            "RouteRedir": null,
-            "Set": "0",
-            "Status": "Init Ok ",
-            "To": " 47K",
-            "Worker URL": null
-        },
-        "balancer_url": "http://10.10.0.2/balancer-manager/",
-        "host": "10.10.0.20",
-        "management_url": "http://10.10.0.2/lb/?b=mywsbalancer&w=http://10.10.0.20:8080/ws&nonce=8925436c-79c6-4841-8936-e7d13b79239b",
-        "path": "/ws",
-        "port": 8080,
-        "protocol": "http",
-        "status": {
-            "disabled": false,
-            "drained": false,
-            "hot_standby": false,
-            "ignore_errors": false
-        }
-        },
-        {"attributes": {
-            "Busy": "0",
-            "Elected": "42",
-            "Factor": "1",
-            "From": "136K",
-            "Load": "0",
-            "Route": null,
-            "RouteRedir": null,
-            "Set": "0",
-            "Status": "Init Ok ",
-            "To": " 47K",
-            "Worker URL": null
-        },
-        "balancer_url": "http://10.10.0.2/balancer-manager/",
-        "host": "10.10.0.21",
-        "management_url": "http://10.10.0.2/lb/?b=mywsbalancer&w=http://10.10.0.21:8080/ws&nonce=8925436c-79c6-4841-8936-e7d13b79239b",
-        "path": "/ws",
-        "port": 8080,
-        "protocol": "http",
-        "status": {
-            "disabled": false,
-            "drained": false,
-            "hot_standby": false,
-            "ignore_errors": false}
-        }
-      ]
-'''
+  description: list of member (defined above) dictionaries, returned when apache2_mod_proxy is invoked with no C(member_host) and state args.
+  returned: success
+  type: list
+  sample:
+    [{"attributes": {
+          "Busy": "0",
+          "Elected": "42",
+          "Factor": "1",
+          "From": "136K",
+          "Load": "0",
+          "Route": null,
+          "RouteRedir": null,
+          "Set": "0",
+          "Status": "Init Ok ",
+          "To": " 47K",
+          "Worker URL": null
+      },
+      "balancer_url": "http://10.10.0.2/balancer-manager/",
+      "host": "10.10.0.20",
+      "management_url": "http://10.10.0.2/lb/?b=mywsbalancer&w=http://10.10.0.20:8080/ws&nonce=8925436c-79c6-4841-8936-e7d13b79239b",
+      "path": "/ws",
+      "port": 8080,
+      "protocol": "http",
+      "status": {
+          "disabled": false,
+          "drained": false,
+          "hot_standby": false,
+          "ignore_errors": false
+      }
+      },
+      {"attributes": {
+          "Busy": "0",
+          "Elected": "42",
+          "Factor": "1",
+          "From": "136K",
+          "Load": "0",
+          "Route": null,
+          "RouteRedir": null,
+          "Set": "0",
+          "Status": "Init Ok ",
+          "To": " 47K",
+          "Worker URL": null
+      },
+      "balancer_url": "http://10.10.0.2/balancer-manager/",
+      "host": "10.10.0.21",
+      "management_url": "http://10.10.0.2/lb/?b=mywsbalancer&w=http://10.10.0.21:8080/ws&nonce=8925436c-79c6-4841-8936-e7d13b79239b",
+      "path": "/ws",
+      "port": 8080,
+      "protocol": "http",
+      "status": {
+          "disabled": false,
+          "drained": false,
+          "hot_standby": false,
+          "ignore_errors": false}
+      }
+    ]
+"""
 
 import re
 import traceback

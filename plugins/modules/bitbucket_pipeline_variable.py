@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: bitbucket_pipeline_variable
 short_description: Manages Bitbucket pipeline variables
 description:
@@ -33,7 +32,7 @@ options:
   workspace:
     description:
       - The repository owner.
-      - "B(Note:) O(ignore:username) used to be an alias of this option. Since community.general 6.0.0 it is an alias of O(user)."
+      - B(Note:) O(ignore:username) used to be an alias of this option. Since community.general 6.0.0 it is an alias of O(user).
     type: str
     required: true
   name:
@@ -55,13 +54,13 @@ options:
       - Indicates desired state of the variable.
     type: str
     required: true
-    choices: [ absent, present ]
+    choices: [absent, present]
 notes:
   - Check mode is supported.
   - For secured values return parameter C(changed) is always V(true).
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Create or update pipeline variables from the list
   community.general.bitbucket_pipeline_variable:
     repository: 'bitbucket-repo'
@@ -71,8 +70,8 @@ EXAMPLES = r'''
     secured: '{{ item.secured }}'
     state: present
   with_items:
-    - { name: AWS_ACCESS_KEY, value: ABCD1234, secured: false }
-    - { name: AWS_SECRET, value: qwe789poi123vbn0, secured: true }
+    - {name: AWS_ACCESS_KEY, value: ABCD1234, secured: false}
+    - {name: AWS_SECRET, value: qwe789poi123vbn0, secured: true}
 
 - name: Remove pipeline variable
   community.general.bitbucket_pipeline_variable:
@@ -80,9 +79,9 @@ EXAMPLES = r'''
     workspace: bitbucket_workspace
     name: AWS_ACCESS_KEY
     state: absent
-'''
+"""
 
-RETURN = r''' # '''
+RETURN = r""" # """
 
 from ansible.module_utils.basic import AnsibleModule, _load_params
 from ansible_collections.community.general.plugins.module_utils.source_control.bitbucket import BitbucketHelper

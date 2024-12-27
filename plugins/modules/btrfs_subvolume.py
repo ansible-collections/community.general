@@ -7,8 +7,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: btrfs_subvolume
 short_description: Manage btrfs subvolumes
 version_added: "6.6.0"
@@ -16,71 +15,73 @@ version_added: "6.6.0"
 description: Creates, updates and deletes btrfs subvolumes and snapshots.
 
 options:
-    automount:
-        description:
-        - Allow the module to temporarily mount the targeted btrfs filesystem in order to validate the current state and make any required changes.
-        type: bool
-        default: false
-    default:
-        description:
-        - Make the subvolume specified by O(name) the filesystem's default subvolume.
-        type: bool
-        default: false
-    filesystem_device:
-        description:
-        - A block device contained within the btrfs filesystem to be targeted.
-        - Useful when multiple btrfs filesystems are present to specify which filesystem should be targeted.
-        type: path
-    filesystem_label:
-        description:
-        - A descriptive label assigned to the btrfs filesystem to be targeted.
-        - Useful when multiple btrfs filesystems are present to specify which filesystem should be targeted.
-        type: str
-    filesystem_uuid:
-        description:
-        - A unique identifier assigned to the btrfs filesystem to be targeted.
-        - Useful when multiple btrfs filesystems are present to specify which filesystem should be targeted.
-        type: str
-    name:
-        description:
-        - Name of the subvolume/snapshot to be targeted.
-        required: true
-        type: str
-    recursive:
-        description:
-        - When true, indicates that parent/child subvolumes should be created/removedas necessary
-          to complete the operation (for O(state=present) and O(state=absent) respectively).
-        type: bool
-        default: false
-    snapshot_source:
-        description:
-        - Identifies the source subvolume for the created snapshot.
-        - Infers that the created subvolume is a snapshot.
-        type: str
-    snapshot_conflict:
-        description:
-        - Policy defining behavior when a subvolume already exists at the path of the requested snapshot.
-        - V(skip) - Create a snapshot only if a subvolume does not yet exist at the target location, otherwise indicate that no change is required.
-          Warning, this option does not yet verify that the target subvolume was generated from a snapshot of the requested source.
-        - V(clobber) - If a subvolume already exists at the requested location, delete it first.
-          This option is not idempotent and will result in a new snapshot being generated on every execution.
-        - V(error) - If a subvolume already exists at the requested location, return an error.
-          This option is not idempotent and will result in an error on replay of the module.
-        type: str
-        choices: [ skip, clobber, error ]
-        default: skip
-    state:
-        description:
-            - Indicates the current state of the targeted subvolume.
-        type: str
-        choices: [ absent, present ]
-        default: present
+  automount:
+    description:
+      - Allow the module to temporarily mount the targeted btrfs filesystem in order to validate the current state and make
+        any required changes.
+    type: bool
+    default: false
+  default:
+    description:
+      - Make the subvolume specified by O(name) the filesystem's default subvolume.
+    type: bool
+    default: false
+  filesystem_device:
+    description:
+      - A block device contained within the btrfs filesystem to be targeted.
+      - Useful when multiple btrfs filesystems are present to specify which filesystem should be targeted.
+    type: path
+  filesystem_label:
+    description:
+      - A descriptive label assigned to the btrfs filesystem to be targeted.
+      - Useful when multiple btrfs filesystems are present to specify which filesystem should be targeted.
+    type: str
+  filesystem_uuid:
+    description:
+      - A unique identifier assigned to the btrfs filesystem to be targeted.
+      - Useful when multiple btrfs filesystems are present to specify which filesystem should be targeted.
+    type: str
+  name:
+    description:
+      - Name of the subvolume/snapshot to be targeted.
+    required: true
+    type: str
+  recursive:
+    description:
+      - When true, indicates that parent/child subvolumes should be created/removedas necessary to complete the operation
+        (for O(state=present) and O(state=absent) respectively).
+    type: bool
+    default: false
+  snapshot_source:
+    description:
+      - Identifies the source subvolume for the created snapshot.
+      - Infers that the created subvolume is a snapshot.
+    type: str
+  snapshot_conflict:
+    description:
+      - Policy defining behavior when a subvolume already exists at the path of the requested snapshot.
+      - V(skip) - Create a snapshot only if a subvolume does not yet exist at the target location, otherwise indicate that
+        no change is required. Warning, this option does not yet verify that the target subvolume was generated from a snapshot
+        of the requested source.
+      - V(clobber) - If a subvolume already exists at the requested location, delete it first. This option is not idempotent
+        and will result in a new snapshot being generated on every execution.
+      - V(error) - If a subvolume already exists at the requested location, return an error. This option is not idempotent
+        and will result in an error on replay of the module.
+    type: str
+    choices: [skip, clobber, error]
+    default: skip
+  state:
+    description:
+      - Indicates the current state of the targeted subvolume.
+    type: str
+    choices: [absent, present]
+    default: present
 
 notes:
-  - If any or all of the options O(filesystem_device), O(filesystem_label) or O(filesystem_uuid) parameters are provided, there is expected
-    to be a matching btrfs filesystem. If none are provided and only a single btrfs filesystem exists or only a single
-    btrfs filesystem is mounted, that filesystem will be used; otherwise, the module will take no action and return an error.
-
+  - If any or all of the options O(filesystem_device), O(filesystem_label) or O(filesystem_uuid) parameters are provided,
+    there is expected to be a matching btrfs filesystem. If none are provided and only a single btrfs filesystem exists or
+    only a single btrfs filesystem is mounted, that filesystem will be used; otherwise, the module will take no action and
+    return an error.
 extends_documentation_fragment:
   - community.general.attributes
 
@@ -88,17 +89,16 @@ attributes:
   check_mode:
     support: partial
     details:
-      - In some scenarios it may erroneously report intermediate subvolumes being created.
-        After mounting, if a directory like file is found where the subvolume would have been created, the operation is skipped.
+      - In some scenarios it may erroneously report intermediate subvolumes being created. After mounting, if a directory
+        like file is found where the subvolume would have been created, the operation is skipped.
   diff_mode:
     support: none
 
 author:
-    - Gregory Furlong (@gnfzdz)
-'''
+  - Gregory Furlong (@gnfzdz)
+"""
 
-EXAMPLES = r'''
-
+EXAMPLES = r"""
 - name: Create a @home subvolume under the root subvolume
   community.general.btrfs_subvolume:
     name: /@home
@@ -127,85 +127,83 @@ EXAMPLES = r'''
   community.general.btrfs_subvolume:
     name: /@snapshots/@2022_06_09
     snapshot_source: /@
-    recursive: True
+    recursive: true
     filesystem_device: /dev/vda2
 
 - name: Remove the /@ subvolume and recursively delete child subvolumes as required
   community.general.btrfs_subvolume:
     name: /@snapshots/@2022_06_09
     snapshot_source: /@
-    recursive: True
+    recursive: true
     filesystem_device: /dev/vda2
+"""
 
-'''
-
-RETURN = r'''
-
+RETURN = r"""
 filesystem:
-    description:
+  description:
     - A summary of the final state of the targeted btrfs filesystem.
-    type: dict
-    returned: success
-    contains:
-        uuid:
-            description: A unique identifier assigned to the filesystem.
-            returned: success
-            type: str
-            sample: 96c9c605-1454-49b8-a63a-15e2584c208e
-        label:
-            description: An optional label assigned to the filesystem.
-            returned: success
-            type: str
-            sample: Tank
-        devices:
-            description: A list of devices assigned to the filesystem.
-            returned: success
-            type: list
-            sample:
-                - /dev/sda1
-                - /dev/sdb1
-        default_subvolume:
-            description: The ID of the filesystem's default subvolume.
-            returned: success and if filesystem is mounted
-            type: int
-            sample: 5
-        subvolumes:
-            description: A list of dicts containing metadata for all of the filesystem's subvolumes.
-            returned: success and if filesystem is mounted
-            type: list
-            elements: dict
-            contains:
-                id:
-                    description: An identifier assigned to the subvolume, unique within the containing filesystem.
-                    type: int
-                    sample: 256
-                mountpoints:
-                    description: Paths where the subvolume is mounted on the targeted host.
-                    type: list
-                    sample: ['/home']
-                parent:
-                    description: The identifier of this subvolume's parent.
-                    type: int
-                    sample: 5
-                path:
-                    description: The full path of the subvolume relative to the btrfs fileystem's root.
-                    type: str
-                    sample: /@home
+  type: dict
+  returned: success
+  contains:
+    uuid:
+      description: A unique identifier assigned to the filesystem.
+      returned: success
+      type: str
+      sample: 96c9c605-1454-49b8-a63a-15e2584c208e
+    label:
+      description: An optional label assigned to the filesystem.
+      returned: success
+      type: str
+      sample: Tank
+    devices:
+      description: A list of devices assigned to the filesystem.
+      returned: success
+      type: list
+      sample:
+        - /dev/sda1
+        - /dev/sdb1
+    default_subvolume:
+      description: The ID of the filesystem's default subvolume.
+      returned: success and if filesystem is mounted
+      type: int
+      sample: 5
+    subvolumes:
+      description: A list of dicts containing metadata for all of the filesystem's subvolumes.
+      returned: success and if filesystem is mounted
+      type: list
+      elements: dict
+      contains:
+        id:
+          description: An identifier assigned to the subvolume, unique within the containing filesystem.
+          type: int
+          sample: 256
+        mountpoints:
+          description: Paths where the subvolume is mounted on the targeted host.
+          type: list
+          sample: ['/home']
+        parent:
+          description: The identifier of this subvolume's parent.
+          type: int
+          sample: 5
+        path:
+          description: The full path of the subvolume relative to the btrfs fileystem's root.
+          type: str
+          sample: /@home
 
 modifications:
-    description:
+  description:
     - A list where each element describes a change made to the target btrfs filesystem.
-    type: list
-    returned: Success
-    elements: str
+  type: list
+  returned: Success
+  elements: str
 
 target_subvolume_id:
-    description:
+  description:
     - The ID of the subvolume specified with the O(name) parameter, either pre-existing or created as part of module execution.
-    type: int
-    sample: 257
-    returned: Success and subvolume exists after module execution
-'''
+  type: int
+  sample: 257
+  returned: Success and subvolume exists after module execution
+"""
 
 from ansible_collections.community.general.plugins.module_utils.btrfs import BtrfsFilesystemsProvider, BtrfsCommands, BtrfsModuleException
 from ansible_collections.community.general.plugins.module_utils.btrfs import normalize_subvolume_path

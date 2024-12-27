@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 author:
   - Kairo Araujo (@kairoaraujo)
 module: aix_lvg
@@ -26,43 +25,43 @@ attributes:
 options:
   force:
     description:
-    - Force volume group creation.
+      - Force volume group creation.
     type: bool
     default: false
   pp_size:
     description:
-    - The size of the physical partition in megabytes.
+      - The size of the physical partition in megabytes.
     type: int
   pvs:
     description:
-    - List of comma-separated devices to use as physical devices in this volume group.
-    - Required when creating or extending (V(present) state) the volume group.
-    - If not informed reducing (V(absent) state) the volume group will be removed.
+      - List of comma-separated devices to use as physical devices in this volume group.
+      - Required when creating or extending (V(present) state) the volume group.
+      - If not informed reducing (V(absent) state) the volume group will be removed.
     type: list
     elements: str
   state:
     description:
-    - Control if the volume group exists and volume group AIX state varyonvg V(varyon) or varyoffvg V(varyoff).
+      - Control if the volume group exists and volume group AIX state varyonvg V(varyon) or varyoffvg V(varyoff).
     type: str
-    choices: [ absent, present, varyoff, varyon ]
+    choices: [absent, present, varyoff, varyon]
     default: present
   vg:
     description:
-    - The name of the volume group.
+      - The name of the volume group.
     type: str
     required: true
   vg_type:
     description:
-    - The type of the volume group.
+      - The type of the volume group.
     type: str
-    choices: [ big, normal, scalable ]
+    choices: [big, normal, scalable]
     default: normal
 notes:
-- AIX will permit remove VG only if all LV/Filesystems are not busy.
-- Module does not modify PP size for already present volume group.
-'''
+  - AIX will permit remove VG only if all LV/Filesystems are not busy.
+  - Module does not modify PP size for already present volume group.
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Create a volume group datavg
   community.general.aix_lvg:
     vg: datavg
@@ -86,9 +85,9 @@ EXAMPLES = r'''
     vg: rootvg
     pvs: hdisk1
     state: absent
-'''
+"""
 
-RETURN = r''' # '''
+RETURN = r""" # """
 
 from ansible.module_utils.basic import AnsibleModule
 

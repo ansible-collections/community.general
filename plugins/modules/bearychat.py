@@ -7,12 +7,11 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: bearychat
 short_description: Send BearyChat notifications
 description:
-    - The M(community.general.bearychat) module sends notifications to U(https://bearychat.com)
-      via the Incoming Robot integration.
+  - The M(community.general.bearychat) module sends notifications to U(https://bearychat.com) using the Incoming Robot integration.
 author: "Jiangge Zhang (@tonyseek)"
 extends_documentation_fragment:
   - community.general.attributes
@@ -25,8 +24,7 @@ options:
   url:
     type: str
     description:
-      - BearyChat WebHook URL. This authenticates you to the bearychat
-        service. It looks like
+      - BearyChat WebHook URL. This authenticates you to the bearychat service. It looks like
         V(https://hook.bearychat.com/=ae2CF/incoming/e61bd5c57b164e04b11ac02e66f47f60).
     required: true
   text:
@@ -41,17 +39,16 @@ options:
   channel:
     type: str
     description:
-      - Channel to send the message to. If absent, the message goes to the
-        default channel selected by the O(url).
+      - Channel to send the message to. If absent, the message goes to the default channel selected by the O(url).
   attachments:
     type: list
     elements: dict
     description:
       - Define a list of attachments. For more information, see
-        https://github.com/bearyinnovative/bearychat-tutorial/blob/master/robots/incoming.md#attachments
-'''
+        U(https://github.com/bearyinnovative/bearychat-tutorial/blob/master/robots/incoming.md#attachments).
+"""
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Send notification message via BearyChat
   local_action:
     module: bearychat
@@ -75,12 +72,12 @@ EXAMPLES = """
           - http://example.com/index.png
 """
 
-RETURN = """
+RETURN = r"""
 msg:
-    description: execution result
-    returned: success
-    type: str
-    sample: "OK"
+  description: Execution result.
+  returned: success
+  type: str
+  sample: "OK"
 """
 
 try:

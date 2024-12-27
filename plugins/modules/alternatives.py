@@ -11,19 +11,18 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: alternatives
 short_description: Manages alternative programs for common commands
 description:
-    - Manages symbolic links using the 'update-alternatives' tool.
-    - Useful when multiple programs are installed but provide similar functionality (e.g. different editors).
+  - Manages symbolic links using the C(update-alternatives) tool.
+  - Useful when multiple programs are installed but provide similar functionality (for example, different editors).
 author:
-    - Marius Rieder (@jiuka)
-    - David Wittman (@DavidWittman)
-    - Gabe Mulley (@mulby)
+  - Marius Rieder (@jiuka)
+  - David Wittman (@DavidWittman)
+  - Gabe Mulley (@mulby)
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
   check_mode:
     support: full
@@ -47,8 +46,8 @@ options:
   link:
     description:
       - The path to the symbolic link that should point to the real executable.
-      - This option is always required on RHEL-based distributions. On Debian-based distributions this option is
-        required when the alternative O(name) is unknown to the system.
+      - This option is always required on RHEL-based distributions. On Debian-based distributions this option is required
+        when the alternative O(name) is unknown to the system.
     type: path
   priority:
     description:
@@ -56,14 +55,14 @@ options:
     type: int
   state:
     description:
-      - V(present) - install the alternative (if not already installed), but do
-        not set it as the currently selected alternative for the group.
-      - V(selected) - install the alternative (if not already installed), and
-        set it as the currently selected alternative for the group.
-      - V(auto) - install the alternative (if not already installed), and
-        set the group to auto mode. Added in community.general 5.1.0.
+      - V(present) - install the alternative (if not already installed), but do not set it as the currently selected alternative
+        for the group.
+      - V(selected) - install the alternative (if not already installed), and set it as the currently selected alternative
+        for the group.
+      - V(auto) - install the alternative (if not already installed), and set the group to auto mode. Added in community.general
+        5.1.0.
       - V(absent) - removes the alternative. Added in community.general 5.1.0.
-    choices: [ present, selected, auto, absent ]
+    choices: [present, selected, auto, absent]
     default: selected
     type: str
     version_added: 4.8.0
@@ -71,8 +70,7 @@ options:
     description:
       - A list of subcommands.
       - Each subcommand needs a name, a link and a path parameter.
-      - Subcommands are also named 'slaves' or 'followers', depending on the version
-        of alternatives.
+      - Subcommands are also named C(slaves) or C(followers), depending on the version of C(alternatives).
     type: list
     elements: dict
     aliases: ['slaves']
@@ -93,10 +91,10 @@ options:
         type: path
         required: true
     version_added: 5.1.0
-requirements: [ update-alternatives ]
-'''
+requirements: [update-alternatives]
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Correct java version selected
   community.general.alternatives:
     name: java
@@ -143,7 +141,7 @@ EXAMPLES = r'''
       - name: keytool
         link: /usr/bin/keytool
         path: /usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool
-'''
+"""
 
 import os
 import re
