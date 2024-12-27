@@ -10,26 +10,26 @@ __metaclass__ = type
 class ModuleDocFragment(object):
 
     # Standard documentation fragment
-    DOCUMENTATION = r'''
+    DOCUMENTATION = r"""
 options:
   api_token:
     description:
       - Online OAuth token.
     type: str
     required: true
-    aliases: [ oauth_token ]
+    aliases: [oauth_token]
   api_url:
     description:
       - Online API URL.
     type: str
     default: 'https://api.online.net'
-    aliases: [ base_url ]
+    aliases: [base_url]
   api_timeout:
     description:
       - HTTP timeout to Online API in seconds.
     type: int
     default: 30
-    aliases: [ timeout ]
+    aliases: [timeout]
   validate_certs:
     description:
       - Validate SSL certs of the Online API.
@@ -37,9 +37,7 @@ options:
     default: true
 notes:
   - Also see the API documentation on U(https://console.online.net/en/api/).
-  - If O(api_token) is not set within the module, the following
-    environment variables can be used in decreasing order of precedence
+  - If O(api_token) is not set within the module, the following environment variables can be used in decreasing order of precedence
     E(ONLINE_TOKEN), E(ONLINE_API_KEY), E(ONLINE_OAUTH_TOKEN), E(ONLINE_API_TOKEN).
-  - If one wants to use a different O(api_url) one can also set the E(ONLINE_API_URL)
-    environment variable.
-'''
+  - If one wants to use a different O(api_url) one can also set the E(ONLINE_API_URL) environment variable.
+"""
