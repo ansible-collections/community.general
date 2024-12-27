@@ -8,16 +8,15 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: cloudflare_dns
 author:
-- Michael Gruener (@mgruener)
+  - Michael Gruener (@mgruener)
 short_description: Manage Cloudflare DNS records
 description:
-   - "Manages dns records via the Cloudflare API, see the docs: U(https://api.cloudflare.com/)."
+  - 'Manages dns records using the Cloudflare API, see the docs: U(https://api.cloudflare.com/).'
 extends_documentation_fragment:
-   - community.general.attributes
+  - community.general.attributes
 attributes:
   check_mode:
     support: full
@@ -26,161 +25,162 @@ attributes:
 options:
   api_token:
     description:
-    - API token.
-    - Required for api token authentication.
-    - "You can obtain your API token from the bottom of the Cloudflare 'My Account' page, found here: U(https://dash.cloudflare.com/)."
-    - Can be specified in E(CLOUDFLARE_TOKEN) environment variable since community.general 2.0.0.
+      - API token.
+      - Required for api token authentication.
+      - "You can obtain your API token from the bottom of the Cloudflare 'My Account' page, found here: U(https://dash.cloudflare.com/)."
+      - Can be specified in E(CLOUDFLARE_TOKEN) environment variable since community.general 2.0.0.
     type: str
     version_added: '0.2.0'
   account_api_key:
     description:
-    - Account API key.
-    - Required for api keys authentication.
-    - "You can obtain your API key from the bottom of the Cloudflare 'My Account' page, found here: U(https://dash.cloudflare.com/)."
+      - Account API key.
+      - Required for api keys authentication.
+      - "You can obtain your API key from the bottom of the Cloudflare 'My Account' page, found here: U(https://dash.cloudflare.com/)."
     type: str
-    aliases: [ account_api_token ]
+    aliases: [account_api_token]
   account_email:
     description:
-    - Account email. Required for API keys authentication.
+      - Account email. Required for API keys authentication.
     type: str
   algorithm:
     description:
-    - Algorithm number.
-    - Required for O(type=DS) and O(type=SSHFP) when O(state=present).
+      - Algorithm number.
+      - Required for O(type=DS) and O(type=SSHFP) when O(state=present).
     type: int
   cert_usage:
     description:
-    - Certificate usage number.
-    - Required for O(type=TLSA) when O(state=present).
+      - Certificate usage number.
+      - Required for O(type=TLSA) when O(state=present).
     type: int
-    choices: [ 0, 1, 2, 3 ]
+    choices: [0, 1, 2, 3]
   comment:
     description:
-    - Comments or notes about the DNS record.
+      - Comments or notes about the DNS record.
     type: str
     version_added: 10.1.0
   flag:
     description:
-    - Issuer Critical Flag.
-    - Required for O(type=CAA) when O(state=present).
+      - Issuer Critical Flag.
+      - Required for O(type=CAA) when O(state=present).
     type: int
-    choices: [ 0, 1 ]
+    choices: [0, 1]
     version_added: 8.0.0
   tag:
     description:
-    - CAA issue restriction.
-    - Required for O(type=CAA) when O(state=present).
+      - CAA issue restriction.
+      - Required for O(type=CAA) when O(state=present).
     type: str
-    choices: [ issue, issuewild, iodef ]
+    choices: [issue, issuewild, iodef]
     version_added: 8.0.0
   hash_type:
     description:
-    - Hash type number.
-    - Required for O(type=DS), O(type=SSHFP) and O(type=TLSA) when O(state=present).
+      - Hash type number.
+      - Required for O(type=DS), O(type=SSHFP) and O(type=TLSA) when O(state=present).
     type: int
-    choices: [ 1, 2 ]
+    choices: [1, 2]
   key_tag:
     description:
-    - DNSSEC key tag.
-    - Needed for O(type=DS) when O(state=present).
+      - DNSSEC key tag.
+      - Needed for O(type=DS) when O(state=present).
     type: int
   port:
     description:
-    - Service port.
-    - Required for O(type=SRV) and O(type=TLSA).
+      - Service port.
+      - Required for O(type=SRV) and O(type=TLSA).
     type: int
   priority:
     description:
-    - Record priority.
-    - Required for O(type=MX) and O(type=SRV)
+      - Record priority.
+      - Required for O(type=MX) and O(type=SRV).
     default: 1
     type: int
   proto:
     description:
-    - Service protocol. Required for O(type=SRV) and O(type=TLSA).
-    - Common values are TCP and UDP.
+      - Service protocol. Required for O(type=SRV) and O(type=TLSA).
+      - Common values are TCP and UDP.
     type: str
   proxied:
     description:
-    - Proxy through Cloudflare network or just use DNS.
+      - Proxy through Cloudflare network or just use DNS.
     type: bool
     default: false
   record:
     description:
-    - Record to add.
-    - Required if O(state=present).
-    - Default is V(@) (that is, the zone name).
+      - Record to add.
+      - Required if O(state=present).
+      - Default is V(@) (that is, the zone name).
     type: str
     default: '@'
-    aliases: [ name ]
+    aliases: [name]
   selector:
     description:
-    - Selector number.
-    - Required for O(type=TLSA) when O(state=present).
-    choices: [ 0, 1 ]
+      - Selector number.
+      - Required for O(type=TLSA) when O(state=present).
+    choices: [0, 1]
     type: int
   service:
     description:
-    - Record service.
-    - Required for O(type=SRV).
+      - Record service.
+      - Required for O(type=SRV).
     type: str
   solo:
     description:
-    - Whether the record should be the only one for that record type and record name.
-    - Only use with O(state=present).
-    - This will delete all other records with the same record name and type.
+      - Whether the record should be the only one for that record type and record name.
+      - Only use with O(state=present).
+      - This will delete all other records with the same record name and type.
     type: bool
   state:
     description:
-    - Whether the record(s) should exist or not.
+      - Whether the record(s) should exist or not.
     type: str
-    choices: [ absent, present ]
+    choices: [absent, present]
     default: present
   tags:
     description:
-    - Custom tags for the DNS record.
+      - Custom tags for the DNS record.
     type: list
     elements: str
     version_added: 10.1.0
   timeout:
     description:
-    - Timeout for Cloudflare API calls.
+      - Timeout for Cloudflare API calls.
     type: int
     default: 30
   ttl:
     description:
-    - The TTL to give the new record.
-    - Must be between 120 and 2,147,483,647 seconds, or 1 for automatic.
+      - The TTL to give the new record.
+      - Must be between V(120) and V(2,147,483,647) seconds, or V(1) for automatic.
     type: int
     default: 1
   type:
     description:
       - The type of DNS record to create. Required if O(state=present).
-      - Support for V(SPF) has been removed from community.general 9.0.0 since that record type is no longer supported by CloudFlare.
+      - Support for V(SPF) has been removed from community.general 9.0.0 since that record type is no longer supported by
+        CloudFlare.
     type: str
-    choices: [ A, AAAA, CNAME, DS, MX, NS, SRV, SSHFP, TLSA, CAA, TXT ]
+    choices: [A, AAAA, CNAME, DS, MX, NS, SRV, SSHFP, TLSA, CAA, TXT]
   value:
     description:
-    - The record value.
-    - Required for O(state=present).
+      - The record value.
+      - Required for O(state=present).
     type: str
-    aliases: [ content ]
+    aliases: [content]
   weight:
     description:
-    - Service weight.
-    - Required for O(type=SRV).
+      - Service weight.
+      - Required for O(type=SRV).
     type: int
     default: 1
   zone:
     description:
-    - The name of the Zone to work with (e.g. "example.com").
-    - The Zone must already exist.
+      - The name of the Zone to work with (for example V(example.com)).
+      - The Zone must already exist.
     type: str
     required: true
-    aliases: [ domain ]
-'''
+    aliases: [domain]
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Create a test.example.net A record to point to 127.0.0.1
   community.general.cloudflare_dns:
     zone: example.net
@@ -207,8 +207,8 @@ EXAMPLES = r'''
     value: 127.0.0.1
     comment: Local test website
     tags:
-    - test
-    - local
+      - test
+      - local
     api_token: dummyapitoken
 
 - name: Create a example.net CNAME record to example.com
@@ -311,123 +311,116 @@ EXAMPLES = r'''
     algorithm: 8
     hash_type: 2
     value: B4EB5AC4467D2DFB3BAF9FB9961DC1B6FED54A58CDFAA3E465081EC86F89BFAB
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 record:
-    description: A dictionary containing the record data.
-    returned: success, except on record deletion
-    type: complex
-    contains:
-        comment:
-            description: Comments or notes about the DNS record.
-            returned: success
-            type: str
-            sample: Domain verification record
-            version_added: 10.1.0
-        comment_modified_on:
-            description: When the record comment was last modified. Omitted if there is no comment.
-            returned: success
-            type: str
-            sample: "2024-01-01T05:20:00.12345Z"
-            version_added: 10.1.0
-        content:
-            description: The record content (details depend on record type).
-            returned: success
-            type: str
-            sample: 192.0.2.91
-        created_on:
-            description: The record creation date.
-            returned: success
-            type: str
-            sample: "2016-03-25T19:09:42.516553Z"
-        data:
-            description: Additional record data.
-            returned: success, if type is SRV, DS, SSHFP TLSA or CAA
-            type: dict
-            sample: {
-                name: "jabber",
-                port: 8080,
-                priority: 10,
-                proto: "_tcp",
-                service: "_xmpp",
-                target: "jabberhost.sample.com",
-                weight: 5,
-            }
-        id:
-            description: The record ID.
-            returned: success
-            type: str
-            sample: f9efb0549e96abcb750de63b38c9576e
-        locked:
-            description: No documentation available.
-            returned: success
-            type: bool
-            sample: false
-        meta:
-            description: Extra Cloudflare-specific information about the record.
-            returned: success
-            type: dict
-            sample: { auto_added: false }
-        modified_on:
-            description: Record modification date.
-            returned: success
-            type: str
-            sample: "2016-03-25T19:09:42.516553Z"
-        name:
-            description: The record name as FQDN (including _service and _proto for SRV).
-            returned: success
-            type: str
-            sample: www.sample.com
-        priority:
-            description: Priority of the MX record.
-            returned: success, if type is MX
-            type: int
-            sample: 10
-        proxiable:
-            description: Whether this record can be proxied through Cloudflare.
-            returned: success
-            type: bool
-            sample: false
-        proxied:
-            description: Whether the record is proxied through Cloudflare.
-            returned: success
-            type: bool
-            sample: false
-        tags:
-            description: Custom tags for the DNS record.
-            returned: success
-            type: list
-            elements: str
-            sample: ['production', 'app']
-            version_added: 10.1.0
-        tags_modified_on:
-            description: When the record tags were last modified. Omitted if there are no tags.
-            returned: success
-            type: str
-            sample: "2025-01-01T05:20:00.12345Z"
-            version_added: 10.1.0
-        ttl:
-            description: The time-to-live for the record.
-            returned: success
-            type: int
-            sample: 300
-        type:
-            description: The record type.
-            returned: success
-            type: str
-            sample: A
-        zone_id:
-            description: The ID of the zone containing the record.
-            returned: success
-            type: str
-            sample: abcede0bf9f0066f94029d2e6b73856a
-        zone_name:
-            description: The name of the zone containing the record.
-            returned: success
-            type: str
-            sample: sample.com
-'''
+  description: A dictionary containing the record data.
+  returned: success, except on record deletion
+  type: complex
+  contains:
+    comment:
+      description: Comments or notes about the DNS record.
+      returned: success
+      type: str
+      sample: Domain verification record
+      version_added: 10.1.0
+    comment_modified_on:
+      description: When the record comment was last modified. Omitted if there is no comment.
+      returned: success
+      type: str
+      sample: "2024-01-01T05:20:00.12345Z"
+      version_added: 10.1.0
+    content:
+      description: The record content (details depend on record type).
+      returned: success
+      type: str
+      sample: 192.0.2.91
+    created_on:
+      description: The record creation date.
+      returned: success
+      type: str
+      sample: "2016-03-25T19:09:42.516553Z"
+    data:
+      description: Additional record data.
+      returned: success, if type is SRV, DS, SSHFP TLSA or CAA
+      type: dict
+      sample: {name: "jabber", port: 8080, priority: 10, proto: "_tcp", service: "_xmpp", target: "jabberhost.sample.com",
+        weight: 5}
+    id:
+      description: The record ID.
+      returned: success
+      type: str
+      sample: f9efb0549e96abcb750de63b38c9576e
+    locked:
+      description: No documentation available.
+      returned: success
+      type: bool
+      sample: false
+    meta:
+      description: Extra Cloudflare-specific information about the record.
+      returned: success
+      type: dict
+      sample: {auto_added: false}
+    modified_on:
+      description: Record modification date.
+      returned: success
+      type: str
+      sample: "2016-03-25T19:09:42.516553Z"
+    name:
+      description: The record name as FQDN (including _service and _proto for SRV).
+      returned: success
+      type: str
+      sample: www.sample.com
+    priority:
+      description: Priority of the MX record.
+      returned: success, if type is MX
+      type: int
+      sample: 10
+    proxiable:
+      description: Whether this record can be proxied through Cloudflare.
+      returned: success
+      type: bool
+      sample: false
+    proxied:
+      description: Whether the record is proxied through Cloudflare.
+      returned: success
+      type: bool
+      sample: false
+    tags:
+      description: Custom tags for the DNS record.
+      returned: success
+      type: list
+      elements: str
+      sample: ['production', 'app']
+      version_added: 10.1.0
+    tags_modified_on:
+      description: When the record tags were last modified. Omitted if there are no tags.
+      returned: success
+      type: str
+      sample: "2025-01-01T05:20:00.12345Z"
+      version_added: 10.1.0
+    ttl:
+      description: The time-to-live for the record.
+      returned: success
+      type: int
+      sample: 300
+    type:
+      description: The record type.
+      returned: success
+      type: str
+      sample: A
+    zone_id:
+      description: The ID of the zone containing the record.
+      returned: success
+      type: str
+      sample: abcede0bf9f0066f94029d2e6b73856a
+    zone_name:
+      description: The name of the zone containing the record.
+      returned: success
+      type: str
+      sample: sample.com
+"""
 
 import json
 

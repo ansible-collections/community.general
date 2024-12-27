@@ -8,12 +8,11 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: cloud_init_data_facts
 short_description: Retrieve facts of cloud-init
 description:
-  - Gathers facts by reading the status.json and result.json of cloud-init.
+  - Gathers facts by reading the C(status.json) and C(result.json) of cloud-init.
 author: René Moser (@resmo)
 extends_documentation_fragment:
   - community.general.attributes
@@ -22,14 +21,14 @@ extends_documentation_fragment:
 options:
   filter:
     description:
-      - Filter facts
+      - Filter facts.
     type: str
-    choices: [ status, result ]
+    choices: [status, result]
 notes:
   - See http://cloudinit.readthedocs.io/ for more information about cloud-init.
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Gather all facts of cloud init
   community.general.cloud_init_data_facts:
   register: result
@@ -44,10 +43,9 @@ EXAMPLES = '''
   until: "res.cloud_init_data_facts.status.v1.stage is defined and not res.cloud_init_data_facts.status.v1.stage"
   retries: 50
   delay: 5
-'''
+"""
 
-RETURN = '''
----
+RETURN = r"""
 cloud_init_data_facts:
   description: Facts of result and status.
   returned: success
@@ -84,7 +82,7 @@ cloud_init_data_facts:
             "stage": null
         }
     }'
-'''
+"""
 
 import os
 

@@ -9,14 +9,13 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = """
+DOCUMENTATION = r"""
 module: consul_binding_rule
 short_description: Manipulate Consul binding rules
 version_added: 8.3.0
 description:
- - Allows the addition, modification and deletion of binding rules in a consul
-   cluster via the agent. For more details on using and configuring binding rules,
-   see U(https://developer.hashicorp.com/consul/api-docs/acl/binding-rules).
+  - Allows the addition, modification and deletion of binding rules in a Consul cluster using the agent. For more details on
+    using and configuring binding rules, see U(https://developer.hashicorp.com/consul/api-docs/acl/binding-rules).
 author:
   - Florian Apolloner (@apollo13)
 extends_documentation_fragment:
@@ -41,7 +40,8 @@ options:
   name:
     description:
       - Specifies a name for the binding rule.
-      - 'Note: This is used to identify the binding rule. But since the API does not support a name, it is prefixed to the description.'
+      - 'Note: This is used to identify the binding rule. But since the API does not support a name, it is prefixed to the
+        description.'
     type: str
     required: true
   description:
@@ -74,7 +74,7 @@ options:
     type: dict
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Create a binding rule
   community.general.consul_binding_rule:
     name: my_name
@@ -91,9 +91,9 @@ EXAMPLES = """
     state: absent
 """
 
-RETURN = """
+RETURN = r"""
 binding_rule:
-  description: The binding rule as returned by the consul HTTP API.
+  description: The binding rule as returned by the Consul HTTP API.
   returned: always
   type: dict
   sample:
