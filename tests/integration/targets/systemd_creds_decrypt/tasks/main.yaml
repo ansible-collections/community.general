@@ -24,7 +24,7 @@
       community.general.systemd_creds_decrypt:
         name: api
         newline: false
-        secret: "{{ encrypted_api_secret.msg }}"
+        secret: "{{ encrypted_api_secret.value }}"
       register: decrypted_secret
 
     - name: Print the decrypted secret
@@ -34,7 +34,7 @@
     - name: Assert that the decrypted secret is the same as the original secret
       ansible.builtin.assert:
         that:
-          - decrypted_secret.msg == 'access_token'
+          - decrypted_secret.value == 'access_token'
         fail_msg: "Decrypted secret is not the same as the original secret"
         success_msg: "Decrypted secret is the same as the original secret"
 
@@ -42,7 +42,7 @@
       community.general.systemd_creds_decrypt:
         name: api
         newline: false
-        secret: "{{ encrypted_api_secret.msg }}"
+        secret: "{{ encrypted_api_secret.value }}"
         transcode: hex
       register: decrypted_secret_hex
 
@@ -53,6 +53,6 @@
     - name: Assert that the decrypted secret is the same as the original secret
       ansible.builtin.assert:
         that:
-          - decrypted_secret_hex.msg == '6163636573735f746f6b656e'
+          - decrypted_secret_hex.value == '6163636573735f746f6b656e'
         fail_msg: "Decrypted secret is not the same as the original secret"
         success_msg: "Decrypted secret is the same as the original secret"

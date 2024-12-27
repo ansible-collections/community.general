@@ -19,7 +19,7 @@
     - name: Assert encrypted secret output is base64 encoded
       ansible.builtin.assert:
         that:
-          - encrypted_secret.msg | b64decode
+          - encrypted_secret.value | b64decode
         fail_msg: "Encrypted secret is not base64 encoded"
         success_msg: "Encrypted secret is base64 encoded"
 
@@ -30,7 +30,7 @@
     - name: Assert that SetCredentialEncrypted message is not in the output
       ansible.builtin.assert:
         that:
-          - '"SetCredentialEncrypted" not in encrypted_secret.msg'
+          - '"SetCredentialEncrypted" not in encrypted_secret.value'
         fail_msg: "SetCredentialEncrypted is in the output"
         success_msg: "SetCredentialEncrypted is not in the output"
 
@@ -50,6 +50,6 @@
     - name: Assert that SetCredentialEncrypted message is in the output
       ansible.builtin.assert:
         that:
-          - '"SetCredentialEncrypted=web: " in pretty_encrypted_secret.msg'
+          - '"SetCredentialEncrypted=web: " in pretty_encrypted_secret.value'
         fail_msg: "SetCredentialEncrypted is not in the output"
         success_msg: "SetCredentialEncrypted is in the output"

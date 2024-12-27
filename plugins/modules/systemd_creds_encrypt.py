@@ -121,7 +121,7 @@ def main():
 
     module.exit_json(
         changed=False,
-        msg=stdout,
+        value=stdout,
         rc=rc,
         stderr=stderr,
     )
