@@ -176,7 +176,7 @@ class ProxmoxAnsible(object):
         :param node_name: Proxmox node name where the task is running.
         :param task_id: ID of the running task.
         :param timeout: Timeout in seconds to wait for the task to complete.
-        :return: Task completion status (True/False) and `exitstatus` message when status=False.
+        :return: Task completion status (True/False) and ``exitstatus`` message when status=False.
         """
         status = {}
         while timeout:

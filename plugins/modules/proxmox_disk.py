@@ -541,7 +541,7 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
         :param vmid: ID of the virtual machine where the disk will be created.
         :param vm: Name of the virtual machine where the disk will be created.
         :param vm_config: Configuration of the virtual machine.
-        :return: (Bool, string) Whether the task was successful or not
+        :return: (bool, string) Whether the task was successful or not
             and the message to return to Ansible.
         """
         create = self.module.params['create']
@@ -631,7 +631,7 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
         :param vmid: ID of virtual machine which disk will be moved.
         :param vm: Name of virtual machine which disk will be moved.
         :param vm_config: Virtual machine configuration.
-        :return: (Bool, string) Whether the task was successful or not
+        :return: (bool, string) Whether the task was successful or not
             and the message to return to Ansible.
         """
         disk_config = disk_conf_str_to_dict(vm_config[disk])
