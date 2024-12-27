@@ -48,7 +48,7 @@ options:
     type: str
   started:
     description:
-      - Start or Stop the container.
+      - Start or stop the container.
     type: bool
     default: true
 """
