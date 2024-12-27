@@ -10,7 +10,7 @@
   block:
     - name: Encrypt secret
       become: true
-      community.general.systemd_creds_encrypt:
+      systemd_creds_encrypt:
         name: api
         not_after: +48hr
         secret: access_token
