@@ -10,7 +10,7 @@ __metaclass__ = type
 class ModuleDocFragment(object):
 
     # Standard files documentation fragment
-    DOCUMENTATION = r'''
+    DOCUMENTATION = r"""
 requirements:
   - requests (Python library U(https://pypi.org/project/requests/))
 
@@ -34,4 +34,4 @@ options:
       - The CA certificates bundle to use to verify GitLab server certificate.
     type: str
     version_added: 8.1.0
-'''
+"""

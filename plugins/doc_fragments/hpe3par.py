@@ -10,26 +10,26 @@ __metaclass__ = type
 class ModuleDocFragment(object):
 
     # HPE 3PAR doc fragment
-    DOCUMENTATION = '''
+    DOCUMENTATION = r"""
 options:
-    storage_system_ip:
-      description:
-        - The storage system IP address.
-      type: str
-      required: true
-    storage_system_password:
-      description:
-        - The storage system password.
-      type: str
-      required: true
-    storage_system_username:
-      description:
-        - The storage system user name.
-      type: str
-      required: true
+  storage_system_ip:
+    description:
+      - The storage system IP address.
+    type: str
+    required: true
+  storage_system_password:
+    description:
+      - The storage system password.
+    type: str
+    required: true
+  storage_system_username:
+    description:
+      - The storage system user name.
+    type: str
+    required: true
 
 requirements:
   - hpe3par_sdk >= 1.0.2. Install using C(pip install hpe3par_sdk).
   - WSAPI service should be enabled on the 3PAR storage array.
 notes:
-    '''
+"""

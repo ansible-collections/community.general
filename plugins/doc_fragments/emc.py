@@ -10,14 +10,14 @@ __metaclass__ = type
 
 class ModuleDocFragment(object):
 
-    DOCUMENTATION = r'''
-options:
-  - See respective platform section for more details
+    DOCUMENTATION = r"""
+options: {}
+# See respective platform section for more details
 requirements:
   - See respective platform section for more details
 notes:
   - Ansible modules are available for EMC VNX.
-'''
+"""
 
     # Documentation fragment for VNX (emc_vnx)
     EMC_VNX = r'''
