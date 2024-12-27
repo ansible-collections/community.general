@@ -117,7 +117,7 @@ def main():
         encrypt_cmd.append("--uid=" + user)
     encrypt_cmd.extend(["-", "-"])
 
-    rc, stdout, stderr = module.run_command(encrypt_cmd, data=secret)
+    rc, stdout, stderr = module.run_command(encrypt_cmd, data=secret, binary_data=True)
 
     module.exit_json(
         changed=False,

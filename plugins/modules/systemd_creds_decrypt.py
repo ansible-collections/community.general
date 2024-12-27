@@ -120,7 +120,7 @@ def main():
         decrypt_cmd.append("--uid=" + user)
     decrypt_cmd.extend(["-", "-"])
 
-    rc, stdout, stderr = module.run_command(decrypt_cmd, data=secret)
+    rc, stdout, stderr = module.run_command(decrypt_cmd, data=secret, binary_data=True)
 
     module.exit_json(
         changed=False,
