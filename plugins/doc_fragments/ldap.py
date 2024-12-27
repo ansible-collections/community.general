@@ -66,7 +66,7 @@ options:
     default: ldapi:///
   start_tls:
     description:
-      - If V(true), it uses the START_TLS LDAP extension.
+      - Use the START_TLS LDAP extension if set to V(true).
     type: bool
     default: false
   validate_certs:
