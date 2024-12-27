@@ -9,7 +9,7 @@ __metaclass__ = type
 
 class ModuleDocFragment(object):
     # Common parameters for Proxmox VE modules
-    DOCUMENTATION = r'''
+    DOCUMENTATION = r"""
 options:
   api_host:
     description:
@@ -51,10 +51,10 @@ options:
       - This should only be used on personally controlled sites using self-signed certificates.
     type: bool
     default: false
-requirements: [ "proxmoxer", "requests" ]
-'''
+requirements: ["proxmoxer", "requests"]
+"""
 
-    SELECTION = r'''
+    SELECTION = r"""
 options:
   vmid:
     description:
@@ -71,7 +71,7 @@ options:
     description:
       - Add the new VM to the specified pool.
     type: str
-'''
+"""
 
     ACTIONGROUP_PROXMOX = r"""
 options: {}

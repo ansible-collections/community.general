@@ -11,23 +11,23 @@ __metaclass__ = type
 class ModuleDocFragment(object):
 
     # Standard documentation fragment
-    DOCUMENTATION = r'''
+    DOCUMENTATION = r"""
 options:
   wait:
     description:
-    - Wait for the resource to reach its desired state before returning.
+      - Wait for the resource to reach its desired state before returning.
     type: bool
     default: true
   wait_timeout:
     type: int
     description:
-    - Time to wait for the resource to reach the expected state.
+      - Time to wait for the resource to reach the expected state.
     required: false
     default: 300
   wait_sleep_time:
     type: int
     description:
-    - Time to wait before every attempt to check the state of the resource.
+      - Time to wait before every attempt to check the state of the resource.
     required: false
     default: 3
-'''
+"""

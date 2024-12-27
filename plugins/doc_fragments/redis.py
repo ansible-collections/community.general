@@ -10,7 +10,7 @@ __metaclass__ = type
 
 class ModuleDocFragment(object):
     # Common parameters for Redis modules
-    DOCUMENTATION = r'''
+    DOCUMENTATION = r"""
 options:
   login_host:
     description:
@@ -40,14 +40,12 @@ options:
   validate_certs:
     description:
       - Specify whether or not to validate TLS certificates.
-      - This should only be turned off for personally controlled sites or with
-        C(localhost) as target.
+      - This should only be turned off for personally controlled sites or with C(localhost) as target.
     type: bool
     default: true
   ca_certs:
     description:
-      - Path to root certificates file. If not set and O(tls) is
-        set to V(true), certifi ca-certificates will be used.
+      - Path to root certificates file. If not set and O(tls) is set to V(true), certifi ca-certificates will be used.
     type: str
   client_cert_file:
     description:
@@ -59,10 +57,9 @@ options:
       - Path to the client private key file.
     type: str
     version_added: 9.3.0
-requirements: [ "redis", "certifi" ]
+requirements: ["redis", "certifi"]
 
 notes:
-  - Requires the C(redis) Python package on the remote host. You can
-    install it with pip (C(pip install redis)) or with a package manager.
-    Information on the library can be found at U(https://github.com/andymccurdy/redis-py).
-'''
+  - Requires the C(redis) Python package on the remote host. You can install it with pip (C(pip install redis)) or with a
+    package manager. Information on the library can be found at U(https://github.com/andymccurdy/redis-py).
+"""

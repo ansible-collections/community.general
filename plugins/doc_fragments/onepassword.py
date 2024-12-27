@@ -9,7 +9,7 @@ __metaclass__ = type
 
 
 class ModuleDocFragment(object):
-    DOCUMENTATION = r'''
+    DOCUMENTATION = r"""
 requirements:
   - See U(https://support.1password.com/command-line/)
 options:
@@ -18,7 +18,8 @@ options:
     aliases: ['vault_password']
     type: str
   section:
-    description: Item section containing the field to retrieve (case-insensitive). If absent will return first match from any section.
+    description: Item section containing the field to retrieve (case-insensitive). If absent will return first match from
+      any section.
   domain:
     description: Domain of 1Password.
     default: '1password.com'
@@ -55,25 +56,25 @@ options:
     env:
       - name: OP_CONNECT_TOKEN
     version_added: 8.1.0
-'''
+"""
 
-    LOOKUP = r'''
+    LOOKUP = r"""
 options:
   service_account_token:
     env:
       - name: OP_SERVICE_ACCOUNT_TOKEN
         version_added: 8.2.0
 notes:
-  - This lookup will use an existing 1Password session if one exists. If not, and you have already
-    performed an initial sign in (meaning C(~/.op/config), C(~/.config/op/config) or C(~/.config/.op/config) exists), then only the
-    O(master_password) is required. You may optionally specify O(subdomain) in this scenario, otherwise the last used subdomain will be used by C(op).
+  - This lookup will use an existing 1Password session if one exists. If not, and you have already performed an initial sign
+    in (meaning C(~/.op/config), C(~/.config/op/config) or C(~/.config/.op/config) exists), then only the O(master_password)
+    is required. You may optionally specify O(subdomain) in this scenario, otherwise the last used subdomain will be used
+    by C(op).
   - This lookup can perform an initial login by providing O(subdomain), O(username), O(secret_key), and O(master_password).
   - Can target a specific account by providing the O(account_id).
-  - Due to the B(very) sensitive nature of these credentials, it is B(highly) recommended that you only pass in the minimal credentials
-    needed at any given time. Also, store these credentials in an Ansible Vault using a key that is equal to or greater in strength
-    to the 1Password master password.
-  - This lookup stores potentially sensitive data from 1Password as Ansible facts.
-    Facts are subject to caching if enabled, which means this data could be stored in clear text
-    on disk or in a database.
+  - Due to the B(very) sensitive nature of these credentials, it is B(highly) recommended that you only pass in the minimal
+    credentials needed at any given time. Also, store these credentials in an Ansible Vault using a key that is equal to or
+    greater in strength to the 1Password master password.
+  - This lookup stores potentially sensitive data from 1Password as Ansible facts. Facts are subject to caching if enabled,
+    which means this data could be stored in clear text on disk or in a database.
   - Tested with C(op) version 2.7.2.
-'''
+"""
