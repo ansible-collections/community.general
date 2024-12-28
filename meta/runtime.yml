@@ -808,11 +808,6 @@ plugin_routing:
         removal_version: 3.0.0
         warning_text: Use community.general.xenserver_guest_info instead.
   doc_fragments:
-    rackspace:
-      tombstone:
-        removal_version: 9.0.0
-        warning_text: This doc fragment was used by rax modules, that relied on the deprecated
-          package pyrax.
     _gcp:
       redirect: community.google._gcp
     docker:
@@ -827,11 +822,16 @@ plugin_routing:
       redirect: infoblox.nios_modules.nios
     postgresql:
       redirect: community.postgresql.postgresql
-  module_utils:
-    rax:
+    purestorage:
+      deprecation:
+        removal_version: 12.0.0
+        warning_text: The modules for purestorage were removed in community.general 3.0.0, this document fragment was left behind.
+    rackspace:
       tombstone:
         removal_version: 9.0.0
-        warning_text: This module util relied on the deprecated package pyrax.
+        warning_text: This doc fragment was used by rax modules, that relied on the deprecated
+          package pyrax.
+  module_utils:
     docker.common:
       redirect: community.docker.common
     docker.swarm:
@@ -850,6 +850,14 @@ plugin_routing:
       redirect: infoblox.nios_modules.api
     postgresql:
       redirect: community.postgresql.postgresql
+    pure:
+      deprecation:
+        removal_version: 12.0.0
+        warning_text: The modules for purestorage were removed in community.general 3.0.0, this module util was left behind.
+    rax:
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module util relied on the deprecated package pyrax.
     remote_management.dellemc.dellemc_idrac:
       redirect: dellemc.openmanage.dellemc_idrac
     remote_management.dellemc.ome:
