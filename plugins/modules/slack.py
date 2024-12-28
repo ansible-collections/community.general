@@ -134,11 +134,14 @@ options:
         a small set of the prefixes that should not have a V(#) prepended. Since an exact condition which O(channel) values must not have the
         V(#) prefix is not known, the value V(auto) for this option will be deprecated in the future. It is best to explicitly set O(prepend_hash=always)
         or O(prepend_hash=never) to obtain the needed behavior.
+      - The B(current default) is V(auto), which has been B(deprecated) since community.general 10.2.0.
+        It will change to V(never) in community.general 12.0.0.
+        To prevent deprecation warnings you can explicitly set O(prepend_hash) to the value you want.
+        We suggest to only use V(always) or V(never), but not V(auto), when explicitly setting a value.
     choices:
       - 'always'
       - 'never'
       - 'auto'
-    default: 'auto'
     version_added: 6.1.0
 """
 
@@ -446,7 +449,7 @@ def main():
             attachments=dict(type='list', elements='dict'),
             blocks=dict(type='list', elements='dict'),
             message_id=dict(type='str'),
-            prepend_hash=dict(type='str', default='auto', choices=['always', 'never', 'auto']),
+            prepend_hash=dict(type='str', choices=['always', 'never', 'auto']),
         ),
         supports_check_mode=True,
     )
@@ -466,6 +469,15 @@ def main():
     blocks = module.params['blocks']
     message_id = module.params['message_id']
     prepend_hash = module.params['prepend_hash']
+
+    if prepend_hash is None:
+        module.deprecate(
+            "The default value 'auto' for 'prepend_hash' is deprecated and will change to 'never' in community.general 12.0.0."
+            " You can explicitly set 'prepend_hash' in your task to avoid this deprecation warning",
+            version="12.0.0",
+            collection_name="community.general",
+        )
+        prepend_hash = 'auto'
 
     color_choices = ['normal', 'good', 'warning', 'danger']
     if color not in color_choices and not is_valid_hex_color(color):

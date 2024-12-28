@@ -1,0 +1,3 @@
+deprecated_features:
+  - "slack - the default value ``auto`` of the ``prepend_hash`` option is deprecated and will change to ``never`` in community.general 12.0.0
+    (https://github.com/ansible-collections/community.general/pull/9443)."
