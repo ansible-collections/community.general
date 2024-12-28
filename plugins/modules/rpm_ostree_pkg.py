@@ -64,7 +64,7 @@ EXAMPLES = r"""
     state: absent
 
 - name: Apply the overlay package live
-  community.general.rpm_ostree:
+  community.general.rpm_ostree_pkg:
     name: nfs-utils
     state: present
     apply_live: true
