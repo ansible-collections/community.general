@@ -195,8 +195,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             p = Popen(cmd_list, stdout=PIPE, stderr=PIPE, env=my_env)
             stdout, stderr = p.communicate()
             if p.returncode != 0:
-                raise AnsibleError('Failed to run cmd=%s, rc=%s, stderr=%s' %
-                                   (cmd_list, p.returncode, to_native(stderr)))
+                raise AnsibleError(f'Failed to run cmd={cmd_list}, rc={p.returncode}, stderr={to_native(stderr)}')
 
             try:
                 t_stdout = to_text(stdout, errors='surrogate_or_strict')
@@ -219,8 +218,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     p = Popen(cmd_get_properties, stdout=PIPE, stderr=PIPE, env=my_env)
                     stdout, stderr = p.communicate()
                     if p.returncode != 0:
-                        raise AnsibleError('Failed to run cmd=%s, rc=%s, stderr=%s' %
-                                           (cmd_get_properties, p.returncode, to_native(stderr)))
+                        raise AnsibleError(
+                            f'Failed to run cmd={cmd_get_properties}, rc={p.returncode}, stderr={to_native(stderr)}')
 
                     try:
                         t_stdout = to_text(stdout, errors='surrogate_or_strict')
