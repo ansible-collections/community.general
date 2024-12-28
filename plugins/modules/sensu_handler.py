@@ -80,24 +80,24 @@ options:
     type: str
     description:
       - The handler command to be executed.
-      - The event data is passed to the process via STDIN.
-      - 'NOTE: the command attribute is only required for Pipe handlers (i.e. handlers configured with "type": "pipe").'
+      - The event data is passed to the process using STDIN.
+      - 'NOTE: the O(command) attribute is only required for Pipe handlers (that is, handlers configured with O(type=pipe)).'
   socket:
     type: dict
     description:
       - The socket definition scope, used to configure the TCP/UDP handler socket.
-      - 'NOTE: the socket attribute is only required for TCP/UDP handlers (i.e. handlers configured with "type": "tcp" or "type": "udp").'
+      - 'NOTE: the O(socket) attribute is only required for TCP/UDP handlers (that is, handlers configured with O(type=tcp) or O(type=udp)).'
   pipe:
     type: dict
     description:
       - The pipe definition scope, used to configure the Sensu transport pipe.
-      - 'NOTE: the pipe attribute is only required for Transport handlers (i.e. handlers configured with "type": "transport").'
+      - 'NOTE: the O(pipe) attribute is only required for Transport handlers (that is, handlers configured with O(type=transport)).'
   handlers:
     type: list
     elements: str
     description:
       - An array of Sensu event handlers (names) to use for events using the handler set.
-      - 'NOTE: the handlers attribute is only required for handler sets (that is, handlers configured with O(type=set)).'
+      - 'NOTE: the O(handlers) attribute is only required for handler sets (that is, handlers configured with O(type=set)).'
 """
 
 EXAMPLES = r"""

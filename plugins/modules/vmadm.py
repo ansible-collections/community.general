@@ -106,7 +106,7 @@ options:
   force:
     required: false
     description:
-      - Force a particular action (i.e. stop or delete a VM).
+      - Force a particular action (in other words, stop or delete a VM).
     type: bool
   fs_allowed:
     required: false

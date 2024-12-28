@@ -326,7 +326,7 @@ options:
 
   tenancy:
     description:
-      - Dedicated vs shared tenancy.
+      - Dedicated or shared tenancy.
       - 'The available choices are: V(default), V(dedicated).'
     type: str
 
