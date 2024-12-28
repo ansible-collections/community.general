@@ -14,9 +14,9 @@ DOCUMENTATION = r"""
 module: udm_dns_zone
 author:
   - Tobias Rüetschi (@keachi)
-short_description: Manage dns zones on a univention corporate server
+short_description: Manage DNS zones on a univention corporate server
 description:
-  - This module allows to manage dns zones on a univention corporate server (UCS). It uses the Python API of the UCS to create a new object or
+  - This module allows to manage DNS zones on a univention corporate server (UCS). It uses the Python API of the UCS to create a new object or
     edit it.
 extends_documentation_fragment:
   - community.general.attributes

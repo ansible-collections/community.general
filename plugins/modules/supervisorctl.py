@@ -11,9 +11,9 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 module: supervisorctl
-short_description: Manage the state of a program or group of programs running via supervisord
+short_description: Manage the state of a program or group of programs managed by C(supervisord).
 description:
-  - Manage the state of a program or group of programs running via supervisord.
+  - Manage the state of a program or group of programs managed by C(supervisord).
 extends_documentation_fragment:
   - community.general.attributes
 attributes:

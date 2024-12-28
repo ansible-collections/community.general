@@ -15,10 +15,10 @@ author:
   - "Artem Feofanov (@tyouxa)"
   - "Nikolai Lomov (@lomserman)"
 
-short_description: Send notifications via telegram
+short_description: Send notifications using telegram
 
 description:
-  - Send notifications via telegram bot, to a verified group or user.
+  - Send notifications using telegram bot, to a verified group or user.
   - Also, the user may try to use any other telegram bot API method, if you specify O(api_method) argument.
 notes:
   - You will require a telegram account and create telegram bot to use this module.

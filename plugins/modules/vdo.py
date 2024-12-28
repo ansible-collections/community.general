@@ -50,7 +50,7 @@ options:
       - The C(activate) status for a VDO volume. If this is set to V(false), the VDO volume cannot be started, and it will not start on system
         startup. However, on initial creation, a VDO volume with "activated" set to "off" will be running, until stopped. This is the default
         behavior of the C(vdo create) command; it provides the user an opportunity to write a base amount of metadata (filesystem, LVM headers,
-        etc.) to the VDO volume prior to stopping the volume, and leaving it deactivated until ready to use.
+        and so on) to the VDO volume prior to stopping the volume, and leaving it deactivated until ready to use.
     type: bool
   running:
     description:

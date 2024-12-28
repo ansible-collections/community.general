@@ -37,7 +37,7 @@ options:
   path:
     type: str
     description:
-      - Path to the subscriptions json file.
+      - Path to the subscriptions JSON file.
     required: false
     default: /etc/sensu/conf.d/subscriptions.json
   backup:
