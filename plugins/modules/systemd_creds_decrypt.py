@@ -40,6 +40,7 @@ options:
               if not present.
         type: bool
         required: false
+        default: false
     secret:
         description:
             - The secret to decrypt.
@@ -106,7 +107,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(type="str", required=False),
-            newline=dict(type="bool", required=False),
+            newline=dict(type="bool", required=False, default=False),
             secret=dict(type="str", required=True, no_log=True),
             timestamp=dict(type="str", required=False),
             transcode=dict(
@@ -133,10 +134,7 @@ def main():
         decrypt_cmd.append("--name=" + name)
     else:
         decrypt_cmd.append("--name=")
-    if newline:
-        decrypt_cmd.append("--newline=" + newline)
-    else:
-        decrypt_cmd.append("--newline=auto")
+    decrypt_cmd.append("--newline=" + ("yes" if newline else "no"))
     if timestamp:
         decrypt_cmd.append("--timestamp=" + timestamp)
     if transcode:
