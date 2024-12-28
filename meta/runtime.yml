@@ -824,8 +824,8 @@ plugin_routing:
       redirect: community.postgresql.postgresql
     purestorage:
       deprecation:
-      removal_version: 12.0.0
-      warning_text: The modules for purestorage were removed in community.general 3.0.0, this document fragment was left behind.
+        removal_version: 12.0.0
+        warning_text: The modules for purestorage were removed in community.general 3.0.0, this document fragment was left behind.
     rackspace:
       tombstone:
         removal_version: 9.0.0
@@ -852,8 +852,8 @@ plugin_routing:
       redirect: community.postgresql.postgresql
     pure:
       deprecation:
-      removal_version: 12.0.0
-      warning_text: The modules for purestorage were removed in community.general 3.0.0, this module util was left behind.
+        removal_version: 12.0.0
+        warning_text: The modules for purestorage were removed in community.general 3.0.0, this module util was left behind.
     rax:
       tombstone:
         removal_version: 9.0.0
