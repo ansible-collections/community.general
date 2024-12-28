@@ -110,12 +110,12 @@ class CallbackModule(CallbackModule_default):
             if name and play.hosts:
                 msg = f"\n- {name} (in check mode) on hosts: {','.join(play.hosts)} -"
             else:
-                msg = u"- check mode -"
+                msg = "- check mode -"
         else:
             if name and play.hosts:
                 msg = f"\n- {name} on hosts: {','.join(play.hosts)} -"
             else:
-                msg = u"---"
+                msg = "---"
 
         self._display.display(msg)
 
@@ -196,16 +196,16 @@ class CallbackModule(CallbackModule_default):
             t = stats.summarize(h)
 
             self._display.display(
-                f"  {hostcolor(h, t)} : {colorize(u'ok', t['ok'], C.COLOR_OK)} {colorize(u'changed', t['changed'], C.COLOR_CHANGED)} "
-                f"{colorize(u'unreachable', t['unreachable'], C.COLOR_UNREACHABLE)} {colorize(u'failed', t['failures'], C.COLOR_ERROR)} "
-                f"{colorize(u'rescued', t['rescued'], C.COLOR_OK)} {colorize(u'ignored', t['ignored'], C.COLOR_WARN)}",
+                f"  {hostcolor(h, t)} : {colorize('ok', t['ok'], C.COLOR_OK)} {colorize('changed', t['changed'], C.COLOR_CHANGED)} "
+                f"{colorize('unreachable', t['unreachable'], C.COLOR_UNREACHABLE)} {colorize('failed', t['failures'], C.COLOR_ERROR)} "
+                f"{colorize('rescued', t['rescued'], C.COLOR_OK)} {colorize('ignored', t['ignored'], C.COLOR_WARN)}",
                 screen_only=True
             )
 
             self._display.display(
-                f"  {hostcolor(h, t, False)} : {colorize(u'ok', t['ok'], None)} {colorize(u'changed', t['changed'], None)} "
-                f"{colorize(u'unreachable', t['unreachable'], None)} {colorize(u'failed', t['failures'], None)} {colorize(u'rescued', t['rescued'], None)} "
-                f"{colorize(u'ignored', t['ignored'], None)}",
+                f"  {hostcolor(h, t, False)} : {colorize('ok', t['ok'], None)} {colorize('changed', t['changed'], None)} "
+                f"{colorize('unreachable', t['unreachable'], None)} {colorize('failed', t['failures'], None)} {colorize('rescued', t['rescued'], None)} "
+                f"{colorize('ignored', t['ignored'], None)}",
                 log_only=True
             )
         if stats.custom and self.get_option('show_custom_stats'):

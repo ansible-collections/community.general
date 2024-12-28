@@ -121,13 +121,13 @@ class ManifoldApiClient(object):
         except ValueError:
             raise ApiError(f'JSON response can\'t be parsed while requesting {url}:\n{data}')
         except HTTPError as e:
-            raise ApiError(f'Server returned: {str(e)} while requesting {url}:\n{e.read()}')
+            raise ApiError(f'Server returned: {e} while requesting {url}:\n{e.read()}')
         except URLError as e:
-            raise ApiError(f'Failed lookup url for {url} : {str(e)}')
+            raise ApiError(f'Failed lookup url for {url} : {e}')
         except SSLValidationError as e:
-            raise ApiError(f'Error validating the server\'s certificate for {url}: {str(e)}')
+            raise ApiError(f'Error validating the server\'s certificate for {url}: {e}')
         except ConnectionError as e:
-            raise ApiError(f'Error connecting to {url}: {str(e)}')
+            raise ApiError(f'Error connecting to {url}: {e}')
 
     def get_resources(self, team_id=None, project_id=None, label=None):
         """
@@ -270,7 +270,7 @@ class LookupModule(LookupBase):
             ret = [credentials]
             return ret
         except ApiError as e:
-            raise AnsibleError(f'API Error: {str(e)}')
+            raise AnsibleError(f'API Error: {e}')
         except AnsibleError as e:
             raise e
         except Exception:
