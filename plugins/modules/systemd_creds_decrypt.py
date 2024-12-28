@@ -55,7 +55,7 @@ options:
         required: false
     transcode:
         description:
-            - Whether to transcode the output before showing it.
+            - Whether to transcode the output before returning it.
         type: str
         choices: [ base64, unbase64, hex, unhex ]
         required: false
