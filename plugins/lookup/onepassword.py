@@ -169,7 +169,7 @@ class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
         rc = p.wait()
 
         if not ignore_errors and rc != expected_rc:
-            raise AnsibleLookupError(to_text(err))
+            raise AnsibleLookupError(str(err))
 
         return rc, out, err
 

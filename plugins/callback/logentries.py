@@ -135,7 +135,7 @@ class PlainTextSocketAppender(object):
         # Error message displayed when an incorrect Token has been detected
         self.INVALID_TOKEN = "\n\nIt appears the LOGENTRIES_TOKEN parameter you entered is incorrect!\n\n"
         # Unicode Line separator character   \u2028
-        self.LINE_SEP = u'\u2028'
+        self.LINE_SEP = '\u2028'
 
         self._display = display
         self._conn = None
@@ -153,7 +153,7 @@ class PlainTextSocketAppender(object):
                 self.open_connection()
                 return
             except Exception as e:
-                self._display.vvvv(f"Unable to connect to Logentries: {to_text(e)}")
+                self._display.vvvv(f"Unable to connect to Logentries: {e}")
 
             root_delay *= 2
             if root_delay > self.MAX_DELAY:
@@ -175,8 +175,8 @@ class PlainTextSocketAppender(object):
         # Replace newlines with Unicode line separator
         # for multi-line events
         data = to_text(data, errors='surrogate_or_strict')
-        multiline = data.replace(u'\n', self.LINE_SEP)
-        multiline += u"\n"
+        multiline = data.replace('\n', self.LINE_SEP)
+        multiline += "\n"
         # Send data, reconnect if needed
         while True:
             try:
@@ -249,7 +249,7 @@ class CallbackModule(CallbackBase):
             self.use_tls = self.get_option('use_tls')
             self.flatten = self.get_option('flatten')
         except KeyError as e:
-            self._display.warning(f"Missing option for Logentries callback plugin: {to_text(e)}")
+            self._display.warning(f"Missing option for Logentries callback plugin: {e}")
             self.disabled = True
 
         try:
