@@ -14,7 +14,7 @@ module: sensu_silence
 author: Steven Bambling (@smbambling)
 short_description: Manage Sensu silence entries
 description:
-  - Create and clear (delete) a silence entries via the Sensu API for subscriptions and checks.
+  - Create and clear (delete) a silence entries using the Sensu API for subscriptions and checks.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -46,7 +46,7 @@ options:
   state:
     type: str
     description:
-      - Specifies to create or clear (delete) a silence entry via the Sensu API.
+      - Specifies to create or clear (delete) a silence entry using the Sensu API.
     default: present
     choices: ['present', 'absent']
   subscription:
