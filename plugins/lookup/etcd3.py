@@ -168,7 +168,7 @@ def etcd3_client(client_params):
         etcd = etcd3.client(**client_params)
         etcd.status()
     except Exception as exp:
-        raise AnsibleLookupError(f'Cannot connect to etcd cluster: {to_native(exp)}')
+        raise AnsibleLookupError(f'Cannot connect to etcd cluster: {exp}')
     return etcd
 
 
@@ -218,12 +218,12 @@ class LookupModule(LookupBase):
                         if val and meta:
                             ret.append({'key': to_native(meta.key), 'value': to_native(val)})
                 except Exception as exp:
-                    display.warning(f'Caught except during etcd3.get_prefix: {to_native(exp)}')
+                    display.warning(f'Caught except during etcd3.get_prefix: {exp}')
             else:
                 try:
                     val, meta = etcd.get(term)
                     if val and meta:
                         ret.append({'key': to_native(meta.key), 'value': to_native(val)})
                 except Exception as exp:
-                    display.warning(f'Caught except during etcd3.get: {to_native(exp)}')
+                    display.warning(f'Caught except during etcd3.get: {exp}')
         return ret

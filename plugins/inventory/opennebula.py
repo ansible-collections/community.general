@@ -96,7 +96,6 @@ except ImportError:
 
 from ansible.errors import AnsibleError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable
-from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.plugin_utils.unsafe import make_unsafe
 
@@ -172,7 +171,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         try:
             vm_pool = one_client.vmpool.infoextended(-2, -1, -1, 3)
         except Exception as e:
-            raise AnsibleError(f"Something happened during XML-RPC call: {to_native(e)}")
+            raise AnsibleError(f"Something happened during XML-RPC call: {e}")
 
         return vm_pool
 
