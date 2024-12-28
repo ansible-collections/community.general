@@ -117,7 +117,7 @@ options:
     type: int
   force_init:
     description:
-      - To avoid duplicating infra, if a state file can't be found this will force a C(terraform init). Generally, this should be turned off unless
+      - To avoid duplicating infra, if a state file cannot be found this will force a C(terraform init). Generally, this should be turned off unless
         you intend to provision an entirely new Terraform deployment.
     default: false
     type: bool
@@ -250,7 +250,7 @@ outputs:
     type:
       type: str
       returned: always
-      description: The type of the value (string, int, etc).
+      description: The type of the value (string, int, and so on).
     value:
       type: str
       returned: always

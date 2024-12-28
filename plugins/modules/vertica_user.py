@@ -49,7 +49,7 @@ options:
     type: bool
   ldap:
     description:
-      - Set to true if users are authenticated via LDAP.
+      - Set to V(true) if users are authenticated using LDAP.
       - The user will be created with password expired and set to V($ldap$).
     type: bool
   roles:

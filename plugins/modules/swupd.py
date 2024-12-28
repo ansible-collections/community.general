@@ -30,7 +30,8 @@ options:
     type: str
   format:
     description:
-      - The format suffix for version file downloads. For example [1,2,3,staging,etc]. If not specified, the default format is used.
+      - The format suffix for version file downloads. For example V(1), V(2), V(3), and so on, or the special value V(staging).
+        If not specified, the default format is used.
     type: str
   manifest:
     description:

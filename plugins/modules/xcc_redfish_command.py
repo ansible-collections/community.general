@@ -16,9 +16,9 @@ description:
   - Builds Redfish URIs locally and sends them to remote OOB controllers to perform an action or get information back or update a configuration
     attribute.
   - Manages virtual media.
-  - Supports getting information back via GET method.
-  - Supports updating a configuration attribute via PATCH method.
-  - Supports performing an action via POST method.
+  - Supports getting information back using GET method.
+  - Supports updating a configuration attribute using PATCH method.
+  - Supports performing an action using POST method.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:

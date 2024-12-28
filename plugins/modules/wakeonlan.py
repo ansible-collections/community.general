@@ -44,7 +44,7 @@ todo:
 notes:
   - This module sends a magic packet, without knowing whether it worked.
   - Only works if the target system was properly configured for Wake-on-LAN (in the BIOS and/or the OS).
-  - Some BIOSes have a different (configurable) Wake-on-LAN boot order (i.e. PXE first).
+  - Some BIOSes have a different (configurable) Wake-on-LAN boot order (in other words, PXE first).
 seealso:
   - module: community.windows.win_wakeonlan
 author:

@@ -12,7 +12,7 @@ DOCUMENTATION = r"""
 module: stacki_host
 short_description: Add or remove host to stacki front-end
 description:
-  - Use this module to add or remove hosts to a stacki front-end via API.
+  - Use this module to add or remove hosts to a stacki front-end using API.
   - Information on stacki can be found at U(https://github.com/StackIQ/stacki).
 extends_documentation_fragment:
   - community.general.attributes
@@ -119,7 +119,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 changed:
-  description: Response to whether or not the api call completed successfully.
+  description: Response to whether or not the API call completed successfully.
   returned: always
   type: bool
   sample: true

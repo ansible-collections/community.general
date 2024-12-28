@@ -36,7 +36,7 @@ options:
     description:
       - Whether to install (V(present)), or remove (V(absent)) a package.
       - If the package is to be installed, then O(src) is required.
-      - The SVR4 package system doesn't provide an upgrade operation. You need to uninstall the old, then install the new package.
+      - The SVR4 package system does not provide an upgrade operation. You need to uninstall the old, then install the new package.
     required: true
     choices: ["present", "absent"]
     type: str

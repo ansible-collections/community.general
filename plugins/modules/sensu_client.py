@@ -43,7 +43,7 @@ options:
     type: list
     elements: str
     description:
-      - An array of client subscriptions, a list of roles and/or responsibilities assigned to the system (e.g. webserver).
+      - An array of client subscriptions, a list of roles and/or responsibilities assigned to the system (for example V(webserver)).
       - These subscriptions determine which monitoring checks are executed by the client, as check requests are sent to subscriptions.
       - The subscriptions array items must be strings.
   safe_mode:
@@ -69,7 +69,7 @@ options:
   keepalive:
     type: dict
     description:
-      - The keepalive definition scope, used to configure Sensu client keepalives behavior (e.g. keepalive thresholds, etc).
+      - The keepalive definition scope, used to configure Sensu client keepalives behavior (for example keepalive thresholds and so).
   registration:
     type: dict
     description:

@@ -40,7 +40,7 @@ options:
   path:
     type: str
     description:
-      - Path to the json file of the check to be added/removed.
+      - Path to the JSON file of the check to be added/removed.
       - Will be created if it does not exist (unless O(state=absent)).
       - The parent folders need to exist when O(state=present), otherwise an error will be thrown.
     default: /etc/sensu/conf.d/checks.json
@@ -110,7 +110,7 @@ options:
   publish:
     description:
       - Whether the check should be scheduled at all.
-      - You can still issue it via the sensu API.
+      - You can still issue it using the sensu API.
       - Default is V(false).
     type: bool
   occurrences:
@@ -125,7 +125,7 @@ options:
   aggregate:
     description:
       - Classifies the check as an aggregate check,
-        making it available via the aggregate API.
+        making it available using the aggregate API.
       - Default is V(false).
     type: bool
   low_flap_threshold:
@@ -140,11 +140,11 @@ options:
     type: dict
     description:
       - A hash/dictionary of custom parameters for mixing to the configuration.
-      - You can't rewrite others module parameters using this.
+      - You cannot rewrite other module parameters using this.
   source:
     type: str
     description:
-      - The check source, used to create a JIT Sensu client for an external resource (e.g. a network switch).
+      - The check source, used to create a JIT Sensu client for an external resource (for example a network switch).
 author: "Anders Ingemann (@andsens)"
 """
 

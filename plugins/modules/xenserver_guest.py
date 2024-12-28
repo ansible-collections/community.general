@@ -27,9 +27,9 @@ notes:
     are accessing XenServer host in trusted environment or use C(https://) scheme explicitly.'
   - 'To use C(https://) scheme for O(hostname) you have to either import host certificate to your OS certificate store or use O(validate_certs=false)
     which requires XenAPI library from XenServer 7.2 SDK or newer and Python 2.7.9 or newer.'
-  - 'Network configuration inside a guest OS, by using O(networks[].type), O(networks[].ip), O(networks[].gateway) etc. parameters, is supported
+  - 'Network configuration inside a guest OS, by using parameters O(networks[].type), O(networks[].ip), O(networks[].gateway) and so on, is supported
     on XenServer 7.0 or newer for Windows guests by using official XenServer Guest agent support for network configuration. The module will try
-    to detect if such support is available and utilize it, else it will use a custom method of configuration via xenstore. Since XenServer Guest
+    to detect if such support is available and utilize it, else it will use a custom method of configuration using xenstore. Since XenServer Guest
     agent only support None and Static types of network configuration, where None means DHCP configured interface, O(networks[].type) and O(networks[].type6)
     values V(none) and V(dhcp) have same effect. More info here:
     U(https://www.citrix.com/community/citrix-developer/citrix-hypervisor-developer/citrix-hypervisor-developing-products/citrix-hypervisor-staticip.html).'
@@ -211,7 +211,7 @@ options:
       type:
         description:
           - Type of IPv4 assignment. Value V(none) means whatever is default for OS.
-          - On some operating systems it could be DHCP configured (e.g. Windows) or unconfigured interface (e.g. Linux).
+          - On some operating systems it could be DHCP configured (for example Windows) or unconfigured interface (for example Linux).
         type: str
         choices: [none, dhcp, static]
       ip:
