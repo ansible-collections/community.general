@@ -80,7 +80,7 @@ class Connection(ConnectionBase):
         super(Connection, self)._connect()
 
         if not self._connected:
-            self._display.vvv(u"ESTABLISH Incus CONNECTION FOR USER: root",
+            self._display.vvv("ESTABLISH Incus CONNECTION FOR USER: root",
                               host=self._instance())
             self._connected = True
 

@@ -56,7 +56,6 @@ from ansible.errors import AnsibleFilterError
 from ansible.module_utils.common._collections_compat import Mapping
 from ansible.module_utils.six.moves import StringIO
 from ansible.module_utils.six.moves.configparser import ConfigParser
-from ansible.module_utils.common.text.converters import to_native
 
 
 class IniParser(ConfigParser):
@@ -79,7 +78,7 @@ def to_ini(obj):
         ini_parser.read_dict(obj)
     except Exception as ex:
         raise AnsibleFilterError('to_ini failed to parse given dict:'
-                                 f'{to_native(ex)}', orig_exc=ex)
+                                 f'{ex}', orig_exc=ex)
 
     # catching empty dicts
     if obj == dict():

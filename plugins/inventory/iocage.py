@@ -195,17 +195,15 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             p = Popen(cmd_list, stdout=PIPE, stderr=PIPE, env=my_env)
             stdout, stderr = p.communicate()
             if p.returncode != 0:
-                raise AnsibleError('Failed to run cmd=%s, rc=%s, stderr=%s' %
-                                   (cmd_list, p.returncode, to_native(stderr)))
+                raise AnsibleError(f'Failed to run cmd={cmd_list}, rc={p.returncode}, stderr={to_native(stderr)}')
 
             try:
                 t_stdout = to_text(stdout, errors='surrogate_or_strict')
             except UnicodeError as e:
-                raise AnsibleError('Invalid (non unicode) input returned: %s' % to_native(e)) from e
+                raise AnsibleError(f'Invalid (non unicode) input returned: {e}') from e
 
         except Exception as e:
-            raise AnsibleParserError('Failed to parse %s: %s' %
-                                     (to_native(path), to_native(e))) from e
+            raise AnsibleParserError(f'Failed to parse {to_native(path)}: {e}') from e
 
         results = {'_meta': {'hostvars': {}}}
         self.get_jails(t_stdout, results)
@@ -220,16 +218,16 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     p = Popen(cmd_get_properties, stdout=PIPE, stderr=PIPE, env=my_env)
                     stdout, stderr = p.communicate()
                     if p.returncode != 0:
-                        raise AnsibleError('Failed to run cmd=%s, rc=%s, stderr=%s' %
-                                           (cmd_get_properties, p.returncode, to_native(stderr)))
+                        raise AnsibleError(
+                            f'Failed to run cmd={cmd_get_properties}, rc={p.returncode}, stderr={to_native(stderr)}')
 
                     try:
                         t_stdout = to_text(stdout, errors='surrogate_or_strict')
                     except UnicodeError as e:
-                        raise AnsibleError('Invalid (non unicode) input returned: %s' % to_native(e)) from e
+                        raise AnsibleError(f'Invalid (non unicode) input returned: {e}') from e
 
                 except Exception as e:
-                    raise AnsibleError('Failed to get properties: %s' % to_native(e)) from e
+                    raise AnsibleError(f'Failed to get properties: {e}') from e
 
                 self.get_properties(t_stdout, results, hostname)
 

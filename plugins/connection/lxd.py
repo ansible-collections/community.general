@@ -86,7 +86,7 @@ class Connection(ConnectionBase):
         super(Connection, self)._connect()
 
         if not self._connected:
-            self._display.vvv(u"ESTABLISH LXD CONNECTION FOR USER: root", host=self._host())
+            self._display.vvv("ESTABLISH LXD CONNECTION FOR USER: root", host=self._host())
             self._connected = True
 
     def exec_command(self, cmd, in_data=None, sudoable=True):

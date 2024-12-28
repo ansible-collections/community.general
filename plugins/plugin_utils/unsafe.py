@@ -15,7 +15,7 @@ from ansible.utils.unsafe_proxy import (
     wrap_var as _make_unsafe,
 )
 
-_RE_TEMPLATE_CHARS = re.compile(u'[{}]')
+_RE_TEMPLATE_CHARS = re.compile('[{}]')
 _RE_TEMPLATE_CHARS_BYTES = re.compile(b'[{}]')
 
 

@@ -94,7 +94,7 @@ from ansible.errors import AnsibleError
 from ansible.module_utils.basic import is_executable
 from ansible.module_utils.common.process import get_bin_path
 from ansible.module_utils.six.moves import shlex_quote
-from ansible.module_utils.common.text.converters import to_bytes, to_native
+from ansible.module_utils.common.text.converters import to_bytes
 from ansible.plugins.connection import ConnectionBase, BUFSIZE
 from ansible.utils.display import Display
 
@@ -143,7 +143,7 @@ class Connection(ConnectionBase):
             try:
                 self.chroot_cmd = get_bin_path(self.get_option('chroot_exe'))
             except ValueError as e:
-                raise AnsibleError(to_native(e))
+                raise AnsibleError(str(e))
 
         super(Connection, self)._connect()
         if not self._connected:

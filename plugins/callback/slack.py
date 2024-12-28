@@ -62,7 +62,6 @@ import os
 import uuid
 
 from ansible import context
-from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.urls import open_url
 from ansible.plugins.callback import CallbackBase
 
@@ -138,7 +137,7 @@ class CallbackModule(CallbackBase):
                                 headers=headers)
             return response.read()
         except Exception as e:
-            self._display.warning(f'Could not submit message to Slack: {to_text(e)}')
+            self._display.warning(f'Could not submit message to Slack: {e}')
 
     def v2_playbook_on_start(self, playbook):
         self.playbook_name = os.path.basename(playbook._file_name)

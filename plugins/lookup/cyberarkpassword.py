@@ -84,7 +84,7 @@ from subprocess import Popen
 
 from ansible.errors import AnsibleError
 from ansible.plugins.lookup import LookupBase
-from ansible.module_utils.common.text.converters import to_bytes, to_text, to_native
+from ansible.module_utils.common.text.converters import to_bytes, to_native
 from ansible.utils.display import Display
 
 display = Display()
@@ -164,7 +164,7 @@ class CyberarkPassword:
         except subprocess.CalledProcessError as e:
             raise AnsibleError(e.output)
         except OSError as e:
-            raise AnsibleError(f"ERROR - AIM not installed or clipasswordsdk not in standard location. ERROR=({to_text(e.errno)}) => {e.strerror} ")
+            raise AnsibleError(f"ERROR - AIM not installed or clipasswordsdk not in standard location. ERROR=({e.errno}) => {e.strerror} ")
 
         return [result_dict]
 

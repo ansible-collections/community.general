@@ -177,7 +177,7 @@ class ActionModule(ActionBase):
         except AnsibleConnectionFailure as e:
             # If the connection is closed too quickly due to the system being shutdown, carry on
             display.debug(
-                f'{self._task.action}: AnsibleConnectionFailure caught and handled: {to_text(e)}')
+                f'{self._task.action}: AnsibleConnectionFailure caught and handled: {e}')
             shutdown_result['rc'] = 0
 
         if shutdown_result['rc'] != 0:

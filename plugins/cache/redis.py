@@ -73,7 +73,6 @@ import time
 import json
 
 from ansible.errors import AnsibleError
-from ansible.module_utils.common.text.converters import to_native
 from ansible.parsing.ajson import AnsibleJSONEncoder, AnsibleJSONDecoder
 from ansible.plugins.cache import BaseCacheModule
 from ansible.utils.display import Display
@@ -169,7 +168,7 @@ class CacheModule(BaseCacheModule):
         try:
             return scon.master_for(self._sentinel_service_name, socket_timeout=0.2)
         except Exception as exc:
-            raise AnsibleError(f'Could not connect to redis sentinel: {to_native(exc)}')
+            raise AnsibleError(f'Could not connect to redis sentinel: {exc}')
 
     def _make_key(self, key):
         return self._prefix + key

@@ -118,7 +118,6 @@ password: secure
 import socket
 
 from ansible.errors import AnsibleError
-from ansible.module_utils.common.text.converters import to_text
 from ansible.plugins.inventory import BaseInventoryPlugin, Cacheable, to_safe_group_name
 from ansible.module_utils.six import text_type
 
@@ -377,7 +376,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                 try:
                     self.inventory.set_variable(hostname, 'cobbler', make_unsafe(host))
                 except ValueError as e:
-                    self.display.warning(f"Could not set host info for {hostname}: {to_text(e)}")
+                    self.display.warning(f"Could not set host info for {hostname}: {e}")
 
         if self.get_option('want_ip_addresses'):
             self.inventory.set_variable(self.group, 'cobbler_ipv4_addresses', make_unsafe(ip_addresses))

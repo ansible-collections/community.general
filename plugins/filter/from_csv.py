@@ -81,7 +81,6 @@ RETURN = '''
 '''
 
 from ansible.errors import AnsibleFilterError
-from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.module_utils.csv import (initialize_dialect, read_csv, CSVError,
                                                                             DialectNotAvailableError,
@@ -99,7 +98,7 @@ def from_csv(data, dialect='excel', fieldnames=None, delimiter=None, skipinitial
     try:
         dialect = initialize_dialect(dialect, **dialect_params)
     except (CustomDialectFailureError, DialectNotAvailableError) as e:
-        raise AnsibleFilterError(to_native(e))
+        raise AnsibleFilterError(str(e))
 
     reader = read_csv(data, dialect, fieldnames)
 
@@ -109,7 +108,7 @@ def from_csv(data, dialect='excel', fieldnames=None, delimiter=None, skipinitial
         for row in reader:
             data_list.append(row)
     except CSVError as e:
-        raise AnsibleFilterError("Unable to process file: %s" % to_native(e))
+        raise AnsibleFilterError(f"Unable to process file: {e}")
 
     return data_list
 
