@@ -20,7 +20,7 @@ DOCUMENTATION = '''
         - inventory_cache
     options:
       plugin:
-        description: The name of this plugin, it should always be set to V(community.general.cobbler) for this plugin to recognize it as it's own.
+        description: The name of this plugin, it should always be set to V(community.general.cobbler) for this plugin to recognize it as its own.
         type: string
         required: true
         choices: [ 'cobbler', 'community.general.cobbler' ]

@@ -257,7 +257,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def _handle_vboxmanage_group_string(self, vboxmanage_group, current_host, cacheable_results):
         '''Handles parsing the VM's Group assignment from VBoxManage according to VirtualBox documentation.'''
         # Per the VirtualBox documentation, a VM can be part of many groups,
-        # and it's possible to have nested groups.
+        # and it is possible to have nested groups.
         # Many groups are separated by commas ",", and nested groups use
         # slash "/".
         # https://www.virtualbox.org/manual/UserManual.html#gui-vmgroups

@@ -217,7 +217,7 @@ def main():
                     module.fail_json(
                         msg=msg.format(path=path, exception=str(e)))
         else:
-            # Idempotency: it's okay if the file doesn't exist
+            # Idempotency: it is okay if the file doesn't exist
             msg = '{path} already does not exist'.format(path=path)
             module.exit_json(msg=msg)
 
@@ -236,7 +236,7 @@ def main():
     try:
         current_config = json.load(open(path, 'r'))
     except (IOError, ValueError):
-        # File either doesn't exist or it's invalid JSON
+        # File either doesn't exist or it is invalid JSON
         pass
 
     if current_config is not None and current_config == config:

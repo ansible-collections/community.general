@@ -221,7 +221,7 @@ def install_ports(module, port_path, ports, variant, stdout, stderr):
 
 
 def activate_ports(module, port_path, ports, stdout, stderr):
-    """ Activate a port if it's inactive. """
+    """ Activate a port if it is inactive. """
 
     activate_c = 0
 
@@ -248,7 +248,7 @@ def activate_ports(module, port_path, ports, stdout, stderr):
 
 
 def deactivate_ports(module, port_path, ports, stdout, stderr):
-    """ Deactivate a port if it's active. """
+    """ Deactivate a port if it is active. """
 
     deactivated_c = 0
 
