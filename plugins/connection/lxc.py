@@ -7,31 +7,31 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    author: Joerg Thalheim (!UNKNOWN) <joerg@higgsboson.tk>
-    name: lxc
-    short_description: Run tasks in lxc containers via lxc python library
+DOCUMENTATION = r"""
+author: Joerg Thalheim (!UNKNOWN) <joerg@higgsboson.tk>
+name: lxc
+short_description: Run tasks in LXC containers using lxc python library
+description:
+  - Run commands or put/fetch files to an existing LXC container using lxc python library.
+options:
+  remote_addr:
     description:
-        - Run commands or put/fetch files to an existing lxc container using lxc python library
-    options:
-      remote_addr:
-        description:
-            - Container identifier
-        type: string
-        default: inventory_hostname
-        vars:
-            - name: inventory_hostname
-            - name: ansible_host
-            - name: ansible_lxc_host
-      executable:
-        default: /bin/sh
-        description:
-            - Shell executable
-        type: string
-        vars:
-            - name: ansible_executable
-            - name: ansible_lxc_executable
-'''
+      - Container identifier.
+    type: string
+    default: inventory_hostname
+    vars:
+      - name: inventory_hostname
+      - name: ansible_host
+      - name: ansible_lxc_host
+  executable:
+    default: /bin/sh
+    description:
+      - Shell executable.
+    type: string
+    vars:
+      - name: ansible_executable
+      - name: ansible_lxc_executable
+"""
 
 import os
 import shutil

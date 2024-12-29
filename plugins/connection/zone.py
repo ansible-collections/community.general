@@ -11,22 +11,22 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    author: Ansible Core Team
-    name: zone
-    short_description: Run tasks in a zone instance
+DOCUMENTATION = r"""
+author: Ansible Core Team
+name: zone
+short_description: Run tasks in a zone instance
+description:
+  - Run commands or put/fetch files to an existing zone.
+options:
+  remote_addr:
     description:
-        - Run commands or put/fetch files to an existing zone.
-    options:
-      remote_addr:
-        description:
-            - Zone identifier
-        type: string
-        default: inventory_hostname
-        vars:
-            - name: ansible_host
-            - name: ansible_zone_host
-'''
+      - Zone identifier.
+    type: string
+    default: inventory_hostname
+    vars:
+      - name: ansible_host
+      - name: ansible_zone_host
+"""
 
 import os
 import os.path
