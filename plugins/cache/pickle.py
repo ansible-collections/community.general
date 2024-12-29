@@ -8,41 +8,41 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    name: pickle
-    short_description: Pickle formatted files.
+DOCUMENTATION = r"""
+name: pickle
+short_description: Pickle formatted files
+description:
+  - This cache uses Python's pickle serialization format, in per host files, saved to the filesystem.
+author: Brian Coca (@bcoca)
+options:
+  _uri:
+    required: true
     description:
-        - This cache uses Python's pickle serialization format, in per host files, saved to the filesystem.
-    author: Brian Coca (@bcoca)
-    options:
-      _uri:
-        required: true
-        description:
-          - Path in which the cache plugin will save the files
-        env:
-          - name: ANSIBLE_CACHE_PLUGIN_CONNECTION
-        ini:
-          - key: fact_caching_connection
-            section: defaults
-        type: path
-      _prefix:
-        description: User defined prefix to use when creating the files
-        env:
-          - name: ANSIBLE_CACHE_PLUGIN_PREFIX
-        ini:
-          - key: fact_caching_prefix
-            section: defaults
-        type: string
-      _timeout:
-        default: 86400
-        description: Expiration timeout in seconds for the cache plugin data. Set to 0 to never expire
-        env:
-          - name: ANSIBLE_CACHE_PLUGIN_TIMEOUT
-        ini:
-          - key: fact_caching_timeout
-            section: defaults
-        type: float
-'''
+      - Path in which the cache plugin will save the files.
+    env:
+      - name: ANSIBLE_CACHE_PLUGIN_CONNECTION
+    ini:
+      - key: fact_caching_connection
+        section: defaults
+    type: path
+  _prefix:
+    description: User defined prefix to use when creating the files.
+    env:
+      - name: ANSIBLE_CACHE_PLUGIN_PREFIX
+    ini:
+      - key: fact_caching_prefix
+        section: defaults
+    type: string
+  _timeout:
+    default: 86400
+    description: Expiration timeout in seconds for the cache plugin data. Set to 0 to never expire.
+    env:
+      - name: ANSIBLE_CACHE_PLUGIN_TIMEOUT
+    ini:
+      - key: fact_caching_timeout
+        section: defaults
+    type: float
+"""
 
 try:
     import cPickle as pickle

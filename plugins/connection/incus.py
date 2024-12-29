@@ -8,47 +8,47 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = """
-    author: Stéphane Graber (@stgraber)
-    name: incus
-    short_description: Run tasks in Incus instances via the Incus CLI.
+DOCUMENTATION = r"""
+author: Stéphane Graber (@stgraber)
+name: incus
+short_description: Run tasks in Incus instances using the Incus CLI
+description:
+  - Run commands or put/fetch files to an existing Incus instance using Incus CLI.
+version_added: "8.2.0"
+options:
+  remote_addr:
     description:
-        - Run commands or put/fetch files to an existing Incus instance using Incus CLI.
-    version_added: "8.2.0"
-    options:
-      remote_addr:
-        description:
-            - The instance identifier.
-        type: string
-        default: inventory_hostname
-        vars:
-            - name: inventory_hostname
-            - name: ansible_host
-            - name: ansible_incus_host
-      executable:
-        description:
-            - The shell to use for execution inside the instance.
-        type: string
-        default: /bin/sh
-        vars:
-            - name: ansible_executable
-            - name: ansible_incus_executable
-      remote:
-        description:
-            - The name of the Incus remote to use (per C(incus remote list)).
-            - Remotes are used to access multiple servers from a single client.
-        type: string
-        default: local
-        vars:
-            - name: ansible_incus_remote
-      project:
-        description:
-            - The name of the Incus project to use (per C(incus project list)).
-            - Projects are used to divide the instances running on a server.
-        type: string
-        default: default
-        vars:
-            - name: ansible_incus_project
+      - The instance identifier.
+    type: string
+    default: inventory_hostname
+    vars:
+      - name: inventory_hostname
+      - name: ansible_host
+      - name: ansible_incus_host
+  executable:
+    description:
+      - The shell to use for execution inside the instance.
+    type: string
+    default: /bin/sh
+    vars:
+      - name: ansible_executable
+      - name: ansible_incus_executable
+  remote:
+    description:
+      - The name of the Incus remote to use (per C(incus remote list)).
+      - Remotes are used to access multiple servers from a single client.
+    type: string
+    default: local
+    vars:
+      - name: ansible_incus_remote
+  project:
+    description:
+      - The name of the Incus project to use (per C(incus project list)).
+      - Projects are used to divide the instances running on a server.
+    type: string
+    default: default
+    vars:
+      - name: ansible_incus_project
 """
 
 import os

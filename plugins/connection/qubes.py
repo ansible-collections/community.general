@@ -12,34 +12,33 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
-    name: qubes
-    short_description: Interact with an existing QubesOS AppVM
+DOCUMENTATION = r"""
+name: qubes
+short_description: Interact with an existing QubesOS AppVM
 
+description:
+  - Run commands or put/fetch files to an existing Qubes AppVM using qubes tools.
+author: Kushal Das (@kushaldas)
+
+
+options:
+  remote_addr:
     description:
-        - Run commands or put/fetch files to an existing Qubes AppVM using qubes tools.
-
-    author: Kushal Das (@kushaldas)
-
-
-    options:
-      remote_addr:
-        description:
-            - VM name.
-        type: string
-        default: inventory_hostname
-        vars:
-            - name: ansible_host
-      remote_user:
-        description:
-            - The user to execute as inside the VM.
-        type: string
-        default: The I(user) account as default in Qubes OS.
-        vars:
-            - name: ansible_user
+      - VM name.
+    type: string
+    default: inventory_hostname
+    vars:
+      - name: ansible_host
+  remote_user:
+    description:
+      - The user to execute as inside the VM.
+    type: string
+    default: The I(user) account as default in Qubes OS.
+    vars:
+      - name: ansible_user
 #        keyword:
 #            - name: hosts
-'''
+"""
 
 import subprocess
 

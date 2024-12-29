@@ -10,79 +10,66 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    author: Maykel Moya (!UNKNOWN) <mmoya@speedyrails.com>
-    name: chroot
-    short_description: Interact with local chroot
+DOCUMENTATION = r"""
+author: Maykel Moya (!UNKNOWN) <mmoya@speedyrails.com>
+name: chroot
+short_description: Interact with local chroot
+description:
+  - Run commands or put/fetch files to an existing chroot on the Ansible controller.
+options:
+  remote_addr:
     description:
-        - Run commands or put/fetch files to an existing chroot on the Ansible controller.
-    options:
-      remote_addr:
-        description:
-            - The path of the chroot you want to access.
-        type: string
-        default: inventory_hostname
-        vars:
-            - name: inventory_hostname
-            - name: ansible_host
-      executable:
-        description:
-            - User specified executable shell
-        type: string
-        ini:
-          - section: defaults
-            key: executable
-        env:
-          - name: ANSIBLE_EXECUTABLE
-        vars:
-          - name: ansible_executable
-        default: /bin/sh
-      chroot_exe:
-        description:
-            - User specified chroot binary
-        type: string
-        ini:
-          - section: chroot_connection
-            key: exe
-        env:
-          - name: ANSIBLE_CHROOT_EXE
-        vars:
-          - name: ansible_chroot_exe
-        default: chroot
-      disable_root_check:
-        description:
-            - Do not check that the user is not root.
-        ini:
-          - section: chroot_connection
-            key: disable_root_check
-        env:
-          - name: ANSIBLE_CHROOT_DISABLE_ROOT_CHECK
-        vars:
-          - name: ansible_chroot_disable_root_check
-        default: false
-        type: bool
-        version_added: 7.3.0
-'''
+      - The path of the chroot you want to access.
+    type: string
+    default: inventory_hostname
+    vars:
+      - name: inventory_hostname
+      - name: ansible_host
+  executable:
+    description:
+      - User specified executable shell.
+    type: string
+    ini:
+      - section: defaults
+        key: executable
+    env:
+      - name: ANSIBLE_EXECUTABLE
+    vars:
+      - name: ansible_executable
+    default: /bin/sh
+  chroot_exe:
+    description:
+      - User specified chroot binary.
+    type: string
+    ini:
+      - section: chroot_connection
+        key: exe
+    env:
+      - name: ANSIBLE_CHROOT_EXE
+    vars:
+      - name: ansible_chroot_exe
+    default: chroot
+  disable_root_check:
+    description:
+      - Do not check that the user is not root.
+    ini:
+      - section: chroot_connection
+        key: disable_root_check
+    env:
+      - name: ANSIBLE_CHROOT_DISABLE_ROOT_CHECK
+    vars:
+      - name: ansible_chroot_disable_root_check
+    default: false
+    type: bool
+    version_added: 7.3.0
+"""
 
 EXAMPLES = r"""
-# Plugin requires root privileges for chroot, -E preserves your env (and location of ~/.ansible):
-# sudo -E ansible-playbook ...
-#
-# Static inventory file
-# [chroots]
-# /path/to/debootstrap
-# /path/to/feboostrap
-# /path/to/lxc-image
-# /path/to/chroot
-
-# playbook
----
 - hosts: chroots
   connection: community.general.chroot
   tasks:
     - debug:
         msg: "This is coming from chroot environment"
-
 """
 
 import os

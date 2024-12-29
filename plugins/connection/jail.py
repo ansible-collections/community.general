@@ -10,30 +10,30 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    author: Ansible Core Team
-    name: jail
-    short_description: Run tasks in jails
+DOCUMENTATION = r"""
+author: Ansible Core Team
+name: jail
+short_description: Run tasks in jails
+description:
+  - Run commands or put/fetch files to an existing jail.
+options:
+  remote_addr:
     description:
-        - Run commands or put/fetch files to an existing jail
-    options:
-      remote_addr:
-        description:
-            - Path to the jail
-        type: string
-        default: inventory_hostname
-        vars:
-            - name: inventory_hostname
-            - name: ansible_host
-            - name: ansible_jail_host
-      remote_user:
-        description:
-            - User to execute as inside the jail
-        type: string
-        vars:
-            - name: ansible_user
-            - name: ansible_jail_user
-'''
+      - Path to the jail.
+    type: string
+    default: inventory_hostname
+    vars:
+      - name: inventory_hostname
+      - name: ansible_host
+      - name: ansible_jail_host
+  remote_user:
+    description:
+      - User to execute as inside the jail.
+    type: string
+    vars:
+      - name: ansible_user
+      - name: ansible_jail_user
+"""
 
 import os
 import os.path
