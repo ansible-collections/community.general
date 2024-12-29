@@ -8,54 +8,54 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    author: Unknown (!UNKNOWN)
-    name: slack
-    type: notification
-    requirements:
-      - whitelist in configuration
-      - prettytable (python library)
-    short_description: Sends play events to a Slack channel
-    description:
-        - This is an ansible callback plugin that sends status updates to a Slack channel during playbook execution.
-    options:
-      webhook_url:
-        required: true
-        description: Slack Webhook URL.
-        type: str
-        env:
-          - name: SLACK_WEBHOOK_URL
-        ini:
-          - section: callback_slack
-            key: webhook_url
-      channel:
-        default: "#ansible"
-        description: Slack room to post in.
-        type: str
-        env:
-          - name: SLACK_CHANNEL
-        ini:
-          - section: callback_slack
-            key: channel
-      username:
-        description: Username to post as.
-        type: str
-        env:
-          - name: SLACK_USERNAME
-        default: ansible
-        ini:
-          - section: callback_slack
-            key: username
-      validate_certs:
-        description: Validate the SSL certificate of the Slack server for HTTPS URLs.
-        env:
-          - name: SLACK_VALIDATE_CERTS
-        ini:
-          - section: callback_slack
-            key: validate_certs
-        default: true
-        type: bool
-'''
+DOCUMENTATION = r"""
+author: Unknown (!UNKNOWN)
+name: slack
+type: notification
+requirements:
+  - whitelist in configuration
+  - prettytable (python library)
+short_description: Sends play events to a Slack channel
+description:
+  - This is an ansible callback plugin that sends status updates to a Slack channel during playbook execution.
+options:
+  webhook_url:
+    required: true
+    description: Slack Webhook URL.
+    type: str
+    env:
+      - name: SLACK_WEBHOOK_URL
+    ini:
+      - section: callback_slack
+        key: webhook_url
+  channel:
+    default: "#ansible"
+    description: Slack room to post in.
+    type: str
+    env:
+      - name: SLACK_CHANNEL
+    ini:
+      - section: callback_slack
+        key: channel
+  username:
+    description: Username to post as.
+    type: str
+    env:
+      - name: SLACK_USERNAME
+    default: ansible
+    ini:
+      - section: callback_slack
+        key: username
+  validate_certs:
+    description: Validate the SSL certificate of the Slack server for HTTPS URLs.
+    env:
+      - name: SLACK_VALIDATE_CERTS
+    ini:
+      - section: callback_slack
+        key: validate_certs
+    default: true
+    type: bool
+"""
 
 import json
 import os

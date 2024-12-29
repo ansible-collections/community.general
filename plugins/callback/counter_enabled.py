@@ -9,20 +9,20 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    author: Unknown (!UNKNOWN)
-    name: counter_enabled
-    type: stdout
-    short_description: adds counters to the output items (tasks and hosts/task)
-    description:
-      - Use this callback when you need a kind of progress bar on a large environments.
-      - You will know how many tasks has the playbook to run, and which one is actually running.
-      - You will know how many hosts may run a task, and which of them is actually running.
-    extends_documentation_fragment:
-      - default_callback
-    requirements:
-      - set as stdout callback in C(ansible.cfg) (C(stdout_callback = counter_enabled))
-'''
+DOCUMENTATION = r"""
+author: Unknown (!UNKNOWN)
+name: counter_enabled
+type: stdout
+short_description: adds counters to the output items (tasks and hosts/task)
+description:
+  - Use this callback when you need a kind of progress bar on a large environments.
+  - You will know how many tasks has the playbook to run, and which one is actually running.
+  - You will know how many hosts may run a task, and which of them is actually running.
+extends_documentation_fragment:
+  - default_callback
+requirements:
+  - set as stdout callback in C(ansible.cfg) (C(stdout_callback = counter_enabled))
+"""
 
 from ansible import constants as C
 from ansible.plugins.callback import CallbackBase

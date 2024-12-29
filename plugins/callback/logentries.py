@@ -6,79 +6,77 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    author: Unknown (!UNKNOWN)
-    name: logentries
-    type: notification
-    short_description: Sends events to Logentries
+DOCUMENTATION = r"""
+author: Unknown (!UNKNOWN)
+name: logentries
+type: notification
+short_description: Sends events to Logentries
+description:
+  - This callback plugin will generate JSON objects and send them to Logentries using TCP for auditing/debugging purposes.
+requirements:
+  - whitelisting in configuration
+  - certifi (Python library)
+  - flatdict (Python library), if you want to use the O(flatten) option
+options:
+  api:
+    description: URI to the Logentries API.
+    type: str
+    env:
+      - name: LOGENTRIES_API
+    default: data.logentries.com
+    ini:
+      - section: callback_logentries
+        key: api
+  port:
+    description: HTTP port to use when connecting to the API.
+    type: int
+    env:
+      - name: LOGENTRIES_PORT
+    default: 80
+    ini:
+      - section: callback_logentries
+        key: port
+  tls_port:
+    description: Port to use when connecting to the API when TLS is enabled.
+    type: int
+    env:
+      - name: LOGENTRIES_TLS_PORT
+    default: 443
+    ini:
+      - section: callback_logentries
+        key: tls_port
+  token:
+    description: The logentries C(TCP token).
+    type: str
+    env:
+      - name: LOGENTRIES_ANSIBLE_TOKEN
+    required: true
+    ini:
+      - section: callback_logentries
+        key: token
+  use_tls:
     description:
-      - This callback plugin will generate JSON objects and send them to Logentries via TCP for auditing/debugging purposes.
-      - Before 2.4, if you wanted to use an ini configuration, the file must be placed in the same directory as this plugin and named C(logentries.ini).
-      - In 2.4 and above you can just put it in the main Ansible configuration file.
-    requirements:
-      - whitelisting in configuration
-      - certifi (Python library)
-      - flatdict (Python library), if you want to use the O(flatten) option
-    options:
-      api:
-        description: URI to the Logentries API.
-        type: str
-        env:
-          - name: LOGENTRIES_API
-        default: data.logentries.com
-        ini:
-          - section: callback_logentries
-            key: api
-      port:
-        description: HTTP port to use when connecting to the API.
-        type: int
-        env:
-            - name: LOGENTRIES_PORT
-        default: 80
-        ini:
-          - section: callback_logentries
-            key: port
-      tls_port:
-        description: Port to use when connecting to the API when TLS is enabled.
-        type: int
-        env:
-            - name: LOGENTRIES_TLS_PORT
-        default: 443
-        ini:
-          - section: callback_logentries
-            key: tls_port
-      token:
-        description: The logentries C(TCP token).
-        type: str
-        env:
-          - name: LOGENTRIES_ANSIBLE_TOKEN
-        required: true
-        ini:
-          - section: callback_logentries
-            key: token
-      use_tls:
-        description:
-          - Toggle to decide whether to use TLS to encrypt the communications with the API server.
-        env:
-          - name: LOGENTRIES_USE_TLS
-        default: false
-        type: boolean
-        ini:
-          - section: callback_logentries
-            key: use_tls
-      flatten:
-        description: Flatten complex data structures into a single dictionary with complex keys.
-        type: boolean
-        default: false
-        env:
-          - name: LOGENTRIES_FLATTEN
-        ini:
-          - section: callback_logentries
-            key: flatten
-'''
+      - Toggle to decide whether to use TLS to encrypt the communications with the API server.
+    env:
+      - name: LOGENTRIES_USE_TLS
+    default: false
+    type: boolean
+    ini:
+      - section: callback_logentries
+        key: use_tls
+  flatten:
+    description: Flatten complex data structures into a single dictionary with complex keys.
+    type: boolean
+    default: false
+    env:
+      - name: LOGENTRIES_FLATTEN
+    ini:
+      - section: callback_logentries
+        key: flatten
+"""
 
-EXAMPLES = '''
-examples: >
+EXAMPLES = r"""
+examples: >-
   To enable, add this to your ansible.cfg file in the defaults block
 
     [defaults]
@@ -97,7 +95,7 @@ examples: >
     use_tls = true
     token = dd21fc88-f00a-43ff-b977-e3a4233c53af
     flatten = false
-'''
+"""
 
 import os
 import socket
