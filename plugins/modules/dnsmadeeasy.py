@@ -190,9 +190,9 @@ options:
 notes:
   - The DNS Made Easy service requires that machines interacting with the API have the proper time and timezone set. Be sure
     you are within a few seconds of actual time by using NTP.
-  - This module returns record(s) and monitor(s) in the "result" element when O(state=present). These values can
+  - This module returns record(s) and monitor(s) in the RV(ignore:result) element when O(state=present). These values can
     be be registered and used in your playbooks.
-  - Only A records can have a monitor or failover.
+  - Only A records can have a O(monitor) or O(failover).
   - To add failover, the O(failover), O(autoFailover), O(port), O(protocol), O(ip1), and O(ip2) options are required.
   - To add monitor, the O(monitor), O(port), O(protocol), O(maxEmails), O(systemDescription), and O(ip1) options are required.
   - The monitor and the failover will share O(port), O(protocol), and O(ip1) options.
