@@ -76,7 +76,7 @@ options:
   from_name:
     type: str
     description:
-      - The name you want to appear in the from field, i.e 'John Doe'.
+      - The name you want to appear in the from field, for example V(John Doe).
   html_body:
     description:
       - Whether the body is html content that should be rendered.
