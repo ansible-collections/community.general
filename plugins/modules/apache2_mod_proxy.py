@@ -40,7 +40,8 @@ options:
     type: str
     description:
       - (IPv4|IPv6|FQDN) of the balancer member to get or to set attributes to. Port number is autodetected and should not
-        be specified here. If undefined, apache2_mod_proxy module will return a members list of dictionaries of all the current
+        be specified here.
+      - If undefined, apache2_mod_proxy module will return a members list of dictionaries of all the current
         balancer pool members' attributes.
   state:
     type: list
@@ -315,14 +316,12 @@ class BalancerMember(object):
 class Balancer(object):
     """ Apache httpd 2.4 mod_proxy balancer object"""
 
-    def __init__(self, host, suffix, module, members=None, tls=False):
+    def __init__(self, module, host, suffix, tls=False):
         proto = "https" if tls else "http"
         self.base_url = '{0}://{1}'.format(proto, host)
         self.url = '{0}://{1}{2}'.format(proto, host, suffix)
         self.module = module
         self.page = self.fetch_balancer_page()
-        if members is None:
-            self._members = []
 
     def fetch_balancer_page(self):
         """ Returns the balancer management html page as a string for later parsing."""
@@ -374,17 +373,16 @@ class ApacheModProxy(ModuleHelper):
     def __init_module__(self):
         deps.validate(self.module)
 
-        if (len(self.vars.state) > 1) and (("present" in self.vars.state) or ("enabled" in self.vars.state)):
+        if len(self.vars.state) > 1 and ("present" in self.vars.state or "enabled" in self.vars.state):
             self.do_raise(msg="states present/enabled are mutually exclusive with other states!")
 
-        self.mybalancer = Balancer(self.vars.balancer_vhost, self.vars.balancer_url_suffix, module=self.module, tls=self.vars.tls)
+        self.mybalancer = Balancer(self.module, self.vars.balancer_vhost, self.vars.balancer_url_suffix, tls=self.vars.tls)
 
     def __run__(self):
         if self.vars.member_host is None:
             json_output_list = []
             for member in self.mybalancer.members:
                 json_output_list.append(member.as_dict())
-            self.changed = False
             self.vars.members = json_output_list
         else:
             member_status = {'disabled': False, 'drained': False, 'hot_standby': False, 'ignore_errors': False}
@@ -399,7 +397,7 @@ class ApacheModProxy(ModuleHelper):
                 if str(member.host) == self.vars.member_host:
                     if self.vars.state is not None:
                         member_status_before = member.status
-                        if not self.module.check_mode:
+                        if not self.check_mode:
                             member_status_after = member.status = member_status
                         else:
                             member_status_after = member_status
