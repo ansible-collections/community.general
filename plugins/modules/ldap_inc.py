@@ -229,8 +229,6 @@ def main():
                         if tries == max_tries:
                             module.fail_json(msg="The increment could not be applied after " + str(max_tries) + " tries.")
                             return
-                    except Exception as e0:
-                        raise e0
 
         else:
             result = mod.connection.search_ext_s(
