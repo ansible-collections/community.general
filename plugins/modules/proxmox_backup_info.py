@@ -19,8 +19,8 @@ description:
   - Retrieve information such as backup times, VM name, VM ID, mode, backup type, and backup schedule using the Proxmox Server API.
 
 author:
-  - "Marzieh Raoufnezhad (@raoufnezhad)"
-  - "Maryam Mayabi (@mmayabi)"
+  - "Marzieh Raoufnezhad (@raoufnezhad) <raoufnezhad@gmail.com>"
+  - "Maryam Mayabi (@mmayabi) <mayabi.ahm@gmail.com>"
 
 options:
   vm_name:
