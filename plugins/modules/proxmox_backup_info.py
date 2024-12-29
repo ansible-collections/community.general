@@ -15,7 +15,7 @@ module: proxmox_backup_info
 
 short_description: Proxmox Schedule Backup Info  
 
-description: The `proxmox_backup_info` module displays information such as backup times, VM name, VM ID, mode, backup type, and backup schedule using the Proxmox Server API.
+description: Retrieve information such as backup times, VM name, VM ID, mode, backup type, and backup schedule using the Proxmox Server API.
 
 author: 
     - Marzieh Raoufnezhad
