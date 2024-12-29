@@ -14,6 +14,10 @@ short_description: Runs the discovery program C(facter) on the remote system
 description:
   - Runs the C(facter) discovery program (U(https://github.com/puppetlabs/facter)) on the remote system, returning JSON data
     that can be useful for inventory purposes.
+deprecated:
+  removed_in: 12.0.0
+  why: The module has been replaced by M(community.general.facter_facts).
+  alternative: Use M(community.general.facter_facts) instead.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
