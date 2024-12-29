@@ -424,7 +424,7 @@ def remove_null_values(data):
         # Recursively remove null values from lists
         return [remove_null_values(item) for item in data if item is not None]
     else:
-        # Return the data if it's neither a dictionary nor a list
+        # Return the data if it is neither a dictionary nor a list
         return data
 
 
@@ -436,7 +436,7 @@ def camel_recursive(data):
         # Apply camelCase conversion to each item in the list
         return [camel_recursive(item) for item in data]
     else:
-        # Return the data as is if it's not a dict or list
+        # Return the data as-is if it is not a dict or list
         return data
 
 

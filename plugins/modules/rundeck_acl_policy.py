@@ -43,7 +43,7 @@ options:
     type: str
     description:
       - Sets the project which receive the ACL policy.
-      - If unset, it's a system ACL policy.
+      - If unset, it is a system ACL policy.
   policy:
     type: str
     description:
@@ -155,7 +155,7 @@ class RundeckACLManager:
             if info["status"] == 201:
                 self.module.exit_json(changed=True, before={}, after=self.get_acl())
             elif info["status"] == 400:
-                self.module.fail_json(msg="Unable to validate acl %s. Please ensure it's a valid ACL" %
+                self.module.fail_json(msg="Unable to validate acl %s. Please ensure it is a valid ACL" %
                                           self.module.params["name"])
             elif info["status"] == 409:
                 self.module.fail_json(msg="ACL %s already exists" % self.module.params["name"])
@@ -179,7 +179,7 @@ class RundeckACLManager:
             if info["status"] == 200:
                 self.module.exit_json(changed=True, before=facts, after=self.get_acl())
             elif info["status"] == 400:
-                self.module.fail_json(msg="Unable to validate acl %s. Please ensure it's a valid ACL" %
+                self.module.fail_json(msg="Unable to validate acl %s. Please ensure it is a valid ACL" %
                                           self.module.params["name"])
             elif info["status"] == 404:
                 self.module.fail_json(msg="ACL %s doesn't exists. Cannot update." % self.module.params["name"])

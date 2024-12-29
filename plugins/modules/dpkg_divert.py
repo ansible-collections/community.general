@@ -19,7 +19,7 @@ description:
   - A diversion is for C(dpkg) the knowledge that only a given package (or the local administrator) is allowed to install
     a file at a given location. Other packages shipping their own version of this file will be forced to O(divert) it, that
     is to install it at another location. It allows one to keep changes in a file provided by a debian package by preventing
-    its overwrite at package upgrade.
+    it being overwritten on package upgrade.
   - This module manages diversions of debian packages files using the C(dpkg-divert) commandline tool. It can either create
     or remove a diversion for a given file, but also update an existing diversion to modify its O(holder) and/or its O(divert)
     location.

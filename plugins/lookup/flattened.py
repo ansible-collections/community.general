@@ -78,7 +78,7 @@ class LookupModule(LookupBase):
                     term = term2
 
             if isinstance(term, list):
-                # if it's a list, check recursively for items that are a list
+                # if it is a list, check recursively for items that are a list
                 term = self._do_flatten(term, variables)
                 ret.extend(term)
             else:

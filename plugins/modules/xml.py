@@ -432,7 +432,7 @@ def is_attribute(tree, xpath, namespaces):
 
     An xpath attribute search will only match one item"""
 
-    # lxml 5.1.1 removed etree._ElementStringResult, so we can no longer simply assume it's there
+    # lxml 5.1.1 removed etree._ElementStringResult, so we can no longer simply assume it is there
     # (https://github.com/lxml/lxml/commit/eba79343d0e7ad1ce40169f60460cdd4caa29eb3)
     ElementStringResult = getattr(etree, '_ElementStringResult', None)
 

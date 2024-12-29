@@ -246,7 +246,7 @@ def create_or_update_executions(kc, config, realm='master'):
     """
     Create or update executions for an authentication flow.
     :param kc: Keycloak API access.
-    :param config: Representation of the authentication flow including it's executions.
+    :param config: Representation of the authentication flow including its executions.
     :param realm: Realm
     :return: tuple (changed, dict(before, after)
         WHERE
