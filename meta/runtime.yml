@@ -83,6 +83,10 @@ plugin_routing:
         removal_version: 2.0.0
         warning_text: Use the 'default' callback plugin with 'display_failed_stderr
           = yes' option.
+    yaml:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: The plugin has been superseded by the the option `result_format=yaml` in callback plugin ansible.builtin.default from ansible-core 2.13 onwards.
   connection:
     docker:
       redirect: community.docker.docker
