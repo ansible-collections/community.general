@@ -7,65 +7,65 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    name: nrdp
-    type: notification
-    author: "Remi VERCHERE (@rverchere)"
-    short_description: Post task results to a Nagios server through nrdp
-    description:
-        - This callback send playbook result to Nagios.
-        - Nagios shall use NRDP to receive passive events.
-        - The passive check is sent to a dedicated host/service for Ansible.
-    options:
-        url:
-            description: URL of the nrdp server.
-            required: true
-            env:
-                - name : NRDP_URL
-            ini:
-                - section: callback_nrdp
-                  key: url
-            type: string
-        validate_certs:
-            description: Validate the SSL certificate of the nrdp server. (Used for HTTPS URLs.)
-            env:
-                - name: NRDP_VALIDATE_CERTS
-            ini:
-                - section: callback_nrdp
-                  key: validate_nrdp_certs
-                - section: callback_nrdp
-                  key: validate_certs
-            type: boolean
-            default: false
-            aliases: [ validate_nrdp_certs ]
-        token:
-            description: Token to be allowed to push nrdp events.
-            required: true
-            env:
-                - name: NRDP_TOKEN
-            ini:
-                - section: callback_nrdp
-                  key: token
-            type: string
-        hostname:
-            description: Hostname where the passive check is linked to.
-            required: true
-            env:
-                - name : NRDP_HOSTNAME
-            ini:
-                - section: callback_nrdp
-                  key: hostname
-            type: string
-        servicename:
-            description: Service where the passive check is linked to.
-            required: true
-            env:
-                - name : NRDP_SERVICENAME
-            ini:
-                - section: callback_nrdp
-                  key: servicename
-            type: string
-'''
+DOCUMENTATION = r"""
+name: nrdp
+type: notification
+author: "Remi VERCHERE (@rverchere)"
+short_description: Post task results to a Nagios server through nrdp
+description:
+  - This callback send playbook result to Nagios.
+  - Nagios shall use NRDP to receive passive events.
+  - The passive check is sent to a dedicated host/service for Ansible.
+options:
+  url:
+    description: URL of the nrdp server.
+    required: true
+    env:
+      - name: NRDP_URL
+    ini:
+      - section: callback_nrdp
+        key: url
+    type: string
+  validate_certs:
+    description: Validate the SSL certificate of the nrdp server. (Used for HTTPS URLs).
+    env:
+      - name: NRDP_VALIDATE_CERTS
+    ini:
+      - section: callback_nrdp
+        key: validate_nrdp_certs
+      - section: callback_nrdp
+        key: validate_certs
+    type: boolean
+    default: false
+    aliases: [validate_nrdp_certs]
+  token:
+    description: Token to be allowed to push nrdp events.
+    required: true
+    env:
+      - name: NRDP_TOKEN
+    ini:
+      - section: callback_nrdp
+        key: token
+    type: string
+  hostname:
+    description: Hostname where the passive check is linked to.
+    required: true
+    env:
+      - name: NRDP_HOSTNAME
+    ini:
+      - section: callback_nrdp
+        key: hostname
+    type: string
+  servicename:
+    description: Service where the passive check is linked to.
+    required: true
+    env:
+      - name: NRDP_SERVICENAME
+    ini:
+      - section: callback_nrdp
+        key: servicename
+    type: string
+"""
 
 from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.common.text.converters import to_bytes

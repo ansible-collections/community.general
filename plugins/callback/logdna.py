@@ -6,56 +6,56 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    author: Unknown (!UNKNOWN)
-    name: logdna
-    type: notification
-    short_description: Sends playbook logs to LogDNA
-    description:
-      - This callback will report logs from playbook actions, tasks, and events to LogDNA (U(https://app.logdna.com)).
-    requirements:
-      - LogDNA Python Library (U(https://github.com/logdna/python))
-      - whitelisting in configuration
-    options:
-      conf_key:
-        required: true
-        description: LogDNA Ingestion Key.
-        type: string
-        env:
-          - name: LOGDNA_INGESTION_KEY
-        ini:
-          - section: callback_logdna
-            key: conf_key
-      plugin_ignore_errors:
-        required: false
-        description: Whether to ignore errors on failing or not.
-        type: boolean
-        env:
-          - name: ANSIBLE_IGNORE_ERRORS
-        ini:
-          - section: callback_logdna
-            key: plugin_ignore_errors
-        default: false
-      conf_hostname:
-        required: false
-        description: Alternative Host Name; the current host name by default.
-        type: string
-        env:
-          - name: LOGDNA_HOSTNAME
-        ini:
-          - section: callback_logdna
-            key: conf_hostname
-      conf_tags:
-        required: false
-        description: Tags.
-        type: string
-        env:
-          - name: LOGDNA_TAGS
-        ini:
-          - section: callback_logdna
-            key: conf_tags
-        default: ansible
-'''
+DOCUMENTATION = r"""
+author: Unknown (!UNKNOWN)
+name: logdna
+type: notification
+short_description: Sends playbook logs to LogDNA
+description:
+  - This callback will report logs from playbook actions, tasks, and events to LogDNA (U(https://app.logdna.com)).
+requirements:
+  - LogDNA Python Library (U(https://github.com/logdna/python))
+  - whitelisting in configuration
+options:
+  conf_key:
+    required: true
+    description: LogDNA Ingestion Key.
+    type: string
+    env:
+      - name: LOGDNA_INGESTION_KEY
+    ini:
+      - section: callback_logdna
+        key: conf_key
+  plugin_ignore_errors:
+    required: false
+    description: Whether to ignore errors on failing or not.
+    type: boolean
+    env:
+      - name: ANSIBLE_IGNORE_ERRORS
+    ini:
+      - section: callback_logdna
+        key: plugin_ignore_errors
+    default: false
+  conf_hostname:
+    required: false
+    description: Alternative Host Name; the current host name by default.
+    type: string
+    env:
+      - name: LOGDNA_HOSTNAME
+    ini:
+      - section: callback_logdna
+        key: conf_hostname
+  conf_tags:
+    required: false
+    description: Tags.
+    type: string
+    env:
+      - name: LOGDNA_TAGS
+    ini:
+      - section: callback_logdna
+        key: conf_tags
+    default: ansible
+"""
 
 import logging
 import json
