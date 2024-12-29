@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2024 Marzieh Raoufnezhad <raoufnezhad at um.ac.ir>
-# Copyright (c) 2024 Maryam Mayabi <mayabi at um.ac.ir>
+# Copyright (c) 2024 Marzieh Raoufnezhad <raoufnezhad at gmail.com>
+# Copyright (c) 2024 Maryam Mayabi <mayabi.ahm at gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -19,8 +19,8 @@ description:
   - Retrieve information such as backup times, VM name, VM ID, mode, backup type, and backup schedule using the Proxmox Server API.
 
 author:
-  - Marzieh Raoufnezhad (@raoufnezhad)
-  - Maryam Mayabi (@mmayabi)
+  - "Marzieh Raoufnezhad (@raoufnezhad)"
+  - "Maryam Mayabi (@mmayabi)"
 
 options:
   vm_name:
@@ -41,17 +41,16 @@ extends_documentation_fragment:
   - community.general.proxmox.documentation
   - community.general.attributes
   - community.general.attributes.info_module
+  - community.general.proxmox.actiongroup_proxmox
 """
 
 EXAMPLES = """
----
 - name: Print all backup information by vmid and vm name
   proxmox_backup_info:
       api_user: 'myUser@pam'
       api_password: '*******'
       api_host: '192.168.20.20'
 
----
 - name: Print proxmox backup information for a specific vm based on its name
   proxmox_backup_info:
       api_user: 'myUser@pam'
@@ -59,7 +58,6 @@ EXAMPLES = """
       api_host: '192.168.20.20'
       vm_name: 'mailsrv'
 
----
 - name: Print proxmox backup information for a specific vm based on its vmid
   proxmox_backup_info:
       api_user: 'myUser@pam'
@@ -67,7 +65,6 @@ EXAMPLES = """
       api_host: '192.168.20.20'
       vm_id: '150'
 
----
 - name: Print proxmox all backup job information
   proxmox_backup_info:
       api_user: 'myUser@pam'
