@@ -9,7 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = """
+DOCUMENTATION = r"""
 module: systemd_creds_encrypt
 short_description: C(systemd)'s C(systemd-creds encrypt) plugin
 description:
@@ -38,7 +38,7 @@ options:
         description:
             - The time when the credential shall not be used anymore.
             - Takes a timestamp specification in the format described in
-              V(systemd.time(7\\)).
+              V(systemd.time(7\)).
         type: str
         required: false
     pretty:
@@ -57,7 +57,7 @@ options:
         description:
             - The timestamp to embed into the encrypted credential.
             - Takes a timestamp specification in the format described in
-              V(systemd.time(7\\)).
+              V(systemd.time(7\)).
         type: str
         required: false
     user:

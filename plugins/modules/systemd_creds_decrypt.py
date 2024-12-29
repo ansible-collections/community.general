@@ -9,7 +9,7 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = """
+DOCUMENTATION = r"""
 module: systemd_creds_decrypt
 short_description: C(systemd)'s C(systemd-creds decrypt) plugin
 description:
@@ -51,7 +51,7 @@ options:
             - The timestamp to use to validate the V(not-after) timestamp that
               was used during encryption.
             - Takes a timestamp specification in the format described in
-              V(systemd.time(7\\)).
+              V(systemd.time(7\)).
         type: str
         required: false
     transcode:
