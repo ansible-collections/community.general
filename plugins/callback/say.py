@@ -8,17 +8,17 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    author: Unknown (!UNKNOWN)
-    name: say
-    type: notification
-    requirements:
-      - whitelisting in configuration
-      - the C(/usr/bin/say) command line program (standard on macOS) or C(espeak) command line program
-    short_description: notify using software speech synthesizer
-    description:
-      - This plugin will use the C(say) or C(espeak) program to "speak" about play events.
-'''
+DOCUMENTATION = r"""
+author: Unknown (!UNKNOWN)
+name: say
+type: notification
+requirements:
+  - whitelisting in configuration
+  - the C(/usr/bin/say) command line program (standard on macOS) or C(espeak) command line program
+short_description: notify using software speech synthesizer
+description:
+  - This plugin will use the C(say) or C(espeak) program to "speak" about play events.
+"""
 
 import platform
 import subprocess
