@@ -37,7 +37,7 @@ options:
     type: str
     description:
       - The unique alert profile name in ManageIQ.
-      - Required when state is "absent" or "present".
+    required: true
   resource_type:
     type: str
     description:
@@ -114,8 +114,7 @@ class ManageIQAlertProfiles(object):
         """
         alerts = []
         for alert_description in alert_descriptions:
-            alert = self.manageiq.find_collection_resource_or_fail("alert_definitions",
-                                                                   description=alert_description)
+            alert = self.manageiq.find_collection_resource_or_fail("alert_definitions", description=alert_description)
             alerts.append(alert['href'])
 
         return alerts
@@ -253,7 +252,7 @@ class ManageIQAlertProfiles(object):
 
 def main():
     argument_spec = dict(
-        name=dict(type='str'),
+        name=dict(type='str', required=True),
         resource_type=dict(type='str', choices=['Vm',
                                                 'ContainerNode',
                                                 'MiqServer',
@@ -270,8 +269,7 @@ def main():
     argument_spec.update(manageiq_argument_spec())
 
     module = AnsibleModule(argument_spec=argument_spec,
-                           required_if=[('state', 'present', ['name', 'resource_type']),
-                                        ('state', 'absent', ['name'])])
+                           required_if=[('state', 'present', ['resource_type', 'alerts'])])
 
     state = module.params['state']
     name = module.params['name']
@@ -279,8 +277,7 @@ def main():
     manageiq = ManageIQ(module)
     manageiq_alert_profiles = ManageIQAlertProfiles(manageiq)
 
-    existing_profile = manageiq.find_collection_resource_by("alert_definition_profiles",
-                                                            name=name)
+    existing_profile = manageiq.find_collection_resource_by("alert_definition_profiles", name=name)
 
     # we need to add or update the alert profile
     if state == "present":
