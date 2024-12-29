@@ -7,68 +7,68 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = """
-    name: run0
-    short_description: Systemd's run0
-    description:
-        - This become plugins allows your remote/login user to execute commands as another user via the C(run0) utility.
-    author:
-        - Thomas Sjögren (@konstruktoid)
-    version_added: '9.0.0'
-    options:
-        become_user:
-            description: User you 'become' to execute the task.
-            default: root
-            ini:
-              - section: privilege_escalation
-                key: become_user
-              - section: run0_become_plugin
-                key: user
-            vars:
-              - name: ansible_become_user
-              - name: ansible_run0_user
-            env:
-              - name: ANSIBLE_BECOME_USER
-              - name: ANSIBLE_RUN0_USER
-            type: string
-        become_exe:
-            description: The C(run0) executable.
-            default: run0
-            ini:
-              - section: privilege_escalation
-                key: become_exe
-              - section: run0_become_plugin
-                key: executable
-            vars:
-              - name: ansible_become_exe
-              - name: ansible_run0_exe
-            env:
-              - name: ANSIBLE_BECOME_EXE
-              - name: ANSIBLE_RUN0_EXE
-            type: string
-        become_flags:
-            description: Options to pass to run0.
-            default: ''
-            ini:
-              - section: privilege_escalation
-                key: become_flags
-              - section: run0_become_plugin
-                key: flags
-            vars:
-              - name: ansible_become_flags
-              - name: ansible_run0_flags
-            env:
-              - name: ANSIBLE_BECOME_FLAGS
-              - name: ANSIBLE_RUN0_FLAGS
-            type: string
-    notes:
-      - This plugin will only work when a polkit rule is in place.
+DOCUMENTATION = r"""
+name: run0
+short_description: Systemd's run0
+description:
+  - This become plugins allows your remote/login user to execute commands as another user using the C(run0) utility.
+author:
+  - Thomas Sjögren (@konstruktoid)
+version_added: '9.0.0'
+options:
+  become_user:
+    description: User you 'become' to execute the task.
+    default: root
+    ini:
+      - section: privilege_escalation
+        key: become_user
+      - section: run0_become_plugin
+        key: user
+    vars:
+      - name: ansible_become_user
+      - name: ansible_run0_user
+    env:
+      - name: ANSIBLE_BECOME_USER
+      - name: ANSIBLE_RUN0_USER
+    type: string
+  become_exe:
+    description: C(run0) executable.
+    default: run0
+    ini:
+      - section: privilege_escalation
+        key: become_exe
+      - section: run0_become_plugin
+        key: executable
+    vars:
+      - name: ansible_become_exe
+      - name: ansible_run0_exe
+    env:
+      - name: ANSIBLE_BECOME_EXE
+      - name: ANSIBLE_RUN0_EXE
+    type: string
+  become_flags:
+    description: Options to pass to C(run0).
+    default: ''
+    ini:
+      - section: privilege_escalation
+        key: become_flags
+      - section: run0_become_plugin
+        key: flags
+    vars:
+      - name: ansible_become_flags
+      - name: ansible_run0_flags
+    env:
+      - name: ANSIBLE_BECOME_FLAGS
+      - name: ANSIBLE_RUN0_FLAGS
+    type: string
+notes:
+  - This plugin will only work when a C(polkit) rule is in place.
 """
 
 EXAMPLES = r"""
 # An example polkit rule that allows the user 'ansible' in the 'wheel' group
 # to execute commands using run0 without authentication.
-/etc/polkit-1/rules.d/60-run0-fast-user-auth.rules: |
+/etc/polkit-1/rules.d/60-run0-fast-user-auth.rules: |-
   polkit.addRule(function(action, subject) {
     if(action.id == "org.freedesktop.systemd1.manage-units" &&
       subject.isInGroup("wheel") &&
