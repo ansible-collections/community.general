@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2024 Marzieh Raoufnezhad <raoufnezhad at um.ac.ir>
-# Copyright (c) 2024 Maryam Mayabi <mayabi at um.ac.ir>
+# Copyright (c) 2024 Marzieh Raoufnezhad <raoufnezhad at gmail.com>
+# Copyright (c) 2024 Maryam Mayabi <mayabi.ahm at gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -32,62 +32,62 @@ RESOURCE_LIST = [
     {
         "uptime": 0,
         "diskwrite": 0,
-        "name":	"test01",
+        "name": "test01",
         "maxcpu": 0,
-        "node":	"NODE1",
+        "node": "NODE1",
         "mem": 0,
         "netout": 0,
         "netin": 0,
         "maxmem": 0,
         "diskread": 0,
-        "disk":	0,
+        "disk": 0,
         "maxdisk": 0,
         "status": "running",
         "cpu": 0,
         "id": "qemu/100",
-        "template":	0,
-        "vmid":	100,
-        "type":	"qemu"
+        "template": 0,
+        "vmid": 100,
+        "type": "qemu"
     },
     {
         "uptime": 0,
         "diskwrite": 0,
-        "name":	"test02",
+        "name": "test02",
         "maxcpu": 0,
-        "node":	"NODE1",
+        "node": "NODE1",
         "mem": 0,
         "netout": 0,
         "netin": 0,
         "maxmem": 0,
-        "diskread":	0,
-        "disk":	0,
+        "diskread": 0,
+        "disk": 0,
         "maxdisk": 0,
         "status": "running",
         "cpu": 0,
         "id": "qemu/101",
-        "template":	0,
-        "vmid":	101,
-        "type":	"qemu"
+        "template": 0,
+        "vmid": 101,
+        "type": "qemu"
     },
     {
         "uptime": 0,
         "diskwrite": 0,
-        "name":	"test03",
+        "name": "test03",
         "maxcpu": 0,
-        "node":	"NODE2",
+        "node": "NODE2",
         "mem": 0,
         "netout": 0,
         "netin": 0,
         "maxmem": 0,
-        "diskread":	0,
-        "disk":	0,
+        "diskread": 0,
+        "disk": 0,
         "maxdisk": 0,
         "status": "running",
         "cpu": 0,
         "id": "qemu/102",
-        "template":	0,
-        "vmid":	102,
-        "type":	"qemu"
+        "template": 0,
+        "vmid": 102,
+        "type": "qemu"
     }
 ]
 BACKUP_SECTIONS = [
@@ -104,14 +104,14 @@ BACKUP_SECTIONS = [
         "notes-template": "guestname"
     },
     {
-        "schedule":	"sat 15:00",
+        "schedule": "sat 15:00",
         "notes-template": "guestname",
-        "mode":	"snapshot",
-        "mailnotification":	"always",
-        "next-run":	1735385400,
-        "type":	"vzdump",
-        "enabled":	1,
-        "vmid":	"100,101,102",
+        "mode": "snapshot",
+        "mailnotification": "always",
+        "next-run": 1735385400,
+        "type": "vzdump",
+        "enabled": 1,
+        "vmid": "100,101,102",
         "storage": "local",
         "id": "backup-70025700-2302",
     }
@@ -190,6 +190,7 @@ EXPECTED_BACKUP_SECTION_OUTPUT = [
     }
 ]
 
+
 class TestProxmoxBackupInfoModule(ModuleTestCase):
     def setUp(self):
         super(TestProxmoxBackupInfoModule, self).setUp()
@@ -219,10 +220,11 @@ class TestProxmoxBackupInfoModule(ModuleTestCase):
 
     def test_get_all_backups_information(self):
         with pytest.raises(AnsibleExitJson) as exc_info:
-            set_module_args({'api_host': 'proxmoxhost',
-                             'api_user': 'root@pam',
-                             'api_password': 'supersecret'
-                            })
+            set_module_args({
+                'api_host': 'proxmoxhost',
+                'api_user': 'root@pam',
+                'api_password': 'supersecret'
+            })
             self.module.main()
 
         result = exc_info.value.args[0]
@@ -234,11 +236,12 @@ class TestProxmoxBackupInfoModule(ModuleTestCase):
             expected_output = [
                 backup for backup in EXPECTED_BACKUP_OUTPUT if backup["vm_name"] == vmname
             ]
-            set_module_args({'api_host': 'proxmoxhost',
-                             'api_user': 'root@pam',
-                             'api_password': 'supersecret',
-                             'vm_name': vmname
-                            })
+            set_module_args({
+                'api_host': 'proxmoxhost',
+                'api_user': 'root@pam',
+                'api_password': 'supersecret',
+                'vm_name': vmname
+            })
             self.module.main()
 
         result = exc_info.value.args[0]
@@ -251,11 +254,12 @@ class TestProxmoxBackupInfoModule(ModuleTestCase):
             expected_output = [
                 backup for backup in EXPECTED_BACKUP_OUTPUT if backup["vmid"] == vmid
             ]
-            set_module_args({'api_host': 'proxmoxhost',
-                             'api_user': 'root@pam',
-                             'api_password': 'supersecret',
-                             'vm_id': vmid
-                            })
+            set_module_args({
+                'api_host': 'proxmoxhost',
+                'api_user': 'root@pam',
+                'api_password': 'supersecret',
+                'vm_id': vmid
+            })
             self.module.main()
         result = exc_info.value.args[0]
         assert result["backup_info"] == expected_output
@@ -264,11 +268,12 @@ class TestProxmoxBackupInfoModule(ModuleTestCase):
     def test_get_specific_backup_information_by_backupsection(self):
         with pytest.raises(AnsibleExitJson) as exc_info:
             backupsection = True
-            set_module_args({'api_host': 'proxmoxhost',
-                             'api_user': 'root@pam',
-                             'api_password': 'supersecret',
-                             'backup_section':backupsection
-                            })
+            set_module_args({
+                'api_host': 'proxmoxhost',
+                'api_user': 'root@pam',
+                'api_password': 'supersecret',
+                'backup_section': backupsection
+            })
             self.module.main()
 
         result = exc_info.value.args[0]
