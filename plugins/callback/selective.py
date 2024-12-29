@@ -7,35 +7,35 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    author: Unknown (!UNKNOWN)
-    name: selective
-    type: stdout
-    requirements:
-      - set as main display callback
-    short_description: only print certain tasks
-    description:
-      - This callback only prints tasks that have been tagged with C(print_action) or that have failed.
-        This allows operators to focus on the tasks that provide value only.
-      - Tasks that are not printed are placed with a C(.).
-      - If you increase verbosity all tasks are printed.
-    options:
-      nocolor:
-        default: false
-        description: This setting allows suppressing colorizing output.
-        env:
-          - name: ANSIBLE_NOCOLOR
-          - name: ANSIBLE_SELECTIVE_DONT_COLORIZE
-        ini:
-          - section: defaults
-            key: nocolor
-        type: boolean
-'''
+DOCUMENTATION = r"""
+author: Unknown (!UNKNOWN)
+name: selective
+type: stdout
+requirements:
+  - set as main display callback
+short_description: only print certain tasks
+description:
+  - This callback only prints tasks that have been tagged with C(print_action) or that have failed. This allows operators
+    to focus on the tasks that provide value only.
+  - Tasks that are not printed are placed with a C(.).
+  - If you increase verbosity all tasks are printed.
+options:
+  nocolor:
+    default: false
+    description: This setting allows suppressing colorizing output.
+    env:
+      - name: ANSIBLE_NOCOLOR
+      - name: ANSIBLE_SELECTIVE_DONT_COLORIZE
+    ini:
+      - section: defaults
+        key: nocolor
+    type: boolean
+"""
 
-EXAMPLES = """
-  - ansible.builtin.debug: msg="This will not be printed"
-  - ansible.builtin.debug: msg="But this will"
-    tags: [print_action]
+EXAMPLES = r"""
+- ansible.builtin.debug: msg="This will not be printed"
+- ansible.builtin.debug: msg="But this will"
+  tags: [print_action]
 """
 
 import difflib
