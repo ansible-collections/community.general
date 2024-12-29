@@ -28,7 +28,7 @@ options:
       - name: ANSIBLE_BECOME_USER
       - name: ANSIBLE_MACHINECTL_USER
   become_exe:
-    description: Machinectl executable.
+    description: C(machinectl) executable.
     type: string
     default: machinectl
     ini:
@@ -43,7 +43,7 @@ options:
       - name: ANSIBLE_BECOME_EXE
       - name: ANSIBLE_MACHINECTL_EXE
   become_flags:
-    description: Options to pass to machinectl.
+    description: Options to pass to C(machinectl).
     type: string
     default: ''
     ini:
@@ -58,7 +58,7 @@ options:
       - name: ANSIBLE_BECOME_FLAGS
       - name: ANSIBLE_MACHINECTL_FLAGS
   become_pass:
-    description: Password for machinectl.
+    description: Password for C(machinectl).
     type: string
     required: false
     vars:

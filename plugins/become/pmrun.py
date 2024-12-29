@@ -13,7 +13,7 @@ description:
 author: Ansible Core Team
 options:
   become_exe:
-    description: Sudo executable.
+    description: C(pmrun) executable.
     type: string
     default: pmrun
     ini:
@@ -28,7 +28,7 @@ options:
       - name: ANSIBLE_BECOME_EXE
       - name: ANSIBLE_PMRUN_EXE
   become_flags:
-    description: Options to pass to pmrun.
+    description: Options to pass to C(pmrun).
     type: string
     default: ''
     ini:
@@ -43,7 +43,7 @@ options:
       - name: ANSIBLE_BECOME_FLAGS
       - name: ANSIBLE_PMRUN_FLAGS
   become_pass:
-    description: Pmrun password.
+    description: C(pmrun) password.
     type: string
     required: false
     vars:
@@ -57,7 +57,7 @@ options:
       - section: pmrun_become_plugin
         key: password
 notes:
-  - This plugin ignores the become_user supplied and uses pmrun's own configuration to select the user.
+  - This plugin ignores the C(become_user) supplied and uses C(pmrun)'s own configuration to select the user.
 """
 
 from ansible.plugins.become import BecomeBase

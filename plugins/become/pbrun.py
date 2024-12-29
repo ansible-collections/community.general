@@ -28,7 +28,7 @@ options:
       - name: ANSIBLE_BECOME_USER
       - name: ANSIBLE_PBRUN_USER
   become_exe:
-    description: Sudo executable.
+    description: C(pbrun) executable.
     type: string
     default: pbrun
     ini:
@@ -43,7 +43,7 @@ options:
       - name: ANSIBLE_BECOME_EXE
       - name: ANSIBLE_PBRUN_EXE
   become_flags:
-    description: Options to pass to pbrun.
+    description: Options to pass to C(pbrun).
     type: string
     default: ''
     ini:
@@ -58,7 +58,7 @@ options:
       - name: ANSIBLE_BECOME_FLAGS
       - name: ANSIBLE_PBRUN_FLAGS
   become_pass:
-    description: Password for pbrun.
+    description: Password for C(pbrun).
     type: string
     required: false
     vars:
@@ -72,7 +72,7 @@ options:
       - section: pbrun_become_plugin
         key: password
   wrap_exe:
-    description: Toggle to wrap the command pbrun calls in C(shell -c) or not.
+    description: Toggle to wrap the command C(pbrun) calls in C(shell -c) or not.
     default: false
     type: bool
     ini:

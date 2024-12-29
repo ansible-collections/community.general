@@ -28,7 +28,7 @@ options:
       - name: ANSIBLE_BECOME_USER
       - name: ANSIBLE_SESU_USER
   become_exe:
-    description: Sesu executable.
+    description: C(sesu) executable.
     type: string
     default: sesu
     ini:
@@ -43,7 +43,7 @@ options:
       - name: ANSIBLE_BECOME_EXE
       - name: ANSIBLE_SESU_EXE
   become_flags:
-    description: Options to pass to sesu.
+    description: Options to pass to C(sesu).
     type: string
     default: -H -S -n
     ini:
@@ -58,7 +58,7 @@ options:
       - name: ANSIBLE_BECOME_FLAGS
       - name: ANSIBLE_SESU_FLAGS
   become_pass:
-    description: Password to pass to sesu.
+    description: Password to pass to C(sesu).
     type: string
     required: false
     vars:

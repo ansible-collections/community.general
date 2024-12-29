@@ -27,7 +27,7 @@ options:
       - name: ANSIBLE_BECOME_USER
       - name: ANSIBLE_DOAS_USER
   become_exe:
-    description: Doas executable.
+    description: C(doas) executable.
     type: string
     default: doas
     ini:
@@ -42,7 +42,7 @@ options:
       - name: ANSIBLE_BECOME_EXE
       - name: ANSIBLE_DOAS_EXE
   become_flags:
-    description: Options to pass to doas.
+    description: Options to pass to C(doas).
     type: string
     default: ''
     ini:
@@ -57,7 +57,7 @@ options:
       - name: ANSIBLE_BECOME_FLAGS
       - name: ANSIBLE_DOAS_FLAGS
   become_pass:
-    description: Password for doas prompt.
+    description: Password for C(doas) prompt.
     type: string
     required: false
     vars:

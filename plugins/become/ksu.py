@@ -28,7 +28,7 @@ options:
       - name: ANSIBLE_KSU_USER
     required: true
   become_exe:
-    description: Su executable.
+    description: C(ksu) executable.
     type: string
     default: ksu
     ini:
@@ -43,7 +43,7 @@ options:
       - name: ANSIBLE_BECOME_EXE
       - name: ANSIBLE_KSU_EXE
   become_flags:
-    description: Options to pass to ksu.
+    description: Options to pass to C(ksu).
     type: string
     default: ''
     ini:
@@ -58,7 +58,7 @@ options:
       - name: ANSIBLE_BECOME_FLAGS
       - name: ANSIBLE_KSU_FLAGS
   become_pass:
-    description: Ksu password.
+    description: C(ksu) password.
     type: string
     required: false
     vars:

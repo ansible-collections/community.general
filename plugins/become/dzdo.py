@@ -27,7 +27,7 @@ options:
       - name: ANSIBLE_BECOME_USER
       - name: ANSIBLE_DZDO_USER
   become_exe:
-    description: Dzdo executable.
+    description: C(dzdo) executable.
     type: string
     default: dzdo
     ini:
@@ -42,7 +42,7 @@ options:
       - name: ANSIBLE_BECOME_EXE
       - name: ANSIBLE_DZDO_EXE
   become_flags:
-    description: Options to pass to dzdo.
+    description: Options to pass to C(dzdo).
     type: string
     default: -H -S -n
     ini:
@@ -57,7 +57,7 @@ options:
       - name: ANSIBLE_BECOME_FLAGS
       - name: ANSIBLE_DZDO_FLAGS
   become_pass:
-    description: Options to pass to dzdo.
+    description: Options to pass to C(dzdo).
     type: string
     required: false
     vars:

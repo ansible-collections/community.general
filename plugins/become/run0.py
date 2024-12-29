@@ -32,7 +32,7 @@ options:
       - name: ANSIBLE_RUN0_USER
     type: string
   become_exe:
-    description: The C(run0) executable.
+    description: C(run0) executable.
     default: run0
     ini:
       - section: privilege_escalation
@@ -47,7 +47,7 @@ options:
       - name: ANSIBLE_RUN0_EXE
     type: string
   become_flags:
-    description: Options to pass to run0.
+    description: Options to pass to C(run0).
     default: ''
     ini:
       - section: privilege_escalation
@@ -62,7 +62,7 @@ options:
       - name: ANSIBLE_RUN0_FLAGS
     type: string
 notes:
-  - This plugin will only work when a polkit rule is in place.
+  - This plugin will only work when a C(polkit) rule is in place.
 """
 
 EXAMPLES = r"""
