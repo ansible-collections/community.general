@@ -7,95 +7,94 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = r'''
-    author: Yevhen Khmelenko (@ujenmr)
-    name: logstash
-    type: notification
-    short_description: Sends events to Logstash
-    description:
-      - This callback will report facts and task events to Logstash U(https://www.elastic.co/products/logstash).
-    requirements:
-      - whitelisting in configuration
-      - logstash (Python library)
-    options:
-      server:
-        description: Address of the Logstash server.
-        type: str
-        env:
-          - name: LOGSTASH_SERVER
-        ini:
-          - section: callback_logstash
-            key: server
-            version_added: 1.0.0
-        default: localhost
-      port:
-        description: Port on which logstash is listening.
-        type: int
-        env:
-            - name: LOGSTASH_PORT
-        ini:
-          - section: callback_logstash
-            key: port
-            version_added: 1.0.0
-        default: 5000
-      type:
-        description: Message type.
-        type: str
-        env:
-          - name: LOGSTASH_TYPE
-        ini:
-          - section: callback_logstash
-            key: type
-            version_added: 1.0.0
-        default: ansible
-      pre_command:
-        description: Executes command before run and its result is added to the C(ansible_pre_command_output) logstash field.
-        type: str
-        version_added: 2.0.0
-        ini:
-          - section: callback_logstash
-            key: pre_command
-        env:
-          - name: LOGSTASH_PRE_COMMAND
-      format_version:
-        description: Logging format.
-        type: str
-        version_added: 2.0.0
-        ini:
-          - section: callback_logstash
-            key: format_version
-        env:
-          - name: LOGSTASH_FORMAT_VERSION
-        default: v1
-        choices:
-          - v1
-          - v2
+DOCUMENTATION = r"""
+author: Yevhen Khmelenko (@ujenmr)
+name: logstash
+type: notification
+short_description: Sends events to Logstash
+description:
+  - This callback will report facts and task events to Logstash U(https://www.elastic.co/products/logstash).
+requirements:
+  - whitelisting in configuration
+  - logstash (Python library)
+options:
+  server:
+    description: Address of the Logstash server.
+    type: str
+    env:
+      - name: LOGSTASH_SERVER
+    ini:
+      - section: callback_logstash
+        key: server
+        version_added: 1.0.0
+    default: localhost
+  port:
+    description: Port on which logstash is listening.
+    type: int
+    env:
+      - name: LOGSTASH_PORT
+    ini:
+      - section: callback_logstash
+        key: port
+        version_added: 1.0.0
+    default: 5000
+  type:
+    description: Message type.
+    type: str
+    env:
+      - name: LOGSTASH_TYPE
+    ini:
+      - section: callback_logstash
+        key: type
+        version_added: 1.0.0
+    default: ansible
+  pre_command:
+    description: Executes command before run and its result is added to the C(ansible_pre_command_output) logstash field.
+    type: str
+    version_added: 2.0.0
+    ini:
+      - section: callback_logstash
+        key: pre_command
+    env:
+      - name: LOGSTASH_PRE_COMMAND
+  format_version:
+    description: Logging format.
+    type: str
+    version_added: 2.0.0
+    ini:
+      - section: callback_logstash
+        key: format_version
+    env:
+      - name: LOGSTASH_FORMAT_VERSION
+    default: v1
+    choices:
+      - v1
+      - v2
+"""
 
-'''
-
-EXAMPLES = r'''
+EXAMPLES = r"""
 ansible.cfg: |
-    # Enable Callback plugin
-    [defaults]
-        callback_whitelist = community.general.logstash
+  # Enable Callback plugin
+  [defaults]
+      callback_whitelist = community.general.logstash
 
-    [callback_logstash]
-        server = logstash.example.com
-        port = 5000
-        pre_command = git rev-parse HEAD
-        type = ansible
+  [callback_logstash]
+      server = logstash.example.com
+      port = 5000
+      pre_command = git rev-parse HEAD
+      type = ansible
 
-11-input-tcp.conf: |
-    # Enable Logstash TCP Input
-    input {
-            tcp {
-                port => 5000
-                codec => json
-                add_field => { "[@metadata][beat]" => "notify" }
-                add_field => { "[@metadata][type]" => "ansible" }
-            }
-        }
-'''
+11-input-tcp.conf: |-
+  # Enable Logstash TCP Input
+  input {
+          tcp {
+              port => 5000
+              codec => json
+              add_field => { "[@metadata][beat]" => "notify" }
+              add_field => { "[@metadata][type]" => "ansible" }
+          }
+      }
+"""
 
 import os
 import json
