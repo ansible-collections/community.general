@@ -253,7 +253,7 @@ def main():
         retvals = create_or_delete_domain(args)
 
     # we would need to populate the return values with the API's response
-    # in several places so it's easier to do it at the end instead.
+    # in several places so it is easier to do it at the end instead.
     if not retvals['failed']:
         if args['state'] == 'present' and not module.check_mode:
             payload = dict()

@@ -173,7 +173,7 @@ EXAMPLES = r"""
         plan: baremetal_0
         facility: sjc1
 
-# Create the same device and wait until it is in state "active", (when it's
+# Create the same device and wait until it is in state "active", (when it is
 # ready for other API operations). Fail if the device is not "active" in
 # 10 minutes.
 

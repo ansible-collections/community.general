@@ -348,7 +348,7 @@ def native_python_main(this_gitlab, purge, requested_labels, state, module):
         item.pop('description_html')
         item.pop('text_color')
         item.pop('subscribed')
-        # field present only when it's a project's label
+        # field present only when it is a project's label
         if 'is_project_label' in item:
             item.pop('is_project_label')
         item['new_name'] = None
@@ -472,7 +472,7 @@ def main():
     if state == 'present':
         _existing_labels = [x.asdict()['name'] for x in this_gitlab.list_all_labels()]
 
-        # color is mandatory when creating label, but it's optional when changing name or updating other fields
+        # color is mandatory when creating label, but it is optional when changing name or updating other fields
         if any(x['color'] is None and x['new_name'] is None and x['name'] not in _existing_labels for x in label_list):
             module.fail_json(msg='color parameter is required for new labels')
 
