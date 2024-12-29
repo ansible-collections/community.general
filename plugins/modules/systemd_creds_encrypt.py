@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = """
 module: systemd_creds_encrypt
-short_description: Systemd's systemd-creds encrypt plugin
+short_description: Systemd's C(systemd-creds encrypt) plugin
 description:
     - This module encrypts input using systemd's C(systemd-creds encrypt).
 author:
