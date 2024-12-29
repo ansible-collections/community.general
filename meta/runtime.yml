@@ -104,6 +104,10 @@ plugin_routing:
       tombstone:
         removal_version: 10.0.0
         warning_text: Use community.general.consul_token and/or community.general.consul_policy instead.
+    facter:
+      deprecation:
+        removal_version: 12.0.0
+        warning_text: Use community.general.facter_facts instead.
     hipchat:
       deprecation:
         removal_version: 11.0.0
