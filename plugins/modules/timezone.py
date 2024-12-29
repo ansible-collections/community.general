@@ -333,7 +333,7 @@ class NosystemdTimezone(Timezone):
         adjtime='/etc/adjtime'
     )
 
-    # It's fine if all tree config files don't exist
+    # It is fine if all tree config files don't exist
     allow_no_file = dict(
         name=True,
         hwclock=True,
@@ -545,7 +545,7 @@ class NosystemdTimezone(Timezone):
                     # to set, we need to return the TZ which the symlink points to.
                     if os.path.exists('/etc/localtime'):
                         # We use readlink() because on some distros zone files are symlinks
-                        # to other zone files, so it's hard to get which TZ is actually set
+                        # to other zone files, so it is hard to get which TZ is actually set
                         # if we follow the symlink.
                         path = os.readlink('/etc/localtime')
                         # most linuxes has it in /usr/share/zoneinfo

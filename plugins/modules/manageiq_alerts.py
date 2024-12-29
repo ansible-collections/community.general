@@ -151,7 +151,7 @@ class ManageIQAlert(object):
             self.miq_expression = alert['miq_expression']
             if 'exp' in self.miq_expression:
                 # miq_expression is a field that needs a special case, because
-                # it's returned surrounded by a dict named exp even though we don't
+                # it is returned surrounded by a dict named exp even though we don't
                 # send it with that dict.
                 self.miq_expression = self.miq_expression['exp']
 

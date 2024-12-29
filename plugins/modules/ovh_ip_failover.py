@@ -158,7 +158,7 @@ def waitForTaskDone(client, name, taskId, timeout):
         task = client.get('/ip/{0}/task/{1}'.format(quote_plus(name), taskId))
         if task['status'] == 'done':
             return True
-        time.sleep(5)  # Delay for 5 sec because it's long to wait completion, do not harass the API
+        time.sleep(5)  # Delay for 5 sec to not harass the API
         currentTimeout -= 5
         if currentTimeout < 0:
             return False

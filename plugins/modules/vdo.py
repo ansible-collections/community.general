@@ -534,7 +534,7 @@ def run_module():
         # Check for differences between the playbook parameters and the
         # current parameters. This will need a comparison function;
         # since AnsibleModule params are all strings, compare them as
-        # strings (but if it's None; skip).
+        # strings (but if it is None; skip).
         for key in currentparams.keys():
             if module.params[key] is not None:
                 if str(currentparams[key]) != module.params[key]:

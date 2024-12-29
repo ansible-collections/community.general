@@ -34,7 +34,7 @@ options:
       - V(started), synonym for V(running).
       - V(stopped), shutdown a zone.
       - V(absent), destroy the zone.
-      - V(configured), configure the ready so that it's to be attached.
+      - V(configured), configure the ready so that it is to be attached.
       - V(attached), attach a zone, but do not boot it.
       - V(detached), shutdown and detach a zone.
     type: str

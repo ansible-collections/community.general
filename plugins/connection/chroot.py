@@ -126,7 +126,7 @@ class Connection(ConnectionBase):
         # Want to check for a usable bourne shell inside the chroot.
         # is_executable() == True is sufficient.  For symlinks it
         # gets really complicated really fast.  So we punt on finding that
-        # out.  As long as it's a symlink we assume that it will work
+        # out.  As long as it is a symlink we assume that it will work
         if not (is_executable(chrootsh) or (os.path.lexists(chrootsh) and os.path.islink(chrootsh))):
             raise AnsibleError(f"{self.chroot} does not look like a chrootable dir (/bin/sh missing)")
 
@@ -186,7 +186,7 @@ class Connection(ConnectionBase):
             exist in any given chroot.  So for now we're choosing "/" instead.
             This also happens to be the former default.
 
-            Can revisit using $HOME instead if it's a problem
+            Can revisit using $HOME instead if it is a problem
         """
         if not remote_path.startswith(os.path.sep):
             remote_path = os.path.join(os.path.sep, remote_path)

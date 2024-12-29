@@ -210,8 +210,8 @@ def get_jobs(module):
             jobs = all_jobs
         # python-jenkins includes the internal Jenkins class used for each job
         # in its return value; we strip that out because the leading underscore
-        # (and the fact that it's not documented in the python-jenkins docs)
-        # indicates that it's not part of the dependable public interface.
+        # (and the fact that it is not documented in the python-jenkins docs)
+        # indicates that it is not part of the dependable public interface.
         for job in jobs:
             if "_class" in job:
                 del job["_class"]

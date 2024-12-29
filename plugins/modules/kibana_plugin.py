@@ -39,7 +39,7 @@ options:
   url:
     description:
       - Set exact URL to download the plugin from.
-      - For local file, prefix its absolute path with file://.
+      - For local file, prefix its absolute path with C(file://).
     type: str
   timeout:
     description:

@@ -46,7 +46,7 @@ options:
     type: str
     description:
       - If O(option) is not presented for the O(iface) and O(state) is V(present) option will be added. If O(option) already
-        exists and is not V(pre-up), V(up), V(post-up) or V(down), it's value will be updated. V(pre-up), V(up), V(post-up)
+        exists and is not V(pre-up), V(up), V(post-up) or V(down), its value will be updated. V(pre-up), V(up), V(post-up)
         and V(down) options cannot be updated, only adding new options, removing existing ones or cleaning the whole option
         set are supported.
   backup:

@@ -1053,7 +1053,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             if ('bios' not in kwargs) or ('ovmf' != kwargs['bios']):
                 self.module.fail_json(msg='efidisk0 cannot be used if bios is not set to ovmf. ')
 
-        # Flatten efidisk0 option to a string so that it's a string which is what Proxmoxer and the API expect
+        # Flatten efidisk0 option to a string so that it is a string which is what Proxmoxer and the API expect
         if 'efidisk0' in kwargs:
             efidisk0_str = ''
             # Regexp to catch underscores in keys name, to replace them after by hyphens
@@ -1068,7 +1068,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
                                       if 'storage' != k])
             kwargs['efidisk0'] = efidisk0_str
 
-        # Flatten tpmstate0 option to a string so that it's a string which is what Proxmoxer and the API expect
+        # Flatten tpmstate0 option to a string so that it is a string which is what Proxmoxer and the API expect
         if 'tpmstate0' in kwargs:
             kwargs['tpmstate0'] = '{storage}:1,version=v{version}'.format(
                 storage=kwargs['tpmstate0'].get('storage'),

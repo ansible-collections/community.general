@@ -119,7 +119,7 @@ EXAMPLES = r"""
     name: '*'
     state: latest
 
-- name: Purge a package and it's configuration files
+- name: Purge a package and its configuration files
   community.general.openbsd_pkg:
     name: mpd
     clean: true

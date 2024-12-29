@@ -278,7 +278,7 @@ def _get_first_certificate_from_x509_file(module, pem_certificate_file, pem_cert
         (extract_rc, dummy, extract_stderr) = module.run_command(extract_cmd, check_rc=False)
 
         if extract_rc != 0:
-            # this time it's a real failure
+            # this time it is a real failure
             module.fail_json(msg="Internal module failure, cannot extract certificate, error: %s" % extract_stderr,
                              rc=extract_rc, cmd=extract_cmd)
 

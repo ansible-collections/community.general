@@ -50,7 +50,7 @@ options:
     type: str
   update_cache:
     description:
-      - Update repository database. Can be run with other steps or on it's own.
+      - Update repository database. Can be run with other steps or on its own.
     type: bool
     default: false
   upgrade:

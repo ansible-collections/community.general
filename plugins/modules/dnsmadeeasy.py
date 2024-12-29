@@ -486,7 +486,7 @@ class DME2(object):
         return self.query(self.record_url, 'GET')['data']
 
     def _instMap(self, type):
-        # @TODO cache this call so it's executed only once per ansible execution
+        # @TODO cache this call so it is executed only once per ansible execution
         map = {}
         results = {}
 

@@ -224,7 +224,7 @@ def install_packages(module, state, packages, prompts):
         # Preparing prompts answer according to item type
         tmp_prompts = []
         for _item in prompts:
-            # If the current item is a dict then we expect it's key to be the prompt regex and it's value to be the answer
+            # If the current item is a dict then we expect its key to be the prompt regex and its value to be the answer
             # We also expect here that the dict only has ONE key and the first key will be taken
             if isinstance(_item, dict):
                 key = list(_item.keys())[0]

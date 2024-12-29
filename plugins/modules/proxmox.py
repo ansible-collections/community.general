@@ -817,7 +817,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
                     if new_value not in current_values:
                         update_config = True
                         break
-            # if it's not a list (or string) just compare the current value
+            # if it is not a list (or string) just compare the current value
             else:
                 # some types don't match with the API, so forcing to string for comparison
                 if str(value) != str(current_config[arg]):

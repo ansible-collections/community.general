@@ -61,8 +61,8 @@ options:
     description:
       - A dict of key-value pairs used in formatting the script using string.Template (see https://docs.python.org/2/library/string.html#template-strings).
 notes:
-  - Since the script can do anything this does not report on changes. Knowing the script is being run it's important to set
-    changed_when for the ansible output to be clear on any alterations made.
+  - Since the script can do anything this does not report on changes. Knowing the script is being run it is important to set
+    C(changed_when) for the ansible output to be clear on any alterations made.
 """
 
 EXAMPLES = r"""

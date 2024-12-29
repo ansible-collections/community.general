@@ -275,7 +275,7 @@ def main():
         # success
         module.exit_json(rc=rc, changed=False, stdout=stdout, stderr=stderr)
     elif rc == 1:
-        # rc==1 could be because it's disabled
+        # rc==1 could be because it is disabled
         # rc==1 could also mean there was a compilation failure
         disabled = "administratively disabled" in stdout
         if disabled:

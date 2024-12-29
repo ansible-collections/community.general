@@ -159,7 +159,7 @@ options:
 
       rdnLDAPAttribute:
         description:
-          - Name of LDAP attribute, which is used as RDN (top attribute) of typical user DN. Usually it's the same as Username LDAP attribute,
+          - Name of LDAP attribute, which is used as RDN (top attribute) of typical user DN. Usually it is the same as Username LDAP attribute,
             however it is not required. For example for Active directory, it is common to use V(cn) as RDN attribute when username attribute might
             be V(sAMAccountName).
         type: str

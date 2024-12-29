@@ -205,7 +205,7 @@ class Hg(object):
         if the desired changeset is already the current changeset.
         """
         if self.revision is None or len(self.revision) < 7:
-            # Assume it's a rev number, tag, or branch
+            # Assume it is a rev number, tag, or branch
             return False
         (rc, out, err) = self._command(['--debug', 'id', '-i', '-R', self.dest])
         if rc != 0:

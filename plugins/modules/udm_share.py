@@ -125,7 +125,7 @@ options:
   sambaCustomSettings:
     default: []
     description:
-      - Option name in smb.conf and its value.
+      - Option name in C(smb.conf) and its value.
     type: list
     elements: dict
     aliases: [samba_custom_settings]

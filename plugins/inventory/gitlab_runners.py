@@ -22,7 +22,7 @@ DOCUMENTATION = '''
         - Uses a YAML configuration file gitlab_runners.[yml|yaml].
     options:
         plugin:
-            description: The name of this plugin, it should always be set to 'gitlab_runners' for this plugin to recognize it as it's own.
+            description: The name of this plugin, it should always be set to 'gitlab_runners' for this plugin to recognize it as its own.
             type: str
             required: true
             choices:

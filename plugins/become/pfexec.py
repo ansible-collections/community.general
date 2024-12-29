@@ -15,7 +15,7 @@ DOCUMENTATION = '''
         become_user:
             description:
                 - User you 'become' to execute the task.
-                - This plugin ignores this setting as pfexec uses it's own C(exec_attr) to figure this out,
+                - This plugin ignores this setting as pfexec uses its own C(exec_attr) to figure this out,
                   but it is supplied here for Ansible to make decisions needed for the task execution, like file permissions.
             type: string
             default: root

@@ -92,7 +92,7 @@ class CapabilitiesModule(object):
             if self.module.check_mode:
                 self.module.exit_json(changed=True, msg='capabilities changed')
             else:
-                # remove from current cap list if it's already set (but op/flags differ)
+                # remove from current cap list if it is already set (but op/flags differ)
                 current = list(filter(lambda x: x[0] != self.capability_tup[0], current))
                 # add new cap with correct op/flags
                 current.append(self.capability_tup)

@@ -216,7 +216,7 @@ class Monit(object):
         return running_status
 
     def wait_for_monit_to_stop_pending(self, current_status=None):
-        """Fails this run if there is no status or it's pending/initializing for timeout"""
+        """Fails this run if there is no status or it is pending/initializing for timeout"""
         timeout_time = time.time() + self.timeout
 
         if not current_status:

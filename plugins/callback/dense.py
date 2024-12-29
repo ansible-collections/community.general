@@ -243,7 +243,7 @@ class CallbackModule(CallbackModule_default):
 
     def _handle_exceptions(self, result):
         if 'exception' in result:
-            # Remove the exception from the result so it's not shown every time
+            # Remove the exception from the result so it is not shown every time
             del result['exception']
 
             if self._display.verbosity == 1:

@@ -804,7 +804,7 @@ class ClcServer:
     @staticmethod
     def _validate_name(module):
         """
-        Validate that name is the correct length if provided, fail if it's not
+        Validate that name is the correct length if provided, fail if it is not
         :param module: the module to validate
         :return: none
         """

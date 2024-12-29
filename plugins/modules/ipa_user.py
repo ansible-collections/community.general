@@ -268,7 +268,7 @@ def get_user_diff(client, ipa_user, module_user):
         if 'sshpubkeyfp' in ipa_user and ipa_user['sshpubkeyfp'][0][:7].upper() == 'SHA256:':
             hash_algo = 'sha256'
         module_user['sshpubkeyfp'] = [get_ssh_key_fingerprint(pubkey, hash_algo) for pubkey in module_user['ipasshpubkey']]
-        # Remove the ipasshpubkey element as it is not returned from IPA but save it's value to be used later on
+        # Remove the ipasshpubkey element as it is not returned from IPA but save its value to be used later on
         sshpubkey = module_user['ipasshpubkey']
         del module_user['ipasshpubkey']
 

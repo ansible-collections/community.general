@@ -61,7 +61,7 @@ options:
     default: ''
   state:
     description:
-      - Control if the volume group exists and it's state.
+      - Control if the volume group exists and its state.
       - The states V(active) and V(inactive) implies V(present) state. Added in 7.1.0.
       - If V(active) or V(inactive), the module manages the VG's logical volumes current state. The module also handles the VG's autoactivation
         state if supported unless when creating a volume group and the autoactivation option specified in O(vg_options).

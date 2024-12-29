@@ -517,7 +517,7 @@ def startstop_server(module, oneandone_conn):
     # Resolve server
     server = get_server(oneandone_conn, server_id, True)
     if server:
-        # Attempt to change the server state, only if it's not already there
+        # Attempt to change the server state, only if it is not already there
         # or on its way.
         try:
             if state == 'stopped' and server['status']['state'] == 'POWERED_ON':
