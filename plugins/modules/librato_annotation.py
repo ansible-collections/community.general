@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 module: librato_annotation
-short_description: Create an annotation in librato
+short_description: Create an annotation in Librato
 description:
   - Create an annotation event on the given annotation stream :name. If the annotation stream does not exist, it will be created automatically.
 author: "Seth Edwards (@Sedward)"
@@ -32,7 +32,7 @@ options:
   api_key:
     type: str
     description:
-      - Librato account api key.
+      - Librato account API key.
     required: true
   name:
     type: str
