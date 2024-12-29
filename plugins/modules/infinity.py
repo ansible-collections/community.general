@@ -110,7 +110,7 @@ network_id:
   type: str
   sample: '1501'
 ip_info:
-  description: When reserve next available ip address from a network, the ip address info ) is returned.
+  description: When reserve next available IP address from a network, the IP address info is returned.
   returned: success
   type: str
   sample: '{"address": "192.168.10.3", "hostname": "", "FQDN": "", "domainname": "", "id": 3229}'

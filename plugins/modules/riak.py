@@ -37,7 +37,7 @@ options:
     type: path
   http_conn:
     description:
-      - The ip address and port that is listening for Riak HTTP queries.
+      - The IP address and port that is listening for Riak HTTP queries.
     default: 127.0.0.1:8098
     type: str
   target_node:
