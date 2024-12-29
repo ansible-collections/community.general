@@ -35,13 +35,13 @@ options:
     elements: int
   server_ids:
     description:
-      - A list of servers to create public ips on.
+      - A list of servers to create public IPs on.
     type: list
     required: true
     elements: str
   state:
     description:
-      - Determine whether to create or delete public IPs. If V(present) module will not create a second public ip if one already
+      - Determine whether to create or delete public IPs. If V(present) module will not create a second public IP if one already
         exists.
     type: str
     default: present

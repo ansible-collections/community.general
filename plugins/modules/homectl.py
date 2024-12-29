@@ -218,7 +218,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 data:
-    description: A json dictionary returned from C(homectl inspect -j).
+    description: Dictionary returned from C(homectl inspect -j).
     returned: success
     type: dict
     sample: {

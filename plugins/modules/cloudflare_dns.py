@@ -14,7 +14,7 @@ author:
   - Michael Gruener (@mgruener)
 short_description: Manage Cloudflare DNS records
 description:
-  - 'Manages dns records using the Cloudflare API, see the docs: U(https://api.cloudflare.com/).'
+  - 'Manages DNS records using the Cloudflare API, see the docs: U(https://api.cloudflare.com/).'
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -26,7 +26,7 @@ options:
   api_token:
     description:
       - API token.
-      - Required for api token authentication.
+      - Required for API token authentication.
       - "You can obtain your API token from the bottom of the Cloudflare 'My Account' page, found here: U(https://dash.cloudflare.com/)."
       - Can be specified in E(CLOUDFLARE_TOKEN) environment variable since community.general 2.0.0.
     type: str
@@ -34,7 +34,7 @@ options:
   account_api_key:
     description:
       - Account API key.
-      - Required for api keys authentication.
+      - Required for API keys authentication.
       - "You can obtain your API key from the bottom of the Cloudflare 'My Account' page, found here: U(https://dash.cloudflare.com/)."
     type: str
     aliases: [account_api_token]

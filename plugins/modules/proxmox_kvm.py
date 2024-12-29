@@ -230,13 +230,13 @@ options:
   ipconfig:
     description:
       - 'Cloud-init: Set the IP configuration.'
-      - A hash/dictionary of network ip configurations. O(ipconfig='{"key":"value", "key":"value"}').
+      - A hash/dictionary of network IP configurations. O(ipconfig='{"key":"value", "key":"value"}').
       - Keys allowed are - V(ipconfig[n]) where 0 ≤ n ≤ network interfaces.
       - Values allowed are - V("[gw=<GatewayIPv4>] [,gw6=<GatewayIPv6>] [,ip=<IPv4Format/CIDR>] [,ip6=<IPv6Format/CIDR>]").
       - 'Cloud-init: Specify IP addresses and gateways for the corresponding interface.'
       - IP addresses use CIDR notation, gateways are optional but they should be in the same subnet of specified IP address.
-      - The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided.
-      - For IPv6 the special string 'auto' can be used to use stateless autoconfiguration.
+      - The special string V(dhcp) can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided.
+      - For IPv6 the special string V(auto) can be used to use stateless autoconfiguration.
       - If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4.
     type: dict
     version_added: 1.3.0
@@ -315,12 +315,12 @@ options:
   numa:
     description:
       - A hash/dictionaries of NUMA topology. O(numa='{"key":"value", "key":"value"}').
-      - Keys allowed are - C(numa[n]) where 0 ≤ n ≤ N.
-      - Values allowed are - C("cpu="<id[-id];...>",hostnodes="<id[-id];...>",memory="number",policy="(bind|interleave|preferred)"").
-      - C(cpus) CPUs accessing this NUMA node.
-      - C(hostnodes) Host NUMA nodes to use.
-      - C(memory) Amount of memory this NUMA node provides.
-      - C(policy) NUMA allocation policy.
+      - Keys allowed are - V(numa[n]) where 0 ≤ n ≤ N.
+      - Values allowed are - V("cpu="<id[-id];...>",hostnodes="<id[-id];...>",memory="number",policy="(bind|interleave|preferred)"").
+      - V(cpus) CPUs accessing this NUMA node.
+      - V(hostnodes) Host NUMA nodes to use.
+      - V(memory) Amount of memory this NUMA node provides.
+      - V(policy) NUMA allocation policy.
     type: dict
   numa_enabled:
     description:
@@ -536,17 +536,17 @@ options:
     type: int
   vga:
     description:
-      - Select VGA type. If you want to use high resolution modes (>= 1280x1024x16) then you should use option 'std' or 'vmware'.
+      - Select VGA type. If you want to use high resolution modes (>= 1280x1024x16) then you should use option V(std) or V(vmware).
     type: str
     choices: ['std', 'cirrus', 'vmware', 'qxl', 'serial0', 'serial1', 'serial2', 'serial3', 'qxl2', 'qxl3', 'qxl4']
   virtio:
     description:
       - A hash/dictionary of volume used as VIRTIO hard disk. O(virtio='{"key":"value", "key":"value"}').
       - Keys allowed are - V(virtio[n]) where 0 ≤ n ≤ 15.
-      - Values allowed are - V("storage:size,format=value").
+      - Values allowed are - V(storage:size,format=value).
       - V(storage) is the storage identifier where to create the disk.
       - V(size) is the size of the disk in GB.
-      - V(format) is the drive's backing file's data format. C(qcow2|raw|subvol). Please refer to the Proxmox VE Administrator Guide, section
+      - V(format) is the drive's backing file's data format. V(qcow2|raw|subvol). Please refer to the Proxmox VE Administrator Guide, section
         Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for the latest version, tables 3 to 14) to find out format
         supported by the provided storage backend.
     type: dict

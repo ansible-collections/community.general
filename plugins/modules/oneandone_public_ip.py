@@ -22,7 +22,7 @@ attributes:
 options:
   state:
     description:
-      - Define a public ip state to create, remove, or update.
+      - Define a public IP state to create, remove, or update.
     type: str
     required: false
     default: 'present'
@@ -108,7 +108,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 public_ip:
-  description: Information about the public ip that was processed.
+  description: Information about the public IP that was processed.
   type: dict
   sample: '{"id": "F77CC589EBC120905B4F4719217BFF6D", "ip": "10.5.132.106"}'
   returned: always

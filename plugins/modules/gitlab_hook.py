@@ -153,7 +153,7 @@ msg:
   sample: "Success"
 
 result:
-  description: Json parsed response from the server.
+  description: JSON parsed response from the server.
   returned: always
   type: dict
 

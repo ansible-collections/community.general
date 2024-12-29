@@ -24,7 +24,7 @@ attributes:
 options:
   name:
     description:
-      - Hostname or ip address of the BMC.
+      - Hostname or IP address of the BMC.
     required: true
     type: str
   port:

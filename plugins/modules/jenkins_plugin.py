@@ -78,7 +78,7 @@ options:
     type: list
     elements: str
     description:
-      - A list of URL segment(s) to retrieve the update center json file from.
+      - A list of URL segment(s) to retrieve the update center JSON file from.
     default: ['update-center.json', 'updates/update-center.json']
     version_added: 3.3.0
   latest_plugins_url_segments:

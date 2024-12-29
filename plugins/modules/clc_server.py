@@ -30,7 +30,7 @@ options:
     default: []
   add_public_ip:
     description:
-      - Whether to add a public ip to the server.
+      - Whether to add a public IP to the server.
     type: bool
     default: false
   alias:
@@ -134,13 +134,13 @@ options:
     type: str
   public_ip_protocol:
     description:
-      - The protocol to use for the public ip if add_public_ip is set to True.
+      - The protocol to use for the public ip if O(add_public_ip=true).
     type: str
     default: 'TCP'
     choices: ['TCP', 'UDP', 'ICMP']
   public_ip_ports:
     description:
-      - A list of ports to allow on the firewall to the servers public ip, if add_public_ip is set to True.
+      - A list of ports to allow on the firewall to the servers public IP, if O(add_public_ip=true).
     type: list
     elements: dict
     default: []
@@ -150,7 +150,7 @@ options:
     type: str
   server_ids:
     description:
-      - Required for started, stopped, and absent states. A list of server Ids to insure are started, stopped, or absent.
+      - Required for started, stopped, and absent states. A list of server IDs to ensure are started, stopped, or absent.
     type: list
     default: []
     elements: str

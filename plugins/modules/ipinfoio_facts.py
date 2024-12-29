@@ -33,7 +33,7 @@ options:
     default: "ansible-ipinfoio-module/0.0.1"
     type: str
 notes:
-  - Check http://ipinfo.io/ for more information.
+  - Check U(http://ipinfo.io/) for more information.
 """
 
 EXAMPLES = r"""
@@ -44,7 +44,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 ansible_facts:
-  description: "Dictionary of ip geolocation facts for a host's IP address."
+  description: "Dictionary of IP geolocation facts for a host's IP address."
   returned: changed
   type: complex
   contains:

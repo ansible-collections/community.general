@@ -374,12 +374,12 @@ lxc_container:
   type: complex
   contains:
     name:
-      description: Name of the lxc container.
+      description: Name of the LXC container.
       returned: success
       type: str
       sample: test_host
     init_pid:
-      description: Pid of the lxc init process.
+      description: Pid of the LXC init process.
       returned: success
       type: int
       sample: 19786
@@ -389,7 +389,7 @@ lxc_container:
       type: list
       sample: ["eth0", "lo"]
     ips:
-      description: List of ips.
+      description: List of IPs.
       returned: success
       type: list
       sample: ["10.0.3.3"]
