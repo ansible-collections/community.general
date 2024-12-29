@@ -1160,7 +1160,7 @@ class KeycloakAPI(object):
             # prefer an exception since this is almost certainly a programming error in the module itself.
             raise Exception("Unable to delete group - one of group ID or name must be provided.")
 
-        # only lookup the name if cid isn't provided.
+        # only lookup the name if cid is not provided.
         # in the case that both are provided, prefer the ID, since it is one
         # less lookup.
         if cid is None and name is not None:

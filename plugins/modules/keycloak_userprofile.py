@@ -436,7 +436,7 @@ def camel_recursive(data):
         # Apply camelCase conversion to each item in the list
         return [camel_recursive(item) for item in data]
     else:
-        # Return the data as is if it is not a dict or list
+        # Return the data as-is if it is not a dict or list
         return data
 
 

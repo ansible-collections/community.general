@@ -1190,7 +1190,7 @@ class RedfishUtils(object):
             while elapsed_time <= wait_timeout:
                 status = self.check_service_availability()
                 if status['available']:
-                    # It is available; we're done
+                    # It is available; we are done
                     break
                 time.sleep(5)
                 elapsed_time = time.time() - start_time
