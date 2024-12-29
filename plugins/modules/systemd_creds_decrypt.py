@@ -11,9 +11,9 @@ __metaclass__ = type
 
 DOCUMENTATION = """
 module: systemd_creds_decrypt
-short_description: Systemd's systemd-creds decrypt plugin
+short_description: C(systemd)'s C(systemd-creds decrypt) plugin
 description:
-    - This module decrypts input using systemd's systemd-creds decrypt.
+    - This module decrypts input using C(systemd)'s C(systemd-creds decrypt).
 author:
     - Thomas Sjögren (@konstruktoid)
 version_added: '10.2.0'

@@ -11,9 +11,9 @@ __metaclass__ = type
 
 DOCUMENTATION = """
 module: systemd_creds_encrypt
-short_description: Systemd's C(systemd-creds encrypt) plugin
+short_description: C(systemd)'s C(systemd-creds encrypt) plugin
 description:
-    - This module encrypts input using systemd's C(systemd-creds encrypt).
+    - This module encrypts input using C(systemd)'s C(systemd-creds encrypt).
 author:
     - Thomas Sjögren (@konstruktoid)
 version_added: '10.2.0'
@@ -101,12 +101,12 @@ def main():
     """Encrypt secret using systemd-creds."""
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(type="str"),
-            not_after=dict(type="str"),
+            name=dict(type="str", required=False),
+            not_after=dict(type="str", required=False),
             pretty=dict(type="bool", default=False),
             secret=dict(type="str", required=True, no_log=True),
-            timestamp=dict(type="str"),
-            user=dict(type="str"),
+            timestamp=dict(type="str", required=False),
+            user=dict(type="str", required=False),
         ),
         supports_check_mode=True,
     )
