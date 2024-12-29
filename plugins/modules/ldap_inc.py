@@ -98,7 +98,7 @@ EXAMPLES = r'''
 RETURN = r'''
 incremented:
   description:
-    - It is set to V(true) if the attribute value has changed
+    - It is set to V(true) if the attribute value has changed.
   returned: success
   type: bool
   sample:
