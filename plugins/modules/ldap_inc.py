@@ -19,6 +19,7 @@ DOCUMENTATION = r'''
 ---
 module: ldap_inc
 short_description: Use the Modify-Increment LDAP V3 feature to increment an attribute value
+version_added: 10.2.0
 description:
   - Atomically increments the value of an attribute and return its new value.
 notes:
