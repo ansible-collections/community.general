@@ -38,15 +38,15 @@ options:
     default: present
 notes:
   - If C(/etc/locale.gen) exists, the module will assume to be using the B(glibc) mechanism, else if C(/var/lib/locales/supported.d/)
-    exists it will assume to be using the B(debian) mechanism, else it will raise an error.
+    exists it will assume to be using the B(ubuntu_legacy) mechanism, else it will raise an error.
   - When using glibc mechanism, it will manage locales by editing C(/etc/locale.gen) and running C(locale-gen).
-  - When using debian mechanism, it will manage locales by editing C(/var/lib/locales/supported.d/local) and then running
+  - When using ubuntu_legacy mechanism, it will manage locales by editing C(/var/lib/locales/supported.d/local) and then running
     C(locale-gen).
-  - Please note that the code path that uses debian mechanism has not been tested for a while, because Ubuntu is already using
+  - Please note that the code path that uses ubuntu_legacy mechanism has not been tested for a while, because Ubuntu is already using
     the glibc mechanism. There is no support for that, given our inability to test it. Therefore, that mechanism is B(deprecated)
     and will be removed in community.general 13.0.0.
-  - Currently the module is B(only supported for Ubuntu) systems.
-  - This module requires the package C(locales) installed in Ubuntu systems.
+  - Currently the module is B(only supported for Debian and Ubuntu) systems.
+  - This module requires the package C(locales) installed in Debian and Ubuntu systems.
 """
 
 EXAMPLES = r"""
@@ -65,7 +65,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 mechanism:
-  description: Mechanism used to deploy the locales. It may have the value C(glibc) or C(debian).
+  description: Mechanism used to deploy the locales. It may have the value C(glibc) or C(ubuntu_legacy).
   type: str
   returned: success
   sample: glibc
@@ -112,9 +112,9 @@ class LocaleGen(StateModuleHelper):
 
     def __init_module__(self):
         self.MECHANISMS = dict(
-            debian=dict(
+            ubuntu_legacy=dict(
                 available=SUPPORTED_LOCALES,
-                apply_change=self.apply_change_debian,
+                apply_change=self.apply_change_ubuntu_legacy,
             ),
             glibc=dict(
                 available=SUPPORTED_LOCALES,
@@ -127,7 +127,7 @@ class LocaleGen(StateModuleHelper):
             self.vars.mechanism = "glibc"
         elif os.path.exists(VAR_LIB_LOCALES):
             self.vars.ubuntu_mode = True
-            self.vars.mechanism = "debian"
+            self.vars.mechanism = "ubuntu_legacy"
         else:
             self.do_raise('{0} and {1} are missing. Is the package "locales" installed?'.format(
                 VAR_LIB_LOCALES, ETC_LOCALE_GEN
@@ -170,7 +170,7 @@ class LocaleGen(StateModuleHelper):
         locales_not_found = self.locale_get_not_present(locales_not_found)
 
         if locales_not_found:
-            self.do_raise("The following locales you've entered are not available on your system: {0}".format(', '.join(locales_not_found)))
+            self.do_raise("The following locales you have entered are not available on your system: {0}".format(', '.join(locales_not_found)))
 
     def is_present(self):
         return not self.locale_get_not_present(self.vars.name)
@@ -234,7 +234,7 @@ class LocaleGen(StateModuleHelper):
         with runner() as ctx:
             ctx.run()
 
-    def apply_change_debian(self, targetState, names):
+    def apply_change_ubuntu_legacy(self, targetState, names):
         """Create or remove locale.
 
         Keyword arguments:
