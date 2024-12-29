@@ -86,7 +86,7 @@ EXAMPLES = r'''
     increment: "1"
   register: ldap_uidNumber_sequence
 
-- name: Modifies the user to define its identification number (uidNumber) when incrementation is successful.
+- name: Modifies the user to define its identification number (uidNumber) when incrementation is successful
   community.general.ldap_attrs:
     dn: "cn=john,ou=posix-users,dc=example,dc=com"
     state: present
