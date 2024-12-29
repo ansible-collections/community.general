@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2024 Marzieh Raoufnezhad <raoufnezhad at gmail.com>
-# Copyright (c) 2024 Maryam Mayabi <mayabi.ahm at gmail.com>
+# Copyright (c) 2024 Marzieh Raoufnezhad <raoufnezhad at um.ac.ir>
+# Copyright (c) 2024 Maryam Mayabi <mayabi at um.ac.ir>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
