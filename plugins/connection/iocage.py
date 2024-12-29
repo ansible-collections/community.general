@@ -10,28 +10,28 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    author: Stephan Lohse (!UNKNOWN) <dev-github@ploek.org>
-    name: iocage
-    short_description: Run tasks in iocage jails
+DOCUMENTATION = r"""
+author: Stephan Lohse (!UNKNOWN) <dev-github@ploek.org>
+name: iocage
+short_description: Run tasks in iocage jails
+description:
+  - Run commands or put/fetch files to an existing iocage jail.
+options:
+  remote_addr:
     description:
-        - Run commands or put/fetch files to an existing iocage jail
-    options:
-      remote_addr:
-        description:
-            - Path to the jail
-        type: string
-        vars:
-            - name: ansible_host
-            - name: ansible_iocage_host
-      remote_user:
-        description:
-            - User to execute as inside the jail
-        type: string
-        vars:
-            - name: ansible_user
-            - name: ansible_iocage_user
-'''
+      - Path to the jail.
+    type: string
+    vars:
+      - name: ansible_host
+      - name: ansible_iocage_host
+  remote_user:
+    description:
+      - User to execute as inside the jail.
+    type: string
+    vars:
+      - name: ansible_user
+      - name: ansible_iocage_user
+"""
 
 import subprocess
 
