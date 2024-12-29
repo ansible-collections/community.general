@@ -90,7 +90,7 @@ options:
     description:
       - A dictionary of key/value attributes to add to new instances, or for setting C(state) of instances with these attributes.
       - Keys are case insensitive and OpenNebula automatically converts them to upper case.
-      - Be aware V(NAME) is a special attribute which sets the name of the VM when it's deployed.
+      - Be aware V(NAME) is a special attribute which sets the name of the VM when it is deployed.
       - C(#) character(s) can be appended to the C(NAME) and the module will automatically add indexes to the names of VMs.
       - 'For example: V(NAME: foo-###) would create VMs with names V(foo-000), V(foo-001),...'
       - When used with O(count_attributes) and O(exact_count) the module will match the base name without the index part.

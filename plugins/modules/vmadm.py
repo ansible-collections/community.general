@@ -432,7 +432,7 @@ def get_vm_uuid(module, alias):
             msg='Could not retrieve UUID of {0}'.format(alias), exception=stderr)
 
     # If no VM was found matching the given alias, we get back an empty array.
-    # That is not an error condition as we might be explicitly checking it's
+    # That is not an error condition as we might be explicitly checking for its
     # absence.
     try:
         stdout_json = json.loads(stdout)
@@ -708,7 +708,7 @@ def main():
 
     result = {'state': state}
 
-    # While it's possible to refer to a given VM by it's `alias`, it's easier
+    # While it is possible to refer to a given VM by its `alias`, it is easier
     # to operate on VMs by their UUID. So if we're not given a `uuid`, look
     # it up.
     if not uuid:
@@ -733,12 +733,12 @@ def main():
         module.exit_json(**result)
 
     # The general flow is as follows:
-    # - first the current state of the VM is obtained by it's UUID.
+    # - first the current state of the VM is obtained by its UUID.
     # - If the state was not found and the desired state is 'deleted', return.
     # - If the state was not found, it means the VM has to be created.
     #   Subsequently the VM will be set to the desired state (i.e. stopped)
-    # - Otherwise, it means the VM exists already and we operate on it's
-    #   state (i.e. reboot it.)
+    # - Otherwise, it means the VM exists already and we operate on its
+    #   state (for example reboot it.)
     #
     # In the future it should be possible to query the VM for a particular
     # property as a valid state (i.e. queried) so the result can be

@@ -255,14 +255,14 @@ EXAMPLES = r"""
   ansible.builtin.debug:
     var: lvm_container_info
 
-- name: Run a command in a container and ensure its in a "stopped" state.
+- name: Run a command in a container and ensure it is in a "stopped" state.
   community.general.lxc_container:
     name: test-container-started
     state: stopped
     container_command: |
       echo 'hello world.' | tee /opt/stopped
 
-- name: Run a command in a container and ensure its it in a "frozen" state.
+- name: Run a command in a container and ensure it is in a "frozen" state.
   community.general.lxc_container:
     name: test-container-stopped
     state: frozen
@@ -681,7 +681,7 @@ class LxcContainerManagement(object):
         """Configure an LXC container.
 
         Write new configuration values to the lxc config file. This will
-        stop the container if it's running write the new options and then
+        stop the container if it is running write the new options and then
         restart the container upon completion.
         """
 

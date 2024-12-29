@@ -1160,8 +1160,8 @@ class KeycloakAPI(object):
             # prefer an exception since this is almost certainly a programming error in the module itself.
             raise Exception("Unable to delete group - one of group ID or name must be provided.")
 
-        # only lookup the name if cid isn't provided.
-        # in the case that both are provided, prefer the ID, since it's one
+        # only lookup the name if cid is not provided.
+        # in the case that both are provided, prefer the ID, since it is one
         # less lookup.
         if cid is None and name is not None:
             for clientscope in self.get_clientscopes(realm=realm):
@@ -1719,7 +1719,7 @@ class KeycloakAPI(object):
             raise Exception("Unable to delete group - one of group ID or name must be provided.")
 
         # only lookup the name if groupid isn't provided.
-        # in the case that both are provided, prefer the ID, since it's one
+        # in the case that both are provided, prefer the ID, since it is one
         # less lookup.
         if groupid is None and name is not None:
             for group in self.get_groups(realm=realm):
@@ -2071,7 +2071,7 @@ class KeycloakAPI(object):
 
     def get_authentication_flow_by_alias(self, alias, realm='master'):
         """
-        Get an authentication flow by it's alias
+        Get an authentication flow by its alias
         :param alias: Alias of the authentication flow to get.
         :param realm: Realm.
         :return: Authentication flow representation.

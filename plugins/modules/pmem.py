@@ -534,7 +534,7 @@ class PersistentMemory(object):
             out = xmltodict.parse(goal, dict_constructor=dict)['ConfigGoalList']['ConfigGoal']
             for entry in out:
 
-                # Probably it's a bug of ipmctl to show the socket goal
+                # Probably it is a bug of ipmctl to show the socket goal
                 # which isn't specified by the -socket option.
                 # Anyway, filter the noise out here:
                 if skt and skt['id'] != int(entry['SocketID'], 16):

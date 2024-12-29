@@ -25,7 +25,7 @@ DOCUMENTATION = '''
         - inventory_cache
     options:
       plugin:
-        description: The name of this plugin, it should always be set to V(community.general.proxmox) for this plugin to recognize it as it's own.
+        description: The name of this plugin, it should always be set to V(community.general.proxmox) for this plugin to recognize it as its own.
         required: true
         choices: ['community.general.proxmox']
         type: str
@@ -403,7 +403,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             if "error" in ifaces:
                 if "class" in ifaces["error"]:
                     # This happens on Windows, even though qemu agent is running, the IP address
-                    # cannot be fetched, as it's unsupported, also a command disabled can happen.
+                    # cannot be fetched, as it is unsupported, also a command disabled can happen.
                     errorClass = ifaces["error"]["class"]
                     if errorClass in ["Unsupported"]:
                         self.display.v("Retrieving network interfaces from guest agents on windows with older qemu-guest-agents is not supported")
