@@ -12,7 +12,7 @@ DOCUMENTATION = r"""
 module: locale_gen
 short_description: Creates or removes locales
 description:
-  - Manages locales in Ubuntu systems.
+  - Manages locales in Debian and Ubuntu systems.
 author:
   - Augustus Kling (@AugustusKling)
 extends_documentation_fragment:
