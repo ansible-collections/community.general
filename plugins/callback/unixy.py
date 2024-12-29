@@ -8,18 +8,18 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    name: unixy
-    type: stdout
-    author: Al Bowles (@akatch)
-    short_description: condensed Ansible output
-    description:
-      - Consolidated Ansible output in the style of LINUX/UNIX startup logs.
-    extends_documentation_fragment:
-      - default_callback
-    requirements:
-      - set as stdout in configuration
-'''
+DOCUMENTATION = r"""
+name: unixy
+type: stdout
+author: Al Bowles (@akatch)
+short_description: condensed Ansible output
+description:
+  - Consolidated Ansible output in the style of LINUX/UNIX startup logs.
+extends_documentation_fragment:
+  - default_callback
+requirements:
+  - set as stdout in configuration
+"""
 
 from os.path import basename
 from ansible import constants as C

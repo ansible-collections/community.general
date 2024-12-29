@@ -7,81 +7,80 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 name: mail
 type: notification
-short_description: Sends failure events via email
+short_description: Sends failure events through email
 description:
-- This callback will report failures via email.
+  - This callback will report failures through email.
 author:
-- Dag Wieers (@dagwieers)
+  - Dag Wieers (@dagwieers)
 requirements:
-- whitelisting in configuration
+  - whitelisting in configuration
 options:
   mta:
     description:
-        - Mail Transfer Agent, server that accepts SMTP.
+      - Mail Transfer Agent, server that accepts SMTP.
     type: str
     env:
-        - name: SMTPHOST
+      - name: SMTPHOST
     ini:
-        - section: callback_mail
-          key: smtphost
+      - section: callback_mail
+        key: smtphost
     default: localhost
   mtaport:
     description:
-        - Mail Transfer Agent Port.
-        - Port at which server SMTP.
+      - Mail Transfer Agent Port.
+      - Port at which server SMTP.
     type: int
     ini:
-        - section: callback_mail
-          key: smtpport
+      - section: callback_mail
+        key: smtpport
     default: 25
   to:
     description:
-        - Mail recipient.
+      - Mail recipient.
     type: list
     elements: str
     ini:
-        - section: callback_mail
-          key: to
+      - section: callback_mail
+        key: to
     default: [root]
   sender:
     description:
-        - Mail sender.
-        - This is required since community.general 6.0.0.
+      - Mail sender.
+      - This is required since community.general 6.0.0.
     type: str
     required: true
     ini:
-        - section: callback_mail
-          key: sender
+      - section: callback_mail
+        key: sender
   cc:
     description:
-        - CC'd recipients.
+      - CC'd recipients.
     type: list
     elements: str
     ini:
-        - section: callback_mail
-          key: cc
+      - section: callback_mail
+        key: cc
   bcc:
     description:
-        - BCC'd recipients.
+      - BCC'd recipients.
     type: list
     elements: str
     ini:
-        - section: callback_mail
-          key: bcc
+      - section: callback_mail
+        key: bcc
   message_id_domain:
     description:
-        - The domain name to use for the L(Message-ID header, https://en.wikipedia.org/wiki/Message-ID).
-        - The default is the hostname of the control node.
+      - The domain name to use for the L(Message-ID header, https://en.wikipedia.org/wiki/Message-ID).
+      - The default is the hostname of the control node.
     type: str
     ini:
-        - section: callback_mail
-          key: message_id_domain
+      - section: callback_mail
+        key: message_id_domain
     version_added: 8.2.0
-
-'''
+"""
 
 import json
 import os

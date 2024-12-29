@@ -7,19 +7,19 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 name: dense
 type: stdout
 short_description: minimal stdout output
 extends_documentation_fragment:
-- default_callback
+  - default_callback
 description:
-- When in verbose mode it will act the same as the default callback.
+  - When in verbose mode it will act the same as the default callback.
 author:
-- Dag Wieers (@dagwieers)
+  - Dag Wieers (@dagwieers)
 requirements:
-- set as stdout in configuration
-'''
+  - set as stdout in configuration
+"""
 
 HAS_OD = False
 try:

@@ -7,23 +7,22 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = r'''
-  name: default_without_diff
-  type: stdout
-  short_description: The default ansible callback without diff output
-  version_added: 8.4.0
-  description:
-    - This is basically the default ansible callback plugin (P(ansible.builtin.default#callback)) without
-      showing diff output. This can be useful when using another callback which sends more detailed information
-      to another service, like the L(ARA, https://ara.recordsansible.org/) callback, and you want diff output
-      sent to that plugin but not shown on the console output.
-  author: Felix Fontein (@felixfontein)
-  extends_documentation_fragment:
-    - ansible.builtin.default_callback
-    - ansible.builtin.result_format_callback
-'''
+DOCUMENTATION = r"""
+name: default_without_diff
+type: stdout
+short_description: The default ansible callback without diff output
+version_added: 8.4.0
+description:
+  - This is basically the default ansible callback plugin (P(ansible.builtin.default#callback)) without showing diff output.
+    This can be useful when using another callback which sends more detailed information to another service, like the L(ARA,
+    https://ara.recordsansible.org/) callback, and you want diff output sent to that plugin but not shown on the console output.
+author: Felix Fontein (@felixfontein)
+extends_documentation_fragment:
+  - ansible.builtin.default_callback
+  - ansible.builtin.result_format_callback
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 # Enable callback in ansible.cfg:
 ansible_config: |
   [defaults]
@@ -32,7 +31,7 @@ ansible_config: |
 # Enable callback with environment variables:
 environment_variable: |
   ANSIBLE_STDOUT_CALLBACK=community.general.default_without_diff
-'''
+"""
 
 from ansible.plugins.callback.default import CallbackModule as Default
 

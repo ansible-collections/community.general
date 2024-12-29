@@ -7,54 +7,54 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    author: Unknown (!UNKNOWN)
-    name: syslog_json
-    type: notification
-    requirements:
-      - whitelist in configuration
-    short_description: sends JSON events to syslog
-    description:
-      - This plugin logs ansible-playbook and ansible runs to a syslog server in JSON format.
-    options:
-      server:
-        description: Syslog server that will receive the event.
-        type: str
-        env:
-        - name: SYSLOG_SERVER
-        default: localhost
-        ini:
-          - section: callback_syslog_json
-            key: syslog_server
-      port:
-        description: Port on which the syslog server is listening.
-        type: int
-        env:
-          - name: SYSLOG_PORT
-        default: 514
-        ini:
-          - section: callback_syslog_json
-            key: syslog_port
-      facility:
-        description: Syslog facility to log as.
-        type: str
-        env:
-          - name: SYSLOG_FACILITY
-        default: user
-        ini:
-          - section: callback_syslog_json
-            key: syslog_facility
-      setup:
-        description: Log setup tasks.
-        env:
-          - name: ANSIBLE_SYSLOG_SETUP
-        type: bool
-        default: true
-        ini:
-          - section: callback_syslog_json
-            key: syslog_setup
-        version_added: 4.5.0
-'''
+DOCUMENTATION = r"""
+author: Unknown (!UNKNOWN)
+name: syslog_json
+type: notification
+requirements:
+  - whitelist in configuration
+short_description: sends JSON events to syslog
+description:
+  - This plugin logs ansible-playbook and ansible runs to a syslog server in JSON format.
+options:
+  server:
+    description: Syslog server that will receive the event.
+    type: str
+    env:
+      - name: SYSLOG_SERVER
+    default: localhost
+    ini:
+      - section: callback_syslog_json
+        key: syslog_server
+  port:
+    description: Port on which the syslog server is listening.
+    type: int
+    env:
+      - name: SYSLOG_PORT
+    default: 514
+    ini:
+      - section: callback_syslog_json
+        key: syslog_port
+  facility:
+    description: Syslog facility to log as.
+    type: str
+    env:
+      - name: SYSLOG_FACILITY
+    default: user
+    ini:
+      - section: callback_syslog_json
+        key: syslog_facility
+  setup:
+    description: Log setup tasks.
+    env:
+      - name: ANSIBLE_SYSLOG_SETUP
+    type: bool
+    default: true
+    ini:
+      - section: callback_syslog_json
+        key: syslog_setup
+    version_added: 4.5.0
+"""
 
 import logging
 import logging.handlers

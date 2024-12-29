@@ -7,27 +7,27 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    author: Unknown (!UNKNOWN)
-    name: log_plays
-    type: notification
-    short_description: write playbook output to log file
-    description:
-      - This callback writes playbook output to a file per host in the C(/var/log/ansible/hosts) directory.
-    requirements:
-     - Whitelist in configuration
-     - A writeable C(/var/log/ansible/hosts) directory by the user executing Ansible on the controller
-    options:
-      log_folder:
-        default: /var/log/ansible/hosts
-        description: The folder where log files will be created.
-        type: str
-        env:
-          - name: ANSIBLE_LOG_FOLDER
-        ini:
-          - section: callback_log_plays
-            key: log_folder
-'''
+DOCUMENTATION = r"""
+author: Unknown (!UNKNOWN)
+name: log_plays
+type: notification
+short_description: write playbook output to log file
+description:
+  - This callback writes playbook output to a file per host in the C(/var/log/ansible/hosts) directory.
+requirements:
+  - Whitelist in configuration
+  - A writeable C(/var/log/ansible/hosts) directory by the user executing Ansible on the controller
+options:
+  log_folder:
+    default: /var/log/ansible/hosts
+    description: The folder where log files will be created.
+    type: str
+    env:
+      - name: ANSIBLE_LOG_FOLDER
+    ini:
+      - section: callback_log_plays
+        key: log_folder
+"""
 
 import os
 import time

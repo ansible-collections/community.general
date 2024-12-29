@@ -7,16 +7,16 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    author: Unknown (!UNKNOWN)
-    name: 'null'
-    type: stdout
-    requirements:
-      - set as main display callback
-    short_description: Don't display stuff to screen
-    description:
-        - This callback prevents outputting events to screen.
-'''
+DOCUMENTATION = r"""
+author: Unknown (!UNKNOWN)
+name: 'null'
+type: stdout
+requirements:
+  - set as main display callback
+short_description: do not display stuff to screen
+description:
+  - This callback prevents outputting events to screen.
+"""
 
 from ansible.plugins.callback import CallbackBase
 
