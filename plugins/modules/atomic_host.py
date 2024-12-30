@@ -14,6 +14,10 @@ short_description: Manage the atomic host platform
 description:
   - Manage the atomic host platform.
   - Rebooting of Atomic host platform should be done outside this module.
+deprecated:
+  removed_in: 13.0.0
+  why: Project Atomic was sunset by the end of 2019.
+  alternative: There is none.
 author:
   - Saravanan KR (@krsacme)
 notes:
