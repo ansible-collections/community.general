@@ -284,6 +284,7 @@ class KeycloakAPI(object):
     """ Keycloak API access; Keycloak uses OAuth 2.0 to protect its API, an access token for which
         is obtained through OpenID connect
     """
+
     def __init__(self, module, connection_header):
         self.module = module
         self.baseurl = self.module.params.get('auth_keycloak_url')
@@ -1466,7 +1467,6 @@ class KeycloakAPI(object):
         :param realm: Realm in which the group resides; default 'master'
         :param parents: Optional list of parents when group to look for is a subgroup
         """
-        groups_url = URL_GROUPS.format(url=self.baseurl, realm=realm)
         try:
             if parents:
                 parent = self.get_subgroup_direct_parent(parents, realm)
@@ -2633,8 +2633,8 @@ class KeycloakAPI(object):
                 url=self.baseurl,
                 realm=realm)
             self._request(users_url,
-                     method='POST',
-                     data=json.dumps(userrep))
+                          method='POST',
+                          data=json.dumps(userrep))
             created_user = self.get_user_by_username(
                 username=userrep['username'],
                 realm=realm)
@@ -3003,6 +3003,6 @@ class KeycloakAPI(object):
         try:
             if isinstance(e, HTTPError):
                 msg = "%s: %s" % (msg, to_native(e.read()))
-        except Exception as ingore:
+        except Exception:
             pass
         self.module.fail_json(msg, **kwargs)
