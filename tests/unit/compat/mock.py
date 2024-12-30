@@ -9,8 +9,6 @@ __metaclass__ = type
 '''
 Compat module for Python3.x's unittest.mock module
 '''
-import sys
-
 # Python 2.7
 
 # Note: Could use the pypi mock library on python3.x as well as python2.x.  It
