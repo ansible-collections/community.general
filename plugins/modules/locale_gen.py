@@ -65,8 +65,11 @@ EXAMPLES = r"""
 
 RETURN = r"""
 mechanism:
-  description: Mechanism used to deploy the locales. It may have the value C(glibc) or C(ubuntu_legacy).
+  description: Mechanism used to deploy the locales.
   type: str
+  choices:
+    - glibc
+    - ubuntu_legacy
   returned: success
   sample: glibc
   version_added: 10.2.0
