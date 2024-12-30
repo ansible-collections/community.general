@@ -477,11 +477,6 @@ class Connection(ConnectionBase):
     def __init__(self, play_context, new_stdin, *args, **kwargs):
         super(Connection, self).__init__(play_context, new_stdin, *args, **kwargs)
 
-    def _connect(self) -> Connection:
-        self.ssh = self._connect_uncached()
-        self._connected = True
-        return self
-
     def _set_log_channel(self, name: str) -> None:
         """ Mimic paramiko.SSHClient.set_log_channel """
         self._log_channel = name
@@ -508,7 +503,7 @@ class Connection(ConnectionBase):
 
         return sock_kwarg
 
-    def _connect_uncached(self) -> paramiko.SSHClient:
+    def _connect(self) -> Connection:
         """ activates the connection object """
 
         if paramiko is None:
@@ -596,7 +591,9 @@ class Connection(ConnectionBase):
                 raise AnsibleConnectionFailure(msg)
             else:
                 raise AnsibleConnectionFailure(msg)
-        return ssh
+        self.ssh = ssh
+        self._connected = True
+        return self
 
     def _any_keys_added(self) -> bool:
         for hostname, keys in self.ssh._host_keys.items():
