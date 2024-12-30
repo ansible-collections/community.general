@@ -230,6 +230,26 @@ plugin_routing:
         removal_version: 10.0.0
         warning_text: RHN is EOL, please contact the community.general maintainers
           if still using this; see the module documentation for more details.
+    sensu_check:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Sensu Core and Sensu Enterprise products have been End of Life since 2019/20.
+    sensu_client:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Sensu Core and Sensu Enterprise products have been End of Life since 2019/20.
+    sensu_handler:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Sensu Core and Sensu Enterprise products have been End of Life since 2019/20.
+    sensu_silence:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Sensu Core and Sensu Enterprise products have been End of Life since 2019/20.
+    sensu_subscription:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Sensu Core and Sensu Enterprise products have been End of Life since 2019/20.
     stackdriver:
       tombstone:
         removal_version: 9.0.0

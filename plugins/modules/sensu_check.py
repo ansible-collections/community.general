@@ -17,6 +17,10 @@ description:
   - Most options do not have a default and will not be added to the check definition unless specified.
   - All defaults except O(path), O(state), O(backup) and O(metric) are not managed by this module,
     they are simply specified for your convenience.
+deprecated:
+  removed_in: 13.0.0
+  why: Sensu Core and Sensu Enterprise products have been End of Life since 2019/20.
+  alternative: Use Sensu Go and its accompanying collection C(sensu.sensu_go).
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
