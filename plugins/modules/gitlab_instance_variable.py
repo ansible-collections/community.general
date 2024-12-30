@@ -74,6 +74,13 @@ options:
           - Whether variable value is protected or not.
         type: bool
         default: false
+      raw:
+        description:
+          - Whether variable value is raw or not.
+          - Support for raw values requires GitLab >= 15.7.
+        type: bool
+        default: false
+        version_added: 10.2.0
       variable_type:
         description:
           - Whether a variable is an environment variable (V(env_var)) or a file (V(file)).
@@ -160,6 +167,7 @@ class GitlabInstanceVariables(object):
             "value": var_obj.get('value'),
             "masked": var_obj.get('masked'),
             "protected": var_obj.get('protected'),
+            "raw": var_obj.get('raw'),
             "variable_type": var_obj.get('variable_type'),
         }
 
@@ -227,6 +235,8 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
             item['protected'] = False
         if item.get('masked') is None:
             item['masked'] = False
+        if item.get('raw') is None:
+            item['raw'] = False
         if item.get('variable_type') is None:
             item['variable_type'] = 'env_var'
 
@@ -297,6 +307,7 @@ def main():
             value=dict(type='str', no_log=True),
             masked=dict(type='bool', default=False),
             protected=dict(type='bool', default=False),
+            raw=dict(type='bool', default=False),
             variable_type=dict(type='str', default='env_var', choices=["env_var", "file"])
         )),
         state=dict(type='str', default="present", choices=["absent", "present"]),
