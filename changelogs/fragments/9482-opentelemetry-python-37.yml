@@ -1,0 +1,2 @@
+minor_changes:
+  - opentelemetry callback plugin - remove code handling Python versions prior to 3.7 (https://github.com/ansible-collections/community.general/pull/9482).
