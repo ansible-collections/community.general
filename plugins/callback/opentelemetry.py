@@ -137,9 +137,8 @@ import getpass
 import json
 import os
 import socket
-import sys
-import time
 import uuid
+from time import time_ns
 
 from collections import OrderedDict
 from os.path import basename
@@ -165,29 +164,11 @@ try:
     from opentelemetry.sdk.trace.export.in_memory_span_exporter import (
         InMemorySpanExporter
     )
-    # Support for opentelemetry-api <= 1.12
-    try:
-        from opentelemetry.util._time import _time_ns
-    except ImportError as imp_exc:
-        OTEL_LIBRARY_TIME_NS_ERROR = imp_exc
-    else:
-        OTEL_LIBRARY_TIME_NS_ERROR = None
-
 except ImportError as imp_exc:
     OTEL_LIBRARY_IMPORT_ERROR = imp_exc
     OTEL_LIBRARY_TIME_NS_ERROR = imp_exc
 else:
     OTEL_LIBRARY_IMPORT_ERROR = None
-
-
-if sys.version_info >= (3, 7):
-    time_ns = time.time_ns
-elif not OTEL_LIBRARY_TIME_NS_ERROR:
-    time_ns = _time_ns
-else:
-    def time_ns():
-        # Support versions older than 3.7 with opentelemetry-api > 1.12
-        return int(time.time() * 1e9)
 
 
 class TaskData:
