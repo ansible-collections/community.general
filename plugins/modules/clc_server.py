@@ -9,7 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: clc_server
 short_description: Create, Delete, Start and Stop servers in CenturyLink Cloud
 description:
@@ -24,13 +24,13 @@ attributes:
 options:
   additional_disks:
     description:
-      - The list of additional disks for the server
+      - The list of additional disks for the server.
     type: list
     elements: dict
     default: []
   add_public_ip:
     description:
-      - Whether to add a public ip to the server
+      - Whether to add a public IP to the server.
     type: bool
     default: false
   alias:
@@ -39,32 +39,32 @@ options:
     type: str
   anti_affinity_policy_id:
     description:
-      - The anti-affinity policy to assign to the server. This is mutually exclusive with 'anti_affinity_policy_name'.
+      - The anti-affinity policy to assign to the server. This is mutually exclusive with O(anti_affinity_policy_name).
     type: str
   anti_affinity_policy_name:
     description:
-      - The anti-affinity policy to assign to the server. This is mutually exclusive with 'anti_affinity_policy_id'.
+      - The anti-affinity policy to assign to the server. This is mutually exclusive with O(anti_affinity_policy_id).
     type: str
   alert_policy_id:
     description:
-      - The alert policy to assign to the server. This is mutually exclusive with 'alert_policy_name'.
+      - The alert policy to assign to the server. This is mutually exclusive with O(alert_policy_name).
     type: str
   alert_policy_name:
     description:
-      - The alert policy to assign to the server. This is mutually exclusive with 'alert_policy_id'.
+      - The alert policy to assign to the server. This is mutually exclusive with O(alert_policy_id).
     type: str
   count:
     description:
-      - The number of servers to build (mutually exclusive with exact_count)
+      - The number of servers to build (mutually exclusive with O(exact_count)).
     default: 1
     type: int
   count_group:
     description:
-      - Required when exact_count is specified.  The Server Group use to determine how many servers to deploy.
+      - Required when exact_count is specified. The Server Group use to determine how many servers to deploy.
     type: str
   cpu:
     description:
-      - How many CPUs to provision on the server
+      - How many CPUs to provision on the server.
     default: 1
     type: int
   cpu_autoscale_policy_id:
@@ -83,8 +83,8 @@ options:
     type: str
   exact_count:
     description:
-      - Run in idempotent mode.  Will insure that this exact number of servers are running in the provided group,
-        creating and deleting them to reach that count.  Requires count_group to be set.
+      - Run in idempotent mode. Will insure that this exact number of servers are running in the provided group, creating
+        and deleting them to reach that count. Requires O(count_group) to be set.
     type: int
   group:
     description:
@@ -112,7 +112,7 @@ options:
     default: 1
   name:
     description:
-      - A 1 to 6 character identifier to use for the server. This is required when state is 'present'
+      - A 1 to 6 character identifier to use for the server. This is required when O(state=present).
     type: str
   network_id:
     description:
@@ -126,7 +126,7 @@ options:
     default: []
   password:
     description:
-      - Password for the administrator / root user
+      - Password for the administrator / root user.
     type: str
   primary_dns:
     description:
@@ -134,13 +134,13 @@ options:
     type: str
   public_ip_protocol:
     description:
-      - The protocol to use for the public ip if add_public_ip is set to True.
+      - The protocol to use for the public ip if O(add_public_ip=true).
     type: str
     default: 'TCP'
     choices: ['TCP', 'UDP', 'ICMP']
   public_ip_ports:
     description:
-      - A list of ports to allow on the firewall to the servers public ip, if add_public_ip is set to True.
+      - A list of ports to allow on the firewall to the servers public IP, if O(add_public_ip=true).
     type: list
     elements: dict
     default: []
@@ -150,8 +150,7 @@ options:
     type: str
   server_ids:
     description:
-      - Required for started, stopped, and absent states.
-        A list of server Ids to insure are started, stopped, or absent.
+      - Required for started, stopped, and absent states. A list of server IDs to ensure are started, stopped, or absent.
     type: list
     default: []
     elements: str
@@ -173,12 +172,12 @@ options:
     choices: ['standard', 'hyperscale']
   template:
     description:
-      - The template to use for server creation.  Will search for a template if a partial string is provided.
-        This is required when state is 'present'
+      - The template to use for server creation. Will search for a template if a partial string is provided. This is required
+        when O(state=present).
     type: str
   ttl:
     description:
-      - The time to live for the server in seconds.  The server will be deleted when this time expires.
+      - The time to live for the server in seconds. The server will be deleted when this time expires.
     type: str
   type:
     description:
@@ -188,13 +187,12 @@ options:
     choices: ['standard', 'hyperscale', 'bareMetal']
   configuration_id:
     description:
-      -  Only required for bare metal servers.
-         Specifies the identifier for the specific configuration type of bare metal server to deploy.
+      - Only required for bare metal servers. Specifies the identifier for the specific configuration type of bare metal server
+        to deploy.
     type: str
   os_type:
     description:
-      - Only required for bare metal servers.
-        Specifies the OS to provision with the bare metal server.
+      - Only required for bare metal servers. Specifies the OS to provision with the bare metal server.
     type: str
     choices: ['redHat6_64Bit', 'centOS6_64Bit', 'windows2012R2Standard_64Bit', 'ubuntu14_64Bit']
   wait:
@@ -203,23 +201,21 @@ options:
     type: bool
     default: true
 requirements:
-    - python = 2.7
-    - requests >= 2.5.0
-    - clc-sdk
+  - requests >= 2.5.0
+  - clc-sdk
 author: "CLC Runner (@clc-runner)"
 notes:
-    - To use this module, it is required to set the below environment variables which enables access to the
-      Centurylink Cloud
-          - CLC_V2_API_USERNAME, the account login id for the centurylink cloud
-          - CLC_V2_API_PASSWORD, the account password for the centurylink cloud
-    - Alternatively, the module accepts the API token and account alias. The API token can be generated using the
-      CLC account login and password via the HTTP api call @ https://api.ctl.io/v2/authentication/login
-          - CLC_V2_API_TOKEN, the API token generated from https://api.ctl.io/v2/authentication/login
-          - CLC_ACCT_ALIAS, the account alias associated with the centurylink cloud
-    - Users can set CLC_V2_API_URL to specify an endpoint for pointing to a different CLC environment.
-'''
+  - To use this module, it is required to set the below environment variables which enables access to the Centurylink Cloud.
+  - E(CLC_V2_API_USERNAME), the account login id for the Centurylink Cloud.
+  - E(CLC_V2_API_PASSWORD), the account password for the Centurylink Cloud.
+  - Alternatively, the module accepts the API token and account alias. The API token can be generated using the CLC account
+    login and password using the HTTP API call @ https://api.ctl.io/v2/authentication/login
+  - E(CLC_V2_API_TOKEN), the API token generated from https://api.ctl.io/v2/authentication/login
+  - E(CLC_ACCT_ALIAS), the account alias associated with the Centurylink Cloud.
+  - Users can set E(CLC_V2_API_URL) to specify an endpoint for pointing to a different CLC environment.
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # Note - You must set the CLC_V2_API_USERNAME And CLC_V2_API_PASSWD Environment variables before running these examples
 
 - name: Provision a single Ubuntu Server
@@ -255,29 +251,21 @@ EXAMPLES = '''
     server_ids:
       - UC1ACCT-TEST01
     state: absent
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 server_ids:
-    description: The list of server ids that are created
-    returned: success
-    type: list
-    sample:
-        [
-            "UC1TEST-SVR01",
-            "UC1TEST-SVR02"
-        ]
+  description: The list of server ids that are created.
+  returned: success
+  type: list
+  sample: ["UC1TEST-SVR01", "UC1TEST-SVR02"]
 partially_created_server_ids:
-    description: The list of server ids that are partially created
-    returned: success
-    type: list
-    sample:
-        [
-            "UC1TEST-SVR01",
-            "UC1TEST-SVR02"
-        ]
+  description: The list of server ids that are partially created.
+  returned: success
+  type: list
+  sample: ["UC1TEST-SVR01", "UC1TEST-SVR02"]
 servers:
-    description: The list of server objects returned from CLC
+    description: The list of server objects returned from CLC.
     returned: success
     type: list
     sample:
@@ -433,7 +421,7 @@ servers:
               "type":"standard"
            }
         ]
-'''
+"""
 
 __version__ = '${version}'
 
@@ -816,7 +804,7 @@ class ClcServer:
     @staticmethod
     def _validate_name(module):
         """
-        Validate that name is the correct length if provided, fail if it's not
+        Validate that name is the correct length if provided, fail if it is not
         :param module: the module to validate
         :return: none
         """

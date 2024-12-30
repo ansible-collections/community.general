@@ -10,63 +10,60 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: udm_dns_record
 author:
-    - Tobias Rüetschi (@keachi)
-short_description: Manage dns entries on a univention corporate server
+  - Tobias Rüetschi (@keachi)
+short_description: Manage DNS entries on a univention corporate server
 description:
-    - "This module allows to manage dns records on a univention corporate server (UCS).
-       It uses the python API of the UCS to create a new object or edit it."
+  - This module allows to manage DNS records on a univention corporate server (UCS). It uses the Python API of the UCS to create a new object
+    or edit it.
 requirements:
-    - Univention
-    - ipaddress (for O(type=ptr_record))
+  - Univention
+  - ipaddress (for O(type=ptr_record))
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: partial
+  check_mode:
+    support: full
+  diff_mode:
+    support: partial
 options:
-    state:
-        type: str
-        default: "present"
-        choices: [ present, absent ]
-        description:
-            - Whether the dns record is present or not.
-    name:
-        type: str
-        required: true
-        description:
-            - "Name of the record, this is also the DNS record. E.g. www for
-               www.example.com."
-            - For PTR records this has to be the IP address.
-    zone:
-        type: str
-        required: true
-        description:
-            - Corresponding DNS zone for this record, e.g. example.com.
-            - For PTR records this has to be the full reverse zone (for example V(1.1.192.in-addr.arpa)).
-    type:
-        type: str
-        required: true
-        description:
-            - "Define the record type. V(host_record) is a A or AAAA record,
-               V(alias) is a CNAME, V(ptr_record) is a PTR record, V(srv_record)
-               is a SRV record and V(txt_record) is a TXT record."
-            - "The available choices are: V(host_record), V(alias), V(ptr_record), V(srv_record), V(txt_record)."
-    data:
-        type: dict
-        default: {}
-        description:
-            - "Additional data for this record, for example V({'a': '192.0.2.1'})."
-            - Required if O(state=present).
-'''
+  state:
+    type: str
+    default: "present"
+    choices: [present, absent]
+    description:
+      - Whether the DNS record is present or not.
+  name:
+    type: str
+    required: true
+    description:
+      - Name of the record, this is also the DNS record. For example V(www) for www.example.com.
+      - For PTR records this has to be the IP address.
+  zone:
+    type: str
+    required: true
+    description:
+      - Corresponding DNS zone for this record, for example V(example.com).
+      - For PTR records this has to be the full reverse zone (for example V(1.1.192.in-addr.arpa)).
+  type:
+    type: str
+    required: true
+    description:
+      - Define the record type. V(host_record) is a A or AAAA record, V(alias) is a CNAME, V(ptr_record) is a PTR record, V(srv_record) is a SRV
+        record and V(txt_record) is a TXT record.
+      - 'The available choices are: V(host_record), V(alias), V(ptr_record), V(srv_record), V(txt_record).'
+  data:
+    type: dict
+    default: {}
+    description:
+      - "Additional data for this record, for example V({'a': '192.0.2.1'})."
+      - Required if O(state=present).
+"""
 
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a DNS record on a UCS
   community.general.udm_dns_record:
     name: www
@@ -74,8 +71,8 @@ EXAMPLES = '''
     type: host_record
     data:
       a:
-         - 192.0.2.1
-         - 2001:0db8::42
+        - 192.0.2.1
+        - 2001:0db8::42
 
 - name: Create a DNS v4 PTR record on a UCS
   community.general.udm_dns_record:
@@ -92,10 +89,10 @@ EXAMPLES = '''
     type: ptr_record
     data:
       ptr_record: "www.example.com."
-'''
+"""
 
 
-RETURN = '''#'''
+RETURN = """#"""
 
 
 from ansible.module_utils.basic import AnsibleModule

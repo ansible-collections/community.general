@@ -9,12 +9,11 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: proxmox_template
 short_description: Management of OS templates in Proxmox VE cluster
 description:
-  - allows you to upload/delete templates in Proxmox VE cluster
+  - Allows you to upload/delete templates in Proxmox VE cluster.
 attributes:
   check_mode:
     support: none
@@ -30,8 +29,14 @@ options:
   src:
     description:
       - Path to uploaded file.
-      - Required only for O(state=present).
+      - Exactly one of O(src) or O(url) is required for O(state=present).
     type: path
+  url:
+    description:
+      - URL to file to download.
+      - Exactly one of O(src) or O(url) is required for O(state=present).
+    type: str
+    version_added: 10.1.0
   template:
     description:
       - The template name.
@@ -62,7 +67,7 @@ options:
     default: false
   state:
     description:
-     - Indicate desired state of the template.
+      - Indicate desired state of the template.
     type: str
     choices: ['present', 'absent']
     default: present
@@ -74,9 +79,9 @@ extends_documentation_fragment:
   - community.general.proxmox.actiongroup_proxmox
   - community.general.proxmox.documentation
   - community.general.attributes
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Upload new openvz template with minimal options
   community.general.proxmox_template:
     node: uk-mc02
@@ -84,6 +89,14 @@ EXAMPLES = '''
     api_password: 1q2w3e
     api_host: node1
     src: ~/ubuntu-14.04-x86_64.tar.gz
+
+- name: Pull new openvz template with minimal options
+  community.general.proxmox_template:
+    node: uk-mc02
+    api_user: root@pam
+    api_password: 1q2w3e
+    api_host: node1
+    url: https://ubuntu-mirror/ubuntu-14.04-x86_64.tar.gz
 
 - name: >
     Upload new openvz template with minimal options use environment
@@ -105,6 +118,17 @@ EXAMPLES = '''
     src: ~/ubuntu-14.04-x86_64.tar.gz
     force: true
 
+- name: Pull new openvz template with all options and force overwrite
+  community.general.proxmox_template:
+    node: uk-mc02
+    api_user: root@pam
+    api_password: 1q2w3e
+    api_host: node1
+    storage: local
+    content_type: vztmpl
+    url: https://ubuntu-mirror/ubuntu-14.04-x86_64.tar.gz
+    force: true
+
 - name: Delete template with minimal options
   community.general.proxmox_template:
     node: uk-mc02
@@ -123,7 +147,7 @@ EXAMPLES = '''
     storage: local
     content_type: vztmpl
     template: ubuntu-20.04-standard_20.04-1_amd64.tar.gz
-'''
+"""
 
 import os
 import time
@@ -132,6 +156,7 @@ import traceback
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.community.general.plugins.module_utils.proxmox import (proxmox_auth_argument_spec, ProxmoxAnsible)
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+from ansible.module_utils.six.moves.urllib.parse import urlparse
 
 REQUESTS_TOOLBELT_ERR = None
 try:
@@ -161,7 +186,7 @@ class ProxmoxTemplateAnsible(ProxmoxAnsible):
             timeout = timeout - 1
             if timeout == 0:
                 self.module.fail_json(msg='Reached timeout while waiting for uploading/downloading template. Last line in task before timeout: %s' %
-                                      self.proxmox_api.node(node).tasks(taskid).log.get()[:1])
+                                      self.proxmox_api.nodes(node).tasks(taskid).log.get()[:1])
 
             time.sleep(1)
         return False
@@ -178,6 +203,17 @@ class ProxmoxTemplateAnsible(ProxmoxAnsible):
             return self.task_status(node, taskid, timeout)
         except Exception as e:
             self.module.fail_json(msg="Uploading template %s failed with error: %s" % (realpath, e))
+
+    def fetch_template(self, node, storage, content_type, url, timeout):
+        """Fetch a template from a web url source using the proxmox download-url endpoint
+        """
+        try:
+            taskid = self.proxmox_api.nodes(node).storage(storage)("download-url").post(
+                url=url, content=content_type, filename=os.path.basename(url)
+            )
+            return self.task_status(node, taskid, timeout)
+        except Exception as e:
+            self.module.fail_json(msg="Fetching template from url %s failed with error: %s" % (url, e))
 
     def download_template(self, node, storage, template, timeout):
         try:
@@ -205,6 +241,7 @@ def main():
     template_args = dict(
         node=dict(),
         src=dict(type='path'),
+        url=dict(),
         template=dict(),
         content_type=dict(default='vztmpl', choices=['vztmpl', 'iso']),
         storage=dict(default='local'),
@@ -218,7 +255,8 @@ def main():
         argument_spec=module_args,
         required_together=[('api_token_id', 'api_token_secret')],
         required_one_of=[('api_password', 'api_token_id')],
-        required_if=[('state', 'absent', ['template'])]
+        required_if=[('state', 'absent', ['template'])],
+        mutually_exclusive=[("src", "url")],
     )
 
     proxmox = ProxmoxTemplateAnsible(module)
@@ -231,9 +269,10 @@ def main():
     if state == 'present':
         content_type = module.params['content_type']
         src = module.params['src']
+        url = module.params['url']
 
         # download appliance template
-        if content_type == 'vztmpl' and not src:
+        if content_type == 'vztmpl' and not (src or url) :
             template = module.params['template']
 
             if not template:
@@ -245,16 +284,27 @@ def main():
             if proxmox.download_template(node, storage, template, timeout):
                 module.exit_json(changed=True, msg='template with volid=%s:%s/%s downloaded' % (storage, content_type, template))
 
-        template = os.path.basename(src)
-        if proxmox.has_template(node, storage, content_type, template) and not module.params['force']:
-            module.exit_json(changed=False, msg='template with volid=%s:%s/%s is already exists' % (storage, content_type, template))
-        elif not src:
-            module.fail_json(msg='src param to uploading template file is mandatory')
-        elif not (os.path.exists(src) and os.path.isfile(src)):
-            module.fail_json(msg='template file on path %s not exists' % src)
+        if not src and not url:
+            module.fail_json(msg='src or url param for uploading template file is mandatory')
+        elif not url:
+            template = os.path.basename(src)
+            if proxmox.has_template(node, storage, content_type, template) and not module.params['force']:
+                module.exit_json(changed=False, msg='template with volid=%s:%s/%s already exists' % (storage, content_type, template))
+            elif not (os.path.exists(src) and os.path.isfile(src)):
+                module.fail_json(msg='template file on path %s not exists' % src)
 
-        if proxmox.upload_template(node, storage, content_type, src, timeout):
-            module.exit_json(changed=True, msg='template with volid=%s:%s/%s uploaded' % (storage, content_type, template))
+            if proxmox.upload_template(node, storage, content_type, src, timeout):
+                module.exit_json(changed=True, msg='template with volid=%s:%s/%s uploaded' % (storage, content_type, template))
+        elif not src:
+            template = os.path.basename(urlparse(url).path)
+            if proxmox.has_template(node, storage, content_type, template):
+                if not module.params['force']:
+                    module.exit_json(changed=False, msg='template with volid=%s:%s/%s already exists' % (storage, content_type, template))
+                elif not proxmox.delete_template(node, storage, content_type, template, timeout):
+                    module.fail_json(changed=False, msg='failed to delete template with volid=%s:%s/%s' % (storage, content_type, template))
+
+            if proxmox.fetch_template(node, storage, content_type, url, timeout):
+                module.exit_json(changed=True, msg='template with volid=%s:%s/%s uploaded' % (storage, content_type, template))
 
     elif state == 'absent':
         try:

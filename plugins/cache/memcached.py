@@ -7,46 +7,46 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    author: Unknown (!UNKNOWN)
-    name: memcached
-    short_description: Use memcached DB for cache
+DOCUMENTATION = r"""
+author: Unknown (!UNKNOWN)
+name: memcached
+short_description: Use memcached DB for cache
+description:
+  - This cache uses JSON formatted, per host records saved in memcached.
+requirements:
+  - memcache (python lib)
+options:
+  _uri:
     description:
-        - This cache uses JSON formatted, per host records saved in memcached.
-    requirements:
-      - memcache (python lib)
-    options:
-      _uri:
-        description:
-          - List of connection information for the memcached DBs
-        default: ['127.0.0.1:11211']
-        type: list
-        elements: string
-        env:
-          - name: ANSIBLE_CACHE_PLUGIN_CONNECTION
-        ini:
-          - key: fact_caching_connection
-            section: defaults
-      _prefix:
-        description: User defined prefix to use when creating the DB entries
-        type: string
-        default: ansible_facts
-        env:
-          - name: ANSIBLE_CACHE_PLUGIN_PREFIX
-        ini:
-          - key: fact_caching_prefix
-            section: defaults
-      _timeout:
-        default: 86400
-        type: integer
+      - List of connection information for the memcached DBs.
+    default: ['127.0.0.1:11211']
+    type: list
+    elements: string
+    env:
+      - name: ANSIBLE_CACHE_PLUGIN_CONNECTION
+    ini:
+      - key: fact_caching_connection
+        section: defaults
+  _prefix:
+    description: User defined prefix to use when creating the DB entries.
+    type: string
+    default: ansible_facts
+    env:
+      - name: ANSIBLE_CACHE_PLUGIN_PREFIX
+    ini:
+      - key: fact_caching_prefix
+        section: defaults
+  _timeout:
+    default: 86400
+    type: integer
         # TODO: determine whether it is OK to change to: type: float
-        description: Expiration timeout in seconds for the cache plugin data. Set to 0 to never expire
-        env:
-          - name: ANSIBLE_CACHE_PLUGIN_TIMEOUT
-        ini:
-          - key: fact_caching_timeout
-            section: defaults
-'''
+    description: Expiration timeout in seconds for the cache plugin data. Set to 0 to never expire.
+    env:
+      - name: ANSIBLE_CACHE_PLUGIN_TIMEOUT
+    ini:
+      - key: fact_caching_timeout
+        section: defaults
+"""
 
 import collections
 import os
@@ -191,7 +191,7 @@ class CacheModule(BaseCacheModule):
         self._keys = CacheModuleKeys(self._db, self._db.get(CacheModuleKeys.PREFIX) or [])
 
     def _make_key(self, key):
-        return "{0}{1}".format(self._prefix, key)
+        return f"{self._prefix}{key}"
 
     def _expire_keys(self):
         if self._timeout > 0:

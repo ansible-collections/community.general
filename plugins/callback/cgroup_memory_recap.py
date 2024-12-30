@@ -7,40 +7,41 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    author: Unknown (!UNKNOWN)
-    name: cgroup_memory_recap
-    type: aggregate
-    requirements:
-      - whitelist in configuration
-      - cgroups
-    short_description: Profiles maximum memory usage of tasks and full execution using cgroups
-    description:
-        - This is an ansible callback plugin that profiles maximum memory usage of ansible and individual tasks, and displays a recap at the end using cgroups.
-    notes:
-        - Requires ansible to be run from within a cgroup, such as with C(cgexec -g memory:ansible_profile ansible-playbook ...).
-        - This cgroup should only be used by ansible to get accurate results.
-        - To create the cgroup, first use a command such as C(sudo cgcreate -a ec2-user:ec2-user -t ec2-user:ec2-user -g memory:ansible_profile).
-    options:
-      max_mem_file:
-        required: true
-        description: Path to cgroups C(memory.max_usage_in_bytes) file. Example V(/sys/fs/cgroup/memory/ansible_profile/memory.max_usage_in_bytes).
-        type: str
-        env:
-          - name: CGROUP_MAX_MEM_FILE
-        ini:
-          - section: callback_cgroupmemrecap
-            key: max_mem_file
-      cur_mem_file:
-        required: true
-        description: Path to C(memory.usage_in_bytes) file. Example V(/sys/fs/cgroup/memory/ansible_profile/memory.usage_in_bytes).
-        type: str
-        env:
-          - name: CGROUP_CUR_MEM_FILE
-        ini:
-          - section: callback_cgroupmemrecap
-            key: cur_mem_file
-'''
+DOCUMENTATION = r"""
+author: Unknown (!UNKNOWN)
+name: cgroup_memory_recap
+type: aggregate
+requirements:
+  - whitelist in configuration
+  - cgroups
+short_description: Profiles maximum memory usage of tasks and full execution using cgroups
+description:
+  - This is an Ansible callback plugin that profiles maximum memory usage of Ansible and individual tasks, and displays a
+    recap at the end using cgroups.
+notes:
+  - Requires ansible to be run from within a C(cgroup), such as with C(cgexec -g memory:ansible_profile ansible-playbook ...).
+  - This C(cgroup) should only be used by Ansible to get accurate results.
+  - To create the C(cgroup), first use a command such as C(sudo cgcreate -a ec2-user:ec2-user -t ec2-user:ec2-user -g memory:ansible_profile).
+options:
+  max_mem_file:
+    required: true
+    description: Path to cgroups C(memory.max_usage_in_bytes) file. Example V(/sys/fs/cgroup/memory/ansible_profile/memory.max_usage_in_bytes).
+    type: str
+    env:
+      - name: CGROUP_MAX_MEM_FILE
+    ini:
+      - section: callback_cgroupmemrecap
+        key: max_mem_file
+  cur_mem_file:
+    required: true
+    description: Path to C(memory.usage_in_bytes) file. Example V(/sys/fs/cgroup/memory/ansible_profile/memory.usage_in_bytes).
+    type: str
+    env:
+      - name: CGROUP_CUR_MEM_FILE
+    ini:
+      - section: callback_cgroupmemrecap
+        key: cur_mem_file
+"""
 
 import time
 import threading
@@ -114,7 +115,7 @@ class CallbackModule(CallbackBase):
             max_results = int(f.read().strip()) / 1024 / 1024
 
         self._display.banner('CGROUP MEMORY RECAP')
-        self._display.display('Execution Maximum: %0.2fMB\n\n' % max_results)
+        self._display.display(f'Execution Maximum: {max_results:0.2f}MB\n\n')
 
         for task, memory in self.task_results:
-            self._display.display('%s (%s): %0.2fMB' % (task.get_name(), task._uuid, memory))
+            self._display.display(f'{task.get_name()} ({task._uuid}): {memory:0.2f}MB')

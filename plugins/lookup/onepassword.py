@@ -140,11 +140,11 @@ class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
         if missing:
             prefix = "Unable to sign in to 1Password. Missing required parameter"
             plural = ""
-            suffix = ": {params}.".format(params=", ".join(missing))
+            suffix = f": {', '.join(missing)}."
             if len(missing) > 1:
                 plural = "s"
 
-            msg = "{prefix}{plural}{suffix}".format(prefix=prefix, plural=plural, suffix=suffix)
+            msg = f"{prefix}{plural}{suffix}"
             raise AnsibleLookupError(msg)
 
     @abc.abstractmethod
@@ -169,7 +169,7 @@ class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
         rc = p.wait()
 
         if not ignore_errors and rc != expected_rc:
-            raise AnsibleLookupError(to_text(err))
+            raise AnsibleLookupError(str(err))
 
         return rc, out, err
 
@@ -210,12 +210,12 @@ class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
         try:
             bin_path = get_bin_path(cls.bin)
         except ValueError:
-            raise AnsibleLookupError("Unable to locate '%s' command line tool" % cls.bin)
+            raise AnsibleLookupError(f"Unable to locate '{cls.bin}' command line tool")
 
         try:
             b_out = subprocess.check_output([bin_path, "--version"], stderr=subprocess.PIPE)
         except subprocess.CalledProcessError as cpe:
-            raise AnsibleLookupError("Unable to get the op version: %s" % cpe)
+            raise AnsibleLookupError(f"Unable to get the op version: {cpe}")
 
         return to_text(b_out).strip()
 
@@ -300,7 +300,7 @@ class OnePassCLIv1(OnePassCLIBase):
         if self.account_id:
             args.extend(["--account", self.account_id])
         elif self.subdomain:
-            account = "{subdomain}.{domain}".format(subdomain=self.subdomain, domain=self.domain)
+            account = f"{self.subdomain}.{self.domain}"
             args.extend(["--account", account])
 
         rc, out, err = self._run(args, ignore_errors=True)
@@ -326,7 +326,7 @@ class OnePassCLIv1(OnePassCLIBase):
 
         args = [
             "signin",
-            "{0}.{1}".format(self.subdomain, self.domain),
+            f"{self.subdomain}.{self.domain}",
             to_bytes(self.username),
             to_bytes(self.secret_key),
             "--raw",
@@ -341,7 +341,7 @@ class OnePassCLIv1(OnePassCLIBase):
             args.extend(["--account", self.account_id])
 
         if vault is not None:
-            args += ["--vault={0}".format(vault)]
+            args += [f"--vault={vault}"]
 
         if token is not None:
             args += [to_bytes("--session=") + token]
@@ -512,7 +512,7 @@ class OnePassCLIv2(OnePassCLIBase):
 
         args = ["account", "list"]
         if self.subdomain:
-            account = "{subdomain}.{domain}".format(subdomain=self.subdomain, domain=self.domain)
+            account = f"{self.subdomain}.{self.domain}"
             args.extend(["--account", account])
 
         rc, out, err = self._run(args)
@@ -525,7 +525,7 @@ class OnePassCLIv2(OnePassCLIBase):
             if self.account_id:
                 args.extend(["--account", self.account_id])
             elif self.subdomain:
-                account = "{subdomain}.{domain}".format(subdomain=self.subdomain, domain=self.domain)
+                account = f"{self.subdomain}.{self.domain}"
                 args.extend(["--account", account])
 
             rc, out, err = self._run(args, ignore_errors=True)
@@ -545,7 +545,7 @@ class OnePassCLIv2(OnePassCLIBase):
 
         args = [
             "account", "add", "--raw",
-            "--address", "{0}.{1}".format(self.subdomain, self.domain),
+            "--address", f"{self.subdomain}.{self.domain}",
             "--email", to_bytes(self.username),
             "--signin",
         ]
@@ -560,7 +560,7 @@ class OnePassCLIv2(OnePassCLIBase):
             args.extend(["--account", self.account_id])
 
         if vault is not None:
-            args += ["--vault={0}".format(vault)]
+            args += [f"--vault={vault}"]
 
         if self.connect_host and self.connect_token:
             if vault is None:
@@ -627,7 +627,7 @@ class OnePass(object):
                 except TypeError as e:
                     raise AnsibleLookupError(e)
 
-        raise AnsibleLookupError("op version %s is unsupported" % version)
+        raise AnsibleLookupError(f"op version {version} is unsupported")
 
     def set_token(self):
         if self._config.config_file_path and os.path.isfile(self._config.config_file_path):

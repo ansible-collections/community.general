@@ -57,6 +57,7 @@
   assert:
     that:
       - install_tox is changed
+      - "'version' in install_tox"
       - "'tox' in install_tox.application"
       - install_tox_again is not changed
       - install_tox_again_force is changed
@@ -263,3 +264,6 @@
 
     - name: Include testcase for PR 9009 injectpkg --global
       ansible.builtin.include_tasks: testcase-9009-fixglobal.yml
+
+    - name: Include testcase for PR 9103 upgrade --global
+      ansible.builtin.include_tasks: testcase-9103-upgrade-global.yml

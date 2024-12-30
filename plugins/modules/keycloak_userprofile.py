@@ -8,275 +8,274 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: keycloak_userprofile
 
 short_description: Allows managing Keycloak User Profiles
 
 description:
-  - This module allows you to create, update, or delete Keycloak User Profiles via Keycloak API. You can also customize the "Unmanaged Attributes" with it.
-
-  - The names of module options are snake_cased versions of the camelCase ones found in the
-    Keycloak API and its documentation at U(https://www.keycloak.org/docs-api/24.0.5/rest-api/index.html).
+  - This module allows you to create, update, or delete Keycloak User Profiles using the Keycloak API. You can also customize the "Unmanaged Attributes"
+    with it.
+  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation at
+    U(https://www.keycloak.org/docs-api/24.0.5/rest-api/index.html).
     For compatibility reasons, the module also accepts the camelCase versions of the options.
-
 version_added: "9.4.0"
 
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: full
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
+  action_group:
+    version_added: 10.2.0
 
 options:
-    state:
-        description:
-            - State of the User Profile provider.
-            - On V(present), the User Profile provider will be created if it does not yet exist, or updated with
-              the parameters you provide.
-            - On V(absent), the User Profile provider will be removed if it exists.
-        default: 'present'
-        type: str
-        choices:
-            - present
-            - absent
+  state:
+    description:
+      - State of the User Profile provider.
+      - On V(present), the User Profile provider will be created if it does not yet exist, or updated with the parameters you provide.
+      - On V(absent), the User Profile provider will be removed if it exists.
+    default: 'present'
+    type: str
+    choices:
+      - present
+      - absent
 
-    parent_id:
+  parent_id:
+    description:
+      - The parent ID of the realm key. In practice the ID (name) of the realm.
+    aliases:
+      - parentId
+      - realm
+    type: str
+    required: true
+
+  provider_id:
+    description:
+      - The name of the provider ID for the key (supported value is V(declarative-user-profile)).
+    aliases:
+      - providerId
+    choices: ['declarative-user-profile']
+    default: 'declarative-user-profile'
+    type: str
+
+  provider_type:
+    description:
+      - Component type for User Profile (only supported value is V(org.keycloak.userprofile.UserProfileProvider)).
+    aliases:
+      - providerType
+    choices: ['org.keycloak.userprofile.UserProfileProvider']
+    default: org.keycloak.userprofile.UserProfileProvider
+    type: str
+
+  config:
+    description:
+      - The configuration of the User Profile Provider.
+    type: dict
+    required: false
+    suboptions:
+      kc_user_profile_config:
         description:
-            - The parent ID of the realm key. In practice the ID (name) of the realm.
+          - Define a declarative User Profile. See EXAMPLES for more context.
         aliases:
-            - parentId
-            - realm
-        type: str
-        required: true
-
-    provider_id:
-        description:
-            - The name of the provider ID for the key (supported value is V(declarative-user-profile)).
-        aliases:
-            - providerId
-        choices: ['declarative-user-profile']
-        default: 'declarative-user-profile'
-        type: str
-
-    provider_type:
-        description:
-            - Component type for User Profile (only supported value is V(org.keycloak.userprofile.UserProfileProvider)).
-        aliases:
-            - providerType
-        choices: ['org.keycloak.userprofile.UserProfileProvider']
-        default: org.keycloak.userprofile.UserProfileProvider
-        type: str
-
-    config:
-        description:
-            - The configuration of the User Profile Provider.
-        type: dict
-        required: false
+          - kcUserProfileConfig
+        type: list
+        elements: dict
         suboptions:
-            kc_user_profile_config:
+          attributes:
+            description:
+              - A list of attributes to be included in the User Profile.
+            type: list
+            elements: dict
+            suboptions:
+              name:
                 description:
-                    - Define a declarative User Profile. See EXAMPLES for more context.
+                  - The name of the attribute.
+                type: str
+                required: true
+
+              display_name:
+                description:
+                  - The display name of the attribute.
                 aliases:
-                    - kcUserProfileConfig
-                type: list
-                elements: dict
+                  - displayName
+                type: str
+                required: true
+
+              validations:
+                description:
+                  - The validations to be applied to the attribute.
+                type: dict
                 suboptions:
-                    attributes:
+                  length:
+                    description:
+                      - The length validation for the attribute.
+                    type: dict
+                    suboptions:
+                      min:
                         description:
-                            - A list of attributes to be included in the User Profile.
-                        type: list
-                        elements: dict
-                        suboptions:
-                            name:
-                                description:
-                                    - The name of the attribute.
-                                type: str
-                                required: true
-
-                            display_name:
-                                description:
-                                    - The display name of the attribute.
-                                aliases:
-                                  - displayName
-                                type: str
-                                required: true
-
-                            validations:
-                                description:
-                                    - The validations to be applied to the attribute.
-                                type: dict
-                                suboptions:
-                                    length:
-                                        description:
-                                            - The length validation for the attribute.
-                                        type: dict
-                                        suboptions:
-                                            min:
-                                                description:
-                                                    - The minimum length of the attribute.
-                                                type: int
-                                            max:
-                                                description:
-                                                    - The maximum length of the attribute.
-                                                type: int
-                                                required: true
-
-                                    email:
-                                        description:
-                                            - The email validation for the attribute.
-                                        type: dict
-
-                                    username_prohibited_characters:
-                                        description:
-                                            - The prohibited characters validation for the username attribute.
-                                        type: dict
-                                        aliases:
-                                            - usernameProhibitedCharacters
-
-                                    up_username_not_idn_homograph:
-                                        description:
-                                            - The validation to prevent IDN homograph attacks in usernames.
-                                        type: dict
-                                        aliases:
-                                            - upUsernameNotIdnHomograph
-
-                                    person_name_prohibited_characters:
-                                        description:
-                                            - The prohibited characters validation for person name attributes.
-                                        type: dict
-                                        aliases:
-                                            - personNameProhibitedCharacters
-
-                                    uri:
-                                        description:
-                                            - The URI validation for the attribute.
-                                        type: dict
-
-                                    pattern:
-                                        description:
-                                            - The pattern validation for the attribute using regular expressions.
-                                        type: dict
-
-                                    options:
-                                        description:
-                                            - Validation to ensure the attribute matches one of the provided options.
-                                        type: dict
-
-                            annotations:
-                                description:
-                                    - Annotations for the attribute.
-                                type: dict
-
-                            group:
-                                description:
-                                    - Specifies the User Profile group where this attribute will be added.
-                                type: str
-
-                            permissions:
-                                description:
-                                    - The permissions for viewing and editing the attribute.
-                                type: dict
-                                suboptions:
-                                    view:
-                                        description:
-                                            - The roles that can view the attribute.
-                                            - Supported values are V(admin) and V(user).
-                                        type: list
-                                        elements: str
-                                        default:
-                                          - admin
-                                          - user
-
-                                    edit:
-                                        description:
-                                            - The roles that can edit the attribute.
-                                            - Supported values are V(admin) and V(user).
-                                        type: list
-                                        elements: str
-                                        default:
-                                          - admin
-                                          - user
-
-                            multivalued:
-                                description:
-                                    - Whether the attribute can have multiple values.
-                                type: bool
-                                default: false
-
-                            required:
-                                description:
-                                    - The roles that require this attribute.
-                                type: dict
-                                suboptions:
-                                    roles:
-                                        description:
-                                            - The roles for which this attribute is required.
-                                            - Supported values are V(admin) and V(user).
-                                        type: list
-                                        elements: str
-                                        default:
-                                          - user
-
-                    groups:
+                          - The minimum length of the attribute.
+                        type: int
+                      max:
                         description:
-                            - A list of attribute groups to be included in the User Profile.
-                        type: list
-                        elements: dict
-                        suboptions:
-                            name:
-                                description:
-                                    - The name of the group.
-                                type: str
-                                required: true
+                          - The maximum length of the attribute.
+                        type: int
+                        required: true
 
-                            display_header:
-                                description:
-                                    - The display header for the group.
-                                aliases:
-                                  - displayHeader
-                                type: str
-                                required: true
+                  email:
+                    description:
+                      - The email validation for the attribute.
+                    type: dict
 
-                            display_description:
-                                description:
-                                    - The display description for the group.
-                                aliases:
-                                  - displayDescription
-                                type: str
-                                required: false
+                  username_prohibited_characters:
+                    description:
+                      - The prohibited characters validation for the username attribute.
+                    type: dict
+                    aliases:
+                      - usernameProhibitedCharacters
 
-                            annotations:
-                                description:
-                                    - The annotations included in the group.
-                                type: dict
-                                required: false
+                  up_username_not_idn_homograph:
+                    description:
+                      - The validation to prevent IDN homograph attacks in usernames.
+                    type: dict
+                    aliases:
+                      - upUsernameNotIdnHomograph
 
-                    unmanaged_attribute_policy:
-                        description:
-                            - Policy for unmanaged attributes.
-                        aliases:
-                          - unmanagedAttributePolicy
-                        type: str
-                        choices:
-                            - ENABLED
-                            - ADMIN_EDIT
-                            - ADMIN_VIEW
+                  person_name_prohibited_characters:
+                    description:
+                      - The prohibited characters validation for person name attributes.
+                    type: dict
+                    aliases:
+                      - personNameProhibitedCharacters
+
+                  uri:
+                    description:
+                      - The URI validation for the attribute.
+                    type: dict
+
+                  pattern:
+                    description:
+                      - The pattern validation for the attribute using regular expressions.
+                    type: dict
+
+                  options:
+                    description:
+                      - Validation to ensure the attribute matches one of the provided options.
+                    type: dict
+
+              annotations:
+                description:
+                  - Annotations for the attribute.
+                type: dict
+
+              group:
+                description:
+                  - Specifies the User Profile group where this attribute will be added.
+                type: str
+
+              permissions:
+                description:
+                  - The permissions for viewing and editing the attribute.
+                type: dict
+                suboptions:
+                  view:
+                    description:
+                      - The roles that can view the attribute.
+                      - Supported values are V(admin) and V(user).
+                    type: list
+                    elements: str
+                    default:
+                      - admin
+                      - user
+
+                  edit:
+                    description:
+                      - The roles that can edit the attribute.
+                      - Supported values are V(admin) and V(user).
+                    type: list
+                    elements: str
+                    default:
+                      - admin
+                      - user
+
+              multivalued:
+                description:
+                  - Whether the attribute can have multiple values.
+                type: bool
+                default: false
+
+              required:
+                description:
+                  - The roles that require this attribute.
+                type: dict
+                suboptions:
+                  roles:
+                    description:
+                      - The roles for which this attribute is required.
+                      - Supported values are V(admin) and V(user).
+                    type: list
+                    elements: str
+                    default:
+                      - user
+
+          groups:
+            description:
+              - A list of attribute groups to be included in the User Profile.
+            type: list
+            elements: dict
+            suboptions:
+              name:
+                description:
+                  - The name of the group.
+                type: str
+                required: true
+
+              display_header:
+                description:
+                  - The display header for the group.
+                aliases:
+                  - displayHeader
+                type: str
+                required: true
+
+              display_description:
+                description:
+                  - The display description for the group.
+                aliases:
+                  - displayDescription
+                type: str
+                required: false
+
+              annotations:
+                description:
+                  - The annotations included in the group.
+                type: dict
+                required: false
+
+          unmanaged_attribute_policy:
+            description:
+              - Policy for unmanaged attributes.
+            aliases:
+              - unmanagedAttributePolicy
+            type: str
+            choices:
+              - ENABLED
+              - ADMIN_EDIT
+              - ADMIN_VIEW
 
 notes:
-    - Currently, only a single V(declarative-user-profile) entry is supported for O(provider_id) (design of the Keyckoak API).
-      However, there can be multiple O(config.kc_user_profile_config[].attributes[]) entries.
-
+  - Currently, only a single V(declarative-user-profile) entry is supported for O(provider_id) (design of the Keyckoak API). However, there can
+    be multiple O(config.kc_user_profile_config[].attributes[]) entries.
 extends_documentation_fragment:
-    - community.general.keycloak
-    - community.general.attributes
+  - community.general.keycloak
+  - community.general.keycloak.actiongroup_keycloak
+  - community.general.attributes
 
 author:
   - Eike Waldt (@yeoldegrove)
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a Declarative User Profile with default settings
   community.general.keycloak_userprofile:
     state: present
@@ -394,9 +393,9 @@ EXAMPLES = '''
     config:
       kc_user_profile_config:
         - unmanagedAttributePolicy: ADMIN_VIEW
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 msg:
   description: The output message generated by the module.
   returned: always
@@ -406,8 +405,8 @@ data:
   description: The data returned by the Keycloak API.
   returned: when state is present
   type: dict
-  sample: {...}
-'''
+  sample: {'...': '...'}
+"""
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
     keycloak_argument_spec, get_token, KeycloakError
@@ -425,7 +424,7 @@ def remove_null_values(data):
         # Recursively remove null values from lists
         return [remove_null_values(item) for item in data if item is not None]
     else:
-        # Return the data if it's neither a dictionary nor a list
+        # Return the data if it is neither a dictionary nor a list
         return data
 
 
@@ -437,7 +436,7 @@ def camel_recursive(data):
         # Apply camelCase conversion to each item in the list
         return [camel_recursive(item) for item in data]
     else:
-        # Return the data as is if it's not a dict or list
+        # Return the data as-is if it is not a dict or list
         return data
 
 

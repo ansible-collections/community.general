@@ -8,47 +8,47 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = """
-    author: Stéphane Graber (@stgraber)
-    name: incus
-    short_description: Run tasks in Incus instances via the Incus CLI.
+DOCUMENTATION = r"""
+author: Stéphane Graber (@stgraber)
+name: incus
+short_description: Run tasks in Incus instances using the Incus CLI
+description:
+  - Run commands or put/fetch files to an existing Incus instance using Incus CLI.
+version_added: "8.2.0"
+options:
+  remote_addr:
     description:
-        - Run commands or put/fetch files to an existing Incus instance using Incus CLI.
-    version_added: "8.2.0"
-    options:
-      remote_addr:
-        description:
-            - The instance identifier.
-        type: string
-        default: inventory_hostname
-        vars:
-            - name: inventory_hostname
-            - name: ansible_host
-            - name: ansible_incus_host
-      executable:
-        description:
-            - The shell to use for execution inside the instance.
-        type: string
-        default: /bin/sh
-        vars:
-            - name: ansible_executable
-            - name: ansible_incus_executable
-      remote:
-        description:
-            - The name of the Incus remote to use (per C(incus remote list)).
-            - Remotes are used to access multiple servers from a single client.
-        type: string
-        default: local
-        vars:
-            - name: ansible_incus_remote
-      project:
-        description:
-            - The name of the Incus project to use (per C(incus project list)).
-            - Projects are used to divide the instances running on a server.
-        type: string
-        default: default
-        vars:
-            - name: ansible_incus_project
+      - The instance identifier.
+    type: string
+    default: inventory_hostname
+    vars:
+      - name: inventory_hostname
+      - name: ansible_host
+      - name: ansible_incus_host
+  executable:
+    description:
+      - The shell to use for execution inside the instance.
+    type: string
+    default: /bin/sh
+    vars:
+      - name: ansible_executable
+      - name: ansible_incus_executable
+  remote:
+    description:
+      - The name of the Incus remote to use (per C(incus remote list)).
+      - Remotes are used to access multiple servers from a single client.
+    type: string
+    default: local
+    vars:
+      - name: ansible_incus_remote
+  project:
+    description:
+      - The name of the Incus project to use (per C(incus project list)).
+      - Projects are used to divide the instances running on a server.
+    type: string
+    default: default
+    vars:
+      - name: ansible_incus_project
 """
 
 import os
@@ -80,7 +80,7 @@ class Connection(ConnectionBase):
         super(Connection, self)._connect()
 
         if not self._connected:
-            self._display.vvv(u"ESTABLISH Incus CONNECTION FOR USER: root",
+            self._display.vvv("ESTABLISH Incus CONNECTION FOR USER: root",
                               host=self._instance())
             self._connected = True
 
@@ -93,14 +93,14 @@ class Connection(ConnectionBase):
         """ execute a command on the Incus host """
         super(Connection, self).exec_command(cmd, in_data=in_data, sudoable=sudoable)
 
-        self._display.vvv(u"EXEC {0}".format(cmd),
+        self._display.vvv(f"EXEC {cmd}",
                           host=self._instance())
 
         local_cmd = [
             self._incus_cmd,
             "--project", self.get_option("project"),
             "exec",
-            "%s:%s" % (self.get_option("remote"), self._instance()),
+            f"{self.get_option('remote')}:{self._instance()}",
             "--",
             self._play_context.executable, "-c", cmd]
 
@@ -114,12 +114,10 @@ class Connection(ConnectionBase):
         stderr = to_text(stderr)
 
         if stderr == "Error: Instance is not running.\n":
-            raise AnsibleConnectionFailure("instance not running: %s" %
-                                           self._instance())
+            raise AnsibleConnectionFailure(f"instance not running: {self._instance()}")
 
         if stderr == "Error: Instance not found\n":
-            raise AnsibleConnectionFailure("instance not found: %s" %
-                                           self._instance())
+            raise AnsibleConnectionFailure(f"instance not found: {self._instance()}")
 
         return process.returncode, stdout, stderr
 
@@ -127,20 +125,18 @@ class Connection(ConnectionBase):
         """ put a file from local to Incus """
         super(Connection, self).put_file(in_path, out_path)
 
-        self._display.vvv(u"PUT {0} TO {1}".format(in_path, out_path),
+        self._display.vvv(f"PUT {in_path} TO {out_path}",
                           host=self._instance())
 
         if not os.path.isfile(to_bytes(in_path, errors='surrogate_or_strict')):
-            raise AnsibleFileNotFound("input path is not a file: %s" % in_path)
+            raise AnsibleFileNotFound(f"input path is not a file: {in_path}")
 
         local_cmd = [
             self._incus_cmd,
             "--project", self.get_option("project"),
             "file", "push", "--quiet",
             in_path,
-            "%s:%s/%s" % (self.get_option("remote"),
-                          self._instance(),
-                          out_path)]
+            f"{self.get_option('remote')}:{self._instance()}/{out_path}"]
 
         local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
 
@@ -150,16 +146,14 @@ class Connection(ConnectionBase):
         """ fetch a file from Incus to local """
         super(Connection, self).fetch_file(in_path, out_path)
 
-        self._display.vvv(u"FETCH {0} TO {1}".format(in_path, out_path),
+        self._display.vvv(f"FETCH {in_path} TO {out_path}",
                           host=self._instance())
 
         local_cmd = [
             self._incus_cmd,
             "--project", self.get_option("project"),
             "file", "pull", "--quiet",
-            "%s:%s/%s" % (self.get_option("remote"),
-                          self._instance(),
-                          in_path),
+            f"{self.get_option('remote')}:{self._instance()}/{in_path}",
             out_path]
 
         local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]

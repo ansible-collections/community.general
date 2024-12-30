@@ -7,9 +7,9 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: gitlab_label
-short_description: Creates/updates/deletes GitLab Labels belonging to project or group.
+short_description: Creates/updates/deletes GitLab Labels belonging to project or group
 version_added: 8.3.0
 description:
   - When a label does not exist, it will be created.
@@ -45,12 +45,12 @@ options:
     required: false
   project:
     description:
-      - The path and name of the project.  Either this or O(group) is required.
+      - The path and name of the project. Either this or O(group) is required.
     required: false
     type: str
   group:
     description:
-      - The path of the group.  Either this or O(project) is required.
+      - The path of the group. Either this or O(project) is required.
     required: false
     type: str
   labels:
@@ -76,21 +76,21 @@ options:
           - Integer value to give priority to the label.
         type: int
         required: false
-        default: null
+        default:
       description:
         description:
           - Label's description.
         type: str
-        default: null
+        default:
       new_name:
         description:
           - Optional field to change label's name.
         type: str
-        default: null
-'''
+        default:
+"""
 
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # same project's task can be executed for group
 - name: Create one Label
   community.general.gitlab_label:
@@ -185,9 +185,9 @@ EXAMPLES = '''
     labels:
       - name: label-abc123
       - name: label-two
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 labels:
   description: Four lists of the labels which were added, updated, removed or exist.
   returned: success
@@ -217,7 +217,7 @@ labels_obj:
   description: API object.
   returned: success
   type: dict
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.api import basic_auth_argument_spec
@@ -348,7 +348,7 @@ def native_python_main(this_gitlab, purge, requested_labels, state, module):
         item.pop('description_html')
         item.pop('text_color')
         item.pop('subscribed')
-        # field present only when it's a project's label
+        # field present only when it is a project's label
         if 'is_project_label' in item:
             item.pop('is_project_label')
         item['new_name'] = None
@@ -472,7 +472,7 @@ def main():
     if state == 'present':
         _existing_labels = [x.asdict()['name'] for x in this_gitlab.list_all_labels()]
 
-        # color is mandatory when creating label, but it's optional when changing name or updating other fields
+        # color is mandatory when creating label, but it is optional when changing name or updating other fields
         if any(x['color'] is None and x['new_name'] is None and x['name'] not in _existing_labels for x in label_list):
             module.fail_json(msg='color parameter is required for new labels')
 

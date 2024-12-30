@@ -9,11 +9,11 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: clc_publicip
-short_description: Add and Delete public ips on servers in CenturyLink Cloud
+short_description: Add and Delete public IPs on servers in CenturyLink Cloud
 description:
-  - An Ansible module to add or delete public ip addresses on an existing server or servers in CenturyLink Cloud.
+  - An Ansible module to add or delete public IP addresses on an existing server or servers in CenturyLink Cloud.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -30,19 +30,19 @@ options:
     choices: ['TCP', 'UDP', 'ICMP']
   ports:
     description:
-      - A list of ports to expose. This is required when state is 'present'
+      - A list of ports to expose. This is required when O(state=present).
     type: list
     elements: int
   server_ids:
     description:
-      - A list of servers to create public ips on.
+      - A list of servers to create public IPs on.
     type: list
     required: true
     elements: str
   state:
     description:
-      - Determine whether to create or delete public IPs. If present module will not create a second public ip if one
-        already exists.
+      - Determine whether to create or delete public IPs. If V(present) module will not create a second public IP if one already
+        exists.
     type: str
     default: present
     choices: ['present', 'absent']
@@ -52,23 +52,21 @@ options:
     type: bool
     default: true
 requirements:
-    - python = 2.7
-    - requests >= 2.5.0
-    - clc-sdk
+  - requests >= 2.5.0
+  - clc-sdk
 author: "CLC Runner (@clc-runner)"
 notes:
-    - To use this module, it is required to set the below environment variables which enables access to the
-      Centurylink Cloud
-          - CLC_V2_API_USERNAME, the account login id for the centurylink cloud
-          - CLC_V2_API_PASSWORD, the account password for the centurylink cloud
-    - Alternatively, the module accepts the API token and account alias. The API token can be generated using the
-      CLC account login and password via the HTTP api call @ https://api.ctl.io/v2/authentication/login
-          - CLC_V2_API_TOKEN, the API token generated from https://api.ctl.io/v2/authentication/login
-          - CLC_ACCT_ALIAS, the account alias associated with the centurylink cloud
-    - Users can set CLC_V2_API_URL to specify an endpoint for pointing to a different CLC environment.
-'''
+  - To use this module, it is required to set the below environment variables which enables access to the Centurylink Cloud.
+  - E(CLC_V2_API_USERNAME), the account login id for the Centurylink Cloud.
+  - E(CLC_V2_API_PASSWORD), the account password for the Centurylink Cloud.
+  - Alternatively, the module accepts the API token and account alias. The API token can be generated using the CLC account
+    login and password using the HTTP API call @ https://api.ctl.io/v2/authentication/login
+  - E(CLC_V2_API_TOKEN), the API token generated from https://api.ctl.io/v2/authentication/login
+  - E(CLC_ACCT_ALIAS), the account alias associated with the Centurylink Cloud.
+  - Users can set E(CLC_V2_API_URL) to specify an endpoint for pointing to a different CLC environment.
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # Note - You must set the CLC_V2_API_USERNAME And CLC_V2_API_PASSWD Environment variables before running these examples
 
 - name: Add Public IP to Server
@@ -107,19 +105,15 @@ EXAMPLES = '''
     - name: Debug
       ansible.builtin.debug:
         var: clc
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 server_ids:
-    description: The list of server ids that are changed
-    returned: success
-    type: list
-    sample:
-        [
-            "UC1TEST-SVR01",
-            "UC1TEST-SVR02"
-        ]
-'''
+  description: The list of server ids that are changed.
+  returned: success
+  type: list
+  sample: ["UC1TEST-SVR01", "UC1TEST-SVR02"]
+"""
 
 __version__ = '${version}'
 

@@ -7,29 +7,31 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    author: Unknown (!UNKNOWN)
-    name: yaml
-    type: stdout
-    short_description: YAML-ized Ansible screen output
-    description:
-        - Ansible output that can be quite a bit easier to read than the
-          default JSON formatting.
-    extends_documentation_fragment:
-      - default_callback
-    requirements:
-      - set as stdout in configuration
-    seealso:
-      - plugin: ansible.builtin.default
-        plugin_type: callback
-        description: >
-          There is a parameter O(ansible.builtin.default#callback:result_format) in P(ansible.builtin.default#callback)
-          that allows you to change the output format to YAML.
-    notes:
-      - >
-        With ansible-core 2.13 or newer, you can instead specify V(yaml) for the parameter O(ansible.builtin.default#callback:result_format)
-        in P(ansible.builtin.default#callback).
-'''
+DOCUMENTATION = r"""
+author: Unknown (!UNKNOWN)
+name: yaml
+type: stdout
+short_description: YAML-ized Ansible screen output
+deprecated:
+  removed_in: 13.0.0
+  why: Starting in ansible-core 2.13, the P(ansible.builtin.default#callback) callback has support for printing output in YAML format.
+  alternative: Use O(ansible.builtin.default#callback:result_format=yaml).
+description:
+  - Ansible output that can be quite a bit easier to read than the default JSON formatting.
+extends_documentation_fragment:
+  - default_callback
+requirements:
+  - set as stdout in configuration
+seealso:
+  - plugin: ansible.builtin.default
+    plugin_type: callback
+    description: >-
+      There is a parameter O(ansible.builtin.default#callback:result_format) in P(ansible.builtin.default#callback) that allows
+      you to change the output format to YAML.
+notes:
+  - With ansible-core 2.13 or newer, you can instead specify V(yaml) for the parameter O(ansible.builtin.default#callback:result_format)
+    in P(ansible.builtin.default#callback).
+"""
 
 import yaml
 import json
@@ -45,7 +47,7 @@ from ansible.plugins.callback.default import CallbackModule as Default
 # from http://stackoverflow.com/a/15423007/115478
 def should_use_block(value):
     """Returns true if string should be in block format"""
-    for c in u"\u000a\u000d\u001c\u001d\u001e\u0085\u2028\u2029":
+    for c in "\u000a\u000d\u001c\u001d\u001e\u0085\u2028\u2029":
         if c in value:
             return True
     return False
@@ -113,11 +115,11 @@ class CallbackModule(Default):
 
         # put changed and skipped into a header line
         if 'changed' in abridged_result:
-            dumped += 'changed=' + str(abridged_result['changed']).lower() + ' '
+            dumped += f"changed={str(abridged_result['changed']).lower()} "
             del abridged_result['changed']
 
         if 'skipped' in abridged_result:
-            dumped += 'skipped=' + str(abridged_result['skipped']).lower() + ' '
+            dumped += f"skipped={str(abridged_result['skipped']).lower()} "
             del abridged_result['skipped']
 
         # if we already have stdout, we don't need stdout_lines

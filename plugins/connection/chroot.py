@@ -10,79 +10,66 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    author: Maykel Moya (!UNKNOWN) <mmoya@speedyrails.com>
-    name: chroot
-    short_description: Interact with local chroot
+DOCUMENTATION = r"""
+author: Maykel Moya (!UNKNOWN) <mmoya@speedyrails.com>
+name: chroot
+short_description: Interact with local chroot
+description:
+  - Run commands or put/fetch files to an existing chroot on the Ansible controller.
+options:
+  remote_addr:
     description:
-        - Run commands or put/fetch files to an existing chroot on the Ansible controller.
-    options:
-      remote_addr:
-        description:
-            - The path of the chroot you want to access.
-        type: string
-        default: inventory_hostname
-        vars:
-            - name: inventory_hostname
-            - name: ansible_host
-      executable:
-        description:
-            - User specified executable shell
-        type: string
-        ini:
-          - section: defaults
-            key: executable
-        env:
-          - name: ANSIBLE_EXECUTABLE
-        vars:
-          - name: ansible_executable
-        default: /bin/sh
-      chroot_exe:
-        description:
-            - User specified chroot binary
-        type: string
-        ini:
-          - section: chroot_connection
-            key: exe
-        env:
-          - name: ANSIBLE_CHROOT_EXE
-        vars:
-          - name: ansible_chroot_exe
-        default: chroot
-      disable_root_check:
-        description:
-            - Do not check that the user is not root.
-        ini:
-          - section: chroot_connection
-            key: disable_root_check
-        env:
-          - name: ANSIBLE_CHROOT_DISABLE_ROOT_CHECK
-        vars:
-          - name: ansible_chroot_disable_root_check
-        default: false
-        type: bool
-        version_added: 7.3.0
-'''
+      - The path of the chroot you want to access.
+    type: string
+    default: inventory_hostname
+    vars:
+      - name: inventory_hostname
+      - name: ansible_host
+  executable:
+    description:
+      - User specified executable shell.
+    type: string
+    ini:
+      - section: defaults
+        key: executable
+    env:
+      - name: ANSIBLE_EXECUTABLE
+    vars:
+      - name: ansible_executable
+    default: /bin/sh
+  chroot_exe:
+    description:
+      - User specified chroot binary.
+    type: string
+    ini:
+      - section: chroot_connection
+        key: exe
+    env:
+      - name: ANSIBLE_CHROOT_EXE
+    vars:
+      - name: ansible_chroot_exe
+    default: chroot
+  disable_root_check:
+    description:
+      - Do not check that the user is not root.
+    ini:
+      - section: chroot_connection
+        key: disable_root_check
+    env:
+      - name: ANSIBLE_CHROOT_DISABLE_ROOT_CHECK
+    vars:
+      - name: ansible_chroot_disable_root_check
+    default: false
+    type: bool
+    version_added: 7.3.0
+"""
 
 EXAMPLES = r"""
-# Plugin requires root privileges for chroot, -E preserves your env (and location of ~/.ansible):
-# sudo -E ansible-playbook ...
-#
-# Static inventory file
-# [chroots]
-# /path/to/debootstrap
-# /path/to/feboostrap
-# /path/to/lxc-image
-# /path/to/chroot
-
-# playbook
----
 - hosts: chroots
   connection: community.general.chroot
   tasks:
     - debug:
         msg: "This is coming from chroot environment"
-
 """
 
 import os
@@ -94,7 +81,7 @@ from ansible.errors import AnsibleError
 from ansible.module_utils.basic import is_executable
 from ansible.module_utils.common.process import get_bin_path
 from ansible.module_utils.six.moves import shlex_quote
-from ansible.module_utils.common.text.converters import to_bytes, to_native
+from ansible.module_utils.common.text.converters import to_bytes
 from ansible.plugins.connection import ConnectionBase, BUFSIZE
 from ansible.utils.display import Display
 
@@ -120,15 +107,15 @@ class Connection(ConnectionBase):
 
         # do some trivial checks for ensuring 'host' is actually a chroot'able dir
         if not os.path.isdir(self.chroot):
-            raise AnsibleError("%s is not a directory" % self.chroot)
+            raise AnsibleError(f"{self.chroot} is not a directory")
 
         chrootsh = os.path.join(self.chroot, 'bin/sh')
         # Want to check for a usable bourne shell inside the chroot.
         # is_executable() == True is sufficient.  For symlinks it
         # gets really complicated really fast.  So we punt on finding that
-        # out.  As long as it's a symlink we assume that it will work
+        # out.  As long as it is a symlink we assume that it will work
         if not (is_executable(chrootsh) or (os.path.lexists(chrootsh) and os.path.islink(chrootsh))):
-            raise AnsibleError("%s does not look like a chrootable dir (/bin/sh missing)" % self.chroot)
+            raise AnsibleError(f"{self.chroot} does not look like a chrootable dir (/bin/sh missing)")
 
     def _connect(self):
         """ connect to the chroot """
@@ -143,7 +130,7 @@ class Connection(ConnectionBase):
             try:
                 self.chroot_cmd = get_bin_path(self.get_option('chroot_exe'))
             except ValueError as e:
-                raise AnsibleError(to_native(e))
+                raise AnsibleError(str(e))
 
         super(Connection, self)._connect()
         if not self._connected:
@@ -161,7 +148,7 @@ class Connection(ConnectionBase):
         executable = self.get_option('executable')
         local_cmd = [self.chroot_cmd, self.chroot, executable, '-c', cmd]
 
-        display.vvv("EXEC %s" % local_cmd, host=self.chroot)
+        display.vvv(f"EXEC {local_cmd}", host=self.chroot)
         local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
         p = subprocess.Popen(local_cmd, shell=False, stdin=stdin,
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -186,7 +173,7 @@ class Connection(ConnectionBase):
             exist in any given chroot.  So for now we're choosing "/" instead.
             This also happens to be the former default.
 
-            Can revisit using $HOME instead if it's a problem
+            Can revisit using $HOME instead if it is a problem
         """
         if not remote_path.startswith(os.path.sep):
             remote_path = os.path.join(os.path.sep, remote_path)
@@ -195,7 +182,7 @@ class Connection(ConnectionBase):
     def put_file(self, in_path, out_path):
         """ transfer a file from local to chroot """
         super(Connection, self).put_file(in_path, out_path)
-        display.vvv("PUT %s TO %s" % (in_path, out_path), host=self.chroot)
+        display.vvv(f"PUT {in_path} TO {out_path}", host=self.chroot)
 
         out_path = shlex_quote(self._prefix_login_path(out_path))
         try:
@@ -205,27 +192,27 @@ class Connection(ConnectionBase):
                 else:
                     count = ''
                 try:
-                    p = self._buffered_exec_command('dd of=%s bs=%s%s' % (out_path, BUFSIZE, count), stdin=in_file)
+                    p = self._buffered_exec_command(f'dd of={out_path} bs={BUFSIZE}{count}', stdin=in_file)
                 except OSError:
                     raise AnsibleError("chroot connection requires dd command in the chroot")
                 try:
                     stdout, stderr = p.communicate()
                 except Exception:
                     traceback.print_exc()
-                    raise AnsibleError("failed to transfer file %s to %s" % (in_path, out_path))
+                    raise AnsibleError(f"failed to transfer file {in_path} to {out_path}")
                 if p.returncode != 0:
-                    raise AnsibleError("failed to transfer file %s to %s:\n%s\n%s" % (in_path, out_path, stdout, stderr))
+                    raise AnsibleError(f"failed to transfer file {in_path} to {out_path}:\n{stdout}\n{stderr}")
         except IOError:
-            raise AnsibleError("file or module does not exist at: %s" % in_path)
+            raise AnsibleError(f"file or module does not exist at: {in_path}")
 
     def fetch_file(self, in_path, out_path):
         """ fetch a file from chroot to local """
         super(Connection, self).fetch_file(in_path, out_path)
-        display.vvv("FETCH %s TO %s" % (in_path, out_path), host=self.chroot)
+        display.vvv(f"FETCH {in_path} TO {out_path}", host=self.chroot)
 
         in_path = shlex_quote(self._prefix_login_path(in_path))
         try:
-            p = self._buffered_exec_command('dd if=%s bs=%s' % (in_path, BUFSIZE))
+            p = self._buffered_exec_command(f'dd if={in_path} bs={BUFSIZE}')
         except OSError:
             raise AnsibleError("chroot connection requires dd command in the chroot")
 
@@ -237,10 +224,10 @@ class Connection(ConnectionBase):
                     chunk = p.stdout.read(BUFSIZE)
             except Exception:
                 traceback.print_exc()
-                raise AnsibleError("failed to transfer file %s to %s" % (in_path, out_path))
+                raise AnsibleError(f"failed to transfer file {in_path} to {out_path}")
             stdout, stderr = p.communicate()
             if p.returncode != 0:
-                raise AnsibleError("failed to transfer file %s to %s:\n%s\n%s" % (in_path, out_path, stdout, stderr))
+                raise AnsibleError(f"failed to transfer file {in_path} to {out_path}:\n{stdout}\n{stderr}")
 
     def close(self):
         """ terminate the connection; nothing to do here """

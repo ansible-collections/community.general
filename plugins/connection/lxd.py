@@ -7,48 +7,48 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    author: Matt Clay (@mattclay) <matt@mystile.com>
-    name: lxd
-    short_description: Run tasks in LXD instances via C(lxc) CLI
+DOCUMENTATION = r"""
+author: Matt Clay (@mattclay) <matt@mystile.com>
+name: lxd
+short_description: Run tasks in LXD instances using C(lxc) CLI
+description:
+  - Run commands or put/fetch files to an existing instance using C(lxc) CLI.
+options:
+  remote_addr:
     description:
-        - Run commands or put/fetch files to an existing instance using C(lxc) CLI.
-    options:
-      remote_addr:
-        description:
-            - Instance (container/VM) identifier.
-            - Since community.general 8.0.0, a FQDN can be provided; in that case, the first component (the part before C(.))
-              is used as the instance identifier.
-        type: string
-        default: inventory_hostname
-        vars:
-            - name: inventory_hostname
-            - name: ansible_host
-            - name: ansible_lxd_host
-      executable:
-        description:
-            - Shell to use for execution inside instance.
-        type: string
-        default: /bin/sh
-        vars:
-            - name: ansible_executable
-            - name: ansible_lxd_executable
-      remote:
-        description:
-            - Name of the LXD remote to use.
-        type: string
-        default: local
-        vars:
-            - name: ansible_lxd_remote
-        version_added: 2.0.0
-      project:
-        description:
-            - Name of the LXD project to use.
-        type: string
-        vars:
-            - name: ansible_lxd_project
-        version_added: 2.0.0
-'''
+      - Instance (container/VM) identifier.
+      - Since community.general 8.0.0, a FQDN can be provided; in that case, the first component (the part before C(.)) is
+        used as the instance identifier.
+    type: string
+    default: inventory_hostname
+    vars:
+      - name: inventory_hostname
+      - name: ansible_host
+      - name: ansible_lxd_host
+  executable:
+    description:
+      - Shell to use for execution inside instance.
+    type: string
+    default: /bin/sh
+    vars:
+      - name: ansible_executable
+      - name: ansible_lxd_executable
+  remote:
+    description:
+      - Name of the LXD remote to use.
+    type: string
+    default: local
+    vars:
+      - name: ansible_lxd_remote
+    version_added: 2.0.0
+  project:
+    description:
+      - Name of the LXD project to use.
+    type: string
+    vars:
+      - name: ansible_lxd_project
+    version_added: 2.0.0
+"""
 
 import os
 from subprocess import Popen, PIPE
@@ -86,26 +86,26 @@ class Connection(ConnectionBase):
         super(Connection, self)._connect()
 
         if not self._connected:
-            self._display.vvv(u"ESTABLISH LXD CONNECTION FOR USER: root", host=self._host())
+            self._display.vvv("ESTABLISH LXD CONNECTION FOR USER: root", host=self._host())
             self._connected = True
 
     def exec_command(self, cmd, in_data=None, sudoable=True):
         """ execute a command on the lxd host """
         super(Connection, self).exec_command(cmd, in_data=in_data, sudoable=sudoable)
 
-        self._display.vvv(u"EXEC {0}".format(cmd), host=self._host())
+        self._display.vvv(f"EXEC {cmd}", host=self._host())
 
         local_cmd = [self._lxc_cmd]
         if self.get_option("project"):
             local_cmd.extend(["--project", self.get_option("project")])
         local_cmd.extend([
             "exec",
-            "%s:%s" % (self.get_option("remote"), self._host()),
+            f"{self.get_option('remote')}:{self._host()}",
             "--",
             self.get_option("executable"), "-c", cmd
         ])
 
-        self._display.vvvvv(u"EXEC {0}".format(local_cmd), host=self._host())
+        self._display.vvvvv(f"EXEC {local_cmd}", host=self._host())
 
         local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
         in_data = to_bytes(in_data, errors='surrogate_or_strict', nonstring='passthru')
@@ -116,13 +116,13 @@ class Connection(ConnectionBase):
         stdout = to_text(stdout)
         stderr = to_text(stderr)
 
-        self._display.vvvvv(u"EXEC lxc output: {0} {1}".format(stdout, stderr), host=self._host())
+        self._display.vvvvv(f"EXEC lxc output: {stdout} {stderr}", host=self._host())
 
         if "is not running" in stderr:
-            raise AnsibleConnectionFailure("instance not running: %s" % self._host())
+            raise AnsibleConnectionFailure(f"instance not running: {self._host()}")
 
         if stderr.strip() == "Error: Instance not found" or stderr.strip() == "error: not found":
-            raise AnsibleConnectionFailure("instance not found: %s" % self._host())
+            raise AnsibleConnectionFailure(f"instance not found: {self._host()}")
 
         return process.returncode, stdout, stderr
 
@@ -130,10 +130,10 @@ class Connection(ConnectionBase):
         """ put a file from local to lxd """
         super(Connection, self).put_file(in_path, out_path)
 
-        self._display.vvv(u"PUT {0} TO {1}".format(in_path, out_path), host=self._host())
+        self._display.vvv(f"PUT {in_path} TO {out_path}", host=self._host())
 
         if not os.path.isfile(to_bytes(in_path, errors='surrogate_or_strict')):
-            raise AnsibleFileNotFound("input path is not a file: %s" % in_path)
+            raise AnsibleFileNotFound(f"input path is not a file: {in_path}")
 
         local_cmd = [self._lxc_cmd]
         if self.get_option("project"):
@@ -141,7 +141,7 @@ class Connection(ConnectionBase):
         local_cmd.extend([
             "file", "push",
             in_path,
-            "%s:%s/%s" % (self.get_option("remote"), self._host(), out_path)
+            f"{self.get_option('remote')}:{self._host()}/{out_path}"
         ])
 
         local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
@@ -153,14 +153,14 @@ class Connection(ConnectionBase):
         """ fetch a file from lxd to local """
         super(Connection, self).fetch_file(in_path, out_path)
 
-        self._display.vvv(u"FETCH {0} TO {1}".format(in_path, out_path), host=self._host())
+        self._display.vvv(f"FETCH {in_path} TO {out_path}", host=self._host())
 
         local_cmd = [self._lxc_cmd]
         if self.get_option("project"):
             local_cmd.extend(["--project", self.get_option("project")])
         local_cmd.extend([
             "file", "pull",
-            "%s:%s/%s" % (self.get_option("remote"), self._host(), in_path),
+            f"{self.get_option('remote')}:{self._host()}/{in_path}",
             out_path
         ])
 

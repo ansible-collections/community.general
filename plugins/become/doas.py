@@ -5,86 +5,86 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    name: doas
-    short_description: Do As user
+DOCUMENTATION = r"""
+name: doas
+short_description: Do As user
+description:
+  - This become plugins allows your remote/login user to execute commands as another user using the C(doas) utility.
+author: Ansible Core Team
+options:
+  become_user:
+    description: User you 'become' to execute the task.
+    type: string
+    ini:
+      - section: privilege_escalation
+        key: become_user
+      - section: doas_become_plugin
+        key: user
+    vars:
+      - name: ansible_become_user
+      - name: ansible_doas_user
+    env:
+      - name: ANSIBLE_BECOME_USER
+      - name: ANSIBLE_DOAS_USER
+  become_exe:
+    description: C(doas) executable.
+    type: string
+    default: doas
+    ini:
+      - section: privilege_escalation
+        key: become_exe
+      - section: doas_become_plugin
+        key: executable
+    vars:
+      - name: ansible_become_exe
+      - name: ansible_doas_exe
+    env:
+      - name: ANSIBLE_BECOME_EXE
+      - name: ANSIBLE_DOAS_EXE
+  become_flags:
+    description: Options to pass to C(doas).
+    type: string
+    default: ''
+    ini:
+      - section: privilege_escalation
+        key: become_flags
+      - section: doas_become_plugin
+        key: flags
+    vars:
+      - name: ansible_become_flags
+      - name: ansible_doas_flags
+    env:
+      - name: ANSIBLE_BECOME_FLAGS
+      - name: ANSIBLE_DOAS_FLAGS
+  become_pass:
+    description: Password for C(doas) prompt.
+    type: string
+    required: false
+    vars:
+      - name: ansible_become_password
+      - name: ansible_become_pass
+      - name: ansible_doas_pass
+    env:
+      - name: ANSIBLE_BECOME_PASS
+      - name: ANSIBLE_DOAS_PASS
+    ini:
+      - section: doas_become_plugin
+        key: password
+  prompt_l10n:
     description:
-        - This become plugins allows your remote/login user to execute commands as another user via the doas utility.
-    author: Ansible Core Team
-    options:
-        become_user:
-            description: User you 'become' to execute the task.
-            type: string
-            ini:
-              - section: privilege_escalation
-                key: become_user
-              - section: doas_become_plugin
-                key: user
-            vars:
-              - name: ansible_become_user
-              - name: ansible_doas_user
-            env:
-              - name: ANSIBLE_BECOME_USER
-              - name: ANSIBLE_DOAS_USER
-        become_exe:
-            description: Doas executable.
-            type: string
-            default: doas
-            ini:
-              - section: privilege_escalation
-                key: become_exe
-              - section: doas_become_plugin
-                key: executable
-            vars:
-              - name: ansible_become_exe
-              - name: ansible_doas_exe
-            env:
-              - name: ANSIBLE_BECOME_EXE
-              - name: ANSIBLE_DOAS_EXE
-        become_flags:
-            description: Options to pass to doas.
-            type: string
-            default: ''
-            ini:
-              - section: privilege_escalation
-                key: become_flags
-              - section: doas_become_plugin
-                key: flags
-            vars:
-              - name: ansible_become_flags
-              - name: ansible_doas_flags
-            env:
-              - name: ANSIBLE_BECOME_FLAGS
-              - name: ANSIBLE_DOAS_FLAGS
-        become_pass:
-            description: Password for doas prompt.
-            type: string
-            required: false
-            vars:
-              - name: ansible_become_password
-              - name: ansible_become_pass
-              - name: ansible_doas_pass
-            env:
-              - name: ANSIBLE_BECOME_PASS
-              - name: ANSIBLE_DOAS_PASS
-            ini:
-              - section: doas_become_plugin
-                key: password
-        prompt_l10n:
-            description:
-                - List of localized strings to match for prompt detection.
-                - If empty we will use the built in one.
-            type: list
-            elements: string
-            default: []
-            ini:
-              - section: doas_become_plugin
-                key: localized_prompts
-            vars:
-              - name: ansible_doas_prompt_l10n
-            env:
-              - name: ANSIBLE_DOAS_PROMPT_L10N
-'''
+      - List of localized strings to match for prompt detection.
+      - If empty we will use the built in one.
+    type: list
+    elements: string
+    default: []
+    ini:
+      - section: doas_become_plugin
+        key: localized_prompts
+    vars:
+      - name: ansible_doas_prompt_l10n
+    env:
+      - name: ANSIBLE_DOAS_PROMPT_L10N
+"""
 
 import re
 
@@ -125,9 +125,9 @@ class BecomeModule(BecomeBase):
             flags += ' -n'
 
         become_user = self.get_option('become_user')
-        user = '-u %s' % (become_user) if become_user else ''
+        user = f'-u {become_user}' if become_user else ''
 
         success_cmd = self._build_success_command(cmd, shell, noexe=True)
         executable = getattr(shell, 'executable', shell.SHELL_FAMILY)
 
-        return '%s %s %s %s -c %s' % (become_exe, flags, user, executable, success_cmd)
+        return f'{become_exe} {flags} {user} {executable} -c {success_cmd}'

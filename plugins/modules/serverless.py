@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: serverless
 short_description: Manages a Serverless Framework project
 description:
@@ -26,11 +25,11 @@ options:
     description:
       - Goal state of given stage/project.
     type: str
-    choices: [ absent, present ]
+    choices: [absent, present]
     default: present
   serverless_bin_path:
     description:
-      - The path of a serverless framework binary relative to the 'service_path' eg. node_module/.bin/serverless
+      - The path of a serverless framework binary relative to the O(service_path), for example V(node_module/.bin/serverless).
     type: path
   service_path:
     description:
@@ -67,16 +66,15 @@ options:
     type: bool
     default: false
 notes:
-   - Currently, the C(serverless) command must be in the path of the node executing the task.
-     In the future this may be a flag.
+  - Currently, the C(serverless) command must be in the path of the node executing the task. In the future this may be a flag.
 requirements:
-- serverless
-- yaml
+  - serverless
+  - PyYAML
 author:
-- Ryan Scott Brown (@ryansb)
-'''
+  - Ryan Scott Brown (@ryansb)
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Basic deploy of a service
   community.general.serverless:
     service_path: '{{ project_dir }}'
@@ -103,9 +101,9 @@ EXAMPLES = r'''
     region: us-east-1
     service_path: '{{ project_dir }}'
     serverless_bin_path: node_modules/.bin/serverless
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 service_name:
   type: str
   description: The service name specified in the serverless.yml that was just deployed.
@@ -120,7 +118,7 @@ command:
   description: Full C(serverless) command run by this module, in case you want to re-run the command outside the module.
   returned: always
   sample: serverless deploy --stage production
-'''
+"""
 
 import os
 

@@ -10,8 +10,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: openbsd_pkg
 author:
   - Patrik Lundin (@eest)
@@ -21,69 +20,64 @@ description:
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: partial
-        version_added: 9.1.0
-        details:
-          - Only works when check mode is not enabled.
+  check_mode:
+    support: full
+  diff_mode:
+    support: partial
+    version_added: 9.1.0
+    details:
+      - Only works when check mode is not enabled.
 options:
-    name:
-        description:
-        - A name or a list of names of the packages.
-        required: true
-        type: list
-        elements: str
-    state:
-        description:
-          - V(present) will make sure the package is installed.
-          - V(latest) will make sure the latest version of the package is installed.
-          - V(absent) will make sure the specified package is not installed.
-        choices: [ absent, latest, present, installed, removed ]
-        default: present
-        type: str
-    build:
-        description:
-          - Build the package from source instead of downloading and installing
-            a binary. Requires that the port source tree is already installed.
-            Automatically builds and installs the 'sqlports' package, if it is
-            not already installed.
-          - Mutually exclusive with O(snapshot).
-        type: bool
-        default: false
-    snapshot:
-        description:
-          - Force C(%c) and C(%m) to expand to C(snapshots), even on a release kernel.
-          - Mutually exclusive with O(build).
-        type: bool
-        default: false
-        version_added: 1.3.0
-    ports_dir:
-        description:
-          - When used in combination with the O(build) option, allows overriding
-            the default ports source directory.
-        default: /usr/ports
-        type: path
-    clean:
-        description:
-          - When updating or removing packages, delete the extra configuration
-            file(s) in the old packages which are annotated with @extra in
-            the packaging-list.
-        type: bool
-        default: false
-    quick:
-        description:
-          - Replace or delete packages quickly; do not bother with checksums
-            before removing normal files.
-        type: bool
-        default: false
+  name:
+    description:
+      - A name or a list of names of the packages.
+    required: true
+    type: list
+    elements: str
+  state:
+    description:
+      - V(present) will make sure the package is installed.
+      - V(latest) will make sure the latest version of the package is installed.
+      - V(absent) will make sure the specified package is not installed.
+    choices: [absent, latest, present, installed, removed]
+    default: present
+    type: str
+  build:
+    description:
+      - Build the package from source instead of downloading and installing a binary. Requires that the port source tree is already installed.
+        Automatically builds and installs the C(sqlports) package, if it is not already installed.
+      - Mutually exclusive with O(snapshot).
+    type: bool
+    default: false
+  snapshot:
+    description:
+      - Force C(%c) and C(%m) to expand to C(snapshots), even on a release kernel.
+      - Mutually exclusive with O(build).
+    type: bool
+    default: false
+    version_added: 1.3.0
+  ports_dir:
+    description:
+      - When used in combination with the O(build) option, allows overriding the default ports source directory.
+    default: /usr/ports
+    type: path
+  clean:
+    description:
+      - When updating or removing packages, delete the extra configuration file(s) in the old packages which are annotated with @extra in the
+        packaging-list.
+    type: bool
+    default: false
+  quick:
+    description:
+      - Replace or delete packages quickly; do not bother with checksums before removing normal files.
+    type: bool
+    default: false
 notes:
-  - When used with a C(loop:) each package will be processed individually,
-    it is much more efficient to pass the list directly to the O(name) option.
-'''
+  - When used with a C(loop:) each package will be processed individually, it is much more efficient to pass the list directly to the O(name)
+    option.
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Make sure nmap is installed
   community.general.openbsd_pkg:
     name: nmap
@@ -125,7 +119,7 @@ EXAMPLES = '''
     name: '*'
     state: latest
 
-- name: Purge a package and it's configuration files
+- name: Purge a package and its configuration files
   community.general.openbsd_pkg:
     name: mpd
     clean: true
@@ -136,7 +130,7 @@ EXAMPLES = '''
     name: qt5
     quick: true
     state: absent
-'''
+"""
 
 import os
 import platform

@@ -11,8 +11,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: xml
 short_description: Manage bits and pieces of XML files or strings
 description:
@@ -27,96 +26,94 @@ attributes:
 options:
   path:
     description:
-    - Path to the file to operate on.
-    - This file must exist ahead of time.
-    - This parameter is required, unless O(xmlstring) is given.
+      - Path to the file to operate on.
+      - This file must exist ahead of time.
+      - This parameter is required, unless O(xmlstring) is given.
     type: path
-    aliases: [ dest, file ]
+    aliases: [dest, file]
   xmlstring:
     description:
-    - A string containing XML on which to operate.
-    - This parameter is required, unless O(path) is given.
+      - A string containing XML on which to operate.
+      - This parameter is required, unless O(path) is given.
     type: str
   xpath:
     description:
-    - A valid XPath expression describing the item(s) you want to manipulate.
-    - Operates on the document root, V(/), by default.
+      - A valid XPath expression describing the item(s) you want to manipulate.
+      - Operates on the document root, V(/), by default.
     type: str
   namespaces:
     description:
-    - The namespace C(prefix:uri) mapping for the XPath expression.
-    - Needs to be a C(dict), not a C(list) of items.
+      - The namespace C(prefix:uri) mapping for the XPath expression.
+      - Needs to be a C(dict), not a C(list) of items.
     type: dict
     default: {}
   state:
     description:
-    - Set or remove an xpath selection (node(s), attribute(s)).
+      - Set or remove an xpath selection (node(s), attribute(s)).
     type: str
-    choices: [ absent, present ]
+    choices: [absent, present]
     default: present
-    aliases: [ ensure ]
+    aliases: [ensure]
   attribute:
     description:
-    - The attribute to select when using parameter O(value).
-    - This is a string, not prepended with V(@).
+      - The attribute to select when using parameter O(value).
+      - This is a string, not prepended with V(@).
     type: raw
   value:
     description:
-    - Desired state of the selected attribute.
-    - Either a string, or to unset a value, the Python V(None) keyword (YAML Equivalent, V(null)).
-    - Elements default to no value (but present).
-    - Attributes default to an empty string.
+      - Desired state of the selected attribute.
+      - Either a string, or to unset a value, the Python V(None) keyword (YAML Equivalent, V(null)).
+      - Elements default to no value (but present).
+      - Attributes default to an empty string.
     type: raw
   add_children:
     description:
-    - Add additional child-element(s) to a selected element for a given O(xpath).
-    - Child elements must be given in a list and each item may be either a string
-      (for example C(children=ansible) to add an empty C(<ansible/>) child element),
-      or a hash where the key is an element name and the value is the element value.
-    - This parameter requires O(xpath) to be set.
+      - Add additional child-element(s) to a selected element for a given O(xpath).
+      - Child elements must be given in a list and each item may be either a string (for example C(children=ansible) to add an empty C(<ansible/>)
+        child element), or a hash where the key is an element name and the value is the element value.
+      - This parameter requires O(xpath) to be set.
     type: list
     elements: raw
   set_children:
     description:
-    - Set the child-element(s) of a selected element for a given O(xpath).
-    - Removes any existing children.
-    - Child elements must be specified as in O(add_children).
-    - This parameter requires O(xpath) to be set.
+      - Set the child-element(s) of a selected element for a given O(xpath).
+      - Removes any existing children.
+      - Child elements must be specified as in O(add_children).
+      - This parameter requires O(xpath) to be set.
     type: list
     elements: raw
   count:
     description:
-    - Search for a given O(xpath) and provide the count of any matches.
-    - This parameter requires O(xpath) to be set.
+      - Search for a given O(xpath) and provide the count of any matches.
+      - This parameter requires O(xpath) to be set.
     type: bool
     default: false
   print_match:
     description:
-    - Search for a given O(xpath) and print out any matches.
-    - This parameter requires O(xpath) to be set.
+      - Search for a given O(xpath) and print out any matches.
+      - This parameter requires O(xpath) to be set.
     type: bool
     default: false
   pretty_print:
     description:
-    - Pretty print XML output.
+      - Pretty print XML output.
     type: bool
     default: false
   content:
     description:
-    - Search for a given O(xpath) and get content.
-    - This parameter requires O(xpath) to be set.
+      - Search for a given O(xpath) and get content.
+      - This parameter requires O(xpath) to be set.
     type: str
-    choices: [ attribute, text ]
+    choices: [attribute, text]
   input_type:
     description:
-    - Type of input for O(add_children) and O(set_children).
+      - Type of input for O(add_children) and O(set_children).
     type: str
-    choices: [ xml, yaml ]
+    choices: [xml, yaml]
     default: yaml
   backup:
     description:
-      - Create a backup file including the timestamp information so you can get
-        the original file back if you somehow clobbered it incorrectly.
+      - Create a backup file including the timestamp information so you can get the original file back if you somehow clobbered it incorrectly.
     type: bool
     default: false
   strip_cdata_tags:
@@ -128,46 +125,44 @@ options:
   insertbefore:
     description:
       - Add additional child-element(s) before the first selected element for a given O(xpath).
-      - Child elements must be given in a list and each item may be either a string
-        (for example C(children=ansible) to add an empty C(<ansible/>) child element),
-        or a hash where the key is an element name and the value is the element value.
+      - Child elements must be given in a list and each item may be either a string (for example C(children=ansible) to add an empty C(<ansible/>)
+        child element), or a hash where the key is an element name and the value is the element value.
       - This parameter requires O(xpath) to be set.
     type: bool
     default: false
   insertafter:
     description:
       - Add additional child-element(s) after the last selected element for a given O(xpath).
-      - Child elements must be given in a list and each item may be either a string
-        (for example C(children=ansible) to add an empty C(<ansible/>) child element),
-        or a hash where the key is an element name and the value is the element value.
+      - Child elements must be given in a list and each item may be either a string (for example C(children=ansible) to add an empty C(<ansible/>)
+        child element), or a hash where the key is an element name and the value is the element value.
       - This parameter requires O(xpath) to be set.
     type: bool
     default: false
 requirements:
-- lxml >= 2.3.0
+  - lxml >= 2.3.0
 notes:
-- Use the C(--check) and C(--diff) options when testing your expressions.
-- The diff output is automatically pretty-printed, so may not reflect the actual file content, only the file structure.
-- This module does not handle complicated xpath expressions, so limit xpath selectors to simple expressions.
-- Beware that in case your XML elements are namespaced, you need to use the O(namespaces) parameter, see the examples.
-- Namespaces prefix should be used for all children of an element where namespace is defined, unless another namespace is defined for them.
+  - Use the C(--check) and C(--diff) options when testing your expressions.
+  - The diff output is automatically pretty-printed, so may not reflect the actual file content, only the file structure.
+  - This module does not handle complicated xpath expressions, so limit xpath selectors to simple expressions.
+  - Beware that in case your XML elements are namespaced, you need to use the O(namespaces) parameter, see the examples.
+  - Namespaces prefix should be used for all children of an element where namespace is defined, unless another namespace is defined for them.
 seealso:
-- name: Xml module development community wiki
-  description: More information related to the development of this xml module.
-  link: https://github.com/ansible/community/wiki/Module:-xml
-- name: Introduction to XPath
-  description: A brief tutorial on XPath (w3schools.com).
-  link: https://www.w3schools.com/xml/xpath_intro.asp
-- name: XPath Reference document
-  description: The reference documentation on XSLT/XPath (developer.mozilla.org).
-  link: https://developer.mozilla.org/en-US/docs/Web/XPath
+  - name: XML module development community wiki (archived)
+    description: More information related to the development of this xml module.
+    link: https://github.com/ansible/community/wiki/Module:-xml
+  - name: Introduction to XPath
+    description: A brief tutorial on XPath (w3schools.com).
+    link: https://www.w3schools.com/xml/xpath_intro.asp
+  - name: XPath Reference document
+    description: The reference documentation on XSLT/XPath (developer.mozilla.org).
+    link: https://developer.mozilla.org/en-US/docs/Web/XPath
 author:
-- Tim Bielawa (@tbielawa)
-- Magnus Hedemark (@magnus919)
-- Dag Wieers (@dagwieers)
-'''
+  - Tim Bielawa (@tbielawa)
+  - Magnus Hedemark (@magnus919)
+  - Dag Wieers (@dagwieers)
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 # Consider the following XML file:
 #
 # <business type="bar">
@@ -219,9 +214,9 @@ EXAMPLES = r'''
     path: /foo/bar.xml
     xpath: /business/beers
     add_children:
-    - beer: Old Rasputin
-    - beer: Old Motor Oil
-    - beer: Old Curmudgeon
+      - beer: Old Rasputin
+      - beer: Old Motor Oil
+      - beer: Old Curmudgeon
 
 - name: Add several more beers to the 'beers' element and add them before the 'Rochefort 10' element
   community.general.xml:
@@ -229,9 +224,9 @@ EXAMPLES = r'''
     xpath: '/business/beers/beer[text()="Rochefort 10"]'
     insertbefore: true
     add_children:
-    - beer: Old Rasputin
-    - beer: Old Motor Oil
-    - beer: Old Curmudgeon
+      - beer: Old Rasputin
+      - beer: Old Motor Oil
+      - beer: Old Curmudgeon
 
 # NOTE: The 'state' defaults to 'present' and 'value' defaults to 'null' for elements
 - name: Add a 'validxhtml' element to the 'website' element
@@ -301,14 +296,14 @@ EXAMPLES = r'''
     xpath: /business
     add_children:
       - building:
-          # Attributes
+        # Attributes
           name: Scumm bar
           location: Monkey island
-          # Subnodes
+        # Subnodes
           _:
             - floor: Pirate hall
             - floor: Grog storage
-            - construction_date: "1990"  # Only strings are valid
+            - construction_date: "1990" # Only strings are valid
       - building: Grog factory
 
 # Consider this XML for following example -
@@ -327,37 +322,37 @@ EXAMPLES = r'''
     path: bar.xml
     xpath: /config/element[@name='test1']
     state: absent
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 actions:
-    description: A dictionary with the original xpath, namespaces and state.
-    type: dict
-    returned: success
-    sample: {xpath: xpath, namespaces: [namespace1, namespace2], state=present}
+  description: A dictionary with the original xpath, namespaces and state.
+  type: dict
+  returned: success
+  sample: {xpath: xpath, namespaces: [namespace1, namespace2], state: present}
 backup_file:
-    description: The name of the backup file that was created
-    type: str
-    returned: when O(backup=true)
-    sample: /path/to/file.xml.1942.2017-08-24@14:16:01~
+  description: The name of the backup file that was created.
+  type: str
+  returned: when O(backup=true)
+  sample: /path/to/file.xml.1942.2017-08-24@14:16:01~
 count:
-    description: The count of xpath matches.
-    type: int
-    returned: when parameter 'count' is set
-    sample: 2
+  description: The count of xpath matches.
+  type: int
+  returned: when parameter O(count) is set
+  sample: 2
 matches:
-    description: The xpath matches found.
-    type: list
-    returned: when parameter 'print_match' is set
+  description: The xpath matches found.
+  type: list
+  returned: when parameter O(print_match) is set
 msg:
-    description: A message related to the performed action(s).
-    type: str
-    returned: always
+  description: A message related to the performed action(s).
+  type: str
+  returned: always
 xmlstring:
-    description: An XML string of the resulting output.
-    type: str
-    returned: when parameter 'xmlstring' is set
-'''
+  description: An XML string of the resulting output.
+  type: str
+  returned: when parameter O(xmlstring) is set
+"""
 
 import copy
 import json
@@ -437,7 +432,7 @@ def is_attribute(tree, xpath, namespaces):
 
     An xpath attribute search will only match one item"""
 
-    # lxml 5.1.1 removed etree._ElementStringResult, so we can no longer simply assume it's there
+    # lxml 5.1.1 removed etree._ElementStringResult, so we can no longer simply assume it is there
     # (https://github.com/lxml/lxml/commit/eba79343d0e7ad1ce40169f60460cdd4caa29eb3)
     ElementStringResult = getattr(etree, '_ElementStringResult', None)
 

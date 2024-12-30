@@ -11,27 +11,19 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: deploy_helper
 author: "Ramon de la Fuente (@ramondelafuente)"
 short_description: Manages some of the steps common in deploying projects
 description:
-  - The Deploy Helper manages some of the steps common in deploying software.
-    It creates a folder structure, manages a symlink for the current release
-    and cleans up old releases.
-  # TODO: convert below to RETURN documentation!
-  - "Running it with the O(state=query) or O(state=present) will return the C(deploy_helper) fact.
-    C(project_path), whatever you set in the O(path) parameter,
-    C(current_path), the path to the symlink that points to the active release,
-    C(releases_path), the path to the folder to keep releases in,
-    C(shared_path), the path to the folder to keep shared resources in,
-    C(unfinished_filename), the file to check for to recognize unfinished builds,
-    C(previous_release), the release the 'current' symlink is pointing to,
-    C(previous_release_path), the full path to the 'current' symlink target,
-    C(new_release), either the 'release' parameter or a generated timestamp,
-    C(new_release_path), the path to the new release folder (not created by the module)."
-
+  - The Deploy Helper manages some of the steps common in deploying software. It creates a folder structure, manages a symlink
+    for the current release and cleans up old releases.
+  - Running it with the O(state=query) or O(state=present) will return the C(deploy_helper) fact. C(project_path), whatever
+    you set in the O(path) parameter, C(current_path), the path to the symlink that points to the active release, C(releases_path),
+    the path to the folder to keep releases in, C(shared_path), the path to the folder to keep shared resources in, C(unfinished_filename),
+    the file to check for to recognize unfinished builds, C(previous_release), the release the 'current' symlink is pointing
+    to, C(previous_release_path), the full path to the 'current' symlink target, C(new_release), either the O(release) parameter
+    or a generated timestamp, C(new_release_path), the path to the new release folder (not created by the module).
 attributes:
   check_mode:
     support: full
@@ -44,42 +36,38 @@ options:
     required: true
     aliases: ['dest']
     description:
-      - The root path of the project.
-        Returned in the C(deploy_helper.project_path) fact.
-
+      - The root path of the project. Returned in the C(deploy_helper.project_path) fact.
   state:
     type: str
     description:
       - The state of the project.
       - V(query) will only gather facts.
       - V(present) will create the project C(root) folder, and in it the C(releases) and C(shared) folders.
-      - V(finalize) will remove the unfinished_filename file, create a symlink to the newly
-          deployed release and optionally clean old releases.
+      - V(finalize) will remove the unfinished_filename file, create a symlink to the newly deployed release and optionally
+        clean old releases.
       - V(clean) will remove failed & old releases.
       - V(absent) will remove the project folder (synonymous to the M(ansible.builtin.file) module with O(state=absent)).
-    choices: [ present, finalize, absent, clean, query ]
+    choices: [present, finalize, absent, clean, query]
     default: present
 
   release:
     type: str
     description:
       - The release version that is being deployed. Defaults to a timestamp format C(%Y%m%d%H%M%S) (for example V(20141119223359)).
-        This parameter is optional during O(state=present), but needs to be set explicitly for O(state=finalize).
-        You can use the generated fact C(release={{ deploy_helper.new_release }}).
-
+        This parameter is optional during O(state=present), but needs to be set explicitly for O(state=finalize). You can
+        use the generated fact C(release={{ deploy_helper.new_release }}).
   releases_path:
     type: str
     description:
-      - The name of the folder that will hold the releases. This can be relative to O(path) or absolute.
-        Returned in the C(deploy_helper.releases_path) fact.
+      - The name of the folder that will hold the releases. This can be relative to O(path) or absolute. Returned in the C(deploy_helper.releases_path)
+        fact.
     default: releases
 
   shared_path:
     type: path
     description:
-      - The name of the folder that will hold the shared resources. This can be relative to O(path) or absolute.
-        If this is set to an empty string, no shared folder will be created.
-        Returned in the C(deploy_helper.shared_path) fact.
+      - The name of the folder that will hold the shared resources. This can be relative to O(path) or absolute. If this is
+        set to an empty string, no shared folder will be created. Returned in the C(deploy_helper.shared_path) fact.
     default: shared
 
   current_path:
@@ -92,9 +80,9 @@ options:
   unfinished_filename:
     type: str
     description:
-      - The name of the file that indicates a deploy has not finished. All folders in the O(releases_path) that
-        contain this file will be deleted on O(state=finalize) with O(clean=true), or O(state=clean). This file is
-        automatically deleted from the C(new_release_path) during O(state=finalize).
+      - The name of the file that indicates a deploy has not finished. All folders in the O(releases_path) that contain this
+        file will be deleted on O(state=finalize) with O(clean=true), or O(state=clean). This file is automatically deleted
+        from the C(new_release_path) during O(state=finalize).
     default: DEPLOY_UNFINISHED
 
   clean:
@@ -111,20 +99,18 @@ options:
     default: 5
 
 notes:
-  - Facts are only returned for O(state=query) and O(state=present). If you use both, you should pass any overridden
-    parameters to both calls, otherwise the second call will overwrite the facts of the first one.
-  - When using O(state=clean), the releases are ordered by I(creation date). You should be able to switch to a
-    new naming strategy without problems.
-  - Because of the default behaviour of generating the C(new_release) fact, this module will not be idempotent
-    unless you pass your own release name with O(release). Due to the nature of deploying software, this should not
-    be much of a problem.
+  - Facts are only returned for O(state=query) and O(state=present). If you use both, you should pass any overridden parameters
+    to both calls, otherwise the second call will overwrite the facts of the first one.
+  - When using O(state=clean), the releases are ordered by I(creation date). You should be able to switch to a new naming
+    strategy without problems.
+  - Because of the default behaviour of generating the C(new_release) fact, this module will not be idempotent unless you
+    pass your own release name with O(release). Due to the nature of deploying software, this should not be much of a problem.
 extends_documentation_fragment:
   - ansible.builtin.files
   - community.general.attributes
-'''
+"""
 
-EXAMPLES = '''
-
+EXAMPLES = r"""
 # General explanation, starting with an example folder structure for a project:
 
 # root:
@@ -192,10 +178,10 @@ EXAMPLES = '''
     src: '{{ deploy_helper.shared_path }}/{{ item.src }}'
     state: link
   with_items:
-      - path: app/sessions
-        src: sessions
-      - path: web/uploads
-        src: uploads
+    - path: app/sessions
+      src: sessions
+    - path: web/uploads
+      src: uploads
 - name: Finalize the deploy, removing the unfinished file and switching the symlink
   community.general.deploy_helper:
     path: /path/to/root
@@ -277,7 +263,8 @@ EXAMPLES = '''
     path: /path/to/root
 - ansible.builtin.debug:
     var: deploy_helper
-'''
+"""
+
 import os
 import shutil
 import time

@@ -6,73 +6,73 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    name: splunk
-    type: notification
-    short_description: Sends task result events to Splunk HTTP Event Collector
-    author: "Stuart Hirst (!UNKNOWN) <support@convergingdata.com>"
+DOCUMENTATION = r"""
+name: splunk
+type: notification
+short_description: Sends task result events to Splunk HTTP Event Collector
+author: "Stuart Hirst (!UNKNOWN) <support@convergingdata.com>"
+description:
+  - This callback plugin will send task results as JSON formatted events to a Splunk HTTP collector.
+  - The companion Splunk Monitoring & Diagnostics App is available here U(https://splunkbase.splunk.com/app/4023/).
+  - Credit to "Ryan Currah (@ryancurrah)" for original source upon which this is based.
+requirements:
+  - Whitelisting this callback plugin
+  - 'Create a HTTP Event Collector in Splunk'
+  - 'Define the URL and token in C(ansible.cfg)'
+options:
+  url:
+    description: URL to the Splunk HTTP collector source.
+    type: str
+    env:
+      - name: SPLUNK_URL
+    ini:
+      - section: callback_splunk
+        key: url
+  authtoken:
+    description: Token to authenticate the connection to the Splunk HTTP collector.
+    type: str
+    env:
+      - name: SPLUNK_AUTHTOKEN
+    ini:
+      - section: callback_splunk
+        key: authtoken
+  validate_certs:
+    description: Whether to validate certificates for connections to HEC. It is not recommended to set to V(false) except
+      when you are sure that nobody can intercept the connection between this plugin and HEC, as setting it to V(false) allows
+      man-in-the-middle attacks!
+    env:
+      - name: SPLUNK_VALIDATE_CERTS
+    ini:
+      - section: callback_splunk
+        key: validate_certs
+    type: bool
+    default: true
+    version_added: '1.0.0'
+  include_milliseconds:
+    description: Whether to include milliseconds as part of the generated timestamp field in the event sent to the Splunk
+      HTTP collector.
+    env:
+      - name: SPLUNK_INCLUDE_MILLISECONDS
+    ini:
+      - section: callback_splunk
+        key: include_milliseconds
+    type: bool
+    default: false
+    version_added: 2.0.0
+  batch:
     description:
-      - This callback plugin will send task results as JSON formatted events to a Splunk HTTP collector.
-      - The companion Splunk Monitoring & Diagnostics App is available here U(https://splunkbase.splunk.com/app/4023/).
-      - Credit to "Ryan Currah (@ryancurrah)" for original source upon which this is based.
-    requirements:
-      - Whitelisting this callback plugin
-      - 'Create a HTTP Event Collector in Splunk'
-      - 'Define the URL and token in C(ansible.cfg)'
-    options:
-      url:
-        description: URL to the Splunk HTTP collector source.
-        type: str
-        env:
-          - name: SPLUNK_URL
-        ini:
-          - section: callback_splunk
-            key: url
-      authtoken:
-        description: Token to authenticate the connection to the Splunk HTTP collector.
-        type: str
-        env:
-          - name: SPLUNK_AUTHTOKEN
-        ini:
-          - section: callback_splunk
-            key: authtoken
-      validate_certs:
-        description: Whether to validate certificates for connections to HEC. It is not recommended to set to
-                     V(false) except when you are sure that nobody can intercept the connection
-                     between this plugin and HEC, as setting it to V(false) allows man-in-the-middle attacks!
-        env:
-          - name: SPLUNK_VALIDATE_CERTS
-        ini:
-          - section: callback_splunk
-            key: validate_certs
-        type: bool
-        default: true
-        version_added: '1.0.0'
-      include_milliseconds:
-        description: Whether to include milliseconds as part of the generated timestamp field in the event
-                     sent to the Splunk HTTP collector.
-        env:
-          - name: SPLUNK_INCLUDE_MILLISECONDS
-        ini:
-          - section: callback_splunk
-            key: include_milliseconds
-        type: bool
-        default: false
-        version_added: 2.0.0
-      batch:
-        description:
-          - Correlation ID which can be set across multiple playbook executions.
-        env:
-          - name: SPLUNK_BATCH
-        ini:
-          - section: callback_splunk
-            key: batch
-        type: str
-        version_added: 3.3.0
-'''
+      - Correlation ID which can be set across multiple playbook executions.
+    env:
+      - name: SPLUNK_BATCH
+    ini:
+      - section: callback_splunk
+        key: batch
+    type: str
+    version_added: 3.3.0
+"""
 
-EXAMPLES = '''
-examples: >
+EXAMPLES = r"""
+examples: >-
   To enable, add this to your ansible.cfg file in the defaults block
     [defaults]
     callback_whitelist = community.general.splunk
@@ -83,7 +83,7 @@ examples: >
     [callback_splunk]
     url = http://mysplunkinstance.datapaas.io:8088/services/collector/event
     authtoken = f23blad6-5965-4537-bf69-5b5a545blabla88
-'''
+"""
 
 import json
 import uuid
@@ -153,15 +153,14 @@ class SplunkHTTPCollectorSource(object):
         data['ansible_result'] = result._result
 
         # This wraps the json payload in and outer json event needed by Splunk
-        jsondata = json.dumps(data, cls=AnsibleJSONEncoder, sort_keys=True)
-        jsondata = '{"event":' + jsondata + "}"
+        jsondata = json.dumps({"event": data}, cls=AnsibleJSONEncoder, sort_keys=True)
 
         open_url(
             url,
             jsondata,
             headers={
                 'Content-type': 'application/json',
-                'Authorization': 'Splunk ' + authtoken
+                'Authorization': f"Splunk {authtoken}"
             },
             method='POST',
             validate_certs=validate_certs

@@ -12,34 +12,33 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
-    name: qubes
-    short_description: Interact with an existing QubesOS AppVM
+DOCUMENTATION = r"""
+name: qubes
+short_description: Interact with an existing QubesOS AppVM
 
+description:
+  - Run commands or put/fetch files to an existing Qubes AppVM using qubes tools.
+author: Kushal Das (@kushaldas)
+
+
+options:
+  remote_addr:
     description:
-        - Run commands or put/fetch files to an existing Qubes AppVM using qubes tools.
-
-    author: Kushal Das (@kushaldas)
-
-
-    options:
-      remote_addr:
-        description:
-            - VM name.
-        type: string
-        default: inventory_hostname
-        vars:
-            - name: ansible_host
-      remote_user:
-        description:
-            - The user to execute as inside the VM.
-        type: string
-        default: The I(user) account as default in Qubes OS.
-        vars:
-            - name: ansible_user
+      - VM name.
+    type: string
+    default: inventory_hostname
+    vars:
+      - name: ansible_host
+  remote_user:
+    description:
+      - The user to execute as inside the VM.
+    type: string
+    default: The I(user) account as default in Qubes OS.
+    vars:
+      - name: ansible_user
 #        keyword:
 #            - name: hosts
-'''
+"""
 
 import subprocess
 
@@ -78,7 +77,7 @@ class Connection(ConnectionBase):
         """
         display.vvvv("CMD: ", cmd)
         if not cmd.endswith("\n"):
-            cmd = cmd + "\n"
+            cmd = f"{cmd}\n"
         local_cmd = []
 
         # For dom0
@@ -95,7 +94,7 @@ class Connection(ConnectionBase):
 
         display.vvvv("Local cmd: ", local_cmd)
 
-        display.vvv("RUN %s" % (local_cmd,), host=self._remote_vmname)
+        display.vvv(f"RUN {local_cmd}", host=self._remote_vmname)
         p = subprocess.Popen(local_cmd, shell=False, stdin=subprocess.PIPE,
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -114,42 +113,42 @@ class Connection(ConnectionBase):
         """Run specified command in a running QubesVM """
         super(Connection, self).exec_command(cmd, in_data=in_data, sudoable=sudoable)
 
-        display.vvvv("CMD IS: %s" % cmd)
+        display.vvvv(f"CMD IS: {cmd}")
 
         rc, stdout, stderr = self._qubes(cmd)
 
-        display.vvvvv("STDOUT %r STDERR %r" % (stderr, stderr))
+        display.vvvvv(f"STDOUT {stdout!r} STDERR {stderr!r}")
         return rc, stdout, stderr
 
     def put_file(self, in_path, out_path):
         """ Place a local file located in 'in_path' inside VM at 'out_path' """
         super(Connection, self).put_file(in_path, out_path)
-        display.vvv("PUT %s TO %s" % (in_path, out_path), host=self._remote_vmname)
+        display.vvv(f"PUT {in_path} TO {out_path}", host=self._remote_vmname)
 
         with open(in_path, "rb") as fobj:
             source_data = fobj.read()
 
-        retcode, dummy, dummy = self._qubes('cat > "{0}"\n'.format(out_path), source_data, "qubes.VMRootShell")
+        retcode, dummy, dummy = self._qubes(f'cat > "{out_path}\"\n', source_data, "qubes.VMRootShell")
         # if qubes.VMRootShell service not supported, fallback to qubes.VMShell and
         # hope it will have appropriate permissions
         if retcode == 127:
-            retcode, dummy, dummy = self._qubes('cat > "{0}"\n'.format(out_path), source_data)
+            retcode, dummy, dummy = self._qubes(f'cat > "{out_path}\"\n', source_data)
 
         if retcode != 0:
-            raise AnsibleConnectionFailure('Failed to put_file to {0}'.format(out_path))
+            raise AnsibleConnectionFailure(f'Failed to put_file to {out_path}')
 
     def fetch_file(self, in_path, out_path):
         """Obtain file specified via 'in_path' from the container and place it at 'out_path' """
         super(Connection, self).fetch_file(in_path, out_path)
-        display.vvv("FETCH %s TO %s" % (in_path, out_path), host=self._remote_vmname)
+        display.vvv(f"FETCH {in_path} TO {out_path}", host=self._remote_vmname)
 
         # We are running in dom0
-        cmd_args_list = ["qvm-run", "--pass-io", self._remote_vmname, "cat {0}".format(in_path)]
+        cmd_args_list = ["qvm-run", "--pass-io", self._remote_vmname, f"cat {in_path}"]
         with open(out_path, "wb") as fobj:
             p = subprocess.Popen(cmd_args_list, shell=False, stdout=fobj)
             p.communicate()
             if p.returncode != 0:
-                raise AnsibleConnectionFailure('Failed to fetch file to {0}'.format(out_path))
+                raise AnsibleConnectionFailure(f'Failed to fetch file to {out_path}')
 
     def close(self):
         """ Closing the connection """

@@ -9,8 +9,7 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = """
----
+DOCUMENTATION = r"""
 module: proxmox_vm_info
 short_description: Retrieve information about one or more Proxmox VE virtual machines
 version_added: 7.2.0
@@ -71,7 +70,7 @@ extends_documentation_fragment:
   - community.general.attributes.info_module
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: List all existing virtual machines on node
   community.general.proxmox_vm_info:
     api_host: proxmoxhost
@@ -108,7 +107,7 @@ EXAMPLES = """
     config: current
 """
 
-RETURN = """
+RETURN = r"""
 proxmox_vms:
     description: List of virtual machines.
     returned: on success

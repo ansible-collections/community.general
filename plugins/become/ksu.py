@@ -5,87 +5,87 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    name: ksu
-    short_description: Kerberos substitute user
+DOCUMENTATION = r"""
+name: ksu
+short_description: Kerberos substitute user
+description:
+  - This become plugins allows your remote/login user to execute commands as another user using the C(ksu) utility.
+author: Ansible Core Team
+options:
+  become_user:
+    description: User you 'become' to execute the task.
+    type: string
+    ini:
+      - section: privilege_escalation
+        key: become_user
+      - section: ksu_become_plugin
+        key: user
+    vars:
+      - name: ansible_become_user
+      - name: ansible_ksu_user
+    env:
+      - name: ANSIBLE_BECOME_USER
+      - name: ANSIBLE_KSU_USER
+    required: true
+  become_exe:
+    description: C(ksu) executable.
+    type: string
+    default: ksu
+    ini:
+      - section: privilege_escalation
+        key: become_exe
+      - section: ksu_become_plugin
+        key: executable
+    vars:
+      - name: ansible_become_exe
+      - name: ansible_ksu_exe
+    env:
+      - name: ANSIBLE_BECOME_EXE
+      - name: ANSIBLE_KSU_EXE
+  become_flags:
+    description: Options to pass to C(ksu).
+    type: string
+    default: ''
+    ini:
+      - section: privilege_escalation
+        key: become_flags
+      - section: ksu_become_plugin
+        key: flags
+    vars:
+      - name: ansible_become_flags
+      - name: ansible_ksu_flags
+    env:
+      - name: ANSIBLE_BECOME_FLAGS
+      - name: ANSIBLE_KSU_FLAGS
+  become_pass:
+    description: C(ksu) password.
+    type: string
+    required: false
+    vars:
+      - name: ansible_ksu_pass
+      - name: ansible_become_pass
+      - name: ansible_become_password
+    env:
+      - name: ANSIBLE_BECOME_PASS
+      - name: ANSIBLE_KSU_PASS
+    ini:
+      - section: ksu_become_plugin
+        key: password
+  prompt_l10n:
     description:
-        - This become plugins allows your remote/login user to execute commands as another user via the ksu utility.
-    author: Ansible Core Team
-    options:
-        become_user:
-            description: User you 'become' to execute the task.
-            type: string
-            ini:
-              - section: privilege_escalation
-                key: become_user
-              - section: ksu_become_plugin
-                key: user
-            vars:
-              - name: ansible_become_user
-              - name: ansible_ksu_user
-            env:
-              - name: ANSIBLE_BECOME_USER
-              - name: ANSIBLE_KSU_USER
-            required: true
-        become_exe:
-            description: Su executable.
-            type: string
-            default: ksu
-            ini:
-              - section: privilege_escalation
-                key: become_exe
-              - section: ksu_become_plugin
-                key: executable
-            vars:
-              - name: ansible_become_exe
-              - name: ansible_ksu_exe
-            env:
-              - name: ANSIBLE_BECOME_EXE
-              - name: ANSIBLE_KSU_EXE
-        become_flags:
-            description: Options to pass to ksu.
-            type: string
-            default: ''
-            ini:
-              - section: privilege_escalation
-                key: become_flags
-              - section: ksu_become_plugin
-                key: flags
-            vars:
-              - name: ansible_become_flags
-              - name: ansible_ksu_flags
-            env:
-              - name: ANSIBLE_BECOME_FLAGS
-              - name: ANSIBLE_KSU_FLAGS
-        become_pass:
-            description: Ksu password.
-            type: string
-            required: false
-            vars:
-              - name: ansible_ksu_pass
-              - name: ansible_become_pass
-              - name: ansible_become_password
-            env:
-              - name: ANSIBLE_BECOME_PASS
-              - name: ANSIBLE_KSU_PASS
-            ini:
-              - section: ksu_become_plugin
-                key: password
-        prompt_l10n:
-            description:
-                - List of localized strings to match for prompt detection.
-                - If empty we will use the built in one.
-            type: list
-            elements: string
-            default: []
-            ini:
-              - section: ksu_become_plugin
-                key: localized_prompts
-            vars:
-              - name: ansible_ksu_prompt_l10n
-            env:
-              - name: ANSIBLE_KSU_PROMPT_L10N
-'''
+      - List of localized strings to match for prompt detection.
+      - If empty we will use the built in one.
+    type: list
+    elements: string
+    default: []
+    ini:
+      - section: ksu_become_plugin
+        key: localized_prompts
+    vars:
+      - name: ansible_ksu_prompt_l10n
+    env:
+      - name: ANSIBLE_KSU_PROMPT_L10N
+"""
 
 import re
 
@@ -124,4 +124,4 @@ class BecomeModule(BecomeBase):
 
         flags = self.get_option('become_flags')
         user = self.get_option('become_user')
-        return '%s %s %s -e %s ' % (exe, user, flags, self._build_success_command(cmd, shell))
+        return f'{exe} {user} {flags} -e {self._build_success_command(cmd, shell)} '

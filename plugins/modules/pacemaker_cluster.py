@@ -8,71 +8,59 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: pacemaker_cluster
 short_description: Manage pacemaker clusters
 author:
   - Mathieu Bultel (@matbu)
 description:
-  - This module can manage a pacemaker cluster and nodes from Ansible using
-    the pacemaker cli.
+  - This module can manage a pacemaker cluster and nodes from Ansible using the pacemaker CLI.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
-    check_mode:
-      support: full
-    diff_mode:
-      support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    state:
-      description:
-        - Indicate desired state of the cluster
-      choices: [ cleanup, offline, online, restart ]
-      type: str
-    node:
-      description:
-        - Specify which node of the cluster you want to manage. None == the
-          cluster status itself, 'all' == check the status of all nodes.
-      type: str
-    timeout:
-      description:
-        - Timeout when the module should considered that the action has failed
-      default: 300
-      type: int
-    force:
-      description:
-        - Force the change of the cluster state
-      type: bool
-      default: true
-'''
-EXAMPLES = '''
----
+  state:
+    description:
+      - Indicate desired state of the cluster.
+    choices: [cleanup, offline, online, restart]
+    type: str
+  node:
+    description:
+      - Specify which node of the cluster you want to manage. V(null) == the cluster status itself, V(all) == check the status of all nodes.
+    type: str
+  timeout:
+    description:
+      - Timeout when the module should considered that the action has failed.
+    default: 300
+    type: int
+  force:
+    description:
+      - Force the change of the cluster state.
+    type: bool
+    default: true
+"""
+
+EXAMPLES = r"""
 - name: Set cluster Online
   hosts: localhost
   gather_facts: false
   tasks:
-  - name: Get cluster state
-    community.general.pacemaker_cluster:
-      state: online
-'''
+    - name: Get cluster state
+      community.general.pacemaker_cluster:
+        state: online
+"""
 
-RETURN = '''
-changed:
-    description: true if the cluster state has changed
-    type: bool
-    returned: always
+RETURN = r"""
 out:
-    description: The output of the current state of the cluster. It return a
-                 list of the nodes state.
-    type: str
-    sample: 'out: [["  overcloud-controller-0", " Online"]]}'
-    returned: always
-rc:
-    description: exit code of the module
-    type: bool
-    returned: always
-'''
+  description: The output of the current state of the cluster. It returns a list of the nodes state.
+  type: str
+  sample: 'out: [["  overcloud-controller-0", " Online"]]}'
+  returned: always
+"""
 
 import time
 
@@ -83,7 +71,7 @@ _PCS_CLUSTER_DOWN = "Error: cluster is not currently running on this node"
 
 
 def get_cluster_status(module):
-    cmd = "pcs cluster status"
+    cmd = ["pcs", "cluster", "status"]
     rc, out, err = module.run_command(cmd)
     if out in _PCS_CLUSTER_DOWN:
         return 'offline'
@@ -92,10 +80,8 @@ def get_cluster_status(module):
 
 
 def get_node_status(module, node='all'):
-    if node == 'all':
-        cmd = "pcs cluster pcsd-status %s" % node
-    else:
-        cmd = "pcs cluster pcsd-status"
+    node_l = ["all"] if node == "all" else []
+    cmd = ["pcs", "cluster", "pcsd-status"] + node_l
     rc, out, err = module.run_command(cmd)
     if rc == 1:
         module.fail_json(msg="Command execution failed.\nCommand: `%s`\nError: %s" % (cmd, err))
@@ -106,7 +92,7 @@ def get_node_status(module, node='all'):
 
 
 def clean_cluster(module, timeout):
-    cmd = "pcs resource cleanup"
+    cmd = ["pcs", "resource", "cleanup"]
     rc, out, err = module.run_command(cmd)
     if rc == 1:
         module.fail_json(msg="Command execution failed.\nCommand: `%s`\nError: %s" % (cmd, err))
@@ -114,11 +100,11 @@ def clean_cluster(module, timeout):
 
 def set_cluster(module, state, timeout, force):
     if state == 'online':
-        cmd = "pcs cluster start"
+        cmd = ["pcs", "cluster", "start"]
     if state == 'offline':
-        cmd = "pcs cluster stop"
+        cmd = ["pcs", "cluster", "stop"]
         if force:
-            cmd = "%s --force" % cmd
+            cmd = cmd + ["--force"]
     rc, out, err = module.run_command(cmd)
     if rc == 1:
         module.fail_json(msg="Command execution failed.\nCommand: `%s`\nError: %s" % (cmd, err))
@@ -130,35 +116,6 @@ def set_cluster(module, state, timeout, force):
         if cluster_state == state:
             ready = True
             break
-    if not ready:
-        module.fail_json(msg="Failed to set the state `%s` on the cluster\n" % (state))
-
-
-def set_node(module, state, timeout, force, node='all'):
-    # map states
-    if state == 'online':
-        cmd = "pcs cluster start"
-    if state == 'offline':
-        cmd = "pcs cluster stop"
-        if force:
-            cmd = "%s --force" % cmd
-
-    nodes_state = get_node_status(module, node)
-    for node in nodes_state:
-        if node[1].strip().lower() != state:
-            cmd = "%s %s" % (cmd, node[0].strip())
-            rc, out, err = module.run_command(cmd)
-            if rc == 1:
-                module.fail_json(msg="Command execution failed.\nCommand: `%s`\nError: %s" % (cmd, err))
-
-    t = time.time()
-    ready = False
-    while time.time() < t + timeout:
-        nodes_state = get_node_status(module)
-        for node in nodes_state:
-            if node[1].strip().lower() == state:
-                ready = True
-                break
     if not ready:
         module.fail_json(msg="Failed to set the state `%s` on the cluster\n" % (state))
 
@@ -210,7 +167,7 @@ def main():
                     cluster_state = get_node_status(module, node)
                     module.exit_json(changed=True, out=cluster_state)
 
-    if state in ['restart']:
+    elif state == 'restart':
         if module.check_mode:
             module.exit_json(changed=True)
         set_cluster(module, 'offline', timeout, force)
@@ -221,17 +178,16 @@ def main():
             if cluster_state == 'online':
                 module.exit_json(changed=True, out=cluster_state)
             else:
-                module.fail_json(msg="Failed during the restart of the cluster, the cluster can't be started")
+                module.fail_json(msg="Failed during the restart of the cluster, the cluster cannot be started")
         else:
-            module.fail_json(msg="Failed during the restart of the cluster, the cluster can't be stopped")
+            module.fail_json(msg="Failed during the restart of the cluster, the cluster cannot be stopped")
 
-    if state in ['cleanup']:
+    elif state == 'cleanup':
         if module.check_mode:
             module.exit_json(changed=True)
         clean_cluster(module, timeout)
         cluster_state = get_cluster_status(module)
-        module.exit_json(changed=True,
-                         out=cluster_state)
+        module.exit_json(changed=True, out=cluster_state)
 
 
 if __name__ == '__main__':

@@ -125,7 +125,7 @@ from ansible.plugins.inventory import BaseInventoryPlugin, Constructable
 from ansible_collections.community.general.plugins.module_utils.scaleway import SCALEWAY_LOCATION, parse_pagination_link
 from ansible_collections.community.general.plugins.plugin_utils.unsafe import make_unsafe
 from ansible.module_utils.urls import open_url
-from ansible.module_utils.common.text.converters import to_native, to_text
+from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.six import raise_from
 
 import ansible.module_utils.six.moves.urllib.parse as urllib_parse
@@ -140,7 +140,7 @@ def _fetch_information(token, url):
                                 headers={'X-Auth-Token': token,
                                          'Content-type': 'application/json'})
         except Exception as e:
-            raise AnsibleError("Error while fetching %s: %s" % (url, to_native(e)))
+            raise AnsibleError(f"Error while fetching {url}: {e}")
         try:
             raw_json = json.loads(to_text(response.read()))
         except ValueError:
@@ -161,7 +161,7 @@ def _fetch_information(token, url):
 
 
 def _build_server_url(api_endpoint):
-    return "/".join([api_endpoint, "servers"])
+    return f"{api_endpoint}/servers"
 
 
 def extract_public_ipv4(server_info):

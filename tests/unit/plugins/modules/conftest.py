@@ -48,4 +48,4 @@ def patch_ansible_module(request, mocker):
 
 @pytest.fixture(autouse=True)
 def deps_cleanup():
-    deps._deps.clear()
+    deps.clear()

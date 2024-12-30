@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: proxmox_kvm
 short_description: Management of Qemu(KVM) Virtual Machines in Proxmox VE cluster
 description:
@@ -66,21 +65,21 @@ options:
     type: str
   bootdisk:
     description:
-      - 'Enable booting from specified disk. Format V((ide|sata|scsi|virtio\)\\d+).'
+      - Enable booting from specified disk. Format V((ide|sata|scsi|virtio\)\\d+).
     type: str
   cicustom:
     description:
-      - 'cloud-init: Specify custom files to replace the automatically generated ones at start.'
+      - 'Cloud-init: Specify custom files to replace the automatically generated ones at start.'
     type: str
     version_added: 1.3.0
   cipassword:
     description:
-      - 'cloud-init: password of default user to create.'
+      - 'Cloud-init: password of default user to create.'
     type: str
     version_added: 1.3.0
   citype:
     description:
-      - 'cloud-init: Specifies the cloud-init configuration format.'
+      - 'Cloud-init: Specifies the cloud-init configuration format.'
       - The default depends on the configured operating system type (V(ostype)).
       - We use the V(nocloud) format for Linux, and V(configdrive2) for Windows.
     type: str
@@ -88,12 +87,12 @@ options:
     version_added: 1.3.0
   ciupgrade:
     description:
-      - 'cloud-init: do an automatic package upgrade after the first boot.'
+      - 'Cloud-init: do an automatic package upgrade after the first boot.'
     type: bool
     version_added: 10.0.0
   ciuser:
     description:
-      - 'cloud-init: username of default user to create.'
+      - 'Cloud-init: username of default user to create.'
     type: str
     version_added: 1.3.0
   clone:
@@ -110,13 +109,13 @@ options:
     type: str
   cpulimit:
     description:
-      - Specify if CPU usage will be limited. Value 0 indicates no CPU limit.
-      - If the computer has 2 CPUs, it has total of '2' CPU time
+      - Specify if CPU usage will be limited. Value V(0) indicates no CPU limit.
+      - If the computer has 2 CPUs, it has total of '2' CPU time.
     type: int
   cpuunits:
     description:
       - Specify CPU weight for a VM.
-      - You can disable fair-scheduler configuration by setting this to 0
+      - You can disable fair-scheduler configuration by setting this to V(0).
     type: int
   delete:
     description:
@@ -144,24 +143,22 @@ options:
         type: str
       format:
         description:
-          - V(format) is the drive's backing file's data format. Please refer to the Proxmox VE Administrator Guide,
-           section Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for the latest
-           version, tables 3 to 14) to find out format supported by the provided storage backend.
+          - V(format) is the drive's backing file's data format. Please refer to the Proxmox VE Administrator Guide, section Proxmox VE Storage
+            (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for the latest version, tables 3 to 14) to find out format supported by
+            the provided storage backend.
         type: str
       efitype:
         description:
           - V(efitype) indicates the size of the EFI disk.
           - V(2m) will allow for a 2MB EFI disk, which will be enough to persist boot order and new boot entries.
-          - V(4m) will allow for a 4MB EFI disk, which will additionally allow to store EFI keys in order to enable
-           Secure Boot
+          - V(4m) will allow for a 4MB EFI disk, which will additionally allow to store EFI keys in order to enable Secure Boot.
         type: str
         choices:
           - 2m
           - 4m
       pre_enrolled_keys:
         description:
-          - V(pre_enrolled_keys) indicates whether EFI keys for Secure Boot should be enrolled V(1) in the VM firmware
-           upon creation or not (0).
+          - V(pre_enrolled_keys) indicates whether EFI keys for Secure Boot should be enrolled V(1) in the VM firmware upon creation or not (0).
           - If set to V(1), Secure Boot will also be enabled by default when the VM is created.
         type: bool
     version_added: 4.5.0
@@ -174,14 +171,13 @@ options:
   format:
     description:
       - Target drive's backing file's data format.
-      - Used only with clone
+      - Used only with clone.
       - Use O(format=unspecified) and O(full=false) for a linked clone.
-      - Please refer to the Proxmox VE Administrator Guide, section Proxmox VE Storage (see
-        U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for the latest version, tables 3 to 14) to find out format
-        supported by the provided storage backend.
+      - Please refer to the Proxmox VE Administrator Guide, section Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html)
+        for the latest version, tables 3 to 14) to find out format supported by the provided storage backend.
       - Not specifying this option is equivalent to setting it to V(unspecified).
     type: str
-    choices: [ "cloop", "cow", "qcow", "qcow2", "qed", "raw", "vmdk", "unspecified" ]
+    choices: ["cloop", "cow", "qcow", "qcow2", "qed", "raw", "vmdk", "unspecified"]
   freeze:
     description:
       - Specify if PVE should freeze CPU at startup (use 'c' monitor command to start execution).
@@ -190,7 +186,7 @@ options:
     description:
       - Create a full copy of all disk. This is always done when you clone a normal VM.
       - For VM templates, we try to create a linked clone by default.
-      - Used only with clone
+      - Used only with clone.
     type: bool
     default: true
   hookscript:
@@ -202,11 +198,11 @@ options:
     description:
       - Specify a hash/dictionary of map host pci devices into guest. O(hostpci='{"key":"value", "key":"value"}').
       - Keys allowed are - C(hostpci[n]) where 0 ≤ n ≤ N.
-      - Values allowed are -  C("host="HOSTPCIID[;HOSTPCIID2...]",pcie="1|0",rombar="1|0",x-vga="1|0"").
-      - The C(host) parameter is Host PCI device pass through. HOSTPCIID syntax is C(bus:dev.func) (hexadecimal numbers).
-      - C(pcie=boolean) C(default=0) Choose the PCI-express bus (needs the q35 machine model).
-      - C(rombar=boolean) C(default=1) Specify whether or not the device's ROM will be visible in the guest's memory map.
-      - C(x-vga=boolean) C(default=0) Enable vfio-vga device support.
+      - Values allowed are - V("host="HOSTPCIID[;HOSTPCIID2...]",pcie="1|0",rombar="1|0",x-vga="1|0"").
+      - The C(host) parameter is Host PCI device pass through. HOSTPCIID syntax is V(bus:dev.func) (hexadecimal numbers).
+      - V(pcie=boolean) V(default=0) Choose the PCI-express bus (needs the q35 machine model).
+      - V(rombar=boolean) V(default=1) Specify whether or not the device's ROM will be visible in the guest's memory map.
+      - V(x-vga=boolean) V(default=0) Enable vfio-vga device support.
       - /!\ This option allows direct access to host hardware. So it is no longer possible to migrate such machines - use with special care.
     type: dict
   hotplug:
@@ -223,24 +219,24 @@ options:
   ide:
     description:
       - A hash/dictionary of volume used as IDE hard disk or CD-ROM. O(ide='{"key":"value", "key":"value"}').
-      - Keys allowed are - C(ide[n]) where 0 ≤ n ≤ 3.
-      - Values allowed are - C("storage:size,format=value").
-      - C(storage) is the storage identifier where to create the disk.
-      - C(size) is the size of the disk in GB.
-      - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol). Please refer to the Proxmox VE
-        Administrator Guide, section Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for
-        the latest version, tables 3 to 14) to find out format supported by the provided storage backend.
+      - Keys allowed are - V(ide[n]) where 0 ≤ n ≤ 3.
+      - Values allowed are - V("storage:size,format=value").
+      - V(storage) is the storage identifier where to create the disk.
+      - V(size) is the size of the disk in GB.
+      - V(format) is the drive's backing file's data format. V(qcow2|raw|subvol). Please refer to the Proxmox VE Administrator Guide, section
+        Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for the latest version, tables 3 to 14) to find out format
+        supported by the provided storage backend.
     type: dict
   ipconfig:
     description:
-      - 'cloud-init: Set the IP configuration.'
-      - A hash/dictionary of network ip configurations. O(ipconfig='{"key":"value", "key":"value"}').
-      - Keys allowed are - C(ipconfig[n]) where 0 ≤ n ≤ network interfaces.
-      - Values allowed are -  C("[gw=<GatewayIPv4>] [,gw6=<GatewayIPv6>] [,ip=<IPv4Format/CIDR>] [,ip6=<IPv6Format/CIDR>]").
-      - 'cloud-init: Specify IP addresses and gateways for the corresponding interface.'
+      - 'Cloud-init: Set the IP configuration.'
+      - A hash/dictionary of network IP configurations. O(ipconfig='{"key":"value", "key":"value"}').
+      - Keys allowed are - V(ipconfig[n]) where 0 ≤ n ≤ network interfaces.
+      - Values allowed are - V("[gw=<GatewayIPv4>] [,gw6=<GatewayIPv6>] [,ip=<IPv4Format/CIDR>] [,ip6=<IPv6Format/CIDR>]").
+      - 'Cloud-init: Specify IP addresses and gateways for the corresponding interface.'
       - IP addresses use CIDR notation, gateways are optional but they should be in the same subnet of specified IP address.
-      - The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided.
-      - For IPv6 the special string 'auto' can be used to use stateless autoconfiguration.
+      - The special string V(dhcp) can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided.
+      - For IPv6 the special string V(auto) can be used to use stateless autoconfiguration.
       - If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4.
     type: dict
     version_added: 1.3.0
@@ -265,7 +261,7 @@ options:
   machine:
     description:
       - Specifies the Qemu machine type.
-      - 'Type => V((pc|pc(-i440fx\)?-\\d+\\.\\d+(\\.pxe\)?|q35|pc-q35-\\d+\\.\\d+(\\.pxe\)?\)).'
+      - Type => V((pc|pc(-i440fx\)?-\\d+\\.\\d+(\\.pxe\)?|q35|pc-q35-\\d+\\.\\d+(\\.pxe\)?\)).
     type: str
   memory:
     description:
@@ -294,7 +290,7 @@ options:
     type: str
   nameservers:
     description:
-      - 'cloud-init: DNS server IP address(es).'
+      - 'Cloud-init: DNS server IP address(es).'
       - If unset, PVE host settings are used.
     type: list
     elements: str
@@ -307,7 +303,8 @@ options:
       - Model is one of C(e1000 e1000-82540em e1000-82544gc e1000-82545em i82551 i82557b i82559er ne2k_isa ne2k_pci pcnet rtl8139 virtio vmxnet3).
       - C(XX:XX:XX:XX:XX:XX) should be an unique MAC address. This is automatically generated if not specified.
       - The C(bridge) parameter can be used to automatically add the interface to a bridge device. The Proxmox VE standard bridge is called 'vmbr0'.
-      - Option C(rate) is used to limit traffic bandwidth from and to this interface. It is specified as floating point number, unit is 'Megabytes per second'.
+      - Option C(rate) is used to limit traffic bandwidth from and to this interface. It is specified as floating point number, unit is 'Megabytes
+        per second'.
       - If you specify no bridge, we create a kvm 'user' (NATed) network device, which provides DHCP and DNS services.
     type: dict
   newid:
@@ -318,12 +315,12 @@ options:
   numa:
     description:
       - A hash/dictionaries of NUMA topology. O(numa='{"key":"value", "key":"value"}').
-      - Keys allowed are - C(numa[n]) where 0 ≤ n ≤ N.
-      - Values allowed are - C("cpu="<id[-id];...>",hostnodes="<id[-id];...>",memory="number",policy="(bind|interleave|preferred)"").
-      - C(cpus) CPUs accessing this NUMA node.
-      - C(hostnodes) Host NUMA nodes to use.
-      - C(memory) Amount of memory this NUMA node provides.
-      - C(policy) NUMA allocation policy.
+      - Keys allowed are - V(numa[n]) where 0 ≤ n ≤ N.
+      - Values allowed are - V("cpu="<id[-id];...>",hostnodes="<id[-id];...>",memory="number",policy="(bind|interleave|preferred)"").
+      - V(cpus) CPUs accessing this NUMA node.
+      - V(hostnodes) Host NUMA nodes to use.
+      - V(memory) Amount of memory this NUMA node provides.
+      - V(policy) NUMA allocation policy.
     type: dict
   numa_enabled:
     description:
@@ -361,23 +358,23 @@ options:
     description:
       - A hash/dictionary of volume used as sata hard disk or CD-ROM. O(sata='{"key":"value", "key":"value"}').
       - Keys allowed are - C(sata[n]) where 0 ≤ n ≤ 5.
-      - Values allowed are -  C("storage:size,format=value").
+      - Values allowed are - C("storage:size,format=value").
       - C(storage) is the storage identifier where to create the disk.
       - C(size) is the size of the disk in GB.
-      - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol). Please refer to the Proxmox VE
-        Administrator Guide, section Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for
-        the latest version, tables 3 to 14) to find out format supported by the provided storage backend.
+      - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol). Please refer to the Proxmox VE Administrator Guide, section
+        Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for the latest version, tables 3 to 14) to find out format
+        supported by the provided storage backend.
     type: dict
   scsi:
     description:
       - A hash/dictionary of volume used as SCSI hard disk or CD-ROM. O(scsi='{"key":"value", "key":"value"}').
       - Keys allowed are - C(scsi[n]) where 0 ≤ n ≤ 13.
-      - Values allowed are -  C("storage:size,format=value").
+      - Values allowed are - C("storage:size,format=value").
       - C(storage) is the storage identifier where to create the disk.
       - C(size) is the size of the disk in GB.
-      - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol). Please refer to the Proxmox VE
-        Administrator Guide, section Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for
-        the latest version, tables 3 to 14) to find out format supported by the provided storage backend.
+      - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol). Please refer to the Proxmox VE Administrator Guide, section
+        Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for the latest version, tables 3 to 14) to find out format
+        supported by the provided storage backend.
     type: dict
   scsihw:
     description:
@@ -386,7 +383,7 @@ options:
     choices: ['lsi', 'lsi53c810', 'virtio-scsi-pci', 'virtio-scsi-single', 'megasas', 'pvscsi']
   searchdomains:
     description:
-      - 'cloud-init: Sets DNS search domain(s).'
+      - 'Cloud-init: Sets DNS search domain(s).'
       - If unset, PVE host settings are used.
     type: list
     elements: str
@@ -407,20 +404,20 @@ options:
     type: int
   skiplock:
     description:
-      - Ignore locks
+      - Ignore locks.
       - Only root is allowed to use this option.
     type: bool
   smbios:
     description:
       - Specifies SMBIOS type 1 fields.
-      - "Comma separated, Base64 encoded (optional) SMBIOS properties:"
-      - V([base64=<1|0>] [,family=<Base64 encoded string>])
-      - V([,manufacturer=<Base64 encoded string>])
-      - V([,product=<Base64 encoded string>])
-      - V([,serial=<Base64 encoded string>])
-      - V([,sku=<Base64 encoded string>])
-      - V([,uuid=<UUID>])
-      - V([,version=<Base64 encoded string>])
+      - Comma separated, Base64 encoded (optional) SMBIOS properties:.
+      - V([base64=<1|0>] [,family=<Base64 encoded string>]).
+      - V([,manufacturer=<Base64 encoded string>]).
+      - V([,product=<Base64 encoded string>]).
+      - V([,serial=<Base64 encoded string>]).
+      - V([,sku=<Base64 encoded string>]).
+      - V([,uuid=<UUID>]).
+      - V([,version=<Base64 encoded string>]).
     type: str
   snapname:
     description:
@@ -432,7 +429,7 @@ options:
     type: int
   sshkeys:
     description:
-      - 'cloud-init: SSH key to assign to the default user. NOT TESTED with multiple keys but a multi-line value should work.'
+      - 'Cloud-init: SSH key to assign to the default user. NOT TESTED with multiple keys but a multi-line value should work.'
     type: str
     version_added: 1.3.0
   startdate:
@@ -449,7 +446,7 @@ options:
   state:
     description:
       - Indicates desired state of the instance.
-      - If V(current), the current state of the VM will be fetched. You can access it with C(results.status)
+      - If V(current), the current state of the VM will be fetched. You can access it with C(results.status).
       - V(template) was added in community.general 8.1.0.
     type: str
     choices: ['present', 'started', 'absent', 'stopped', 'restarted', 'current', 'template']
@@ -473,7 +470,7 @@ options:
   target:
     description:
       - Target node. Only allowed if the original VM is on shared storage.
-      - Used only with clone
+      - Used only with clone.
     type: str
   tdf:
     description:
@@ -512,7 +509,7 @@ options:
       - A hash/dictionary of USB devices for the VM. O(usb='{"key":"value", "key":"value"}').
       - Keys allowed are - C(usb[n]) where 0 ≤ n ≤ N.
       - Values allowed are - C(host="value|spice",mapping="value",usb3="1|0").
-      - host is either C(spice) or the USB id/port.
+      - Host is either C(spice) or the USB id/port.
       - Option C(mapping) is the mapped USB device name.
       - Option C(usb3) enables USB 3 support.
     type: dict
@@ -520,16 +517,16 @@ options:
   update:
     description:
       - If V(true), the VM will be updated with new value.
-      - Because of the operations of the API and security reasons, I have disabled the update of the following parameters
-        O(net), O(virtio), O(ide), O(sata), O(scsi). Per example updating O(net) update the MAC address and C(virtio) create always new disk...
-        This security feature can be disabled by setting the O(update_unsafe) to V(true).
+      - Because of the operations of the API and security reasons, I have disabled the update of the following parameters O(net), O(virtio), O(ide),
+        O(sata), O(scsi). Per example updating O(net) update the MAC address and O(virtio) create always new disk... This security feature can
+        be disabled by setting the O(update_unsafe) to V(true).
       - Update of O(pool) is disabled. It needs an additional API endpoint not covered by this module.
     type: bool
     default: false
   update_unsafe:
     description:
-      - If V(true), do not enforce limitations on parameters O(net), O(virtio), O(ide), O(sata), O(scsi), O(efidisk0), and O(tpmstate0).
-        Use this option with caution because an improper configuration might result in a permanent loss of data (e.g. disk recreated).
+      - If V(true), do not enforce limitations on parameters O(net), O(virtio), O(ide), O(sata), O(scsi), O(efidisk0), and O(tpmstate0). Use this
+        option with caution because an improper configuration might result in a permanent loss of data (for example disk recreated).
     type: bool
     default: false
     version_added: 8.4.0
@@ -539,19 +536,19 @@ options:
     type: int
   vga:
     description:
-      - Select VGA type. If you want to use high resolution modes (>= 1280x1024x16) then you should use option 'std' or 'vmware'.
+      - Select VGA type. If you want to use high resolution modes (>= 1280x1024x16) then you should use option V(std) or V(vmware).
     type: str
     choices: ['std', 'cirrus', 'vmware', 'qxl', 'serial0', 'serial1', 'serial2', 'serial3', 'qxl2', 'qxl3', 'qxl4']
   virtio:
     description:
       - A hash/dictionary of volume used as VIRTIO hard disk. O(virtio='{"key":"value", "key":"value"}').
-      - Keys allowed are - C(virtio[n]) where 0 ≤ n ≤ 15.
-      - Values allowed are -  C("storage:size,format=value").
-      - C(storage) is the storage identifier where to create the disk.
-      - C(size) is the size of the disk in GB.
-      - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol). Please refer to the Proxmox VE
-        Administrator Guide, section Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html)
-        for the latest version, tables 3 to 14) to find out format supported by the provided storage backend.
+      - Keys allowed are - V(virtio[n]) where 0 ≤ n ≤ 15.
+      - Values allowed are - V(storage:size,format=value).
+      - V(storage) is the storage identifier where to create the disk.
+      - V(size) is the size of the disk in GB.
+      - V(format) is the drive's backing file's data format. V(qcow2|raw|subvol). Please refer to the Proxmox VE Administrator Guide, section
+        Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for the latest version, tables 3 to 14) to find out format
+        supported by the provided storage backend.
     type: dict
   watchdog:
     description:
@@ -564,9 +561,9 @@ extends_documentation_fragment:
   - community.general.proxmox.documentation
   - community.general.proxmox.selection
   - community.general.attributes
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create new VM with minimal options
   community.general.proxmox_kvm:
     api_user: root@pam
@@ -846,7 +843,7 @@ EXAMPLES = '''
     cores: 8
     memory: 16384
     net:
-        net0: virtio,bridge=vmbr1
+      net0: virtio,bridge=vmbr1
     update: true
     update_unsafe: true
 
@@ -886,10 +883,9 @@ EXAMPLES = '''
     node: sabrewulf
     hookscript: local:snippets/hookscript.pl
     update: true
+"""
 
-'''
-
-RETURN = '''
+RETURN = r"""
 vmid:
   description: The VM vmid.
   returned: success
@@ -901,11 +897,11 @@ status:
   type: str
   sample: running
 msg:
-  description: A short message
+  description: A short message.
   returned: always
   type: str
   sample: "VM kropta with vmid = 110 is running"
-'''
+"""
 
 import re
 import time
@@ -1057,7 +1053,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             if ('bios' not in kwargs) or ('ovmf' != kwargs['bios']):
                 self.module.fail_json(msg='efidisk0 cannot be used if bios is not set to ovmf. ')
 
-        # Flatten efidisk0 option to a string so that it's a string which is what Proxmoxer and the API expect
+        # Flatten efidisk0 option to a string so that it is a string which is what Proxmoxer and the API expect
         if 'efidisk0' in kwargs:
             efidisk0_str = ''
             # Regexp to catch underscores in keys name, to replace them after by hyphens
@@ -1072,7 +1068,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
                                       if 'storage' != k])
             kwargs['efidisk0'] = efidisk0_str
 
-        # Flatten tpmstate0 option to a string so that it's a string which is what Proxmoxer and the API expect
+        # Flatten tpmstate0 option to a string so that it is a string which is what Proxmoxer and the API expect
         if 'tpmstate0' in kwargs:
             kwargs['tpmstate0'] = '{storage}:1,version=v{version}'.format(
                 storage=kwargs['tpmstate0'].get('storage'),

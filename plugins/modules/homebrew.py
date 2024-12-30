@@ -14,81 +14,80 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: homebrew
 author:
-    - "Indrajit Raychaudhuri (@indrajitr)"
-    - "Daniel Jaouen (@danieljaouen)"
-    - "Andrew Dunham (@andrew-d)"
+  - "Indrajit Raychaudhuri (@indrajitr)"
+  - "Daniel Jaouen (@danieljaouen)"
+  - "Andrew Dunham (@andrew-d)"
 requirements:
-    - homebrew must already be installed on the target system
+  - homebrew must already be installed on the target system
 short_description: Package manager for Homebrew
 description:
-    - Manages Homebrew packages
+  - Manages Homebrew packages.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    name:
-        description:
-            - A list of names of packages to install/remove.
-        aliases: [ 'formula', 'package', 'pkg' ]
-        type: list
-        elements: str
-    path:
-        description:
-            - "A V(:) separated list of paths to search for C(brew) executable.
-              Since a package (I(formula) in homebrew parlance) location is prefixed relative to the actual path of C(brew) command,
-              providing an alternative C(brew) path enables managing different set of packages in an alternative location in the system."
-        default: '/usr/local/bin:/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin'
-        type: path
-    state:
-        description:
-            - state of the package.
-        choices: [ 'absent', 'head', 'installed', 'latest', 'linked', 'present', 'removed', 'uninstalled', 'unlinked', 'upgraded' ]
-        default: present
-        type: str
-    update_homebrew:
-        description:
-            - update homebrew itself first.
-        type: bool
-        default: false
-    upgrade_all:
-        description:
-            - upgrade all homebrew packages.
-        type: bool
-        default: false
-        aliases: ['upgrade']
-    install_options:
-        description:
-            - options flags to install a package.
-        aliases: ['options']
-        type: list
-        elements: str
-    upgrade_options:
-        description:
-            - Option flags to upgrade.
-        type: list
-        elements: str
-        version_added: '0.2.0'
-    force_formula:
-        description:
-            - Force the package(s) to be treated as a formula (equivalent to C(brew --formula)).
-            - To install a cask, use the M(community.general.homebrew_cask) module.
-        type: bool
-        default: false
-        version_added: 9.0.0
+  name:
+    description:
+      - A list of names of packages to install/remove.
+    aliases: ['formula', 'package', 'pkg']
+    type: list
+    elements: str
+  path:
+    description:
+      - A V(:) separated list of paths to search for C(brew) executable. Since a package (I(formula) in homebrew parlance)
+        location is prefixed relative to the actual path of C(brew) command, providing an alternative C(brew) path enables
+        managing different set of packages in an alternative location in the system.
+    default: '/usr/local/bin:/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin'
+    type: path
+  state:
+    description:
+      - State of the package.
+    choices: ['absent', 'head', 'installed', 'latest', 'linked', 'present', 'removed', 'uninstalled', 'unlinked', 'upgraded']
+    default: present
+    type: str
+  update_homebrew:
+    description:
+      - Update homebrew itself first.
+    type: bool
+    default: false
+  upgrade_all:
+    description:
+      - Upgrade all homebrew packages.
+    type: bool
+    default: false
+    aliases: ['upgrade']
+  install_options:
+    description:
+      - Options flags to install a package.
+    aliases: ['options']
+    type: list
+    elements: str
+  upgrade_options:
+    description:
+      - Option flags to upgrade.
+    type: list
+    elements: str
+    version_added: '0.2.0'
+  force_formula:
+    description:
+      - Force the package(s) to be treated as a formula (equivalent to C(brew --formula)).
+      - To install a cask, use the M(community.general.homebrew_cask) module.
+    type: bool
+    default: false
+    version_added: 9.0.0
 notes:
-  - When used with a C(loop:) each package will be processed individually,
-    it is much more efficient to pass the list directly to the O(name) option.
-'''
+  - When used with a C(loop:) each package will be processed individually, it is much more efficient to pass the list directly
+    to the O(name) option.
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # Install formula foo with 'brew' in default path
 - community.general.homebrew:
     name: foo
@@ -154,29 +153,29 @@ EXAMPLES = '''
     name: ambiguous_formula
     state: present
     force_formula: true
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 msg:
-    description: if the cache was updated or not
-    returned: always
-    type: str
-    sample: "Changed: 0, Unchanged: 2"
+  description: If the cache was updated or not.
+  returned: always
+  type: str
+  sample: "Changed: 0, Unchanged: 2"
 unchanged_pkgs:
-    description:
-    - List of package names which are unchanged after module run
-    returned: success
-    type: list
-    sample: ["awscli", "ag"]
-    version_added: '0.2.0'
+  description:
+    - List of package names which are unchanged after module run.
+  returned: success
+  type: list
+  sample: ["awscli", "ag"]
+  version_added: '0.2.0'
 changed_pkgs:
-    description:
-    - List of package names which are changed after module run
-    returned: success
-    type: list
-    sample: ['git', 'git-cola']
-    version_added: '0.2.0'
-'''
+  description:
+    - List of package names which are changed after module run.
+  returned: success
+  type: list
+  sample: ['git', 'git-cola']
+  version_added: '0.2.0'
+"""
 
 import json
 import re
@@ -308,21 +307,6 @@ class Homebrew(object):
         self._params = self.module.params
         return self._params
 
-    @property
-    def current_package(self):
-        return self._current_package
-
-    @current_package.setter
-    def current_package(self, package):
-        if not HomebrewValidate.valid_package(package):
-            self._current_package = None
-            self.failed = True
-            self.message = 'Invalid package: {0}.'.format(package)
-            raise HomebrewException(self.message)
-
-        else:
-            self._current_package = package
-            return package
     # /class properties -------------------------------------------- }}}
 
     def __init__(self, module, path, packages=None, state=None,
@@ -347,13 +331,13 @@ class Homebrew(object):
     def _setup_status_vars(self):
         self.failed = False
         self.changed = False
-        self.changed_count = 0
-        self.unchanged_count = 0
         self.changed_pkgs = []
         self.unchanged_pkgs = []
         self.message = ''
 
     def _setup_instance_vars(self, **kwargs):
+        self.installed_packages = set()
+        self.outdated_packages = set()
         for key, val in iteritems(kwargs):
             setattr(self, key, val)
 
@@ -380,8 +364,59 @@ class Homebrew(object):
 
         return self.brew_path
 
-    def _status(self):
-        return (self.failed, self.changed, self.message)
+    def _validate_packages_names(self):
+        invalid_packages = []
+        for package in self.packages:
+            if not HomebrewValidate.valid_package(package):
+                invalid_packages.append(package)
+
+        if invalid_packages:
+            self.failed = True
+            self.message = 'Invalid package{0}: {1}'.format(
+                "s" if len(invalid_packages) > 1 else "",
+                ", ".join(invalid_packages),
+            )
+            raise HomebrewException(self.message)
+
+    def _save_package_info(self, package_detail, package_name):
+        if bool(package_detail.get("installed")):
+            self.installed_packages.add(package_name)
+        if bool(package_detail.get("outdated")):
+            self.outdated_packages.add(package_name)
+
+    def _extract_package_name(self, package_detail, is_cask):
+        canonical_name = package_detail["token"] if is_cask else package_detail["name"]  # For ex: 'sqlite'
+        all_valid_names = set(package_detail.get("aliases", []))  # For ex: {'sqlite3'}
+        all_valid_names.add(canonical_name)
+
+        # Then make sure the user provided name resurface.
+        return (all_valid_names & set(self.packages)).pop()
+
+    def _get_packages_info(self):
+        cmd = [
+            "{brew_path}".format(brew_path=self.brew_path),
+            "info",
+            "--json=v2",
+        ]
+        cmd.extend(self.packages)
+        if self.force_formula:
+            cmd.append("--formula")
+
+        rc, out, err = self.module.run_command(cmd)
+        if rc != 0:
+            self.failed = True
+            self.message = err.strip() or ("Unknown failure with exit code %d" % rc)
+            raise HomebrewException(self.message)
+
+        data = json.loads(out)
+        for package_detail in data.get("formulae", []):
+            package_name = self._extract_package_name(package_detail, is_cask=False)
+            self._save_package_info(package_detail, package_name)
+
+        for package_detail in data.get("casks", []):
+            package_name = self._extract_package_name(package_detail, is_cask=True)
+            self._save_package_info(package_detail, package_name)
+
     # /prep -------------------------------------------------------- }}}
 
     def run(self):
@@ -390,70 +425,14 @@ class Homebrew(object):
         except HomebrewException:
             pass
 
-        if not self.failed and (self.changed_count + self.unchanged_count > 1):
+        changed_count = len(self.changed_pkgs)
+        unchanged_count = len(self.unchanged_pkgs)
+        if not self.failed and (changed_count + unchanged_count > 1):
             self.message = "Changed: %d, Unchanged: %d" % (
-                self.changed_count,
-                self.unchanged_count,
+                changed_count,
+                unchanged_count,
             )
-        (failed, changed, message) = self._status()
-
-        return (failed, changed, message)
-
-    # checks ------------------------------------------------------- {{{
-    def _current_package_is_installed(self):
-        if not HomebrewValidate.valid_package(self.current_package):
-            self.failed = True
-            self.message = 'Invalid package: {0}.'.format(self.current_package)
-            raise HomebrewException(self.message)
-
-        cmd = [
-            "{brew_path}".format(brew_path=self.brew_path),
-            "info",
-            "--json=v2",
-            self.current_package,
-        ]
-        if self.force_formula:
-            cmd.append("--formula")
-        rc, out, err = self.module.run_command(cmd)
-        if rc != 0:
-            self.failed = True
-            self.message = err.strip() or ("Unknown failure with exit code %d" % rc)
-            raise HomebrewException(self.message)
-        data = json.loads(out)
-
-        return _check_package_in_json(data, "formulae") or _check_package_in_json(data, "casks")
-
-    def _current_package_is_outdated(self):
-        if not HomebrewValidate.valid_package(self.current_package):
-            return False
-
-        rc, out, err = self.module.run_command([
-            self.brew_path,
-            'outdated',
-            self.current_package,
-        ])
-
-        return rc != 0
-
-    def _current_package_is_installed_from_head(self):
-        if not HomebrewValidate.valid_package(self.current_package):
-            return False
-        elif not self._current_package_is_installed():
-            return False
-
-        rc, out, err = self.module.run_command([
-            self.brew_path,
-            'info',
-            self.current_package,
-        ])
-
-        try:
-            version_info = [line for line in out.split('\n') if line][0]
-        except IndexError:
-            return False
-
-        return version_info.split(' ')[-1] == 'HEAD'
-    # /checks ------------------------------------------------------ }}}
+        return (self.failed, self.changed, self.message)
 
     # commands ----------------------------------------------------- {{{
     def _run(self):
@@ -464,6 +443,8 @@ class Homebrew(object):
             self._upgrade_all()
 
         if self.packages:
+            self._validate_packages_names()
+            self._get_packages_info()
             if self.state == 'installed':
                 return self._install_packages()
             elif self.state == 'upgraded':
@@ -533,24 +514,22 @@ class Homebrew(object):
     # /_upgrade_all -------------------------- }}}
 
     # installed ------------------------------ {{{
-    def _install_current_package(self):
-        if not HomebrewValidate.valid_package(self.current_package):
-            self.failed = True
-            self.message = 'Invalid package: {0}.'.format(self.current_package)
-            raise HomebrewException(self.message)
+    def _install_packages(self):
+        packages_to_install = set(self.packages) - self.installed_packages
 
-        if self._current_package_is_installed():
-            self.unchanged_count += 1
-            self.unchanged_pkgs.append(self.current_package)
-            self.message = 'Package already installed: {0}'.format(
-                self.current_package,
+        if len(packages_to_install) == 0:
+            self.unchanged_pkgs.extend(self.packages)
+            self.message = 'Package{0} already installed: {1}'.format(
+                "s" if len(self.packages) > 1 else "",
+                ", ".join(self.packages),
             )
             return True
 
         if self.module.check_mode:
             self.changed = True
-            self.message = 'Package would be installed: {0}'.format(
-                self.current_package
+            self.message = 'Package{0} would be installed: {1}'.format(
+                "s" if len(packages_to_install) > 1 else "",
+                ", ".join(packages_to_install)
             )
             raise HomebrewException(self.message)
 
@@ -567,77 +546,28 @@ class Homebrew(object):
         opts = (
             [self.brew_path, 'install']
             + self.install_options
-            + [self.current_package, head, formula]
+            + list(packages_to_install)
+            + [head, formula]
         )
         cmd = [opt for opt in opts if opt]
         rc, out, err = self.module.run_command(cmd)
 
         if rc == 0:
-            self.changed_count += 1
-            self.changed_pkgs.append(self.current_package)
+            self.changed_pkgs.extend(packages_to_install)
+            self.unchanged_pkgs.extend(self.installed_packages)
             self.changed = True
-            self.message = 'Package installed: {0}'.format(self.current_package)
+            self.message = 'Package{0} installed: {1}'.format(
+                "s" if len(packages_to_install) > 1 else "",
+                ", ".join(packages_to_install)
+            )
             return True
         else:
             self.failed = True
             self.message = err.strip()
             raise HomebrewException(self.message)
-
-    def _install_packages(self):
-        for package in self.packages:
-            self.current_package = package
-            self._install_current_package()
-
-        return True
     # /installed ----------------------------- }}}
 
     # upgraded ------------------------------- {{{
-    def _upgrade_current_package(self):
-        command = 'upgrade'
-
-        if not HomebrewValidate.valid_package(self.current_package):
-            self.failed = True
-            self.message = 'Invalid package: {0}.'.format(self.current_package)
-            raise HomebrewException(self.message)
-
-        current_package_is_installed = self._current_package_is_installed()
-        if not current_package_is_installed:
-            command = 'install'
-
-        if current_package_is_installed and not self._current_package_is_outdated():
-            self.message = 'Package is already upgraded: {0}'.format(
-                self.current_package,
-            )
-            self.unchanged_count += 1
-            self.unchanged_pkgs.append(self.current_package)
-            return True
-
-        if self.module.check_mode:
-            self.changed = True
-            self.message = 'Package would be upgraded: {0}'.format(
-                self.current_package
-            )
-            raise HomebrewException(self.message)
-
-        opts = (
-            [self.brew_path, command]
-            + self.install_options
-            + [self.current_package]
-        )
-        cmd = [opt for opt in opts if opt]
-        rc, out, err = self.module.run_command(cmd)
-
-        if rc == 0:
-            self.changed_count += 1
-            self.changed_pkgs.append(self.current_package)
-            self.changed = True
-            self.message = 'Package upgraded: {0}'.format(self.current_package)
-            return True
-        else:
-            self.failed = True
-            self.message = err.strip()
-            raise HomebrewException(self.message)
-
     def _upgrade_all_packages(self):
         opts = (
             [self.brew_path, 'upgrade']
@@ -659,153 +589,188 @@ class Homebrew(object):
         if not self.packages:
             self._upgrade_all_packages()
         else:
-            for package in self.packages:
-                self.current_package = package
-                self._upgrade_current_package()
-            return True
+            # There are 3 action possible here depending on installed and outdated states:
+            #   - not installed -> 'install'
+            #   - installed and outdated -> 'upgrade'
+            #   - installed and NOT outdated -> Nothing to do!
+            packages_to_install = set(self.packages) - self.installed_packages
+            packages_to_upgrade = self.installed_packages & self.outdated_packages
+            packages_to_install_or_upgrade = packages_to_install | packages_to_upgrade
+
+            if len(packages_to_install_or_upgrade) == 0:
+                self.unchanged_pkgs.extend(self.packages)
+                self.message = 'Package{0} already upgraded: {1}'.format(
+                    "s" if len(self.packages) > 1 else "",
+                    ", ".join(self.packages),
+                )
+                return True
+
+            if self.module.check_mode:
+                self.changed = True
+                self.message = 'Package{0} would be upgraded: {1}'.format(
+                    "s" if len(packages_to_install_or_upgrade) > 1 else "",
+                    ", ".join(packages_to_install_or_upgrade)
+                )
+                raise HomebrewException(self.message)
+
+            for command, packages in [
+                ("install", packages_to_install),
+                ("upgrade", packages_to_upgrade)
+            ]:
+                if not packages:
+                    continue
+
+                opts = (
+                    [self.brew_path, command]
+                    + self.install_options
+                    + list(packages)
+                )
+                cmd = [opt for opt in opts if opt]
+                rc, out, err = self.module.run_command(cmd)
+
+                if rc != 0:
+                    self.failed = True
+                    self.message = err.strip()
+                    raise HomebrewException(self.message)
+
+            self.changed_pkgs.extend(packages_to_install_or_upgrade)
+            self.unchanged_pkgs.extend(set(self.packages) - packages_to_install_or_upgrade)
+            self.changed = True
+            self.message = 'Package{0} upgraded: {1}'.format(
+                "s" if len(packages_to_install_or_upgrade) > 1 else "",
+                ", ".join(packages_to_install_or_upgrade),
+            )
     # /upgraded ------------------------------ }}}
 
     # uninstalled ---------------------------- {{{
-    def _uninstall_current_package(self):
-        if not HomebrewValidate.valid_package(self.current_package):
-            self.failed = True
-            self.message = 'Invalid package: {0}.'.format(self.current_package)
-            raise HomebrewException(self.message)
+    def _uninstall_packages(self):
+        packages_to_uninstall = self.installed_packages & set(self.packages)
 
-        if not self._current_package_is_installed():
-            self.unchanged_count += 1
-            self.unchanged_pkgs.append(self.current_package)
-            self.message = 'Package already uninstalled: {0}'.format(
-                self.current_package,
+        if len(packages_to_uninstall) == 0:
+            self.unchanged_pkgs.extend(self.packages)
+            self.message = 'Package{0} already uninstalled: {1}'.format(
+                "s" if len(self.packages) > 1 else "",
+                ", ".join(self.packages),
             )
             return True
 
         if self.module.check_mode:
             self.changed = True
-            self.message = 'Package would be uninstalled: {0}'.format(
-                self.current_package
+            self.message = 'Package{0} would be uninstalled: {1}'.format(
+                "s" if len(packages_to_uninstall) > 1 else "",
+                ", ".join(packages_to_uninstall)
             )
             raise HomebrewException(self.message)
 
         opts = (
             [self.brew_path, 'uninstall', '--force']
             + self.install_options
-            + [self.current_package]
+            + list(packages_to_uninstall)
         )
         cmd = [opt for opt in opts if opt]
         rc, out, err = self.module.run_command(cmd)
 
-        if not self._current_package_is_installed():
-            self.changed_count += 1
-            self.changed_pkgs.append(self.current_package)
+        if rc == 0:
+            self.changed_pkgs.extend(packages_to_uninstall)
+            self.unchanged_pkgs.extend(set(self.packages) - self.installed_packages)
             self.changed = True
-            self.message = 'Package uninstalled: {0}'.format(self.current_package)
+            self.message = 'Package{0} uninstalled: {1}'.format(
+                "s" if len(packages_to_uninstall) > 1 else "",
+                ", ".join(packages_to_uninstall)
+            )
             return True
         else:
             self.failed = True
             self.message = err.strip()
             raise HomebrewException(self.message)
-
-    def _uninstall_packages(self):
-        for package in self.packages:
-            self.current_package = package
-            self._uninstall_current_package()
-
-        return True
     # /uninstalled ----------------------------- }}}
 
     # linked --------------------------------- {{{
-    def _link_current_package(self):
-        if not HomebrewValidate.valid_package(self.current_package):
+    def _link_packages(self):
+        missing_packages = set(self.packages) - self.installed_packages
+        if missing_packages:
             self.failed = True
-            self.message = 'Invalid package: {0}.'.format(self.current_package)
-            raise HomebrewException(self.message)
-
-        if not self._current_package_is_installed():
-            self.failed = True
-            self.message = 'Package not installed: {0}.'.format(self.current_package)
+            self.message = 'Package{0} not installed: {1}.'.format(
+                "s" if len(missing_packages) > 1 else "",
+                ", ".join(missing_packages),
+            )
             raise HomebrewException(self.message)
 
         if self.module.check_mode:
             self.changed = True
-            self.message = 'Package would be linked: {0}'.format(
-                self.current_package
+            self.message = 'Package{0} would be linked: {1}'.format(
+                "s" if len(self.packages) > 1 else "",
+                ", ".join(self.packages)
             )
             raise HomebrewException(self.message)
 
         opts = (
             [self.brew_path, 'link']
             + self.install_options
-            + [self.current_package]
+            + self.packages
         )
         cmd = [opt for opt in opts if opt]
         rc, out, err = self.module.run_command(cmd)
 
         if rc == 0:
-            self.changed_count += 1
-            self.changed_pkgs.append(self.current_package)
+            self.changed_pkgs.extend(self.packages)
             self.changed = True
-            self.message = 'Package linked: {0}'.format(self.current_package)
-
+            self.message = 'Package{0} linked: {1}'.format(
+                "s" if len(self.packages) > 1 else "",
+                ", ".join(self.packages)
+            )
             return True
         else:
             self.failed = True
-            self.message = 'Package could not be linked: {0}.'.format(self.current_package)
+            self.message = 'Package{0} could not be linked: {1}.'.format(
+                "s" if len(self.packages) > 1 else "",
+                ", ".join(self.packages)
+            )
             raise HomebrewException(self.message)
-
-    def _link_packages(self):
-        for package in self.packages:
-            self.current_package = package
-            self._link_current_package()
-
-        return True
     # /linked -------------------------------- }}}
 
     # unlinked ------------------------------- {{{
-    def _unlink_current_package(self):
-        if not HomebrewValidate.valid_package(self.current_package):
+    def _unlink_packages(self):
+        missing_packages = set(self.packages) - self.installed_packages
+        if missing_packages:
             self.failed = True
-            self.message = 'Invalid package: {0}.'.format(self.current_package)
-            raise HomebrewException(self.message)
-
-        if not self._current_package_is_installed():
-            self.failed = True
-            self.message = 'Package not installed: {0}.'.format(self.current_package)
+            self.message = 'Package{0} not installed: {1}.'.format(
+                "s" if len(missing_packages) > 1 else "",
+                ", ".join(missing_packages),
+            )
             raise HomebrewException(self.message)
 
         if self.module.check_mode:
             self.changed = True
-            self.message = 'Package would be unlinked: {0}'.format(
-                self.current_package
+            self.message = 'Package{0} would be unlinked: {1}'.format(
+                "s" if len(self.packages) > 1 else "",
+                ", ".join(self.packages)
             )
             raise HomebrewException(self.message)
 
         opts = (
             [self.brew_path, 'unlink']
             + self.install_options
-            + [self.current_package]
+            + self.packages
         )
         cmd = [opt for opt in opts if opt]
         rc, out, err = self.module.run_command(cmd)
 
         if rc == 0:
-            self.changed_count += 1
-            self.changed_pkgs.append(self.current_package)
+            self.changed_pkgs.extend(self.packages)
             self.changed = True
-            self.message = 'Package unlinked: {0}'.format(self.current_package)
-
+            self.message = 'Package{0} unlinked: {1}'.format(
+                "s" if len(self.packages) > 1 else "",
+                ", ".join(self.packages)
+            )
             return True
         else:
             self.failed = True
-            self.message = 'Package could not be unlinked: {0}.'.format(self.current_package)
+            self.message = 'Package{0} could not be unlinked: {1}.'.format(
+                "s" if len(self.packages) > 1 else "",
+                ", ".join(self.packages)
+            )
             raise HomebrewException(self.message)
-
-    def _unlink_packages(self):
-        for package in self.packages:
-            self.current_package = package
-            self._unlink_current_package()
-
-        return True
     # /unlinked ------------------------------ }}}
     # /commands ---------------------------------------------------- }}}
 

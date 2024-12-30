@@ -9,8 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: zfs_facts
 short_description: Gather facts about ZFS datasets
 description:
@@ -21,45 +20,42 @@ extends_documentation_fragment:
   - community.general.attributes.facts
   - community.general.attributes.facts_module
 options:
-    name:
-        description:
-            - ZFS dataset name.
-        required: true
-        aliases: [ "ds", "dataset" ]
-        type: str
-    recurse:
-        description:
-            - Specifies if properties for any children should be recursively
-              displayed.
-        type: bool
-        default: false
-    parsable:
-        description:
-            - Specifies if property values should be displayed in machine
-              friendly format.
-        type: bool
-        default: false
-    properties:
-        description:
-            - Specifies which dataset properties should be queried in comma-separated format.
-              For more information about dataset properties, check zfs(1M) man page.
-        default: all
-        type: str
-    type:
-        description:
-            - Specifies which datasets types to display. Multiple values have to be
-              provided in comma-separated form.
-        choices: [ 'all', 'filesystem', 'volume', 'snapshot', 'bookmark' ]
-        default: all
-        type: str
-    depth:
-        description:
-            - Specifies recursion depth.
-        type: int
-        default: 0
-'''
+  name:
+    description:
+      - ZFS dataset name.
+    required: true
+    aliases: ["ds", "dataset"]
+    type: str
+  recurse:
+    description:
+      - Specifies if properties for any children should be recursively displayed.
+    type: bool
+    default: false
+  parsable:
+    description:
+      - Specifies if property values should be displayed in machine friendly format.
+    type: bool
+    default: false
+  properties:
+    description:
+      - Specifies which dataset properties should be queried in comma-separated format. For more information about dataset properties, check zfs(1M)
+        man page.
+    default: all
+    type: str
+  type:
+    description:
+      - Specifies which datasets types to display. Multiple values have to be provided in comma-separated form.
+    choices: ['all', 'filesystem', 'volume', 'snapshot', 'bookmark']
+    default: all
+    type: str
+  depth:
+    description:
+      - Specifies recursion depth.
+    type: int
+    default: 0
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Gather facts about ZFS dataset rpool/export/home
   community.general.zfs_facts:
     dataset: rpool/export/home
@@ -73,88 +69,38 @@ EXAMPLES = '''
 - ansible.builtin.debug:
     msg: 'ZFS dataset {{ item.name }} consumes {{ item.used }} of disk space.'
   with_items: '{{ ansible_zfs_datasets }}'
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 name:
-    description: ZFS dataset name
-    returned: always
-    type: str
-    sample: rpool/var/spool
+  description: ZFS dataset name.
+  returned: always
+  type: str
+  sample: rpool/var/spool
 parsable:
-    description: if parsable output should be provided in machine friendly format.
-    returned: if 'parsable' is set to True
-    type: bool
-    sample: true
+  description: If parsable output should be provided in machine friendly format.
+  returned: if O(parsable=True)
+  type: bool
+  sample: true
 recurse:
-    description: if we should recurse over ZFS dataset
-    returned: if 'recurse' is set to True
-    type: bool
-    sample: true
+  description: If we should recurse over ZFS dataset.
+  returned: if O(recurse=True)
+  type: bool
+  sample: true
 zfs_datasets:
-    description: ZFS dataset facts
-    returned: always
-    type: str
-    sample:
-            {
-                "aclinherit": "restricted",
-                "aclmode": "discard",
-                "atime": "on",
-                "available": "43.8G",
-                "canmount": "on",
-                "casesensitivity": "sensitive",
-                "checksum": "on",
-                "compression": "off",
-                "compressratio": "1.00x",
-                "copies": "1",
-                "creation": "Thu Jun 16 11:37 2016",
-                "dedup": "off",
-                "devices": "on",
-                "exec": "on",
-                "filesystem_count": "none",
-                "filesystem_limit": "none",
-                "logbias": "latency",
-                "logicalreferenced": "18.5K",
-                "logicalused": "3.45G",
-                "mlslabel": "none",
-                "mounted": "yes",
-                "mountpoint": "/rpool",
-                "name": "rpool",
-                "nbmand": "off",
-                "normalization": "none",
-                "org.openindiana.caiman:install": "ready",
-                "primarycache": "all",
-                "quota": "none",
-                "readonly": "off",
-                "recordsize": "128K",
-                "redundant_metadata": "all",
-                "refcompressratio": "1.00x",
-                "referenced": "29.5K",
-                "refquota": "none",
-                "refreservation": "none",
-                "reservation": "none",
-                "secondarycache": "all",
-                "setuid": "on",
-                "sharenfs": "off",
-                "sharesmb": "off",
-                "snapdir": "hidden",
-                "snapshot_count": "none",
-                "snapshot_limit": "none",
-                "sync": "standard",
-                "type": "filesystem",
-                "used": "4.41G",
-                "usedbychildren": "4.41G",
-                "usedbydataset": "29.5K",
-                "usedbyrefreservation": "0",
-                "usedbysnapshots": "0",
-                "utf8only": "off",
-                "version": "5",
-                "vscan": "off",
-                "written": "29.5K",
-                "xattr": "on",
-                "zoned": "off"
-            }
-'''
+  description: ZFS dataset facts.
+  returned: always
+  type: str
+  sample: {"aclinherit": "restricted", "aclmode": "discard", "atime": "on", "available": "43.8G", "canmount": "on", "casesensitivity": "sensitive",
+    "checksum": "on", "compression": "off", "compressratio": "1.00x", "copies": "1", "creation": "Thu Jun 16 11:37 2016", "dedup": "off", "devices": "on",
+    "exec": "on", "filesystem_count": "none", "filesystem_limit": "none", "logbias": "latency", "logicalreferenced": "18.5K", "logicalused": "3.45G",
+    "mlslabel": "none", "mounted": "yes", "mountpoint": "/rpool", "name": "rpool", "nbmand": "off", "normalization": "none", "org.openindiana.caiman:install":
+    "ready", "primarycache": "all", "quota": "none", "readonly": "off", "recordsize": "128K", "redundant_metadata": "all", "refcompressratio": "1.00x",
+    "referenced": "29.5K", "refquota": "none", "refreservation": "none", "reservation": "none", "secondarycache": "all", "setuid": "on", "sharenfs": "off",
+    "sharesmb": "off", "snapdir": "hidden", "snapshot_count": "none", "snapshot_limit": "none", "sync": "standard", "type": "filesystem", "used": "4.41G",
+    "usedbychildren": "4.41G", "usedbydataset": "29.5K", "usedbyrefreservation": "0", "usedbysnapshots": "0", "utf8only": "off", "version": "5",
+    "vscan": "off", "written": "29.5K", "xattr": "on", "zoned": "off"}
+"""
 
 from collections import defaultdict
 

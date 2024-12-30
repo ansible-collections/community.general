@@ -178,7 +178,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         try:
             self._nmap = get_bin_path('nmap')
         except ValueError as e:
-            raise AnsibleParserError('nmap inventory plugin requires the nmap cli tool to work: {0}'.format(to_native(e)))
+            raise AnsibleParserError(f'nmap inventory plugin requires the nmap cli tool to work: {e}')
 
         super(InventoryModule, self).parse(inventory, loader, path, cache=cache)
 
@@ -248,7 +248,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 p = Popen(cmd, stdout=PIPE, stderr=PIPE)
                 stdout, stderr = p.communicate()
                 if p.returncode != 0:
-                    raise AnsibleParserError('Failed to run nmap, rc=%s: %s' % (p.returncode, to_native(stderr)))
+                    raise AnsibleParserError(f'Failed to run nmap, rc={p.returncode}: {to_native(stderr)}')
 
                 # parse results
                 host = None
@@ -259,7 +259,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 try:
                     t_stdout = to_text(stdout, errors='surrogate_or_strict')
                 except UnicodeError as e:
-                    raise AnsibleParserError('Invalid (non unicode) input returned: %s' % to_native(e))
+                    raise AnsibleParserError(f'Invalid (non unicode) input returned: {e}')
 
                 for line in t_stdout.splitlines():
                     hits = self.find_host.match(line)
@@ -300,7 +300,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     results[-1]['ports'] = ports
 
             except Exception as e:
-                raise AnsibleParserError("failed to parse %s: %s " % (to_native(path), to_native(e)))
+                raise AnsibleParserError(f"failed to parse {to_native(path)}: {e} ")
 
         if cache_needs_update:
             self._cache[cache_key] = results

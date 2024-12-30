@@ -7,13 +7,12 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: ipa_group
 author: Thomas Krahn (@Nosmoht)
 short_description: Manage FreeIPA group
 description:
-  - Add, modify and delete group within IPA server
+  - Add, modify and delete group within IPA server.
 attributes:
   check_mode:
     support: full
@@ -22,77 +21,76 @@ attributes:
 options:
   append:
     description:
-    - If V(true), add the listed O(user) and O(group) to the group members.
-    - If V(false), only the listed O(user) and O(group) will be group members, removing any other members.
+      - If V(true), add the listed O(user) and O(group) to the group members.
+      - If V(false), only the listed O(user) and O(group) will be group members, removing any other members.
     default: false
     type: bool
     version_added: 4.0.0
   cn:
     description:
-    - Canonical name.
-    - Can not be changed as it is the unique identifier.
+      - Canonical name.
+      - Can not be changed as it is the unique identifier.
     required: true
     aliases: ['name']
     type: str
   description:
     description:
-    - Description of the group.
+      - Description of the group.
     type: str
   external:
     description:
-    - Allow adding external non-IPA members from trusted domains.
+      - Allow adding external non-IPA members from trusted domains.
     type: bool
   gidnumber:
     description:
-    - GID (use this option to set it manually).
+      - GID (use this option to set it manually).
     aliases: ['gid']
     type: str
   group:
     description:
-    - List of group names assigned to this group.
-    - If O(append=false) and an empty list is passed all groups will be removed from this group.
-    - Groups that are already assigned but not passed will be removed.
-    - If O(append=true) the listed groups will be assigned without removing other groups.
-    - If option is omitted assigned groups will not be checked or changed.
+      - List of group names assigned to this group.
+      - If O(append=false) and an empty list is passed all groups will be removed from this group.
+      - Groups that are already assigned but not passed will be removed.
+      - If O(append=true) the listed groups will be assigned without removing other groups.
+      - If option is omitted assigned groups will not be checked or changed.
     type: list
     elements: str
   nonposix:
     description:
-    - Create as a non-POSIX group.
+      - Create as a non-POSIX group.
     type: bool
   user:
     description:
-    - List of user names assigned to this group.
-    - If O(append=false) and an empty list is passed all users will be removed from this group.
-    - Users that are already assigned but not passed will be removed.
-    - If O(append=true) the listed users will be assigned without removing other users.
-    - If option is omitted assigned users will not be checked or changed.
+      - List of user names assigned to this group.
+      - If O(append=false) and an empty list is passed all users will be removed from this group.
+      - Users that are already assigned but not passed will be removed.
+      - If O(append=true) the listed users will be assigned without removing other users.
+      - If option is omitted assigned users will not be checked or changed.
     type: list
     elements: str
   external_user:
     description:
-    - List of external users assigned to this group.
-    - Behaves identically to O(user) with respect to O(append) attribute.
-    - List entries can be in V(DOMAIN\\\\username) or SID format.
-    - Unless SIDs are provided, the module will always attempt to make changes even if the group already has all the users.
-      This is because only SIDs are returned by IPA query.
-    - O(external=true) is needed for this option to work.
+      - List of external users assigned to this group.
+      - Behaves identically to O(user) with respect to O(append) attribute.
+      - List entries can be in V(DOMAIN\\\\username) or SID format.
+      - Unless SIDs are provided, the module will always attempt to make changes even if the group already has all the users.
+        This is because only SIDs are returned by IPA query.
+      - O(external=true) is needed for this option to work.
     type: list
     elements: str
     version_added: 6.3.0
   state:
     description:
-    - State to ensure
+      - State to ensure.
     default: "present"
     choices: ["absent", "present"]
     type: str
 extends_documentation_fragment:
   - community.general.ipa.documentation
   - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Ensure group is present
   community.general.ipa_group:
     name: oinstall
@@ -106,8 +104,8 @@ EXAMPLES = r'''
   community.general.ipa_group:
     name: ops
     group:
-    - sysops
-    - appops
+      - sysops
+      - appops
     ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
@@ -116,8 +114,8 @@ EXAMPLES = r'''
   community.general.ipa_group:
     name: sysops
     user:
-    - linus
-    - larry
+      - linus
+      - larry
     ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
@@ -126,7 +124,7 @@ EXAMPLES = r'''
   community.general.ipa_group:
     name: developers
     user:
-    - john
+      - john
     append: true
     state: present
     ipa_host: ipa.example.com
@@ -135,25 +133,25 @@ EXAMPLES = r'''
 
 - name: Add external user to a group
   community.general.ipa_group:
-   name: developers
-   external: true
-   append: true
-   external_user:
-   - S-1-5-21-123-1234-12345-63421
-   ipa_host: ipa.example.com
-   ipa_user: admin
-   ipa_pass: topsecret
+    name: developers
+    external: true
+    append: true
+    external_user:
+      - S-1-5-21-123-1234-12345-63421
+    ipa_host: ipa.example.com
+    ipa_user: admin
+    ipa_pass: topsecret
 
 - name: Add a user from MYDOMAIN
   community.general.ipa_group:
-   name: developers
-   external: true
-   append: true
-   external_user:
-   - MYDOMAIN\\john
-   ipa_host: ipa.example.com
-   ipa_user: admin
-   ipa_pass: topsecret
+    name: developers
+    external: true
+    append: true
+    external_user:
+      - MYDOMAIN\\john
+    ipa_host: ipa.example.com
+    ipa_user: admin
+    ipa_pass: topsecret
 
 - name: Ensure group is absent
   community.general.ipa_group:
@@ -162,14 +160,14 @@ EXAMPLES = r'''
     ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 group:
-  description: Group as returned by IPA API
+  description: Group as returned by IPA API.
   returned: always
   type: dict
-'''
+"""
 
 import traceback
 

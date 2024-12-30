@@ -61,7 +61,7 @@ def keycloak_clientsecret_module_resolve_params(module, kc):
     client_id = module.params.get('client_id')
 
     # only lookup the client_id if id isn't provided.
-    # in the case that both are provided, prefer the ID, since it's one
+    # in the case that both are provided, prefer the ID, since it is one
     # less lookup.
     if id is None:
         # Due to the required_one_of spec, client_id is guaranteed to not be None

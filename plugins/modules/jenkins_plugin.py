@@ -9,14 +9,12 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: jenkins_plugin
 author: Jiri Tyr (@jtyr)
 short_description: Add or remove Jenkins plugin
 description:
   - Ansible module which helps to manage Jenkins plugins.
-
 attributes:
   check_mode:
     support: full
@@ -53,8 +51,7 @@ options:
     type: str
     description:
       - Desired plugin state.
-      - If set to V(latest), the check for new version will be performed
-        every time. This is suitable to keep the plugin up-to-date.
+      - If set to V(latest), the check for new version will be performed every time. This is suitable to keep the plugin up-to-date.
     choices: [absent, present, pinned, unpinned, enabled, disabled, latest]
     default: present
   timeout:
@@ -65,12 +62,10 @@ options:
   updates_expiration:
     type: int
     description:
-      - Number of seconds after which a new copy of the C(update-center.json)
-        file is downloaded. This is used to avoid the need to download the
-        plugin to calculate its checksum when O(state=latest) is specified.
-      - Set it to V(0) if no cache file should be used. In that case, the
-        plugin file will always be downloaded to calculate its checksum when
-        O(state=latest) is specified.
+      - Number of seconds after which a new copy of the C(update-center.json) file is downloaded. This is used to avoid the
+        need to download the plugin to calculate its checksum when O(state=latest) is specified.
+      - Set it to V(0) if no cache file should be used. In that case, the plugin file will always be downloaded to calculate
+        its checksum when O(state=latest) is specified.
     default: 86400
   updates_url:
     type: list
@@ -83,7 +78,7 @@ options:
     type: list
     elements: str
     description:
-      - A list of URL segment(s) to retrieve the update center json file from.
+      - A list of URL segment(s) to retrieve the update center JSON file from.
     default: ['update-center.json', 'updates/update-center.json']
     version_added: 3.3.0
   latest_plugins_url_segments:
@@ -109,12 +104,11 @@ options:
     type: str
     description:
       - Plugin version number.
-      - If this option is specified, all plugin dependencies must be installed
-        manually.
-      - It might take longer to verify that the correct version is installed.
-        This is especially true if a specific version number is specified.
-      - Quote the version to prevent the value to be interpreted as float. For
-        example if V(1.20) would be unquoted, it would become V(1.2).
+      - If this option is specified, all plugin dependencies must be installed manually.
+      - It might take longer to verify that the correct version is installed. This is especially true if a specific version
+        number is specified.
+      - Quote the version to prevent the value to be interpreted as float. For example if V(1.20) would be unquoted, it would
+        become V(1.2).
   with_dependencies:
     description:
       - Defines whether to install plugin dependencies.
@@ -123,24 +117,20 @@ options:
     default: true
 
 notes:
-  - Plugin installation should be run under root or the same user which owns
-    the plugin files on the disk. Only if the plugin is not installed yet and
-    no version is specified, the API installation is performed which requires
-    only the Web UI credentials.
-  - It is necessary to notify the handler or call the M(ansible.builtin.service) module to
-    restart the Jenkins service after a new plugin was installed.
-  - Pinning works only if the plugin is installed and Jenkins service was
-    successfully restarted after the plugin installation.
-  - It is not possible to run the module remotely by changing the O(url)
-    parameter to point to the Jenkins server. The module must be used on the
-    host where Jenkins runs as it needs direct access to the plugin files.
+  - Plugin installation should be run under root or the same user which owns the plugin files on the disk. Only if the plugin
+    is not installed yet and no version is specified, the API installation is performed which requires only the Web UI credentials.
+  - It is necessary to notify the handler or call the M(ansible.builtin.service) module to restart the Jenkins service after
+    a new plugin was installed.
+  - Pinning works only if the plugin is installed and Jenkins service was successfully restarted after the plugin installation.
+  - It is not possible to run the module remotely by changing the O(url) parameter to point to the Jenkins server. The module
+    must be used on the host where Jenkins runs as it needs direct access to the plugin files.
 extends_documentation_fragment:
   - ansible.builtin.url
   - ansible.builtin.files
   - community.general.attributes
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Install plugin
   community.general.jenkins_plugin:
     name: build-pipeline-plugin
@@ -281,8 +271,8 @@ EXAMPLES = '''
       retries: 60
       delay: 5
       until: >
-         'status' in jenkins_service_status and
-         jenkins_service_status['status'] == 200
+        'status' in jenkins_service_status and
+        jenkins_service_status['status'] == 200
       when: jenkins_restart_required
 
     - name: Reset the fact
@@ -305,20 +295,20 @@ EXAMPLES = '''
       when: >
         'enabled' in item.value
       with_dict: "{{ my_jenkins_plugins }}"
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 plugin:
-    description: plugin name
-    returned: success
-    type: str
-    sample: build-pipeline-plugin
+  description: Plugin name.
+  returned: success
+  type: str
+  sample: build-pipeline-plugin
 state:
-    description: state of the target, after execution
-    returned: success
-    type: str
-    sample: "present"
-'''
+  description: State of the target, after execution.
+  returned: success
+  type: str
+  sample: "present"
+"""
 
 import hashlib
 import io

@@ -9,8 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: vmadm
 short_description: Manage SmartOS virtual machines and zones
 description:
@@ -27,8 +26,7 @@ options:
   archive_on_delete:
     required: false
     description:
-      - When enabled, the zone dataset will be mounted on C(/zones/archive)
-        upon removal.
+      - When enabled, the zone dataset will be mounted on C(/zones/archive) upon removal.
     type: bool
   autoboot:
     required: false
@@ -36,7 +34,7 @@ options:
       - Whether or not a VM is booted when the system is rebooted.
     type: bool
   brand:
-    choices: [ joyent, joyent-minimal, lx, kvm, bhyve ]
+    choices: [joyent, joyent-minimal, lx, kvm, bhyve]
     default: joyent
     description:
       - Type of virtual machine. The V(bhyve) option was added in community.general 0.2.0.
@@ -49,18 +47,16 @@ options:
   cpu_cap:
     required: false
     description:
-      - Sets a limit on the amount of CPU time that can be used by a VM.
-        Use V(0) for no cap.
+      - Sets a limit on the amount of CPU time that can be used by a VM. Use V(0) for no cap.
     type: int
   cpu_shares:
     required: false
     description:
-      - Sets a limit on the number of fair share scheduler (FSS) CPU shares for
-        a VM. This limit is relative to all other VMs on the system.
+      - Sets a limit on the number of fair share scheduler (FSS) CPU shares for a VM. This limit is relative to all other VMs on the system.
     type: int
   cpu_type:
     required: false
-    choices: [ qemu64, host ]
+    choices: [qemu64, host]
     default: qemu64
     description:
       - Control the type of virtual CPU exposed to KVM VMs.
@@ -68,8 +64,7 @@ options:
   customer_metadata:
     required: false
     description:
-      - Metadata to be set and associated with this VM, this contain customer
-        modifiable keys.
+      - Metadata to be set and associated with this VM, this contain customer modifiable keys.
     type: dict
   delegate_dataset:
     required: false
@@ -111,7 +106,7 @@ options:
   force:
     required: false
     description:
-      - Force a particular action (i.e. stop or delete a VM).
+      - Force a particular action (in other words, stop or delete a VM).
     type: bool
   fs_allowed:
     required: false
@@ -141,14 +136,12 @@ options:
   internal_metadata:
     required: false
     description:
-      - Metadata to be set and associated with this VM, this contains operator
-        generated keys.
+      - Metadata to be set and associated with this VM, this contains operator generated keys.
     type: dict
   internal_metadata_namespace:
     required: false
     description:
-      - List of namespaces to be set as C(internal_metadata-only); these namespaces
-        will come from O(internal_metadata) rather than O(customer_metadata).
+      - List of namespaces to be set as C(internal_metadata-only); these namespaces will come from O(internal_metadata) rather than O(customer_metadata).
     type: str
   kernel_version:
     required: false
@@ -163,8 +156,7 @@ options:
   maintain_resolvers:
     required: false
     description:
-      - Resolvers in C(/etc/resolv.conf) will be updated when updating
-        the O(resolvers) property.
+      - Resolvers in C(/etc/resolv.conf) will be updated when updating the O(resolvers) property.
     type: bool
   max_locked_memory:
     required: false
@@ -189,12 +181,11 @@ options:
   mdata_exec_timeout:
     required: false
     description:
-      - Timeout in seconds (or 0 to disable) for the C(svc:/smartdc/mdata:execute) service
-        that runs user-scripts in the zone.
+      - Timeout in seconds (or 0 to disable) for the C(svc:/smartdc/mdata:execute) service that runs user-scripts in the zone.
     type: int
   name:
     required: false
-    aliases: [ alias ]
+    aliases: [alias]
     description:
       - Name of the VM. vmadm(1M) uses this as an optional name.
     type: str
@@ -212,14 +203,12 @@ options:
   nowait:
     required: false
     description:
-      - Consider the provisioning complete when the VM first starts, rather than
-        when the VM has rebooted.
+      - Consider the provisioning complete when the VM first starts, rather than when the VM has rebooted.
     type: bool
   qemu_opts:
     required: false
     description:
-      - Additional qemu arguments for KVM guests. This overwrites the default arguments
-        provided by vmadm(1M) and should only be used for debugging.
+      - Additional qemu arguments for KVM guests. This overwrites the default arguments provided by vmadm(1M) and should only be used for debugging.
     type: str
   qemu_extra_opts:
     required: false
@@ -245,8 +234,7 @@ options:
   routes:
     required: false
     description:
-      - Dictionary that maps destinations to gateways, these will be set as static
-        routes in the VM.
+      - Dictionary that maps destinations to gateways, these will be set as static routes in the VM.
     type: dict
   spice_opts:
     required: false
@@ -256,19 +244,15 @@ options:
   spice_password:
     required: false
     description:
-      - Password required to connect to SPICE. By default no password is set.
-        Please note this can be read from the Global Zone.
+      - Password required to connect to SPICE. By default no password is set. Please note this can be read from the Global Zone.
     type: str
   state:
-    choices: [ present, running, absent, deleted, stopped, created, restarted, rebooted ]
+    choices: [present, running, absent, deleted, stopped, created, restarted, rebooted]
     default: running
     description:
-      - States for the VM to be in. Please note that V(present), V(stopped) and V(restarted)
-        operate on a VM that is currently provisioned. V(present) means that the VM will be
-        created if it was absent, and that it will be in a running state. V(absent) will
-        shutdown the zone before removing it.
-        V(stopped) means the zone will be created if it does not exist already, before shutting
-        it down.
+      - States for the VM to be in. Please note that V(present), V(stopped) and V(restarted) operate on a VM that is currently provisioned. V(present)
+        means that the VM will be created if it was absent, and that it will be in a running state. V(absent) will shutdown the zone before removing
+        it. V(stopped) means the zone will be created if it does not exist already, before shutting it down.
     type: str
   tmpfs:
     required: false
@@ -303,20 +287,17 @@ options:
   vnc_password:
     required: false
     description:
-      - Password required to connect to VNC. By default no password is set.
-        Please note this can be read from the Global Zone.
+      - Password required to connect to VNC. By default no password is set. Please note this can be read from the Global Zone.
     type: str
   vnc_port:
     required: false
     description:
-      - TCP port to listen of the VNC server. Or set V(0) for random,
-        or V(-1) to disable.
+      - TCP port to listen of the VNC server. Or set V(0) for random, or V(-1) to disable.
     type: int
   zfs_data_compression:
     required: false
     description:
-      - Specifies compression algorithm used for this VMs data dataset. This option
-        only has effect on delegated datasets.
+      - Specifies compression algorithm used for this VMs data dataset. This option only has effect on delegated datasets.
     type: str
   zfs_data_recsize:
     required: false
@@ -336,8 +317,7 @@ options:
   zfs_root_compression:
     required: false
     description:
-      - Specifies compression algorithm used for this VMs root dataset. This option
-        only has effect on the zoneroot dataset.
+      - Specifies compression algorithm used for this VMs root dataset. This option only has effect on the zoneroot dataset.
     type: str
   zfs_root_recsize:
     required: false
@@ -354,9 +334,9 @@ options:
     description:
       - ZFS pool the VM's zone dataset will be created in.
     type: str
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create SmartOS zone
   community.general.vmadm:
     brand: joyent
@@ -382,9 +362,9 @@ EXAMPLES = '''
   community.general.vmadm:
     uuid: '*'
     state: stopped
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 uuid:
   description: UUID of the managed VM.
   returned: always
@@ -400,7 +380,7 @@ state:
   returned: success
   type: str
   sample: 'running'
-'''
+"""
 
 import json
 import os
@@ -452,7 +432,7 @@ def get_vm_uuid(module, alias):
             msg='Could not retrieve UUID of {0}'.format(alias), exception=stderr)
 
     # If no VM was found matching the given alias, we get back an empty array.
-    # That is not an error condition as we might be explicitly checking it's
+    # That is not an error condition as we might be explicitly checking for its
     # absence.
     try:
         stdout_json = json.loads(stdout)
@@ -728,7 +708,7 @@ def main():
 
     result = {'state': state}
 
-    # While it's possible to refer to a given VM by it's `alias`, it's easier
+    # While it is possible to refer to a given VM by its `alias`, it is easier
     # to operate on VMs by their UUID. So if we're not given a `uuid`, look
     # it up.
     if not uuid:
@@ -753,12 +733,12 @@ def main():
         module.exit_json(**result)
 
     # The general flow is as follows:
-    # - first the current state of the VM is obtained by it's UUID.
+    # - first the current state of the VM is obtained by its UUID.
     # - If the state was not found and the desired state is 'deleted', return.
     # - If the state was not found, it means the VM has to be created.
     #   Subsequently the VM will be set to the desired state (i.e. stopped)
-    # - Otherwise, it means the VM exists already and we operate on it's
-    #   state (i.e. reboot it.)
+    # - Otherwise, it means the VM exists already and we operate on its
+    #   state (for example reboot it.)
     #
     # In the future it should be possible to query the VM for a particular
     # property as a valid state (i.e. queried) so the result can be

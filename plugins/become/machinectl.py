@@ -5,91 +5,90 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    name: machinectl
-    short_description: Systemd's machinectl privilege escalation
-    description:
-        - This become plugins allows your remote/login user to execute commands as another user via the machinectl utility.
-    author: Ansible Core Team
-    options:
-        become_user:
-            description: User you 'become' to execute the task.
-            type: string
-            default: ''
-            ini:
-              - section: privilege_escalation
-                key: become_user
-              - section: machinectl_become_plugin
-                key: user
-            vars:
-              - name: ansible_become_user
-              - name: ansible_machinectl_user
-            env:
-              - name: ANSIBLE_BECOME_USER
-              - name: ANSIBLE_MACHINECTL_USER
-        become_exe:
-            description: Machinectl executable.
-            type: string
-            default: machinectl
-            ini:
-              - section: privilege_escalation
-                key: become_exe
-              - section: machinectl_become_plugin
-                key: executable
-            vars:
-              - name: ansible_become_exe
-              - name: ansible_machinectl_exe
-            env:
-              - name: ANSIBLE_BECOME_EXE
-              - name: ANSIBLE_MACHINECTL_EXE
-        become_flags:
-            description: Options to pass to machinectl.
-            type: string
-            default: ''
-            ini:
-              - section: privilege_escalation
-                key: become_flags
-              - section: machinectl_become_plugin
-                key: flags
-            vars:
-              - name: ansible_become_flags
-              - name: ansible_machinectl_flags
-            env:
-              - name: ANSIBLE_BECOME_FLAGS
-              - name: ANSIBLE_MACHINECTL_FLAGS
-        become_pass:
-            description: Password for machinectl.
-            type: string
-            required: false
-            vars:
-              - name: ansible_become_password
-              - name: ansible_become_pass
-              - name: ansible_machinectl_pass
-            env:
-              - name: ANSIBLE_BECOME_PASS
-              - name: ANSIBLE_MACHINECTL_PASS
-            ini:
-              - section: machinectl_become_plugin
-                key: password
-    notes:
-      - When not using this plugin with user V(root), it only works correctly with a polkit rule which will alter
-        the behaviour of machinectl. This rule must alter the prompt behaviour to ask directly for the user credentials,
-        if the user is allowed to perform the action (take a look at the examples section).
-        If such a rule is not present the plugin only work if it is used in context with the root user,
-        because then no further prompt will be shown by machinectl.
-'''
+DOCUMENTATION = r"""
+name: machinectl
+short_description: Systemd's machinectl privilege escalation
+description:
+  - This become plugins allows your remote/login user to execute commands as another user using the C(machinectl) utility.
+author: Ansible Core Team
+options:
+  become_user:
+    description: User you 'become' to execute the task.
+    type: string
+    default: ''
+    ini:
+      - section: privilege_escalation
+        key: become_user
+      - section: machinectl_become_plugin
+        key: user
+    vars:
+      - name: ansible_become_user
+      - name: ansible_machinectl_user
+    env:
+      - name: ANSIBLE_BECOME_USER
+      - name: ANSIBLE_MACHINECTL_USER
+  become_exe:
+    description: C(machinectl) executable.
+    type: string
+    default: machinectl
+    ini:
+      - section: privilege_escalation
+        key: become_exe
+      - section: machinectl_become_plugin
+        key: executable
+    vars:
+      - name: ansible_become_exe
+      - name: ansible_machinectl_exe
+    env:
+      - name: ANSIBLE_BECOME_EXE
+      - name: ANSIBLE_MACHINECTL_EXE
+  become_flags:
+    description: Options to pass to C(machinectl).
+    type: string
+    default: ''
+    ini:
+      - section: privilege_escalation
+        key: become_flags
+      - section: machinectl_become_plugin
+        key: flags
+    vars:
+      - name: ansible_become_flags
+      - name: ansible_machinectl_flags
+    env:
+      - name: ANSIBLE_BECOME_FLAGS
+      - name: ANSIBLE_MACHINECTL_FLAGS
+  become_pass:
+    description: Password for C(machinectl).
+    type: string
+    required: false
+    vars:
+      - name: ansible_become_password
+      - name: ansible_become_pass
+      - name: ansible_machinectl_pass
+    env:
+      - name: ANSIBLE_BECOME_PASS
+      - name: ANSIBLE_MACHINECTL_PASS
+    ini:
+      - section: machinectl_become_plugin
+        key: password
+notes:
+  - When not using this plugin with user V(root), it only works correctly with a polkit rule which will alter the behaviour
+    of machinectl. This rule must alter the prompt behaviour to ask directly for the user credentials, if the user is allowed
+    to perform the action (take a look at the examples section). If such a rule is not present the plugin only work if it
+    is used in context with the root user, because then no further prompt will be shown by machinectl.
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 # A polkit rule needed to use the module with a non-root user.
 # See the Notes section for details.
-/etc/polkit-1/rules.d/60-machinectl-fast-user-auth.rules: |
+/etc/polkit-1/rules.d/60-machinectl-fast-user-auth.rules: |-
   polkit.addRule(function(action, subject) {
     if(action.id == "org.freedesktop.machine1.host-shell" &&
       subject.isInGroup("wheel")) {
         return polkit.Result.AUTH_SELF_KEEP;
     }
   });
-'''
+"""
 
 from re import compile as re_compile
 
@@ -123,7 +122,7 @@ class BecomeModule(BecomeBase):
 
         flags = self.get_option('become_flags')
         user = self.get_option('become_user')
-        return '%s -q shell %s %s@ %s' % (become, flags, user, self._build_success_command(cmd, shell))
+        return f'{become} -q shell {flags} {user}@ {self._build_success_command(cmd, shell)}'
 
     def check_success(self, b_output):
         b_output = self.remove_ansi_codes(b_output)

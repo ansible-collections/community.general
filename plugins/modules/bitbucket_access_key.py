@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: bitbucket_access_key
 short_description: Manages Bitbucket repository access keys
 description:
@@ -33,7 +32,7 @@ options:
   workspace:
     description:
       - The repository owner.
-      - "B(Note:) O(ignore:username) used to be an alias of this option. Since community.general 6.0.0 it is an alias of O(user)."
+      - B(Note:) O(ignore:username) used to be an alias of this option. Since community.general 6.0.0 it is an alias of O(user).
     type: str
     required: true
   key:
@@ -50,13 +49,13 @@ options:
       - Indicates desired state of the access key.
     type: str
     required: true
-    choices: [ absent, present ]
+    choices: [absent, present]
 notes:
   - Bitbucket OAuth consumer or App password should have permissions to read and administrate account repositories.
   - Check mode is supported.
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Create access key
   community.general.bitbucket_access_key:
     repository: 'bitbucket-repo'
@@ -71,9 +70,9 @@ EXAMPLES = r'''
     workspace: bitbucket_workspace
     label: Bitbucket
     state: absent
-'''
+"""
 
-RETURN = r''' # '''
+RETURN = r""" # """
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.source_control.bitbucket import BitbucketHelper

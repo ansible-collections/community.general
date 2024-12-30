@@ -8,26 +8,25 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = """
----
+DOCUMENTATION = r"""
 module: xfconf
 author:
-- "Joseph Benden (@jbenden)"
-- "Alexei Znamensky (@russoz)"
+  - "Joseph Benden (@jbenden)"
+  - "Alexei Znamensky (@russoz)"
 short_description: Edit XFCE4 Configurations
 description:
-- This module allows for the manipulation of Xfce 4 Configuration with the help of C(xfconf-query).
+  - This module allows for the manipulation of Xfce 4 Configuration with the help of C(xfconf-query).
 seealso:
-- name: xfconf-query(1) man page
-  description: Manual page of the C(xfconf-query) tool at the XFCE documentation site.
-  link: 'https://docs.xfce.org/xfce/xfconf/xfconf-query'
+  - name: xfconf-query(1) man page
+    description: Manual page of the C(xfconf-query) tool at the XFCE documentation site.
+    link: 'https://docs.xfce.org/xfce/xfconf/xfconf-query'
 
-- name: xfconf - Configuration Storage System
-  description: XFCE documentation for the Xfconf configuration system.
-  link: 'https://docs.xfce.org/xfce/xfconf/start'
+  - name: xfconf - Configuration Storage System
+    description: XFCE documentation for the Xfconf configuration system.
+    link: 'https://docs.xfce.org/xfce/xfconf/start'
 
 extends_documentation_fragment:
-- community.general.attributes
+  - community.general.attributes
 
 attributes:
   check_mode:
@@ -38,50 +37,49 @@ attributes:
 options:
   channel:
     description:
-    - A Xfconf preference channel is a top-level tree key, inside of the Xfconf repository that corresponds to the location for which all application
-      properties/keys are stored. See man xfconf-query(1).
+      - A Xfconf preference channel is a top-level tree key, inside of the Xfconf repository that corresponds to the location for which all application
+        properties/keys are stored. See man xfconf-query(1).
     required: true
     type: str
   property:
     description:
-    - A Xfce preference key is an element in the Xfconf repository that corresponds to an application preference. See man xfconf-query(1).
+      - A Xfce preference key is an element in the Xfconf repository that corresponds to an application preference. See man xfconf-query(1).
     required: true
     type: str
   value:
     description:
-    - Preference properties typically have simple values such as strings, integers, or lists of strings and integers. See man xfconf-query(1).
+      - Preference properties typically have simple values such as strings, integers, or lists of strings and integers. See man xfconf-query(1).
     type: list
     elements: raw
   value_type:
     description:
-    - The type of value being set.
-    - When providing more than one O(value_type), the length of the list must be equal to the length of O(value).
-    - If only one O(value_type) is provided, but O(value) contains more than on element, that O(value_type) will be applied to all elements of
-      O(value).
-    - If the O(property) being set is an array and it can possibly have only one element in the array, then O(force_array=true) must be used to
-      ensure that C(xfconf-query) will interpret the value as an array rather than a scalar.
-    - Support for V(uchar), V(char), V(uint64), and V(int64) has been added in community.general 4.8.0.
+      - The type of value being set.
+      - When providing more than one O(value_type), the length of the list must be equal to the length of O(value).
+      - If only one O(value_type) is provided, but O(value) contains more than on element, that O(value_type) will be applied to all elements
+        of O(value).
+      - If the O(property) being set is an array and it can possibly have only one element in the array, then O(force_array=true) must be used
+        to ensure that C(xfconf-query) will interpret the value as an array rather than a scalar.
+      - Support for V(uchar), V(char), V(uint64), and V(int64) has been added in community.general 4.8.0.
     type: list
     elements: str
     choices: [string, int, double, bool, uint, uchar, char, uint64, int64, float]
   state:
     type: str
     description:
-    - The action to take upon the property/value.
-    - The state V(get) has been removed in community.general 5.0.0. Please use the module M(community.general.xfconf_info) instead.
+      - The action to take upon the property/value.
+      - The state V(get) has been removed in community.general 5.0.0. Please use the module M(community.general.xfconf_info) instead.
     choices: [present, absent]
     default: "present"
   force_array:
     description:
-    - Force array even if only one element.
+      - Force array even if only one element.
     type: bool
     default: false
     aliases: ['array']
     version_added: 1.0.0
 """
 
-EXAMPLES = """
----
+EXAMPLES = r"""
 - name: Change the DPI to "192"
   xfconf:
     channel: "xsettings"
@@ -105,61 +103,67 @@ EXAMPLES = """
     force_array: true
 """
 
-RETURN = """
----
+RETURN = r"""
 channel:
-  description: The channel specified in the module parameters
+  description: The channel specified in the module parameters.
   returned: success
   type: str
   sample: "xsettings"
 property:
-  description: The property specified in the module parameters
+  description: The property specified in the module parameters.
   returned: success
   type: str
   sample: "/Xft/DPI"
 value_type:
   description:
-  - The type of the value that was changed (V(none) for O(state=reset)). Either a single string value or a list of strings for array types.
-  - This is a string or a list of strings.
+    - The type of the value that was changed (V(none) for O(state=reset)). Either a single string value or a list of strings for array types.
+    - This is a string or a list of strings.
   returned: success
   type: any
   sample: '"int" or ["str", "str", "str"]'
 value:
   description:
-  - The value of the preference key after executing the module. Either a single string value or a list of strings for array types.
-  - This is a string or a list of strings.
+    - The value of the preference key after executing the module. Either a single string value or a list of strings for array types.
+    - This is a string or a list of strings.
   returned: success
   type: any
-  sample: '"192" or ["orange", "yellow", "violet"]'
+  sample: "'192' or ['orange', 'yellow', 'violet']"
 previous_value:
   description:
-  - The value of the preference key before executing the module. Either a single string value or a list of strings for array types.
-  - This is a string or a list of strings.
+    - The value of the preference key before executing the module. Either a single string value or a list of strings for array types.
+    - This is a string or a list of strings.
   returned: success
   type: any
   sample: '"96" or ["red", "blue", "green"]'
 cmd:
   description:
-  - A list with the resulting C(xfconf-query) command executed by the module.
+    - A list with the resulting C(xfconf-query) command executed by the module.
   returned: success
   type: list
   elements: str
   version_added: 5.4.0
   sample:
-  - /usr/bin/xfconf-query
-  - --channel
-  - xfce4-panel
-  - --property
-  - /plugins/plugin-19/timezone
-  - --create
-  - --type
-  - string
-  - --set
-  - Pacific/Auckland
+    - /usr/bin/xfconf-query
+    - --channel
+    - xfce4-panel
+    - --property
+    - /plugins/plugin-19/timezone
+    - --create
+    - --type
+    - string
+    - --set
+    - Pacific/Auckland
+version:
+  description:
+    - The version of the C(xfconf-query) command.
+  returned: success
+  type: str
+  sample: 4.18.1
+  version_added: 10.2.0
 """
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
-from ansible_collections.community.general.plugins.module_utils.xfconf import xfconf_runner
+from ansible_collections.community.general.plugins.module_utils.xfconf import xfconf_runner, get_xfconf_version
 
 
 class XFConfProperty(StateModuleHelper):
@@ -186,8 +190,8 @@ class XFConfProperty(StateModuleHelper):
 
     def __init_module__(self):
         self.runner = xfconf_runner(self.module)
-        self.does_not = 'Property "{0}" does not exist on channel "{1}".'.format(self.vars.property,
-                                                                                 self.vars.channel)
+        self.vars.version = get_xfconf_version(self.runner)
+        self.does_not = 'Property "{0}" does not exist on channel "{1}".'.format(self.vars.property, self.vars.channel)
         self.vars.set('previous_value', self._get())
         self.vars.set('type', self.vars.value_type)
         self.vars.set_meta('value', initial_value=self.vars.previous_value)
@@ -216,8 +220,7 @@ class XFConfProperty(StateModuleHelper):
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err
             self.vars.cmd = ctx.cmd
-            if self.verbosity >= 4:
-                self.vars.run_info = ctx.run_info
+            self.vars.set("run_info", ctx.run_info, verbosity=4)
         self.vars.value = None
 
     def state_present(self):
@@ -247,8 +250,7 @@ class XFConfProperty(StateModuleHelper):
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err
             self.vars.cmd = ctx.cmd
-            if self.verbosity >= 4:
-                self.vars.run_info = ctx.run_info
+            self.vars.set("run_info", ctx.run_info, verbosity=4)
 
         if not self.vars.is_array:
             self.vars.value = self.vars.value[0]

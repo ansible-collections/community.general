@@ -10,46 +10,45 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 DOCUMENTATION = r"""
-  name: timestamp
-  type: stdout
-  short_description: Adds simple timestamp for each header
-  version_added: 9.0.0
-  description:
-    - This callback adds simple timestamp for each header.
-  author: kurokobo (@kurokobo)
-  options:
-    timezone:
-      description:
-        - Timezone to use for the timestamp in IANA time zone format.
-        - For example C(America/New_York), C(Asia/Tokyo)). Ignored on Python < 3.9.
-      ini:
-        - section: callback_timestamp
-          key: timezone
-      env:
-        - name: ANSIBLE_CALLBACK_TIMESTAMP_TIMEZONE
-      type: string
-    format_string:
-      description:
-        - Format of the timestamp shown to user in 1989 C standard format.
-        - >
-          Refer to L(the Python documentation,https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes)
-          for the available format codes.
-      ini:
-        - section: callback_timestamp
-          key: format_string
-      env:
-        - name: ANSIBLE_CALLBACK_TIMESTAMP_FORMAT_STRING
-      default: "%H:%M:%S"
-      type: string
-  seealso:
-    - plugin: ansible.posix.profile_tasks
-      plugin_type: callback
-      description: >
-        You can use P(ansible.posix.profile_tasks#callback) callback plugin to time individual tasks and overall execution time
-        with detailed timestamps.
-  extends_documentation_fragment:
-    - ansible.builtin.default_callback
-    - ansible.builtin.result_format_callback
+name: timestamp
+type: stdout
+short_description: Adds simple timestamp for each header
+version_added: 9.0.0
+description:
+  - This callback adds simple timestamp for each header.
+author: kurokobo (@kurokobo)
+options:
+  timezone:
+    description:
+      - Timezone to use for the timestamp in IANA time zone format.
+      - For example V(America/New_York), V(Asia/Tokyo)). Ignored on Python < 3.9.
+    ini:
+      - section: callback_timestamp
+        key: timezone
+    env:
+      - name: ANSIBLE_CALLBACK_TIMESTAMP_TIMEZONE
+    type: string
+  format_string:
+    description:
+      - Format of the timestamp shown to user in 1989 C standard format.
+      - Refer to L(the Python documentation,https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes)
+        for the available format codes.
+    ini:
+      - section: callback_timestamp
+        key: format_string
+    env:
+      - name: ANSIBLE_CALLBACK_TIMESTAMP_FORMAT_STRING
+    default: "%H:%M:%S"
+    type: string
+seealso:
+  - plugin: ansible.posix.profile_tasks
+    plugin_type: callback
+    description: >-
+      You can use P(ansible.posix.profile_tasks#callback) callback plugin to time individual tasks and overall execution time
+      with detailed timestamps.
+extends_documentation_fragment:
+  - ansible.builtin.default_callback
+  - ansible.builtin.result_format_callback
 """
 
 
@@ -85,7 +84,7 @@ def banner(self, msg, color=None, cows=True):
     msg = to_text(msg)
     if self.b_cowsay and cows:
         try:
-            self.banner_cowsay("%s @ %s" % (msg, timestamp))
+            self.banner_cowsay(f"{msg} @ {timestamp}")
             return
         except OSError:
             self.warning("somebody cleverly deleted cowsay or something during the PB run.  heh.")
@@ -98,7 +97,7 @@ def banner(self, msg, color=None, cows=True):
     if star_len <= 3:
         star_len = 3
     stars = "*" * star_len
-    self.display("\n%s %s %s" % (msg, stars, timestamp), color=color)
+    self.display(f"\n{msg} {stars} {timestamp}", color=color)
 
 
 class CallbackModule(Default):

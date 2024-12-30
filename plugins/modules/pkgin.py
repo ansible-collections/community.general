@@ -16,70 +16,66 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: pkgin
 short_description: Package manager for SmartOS, NetBSD, et al
 description:
-    - "The standard package manager for SmartOS, but also usable on NetBSD
-      or any OS that uses C(pkgsrc).  (Home: U(http://pkgin.net/))"
+  - 'The standard package manager for SmartOS, but also usable on NetBSD or any OS that uses C(pkgsrc). (Home: U(http://pkgin.net/)).'
 author:
-    - "Larry Gilbert (@L2G)"
-    - "Shaun Zinck (@szinck)"
-    - "Jasper Lievisse Adriaanse (@jasperla)"
+  - "Larry Gilbert (@L2G)"
+  - "Shaun Zinck (@szinck)"
+  - "Jasper Lievisse Adriaanse (@jasperla)"
 notes:
-    - "Known bug with pkgin < 0.8.0: if a package is removed and another
-      package depends on it, the other package will be silently removed as
-      well."
+  - 'Known bug with pkgin < 0.8.0: if a package is removed and another package depends on it, the other package will be silently removed as well.'
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    name:
-        description:
-            - Name of package to install/remove;
-            - multiple names may be given, separated by commas
-        aliases: [pkg]
-        type: list
-        elements: str
-    state:
-        description:
-            - Intended state of the package
-        choices: [ 'present', 'absent' ]
-        default: present
-        type: str
-    update_cache:
-        description:
-          - Update repository database. Can be run with other steps or on it's own.
-        type: bool
-        default: false
-    upgrade:
-        description:
-          - Upgrade main packages to their newer versions
-        type: bool
-        default: false
-    full_upgrade:
-        description:
-          - Upgrade all packages to their newer versions
-        type: bool
-        default: false
-    clean:
-        description:
-          - Clean packages cache
-        type: bool
-        default: false
-    force:
-        description:
-          - Force package reinstall
-        type: bool
-        default: false
-'''
+  name:
+    description:
+      - Name of package to install/remove;
+      - Multiple names may be given, separated by commas.
+    aliases: [pkg]
+    type: list
+    elements: str
+  state:
+    description:
+      - Intended state of the package.
+    choices: ['present', 'absent']
+    default: present
+    type: str
+  update_cache:
+    description:
+      - Update repository database. Can be run with other steps or on its own.
+    type: bool
+    default: false
+  upgrade:
+    description:
+      - Upgrade main packages to their newer versions.
+    type: bool
+    default: false
+  full_upgrade:
+    description:
+      - Upgrade all packages to their newer versions.
+    type: bool
+    default: false
+  clean:
+    description:
+      - Clean packages cache.
+    type: bool
+    default: false
+  force:
+    description:
+      - Force package reinstall.
+    type: bool
+    default: false
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Install package foo
   community.general.pkgin:
     name: foo
@@ -125,7 +121,7 @@ EXAMPLES = '''
 - name: Clean packages cache (equivalent to pkgin clean)
   community.general.pkgin:
     clean: true
-'''
+"""
 
 
 import re

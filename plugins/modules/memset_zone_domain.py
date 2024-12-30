@@ -8,53 +8,50 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: memset_zone_domain
 author: "Simon Weald (@glitchcrab)"
 short_description: Create and delete domains in Memset DNS zones
 notes:
-  - Zone domains can be thought of as a collection of domains, all of which share the
-    same DNS records (i.e. they point to the same IP). An API key generated via the
-    Memset customer control panel is needed with the following minimum scope -
-    C(dns.zone_domain_create), C(dns.zone_domain_delete), C(dns.zone_domain_list).
-  - Currently this module can only create one domain at a time. Multiple domains should
-    be created using C(loop).
+  - Zone domains can be thought of as a collection of domains, all of which share the same DNS records (in other words, they point to the same IP). An API
+    key generated using the Memset customer control panel is needed with the following minimum scope - C(dns.zone_domain_create), C(dns.zone_domain_delete),
+    C(dns.zone_domain_list).
+  - Currently this module can only create one domain at a time. Multiple domains should be created using C(loop).
 description:
   - Manage DNS zone domains in a Memset account.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    state:
-        default: present
-        description:
-            - Indicates desired state of resource.
-        type: str
-        choices: [ absent, present ]
-    api_key:
-        required: true
-        description:
-            - The API key obtained from the Memset control panel.
-        type: str
-    domain:
-        required: true
-        description:
-            - The zone domain name. Ensure this value has at most 250 characters.
-        type: str
-        aliases: ['name']
-    zone:
-        required: true
-        description:
-            - The zone to add the domain to (this must already exist).
-        type: str
-'''
+  state:
+    default: present
+    description:
+      - Indicates desired state of resource.
+    type: str
+    choices: [absent, present]
+  api_key:
+    required: true
+    description:
+      - The API key obtained from the Memset control panel.
+    type: str
+  domain:
+    required: true
+    description:
+      - The zone domain name. Ensure this value has at most 250 characters.
+    type: str
+    aliases: ['name']
+  zone:
+    required: true
+    description:
+      - The zone to add the domain to (this must already exist).
+    type: str
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # Create the zone domain 'test.com'
 - name: Create zone domain
   community.general.memset_zone_domain:
@@ -63,25 +60,25 @@ EXAMPLES = '''
     state: present
     api_key: 5eb86c9196ab03919abcf03857163741
   delegate_to: localhost
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 memset_api:
-  description: Domain info from the Memset API
+  description: Domain info from the Memset API.
   returned: when changed or state == present
   type: complex
   contains:
     domain:
-      description: Domain name
+      description: Domain name.
       returned: always
       type: str
       sample: "example.com"
     id:
-      description: Domain ID
+      description: Domain ID.
       returned: always
       type: str
       sample: "b0bb1ce851aeea6feeb2dc32fe83bf9c"
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.memset import get_zone_id
@@ -256,7 +253,7 @@ def main():
         retvals = create_or_delete_domain(args)
 
     # we would need to populate the return values with the API's response
-    # in several places so it's easier to do it at the end instead.
+    # in several places so it is easier to do it at the end instead.
     if not retvals['failed']:
         if args['state'] == 'present' and not module.check_mode:
             payload = dict()

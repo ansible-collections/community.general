@@ -7,27 +7,27 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    author: Unknown (!UNKNOWN)
-    name: log_plays
-    type: notification
-    short_description: write playbook output to log file
-    description:
-      - This callback writes playbook output to a file per host in the C(/var/log/ansible/hosts) directory.
-    requirements:
-     - Whitelist in configuration
-     - A writeable C(/var/log/ansible/hosts) directory by the user executing Ansible on the controller
-    options:
-      log_folder:
-        default: /var/log/ansible/hosts
-        description: The folder where log files will be created.
-        type: str
-        env:
-          - name: ANSIBLE_LOG_FOLDER
-        ini:
-          - section: callback_log_plays
-            key: log_folder
-'''
+DOCUMENTATION = r"""
+author: Unknown (!UNKNOWN)
+name: log_plays
+type: notification
+short_description: write playbook output to log file
+description:
+  - This callback writes playbook output to a file per host in the C(/var/log/ansible/hosts) directory.
+requirements:
+  - Whitelist in configuration
+  - A writeable C(/var/log/ansible/hosts) directory by the user executing Ansible on the controller
+options:
+  log_folder:
+    default: /var/log/ansible/hosts
+    description: The folder where log files will be created.
+    type: str
+    env:
+      - name: ANSIBLE_LOG_FOLDER
+    ini:
+      - section: callback_log_plays
+        key: log_folder
+"""
 
 import os
 import time
@@ -57,7 +57,10 @@ class CallbackModule(CallbackBase):
     CALLBACK_NEEDS_WHITELIST = True
 
     TIME_FORMAT = "%b %d %Y %H:%M:%S"
-    MSG_FORMAT = "%(now)s - %(playbook)s - %(task_name)s - %(task_action)s - %(category)s - %(data)s\n\n"
+
+    @staticmethod
+    def _make_msg(now, playbook, task_name, task_action, category, data):
+        return f"{now} - {playbook} - {task_name} - {task_action} - {category} - {data}\n\n"
 
     def __init__(self):
 
@@ -82,22 +85,12 @@ class CallbackModule(CallbackBase):
                 invocation = data.pop('invocation', None)
                 data = json.dumps(data, cls=AnsibleJSONEncoder)
                 if invocation is not None:
-                    data = json.dumps(invocation) + " => %s " % data
+                    data = f"{json.dumps(invocation)} => {data} "
 
         path = os.path.join(self.log_folder, result._host.get_name())
         now = time.strftime(self.TIME_FORMAT, time.localtime())
 
-        msg = to_bytes(
-            self.MSG_FORMAT
-            % dict(
-                now=now,
-                playbook=self.playbook,
-                task_name=result._task.name,
-                task_action=result._task.action,
-                category=category,
-                data=data,
-            )
-        )
+        msg = to_bytes(self._make_msg(now, self.playbook, result._task.name, result._task.action, category, data))
         with open(path, "ab") as fd:
             fd.write(msg)
 

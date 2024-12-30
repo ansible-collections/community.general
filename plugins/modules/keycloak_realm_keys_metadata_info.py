@@ -9,37 +9,39 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = """
----
+DOCUMENTATION = r"""
 module: keycloak_realm_keys_metadata_info
 
-short_description: Allows obtaining Keycloak realm keys metadata via Keycloak API
+short_description: Allows obtaining Keycloak realm keys metadata using Keycloak API
 
 version_added: 9.3.0
 
 description:
-    - This module allows you to get Keycloak realm keys metadata via the Keycloak REST API.
-
-    - The names of module options are snake_cased versions of the camelCase ones found in the
-      Keycloak API and its documentation at U(https://www.keycloak.org/docs-api/latest/rest-api/index.html).
+  - This module allows you to get Keycloak realm keys metadata using the Keycloak REST API.
+  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation at
+    U(https://www.keycloak.org/docs-api/latest/rest-api/index.html).
+attributes:
+  action_group:
+    version_added: 10.2.0
 
 options:
-    realm:
-        type: str
-        description:
-            - They Keycloak realm to fetch keys metadata.
-        default: 'master'
+  realm:
+    type: str
+    description:
+      - They Keycloak realm to fetch keys metadata.
+    default: 'master'
 
 extends_documentation_fragment:
-    - community.general.keycloak
-    - community.general.attributes
-    - community.general.attributes.info_module
+  - community.general.keycloak
+  - community.general.keycloak.actiongroup_keycloak
+  - community.general.attributes
+  - community.general.attributes.info_module
 
 author:
-    - Thomas Bach (@thomasbach-dev)
+  - Thomas Bach (@thomasbach-dev)
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Fetch Keys metadata
   community.general.keycloak_realm_keys_metadata_info:
     auth_keycloak_url: https://auth.example.com/auth
@@ -62,30 +64,28 @@ EXAMPLES = """
   delegate_to: localhost
 """
 
-RETURN = """
+RETURN = r"""
 msg:
-    description: Message as to what action was taken.
-    returned: always
-    type: str
+  description: Message as to what action was taken.
+  returned: always
+  type: str
 
 keys_metadata:
-    description:
+  description:
 
-        - Representation of the realm keys metadata (see
-          U(https://www.keycloak.org/docs-api/latest/rest-api/index.html#KeysMetadataRepresentation)).
-
-    returned: always
-    type: dict
-    contains:
-        active:
-            description: A mapping (that is, a dict) from key algorithms to UUIDs.
-            type: dict
-            returned: always
-        keys:
-            description: A list of dicts providing detailed information on the keys.
-            type: list
-            elements: dict
-            returned: always
+    - Representation of the realm keys metadata (see U(https://www.keycloak.org/docs-api/latest/rest-api/index.html#KeysMetadataRepresentation)).
+  returned: always
+  type: dict
+  contains:
+    active:
+      description: A mapping (that is, a dict) from key algorithms to UUIDs.
+      type: dict
+      returned: always
+    keys:
+      description: A list of dicts providing detailed information on the keys.
+      type: list
+      elements: dict
+      returned: always
 """
 
 from ansible.module_utils.basic import AnsibleModule

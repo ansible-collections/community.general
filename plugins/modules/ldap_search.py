@@ -10,19 +10,11 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 DOCUMENTATION = r"""
----
 module: ldap_search
 version_added: '0.2.0'
 short_description: Search for entries in a LDAP server
 description:
   - Return the results of an LDAP search.
-notes:
-  - The default authentication settings will attempt to use a SASL EXTERNAL
-    bind over a UNIX domain socket. This works well with the default Ubuntu
-    install for example, which includes a C(cn=peercred,cn=external,cn=auth) ACL
-    rule allowing root to modify the server configuration. If you need to use
-    a simple bind to access your server, pass the credentials in O(bind_dn)
-    and O(bind_pw).
 author:
   - Sebastian Pfahl (@eryx12o45)
 requirements:
@@ -55,30 +47,26 @@ options:
     type: list
     elements: str
     description:
-      - A list of attributes for limiting the result. Use an
-        actual list or a comma-separated string.
+      - A list of attributes for limiting the result. Use an actual list or a comma-separated string.
   schema:
     default: false
     type: bool
     description:
-      - Set to V(true) to return the full attribute schema of entries, not
-        their attribute values. Overrides O(attrs) when provided.
+      - Set to V(true) to return the full attribute schema of entries, not their attribute values. Overrides O(attrs) when provided.
   page_size:
     default: 0
     type: int
     description:
-      - The page size when performing a simple paged result search (RFC 2696).
-        This setting can be tuned to reduce issues with timeouts and server limits.
+      - The page size when performing a simple paged result search (RFC 2696). This setting can be tuned to reduce issues with timeouts and server
+        limits.
       - Setting the page size to V(0) (default) disables paged searching.
     version_added: 7.1.0
   base64_attributes:
     description:
-      - If provided, all attribute values returned that are listed in this option
-        will be Base64 encoded.
-      - If the special value V(*) appears in this list, all attributes will be
-        Base64 encoded.
-      - All other attribute values will be converted to UTF-8 strings. If they
-        contain binary data, please note that invalid UTF-8 bytes will be omitted.
+      - If provided, all attribute values returned that are listed in this option will be Base64 encoded.
+      - If the special value V(*) appears in this list, all attributes will be Base64 encoded.
+      - All other attribute values will be converted to UTF-8 strings. If they contain binary data, please note that invalid UTF-8 bytes will
+        be omitted.
     type: list
     elements: str
     version_added: 7.0.0

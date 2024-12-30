@@ -6,41 +6,41 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    name: loganalytics
-    type: notification
-    short_description: Posts task results to Azure Log Analytics
-    author: "Cyrus Li (@zhcli) <cyrus1006@gmail.com>"
-    description:
-      - This callback plugin will post task results in JSON formatted to an Azure Log Analytics workspace.
-      - Credits to authors of splunk callback plugin.
-    version_added: "2.4.0"
-    requirements:
-      - Whitelisting this callback plugin.
-      - An Azure log analytics work space has been established.
-    options:
-      workspace_id:
-        description: Workspace ID of the Azure log analytics workspace.
-        type: str
-        required: true
-        env:
-          - name: WORKSPACE_ID
-        ini:
-          - section: callback_loganalytics
-            key: workspace_id
-      shared_key:
-        description: Shared key to connect to Azure log analytics workspace.
-        type: str
-        required: true
-        env:
-          - name: WORKSPACE_SHARED_KEY
-        ini:
-          - section: callback_loganalytics
-            key: shared_key
-'''
+DOCUMENTATION = r"""
+name: loganalytics
+type: notification
+short_description: Posts task results to Azure Log Analytics
+author: "Cyrus Li (@zhcli) <cyrus1006@gmail.com>"
+description:
+  - This callback plugin will post task results in JSON formatted to an Azure Log Analytics workspace.
+  - Credits to authors of splunk callback plugin.
+version_added: "2.4.0"
+requirements:
+  - Whitelisting this callback plugin.
+  - An Azure log analytics work space has been established.
+options:
+  workspace_id:
+    description: Workspace ID of the Azure log analytics workspace.
+    type: str
+    required: true
+    env:
+      - name: WORKSPACE_ID
+    ini:
+      - section: callback_loganalytics
+        key: workspace_id
+  shared_key:
+    description: Shared key to connect to Azure log analytics workspace.
+    type: str
+    required: true
+    env:
+      - name: WORKSPACE_SHARED_KEY
+    ini:
+      - section: callback_loganalytics
+        key: shared_key
+"""
 
-EXAMPLES = '''
-examples: |
+EXAMPLES = r"""
+examples: |-
   Whitelist the plugin in ansible.cfg:
     [defaults]
     callback_whitelist = community.general.loganalytics
@@ -51,7 +51,7 @@ examples: |
     [callback_loganalytics]
     workspace_id = 01234567-0123-0123-0123-01234567890a
     shared_key = dZD0kCbKl3ehZG6LHFMuhtE0yHiFCmetzFMc2u+roXIUQuatqU924SsAAAAPemhjbGlAemhjbGktTUJQAQIDBA==
-'''
+"""
 
 import hashlib
 import hmac
@@ -84,18 +84,17 @@ class AzureLogAnalyticsSource(object):
 
     def __build_signature(self, date, workspace_id, shared_key, content_length):
         # Build authorisation signature for Azure log analytics API call
-        sigs = "POST\n{0}\napplication/json\nx-ms-date:{1}\n/api/logs".format(
-            str(content_length), date)
+        sigs = f"POST\n{content_length}\napplication/json\nx-ms-date:{date}\n/api/logs"
         utf8_sigs = sigs.encode('utf-8')
         decoded_shared_key = base64.b64decode(shared_key)
         hmac_sha256_sigs = hmac.new(
             decoded_shared_key, utf8_sigs, digestmod=hashlib.sha256).digest()
         encoded_hash = base64.b64encode(hmac_sha256_sigs).decode('utf-8')
-        signature = "SharedKey {0}:{1}".format(workspace_id, encoded_hash)
+        signature = f"SharedKey {workspace_id}:{encoded_hash}"
         return signature
 
     def __build_workspace_url(self, workspace_id):
-        return "https://{0}.ods.opinsights.azure.com/api/logs?api-version=2016-04-01".format(workspace_id)
+        return f"https://{workspace_id}.ods.opinsights.azure.com/api/logs?api-version=2016-04-01"
 
     def __rfc1123date(self):
         return now().strftime('%a, %d %b %Y %H:%M:%S GMT')

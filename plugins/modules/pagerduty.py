@@ -9,84 +9,82 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
-
+DOCUMENTATION = r"""
 module: pagerduty
 short_description: Create PagerDuty maintenance windows
 description:
-    - This module will let you create PagerDuty maintenance windows
+  - This module will let you create PagerDuty maintenance windows.
 author:
-    - "Andrew Newdigate (@suprememoocow)"
-    - "Dylan Silva (@thaumos)"
-    - "Justin Johns (!UNKNOWN)"
-    - "Bruce Pennypacker (@bpennypacker)"
+  - "Andrew Newdigate (@suprememoocow)"
+  - "Dylan Silva (@thaumos)"
+  - "Justin Johns (!UNKNOWN)"
+  - "Bruce Pennypacker (@bpennypacker)"
 requirements:
-    - PagerDuty API access
+  - PagerDuty API access
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    state:
-        type: str
-        description:
-            - Create a maintenance window or get a list of ongoing windows.
-        required: true
-        choices: [ "running", "started", "ongoing", "absent" ]
-    name:
-        type: str
-        description:
-            - PagerDuty unique subdomain. Obsolete. It is not used with PagerDuty REST v2 API.
-    user:
-        type: str
-        description:
-            - PagerDuty user ID. Obsolete. Please, use O(token) for authorization.
-    token:
-        type: str
-        description:
-            - A pagerduty token, generated on the pagerduty site. It is used for authorization.
-        required: true
-    requester_id:
-        type: str
-        description:
-            - ID of user making the request. Only needed when creating a maintenance_window.
-    service:
-        type: list
-        elements: str
-        description:
-            - A comma separated list of PagerDuty service IDs.
-        aliases: [ services ]
-    window_id:
-        type: str
-        description:
-            - ID of maintenance window. Only needed when absent a maintenance_window.
-    hours:
-        type: str
-        description:
-            - Length of maintenance window in hours.
-        default: '1'
-    minutes:
-        type: str
-        description:
-            - Maintenance window in minutes (this is added to the hours).
-        default: '0'
-    desc:
-        type: str
-        description:
-            - Short description of maintenance window.
-        default: Created by Ansible
-    validate_certs:
-        description:
-            - If V(false), SSL certificates will not be validated. This should only be used
-              on personally controlled sites using self-signed certificates.
-        type: bool
-        default: true
-'''
+  state:
+    type: str
+    description:
+      - Create a maintenance window or get a list of ongoing windows.
+    required: true
+    choices: ["running", "started", "ongoing", "absent"]
+  name:
+    type: str
+    description:
+      - PagerDuty unique subdomain. Obsolete. It is not used with PagerDuty REST v2 API.
+  user:
+    type: str
+    description:
+      - PagerDuty user ID. Obsolete. Please, use O(token) for authorization.
+  token:
+    type: str
+    description:
+      - A pagerduty token, generated on the pagerduty site. It is used for authorization.
+    required: true
+  requester_id:
+    type: str
+    description:
+      - ID of user making the request. Only needed when creating a maintenance_window.
+  service:
+    type: list
+    elements: str
+    description:
+      - A comma separated list of PagerDuty service IDs.
+    aliases: [services]
+  window_id:
+    type: str
+    description:
+      - ID of maintenance window. Only needed when absent a maintenance_window.
+  hours:
+    type: str
+    description:
+      - Length of maintenance window in hours.
+    default: '1'
+  minutes:
+    type: str
+    description:
+      - Maintenance window in minutes (this is added to the hours).
+    default: '0'
+  desc:
+    type: str
+    description:
+      - Short description of maintenance window.
+    default: Created by Ansible
+  validate_certs:
+    description:
+      - If V(false), SSL certificates will not be validated. This should only be used on personally controlled sites using self-signed certificates.
+    type: bool
+    default: true
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: List ongoing maintenance windows using a token
   community.general.pagerduty:
     name: companyabc
@@ -143,7 +141,7 @@ EXAMPLES = '''
     token: yourtoken
     state: absent
     window_id: "{{ pd_window.result.maintenance_windows[0].id }}"
-'''
+"""
 
 import datetime
 import json

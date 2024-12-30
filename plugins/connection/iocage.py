@@ -10,28 +10,28 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    author: Stephan Lohse (!UNKNOWN) <dev-github@ploek.org>
-    name: iocage
-    short_description: Run tasks in iocage jails
+DOCUMENTATION = r"""
+author: Stephan Lohse (!UNKNOWN) <dev-github@ploek.org>
+name: iocage
+short_description: Run tasks in iocage jails
+description:
+  - Run commands or put/fetch files to an existing iocage jail.
+options:
+  remote_addr:
     description:
-        - Run commands or put/fetch files to an existing iocage jail
-    options:
-      remote_addr:
-        description:
-            - Path to the jail
-        type: string
-        vars:
-            - name: ansible_host
-            - name: ansible_iocage_host
-      remote_user:
-        description:
-            - User to execute as inside the jail
-        type: string
-        vars:
-            - name: ansible_user
-            - name: ansible_iocage_user
-'''
+      - Path to the jail.
+    type: string
+    vars:
+      - name: ansible_host
+      - name: ansible_iocage_host
+  remote_user:
+    description:
+      - User to execute as inside the jail.
+    type: string
+    vars:
+      - name: ansible_user
+      - name: ansible_iocage_user
+"""
 
 import subprocess
 
@@ -55,11 +55,12 @@ class Connection(Jail):
 
         jail_uuid = self.get_jail_uuid()
 
-        kwargs[Jail.modified_jailname_key] = 'ioc-{0}'.format(jail_uuid)
+        kwargs[Jail.modified_jailname_key] = f'ioc-{jail_uuid}'
 
-        display.vvv(u"Jail {iocjail} has been translated to {rawjail}".format(
-            iocjail=self.ioc_jail, rawjail=kwargs[Jail.modified_jailname_key]),
-            host=kwargs[Jail.modified_jailname_key])
+        display.vvv(
+            f"Jail {self.ioc_jail} has been translated to {kwargs[Jail.modified_jailname_key]}",
+            host=kwargs[Jail.modified_jailname_key]
+        )
 
         super(Connection, self).__init__(play_context, new_stdin, *args, **kwargs)
 
@@ -81,6 +82,6 @@ class Connection(Jail):
         p.wait()
 
         if p.returncode != 0:
-            raise AnsibleError(u"iocage returned an error: {0}".format(stdout))
+            raise AnsibleError(f"iocage returned an error: {stdout}")
 
         return stdout.strip('\n')

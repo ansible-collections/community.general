@@ -8,14 +8,12 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: xattr
 short_description: Manage user defined extended attributes
 description:
   - Manages filesystem user defined extended attributes.
-  - Requires that extended attributes are enabled on the target filesystem
-    and that the setfattr/getfattr utilities are present.
+  - Requires that extended attributes are enabled on the target filesystem and that the C(setfattr)/C(getfattr) utilities are present.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -29,7 +27,7 @@ options:
       - The full path of the file/object to get the facts of.
     type: path
     required: true
-    aliases: [ name ]
+    aliases: [name]
   namespace:
     description:
       - Namespace of the named name/key.
@@ -45,27 +43,26 @@ options:
     type: str
   state:
     description:
-      - defines which state you want to do.
-        V(read) retrieves the current value for a O(key) (default)
-        V(present) sets O(path) to O(value), default if value is set
-        V(all) dumps all data
-        V(keys) retrieves all keys
-        V(absent) deletes the key
+      - Defines which state you want to do.
+      - V(read) retrieves the current value for a O(key).
+      - V(present) sets O(path) to O(value), default if value is set.
+      - V(all) dumps all data.
+      - V(keys) retrieves all keys.
+      - V(absent) deletes the key.
     type: str
-    choices: [ absent, all, keys, present, read ]
+    choices: [absent, all, keys, present, read]
     default: read
   follow:
     description:
-      - If V(true), dereferences symlinks and sets/gets attributes on symlink target,
-        otherwise acts on symlink itself.
+      - If V(true), dereferences symlinks and sets/gets attributes on symlink target, otherwise acts on symlink itself.
     type: bool
     default: true
 author:
   - Brian Coca (@bcoca)
-'''
+"""
 
-EXAMPLES = '''
-- name: Obtain the extended attributes  of /etc/foo.conf
+EXAMPLES = r"""
+- name: Obtain the extended attributes of /etc/foo.conf
   community.general.xattr:
     path: /etc/foo.conf
 
@@ -94,7 +91,7 @@ EXAMPLES = '''
     namespace: trusted
     key: glusterfs.volume-id
     state: absent
-'''
+"""
 
 import os
 

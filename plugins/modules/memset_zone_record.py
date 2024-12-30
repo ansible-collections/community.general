@@ -8,83 +8,78 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: memset_zone_record
 author: "Simon Weald (@glitchcrab)"
 short_description: Create and delete records in Memset DNS zones
 notes:
-  - Zones can be thought of as a logical group of domains, all of which share the
-    same DNS records (i.e. they point to the same IP). An API key generated via the
-    Memset customer control panel is needed with the following minimum scope -
-    C(dns.zone_create), C(dns.zone_delete), C(dns.zone_list).
-  - Currently this module can only create one DNS record at a time. Multiple records
-    should be created using C(loop).
+  - Zones can be thought of as a logical group of domains, all of which share the same DNS records (in other words they point to the same IP). An API key
+    generated using the Memset customer control panel is needed with the following minimum scope - C(dns.zone_create), C(dns.zone_delete), C(dns.zone_list).
+  - Currently this module can only create one DNS record at a time. Multiple records should be created using C(loop).
 description:
   - Manage DNS records in a Memset account.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    state:
-        default: present
-        description:
-            - Indicates desired state of resource.
-        type: str
-        choices: [ absent, present ]
-    api_key:
-        required: true
-        description:
-            - The API key obtained from the Memset control panel.
-        type: str
-    address:
-        required: true
-        description:
-            - The address for this record (can be IP or text string depending on record type).
-        type: str
-        aliases: [ ip, data ]
-    priority:
-        description:
-            - C(SRV) and C(TXT) record priority, in the range 0 > 999 (inclusive).
-        type: int
-        default: 0
-    record:
-        required: false
-        description:
-            - The subdomain to create.
-        type: str
-        default: ''
-    type:
-        required: true
-        description:
-            - The type of DNS record to create.
-        choices: [ A, AAAA, CNAME, MX, NS, SRV, TXT ]
-        type: str
-    relative:
-        type: bool
-        default: false
-        description:
-            - If set then the current domain is added onto the address field for C(CNAME), C(MX), C(NS)
-              and C(SRV)record types.
-    ttl:
-        description:
-            - The record's TTL in seconds (will inherit zone's TTL if not explicitly set). This must be a
-              valid int from U(https://www.memset.com/apidocs/methods_dns.html#dns.zone_record_create).
-        default: 0
-        choices: [ 0, 300, 600, 900, 1800, 3600, 7200, 10800, 21600, 43200, 86400 ]
-        type: int
-    zone:
-        required: true
-        description:
-            - The name of the zone to which to add the record to.
-        type: str
-'''
+  state:
+    default: present
+    description:
+      - Indicates desired state of resource.
+    type: str
+    choices: [absent, present]
+  api_key:
+    required: true
+    description:
+      - The API key obtained from the Memset control panel.
+    type: str
+  address:
+    required: true
+    description:
+      - The address for this record (can be IP or text string depending on record type).
+    type: str
+    aliases: [ip, data]
+  priority:
+    description:
+      - C(SRV) and C(TXT) record priority, in the range 0 > 999 (inclusive).
+    type: int
+    default: 0
+  record:
+    required: false
+    description:
+      - The subdomain to create.
+    type: str
+    default: ''
+  type:
+    required: true
+    description:
+      - The type of DNS record to create.
+    choices: [A, AAAA, CNAME, MX, NS, SRV, TXT]
+    type: str
+  relative:
+    type: bool
+    default: false
+    description:
+      - If set then the current domain is added onto the address field for C(CNAME), C(MX), C(NS) and C(SRV)record types.
+  ttl:
+    description:
+      - The record's TTL in seconds (will inherit zone's TTL if not explicitly set). This must be a valid int from
+        U(https://www.memset.com/apidocs/methods_dns.html#dns.zone_record_create).
+    default: 0
+    choices: [0, 300, 600, 900, 1800, 3600, 7200, 10800, 21600, 43200, 86400]
+    type: int
+  zone:
+    required: true
+    description:
+      - The name of the zone to which to add the record to.
+    type: str
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # Create DNS record for www.domain.com
 - name: Create DNS record
   community.general.memset_zone_record:
@@ -118,11 +113,11 @@ EXAMPLES = '''
     address: "{{ item.address }}"
   delegate_to: localhost
   with_items:
-    - { 'zone': 'domain1.com', 'type': 'A', 'record': 'www', 'address': '1.2.3.4' }
-    - { 'zone': 'domain2.com', 'type': 'A', 'record': 'mail', 'address': '4.3.2.1' }
-'''
+    - {'zone': 'domain1.com', 'type': 'A', 'record': 'www', 'address': '1.2.3.4'}
+    - {'zone': 'domain2.com', 'type': 'A', 'record': 'mail', 'address': '4.3.2.1'}
+"""
 
-RETURN = '''
+RETURN = r"""
 memset_api:
   description: Record info from the Memset API.
   returned: when state == present
@@ -168,7 +163,7 @@ memset_api:
       returned: always
       type: str
       sample: "b0bb1ce851aeea6feeb2dc32fe83bf9c"
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.memset import get_zone_id

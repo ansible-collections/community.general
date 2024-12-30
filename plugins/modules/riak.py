@@ -9,18 +9,16 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: riak
 short_description: This module handles some common Riak operations
 description:
-    - This module can be used to join nodes to a cluster, check
-      the status of the cluster.
+  - This module can be used to join nodes to a cluster, check the status of the cluster.
 author:
-    - "James Martin (@jsmartin)"
-    - "Drew Kerrigan (@drewkerrigan)"
+  - "James Martin (@jsmartin)"
+  - "Drew Kerrigan (@drewkerrigan)"
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
   check_mode:
     support: none
@@ -34,17 +32,17 @@ options:
     type: str
   config_dir:
     description:
-      - The path to the riak configuration directory
+      - The path to the riak configuration directory.
     default: /etc/riak
     type: path
   http_conn:
     description:
-      - The ip address and port that is listening for Riak HTTP queries
+      - The IP address and port that is listening for Riak HTTP queries.
     default: 127.0.0.1:8098
     type: str
   target_node:
     description:
-      - The target node for certain operations (join, ping)
+      - The target node for certain operations (join, ping).
     default: riak@127.0.0.1
     type: str
   wait_for_handoffs:
@@ -64,13 +62,12 @@ options:
     type: str
   validate_certs:
     description:
-      - If V(false), SSL certificates will not be validated. This should only be used
-        on personally controlled sites using self-signed certificates.
+      - If V(false), SSL certificates will not be validated. This should only be used on personally controlled sites using self-signed certificates.
     type: bool
     default: true
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: "Join's a Riak node to another node"
   community.general.riak:
     command: join
@@ -83,7 +80,7 @@ EXAMPLES = '''
 - name: Wait for riak_kv service to startup
   community.general.riak:
     wait_for_service: kv
-'''
+"""
 
 import json
 import time

@@ -8,282 +8,280 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: keycloak_identity_provider
 
-short_description: Allows administration of Keycloak identity providers via Keycloak API
+short_description: Allows administration of Keycloak identity providers using Keycloak API
 
 version_added: 3.6.0
 
 description:
-    - This module allows you to add, remove or modify Keycloak identity providers via the Keycloak REST API.
-      It requires access to the REST API via OpenID Connect; the user connecting and the client being
-      used must have the requisite access rights. In a default Keycloak installation, admin-cli
-      and an admin user would work, as would a separate client definition with the scope tailored
-      to your needs and a user having the expected roles.
-
-    - The names of module options are snake_cased versions of the camelCase ones found in the
-      Keycloak API and its documentation at U(https://www.keycloak.org/docs-api/15.0/rest-api/index.html).
-
+  - This module allows you to add, remove or modify Keycloak identity providers using the Keycloak REST API. It requires access to the REST API
+    using OpenID Connect; the user connecting and the client being used must have the requisite access rights. In a default Keycloak installation,
+    admin-cli and an admin user would work, as would a separate client definition with the scope tailored to your needs and a user having the
+    expected roles.
+  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation at
+    U(https://www.keycloak.org/docs-api/15.0/rest-api/index.html).
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: full
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
+  action_group:
+    version_added: 10.2.0
 
 options:
-    state:
-        description:
-            - State of the identity provider.
-            - On V(present), the identity provider will be created if it does not yet exist, or updated with the parameters you provide.
-            - On V(absent), the identity provider will be removed if it exists.
-        default: 'present'
-        type: str
-        choices:
-            - present
-            - absent
+  state:
+    description:
+      - State of the identity provider.
+      - On V(present), the identity provider will be created if it does not yet exist, or updated with the parameters you provide.
+      - On V(absent), the identity provider will be removed if it exists.
+    default: 'present'
+    type: str
+    choices:
+      - present
+      - absent
 
-    realm:
-        description:
-            - The Keycloak realm under which this identity provider resides.
-        default: 'master'
-        type: str
+  realm:
+    description:
+      - The Keycloak realm under which this identity provider resides.
+    default: 'master'
+    type: str
 
-    alias:
-        description:
-            - The alias uniquely identifies an identity provider and it is also used to build the redirect URI.
-        required: true
-        type: str
+  alias:
+    description:
+      - The alias uniquely identifies an identity provider and it is also used to build the redirect URI.
+    required: true
+    type: str
 
-    display_name:
+  display_name:
+    description:
+      - Friendly name for identity provider.
+    aliases:
+      - displayName
+    type: str
+
+  enabled:
+    description:
+      - Enable/disable this identity provider.
+    type: bool
+
+  store_token:
+    description:
+      - Enable/disable whether tokens must be stored after authenticating users.
+    aliases:
+      - storeToken
+    type: bool
+
+  add_read_token_role_on_create:
+    description:
+      - Enable/disable whether new users can read any stored tokens. This assigns the C(broker.read-token) role.
+    aliases:
+      - addReadTokenRoleOnCreate
+    type: bool
+
+  trust_email:
+    description:
+      - If enabled, email provided by this provider is not verified even if verification is enabled for the realm.
+    aliases:
+      - trustEmail
+    type: bool
+
+  link_only:
+    description:
+      - If true, users cannot log in through this provider. They can only link to this provider. This is useful if you do not want to allow login
+        from the provider, but want to integrate with a provider.
+    aliases:
+      - linkOnly
+    type: bool
+
+  first_broker_login_flow_alias:
+    description:
+      - Alias of authentication flow, which is triggered after first login with this identity provider.
+    aliases:
+      - firstBrokerLoginFlowAlias
+    type: str
+
+  post_broker_login_flow_alias:
+    description:
+      - Alias of authentication flow, which is triggered after each login with this identity provider.
+    aliases:
+      - postBrokerLoginFlowAlias
+    type: str
+
+  authenticate_by_default:
+    description:
+      - Specifies if this identity provider should be used by default for authentication even before displaying login screen.
+    aliases:
+      - authenticateByDefault
+    type: bool
+
+  provider_id:
+    description:
+      - Protocol used by this provider (supported values are V(oidc) or V(saml)).
+    aliases:
+      - providerId
+    type: str
+
+  config:
+    description:
+      - Dict specifying the configuration options for the provider; the contents differ depending on the value of O(provider_id). Examples are
+        given below for V(oidc) and V(saml). It is easiest to obtain valid config values by dumping an already-existing identity provider configuration
+        through check-mode in the RV(existing) field.
+    type: dict
+    suboptions:
+      hide_on_login_page:
         description:
-            - Friendly name for identity provider.
+          - If hidden, login with this provider is possible only if requested explicitly, for example using the C(kc_idp_hint) parameter.
         aliases:
-            - displayName
-        type: str
-
-    enabled:
-        description:
-            - Enable/disable this identity provider.
+          - hideOnLoginPage
         type: bool
 
-    store_token:
+      gui_order:
         description:
-            - Enable/disable whether tokens must be stored after authenticating users.
+          - Number defining order of the provider in GUI (for example, on Login page).
         aliases:
-            - storeToken
-        type: bool
+          - guiOrder
+        type: int
 
-    add_read_token_role_on_create:
+      sync_mode:
         description:
-            - Enable/disable whether new users can read any stored tokens. This assigns the C(broker.read-token) role.
+          - Default sync mode for all mappers. The sync mode determines when user data will be synced using the mappers.
         aliases:
-            - addReadTokenRoleOnCreate
-        type: bool
-
-    trust_email:
-        description:
-            - If enabled, email provided by this provider is not verified even if verification is enabled for the realm.
-        aliases:
-            - trustEmail
-        type: bool
-
-    link_only:
-        description:
-            - If true, users cannot log in through this provider. They can only link to this provider.
-              This is useful if you don't want to allow login from the provider, but want to integrate with a provider.
-        aliases:
-            - linkOnly
-        type: bool
-
-    first_broker_login_flow_alias:
-        description:
-            - Alias of authentication flow, which is triggered after first login with this identity provider.
-        aliases:
-            - firstBrokerLoginFlowAlias
+          - syncMode
         type: str
 
-    post_broker_login_flow_alias:
+      issuer:
         description:
-            - Alias of authentication flow, which is triggered after each login with this identity provider.
-        aliases:
-            - postBrokerLoginFlowAlias
+          - The issuer identifier for the issuer of the response. If not provided, no validation will be performed.
         type: str
 
-    authenticate_by_default:
+      authorizationUrl:
         description:
-            - Specifies if this identity provider should be used by default for authentication even before displaying login screen.
-        aliases:
-            - authenticateByDefault
+          - The Authorization URL.
+        type: str
+
+      tokenUrl:
+        description:
+          - The Token URL.
+        type: str
+
+      logoutUrl:
+        description:
+          - End session endpoint to use to logout user from external IDP.
+        type: str
+
+      userInfoUrl:
+        description:
+          - The User Info URL.
+        type: str
+
+      clientAuthMethod:
+        description:
+          - The client authentication method.
+        type: str
+
+      clientId:
+        description:
+          - The client or client identifier registered within the identity provider.
+        type: str
+
+      clientSecret:
+        description:
+          - The client or client secret registered within the identity provider.
+        type: str
+
+      defaultScope:
+        description:
+          - The scopes to be sent when asking for authorization.
+        type: str
+
+      validateSignature:
+        description:
+          - Enable/disable signature validation of external IDP signatures.
         type: bool
 
-    provider_id:
+      useJwksUrl:
         description:
-            - Protocol used by this provider (supported values are V(oidc) or V(saml)).
-        aliases:
-            - providerId
+          - If the switch is on, identity provider public keys will be downloaded from given JWKS URL.
+        type: bool
+
+      jwksUrl:
+        description:
+          - URL where identity provider keys in JWK format are stored. See JWK specification for more details.
         type: str
 
-    config:
+      entityId:
         description:
-            - Dict specifying the configuration options for the provider; the contents differ depending on the value of O(provider_id).
-              Examples are given below for V(oidc) and V(saml). It is easiest to obtain valid config values by dumping an already-existing
-              identity provider configuration through check-mode in the RV(existing) field.
+          - The Entity ID that will be used to uniquely identify this SAML Service Provider.
+        type: str
+
+      singleSignOnServiceUrl:
+        description:
+          - The URL that must be used to send authentication requests (SAML AuthnRequest).
+        type: str
+
+      singleLogoutServiceUrl:
+        description:
+          - The URL that must be used to send logout requests.
+        type: str
+
+      backchannelSupported:
+        description:
+          - Does the external IDP support backchannel logout?
+        type: str
+
+      nameIDPolicyFormat:
+        description:
+          - Specifies the URI reference corresponding to a name identifier format.
+        type: str
+
+      principalType:
+        description:
+          - Way to identify and track external users from the assertion.
+        type: str
+
+  mappers:
+    description:
+      - A list of dicts defining mappers associated with this Identity Provider.
+    type: list
+    elements: dict
+    suboptions:
+      id:
+        description:
+          - Unique ID of this mapper.
+        type: str
+
+      name:
+        description:
+          - Name of the mapper.
+        type: str
+
+      identityProviderAlias:
+        description:
+          - Alias of the identity provider for this mapper.
+        type: str
+
+      identityProviderMapper:
+        description:
+          - Type of mapper.
+        type: str
+
+      config:
+        description:
+          - Dict specifying the configuration options for the mapper; the contents differ depending on the value of O(mappers[].identityProviderMapper).
         type: dict
-        suboptions:
-            hide_on_login_page:
-                description:
-                    - If hidden, login with this provider is possible only if requested explicitly, for example using the C(kc_idp_hint) parameter.
-                aliases:
-                    - hideOnLoginPage
-                type: bool
-
-            gui_order:
-                description:
-                    - Number defining order of the provider in GUI (for example, on Login page).
-                aliases:
-                    - guiOrder
-                type: int
-
-            sync_mode:
-                description:
-                    - Default sync mode for all mappers. The sync mode determines when user data will be synced using the mappers.
-                aliases:
-                    - syncMode
-                type: str
-
-            issuer:
-                description:
-                    - The issuer identifier for the issuer of the response. If not provided, no validation will be performed.
-                type: str
-
-            authorizationUrl:
-                description:
-                    - The Authorization URL.
-                type: str
-
-            tokenUrl:
-                description:
-                    - The Token URL.
-                type: str
-
-            logoutUrl:
-                description:
-                    - End session endpoint to use to logout user from external IDP.
-                type: str
-
-            userInfoUrl:
-                description:
-                    - The User Info URL.
-                type: str
-
-            clientAuthMethod:
-                description:
-                    - The client authentication method.
-                type: str
-
-            clientId:
-                description:
-                    - The client or client identifier registered within the identity provider.
-                type: str
-
-            clientSecret:
-                description:
-                    - The client or client secret registered within the identity provider.
-                type: str
-
-            defaultScope:
-                description:
-                    - The scopes to be sent when asking for authorization.
-                type: str
-
-            validateSignature:
-                description:
-                    - Enable/disable signature validation of external IDP signatures.
-                type: bool
-
-            useJwksUrl:
-                description:
-                    - If the switch is on, identity provider public keys will be downloaded from given JWKS URL.
-                type: bool
-
-            jwksUrl:
-                description:
-                    - URL where identity provider keys in JWK format are stored. See JWK specification for more details.
-                type: str
-
-            entityId:
-                description:
-                    - The Entity ID that will be used to uniquely identify this SAML Service Provider.
-                type: str
-
-            singleSignOnServiceUrl:
-                description:
-                    - The URL that must be used to send authentication requests (SAML AuthnRequest).
-                type: str
-
-            singleLogoutServiceUrl:
-                description:
-                    - The URL that must be used to send logout requests.
-                type: str
-
-            backchannelSupported:
-                description:
-                    - Does the external IDP support backchannel logout?
-                type: str
-
-            nameIDPolicyFormat:
-                description:
-                    - Specifies the URI reference corresponding to a name identifier format.
-                type: str
-
-            principalType:
-                description:
-                    - Way to identify and track external users from the assertion.
-                type: str
-
-    mappers:
-        description:
-            - A list of dicts defining mappers associated with this Identity Provider.
-        type: list
-        elements: dict
-        suboptions:
-            id:
-                description:
-                    - Unique ID of this mapper.
-                type: str
-
-            name:
-                description:
-                    - Name of the mapper.
-                type: str
-
-            identityProviderAlias:
-                description:
-                    - Alias of the identity provider for this mapper.
-                type: str
-
-            identityProviderMapper:
-                description:
-                    - Type of mapper.
-                type: str
-
-            config:
-                description:
-                    - Dict specifying the configuration options for the mapper; the contents differ depending on the value of
-                      O(mappers[].identityProviderMapper).
-                type: dict
 
 extends_documentation_fragment:
-    - community.general.keycloak
-    - community.general.attributes
+  - community.general.keycloak
+  - community.general.keycloak.actiongroup_keycloak
+  - community.general.attributes
 
 author:
-    - Laurent Paumier (@laurpaum)
-'''
+  - Laurent Paumier (@laurpaum)
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create OIDC identity provider, authentication with credentials
   community.general.keycloak_identity_provider:
     state: present
@@ -344,14 +342,14 @@ EXAMPLES = '''
           attribute.friendly.name: User Roles
           attribute.name: roles
           syncMode: INHERIT
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 msg:
-    description: Message as to what action was taken.
-    returned: always
-    type: str
-    sample: "Identity provider my-idp has been created"
+  description: Message as to what action was taken.
+  returned: always
+  type: str
+  sample: "Identity provider my-idp has been created"
 
 proposed:
     description: Representation of proposed identity provider.
@@ -425,7 +423,7 @@ end_state:
         "storeToken": false,
         "trustEmail": false,
     }
-'''
+"""
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
     keycloak_argument_spec, get_token, KeycloakError

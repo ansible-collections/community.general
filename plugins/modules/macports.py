@@ -12,54 +12,54 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: macports
 author: "Jimmy Tang (@jcftang)"
 short_description: Package manager for MacPorts
 description:
-    - Manages MacPorts packages (ports)
+  - Manages MacPorts packages (ports).
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    name:
-        description:
-            - A list of port names.
-        aliases: ['port']
-        type: list
-        elements: str
-    selfupdate:
-        description:
-            - Update Macports and the ports tree, either prior to installing ports or as a separate step.
-            - Equivalent to running C(port selfupdate).
-        aliases: ['update_cache', 'update_ports']
-        default: false
-        type: bool
-    state:
-        description:
-            - Indicates the desired state of the port.
-        choices: [ 'present', 'absent', 'active', 'inactive', 'installed', 'removed']
-        default: present
-        type: str
-    upgrade:
-        description:
-            - Upgrade all outdated ports, either prior to installing ports or as a separate step.
-            - Equivalent to running C(port upgrade outdated).
-        default: false
-        type: bool
-    variant:
-        description:
-            - A port variant specification.
-            - 'O(variant) is only supported with O(state=installed) and O(state=present).'
-        aliases: ['variants']
-        type: str
-'''
-EXAMPLES = '''
+  name:
+    description:
+      - A list of port names.
+    aliases: ['port']
+    type: list
+    elements: str
+  selfupdate:
+    description:
+      - Update Macports and the ports tree, either prior to installing ports or as a separate step.
+      - Equivalent to running C(port selfupdate).
+    aliases: ['update_cache', 'update_ports']
+    default: false
+    type: bool
+  state:
+    description:
+      - Indicates the desired state of the port.
+    choices: ['present', 'absent', 'active', 'inactive', 'installed', 'removed']
+    default: present
+    type: str
+  upgrade:
+    description:
+      - Upgrade all outdated ports, either prior to installing ports or as a separate step.
+      - Equivalent to running C(port upgrade outdated).
+    default: false
+    type: bool
+  variant:
+    description:
+      - A port variant specification.
+      - O(variant) is only supported with O(state=installed) and O(state=present).
+    aliases: ['variants']
+    type: str
+"""
+
+EXAMPLES = r"""
 - name: Install the foo port
   community.general.macports:
     name: foo
@@ -74,8 +74,8 @@ EXAMPLES = '''
     name: "{{ ports }}"
   vars:
     ports:
-    - foo
-    - foo-tools
+      - foo
+      - foo-tools
 
 - name: Update Macports and the ports tree, then upgrade all outdated ports
   community.general.macports:
@@ -101,7 +101,7 @@ EXAMPLES = '''
   community.general.macports:
     name: foo
     state: inactive
-'''
+"""
 
 import re
 
@@ -221,7 +221,7 @@ def install_ports(module, port_path, ports, variant, stdout, stderr):
 
 
 def activate_ports(module, port_path, ports, stdout, stderr):
-    """ Activate a port if it's inactive. """
+    """ Activate a port if it is inactive. """
 
     activate_c = 0
 
@@ -248,7 +248,7 @@ def activate_ports(module, port_path, ports, stdout, stderr):
 
 
 def deactivate_ports(module, port_path, ports, stdout, stderr):
-    """ Deactivate a port if it's active. """
+    """ Deactivate a port if it is active. """
 
     deactivated_c = 0
 

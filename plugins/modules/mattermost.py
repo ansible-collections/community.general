@@ -15,14 +15,14 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: mattermost
 short_description: Send Mattermost notifications
 description:
-    - Sends notifications to U(http://your.mattermost.url) via the Incoming WebHook integration.
+  - Sends notifications to U(http://your.mattermost.url) using the Incoming WebHook integration.
 author: "Benjamin Jolivot (@bjolivot)"
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
   check_mode:
     support: full
@@ -32,15 +32,13 @@ options:
   url:
     type: str
     description:
-      - Mattermost url (i.e. http://mattermost.yourcompany.com).
+      - Mattermost url (for example V(http://mattermost.yourcompany.com)).
     required: true
   api_key:
     type: str
     description:
-      - Mattermost webhook api key. Log into your mattermost site, go to
-        Menu -> Integration -> Incoming Webhook -> Add Incoming Webhook.
-        This will give you full URL. O(api_key) is the last part.
-        http://mattermost.example.com/hooks/C(API_KEY)
+      - Mattermost webhook API key. Log into your Mattermost site, go to Menu -> Integration -> Incoming Webhook -> Add Incoming Webhook. This
+        will give you full URL. O(api_key) is the last part. U(http://mattermost.example.com/hooks/API_KEY).
     required: true
   text:
     type: str
@@ -73,17 +71,16 @@ options:
     type: str
     description:
       - Set a priority for the message.
-    choices: [ important, urgent ]
+    choices: [important, urgent]
     version_added: 10.0.0
   validate_certs:
     description:
-      - If V(false), SSL certificates will not be validated. This should only be used
-        on personally controlled sites using self-signed certificates.
+      - If V(false), SSL certificates will not be validated. This should only be used on personally controlled sites using self-signed certificates.
     default: true
     type: bool
-'''
+"""
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Send notification message via Mattermost
   community.general.mattermost:
     url: http://mattermost.example.com
@@ -117,16 +114,16 @@ EXAMPLES = """
             short: true
 """
 
-RETURN = '''
+RETURN = r"""
 payload:
-    description: Mattermost payload
-    returned: success
-    type: str
+  description: Mattermost payload.
+  returned: success
+  type: str
 webhook_url:
-    description: URL the webhook is sent to
-    returned: success
-    type: str
-'''
+  description: URL the webhook is sent to.
+  returned: success
+  type: str
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url

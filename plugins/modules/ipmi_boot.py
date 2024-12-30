@@ -9,12 +9,11 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: ipmi_boot
 short_description: Management of order of boot devices
 description:
-  - Use this module to manage order of boot devices
+  - Use this module to manage order of boot devices.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -25,7 +24,7 @@ attributes:
 options:
   name:
     description:
-      - Hostname or ip address of the BMC.
+      - Hostname or IP address of the BMC.
     required: true
     type: str
   port:
@@ -52,14 +51,14 @@ options:
   bootdev:
     description:
       - Set boot device to use on next reboot
-      - "The choices for the device are:
-          - network -- Request network boot
-          - floppy -- Boot from floppy
-          - hd -- Boot from hard drive
-          - safe -- Boot from hard drive, requesting 'safe mode'
-          - optical -- boot from CD/DVD/BD drive
-          - setup -- Boot into setup utility
-          - default -- remove any IPMI directed boot device request"
+      - "The choices for the device are:"
+      - V(network) -- Request network boot
+      - V(floppy) -- Boot from floppy
+      - V(hd) -- Boot from hard drive
+      - "V(safe) -- Boot from hard drive, requesting 'safe mode'"
+      - V(optical) -- boot from CD/DVD/BD drive
+      - V(setup) -- Boot into setup utility
+      - V(default) -- remove any IPMI directed boot device request
     required: true
     choices:
       - network
@@ -73,49 +72,46 @@ options:
   state:
     description:
       - Whether to ensure that boot devices is desired.
-      - "The choices for the state are:
-            - present -- Request system turn on
-            - absent -- Request system turn on"
+      - 'The choices for the state are: - present -- Request system turn on - absent -- Request system turn on.'
     default: present
-    choices: [ present, absent ]
+    choices: [present, absent]
     type: str
   persistent:
     description:
-      - If set, ask that system firmware uses this device beyond next boot.
-        Be aware many systems do not honor this.
+      - If set, ask that system firmware uses this device beyond next boot. Be aware many systems do not honor this.
     type: bool
     default: false
   uefiboot:
     description:
-      - If set, request UEFI boot explicitly.
-        Strictly speaking, the spec suggests that if not set, the system should BIOS boot and offers no "don't care" option.
-        In practice, this flag not being set does not preclude UEFI boot on any system I've encountered.
+      - If set, request UEFI boot explicitly. Strictly speaking, the spec suggests that if not set, the system should BIOS
+        boot and offers no "do not care" option. In practice, this flag not being set does not preclude UEFI boot on any system
+        I have encountered.
     type: bool
     default: false
 requirements:
   - pyghmi
 author: "Bulat Gaifullin (@bgaifullin) <gaifullinbf@gmail.com>"
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 bootdev:
-    description: The boot device name which will be used beyond next boot.
-    returned: success
-    type: str
-    sample: default
+  description: The boot device name which will be used beyond next boot.
+  returned: success
+  type: str
+  sample: default
 persistent:
-    description: If True, system firmware will use this device beyond next boot.
-    returned: success
-    type: bool
-    sample: false
+  description: If True, system firmware will use this device beyond next boot.
+  returned: success
+  type: bool
+  sample: false
 uefimode:
-    description: If True, system firmware will use UEFI boot explicitly beyond next boot.
-    returned: success
-    type: bool
-    sample: false
-'''
+  description: If True, system firmware will use UEFI boot explicitly beyond next boot.
+  returned: success
+  type: bool
+  sample: false
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Ensure bootdevice is HD
   community.general.ipmi_boot:
     name: test.testdomain.com
@@ -131,7 +127,7 @@ EXAMPLES = '''
     key: 1234567890AABBCCDEFF000000EEEE12
     bootdev: network
     state: absent
-'''
+"""
 
 import traceback
 import binascii

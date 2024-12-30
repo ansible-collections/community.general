@@ -9,84 +9,83 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: etcd3
 short_description: Set or delete key value pairs from an etcd3 cluster
 requirements:
   - etcd3
 description:
-  - Sets or deletes values in etcd3 cluster using its v3 api.
-  - Needs python etcd3 lib to work
+  - Sets or deletes values in etcd3 cluster using its v3 API.
+  - Needs python etcd3 lib to work.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    key:
-        type: str
-        description:
-            - the key where the information is stored in the cluster
-        required: true
-    value:
-        type: str
-        description:
-            - the information stored
-        required: true
-    host:
-        type: str
-        description:
-            - the IP address of the cluster
-        default: 'localhost'
-    port:
-        type: int
-        description:
-            - the port number used to connect to the cluster
-        default: 2379
-    state:
-        type: str
-        description:
-            - the state of the value for the key.
-            - can be present or absent
-        required: true
-        choices: [ present, absent ]
-    user:
-        type: str
-        description:
-            - The etcd user to authenticate with.
-    password:
-        type: str
-        description:
-            - The password to use for authentication.
-            - Required if O(user) is defined.
-    ca_cert:
-        type: path
-        description:
-            - The Certificate Authority to use to verify the etcd host.
-            - Required if O(client_cert) and O(client_key) are defined.
-    client_cert:
-        type: path
-        description:
-            - PEM formatted certificate chain file to be used for SSL client authentication.
-            - Required if O(client_key) is defined.
-    client_key:
-        type: path
-        description:
-            - PEM formatted file that contains your private key to be used for SSL client authentication.
-            - Required if O(client_cert) is defined.
-    timeout:
-        type: int
-        description:
-            - The socket level timeout in seconds.
+  key:
+    type: str
+    description:
+      - The key where the information is stored in the cluster.
+    required: true
+  value:
+    type: str
+    description:
+      - The information stored.
+    required: true
+  host:
+    type: str
+    description:
+      - The IP address of the cluster.
+    default: 'localhost'
+  port:
+    type: int
+    description:
+      - The port number used to connect to the cluster.
+    default: 2379
+  state:
+    type: str
+    description:
+      - The state of the value for the key.
+      - Can be present or absent.
+    required: true
+    choices: [present, absent]
+  user:
+    type: str
+    description:
+      - The etcd user to authenticate with.
+  password:
+    type: str
+    description:
+      - The password to use for authentication.
+      - Required if O(user) is defined.
+  ca_cert:
+    type: path
+    description:
+      - The Certificate Authority to use to verify the etcd host.
+      - Required if O(client_cert) and O(client_key) are defined.
+  client_cert:
+    type: path
+    description:
+      - PEM formatted certificate chain file to be used for SSL client authentication.
+      - Required if O(client_key) is defined.
+  client_key:
+    type: path
+    description:
+      - PEM formatted file that contains your private key to be used for SSL client authentication.
+      - Required if O(client_cert) is defined.
+  timeout:
+    type: int
+    description:
+      - The socket level timeout in seconds.
 author:
-    - Jean-Philippe Evrard (@evrardjp)
-    - Victor Fauth (@vfauth)
-'''
+  - Jean-Philippe Evrard (@evrardjp)
+  - Victor Fauth (@vfauth)
+"""
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Store a value "bar" under the key "foo" for a cluster located "http://localhost:2379"
   community.general.etcd3:
     key: "foo"
@@ -114,16 +113,16 @@ EXAMPLES = """
     client_key: "/etc/ssl/private/key.pem"
 """
 
-RETURN = '''
+RETURN = r"""
 key:
-    description: The key that was queried
-    returned: always
-    type: str
+  description: The key that was queried.
+  returned: always
+  type: str
 old_value:
-    description: The previous value in the cluster
-    returned: always
-    type: str
-'''
+  description: The previous value in the cluster.
+  returned: always
+  type: str
+"""
 
 import traceback
 

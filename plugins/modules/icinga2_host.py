@@ -11,13 +11,12 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: icinga2_host
 short_description: Manage a host in Icinga2
 description:
-   - "Add or remove a host to Icinga2 through the API."
-   - "See U(https://www.icinga.com/docs/icinga2/latest/doc/12-icinga2-api/)"
+  - Add or remove a host to Icinga2 through the API.
+  - See U(https://www.icinga.com/docs/icinga2/latest/doc/12-icinga2-api/).
 author: "Jurgen Brand (@t794104)"
 attributes:
   check_mode:
@@ -28,17 +27,16 @@ options:
   url:
     type: str
     description:
-      - HTTP, HTTPS, or FTP URL in the form (http|https|ftp)://[user[:pass]]@host.domain[:port]/path
+      - HTTP, HTTPS, or FTP URL in the form V((http|https|ftp\)://[user[:pass]]@host.domain[:port]/path).
   use_proxy:
     description:
-      - If V(false), it will not use a proxy, even if one is defined in
-        an environment variable on the target hosts.
+      - If V(false), it will not use a proxy, even if one is defined in an environment variable on the target hosts.
     type: bool
     default: true
   validate_certs:
     description:
-      - If V(false), SSL certificates will not be validated. This should only be used
-        on personally controlled sites using self-signed certificates.
+      - If V(false), SSL certificates will not be validated. This should only be used on personally controlled sites using
+        self-signed certificates.
     type: bool
     default: true
   url_username:
@@ -49,33 +47,30 @@ options:
   url_password:
     type: str
     description:
-        - The password for use in HTTP basic authentication.
-        - If the O(url_username) parameter is not specified, the O(url_password) parameter will not be used.
+      - The password for use in HTTP basic authentication.
+      - If the O(url_username) parameter is not specified, the O(url_password) parameter will not be used.
   force_basic_auth:
     description:
-      - httplib2, the library used by the uri module only sends authentication information when a webservice
-        responds to an initial request with a 401 status. Since some basic auth services do not properly
-        send a 401, logins will fail. This option forces the sending of the Basic authentication header
-        upon initial request.
+      - Httplib2, the library used by the uri module only sends authentication information when a webservice responds to an
+        initial request with a 401 status. Since some basic auth services do not properly send a 401, logins will fail. This
+        option forces the sending of the Basic authentication header upon initial request.
     type: bool
     default: false
   client_cert:
     type: path
     description:
-      - PEM formatted certificate chain file to be used for SSL client
-        authentication. This file can also include the key as well, and if
-        the key is included, O(client_key) is not required.
+      - PEM formatted certificate chain file to be used for SSL client authentication. This file can also include the key
+        as well, and if the key is included, O(client_key) is not required.
   client_key:
     type: path
     description:
-      - PEM formatted file that contains your private key to be used for SSL
-        client authentication. If O(client_cert) contains both the certificate
-        and key, this option is not required.
+      - PEM formatted file that contains your private key to be used for SSL client authentication. If O(client_cert) contains
+        both the certificate and key, this option is not required.
   state:
     type: str
     description:
       - Apply feature state.
-    choices: [ "present", "absent" ]
+    choices: ["present", "absent"]
     default: present
   name:
     type: str
@@ -114,9 +109,9 @@ options:
 extends_documentation_fragment:
   - ansible.builtin.url
   - community.general.attributes
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Add host to icinga
   community.general.icinga2_host:
     url: "https://icinga2.example.com"
@@ -128,18 +123,18 @@ EXAMPLES = '''
     variables:
       foo: "bar"
   delegate_to: 127.0.0.1
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 name:
-    description: The name used to create, modify or delete the host
-    type: str
-    returned: always
+  description: The name used to create, modify or delete the host.
+  type: str
+  returned: always
 data:
-    description: The data structure used for create, modify or delete of the host
-    type: dict
-    returned: always
-'''
+  description: The data structure used for create, modify or delete of the host.
+  type: dict
+  returned: always
+"""
 
 import json
 

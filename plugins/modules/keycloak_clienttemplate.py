@@ -8,173 +8,163 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: keycloak_clienttemplate
 
-short_description: Allows administration of Keycloak client templates via Keycloak API
+short_description: Allows administration of Keycloak client templates using Keycloak API
 
 description:
-    - This module allows the administration of Keycloak client templates via the Keycloak REST API. It
-      requires access to the REST API via OpenID Connect; the user connecting and the client being
-      used must have the requisite access rights. In a default Keycloak installation, admin-cli
-      and an admin user would work, as would a separate client definition with the scope tailored
-      to your needs and a user having the expected roles.
-
-    - The names of module options are snake_cased versions of the camelCase ones found in the
-      Keycloak API and its documentation at U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html)
-
-    - The Keycloak API does not always enforce for only sensible settings to be used -- you can set
-      SAML-specific settings on an OpenID Connect client for instance and vice versa. Be careful.
-      If you do not specify a setting, usually a sensible default is chosen.
-
+  - This module allows the administration of Keycloak client templates using the Keycloak REST API. It requires access to the REST API using OpenID
+    Connect; the user connecting and the client being used must have the requisite access rights. In a default Keycloak installation, admin-cli
+    and an admin user would work, as would a separate client definition with the scope tailored to your needs and a user having the expected roles.
+  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation at
+    U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html).
+  - The Keycloak API does not always enforce for only sensible settings to be used -- you can set SAML-specific settings on an OpenID Connect
+    client for instance and the other way around. Be careful. If you do not specify a setting, usually a sensible default is chosen.
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: full
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
+  action_group:
+    version_added: 10.2.0
 
 options:
-    state:
-        description:
-            - State of the client template.
-            - On V(present), the client template will be created (or updated if it exists already).
-            - On V(absent), the client template will be removed if it exists
-        choices: ['present', 'absent']
-        default: 'present'
-        type: str
-
-    id:
-        description:
-            - Id of client template to be worked on. This is usually a UUID.
-        type: str
-
-    realm:
-        description:
-            - Realm this client template is found in.
-        type: str
-        default: master
-
-    name:
-        description:
-            - Name of the client template.
-        type: str
-
+  state:
     description:
+      - State of the client template.
+      - On V(present), the client template will be created (or updated if it exists already).
+      - On V(absent), the client template will be removed if it exists.
+    choices: ['present', 'absent']
+    default: 'present'
+    type: str
+
+  id:
+    description:
+      - Id of client template to be worked on. This is usually a UUID.
+    type: str
+
+  realm:
+    description:
+      - Realm this client template is found in.
+    type: str
+    default: master
+
+  name:
+    description:
+      - Name of the client template.
+    type: str
+
+  description:
+    description:
+      - Description of the client template in Keycloak.
+    type: str
+
+  protocol:
+    description:
+      - Type of client template.
+      - The V(docker-v2) value was added in community.general 8.6.0.
+    choices: ['openid-connect', 'saml', 'docker-v2']
+    type: str
+
+  full_scope_allowed:
+    description:
+      - Is the "Full Scope Allowed" feature set for this client template or not. This is C(fullScopeAllowed) in the Keycloak REST API.
+    type: bool
+
+  protocol_mappers:
+    description:
+      - A list of dicts defining protocol mappers for this client template. This is C(protocolMappers) in the Keycloak REST API.
+    type: list
+    elements: dict
+    suboptions:
+      consentRequired:
         description:
-            - Description of the client template in Keycloak.
+          - Specifies whether a user needs to provide consent to a client for this mapper to be active.
+        type: bool
+
+      consentText:
+        description:
+          - The human-readable name of the consent the user is presented to accept.
         type: str
 
-    protocol:
+      id:
         description:
-            - Type of client template.
-            - The V(docker-v2) value was added in community.general 8.6.0.
+          - Usually a UUID specifying the internal ID of this protocol mapper instance.
+        type: str
+
+      name:
+        description:
+          - The name of this protocol mapper.
+        type: str
+
+      protocol:
+        description:
+          - This specifies for which protocol this protocol mapper is active.
         choices: ['openid-connect', 'saml', 'docker-v2']
         type: str
 
-    full_scope_allowed:
+      protocolMapper:
         description:
-            - Is the "Full Scope Allowed" feature set for this client template or not.
-              This is 'fullScopeAllowed' in the Keycloak REST API.
-        type: bool
+          - 'The Keycloak-internal name of the type of this protocol-mapper. While an exhaustive list is impossible to provide since this may
+            be extended through SPIs by the user of Keycloak, by default Keycloak as of 3.4 ships with at least:'
+          - V(docker-v2-allow-all-mapper).
+          - V(oidc-address-mapper).
+          - V(oidc-full-name-mapper).
+          - V(oidc-group-membership-mapper).
+          - V(oidc-hardcoded-claim-mapper).
+          - V(oidc-hardcoded-role-mapper).
+          - V(oidc-role-name-mapper).
+          - V(oidc-script-based-protocol-mapper).
+          - V(oidc-sha256-pairwise-sub-mapper).
+          - V(oidc-usermodel-attribute-mapper).
+          - V(oidc-usermodel-client-role-mapper).
+          - V(oidc-usermodel-property-mapper).
+          - V(oidc-usermodel-realm-role-mapper).
+          - V(oidc-usersessionmodel-note-mapper).
+          - V(saml-group-membership-mapper).
+          - V(saml-hardcode-attribute-mapper).
+          - V(saml-hardcode-role-mapper).
+          - V(saml-role-list-mapper).
+          - V(saml-role-name-mapper).
+          - V(saml-user-attribute-mapper).
+          - V(saml-user-property-mapper).
+          - V(saml-user-session-note-mapper).
+          - An exhaustive list of available mappers on your installation can be obtained on the admin console by going to Server Info -> Providers
+            and looking under 'protocol-mapper'.
+        type: str
 
-    protocol_mappers:
+      config:
         description:
-            - a list of dicts defining protocol mappers for this client template.
-              This is 'protocolMappers' in the Keycloak REST API.
-        type: list
-        elements: dict
-        suboptions:
-            consentRequired:
-                description:
-                    - Specifies whether a user needs to provide consent to a client for this mapper to be active.
-                type: bool
-
-            consentText:
-                description:
-                    - The human-readable name of the consent the user is presented to accept.
-                type: str
-
-            id:
-                description:
-                    - Usually a UUID specifying the internal ID of this protocol mapper instance.
-                type: str
-
-            name:
-                description:
-                    - The name of this protocol mapper.
-                type: str
-
-            protocol:
-                description:
-                    - This specifies for which protocol this protocol mapper is active.
-                choices: ['openid-connect', 'saml', 'docker-v2']
-                type: str
-
-            protocolMapper:
-                description:
-                    - "The Keycloak-internal name of the type of this protocol-mapper. While an exhaustive list is
-                      impossible to provide since this may be extended through SPIs by the user of Keycloak,
-                      by default Keycloak as of 3.4 ships with at least:"
-                    - V(docker-v2-allow-all-mapper)
-                    - V(oidc-address-mapper)
-                    - V(oidc-full-name-mapper)
-                    - V(oidc-group-membership-mapper)
-                    - V(oidc-hardcoded-claim-mapper)
-                    - V(oidc-hardcoded-role-mapper)
-                    - V(oidc-role-name-mapper)
-                    - V(oidc-script-based-protocol-mapper)
-                    - V(oidc-sha256-pairwise-sub-mapper)
-                    - V(oidc-usermodel-attribute-mapper)
-                    - V(oidc-usermodel-client-role-mapper)
-                    - V(oidc-usermodel-property-mapper)
-                    - V(oidc-usermodel-realm-role-mapper)
-                    - V(oidc-usersessionmodel-note-mapper)
-                    - V(saml-group-membership-mapper)
-                    - V(saml-hardcode-attribute-mapper)
-                    - V(saml-hardcode-role-mapper)
-                    - V(saml-role-list-mapper)
-                    - V(saml-role-name-mapper)
-                    - V(saml-user-attribute-mapper)
-                    - V(saml-user-property-mapper)
-                    - V(saml-user-session-note-mapper)
-                    - An exhaustive list of available mappers on your installation can be obtained on
-                      the admin console by going to Server Info -> Providers and looking under
-                      'protocol-mapper'.
-                type: str
-
-            config:
-                description:
-                    - Dict specifying the configuration options for the protocol mapper; the
-                      contents differ depending on the value of O(protocol_mappers[].protocolMapper) and are not documented
-                      other than by the source of the mappers and its parent class(es). An example is given
-                      below. It is easiest to obtain valid config values by dumping an already-existing
-                      protocol mapper configuration through check-mode in the RV(existing) field.
-                type: dict
-
-    attributes:
-        description:
-            - A dict of further attributes for this client template. This can contain various
-              configuration settings, though in the default installation of Keycloak as of 3.4, none
-              are documented or known, so this is usually empty.
+          - Dict specifying the configuration options for the protocol mapper; the contents differ depending on the value of
+            O(protocol_mappers[].protocolMapper)
+            and are not documented other than by the source of the mappers and its parent class(es). An example is given below. It is easiest
+            to obtain valid config values by dumping an already-existing protocol mapper configuration through check-mode in the RV(existing)
+            field.
         type: dict
 
-notes:
-    - The Keycloak REST API defines further fields (namely C(bearerOnly), C(consentRequired), C(standardFlowEnabled),
-      C(implicitFlowEnabled), C(directAccessGrantsEnabled), C(serviceAccountsEnabled), C(publicClient), and
-      C(frontchannelLogout)) which, while available with keycloak_client, do not have any effect on
-      Keycloak client-templates and are discarded if supplied with an API request changing client-templates. As such,
-      they are not available through this module.
+  attributes:
+    description:
+      - A dict of further attributes for this client template. This can contain various configuration settings, though in the default installation
+        of Keycloak as of 3.4, none are documented or known, so this is usually empty.
+    type: dict
 
+notes:
+  - The Keycloak REST API defines further fields (namely C(bearerOnly), C(consentRequired), C(standardFlowEnabled), C(implicitFlowEnabled),
+    C(directAccessGrantsEnabled),
+    C(serviceAccountsEnabled), C(publicClient), and C(frontchannelLogout)) which, while available with keycloak_client, do not have any effect
+    on Keycloak client-templates and are discarded if supplied with an API request changing client-templates. As such, they are not available
+    through this module.
 extends_documentation_fragment:
-    - community.general.keycloak
-    - community.general.attributes
+  - community.general.keycloak
+  - community.general.keycloak.actiongroup_keycloak
+  - community.general.attributes
 
 author:
-    - Eike Frost (@eikef)
-'''
+  - Eike Frost (@eikef)
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create or update Keycloak client template (minimal), authentication with credentials
   community.general.keycloak_client:
     auth_client_id: admin-cli
@@ -233,47 +223,33 @@ EXAMPLES = '''
     full_scope_allowed: false
     id: bce6f5e9-d7d3-4955-817e-c5b7f8d65b3f
   delegate_to: localhost
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 msg:
-    description: Message as to what action was taken.
-    returned: always
-    type: str
-    sample: "Client template testclient has been updated"
+  description: Message as to what action was taken.
+  returned: always
+  type: str
+  sample: "Client template testclient has been updated"
 
 proposed:
-    description: Representation of proposed client template.
-    returned: always
-    type: dict
-    sample: {
-      name: "test01"
-    }
+  description: Representation of proposed client template.
+  returned: always
+  type: dict
+  sample: {name: "test01"}
 
 existing:
-    description: Representation of existing client template (sample is truncated).
-    returned: always
-    type: dict
-    sample: {
-        "description": "test01",
-        "fullScopeAllowed": false,
-        "id": "9c3712ab-decd-481e-954f-76da7b006e5f",
-        "name": "test01",
-        "protocol": "saml"
-    }
+  description: Representation of existing client template (sample is truncated).
+  returned: always
+  type: dict
+  sample: {"description": "test01", "fullScopeAllowed": false, "id": "9c3712ab-decd-481e-954f-76da7b006e5f", "name": "test01", "protocol": "saml"}
 
 end_state:
-    description: Representation of client template after module execution (sample is truncated).
-    returned: on success
-    type: dict
-    sample: {
-        "description": "test01",
-        "fullScopeAllowed": false,
-        "id": "9c3712ab-decd-481e-954f-76da7b006e5f",
-        "name": "test01",
-        "protocol": "saml"
-    }
-'''
+  description: Representation of client template after module execution (sample is truncated).
+  returned: on success
+  type: dict
+  sample: {"description": "test01", "fullScopeAllowed": false, "id": "9c3712ab-decd-481e-954f-76da7b006e5f", "name": "test01", "protocol": "saml"}
+"""
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
     keycloak_argument_spec, get_token, KeycloakError

@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: proxmox_disk
 short_description: Management of a disk of a Qemu(KVM) VM in a Proxmox VE cluster
 version_added: 5.7.0
@@ -38,31 +37,21 @@ options:
     description:
       - The disk key (V(unused[n]), V(ide[n]), V(sata[n]), V(scsi[n]) or V(virtio[n])) you want to operate on.
       - Disk buses (IDE, SATA and so on) have fixed ranges of V(n) that accepted by Proxmox API.
-      - >
-        For IDE: 0-3;
-        for SCSI: 0-30;
-        for SATA: 0-5;
-        for VirtIO: 0-15;
-        for Unused: 0-255.
+      - 'For IDE: 0-3; for SCSI: 0-30; for SATA: 0-5; for VirtIO: 0-15; for Unused: 0-255.'
     type: str
     required: true
   state:
     description:
       - Indicates desired state of the disk.
-      - >
-        O(state=present) can be used to create, replace disk or update options in existing disk. It will create missing
-        disk or update options in existing one by default. See the O(create) parameter description to control behavior
-        of this option.
+      - O(state=present) can be used to create, replace disk or update options in existing disk. It will create missing disk or update options
+        in existing one by default. See the O(create) parameter description to control behavior of this option.
       - Some updates on options (like O(cache)) are not being applied instantly and require VM restart.
-      - >
-        Use O(state=detached) to detach existing disk from VM but do not remove it entirely.
-        When O(state=detached) and disk is V(unused[n]) it will be left in same state (not removed).
-      - >
-        O(state=moved) may be used to change backing storage for the disk in bounds of the same VM
-        or to send the disk to another VM (using the same backing storage).
-      - >
-        O(state=resized) intended to change the disk size. As of Proxmox 7.2 you can only increase the disk size
-        because shrinking disks is not supported by the PVE API and has to be done manually.
+      - Use O(state=detached) to detach existing disk from VM but do not remove it entirely. When O(state=detached) and disk is V(unused[n]) it
+        will be left in same state (not removed).
+      - O(state=moved) may be used to change backing storage for the disk in bounds of the same VM or to send the disk to another VM (using the
+        same backing storage).
+      - O(state=resized) intended to change the disk size. As of Proxmox 7.2 you can only increase the disk size because shrinking disks is not
+        supported by the PVE API and has to be done manually.
       - To entirely remove the disk from backing storage use O(state=absent).
     type: str
     choices: ['present', 'resized', 'detached', 'moved', 'absent']
@@ -84,10 +73,8 @@ options:
   size:
     description:
       - Desired volume size in GB to allocate when O(state=present) (specify O(size) without suffix).
-      - >
-        New (or additional) size of volume when O(state=resized). With the V(+) sign
-        the value is added to the actual size of the volume
-        and without it, the value is taken as an absolute one.
+      - New (or additional) size of volume when O(state=resized). With the V(+) sign the value is added to the actual size of the volume and without
+        it, the value is taken as an absolute one.
     type: str
   bwlimit:
     description:
@@ -176,8 +163,8 @@ options:
   import_from:
     description:
       - Import volume from this existing one.
-      - Volume string format
-      - C(<STORAGE>:<VMID>/<FULL_NAME>) or C(<ABSOLUTE_PATH>/<FULL_NAME>)
+      - Volume string format.
+      - V(<STORAGE>:<VMID>/<FULL_NAME>) or V(<ABSOLUTE_PATH>/<FULL_NAME>).
       - Attention! Only root can use absolute paths.
       - This parameter is mutually exclusive with O(size).
       - Increase O(timeout) parameter when importing large disk images or using slow storage.
@@ -223,7 +210,7 @@ options:
     type: int
   iothread:
     description:
-      - Whether to use iothreads for this drive (only for SCSI and VirtIO)
+      - Whether to use iothreads for this drive (only for SCSI and VirtIO).
     type: bool
   mbps:
     description:
@@ -262,10 +249,9 @@ options:
     description:
       - The ISO image to be mounted on the specified in O(disk) CD-ROM.
       - O(media=cdrom) needs to be specified for this option to work.
-      - "Image string format:"
-      - V(<STORAGE>:iso/<ISO_NAME>) to mount ISO.
-      - V(cdrom) to use physical CD/DVD drive.
-      - V(none) to unmount image from existent CD-ROM or create empty CD-ROM drive.
+      - Use V(<STORAGE>:iso/<ISO_NAME>) to mount ISO.
+      - Use V(cdrom) to access the physical CD/DVD drive.
+      - Use V(none) to unmount image from existent CD-ROM or create empty CD-ROM drive.
     type: str
     version_added: 8.1.0
   queues:
@@ -330,9 +316,9 @@ extends_documentation_fragment:
   - community.general.proxmox.actiongroup_proxmox
   - community.general.proxmox.documentation
   - community.general.attributes
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create new disk in VM (do not rewrite in case it exists already)
   community.general.proxmox_disk:
     api_host: node1
@@ -437,9 +423,9 @@ EXAMPLES = '''
     media: cdrom
     iso_image: local:iso/favorite_distro_amd64.iso
     state: present
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 vmid:
   description: The VM vmid.
   returned: success
@@ -450,13 +436,14 @@ msg:
   returned: always
   type: str
   sample: "Disk scsi3 created in VM 101"
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
+
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 from ansible_collections.community.general.plugins.module_utils.proxmox import (proxmox_auth_argument_spec,
                                                                                 ProxmoxAnsible)
 from re import compile, match, sub
-from time import sleep
 
 
 def disk_conf_str_to_dict(config_string):
@@ -531,17 +518,18 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
         }
         return params
 
-    def wait_till_complete_or_timeout(self, node_name, task_id):
-        timeout = self.module.params['timeout']
-        while timeout:
-            if self.api_task_ok(node_name, task_id):
-                return True
-            timeout -= 1
-            if timeout <= 0:
-                return False
-            sleep(1)
-
     def create_disk(self, disk, vmid, vm, vm_config):
+        """Create a disk in the specified virtual machine. Check if creation is required,
+        and if so, compile the disk configuration and create it by updating the virtual
+        machine configuration. After calling the API function, wait for the result.
+
+        :param disk: ID of the disk in format "<bus><number>".
+        :param vmid: ID of the virtual machine where the disk will be created.
+        :param vm: Name of the virtual machine where the disk will be created.
+        :param vm_config: Configuration of the virtual machine.
+        :return: (bool, string) Whether the task was successful or not
+            and the message to return to Ansible.
+        """
         create = self.module.params['create']
         if create == 'disabled' and disk not in vm_config:
             # NOOP
@@ -610,15 +598,31 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
             disk_config_to_apply = {self.module.params["disk"]: config_str}
 
         current_task_id = self.proxmox_api.nodes(vm['node']).qemu(vmid).config.post(**disk_config_to_apply)
-        task_success = self.wait_till_complete_or_timeout(vm['node'], current_task_id)
+        task_success, fail_reason = self.api_task_complete(vm['node'], current_task_id, self.module.params['timeout'])
+
         if task_success:
             return True, ok_str % (disk, vmid)
         else:
-            self.module.fail_json(
-                msg=timeout_str % self.proxmox_api.nodes(vm['node']).tasks(current_task_id).log.get()[:1]
-            )
+            if fail_reason == ProxmoxAnsible.TASK_TIMED_OUT:
+                self.module.fail_json(
+                    msg=timeout_str % self.proxmox_api.nodes(vm['node']).tasks(current_task_id).log.get()[:1]
+                )
+            else:
+                self.module.fail_json(msg="Error occurred on task execution: %s" % fail_reason)
 
     def move_disk(self, disk, vmid, vm, vm_config):
+        """Call the `move_disk` API function that moves the disk to another storage and wait for the result.
+
+        :param disk: ID of disk in format "<bus><number>".
+        :param vmid: ID of virtual machine which disk will be moved.
+        :param vm: Name of virtual machine which disk will be moved.
+        :param vm_config: Virtual machine configuration.
+        :return: (bool, string) Whether the task was successful or not
+            and the message to return to Ansible.
+        """
+        disk_config = disk_conf_str_to_dict(vm_config[disk])
+        disk_storage = disk_config["storage_name"]
+
         params = dict()
         params['disk'] = disk
         params['vmid'] = vmid
@@ -632,19 +636,62 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
         params = {k: v for k, v in params.items() if v is not None}
 
         if params.get('storage', False):
+            # Check if the disk is already in the target storage.
             disk_config = disk_conf_str_to_dict(vm_config[disk])
             if params['storage'] == disk_config['storage_name']:
-                return False
+                return False, "Disk %s already at %s storage" % (disk, disk_storage)
 
-        task_id = self.proxmox_api.nodes(vm['node']).qemu(vmid).move_disk.post(**params)
-        task_success = self.wait_till_complete_or_timeout(vm['node'], task_id)
+        current_task_id = self.proxmox_api.nodes(vm['node']).qemu(vmid).move_disk.post(**params)
+        task_success, fail_reason = self.api_task_complete(vm['node'], current_task_id, self.module.params['timeout'])
+
         if task_success:
-            return True
+            return True, "Disk %s moved from VM %s storage %s" % (disk, vmid, disk_storage)
         else:
-            self.module.fail_json(
-                msg='Reached timeout while waiting for moving VM disk. Last line in task before timeout: %s' %
-                    self.proxmox_api.nodes(vm['node']).tasks(task_id).log.get()[:1]
-            )
+            if fail_reason == ProxmoxAnsible.TASK_TIMED_OUT:
+                self.module.fail_json(
+                    msg='Reached timeout while waiting for moving VM disk. Last line in task before timeout: %s' %
+                        self.proxmox_api.nodes(vm['node']).tasks(current_task_id).log.get()[:1]
+                )
+            else:
+                self.module.fail_json(msg="Error occurred on task execution: %s" % fail_reason)
+
+    def resize_disk(self, disk, vmid, vm, vm_config):
+        """Call the `resize` API function to change the disk size and wait for the result.
+
+        :param disk: ID of disk in format "<bus><number>".
+        :param vmid: ID of virtual machine which disk will be resized.
+        :param vm: Name of virtual machine which disk will be resized.
+        :param vm_config: Virtual machine configuration.
+        :return: (Bool, string) Whether the task was successful or not
+            and the message to return to Ansible.
+        """
+        size = self.module.params['size']
+        if not match(r'^\+?\d+(\.\d+)?[KMGT]?$', size):
+            self.module.fail_json(msg="Unrecognized size pattern for disk %s: %s" % (disk, size))
+        disk_config = disk_conf_str_to_dict(vm_config[disk])
+        actual_size = disk_config['size']
+        if size == actual_size:
+            return False, "Disk %s is already %s size" % (disk, size)
+
+        # Resize disk API endpoint has changed at v8.0: PUT method become async.
+        version = self.version()
+        pve_major_version = 3 if version < LooseVersion('4.0') else version.version[0]
+        if pve_major_version >= 8:
+            current_task_id = self.proxmox_api.nodes(vm['node']).qemu(vmid).resize.set(disk=disk, size=size)
+            task_success, fail_reason = self.api_task_complete(vm['node'], current_task_id, self.module.params['timeout'])
+            if task_success:
+                return True, "Disk %s resized in VM %s" % (disk, vmid)
+            else:
+                if fail_reason == ProxmoxAnsible.TASK_TIMED_OUT:
+                    self.module.fail_json(
+                        msg="Reached timeout while resizing disk. Last line in task before timeout: %s" %
+                            self.proxmox_api.nodes(vm['node']).tasks(current_task_id).log.get()[:1]
+                    )
+                else:
+                    self.module.fail_json(msg="Error occurred on task execution: %s" % fail_reason)
+        else:
+            self.proxmox_api.nodes(vm['node']).qemu(vmid).resize.set(disk=disk, size=size)
+            return True, "Disk %s resized in VM %s" % (disk, vmid)
 
 
 def main():
@@ -783,11 +830,8 @@ def main():
 
     if state == 'present':
         try:
-            success, message = proxmox.create_disk(disk, vmid, vm, vm_config)
-            if success:
-                module.exit_json(changed=True, vmid=vmid, msg=message)
-            else:
-                module.exit_json(changed=False, vmid=vmid, msg=message)
+            changed, message = proxmox.create_disk(disk, vmid, vm, vm_config)
+            module.exit_json(changed=changed, vmid=vmid, msg=message)
         except Exception as e:
             module.fail_json(vmid=vmid, msg='Unable to create/update disk %s in VM %s: %s' % (disk, vmid, str(e)))
 
@@ -804,27 +848,15 @@ def main():
 
     elif state == 'moved':
         try:
-            disk_config = disk_conf_str_to_dict(vm_config[disk])
-            disk_storage = disk_config["storage_name"]
-            if proxmox.move_disk(disk, vmid, vm, vm_config):
-                module.exit_json(changed=True, vmid=vmid,
-                                 msg="Disk %s moved from VM %s storage %s" % (disk, vmid, disk_storage))
-            else:
-                module.exit_json(changed=False, vmid=vmid, msg="Disk %s already at %s storage" % (disk, disk_storage))
+            changed, message = proxmox.move_disk(disk, vmid, vm, vm_config)
+            module.exit_json(changed=changed, vmid=vmid, msg=message)
         except Exception as e:
             module.fail_json(msg="Failed to move disk %s in VM %s with exception: %s" % (disk, vmid, str(e)))
 
     elif state == 'resized':
         try:
-            size = module.params['size']
-            if not match(r'^\+?\d+(\.\d+)?[KMGT]?$', size):
-                module.fail_json(msg="Unrecognized size pattern for disk %s: %s" % (disk, size))
-            disk_config = disk_conf_str_to_dict(vm_config[disk])
-            actual_size = disk_config['size']
-            if size == actual_size:
-                module.exit_json(changed=False, vmid=vmid, msg="Disk %s is already %s size" % (disk, size))
-            proxmox.proxmox_api.nodes(vm['node']).qemu(vmid).resize.set(disk=disk, size=size)
-            module.exit_json(changed=True, vmid=vmid, msg="Disk %s resized in VM %s" % (disk, vmid))
+            changed, message = proxmox.resize_disk(disk, vmid, vm, vm_config)
+            module.exit_json(changed=changed, vmid=vmid, msg=message)
         except Exception as e:
             module.fail_json(msg="Failed to resize disk %s in VM %s with exception: %s" % (disk, vmid, str(e)))
 

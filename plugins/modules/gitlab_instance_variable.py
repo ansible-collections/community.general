@@ -10,7 +10,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 module: gitlab_instance_variable
 short_description: Creates, updates, or deletes GitLab instance variables
 version_added: 7.1.0
@@ -18,8 +18,8 @@ description:
   - Creates a instance variable if it does not exist.
   - When a instance variable does exist, its value will be updated if the values are different.
   - Support for instance variables requires GitLab >= 13.0.
-  - Variables which are not mentioned in the modules options, but are present on the GitLab instance,
-    will either stay (O(purge=false)) or will be deleted (O(purge=true)).
+  - Variables which are not mentioned in the modules options, but are present on the GitLab instance, will either stay (O(purge=false))
+    or will be deleted (O(purge=true)).
 author:
   - Benedikt Braunger (@benibr)
 requirements:
@@ -74,16 +74,23 @@ options:
           - Whether variable value is protected or not.
         type: bool
         default: false
+      raw:
+        description:
+          - Whether variable value is raw or not.
+          - Support for raw values requires GitLab >= 15.7.
+        type: bool
+        default: false
+        version_added: 10.2.0
       variable_type:
         description:
           - Whether a variable is an environment variable (V(env_var)) or a file (V(file)).
         type: str
-        choices: [ "env_var", "file" ]
+        choices: ["env_var", "file"]
         default: env_var
-'''
+"""
 
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Set or update some CI/CD variables
   community.general.gitlab_instance_variable:
     api_url: https://gitlab.com
@@ -105,9 +112,9 @@ EXAMPLES = r'''
     state: absent
     variables:
       - name: ACCESS_KEY_ID
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 instance_variable:
   description: Four lists of the variablenames which were added, updated, removed or exist.
   returned: always
@@ -133,7 +140,7 @@ instance_variable:
       returned: always
       type: list
       sample: ['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.api import basic_auth_argument_spec
@@ -160,6 +167,7 @@ class GitlabInstanceVariables(object):
             "value": var_obj.get('value'),
             "masked": var_obj.get('masked'),
             "protected": var_obj.get('protected'),
+            "raw": var_obj.get('raw'),
             "variable_type": var_obj.get('variable_type'),
         }
 
@@ -227,6 +235,8 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
             item['protected'] = False
         if item.get('masked') is None:
             item['masked'] = False
+        if item.get('raw') is None:
+            item['raw'] = False
         if item.get('variable_type') is None:
             item['variable_type'] = 'env_var'
 
@@ -297,6 +307,7 @@ def main():
             value=dict(type='str', no_log=True),
             masked=dict(type='bool', default=False),
             protected=dict(type='bool', default=False),
+            raw=dict(type='bool', default=False),
             variable_type=dict(type='str', default='env_var', choices=["env_var", "file"])
         )),
         state=dict(type='str', default="present", choices=["absent", "present"]),

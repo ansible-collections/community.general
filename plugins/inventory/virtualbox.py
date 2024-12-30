@@ -76,7 +76,7 @@ import os
 from subprocess import Popen, PIPE
 
 from ansible.errors import AnsibleParserError
-from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
+from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible.module_utils.common._collections_compat import MutableMapping
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
 from ansible.module_utils.common.process import get_bin_path
@@ -203,7 +203,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
             else:
                 # found vars, accumulate in hostvars for clean inventory set
-                pref_k = make_unsafe('vbox_' + k.strip().replace(' ', '_'))
+                pref_k = make_unsafe(f"vbox_{k.strip().replace(' ', '_')}")
                 leading_spaces = len(k) - len(k.lstrip(' '))
                 if 0 < leading_spaces <= 2:
                     if prevkey not in hostvars[current_host] or not isinstance(hostvars[current_host][prevkey], dict):
@@ -257,7 +257,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def _handle_vboxmanage_group_string(self, vboxmanage_group, current_host, cacheable_results):
         '''Handles parsing the VM's Group assignment from VBoxManage according to VirtualBox documentation.'''
         # Per the VirtualBox documentation, a VM can be part of many groups,
-        # and it's possible to have nested groups.
+        # and it is possible to have nested groups.
         # Many groups are separated by commas ",", and nested groups use
         # slash "/".
         # https://www.virtualbox.org/manual/UserManual.html#gui-vmgroups
@@ -352,7 +352,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             try:
                 p = Popen(cmd, stdout=PIPE)
             except Exception as e:
-                raise AnsibleParserError(to_native(e))
+                raise AnsibleParserError(str(e))
 
             source_data = p.stdout.read().splitlines()
 

@@ -9,12 +9,11 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: one_vm
 short_description: Creates or terminates OpenNebula instances
 description:
-  - Manages OpenNebula instances
+  - Manages OpenNebula instances.
 requirements:
   - pyone
 extends_documentation_fragment:
@@ -28,34 +27,30 @@ options:
   api_url:
     description:
       - URL of the OpenNebula RPC server.
-      - It is recommended to use HTTPS so that the username/password are not
-        transferred over the network unencrypted.
+      - It is recommended to use HTTPS so that the username/password are not transferred over the network unencrypted.
       - If not set then the value of the E(ONE_URL) environment variable is used.
     type: str
   api_username:
     description:
-      - Name of the user to login into the OpenNebula RPC server. If not set
-        then the value of the E(ONE_USERNAME) environment variable is used.
+      - Name of the user to login into the OpenNebula RPC server. If not set then the value of the E(ONE_USERNAME) environment variable is used.
     type: str
   api_password:
     description:
-      - Password of the user to login into OpenNebula RPC server. If not set
-        then the value of the E(ONE_PASSWORD) environment variable is used.
-        if both O(api_username) or O(api_password) are not set, then it will try
-        authenticate with ONE auth file. Default path is "~/.one/one_auth".
+      - Password of the user to login into OpenNebula RPC server. If not set then the value of the E(ONE_PASSWORD) environment variable is used.
+        if both O(api_username) or O(api_password) are not set, then it will try authenticate with ONE auth file. Default path is "~/.one/one_auth".
       - Set environment variable E(ONE_AUTH) to override this path.
     type: str
   template_name:
     description:
-      - Name of VM template to use to create a new instance
+      - Name of VM template to use to create a new instance.
     type: str
   template_id:
     description:
-      - ID of a VM template to use to create a new instance
+      - ID of a VM template to use to create a new instance.
     type: int
   vm_start_on_hold:
     description:
-      - Set to true to put vm on hold while creating
+      - Set to true to put vm on hold while creating.
     default: false
     type: bool
   instance_ids:
@@ -67,10 +62,10 @@ options:
   state:
     description:
       - V(present) - create instances from a template specified with C(template_id)/C(template_name).
-      - V(running) - run instances
-      - V(poweredoff) - power-off instances
-      - V(rebooted) - reboot instances
-      - V(absent) - terminate instances
+      - V(running) - run instances.
+      - V(poweredoff) - power-off instances.
+      - V(rebooted) - reboot instances.
+      - V(absent) - terminate instances.
     choices: ["present", "absent", "running", "rebooted", "poweredoff"]
     default: present
     type: str
@@ -81,64 +76,53 @@ options:
     type: bool
   wait:
     description:
-      - Wait for the instance to reach its desired state before returning. Keep
-        in mind if you are waiting for instance to be in running state it
-        doesn't mean that you will be able to SSH on that machine only that
-        boot process have started on that instance, see 'wait_for' example for
-        details.
+      - Wait for the instance to reach its desired state before returning. Keep in mind if you are waiting for instance to be in running state
+        it does not mean that you will be able to SSH on that machine only that boot process have started on that instance, see 'wait_for' example
+        for details.
     default: true
     type: bool
   wait_timeout:
     description:
-      - How long before wait gives up, in seconds
+      - How long before wait gives up, in seconds.
     default: 300
     type: int
   attributes:
     description:
-      - A dictionary of key/value attributes to add to new instances, or for
-        setting C(state) of instances with these attributes.
+      - A dictionary of key/value attributes to add to new instances, or for setting C(state) of instances with these attributes.
       - Keys are case insensitive and OpenNebula automatically converts them to upper case.
-      - Be aware C(NAME) is a special attribute which sets the name of the VM when it's deployed.
-      - C(#) character(s) can be appended to the C(NAME) and the module will automatically add
-        indexes to the names of VMs.
-      - For example':' C(NAME':' foo-###) would create VMs with names C(foo-000), C(foo-001),...
-      - When used with O(count_attributes) and O(exact_count) the module will
-        match the base name without the index part.
+      - Be aware V(NAME) is a special attribute which sets the name of the VM when it is deployed.
+      - C(#) character(s) can be appended to the C(NAME) and the module will automatically add indexes to the names of VMs.
+      - 'For example: V(NAME: foo-###) would create VMs with names V(foo-000), V(foo-001),...'
+      - When used with O(count_attributes) and O(exact_count) the module will match the base name without the index part.
     default: {}
     type: dict
   labels:
     description:
-      - A list of labels to associate with new instances, or for setting
-        C(state) of instances with these labels.
+      - A list of labels to associate with new instances, or for setting C(state) of instances with these labels.
     default: []
     type: list
     elements: str
   count_attributes:
     description:
-      - A dictionary of key/value attributes that can only be used with
-        O(exact_count) to determine how many nodes based on a specific
-        attributes criteria should be deployed. This can be expressed in
-        multiple ways and is shown in the EXAMPLES section.
+      - A dictionary of key/value attributes that can only be used with O(exact_count) to determine how many nodes based on a specific attributes
+        criteria should be deployed. This can be expressed in multiple ways and is shown in the EXAMPLES section.
     type: dict
   count_labels:
     description:
-      - A list of labels that can only be used with O(exact_count) to determine
-        how many nodes based on a specific labels criteria should be deployed.
-        This can be expressed in multiple ways and is shown in the EXAMPLES
-        section.
+      - A list of labels that can only be used with O(exact_count) to determine how many nodes based on a specific labels criteria should be deployed.
+        This can be expressed in multiple ways and is shown in the EXAMPLES section.
     type: list
     elements: str
   count:
     description:
-      - Number of instances to launch
+      - Number of instances to launch.
     default: 1
     type: int
   exact_count:
     description:
-      - Indicates how many instances that match O(count_attributes) and
-        O(count_labels) parameters should be deployed. Instances are either
-        created or terminated based on this value.
-      - 'B(NOTE:) Instances with the least IDs will be terminated first.'
+      - Indicates how many instances that match O(count_attributes) and O(count_labels) parameters should be deployed. Instances are either created
+        or terminated based on this value.
+      - B(NOTE:) Instances with the least IDs will be terminated first.
     type: int
   mode:
     description:
@@ -146,27 +130,25 @@ options:
     type: str
   owner_id:
     description:
-      - ID of the user which will be set as the owner of the instance
+      - ID of the user which will be set as the owner of the instance.
     type: int
   group_id:
     description:
-      - ID of the group which will be set as the group of the instance
+      - ID of the group which will be set as the group of the instance.
     type: int
   memory:
     description:
-      - The size of the memory for new instances (in MB, GB, ...)
+      - The size of the memory for new instances (in MB, GB, ..).
     type: str
   disk_size:
     description:
       - The size of the disk created for new instances (in MB, GB, TB,...).
-      - 'B(NOTE:) If The Template hats Multiple Disks the Order of the Sizes is
-        matched against the order specified in O(template_id)/O(template_name).'
+      - B(NOTE:) If The Template hats Multiple Disks the Order of the Sizes is matched against the order specified in O(template_id)/O(template_name).
     type: list
     elements: str
   cpu:
     description:
-      - Percentage of CPU divided by 100 required for the new instance. Half a
-        processor is written 0.5.
+      - Percentage of CPU divided by 100 required for the new instance. Half a processor is written 0.5.
     type: float
   vcpu:
     description:
@@ -183,8 +165,8 @@ options:
       - Creates an image from a VM disk.
       - It is a dictionary where you have to specify C(name) of the new image.
       - Optionally you can specify C(disk_id) of the disk you want to save. By default C(disk_id) is 0.
-      - 'B(NOTE:) This operation will only be performed on the first VM (if more than one VM ID is passed)
-        and the VM has to be in the C(poweredoff) state.'
+      - B(NOTE:) This operation will only be performed on the first VM (if more than one VM ID is passed) and the VM has to be in the C(poweredoff)
+        state.
       - Also this operation will fail if an image with specified C(name) already exists.
     type: dict
   persistent:
@@ -195,28 +177,28 @@ options:
     version_added: '0.2.0'
   datastore_id:
     description:
-      - Name of Datastore to use to create a new instance
+      - Name of Datastore to use to create a new instance.
     version_added: '0.2.0'
     type: int
   datastore_name:
     description:
-      - Name of Datastore to use to create a new instance
+      - Name of Datastore to use to create a new instance.
     version_added: '0.2.0'
     type: str
   updateconf:
     description:
       - When O(instance_ids) is provided, updates running VMs with the C(updateconf) API call.
-      - When new VMs are being created, emulates the C(updateconf) API call via direct template merge.
+      - When new VMs are being created, emulates the C(updateconf) API call using direct template merge.
       - Allows for complete modifications of the C(CONTEXT) attribute.
     type: dict
     version_added: 6.3.0
 author:
-    - "Milan Ilic (@ilicmilan)"
-    - "Jan Meerkamp (@meerkampdvv)"
-'''
+  - "Milan Ilic (@ilicmilan)"
+  - "Jan Meerkamp (@meerkampdvv)"
+"""
 
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a new instance
   community.general.one_vm:
     template_id: 90
@@ -441,241 +423,219 @@ EXAMPLES = '''
         SSH_PUBLIC_KEY: |-
           ssh-rsa ...
           ssh-ed25519 ...
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 instances_ids:
-    description: a list of instances ids whose state is changed or which are fetched with O(instance_ids) option.
-    type: list
-    returned: success
-    sample: [ 1234, 1235 ]
+  description: A list of instances ids whose state is changed or which are fetched with O(instance_ids) option.
+  type: list
+  returned: success
+  sample: [1234, 1235]
 instances:
-    description: a list of instances info whose state is changed or which are fetched with O(instance_ids) option.
-    type: complex
-    returned: success
-    contains:
-        vm_id:
-            description: vm id
-            type: int
-            sample: 153
-        vm_name:
-            description: vm name
-            type: str
-            sample: foo
-        template_id:
-            description: vm's template id
-            type: int
-            sample: 153
-        group_id:
-            description: vm's group id
-            type: int
-            sample: 1
-        group_name:
-            description: vm's group name
-            type: str
-            sample: one-users
-        owner_id:
-            description: vm's owner id
-            type: int
-            sample: 143
-        owner_name:
-            description: vm's owner name
-            type: str
-            sample: app-user
-        mode:
-            description: vm's mode
-            type: str
-            returned: success
-            sample: 660
-        state:
-            description: state of an instance
-            type: str
-            sample: ACTIVE
-        lcm_state:
-            description: lcm state of an instance that is only relevant when the state is ACTIVE
-            type: str
-            sample: RUNNING
-        cpu:
-            description: Percentage of CPU divided by 100
-            type: float
-            sample: 0.2
-        vcpu:
-            description: Number of CPUs (cores)
-            type: int
-            sample: 2
-        memory:
-            description: The size of the memory in MB
-            type: str
-            sample: 4096 MB
-        disk_size:
-            description: The size of the disk in MB
-            type: str
-            sample: 20480 MB
-        networks:
-            description: a list of dictionaries with info about IP, NAME, MAC, SECURITY_GROUPS for each NIC
-            type: list
-            sample: [
-                        {
-                            "ip": "10.120.5.33",
-                            "mac": "02:00:0a:78:05:21",
-                            "name": "default-test-private",
-                            "security_groups": "0,10"
-                        },
-                        {
-                            "ip": "10.120.5.34",
-                            "mac": "02:00:0a:78:05:22",
-                            "name": "default-test-private",
-                            "security_groups": "0"
-                        }
-                    ]
-        uptime_h:
-            description: Uptime of the instance in hours
-            type: int
-            sample: 35
-        labels:
-            description: A list of string labels that are associated with the instance
-            type: list
-            sample: [
-                        "foo",
-                        "spec-label"
-                    ]
-        attributes:
-            description: A dictionary of key/values attributes that are associated with the instance
-            type: dict
-            sample: {
-                        "HYPERVISOR": "kvm",
-                        "LOGO": "images/logos/centos.png",
-                        "TE_GALAXY": "bar",
-                        "USER_INPUTS": null
-                    }
-        updateconf:
-            description: A dictionary of key/values attributes that are set with the updateconf API call.
-            type: dict
-            version_added: 6.3.0
-            sample: {
-                        "OS": { "ARCH": "x86_64" },
-                        "CONTEXT": {
-                            "START_SCRIPT": "ip r r 169.254.16.86/32 dev eth0",
-                            "SSH_PUBLIC_KEY": "ssh-rsa ...\\nssh-ed25519 ..."
-                        }
-                    }
+  description: A list of instances info whose state is changed or which are fetched with O(instance_ids) option.
+  type: complex
+  returned: success
+  contains:
+    vm_id:
+      description: Vm id.
+      type: int
+      sample: 153
+    vm_name:
+      description: Vm name.
+      type: str
+      sample: foo
+    template_id:
+      description: Vm's template id.
+      type: int
+      sample: 153
+    group_id:
+      description: Vm's group id.
+      type: int
+      sample: 1
+    group_name:
+      description: Vm's group name.
+      type: str
+      sample: one-users
+    owner_id:
+      description: Vm's owner id.
+      type: int
+      sample: 143
+    owner_name:
+      description: Vm's owner name.
+      type: str
+      sample: app-user
+    mode:
+      description: Vm's mode.
+      type: str
+      returned: success
+      sample: 660
+    state:
+      description: State of an instance.
+      type: str
+      sample: ACTIVE
+    lcm_state:
+      description: Lcm state of an instance that is only relevant when the state is ACTIVE.
+      type: str
+      sample: RUNNING
+    cpu:
+      description: Percentage of CPU divided by 100.
+      type: float
+      sample: 0.2
+    vcpu:
+      description: Number of CPUs (cores).
+      type: int
+      sample: 2
+    memory:
+      description: The size of the memory in MB.
+      type: str
+      sample: 4096 MB
+    disk_size:
+      description: The size of the disk in MB.
+      type: str
+      sample: 20480 MB
+    networks:
+      description: A list of dictionaries with info about IP, NAME, MAC, SECURITY_GROUPS for each NIC.
+      type: list
+      sample: [
+        {
+          "ip": "10.120.5.33",
+          "mac": "02:00:0a:78:05:21",
+          "name": "default-test-private",
+          "security_groups": "0,10"
+        },
+        {
+          "ip": "10.120.5.34",
+          "mac": "02:00:0a:78:05:22",
+          "name": "default-test-private",
+          "security_groups": "0"
+        }
+      ]
+    uptime_h:
+      description: Uptime of the instance in hours.
+      type: int
+      sample: 35
+    labels:
+      description: A list of string labels that are associated with the instance.
+      type: list
+      sample: ["foo", "spec-label"]
+    attributes:
+      description: A dictionary of key/values attributes that are associated with the instance.
+      type: dict
+      sample: {
+        "HYPERVISOR": "kvm",
+        "LOGO": "images/logos/centos.png",
+        "TE_GALAXY": "bar",
+        "USER_INPUTS": null
+      }
+    updateconf:
+      description: A dictionary of key/values attributes that are set with the updateconf API call.
+      type: dict
+      version_added: 6.3.0
+      sample: {
+        "OS": { "ARCH": "x86_64" },
+        "CONTEXT": {
+          "START_SCRIPT": "ip r r 169.254.16.86/32 dev eth0",
+          "SSH_PUBLIC_KEY": "ssh-rsa ...\\nssh-ed25519 ..."
+        }
+      }
 tagged_instances:
-    description:
-        - A list of instances info based on a specific attributes and/or
-        - labels that are specified with O(count_attributes) and O(count_labels)
-        - options.
-    type: complex
-    returned: success
-    contains:
-        vm_id:
-            description: vm id
-            type: int
-            sample: 153
-        vm_name:
-            description: vm name
-            type: str
-            sample: foo
-        template_id:
-            description: vm's template id
-            type: int
-            sample: 153
-        group_id:
-            description: vm's group id
-            type: int
-            sample: 1
-        group_name:
-            description: vm's group name
-            type: str
-            sample: one-users
-        owner_id:
-            description: vm's user id
-            type: int
-            sample: 143
-        owner_name:
-            description: vm's user name
-            type: str
-            sample: app-user
-        mode:
-            description: vm's mode
-            type: str
-            returned: success
-            sample: 660
-        state:
-            description: state of an instance
-            type: str
-            sample: ACTIVE
-        lcm_state:
-            description: lcm state of an instance that is only relevant when the state is ACTIVE
-            type: str
-            sample: RUNNING
-        cpu:
-            description: Percentage of CPU divided by 100
-            type: float
-            sample: 0.2
-        vcpu:
-            description: Number of CPUs (cores)
-            type: int
-            sample: 2
-        memory:
-            description: The size of the memory in MB
-            type: str
-            sample: 4096 MB
-        disk_size:
-            description: The size of the disk in MB
-            type: list
-            sample: [
-                        "20480 MB",
-                        "10240 MB"
-                    ]
-        networks:
-            description: a list of dictionaries with info about IP, NAME, MAC, SECURITY_GROUPS for each NIC
-            type: list
-            sample: [
-                        {
-                            "ip": "10.120.5.33",
-                            "mac": "02:00:0a:78:05:21",
-                            "name": "default-test-private",
-                            "security_groups": "0,10"
-                        },
-                        {
-                            "ip": "10.120.5.34",
-                            "mac": "02:00:0a:78:05:22",
-                            "name": "default-test-private",
-                            "security_groups": "0"
-                        }
-                    ]
-        uptime_h:
-            description: Uptime of the instance in hours
-            type: int
-            sample: 35
-        labels:
-            description: A list of string labels that are associated with the instance
-            type: list
-            sample: [
-                        "foo",
-                        "spec-label"
-                    ]
-        attributes:
-            description: A dictionary of key/values attributes that are associated with the instance
-            type: dict
-            sample: {
-                        "HYPERVISOR": "kvm",
-                        "LOGO": "images/logos/centos.png",
-                        "TE_GALAXY": "bar",
-                        "USER_INPUTS": null
-                    }
-        updateconf:
-            description: A dictionary of key/values attributes that are set with the updateconf API call
-            type: dict
-            version_added: 6.3.0
-            sample: {
-                        "OS": { "ARCH": "x86_64" },
-                        "CONTEXT": {
-                            "START_SCRIPT": "ip r r 169.254.16.86/32 dev eth0",
-                            "SSH_PUBLIC_KEY": "ssh-rsa ...\\nssh-ed25519 ..."
-                        }
-                    }
-'''
+  description:
+    - A list of instances info based on a specific attributes and/or labels that are specified with O(count_attributes) and O(count_labels) options.
+  type: complex
+  returned: success
+  contains:
+    vm_id:
+      description: Vm id.
+      type: int
+      sample: 153
+    vm_name:
+      description: Vm name.
+      type: str
+      sample: foo
+    template_id:
+      description: Vm's template id.
+      type: int
+      sample: 153
+    group_id:
+      description: Vm's group id.
+      type: int
+      sample: 1
+    group_name:
+      description: Vm's group name.
+      type: str
+      sample: one-users
+    owner_id:
+      description: Vm's user id.
+      type: int
+      sample: 143
+    owner_name:
+      description: Vm's user name.
+      type: str
+      sample: app-user
+    mode:
+      description: Vm's mode.
+      type: str
+      returned: success
+      sample: 660
+    state:
+      description: State of an instance.
+      type: str
+      sample: ACTIVE
+    lcm_state:
+      description: Lcm state of an instance that is only relevant when the state is ACTIVE.
+      type: str
+      sample: RUNNING
+    cpu:
+      description: Percentage of CPU divided by 100.
+      type: float
+      sample: 0.2
+    vcpu:
+      description: Number of CPUs (cores).
+      type: int
+      sample: 2
+    memory:
+      description: The size of the memory in MB.
+      type: str
+      sample: 4096 MB
+    disk_size:
+      description: The size of the disk in MB.
+      type: list
+      sample: ["20480 MB", "10240 MB"]
+    networks:
+      description: A list of dictionaries with info about IP, NAME, MAC, SECURITY_GROUPS for each NIC.
+      type: list
+      sample: [
+        {
+          "ip": "10.120.5.33",
+          "mac": "02:00:0a:78:05:21",
+          "name": "default-test-private",
+          "security_groups": "0,10"
+        },
+        {
+          "ip": "10.120.5.34",
+          "mac": "02:00:0a:78:05:22",
+          "name": "default-test-private",
+          "security_groups": "0"
+        }
+      ]
+    uptime_h:
+      description: Uptime of the instance in hours.
+      type: int
+      sample: 35
+    labels:
+      description: A list of string labels that are associated with the instance.
+      type: list
+      sample: ["foo", "spec-label"]
+    attributes:
+      description: A dictionary of key/values attributes that are associated with the instance.
+      type: dict
+      sample: {"HYPERVISOR": "kvm", "LOGO": "images/logos/centos.png", "TE_GALAXY": "bar", "USER_INPUTS": null}
+    updateconf:
+      description: A dictionary of key/values attributes that are set with the updateconf API call.
+      type: dict
+      version_added: 6.3.0
+      sample: {"OS": {"ARCH": "x86_64"}, "CONTEXT": {"START_SCRIPT": "ip r r 169.254.16.86/32 dev eth0", "SSH_PUBLIC_KEY": "ssh-rsa ...\\nssh-ed25519 ..."}}
+"""
 
 try:
     import pyone

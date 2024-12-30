@@ -7,50 +7,49 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = """
----
+DOCUMENTATION = r"""
 module: django_check
 author:
-- Alexei Znamensky (@russoz)
+  - Alexei Znamensky (@russoz)
 short_description: Wrapper for C(django-admin check)
 version_added: 9.1.0
 description:
-- This module is a wrapper for the execution of C(django-admin check).
+  - This module is a wrapper for the execution of C(django-admin check).
 extends_documentation_fragment:
-- community.general.attributes
-- community.general.django
+  - community.general.attributes
+  - community.general.django
 options:
   database:
     description:
-    - Specify databases to run checks against.
-    - If not specified, Django will not run database tests.
+      - Specify databases to run checks against.
+      - If not specified, Django will not run database tests.
     type: list
     elements: str
   deploy:
     description:
-    - Include additional checks relevant in a deployment setting.
+      - Include additional checks relevant in a deployment setting.
     type: bool
     default: false
   fail_level:
     description:
-    - Message level that will trigger failure.
-    - Default is the Django default value. Check the documentation for the version being used.
+      - Message level that will trigger failure.
+      - Default is the Django default value. Check the documentation for the version being used.
     type: str
     choices: [CRITICAL, ERROR, WARNING, INFO, DEBUG]
   tags:
     description:
-    - Restrict checks to specific tags.
+      - Restrict checks to specific tags.
     type: list
     elements: str
   apps:
     description:
-    - Restrict checks to specific applications.
-    - Default is to check all applications.
+      - Restrict checks to specific applications.
+      - Default is to check all applications.
     type: list
     elements: str
 notes:
-- The outcome of the module is found in the common return values RV(ignore:stdout), RV(ignore:stderr), RV(ignore:rc).
-- The module will fail if RV(ignore:rc) is not zero.
+  - The outcome of the module is found in the common return values RV(ignore:stdout), RV(ignore:stderr), RV(ignore:rc).
+  - The module will fail if RV(ignore:rc) is not zero.
 attributes:
   check_mode:
     support: full
@@ -58,8 +57,7 @@ attributes:
     support: none
 """
 
-EXAMPLES = """
----
+EXAMPLES = r"""
 - name: Check the entire project
   community.general.django_check:
     settings: myproject.settings
@@ -67,15 +65,14 @@ EXAMPLES = """
 - name: Create the project using specific databases
   community.general.django_check:
     database:
-    - somedb
-    - myotherdb
+      - somedb
+      - myotherdb
     settings: fancysite.settings
     pythonpath: /home/joedoe/project/fancysite
     venv: /home/joedoe/project/fancysite/venv
 """
 
-RETURN = """
----
+RETURN = r"""
 run_info:
   description: Command-line execution information.
   type: dict

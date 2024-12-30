@@ -11,22 +11,22 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    author: Ansible Core Team
-    name: zone
-    short_description: Run tasks in a zone instance
+DOCUMENTATION = r"""
+author: Ansible Core Team
+name: zone
+short_description: Run tasks in a zone instance
+description:
+  - Run commands or put/fetch files to an existing zone.
+options:
+  remote_addr:
     description:
-        - Run commands or put/fetch files to an existing zone.
-    options:
-      remote_addr:
-        description:
-            - Zone identifier
-        type: string
-        default: inventory_hostname
-        vars:
-            - name: ansible_host
-            - name: ansible_zone_host
-'''
+      - Zone identifier.
+    type: string
+    default: inventory_hostname
+    vars:
+      - name: ansible_host
+      - name: ansible_zone_host
+"""
 
 import os
 import os.path
@@ -62,14 +62,14 @@ class Connection(ConnectionBase):
         self.zlogin_cmd = to_bytes(self._search_executable('zlogin'))
 
         if self.zone not in self.list_zones():
-            raise AnsibleError("incorrect zone name %s" % self.zone)
+            raise AnsibleError(f"incorrect zone name {self.zone}")
 
     @staticmethod
     def _search_executable(executable):
         try:
             return get_bin_path(executable)
         except ValueError:
-            raise AnsibleError("%s command not found in PATH" % executable)
+            raise AnsibleError(f"{executable} command not found in PATH")
 
     def list_zones(self):
         process = subprocess.Popen([self.zoneadm_cmd, 'list', '-ip'],
@@ -94,7 +94,7 @@ class Connection(ConnectionBase):
 
         # stdout, stderr = p.communicate()
         path = process.stdout.readlines()[0].split(':')[3]
-        return path + '/root'
+        return f"{path}/root"
 
     def _connect(self):
         """ connect to the zone; nothing to do here """
@@ -117,7 +117,7 @@ class Connection(ConnectionBase):
         local_cmd = [self.zlogin_cmd, self.zone, cmd]
         local_cmd = map(to_bytes, local_cmd)
 
-        display.vvv("EXEC %s" % (local_cmd), host=self.zone)
+        display.vvv(f"EXEC {local_cmd}", host=self.zone)
         p = subprocess.Popen(local_cmd, shell=False, stdin=stdin,
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -140,7 +140,7 @@ class Connection(ConnectionBase):
             exist in any given chroot.  So for now we're choosing "/" instead.
             This also happens to be the former default.
 
-            Can revisit using $HOME instead if it's a problem
+            Can revisit using $HOME instead if it is a problem
         """
         if not remote_path.startswith(os.path.sep):
             remote_path = os.path.join(os.path.sep, remote_path)
@@ -149,7 +149,7 @@ class Connection(ConnectionBase):
     def put_file(self, in_path, out_path):
         """ transfer a file from local to zone """
         super(Connection, self).put_file(in_path, out_path)
-        display.vvv("PUT %s TO %s" % (in_path, out_path), host=self.zone)
+        display.vvv(f"PUT {in_path} TO {out_path}", host=self.zone)
 
         out_path = shlex_quote(self._prefix_login_path(out_path))
         try:
@@ -159,27 +159,27 @@ class Connection(ConnectionBase):
                 else:
                     count = ''
                 try:
-                    p = self._buffered_exec_command('dd of=%s bs=%s%s' % (out_path, BUFSIZE, count), stdin=in_file)
+                    p = self._buffered_exec_command(f'dd of={out_path} bs={BUFSIZE}{count}', stdin=in_file)
                 except OSError:
                     raise AnsibleError("jail connection requires dd command in the jail")
                 try:
                     stdout, stderr = p.communicate()
                 except Exception:
                     traceback.print_exc()
-                    raise AnsibleError("failed to transfer file %s to %s" % (in_path, out_path))
+                    raise AnsibleError(f"failed to transfer file {in_path} to {out_path}")
                 if p.returncode != 0:
-                    raise AnsibleError("failed to transfer file %s to %s:\n%s\n%s" % (in_path, out_path, stdout, stderr))
+                    raise AnsibleError(f"failed to transfer file {in_path} to {out_path}:\n{stdout}\n{stderr}")
         except IOError:
-            raise AnsibleError("file or module does not exist at: %s" % in_path)
+            raise AnsibleError(f"file or module does not exist at: {in_path}")
 
     def fetch_file(self, in_path, out_path):
         """ fetch a file from zone to local """
         super(Connection, self).fetch_file(in_path, out_path)
-        display.vvv("FETCH %s TO %s" % (in_path, out_path), host=self.zone)
+        display.vvv(f"FETCH {in_path} TO {out_path}", host=self.zone)
 
         in_path = shlex_quote(self._prefix_login_path(in_path))
         try:
-            p = self._buffered_exec_command('dd if=%s bs=%s' % (in_path, BUFSIZE))
+            p = self._buffered_exec_command(f'dd if={in_path} bs={BUFSIZE}')
         except OSError:
             raise AnsibleError("zone connection requires dd command in the zone")
 
@@ -191,10 +191,10 @@ class Connection(ConnectionBase):
                     chunk = p.stdout.read(BUFSIZE)
             except Exception:
                 traceback.print_exc()
-                raise AnsibleError("failed to transfer file %s to %s" % (in_path, out_path))
+                raise AnsibleError(f"failed to transfer file {in_path} to {out_path}")
             stdout, stderr = p.communicate()
             if p.returncode != 0:
-                raise AnsibleError("failed to transfer file %s to %s:\n%s\n%s" % (in_path, out_path, stdout, stderr))
+                raise AnsibleError(f"failed to transfer file {in_path} to {out_path}:\n{stdout}\n{stderr}")
 
     def close(self):
         """ terminate the connection; nothing to do here """

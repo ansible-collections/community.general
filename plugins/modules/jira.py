@@ -20,7 +20,6 @@ module: jira
 short_description: Create and modify issues in a JIRA instance
 description:
   - Create and modify issues in a JIRA instance.
-
 extends_documentation_fragment:
   - community.general.attributes
 
@@ -36,28 +35,24 @@ options:
     required: true
     description:
       - Base URI for the JIRA instance.
-
   operation:
     type: str
     required: true
-    aliases: [ command ]
-    choices: [ attach, comment, create, edit, fetch, link, search, transition, update, worklog ]
+    aliases: [command]
+    choices: [attach, comment, create, edit, fetch, link, search, transition, update, worklog]
     description:
       - The operation to perform.
       - V(worklog) was added in community.general 6.5.0.
-
   username:
     type: str
     description:
       - The username to log-in with.
       - Must be used with O(password). Mutually exclusive with O(token).
-
   password:
     type: str
     description:
       - The password to log-in with.
-      - Must be used with O(username).  Mutually exclusive with O(token).
-
+      - Must be used with O(username). Mutually exclusive with O(token).
   token:
     type: str
     description:
@@ -70,56 +65,54 @@ options:
     required: false
     description:
       - The project for this operation. Required for issue creation.
-
   summary:
     type: str
     required: false
     description:
-     - The issue summary, where appropriate.
-     - Note that JIRA may not allow changing field values on specific transitions or states.
-
+      - The issue summary, where appropriate.
+      - Note that JIRA may not allow changing field values on specific transitions or states.
   description:
     type: str
     required: false
     description:
-     - The issue description, where appropriate.
-     - Note that JIRA may not allow changing field values on specific transitions or states.
-
+      - The issue description, where appropriate.
+      - Note that JIRA may not allow changing field values on specific transitions or states.
   issuetype:
     type: str
     required: false
     description:
-     - The issue type, for issue creation.
-
+      - The issue type, for issue creation.
   issue:
     type: str
     required: false
     description:
-     - An existing issue key to operate on.
+      - An existing issue key to operate on.
     aliases: ['ticket']
 
   comment:
     type: str
     required: false
     description:
-     - The comment text to add.
-     - Note that JIRA may not allow changing field values on specific transitions or states.
-
+      - The comment text to add.
+      - Note that JIRA may not allow changing field values on specific transitions or states.
   comment_visibility:
     type: dict
     description:
-     - Used to specify comment comment visibility.
-     - See U(https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-comments/#api-rest-api-2-issue-issueidorkey-comment-post) for details.
+      - Used to specify comment comment visibility.
+      - See
+        U(https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-comments/#api-rest-api-2-issue-issueidorkey-comment-post)
+        for details.
     suboptions:
       type:
         description:
-         - Use type to specify which of the JIRA visibility restriction types will be used.
+          - Use type to specify which of the JIRA visibility restriction types will be used.
         type: str
         required: true
         choices: [group, role]
       value:
         description:
-         - Use value to specify value corresponding to the type of visibility restriction. For example name of the group or role.
+          - Use value to specify value corresponding to the type of visibility restriction. For example name of the group
+            or role.
         type: str
         required: true
     version_added: '3.2.0'
@@ -128,63 +121,59 @@ options:
     type: str
     required: false
     description:
-     - Only used when O(operation) is V(transition), and a bit of a misnomer, it actually refers to the transition name.
-
+      - Only used when O(operation) is V(transition), and a bit of a misnomer, it actually refers to the transition name.
   assignee:
     type: str
     required: false
     description:
-     - Sets the the assignee when O(operation) is V(create), V(transition), or V(edit).
-     - Recent versions of JIRA no longer accept a user name as a user identifier. In that case, use O(account_id) instead.
-     - Note that JIRA may not allow changing field values on specific transitions or states.
-
+      - Sets the the assignee when O(operation) is V(create), V(transition), or V(edit).
+      - Recent versions of JIRA no longer accept a user name as a user identifier. In that case, use O(account_id) instead.
+      - Note that JIRA may not allow changing field values on specific transitions or states.
   account_id:
     type: str
     description:
-     - Sets the account identifier for the assignee when O(operation) is V(create), V(transition), or V(edit).
-     - Note that JIRA may not allow changing field values on specific transitions or states.
+      - Sets the account identifier for the assignee when O(operation) is V(create), V(transition), or V(edit).
+      - Note that JIRA may not allow changing field values on specific transitions or states.
     version_added: 2.5.0
 
   linktype:
     type: str
     required: false
     description:
-     - Set type of link, when action 'link' selected.
-
+      - Set type of link, when action 'link' selected.
   inwardissue:
     type: str
     required: false
     description:
-     - Set issue from which link will be created.
-
+      - Set issue from which link will be created.
   outwardissue:
     type: str
     required: false
     description:
-     - Set issue to which link will be created.
-
+      - Set issue to which link will be created.
   fields:
     type: dict
     required: false
     description:
-     - This is a free-form data structure that can contain arbitrary data. This is passed directly to the JIRA REST API
-       (possibly after merging with other required data, as when passed to create). See examples for more information,
-       and the JIRA REST API for the structure required for various fields.
-     - When passed to comment, the data structure is merged at the first level since community.general 4.6.0. Useful to add JIRA properties for example.
-     - Note that JIRA may not allow changing field values on specific transitions or states.
+      - This is a free-form data structure that can contain arbitrary data. This is passed directly to the JIRA REST API (possibly
+        after merging with other required data, as when passed to create). See examples for more information, and the JIRA
+        REST API for the structure required for various fields.
+      - When passed to comment, the data structure is merged at the first level since community.general 4.6.0. Useful to add
+        JIRA properties for example.
+      - Note that JIRA may not allow changing field values on specific transitions or states.
     default: {}
   jql:
     required: false
     description:
-     - Query JIRA in JQL Syntax, e.g. 'CMDB Hostname'='test.example.com'.
+      - Query JIRA in JQL Syntax, for example V("CMDB Hostname" = test.example.com).
     type: str
     version_added: '0.2.0'
 
   maxresults:
     required: false
     description:
-     - Limit the result of O(operation=search). If no value is specified, the default jira limit will be used.
-     - Used when O(operation=search) only, ignored otherwise.
+      - Limit the result of O(operation=search). If no value is specified, the default jira limit will be used.
+      - Used when O(operation=search) only, ignored otherwise.
     type: int
     version_added: '0.2.0'
 
@@ -198,7 +187,7 @@ options:
   validate_certs:
     required: false
     description:
-      - Require valid SSL certificates (set to V(false) if you would like to use self-signed certificates)
+      - Require valid SSL certificates (set to V(false) if you would like to use self-signed certificates).
     default: true
     type: bool
 
@@ -212,27 +201,24 @@ options:
         required: true
         type: path
         description:
-          - The path to the file to upload (from the remote node) or, if O(attachment.content) is specified,
-            the filename to use for the attachment.
+          - The path to the file to upload (from the remote node) or, if O(attachment.content) is specified, the filename
+            to use for the attachment.
       content:
         type: str
         description:
-          - The Base64 encoded contents of the file to attach. If not specified, the contents of O(attachment.filename) will be
-            used instead.
+          - The Base64 encoded contents of the file to attach. If not specified, the contents of O(attachment.filename) will
+            be used instead.
       mimetype:
         type: str
         description:
-          - The MIME type to supply for the upload. If not specified, best-effort detection will be
-            done.
-
+          - The MIME type to supply for the upload. If not specified, best-effort detection will be done.
 notes:
-  - "Currently this only works with basic-auth, or tokens."
-  - "To use with JIRA Cloud, pass the login e-mail as the O(username) and the API token as O(password)."
-
+  - Currently this only works with basic-auth, or tokens.
+  - To use with JIRA Cloud, pass the login e-mail as the O(username) and the API token as O(password).
 author:
-- "Steve Smith (@tarka)"
-- "Per Abildgaard Toft (@pertoft)"
-- "Brandon McNama (@DWSR)"
+  - "Steve Smith (@tarka)"
+  - "Per Abildgaard Toft (@pertoft)"
+  - "Brandon McNama (@DWSR)"
 """
 
 EXAMPLES = r"""
@@ -249,8 +235,8 @@ EXAMPLES = r"""
     issuetype: Task
   args:
     fields:
-        customfield_13225: "test"
-        customfield_12931: {"value": "Test"}
+      customfield_13225: "test"
+      customfield_12931: {"value": "Test"}
   register: issue
 
 - name: Comment on issue
@@ -362,9 +348,9 @@ EXAMPLES = r"""
     operation: edit
   args:
     fields:
-        labels:
-          - autocreated
-          - ansible
+      labels:
+        - autocreated
+        - ansible
 
 # Updating a field using operations: add, set & remove
 - name: Change the value of a Select dropdown
@@ -376,8 +362,8 @@ EXAMPLES = r"""
     operation: update
   args:
     fields:
-      customfield_12931: [ {'set': {'value': 'Virtual'}} ]
-      customfield_13820: [ {'set': {'value':'Manually'}} ]
+      customfield_12931: ['set': {'value': 'Virtual'}]
+      customfield_13820: ['set': {'value': 'Manually'}]
   register: cmdb_issue
   delegate_to: localhost
 
@@ -406,7 +392,7 @@ EXAMPLES = r"""
     jql: project=cmdb AND cf[13225]="test"
   args:
     fields:
-      lastViewed: null
+      lastViewed:
   register: issue
 
 - name: Create a unix account for the reporter

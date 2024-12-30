@@ -9,11 +9,11 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: clc_firewall_policy
 short_description: Create/delete/update firewall policies
 description:
-  - Create or delete or update firewall policies on Centurylink Cloud
+  - Create or delete or update firewall policies on Centurylink Cloud.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -24,46 +24,43 @@ attributes:
 options:
   location:
     description:
-      - Target datacenter for the firewall policy
+      - Target datacenter for the firewall policy.
     type: str
     required: true
   state:
     description:
-      - Whether to create or delete the firewall policy
+      - Whether to create or delete the firewall policy.
     type: str
     default: present
     choices: ['present', 'absent']
   source:
     description:
-      - The list  of source addresses for traffic on the originating firewall.
-        This is required when state is 'present'
+      - The list of source addresses for traffic on the originating firewall. This is required when O(state=present).
     type: list
     elements: str
   destination:
     description:
-      - The list of destination addresses for traffic on the terminating firewall.
-        This is required when state is 'present'
+      - The list of destination addresses for traffic on the terminating firewall. This is required when O(state=present).
     type: list
     elements: str
   ports:
     description:
-      - The list of ports associated with the policy.
-        TCP and UDP can take in single ports or port ranges.
+      - The list of ports associated with the policy. TCP and UDP can take in single ports or port ranges.
       - "Example: V(['any', 'icmp', 'TCP/123', 'UDP/123', 'TCP/123-456', 'UDP/123-456'])."
     type: list
     elements: str
   firewall_policy_id:
     description:
-      - Id of the firewall policy. This is required to update or delete an existing firewall policy
+      - Id of the firewall policy. This is required to update or delete an existing firewall policy.
     type: str
   source_account_alias:
     description:
-      - CLC alias for the source account
+      - CLC alias for the source account.
     type: str
     required: true
   destination_account_alias:
     description:
-      - CLC alias for the destination account
+      - CLC alias for the destination account.
     type: str
   wait:
     description:
@@ -72,29 +69,26 @@ options:
     default: 'True'
   enabled:
     description:
-      - Whether the firewall policy is enabled or disabled
+      - Whether the firewall policy is enabled or disabled.
     type: str
     choices: ['True', 'False']
     default: 'True'
 requirements:
-    - python = 2.7
-    - requests >= 2.5.0
-    - clc-sdk
+  - requests >= 2.5.0
+  - clc-sdk
 author: "CLC Runner (@clc-runner)"
 notes:
-    - To use this module, it is required to set the below environment variables which enables access to the
-      Centurylink Cloud
-          - CLC_V2_API_USERNAME, the account login id for the centurylink cloud
-          - CLC_V2_API_PASSWORD, the account password for the centurylink cloud
-    - Alternatively, the module accepts the API token and account alias. The API token can be generated using the
-      CLC account login and password via the HTTP api call @ https://api.ctl.io/v2/authentication/login
-          - CLC_V2_API_TOKEN, the API token generated from https://api.ctl.io/v2/authentication/login
-          - CLC_ACCT_ALIAS, the account alias associated with the centurylink cloud
-    - Users can set CLC_V2_API_URL to specify an endpoint for pointing to a different CLC environment.
-'''
+  - To use this module, it is required to set the below environment variables which enables access to the Centurylink Cloud.
+  - E(CLC_V2_API_USERNAME), the account login id for the Centurylink Cloud.
+  - E(CLC_V2_API_PASSWORD), the account password for the Centurylink Cloud.
+  - Alternatively, the module accepts the API token and account alias. The API token can be generated using the CLC account
+    login and password using the HTTP API call @ https://api.ctl.io/v2/authentication/login
+  - E(CLC_V2_API_TOKEN), the API token generated from https://api.ctl.io/v2/authentication/login
+  - E(CLC_ACCT_ALIAS), the account alias associated with the Centurylink Cloud.
+  - Users can set E(CLC_V2_API_URL) to specify an endpoint for pointing to a different CLC environment.
+"""
 
-EXAMPLES = '''
----
+EXAMPLES = r"""
 - name: Create Firewall Policy
   hosts: localhost
   gather_facts: false
@@ -121,16 +115,16 @@ EXAMPLES = '''
         location: VA1
         state: absent
         firewall_policy_id: c62105233d7a4231bd2e91b9c791e43e1
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 firewall_policy_id:
-    description: The fire wall policy id
-    returned: success
-    type: str
-    sample: fc36f1bfd47242e488a9c44346438c05
+  description: The firewall policy id.
+  returned: success
+  type: str
+  sample: fc36f1bfd47242e488a9c44346438c05
 firewall_policy:
-    description: The fire wall policy information
+    description: The firewall policy information.
     returned: success
     type: dict
     sample:
@@ -162,7 +156,7 @@ firewall_policy:
            ],
            "status":"active"
         }
-'''
+"""
 
 __version__ = '${version}'
 

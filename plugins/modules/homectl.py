@@ -8,186 +8,185 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: homectl
 author:
-    - "James Livulpi (@jameslivulpi)"
+  - "James Livulpi (@jameslivulpi)"
 short_description: Manage user accounts with systemd-homed
 version_added: 4.4.0
 description:
-    - Manages a user's home directory managed by systemd-homed.
+  - Manages a user's home directory managed by systemd-homed.
 notes:
-    - This module requires the deprecated L(crypt Python module,
-      https://docs.python.org/3.12/library/crypt.html) library which was removed from Python 3.13.
-      For Python 3.13 or newer, you need to install L(legacycrypt, https://pypi.org/project/legacycrypt/).
+  - This module requires the deprecated L(crypt Python module, https://docs.python.org/3.12/library/crypt.html) library which
+    was removed from Python 3.13. For Python 3.13 or newer, you need to install L(legacycrypt, https://pypi.org/project/legacycrypt/).
 requirements:
-    - legacycrypt (on Python 3.13 or newer)
+  - legacycrypt (on Python 3.13 or newer)
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    name:
-        description:
-            - The user name to create, remove, or update.
-        required: true
-        aliases: [ 'user', 'username' ]
-        type: str
-    password:
-        description:
-            - Set the user's password to this.
-            - Homed requires this value to be in cleartext on user creation and updating a user.
-            - The module takes the password and generates a password hash in SHA-512 with 10000 rounds of salt generation using crypt.
-            - See U(https://systemd.io/USER_RECORD/).
-            - This is required for O(state=present). When an existing user is updated this is checked against the stored hash in homed.
-        type: str
-    state:
-        description:
-            - The operation to take on the user.
-        choices: [ 'absent', 'present' ]
-        default: present
-        type: str
-    storage:
-        description:
-            - Indicates the storage mechanism for the user's home directory.
-            - If the storage type is not specified, ``homed.conf(5)`` defines which default storage to use.
-            - Only used when a user is first created.
-        choices: [ 'classic', 'luks', 'directory', 'subvolume', 'fscrypt', 'cifs' ]
-        type: str
-    disksize:
-        description:
-            - The intended home directory disk space.
-            - Human readable value such as V(10G), V(10M), or V(10B).
-        type: str
-    resize:
-        description:
-            - When used with O(disksize) this will attempt to resize the home directory immediately.
-        default: false
-        type: bool
-    realname:
-        description:
-            - The user's real ('human') name.
-            - This can also be used to add a comment to maintain compatibility with C(useradd).
-        aliases: [ 'comment' ]
-        type: str
-    realm:
-        description:
-            - The 'realm' a user is defined in.
-        type: str
-    email:
-        description:
-            - The email address of the user.
-        type: str
-    location:
-        description:
-            -  A free-form location string describing the location of the user.
-        type: str
-    iconname:
-        description:
-            - The name of an icon picked by the user, for example for the purpose of an avatar.
-            - Should follow the semantics defined in the Icon Naming Specification.
-            - See U(https://specifications.freedesktop.org/icon-naming-spec/icon-naming-spec-latest.html) for specifics.
-        type: str
-    homedir:
-        description:
-            - Path to use as home directory for the user.
-            - This is the directory the user's home directory is mounted to while the user is logged in.
-            - This is not where the user's data is actually stored, see O(imagepath) for that.
-            - Only used when a user is first created.
-        type: path
-    imagepath:
-        description:
-            - Path to place the user's home directory.
-            - See U(https://www.freedesktop.org/software/systemd/man/homectl.html#--image-path=PATH) for more information.
-            - Only used when a user is first created.
-        type: path
-    uid:
-        description:
-            - Sets the UID of the user.
-            - If using O(gid) homed requires the value to be the same.
-            - Only used when a user is first created.
-        type: int
-    gid:
-        description:
-            - Sets the gid of the user.
-            - If using O(uid) homed requires the value to be the same.
-            - Only used when a user is first created.
-        type: int
-    mountopts:
-        description:
-            - String separated by comma each indicating mount options for a users home directory.
-            - Valid options are V(nosuid), V(nodev) or V(noexec).
-            - Homed by default uses V(nodev) and V(nosuid) while V(noexec) is off.
-        type: str
-    umask:
-        description:
-            - Sets the umask for the user's login sessions
-            - Value from V(0000) to V(0777).
-        type: int
-    memberof:
-        description:
-            - String separated by comma each indicating a UNIX group this user shall be a member of.
-            - Groups the user should be a member of should be supplied as comma separated list.
-        aliases: [ 'groups' ]
-        type: str
-    skeleton:
-        description:
-            - The absolute path to the skeleton directory to populate a new home directory from.
-            - This is only used when a home directory is first created.
-            - If not specified homed by default uses V(/etc/skel).
-        aliases: [ 'skel' ]
-        type: path
-    shell:
-        description:
-            - Shell binary to use for terminal logins of given user.
-            - If not specified homed by default uses V(/bin/bash).
-        type: str
-    environment:
-        description:
-            - String separated by comma each containing an environment variable and its value to
-              set for the user's login session, in a format compatible with ``putenv()``.
-            - Any environment variable listed here is automatically set by pam_systemd for all
-              login sessions of the user.
-        aliases: [ 'setenv' ]
-        type: str
-    timezone:
-        description:
-            - Preferred timezone to use for the user.
-            - Should be a tzdata compatible location string such as V(America/New_York).
-        type: str
-    locked:
-        description:
-            - Whether the user account should be locked or not.
-        type: bool
-    language:
-        description:
-            - The preferred language/locale for the user.
-            - This should be in a format compatible with the E(LANG) environment variable.
-        type: str
-    passwordhint:
-        description:
-            - Password hint for the given user.
-        type: str
-    sshkeys:
-        description:
-            - String separated by comma each listing a SSH public key that is authorized to access the account.
-            - The keys should follow the same format as the lines in a traditional C(~/.ssh/authorized_key) file.
-        type: str
-    notbefore:
-        description:
-            - A time since the UNIX epoch before which the record should be considered invalid for the purpose of logging in.
-        type: int
-    notafter:
-        description:
-            - A time since the UNIX epoch after which the record should be considered invalid for the purpose of logging in.
-        type: int
-'''
+  name:
+    description:
+      - The user name to create, remove, or update.
+    required: true
+    aliases: ['user', 'username']
+    type: str
+  password:
+    description:
+      - Set the user's password to this.
+      - Homed requires this value to be in cleartext on user creation and updating a user.
+      - The module takes the password and generates a password hash in SHA-512 with 10000 rounds of salt generation using
+        crypt.
+      - See U(https://systemd.io/USER_RECORD/).
+      - This is required for O(state=present). When an existing user is updated this is checked against the stored hash in
+        homed.
+    type: str
+  state:
+    description:
+      - The operation to take on the user.
+    choices: ['absent', 'present']
+    default: present
+    type: str
+  storage:
+    description:
+      - Indicates the storage mechanism for the user's home directory.
+      - If the storage type is not specified, C(homed.conf(5\)) defines which default storage to use.
+      - Only used when a user is first created.
+    choices: ['classic', 'luks', 'directory', 'subvolume', 'fscrypt', 'cifs']
+    type: str
+  disksize:
+    description:
+      - The intended home directory disk space.
+      - Human readable value such as V(10G), V(10M), or V(10B).
+    type: str
+  resize:
+    description:
+      - When used with O(disksize) this will attempt to resize the home directory immediately.
+    default: false
+    type: bool
+  realname:
+    description:
+      - The user's real ('human') name.
+      - This can also be used to add a comment to maintain compatibility with C(useradd).
+    aliases: ['comment']
+    type: str
+  realm:
+    description:
+      - The 'realm' a user is defined in.
+    type: str
+  email:
+    description:
+      - The email address of the user.
+    type: str
+  location:
+    description:
+      - A free-form location string describing the location of the user.
+    type: str
+  iconname:
+    description:
+      - The name of an icon picked by the user, for example for the purpose of an avatar.
+      - Should follow the semantics defined in the Icon Naming Specification.
+      - See U(https://specifications.freedesktop.org/icon-naming-spec/icon-naming-spec-latest.html) for specifics.
+    type: str
+  homedir:
+    description:
+      - Path to use as home directory for the user.
+      - This is the directory the user's home directory is mounted to while the user is logged in.
+      - This is not where the user's data is actually stored, see O(imagepath) for that.
+      - Only used when a user is first created.
+    type: path
+  imagepath:
+    description:
+      - Path to place the user's home directory.
+      - See U(https://www.freedesktop.org/software/systemd/man/homectl.html#--image-path=PATH) for more information.
+      - Only used when a user is first created.
+    type: path
+  uid:
+    description:
+      - Sets the UID of the user.
+      - If using O(gid) homed requires the value to be the same.
+      - Only used when a user is first created.
+    type: int
+  gid:
+    description:
+      - Sets the gid of the user.
+      - If using O(uid) homed requires the value to be the same.
+      - Only used when a user is first created.
+    type: int
+  mountopts:
+    description:
+      - String separated by comma each indicating mount options for a users home directory.
+      - Valid options are V(nosuid), V(nodev) or V(noexec).
+      - Homed by default uses V(nodev) and V(nosuid) while V(noexec) is off.
+    type: str
+  umask:
+    description:
+      - Sets the umask for the user's login sessions.
+      - Value from V(0000) to V(0777).
+    type: int
+  memberof:
+    description:
+      - String separated by comma each indicating a UNIX group this user shall be a member of.
+      - Groups the user should be a member of should be supplied as comma separated list.
+    aliases: ['groups']
+    type: str
+  skeleton:
+    description:
+      - The absolute path to the skeleton directory to populate a new home directory from.
+      - This is only used when a home directory is first created.
+      - If not specified homed by default uses V(/etc/skel).
+    aliases: ['skel']
+    type: path
+  shell:
+    description:
+      - Shell binary to use for terminal logins of given user.
+      - If not specified homed by default uses V(/bin/bash).
+    type: str
+  environment:
+    description:
+      - String separated by comma each containing an environment variable and its value to set for the user's login session,
+        in a format compatible with C(putenv(\)).
+      - Any environment variable listed here is automatically set by pam_systemd for all login sessions of the user.
+    aliases: ['setenv']
+    type: str
+  timezone:
+    description:
+      - Preferred timezone to use for the user.
+      - Should be a tzdata compatible location string such as V(America/New_York).
+    type: str
+  locked:
+    description:
+      - Whether the user account should be locked or not.
+    type: bool
+  language:
+    description:
+      - The preferred language/locale for the user.
+      - This should be in a format compatible with the E(LANG) environment variable.
+    type: str
+  passwordhint:
+    description:
+      - Password hint for the given user.
+    type: str
+  sshkeys:
+    description:
+      - String separated by comma each listing a SSH public key that is authorized to access the account.
+      - The keys should follow the same format as the lines in a traditional C(~/.ssh/authorized_key) file.
+    type: str
+  notbefore:
+    description:
+      - A time since the UNIX epoch before which the record should be considered invalid for the purpose of logging in.
+    type: int
+  notafter:
+    description:
+      - A time since the UNIX epoch after which the record should be considered invalid for the purpose of logging in.
+    type: int
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Add the user 'james'
   community.general.homectl:
     name: johnd
@@ -215,11 +214,11 @@ EXAMPLES = '''
   community.general.homectl:
     name: janet
     state: absent
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 data:
-    description: A json dictionary returned from C(homectl inspect -j).
+    description: Dictionary returned from C(homectl inspect -j).
     returned: success
     type: dict
     sample: {
@@ -267,7 +266,7 @@ data:
             "userName": "james",
         }
     }
-'''
+"""
 
 import json
 import traceback

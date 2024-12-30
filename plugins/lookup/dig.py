@@ -220,7 +220,6 @@ RETURN = """
 
 from ansible.errors import AnsibleError
 from ansible.plugins.lookup import LookupBase
-from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.parsing.convert_bool import boolean
 from ansible.utils.display import Display
 import socket
@@ -345,7 +344,7 @@ class LookupModule(LookupBase):
         try:
             rdclass = dns.rdataclass.from_text(self.get_option('class'))
         except Exception as e:
-            raise AnsibleError("dns lookup illegal CLASS: %s" % to_native(e))
+            raise AnsibleError(f"dns lookup illegal CLASS: {e}")
         myres.retry_servfail = self.get_option('retry_servfail')
 
         for t in terms:
@@ -363,7 +362,7 @@ class LookupModule(LookupBase):
                             nsaddr = dns.resolver.query(ns)[0].address
                             nameservers.append(nsaddr)
                         except Exception as e:
-                            raise AnsibleError("dns lookup NS: %s" % to_native(e))
+                            raise AnsibleError(f"dns lookup NS: {e}")
                 continue
             if '=' in t:
                 try:
@@ -379,7 +378,7 @@ class LookupModule(LookupBase):
                     try:
                         rdclass = dns.rdataclass.from_text(arg)
                     except Exception as e:
-                        raise AnsibleError("dns lookup illegal CLASS: %s" % to_native(e))
+                        raise AnsibleError(f"dns lookup illegal CLASS: {e}")
                 elif opt == 'retry_servfail':
                     myres.retry_servfail = boolean(arg)
                 elif opt == 'fail_on_error':
@@ -400,7 +399,7 @@ class LookupModule(LookupBase):
             else:
                 domains.append(t)
 
-        # print "--- domain = {0} qtype={1} rdclass={2}".format(domain, qtype, rdclass)
+        # print "--- domain = {domain} qtype={qtype} rdclass={rdclass}"
 
         if port:
             myres.port = port
@@ -416,7 +415,7 @@ class LookupModule(LookupBase):
                 except dns.exception.SyntaxError:
                     pass
                 except Exception as e:
-                    raise AnsibleError("dns.reversename unhandled exception %s" % to_native(e))
+                    raise AnsibleError(f"dns.reversename unhandled exception {e}")
             domains = reversed_domains
 
         if len(domains) > 1:
@@ -445,25 +444,20 @@ class LookupModule(LookupBase):
                             ret.append(rd)
                         except Exception as err:
                             if fail_on_error:
-                                raise AnsibleError("Lookup failed: %s" % str(err))
+                                raise AnsibleError(f"Lookup failed: {err}")
                             ret.append(str(err))
 
             except dns.resolver.NXDOMAIN as err:
                 if fail_on_error:
-                    raise AnsibleError("Lookup failed: %s" % str(err))
+                    raise AnsibleError(f"Lookup failed: {err}")
                 if not real_empty:
                     ret.append('NXDOMAIN')
-            except dns.resolver.NoAnswer as err:
+            except (dns.resolver.NoAnswer, dns.resolver.Timeout, dns.resolver.NoNameservers) as err:
                 if fail_on_error:
-                    raise AnsibleError("Lookup failed: %s" % str(err))
-                if not real_empty:
-                    ret.append("")
-            except dns.resolver.Timeout as err:
-                if fail_on_error:
-                    raise AnsibleError("Lookup failed: %s" % str(err))
+                    raise AnsibleError(f"Lookup failed: {err}")
                 if not real_empty:
                     ret.append("")
             except dns.exception.DNSException as err:
-                raise AnsibleError("dns.resolver unhandled exception %s" % to_native(err))
+                raise AnsibleError(f"dns.resolver unhandled exception {err}")
 
         return ret

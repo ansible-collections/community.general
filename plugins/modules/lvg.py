@@ -9,10 +9,9 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 author:
-- Alexander Bulimov (@abulimov)
+  - Alexander Bulimov (@abulimov)
 module: lvg
 short_description: Configure LVM volume groups
 description:
@@ -27,78 +26,76 @@ attributes:
 options:
   vg:
     description:
-    - The name of the volume group.
+      - The name of the volume group.
     type: str
     required: true
   pvs:
     description:
-    - List of comma-separated devices to use as physical devices in this volume group.
-    - Required when creating or resizing volume group.
-    - The module will take care of running pvcreate if needed.
+      - List of comma-separated devices to use as physical devices in this volume group.
+      - Required when creating or resizing volume group.
+      - The module will take care of running pvcreate if needed.
     type: list
     elements: str
   pesize:
     description:
-    - "The size of the physical extent. O(pesize) must be a power of 2 of at least 1 sector
-       (where the sector size is the largest sector size of the PVs currently used in the VG),
-       or at least 128KiB."
-    - O(pesize) can be optionally suffixed by a UNIT (k/K/m/M/g/G), default unit is megabyte.
+      - The size of the physical extent. O(pesize) must be a power of 2 of at least 1 sector (where the sector size is the largest sector size
+        of the PVs currently used in the VG), or at least 128KiB.
+      - O(pesize) can be optionally suffixed by a UNIT (k/K/m/M/g/G), default unit is megabyte.
     type: str
     default: "4"
   pv_options:
     description:
-    - Additional options to pass to C(pvcreate) when creating the volume group.
+      - Additional options to pass to C(pvcreate) when creating the volume group.
     type: str
     default: ''
   pvresize:
     description:
-    - If V(true), resize the physical volume to the maximum available size.
+      - If V(true), resize the physical volume to the maximum available size.
     type: bool
     default: false
     version_added: '0.2.0'
   vg_options:
     description:
-    - Additional options to pass to C(vgcreate) when creating the volume group.
+      - Additional options to pass to C(vgcreate) when creating the volume group.
     type: str
     default: ''
   state:
     description:
-    - Control if the volume group exists and it's state.
-    - The states V(active) and V(inactive) implies V(present) state. Added in 7.1.0
-    - "If V(active) or V(inactive), the module manages the VG's logical volumes current state.
-       The module also handles the VG's autoactivation state if supported
-       unless when creating a volume group and the autoactivation option specified in O(vg_options)."
+      - Control if the volume group exists and its state.
+      - The states V(active) and V(inactive) implies V(present) state. Added in 7.1.0.
+      - If V(active) or V(inactive), the module manages the VG's logical volumes current state. The module also handles the VG's autoactivation
+        state if supported unless when creating a volume group and the autoactivation option specified in O(vg_options).
     type: str
-    choices: [ absent, present, active, inactive ]
+    choices: [absent, present, active, inactive]
     default: present
   force:
     description:
-    - If V(true), allows to remove volume group with logical volumes.
+      - If V(true), allows to remove volume group with logical volumes.
     type: bool
     default: false
   reset_vg_uuid:
     description:
-    - Whether the volume group's UUID is regenerated.
-    - This is B(not idempotent). Specifying this parameter always results in a change.
+      - Whether the volume group's UUID is regenerated.
+      - This is B(not idempotent). Specifying this parameter always results in a change.
     type: bool
     default: false
     version_added: 7.1.0
   reset_pv_uuid:
     description:
-    - Whether the volume group's physical volumes' UUIDs are regenerated.
-    - This is B(not idempotent). Specifying this parameter always results in a change.
+      - Whether the volume group's physical volumes' UUIDs are regenerated.
+      - This is B(not idempotent). Specifying this parameter always results in a change.
     type: bool
     default: false
     version_added: 7.1.0
 seealso:
-- module: community.general.filesystem
-- module: community.general.lvol
-- module: community.general.parted
+  - module: community.general.filesystem
+  - module: community.general.lvol
+  - module: community.general.parted
 notes:
   - This module does not modify PE size for already present volume group.
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Create a volume group on top of /dev/sda1 with physical extent size = 32MB
   community.general.lvg:
     vg: vg.services
@@ -154,7 +151,7 @@ EXAMPLES = r'''
     pvs: /dev/sdb1,/dev/sdc5
     reset_vg_uuid: true
     reset_pv_uuid: true
-'''
+"""
 
 import itertools
 import os

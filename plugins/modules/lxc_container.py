@@ -9,8 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: lxc_container
 short_description: Manage LXC Containers
 description:
@@ -19,183 +18,171 @@ author: "Kevin Carter (@cloudnull)"
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    name:
-        description:
-          - Name of a container.
-        type: str
-        required: true
-    backing_store:
-        choices:
-          - dir
-          - lvm
-          - loop
-          - btrfs
-          - overlayfs
-          - zfs
-        description:
-          - Backend storage type for the container.
-        type: str
-        default: dir
-    template:
-        description:
-          - Name of the template to use within an LXC create.
-        type: str
-        default: ubuntu
-    template_options:
-        description:
-          - Template options when building the container.
-        type: str
-    config:
-        description:
-          - Path to the LXC configuration file.
-        type: path
-    lv_name:
-        description:
-          - Name of the logical volume, defaults to the container name.
-          - If not specified, it defaults to C($CONTAINER_NAME).
-        type: str
-    vg_name:
-        description:
-          - If backend store is lvm, specify the name of the volume group.
-        type: str
-        default: lxc
-    thinpool:
-        description:
-          - Use LVM thin pool called TP.
-        type: str
-    fs_type:
-        description:
-          - Create fstype TYPE.
-        type: str
-        default: ext4
-    fs_size:
-        description:
-          - File system Size.
-        type: str
-        default: 5G
-    directory:
-        description:
-          - Place rootfs directory under DIR.
-        type: path
-    zfs_root:
-        description:
-          - Create zfs under given zfsroot.
-        type: str
-    container_command:
-        description:
-          - Run a command within a container.
-        type: str
-    lxc_path:
-        description:
-          - Place container under E(PATH).
-        type: path
-    container_log:
-        description:
-          - Enable a container log for host actions to the container.
-        type: bool
-        default: false
-    container_log_level:
-        choices:
-          - Info
-          - info
-          - INFO
-          - Error
-          - error
-          - ERROR
-          - Debug
-          - debug
-          - DEBUG
-        description:
-          - Set the log level for a container where O(container_log) was set.
-        type: str
-        required: false
-        default: INFO
-    clone_name:
-        description:
-          - Name of the new cloned server.
-          - This is only used when state is clone.
-        type: str
-    clone_snapshot:
-        description:
-          - Create a snapshot a container when cloning.
-          - This is not supported by all container storage backends.
-          - Enabling this may fail if the backing store does not support snapshots.
-        type: bool
-        default: false
-    archive:
-        description:
-          - Create an archive of a container.
-          - This will create a tarball of the running container.
-        type: bool
-        default: false
-    archive_path:
-        description:
-          - Path the save the archived container.
-          - If the path does not exist the archive method will attempt to create it.
-        type: path
-    archive_compression:
-        choices:
-          - gzip
-          - bzip2
-          - none
-        description:
-          - Type of compression to use when creating an archive of a running
-            container.
-        type: str
-        default: gzip
-    state:
-        choices:
-          - started
-          - stopped
-          - restarted
-          - absent
-          - frozen
-          - clone
-        description:
-          - Define the state of a container.
-          - If you clone a container using O(clone_name) the newly cloned
-            container created in a stopped state.
-          - The running container will be stopped while the clone operation is
-            happening and upon completion of the clone the original container
-            state will be restored.
-        type: str
-        default: started
-    container_config:
-        description:
-          - A list of C(key=value) options to use when configuring a container.
-        type: list
-        elements: str
+  name:
+    description:
+      - Name of a container.
+    type: str
+    required: true
+  backing_store:
+    choices:
+      - dir
+      - lvm
+      - loop
+      - btrfs
+      - overlayfs
+      - zfs
+    description:
+      - Backend storage type for the container.
+    type: str
+    default: dir
+  template:
+    description:
+      - Name of the template to use within an LXC create.
+    type: str
+    default: ubuntu
+  template_options:
+    description:
+      - Template options when building the container.
+    type: str
+  config:
+    description:
+      - Path to the LXC configuration file.
+    type: path
+  lv_name:
+    description:
+      - Name of the logical volume, defaults to the container name.
+      - If not specified, it defaults to E(CONTAINER_NAME).
+    type: str
+  vg_name:
+    description:
+      - If backend store is lvm, specify the name of the volume group.
+    type: str
+    default: lxc
+  thinpool:
+    description:
+      - Use LVM thin pool called TP.
+    type: str
+  fs_type:
+    description:
+      - Create fstype TYPE.
+    type: str
+    default: ext4
+  fs_size:
+    description:
+      - File system Size.
+    type: str
+    default: 5G
+  directory:
+    description:
+      - Place rootfs directory under DIR.
+    type: path
+  zfs_root:
+    description:
+      - Create zfs under given zfsroot.
+    type: str
+  container_command:
+    description:
+      - Run a command within a container.
+    type: str
+  lxc_path:
+    description:
+      - Place container under E(PATH).
+    type: path
+  container_log:
+    description:
+      - Enable a container log for host actions to the container.
+    type: bool
+    default: false
+  container_log_level:
+    choices:
+      - Info
+      - info
+      - INFO
+      - Error
+      - error
+      - ERROR
+      - Debug
+      - debug
+      - DEBUG
+    description:
+      - Set the log level for a container where O(container_log) was set.
+    type: str
+    required: false
+    default: INFO
+  clone_name:
+    description:
+      - Name of the new cloned server.
+      - This is only used when state is clone.
+    type: str
+  clone_snapshot:
+    description:
+      - Create a snapshot a container when cloning.
+      - This is not supported by all container storage backends.
+      - Enabling this may fail if the backing store does not support snapshots.
+    type: bool
+    default: false
+  archive:
+    description:
+      - Create an archive of a container.
+      - This will create a tarball of the running container.
+    type: bool
+    default: false
+  archive_path:
+    description:
+      - Path the save the archived container.
+      - If the path does not exist the archive method will attempt to create it.
+    type: path
+  archive_compression:
+    choices:
+      - gzip
+      - bzip2
+      - none
+    description:
+      - Type of compression to use when creating an archive of a running container.
+    type: str
+    default: gzip
+  state:
+    choices:
+      - started
+      - stopped
+      - restarted
+      - absent
+      - frozen
+      - clone
+    description:
+      - Define the state of a container.
+      - If you clone a container using O(clone_name) the newly cloned container created in a stopped state.
+      - The running container will be stopped while the clone operation is happening and upon completion of the clone the original container state
+        will be restored.
+    type: str
+    default: started
+  container_config:
+    description:
+      - A list of C(key=value) options to use when configuring a container.
+    type: list
+    elements: str
 requirements:
   - 'lxc >= 2.0 # OS package'
   - 'python3 >= 3.5 # OS Package'
   - 'python3-lxc # OS Package'
 notes:
-  - Containers must have a unique name. If you attempt to create a container
-    with a name that already exists in the users namespace the module will
-    simply return as "unchanged".
-  - The O(container_command) can be used with any state except V(absent). If
-    used with state V(stopped) the container will be V(started), the command
-    executed, and then the container V(stopped) again. Likewise if O(state=stopped)
-    and the container does not exist it will be first created,
-    V(started), the command executed, and then V(stopped). If you use a "|"
-    in the variable you can use common script formatting within the variable
-    itself. The O(container_command) option will always execute as BASH.
-    When using O(container_command), a log file is created in the C(/tmp/) directory
-    which contains both C(stdout) and C(stderr) of any command executed.
-  - If O(archive=true) the system will attempt to create a compressed
-    tarball of the running container. The O(archive) option supports LVM backed
-    containers and will create a snapshot of the running container when
-    creating the archive.
-  - If your distro does not have a package for C(python3-lxc), which is a
-    requirement for this module, it can be installed from source at
-    U(https://github.com/lxc/python3-lxc) or installed via pip using the
-    package name C(lxc).
-'''
+  - Containers must have a unique name. If you attempt to create a container with a name that already exists in the users namespace the module
+    will simply return as "unchanged".
+  - The O(container_command) can be used with any state except V(absent). If used with state V(stopped) the container will be V(started), the
+    command executed, and then the container V(stopped) again. Likewise if O(state=stopped) and the container does not exist it will be first
+    created, V(started), the command executed, and then V(stopped). If you use a C(|) in the variable you can use common script formatting within
+    the variable itself. The O(container_command) option will always execute as C(bash). When using O(container_command), a log file is created in
+    the C(/tmp/) directory which contains both C(stdout) and C(stderr) of any command executed.
+  - If O(archive=true) the system will attempt to create a compressed tarball of the running container. The O(archive) option supports LVM backed
+    containers and will create a snapshot of the running container when creating the archive.
+  - If your distro does not have a package for C(python3-lxc), which is a requirement for this module, it can be installed from source at
+    U(https://github.com/lxc/python3-lxc) or installed using C(pip install lxc).
+"""
 
 EXAMPLES = r"""
 - name: Create a started container
@@ -268,14 +255,14 @@ EXAMPLES = r"""
   ansible.builtin.debug:
     var: lvm_container_info
 
-- name: Run a command in a container and ensure its in a "stopped" state.
+- name: Run a command in a container and ensure it is in a "stopped" state.
   community.general.lxc_container:
     name: test-container-started
     state: stopped
     container_command: |
       echo 'hello world.' | tee /opt/stopped
 
-- name: Run a command in a container and ensure its it in a "frozen" state.
+- name: Run a command in a container and ensure it is in a "frozen" state.
   community.general.lxc_container:
     name: test-container-stopped
     state: frozen
@@ -382,45 +369,45 @@ EXAMPLES = r"""
 
 RETURN = r"""
 lxc_container:
-    description: container information
-    returned: success
-    type: complex
-    contains:
-        name:
-            description: name of the lxc container
-            returned: success
-            type: str
-            sample: test_host
-        init_pid:
-            description: pid of the lxc init process
-            returned: success
-            type: int
-            sample: 19786
-        interfaces:
-            description: list of the container's network interfaces
-            returned: success
-            type: list
-            sample: [ "eth0", "lo" ]
-        ips:
-            description: list of ips
-            returned: success
-            type: list
-            sample: [ "10.0.3.3" ]
-        state:
-            description: resulting state of the container
-            returned: success
-            type: str
-            sample: "running"
-        archive:
-            description: resulting state of the container
-            returned: success, when archive is true
-            type: str
-            sample: "/tmp/test-container-config.tar"
-        clone:
-            description: if the container was cloned
-            returned: success, when clone_name is specified
-            type: bool
-            sample: true
+  description: Container information.
+  returned: success
+  type: complex
+  contains:
+    name:
+      description: Name of the LXC container.
+      returned: success
+      type: str
+      sample: test_host
+    init_pid:
+      description: Pid of the LXC init process.
+      returned: success
+      type: int
+      sample: 19786
+    interfaces:
+      description: List of the container's network interfaces.
+      returned: success
+      type: list
+      sample: ["eth0", "lo"]
+    ips:
+      description: List of IPs.
+      returned: success
+      type: list
+      sample: ["10.0.3.3"]
+    state:
+      description: Resulting state of the container.
+      returned: success
+      type: str
+      sample: "running"
+    archive:
+      description: Resulting state of the container.
+      returned: success, when archive is true
+      type: str
+      sample: "/tmp/test-container-config.tar"
+    clone:
+      description: If the container was cloned.
+      returned: success, when clone_name is specified
+      type: bool
+      sample: true
 """
 
 import os
@@ -694,7 +681,7 @@ class LxcContainerManagement(object):
         """Configure an LXC container.
 
         Write new configuration values to the lxc config file. This will
-        stop the container if it's running write the new options and then
+        stop the container if it is running write the new options and then
         restart the container upon completion.
         """
 

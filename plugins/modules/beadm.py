@@ -9,62 +9,59 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: beadm
 short_description: Manage ZFS boot environments on FreeBSD/Solaris/illumos systems
 description:
-    - Create, delete or activate ZFS boot environments.
-    - Mount and unmount ZFS boot environments.
+  - Create, delete or activate ZFS boot environments.
+  - Mount and unmount ZFS boot environments.
 author: Adam Števko (@xen0l)
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    name:
-        description:
-            - ZFS boot environment name.
-        type: str
-        required: true
-        aliases: [ "be" ]
-    snapshot:
-        description:
-            - If specified, the new boot environment will be cloned from the given
-              snapshot or inactive boot environment.
-        type: str
+  name:
     description:
-        description:
-            - Associate a description with a new boot environment. This option is
-              available only on Solarish platforms.
-        type: str
-    options:
-        description:
-            - Create the datasets for new BE with specific ZFS properties.
-            - Multiple options can be specified.
-            - This option is available only on Solarish platforms.
-        type: str
-    mountpoint:
-        description:
-            - Path where to mount the ZFS boot environment.
-        type: path
-    state:
-        description:
-            - Create or delete ZFS boot environment.
-        type: str
-        choices: [ absent, activated, mounted, present, unmounted ]
-        default: present
-    force:
-        description:
-            - Specifies if the unmount should be forced.
-        type: bool
-        default: false
-'''
+      - ZFS boot environment name.
+    type: str
+    required: true
+    aliases: ["be"]
+  snapshot:
+    description:
+      - If specified, the new boot environment will be cloned from the given snapshot or inactive boot environment.
+    type: str
+  description:
+    description:
+      - Associate a description with a new boot environment. This option is available only on Solarish platforms.
+    type: str
+  options:
+    description:
+      - Create the datasets for new BE with specific ZFS properties.
+      - Multiple options can be specified.
+      - This option is available only on Solarish platforms.
+    type: str
+  mountpoint:
+    description:
+      - Path where to mount the ZFS boot environment.
+    type: path
+  state:
+    description:
+      - Create or delete ZFS boot environment.
+    type: str
+    choices: [absent, activated, mounted, present, unmounted]
+    default: present
+  force:
+    description:
+      - Specifies if the unmount should be forced.
+    type: bool
+    default: false
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Create ZFS boot environment
   community.general.beadm:
     name: upgrade-be
@@ -103,45 +100,45 @@ EXAMPLES = r'''
   community.general.beadm:
     name: upgrade-be
     state: activated
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 name:
-    description: BE name
-    returned: always
-    type: str
-    sample: pre-upgrade
+  description: BE name.
+  returned: always
+  type: str
+  sample: pre-upgrade
 snapshot:
-    description: ZFS snapshot to create BE from
-    returned: always
-    type: str
-    sample: rpool/ROOT/oi-hipster@fresh
+  description: ZFS snapshot to create BE from.
+  returned: always
+  type: str
+  sample: rpool/ROOT/oi-hipster@fresh
 description:
-    description: BE description
-    returned: always
-    type: str
-    sample: Upgrade from 9.0 to 10.0
+  description: BE description.
+  returned: always
+  type: str
+  sample: Upgrade from 9.0 to 10.0
 options:
-    description: BE additional options
-    returned: always
-    type: str
-    sample: compression=on
+  description: BE additional options.
+  returned: always
+  type: str
+  sample: compression=on
 mountpoint:
-    description: BE mountpoint
-    returned: always
-    type: str
-    sample: /mnt/be
+  description: BE mountpoint.
+  returned: always
+  type: str
+  sample: /mnt/be
 state:
-    description: state of the target
-    returned: always
-    type: str
-    sample: present
+  description: State of the target.
+  returned: always
+  type: str
+  sample: present
 force:
-    description: If forced action is wanted
-    returned: always
-    type: bool
-    sample: false
-'''
+  description: If forced action is wanted.
+  returned: always
+  type: bool
+  sample: false
+"""
 
 import os
 from ansible.module_utils.basic import AnsibleModule

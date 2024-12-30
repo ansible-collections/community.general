@@ -10,14 +10,13 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = """
----
+DOCUMENTATION = r"""
 module: cpanm
 short_description: Manages Perl library dependencies
 description:
-- Manage Perl library dependencies using cpanminus.
+  - Manage Perl library dependencies using cpanminus.
 extends_documentation_fragment:
-- community.general.attributes
+  - community.general.attributes
 attributes:
   check_mode:
     support: none
@@ -27,82 +26,79 @@ options:
   name:
     type: str
     description:
-    - The Perl library to install. Valid values change according to the O(mode), see notes for more details.
-    - Note that for installing from a local path the parameter O(from_path) should be used.
+      - The Perl library to install. Valid values change according to the O(mode), see notes for more details.
+      - Note that for installing from a local path the parameter O(from_path) should be used.
     aliases: [pkg]
   from_path:
     type: path
     description:
-    - The local directory or C(tar.gz) file to install from.
+      - The local directory or C(tar.gz) file to install from.
   notest:
     description:
-    - Do not run unit tests.
+      - Do not run unit tests.
     type: bool
     default: false
   locallib:
     description:
-    - Specify the install base to install modules.
+      - Specify the install base to install modules.
     type: path
   mirror:
     description:
-    - Specifies the base URL for the CPAN mirror to use.
+      - Specifies the base URL for the CPAN mirror to use.
     type: str
   mirror_only:
     description:
-    - Use the mirror's index file instead of the CPAN Meta DB.
+      - Use the mirror's index file instead of the CPAN Meta DB.
     type: bool
     default: false
   installdeps:
     description:
-    - Only install dependencies.
+      - Only install dependencies.
     type: bool
     default: false
   version:
     description:
-    - Version specification for the perl module. When O(mode) is V(new), C(cpanm) version operators are accepted.
+      - Version specification for the perl module. When O(mode) is V(new), C(cpanm) version operators are accepted.
     type: str
   executable:
     description:
-    - Override the path to the cpanm executable.
+      - Override the path to the cpanm executable.
     type: path
   mode:
     description:
-    - Controls the module behavior. See notes below for more details.
-    - The default changed from V(compatibility) to V(new) in community.general 9.0.0.
+      - Controls the module behavior. See notes below for more details.
+      - The default changed from V(compatibility) to V(new) in community.general 9.0.0.
     type: str
     choices: [compatibility, new]
     default: new
     version_added: 3.0.0
   name_check:
     description:
-    - When O(mode=new), this parameter can be used to check if there is a module O(name) installed (at O(version), when specified).
+      - When O(mode=new), this parameter can be used to check if there is a module O(name) installed (at O(version), when
+        specified).
     type: str
     version_added: 3.0.0
 notes:
-- Please note that U(http://search.cpan.org/dist/App-cpanminus/bin/cpanm, cpanm) must be installed on the remote host.
-- "This module now comes with a choice of execution O(mode): V(compatibility) or V(new)."
-- >
-  O(mode=compatibility): When using V(compatibility) mode, the module will keep backward compatibility.
-  This was the default mode before community.general 9.0.0.
-  O(name) must be either a module name or a distribution file. If the perl module given by O(name) is installed (at the exact O(version)
-  when specified), then nothing happens. Otherwise, it will be installed using the C(cpanm) executable. O(name) cannot be an URL, or a git URL.
-  C(cpanm) version specifiers do not work in this mode.
-- >
-  O(mode=new): When using V(new) mode, the module will behave differently. The O(name) parameter may refer to a module name, a distribution file,
-  a HTTP URL or a git repository URL as described in C(cpanminus) documentation. C(cpanm) version specifiers are recognized.
-  This is the default mode from community.general 9.0.0 onwards.
-
+  - Please note that U(http://search.cpan.org/dist/App-cpanminus/bin/cpanm, cpanm) must be installed on the remote host.
+  - 'This module now comes with a choice of execution O(mode): V(compatibility) or V(new).'
+  - 'O(mode=compatibility): When using V(compatibility) mode, the module will keep backward compatibility. This was the default
+    mode before community.general 9.0.0. O(name) must be either a module name or a distribution file. If the perl module given
+    by O(name) is installed (at the exact O(version) when specified), then nothing happens. Otherwise, it will be installed
+    using the C(cpanm) executable. O(name) cannot be an URL, or a git URL. C(cpanm) version specifiers do not work in this
+    mode.'
+  - 'O(mode=new): When using V(new) mode, the module will behave differently. The O(name) parameter may refer to a module
+    name, a distribution file, a HTTP URL or a git repository URL as described in C(cpanminus) documentation. C(cpanm) version
+    specifiers are recognized. This is the default mode from community.general 9.0.0 onwards.'
 seealso:
-- name: C(cpanm) command manual page
-  description: Manual page for the command.
-  link: https://metacpan.org/dist/App-cpanminus/view/bin/cpanm
+  - name: C(cpanm) command manual page
+    description: Manual page for the command.
+    link: https://metacpan.org/dist/App-cpanminus/view/bin/cpanm
 author:
-- "Franck Cuny (@fcuny)"
-- "Alexei Znamensky (@russoz)"
+  - "Franck Cuny (@fcuny)"
+  - "Alexei Znamensky (@russoz)"
 """
 
-EXAMPLES = """
----
+EXAMPLES = r"""
 - name: Install Dancer perl package
   community.general.cpanm:
     name: Dancer
@@ -142,8 +138,7 @@ EXAMPLES = """
     version: '1.0'
 """
 
-RETURN = """
----
+RETURN = r"""
 cpanm_version:
   description: Version of CPANMinus.
   type: str

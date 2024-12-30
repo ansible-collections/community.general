@@ -64,7 +64,6 @@ except ImportError:
     pass
 
 from ansible.errors import AnsibleError
-from ansible.module_utils.common.text.converters import to_native
 from ansible.plugins.lookup import LookupBase
 
 # ==============================================================
@@ -108,7 +107,7 @@ class LookupModule(LookupBase):
                     continue
                 string = ''
             except DNSException as e:
-                raise AnsibleError("dns.resolver unhandled exception %s" % to_native(e))
+                raise AnsibleError(f"dns.resolver unhandled exception {e}")
 
             ret.append(''.join(string))
 

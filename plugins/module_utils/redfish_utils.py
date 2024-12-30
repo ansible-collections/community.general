@@ -55,7 +55,6 @@ class RedfishUtils(object):
         self.strip_etag_quotes = strip_etag_quotes
         self.ciphers = ciphers
         self._vendor = None
-        self._init_session()
 
     def _auth_params(self, headers):
         """
@@ -120,7 +119,7 @@ class RedfishUtils(object):
 
                 # Note: This is also a fallthrough for properties that are
                 # arrays of objects.  Some services erroneously omit properties
-                # within arrays of objects when not configured, and it's
+                # within arrays of objects when not configured, and it is
                 # expecting the client to provide them anyway.
 
                 if req_pyld[prop] != cur_pyld[prop]:
@@ -411,7 +410,7 @@ class RedfishUtils(object):
         return msg, data
 
     def _init_session(self):
-        pass
+        self.module.deprecate("Method _init_session is deprecated and will be removed.", version="11.0.0", collection_name="community.general")
 
     def _get_vendor(self):
         # If we got the vendor info once, don't get it again
@@ -1178,7 +1177,7 @@ class RedfishUtils(object):
             return response
 
         # If requested to wait for the service to be available again, block
-        # until it's ready
+        # until it is ready
         if wait:
             elapsed_time = 0
             start_time = time.time()
@@ -1191,7 +1190,7 @@ class RedfishUtils(object):
             while elapsed_time <= wait_timeout:
                 status = self.check_service_availability()
                 if status['available']:
-                    # It's available; we're done
+                    # It is available; we are done
                     break
                 time.sleep(5)
                 elapsed_time = time.time() - start_time
@@ -1814,7 +1813,7 @@ class RedfishUtils(object):
                     operation_results['status'] = data.get('TaskState', data.get('JobState'))
                     operation_results['messages'] = data.get('Messages', [])
                 else:
-                    # Error response body, which is a bit of a misnomer since it's used in successful action responses
+                    # Error response body, which is a bit of a misnomer since it is used in successful action responses
                     operation_results['status'] = 'Completed'
                     if response.status >= 400:
                         operation_results['status'] = 'Exception'
@@ -1933,6 +1932,9 @@ class RedfishUtils(object):
         targets = update_opts.get('update_targets')
         apply_time = update_opts.get('update_apply_time')
         oem_params = update_opts.get('update_oem_params')
+        custom_oem_header = update_opts.get('update_custom_oem_header')
+        custom_oem_mime_type = update_opts.get('update_custom_oem_mime_type')
+        custom_oem_params = update_opts.get('update_custom_oem_params')
 
         # Ensure the image file is provided
         if not image_file:
@@ -1958,7 +1960,7 @@ class RedfishUtils(object):
         update_uri = data['MultipartHttpPushUri']
 
         # Assemble the JSON payload portion of the request
-        payload = {"@Redfish.OperationApplyTime": "Immediate"}
+        payload = {}
         if targets:
             payload["Targets"] = targets
         if apply_time:
@@ -1969,6 +1971,11 @@ class RedfishUtils(object):
             'UpdateParameters': {'content': json.dumps(payload), 'mime_type': 'application/json'},
             'UpdateFile': {'filename': image_file, 'content': image_payload, 'mime_type': 'application/octet-stream'}
         }
+        if custom_oem_params:
+            multipart_payload[custom_oem_header] = {'content': custom_oem_params}
+            if custom_oem_mime_type:
+                multipart_payload[custom_oem_header]['mime_type'] = custom_oem_mime_type
+
         response = self.post_request(self.root_uri + update_uri, multipart_payload, multipart=True)
         if response['ret'] is False:
             return response
@@ -3609,7 +3616,7 @@ class RedfishUtils(object):
 
     def verify_bios_attributes(self, bios_attributes):
         # This method verifies BIOS attributes against the provided input
-        server_bios = self.get_multi_bios_attributes()
+        server_bios = self.get_bios_attributes(self.systems_uri)
         if server_bios["ret"] is False:
             return server_bios
 
@@ -3618,8 +3625,8 @@ class RedfishUtils(object):
 
         # Verify bios_attributes with BIOS settings available in the server
         for key, value in bios_attributes.items():
-            if key in server_bios["entries"][0][1]:
-                if server_bios["entries"][0][1][key] != value:
+            if key in server_bios["entries"]:
+                if server_bios["entries"][key] != value:
                     bios_dict.update({key: value})
             else:
                 wrong_param.update({key: value})

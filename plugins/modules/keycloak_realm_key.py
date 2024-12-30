@@ -9,142 +9,123 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: keycloak_realm_key
 
-short_description: Allows administration of Keycloak realm keys via Keycloak API
+short_description: Allows administration of Keycloak realm keys using Keycloak API
 
 version_added: 7.5.0
 
 description:
-    - This module allows the administration of Keycloak realm keys via the Keycloak REST API. It
-      requires access to the REST API via OpenID Connect; the user connecting and the realm being
-      used must have the requisite access rights. In a default Keycloak installation, admin-cli
-      and an admin user would work, as would a separate realm definition with the scope tailored
-      to your needs and a user having the expected roles.
-
-    - The names of module options are snake_cased versions of the camelCase ones found in the
-      Keycloak API and its documentation at U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html).
-      Aliases are provided so camelCased versions can be used as well.
-
-    - This module is unable to detect changes to the actual cryptographic key after importing it.
-      However, if some other property is changed alongside the cryptographic key, then the key
-      will also get changed as a side-effect, as the JSON payload needs to include the private key.
-      This can be considered either a bug or a feature, as the alternative would be to always
-      update the realm key whether it has changed or not.
-
-    - If certificate is not explicitly provided it will be dynamically created by Keycloak.
-      Therefore comparing the current state of the certificate to the desired state (which may be
-      empty) is not possible.
-
+  - This module allows the administration of Keycloak realm keys using the Keycloak REST API. It requires access to the REST API using OpenID Connect;
+    the user connecting and the realm being used must have the requisite access rights. In a default Keycloak installation, admin-cli and an admin
+    user would work, as would a separate realm definition with the scope tailored to your needs and a user having the expected roles.
+  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation at
+    U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html).
+    Aliases are provided so camelCased versions can be used as well.
+  - This module is unable to detect changes to the actual cryptographic key after importing it. However, if some other property is changed alongside
+    the cryptographic key, then the key will also get changed as a side-effect, as the JSON payload needs to include the private key. This can
+    be considered either a bug or a feature, as the alternative would be to always update the realm key whether it has changed or not.
+  - If certificate is not explicitly provided it will be dynamically created by Keycloak. Therefore comparing the current state of the certificate
+    to the desired state (which may be empty) is not possible.
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: partial
+  check_mode:
+    support: full
+  diff_mode:
+    support: partial
+  action_group:
+    version_added: 10.2.0
 
 options:
-    state:
+  state:
+    description:
+      - State of the keycloak realm key.
+      - On V(present), the realm key will be created (or updated if it exists already).
+      - On V(absent), the realm key will be removed if it exists.
+    choices: ['present', 'absent']
+    default: 'present'
+    type: str
+  name:
+    description:
+      - Name of the realm key to create.
+    type: str
+    required: true
+  force:
+    description:
+      - Enforce the state of the private key and certificate. This is not automatically the case as this module is unable to determine the current
+        state of the private key and thus cannot trigger an update based on an actual divergence. That said, a private key update may happen even
+        if force is false as a side-effect of other changes.
+    default: false
+    type: bool
+  parent_id:
+    description:
+      - The parent_id of the realm key. In practice the name of the realm.
+    type: str
+    required: true
+  provider_id:
+    description:
+      - The name of the "provider ID" for the key.
+      - The value V(rsa-enc) has been added in community.general 8.2.0.
+    choices: ['rsa', 'rsa-enc']
+    default: 'rsa'
+    type: str
+  config:
+    description:
+      - Dict specifying the key and its properties.
+    type: dict
+    suboptions:
+      active:
         description:
-            - State of the keycloak realm key.
-            - On V(present), the realm key will be created (or updated if it exists already).
-            - On V(absent), the realm key will be removed if it exists.
-        choices: ['present', 'absent']
-        default: 'present'
-        type: str
-    name:
-        description:
-            - Name of the realm key to create.
-        type: str
-        required: true
-    force:
-        description:
-            - Enforce the state of the private key and certificate. This is not automatically the
-              case as this module is unable to determine the current state of the private key and
-              thus cannot trigger an update based on an actual divergence. That said, a private key
-              update may happen even if force is false as a side-effect of other changes.
-        default: false
+          - Whether they key is active or inactive. Not to be confused with the state of the Ansible resource managed by the O(state) parameter.
+        default: true
         type: bool
-    parent_id:
+      enabled:
         description:
-            - The parent_id of the realm key. In practice the name of the realm.
-        type: str
+          - Whether the key is enabled or disabled. Not to be confused with the state of the Ansible resource managed by the O(state) parameter.
+        default: true
+        type: bool
+      priority:
+        description:
+          - The priority of the key.
+        type: int
         required: true
-    provider_id:
+      algorithm:
         description:
-            - The name of the "provider ID" for the key.
-            - The value V(rsa-enc) has been added in community.general 8.2.0.
-        choices: ['rsa', 'rsa-enc']
-        default: 'rsa'
+          - Key algorithm.
+          - The values V(RS384), V(RS512), V(PS256), V(PS384), V(PS512), V(RSA1_5), V(RSA-OAEP), V(RSA-OAEP-256) have been added in community.general
+            8.2.0.
+        default: RS256
+        choices: ['RS256', 'RS384', 'RS512', 'PS256', 'PS384', 'PS512', 'RSA1_5', 'RSA-OAEP', 'RSA-OAEP-256']
         type: str
-    config:
+      private_key:
         description:
-            - Dict specifying the key and its properties.
-        type: dict
-        suboptions:
-            active:
-                description:
-                    - Whether they key is active or inactive. Not to be confused with the state
-                      of the Ansible resource managed by the O(state) parameter.
-                default: true
-                type: bool
-            enabled:
-                description:
-                    - Whether the key is enabled or disabled. Not to be confused with the state
-                      of the Ansible resource managed by the O(state) parameter.
-                default: true
-                type: bool
-            priority:
-                description:
-                    - The priority of the key.
-                type: int
-                required: true
-            algorithm:
-                description:
-                    - Key algorithm.
-                    - The values V(RS384), V(RS512), V(PS256), V(PS384), V(PS512), V(RSA1_5),
-                      V(RSA-OAEP), V(RSA-OAEP-256) have been added in community.general 8.2.0.
-                default: RS256
-                choices: ['RS256', 'RS384', 'RS512', 'PS256', 'PS384', 'PS512', 'RSA1_5', 'RSA-OAEP', 'RSA-OAEP-256']
-                type: str
-            private_key:
-                description:
-                    - The private key as an ASCII string. Contents of the key must match O(config.algorithm)
-                      and O(provider_id).
-                    - Please note that the module cannot detect whether the private key specified differs from the
-                      current state's private key. Use O(force=true) to force the module to update the private key
-                      if you expect it to be updated.
-                required: true
-                type: str
-            certificate:
-                description:
-                    - A certificate signed with the private key as an ASCII string. Contents of the
-                      key must match O(config.algorithm) and O(provider_id).
-                    - If you want Keycloak to automatically generate a certificate using your private key
-                      then set this to an empty string.
-                required: true
-                type: str
+          - The private key as an ASCII string. Contents of the key must match O(config.algorithm) and O(provider_id).
+          - Please note that the module cannot detect whether the private key specified differs from the current state's private key. Use O(force=true)
+            to force the module to update the private key if you expect it to be updated.
+        required: true
+        type: str
+      certificate:
+        description:
+          - A certificate signed with the private key as an ASCII string. Contents of the key must match O(config.algorithm) and O(provider_id).
+          - If you want Keycloak to automatically generate a certificate using your private key then set this to an empty string.
+        required: true
+        type: str
 notes:
-    - Current value of the private key cannot be fetched from Keycloak.
-      Therefore comparing its desired state to the current state is not
-      possible.
-    - If certificate is not explicitly provided it will be dynamically created
-      by Keycloak. Therefore comparing the current state of the certificate to
-      the desired state (which may be empty) is not possible.
-    - Due to the private key and certificate options the module is
-      B(not fully idempotent). You can use O(force=true) to force the module
-      to always update if you know that the private key might have changed.
-
+  - Current value of the private key cannot be fetched from Keycloak. Therefore comparing its desired state to the current state is not possible.
+  - If certificate is not explicitly provided it will be dynamically created by Keycloak. Therefore comparing the current state of the certificate
+    to the desired state (which may be empty) is not possible.
+  - Due to the private key and certificate options the module is B(not fully idempotent). You can use O(force=true) to force the module to always
+    update if you know that the private key might have changed.
 extends_documentation_fragment:
-    - community.general.keycloak
-    - community.general.attributes
+  - community.general.keycloak
+  - community.general.keycloak.actiongroup_keycloak
+  - community.general.attributes
 
 author:
-    - Samuli Seppänen (@mattock)
-'''
+  - Samuli Seppänen (@mattock)
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Manage Keycloak realm key (certificate autogenerated by Keycloak)
   community.general.keycloak_realm_key:
     name: custom
@@ -179,54 +160,49 @@ EXAMPLES = '''
       active: true
       priority: 120
       algorithm: RS256
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 msg:
-    description: Message as to what action was taken.
-    returned: always
-    type: str
+  description: Message as to what action was taken.
+  returned: always
+  type: str
 
 end_state:
-    description: Representation of the keycloak_realm_key after module execution.
-    returned: on success
-    type: dict
-    contains:
-        id:
-            description: ID of the realm key.
-            type: str
-            returned: when O(state=present)
-            sample: 5b7ec13f-99da-46ad-8326-ab4c73cf4ce4
-        name:
-            description: Name of the realm key.
-            type: str
-            returned: when O(state=present)
-            sample: mykey
-        parentId:
-            description: ID of the realm this key belongs to.
-            type: str
-            returned: when O(state=present)
-            sample: myrealm
-        providerId:
-            description: The ID of the key provider.
-            type: str
-            returned: when O(state=present)
-            sample: rsa
-        providerType:
-            description: The type of provider.
-            type: str
-            returned: when O(state=present)
-        config:
-            description: Realm key configuration.
-            type: dict
-            returned: when O(state=present)
-            sample: {
-              "active": ["true"],
-              "algorithm": ["RS256"],
-              "enabled": ["true"],
-              "priority": ["140"]
-            }
-'''
+  description: Representation of the keycloak_realm_key after module execution.
+  returned: on success
+  type: dict
+  contains:
+    id:
+      description: ID of the realm key.
+      type: str
+      returned: when O(state=present)
+      sample: 5b7ec13f-99da-46ad-8326-ab4c73cf4ce4
+    name:
+      description: Name of the realm key.
+      type: str
+      returned: when O(state=present)
+      sample: mykey
+    parentId:
+      description: ID of the realm this key belongs to.
+      type: str
+      returned: when O(state=present)
+      sample: myrealm
+    providerId:
+      description: The ID of the key provider.
+      type: str
+      returned: when O(state=present)
+      sample: rsa
+    providerType:
+      description: The type of provider.
+      type: str
+      returned: when O(state=present)
+    config:
+      description: Realm key configuration.
+      type: dict
+      returned: when O(state=present)
+      sample: {"active": ["true"], "algorithm": ["RS256"], "enabled": ["true"], "priority": ["140"]}
+"""
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
     keycloak_argument_spec, get_token, KeycloakError

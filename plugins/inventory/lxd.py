@@ -211,7 +211,7 @@ class InventoryModule(BaseInventoryPlugin):
             with open(path, 'r') as json_file:
                 return json.load(json_file)
         except (IOError, json.decoder.JSONDecodeError) as err:
-            raise AnsibleParserError('Could not load the test data from {0}: {1}'.format(to_native(path), to_native(err)))
+            raise AnsibleParserError(f'Could not load the test data from {to_native(path)}: {err}')
 
     def save_json_data(self, path, file_name=None):
         """save data as json
@@ -241,7 +241,7 @@ class InventoryModule(BaseInventoryPlugin):
             with open(os.path.abspath(os.path.join(cwd, *path)), 'w') as json_file:
                 json.dump(self.data, json_file)
         except IOError as err:
-            raise AnsibleParserError('Could not save data: {0}'.format(to_native(err)))
+            raise AnsibleParserError(f'Could not save data: {err}')
 
     def verify_file(self, path):
         """Check the config
@@ -281,7 +281,7 @@ class InventoryModule(BaseInventoryPlugin):
         if not isinstance(url, str):
             return False
         if not url.startswith(('unix:', 'https:')):
-            raise AnsibleError('URL is malformed: {0}'.format(to_native(url)))
+            raise AnsibleError(f'URL is malformed: {url}')
         return True
 
     def _connect_to_socket(self):
@@ -306,7 +306,7 @@ class InventoryModule(BaseInventoryPlugin):
                 return socket_connection
             except LXDClientException as err:
                 error_storage[url] = err
-        raise AnsibleError('No connection to the socket: {0}'.format(to_native(error_storage)))
+        raise AnsibleError(f'No connection to the socket: {error_storage}')
 
     def _get_networks(self):
         """Get Networknames
@@ -355,7 +355,7 @@ class InventoryModule(BaseInventoryPlugin):
         #      }
         url = '/1.0/instances'
         if self.project:
-            url = url + '?{0}'.format(urlencode(dict(project=self.project)))
+            url = f"{url}?{urlencode(dict(project=self.project))}"
 
         instances = self.socket.do('GET', url)
 
@@ -383,10 +383,10 @@ class InventoryModule(BaseInventoryPlugin):
         config = {}
         if isinstance(branch, (tuple, list)):
             config[name] = {branch[1]: self.socket.do(
-                'GET', '/1.0/{0}/{1}/{2}?{3}'.format(to_native(branch[0]), to_native(name), to_native(branch[1]), urlencode(dict(project=self.project))))}
+                'GET', f'/1.0/{to_native(branch[0])}/{to_native(name)}/{to_native(branch[1])}?{urlencode(dict(project=self.project))}')}
         else:
             config[name] = {branch: self.socket.do(
-                'GET', '/1.0/{0}/{1}?{2}'.format(to_native(branch), to_native(name), urlencode(dict(project=self.project))))}
+                'GET', f'/1.0/{to_native(branch)}/{to_native(name)}?{urlencode(dict(project=self.project))}')}
         return config
 
     def get_instance_data(self, names):
@@ -449,7 +449,7 @@ class InventoryModule(BaseInventoryPlugin):
             None
         Returns:
             dict(network_configuration): network config"""
-        instance_network_interfaces = self._get_data_entry('instances/{0}/state/metadata/network'.format(instance_name))
+        instance_network_interfaces = self._get_data_entry(f'instances/{instance_name}/state/metadata/network')
         network_configuration = None
         if instance_network_interfaces:
             network_configuration = {}
@@ -462,7 +462,7 @@ class InventoryModule(BaseInventoryPlugin):
                     address_set['family'] = address.get('family')
                     address_set['address'] = address.get('address')
                     address_set['netmask'] = address.get('netmask')
-                    address_set['combined'] = address.get('address') + '/' + address.get('netmask')
+                    address_set['combined'] = f"{address.get('address')}/{address.get('netmask')}"
                     network_configuration[interface_name].append(address_set)
         return network_configuration
 
@@ -479,7 +479,7 @@ class InventoryModule(BaseInventoryPlugin):
             None
         Returns:
             str(prefered_interface): None or interface name"""
-        instance_network_interfaces = self._get_data_entry('inventory/{0}/network_interfaces'.format(instance_name))
+        instance_network_interfaces = self._get_data_entry(f'inventory/{instance_name}/network_interfaces')
         prefered_interface = None  # init
         if instance_network_interfaces:  # instance have network interfaces
             # generator if interfaces which start with the desired pattern
@@ -516,7 +516,7 @@ class InventoryModule(BaseInventoryPlugin):
         #          "network":"lxdbr0",
         #          "type":"nic"},
         vlan_ids = {}
-        devices = self._get_data_entry('instances/{0}/instances/metadata/expanded_devices'.format(to_native(instance_name)))
+        devices = self._get_data_entry(f'instances/{to_native(instance_name)}/instances/metadata/expanded_devices')
         for device in devices:
             if 'network' in devices[device]:
                 if devices[device]['network'] in network_vlans:
@@ -579,7 +579,7 @@ class InventoryModule(BaseInventoryPlugin):
             else:
                 path[instance_name][key] = value
         except KeyError as err:
-            raise AnsibleParserError("Unable to store Information: {0}".format(to_native(err)))
+            raise AnsibleParserError(f"Unable to store Information: {err}")
 
     def extract_information_from_instance_configs(self):
         """Process configuration information
@@ -600,24 +600,24 @@ class InventoryModule(BaseInventoryPlugin):
 
         for instance_name in self.data['instances']:
             self._set_data_entry(instance_name, 'os', self._get_data_entry(
-                'instances/{0}/instances/metadata/config/image.os'.format(instance_name)))
+                f'instances/{instance_name}/instances/metadata/config/image.os'))
             self._set_data_entry(instance_name, 'release', self._get_data_entry(
-                'instances/{0}/instances/metadata/config/image.release'.format(instance_name)))
+                f'instances/{instance_name}/instances/metadata/config/image.release'))
             self._set_data_entry(instance_name, 'version', self._get_data_entry(
-                'instances/{0}/instances/metadata/config/image.version'.format(instance_name)))
+                f'instances/{instance_name}/instances/metadata/config/image.version'))
             self._set_data_entry(instance_name, 'profile', self._get_data_entry(
-                'instances/{0}/instances/metadata/profiles'.format(instance_name)))
+                f'instances/{instance_name}/instances/metadata/profiles'))
             self._set_data_entry(instance_name, 'location', self._get_data_entry(
-                'instances/{0}/instances/metadata/location'.format(instance_name)))
+                f'instances/{instance_name}/instances/metadata/location'))
             self._set_data_entry(instance_name, 'state', self._get_data_entry(
-                'instances/{0}/instances/metadata/config/volatile.last_state.power'.format(instance_name)))
+                f'instances/{instance_name}/instances/metadata/config/volatile.last_state.power'))
             self._set_data_entry(instance_name, 'type', self._get_data_entry(
-                'instances/{0}/instances/metadata/type'.format(instance_name)))
+                f'instances/{instance_name}/instances/metadata/type'))
             self._set_data_entry(instance_name, 'network_interfaces', self.extract_network_information_from_instance_config(instance_name))
             self._set_data_entry(instance_name, 'preferred_interface', self.get_prefered_instance_network_interface(instance_name))
             self._set_data_entry(instance_name, 'vlan_ids', self.get_instance_vlans(instance_name))
             self._set_data_entry(instance_name, 'project', self._get_data_entry(
-                'instances/{0}/instances/metadata/project'.format(instance_name)))
+                f'instances/{instance_name}/instances/metadata/project'))
 
     def build_inventory_network(self, instance_name):
         """Add the network interfaces of the instance to the inventory
@@ -651,18 +651,18 @@ class InventoryModule(BaseInventoryPlugin):
                 None
             Returns:
                 dict(interface_name: ip)"""
-            prefered_interface = self._get_data_entry('inventory/{0}/preferred_interface'.format(instance_name))  # name or None
+            prefered_interface = self._get_data_entry(f'inventory/{instance_name}/preferred_interface')  # name or None
             prefered_instance_network_family = self.prefered_instance_network_family
 
             ip_address = ''
             if prefered_interface:
-                interface = self._get_data_entry('inventory/{0}/network_interfaces/{1}'.format(instance_name, prefered_interface))
+                interface = self._get_data_entry(f'inventory/{instance_name}/network_interfaces/{prefered_interface}')
                 for config in interface:
                     if config['family'] == prefered_instance_network_family:
                         ip_address = config['address']
                         break
             else:
-                interfaces = self._get_data_entry('inventory/{0}/network_interfaces'.format(instance_name))
+                interfaces = self._get_data_entry(f'inventory/{instance_name}/network_interfaces')
                 for interface in interfaces.values():
                     for config in interface:
                         if config['family'] == prefered_instance_network_family:
@@ -670,7 +670,7 @@ class InventoryModule(BaseInventoryPlugin):
                             break
             return ip_address
 
-        if self._get_data_entry('inventory/{0}/network_interfaces'.format(instance_name)):  # instance have network interfaces
+        if self._get_data_entry(f'inventory/{instance_name}/network_interfaces'):  # instance have network interfaces
             self.inventory.set_variable(instance_name, 'ansible_connection', 'ssh')
             self.inventory.set_variable(instance_name, 'ansible_host', make_unsafe(interface_selection(instance_name)))
         else:
@@ -691,7 +691,7 @@ class InventoryModule(BaseInventoryPlugin):
         Returns:
             None"""
         for instance_name in self.data['inventory']:
-            instance_state = str(self._get_data_entry('inventory/{0}/state'.format(instance_name)) or "STOPPED").lower()
+            instance_state = str(self._get_data_entry(f'inventory/{instance_name}/state') or "STOPPED").lower()
 
             # Only consider instances that match the "state" filter, if self.state is not None
             if self.filter:
@@ -703,34 +703,34 @@ class InventoryModule(BaseInventoryPlugin):
             # add network information
             self.build_inventory_network(instance_name)
             # add os
-            v = self._get_data_entry('inventory/{0}/os'.format(instance_name))
+            v = self._get_data_entry(f'inventory/{instance_name}/os')
             if v:
                 self.inventory.set_variable(instance_name, 'ansible_lxd_os', make_unsafe(v.lower()))
             # add release
-            v = self._get_data_entry('inventory/{0}/release'.format(instance_name))
+            v = self._get_data_entry(f'inventory/{instance_name}/release')
             if v:
                 self.inventory.set_variable(
                     instance_name, 'ansible_lxd_release', make_unsafe(v.lower()))
             # add profile
             self.inventory.set_variable(
-                instance_name, 'ansible_lxd_profile', make_unsafe(self._get_data_entry('inventory/{0}/profile'.format(instance_name))))
+                instance_name, 'ansible_lxd_profile', make_unsafe(self._get_data_entry(f'inventory/{instance_name}/profile')))
             # add state
             self.inventory.set_variable(
                 instance_name, 'ansible_lxd_state', make_unsafe(instance_state))
             # add type
             self.inventory.set_variable(
-                instance_name, 'ansible_lxd_type', make_unsafe(self._get_data_entry('inventory/{0}/type'.format(instance_name))))
+                instance_name, 'ansible_lxd_type', make_unsafe(self._get_data_entry(f'inventory/{instance_name}/type')))
             # add location information
-            if self._get_data_entry('inventory/{0}/location'.format(instance_name)) != "none":  # wrong type by lxd 'none' != 'None'
+            if self._get_data_entry(f'inventory/{instance_name}/location') != "none":  # wrong type by lxd 'none' != 'None'
                 self.inventory.set_variable(
-                    instance_name, 'ansible_lxd_location', make_unsafe(self._get_data_entry('inventory/{0}/location'.format(instance_name))))
+                    instance_name, 'ansible_lxd_location', make_unsafe(self._get_data_entry(f'inventory/{instance_name}/location')))
             # add VLAN_ID information
-            if self._get_data_entry('inventory/{0}/vlan_ids'.format(instance_name)):
+            if self._get_data_entry(f'inventory/{instance_name}/vlan_ids'):
                 self.inventory.set_variable(
-                    instance_name, 'ansible_lxd_vlan_ids', make_unsafe(self._get_data_entry('inventory/{0}/vlan_ids'.format(instance_name))))
+                    instance_name, 'ansible_lxd_vlan_ids', make_unsafe(self._get_data_entry(f'inventory/{instance_name}/vlan_ids')))
             # add project
             self.inventory.set_variable(
-                instance_name, 'ansible_lxd_project', make_unsafe(self._get_data_entry('inventory/{0}/project'.format(instance_name))))
+                instance_name, 'ansible_lxd_project', make_unsafe(self._get_data_entry(f'inventory/{instance_name}/project')))
 
     def build_inventory_groups_location(self, group_name):
         """create group by attribute: location
@@ -792,7 +792,7 @@ class InventoryModule(BaseInventoryPlugin):
             network = ipaddress.ip_network(to_text(self.groupby[group_name].get('attribute')))
         except ValueError as err:
             raise AnsibleParserError(
-                'Error while parsing network range {0}: {1}'.format(self.groupby[group_name].get('attribute'), to_native(err)))
+                f"Error while parsing network range {self.groupby[group_name].get('attribute')}: {err}")
 
         for instance_name in self.inventory.hosts:
             if self.data['inventory'][instance_name].get('network_interfaces') is not None:
@@ -997,12 +997,12 @@ class InventoryModule(BaseInventoryPlugin):
             elif self.groupby[group_name].get('type') == 'project':
                 self.build_inventory_groups_project(group_name)
             else:
-                raise AnsibleParserError('Unknown group type: {0}'.format(to_native(group_name)))
+                raise AnsibleParserError(f'Unknown group type: {to_native(group_name)}')
 
         if self.groupby:
             for group_name in self.groupby:
                 if not group_name.isalnum():
-                    raise AnsibleParserError('Invalid character(s) in groupname: {0}'.format(to_native(group_name)))
+                    raise AnsibleParserError(f'Invalid character(s) in groupname: {to_native(group_name)}')
                 group_type(make_unsafe(group_name))
 
     def build_inventory(self):
@@ -1039,7 +1039,7 @@ class InventoryModule(BaseInventoryPlugin):
             None"""
         iter_keys = list(self.data['instances'].keys())
         for instance_name in iter_keys:
-            if self._get_data_entry('instances/{0}/instances/metadata/type'.format(instance_name)) != self.type_filter:
+            if self._get_data_entry(f'instances/{instance_name}/instances/metadata/type') != self.type_filter:
                 del self.data['instances'][instance_name]
 
     def _populate(self):
@@ -1120,6 +1120,6 @@ class InventoryModule(BaseInventoryPlugin):
             self.url = self.get_option('url')
         except Exception as err:
             raise AnsibleParserError(
-                'All correct options required: {0}'.format(to_native(err)))
+                f'All correct options required: {err}')
         # Call our internal helper to populate the dynamic inventory
         self._populate()

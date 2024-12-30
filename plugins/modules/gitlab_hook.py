@@ -11,12 +11,11 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: gitlab_hook
 short_description: Manages GitLab project hooks
 description:
-  - Adds, updates and removes project hook
+  - Adds, updates and removes project hook.
 author:
   - Marcus Watkins (@marwatk)
   - Guillaume Martinez (@Lunik)
@@ -46,11 +45,11 @@ options:
     type: str
   state:
     description:
-      - When V(present) the hook will be updated to match the input or created if it doesn't exist.
+      - When V(present) the hook will be updated to match the input or created if it does not exist.
       - When V(absent) hook will be deleted if it exists.
     default: present
     type: str
-    choices: [ "present", "absent" ]
+    choices: ["present", "absent"]
   push_events:
     description:
       - Trigger hook on push events.
@@ -58,7 +57,7 @@ options:
     default: true
   push_events_branch_filter:
     description:
-      - Branch name of wildcard to trigger hook on push events
+      - Branch name of wildcard to trigger hook on push events.
     type: str
     version_added: '0.2.0'
     default: ''
@@ -107,7 +106,7 @@ options:
       - Whether GitLab will do SSL verification when triggering the hook.
     type: bool
     default: false
-    aliases: [ enable_ssl_verification ]
+    aliases: [enable_ssl_verification]
   token:
     description:
       - Secret token to validate hook messages at the receiver.
@@ -115,9 +114,9 @@ options:
       - Will show up in the X-GitLab-Token HTTP request header.
     required: false
     type: str
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: "Adding a project hook"
   community.general.gitlab_hook:
     api_url: https://gitlab.example.com/
@@ -144,31 +143,31 @@ EXAMPLES = '''
     project: 10
     hook_url: "https://my-ci-server.example.com/gitlab-hook"
     state: absent
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 msg:
-  description: Success or failure message
+  description: Success or failure message.
   returned: always
   type: str
   sample: "Success"
 
 result:
-  description: json parsed response from the server
+  description: JSON parsed response from the server.
   returned: always
   type: dict
 
 error:
-  description: the error message returned by the GitLab API
+  description: The error message returned by the GitLab API.
   returned: failed
   type: str
   sample: "400: path is already in use"
 
 hook:
-  description: API object
+  description: API object.
   returned: always
   type: dict
-'''
+"""
 
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule

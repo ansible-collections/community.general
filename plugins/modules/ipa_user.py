@@ -7,13 +7,12 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: ipa_user
 author: Thomas Krahn (@Nosmoht)
 short_description: Manage FreeIPA users
 description:
-- Add, modify and delete user within IPA server.
+  - Add, modify and delete user within IPA server.
 attributes:
   check_mode:
     support: full
@@ -25,46 +24,46 @@ options:
     type: str
   update_password:
     description:
-    - Set password for a user.
+      - Set password for a user.
     type: str
     default: 'always'
-    choices: [ always, on_create ]
+    choices: [always, on_create]
   givenname:
     description:
-    - First name.
-    - If user does not exist and O(state=present), the usage of O(givenname) is required.
+      - First name.
+      - If user does not exist and O(state=present), the usage of O(givenname) is required.
     type: str
   krbpasswordexpiration:
     description:
-    - Date at which the user password will expire.
-    - In the format YYYYMMddHHmmss.
-    - e.g. 20180121182022 will expire on 21 January 2018 at 18:20:22.
+      - Date at which the user password will expire.
+      - In the format YYYYMMddHHmmss.
+      - For example V(20180121182022) will expire on 21 January 2018 at 18:20:22.
     type: str
   loginshell:
     description: Login shell.
     type: str
   mail:
     description:
-    - List of mail addresses assigned to the user.
-    - If an empty list is passed all assigned email addresses will be deleted.
-    - If None is passed email addresses will not be checked or changed.
+      - List of mail addresses assigned to the user.
+      - If an empty list is passed all assigned email addresses will be deleted.
+      - If None is passed email addresses will not be checked or changed.
     type: list
     elements: str
   password:
     description:
-    - Password for a user.
-    - Will not be set for an existing user unless O(update_password=always), which is the default.
+      - Password for a user.
+      - Will not be set for an existing user unless O(update_password=always), which is the default.
     type: str
   sn:
     description:
-    - Surname.
-    - If user does not exist and O(state=present), the usage of O(sn) is required.
+      - Surname.
+      - If user does not exist and O(state=present), the usage of O(sn) is required.
     type: str
   sshpubkey:
     description:
-    - List of public SSH key.
-    - If an empty list is passed all assigned public keys will be deleted.
-    - If None is passed SSH public keys will not be checked or changed.
+      - List of public SSH key.
+      - If an empty list is passed all assigned public keys will be deleted.
+      - If None is passed SSH public keys will not be checked or changed.
     type: list
     elements: str
   state:
@@ -74,37 +73,37 @@ options:
     type: str
   telephonenumber:
     description:
-    - List of telephone numbers assigned to the user.
-    - If an empty list is passed all assigned telephone numbers will be deleted.
-    - If None is passed telephone numbers will not be checked or changed.
+      - List of telephone numbers assigned to the user.
+      - If an empty list is passed all assigned telephone numbers will be deleted.
+      - If None is passed telephone numbers will not be checked or changed.
     type: list
     elements: str
   title:
     description: Title.
     type: str
   uid:
-    description: uid of the user.
+    description: Uid of the user.
     required: true
     aliases: ["name"]
     type: str
   uidnumber:
     description:
-    - Account Settings UID/Posix User ID number.
+      - Account Settings UID/Posix User ID number.
     type: str
   gidnumber:
     description:
-    - Posix Group ID.
+      - Posix Group ID.
     type: str
   homedirectory:
     description:
-    - Default home directory of the user.
+      - Default home directory of the user.
     type: str
     version_added: '0.2.0'
   userauthtype:
     description:
-    - The authentication type to use for the user.
-    - To remove all authentication types from the user, use an empty list V([]).
-    - The choice V(idp) and V(passkey) has been added in community.general 8.1.0.
+      - The authentication type to use for the user.
+      - To remove all authentication types from the user, use an empty list V([]).
+      - The choice V(idp) and V(passkey) has been added in community.general 8.1.0.
     choices: ["password", "radius", "otp", "pkinit", "hardened", "idp", "passkey"]
     type: list
     elements: str
@@ -114,11 +113,11 @@ extends_documentation_fragment:
   - community.general.attributes
 
 requirements:
-- base64
-- hashlib
-'''
+  - base64
+  - hashlib
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Ensure pinky is present and always reset password
   community.general.ipa_user:
     name: pinky
@@ -127,12 +126,12 @@ EXAMPLES = r'''
     givenname: Pinky
     sn: Acme
     mail:
-    - pinky@acme.com
+      - pinky@acme.com
     telephonenumber:
-    - '+555123456'
+      - '+555123456'
     sshpubkey:
-    - ssh-rsa ....
-    - ssh-dsa ....
+      - ssh-rsa ....
+      - ssh-dsa ....
     uidnumber: '1001'
     gidnumber: '100'
     homedirectory: /home/pinky
@@ -170,14 +169,14 @@ EXAMPLES = r'''
     ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 user:
-  description: User as returned by IPA API
+  description: User as returned by IPA API.
   returned: always
   type: dict
-'''
+"""
 
 import base64
 import hashlib
@@ -269,7 +268,7 @@ def get_user_diff(client, ipa_user, module_user):
         if 'sshpubkeyfp' in ipa_user and ipa_user['sshpubkeyfp'][0][:7].upper() == 'SHA256:':
             hash_algo = 'sha256'
         module_user['sshpubkeyfp'] = [get_ssh_key_fingerprint(pubkey, hash_algo) for pubkey in module_user['ipasshpubkey']]
-        # Remove the ipasshpubkey element as it is not returned from IPA but save it's value to be used later on
+        # Remove the ipasshpubkey element as it is not returned from IPA but save its value to be used later on
         sshpubkey = module_user['ipasshpubkey']
         del module_user['ipasshpubkey']
 

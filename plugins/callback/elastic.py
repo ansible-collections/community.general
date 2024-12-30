@@ -5,69 +5,69 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    author: Victor Martinez (@v1v)  <VictorMartinezRubio@gmail.com>
-    name: elastic
-    type: notification
-    short_description: Create distributed traces for each Ansible task in Elastic APM
-    version_added: 3.8.0
+DOCUMENTATION = r"""
+author: Victor Martinez (@v1v)  <VictorMartinezRubio@gmail.com>
+name: elastic
+type: notification
+short_description: Create distributed traces for each Ansible task in Elastic APM
+version_added: 3.8.0
+description:
+  - This callback creates distributed traces for each Ansible task in Elastic APM.
+  - You can configure the plugin with environment variables.
+  - See U(https://www.elastic.co/guide/en/apm/agent/python/current/configuration.html).
+options:
+  hide_task_arguments:
+    default: false
+    type: bool
     description:
-      - This callback creates distributed traces for each Ansible task in Elastic APM.
-      - You can configure the plugin with environment variables.
-      - See U(https://www.elastic.co/guide/en/apm/agent/python/current/configuration.html).
-    options:
-      hide_task_arguments:
-        default: false
-        type: bool
-        description:
-          - Hide the arguments for a task.
-        env:
-          - name: ANSIBLE_OPENTELEMETRY_HIDE_TASK_ARGUMENTS
-      apm_service_name:
-        default: ansible
-        type: str
-        description:
-          - The service name resource attribute.
-        env:
-          - name: ELASTIC_APM_SERVICE_NAME
-      apm_server_url:
-        type: str
-        description:
-          - Use the APM server and its environment variables.
-        env:
-          - name: ELASTIC_APM_SERVER_URL
-      apm_secret_token:
-        type: str
-        description:
-          - Use the APM server token
-        env:
-          - name: ELASTIC_APM_SECRET_TOKEN
-      apm_api_key:
-        type: str
-        description:
-          - Use the APM API key
-        env:
-          - name: ELASTIC_APM_API_KEY
-      apm_verify_server_cert:
-        default: true
-        type: bool
-        description:
-          - Verifies the SSL certificate if an HTTPS connection.
-        env:
-          - name: ELASTIC_APM_VERIFY_SERVER_CERT
-      traceparent:
-        type: str
-        description:
-          - The L(W3C Trace Context header traceparent,https://www.w3.org/TR/trace-context-1/#traceparent-header).
-        env:
-          - name: TRACEPARENT
-    requirements:
-      - elastic-apm (Python library)
-'''
+      - Hide the arguments for a task.
+    env:
+      - name: ANSIBLE_OPENTELEMETRY_HIDE_TASK_ARGUMENTS
+  apm_service_name:
+    default: ansible
+    type: str
+    description:
+      - The service name resource attribute.
+    env:
+      - name: ELASTIC_APM_SERVICE_NAME
+  apm_server_url:
+    type: str
+    description:
+      - Use the APM server and its environment variables.
+    env:
+      - name: ELASTIC_APM_SERVER_URL
+  apm_secret_token:
+    type: str
+    description:
+      - Use the APM server token.
+    env:
+      - name: ELASTIC_APM_SECRET_TOKEN
+  apm_api_key:
+    type: str
+    description:
+      - Use the APM API key.
+    env:
+      - name: ELASTIC_APM_API_KEY
+  apm_verify_server_cert:
+    default: true
+    type: bool
+    description:
+      - Verifies the SSL certificate if an HTTPS connection.
+    env:
+      - name: ELASTIC_APM_VERIFY_SERVER_CERT
+  traceparent:
+    type: str
+    description:
+      - The L(W3C Trace Context header traceparent,https://www.w3.org/TR/trace-context-1/#traceparent-header).
+    env:
+      - name: TRACEPARENT
+requirements:
+  - elastic-apm (Python library)
+"""
 
 
-EXAMPLES = '''
-examples: |
+EXAMPLES = r"""
+examples: |-
   Enable the plugin in ansible.cfg:
     [defaults]
     callbacks_enabled = community.general.elastic
@@ -76,7 +76,7 @@ examples: |
     export ELASTIC_APM_SERVER_URL=<your APM server URL)>
     export ELASTIC_APM_SERVICE_NAME=your_service_name
     export ELASTIC_APM_API_KEY=your_APM_API_KEY
-'''
+"""
 
 import getpass
 import socket
@@ -118,7 +118,7 @@ class TaskData:
         if host.uuid in self.host_data:
             if host.status == 'included':
                 # concatenate task include output from multiple items
-                host.result = '%s\n%s' % (self.host_data[host.uuid].result, host.result)
+                host.result = f'{self.host_data[host.uuid].result}\n{host.result}'
             else:
                 return
 
@@ -166,7 +166,7 @@ class ElasticSource(object):
         args = None
 
         if not task.no_log and not hide_task_arguments:
-            args = ', '.join(('%s=%s' % a for a in task.args.items()))
+            args = ', '.join((f'{k}={v}' for k, v in task.args.items()))
 
         tasks_data[uuid] = TaskData(uuid, name, path, play_name, action, args)
 
@@ -225,7 +225,7 @@ class ElasticSource(object):
     def create_span_data(self, apm_cli, task_data, host_data):
         """ create the span with the given TaskData and HostData """
 
-        name = '[%s] %s: %s' % (host_data.name, task_data.play, task_data.name)
+        name = f'[{host_data.name}] {task_data.play}: {task_data.name}'
 
         message = "success"
         status = "success"
@@ -259,7 +259,7 @@ class ElasticSource(object):
                                   "ansible.task.host.status": host_data.status}) as span:
             span.outcome = status
             if 'failure' in status:
-                exception = AnsibleRuntimeError(message="{0}: {1} failed with error message {2}".format(task_data.action, name, enriched_error_message))
+                exception = AnsibleRuntimeError(message=f"{task_data.action}: {name} failed with error message {enriched_error_message}")
                 apm_cli.capture_exception(exc_info=(type(exception), exception, exception.__traceback__), handled=True)
 
     def init_apm_client(self, apm_server_url, apm_service_name, apm_verify_server_cert, apm_secret_token, apm_api_key):
@@ -288,7 +288,7 @@ class ElasticSource(object):
         message = result.get('msg', 'failed')
         exception = result.get('exception')
         stderr = result.get('stderr')
-        return ('message: "{0}"\nexception: "{1}"\nstderr: "{2}"').format(message, exception, stderr)
+        return f"message: \"{message}\"\nexception: \"{exception}\"\nstderr: \"{stderr}\""
 
 
 class CallbackModule(CallbackBase):

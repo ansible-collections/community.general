@@ -8,12 +8,11 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: scaleway_ip_info
-short_description: Gather information about the Scaleway ips available
+short_description: Gather information about the Scaleway IPs available
 description:
-  - Gather information about the Scaleway ips available.
+  - Gather information about the Scaleway IPs available.
 author:
   - "Yanis Guenane (@Spredzy)"
   - "Remy Leone (@remyleone)"
@@ -37,24 +36,23 @@ options:
       - EMEA-FR-PAR2
       - waw1
       - EMEA-PL-WAW1
-'''
+"""
 
-EXAMPLES = r'''
-- name: Gather Scaleway ips information
+EXAMPLES = r"""
+- name: Gather Scaleway IPs information
   community.general.scaleway_ip_info:
     region: par1
   register: result
 
 - ansible.builtin.debug:
     msg: "{{ result.scaleway_ip_info }}"
-'''
+"""
 
-RETURN = r'''
----
+RETURN = r"""
 scaleway_ip_info:
   description:
     - Response from Scaleway API.
-    - "For more details please refer to: U(https://developers.scaleway.com/en/products/instance/api/)."
+    - 'For more details please refer to: U(https://developers.scaleway.com/en/products/instance/api/)'
   returned: success
   type: list
   elements: dict
@@ -71,7 +69,7 @@ scaleway_ip_info:
             }
         }
     ]
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.scaleway import (

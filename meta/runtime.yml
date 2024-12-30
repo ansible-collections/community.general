@@ -16,6 +16,7 @@ action_groups:
     - consul_token
   proxmox:
     - proxmox
+    - proxmox_backup
     - proxmox_disk
     - proxmox_domain_info
     - proxmox_group_info
@@ -31,6 +32,34 @@ action_groups:
     - proxmox_template
     - proxmox_user_info
     - proxmox_vm_info
+  keycloak:
+    - keycloak_authentication
+    - keycloak_authentication_required_actions
+    - keycloak_authz_authorization_scope
+    - keycloak_authz_custom_policy
+    - keycloak_authz_permission
+    - keycloak_authz_permission_info
+    - keycloak_client
+    - keycloak_client_rolemapping
+    - keycloak_client_rolescope
+    - keycloak_clientscope
+    - keycloak_clientscope_type
+    - keycloak_clientsecret_info
+    - keycloak_clientsecret_regenerate
+    - keycloak_clienttemplate
+    - keycloak_component
+    - keycloak_component_info
+    - keycloak_group
+    - keycloak_identity_provider
+    - keycloak_realm
+    - keycloak_realm_key
+    - keycloak_realm_keys_metadata_info
+    - keycloak_realm_rolemapping
+    - keycloak_role
+    - keycloak_user
+    - keycloak_user_federation
+    - keycloak_user_rolemapping
+    - keycloak_userprofile
 plugin_routing:
   callback:
     actionable:
@@ -54,6 +83,10 @@ plugin_routing:
         removal_version: 2.0.0
         warning_text: Use the 'default' callback plugin with 'display_failed_stderr
           = yes' option.
+    yaml:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: The plugin has been superseded by the the option `result_format=yaml` in callback plugin ansible.builtin.default from ansible-core 2.13 onwards.
   connection:
     docker:
       redirect: community.docker.docker
@@ -75,6 +108,10 @@ plugin_routing:
       tombstone:
         removal_version: 10.0.0
         warning_text: Use community.general.consul_token and/or community.general.consul_policy instead.
+    facter:
+      deprecation:
+        removal_version: 12.0.0
+        warning_text: Use community.general.facter_facts instead.
     hipchat:
       deprecation:
         removal_version: 11.0.0
@@ -193,6 +230,26 @@ plugin_routing:
         removal_version: 10.0.0
         warning_text: RHN is EOL, please contact the community.general maintainers
           if still using this; see the module documentation for more details.
+    sensu_check:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Sensu Core and Sensu Enterprise products have been End of Life since 2019/20.
+    sensu_client:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Sensu Core and Sensu Enterprise products have been End of Life since 2019/20.
+    sensu_handler:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Sensu Core and Sensu Enterprise products have been End of Life since 2019/20.
+    sensu_silence:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Sensu Core and Sensu Enterprise products have been End of Life since 2019/20.
+    sensu_subscription:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Sensu Core and Sensu Enterprise products have been End of Life since 2019/20.
     stackdriver:
       tombstone:
         removal_version: 9.0.0
@@ -779,11 +836,6 @@ plugin_routing:
         removal_version: 3.0.0
         warning_text: Use community.general.xenserver_guest_info instead.
   doc_fragments:
-    rackspace:
-      tombstone:
-        removal_version: 9.0.0
-        warning_text: This doc fragment was used by rax modules, that relied on the deprecated
-          package pyrax.
     _gcp:
       redirect: community.google._gcp
     docker:
@@ -798,11 +850,16 @@ plugin_routing:
       redirect: infoblox.nios_modules.nios
     postgresql:
       redirect: community.postgresql.postgresql
-  module_utils:
-    rax:
+    purestorage:
+      deprecation:
+        removal_version: 12.0.0
+        warning_text: The modules for purestorage were removed in community.general 3.0.0, this document fragment was left behind.
+    rackspace:
       tombstone:
         removal_version: 9.0.0
-        warning_text: This module util relied on the deprecated package pyrax.
+        warning_text: This doc fragment was used by rax modules, that relied on the deprecated
+          package pyrax.
+  module_utils:
     docker.common:
       redirect: community.docker.common
     docker.swarm:
@@ -821,6 +878,14 @@ plugin_routing:
       redirect: infoblox.nios_modules.api
     postgresql:
       redirect: community.postgresql.postgresql
+    pure:
+      deprecation:
+        removal_version: 12.0.0
+        warning_text: The modules for purestorage were removed in community.general 3.0.0, this module util was left behind.
+    rax:
+      tombstone:
+        removal_version: 9.0.0
+        warning_text: This module util relied on the deprecated package pyrax.
     remote_management.dellemc.dellemc_idrac:
       redirect: dellemc.openmanage.dellemc_idrac
     remote_management.dellemc.ome:

@@ -11,72 +11,68 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: opkg
 author: "Patrick Pelletier (@skinp)"
 short_description: Package manager for OpenWrt and Openembedded/Yocto based Linux distributions
 description:
-    - Manages ipk packages for OpenWrt and Openembedded/Yocto based Linux distributions
+  - Manages ipk packages for OpenWrt and Openembedded/Yocto based Linux distributions.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    name:
-        description:
-            - Name of package(s) to install/remove.
-            - C(NAME=VERSION) syntax is also supported to install a package
-              in a certain version. See the examples. This only works on Yocto based
-              Linux distributions (opkg>=0.3.2) and not for OpenWrt. This is
-              supported since community.general 6.2.0.
-        aliases: [pkg]
-        required: true
-        type: list
-        elements: str
-    state:
-        description:
-            - State of the package.
-        choices: [ 'present', 'absent', 'installed', 'removed' ]
-        default: present
-        type: str
-    force:
-        description:
-            - The C(opkg --force) parameter used.
-            - Passing V("") as value and not passing any value at all have both
-              the same effect of B(not) using any C(--force-) parameter.
-        choices:
-            - ""
-            - "depends"
-            - "maintainer"
-            - "reinstall"
-            - "overwrite"
-            - "downgrade"
-            - "space"
-            - "postinstall"
-            - "remove"
-            - "checksum"
-            - "removal-of-dependent-packages"
-        type: str
-    update_cache:
-        description:
-            - Update the package DB first.
-        default: false
-        type: bool
-    executable:
-        description:
-            - The executable location for C(opkg).
-        type: path
-        version_added: 7.2.0
+  name:
+    description:
+      - Name of package(s) to install/remove.
+      - C(NAME=VERSION) syntax is also supported to install a package in a certain version. See the examples. This only works on Yocto based Linux
+        distributions (opkg>=0.3.2) and not for OpenWrt. This is supported since community.general 6.2.0.
+    aliases: [pkg]
+    required: true
+    type: list
+    elements: str
+  state:
+    description:
+      - State of the package.
+    choices: ['present', 'absent', 'installed', 'removed']
+    default: present
+    type: str
+  force:
+    description:
+      - The C(opkg --force) parameter used.
+      - State V("") is deprecated and will be removed in community.general 12.0.0. Please omit the parameter O(force) to obtain the same behavior.
+    choices:
+      - ""
+      - "depends"
+      - "maintainer"
+      - "reinstall"
+      - "overwrite"
+      - "downgrade"
+      - "space"
+      - "postinstall"
+      - "remove"
+      - "checksum"
+      - "removal-of-dependent-packages"
+    type: str
+  update_cache:
+    description:
+      - Update the package DB first.
+    default: false
+    type: bool
+  executable:
+    description:
+      - The executable location for C(opkg).
+    type: path
+    version_added: 7.2.0
 requirements:
-    - opkg
-    - python
-'''
+  - opkg
+  - python
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Install foo
   community.general.opkg:
     name: foo
@@ -110,9 +106,9 @@ EXAMPLES = '''
     name: foo
     state: present
     force: overwrite
-'''
+"""
 
-RETURN = """
+RETURN = r"""
 version:
   description: Version of opkg.
   type: str
@@ -152,7 +148,11 @@ class Opkg(StateModuleHelper):
         )
 
         def _force(value):
+            # 12.0.0 function _force() to be removed entirely
             if value == "":
+                self.deprecate('Value "" is deprecated. Simply omit the parameter "force" to prevent any --force-X argument when running opkg',
+                               version="12.0.0",
+                               collection_name="community.general")
                 value = None
             return cmd_runner_fmt.as_optval("--force-")(value, ctx_ignore_none=True)
 
@@ -164,7 +164,7 @@ class Opkg(StateModuleHelper):
             arg_formats=dict(
                 package=cmd_runner_fmt.as_list(),
                 state=cmd_runner_fmt.as_map(state_map),
-                force=cmd_runner_fmt.as_func(_force),
+                force=cmd_runner_fmt.as_func(_force),  # 12.0.0 replace with cmd_runner_fmt.as_optval("--force-")
                 update_cache=cmd_runner_fmt.as_bool("update"),
                 version=cmd_runner_fmt.as_fixed("--version"),
             ),

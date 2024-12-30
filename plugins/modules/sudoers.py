@@ -10,8 +10,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: sudoers
 short_description: Manage sudoers files
 version_added: "4.3.0"
@@ -53,7 +52,7 @@ options:
     version_added: 8.4.0
   nopassword:
     description:
-      - Whether a password will be required to run the sudo'd command.
+      - Whether a password is required when command is run with sudo.
     default: true
     type: bool
   setenv:
@@ -98,11 +97,11 @@ options:
       - If V(required), visudo must be available to validate the sudoers rule.
     type: str
     default: detect
-    choices: [ absent, detect, required ]
+    choices: [absent, detect, required]
     version_added: 5.2.0
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Allow the backup user to sudo /usr/local/bin/backup
   community.general.sudoers:
     name: allow-backup
@@ -158,7 +157,7 @@ EXAMPLES = '''
     user: alice
     commands: /usr/bin/less
     noexec: true
-'''
+"""
 
 import os
 from ansible.module_utils.basic import AnsibleModule

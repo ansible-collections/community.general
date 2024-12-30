@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: puppet
 short_description: Runs puppet
 description:
@@ -66,11 +65,11 @@ options:
     version_added: 5.1.0
   logdest:
     description:
-    - Where the puppet logs should go, if puppet apply is being used.
-    - V(all) will go to both C(console) and C(syslog).
-    - V(stdout) will be deprecated and replaced by C(console).
+      - Where the puppet logs should go, if puppet apply is being used.
+      - V(all) will go to both C(console) and C(syslog).
+      - V(stdout) will be deprecated and replaced by C(console).
     type: str
-    choices: [ all, stdout, syslog ]
+    choices: [all, stdout, syslog]
     default: stdout
   certname:
     description:
@@ -94,7 +93,7 @@ options:
     type: str
   use_srv_records:
     description:
-      - Toggles use_srv_records flag
+      - Toggles use_srv_records flag.
     type: bool
   summarize:
     description:
@@ -103,8 +102,8 @@ options:
     default: false
   waitforlock:
     description:
-     - The maximum amount of time C(puppet) should wait for an already running C(puppet) agent to finish before starting.
-     - If a number without unit is provided, it is assumed to be a number of seconds. Allowed units are V(m) for minutes and V(h) for hours.
+      - The maximum amount of time C(puppet) should wait for an already running C(puppet) agent to finish before starting.
+      - If a number without unit is provided, it is assumed to be a number of seconds. Allowed units are V(m) for minutes and V(h) for hours.
     type: str
     version_added: 9.0.0
   verbose:
@@ -119,27 +118,27 @@ options:
     default: false
   show_diff:
     description:
-      - Whether to print file changes details
+      - Whether to print file changes details.
     type: bool
     default: false
   environment_lang:
     description:
       - The lang environment to use when running the puppet agent.
-      - The default value, V(C), is supported on every system, but can lead to encoding errors if UTF-8 is used in the output
-      - Use V(C.UTF-8) or V(en_US.UTF-8) or similar UTF-8 supporting locales in case of problems. You need to make sure
-        the selected locale is supported on the system the puppet agent runs on.
-      - Starting with community.general 9.1.0, you can use the value V(auto) and the module will
-        try and determine the best parseable locale to use.
+      - The default value, V(C), is supported on every system, but can lead to encoding errors if UTF-8 is used in the output.
+      - Use V(C.UTF-8) or V(en_US.UTF-8) or similar UTF-8 supporting locales in case of problems. You need to make sure the selected locale is
+        supported on the system the puppet agent runs on.
+      - Starting with community.general 9.1.0, you can use the value V(auto) and the module will try and determine the best parseable locale to
+        use.
     type: str
     default: C
     version_added: 8.6.0
 requirements:
-- puppet
+  - puppet
 author:
-- Monty Taylor (@emonty)
-'''
+  - Monty Taylor (@emonty)
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Run puppet agent and fail if anything goes wrong
   community.general.puppet:
 
@@ -162,10 +161,10 @@ EXAMPLES = r'''
 - name: Run puppet using a specific tags
   community.general.puppet:
     tags:
-    - update
-    - nginx
+      - update
+      - nginx
     skip_tags:
-    - service
+      - service
 
 - name: Wait 30 seconds for any current puppet runs to finish
   community.general.puppet:
@@ -184,7 +183,7 @@ EXAMPLES = r'''
     modulepath: /etc/puppet/modules:/opt/stack/puppet-modules:/usr/share/openstack-puppet/modules
     logdest: all
     manifest: /var/lib/example/puppet_step_config.pp
-'''
+"""
 
 import json
 import os
@@ -276,7 +275,7 @@ def main():
         # success
         module.exit_json(rc=rc, changed=False, stdout=stdout, stderr=stderr)
     elif rc == 1:
-        # rc==1 could be because it's disabled
+        # rc==1 could be because it is disabled
         # rc==1 could also mean there was a compilation failure
         disabled = "administratively disabled" in stdout
         if disabled:

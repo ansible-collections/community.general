@@ -1,0 +1,2 @@
+minor_changes:
+  - nmcli - add ``sriov`` parameter that enables support for SR-IOV settings (https://github.com/ansible-collections/community.general/pull/9168).

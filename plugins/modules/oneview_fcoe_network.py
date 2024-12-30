@@ -7,44 +7,42 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: oneview_fcoe_network
 short_description: Manage OneView FCoE Network resources
 description:
-    - Provides an interface to manage FCoE Network resources. Can create, update, or delete.
+  - Provides an interface to manage FCoE Network resources. Can create, update, or delete.
 requirements:
-    - "Python >= 2.7.9"
-    - "hpOneView >= 4.0.0"
+  - "Python >= 2.7.9"
+  - "hpOneView >= 4.0.0"
 author: "Felipe Bulsoni (@fgbulsoni)"
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    state:
-        description:
-            - Indicates the desired state for the FCoE Network resource.
-              V(present) will ensure data properties are compliant with OneView.
-              V(absent) will remove the resource from OneView, if it exists.
-        type: str
-        default: present
-        choices: ['present', 'absent']
-    data:
-        description:
-            - List with FCoE Network properties.
-        type: dict
-        required: true
+  state:
+    description:
+      - Indicates the desired state for the FCoE Network resource.
+      - V(present) will ensure data properties are compliant with OneView.
+      - V(absent) will remove the resource from OneView, if it exists.
+    type: str
+    default: present
+    choices: ['present', 'absent']
+  data:
+    description:
+      - List with FCoE Network properties.
+    type: dict
+    required: true
 
 extends_documentation_fragment:
-    - community.general.oneview
-    - community.general.oneview.validateetag
-    - community.general.attributes
+  - community.general.oneview
+  - community.general.oneview.validateetag
+  - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Ensure that FCoE Network is present using the default configuration
   community.general.oneview_fcoe_network:
     config: '/etc/oneview/oneview_config.json'
@@ -72,14 +70,14 @@ EXAMPLES = '''
     data:
       name: New FCoE Network
   delegate_to: localhost
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 fcoe_network:
-    description: Has the facts about the OneView FCoE Networks.
-    returned: On state 'present'. Can be null.
-    type: dict
-'''
+  description: Has the facts about the OneView FCoE Networks.
+  returned: On O(state=present). Can be null.
+  type: dict
+"""
 
 from ansible_collections.community.general.plugins.module_utils.oneview import OneViewModuleBase
 

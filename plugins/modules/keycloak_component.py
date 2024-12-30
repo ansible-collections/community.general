@@ -8,77 +8,75 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: keycloak_component
 
-short_description: Allows administration of Keycloak components via Keycloak API
+short_description: Allows administration of Keycloak components using Keycloak API
 
 version_added: 10.0.0
 
 description:
-    - This module allows the administration of Keycloak components via the Keycloak REST API. It
-      requires access to the REST API via OpenID Connect; the user connecting and the realm being
-      used must have the requisite access rights. In a default Keycloak installation, C(admin-cli)
-      and an C(admin) user would work, as would a separate realm definition with the scope tailored
-      to your needs and a user having the expected roles.
-
-    - The names of module options are snake_cased versions of the camelCase ones found in the
-      Keycloak API and its documentation at U(https://www.keycloak.org/docs-api/latest/rest-api/index.html).
-      Aliases are provided so camelCased versions can be used as well.
-
+  - This module allows the administration of Keycloak components using the Keycloak REST API. It requires access to the REST API using OpenID Connect;
+    the user connecting and the realm being used must have the requisite access rights. In a default Keycloak installation, C(admin-cli) and an
+    C(admin) user would work, as would a separate realm definition with the scope tailored to your needs and a user having the expected roles.
+  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation at
+    U(https://www.keycloak.org/docs-api/latest/rest-api/index.html).
+    Aliases are provided so camelCased versions can be used as well.
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: full
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
+  action_group:
+    version_added: 10.2.0
 
 options:
-    state:
-        description:
-            - State of the Keycloak component.
-            - On V(present), the component will be created (or updated if it exists already).
-            - On V(absent), the component will be removed if it exists.
-        choices: ['present', 'absent']
-        default: 'present'
-        type: str
-    name:
-        description:
-            - Name of the component to create.
-        type: str
-        required: true
-    parent_id:
-        description:
-            - The parent_id of the component. In practice the ID (name) of the realm.
-        type: str
-        required: true
-    provider_id:
-        description:
-            - The name of the "provider ID" for the key.
-        type: str
-        required: true
-    provider_type:
-        description:
-            - The name of the "provider type" for the key. That is, V(org.keycloak.storage.UserStorageProvider),
-              V(org.keycloak.userprofile.UserProfileProvider), ...
-            - See U(https://www.keycloak.org/docs/latest/server_development/index.html#_providers).
-        type: str
-        required: true
-    config:
-        description:
-            - Configuration properties for the provider.
-            - Contents vary depending on the provider type.
-        type: dict
+  state:
+    description:
+      - State of the Keycloak component.
+      - On V(present), the component will be created (or updated if it exists already).
+      - On V(absent), the component will be removed if it exists.
+    choices: ['present', 'absent']
+    default: 'present'
+    type: str
+  name:
+    description:
+      - Name of the component to create.
+    type: str
+    required: true
+  parent_id:
+    description:
+      - The parent_id of the component. In practice the ID (name) of the realm.
+    type: str
+    required: true
+  provider_id:
+    description:
+      - The name of the "provider ID" for the key.
+    type: str
+    required: true
+  provider_type:
+    description:
+      - The name of the "provider type" for the key. That is, V(org.keycloak.storage.UserStorageProvider), V(org.keycloak.userprofile.UserProfileProvider),
+        ...
+      - See U(https://www.keycloak.org/docs/latest/server_development/index.html#_providers).
+    type: str
+    required: true
+  config:
+    description:
+      - Configuration properties for the provider.
+      - Contents vary depending on the provider type.
+    type: dict
 
 extends_documentation_fragment:
-    - community.general.keycloak
-    - community.general.attributes
+  - community.general.keycloak
+  - community.general.keycloak.actiongroup_keycloak
+  - community.general.attributes
 
 author:
-    - Björn Bösel (@fivetide)
-'''
+  - Björn Bösel (@fivetide)
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Manage Keycloak User Storage Provider
   community.general.keycloak_component:
     auth_keycloak_url: http://localhost:8080/auth
@@ -94,42 +92,42 @@ EXAMPLES = '''
       myCustomKey: "my_custom_key"
       cachePolicy: "NO_CACHE"
       enabled: true
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 end_state:
-    description: Representation of the keycloak_component after module execution.
-    returned: on success
-    type: dict
-    contains:
-        id:
-            description: ID of the component.
-            type: str
-            returned: when O(state=present)
-            sample: 5b7ec13f-99da-46ad-8326-ab4c73cf4ce4
-        name:
-            description: Name of the component.
-            type: str
-            returned: when O(state=present)
-            sample: mykey
-        parentId:
-            description: ID of the realm this key belongs to.
-            type: str
-            returned: when O(state=present)
-            sample: myrealm
-        providerId:
-            description: The ID of the key provider.
-            type: str
-            returned: when O(state=present)
-            sample: rsa
-        providerType:
-            description: The type of provider.
-            type: str
-            returned: when O(state=present)
-        config:
-            description: component configuration.
-            type: dict
-'''
+  description: Representation of the keycloak_component after module execution.
+  returned: on success
+  type: dict
+  contains:
+    id:
+      description: ID of the component.
+      type: str
+      returned: when O(state=present)
+      sample: 5b7ec13f-99da-46ad-8326-ab4c73cf4ce4
+    name:
+      description: Name of the component.
+      type: str
+      returned: when O(state=present)
+      sample: mykey
+    parentId:
+      description: ID of the realm this key belongs to.
+      type: str
+      returned: when O(state=present)
+      sample: myrealm
+    providerId:
+      description: The ID of the key provider.
+      type: str
+      returned: when O(state=present)
+      sample: rsa
+    providerType:
+      description: The type of provider.
+      type: str
+      returned: when O(state=present)
+    config:
+      description: Component configuration.
+      type: dict
+"""
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
     keycloak_argument_spec, get_token, KeycloakError
