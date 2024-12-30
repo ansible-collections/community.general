@@ -34,9 +34,6 @@ notes:
   - This only deals with integer attribute of an existing entry. To modify attributes
     of an entry, see M(community.general.ldap_attrs) or to add or remove whole entries,
     see M(community.general.ldap_entry).
-  - The default authentication settings will attempt to use a SASL EXTERNAL
-    bind over a UNIX domain socket. If you need to use a simple bind to access
-    your server, pass the credentials in O(bind_dn) and O(bind_pw).
 author:
   - Philippe Duveau (@pduveau)
 requirements:

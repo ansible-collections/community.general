@@ -19,9 +19,6 @@ description:
   - Add or remove multiple LDAP attribute values.
 notes:
   - This only deals with attributes on existing entries. To add or remove whole entries, see M(community.general.ldap_entry).
-  - The default authentication settings will attempt to use a SASL EXTERNAL bind over a UNIX domain socket. This works well with the default Ubuntu
-    install for example, which includes a C(cn=peercred,cn=external,cn=auth) ACL rule allowing root to modify the server configuration. If you need
-    to use a simple bind to access your server, pass the credentials in O(bind_dn) and O(bind_pw).
   - For O(state=present) and O(state=absent), all value comparisons are performed on the server for maximum accuracy. For O(state=exact), values
     have to be compared in Python, which obviously ignores LDAP matching rules. This should work out in most cases, but it is theoretically possible
     to see spurious changes when target and actual values are semantically identical but lexically distinct.

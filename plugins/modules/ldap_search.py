@@ -15,10 +15,6 @@ version_added: '0.2.0'
 short_description: Search for entries in a LDAP server
 description:
   - Return the results of an LDAP search.
-notes:
-  - The default authentication settings will attempt to use a SASL EXTERNAL bind over a UNIX domain socket. This works well with the default Ubuntu
-    install for example, which includes a C(cn=peercred,cn=external,cn=auth) ACL rule allowing root to modify the server configuration. If you
-    need to use a simple bind to access your server, pass the credentials in O(bind_dn) and O(bind_pw).
 author:
   - Sebastian Pfahl (@eryx12o45)
 requirements:
