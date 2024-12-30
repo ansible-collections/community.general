@@ -102,8 +102,7 @@ incremented:
     - It is set to V(true) if the attribute value has changed.
   returned: success
   type: bool
-  sample:
-    - true
+  sample: true
 
 attribute:
   description:
