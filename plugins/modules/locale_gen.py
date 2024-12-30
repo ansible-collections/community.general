@@ -131,6 +131,12 @@ class LocaleGen(StateModuleHelper):
         elif os.path.exists(VAR_LIB_LOCALES):
             self.vars.ubuntu_mode = True
             self.vars.mechanism = "ubuntu_legacy"
+            self.module.deprecate(
+                "On this machine mechanism=ubuntu_legacy is used. This mechanism is deprecated and will be removed from"
+                " in community.general 13.0.0. If you see this message on a modern Debian or Ubuntu version,"
+                " please create an issue in the community.general repository",
+                version="13.0.0", collection_name="community.general"
+            )
         else:
             self.do_raise('{0} and {1} are missing. Is the package "locales" installed?'.format(
                 VAR_LIB_LOCALES, ETC_LOCALE_GEN
