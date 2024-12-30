@@ -1,0 +1,13 @@
+minor_changes:
+  - "locale_gen - invert the logic to determine ``ubuntu_mode``, making it look first for ``/etc/locale.gen`` (set ``ubuntu_mode`` to ``False``)
+    and only then looking for ``/var/lib/locales/supported.d/`` (set ``ubuntu_mode`` to ``True``)
+    (https://github.com/ansible-collections/community.general/pull/9238,
+    https://github.com/ansible-collections/community.general/issues/9131,
+    https://github.com/ansible-collections/community.general/issues/8487)."
+  - >
+    locale_gen - new return value ``mechanism`` to better express the semantics of the ``ubuntu_mode``, with the possible values being either
+    ``glibc`` (``ubuntu_mode=False``) or ``ubuntu_legacy`` (``ubuntu_mode=True``) (https://github.com/ansible-collections/community.general/pull/9238).
+deprecated_features:
+  - >
+    locale_gen - ``ubuntu_mode=True``, or ``mechanism=ubuntu_legacy`` is deprecated and will be removed in community.general 13.0.0
+    (https://github.com/ansible-collections/community.general/pull/9238).
