@@ -38,7 +38,7 @@ options:
     choices: [killed, once, reloaded, restarted, started, stopped]
   downed:
     description:
-      - Should a C(down) file exist or not, if it exists it disables auto startup. Defaults to C(no). Downed does not imply stopped.
+      - Should a C(down) file exist or not, if it exists it disables auto startup. Defaults to V(false). Downed does not imply stopped.
     type: bool
   enabled:
     description:
