@@ -805,7 +805,7 @@ class Connection(ConnectionBase):
                     uid = key_stat.st_uid
                     gid = key_stat.st_gid
                 else:
-                    mode = 33188
+                    mode = 0o644
                     uid = os.getuid()
                     gid = os.getgid()
 
