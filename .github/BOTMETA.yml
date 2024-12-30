@@ -856,6 +856,8 @@ files:
     maintainers: drybjed jtyr noles
   $modules/ldap_entry.py:
     maintainers: jtyr
+  $modules/ldap_inc.py:
+    maintainers: pduveau
   $modules/ldap_passwd.py:
     maintainers: KellerFuchs jtyr
   $modules/ldap_search.py:
