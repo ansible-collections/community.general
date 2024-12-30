@@ -13,7 +13,7 @@ DOCUMENTATION = """
 ---
 module: proxmox_backup_info
 
-short_description: Proxmox Schedule Backup Info
+short_description: Retrieve information on Proxmox scheduled backups
 
 description:
   - Retrieve information such as backup times, VM name, VM ID, mode, backup type, and backup schedule using the Proxmox Server API.
@@ -24,17 +24,17 @@ author:
 
 options:
   vm_name:
-    description: Proxmox VM name
-    required: False
+    description: The name of the Proxmox VM.
+    required: false
     type: str
   vm_id:
-    description: Proxmox VM id
-    required: False
+    description: The ID of the Proxmox VM.
+    required: false
     type: int
   backup_section:
-    description: proxmox_backup_section
-    required: False
-    default: False
+    description: The backup_section value is true or false. if this be true, proxmox backup info module just return all backup job information.
+    required: false
+    default: false
     type: bool
 
 extends_documentation_fragment:
@@ -70,13 +70,13 @@ EXAMPLES = """
       api_user: 'myUser@pam'
       api_password: '*******'
       api_host: '192.168.20.20'
-      backup_section: True
+      backup_section: true
 """
 
 RETURN = """
 ---
 backup_info:
-  description: The return value provided by proxmox_backup_info.
+  description: The return value provides backup job information based on VM ID or VM name, or total backup job information.
   returned: always, but can be empty
   type: list
   elements: dict
