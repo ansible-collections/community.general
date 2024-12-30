@@ -12,9 +12,9 @@ DOCUMENTATION = r"""
 module: svc
 author:
   - Brian Coca (@bcoca)
-short_description: Manage daemontools services
+short_description: Manage C(daemontools) services
 description:
-  - Controls daemontools services on remote hosts using the svc utility.
+  - Controls C(daemontools) services on remote hosts using the C(svc) utility.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -30,23 +30,24 @@ options:
     required: true
   state:
     description:
-      - V(started)/V(stopped) are idempotent actions that will not run commands unless necessary. V(restarted) will always bounce the svc (svc
-        -t) and V(killed) will always bounce the svc (svc -k). V(reloaded) will send a sigusr1 (svc -1). V(once) will run a normally downed svc
-        once (svc -o), not really an idempotent operation.
+      - V(started)/V(stopped) are idempotent actions that will not run commands unless necessary.
+      - V(restarted) will always bounce the svc (svc -t) and V(killed) will always bounce the svc (svc -k).
+      - V(reloaded) will send a sigusr1 (svc -1).
+      - V(once) will run a normally downed svc once (svc -o), not really an idempotent operation.
     type: str
     choices: [killed, once, reloaded, restarted, started, stopped]
   downed:
     description:
-      - Should a 'down' file exist or not, if it exists it disables auto startup. Defaults to no. Downed does not imply stopped.
+      - Should a C(down) file exist or not, if it exists it disables auto startup. Defaults to V(false). Downed does not imply stopped.
     type: bool
   enabled:
     description:
-      - Whether the service is enabled or not, if disabled it also implies stopped. Take note that a service can be enabled and downed (no auto
+      - Whether the service is enabled or not, if disabled it also implies O(state=stopped). Take note that a service can be enabled and downed (no auto
         restart).
     type: bool
   service_dir:
     description:
-      - Directory svscan watches for services.
+      - Directory C(svscan) watches for services.
     type: str
     default: /service
   service_src:
