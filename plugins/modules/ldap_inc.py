@@ -237,6 +237,9 @@ def main():
                 attrlist=[mod.attr])
             if len(result) == 1:
                 ret = str(int(result[0][1][mod.attr][0]) + mod.increment)
+                changed = mod.increment != 0
+            else:
+                module.fail_json(msg="The entry does not exist or does not contain the specified attribute.")
 
     except Exception as e:
         module.fail_json(msg="Attribute action failed.", details=to_native(e))
