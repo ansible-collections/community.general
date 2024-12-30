@@ -104,6 +104,18 @@ plugin_routing:
     nios_next_network:
       redirect: infoblox.nios_modules.nios_next_network
   modules:
+    atomic_container:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Poject Atomic was sunset by the end of 2019.
+    atomic_host:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Poject Atomic was sunset by the end of 2019.
+    atomic_image:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Poject Atomic was sunset by the end of 2019.
     consul_acl:
       tombstone:
         removal_version: 10.0.0
