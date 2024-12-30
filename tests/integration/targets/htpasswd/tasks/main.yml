@@ -13,6 +13,7 @@
     path: "{{ htpasswd_path }}"
     name: bob
     password: c00lbob
+    mode: "0644"
   check_mode: true
   register: add_bob_check
 
@@ -21,6 +22,7 @@
     path: "{{ htpasswd_path }}"
     name: bob
     password: c00lbob
+    mode: "0644"
   register: add_bob
 
 - name: add bob (idempotency)
@@ -28,13 +30,40 @@
     path: "{{ htpasswd_path }}"
     name: bob
     password: c00lbob
+    mode: "0644"
   register: add_bob_idempot
+
+- name: update permissions (check mode)
+  community.general.htpasswd:
+    path: "{{ htpasswd_path }}"
+    name: bob
+    password: c00lbob
+    mode: "0600"
+  check_mode: true
+  register: update_perms_check
+
+- name: update permissions
+  community.general.htpasswd:
+    path: "{{ htpasswd_path }}"
+    name: bob
+    password: c00lbob
+    mode: "0600"
+  register: update_perms
+
+- name: update permissions (idempotency)
+  community.general.htpasswd:
+    path: "{{ htpasswd_path }}"
+    name: bob
+    password: c00lbob
+    mode: "0600"
+  register: update_perms_idempot
 
 - name: add bob new password
   community.general.htpasswd:
     path: "{{ htpasswd_path }}"
     name: bob
     password: SUPERsecret
+    mode: "0600"
   register: add_bob_newpw
 
 - name: add bob new password (idempotency)
@@ -42,6 +71,7 @@
     path: "{{ htpasswd_path }}"
     name: bob
     password: SUPERsecret
+    mode: "0600"
   register: add_bob_newpw_idempot
 
 - name: test add bob assertions
@@ -50,6 +80,9 @@
       - add_bob_check is changed
       - add_bob is changed
       - add_bob_idempot is not changed
+      - update_perms_check is changed
+      - update_perms is changed
+      - update_perms_idempot is not changed
       - add_bob_newpw is changed
       - add_bob_newpw_idempot is not changed
 
@@ -58,6 +91,7 @@
     path: "{{ htpasswd_path }}"
     name: bob
     state: absent
+    mode: "0600"
   check_mode: true
   register: del_bob_check
 
@@ -66,6 +100,7 @@
     path: "{{ htpasswd_path }}"
     name: bob
     state: absent
+    mode: "0600"
   register: del_bob
 
 - name: remove bob (idempotency)
@@ -73,6 +108,7 @@
     path: "{{ htpasswd_path }}"
     name: bob
     state: absent
+    mode: "0600"
   register: del_bob_idempot
 
 - name: test remove bob assertions
