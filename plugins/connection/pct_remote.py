@@ -824,6 +824,7 @@ class Connection(ConnectionBase):
 
                     os.rename(tmp_keyfile_name, self.keyfile)
                 except LockTimeout:
+                    pathlib.Path(tmp_keyfile_name).unlink(missing_ok=True)
                     raise AnsibleError(
                         f'writing lock file {tmp_keyfile_name} ran in to the timeout of {self.get_option("locktimeout")}s')
                 except Exception:
