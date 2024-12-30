@@ -106,6 +106,7 @@
 - name: Create new realm role with invalid auth token and valid refresh token
   community.general.keycloak_role:
     auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
     token: "invalidtoken!!!"
     refresh_token: "{{ refresh_token }}"
     realm: "{{ realm }}"

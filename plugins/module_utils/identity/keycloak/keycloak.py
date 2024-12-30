@@ -142,6 +142,7 @@ def keycloak_argument_spec():
         validate_certs=dict(type='bool', default=True),
         connection_timeout=dict(type='int', default=10),
         token=dict(type='str', no_log=True),
+        refresh_token=dict(type='str', no_log=True),
         http_agent=dict(type='str', default='Ansible'),
     )
 
@@ -197,6 +198,23 @@ def _get_token_using_credentials(module_params):
         'client_secret': client_secret,
         'username': auth_username,
         'password': auth_password,
+    }
+    # Remove empty items, for instance missing client_secret
+    payload = {k: v for k, v in temp_payload.items() if v is not None}
+
+    return _token_request(module_params, payload)
+
+
+def _get_token_using_refresh_token(module_params):
+    client_id = module_params.get('auth_client_id')
+    refresh_token = module_params.get('refresh_token')
+    client_secret = module_params.get('auth_client_secret')
+
+    temp_payload = {
+        'grant_type': 'refresh_token',
+        'client_id': client_id,
+        'client_secret': client_secret,
+        'refresh_token': refresh_token,
     }
     # Remove empty items, for instance missing client_secret
     payload = {k: v for k, v in temp_payload.items() if v is not None}
@@ -294,10 +312,40 @@ class KeycloakAPI(object):
         self.http_agent = self.module.params.get('http_agent')
 
     def _request(self, url, method, data=None):
-        return open_url(url, method=method, data=data,
-                        http_agent=self.http_agent, headers=self.restheaders,
-                        timeout=self.connection_timeout,
-                        validate_certs=self.validate_certs)
+        def make_request_ignoring_401():
+            try:
+                return open_url(url, method=method, data=data,
+                                http_agent=self.http_agent, headers=self.restheaders,
+                                timeout=self.connection_timeout,
+                                validate_certs=self.validate_certs)
+            except HTTPError as e:
+                if e.code != 401:
+                    raise e
+
+            return None
+
+        r = make_request_ignoring_401()
+        if r is not None:
+            return r
+
+        # Authentication may have expired, re-authenticate with refresh token and retry
+        refresh_token = self.module.params.get('refresh_token')
+        if refresh_token is not None:
+            token = _get_token_using_refresh_token(self.module.params)
+            self.restheaders['Authorization'] = 'Bearer ' + token
+
+        r = make_request_ignoring_401()
+        if r is not None:
+            return r
+
+        # Retry once more with username and password
+        auth_username = self.module.params.get('auth_username')
+        auth_password = self.module.params.get('auth_password')
+        if auth_username is not None and auth_password is not None:
+            token = _get_token_using_credentials(self.module.params)
+            self.restheaders['Authorization'] = 'Bearer ' + token
+
+        return make_request_ignoring_401()
 
     def _request_and_deserialize(self, url, method, data=None):
         return json.loads(to_native(self._request(url, method, data).read()))
