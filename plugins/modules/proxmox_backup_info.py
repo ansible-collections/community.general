@@ -32,7 +32,7 @@ options:
     required: false
     type: int
   backup_section:
-    description: The backup_section value is true or false. if this be true, proxmox backup info module just return all backup job information.
+    description: The backup_section value is true or false. if this be true, this module just return all backup job information.
     required: false
     default: false
     type: bool
