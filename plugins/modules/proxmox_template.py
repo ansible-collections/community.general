@@ -186,7 +186,7 @@ class ProxmoxTemplateAnsible(ProxmoxAnsible):
             timeout = timeout - 1
             if timeout == 0:
                 self.module.fail_json(msg='Reached timeout while waiting for uploading/downloading template. Last line in task before timeout: %s' %
-                                      self.proxmox_api.node(node).tasks(taskid).log.get()[:1])
+                                      self.proxmox_api.nodes(node).tasks(taskid).log.get()[:1])
 
             time.sleep(1)
         return False
