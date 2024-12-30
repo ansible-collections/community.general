@@ -244,7 +244,7 @@ def main():
         else:
             module.fail_json(msg="Invalid state: %s" % state)
 
-        check_file_attrs(module, changed, msg)
+        (msg, changed) = check_file_attrs(module, changed, msg)
         module.exit_json(msg=msg, changed=changed)
     except Exception as e:
         module.fail_json(msg=to_native(e))
