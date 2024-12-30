@@ -192,6 +192,10 @@ options:
       - name: ansible_paramiko_timeout
     cli:
       - name: timeout
+    lock_file_timeout:
+        description: Number of seconds until the plugin gives up on trying to write a lock file when writing SSH known host keys.
+        type: int
+        default: 60
   private_key_file:
     description:
       - Path to private key file to use for authentication.
@@ -378,7 +382,6 @@ EXAMPLES = r"""
         msg: "This is coming from pct environment"
 """
 
-import fcntl
 import os
 import pathlib
 import socket
@@ -391,6 +394,7 @@ from ansible.errors import (
     AnsibleConnectionFailure,
     AnsibleError,
 )
+from ansible_collections.community.general.plugins.module_utils._filelock import FileLock, LockTimeout
 from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
 from ansible.module_utils.compat.paramiko import PARAMIKO_IMPORT_ERR, paramiko
 from ansible.module_utils.compat.version import LooseVersion
@@ -786,46 +790,46 @@ class Connection(ConnectionBase):
             dirname = os.path.dirname(self.keyfile)
             makedirs_safe(dirname)
 
-            KEY_LOCK = open(lockfile, 'w')
-            fcntl.lockf(KEY_LOCK, fcntl.LOCK_EX)
+            with FileLock().lock_file(lockfile, dirname, self.get_option('locktimeout')):
+                try:
+                    # just in case any were added recently
 
-            try:
-                # just in case any were added recently
+                    self.ssh.load_system_host_keys()
+                    self.ssh._host_keys.update(self.ssh._system_host_keys)
 
-                self.ssh.load_system_host_keys()
-                self.ssh._host_keys.update(self.ssh._system_host_keys)
+                    # gather information about the current key file, so
+                    # we can ensure the new file has the correct mode/owner
 
-                # gather information about the current key file, so
-                # we can ensure the new file has the correct mode/owner
+                    key_dir = os.path.dirname(self.keyfile)
+                    if os.path.exists(self.keyfile):
+                        key_stat = os.stat(self.keyfile)
+                        mode = key_stat.st_mode
+                        uid = key_stat.st_uid
+                        gid = key_stat.st_gid
+                    else:
+                        mode = 0o644
+                        uid = os.getuid()
+                        gid = os.getgid()
 
-                key_dir = os.path.dirname(self.keyfile)
-                if os.path.exists(self.keyfile):
-                    key_stat = os.stat(self.keyfile)
-                    mode = key_stat.st_mode
-                    uid = key_stat.st_uid
-                    gid = key_stat.st_gid
-                else:
-                    mode = 0o644
-                    uid = os.getuid()
-                    gid = os.getgid()
+                    # Save the new keys to a temporary file and move it into place
+                    # rather than rewriting the file. We set delete=False because
+                    # the file will be moved into place rather than cleaned up.
 
-                # Save the new keys to a temporary file and move it into place
-                # rather than rewriting the file. We set delete=False because
-                # the file will be moved into place rather than cleaned up.
+                    with tempfile.NamedTemporaryFile(dir=key_dir, delete=False) as tmp_keyfile:
+                        tmp_keyfile_name = tmp_keyfile.name
+                        os.chmod(tmp_keyfile_name, mode)
+                        os.chown(tmp_keyfile_name, uid, gid)
+                        self._save_ssh_host_keys(tmp_keyfile_name)
 
-                with tempfile.NamedTemporaryFile(dir=key_dir, delete=False) as tmp_keyfile:
-                    tmp_keyfile_name = tmp_keyfile.name
-                    os.chmod(tmp_keyfile_name, mode)
-                    os.chown(tmp_keyfile_name, uid, gid)
-                    self._save_ssh_host_keys(tmp_keyfile_name)
-
-                os.rename(tmp_keyfile_name, self.keyfile)
-            except Exception:
-                # unable to save keys, including scenario when key was invalid
-                # and caught earlier
-                pathlib.Path(tmp_keyfile_name).unlink(missing_ok=True)
-                traceback.print_exc()
-            fcntl.lockf(KEY_LOCK, fcntl.LOCK_UN)
+                    os.rename(tmp_keyfile_name, self.keyfile)
+                except LockTimeout:
+                    raise AnsibleError(
+                        f'writing lock file {tmp_keyfile_name} ran in to the timeout of {self.get_option("locktimeout")}s')
+                except Exception:
+                    # unable to save keys, including scenario when key was invalid
+                    # and caught earlier
+                    pathlib.Path(tmp_keyfile_name).unlink(missing_ok=True)
+                    traceback.print_exc()
 
         self.ssh.close()
         self._connected = False
