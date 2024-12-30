@@ -1,0 +1,2 @@
+minor_changes:
+  - Slack upload file - feature added support for uploading files to Slack (https://github.com/ansible-collections/community.general/pull/9472).
