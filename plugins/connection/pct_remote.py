@@ -380,6 +380,7 @@ EXAMPLES = r"""
 
 import fcntl
 import os
+import pathlib
 import socket
 import tempfile
 import traceback
@@ -812,17 +813,17 @@ class Connection(ConnectionBase):
                 # rather than rewriting the file. We set delete=False because
                 # the file will be moved into place rather than cleaned up.
 
-                tmp_keyfile = tempfile.NamedTemporaryFile(dir=key_dir, delete=False)
-                os.chmod(tmp_keyfile.name, mode & 0o7777)
-                os.chown(tmp_keyfile.name, uid, gid)
+                with tempfile.NamedTemporaryFile(dir=key_dir, delete=False) as tmp_keyfile:
+                    tmp_keyfile_name = tmp_keyfile.name
+                    os.chmod(tmp_keyfile_name, mode)
+                    os.chown(tmp_keyfile_name, uid, gid)
+                    self._save_ssh_host_keys(tmp_keyfile_name)
 
-                self._save_ssh_host_keys(tmp_keyfile.name)
-                tmp_keyfile.close()
-
-                os.rename(tmp_keyfile.name, self.keyfile)
+                os.rename(tmp_keyfile_name, self.keyfile)
             except Exception:
                 # unable to save keys, including scenario when key was invalid
                 # and caught earlier
+                pathlib.Path(tmp_keyfile_name).unlink(missing_ok=True)
                 traceback.print_exc()
             fcntl.lockf(KEY_LOCK, fcntl.LOCK_UN)
 
