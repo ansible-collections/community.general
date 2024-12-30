@@ -17,10 +17,6 @@ short_description: Add or remove LDAP entries
 description:
   - Add or remove LDAP entries. This module only asserts the existence or non-existence of an LDAP entry, not its attributes. To assert the attribute
     values of an entry, see M(community.general.ldap_attrs).
-notes:
-  - The default authentication settings will attempt to use a SASL EXTERNAL bind over a UNIX domain socket. This works well with the default Ubuntu
-    install for example, which includes a C(cn=peercred,cn=external,cn=auth) ACL rule allowing root to modify the server configuration. If you need
-    to use a simple bind to access your server, pass the credentials in O(bind_dn) and O(bind_pw).
 author:
   - Jiri Tyr (@jtyr)
 requirements:
