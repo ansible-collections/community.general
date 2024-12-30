@@ -459,11 +459,6 @@ class MyAddPolicy(MissingHostKeyPolicy):
         # in order to control ordering.
 
 
-# keep connection objects on a per host basis to avoid repeated attempts to reconnect
-
-SSH_CONNECTION_CACHE: dict[str, paramiko.client.SSHClient] = {}
-
-
 class Connection(ConnectionBase):
     """ SSH based connections (paramiko) to Proxmox pct """
 
@@ -473,16 +468,8 @@ class Connection(ConnectionBase):
     def __init__(self, play_context, new_stdin, *args, **kwargs):
         super(Connection, self).__init__(play_context, new_stdin, *args, **kwargs)
 
-    def _cache_key(self) -> str:
-        return f'{self.get_option("remote_addr")}__{self.get_option("remote_user")}__'
-
     def _connect(self) -> Connection:
-        cache_key = self._cache_key()
-        if cache_key in SSH_CONNECTION_CACHE:
-            self.ssh = SSH_CONNECTION_CACHE[cache_key]
-        else:
-            self.ssh = SSH_CONNECTION_CACHE[cache_key] = self._connect_uncached()
-
+        self.ssh = self._connect_uncached()
         self._connected = True
         return self
 
@@ -788,9 +775,6 @@ class Connection(ConnectionBase):
 
     def close(self) -> None:
         """ terminate the connection """
-
-        cache_key = self._cache_key()
-        SSH_CONNECTION_CACHE.pop(cache_key, None)
 
         if self.get_option('host_key_checking') and self.get_option('record_host_keys') and self._any_keys_added():
             # add any new SSH host keys -- warning -- this could be slow
