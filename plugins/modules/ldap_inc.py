@@ -123,8 +123,7 @@ rfc4525:
     - Is V(true) if the method used to increment is based on RFC4525, V(false) if legacy.
   returned: success
   type: bool
-  sample:
-    - true
+  sample: true
 '''
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
