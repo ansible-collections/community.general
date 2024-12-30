@@ -24,11 +24,11 @@ author:
 
 options:
   vm_name:
-    description: Proxmox vm name
+    description: Proxmox VM name
     required: False
     type: str
   vm_id:
-    description: Proxmox vm id
+    description: Proxmox VM id
     required: False
     type: int
   backup_section:
@@ -45,20 +45,20 @@ extends_documentation_fragment:
 """
 
 EXAMPLES = """
-- name: Print all backup information by vmid and vm name
+- name: Print all backup information by VM id and VM name
   proxmox_backup_info:
       api_user: 'myUser@pam'
       api_password: '*******'
       api_host: '192.168.20.20'
 
-- name: Print proxmox backup information for a specific vm based on its name
+- name: Print proxmox backup information for a specific VM based on its name
   proxmox_backup_info:
       api_user: 'myUser@pam'
       api_password: '*******'
       api_host: '192.168.20.20'
       vm_name: 'mailsrv'
 
-- name: Print proxmox backup information for a specific vm based on its vmid
+- name: Print proxmox backup information for a specific VM based on its VM id
   proxmox_backup_info:
       api_user: 'myUser@pam'
       api_password: '*******'
@@ -88,7 +88,7 @@ backup_info:
     enabled:
       description: 1 if backup is enabled else 0.
       returned: on success
-      type: bool
+      type: int
     id:
       description: backup job id
       returned: on success
@@ -114,7 +114,7 @@ backup_info:
       returned: on success
       type: str
     vmid:
-      description: vm id
+      description: VM id
       returned: on success
       type: int
 """
@@ -135,15 +135,15 @@ class ProxmoxBackupInfoAnsible(ProxmoxAnsible):
             self.module.fail_json(msg="Getting backup sections failed: %s" % e)
         return backupSections
 
-    # Get vm information
+    # Get VM information
     def getVmsList(self):
         try:
             vms = self.proxmox_api.cluster.resources.get(type='vm')
         except Exception as e:
-            self.module.fail_json(msg="Getting vms info from cluster failed: %s" % e)
+            self.module.fail_json(msg="Getting VMs info from cluster failed: %s" % e)
         return vms
 
-    # Get all backup information by vmid and vm name
+    # Get all backup information by VM id and VM name
     def vmsBackupInfo(self):
         backupList = self.getSectionsList()
         vmInfo = self.getVmsList()
@@ -168,7 +168,7 @@ class ProxmoxBackupInfoAnsible(ProxmoxAnsible):
                 bkInfo.append(bkInfoData)
         return bkInfo
 
-    # Get proxmox backup information for a specific vm based on its vmid or vm name
+    # Get proxmox backup information for a specific VM based on its VM id or VM name
     def specificVmBackupInfo(self, vm_name_id):
         fullBackupInfo = self.vmsBackupInfo()
         vmBackupSections = []
