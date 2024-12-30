@@ -192,10 +192,14 @@ options:
       - name: ansible_paramiko_timeout
     cli:
       - name: timeout
-    lock_file_timeout:
-        description: Number of seconds until the plugin gives up on trying to write a lock file when writing SSH known host keys.
-        type: int
-        default: 60
+  lock_file_timeout:
+    type: int
+    default: 60
+    description: Number of seconds until the plugin gives up on trying to write a lock file when writing SSH known host keys.
+    vars:
+      - name: ansible_lock_file_timeout
+    env:
+      - name: ANSIBLE_LOCK_FILE_TIMEOUT
   private_key_file:
     description:
       - Path to private key file to use for authentication.
