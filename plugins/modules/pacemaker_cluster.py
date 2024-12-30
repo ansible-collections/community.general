@@ -120,35 +120,6 @@ def set_cluster(module, state, timeout, force):
         module.fail_json(msg="Failed to set the state `%s` on the cluster\n" % (state))
 
 
-def set_node(module, state, timeout, force, node='all'):
-    # map states
-    if state == 'online':
-        cmd = ["pcs", "cluster", "start"]
-    if state == 'offline':
-        cmd = ["pcs", "cluster", "stop"]
-        if force:
-            cmd = cmd + ["--force"]
-
-    nodes_state = get_node_status(module, node)
-    for node in nodes_state:
-        if node[1].strip().lower() != state:
-            cmd = cmd + [node[0].strip()]
-    rc, out, err = module.run_command(cmd)
-    if rc == 1:
-        module.fail_json(msg="Command execution failed.\nCommand: `%s`\nError: %s" % (cmd, err))
-
-    t = time.time()
-    ready = False
-    while time.time() < t + timeout:
-        nodes_state = get_node_status(module)
-        for node in nodes_state:
-            if node[1].strip().lower() == state:
-                ready = True
-                break
-    if not ready:
-        module.fail_json(msg="Failed to set the state `%s` on the cluster\n" % (state))
-
-
 def main():
     argument_spec = dict(
         state=dict(type='str', choices=['online', 'offline', 'restart', 'cleanup']),
@@ -196,7 +167,7 @@ def main():
                     cluster_state = get_node_status(module, node)
                     module.exit_json(changed=True, out=cluster_state)
 
-    if state in ['restart']:
+    elif state == 'restart':
         if module.check_mode:
             module.exit_json(changed=True)
         set_cluster(module, 'offline', timeout, force)
@@ -211,13 +182,12 @@ def main():
         else:
             module.fail_json(msg="Failed during the restart of the cluster, the cluster cannot be stopped")
 
-    if state in ['cleanup']:
+    elif state == 'cleanup':
         if module.check_mode:
             module.exit_json(changed=True)
         clean_cluster(module, timeout)
         cluster_state = get_cluster_status(module)
-        module.exit_json(changed=True,
-                         out=cluster_state)
+        module.exit_json(changed=True, out=cluster_state)
 
 
 if __name__ == '__main__':
