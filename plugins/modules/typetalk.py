@@ -16,7 +16,7 @@ description:
   - Send a message to typetalk using typetalk API.
 deprecated:
   removed_in: 13.0.0
-  why: The typetalk service will be discontinued on Dec 2025.
+  why: The typetalk service will be discontinued on Dec 2025. See U(https://nulab.com/blog/company-news/typetalk-sunsetting/).
   alternative: There is none.
 extends_documentation_fragment:
   - community.general.attributes
