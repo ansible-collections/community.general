@@ -1674,3 +1674,14 @@ releases:
       - 8.6.8.yml
       - 9186-fix-broken-check-mode-in-github-key.yml
     release_date: '2024-12-02'
+  8.6.9:
+    changes:
+      release_summary: Maintenance release with a security fix.
+      security_fixes:
+        - keycloak_authentication - API calls did not properly set the ``priority``
+          during update resulting in incorrectly sorted authentication flows. This
+          apparently only affects Keycloak 25 or newer (https://github.com/ansible-collections/community.general/pull/9263).
+    fragments:
+      - 8.6.9.yml
+      - 9263-kc_authentication-api-priority.yaml
+    release_date: '2024-12-31'
