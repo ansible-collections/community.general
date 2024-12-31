@@ -12,7 +12,6 @@ from ansible_collections.community.general.plugins.callback.loganalytics import 
 
 from datetime import datetime
 import json
-import sys
 
 
 class TestAzureLogAnalytics(unittest.TestCase):
@@ -27,10 +26,6 @@ class TestAzureLogAnalytics(unittest.TestCase):
         self.task_fields = {'args': {}}
         self.mock_host = Mock('MockHost')
         self.mock_host.name = 'myhost'
-
-        # Add backward compatibility
-        if sys.version_info < (3, 2):
-            self.assertRegex = self.assertRegexpMatches
 
     @patch('ansible_collections.community.general.plugins.callback.loganalytics.now')
     @patch('ansible_collections.community.general.plugins.callback.loganalytics.open_url')
