@@ -10,7 +10,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 author: Nils Stein (@mietzen) <github.nstein@mailbox.org>
-name: pct_remote
+name: proxmox_pct_remote
 short_description: Run tasks in Proxmox LXC container instances using pct CLI via SSH
 requirements:
   - paramiko
@@ -341,12 +341,12 @@ EXAMPLES = r"""
 #         container-1:
 #           ansible_host: 10.0.0.10
 #           proxmox_vmid: 100
-#           ansible_connection: community.general.pct_remote
+#           ansible_connection: community.general.proxmox_pct_remote
 #           ansible_user: ansible
 #         container-2:
 #           ansible_host: 10.0.0.10
 #           proxmox_vmid: 200
-#           ansible_connection: community.general.pct_remote
+#           ansible_connection: community.general.proxmox_pct_remote
 #           ansible_user: ansible
 #     proxmox:
 #       hosts:
@@ -373,7 +373,7 @@ EXAMPLES = r"""
 # want_proxmox_nodes_ansible_host: false
 # compose:
 #   ansible_host: "'10.0.0.10'"
-#   ansible_connection: "'community.general.pct_remote'"
+#   ansible_connection: "'community.general.proxmox_pct_remote'"
 #   ansible_user: "'ansible'"
 #
 #
@@ -472,7 +472,7 @@ class MyAddPolicy(MissingHostKeyPolicy):
 class Connection(ConnectionBase):
     """ SSH based connections (paramiko) to Proxmox pct """
 
-    transport = 'community.general.pct_remote'
+    transport = 'community.general.proxmox_pct_remote'
     _log_channel: str | None = None
 
     def __init__(self, play_context, new_stdin, *args, **kwargs):
