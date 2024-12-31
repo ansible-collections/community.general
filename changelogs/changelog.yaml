@@ -1509,3 +1509,35 @@ releases:
       - 9198-fail-if-slack-api-response-is-not-ok-with-error-message.yml
       - 9202-keycloak_clientscope_type-sort-lists.yml
     release_date: '2024-12-02'
+  9.5.3:
+    changes:
+      bugfixes:
+        - dig lookup plugin - correctly handle ``NoNameserver`` exception (https://github.com/ansible-collections/community.general/pull/9363,
+          https://github.com/ansible-collections/community.general/issues/9362).
+        - htpasswd - report changes when file permissions are adjusted (https://github.com/ansible-collections/community.general/issues/9485,
+          https://github.com/ansible-collections/community.general/pull/9490).
+        - proxmox_disk - fix async method and make ``resize_disk`` method handle errors
+          correctly (https://github.com/ansible-collections/community.general/pull/9256).
+        - proxmox_template - fix the wrong path called on ``proxmox_template.task_status``
+          (https://github.com/ansible-collections/community.general/issues/9276, https://github.com/ansible-collections/community.general/pull/9277).
+        - qubes connection plugin - fix the printing of debug information (https://github.com/ansible-collections/community.general/pull/9334).
+        - redfish_utils module utils - Fix ``VerifyBiosAttributes`` command on multi
+          system resource nodes (https://github.com/ansible-collections/community.general/pull/9234).
+      minor_changes:
+        - proxmox module utils - add method ``api_task_complete`` that can wait for
+          task completion and return error message (https://github.com/ansible-collections/community.general/pull/9256).
+      release_summary: Regular bugfix release.
+      security_fixes:
+        - keycloak_authentication - API calls did not properly set the ``priority``
+          during update resulting in incorrectly sorted authentication flows. This
+          apparently only affects Keycloak 25 or newer (https://github.com/ansible-collections/community.general/pull/9263).
+    fragments:
+      - 9.5.3.yml
+      - 9234-fix-verify-bios-attributes-multi-system.yml
+      - 9256-proxmox_disk-fix-async-method-of-resize_disk.yml
+      - 9263-kc_authentication-api-priority.yaml
+      - 9277-proxmox_template-fix-the-wrong-path-called-on-proxmox_template.task_status.yaml
+      - 9334-qubes-conn.yml
+      - 9363-dig-nonameservers.yml
+      - 9490-htpasswd-permissions.yml
+    release_date: '2024-12-31'
