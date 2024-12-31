@@ -12,6 +12,7 @@ class ModuleDocFragment(object):
 
     # Standard documentation fragment
     DOCUMENTATION = r"""
+options: {}
 requirements:
   - requests >= 2.5.0
   - clc-sdk
