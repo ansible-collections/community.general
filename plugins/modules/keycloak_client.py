@@ -904,9 +904,8 @@ def main():
                            required_one_of=([['client_id', 'id'],
                                              ['token', 'auth_realm', 'auth_username', 'auth_password']]),
                            required_together=([['auth_realm', 'auth_username', 'auth_password']]),
-                           required_by={
-                               'refresh_token': 'auth_realm',
-                           })
+                           required_by={'refresh_token': 'auth_realm'},
+                           )
 
     result = dict(changed=False, msg='', diff={}, proposed={}, existing={}, end_state={})
 
