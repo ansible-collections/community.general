@@ -16,8 +16,6 @@ options: {}
 requirements:
   - requests >= 2.5.0
   - clc-sdk
-author:
-  - "CLC Runner (@clc-runner)"
 notes:
   - To use this module, it is required to set the below environment variables which enables access to the Centurylink Cloud.
   - E(CLC_V2_API_USERNAME), the account login ID for the Centurylink Cloud.

@@ -17,6 +17,8 @@ description:
 extends_documentation_fragment:
   - community.general.attributes
   - community.general.clc
+author:
+  - "CLC Runner (@clc-runner)"
 attributes:
   check_mode:
     support: full
