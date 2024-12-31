@@ -31,8 +31,11 @@ options:
     description: The ID of the Proxmox VM.
     required: false
     type: int
-  backup_section:
-    description: The backup_section value is true or false. if this be true, this module just return all backup job information.
+  backup_jobs:
+    description: 
+      - The backup_jobs value is true or false. 
+      - If set to true, this module just return all backup jobs information.
+      - If set to false, what is listed depends on the other options.
     required: false
     default: false
     type: bool
@@ -70,7 +73,7 @@ EXAMPLES = """
       api_user: 'myUser@pam'
       api_password: '*******'
       api_host: '192.168.20.20'
-      backup_section: true
+      backup_jobs: true
 """
 
 RETURN = """
@@ -82,7 +85,7 @@ backup_info:
   elements: dict
   contains:
     bktype:
-      description: backup type
+      description: The type of the backup.
       returned: on success
       type: str
     enabled:
@@ -90,31 +93,31 @@ backup_info:
       returned: on success
       type: int
     id:
-      description: backup job id
+      description: The backup job id.
       returned: on success
       type: str
     mode:
-      description: backup job mode such as snapshot
+      description: The backup job mode such as snapshot.
       returned: on success
       type: str
     next-run:
-      description: next backup time
+      description: The next backup time.
       returned: on success
       type: str
     schedule:
-      description: backup job schedule
+      description: The backup job schedule.
       returned: on success
       type: str
     storage:
-      description: backup storage location
+      description: The backup storage location.
       returned: on success
       type: str
     vm_name:
-      description: VM name
+      description: The VM name.
       returned: on success
       type: str
     vmid:
-      description: VM id
+      description: The VM vmid.
       returned: on success
       type: int
 """
@@ -128,12 +131,12 @@ from ansible_collections.community.general.plugins.module_utils.proxmox import (
 class ProxmoxBackupInfoAnsible(ProxmoxAnsible):
 
     # Get all backup information
-    def getSectionsList(self):
+    def getJobsList(self):
         try:
-            backupSections = self.proxmox_api.cluster.backup.get()
+            backupJobs = self.proxmox_api.cluster.backup.get()
         except Exception as e:
-            self.module.fail_json(msg="Getting backup sections failed: %s" % e)
-        return backupSections
+            self.module.fail_json(msg="Getting backup jobs failed: %s" % e)
+        return backupJobs
 
     # Get VM information
     def getVmsList(self):
@@ -145,7 +148,7 @@ class ProxmoxBackupInfoAnsible(ProxmoxAnsible):
 
     # Get all backup information by VM id and VM name
     def vmsBackupInfo(self):
-        backupList = self.getSectionsList()
+        backupList = self.getJobsList()
         vmInfo = self.getVmsList()
         bkInfo = []
         for backupItem in backupList:
@@ -171,11 +174,11 @@ class ProxmoxBackupInfoAnsible(ProxmoxAnsible):
     # Get proxmox backup information for a specific VM based on its VM id or VM name
     def specificVmBackupInfo(self, vm_name_id):
         fullBackupInfo = self.vmsBackupInfo()
-        vmBackupSections = []
+        vmBackupJobs = []
         for vm in fullBackupInfo:
             if (vm["vm_name"] == vm_name_id or int(vm["vmid"]) == vm_name_id):
-                vmBackupSections.append(vm)
-        return vmBackupSections
+                vmBackupJobs.append(vm)
+        return vmBackupJobs
 
 
 def main():
@@ -184,13 +187,13 @@ def main():
     backup_info_args = dict(
         vm_id=dict(type='int', required=False),
         vm_name=dict(type='str', required=False),
-        backup_section=dict(type='bool', default=False, required=False)
+        backup_jobs=dict(type='bool', default=False, required=False)
     )
     args.update(backup_info_args)
 
     module = AnsibleModule(
         argument_spec=args,
-        mutually_exclusive=[('backup_section', 'vm_id', 'vm_name')],
+        mutually_exclusive=[('backup_jobs', 'vm_id', 'vm_name')],
         supports_check_mode=True
     )
 
@@ -207,11 +210,11 @@ def main():
     proxmox = ProxmoxBackupInfoAnsible(module)
     vm_id = module.params['vm_id']
     vm_name = module.params['vm_name']
-    backup_section = module.params['backup_section']
+    backup_jobs = module.params['backup_jobs']
 
     # Update result value based on what requested (module args)
-    if backup_section:
-        result['backup_info'] = proxmox.getSectionsList()
+    if backup_jobs:
+        result['backup_info'] = proxmox.getJobsList()
     elif vm_id:
         result['backup_info'] = proxmox.specificVmBackupInfo(vm_id)
     elif vm_name:
