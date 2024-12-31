@@ -16,7 +16,7 @@ requirements:
   - paramiko
 description:
   - Run commands or put/fetch files to an existing Proxmox LXC container using pct CLI via SSH.
-  - Use the Python SSH implementation (Paramiko) to connect to Proxmox.
+  - Uses the Python SSH implementation (Paramiko) to connect to the Proxmox host.
 version_added: "10.2.0"
 options:
   remote_addr:
@@ -88,14 +88,15 @@ options:
       - {key: use_rsa_sha2_algorithms, section: paramiko_connection}
     env:
       - {name: ANSIBLE_PARAMIKO_USE_RSA_SHA2_ALGORITHMS}
-    default: True
+    default: true
     type: boolean
   host_key_auto_add:
-    description: "Automatically add host keys."
+    description: "Automatically add host keys to C(~/.ssh/known_hosts)."
     env:
       - name: ANSIBLE_PARAMIKO_HOST_KEY_AUTO_ADD
     ini:
-      - {key: host_key_auto_add, section: paramiko_connection}
+      - key: host_key_auto_add
+        section: paramiko_connection
     type: boolean
   look_for_keys:
     default: True
@@ -137,7 +138,7 @@ options:
   host_key_checking:
     description: "Set this to V(false) if you want to avoid host key checking by the underlying tools Ansible uses to connect to the host."
     type: boolean
-    default: True
+    default: true
     env:
       - name: ANSIBLE_HOST_KEY_CHECKING
       - name: ANSIBLE_SSH_HOST_KEY_CHECKING
@@ -787,7 +788,7 @@ class Connection(ConnectionBase):
             # (This doesn't acquire the connection lock because it needs
             # to exclude only other known_hosts writers, not connections
             # that are starting up.)
-            lockfile = self.keyfile.replace('known_hosts', '.known_hosts.lock')
+            lockfile = os.path.join(os.path.dirname(self.keyfile, f'.{os.path.basename(self.keyfile)}.lock'))
             dirname = os.path.dirname(self.keyfile)
             makedirs_safe(dirname)
 
