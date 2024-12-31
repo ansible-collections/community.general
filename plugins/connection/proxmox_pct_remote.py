@@ -383,8 +383,8 @@ EXAMPLES = r"""
 ---
 - hosts: lxc
   tasks:
-    - debug:
-        msg: "This is coming from pct environment"
+    - name: Ping LXC container
+      ansible.builtin.ping:
 """
 
 import os
