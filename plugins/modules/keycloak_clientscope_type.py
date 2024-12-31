@@ -40,7 +40,7 @@ options:
 
   client_id:
     description:
-      - The O(client_id) of the client. If not set the clientscop types are set as a default for the realm.
+      - The O(client_id) of the client. If not set the clientscope types are set as a default for the realm.
     aliases:
       - clientId
     type: str
