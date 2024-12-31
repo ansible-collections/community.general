@@ -90,7 +90,7 @@ RESOURCE_LIST = [
         "type": "qemu"
     }
 ]
-BACKUP_SECTIONS = [
+BACKUP_JOBS = [
     {
         "type": "vzdump",
         "id": "backup-83831498-c631",
@@ -163,7 +163,7 @@ EXPECTED_BACKUP_OUTPUT = [
         "vmid": "102"
     }
 ]
-EXPECTED_BACKUP_SECTION_OUTPUT = [
+EXPECTED_BACKUP_JOBS_OUTPUT = [
     {
         "enabled": 1,
         "id": "backup-83831498-c631",
@@ -203,7 +203,7 @@ class TestProxmoxBackupInfoModule(ModuleTestCase):
             RESOURCE_LIST
         )
         self.connect_mock.return_value.cluster.backup.get.return_value = (
-            BACKUP_SECTIONS
+            BACKUP_JOBS
         )
 
     def tearDown(self):
@@ -265,16 +265,16 @@ class TestProxmoxBackupInfoModule(ModuleTestCase):
         assert result["backup_info"] == expected_output
         assert len(result["backup_info"]) == 1
 
-    def test_get_specific_backup_information_by_backupsection(self):
+    def test_get_specific_backup_information_by_backupjobs(self):
         with pytest.raises(AnsibleExitJson) as exc_info:
-            backupsection = True
+            backupjobs = True
             set_module_args({
                 'api_host': 'proxmoxhost',
                 'api_user': 'root@pam',
                 'api_password': 'supersecret',
-                'backup_section': backupsection
+                'backup_jobs': backupjobs
             })
             self.module.main()
 
         result = exc_info.value.args[0]
-        assert result["backup_info"] == EXPECTED_BACKUP_SECTION_OUTPUT
+        assert result["backup_info"] == EXPECTED_BACKUP_JOBS_OUTPUT
