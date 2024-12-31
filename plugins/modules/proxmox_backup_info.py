@@ -24,18 +24,22 @@ author:
 
 options:
   vm_name:
-    description: The name of the Proxmox VM.
+    description:
+      - The name of the Proxmox VM.
+      - If vm_name is defined, the returned list will contain backup jobs that have been parsed and filtered based on vm_name value.
     required: false
     type: str
   vm_id:
-    description: The ID of the Proxmox VM.
+    description:
+      - The ID of the Proxmox VM.
+      - If vm_id is defined, the returned list will contain backup jobs that have been parsed and filtered based on vm_id value.
     required: false
     type: int
   backup_jobs:
     description:
       - The backup_jobs value is true or false.
-      - If set to true, this module just return all backup jobs information.
-      - If set to false, what is listed depends on the other options.
+      - If V(true), the module will return all backup jobs information.
+      - If V(false), the module will parse all backup jobs based on VM IDs and return a list of VMs' backup information.
     required: false
     default: false
     type: bool
