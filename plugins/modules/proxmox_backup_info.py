@@ -47,9 +47,9 @@ extends_documentation_fragment:
 EXAMPLES = """
 - name: Print all backup information by VM id and VM name
   proxmox_backup_info:
-      api_user: 'myUser@pam'
-      api_password: '*******'
-      api_host: '192.168.20.20'
+    api_user: 'myUser@pam'
+    api_password: '*******'
+    api_host: '192.168.20.20'
 
 - name: Print proxmox backup information for a specific VM based on its name
   proxmox_backup_info:
