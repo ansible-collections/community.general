@@ -32,8 +32,8 @@ options:
     required: false
     type: int
   backup_jobs:
-    description: 
-      - The backup_jobs value is true or false. 
+    description:
+      - The backup_jobs value is true or false.
       - If set to true, this module just return all backup jobs information.
       - If set to false, what is listed depends on the other options.
     required: false
