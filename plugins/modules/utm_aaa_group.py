@@ -28,7 +28,7 @@ attributes:
 options:
   name:
     description:
-      - The name of the object. Will be used to identify the entry.
+      - The name of the object identifies the entry.
     type: str
     required: true
   adirectory_groups:

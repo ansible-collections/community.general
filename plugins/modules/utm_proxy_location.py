@@ -30,7 +30,7 @@ options:
   name:
     type: str
     description:
-      - The name of the object. Will be used to identify the entry.
+      - The name of the object identifies the entry.
     required: true
   access_control:
     description:
@@ -92,7 +92,7 @@ options:
   stickysession_id:
     type: str
     description:
-      - The stickysession id.
+      - The stickysession ID.
     default: ROUTEID
   stickysession_status:
     description:
@@ -182,7 +182,7 @@ result:
       description: Whether to use stickysession or not.
       type: bool
     websocket_passthrough:
-      description: Whether websocket passthrough will be used or not.
+      description: Whether websocket passthrough is used or not.
       type: bool
 """
 

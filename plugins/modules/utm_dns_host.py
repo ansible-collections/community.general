@@ -29,7 +29,7 @@ options:
   name:
     type: str
     description:
-      - The name of the object. Will be used to identify the entry.
+      - The name of the object identifies the entry.
     required: true
   address:
     type: str
@@ -53,7 +53,7 @@ options:
   interface:
     type: str
     description:
-      - The reference name of the interface to use. If not provided the default interface will be used.
+      - The reference name of the interface to use. If not provided the default interface is used.
     default: ''
   resolved:
     description:
@@ -130,7 +130,7 @@ result:
       description: Whether the ipv6 address is resolved or not.
       type: bool
     timeout:
-      description: The timeout until a new resolving will be attempted.
+      description: The timeout until a new resolution is attempted.
       type: int
 """
 

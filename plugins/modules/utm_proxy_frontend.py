@@ -30,7 +30,7 @@ options:
   name:
     type: str
     description:
-      - The name of the object. Will be used to identify the entry.
+      - The name of the object identifies the entry.
     required: true
   add_content_type_header:
     description:
@@ -207,7 +207,7 @@ result:
       description: State of html rewrite.
       type: bool
     htmlrewrite_cookies:
-      description: Whether the html rewrite cookie will be set.
+      description: Whether the html rewrite cookie is set.
       type: bool
     implicitredirect:
       description: Whether to use implicit redirection.

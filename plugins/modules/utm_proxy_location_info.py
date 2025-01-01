@@ -29,7 +29,7 @@ options:
   name:
     type: str
     description:
-      - The name of the object. Will be used to identify the entry.
+      - The name of the object identifies the entry.
     required: true
 
 extends_documentation_fragment:
@@ -101,7 +101,7 @@ result:
       description: Whether to use stickysession or not.
       type: bool
     websocket_passthrough:
-      description: Whether websocket passthrough will be used or not.
+      description: Whether websocket passthrough is used or not.
       type: bool
 """
 
