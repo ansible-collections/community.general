@@ -38,8 +38,8 @@ options:
       - present
       - absent
     description:
-      - If V(present), the module adds user O(user_name) to the Pritunl O(organization). If V(absent), removes the user O(user_name) from the
-        Pritunl O(organization).
+      - If V(present), the module adds user O(user_name) to the Pritunl O(organization). If V(absent), removes the user O(user_name)
+        from the Pritunl O(organization).
   user_name:
     type: str
     required: true

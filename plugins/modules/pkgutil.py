@@ -28,7 +28,8 @@ attributes:
   check_mode:
     support: full
     details:
-      - In order to check the availability of packages, the catalog cache under C(/var/opt/csw/pkgutil) may be refreshed even in check mode.
+      - In order to check the availability of packages, the catalog cache under C(/var/opt/csw/pkgutil) may be refreshed even
+        in check mode.
   diff_mode:
     support: none
 options:
