@@ -61,7 +61,7 @@ options:
     description:
       - Authentication refresh token for Keycloak API.
     type: str
-    version_added: 10.2.0
+    version_added: 10.3.0
 
   validate_certs:
     description:
