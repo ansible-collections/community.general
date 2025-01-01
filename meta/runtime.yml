@@ -725,13 +725,11 @@ plugin_routing:
     rhn_channel:
       tombstone:
         removal_version: 10.0.0
-        warning_text: RHN is EOL, please contact the community.general maintainers
-          if still using this; see the module documentation for more details.
+        warning_text: RHN is EOL.
     rhn_register:
       tombstone:
         removal_version: 10.0.0
-        warning_text: RHN is EOL, please contact the community.general maintainers
-          if still using this; see the module documentation for more details.
+        warning_text: RHN is EOL.
     sapcar_extract:
       redirect: community.sap_libs.sapcar_extract
     sap_task_list_execute:
