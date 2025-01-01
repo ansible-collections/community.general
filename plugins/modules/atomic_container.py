@@ -15,6 +15,10 @@ short_description: Manage the containers on the atomic host platform
 description:
   - Manage the containers on the atomic host platform.
   - Allows to manage the lifecycle of a container on the atomic host platform.
+deprecated:
+  removed_in: 13.0.0
+  why: Project Atomic was sunset by the end of 2019.
+  alternative: There is none.
 author: "Giuseppe Scrivano (@giuseppe)"
 requirements:
   - atomic
