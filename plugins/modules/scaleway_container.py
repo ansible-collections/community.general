@@ -108,8 +108,8 @@ options:
   privacy:
     description:
       - Privacy policies define whether a container can be executed anonymously.
-      - Choose V(public) to enable anonymous execution, or V(private) to protect your container with an authentication mechanism provided by the
-        Scaleway API.
+      - Choose V(public) to enable anonymous execution, or V(private) to protect your container with an authentication mechanism
+        provided by the Scaleway API.
     type: str
     default: public
     choices:
