@@ -125,7 +125,8 @@ ansible_sysuptime:
   type: int
   sample: 42388
 ansible_syscontact:
-  description: The textual identification of the contact person for this managed node, together with information on how to contact this person.
+  description: The textual identification of the contact person for this managed node, together with information on how to
+    contact this person.
   returned: success
   type: str
   sample: Me <me@example.org>
