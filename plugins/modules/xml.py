@@ -139,7 +139,7 @@ options:
     type: bool
     default: false
 requirements:
-  - lxml >= 2.3.0
+  - lxml >= 2.3.0 and <= 5.1.0
 notes:
   - Use the C(--check) and C(--diff) options when testing your expressions.
   - The diff output is automatically pretty-printed, so may not reflect the actual file content, only the file structure.
