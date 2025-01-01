@@ -120,6 +120,8 @@ files:
     maintainers: $team_ansible_core
   $doc_fragments/:
     labels: docs_fragments
+  $doc_fragments/clc.py:
+    maintainers: clc-runner russoz
   $doc_fragments/django.py:
     maintainers: russoz
   $doc_fragments/hpe3par.py:
