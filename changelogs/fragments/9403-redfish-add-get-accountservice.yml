@@ -1,0 +1,2 @@
+minor_changes:
+  - redfish_info - add command ``GetAccountServiceConfig`` to get full information about AccountService configuration (https://github.com/ansible-collections/community.general/pull/9403).
