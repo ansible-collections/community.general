@@ -22,9 +22,9 @@ author:
   - Ahti Kitsik (@ahtik)
 notes:
   - See C(man ufw) for more examples.
-  - "B(Warning:) Whilst the module itself can be run using concurrent strategies, C(ufw) does not support concurrency, as firewall rules are meant
-    to be ordered and parallel executions do not guarantee order. B(Do not use concurrency:) The results are unpredictable and the module may
-    fail silently if you do."
+  - B(Warning:) Whilst the module itself can be run using concurrent strategies, C(ufw) does not support concurrency, as firewall
+    rules are meant to be ordered and parallel executions do not guarantee order. B(Do not use concurrency:) The results are
+    unpredictable and the module may fail silently if you do.
 requirements:
   - C(ufw) package
 extends_documentation_fragment:
@@ -69,14 +69,14 @@ options:
     description:
       - Allows to interpret the index in O(insert) relative to a position.
       - V(zero) interprets the rule number as an absolute index (that is, 1 is the first rule).
-      - V(first-ipv4) interprets the rule number relative to the index of the first IPv4 rule, or relative to the position where the first IPv4
-        rule would be if there is currently none.
-      - V(last-ipv4) interprets the rule number relative to the index of the last IPv4 rule, or relative to the position where the last IPv4 rule
-        would be if there is currently none.
-      - V(first-ipv6) interprets the rule number relative to the index of the first IPv6 rule, or relative to the position where the first IPv6
-        rule would be if there is currently none.
-      - V(last-ipv6) interprets the rule number relative to the index of the last IPv6 rule, or relative to the position where the last IPv6 rule
-        would be if there is currently none.
+      - V(first-ipv4) interprets the rule number relative to the index of the first IPv4 rule, or relative to the position
+        where the first IPv4 rule would be if there is currently none.
+      - V(last-ipv4) interprets the rule number relative to the index of the last IPv4 rule, or relative to the position where
+        the last IPv4 rule would be if there is currently none.
+      - V(first-ipv6) interprets the rule number relative to the index of the first IPv6 rule, or relative to the position
+        where the first IPv6 rule would be if there is currently none.
+      - V(last-ipv6) interprets the rule number relative to the index of the last IPv6 rule, or relative to the position where
+        the last IPv6 rule would be if there is currently none.
     type: str
     choices: [first-ipv4, first-ipv6, last-ipv4, last-ipv6, zero]
     default: zero
@@ -130,22 +130,22 @@ options:
     default: false
   interface:
     description:
-      - Specify interface for the rule. The direction (in or out) used for the interface depends on the value of O(direction). See O(interface_in)
-        and O(interface_out) for routed rules that needs to supply both an input and output interface. Mutually exclusive with O(interface_in)
-        and O(interface_out).
+      - Specify interface for the rule. The direction (in or out) used for the interface depends on the value of O(direction).
+        See O(interface_in) and O(interface_out) for routed rules that needs to supply both an input and output interface.
+        Mutually exclusive with O(interface_in) and O(interface_out).
     type: str
     aliases: [if]
   interface_in:
     description:
-      - Specify input interface for the rule. This is mutually exclusive with O(direction) and O(interface). However, it is compatible with O(interface_out)
-        for routed rules.
+      - Specify input interface for the rule. This is mutually exclusive with O(direction) and O(interface). However, it is
+        compatible with O(interface_out) for routed rules.
     type: str
     aliases: [if_in]
     version_added: '0.2.0'
   interface_out:
     description:
-      - Specify output interface for the rule. This is mutually exclusive with O(direction) and O(interface). However, it is compatible with O(interface_in)
-        for routed rules.
+      - Specify output interface for the rule. This is mutually exclusive with O(direction) and O(interface). However, it
+        is compatible with O(interface_in) for routed rules.
     type: str
     aliases: [if_out]
     version_added: '0.2.0'

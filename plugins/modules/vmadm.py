@@ -26,7 +26,7 @@ options:
   archive_on_delete:
     required: false
     description:
-      - When enabled, the zone dataset will be mounted on C(/zones/archive) upon removal.
+      - When enabled, the zone dataset is mounted on C(/zones/archive) upon removal.
     type: bool
   autoboot:
     required: false
@@ -52,7 +52,8 @@ options:
   cpu_shares:
     required: false
     description:
-      - Sets a limit on the number of fair share scheduler (FSS) CPU shares for a VM. This limit is relative to all other VMs on the system.
+      - Sets a limit on the number of fair share scheduler (FSS) CPU shares for a VM. This limit is relative to all other
+        VMs on the system.
     type: int
   cpu_type:
     required: false
@@ -141,7 +142,8 @@ options:
   internal_metadata_namespace:
     required: false
     description:
-      - List of namespaces to be set as C(internal_metadata-only); these namespaces will come from O(internal_metadata) rather than O(customer_metadata).
+      - List of namespaces to be set as C(internal_metadata-only); these namespaces come from O(internal_metadata) rather
+        than O(customer_metadata).
     type: str
   kernel_version:
     required: false
@@ -156,7 +158,7 @@ options:
   maintain_resolvers:
     required: false
     description:
-      - Resolvers in C(/etc/resolv.conf) will be updated when updating the O(resolvers) property.
+      - Resolvers in C(/etc/resolv.conf) are updated when updating the O(resolvers) property.
     type: bool
   max_locked_memory:
     required: false
@@ -208,7 +210,8 @@ options:
   qemu_opts:
     required: false
     description:
-      - Additional qemu arguments for KVM guests. This overwrites the default arguments provided by vmadm(1M) and should only be used for debugging.
+      - Additional qemu arguments for KVM guests. This overwrites the default arguments provided by vmadm(1M) and should only
+        be used for debugging.
     type: str
   qemu_extra_opts:
     required: false
@@ -234,7 +237,7 @@ options:
   routes:
     required: false
     description:
-      - Dictionary that maps destinations to gateways, these will be set as static routes in the VM.
+      - Dictionary that maps destinations to gateways, these are set as static routes in the VM.
     type: dict
   spice_opts:
     required: false
@@ -244,20 +247,22 @@ options:
   spice_password:
     required: false
     description:
-      - Password required to connect to SPICE. By default no password is set. Please note this can be read from the Global Zone.
+      - Password required to connect to SPICE. By default no password is set. Please note this can be read from the Global
+        Zone.
     type: str
   state:
     choices: [present, running, absent, deleted, stopped, created, restarted, rebooted]
     default: running
     description:
-      - States for the VM to be in. Please note that V(present), V(stopped) and V(restarted) operate on a VM that is currently provisioned. V(present)
-        means that the VM will be created if it was absent, and that it will be in a running state. V(absent) will shutdown the zone before removing
-        it. V(stopped) means the zone will be created if it does not exist already, before shutting it down.
+      - States for the VM to be in. Please note that V(present), V(stopped) and V(restarted) operate on a VM that is currently
+        provisioned. V(present) means that the VM is created if it was absent, and that it is in a running state. V(absent)
+        shutdowns the zone before removing it. V(stopped) means the zone is created if it does not exist already, before shutting
+        it down.
     type: str
   tmpfs:
     required: false
     description:
-      - Amount of memory (in MiBs) that will be available in the VM for the C(/tmp) filesystem.
+      - Amount of memory (in MiBs) that is available in the VM for the C(/tmp) filesystem.
     type: int
   uuid:
     required: false
@@ -332,7 +337,7 @@ options:
   zpool:
     required: false
     description:
-      - ZFS pool the VM's zone dataset will be created in.
+      - ZFS pool the VM's zone dataset is created in.
     type: str
 """
 
