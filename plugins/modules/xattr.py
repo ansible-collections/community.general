@@ -13,7 +13,8 @@ module: xattr
 short_description: Manage user defined extended attributes
 description:
   - Manages filesystem user defined extended attributes.
-  - Requires that extended attributes are enabled on the target filesystem and that the C(setfattr)/C(getfattr) utilities are present.
+  - Requires that extended attributes are enabled on the target filesystem and that the C(setfattr)/C(getfattr) utilities
+    are present.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:

@@ -25,7 +25,7 @@ requirements:
   - "zypper >= 1.0  (included in openSUSE >= 11.1 or SUSE Linux Enterprise Server/Desktop >= 11.0)"
   - python-xml
 notes:
-  - "For info about packages, use the module M(ansible.builtin.package_facts)."
+  - For info about packages, use the module M(ansible.builtin.package_facts).
 """
 
 EXAMPLES = r"""
