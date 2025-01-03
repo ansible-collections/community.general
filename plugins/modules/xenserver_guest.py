@@ -33,7 +33,7 @@ notes:
     of configuration using xenstore. Since XenServer Guest agent only support None and Static types of network configuration,
     where None means DHCP configured interface, O(networks[].type) and O(networks[].type6) values V(none) and V(dhcp) have
     same effect. More info here:
-    U(https://www.citrix.com/community/citrix-developer/citrix-hypervisor-developer/citrix-hypervisor-developing-products/citrix-hypervisor-staticip.html).'
+    U(https://web.archive.org/web/20180218110151/https://xenserver.org/blog/entry/set-windows-guest-vm-static-ip-address-in-xenserver.html).'
   - 'On platforms without official support for network configuration inside a guest OS, network parameters are written to
     xenstore C(vm-data/networks/<vif_device>) key. Parameters can be inspected by using C(xenstore ls) and C(xenstore read)
     tools on \*nix guests or through WMI interface on Windows guests. They can also be found in VM facts C(instance.xenstore_data)
