@@ -44,15 +44,15 @@ options:
       - When set, the plugin discovery and auto-download behavior of Terraform is disabled.
       - The directory structure in the plugin path can be tricky. The Terraform docs
         U(https://learn.hashicorp.com/tutorials/terraform/automate-terraform#pre-installed-plugins)
-        show a simple directory of files, but actually, the directory structure has to follow the same structure you would see if Terraform auto-downloaded
-        the plugins. See the examples below for a tree output of an example plugin directory.
+        show a simple directory of files, but actually, the directory structure has to follow the same structure you would
+        see if Terraform auto-downloaded the plugins. See the examples below for a tree output of an example plugin directory.
     type: list
     elements: path
     version_added: 3.0.0
   workspace:
     description:
-      - The terraform workspace to work with. This sets the E(TF_WORKSPACE) environmental variable that is used to override workspace selection.
-        For more information about workspaces have a look at U(https://developer.hashicorp.com/terraform/language/state/workspaces).
+      - The terraform workspace to work with. This sets the E(TF_WORKSPACE) environmental variable that is used to override
+        workspace selection. For more information about workspaces have a look at U(https://developer.hashicorp.com/terraform/language/state/workspaces).
     type: str
     default: default
   purge_workspace:
@@ -64,26 +64,28 @@ options:
     type: bool
   plan_file:
     description:
-      - The path to an existing Terraform plan file to apply. If this is not specified, Ansible will build a new TF plan and execute it. Note
-        that this option is required if 'state' has the 'planned' value.
+      - The path to an existing Terraform plan file to apply. If this is not specified, Ansible will build a new TF plan and
+        execute it. Note that this option is required if 'state' has the 'planned' value.
     type: path
   state_file:
     description:
-      - The path to an existing Terraform state file to use when building plan. If this is not specified, the default C(terraform.tfstate) will
-        be used.
+      - The path to an existing Terraform state file to use when building plan. If this is not specified, the default C(terraform.tfstate)
+        will be used.
       - This option is ignored when plan is specified.
     type: path
   variables_files:
     description:
-      - The path to a variables file for Terraform to fill into the TF configurations. This can accept a list of paths to multiple variables files.
+      - The path to a variables file for Terraform to fill into the TF configurations. This can accept a list of paths to
+        multiple variables files.
     type: list
     elements: path
     aliases: ['variables_file']
   variables:
     description:
-      - A group of key-values pairs to override template variables or those in variables files. By default, only string and number values are
-        allowed, which are passed on unquoted.
-      - Support complex variable structures (lists, dictionaries, numbers, and booleans) to reflect terraform variable syntax when O(complex_vars=true).
+      - A group of key-values pairs to override template variables or those in variables files. By default, only string and
+        number values are allowed, which are passed on unquoted.
+      - Support complex variable structures (lists, dictionaries, numbers, and booleans) to reflect terraform variable syntax
+        when O(complex_vars=true).
       - Ansible integers or floats are mapped to terraform numbers.
       - Ansible strings are mapped to terraform strings.
       - Ansible dictionaries are mapped to terraform objects.
@@ -94,15 +96,16 @@ options:
   complex_vars:
     description:
       - Enable/disable capability to handle complex variable structures for C(terraform).
-      - If V(true) the O(variables) also accepts dictionaries, lists, and booleans to be passed to C(terraform). Strings that are passed are correctly
-        quoted.
+      - If V(true) the O(variables) also accepts dictionaries, lists, and booleans to be passed to C(terraform). Strings that
+        are passed are correctly quoted.
       - When disabled, supports only simple variables (strings, integers, and floats), and passes them on unquoted.
     type: bool
     default: false
     version_added: 5.7.0
   targets:
     description:
-      - A list of specific resources to target in this plan/application. The resources selected here will also auto-include any dependencies.
+      - A list of specific resources to target in this plan/application. The resources selected here will also auto-include
+        any dependencies.
     type: list
     elements: str
     default: []
@@ -117,8 +120,8 @@ options:
     type: int
   force_init:
     description:
-      - To avoid duplicating infra, if a state file cannot be found this will force a C(terraform init). Generally, this should be turned off unless
-        you intend to provision an entirely new Terraform deployment.
+      - To avoid duplicating infra, if a state file cannot be found this will force a C(terraform init). Generally, this should
+        be turned off unless you intend to provision an entirely new Terraform deployment.
     default: false
     type: bool
   overwrite_init:
@@ -133,8 +136,8 @@ options:
     type: dict
   backend_config_files:
     description:
-      - The path to a configuration file to provide at init state to the -backend-config parameter. This can accept a list of paths to multiple
-        configuration files.
+      - The path to a configuration file to provide at init state to the -backend-config parameter. This can accept a list
+        of paths to multiple configuration files.
     type: list
     elements: path
     version_added: '0.2.0'
@@ -152,8 +155,8 @@ options:
     version_added: '1.3.0'
   check_destroy:
     description:
-      - Apply only when no resources are destroyed. Note that this only prevents "destroy" actions, but not "destroy and re-create" actions. This
-        option is ignored when O(state=absent).
+      - Apply only when no resources are destroyed. Note that this only prevents "destroy" actions, but not "destroy and re-create"
+        actions. This option is ignored when O(state=absent).
     type: bool
     default: false
     version_added: '3.3.0'
@@ -239,7 +242,8 @@ EXAMPLES = r"""
 RETURN = r"""
 outputs:
   type: complex
-  description: A dictionary of all the TF outputs by their assigned name. Use RV(ignore:outputs.MyOutputName.value) to access the value.
+  description: A dictionary of all the TF outputs by their assigned name. Use RV(ignore:outputs.MyOutputName.value) to access
+    the value.
   returned: on success
   sample: '{"bukkit_arn": {"sensitive": false, "type": "string", "value": "arn:aws:s3:::tf-test-bukkit"}'
   contains:
@@ -262,7 +266,8 @@ stdout:
   sample: ''
 command:
   type: str
-  description: Full C(terraform) command built by this module, in case you want to re-run the command outside the module or debug a problem.
+  description: Full C(terraform) command built by this module, in case you want to re-run the command outside the module or
+    debug a problem.
   returned: always
   sample: terraform apply ...
 """

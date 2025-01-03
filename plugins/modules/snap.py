@@ -37,8 +37,8 @@ options:
   state:
     description:
       - Desired state of the package.
-      - When O(state=present) the module will use C(snap install) if the snap is not installed, and C(snap refresh) if it is installed but from
-        a different channel.
+      - When O(state=present) the module will use C(snap install) if the snap is not installed, and C(snap refresh) if it
+        is installed but from a different channel.
     default: present
     choices: [absent, present, enabled, disabled]
     type: str
@@ -46,28 +46,29 @@ options:
     description:
       - Install a snap that has classic confinement.
       - This option corresponds to the C(--classic) argument of the C(snap install) command.
-      - This level of confinement is permissive, granting full system access, similar to that of traditionally packaged applications that do not
-        use sandboxing mechanisms. This option can only be specified when the task involves a single snap.
+      - This level of confinement is permissive, granting full system access, similar to that of traditionally packaged applications
+        that do not use sandboxing mechanisms. This option can only be specified when the task involves a single snap.
       - See U(https://snapcraft.io/docs/snap-confinement) for more details about classic confinement and confinement levels.
     type: bool
     required: false
     default: false
   channel:
     description:
-      - Define which release of a snap is installed and tracked for updates. This option can only be specified if there is a single snap in the
-        task.
+      - Define which release of a snap is installed and tracked for updates. This option can only be specified if there is
+        a single snap in the task.
       - If not passed, the C(snap) command will default to V(stable).
-      - If the value passed does not contain the C(track), it will default to C(latest). For example, if V(edge) is passed, the module will assume
-        the channel to be V(latest/edge).
+      - If the value passed does not contain the C(track), it will default to C(latest). For example, if V(edge) is passed,
+        the module will assume the channel to be V(latest/edge).
       - See U(https://snapcraft.io/docs/channels) for more details about snap channels.
     type: str
     required: false
   options:
     description:
-      - Set options with pattern C(key=value) or C(snap:key=value). If a snap name is given, the option will be applied to that snap only. If
-        the snap name is omitted, the options will be applied to all snaps listed in O(name). Options will only be applied to active snaps.
-      - Options will only be applied when C(state) is set to V(present). This is done after the necessary installation or refresh (upgrade/downgrade)
-        of all the snaps listed in O(name).
+      - Set options with pattern C(key=value) or C(snap:key=value). If a snap name is given, the option will be applied to
+        that snap only. If the snap name is omitted, the options will be applied to all snaps listed in O(name). Options will
+        only be applied to active snaps.
+      - Options will only be applied when C(state) is set to V(present). This is done after the necessary installation or
+        refresh (upgrade/downgrade) of all the snaps listed in O(name).
       - See U(https://snapcraft.io/docs/configuration-in-snaps) for more details about snap configuration options.
     required: false
     type: list
@@ -83,8 +84,8 @@ options:
     default: false
     version_added: 7.2.0
 notes:
-  - Privileged operations, such as installing and configuring snaps, require root priviledges. This is only the case if the user has not logged
-    in to the Snap Store.
+  - Privileged operations, such as installing and configuring snaps, require root priviledges. This is only the case if the
+    user has not logged in to the Snap Store.
 author:
   - Victor Carceler (@vcarceler) <vcarceler@iespuigcastellar.xeill.net>
   - Stanislas Lange (@angristan) <angristan@pm.me>

@@ -24,7 +24,7 @@ attributes:
 options:
   instance_id:
     description:
-      - Instance Id of the virtual instance to perform action option.
+      - Instance ID of the virtual instance to perform action option.
     type: str
   hostname:
     description:
@@ -146,7 +146,7 @@ options:
     type: str
   ssh_keys:
     description:
-      - List of ssh keys by their Id to be assigned to a virtual instance.
+      - List of ssh keys by their ID to be assigned to a virtual instance.
     type: list
     elements: str
     default: []
