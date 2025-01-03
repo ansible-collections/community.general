@@ -42,7 +42,8 @@ options:
       - List of paths containing Terraform plugin executable files.
       - Plugin executables can be downloaded from U(https://releases.hashicorp.com/).
       - When set, the plugin discovery and auto-download behavior of Terraform is disabled.
-      - The directory structure in the plugin path can be tricky. The Terraform docs U(https://learn.hashicorp.com/tutorials/terraform/automate-terraform#pre-installed-plugins)
+      - The directory structure in the plugin path can be tricky. The Terraform docs
+        U(https://learn.hashicorp.com/tutorials/terraform/automate-terraform#pre-installed-plugins)
         show a simple directory of files, but actually, the directory structure has to follow the same structure you would
         see if Terraform auto-downloaded the plugins. See the examples below for a tree output of an example plugin directory.
     type: list

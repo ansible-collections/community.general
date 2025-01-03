@@ -55,8 +55,8 @@ options:
     type: str
     description:
       - Message to send. Note that the module does not handle escaping characters. Plain-text angle brackets and ampersands
-        should be converted to HTML entities (for example C(&) to C(&amp;)) before sending. See Slack's documentation (U(https://api.slack.com/docs/message-formatting))
-        for more.
+        should be converted to HTML entities (for example C(&) to C(&amp;)) before sending. See Slack's documentation
+        (U(https://api.slack.com/docs/message-formatting)) for more.
   channel:
     type: str
     description:
@@ -115,8 +115,8 @@ options:
     description:
       - Allow text to use default colors - use the default of V(normal) to not send a custom color bar at the start of the
         message.
-      - Allowed values for color can be one of V(normal), V(good), V(warning), V(danger), any valid 3 digit or 6 digit hex color
-        value.
+      - Allowed values for color can be one of V(normal), V(good), V(warning), V(danger), any valid 3 digit or 6 digit hex
+        color value.
     default: 'normal'
   attachments:
     type: list
