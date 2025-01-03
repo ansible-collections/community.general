@@ -36,7 +36,8 @@ options:
     description:
       - Whether to install (V(present)), or remove (V(absent)) a package.
       - If the package is to be installed, then O(src) is required.
-      - The SVR4 package system does not provide an upgrade operation. You need to uninstall the old, then install the new package.
+      - The SVR4 package system does not provide an upgrade operation. You need to uninstall the old, then install the new
+        package.
     required: true
     choices: ["present", "absent"]
     type: str
@@ -44,9 +45,10 @@ options:
   src:
     description:
       - Specifies the location to install the package from. Required when O(state=present).
-      - "Can be any path acceptable to the C(pkgadd) command's C(-d) option. For example: V(somefile.pkg), V(/dir/with/pkgs), V(http://server/mypkgs.pkg)."
-      - If using a file or directory, they must already be accessible by the host. See the M(ansible.builtin.copy) module for a way to get them
-        there.
+      - "Can be any path acceptable to the C(pkgadd) command's C(-d) option. For example: V(somefile.pkg), V(/dir/with/pkgs),
+        V(http://server/mypkgs.pkg)."
+      - If using a file or directory, they must already be accessible by the host. See the M(ansible.builtin.copy) module
+        for a way to get them there.
     type: str
   proxy:
     description:

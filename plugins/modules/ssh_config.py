@@ -71,9 +71,9 @@ options:
     type: path
   identities_only:
     description:
-      - Specifies that SSH should only use the configured authentication identity and certificate files (either the default files, or those explicitly
-        configured in the C(ssh_config) files or passed on the ssh command-line), even if ssh-agent or a PKCS11Provider or SecurityKeyProvider
-        offers more identities.
+      - Specifies that SSH should only use the configured authentication identity and certificate files (either the default
+        files, or those explicitly configured in the C(ssh_config) files or passed on the ssh command-line), even if C(ssh-agent)
+        or a C(PKCS11Provider) or C(SecurityKeyProvider) offers more identities.
     type: bool
     version_added: 8.2.0
   user_known_hosts_file:

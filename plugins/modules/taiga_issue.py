@@ -88,8 +88,8 @@ options:
 author: Alejandro Guirao (@lekum)
 requirements: [python-taiga]
 notes:
-  - The authentication is achieved either by the environment variable E(TAIGA_TOKEN) or by the pair
-    of environment variables E(TAIGA_USERNAME) and E(TAIGA_PASSWORD).
+  - The authentication is achieved either by the environment variable E(TAIGA_TOKEN) or by the pair of environment variables
+    E(TAIGA_USERNAME) and E(TAIGA_PASSWORD).
 """
 
 EXAMPLES = r"""
