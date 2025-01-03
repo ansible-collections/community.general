@@ -58,7 +58,7 @@ options:
     aliases: ["refresh"]
   priority:
     description:
-      - Set priority of repository. Packages will always be installed from the repository with the smallest priority number.
+      - Set priority of repository. Packages are always installed from the repository with the smallest priority number.
       - Needs C(zypper) version >= 1.12.25.
     type: int
   overwrite_multiple:
@@ -69,7 +69,8 @@ options:
   auto_import_keys:
     description:
       - Automatically import the gpg signing key of the new or changed repository.
-      - Has an effect only if O(state=present). Has no effect on existing (unchanged) repositories or in combination with O(state=absent).
+      - Has an effect only if O(state=present). Has no effect on existing (unchanged) repositories or in combination with
+        O(state=absent).
       - Implies O(runrefresh).
       - Only works with C(.repo) files if O(name) is given explicitly.
     type: bool

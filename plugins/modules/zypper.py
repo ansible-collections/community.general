@@ -29,7 +29,8 @@ author:
 short_description: Manage packages on SUSE and openSUSE
 description:
   - Manage packages on SUSE and openSUSE using the zypper and rpm tools.
-  - Also supports transactional updates, by running zypper inside C(/sbin/transactional-update --continue --drop-if-no-change --quiet run).
+  - Also supports transactional updates, by running zypper inside C(/sbin/transactional-update --continue --drop-if-no-change
+    --quiet run).
 extends_documentation_fragment:
   - community.general.attributes
   - community.general.attributes
@@ -42,9 +43,9 @@ options:
   name:
     description:
       - Package name V(name) or package specifier or a list of either.
-      - Can include a version like V(name=1.0), V(name>3.4) or V(name<=2.7). If a version is given, V(oldpackage) is implied and zypper is allowed
-        to update the package within the version range given.
-      - You can also pass a url or a local path to a rpm file.
+      - Can include a version like V(name=1.0), V(name>3.4) or V(name<=2.7). If a version is given, V(oldpackage) is implied
+        and zypper is allowed to update the package within the version range given.
+      - You can also pass a URL or a local path to a rpm file.
       - When using O(state=latest), this can be V(*), which updates all installed packages.
     required: true
     aliases: ['pkg']
@@ -52,10 +53,10 @@ options:
     elements: str
   state:
     description:
-      - V(present) will make sure the package is installed.
-      - V(latest) will make sure the latest version of the package is installed.
-      - V(absent) will make sure the specified package is not installed.
-      - V(dist-upgrade) will make sure the latest version of all installed packages from all enabled repositories is installed.
+      - V(present) makes sure the package is installed.
+      - V(latest) makes sure the latest version of the package is installed.
+      - V(absent) makes sure the specified package is not installed.
+      - V(dist-upgrade) makes sure the latest version of all installed packages from all enabled repositories is installed.
       - When using V(dist-upgrade), O(name) should be V(*).
     required: false
     choices: [present, latest, absent, dist-upgrade, installed, removed]
@@ -76,15 +77,15 @@ options:
     type: str
   disable_gpg_check:
     description:
-      - Whether to disable to GPG signature checking of the package signature being installed. Has an effect only if O(state) is V(present) or
-        V(latest).
+      - Whether to disable to GPG signature checking of the package signature being installed. Has an effect only if O(state)
+        is V(present) or V(latest).
     required: false
     default: false
     type: bool
   disable_recommends:
     description:
-      - Corresponds to the C(--no-recommends) option for I(zypper). Default behavior (V(true)) modifies zypper's default behavior; V(false) does
-        install recommended packages.
+      - Corresponds to the C(--no-recommends) option for I(zypper). Default behavior (V(true)) modifies zypper's default behavior;
+        V(false) does install recommended packages.
     required: false
     default: true
     type: bool
@@ -96,7 +97,8 @@ options:
     type: bool
   force_resolution:
     description:
-      - Adds C(--force-resolution) option to I(zypper). Allows to (un)install packages with conflicting requirements (resolver will choose a solution).
+      - Adds C(--force-resolution) option to I(zypper). Allows to (un)install packages with conflicting requirements (resolver
+        chooses a solution).
     required: false
     default: false
     type: bool
@@ -110,8 +112,8 @@ options:
     aliases: ["refresh"]
   oldpackage:
     description:
-      - Adds C(--oldpackage) option to I(zypper). Allows to downgrade packages with less side-effects than force. This is implied as soon as a
-        version is specified as part of the package name.
+      - Adds C(--oldpackage) option to I(zypper). Allows to downgrade packages with less side-effects than force. This is
+        implied as soon as a version is specified as part of the package name.
     required: false
     default: false
     type: bool
@@ -157,9 +159,8 @@ options:
       - Adds C(--quiet) option to I(zypper) install/update command.
     version_added: '10.2.0'
 notes:
-  - When used with a C(loop:) each package will be processed individually, it is much more efficient to pass the list directly to the O(name)
-    option.
-# informational: requirements for nodes
+  - When used with a C(loop:) each package is processed individually, it is much more efficient to pass the list directly
+    to the O(name) option.
 requirements:
   - "zypper >= 1.0  # included in openSUSE >= 11.1 or SUSE Linux Enterprise Server/Desktop >= 11.0"
   - python-xml
