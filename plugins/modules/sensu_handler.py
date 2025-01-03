@@ -14,7 +14,7 @@ author: "David Moreau Simard (@dmsimard)"
 short_description: Manages Sensu handler configuration
 description:
   - Manages Sensu handler configuration.
-  - 'For more information, refer to the Sensu documentation: U(https://sensuapp.org/docs/latest/reference/handlers.html)'
+  - 'For more information, refer to the L(Sensu documentation, https://sensuapp.org/docs/latest/reference/handlers.html).'
 deprecated:
   removed_in: 13.0.0
   why: Sensu Core and Sensu Enterprise products have been End of Life since 2019/20.
@@ -90,7 +90,8 @@ options:
     type: dict
     description:
       - The socket definition scope, used to configure the TCP/UDP handler socket.
-      - 'NOTE: the O(socket) attribute is only required for TCP/UDP handlers (that is, handlers configured with O(type=tcp) or O(type=udp)).'
+      - 'NOTE: the O(socket) attribute is only required for TCP/UDP handlers (that is, handlers configured with O(type=tcp)
+        or O(type=udp)).'
   pipe:
     type: dict
     description:

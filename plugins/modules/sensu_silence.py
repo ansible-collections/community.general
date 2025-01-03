@@ -46,7 +46,8 @@ options:
   reason:
     type: str
     description:
-      - If specified, this free-form string is used to provide context or rationale for the reason this silence entry was created.
+      - If specified, this free-form string is used to provide context or rationale for the reason this silence entry was
+        created.
   state:
     type: str
     description:
