@@ -32,7 +32,7 @@ notes:
     network configuration. The module tries to detect if such support is available and utilize it, else it uses a custom method
     of configuration using xenstore. Since XenServer Guest agent only support None and Static types of network configuration,
     where None means DHCP configured interface, O(networks[].type) and O(networks[].type6) values V(none) and V(dhcp) have
-    same effect. More info here: 
+    same effect. More info here:
     U(https://www.citrix.com/community/citrix-developer/citrix-hypervisor-developer/citrix-hypervisor-developing-products/citrix-hypervisor-staticip.html).'
   - 'On platforms without official support for network configuration inside a guest OS, network parameters are written to
     xenstore C(vm-data/networks/<vif_device>) key. Parameters can be inspected by using C(xenstore ls) and C(xenstore read)
