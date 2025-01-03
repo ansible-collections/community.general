@@ -113,7 +113,7 @@ EXAMPLES = r"""
     region: fr-par
 """
 
-RETURNS = '''
+RETURNS = """
 {
    "scaleway_lb": {
       "backend_count": 0,
@@ -154,7 +154,7 @@ RETURNS = '''
       ]
    }
 }
-'''
+"""
 
 import datetime
 import time
