@@ -32,7 +32,8 @@ options:
   channel:
     type: str
     description:
-      - The channel TAG you wish to broadcast a push notification, as seen on the "My Channels" > "Edit your channel" at Pushbullet page.
+      - The channel TAG you wish to broadcast a push notification, as seen on the "My Channels" > "Edit your channel" at Pushbullet
+        page.
   device:
     type: str
     description:

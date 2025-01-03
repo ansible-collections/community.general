@@ -26,7 +26,8 @@ author:
   - "Shaun Zinck (@szinck)"
   - "Jasper Lievisse Adriaanse (@jasperla)"
 notes:
-  - 'Known bug with pkgin < 0.8.0: if a package is removed and another package depends on it, the other package will be silently removed as well.'
+  - 'Known bug with pkgin < 0.8.0: if a package is removed and another package depends on it, the other package will be silently
+    removed as well.'
 extends_documentation_fragment:
   - community.general.attributes
 attributes:

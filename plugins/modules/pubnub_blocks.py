@@ -18,8 +18,8 @@ DOCUMENTATION = r"""
 module: pubnub_blocks
 short_description: PubNub blocks management module
 description:
-  - 'This module allows Ansible to interface with the PubNub BLOCKS infrastructure by providing the following operations: create / remove, start
-    / stop and rename for blocks and create / modify / remove for event handlers.'
+  - 'This module allows Ansible to interface with the PubNub BLOCKS infrastructure by providing the following operations:
+    create / remove, start / stop and rename for blocks and create / modify / remove for event handlers.'
 author:
   - PubNub <support@pubnub.com> (@pubnub)
   - Sergey Mamontov <sergey@pubnub.com> (@parfeon)
@@ -49,8 +49,8 @@ options:
     default: ''
   cache:
     description: >-
-      In case if single play use blocks management module few times it is preferred to enabled 'caching' by making previous module to share gathered
-      artifacts and pass them to this parameter.
+      In case if single play use blocks management module few times it is preferred to enabled 'caching' by making previous
+      module to share gathered artifacts and pass them to this parameter.
     required: false
     type: dict
     default: {}
@@ -84,22 +84,22 @@ options:
     type: str
   description:
     description:
-      - Short block description which will be later visible on admin.pubnub.com. Used only if block doesn't exists and won't change description
-        for existing block.
+      - Short block description which will be later visible on U(https://admin.pubnub.com).
+      - Used only if block does not exists and does not change description for existing block.
     required: false
     type: str
   event_handlers:
     description:
       - List of event handlers which should be updated for specified block O(name).
-      - 'Each entry for new event handler should contain: V(name), V(src), V(channels), V(event). V(name) used as event handler name which can
-        be used later to make changes to it.'
+      - 'Each entry for new event handler should contain: V(name), V(src), V(channels), V(event). V(name) used as event handler
+        name which can be used later to make changes to it.'
       - C(src) is full path to file with event handler code.
       - V(channels) is name of channel from which event handler is waiting for events.
       - 'V(event) is type of event which is able to trigger event handler: V(js-before-publish), V(js-after-publish), V(js-after-presence).'
-      - Each entry for existing handlers should contain C(name) (so target handler can be identified). Rest parameters (C(src), C(channels) and
-        C(event)) can be added if changes required for them.
-      - It is possible to rename event handler by adding C(changes) key to event handler payload and pass dictionary, which will contain single
-        key C(name), where new name should be passed.
+      - Each entry for existing handlers should contain C(name) (so target handler can be identified). Rest parameters (C(src),
+        C(channels) and C(event)) can be added if changes required for them.
+      - It is possible to rename event handler by adding C(changes) key to event handler payload and pass dictionary, which
+        will contain single key C(name), where new name should be passed.
       - To remove particular event handler it is possible to set C(state) for it to C(absent) and it will be removed.
     required: false
     default: []
@@ -114,8 +114,8 @@ options:
     type: dict
   validate_certs:
     description:
-      - This key allow to try skip certificates check when performing REST API calls. Sometimes host may have issues with certificates on it and
-        this will cause problems to call PubNub REST API.
+      - This key allow to try skip certificates check when performing REST API calls. Sometimes host may have issues with
+        certificates on it and this will cause problems to call PubNub REST API.
       - If check should be ignored V(false) should be passed to this parameter.
     required: false
     default: true
@@ -208,8 +208,8 @@ EXAMPLES = r"""
 RETURN = r"""
 module_cache:
   description:
-    - Cached account information. In case if with single play module used few times it is better to pass cached data to next module calls to speed
-      up process.
+    - Cached account information. In case if with single play module used few times it is better to pass cached data to next
+      module calls to speed up process.
   type: dict
   returned: always
 """

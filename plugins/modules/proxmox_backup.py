@@ -17,8 +17,10 @@ short_description: Start a VM backup in Proxmox VE cluster
 version_added: 10.1.0
 description:
   - Allows you to create backups of KVM and LXC guests in Proxmox VE cluster.
-  - Offers the GUI functionality of creating a single backup as well as using the run-now functionality from the cluster backup schedule.
-  - The mininum required privileges to use this module are C(VM.Backup) and C(Datastore.AllocateSpace) for the respective VMs and storage.
+  - Offers the GUI functionality of creating a single backup as well as using the run-now functionality from the cluster backup
+    schedule.
+  - The mininum required privileges to use this module are C(VM.Backup) and C(Datastore.AllocateSpace) for the respective
+    VMs and storage.
   - Most options are optional and if unspecified will be chosen by the Cluster and its default values.
   - Note that this module B(is not idempotent). It always starts a new backup (when not in check mode).
 attributes:
@@ -60,9 +62,10 @@ options:
     description:
       - Specify the description of the backup.
       - Needs to be a single line, newline and backslash need to be escaped as V(\\n) and V(\\\\) respectively.
-      - If you need variable interpolation, you can set the content as usual through ansible jinja templating and/or let Proxmox substitute templates.
-      - Proxmox currently supports V({{cluster}}), V({{guestname}}), V({{node}}), and V({{vmid}}) as templating variables. Since this is also
-        a jinja delimiter, you need to set these values as raw jinja.
+      - If you need variable interpolation, you can set the content as usual through ansible jinja templating and/or let Proxmox
+        substitute templates.
+      - Proxmox currently supports V({{cluster}}), V({{guestname}}), V({{node}}), and V({{vmid}}) as templating variables.
+        Since this is also a jinja delimiter, you need to set these values as raw jinja.
     default: "{{guestname}}"
     type: str
   fleecing:
@@ -109,8 +112,8 @@ options:
     description:
       - Use custom retention options instead of those from the default cluster configuration (which is usually V("keep-all=1")).
       - Always requires Datastore.Allocate permission at the storage endpoint.
-      - Specifying a retention time other than V(keep-all=1) might trigger pruning on the datastore, if an existing backup should be deleted
-        due to your specified timeframe.
+      - Specifying a retention time other than V(keep-all=1) might trigger pruning on the datastore, if an existing backup
+        should be deleted due to your specified timeframe.
       - Deleting requires C(Datastore.Modify) or C(Datastore.Prune) permissions on the backup storage.
     type: str
   storage:
@@ -120,7 +123,7 @@ options:
     required: true
   vmids:
     description:
-      - The instance ids to be backed up.
+      - The instance IDs to be backed up.
       - Only valid, if O(mode=include).
     type: list
     elements: int
@@ -212,8 +215,8 @@ backups:
       choices: ["unknown", "success", "failed"]
     upid:
       description: >-
-        Proxmox cluster UPID, which is needed to lookup task info. Returns OK, when a cluster node did not create a task after being called, for
-        example due to no matching targets.
+        Proxmox cluster UPID, which is needed to lookup task info. Returns OK, when a cluster node did not create a task after
+        being called, for example due to no matching targets.
       returned: on success
       type: str
 """

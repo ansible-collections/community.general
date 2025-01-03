@@ -47,24 +47,28 @@ options:
     description:
       - Desired state for the application.
       - The states V(present) and V(absent) are aliases to V(install) and V(uninstall), respectively.
-      - The state V(latest) is equivalent to executing the task twice, with state V(install) and then V(upgrade). It was added in community.general
-        5.5.0.
-      - The states V(install_all), V(uninject), V(upgrade_shared), V(pin) and V(unpin) are only available in C(pipx>=1.6.0), make sure to have
-        a compatible version when using this option. These states have been added in community.general 9.4.0.
+      - The state V(latest) is equivalent to executing the task twice, with state V(install) and then V(upgrade). It was added
+        in community.general 5.5.0.
+      - The states V(install_all), V(uninject), V(upgrade_shared), V(pin) and V(unpin) are only available in C(pipx>=1.6.0),
+        make sure to have a compatible version when using this option. These states have been added in community.general 9.4.0.
   name:
     type: str
     description:
-      - The name of the application. In C(pipx) documentation it is also referred to as the name of the virtual environment where the application
-        will be installed.
-      - If O(name) is a simple package name without version specifiers, then that name is used as the Python package name to be installed.
+      - The name of the application. In C(pipx) documentation it is also referred to as the name of the virtual environment
+        where the application will be installed.
+      - If O(name) is a simple package name without version specifiers, then that name is used as the Python package name
+        to be installed.
       - Use O(source) for passing package specifications or installing from URLs or directories.
   source:
     type: str
     description:
-      - Source for the package. This option is used when O(state=install) or O(state=latest), and it is ignored with other states.
-      - Use O(source) when installing a Python package with version specifier, or from a local path, from a VCS URL or compressed file.
+      - Source for the package. This option is used when O(state=install) or O(state=latest), and it is ignored with other
+        states.
+      - Use O(source) when installing a Python package with version specifier, or from a local path, from a VCS URL or compressed
+        file.
       - The value of this option is passed as-is to C(pipx).
-      - O(name) is still required when using O(source) to establish the application name without fetching the package from a remote source.
+      - O(name) is still required when using O(source) to establish the application name without fetching the package from
+        a remote source.
   install_apps:
     description:
       - Add apps from the injected packages.
@@ -136,14 +140,14 @@ options:
   spec_metadata:
     description:
       - Spec metadata file for O(state=install_all).
-      - This content of the file is usually generated with C(pipx list --json), and it can be obtained with M(community.general.pipx_info) with
-        O(community.general.pipx_info#module:include_raw=true) and obtaining the content from the RV(community.general.pipx_info#module:raw_output).
+      - This content of the file is usually generated with C(pipx list --json), and it can be obtained with M(community.general.pipx_info)
+        with O(community.general.pipx_info#module:include_raw=true) and obtaining the content from the RV(community.general.pipx_info#module:raw_output).
     type: path
     version_added: 9.4.0
 notes:
-  - This first implementation does not verify whether a specified version constraint has been installed or not. Hence, when using version operators,
-    C(pipx) module will always try to execute the operation, even when the application was previously installed. This feature will be added in
-    the future.
+  - This first implementation does not verify whether a specified version constraint has been installed or not. Hence, when
+    using version operators, C(pipx) module will always try to execute the operation, even when the application was previously
+    installed. This feature will be added in the future.
 author:
   - "Alexei Znamensky (@russoz)"
 """

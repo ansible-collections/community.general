@@ -30,7 +30,8 @@ options:
     type: str
   node:
     description:
-      - Specify which node of the cluster you want to manage. V(null) == the cluster status itself, V(all) == check the status of all nodes.
+      - Specify which node of the cluster you want to manage. V(null) == the cluster status itself, V(all) == check the status
+        of all nodes.
     type: str
   timeout:
     description:

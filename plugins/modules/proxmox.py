@@ -40,11 +40,13 @@ options:
     type: str
   disk:
     description:
-      - This option was previously described as "hard disk size in GB for instance" however several formats describing a lxc mount are permitted.
-      - Older versions of Proxmox will accept a numeric value for size using the O(storage) parameter to automatically choose which storage to
-        allocate from, however new versions enforce the C(<STORAGE>:<SIZE>) syntax.
-      - Additional options are available by using some combination of the following key-value pairs as a comma-delimited list C([volume=]<volume>
-        [,acl=<1|0>] [,mountoptions=<opt[;opt...]>] [,quota=<1|0>] [,replicate=<1|0>] [,ro=<1|0>] [,shared=<1|0>] [,size=<DiskSize>]).
+      - This option was previously described as "hard disk size in GB for instance" however several formats describing a lxc
+        mount are permitted.
+      - Older versions of Proxmox will accept a numeric value for size using the O(storage) parameter to automatically choose
+        which storage to allocate from, however new versions enforce the C(<STORAGE>:<SIZE>) syntax.
+      - Additional options are available by using some combination of the following key-value pairs as a comma-delimited list
+        C([volume=]<volume> [,acl=<1|0>] [,mountoptions=<opt[;opt...]>] [,quota=<1|0>] [,replicate=<1|0>] [,ro=<1|0>] [,shared=<1|0>]
+        [,size=<DiskSize>]).
       - See U(https://pve.proxmox.com/wiki/Linux_Container) for a full description.
       - This option is mutually exclusive with O(storage) and O(disk_volume).
     type: str
@@ -114,7 +116,8 @@ options:
   startup:
     description:
       - Specifies the startup order of the container.
-      - Use C(order=#) where C(#) is a non-negative number to define the general startup order. Shutdown in done with reverse ordering.
+      - Use C(order=#) where C(#) is a non-negative number to define the general startup order. Shutdown in done with reverse
+        ordering.
       - Use C(up=#) where C(#) is in seconds, to specify a delay to wait before the next VM is started.
       - Use C(down=#) where C(#) is in seconds, to specify a delay to wait before the next VM is stopped.
     type: list
@@ -190,7 +193,8 @@ options:
     description:
       - Specifies the C(ostype) of the LXC container.
       - If set to V(auto), no C(ostype) will be provided on instance creation.
-    choices: ['auto', 'debian', 'devuan', 'ubuntu', 'centos', 'fedora', 'opensuse', 'archlinux', 'alpine', 'gentoo', 'nixos', 'unmanaged']
+    choices: ['auto', 'debian', 'devuan', 'ubuntu', 'centos', 'fedora', 'opensuse', 'archlinux', 'alpine', 'gentoo', 'nixos',
+      'unmanaged']
     type: str
     default: 'auto'
     version_added: 8.1.0
@@ -289,8 +293,8 @@ options:
       - Type of the clone created.
       - V(full) creates a full clone, and O(storage) must be specified.
       - V(linked) creates a linked clone, and the cloned container must be a template container.
-      - V(opportunistic) creates a linked clone if the cloned container is a template container, and a full clone if not. O(storage) may be specified,
-        if not it will fall back to the default.
+      - V(opportunistic) creates a linked clone if the cloned container is a template container, and a full clone if not.
+        O(storage) may be specified, if not it will fall back to the default.
     type: str
     choices: ['full', 'linked', 'opportunistic']
     default: opportunistic

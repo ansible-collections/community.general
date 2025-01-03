@@ -20,10 +20,10 @@ attributes:
   check_mode:
     support: partial
     details:
-      - For C(check_mode) to work, the specified O(login_user) needs permission to run the C(GET) command on the key, otherwise the module will
-        fail.
-      - When using C(check_mode) the module will try to calculate the value that Redis would return. If the key is not present, V(0.0) is used as
-        value.
+      - For C(check_mode) to work, the specified O(login_user) needs permission to run the C(GET) command on the key, otherwise
+        the module will fail.
+      - When using C(check_mode) the module will try to calculate the value that Redis would return. If the key is not present,
+        V(0.0) is used as value.
   diff_mode:
     support: none
 options:

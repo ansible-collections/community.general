@@ -75,9 +75,10 @@ options:
   state:
     description:
       - Desired state of the IP subnet on the specified device.
-      - With O(state=present), you must specify either O(hostname) or O(device_id). Subnet with given CIDR will then be assigned to the specified
-        device.
-      - With O(state=absent), you can specify either O(hostname) or O(device_id). The subnet will be removed from specified devices.
+      - With O(state=present), you must specify either O(hostname) or O(device_id). Subnet with given CIDR will then be assigned
+        to the specified device.
+      - With O(state=absent), you can specify either O(hostname) or O(device_id). The subnet will be removed from specified
+        devices.
       - If you leave both O(hostname) and O(device_id) empty, the subnet will be removed from any device it is assigned to.
     choices: ['present', 'absent']
     default: 'present'

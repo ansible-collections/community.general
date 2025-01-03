@@ -12,8 +12,8 @@ DOCUMENTATION = r"""
 module: profitbricks
 short_description: Create, destroy, start, stop, and reboot a ProfitBricks virtual machine
 description:
-  - Create, destroy, update, start, stop, and reboot a ProfitBricks virtual machine. When the virtual machine is created it can optionally wait
-    for it to be 'running' before returning. This module has a dependency on profitbricks >= 1.0.0.
+  - Create, destroy, update, start, stop, and reboot a ProfitBricks virtual machine. When the virtual machine is created it
+    can optionally wait for it to be 'running' before returning. This module has a dependency on profitbricks >= 1.0.0.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -78,7 +78,7 @@ options:
     choices: ["IDE", "VIRTIO"]
   instance_ids:
     description:
-      - List of instance ids, currently only used when state='absent' to remove instances.
+      - List of instance IDs, currently only used when state='absent' to remove instances.
     type: list
     elements: str
     default: []
