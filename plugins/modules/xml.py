@@ -69,8 +69,8 @@ options:
   add_children:
     description:
       - Add additional child-element(s) to a selected element for a given O(xpath).
-      - Child elements must be given in a list and each item may be either a string (for example C(children=ansible) to add an empty C(<ansible/>)
-        child element), or a hash where the key is an element name and the value is the element value.
+      - Child elements must be given in a list and each item may be either a string (for example C(children=ansible) to add
+        an empty C(<ansible/>) child element), or a hash where the key is an element name and the value is the element value.
       - This parameter requires O(xpath) to be set.
     type: list
     elements: raw
@@ -113,7 +113,8 @@ options:
     default: yaml
   backup:
     description:
-      - Create a backup file including the timestamp information so you can get the original file back if you somehow clobbered it incorrectly.
+      - Create a backup file including the timestamp information so you can get the original file back if you somehow clobbered
+        it incorrectly.
     type: bool
     default: false
   strip_cdata_tags:
@@ -125,16 +126,16 @@ options:
   insertbefore:
     description:
       - Add additional child-element(s) before the first selected element for a given O(xpath).
-      - Child elements must be given in a list and each item may be either a string (for example C(children=ansible) to add an empty C(<ansible/>)
-        child element), or a hash where the key is an element name and the value is the element value.
+      - Child elements must be given in a list and each item may be either a string (for example C(children=ansible) to add
+        an empty C(<ansible/>) child element), or a hash where the key is an element name and the value is the element value.
       - This parameter requires O(xpath) to be set.
     type: bool
     default: false
   insertafter:
     description:
       - Add additional child-element(s) after the last selected element for a given O(xpath).
-      - Child elements must be given in a list and each item may be either a string (for example C(children=ansible) to add an empty C(<ansible/>)
-        child element), or a hash where the key is an element name and the value is the element value.
+      - Child elements must be given in a list and each item may be either a string (for example C(children=ansible) to add
+        an empty C(<ansible/>) child element), or a hash where the key is an element name and the value is the element value.
       - This parameter requires O(xpath) to be set.
     type: bool
     default: false
@@ -145,7 +146,8 @@ notes:
   - The diff output is automatically pretty-printed, so may not reflect the actual file content, only the file structure.
   - This module does not handle complicated xpath expressions, so limit xpath selectors to simple expressions.
   - Beware that in case your XML elements are namespaced, you need to use the O(namespaces) parameter, see the examples.
-  - Namespaces prefix should be used for all children of an element where namespace is defined, unless another namespace is defined for them.
+  - Namespaces prefix should be used for all children of an element where namespace is defined, unless another namespace is
+    defined for them.
 seealso:
   - name: XML module development community wiki (archived)
     description: More information related to the development of this xml module.
@@ -296,10 +298,10 @@ EXAMPLES = r"""
     xpath: /business
     add_children:
       - building:
-        # Attributes
+# Attributes
           name: Scumm bar
           location: Monkey island
-        # Subnodes
+# Subnodes
           _:
             - floor: Pirate hall
             - floor: Grog storage

@@ -57,7 +57,7 @@ options:
     default: false
   auth_scheme:
     description:
-      - 'Authentication scheme.'
+      - Authentication scheme.
     choices: [digest, sasl]
     type: str
     default: "digest"

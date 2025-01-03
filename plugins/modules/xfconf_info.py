@@ -25,15 +25,15 @@ attributes:
 options:
   channel:
     description:
-      - "A Xfconf preference channel is a top-level tree key, inside of the Xfconf repository that corresponds to the location for which all application
-        properties/keys are stored."
-      - If not provided, the module will list all available channels.
+      - A Xfconf preference channel is a top-level tree key, inside of the Xfconf repository that corresponds to the location
+        for which all application properties/keys are stored.
+      - If not provided, the module lists all available channels.
     type: str
   property:
     description:
-      - "A Xfce preference key is an element in the Xfconf repository that corresponds to an application preference."
+      - A Xfce preference key is an element in the Xfconf repository that corresponds to an application preference.
       - If provided, then O(channel) is required.
-      - If not provided and a O(channel) is provided, then the module will list all available properties in that O(channel).
+      - If not provided and a O(channel) is provided, then the module lists all available properties in that O(channel).
     type: str
 notes:
   - See man xfconf-query(1) for more details.

@@ -37,28 +37,30 @@ attributes:
 options:
   channel:
     description:
-      - A Xfconf preference channel is a top-level tree key, inside of the Xfconf repository that corresponds to the location for which all application
-        properties/keys are stored. See man xfconf-query(1).
+      - A Xfconf preference channel is a top-level tree key, inside of the Xfconf repository that corresponds to the location
+        for which all application properties/keys are stored. See man xfconf-query(1).
     required: true
     type: str
   property:
     description:
-      - A Xfce preference key is an element in the Xfconf repository that corresponds to an application preference. See man xfconf-query(1).
+      - A Xfce preference key is an element in the Xfconf repository that corresponds to an application preference. See man
+        xfconf-query(1).
     required: true
     type: str
   value:
     description:
-      - Preference properties typically have simple values such as strings, integers, or lists of strings and integers. See man xfconf-query(1).
+      - Preference properties typically have simple values such as strings, integers, or lists of strings and integers. See
+        man xfconf-query(1).
     type: list
     elements: raw
   value_type:
     description:
       - The type of value being set.
       - When providing more than one O(value_type), the length of the list must be equal to the length of O(value).
-      - If only one O(value_type) is provided, but O(value) contains more than on element, that O(value_type) will be applied to all elements
-        of O(value).
-      - If the O(property) being set is an array and it can possibly have only one element in the array, then O(force_array=true) must be used
-        to ensure that C(xfconf-query) will interpret the value as an array rather than a scalar.
+      - If only one O(value_type) is provided, but O(value) contains more than on element, that O(value_type) is applied to
+        all elements of O(value).
+      - If the O(property) being set is an array and it can possibly have only one element in the array, then O(force_array=true)
+        must be used to ensure that C(xfconf-query) interprets the value as an array rather than a scalar.
       - Support for V(uchar), V(char), V(uint64), and V(int64) has been added in community.general 4.8.0.
     type: list
     elements: str
@@ -67,7 +69,8 @@ options:
     type: str
     description:
       - The action to take upon the property/value.
-      - The state V(get) has been removed in community.general 5.0.0. Please use the module M(community.general.xfconf_info) instead.
+      - The state V(get) has been removed in community.general 5.0.0. Please use the module M(community.general.xfconf_info)
+        instead.
     choices: [present, absent]
     default: "present"
   force_array:
@@ -116,21 +119,24 @@ property:
   sample: "/Xft/DPI"
 value_type:
   description:
-    - The type of the value that was changed (V(none) for O(state=reset)). Either a single string value or a list of strings for array types.
+    - The type of the value that was changed (V(none) for O(state=reset)). Either a single string value or a list of strings
+      for array types.
     - This is a string or a list of strings.
   returned: success
   type: any
   sample: '"int" or ["str", "str", "str"]'
 value:
   description:
-    - The value of the preference key after executing the module. Either a single string value or a list of strings for array types.
+    - The value of the preference key after executing the module. Either a single string value or a list of strings for array
+      types.
     - This is a string or a list of strings.
   returned: success
   type: any
   sample: "'192' or ['orange', 'yellow', 'violet']"
 previous_value:
   description:
-    - The value of the preference key before executing the module. Either a single string value or a list of strings for array types.
+    - The value of the preference key before executing the module. Either a single string value or a list of strings for array
+      types.
     - This is a string or a list of strings.
   returned: success
   type: any

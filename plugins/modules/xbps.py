@@ -40,13 +40,14 @@ options:
     type: str
   recurse:
     description:
-      - When removing a package, also remove its dependencies, provided that they are not required by other packages and were not explicitly installed
-        by a user.
+      - When removing a package, also remove its dependencies, provided that they are not required by other packages and were
+        not explicitly installed by a user.
     type: bool
     default: false
   update_cache:
     description:
-      - Whether or not to refresh the master package lists. This can be run as part of a package installation or as a separate step.
+      - Whether or not to refresh the master package lists. This can be run as part of a package installation or as a separate
+        step.
     type: bool
     default: true
   upgrade:
@@ -56,8 +57,9 @@ options:
     default: false
   upgrade_xbps:
     description:
-      - Whether or not to upgrade the xbps package when necessary. Before installing new packages, xbps requires the user to update the xbps package
-        itself. Thus when this option is set to V(false), upgrades and installations will fail when xbps is not up to date.
+      - Whether or not to upgrade the C(xbps) package when necessary. Before installing new packages, C(xbps) requires the
+        user to update itself. Thus when this option is set to V(false), upgrades and installations fail when C(xbps) is not
+        up to date.
     type: bool
     default: true
     version_added: '0.2.0'
@@ -68,8 +70,8 @@ options:
     version_added: '10.2.0'
   repositories:
     description:
-      - Repository URL(s) to prepend to the repository list for the package installation. The URL can be a URL to a repository for remote repositories
-        or a path for local repositories.
+      - Repository URL(s) to prepend to the repository list for the package installation. The URL can be remote repositories
+        or paths for local repositories.
     type: list
     elements: str
     version_added: '10.2.0'

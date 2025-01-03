@@ -12,13 +12,13 @@ DOCUMENTATION = r"""
 module: zfs_delegate_admin
 short_description: Manage ZFS delegated administration (user admin privileges)
 description:
-  - Manages ZFS file system delegated administration permissions, which allow unprivileged users to perform ZFS operations normally restricted
-    to the superuser.
+  - Manages ZFS file system delegated administration permissions, which allow unprivileged users to perform ZFS operations
+    normally restricted to the superuser.
   - See the C(zfs allow) section of V(zfs(1M\)) for detailed explanations of options.
   - This module attempts to adhere to the behavior of the command line tool as much as possible.
 requirements:
-  - "A ZFS/OpenZFS implementation that supports delegation with C(zfs allow), including: Solaris >= 10, illumos (all versions), FreeBSD >= 8.0R,
-    ZFS on Linux >= 0.7.0."
+  - "A ZFS/OpenZFS implementation that supports delegation with C(zfs allow), including: Solaris >= 10, illumos (all versions),
+    FreeBSD >= 8.0R, ZFS on Linux >= 0.7.0."
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -36,7 +36,8 @@ options:
     description:
       - Whether to allow (V(present)), or unallow (V(absent)) a permission.
       - When set to V(present), at least one "entity" param of O(users), O(groups), or O(everyone) are required.
-      - When set to V(absent), removes permissions from the specified entities, or removes all permissions if no entity params are specified.
+      - When set to V(absent), removes permissions from the specified entities, or removes all permissions if no entity params
+        are specified.
     choices: [absent, present]
     default: present
     type: str
