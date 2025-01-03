@@ -52,7 +52,7 @@ RETURN = r"""
 scaleway_ip_info:
   description:
     - Response from Scaleway API.
-    - 'For more details please refer to: U(https://developers.scaleway.com/en/products/instance/api/)'
+    - 'For more details please refer to U(https://developers.scaleway.com/en/products/instance/api/).'
   returned: success
   type: list
   elements: dict

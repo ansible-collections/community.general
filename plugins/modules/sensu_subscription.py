@@ -46,8 +46,8 @@ options:
     default: /etc/sensu/conf.d/subscriptions.json
   backup:
     description:
-      - Create a backup file (if yes), including the timestamp information so you
-        can get the original file back if you somehow clobbered it incorrectly.
+      - Create a backup file (if yes), including the timestamp information so you can get the original file back if you somehow
+        clobbered it incorrectly.
     type: bool
     required: false
     default: false

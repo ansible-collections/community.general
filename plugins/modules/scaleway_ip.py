@@ -61,12 +61,12 @@ options:
   id:
     type: str
     description:
-      - Id of the Scaleway IP (UUID).
+      - ID of the Scaleway IP (UUID).
   server:
     type: str
     description:
-      - Id of the server you want to attach an IP to.
-      - To unattach an IP don't specify this option.
+      - ID of the server you want to attach an IP to.
+      - To unattach an IP do not specify this option.
   reverse:
     type: str
     description:

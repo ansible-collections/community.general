@@ -52,9 +52,10 @@ options:
     type: str
   substitute:
     description:
-      - Path to use to substitute file context(s) for the specified O(target). The context labeling for the O(target) subtree is made equivalent
-        to this path.
-      - This is also referred to as SELinux file context equivalence and it implements the C(equal) functionality of the SELinux management tools.
+      - Path to use to substitute file context(s) for the specified O(target). The context labeling for the O(target) subtree
+        is made equivalent to this path.
+      - This is also referred to as SELinux file context equivalence and it implements the C(equal) functionality of the SELinux
+        management tools.
     version_added: 6.4.0
     type: str
     aliases: [equal]
@@ -72,7 +73,8 @@ options:
   state:
     description:
       - Whether the SELinux file context must be V(absent) or V(present).
-      - Specifying V(absent) without either O(setype) or O(substitute) deletes both SELinux type or path substitution mappings that match O(target).
+      - Specifying V(absent) without either O(setype) or O(substitute) deletes both SELinux type or path substitution mappings
+        that match O(target).
     type: str
     choices: [absent, present]
     default: present
@@ -91,10 +93,11 @@ notes:
   - The changes are persistent across reboots.
   - O(setype) and O(substitute) are mutually exclusive.
   - If O(state=present) then one of O(setype) or O(substitute) is mandatory.
-  - The M(community.general.sefcontext) module does not modify existing files to the new SELinux context(s), so it is advisable to first create
-    the SELinux file contexts before creating files, or run C(restorecon) manually for the existing files that require the new SELinux file contexts.
-  - Not applying SELinux fcontexts to existing files is a deliberate decision as it would be unclear what reported changes would entail to, and
-    there is no guarantee that applying SELinux fcontext does not pick up other unrelated prior changes.
+  - The M(community.general.sefcontext) module does not modify existing files to the new SELinux context(s), so it is advisable
+    to first create the SELinux file contexts before creating files, or run C(restorecon) manually for the existing files
+    that require the new SELinux file contexts.
+  - Not applying SELinux fcontexts to existing files is a deliberate decision as it would be unclear what reported changes
+    would entail to, and there is no guarantee that applying SELinux fcontext does not pick up other unrelated prior changes.
 requirements:
   - libselinux-python
   - policycoreutils-python

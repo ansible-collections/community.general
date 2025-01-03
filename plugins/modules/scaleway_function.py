@@ -97,7 +97,8 @@ options:
   runtime:
     description:
       - Runtime of the function.
-      - See U(https://www.scaleway.com/en/docs/compute/functions/reference-content/functions-lifecycle/) for all available runtimes.
+      - See U(https://www.scaleway.com/en/docs/compute/functions/reference-content/functions-lifecycle/) for all available
+        runtimes.
     type: str
     required: true
 
@@ -120,8 +121,8 @@ options:
   privacy:
     description:
       - Privacy policies define whether a function can be executed anonymously.
-      - Choose V(public) to enable anonymous execution, or V(private) to protect your function with an authentication mechanism provided by the
-        Scaleway API.
+      - Choose V(public) to enable anonymous execution, or V(private) to protect your function with an authentication mechanism
+        provided by the Scaleway API.
     type: str
     default: public
     choices:

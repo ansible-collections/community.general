@@ -66,7 +66,7 @@ container:
     description: Container used for testing scaleway_container ansible module
     domain_name: cnansibletestgfogtjod-cn-ansible-test.functions.fnc.fr-par.scw.cloud
     environment_variables:
-        MY_VAR: my_value
+      MY_VAR: my_value
     error_message: null
     http_option: ""
     id: c9070eb0-d7a4-48dd-9af3-4fb139890721
