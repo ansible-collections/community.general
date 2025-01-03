@@ -72,6 +72,13 @@ options:
       - Remove any added source files and trees after adding to archive.
     type: bool
     default: false
+  reproducible_tar:
+    description:
+      - Set tar metadata and gzip headers to vary less given the same input file content.
+      - Useful for minimizing unneeded archive changes and avoiding handlers that may trigger on such changes.
+    type: bool
+    default: false
+    version_added: 9.3.0
 notes:
   - Can produce C(gzip), C(bzip2), C(lzma), and C(zip) compressed files or archives.
   - This module uses C(tarfile), C(zipfile), C(gzip), and C(bz2) packages on the target host to create archives. These are
@@ -190,7 +197,6 @@ import shutil
 import tarfile
 import zipfile
 from fnmatch import fnmatch
-from sys import version_info
 from traceback import format_exc
 from zlib import crc32
 
@@ -218,8 +224,6 @@ else:
     except ImportError:
         LZMA_IMP_ERR = format_exc()
         HAS_LZMA = False
-
-PY27 = version_info[0:2] >= (2, 7)
 
 STATE_ABSENT = 'absent'
 STATE_ARCHIVED = 'archive'
@@ -283,6 +287,7 @@ class Archive(object):
         self.format = module.params['format']
         self.must_archive = module.params['force_archive']
         self.remove = module.params['remove']
+        self.reproducible_tar = module.params["reproducible_tar"]
 
         self.changed = False
         self.destination_state = STATE_ABSENT
@@ -491,6 +496,9 @@ class Archive(object):
 
         return f
 
+    def _reproducible_mtime(self):
+        return 0
+
     @abc.abstractmethod
     def close(self):
         pass
@@ -543,6 +551,35 @@ class ZipArchive(Archive):
         return checksums
 
 
+class ReproducibleTGZFile(tarfile.TarFile):
+    def __init__(
+        self, name=None, mode=None, compresslevel=9, fileobj=None, mtime=None, **kwargs
+    ):
+        self._fileobj = fileobj or open(name, mode + "b")
+
+        try:
+            # filename intentionally empty to exclude it from gzip header
+            self._gzipfileobj = gzip.GzipFile("", mode, compresslevel, self._fileobj, mtime)
+
+            try:
+                super(ReproducibleTGZFile, self).__init__(mode=mode, fileobj=self._gzipfileobj, **kwargs)
+            except Exception:
+                self._gzipfileobj.close()
+                raise
+        except Exception:
+            self._fileobj.close()
+            raise
+
+    def close(self):
+        try:
+            super(ReproducibleTGZFile, self).close()
+        finally:
+            try:
+                self._gzipfileobj.close()
+            finally:
+                self._fileobj.close()
+
+
 class TarArchive(Archive):
     def __init__(self, module):
         super(TarArchive, self).__init__(module)
@@ -563,7 +600,11 @@ class TarArchive(Archive):
         return True
 
     def open(self):
-        if self.format in ('gz', 'bz2'):
+        if self.reproducible_tar and self.format == "gz":
+            self.file = ReproducibleTGZFile(
+                _to_native_ascii(self.destination), "w", mtime=self._reproducible_mtime()
+            )
+        elif self.format in ('gz', 'bz2'):
             self.file = tarfile.open(_to_native_ascii(self.destination), 'w|' + self.format)
         # python3 tarfile module allows xz format but for python2 we have to create the tarfile
         # in memory and then compress it with lzma.
@@ -576,16 +617,34 @@ class TarArchive(Archive):
             self.module.fail_json(msg="%s is not a valid archive format" % self.format)
 
     def _add(self, path, archive_name):
-        def py27_filter(tarinfo):
-            return None if matches_exclusion_patterns(tarinfo.name, self.exclusion_patterns) else tarinfo
+        def filter(tarinfo):
+            # type: (tarfile.TarInfo) -> tarfile.TarInfo | None
+            if matches_exclusion_patterns(tarinfo.name, self.exclusion_patterns):
+                return None
 
-        def py26_filter(path):
-            return matches_exclusion_patterns(path, self.exclusion_patterns)
+            if self.reproducible_tar:
+                # Remove unused backref that prevents copy
+                if hasattr(tarinfo, "tarfile"):
+                    delattr(tarinfo, "tarfile")
 
-        if PY27:
-            self.file.add(path, archive_name, recursive=False, filter=py27_filter)
-        else:
-            self.file.add(path, archive_name, recursive=False, exclude=py26_filter)
+                if tarinfo.isdir():
+                    mode = 0o40000 | 0o755
+                else:
+                    mode = 0o100000 | (0o755 if tarinfo.mode & 0o100 else 0o644)
+
+                # Copy tarfile while reducing metadata
+                return tarinfo.replace(
+                    mtime=self._reproducible_mtime(),
+                    mode=mode,
+                    uid=0,
+                    gid=0,
+                    uname="",
+                    gname="",
+                )
+
+            return tarinfo
+
+        self.file.add(path, archive_name, recursive=False, filter=filter)
 
     def _get_checksums(self, path):
         if HAS_LZMA:
@@ -638,6 +697,7 @@ def main():
             exclusion_patterns=dict(type='list', elements='path'),
             force_archive=dict(type='bool', default=False),
             remove=dict(type='bool', default=False),
+            reproducible_tar=dict(type="bool", default=False),
         ),
         add_file_common_args=True,
         supports_check_mode=True,
