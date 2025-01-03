@@ -37,7 +37,7 @@ options:
   path:
     type: path
     description:
-      - The base path where Node.js libraries are installed.
+      - The base path where Node.js installs libraries.
       - This is where the C(node_modules) folder lives.
     required: false
   version:
