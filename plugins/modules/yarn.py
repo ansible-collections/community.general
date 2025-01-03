@@ -37,7 +37,7 @@ options:
   path:
     type: path
     description:
-      - The base path where Node.js libraries will be installed.
+      - The base path where Node.js installs libraries.
       - This is where the C(node_modules) folder lives.
     required: false
   version:
@@ -66,7 +66,7 @@ options:
   production:
     description:
       - Install dependencies in production mode.
-      - Yarn will ignore any dependencies under devDependencies in C(package.json).
+      - C(yarn) ignores any dependencies under devDependencies in C(package.json).
     required: false
     type: bool
     default: false
@@ -130,8 +130,8 @@ out:
   description: Output generated from Yarn.
   returned: always
   type: str
-  sample: "yarn add v0.16.1[1/4] Resolving packages...[2/4] Fetching packages...[3/4] Linking dependencies...[4/4] Building fresh packages...success
-    Saved lockfile.success Saved 1 new dependency..left-pad@1.1.3 Done in 0.59s."
+  sample: "yarn add v0.16.1[1/4] Resolving packages...[2/4] Fetching packages...[3/4] Linking dependencies...[4/4] Building
+    fresh packages...success Saved lockfile.success Saved 1 new dependency..left-pad@1.1.3 Done in 0.59s."
 """
 
 import os

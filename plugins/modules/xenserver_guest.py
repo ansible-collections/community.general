@@ -12,34 +12,35 @@ DOCUMENTATION = r"""
 module: xenserver_guest
 short_description: Manages virtual machines running on Citrix Hypervisor/XenServer host or pool
 description: >-
-  This module can be used to create new virtual machines from templates or other virtual machines, modify various virtual machine components like
-  network and disk, rename a virtual machine and remove a virtual machine with associated components.
+  This module can be used to create new virtual machines from templates or other virtual machines, modify various virtual
+  machine components like network and disk, rename a virtual machine and remove a virtual machine with associated components.
 author:
   - Bojan Vitnik (@bvitnik) <bvitnik@mainstream.rs>
 notes:
   - Minimal supported version of XenServer is 5.6.
   - Module was tested with XenServer 6.5, 7.1, 7.2, 7.6, Citrix Hypervisor 8.0, XCP-ng 7.6 and 8.0.
-  - 'To acquire XenAPI Python library, just run C(pip install XenAPI) on your Ansible Control Node. The library can also be found inside Citrix
-    Hypervisor/XenServer SDK (downloadable from Citrix website). Copy the C(XenAPI.py) file from the SDK to your Python site-packages on your Ansible
-    Control Node to use it. Latest version of the library can also be acquired from GitHub:
-    U(https://raw.githubusercontent.com/xapi-project/xen-api/master/scripts/examples/python/XenAPI/XenAPI.py).'
-  - 'If no scheme is specified in O(hostname), module defaults to C(http://) because C(https://) is problematic in most setups. Make sure you
-    are accessing XenServer host in trusted environment or use C(https://) scheme explicitly.'
-  - 'To use C(https://) scheme for O(hostname) you have to either import host certificate to your OS certificate store or use O(validate_certs=false)
-    which requires XenAPI library from XenServer 7.2 SDK or newer and Python 2.7.9 or newer.'
-  - 'Network configuration inside a guest OS, by using parameters O(networks[].type), O(networks[].ip), O(networks[].gateway) and so on, is supported
-    on XenServer 7.0 or newer for Windows guests by using official XenServer Guest agent support for network configuration. The module will try
-    to detect if such support is available and utilize it, else it will use a custom method of configuration using xenstore. Since XenServer Guest
-    agent only support None and Static types of network configuration, where None means DHCP configured interface, O(networks[].type) and O(networks[].type6)
-    values V(none) and V(dhcp) have same effect. More info here:
-    U(https://www.citrix.com/community/citrix-developer/citrix-hypervisor-developer/citrix-hypervisor-developing-products/citrix-hypervisor-staticip.html).'
-  - 'On platforms without official support for network configuration inside a guest OS, network parameters will be written to xenstore
-    C(vm-data/networks/<vif_device>) key. Parameters can be inspected by using C(xenstore ls) and C(xenstore read) tools on \*nix guests or through WMI
-    interface on Windows guests.
-    They can also be found in VM facts C(instance.xenstore_data) key as returned by the module. It is up to the user to implement a boot time
-    scripts or custom agent that will read the parameters from xenstore and configure network with given parameters. Take note that for xenstore
-    data to become available inside a guest, a VM restart is needed hence module will require VM restart if any parameter is changed. This is
-    a limitation of XenAPI and xenstore. Considering these limitations, network configuration through xenstore is most useful for bootstrapping
+  - 'To acquire XenAPI Python library, just run C(pip install XenAPI) on your Ansible Control Node. The library can also be
+    found inside Citrix Hypervisor/XenServer SDK (downloadable from Citrix website). Copy the C(XenAPI.py) file from the SDK
+    to your Python site-packages on your Ansible Control Node to use it. Latest version of the library can also be acquired
+    from GitHub: U(https://raw.githubusercontent.com/xapi-project/xen-api/master/scripts/examples/python/XenAPI/XenAPI.py).'
+  - If no scheme is specified in O(hostname), module defaults to C(http://) because C(https://) is problematic in most setups.
+    Make sure you are accessing XenServer host in trusted environment or use C(https://) scheme explicitly.
+  - To use C(https://) scheme for O(hostname) you have to either import host certificate to your OS certificate store or use
+    O(validate_certs=false) which requires XenAPI library from XenServer 7.2 SDK or newer and Python 2.7.9 or newer.
+  - 'Network configuration inside a guest OS, by using parameters O(networks[].type), O(networks[].ip), O(networks[].gateway)
+    and so on, is supported on XenServer 7.0 or newer for Windows guests by using official XenServer Guest agent support for
+    network configuration. The module tries to detect if such support is available and utilize it, else it uses a custom method
+    of configuration using xenstore. Since XenServer Guest agent only support None and Static types of network configuration,
+    where None means DHCP configured interface, O(networks[].type) and O(networks[].type6) values V(none) and V(dhcp) have
+    same effect. More info here:
+    U(https://web.archive.org/web/20180218110151/https://xenserver.org/blog/entry/set-windows-guest-vm-static-ip-address-in-xenserver.html).'
+  - 'On platforms without official support for network configuration inside a guest OS, network parameters are written to
+    xenstore C(vm-data/networks/<vif_device>) key. Parameters can be inspected by using C(xenstore ls) and C(xenstore read)
+    tools on \*nix guests or through WMI interface on Windows guests. They can also be found in VM facts C(instance.xenstore_data)
+    key as returned by the module. It is up to the user to implement a boot time scripts or custom agent that reads the parameters
+    from xenstore and configure network with given parameters. Take note that for xenstore data to become available inside
+    a guest, a VM restart is needed hence module requires VM restart if any parameter is changed. This is a limitation of
+    XenAPI and xenstore. Considering these limitations, network configuration through xenstore is most useful for bootstrapping
     newly deployed VMs, much less for reconfiguring existing ones. More info here: U(https://support.citrix.com/article/CTX226713).'
 requirements:
   - XenAPI
@@ -55,14 +56,16 @@ options:
       - If O(state) is set to V(present) and VM exists, ensure the VM configuration conforms to given parameters.
       - If O(state) is set to V(present) and VM does not exist, then VM is deployed with given parameters.
       - If O(state) is set to V(absent) and VM exists, then VM is removed with its associated components.
-      - If O(state) is set to V(poweredon) and VM does not exist, then VM is deployed with given parameters and powered on automatically.
+      - If O(state) is set to V(poweredon) and VM does not exist, then VM is deployed with given parameters and powered on
+        automatically.
     type: str
     default: present
     choices: [present, absent, poweredon]
   name:
     description:
       - Name of the VM to work with.
-      - VMs running on XenServer do not necessarily have unique names. The module will fail if multiple VMs with same name are found.
+      - VMs running on XenServer do not necessarily have unique names. The module fails if multiple VMs with same name are
+        found.
       - In case of multiple VMs with same name, use O(uuid) to uniquely specify VM to manage.
       - This parameter is case sensitive.
     type: str
@@ -75,15 +78,15 @@ options:
     description:
       - UUID of the VM to manage if known. This is XenServer's unique identifier.
       - It is required if name is not unique.
-      - Please note that a supplied UUID will be ignored on VM creation, as XenServer creates the UUID internally.
+      - Please note that a supplied UUID is ignored on VM creation, as XenServer creates the UUID internally.
     type: str
   template:
     description:
       - Name of a template, an existing VM (must be shut down) or a snapshot that should be used to create VM.
-      - Templates/VMs/snapshots on XenServer do not necessarily have unique names. The module will fail if multiple templates with same name are
-        found.
+      - Templates/VMs/snapshots on XenServer do not necessarily have unique names. The module fails if multiple templates
+        with same name are found.
       - In case of multiple templates/VMs/snapshots with same name, use O(template_uuid) to uniquely specify source template.
-      - If VM already exists, this setting will be ignored.
+      - If VM already exists, this setting is ignored.
       - This parameter is case sensitive.
     type: str
     aliases: [template_src]
@@ -101,8 +104,7 @@ options:
     description:
       - Destination folder for VM.
       - This parameter is case sensitive.
-      - 'Example:'
-      - '  folder: /folder1/folder2'
+      - 'Example: O(folder=/folder1/folder2).'
     type: str
   hardware:
     description:
@@ -126,7 +128,8 @@ options:
       - A list of disks to add to VM.
       - All parameters are case sensitive.
       - Removing or detaching existing disks of VM is not supported.
-      - New disks are required to have either a O(disks[].size) or one of O(ignore:disks[].size_[tb,gb,mb,kb,b]) parameters specified.
+      - New disks are required to have either a O(disks[].size) or one of O(ignore:disks[].size_[tb,gb,mb,kb,b]) parameters
+        specified.
       - VM needs to be shut down to reconfigure disk size.
     type: list
     elements: dict
@@ -134,7 +137,8 @@ options:
     suboptions:
       size:
         description:
-          - 'Disk size with unit. Unit must be: V(b), V(kb), V(mb), V(gb), V(tb). VM needs to be shut down to reconfigure this parameter.'
+          - 'Disk size with unit. Unit must be: V(b), V(kb), V(mb), V(gb), V(tb). VM needs to be shut down to reconfigure
+            this parameter.'
           - If no unit is specified, size is assumed to be in bytes.
         type: str
       size_b:
@@ -168,7 +172,8 @@ options:
         type: str
       sr:
         description:
-          - Storage Repository to create disk on. If not specified, will use default SR. Cannot be used for moving disk to other SR.
+          - Storage Repository to create disk on. If not specified, it uses default SR. Cannot be used for moving disk to
+            other SR.
         type: str
       sr_uuid:
         description:
@@ -182,12 +187,12 @@ options:
     suboptions:
       type:
         description:
-          - The type of CD-ROM. With V(none) the CD-ROM device will be present but empty.
+          - The type of CD-ROM. When V(none) the CD-ROM device is present but empty.
         type: str
         choices: [none, iso]
       iso_name:
         description:
-          - 'The file name of an ISO image from one of the XenServer ISO Libraries (implies O(cdrom.type=iso)).'
+          - The file name of an ISO image from one of the XenServer ISO Libraries (implies O(cdrom.type=iso)).
           - Required if O(cdrom.type) is set to V(iso).
         type: str
   networks:
@@ -211,13 +216,14 @@ options:
       type:
         description:
           - Type of IPv4 assignment. Value V(none) means whatever is default for OS.
-          - On some operating systems it could be DHCP configured (for example Windows) or unconfigured interface (for example Linux).
+          - On some operating systems it could be DHCP configured (for example Windows) or unconfigured interface (for example
+            Linux).
         type: str
         choices: [none, dhcp, static]
       ip:
         description:
-          - Static IPv4 address (implies O(networks[].type=static)). Can include prefix in format C(<IPv4 address>/<prefix>) instead of using
-            C(netmask).
+          - Static IPv4 address (implies O(networks[].type=static)). Can include prefix in format C(<IPv4 address>/<prefix>)
+            instead of using C(netmask).
         type: str
       netmask:
         description:
@@ -234,7 +240,7 @@ options:
         choices: [none, dhcp, static]
       ip6:
         description:
-          - 'Static IPv6 address (implies O(networks[].type6=static)) with prefix in format C(<IPv6 address>/<prefix>).'
+          - Static IPv6 address (implies O(networks[].type6=static)) with prefix in format C(<IPv6 address>/<prefix>).
         type: str
       gateway6:
         description:
@@ -242,7 +248,7 @@ options:
         type: str
   home_server:
     description:
-      - Name of a XenServer host that will be a Home Server for the VM.
+      - Name of a XenServer host that is a Home Server for the VM.
       - This parameter is case sensitive.
     type: str
   custom_params:
@@ -271,14 +277,15 @@ options:
     default: false
   state_change_timeout:
     description:
-      - 'By default, module will wait indefinitely for VM to acquire an IP address if O(wait_for_ip_address=true).'
-      - If this parameter is set to positive value, the module will instead wait specified number of seconds for the state change.
-      - In case of timeout, module will generate an error message.
+      - By default, the module waits indefinitely for VM to acquire an IP address if O(wait_for_ip_address=true).
+      - If this parameter is set to a positive value, the module instead waits the specified number of seconds for the state
+        change.
+      - In case of timeout, module generates an error message.
     type: int
     default: 0
   linked_clone:
     description:
-      - Whether to create a Linked Clone from the template, existing VM or snapshot. If no, will create a full copy.
+      - Whether to create a Linked Clone from the template, existing VM or snapshot. If V(false), it creates a full copy.
       - This is equivalent to C(Use storage-level fast disk clone) option in XenCenter.
     type: bool
     default: false

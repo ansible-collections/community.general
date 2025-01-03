@@ -31,8 +31,8 @@ options:
     elements: str
   state:
     description:
-      - If state is V(present), package(s) will be added to yum versionlock list.
-      - If state is V(absent), package(s) will be removed from yum versionlock list.
+      - If state is V(present), package(s) is/are added to yum versionlock list.
+      - If state is V(absent), package(s) is/are removed from yum versionlock list.
     choices: ['absent', 'present']
     type: str
     default: present
