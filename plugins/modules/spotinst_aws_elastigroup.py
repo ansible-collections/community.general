@@ -10,9 +10,10 @@ module: spotinst_aws_elastigroup
 short_description: Create, update or delete Spotinst AWS Elastigroups
 author: Spotinst (@talzur)
 description:
-  - Can create, update, or delete Spotinst AWS Elastigroups Launch configuration is part of the elastigroup configuration, so no additional modules
-    are necessary for handling the launch configuration. You will have to have a credentials file in this location - C($HOME/.spotinst/credentials).
-    The credentials file must contain a row that looks like this C(token = <YOUR TOKEN>).
+  - Can create, update, or delete Spotinst AWS Elastigroups Launch configuration is part of the elastigroup configuration,
+    so no additional modules are necessary for handling the launch configuration. You will have to have a credentials file
+    in this location - C($HOME/.spotinst/credentials). The credentials file must contain a row that looks like this C(token
+    = <YOUR TOKEN>).
   - Full documentation available at U(https://help.spotinst.com/hc/en-us/articles/115003530285-Ansible-).
 requirements:
   - spotinst_sdk >= 1.0.38
@@ -40,8 +41,8 @@ options:
   token:
     description:
       - A Personal API Access Token issued by Spotinst.
-      - 'When not specified, the module will try to obtain it, in that order, from: environment variable E(SPOTINST_TOKEN), or from the credentials
-        path.'
+      - 'When not specified, the module will try to obtain it, in that order, from: environment variable E(SPOTINST_TOKEN),
+        or from the credentials path.'
     type: str
 
   availability_vs_cost:
@@ -53,24 +54,25 @@ options:
 
   availability_zones:
     description:
-      - A list of hash/dictionaries of Availability Zones that are configured in the elastigroup; '[{"key":"value", "key":"value"}]'; keys allowed
-        are name (String), subnet_id (String), placement_group_name (String),.
+      - A list of hash/dictionaries of Availability Zones that are configured in the elastigroup; '[{"key":"value", "key":"value"}]';
+        keys allowed are name (String), subnet_id (String), placement_group_name (String),.
     required: true
     type: list
     elements: dict
 
   block_device_mappings:
     description:
-      - A list of hash/dictionaries of Block Device Mappings for elastigroup instances; You can specify virtual devices and EBS volumes.; '[{"key":"value",
-        "key":"value"}]'; keys allowed are device_name (List of Strings), virtual_name (String), no_device (String), ebs (Object, expects the
-        following keys- delete_on_termination(Boolean), encrypted(Boolean), iops (Integer), snapshot_id(Integer), volume_type(String), volume_size(Integer)).
+      - A list of hash/dictionaries of Block Device Mappings for elastigroup instances; You can specify virtual devices and
+        EBS volumes.; '[{"key":"value", "key":"value"}]'; keys allowed are device_name (List of Strings), virtual_name (String),
+        no_device (String), ebs (Object, expects the following keys- delete_on_termination(Boolean), encrypted(Boolean), iops
+        (Integer), snapshot_id(Integer), volume_type(String), volume_size(Integer)).
     type: list
     elements: dict
 
   chef:
     description:
-      - The Chef integration configuration.; Expects the following keys - chef_server (String), organization (String), user (String), pem_key
-        (String), chef_version (String).
+      - The Chef integration configuration.; Expects the following keys - chef_server (String), organization (String), user
+        (String), pem_key (String), chef_version (String).
     type: dict
 
   draining_timeout:
@@ -80,13 +82,14 @@ options:
 
   ebs_optimized:
     description:
-      - Enable EBS optimization for supported instances which are not enabled by default.; Note - additional charges will be applied.
+      - Enable EBS optimization for supported instances which are not enabled by default.; Note - additional charges will
+        be applied.
     type: bool
 
   ebs_volume_pool:
     description:
-      - A list of hash/dictionaries of EBS devices to reattach to the elastigroup when available; '[{"key":"value", "key":"value"}]'; keys allowed
-        are - volume_ids (List of Strings), device_name (String).
+      - A list of hash/dictionaries of EBS devices to reattach to the elastigroup when available; '[{"key":"value", "key":"value"}]';
+        keys allowed are - volume_ids (List of Strings), device_name (String).
     type: list
     elements: dict
 
@@ -97,7 +100,7 @@ options:
 
   elastic_ips:
     description:
-      - List of ElasticIps Allocation Ids (example V(eipalloc-9d4e16f8)) to associate to the group instances.
+      - List of ElasticIps Allocation IDs (example V(eipalloc-9d4e16f8)) to associate to the group instances.
     type: list
     elements: str
 
@@ -137,13 +140,15 @@ options:
 
   id:
     description:
-      - The group id if it already exists and you want to update, or delete it. This will not work unless the uniqueness_by field is set to id.
-        When this is set, and the uniqueness_by field is set, the group will either be updated or deleted, but not created.
+      - The group ID if it already exists and you want to update, or delete it. This will not work unless the uniqueness_by
+        field is set to ID. When this is set, and the uniqueness_by field is set, the group will either be updated or deleted,
+        but not created.
     type: str
 
   image_id:
     description:
-      - The image Id used to launch the instance.; In case of conflict between Instance type and image type, an error will be returned.
+      - The image ID used to launch the instance.; In case of conflict between Instance type and image type, an error will
+        be returned.
     required: true
     type: str
 
@@ -198,17 +203,19 @@ options:
 
   network_interfaces:
     description:
-      - A list of hash/dictionaries of network interfaces to add to the elastigroup; '[{"key":"value", "key":"value"}]'; keys allowed are - description
-        (String), device_index (Integer), secondary_private_ip_address_count (Integer), associate_public_ip_address (Boolean), delete_on_termination
-        (Boolean), groups (List of Strings), network_interface_id (String), private_ip_address (String), subnet_id (String), associate_ipv6_address
-        (Boolean), private_ip_addresses (List of Objects, Keys are privateIpAddress (String, required) and primary (Boolean)).
+      - A list of hash/dictionaries of network interfaces to add to the elastigroup; '[{"key":"value", "key":"value"}]'; keys
+        allowed are - description (String), device_index (Integer), secondary_private_ip_address_count (Integer), associate_public_ip_address
+        (Boolean), delete_on_termination (Boolean), groups (List of Strings), network_interface_id (String), private_ip_address
+        (String), subnet_id (String), associate_ipv6_address (Boolean), private_ip_addresses (List of Objects, Keys are privateIpAddress
+        (String, required) and primary (Boolean)).
     type: list
     elements: dict
 
   on_demand_count:
     description:
       - Required if risk is not set.
-      - Number of on demand instances to launch. All other instances will be spot instances.; Either set this parameter or the risk parameter.
+      - Number of on demand instances to launch. All other instances will be spot instances.; Either set this parameter or
+        the risk parameter.
     type: int
 
   on_demand_instance_type:
@@ -230,14 +237,15 @@ options:
   product:
     description:
       - Operation system type.
-      - 'Available choices are: V(Linux/UNIX), V(SUSE Linux), V(Windows), V(Linux/UNIX (Amazon VPC)), V(SUSE Linux (Amazon VPC)).'
+      - 'Available choices are: V(Linux/UNIX), V(SUSE Linux), V(Windows), V(Linux/UNIX (Amazon VPC)), V(SUSE Linux (Amazon
+        VPC)).'
     required: true
     type: str
 
   rancher:
     description:
-      - The Rancher integration configuration.; Expects the following keys - version (String), access_key (String), secret_key (String), master_host
-        (String).
+      - The Rancher integration configuration.; Expects the following keys - version (String), access_key (String), secret_key
+        (String), master_host (String).
     type: dict
 
   right_scale:
@@ -254,15 +262,16 @@ options:
     description:
       - Roll configuration.
       - If you would like the group to roll after updating, please use this feature.
-      - Accepts the following keys - batch_size_percentage(Integer, Required), grace_period - (Integer, Required), health_check_type(String, Optional).
+      - Accepts the following keys - batch_size_percentage(Integer, Required), grace_period - (Integer, Required), health_check_type(String,
+        Optional).
     type: dict
 
   scheduled_tasks:
     description:
       - A list of hash/dictionaries of scheduled tasks to configure in the elastigroup, as in V([{"key":"value", "key":"value"}]).
-      - 'Keys allowed are: adjustment (Integer), scale_target_capacity (Integer), scale_min_capacity (Integer), scale_max_capacity (Integer),
-        adjustment_percentage (Integer), batch_size_percentage (Integer), cron_expression (String), frequency (String), grace_period (Integer),
-        task_type (String, required), is_enabled (Boolean).'
+      - 'Keys allowed are: adjustment (Integer), scale_target_capacity (Integer), scale_min_capacity (Integer), scale_max_capacity
+        (Integer), adjustment_percentage (Integer), batch_size_percentage (Integer), cron_expression (String), frequency (String),
+        grace_period (Integer), task_type (String, required), is_enabled (Boolean).'
     type: list
     elements: dict
 
@@ -281,7 +290,8 @@ options:
 
   signals:
     description:
-      - A list of hash/dictionaries of signals to configure in the elastigroup; keys allowed are - name (String, required), timeout (Integer).
+      - A list of hash/dictionaries of signals to configure in the elastigroup; keys allowed are - name (String, required),
+        timeout (Integer).
     type: list
     elements: dict
 
@@ -343,29 +353,32 @@ options:
 
   up_scaling_policies:
     description:
-      - A list of hash/dictionaries of scaling policies to configure in the elastigroup; '[{"key":"value", "key":"value"}]'; keys allowed are
-        - policy_name (String, required), namespace (String, required), metric_name (String, required), dimensions (List of Objects, Keys allowed
-        are name (String, required) and value (String)), statistic (String, required) evaluation_periods (String, required), period (String, required),
-        threshold (String, required), cooldown (String, required), unit (String, required), operator (String, required), action_type (String,
-        required), adjustment (String), min_target_capacity (String), target (String), maximum (String), minimum (String).
+      - A list of hash/dictionaries of scaling policies to configure in the elastigroup; '[{"key":"value", "key":"value"}]';
+        keys allowed are - policy_name (String, required), namespace (String, required), metric_name (String, required), dimensions
+        (List of Objects, Keys allowed are name (String, required) and value (String)), statistic (String, required) evaluation_periods
+        (String, required), period (String, required), threshold (String, required), cooldown (String, required), unit (String,
+        required), operator (String, required), action_type (String, required), adjustment (String), min_target_capacity (String),
+        target (String), maximum (String), minimum (String).
     type: list
     elements: dict
 
   down_scaling_policies:
     description:
-      - A list of hash/dictionaries of scaling policies to configure in the elastigroup; '[{"key":"value", "key":"value"}]'; keys allowed are
-        - policy_name (String, required), namespace (String, required), metric_name (String, required), dimensions ((List of Objects), Keys allowed
-        are name (String, required) and value (String)), statistic (String, required), evaluation_periods (String, required), period (String,
-        required), threshold (String, required), cooldown (String, required), unit (String, required), operator (String, required), action_type
-        (String, required), adjustment (String), max_target_capacity (String), target (String), maximum (String), minimum (String).
+      - A list of hash/dictionaries of scaling policies to configure in the elastigroup; '[{"key":"value", "key":"value"}]';
+        keys allowed are - policy_name (String, required), namespace (String, required), metric_name (String, required), dimensions
+        ((List of Objects), Keys allowed are name (String, required) and value (String)), statistic (String, required), evaluation_periods
+        (String, required), period (String, required), threshold (String, required), cooldown (String, required), unit (String,
+        required), operator (String, required), action_type (String, required), adjustment (String), max_target_capacity (String),
+        target (String), maximum (String), minimum (String).
     type: list
     elements: dict
 
   target_tracking_policies:
     description:
-      - A list of hash/dictionaries of target tracking policies to configure in the elastigroup; '[{"key":"value", "key":"value"}]'; keys allowed
-        are - policy_name (String, required), namespace (String, required), source (String, required), metric_name (String, required), statistic
-        (String, required), unit (String, required), cooldown (String, required), target (String, required).
+      - A list of hash/dictionaries of target tracking policies to configure in the elastigroup; '[{"key":"value", "key":"value"}]';
+        keys allowed are - policy_name (String, required), namespace (String, required), source (String, required), metric_name
+        (String, required), statistic (String, required), unit (String, required), cooldown (String, required), target (String,
+        required).
     type: list
     elements: dict
 
@@ -374,8 +387,8 @@ options:
       - id
       - name
     description:
-      - If your group names are not unique, you may use this feature to update or delete a specific group. Whenever this property is set, you
-        must set a group_id in order to update or delete a group, otherwise a group will be created.
+      - If your group names are not unique, you may use this feature to update or delete a specific group. Whenever this property
+        is set, you must set a group_id in order to update or delete a group, otherwise a group will be created.
     default: name
     type: str
 
@@ -684,18 +697,8 @@ instances:
   description: List of active elastigroup instances and their details.
   returned: success
   type: dict
-  sample: [
-    {
-      "spotInstanceRequestId": "sir-regs25zp",
-      "instanceId": "i-09640ad8678234c",
-      "instanceType": "m4.large",
-      "product": "Linux/UNIX",
-      "availabilityZone": "us-west-2b",
-      "privateIp": "180.0.2.244",
-      "createdAt": "2017-07-17T12:46:18.000Z",
-      "status": "fulfilled"
-    }
-  ]
+  sample: [{"spotInstanceRequestId": "sir-regs25zp", "instanceId": "i-09640ad8678234c", "instanceType": "m4.large", "product": "Linux/UNIX",
+        "availabilityZone": "us-west-2b", "privateIp": "180.0.2.244", "createdAt": "2017-07-17T12:46:18.000Z", "status": "fulfilled"}]
 group_id:
   description: Created / Updated group's ID.
   returned: success

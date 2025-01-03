@@ -13,9 +13,9 @@ DOCUMENTATION = r"""
 module: systemd_creds_decrypt
 short_description: C(systemd)'s C(systemd-creds decrypt) plugin
 description:
-    - This module decrypts input using C(systemd)'s C(systemd-creds decrypt).
+  - This module decrypts input using C(systemd)'s C(systemd-creds decrypt).
 author:
-    - Thomas Sjögren (@konstruktoid)
+  - Thomas Sjögren (@konstruktoid)
 version_added: '10.2.0'
 extends_documentation_fragment:
   - community.general.attributes
@@ -29,50 +29,46 @@ attributes:
     details:
       - This action does not modify state.
 options:
-    name:
-        description:
-            - The credential name to validate the embedded credential name.
-        type: str
-        required: false
-    newline:
-        description:
-            - Whether to add a trailing newline character to the end of the output,
-              if not present.
-        type: bool
-        required: false
-        default: false
-    secret:
-        description:
-            - The secret to decrypt.
-        type: str
-        required: true
-    timestamp:
-        description:
-            - The timestamp to use to validate the V(not-after) timestamp that
-              was used during encryption.
-            - Takes a timestamp specification in the format described in
-              V(systemd.time(7\)).
-        type: str
-        required: false
-    transcode:
-        description:
-            - Whether to transcode the output before returning it.
-        type: str
-        choices: [ base64, unbase64, hex, unhex ]
-        required: false
-    user:
-        description:
-            - A user name or numeric UID when decrypting from a specific user context.
-            - If set to the special string V(self) it sets the user to the user
-              of the calling process.
-            - Requires C(systemd) 256 or later.
-        type: str
-        required: false
+  name:
+    description:
+      - The credential name to validate the embedded credential name.
+    type: str
+    required: false
+  newline:
+    description:
+      - Whether to add a trailing newline character to the end of the output, if not present.
+    type: bool
+    required: false
+    default: false
+  secret:
+    description:
+      - The secret to decrypt.
+    type: str
+    required: true
+  timestamp:
+    description:
+      - The timestamp to use to validate the V(not-after) timestamp that was used during encryption.
+      - Takes a timestamp specification in the format described in V(systemd.time(7\)).
+    type: str
+    required: false
+  transcode:
+    description:
+      - Whether to transcode the output before returning it.
+    type: str
+    choices: [base64, unbase64, hex, unhex]
+    required: false
+  user:
+    description:
+      - A user name or numeric UID when decrypting from a specific user context.
+      - If set to the special string V(self) it sets the user to the user of the calling process.
+      - Requires C(systemd) 256 or later.
+    type: str
+    required: false
 notes:
   - C(systemd-creds) requires C(systemd) 250 or later.
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Decrypt secret
   community.general.systemd_creds_decrypt:
     name: db
@@ -86,16 +82,14 @@ EXAMPLES = """
 
 RETURN = r"""
 value:
-    description:
-      - The decrypted secret.
-      - Note that Ansible only supports returning UTF-8 encoded strings.
-        If the decrypted secret is binary data, or a string encoded in another
-        way, use O(transcode=base64) or O(transcode=hex) to circument this
-        restriction. You then need to decode the data when using it, for
-        example using the P(ansible.builtin.b64decode#filter) filter.
-    type: str
-    returned: always
-    sample: "access_token"
+  description:
+    - The decrypted secret.
+    - Note that Ansible only supports returning UTF-8 encoded strings. If the decrypted secret is binary data, or a string
+      encoded in another way, use O(transcode=base64) or O(transcode=hex) to circument this restriction. You then need to
+      decode the data when using it, for example using the P(ansible.builtin.b64decode#filter) filter.
+  type: str
+  returned: always
+  sample: "access_token"
 """
 
 

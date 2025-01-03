@@ -107,7 +107,7 @@ options:
   maintenance_id:
     type: str
     description:
-      - The maintenance id number when deleting a maintenance window.
+      - The maintenance ID number when deleting a maintenance window.
   minutes:
     type: int
     description:

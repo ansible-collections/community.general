@@ -35,7 +35,7 @@ options:
   topic:
     type: int
     description:
-      - Topic id to post message.
+      - Topic ID to post message.
     required: true
   msg:
     type: str

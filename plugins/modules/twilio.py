@@ -15,9 +15,10 @@ short_description: Sends a text message to a mobile phone through Twilio
 description:
   - Sends a text message to a phone number through the Twilio messaging API.
 notes:
-  - This module is non-idempotent because it sends an email through the external API. It is idempotent only in the case that the module fails.
-  - Like the other notification modules, this one requires an external dependency to work. In this case, you need a Twilio account with a purchased
-    or verified phone number to send the text message.
+  - This module is non-idempotent because it sends an email through the external API. It is idempotent only in the case that
+    the module fails.
+  - Like the other notification modules, this one requires an external dependency to work. In this case, you need a Twilio
+    account with a purchased or verified phone number to send the text message.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:

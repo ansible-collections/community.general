@@ -32,29 +32,31 @@ options:
   domain:
     type: str
     description:
-      - Slack (sub)domain for your environment without protocol. (For example V(example.slack.com).) In Ansible 1.8 and beyond, this is deprecated
-        and may be ignored. See token documentation for information.
+      - Slack (sub)domain for your environment without protocol. (For example V(example.slack.com).) In Ansible 1.8 and beyond,
+        this is deprecated and may be ignored. See token documentation for information.
   token:
     type: str
     description:
-      - Slack integration token. This authenticates you to the slack service. Make sure to use the correct type of token, depending on what method
-        you use.
-      - 'Webhook token: Prior to Ansible 1.8, a token looked like V(3Ffe373sfhRE6y42Fg3rvf4GlK). In Ansible 1.8 and above, Ansible adapts to the
-        new slack API where tokens look like V(G922VJP24/D921DW937/3Ffe373sfhRE6y42Fg3rvf4GlK). If tokens are in the new format then slack will
-        ignore any value of domain. If the token is in the old format the domain is required. Ansible has no control of when slack will get rid
-        of the old API. When slack does that the old format will stop working. ** Please keep in mind the tokens are not the API tokens but are
-        the webhook tokens. In slack these are found in the webhook URL which are obtained under the apps and integrations. The incoming webhooks
-        can be added in that area. In some cases this may be locked by your Slack admin and you must request access. It is there that the incoming
-        webhooks can be added. The key is on the end of the URL given to you in that section.'
-      - "WebAPI token: Slack WebAPI requires a personal, bot or work application token. These tokens start with V(xoxp-), V(xoxb-) or V(xoxa-),
-        for example V(xoxb-1234-56789abcdefghijklmnop). WebAPI token is required if you intend to receive thread_id. See Slack's documentation
-        (U(https://api.slack.com/docs/token-types)) for more information."
+      - Slack integration token. This authenticates you to the slack service. Make sure to use the correct type of token,
+        depending on what method you use.
+      - 'Webhook token: Prior to Ansible 1.8, a token looked like V(3Ffe373sfhRE6y42Fg3rvf4GlK). In Ansible 1.8 and above,
+        Ansible adapts to the new slack API where tokens look like V(G922VJP24/D921DW937/3Ffe373sfhRE6y42Fg3rvf4GlK). If tokens
+        are in the new format then slack will ignore any value of domain. If the token is in the old format the domain is
+        required. Ansible has no control of when slack will get rid of the old API. When slack does that the old format will
+        stop working. ** Please keep in mind the tokens are not the API tokens but are the webhook tokens. In slack these
+        are found in the webhook URL which are obtained under the apps and integrations. The incoming webhooks can be added
+        in that area. In some cases this may be locked by your Slack admin and you must request access. It is there that the
+        incoming webhooks can be added. The key is on the end of the URL given to you in that section.'
+      - "WebAPI token: Slack WebAPI requires a personal, bot or work application token. These tokens start with V(xoxp-),
+        V(xoxb-) or V(xoxa-), for example V(xoxb-1234-56789abcdefghijklmnop). WebAPI token is required if you intend to receive
+        thread_id. See Slack's documentation (U(https://api.slack.com/docs/token-types)) for more information."
     required: true
   msg:
     type: str
     description:
-      - Message to send. Note that the module does not handle escaping characters. Plain-text angle brackets and ampersands should be converted
-        to HTML entities (for example C(&) to C(&amp;)) before sending. See Slack's documentation (U(https://api.slack.com/docs/message-formatting)) for more.
+      - Message to send. Note that the module does not handle escaping characters. Plain-text angle brackets and ampersands
+        should be converted to HTML entities (for example C(&) to C(&amp;)) before sending. See Slack's documentation
+        (U(https://api.slack.com/docs/message-formatting)) for more.
   channel:
     type: str
     description:
@@ -66,8 +68,8 @@ options:
   message_id:
     description:
       - Optional. Message ID to edit, instead of posting a new message.
-      - If supplied O(channel) must be in form of C(C0xxxxxxx). use C({{ slack_response.channel }}) to get RV(ignore:channel) from previous task
-        run.
+      - If supplied O(channel) must be in form of C(C0xxxxxxx). use C({{ slack_response.channel }}) to get RV(ignore:channel)
+        from previous task run.
       - The token needs history scope to get information on the message to edit (C(channels:history,groups:history,mpim:history,im:history)).
       - Corresponds to C(ts) in the Slack API (U(https://api.slack.com/messaging/modifying)).
     type: str
@@ -104,14 +106,17 @@ options:
       - 'none'
   validate_certs:
     description:
-      - If V(false), SSL certificates will not be validated. This should only be used on personally controlled sites using self-signed certificates.
+      - If V(false), SSL certificates will not be validated. This should only be used on personally controlled sites using
+        self-signed certificates.
     type: bool
     default: true
   color:
     type: str
     description:
-      - Allow text to use default colors - use the default of 'normal' to not send a custom color bar at the start of the message.
-      - Allowed values for color can be one of 'normal', 'good', 'warning', 'danger', any valid 3 digit or 6 digit hex color value.
+      - Allow text to use default colors - use the default of V(normal) to not send a custom color bar at the start of the
+        message.
+      - Allowed values for color can be one of V(normal), V(good), V(warning), V(danger), any valid 3 digit or 6 digit hex
+        color value.
     default: 'normal'
   attachments:
     type: list
@@ -130,14 +135,13 @@ options:
     type: str
     description:
       - Setting for automatically prepending a V(#) symbol on the passed in O(channel).
-      - The V(auto) method prepends a V(#) unless O(channel) starts with one of V(#), V(@), V(C0), V(GF), V(G0), V(CP). These prefixes only cover
-        a small set of the prefixes that should not have a V(#) prepended. Since an exact condition which O(channel) values must not have the
-        V(#) prefix is not known, the value V(auto) for this option will be deprecated in the future. It is best to explicitly set O(prepend_hash=always)
-        or O(prepend_hash=never) to obtain the needed behavior.
-      - The B(current default) is V(auto), which has been B(deprecated) since community.general 10.2.0.
-        It will change to V(never) in community.general 12.0.0.
-        To prevent deprecation warnings you can explicitly set O(prepend_hash) to the value you want.
-        We suggest to only use V(always) or V(never), but not V(auto), when explicitly setting a value.
+      - The V(auto) method prepends a V(#) unless O(channel) starts with one of V(#), V(@), V(C0), V(GF), V(G0), V(CP). These
+        prefixes only cover a small set of the prefixes that should not have a V(#) prepended. Since an exact condition which
+        O(channel) values must not have the V(#) prefix is not known, the value V(auto) for this option will be deprecated
+        in the future. It is best to explicitly set O(prepend_hash=always) or O(prepend_hash=never) to obtain the needed behavior.
+      - The B(current default) is V(auto), which has been B(deprecated) since community.general 10.2.0. It will change to
+        V(never) in community.general 12.0.0. To prevent deprecation warnings you can explicitly set O(prepend_hash) to the
+        value you want. We suggest to only use V(always) or V(never), but not V(auto), when explicitly setting a value.
     choices:
       - 'always'
       - 'never'
@@ -164,7 +168,8 @@ EXAMPLES = r"""
     parse: 'none'
   delegate_to: localhost
 
-- name: Insert a color bar in front of the message for visibility purposes and use the default webhook icon and name configured in Slack
+- name: Insert a color bar in front of the message for visibility purposes and use the default webhook icon and name configured
+    in Slack
   community.general.slack:
     token: thetoken/generatedby/slack
     msg: '{{ inventory_hostname }} is alive!'

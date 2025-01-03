@@ -25,7 +25,8 @@ attributes:
 options:
   filters:
     description:
-      - Criteria for selecting image. Can be any value from image manifest and V(published_date), V(published), V(source), V(clones), and V(size).
+      - Criteria for selecting image. Can be any value from image manifest and V(published_date), V(published), V(source),
+        V(clones), and V(size).
       - More information can be found at U(https://smartos.org/man/1m/imgadm) under C(imgadm list).
     type: str
 """

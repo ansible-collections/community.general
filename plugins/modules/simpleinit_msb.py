@@ -39,10 +39,10 @@ options:
     required: false
     choices: [running, started, stopped, restarted, reloaded]
     description:
-      - V(started)/V(stopped) are idempotent actions that will not run commands unless necessary. V(restarted) will always bounce the service.
-        V(reloaded) will always reload.
+      - V(started)/V(stopped) are idempotent actions that do not run commands unless necessary. V(restarted) always bounces
+        the service. V(reloaded) always reloads.
       - At least one of O(state) and O(enabled) are required.
-      - Note that V(reloaded) will start the service if it is not already started, even if your chosen init system would not normally.
+      - Note that V(reloaded) starts the service if it is not already started, even if your chosen init system would not normally.
   enabled:
     type: bool
     required: false

@@ -35,8 +35,8 @@ options:
     type: str
   manifest:
     description:
-      - The manifest contains information about the bundles at certain version of the OS. Specify a Manifest version to verify against that version
-        or leave unspecified to verify against the current version.
+      - The manifest contains information about the bundles at certain version of the OS. Specify a Manifest version to verify
+        against that version or leave unspecified to verify against the current version.
     aliases: [release, version]
     type: int
   name:
@@ -46,7 +46,8 @@ options:
     type: str
   state:
     description:
-      - Indicates the desired (I)bundle state. V(present) ensures the bundle is installed while V(absent) ensures the (I)bundle is not installed.
+      - Indicates the desired (I)bundle state. V(present) ensures the bundle is installed while V(absent) ensures the (I)bundle
+        is not installed.
     default: present
     choices: [present, absent]
     type: str

@@ -13,9 +13,9 @@ DOCUMENTATION = r"""
 module: systemd_creds_encrypt
 short_description: C(systemd)'s C(systemd-creds encrypt) plugin
 description:
-    - This module encrypts input using C(systemd)'s C(systemd-creds encrypt).
+  - This module encrypts input using C(systemd)'s C(systemd-creds encrypt).
 author:
-    - Thomas Sjögren (@konstruktoid)
+  - Thomas Sjögren (@konstruktoid)
 version_added: '10.2.0'
 extends_documentation_fragment:
   - community.general.attributes
@@ -29,50 +29,46 @@ attributes:
     details:
       - This action does not modify state.
 options:
-    name:
-        description:
-            - The credential name to embed in the encrypted credential data.
-        type: str
-        required: false
-    not_after:
-        description:
-            - The time when the credential shall not be used anymore.
-            - Takes a timestamp specification in the format described in
-              V(systemd.time(7\)).
-        type: str
-        required: false
-    pretty:
-        description:
-            - Pretty print the output so that it may be pasted directly into a
-              unit file.
-        type: bool
-        required: false
-        default: false
-    secret:
-        description:
-            - The secret to encrypt.
-        type: str
-        required: true
-    timestamp:
-        description:
-            - The timestamp to embed into the encrypted credential.
-            - Takes a timestamp specification in the format described in
-              V(systemd.time(7\)).
-        type: str
-        required: false
-    user:
-        description:
-            - A user name or numeric UID to encrypt the credential for.
-            - If set to the special string V(self) it sets the user to the user
-              of the calling process.
-            - Requires C(systemd) 256 or later.
-        type: str
-        required: false
+  name:
+    description:
+      - The credential name to embed in the encrypted credential data.
+    type: str
+    required: false
+  not_after:
+    description:
+      - The time when the credential shall not be used anymore.
+      - Takes a timestamp specification in the format described in V(systemd.time(7\)).
+    type: str
+    required: false
+  pretty:
+    description:
+      - Pretty print the output so that it may be pasted directly into a unit file.
+    type: bool
+    required: false
+    default: false
+  secret:
+    description:
+      - The secret to encrypt.
+    type: str
+    required: true
+  timestamp:
+    description:
+      - The timestamp to embed into the encrypted credential.
+      - Takes a timestamp specification in the format described in V(systemd.time(7\)).
+    type: str
+    required: false
+  user:
+    description:
+      - A user name or numeric UID to encrypt the credential for.
+      - If set to the special string V(self) it sets the user to the user of the calling process.
+      - Requires C(systemd) 256 or later.
+    type: str
+    required: false
 notes:
   - C(systemd-creds) requires C(systemd) 250 or later.
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Encrypt secret
   become: true
   community.general.systemd_creds_encrypt:
@@ -88,10 +84,10 @@ EXAMPLES = """
 
 RETURN = r"""
 value:
-    description: The Base64 encoded encrypted secret.
-    type: str
-    returned: always
-    sample: "WhQZht+JQJax1aZemmGLxmAAAA..."
+  description: The Base64 encoded encrypted secret.
+  type: str
+  returned: always
+  sample: "WhQZht+JQJax1aZemmGLxmAAAA..."
 """
 
 from ansible.module_utils.basic import AnsibleModule

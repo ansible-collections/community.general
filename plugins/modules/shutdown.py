@@ -12,10 +12,10 @@ DOCUMENTATION = r"""
 module: shutdown
 short_description: Shut down a machine
 notes:
-  - E(PATH) is ignored on the remote node when searching for the C(shutdown) command. Use O(search_paths) to specify locations to search if the
-    default paths do not work.
-  - The O(msg) and O(delay) options are not supported when a shutdown command is not found in O(search_paths), instead the module will attempt
-    to shutdown the system by calling C(systemctl shutdown).
+  - E(PATH) is ignored on the remote node when searching for the C(shutdown) command. Use O(search_paths) to specify locations
+    to search if the default paths do not work.
+  - The O(msg) and O(delay) options are not supported when a shutdown command is not found in O(search_paths), instead the
+    module attempts to shutdown the system by calling C(systemctl shutdown).
 description:
   - Shut downs a machine.
 version_added: "1.1.0"
@@ -35,8 +35,8 @@ options:
   delay:
     description:
       - Seconds to wait before shutdown. Passed as a parameter to the shutdown command.
-      - On Linux, macOS and OpenBSD, this is converted to minutes and rounded down. If less than 60, it will be set to 0.
-      - On Solaris and FreeBSD, this will be seconds.
+      - On Linux, macOS and OpenBSD, this is converted to minutes and rounded down. If less than 60, it is set to 0.
+      - On Solaris and FreeBSD, this represents seconds.
     type: int
     default: 0
   msg:
@@ -47,8 +47,8 @@ options:
   search_paths:
     description:
       - Paths to search on the remote machine for the C(shutdown) command.
-      - I(Only) these paths will be searched for the C(shutdown) command. E(PATH) is ignored in the remote node when searching for the C(shutdown)
-        command.
+      - I(Only) these paths are searched for the C(shutdown) command. E(PATH) is ignored in the remote node when searching
+        for the C(shutdown) command.
     type: list
     elements: path
     default: ['/sbin', '/usr/sbin', '/usr/local/sbin']
