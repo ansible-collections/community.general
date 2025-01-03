@@ -63,8 +63,8 @@ options:
     required: true
   validate_certs:
     description:
-      - Validate SSL certificates. Only change this to V(false) if you can guarantee that you are talking to the correct endpoint and there is
-        no man-in-the-middle attack happening.
+      - Validate SSL certificates. Only change this to V(false) if you can guarantee that you are talking to the correct endpoint
+        and there is no man-in-the-middle attack happening.
     type: bool
     default: true
     required: false

@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2015 CenturyLink
-#
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -17,6 +16,9 @@ description:
   - An Ansible module to Create, Delete shared loadbalancers in CenturyLink Cloud.
 extends_documentation_fragment:
   - community.general.attributes
+  - community.general.clc
+author:
+  - "CLC Runner (@clc-runner)"
 attributes:
   check_mode:
     support: full
@@ -75,19 +77,6 @@ options:
     type: str
     default: present
     choices: ['present', 'absent', 'port_absent', 'nodes_present', 'nodes_absent']
-requirements:
-  - requests >= 2.5.0
-  - clc-sdk
-author: "CLC Runner (@clc-runner)"
-notes:
-  - To use this module, it is required to set the below environment variables which enables access to the Centurylink Cloud.
-  - E(CLC_V2_API_USERNAME), the account login id for the Centurylink Cloud.
-  - E(CLC_V2_API_PASSWORD), the account password for the Centurylink Cloud.
-  - Alternatively, the module accepts the API token and account alias. The API token can be generated using the CLC account
-    login and password using the HTTP API call @ https://api.ctl.io/v2/authentication/login
-  - E(CLC_V2_API_TOKEN), the API token generated from https://api.ctl.io/v2/authentication/login
-  - E(CLC_ACCT_ALIAS), the account alias associated with the Centurylink Cloud.
-  - Users can set E(CLC_V2_API_URL) to specify an endpoint for pointing to a different CLC environment.
 """
 
 EXAMPLES = r"""

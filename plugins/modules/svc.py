@@ -38,12 +38,13 @@ options:
     choices: [killed, once, reloaded, restarted, started, stopped]
   downed:
     description:
-      - Should a C(down) file exist or not, if it exists it disables auto startup. Defaults to V(false). Downed does not imply stopped.
+      - Should a C(down) file exist or not, if it exists it disables auto startup. Defaults to V(false). Downed does not imply
+        stopped.
     type: bool
   enabled:
     description:
-      - Whether the service is enabled or not, if disabled it also implies O(state=stopped). Take note that a service can be enabled and downed (no auto
-        restart).
+      - Whether the service is enabled or not, if disabled it also implies O(state=stopped). Take note that a service can
+        be enabled and downed (no auto restart).
     type: bool
   service_dir:
     description:
