@@ -3054,3 +3054,6 @@ class KeycloakAPI(object):
         except Exception:
             pass
         self.module.fail_json(msg, **kwargs)
+
+    def fail_open_url(self, e, msg, **kwargs):
+        return self.fail_request(e, msg, **kwargs)
