@@ -1380,8 +1380,10 @@ files:
     keywords: sophos utm
     maintainers: $team_e_spirit
   $modules/utm_ca_host_key_cert.py:
+    ignore: stearz
     maintainers: $team_e_spirit
   $modules/utm_ca_host_key_cert_info.py:
+    ignore: stearz
     maintainers: $team_e_spirit
   $modules/utm_network_interface_address.py:
     maintainers: steamx
@@ -1389,6 +1391,7 @@ files:
     maintainers: steamx
   $modules/utm_proxy_auth_profile.py:
     keywords: sophos utm
+    ignore: stearz
     maintainers: $team_e_spirit
   $modules/utm_proxy_exception.py:
     keywords: sophos utm
