@@ -111,6 +111,9 @@ files:
   $connections/lxd.py:
     labels: lxd
     maintainers: mattclay
+  $connections/proxmox_pct_remote.py:
+    labels: proxmox
+    maintainers: mietzen
   $connections/qubes.py:
     maintainers: kushaldas
   $connections/saltstack.py:

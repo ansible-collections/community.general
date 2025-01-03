@@ -51,6 +51,9 @@ passlib[argon2]
 proxmoxer < 2.0.0 ; python_version >= '2.7' and python_version <= '3.6'
 proxmoxer ; python_version > '3.6'
 
+# requirements for the proxmox_pct_remote connection plugin
+paramiko >= 3.0.0 ; python_version >= '3.6'
+
 #requirements for nomad_token modules
 python-nomad < 2.0.0 ; python_version <= '3.6'
 python-nomad >= 2.0.0 ; python_version >= '3.7'
