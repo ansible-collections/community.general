@@ -255,7 +255,7 @@ EXAMPLES = r"""
     port: '25'
 
 - name: Deny all IPv6 traffic to tcp port 20 on this host
-# this should be the first IPv6 rule
+  # this should be the first IPv6 rule
   community.general.ufw:
     rule: deny
     proto: tcp
@@ -265,11 +265,11 @@ EXAMPLES = r"""
     insert_relative_to: first-ipv6
 
 - name: Deny all IPv4 traffic to tcp port 20 on this host
-# This should be the third to last IPv4 rule
-# (insert: -1 addresses the second to last IPv4 rule;
-#  so the new rule will be inserted before the second
-#  to last IPv4 rule, and will be come the third to last
-#  IPv4 rule.)
+  # This should be the third to last IPv4 rule
+  # (insert: -1 addresses the second to last IPv4 rule;
+  #  so the new rule will be inserted before the second
+  #  to last IPv4 rule, and will be come the third to last
+  #  IPv4 rule.)
   community.general.ufw:
     rule: deny
     proto: tcp
