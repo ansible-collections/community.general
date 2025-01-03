@@ -315,6 +315,7 @@ import io
 import json
 import os
 import tempfile
+import base64
 
 from ansible.module_utils.basic import AnsibleModule, to_bytes
 from ansible.module_utils.six.moves import http_cookiejar as cookiejar
@@ -339,6 +340,9 @@ class JenkinsPlugin(object):
         self.params = self.module.params
         self.url = self.params['url']
         self.timeout = self.params['timeout']
+        self.username = self.params['url_username']
+        self.password = self.params['url_password']
+        self.force_basic_auth = self.params['force_basic_auth']
 
         # Crumb
         self.crumb = {}
@@ -351,6 +355,15 @@ class JenkinsPlugin(object):
 
         # Get list of installed plugins
         self._get_installed_plugins()
+
+    def _create_basic_auth_header(self):
+        credentials = f"{self.username}:{self.password}"
+
+        encoded_credentials = base64.b64encode(credentials.encode("utf-8")).decode("utf-8")
+
+        auth_header = f"Basic {encoded_credentials}"
+
+        return auth_header
 
     def _csrf_enabled(self):
         csrf_data = self._get_json_data(
@@ -420,11 +433,21 @@ class JenkinsPlugin(object):
         if msg_exception is None:
             msg_exception = "Retrieval of %s failed." % what
 
+        # Get any custom headers from kwargs, default to empty dictionary if none
+        custom_headers = kwargs.get('headers', {})
+
+        # Merge custom headers with self.crumb, ensuring self.crumb is always included
+        headers = {**self.crumb, **custom_headers}
+
+        # If force_basic_auth is True, add the Authorization header
+        if self.force_basic_auth:
+            headers["Authorization"] = self._create_basic_auth_header()
+
         # Get the URL data
         try:
             response, info = fetch_url(
                 self.module, url, timeout=self.timeout, cookies=self.cookies,
-                headers=self.crumb, **kwargs)
+                headers=headers, **kwargs)
 
             if info['status'] != 200:
                 if dont_fail:
@@ -811,6 +834,7 @@ def main():
         url_password=dict(no_log=True),
         version=dict(),
         with_dependencies=dict(default=True, type='bool'),
+        force_basic_auth=dict(default=False, type='bool')  # Add force_basic_auth to arguments
     )
     # Module settings
     module = AnsibleModule(
@@ -818,9 +842,6 @@ def main():
         add_file_common_args=True,
         supports_check_mode=True,
     )
-
-    # Force basic authentication
-    module.params['force_basic_auth'] = True
 
     # Convert timeout to float
     try:
