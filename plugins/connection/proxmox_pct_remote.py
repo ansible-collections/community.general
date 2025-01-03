@@ -391,7 +391,6 @@ import os
 import pathlib
 import socket
 import tempfile
-import traceback
 import typing as t
 
 from ansible.errors import (
@@ -788,14 +787,13 @@ class Connection(ConnectionBase):
             # (This doesn't acquire the connection lock because it needs
             # to exclude only other known_hosts writers, not connections
             # that are starting up.)
-            lockfile = os.path.join(os.path.dirname(self.keyfile, f'.{os.path.basename(self.keyfile)}.lock'))
+            lockfile = os.path.basename(self.keyfile)
             dirname = os.path.dirname(self.keyfile)
             makedirs_safe(dirname)
-
-            with FileLock().lock_file(lockfile, dirname, self.get_option('locktimeout')):
-                try:
+            tmp_keyfile_name = None
+            try:
+                with FileLock().lock_file(lockfile, dirname, self.get_option('lock_file_timeout')):
                     # just in case any were added recently
-
                     self.ssh.load_system_host_keys()
                     self.ssh._host_keys.update(self.ssh._system_host_keys)
 
@@ -805,7 +803,7 @@ class Connection(ConnectionBase):
                     key_dir = os.path.dirname(self.keyfile)
                     if os.path.exists(self.keyfile):
                         key_stat = os.stat(self.keyfile)
-                        mode = key_stat.st_mode
+                        mode = key_stat.st_mode & 0o777
                         uid = key_stat.st_uid
                         gid = key_stat.st_gid
                     else:
@@ -824,15 +822,17 @@ class Connection(ConnectionBase):
                         self._save_ssh_host_keys(tmp_keyfile_name)
 
                     os.rename(tmp_keyfile_name, self.keyfile)
-                except LockTimeout:
+            except LockTimeout:
+                raise AnsibleError(
+                    f'writing lock file for {self.keyfile} ran in to the timeout of {self.get_option("lock_file_timeout")}s')
+            except Exception as e:
+                # unable to save keys, including scenario when key was invalid
+                # and caught earlier
+                raise AnsibleError(
+                    f'error occurred while writing SSH host keys!\n{to_text(e)}')
+            finally:
+                if tmp_keyfile_name is not None:
                     pathlib.Path(tmp_keyfile_name).unlink(missing_ok=True)
-                    raise AnsibleError(
-                        f'writing lock file {tmp_keyfile_name} ran in to the timeout of {self.get_option("locktimeout")}s')
-                except Exception:
-                    # unable to save keys, including scenario when key was invalid
-                    # and caught earlier
-                    pathlib.Path(tmp_keyfile_name).unlink(missing_ok=True)
-                    traceback.print_exc()
 
         self.ssh.close()
         self._connected = False
