@@ -102,7 +102,7 @@ EXAMPLES = r"""
     name: pecl/gnupg, pecl/apcu
     state: present
     prompts:
-      - 
+      - null
       - (.*)Enable internal debugging in APCu \[no\]: "yes"
 
 - name: Upgrade package
