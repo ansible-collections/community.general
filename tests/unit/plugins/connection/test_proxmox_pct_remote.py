@@ -122,6 +122,19 @@ def test_connect_with_bad_host_key(mock_ssh, connection):
 
 
 @patch('paramiko.SSHClient')
+def test_connect_with_invalid_host_key(mock_ssh, connection):
+    """ Test connection with bad host key """
+    connection.set_option('host_key_checking', True)
+    mock_client = MagicMock()
+    mock_ssh.return_value = mock_client
+    mock_client.load_system_host_keys.side_effect = paramiko.hostkeys.InvalidHostKey(
+        "Bad Line!", Exception('Something crashed!'))
+
+    with pytest.raises(AnsibleConnectionFailure, match="Invalid host key: Bad Line!"):
+        connection._connect()
+
+
+@patch('paramiko.SSHClient')
 def test_connect_success(mock_ssh, connection):
     """ Test successful SSH connection establishment """
     mock_client = MagicMock()
@@ -529,6 +542,31 @@ def test_close_tempfile_error_handling(mock_exists, mock_lock_file, mock_tempfil
         with patch.object(os, 'chmod', side_effect=Exception()):
             connection.close()
     mock_unlink.assert_called_with(missing_ok=True)
+
+
+@patch('ansible_collections.community.general.plugins.module_utils._filelock.FileLock.lock_file')
+@patch('os.path.exists')
+def test_close_with_invalid_host_key(mock_exists, mock_lock_file, connection):
+    """ Test load_system_host_keys on close with InvalidHostKey error """
+    connection._any_keys_added = MagicMock(return_value=True)
+    connection._connected = True
+    connection._save_ssh_host_keys = MagicMock()
+    connection.keyfile = '/tmp/pct-remote-known_hosts-test'
+    connection.set_option('host_key_checking', True)
+    connection.set_option('lock_file_timeout', 5)
+    connection.set_option('record_host_keys', True)
+    connection.ssh = MagicMock()
+    connection.ssh.load_system_host_keys.side_effect = paramiko.hostkeys.InvalidHostKey(
+        "Bad Line!", Exception('Something crashed!'))
+
+    mock_exists.return_value = False
+
+    mock_lock_file_instance = MagicMock()
+    mock_lock_file.return_value = mock_lock_file_instance
+    mock_lock_file_instance.__enter__.return_value = None
+
+    with pytest.raises(AnsibleConnectionFailure, match="Invalid host key: Bad Line!"):
+        connection.close()
 
 
 def test_reset(connection):
