@@ -598,9 +598,9 @@ msg:
   sample: "No changes required to user federation 164bb483-c613-482e-80fe-7f1431308799."
 
 proposed:
-  description: Representation of proposed user federation.
-  returned: always
-  type: dict
+    description: Representation of proposed user federation.
+    returned: always
+    type: dict
     sample: {
         "config": {
             "allowKerberosAuthentication": "false",
@@ -636,9 +636,9 @@ proposed:
     }
 
 existing:
-  description: Representation of existing user federation.
-  returned: always
-  type: dict
+    description: Representation of existing user federation.
+    returned: always
+    type: dict
     sample: {
         "config": {
             "allowKerberosAuthentication": "false",
@@ -694,9 +694,9 @@ existing:
     }
 
 end_state:
-  description: Representation of user federation after module execution.
-  returned: on success
-  type: dict
+    description: Representation of user federation after module execution.
+    returned: on success
+    type: dict
     sample: {
         "config": {
             "allowPasswordAuthentication": "false",
