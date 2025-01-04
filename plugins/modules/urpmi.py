@@ -54,7 +54,8 @@ options:
     default: true
   root:
     description:
-      - Specifies an alternative install root, relative to which all packages will be installed. Corresponds to the C(--root) option for C(urpmi).
+      - Specifies an alternative install root, relative to which all packages are installed. Corresponds to the C(--root)
+        option for C(urpmi).
     aliases: [installroot]
     type: str
 author:
