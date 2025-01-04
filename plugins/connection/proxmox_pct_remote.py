@@ -541,7 +541,12 @@ class Connection(ConnectionBase):
                     break
                 except IOError:
                     pass  # file was not found, but not required to function
-            ssh.load_system_host_keys()
+                except paramiko.hostkeys.InvalidHostKey as e:
+                    raise AnsibleConnectionFailure(f'Invalid host key: {to_text(e.line)}')
+            try:
+                ssh.load_system_host_keys()
+            except paramiko.hostkeys.InvalidHostKey as e:
+                raise AnsibleConnectionFailure(f'Invalid host key: {to_text(e.line)}')
 
         ssh_connect_kwargs = self._parse_proxy_command(port)
         ssh.set_missing_host_key_policy(MyAddPolicy(self))
@@ -794,6 +799,7 @@ class Connection(ConnectionBase):
             try:
                 with FileLock().lock_file(lockfile, dirname, self.get_option('lock_file_timeout')):
                     # just in case any were added recently
+
                     self.ssh.load_system_host_keys()
                     self.ssh._host_keys.update(self.ssh._system_host_keys)
 
@@ -825,6 +831,8 @@ class Connection(ConnectionBase):
             except LockTimeout:
                 raise AnsibleError(
                     f'writing lock file for {self.keyfile} ran in to the timeout of {self.get_option("lock_file_timeout")}s')
+            except paramiko.hostkeys.InvalidHostKey as e:
+                raise AnsibleConnectionFailure(f'Invalid host key: {e.line}')
             except Exception as e:
                 # unable to save keys, including scenario when key was invalid
                 # and caught earlier
