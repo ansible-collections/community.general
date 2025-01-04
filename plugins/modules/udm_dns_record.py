@@ -16,8 +16,8 @@ author:
   - Tobias Rüetschi (@keachi)
 short_description: Manage DNS entries on a univention corporate server
 description:
-  - This module allows to manage DNS records on a univention corporate server (UCS). It uses the Python API of the UCS to create a new object
-    or edit it.
+  - This module allows to manage DNS records on a univention corporate server (UCS). It uses the Python API of the UCS to
+    create a new object or edit it.
 requirements:
   - Univention
   - ipaddress (for O(type=ptr_record))
@@ -51,8 +51,8 @@ options:
     type: str
     required: true
     description:
-      - Define the record type. V(host_record) is a A or AAAA record, V(alias) is a CNAME, V(ptr_record) is a PTR record, V(srv_record) is a SRV
-        record and V(txt_record) is a TXT record.
+      - Define the record type. V(host_record) is a A or AAAA record, V(alias) is a CNAME, V(ptr_record) is a PTR record,
+        V(srv_record) is a SRV record and V(txt_record) is a TXT record.
       - 'The available choices are: V(host_record), V(alias), V(ptr_record), V(srv_record), V(txt_record).'
   data:
     type: dict

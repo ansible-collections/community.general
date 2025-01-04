@@ -13,8 +13,8 @@ module: vertica_user
 short_description: Adds or removes Vertica database users and assigns roles
 description:
   - Adds or removes Vertica database user and, optionally, assigns roles.
-  - A user will not be removed until all the dependencies have been dropped.
-  - In such a situation, if the module tries to remove the user it will fail and only remove roles granted to the user.
+  - A user is not removed until all the dependencies have been dropped.
+  - In such a situation, if the module tries to remove the user it fails and only remove roles granted to the user.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -40,8 +40,8 @@ options:
   password:
     description:
       - The user's password encrypted by the MD5 algorithm.
-      - The password must be generated with the format C("md5" + md5[password + username]), resulting in a total of 35 characters. An easy way
-        to do this is by querying the Vertica database with select V('md5'||md5('<user_password><user_name>'\)).
+      - The password must be generated with the format C("md5" + md5[password + username]), resulting in a total of 35 characters.
+        An easy way to do this is by querying the Vertica database with select V('md5'|| md5('<user_password><user_name>'\)).
     type: str
   expired:
     description:
@@ -50,7 +50,7 @@ options:
   ldap:
     description:
       - Set to V(true) if users are authenticated using LDAP.
-      - The user will be created with password expired and set to V($ldap$).
+      - The user is created with password expired and set to V($ldap$).
     type: bool
   roles:
     description:
@@ -88,11 +88,11 @@ options:
     type: str
 notes:
   - The default authentication assumes that you are either logging in as or sudo'ing to the C(dbadmin) account on the host.
-  - This module uses C(pyodbc), a Python ODBC database adapter. You must ensure that C(unixODBC) and C(pyodbc) is installed on the host and properly
-    configured.
-  - Configuring C(unixODBC) for Vertica requires C(Driver = /opt/vertica/lib64/libverticaodbc.so) to be added to the C(Vertica) section of either
-    C(/etc/odbcinst.ini) or C($HOME/.odbcinst.ini) and both C(ErrorMessagesPath = /opt/vertica/lib64) and C(DriverManagerEncoding = UTF-16) to
-    be added to the C(Driver) section of either C(/etc/vertica.ini) or C($HOME/.vertica.ini).
+  - This module uses C(pyodbc), a Python ODBC database adapter. You must ensure that C(unixODBC) and C(pyodbc) is installed
+    on the host and properly configured.
+  - Configuring C(unixODBC) for Vertica requires C(Driver = /opt/vertica/lib64/libverticaodbc.so) to be added to the C(Vertica)
+    section of either C(/etc/odbcinst.ini) or C($HOME/.odbcinst.ini) and both C(ErrorMessagesPath = /opt/vertica/lib64) and
+    C(DriverManagerEncoding = UTF-16) to be added to the C(Driver) section of either C(/etc/vertica.ini) or C($HOME/.vertica.ini).
 requirements: ['unixODBC', 'pyodbc']
 author: "Dariusz Owczarek (@dareko)"
 """

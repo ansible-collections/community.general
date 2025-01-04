@@ -14,8 +14,8 @@ module: vexata_eg
 short_description: Manage export groups on Vexata VX100 storage arrays
 description:
   - Create or delete export groups on a Vexata VX100 array.
-  - An export group is a tuple of a volume group, initiator group and port group that allows a set of volumes to be exposed to one or more hosts
-    through specific array ports.
+  - An export group is a tuple of a volume group, initiator group and port group that allows a set of volumes to be exposed
+    to one or more hosts through specific array ports.
 author:
   - Sandeep Kasargod (@vexata)
 attributes:

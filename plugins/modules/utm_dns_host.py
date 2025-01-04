@@ -53,7 +53,7 @@ options:
   interface:
     type: str
     description:
-      - The reference name of the interface to use. If not provided the default interface will be used.
+      - The reference name of the interface to use. If not provided the default interface is used.
     default: ''
   resolved:
     description:

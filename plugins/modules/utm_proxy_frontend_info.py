@@ -93,7 +93,7 @@ result:
       description: State of html rewrite.
       type: bool
     htmlrewrite_cookies:
-      description: Whether the html rewrite cookie will be set.
+      description: Whether the HTML rewrite cookie is set.
       type: bool
     implicitredirect:
       description: Whether to use implicit redirection.

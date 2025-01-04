@@ -16,11 +16,11 @@ author:
   - Tobias Rüetschi (@keachi)
 short_description: Manage posix users on a univention corporate server
 description:
-  - This module allows to manage posix users on a univention corporate server (UCS). It uses the Python API of the UCS to create a new object
-    or edit it.
+  - This module allows to manage posix users on a univention corporate server (UCS). It uses the Python API of the UCS to
+    create a new object or edit it.
 notes:
-  - This module requires the deprecated L(crypt Python module, https://docs.python.org/3.12/library/crypt.html) library which was removed from
-    Python 3.13. For Python 3.13 or newer, you need to install L(legacycrypt, https://pypi.org/project/legacycrypt/).
+  - This module requires the deprecated L(crypt Python module, https://docs.python.org/3.12/library/crypt.html) library which
+    was removed from Python 3.13. For Python 3.13 or newer, you need to install L(legacycrypt, https://pypi.org/project/legacycrypt/).
 requirements:
   - legacycrypt (on Python 3.13 or newer)
 extends_documentation_fragment:
@@ -104,7 +104,7 @@ options:
   groups:
     default: []
     description:
-      - 'POSIX groups, the LDAP DNs of the groups will be found with the LDAP filter for each group as $GROUP: V((&(objectClass=posixGroup\)(cn=$GROUP\)\)).'
+      - 'POSIX groups, the LDAP DNs of the groups is found with the LDAP filter for each group as $GROUP: V((&(objectClass=posixGroup\)(cn=$GROUP\)\)).'
     type: list
     elements: str
   home_share:
@@ -273,7 +273,8 @@ options:
     default: always
     choices: [always, on_create]
     description:
-      - V(always) will update passwords if they differ. V(on_create) will only set the password for newly created users.
+      - V(always) updates passwords if they differ.
+      - V(on_create) only sets the password for newly created users.
     type: str
   ou:
     default: ''
