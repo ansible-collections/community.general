@@ -45,8 +45,8 @@ options:
     description:
       - The type of the resource to which the profile should be [un]assigned.
     required: true
-    choices: ['provider', 'host', 'vm', 'blueprint', 'category', 'cluster', 'data store', 'group', 'resource pool', 'service', 'service template',
-      'template', 'tenant', 'user']
+    choices: ['provider', 'host', 'vm', 'blueprint', 'category', 'cluster', 'data store', 'group', 'resource pool', 'service',
+      'service template', 'template', 'tenant', 'user']
   resource_name:
     type: str
     description:
@@ -93,7 +93,7 @@ manageiq_policies:
       - List current policy_profile and policies for a provider in ManageIQ.
     returned: always
     type: dict
-    sample: '{
+    sample: {
         "changed": false,
         "profiles": [
             {
@@ -118,7 +118,7 @@ manageiq_policies:
                 "profile_name": "openscap profile"
             }
         ]
-    }'
+    }
 """
 
 from ansible.module_utils.basic import AnsibleModule

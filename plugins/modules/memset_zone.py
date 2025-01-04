@@ -13,8 +13,9 @@ module: memset_zone
 author: "Simon Weald (@glitchcrab)"
 short_description: Creates and deletes Memset DNS zones
 notes:
-  - Zones can be thought of as a logical group of domains, all of which share the same DNS records (in other words they point to the same IP). An API key
-    generated using the Memset customer control panel is needed with the following minimum scope - C(dns.zone_create), C(dns.zone_delete), C(dns.zone_list).
+  - Zones can be thought of as a logical group of domains, all of which share the same DNS records (in other words they point
+    to the same IP). An API key generated using the Memset customer control panel is needed with the following minimum scope
+    - C(dns.zone_create), C(dns.zone_delete), C(dns.zone_list).
 description:
   - Manage DNS zones in a Memset account.
 extends_documentation_fragment:
@@ -88,7 +89,7 @@ memset_api:
       type: list
       sample: []
     id:
-      description: Zone id.
+      description: Zone ID.
       returned: always
       type: str
       sample: "b0bb1ce851aeea6feeb2dc32fe83bf9c"

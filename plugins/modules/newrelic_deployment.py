@@ -62,15 +62,16 @@ options:
     required: false
   validate_certs:
     description:
-      - If V(false), SSL certificates will not be validated. This should only be used on personally controlled sites using self-signed certificates.
+      - If V(false), SSL certificates will not be validated. This should only be used on personally controlled sites using
+        self-signed certificates.
     required: false
     default: true
     type: bool
   app_name_exact_match:
     type: bool
     description:
-      - If this flag is set to V(true) then the application ID lookup by name would only work for an exact match. If set to V(false) it returns
-        the first result.
+      - If this flag is set to V(true) then the application ID lookup by name would only work for an exact match. If set to
+        V(false) it returns the first result.
     required: false
     default: false
     version_added: 7.5.0

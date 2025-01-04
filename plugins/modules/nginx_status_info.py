@@ -62,8 +62,8 @@ accepts:
   type: int
   sample: 81769947
 handled:
-  description: The total number of handled connections. Generally, the parameter value is the same as accepts unless some resource limits have
-    been reached.
+  description: The total number of handled connections. Generally, the parameter value is the same as accepts unless some
+    resource limits have been reached.
   returned: success
   type: int
   sample: 81769947

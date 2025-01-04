@@ -20,13 +20,13 @@ short_description: Perform common tasks in Nagios related to downtime and notifi
 description:
   - 'The C(nagios) module has two basic functions: scheduling downtime and toggling alerts for services or hosts.'
   - The C(nagios) module is not idempotent.
-  - All actions require the O(host) parameter to be given explicitly. In playbooks you can use the C({{inventory_hostname}}) variable to refer
-    to the host the playbook is currently running on.
+  - All actions require the O(host) parameter to be given explicitly. In playbooks you can use the C({{inventory_hostname}})
+    variable to refer to the host the playbook is currently running on.
   - You can specify multiple services at once by separating them with commas, for example O(services=httpd,nfs,puppet).
-  - When specifying what service to handle there is a special service value, O(host), which will handle alerts/downtime/acknowledge for the I(host
-    itself), for example O(services=host). This keyword may not be given with other services at the same time. B(Setting alerts/downtime/acknowledge
-    for a host does not affect alerts/downtime/acknowledge for any of the services running on it.) To schedule downtime for all services on particular
-    host use keyword "all", for example O(services=all).
+  - When specifying what service to handle there is a special service value, O(host), which will handle alerts/downtime/acknowledge
+    for the I(host itself), for example O(services=host). This keyword may not be given with other services at the same time.
+    B(Setting alerts/downtime/acknowledge for a host does not affect alerts/downtime/acknowledge for any of the services running
+    on it.) To schedule downtime for all services on particular host use keyword "all", for example O(services=all).
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -40,8 +40,8 @@ options:
       - Action to take.
       - The V(acknowledge) and V(forced_check) actions were added in community.general 1.2.0.
     required: true
-    choices: ["downtime", "delete_downtime", "enable_alerts", "disable_alerts", "silence", "unsilence", "silence_nagios", "unsilence_nagios",
-      "command", "servicegroup_service_downtime", "servicegroup_host_downtime", "acknowledge", "forced_check"]
+    choices: ["downtime", "delete_downtime", "enable_alerts", "disable_alerts", "silence", "unsilence", "silence_nagios",
+      "unsilence_nagios", "command", "servicegroup_service_downtime", "servicegroup_host_downtime", "acknowledge", "forced_check"]
     type: str
   host:
     description:
