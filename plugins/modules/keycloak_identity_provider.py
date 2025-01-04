@@ -16,12 +16,12 @@ short_description: Allows administration of Keycloak identity providers using Ke
 version_added: 3.6.0
 
 description:
-  - This module allows you to add, remove or modify Keycloak identity providers using the Keycloak REST API. It requires access to the REST API
-    using OpenID Connect; the user connecting and the client being used must have the requisite access rights. In a default Keycloak installation,
-    admin-cli and an admin user would work, as would a separate client definition with the scope tailored to your needs and a user having the
-    expected roles.
-  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation at
-    U(https://www.keycloak.org/docs-api/15.0/rest-api/index.html).
+  - This module allows you to add, remove or modify Keycloak identity providers using the Keycloak REST API. It requires access
+    to the REST API using OpenID Connect; the user connecting and the client being used must have the requisite access rights.
+    In a default Keycloak installation, admin-cli and an admin user would work, as would a separate client definition with
+    the scope tailored to your needs and a user having the expected roles.
+  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation
+    at U(https://www.keycloak.org/docs-api/15.0/rest-api/index.html).
 attributes:
   check_mode:
     support: full
@@ -34,7 +34,8 @@ options:
   state:
     description:
       - State of the identity provider.
-      - On V(present), the identity provider will be created if it does not yet exist, or updated with the parameters you provide.
+      - On V(present), the identity provider will be created if it does not yet exist, or updated with the parameters you
+        provide.
       - On V(absent), the identity provider will be removed if it exists.
     default: 'present'
     type: str
@@ -89,8 +90,8 @@ options:
 
   link_only:
     description:
-      - If true, users cannot log in through this provider. They can only link to this provider. This is useful if you do not want to allow login
-        from the provider, but want to integrate with a provider.
+      - If true, users cannot log in through this provider. They can only link to this provider. This is useful if you do
+        not want to allow login from the provider, but want to integrate with a provider.
     aliases:
       - linkOnly
     type: bool
@@ -125,14 +126,15 @@ options:
 
   config:
     description:
-      - Dict specifying the configuration options for the provider; the contents differ depending on the value of O(provider_id). Examples are
-        given below for V(oidc) and V(saml). It is easiest to obtain valid config values by dumping an already-existing identity provider configuration
-        through check-mode in the RV(existing) field.
+      - Dict specifying the configuration options for the provider; the contents differ depending on the value of O(provider_id).
+        Examples are given below for V(oidc) and V(saml). It is easiest to obtain valid config values by dumping an already-existing
+        identity provider configuration through check-mode in the RV(existing) field.
     type: dict
     suboptions:
       hide_on_login_page:
         description:
-          - If hidden, login with this provider is possible only if requested explicitly, for example using the C(kc_idp_hint) parameter.
+          - If hidden, login with this provider is possible only if requested explicitly, for example using the C(kc_idp_hint)
+            parameter.
         aliases:
           - hideOnLoginPage
         type: bool

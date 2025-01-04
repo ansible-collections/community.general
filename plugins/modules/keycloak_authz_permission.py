@@ -17,18 +17,20 @@ version_added: 7.2.0
 short_description: Allows administration of Keycloak client authorization permissions using Keycloak API
 
 description:
-  - This module allows the administration of Keycloak client authorization permissions using the Keycloak REST API. Authorization permissions are
-    only available if a client has Authorization enabled.
-  - There are some peculiarities in JSON paths and payloads for authorization permissions. In particular POST and PUT operations are targeted
-    at permission endpoints, whereas GET requests go to policies endpoint. To make matters more interesting the JSON responses from GET requests
-    return data in a different format than what is expected for POST and PUT. The end result is that it is not possible to detect changes to things
-    like policies, scopes or resources - at least not without a large number of additional API calls. Therefore this module always updates authorization
-    permissions instead of attempting to determine if changes are truly needed.
-  - This module requires access to the REST API using OpenID Connect; the user connecting and the realm being used must have the requisite access
-    rights. In a default Keycloak installation, admin-cli and an admin user would work, as would a separate realm definition with the scope tailored
-    to your needs and a user having the expected roles.
-  - The names of module options are snake_cased versions of the camelCase options used by Keycloak. The Authorization Services paths and payloads
-    have not officially been documented by the Keycloak project. U(https://www.puppeteers.net/blog/keycloak-authorization-services-rest-api-paths-and-payload/).
+  - This module allows the administration of Keycloak client authorization permissions using the Keycloak REST API. Authorization
+    permissions are only available if a client has Authorization enabled.
+  - There are some peculiarities in JSON paths and payloads for authorization permissions. In particular POST and PUT operations
+    are targeted at permission endpoints, whereas GET requests go to policies endpoint. To make matters more interesting the
+    JSON responses from GET requests return data in a different format than what is expected for POST and PUT. The end result
+    is that it is not possible to detect changes to things like policies, scopes or resources - at least not without a large
+    number of additional API calls. Therefore this module always updates authorization permissions instead of attempting to
+    determine if changes are truly needed.
+  - This module requires access to the REST API using OpenID Connect; the user connecting and the realm being used must have
+    the requisite access rights. In a default Keycloak installation, admin-cli and an admin user would work, as would a separate
+    realm definition with the scope tailored to your needs and a user having the expected roles.
+  - The names of module options are snake_cased versions of the camelCase options used by Keycloak. The Authorization Services
+    paths and payloads have not officially been documented by the Keycloak project.
+    U(https://www.puppeteers.net/blog/keycloak-authorization-services-rest-api-paths-and-payload/).
 attributes:
   check_mode:
     support: full

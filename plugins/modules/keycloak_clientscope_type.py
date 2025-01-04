@@ -17,9 +17,10 @@ short_description: Set the type of aclientscope in realm or client using Keycloa
 version_added: 6.6.0
 
 description:
-  - This module allows you to set the type (optional, default) of clientscopes using the Keycloak REST API. It requires access to the REST API using
-    OpenID Connect; the user connecting and the client being used must have the requisite access rights. In a default Keycloak installation, admin-cli
-    and an admin user would work, as would a separate client definition with the scope tailored to your needs and a user having the expected roles.
+  - This module allows you to set the type (optional, default) of clientscopes using the Keycloak REST API. It requires access
+    to the REST API using OpenID Connect; the user connecting and the client being used must have the requisite access rights.
+    In a default Keycloak installation, admin-cli and an admin user would work, as would a separate client definition with
+    the scope tailored to your needs and a user having the expected roles.
 attributes:
   check_mode:
     support: full

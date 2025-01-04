@@ -11,17 +11,20 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 module: keycloak_client_rolescope
 
-short_description: Allows administration of Keycloak client roles scope to restrict the usage of certain roles to a other specific client applications
+short_description: Allows administration of Keycloak client roles scope to restrict the usage of certain roles to a other
+  specific client applications
 
 version_added: 8.6.0
 
 description:
-  - This module allows you to add or remove Keycloak roles from clients scope using the Keycloak REST API. It requires access to the REST API using
-    OpenID Connect; the user connecting and the client being used must have the requisite access rights. In a default Keycloak installation, admin-cli
-    and an admin user would work, as would a separate client definition with the scope tailored to your needs and a user having the expected roles.
+  - This module allows you to add or remove Keycloak roles from clients scope using the Keycloak REST API. It requires access
+    to the REST API using OpenID Connect; the user connecting and the client being used must have the requisite access rights.
+    In a default Keycloak installation, admin-cli and an admin user would work, as would a separate client definition with
+    the scope tailored to your needs and a user having the expected roles.
   - Client O(client_id) must have O(community.general.keycloak_client#module:full_scope_allowed) set to V(false).
-  - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and will be returned that way by this module.
-    You may pass single values for attributes when calling the module, and this will be translated into a list suitable for the API.
+  - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and will be returned that
+    way by this module. You may pass single values for attributes when calling the module, and this will be translated into
+    a list suitable for the API.
 attributes:
   check_mode:
     support: full

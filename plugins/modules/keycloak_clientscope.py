@@ -16,15 +16,17 @@ short_description: Allows administration of Keycloak client_scopes using Keycloa
 version_added: 3.4.0
 
 description:
-  - This module allows you to add, remove or modify Keycloak client_scopes using the Keycloak REST API. It requires access to the REST API using OpenID
-    Connect; the user connecting and the client being used must have the requisite access rights. In a default Keycloak installation, admin-cli
-    and an admin user would work, as would a separate client definition with the scope tailored to your needs and a user having the expected roles.
-  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation at
-    U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html).
-  - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and will be returned that way by this module.
-    You may pass single values for attributes when calling the module, and this will be translated into a list suitable for the API.
-  - When updating a client_scope, where possible provide the client_scope ID to the module. This removes a lookup to the API to translate the
-    name into the client_scope ID.
+  - This module allows you to add, remove or modify Keycloak client_scopes using the Keycloak REST API. It requires access
+    to the REST API using OpenID Connect; the user connecting and the client being used must have the requisite access rights.
+    In a default Keycloak installation, admin-cli and an admin user would work, as would a separate client definition with
+    the scope tailored to your needs and a user having the expected roles.
+  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation
+    at U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html).
+  - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and will be returned that
+    way by this module. You may pass single values for attributes when calling the module, and this will be translated into
+    a list suitable for the API.
+  - When updating a client_scope, where possible provide the client_scope ID to the module. This removes a lookup to the API
+    to translate the name into the client_scope ID.
 attributes:
   check_mode:
     support: full
@@ -60,7 +62,8 @@ options:
     type: str
     description:
       - The unique identifier for this client_scope.
-      - This parameter is not required for updating or deleting a client_scope but providing it will reduce the number of API calls required.
+      - This parameter is not required for updating or deleting a client_scope but providing it will reduce the number of
+        API calls required.
   description:
     type: str
     description:
@@ -91,8 +94,8 @@ options:
 
       protocolMapper:
         description:
-          - 'The Keycloak-internal name of the type of this protocol-mapper. While an exhaustive list is impossible to provide since this may
-            be extended through SPIs by the user of Keycloak, by default Keycloak as of 3.4 ships with at least:'
+          - 'The Keycloak-internal name of the type of this protocol-mapper. While an exhaustive list is impossible to provide
+            since this may be extended through SPIs by the user of Keycloak, by default Keycloak as of 3.4 ships with at least:'
           - V(docker-v2-allow-all-mapper).
           - V(oidc-address-mapper).
           - V(oidc-full-name-mapper).
@@ -115,8 +118,8 @@ options:
           - V(saml-user-attribute-mapper).
           - V(saml-user-property-mapper).
           - V(saml-user-session-note-mapper).
-          - An exhaustive list of available mappers on your installation can be obtained on the admin console by going to Server Info -> Providers
-            and looking under 'protocol-mapper'.
+          - An exhaustive list of available mappers on your installation can be obtained on the admin console by going to
+            Server Info -> Providers and looking under 'protocol-mapper'.
         type: str
 
       name:
@@ -131,11 +134,10 @@ options:
 
       config:
         description:
-          - Dict specifying the configuration options for the protocol mapper; the contents differ depending on the value of
-            O(protocol_mappers[].protocolMapper)
-            and are not documented other than by the source of the mappers and its parent class(es). An example is given below. It is easiest
-            to obtain valid config values by dumping an already-existing protocol mapper configuration through check-mode in the RV(existing)
-            return value.
+          - Dict specifying the configuration options for the protocol mapper; the contents differ depending on the value
+            of O(protocol_mappers[].protocolMapper) and are not documented other than by the source of the mappers and its
+            parent class(es). An example is given below. It is easiest to obtain valid config values by dumping an already-existing
+            protocol mapper configuration through check-mode in the RV(existing) return value.
         type: dict
 
   attributes:

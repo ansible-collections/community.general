@@ -19,8 +19,8 @@ author:
   - Alexander Hussey (@ahussey-redhat)
 short_description: Set or delete a passphrase using the Operating System's native keyring
 description: >-
-  This module uses the L(keyring Python library, https://pypi.org/project/keyring/) to set or delete passphrases for a given service and username
-  from the OS' native keyring.
+  This module uses the L(keyring Python library, https://pypi.org/project/keyring/) to set or delete passphrases for a given
+  service and username from the OS' native keyring.
 requirements:
   - keyring (Python library)
   - gnome-keyring (application - required for headless Gnome keyring access)

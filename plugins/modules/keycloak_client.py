@@ -15,14 +15,16 @@ short_description: Allows administration of Keycloak clients using Keycloak API
 
 
 description:
-  - This module allows the administration of Keycloak clients using the Keycloak REST API. It requires access to the REST API using OpenID Connect;
-    the user connecting and the client being used must have the requisite access rights. In a default Keycloak installation, admin-cli and an
-    admin user would work, as would a separate client definition with the scope tailored to your needs and a user having the expected roles.
-  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation at
-    U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html).
-    Aliases are provided so camelCased versions can be used as well.
-  - The Keycloak API does not always sanity check inputs, for example you can set SAML-specific settings on an OpenID Connect client for instance and
-    the other way around. Be careful. If you do not specify a setting, usually a sensible default is chosen.
+  - This module allows the administration of Keycloak clients using the Keycloak REST API. It requires access to the REST
+    API using OpenID Connect; the user connecting and the client being used must have the requisite access rights. In a default
+    Keycloak installation, admin-cli and an admin user would work, as would a separate client definition with the scope tailored
+    to your needs and a user having the expected roles.
+  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation
+    at U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html). Aliases are provided so camelCased versions can be used
+    as well.
+  - The Keycloak API does not always sanity check inputs, for example you can set SAML-specific settings on an OpenID Connect
+    client for instance and the other way around. Be careful. If you do not specify a setting, usually a sensible default
+    is chosen.
 attributes:
   check_mode:
     support: full
@@ -49,15 +51,16 @@ options:
 
   client_id:
     description:
-      - Client id of client to be worked on. This is usually an alphanumeric name chosen by you. Either this or O(id) is required. If you specify
-        both, O(id) takes precedence. This is C(clientId) in the Keycloak REST API.
+      - Client ID of client to be worked on. This is usually an alphanumeric name chosen by you. Either this or O(id) is required.
+        If you specify both, O(id) takes precedence. This is C(clientId) in the Keycloak REST API.
     aliases:
       - clientId
     type: str
 
   id:
     description:
-      - Id of client to be worked on. This is usually an UUID. Either this or O(client_id) is required. If you specify both, this takes precedence.
+      - ID of client to be worked on. This is usually an UUID. Either this or O(client_id) is required. If you specify both,
+        this takes precedence.
     type: str
 
   name:
@@ -86,7 +89,8 @@ options:
 
   base_url:
     description:
-      - Default URL to use when the auth server needs to redirect or link back to the client This is C(baseUrl) in the Keycloak REST API.
+      - Default URL to use when the auth server needs to redirect or link back to the client This is C(baseUrl) in the Keycloak
+        REST API.
     aliases:
       - baseUrl
     type: str
@@ -98,11 +102,11 @@ options:
 
   client_authenticator_type:
     description:
-      - How do clients authenticate with the auth server? Either V(client-secret), V(client-jwt), or V(client-x509) can be chosen. When using
-        V(client-secret), the module parameter O(secret) can set it, for V(client-jwt), you can use the keys C(use.jwks.url), C(jwks.url), and
-        C(jwt.credential.certificate) in the O(attributes) module parameter to configure its behavior. For V(client-x509) you can use the keys
-        C(x509.allow.regex.pattern.comparison) and C(x509.subjectdn) in the O(attributes) module parameter to configure which certificate(s) to
-        accept.
+      - How do clients authenticate with the auth server? Either V(client-secret), V(client-jwt), or V(client-x509) can be
+        chosen. When using V(client-secret), the module parameter O(secret) can set it, for V(client-jwt), you can use the
+        keys C(use.jwks.url), C(jwks.url), and C(jwt.credential.certificate) in the O(attributes) module parameter to configure
+        its behavior. For V(client-x509) you can use the keys C(x509.allow.regex.pattern.comparison) and C(x509.subjectdn)
+        in the O(attributes) module parameter to configure which certificate(s) to accept.
       - This is C(clientAuthenticatorType) in the Keycloak REST API.
     choices: ['client-secret', 'client-jwt', 'client-x509']
     aliases:
@@ -111,22 +115,23 @@ options:
 
   secret:
     description:
-      - When using O(client_authenticator_type=client-secret) (the default), you can specify a secret here (otherwise one will be generated if
-        it does not exit). If changing this secret, the module will not register a change currently (but the changed secret will be saved).
+      - When using O(client_authenticator_type=client-secret) (the default), you can specify a secret here (otherwise one
+        will be generated if it does not exit). If changing this secret, the module will not register a change currently (but
+        the changed secret will be saved).
     type: str
 
   registration_access_token:
     description:
-      - The registration access token provides access for clients to the client registration service. This is C(registrationAccessToken) in the
-        Keycloak REST API.
+      - The registration access token provides access for clients to the client registration service. This is C(registrationAccessToken)
+        in the Keycloak REST API.
     aliases:
       - registrationAccessToken
     type: str
 
   default_roles:
     description:
-      - List of default roles for this client. If the client roles referenced do not exist yet, they will be created. This is C(defaultRoles) in
-        the Keycloak REST API.
+      - List of default roles for this client. If the client roles referenced do not exist yet, they will be created. This
+        is C(defaultRoles) in the Keycloak REST API.
     aliases:
       - defaultRoles
     type: list
@@ -150,7 +155,8 @@ options:
 
   not_before:
     description:
-      - Revoke any tokens issued before this date for this client (this is a UNIX timestamp). This is C(notBefore) in the Keycloak REST API.
+      - Revoke any tokens issued before this date for this client (this is a UNIX timestamp). This is C(notBefore) in the
+        Keycloak REST API.
     type: int
     aliases:
       - notBefore
@@ -171,36 +177,40 @@ options:
 
   standard_flow_enabled:
     description:
-      - Enable standard flow for this client or not (OpenID connect). This is C(standardFlowEnabled) in the Keycloak REST API.
+      - Enable standard flow for this client or not (OpenID connect). This is C(standardFlowEnabled) in the Keycloak REST
+        API.
     aliases:
       - standardFlowEnabled
     type: bool
 
   implicit_flow_enabled:
     description:
-      - Enable implicit flow for this client or not (OpenID connect). This is C(implicitFlowEnabled) in the Keycloak REST API.
+      - Enable implicit flow for this client or not (OpenID connect). This is C(implicitFlowEnabled) in the Keycloak REST
+        API.
     aliases:
       - implicitFlowEnabled
     type: bool
 
   direct_access_grants_enabled:
     description:
-      - Are direct access grants enabled for this client or not (OpenID connect). This is C(directAccessGrantsEnabled) in the Keycloak REST API.
+      - Are direct access grants enabled for this client or not (OpenID connect). This is C(directAccessGrantsEnabled) in
+        the Keycloak REST API.
     aliases:
       - directAccessGrantsEnabled
     type: bool
 
   service_accounts_enabled:
     description:
-      - Are service accounts enabled for this client or not (OpenID connect). This is C(serviceAccountsEnabled) in the Keycloak REST API.
+      - Are service accounts enabled for this client or not (OpenID connect). This is C(serviceAccountsEnabled) in the Keycloak
+        REST API.
     aliases:
       - serviceAccountsEnabled
     type: bool
 
   authorization_services_enabled:
     description:
-      - Are authorization services enabled for this client or not (OpenID connect). This is C(authorizationServicesEnabled) in the Keycloak REST
-        API.
+      - Are authorization services enabled for this client or not (OpenID connect). This is C(authorizationServicesEnabled)
+        in the Keycloak REST API.
     aliases:
       - authorizationServicesEnabled
     type: bool
@@ -243,37 +253,40 @@ options:
 
   registered_nodes:
     description:
-      - Dict of registered cluster nodes (with C(nodename) as the key and last registration time as the value). This is C(registeredNodes) in the
-        Keycloak REST API.
+      - Dict of registered cluster nodes (with C(nodename) as the key and last registration time as the value). This is C(registeredNodes)
+        in the Keycloak REST API.
     type: dict
     aliases:
       - registeredNodes
 
   client_template:
     description:
-      - Client template to use for this client. If it does not exist this field will silently be dropped. This is C(clientTemplate) in the Keycloak
-        REST API.
+      - Client template to use for this client. If it does not exist this field will silently be dropped. This is C(clientTemplate)
+        in the Keycloak REST API.
     type: str
     aliases:
       - clientTemplate
 
   use_template_config:
     description:
-      - Whether or not to use configuration from the O(client_template). This is C(useTemplateConfig) in the Keycloak REST API.
+      - Whether or not to use configuration from the O(client_template). This is C(useTemplateConfig) in the Keycloak REST
+        API.
     aliases:
       - useTemplateConfig
     type: bool
 
   use_template_scope:
     description:
-      - Whether or not to use scope configuration from the O(client_template). This is C(useTemplateScope) in the Keycloak REST API.
+      - Whether or not to use scope configuration from the O(client_template). This is C(useTemplateScope) in the Keycloak
+        REST API.
     aliases:
       - useTemplateScope
     type: bool
 
   use_template_mappers:
     description:
-      - Whether or not to use mapper configuration from the O(client_template). This is C(useTemplateMappers) in the Keycloak REST API.
+      - Whether or not to use mapper configuration from the O(client_template). This is C(useTemplateMappers) in the Keycloak
+        REST API.
     aliases:
       - useTemplateMappers
     type: bool
@@ -295,9 +308,9 @@ options:
 
   authorization_settings:
     description:
-      - A data structure defining the authorization settings for this client. For reference, please see the Keycloak API docs at
-        U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_resourceserverrepresentation).
-        This is C(authorizationSettings) in the Keycloak REST API.
+      - A data structure defining the authorization settings for this client. For reference, please see the Keycloak API docs
+        at U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_resourceserverrepresentation). This is C(authorizationSettings)
+        in the Keycloak REST API.
     type: dict
     aliases:
       - authorizationSettings
@@ -310,13 +323,15 @@ options:
       browser:
         description:
           - Flow ID of the browser authentication flow.
-          - O(authentication_flow_binding_overrides.browser) and O(authentication_flow_binding_overrides.browser_name) are mutually exclusive.
+          - O(authentication_flow_binding_overrides.browser) and O(authentication_flow_binding_overrides.browser_name) are
+            mutually exclusive.
         type: str
 
       browser_name:
         description:
           - Flow name of the browser authentication flow.
-          - O(authentication_flow_binding_overrides.browser) and O(authentication_flow_binding_overrides.browser_name) are mutually exclusive.
+          - O(authentication_flow_binding_overrides.browser) and O(authentication_flow_binding_overrides.browser_name) are
+            mutually exclusive.
         aliases:
           - browserName
         type: str
@@ -325,8 +340,8 @@ options:
       direct_grant:
         description:
           - Flow ID of the direct grant authentication flow.
-          - O(authentication_flow_binding_overrides.direct_grant) and O(authentication_flow_binding_overrides.direct_grant_name) are mutually
-            exclusive.
+          - O(authentication_flow_binding_overrides.direct_grant) and O(authentication_flow_binding_overrides.direct_grant_name)
+            are mutually exclusive.
         aliases:
           - directGrant
         type: str
@@ -334,8 +349,8 @@ options:
       direct_grant_name:
         description:
           - Flow name of the direct grant authentication flow.
-          - O(authentication_flow_binding_overrides.direct_grant) and O(authentication_flow_binding_overrides.direct_grant_name) are mutually
-            exclusive.
+          - O(authentication_flow_binding_overrides.direct_grant) and O(authentication_flow_binding_overrides.direct_grant_name)
+            are mutually exclusive.
         aliases:
           - directGrantName
         type: str
@@ -398,8 +413,8 @@ options:
 
       protocolMapper:
         description:
-          - 'The Keycloak-internal name of the type of this protocol-mapper. While an exhaustive list is impossible to provide since this may
-            be extended through SPIs by the user of Keycloak, by default Keycloak as of 3.4 ships with at least:'
+          - 'The Keycloak-internal name of the type of this protocol-mapper. While an exhaustive list is impossible to provide
+            since this may be extended through SPIs by the user of Keycloak, by default Keycloak as of 3.4 ships with at least:'
           - V(docker-v2-allow-all-mapper).
           - V(oidc-address-mapper).
           - V(oidc-full-name-mapper).
@@ -422,29 +437,30 @@ options:
           - V(saml-user-attribute-mapper).
           - V(saml-user-property-mapper).
           - V(saml-user-session-note-mapper).
-          - An exhaustive list of available mappers on your installation can be obtained on the admin console by going to Server Info -> Providers
-            and looking under 'protocol-mapper'.
+          - An exhaustive list of available mappers on your installation can be obtained on the admin console by going to
+            Server Info -> Providers and looking under 'protocol-mapper'.
         type: str
 
       config:
         description:
-          - Dict specifying the configuration options for the protocol mapper; the contents differ depending on the value of
-            O(protocol_mappers[].protocolMapper)
-            and are not documented other than by the source of the mappers and its parent class(es). An example is given below. It is easiest
-            to obtain valid config values by dumping an already-existing protocol mapper configuration through check-mode in the RV(existing)
-            field.
+          - Dict specifying the configuration options for the protocol mapper; the contents differ depending on the value
+            of O(protocol_mappers[].protocolMapper) and are not documented other than by the source of the mappers and its
+            parent class(es). An example is given below. It is easiest to obtain valid config values by dumping an already-existing
+            protocol mapper configuration through check-mode in the RV(existing) field.
         type: dict
 
   attributes:
     description:
-      - A dict of further attributes for this client. This can contain various configuration settings; an example is given in the examples section.
-        While an exhaustive list of permissible options is not available; possible options as of Keycloak 3.4 are listed below. The Keycloak API
-        does not validate whether a given option is appropriate for the protocol used; if specified anyway, Keycloak will simply not use it.
+      - A dict of further attributes for this client. This can contain various configuration settings; an example is given
+        in the examples section. While an exhaustive list of permissible options is not available; possible options as of
+        Keycloak 3.4 are listed below. The Keycloak API does not validate whether a given option is appropriate for the protocol
+        used; if specified anyway, Keycloak will simply not use it.
     type: dict
     suboptions:
       saml.authnstatement:
         description:
-          - For SAML clients, boolean specifying whether or not a statement containing method and timestamp should be included in the login response.
+          - For SAML clients, boolean specifying whether or not a statement containing method and timestamp should be included
+            in the login response.
       saml.client.signature:
         description:
           - For SAML clients, boolean specifying whether a client signature is required and validated.
@@ -462,8 +478,8 @@ options:
           - Boolean specifying whether SAML documents should be signed by the realm.
       saml.server.signature.keyinfo.ext:
         description:
-          - For SAML clients, boolean specifying whether REDIRECT signing key lookup should be optimized through inclusion of the signing key
-            id in the SAML Extensions element.
+          - For SAML clients, boolean specifying whether REDIRECT signing key lookup should be optimized through inclusion
+            of the signing key ID in the SAML Extensions element.
       saml.signature.algorithm:
         description:
           - Signature algorithm used to sign SAML documents. One of V(RSA_SHA256), V(RSA_SHA1), V(RSA_SHA512), or V(DSA_SHA1).
@@ -481,28 +497,30 @@ options:
           - SAML Redirect Binding URL for the client's assertion consumer service (login responses).
       saml_force_name_id_format:
         description:
-          - For SAML clients, Boolean specifying whether to ignore requested NameID subject format and using the configured one instead.
+          - For SAML clients, Boolean specifying whether to ignore requested NameID subject format and using the configured
+            one instead.
       saml_name_id_format:
         description:
           - For SAML clients, the NameID format to use (one of V(username), V(email), V(transient), or V(persistent)).
       saml_signature_canonicalization_method:
         description:
-          - SAML signature canonicalization method. This is one of four values, namely V(http://www.w3.org/2001/10/xml-exc-c14n#) for EXCLUSIVE,
-            V(http://www.w3.org/2001/10/xml-exc-c14n#WithComments) for EXCLUSIVE_WITH_COMMENTS, V(http://www.w3.org/TR/2001/REC-xml-c14n-20010315)
+          - SAML signature canonicalization method. This is one of four values, namely V(http://www.w3.org/2001/10/xml-exc-c14n#)
+            for EXCLUSIVE, V(http://www.w3.org/2001/10/xml-exc-c14n#WithComments) for EXCLUSIVE_WITH_COMMENTS,
+            V(http://www.w3.org/TR/2001/REC-xml-c14n-20010315)
             for INCLUSIVE, and V(http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments) for INCLUSIVE_WITH_COMMENTS.
       saml_single_logout_service_url_post:
         description:
-          - SAML POST binding url for the client's single logout service.
+          - SAML POST binding URL for the client's single logout service.
       saml_single_logout_service_url_redirect:
         description:
-          - SAML redirect binding url for the client's single logout service.
+          - SAML redirect binding URL for the client's single logout service.
       user.info.response.signature.alg:
         description:
           - For OpenID-Connect clients, JWA algorithm for signed UserInfo-endpoint responses. One of V(RS256) or V(unsigned).
       request.object.signature.alg:
         description:
-          - For OpenID-Connect clients, JWA algorithm which the client needs to use when sending OIDC request object. One of V(any), V(none),
-            V(RS256).
+          - For OpenID-Connect clients, JWA algorithm which the client needs to use when sending OIDC request object. One
+            of V(any), V(none), V(RS256).
       use.jwks.url:
         description:
           - For OpenID-Connect clients, boolean specifying whether to use a JWKS URL to obtain client public keys.

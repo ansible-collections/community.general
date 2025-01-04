@@ -14,13 +14,15 @@ module: keycloak_clienttemplate
 short_description: Allows administration of Keycloak client templates using Keycloak API
 
 description:
-  - This module allows the administration of Keycloak client templates using the Keycloak REST API. It requires access to the REST API using OpenID
-    Connect; the user connecting and the client being used must have the requisite access rights. In a default Keycloak installation, admin-cli
-    and an admin user would work, as would a separate client definition with the scope tailored to your needs and a user having the expected roles.
-  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation at
-    U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html).
-  - The Keycloak API does not always enforce for only sensible settings to be used -- you can set SAML-specific settings on an OpenID Connect
-    client for instance and the other way around. Be careful. If you do not specify a setting, usually a sensible default is chosen.
+  - This module allows the administration of Keycloak client templates using the Keycloak REST API. It requires access to
+    the REST API using OpenID Connect; the user connecting and the client being used must have the requisite access rights.
+    In a default Keycloak installation, admin-cli and an admin user would work, as would a separate client definition with
+    the scope tailored to your needs and a user having the expected roles.
+  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation
+    at U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html).
+  - The Keycloak API does not always enforce for only sensible settings to be used -- you can set SAML-specific settings on
+    an OpenID Connect client for instance and the other way around. Be careful. If you do not specify a setting, usually a
+    sensible default is chosen.
 attributes:
   check_mode:
     support: full
@@ -41,7 +43,7 @@ options:
 
   id:
     description:
-      - Id of client template to be worked on. This is usually a UUID.
+      - ID of client template to be worked on. This is usually a UUID.
     type: str
 
   realm:
@@ -69,12 +71,14 @@ options:
 
   full_scope_allowed:
     description:
-      - Is the "Full Scope Allowed" feature set for this client template or not. This is C(fullScopeAllowed) in the Keycloak REST API.
+      - Is the "Full Scope Allowed" feature set for this client template or not. This is C(fullScopeAllowed) in the Keycloak
+        REST API.
     type: bool
 
   protocol_mappers:
     description:
-      - A list of dicts defining protocol mappers for this client template. This is C(protocolMappers) in the Keycloak REST API.
+      - A list of dicts defining protocol mappers for this client template. This is C(protocolMappers) in the Keycloak REST
+        API.
     type: list
     elements: dict
     suboptions:
@@ -106,8 +110,8 @@ options:
 
       protocolMapper:
         description:
-          - 'The Keycloak-internal name of the type of this protocol-mapper. While an exhaustive list is impossible to provide since this may
-            be extended through SPIs by the user of Keycloak, by default Keycloak as of 3.4 ships with at least:'
+          - 'The Keycloak-internal name of the type of this protocol-mapper. While an exhaustive list is impossible to provide
+            since this may be extended through SPIs by the user of Keycloak, by default Keycloak as of 3.4 ships with at least:'
           - V(docker-v2-allow-all-mapper).
           - V(oidc-address-mapper).
           - V(oidc-full-name-mapper).
@@ -130,31 +134,29 @@ options:
           - V(saml-user-attribute-mapper).
           - V(saml-user-property-mapper).
           - V(saml-user-session-note-mapper).
-          - An exhaustive list of available mappers on your installation can be obtained on the admin console by going to Server Info -> Providers
-            and looking under 'protocol-mapper'.
+          - An exhaustive list of available mappers on your installation can be obtained on the admin console by going to
+            Server Info -> Providers and looking under 'protocol-mapper'.
         type: str
 
       config:
         description:
-          - Dict specifying the configuration options for the protocol mapper; the contents differ depending on the value of
-            O(protocol_mappers[].protocolMapper)
-            and are not documented other than by the source of the mappers and its parent class(es). An example is given below. It is easiest
-            to obtain valid config values by dumping an already-existing protocol mapper configuration through check-mode in the RV(existing)
-            field.
+          - Dict specifying the configuration options for the protocol mapper; the contents differ depending on the value
+            of O(protocol_mappers[].protocolMapper) and are not documented other than by the source of the mappers and its
+            parent class(es). An example is given below. It is easiest to obtain valid config values by dumping an already-existing
+            protocol mapper configuration through check-mode in the RV(existing) field.
         type: dict
 
   attributes:
     description:
-      - A dict of further attributes for this client template. This can contain various configuration settings, though in the default installation
-        of Keycloak as of 3.4, none are documented or known, so this is usually empty.
+      - A dict of further attributes for this client template. This can contain various configuration settings, though in
+        the default installation of Keycloak as of 3.4, none are documented or known, so this is usually empty.
     type: dict
 
 notes:
   - The Keycloak REST API defines further fields (namely C(bearerOnly), C(consentRequired), C(standardFlowEnabled), C(implicitFlowEnabled),
-    C(directAccessGrantsEnabled),
-    C(serviceAccountsEnabled), C(publicClient), and C(frontchannelLogout)) which, while available with keycloak_client, do not have any effect
-    on Keycloak client-templates and are discarded if supplied with an API request changing client-templates. As such, they are not available
-    through this module.
+    C(directAccessGrantsEnabled), C(serviceAccountsEnabled), C(publicClient), and C(frontchannelLogout)) which, while available
+    with keycloak_client, do not have any effect on Keycloak client-templates and are discarded if supplied with an API request
+    changing client-templates. As such, they are not available through this module.
 extends_documentation_fragment:
   - community.general.keycloak
   - community.general.keycloak.actiongroup_keycloak
@@ -242,13 +244,15 @@ existing:
   description: Representation of existing client template (sample is truncated).
   returned: always
   type: dict
-  sample: {"description": "test01", "fullScopeAllowed": false, "id": "9c3712ab-decd-481e-954f-76da7b006e5f", "name": "test01", "protocol": "saml"}
+  sample: {"description": "test01", "fullScopeAllowed": false, "id": "9c3712ab-decd-481e-954f-76da7b006e5f", "name": "test01",
+    "protocol": "saml"}
 
 end_state:
   description: Representation of client template after module execution (sample is truncated).
   returned: on success
   type: dict
-  sample: {"description": "test01", "fullScopeAllowed": false, "id": "9c3712ab-decd-481e-954f-76da7b006e5f", "name": "test01", "protocol": "saml"}
+  sample: {"description": "test01", "fullScopeAllowed": false, "id": "9c3712ab-decd-481e-954f-76da7b006e5f", "name": "test01",
+    "protocol": "saml"}
 """
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
