@@ -6,8 +6,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 # Community General Collection
 
+[![Documentation](https://img.shields.io/badge/docs-brightgreen.svg)](https://docs.ansible.com/ansible/latest/collections/community/general/)
 [![Build Status](https://dev.azure.com/ansible/community.general/_apis/build/status/CI?branchName=stable-10)](https://dev.azure.com/ansible/community.general/_build?definitionId=31)
-[![EOL CI](https://github.com/ansible-collections/community.general/workflows/EOL%20CI/badge.svg?event=push)](https://github.com/ansible-collections/community.general/actions)
+[![EOL CI](https://github.com/ansible-collections/community.general/actions/workflows/ansible-test.yml/badge.svg?branch=stable-10)](https://github.com/ansible-collections/community.general/actions)
 [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/community.general)](https://codecov.io/gh/ansible-collections/community.general)
 [![REUSE status](https://api.reuse.software/badge/github.com/ansible-collections/community.general)](https://api.reuse.software/info/github.com/ansible-collections/community.general)
 
