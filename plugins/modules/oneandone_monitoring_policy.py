@@ -11,7 +11,8 @@ DOCUMENTATION = r"""
 module: oneandone_monitoring_policy
 short_description: Configure 1&1 monitoring policy
 description:
-  - Create, remove, update monitoring policies (and add/remove ports, processes, and servers). This module has a dependency on 1and1 >= 1.0.
+  - Create, remove, update monitoring policies (and add/remove ports, processes, and servers). This module has a dependency
+    on 1and1 >= 1.0.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -59,9 +60,9 @@ options:
     required: false
   thresholds:
     description:
-      - Monitoring policy thresholds. Each of the suboptions have warning and critical, which both have alert and value suboptions. Warning is
-        used to set limits for warning alerts, critical is used to set critical alerts. alert enables alert, and value is used to advise when
-        the value is exceeded.
+      - Monitoring policy thresholds. Each of the suboptions have warning and critical, which both have alert and value suboptions.
+        Warning is used to set limits for warning alerts, critical is used to set critical alerts. alert enables alert, and
+        value is used to advise when the value is exceeded.
     type: list
     elements: dict
     default: []

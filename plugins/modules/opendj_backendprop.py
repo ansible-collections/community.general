@@ -81,16 +81,16 @@ options:
     type: str
 """
 
-EXAMPLES = """
-  - name: Add or update OpenDJ backend properties
-    opendj_backendprop:
-      hostname: localhost
-      port: 4444
-      username: "cn=Directory Manager"
-      password: password
-      backend: userRoot
-      name: index-entry-limit
-      value: 5000
+EXAMPLES = r"""
+- name: Add or update OpenDJ backend properties
+  opendj_backendprop:
+    hostname: localhost
+    port: 4444
+    username: "cn=Directory Manager"
+    password: password
+    backend: userRoot
+    name: index-entry-limit
+    value: 5000
 """
 
 RETURN = r"""

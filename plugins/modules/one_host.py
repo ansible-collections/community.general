@@ -56,7 +56,8 @@ options:
     type: str
   vmm_mad_name:
     description:
-      - The name of the virtual machine manager mad name, this values are taken from the oned.conf with the tag name VM_MAD (name).
+      - The name of the virtual machine manager mad name, this values are taken from the oned.conf with the tag name VM_MAD
+        (name).
     default: kvm
     type: str
   cluster_id:
