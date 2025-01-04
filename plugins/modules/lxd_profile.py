@@ -153,9 +153,9 @@ EXAMPLES = r"""
     - name: Create macvlan profile
       community.general.lxd_profile:
         url: https://127.0.0.1:8443
-      # These client_cert and client_key values are equal to the default values.
-      #client_cert: "{{ lookup('env', 'HOME') }}/.config/lxc/client.crt"
-      #client_key: "{{ lookup('env', 'HOME') }}/.config/lxc/client.key"
+        # These client_cert and client_key values are equal to the default values.
+        # client_cert: "{{ lookup('env', 'HOME') }}/.config/lxc/client.crt"
+        # client_key: "{{ lookup('env', 'HOME') }}/.config/lxc/client.key"
         trust_password: mypassword
         name: macvlan
         state: present

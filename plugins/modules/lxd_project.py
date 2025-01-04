@@ -161,7 +161,7 @@ logs:
         timeout:
           description: Timeout of HTTP request, V(null) if unset.
           type: int
-          sample:
+          sample: null
     response:
       description: HTTP response received from LXD server.
       type: dict
