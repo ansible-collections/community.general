@@ -77,7 +77,7 @@ result:
       description: The comment string.
       type: str
     dynamic:
-      description: Whether the group match is ipsec_dn or directory_group.
+      description: Whether the group match is V(ipsec_dn) or V(directory_group).
       type: str
     edirectory_groups:
       description: List of eDirectory Groups.
