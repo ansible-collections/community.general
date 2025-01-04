@@ -834,8 +834,15 @@ return_values:
   returned: on success
   type: dict
   version_added: 6.1.0
-  sample: {"update_status": {"handle": "/redfish/v1/TaskService/TaskMonitors/735", "messages": [], "resets_requested": [],
-      "ret": true, "status": "New"}}
+  sample: {
+    "update_status": {
+      "handle": "/redfish/v1/TaskService/TaskMonitors/735",
+      "messages": [],
+      "resets_requested": [],
+      "ret": true,
+      "status": "New"
+    }
+  }
 """
 
 from ansible.module_utils.basic import AnsibleModule
