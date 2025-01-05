@@ -15,6 +15,8 @@ module: proxmox_backup_info
 
 short_description: Retrieve information on Proxmox scheduled backups
 
+version_added: 10.3.0
+
 description:
   - Retrieve information such as backup times, VM name, VM ID, mode, backup type, and backup schedule using the Proxmox Server API.
 
@@ -26,18 +28,17 @@ options:
   vm_name:
     description:
       - The name of the Proxmox VM.
-      - If vm_name is defined, the returned list will contain backup jobs that have been parsed and filtered based on vm_name value.
+      - If defined, the returned list will contain backup jobs that have been parsed and filtered based on O(vm_name) value.
     required: false
     type: str
   vm_id:
     description:
       - The ID of the Proxmox VM.
-      - If vm_id is defined, the returned list will contain backup jobs that have been parsed and filtered based on vm_id value.
+      - If defined, the returned list will contain backup jobs that have been parsed and filtered based on O(vm_id) value.
     required: false
-    type: int
+    type: str
   backup_jobs:
     description:
-      - The backup_jobs value is true or false.
       - If V(true), the module will return all backup jobs information.
       - If V(false), the module will parse all backup jobs based on VM IDs and return a list of VMs' backup information.
     required: false
@@ -93,7 +94,7 @@ backup_info:
       returned: on success
       type: str
     enabled:
-      description: 1 if backup is enabled else 0.
+      description: V(1) if backup is enabled else V(0).
       returned: on success
       type: int
     id:
@@ -123,7 +124,7 @@ backup_info:
     vmid:
       description: The VM vmid.
       returned: on success
-      type: int
+      type: str
 """
 
 from datetime import datetime
@@ -135,7 +136,7 @@ from ansible_collections.community.general.plugins.module_utils.proxmox import (
 class ProxmoxBackupInfoAnsible(ProxmoxAnsible):
 
     # Get all backup information
-    def getJobsList(self):
+    def get_Jobs_List(self):
         try:
             backupJobs = self.proxmox_api.cluster.backup.get()
         except Exception as e:
@@ -143,7 +144,7 @@ class ProxmoxBackupInfoAnsible(ProxmoxAnsible):
         return backupJobs
 
     # Get VM information
-    def getVmsList(self):
+    def get_Vms_List(self):
         try:
             vms = self.proxmox_api.cluster.resources.get(type='vm')
         except Exception as e:
@@ -151,9 +152,9 @@ class ProxmoxBackupInfoAnsible(ProxmoxAnsible):
         return vms
 
     # Get all backup information by VM id and VM name
-    def vmsBackupInfo(self):
-        backupList = self.getJobsList()
-        vmInfo = self.getVmsList()
+    def vms_Backup_Info(self):
+        backupList = self.get_Jobs_List()
+        vmInfo = self.get_Vms_List()
         bkInfo = []
         for backupItem in backupList:
             nextrun = datetime.fromtimestamp(backupItem['next-run'])
@@ -176,11 +177,12 @@ class ProxmoxBackupInfoAnsible(ProxmoxAnsible):
         return bkInfo
 
     # Get proxmox backup information for a specific VM based on its VM id or VM name
-    def specificVmBackupInfo(self, vm_name_id):
-        fullBackupInfo = self.vmsBackupInfo()
+    def specific_VmBackup_Info(self, vm_name_id):
+        fullBackupInfo = self.vms_Backup_Info()
         vmBackupJobs = []
         for vm in fullBackupInfo:
-            if (vm["vm_name"] == vm_name_id or int(vm["vmid"]) == vm_name_id):
+            #if (vm["vm_name"] == vm_name_id or int(vm["vmid"]) == vm_name_id):
+            if (vm["vm_name"] == vm_name_id or vm["vmid"] == vm_name_id):
                 vmBackupJobs.append(vm)
         return vmBackupJobs
 
@@ -189,9 +191,9 @@ def main():
     # Define module args
     args = proxmox_auth_argument_spec()
     backup_info_args = dict(
-        vm_id=dict(type='int', required=False),
-        vm_name=dict(type='str', required=False),
-        backup_jobs=dict(type='bool', default=False, required=False)
+        vm_id=dict(type='str'),
+        vm_name=dict(type='str'),
+        backup_jobs=dict(type='bool', default=False)
     )
     args.update(backup_info_args)
 
@@ -218,13 +220,13 @@ def main():
 
     # Update result value based on what requested (module args)
     if backup_jobs:
-        result['backup_info'] = proxmox.getJobsList()
+        result['backup_info'] = proxmox.get_Jobs_List()
     elif vm_id:
-        result['backup_info'] = proxmox.specificVmBackupInfo(vm_id)
+        result['backup_info'] = proxmox.specific_VmBackup_Info(vm_id)
     elif vm_name:
-        result['backup_info'] = proxmox.specificVmBackupInfo(vm_name)
+        result['backup_info'] = proxmox.specific_VmBackup_Info(vm_name)
     else:
-        result['backup_info'] = proxmox.vmsBackupInfo()
+        result['backup_info'] = proxmox.vms_Backup_Info()
 
     # Return result value
     module.exit_json(**result)
