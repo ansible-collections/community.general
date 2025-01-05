@@ -48,7 +48,7 @@ options:
   vm_uid:
     description:
       - UID of the target Virtual Machine. Required when O(state=absent), O(state=started), O(state=stopped) or
-        O(state=restarted)
+        O(state=restarted).
     type: str
   label:
     description: Label of the Virtual Machine to create, can be used when O(state=present).
@@ -59,7 +59,7 @@ options:
   template:
     description:
       - UID of a template to create Virtual Machine from.
-      - Muse be provided when O(state=present)
+      - Muse be provided when O(state=present).
     type: str
   boot_after_create:
     description: Boot Virtual Machine after creation, can be used when O(state=present).
@@ -172,9 +172,9 @@ class XenOrchestra(object):
 
     def call(self, method, params):
         '''Calls a method on the XO server with the provided parameters.'''
-        id = self.pointer
+        pointer = self.pointer
         self.conn.send(json.dumps({
-            'id': id,
+            'id': pointer,
             'jsonrpc': '2.0',
             'method': method,
             'params': params
@@ -183,7 +183,7 @@ class XenOrchestra(object):
         waited = 0
         while waited < self.CALL_TIMEOUT:
             response = json.loads(self.conn.recv())
-            if 'id' in response and response['id'] == id:
+            if response.get('id') == pointer:
                 return response
             else:
                 sleep(0.1)
@@ -319,7 +319,7 @@ def main():
 
     if state == 'present':
         result = xen_orchestra.create_vm()
-        module.exit_json(changed=True, vm_uid=result)
+        module.exit_json(changed=False, vm_uid=result)
 
 
 if __name__ == '__main__':
