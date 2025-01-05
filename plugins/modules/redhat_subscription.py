@@ -131,7 +131,8 @@ options:
     type: str
   pool_ids:
     description:
-      - 'Specify subscription pool IDs to consume. - A pool ID may be specified as a C(string) - just the pool ID (for example
+      - Specify subscription pool IDs to consume.
+      - 'A pool ID may be specified as a C(string) - just the pool ID (for example
         V(0123456789abcdef0123456789abcdef)), or as a C(dict) with the pool ID as the key, and a quantity as the value (for
         example V(0123456789abcdef0123456789abcdef: 2). If the quantity is provided, it is used to consume multiple entitlements
         from a pool (the pool must support this).'
