@@ -180,8 +180,7 @@ class ProxmoxBackupInfoAnsible(ProxmoxAnsible):
     def specific_VmBackup_Info(self, vm_name_id):
         fullBackupInfo = self.vms_Backup_Info()
         vmBackupJobs = []
-        for vm in fullBackupInfo:
-            #if (vm["vm_name"] == vm_name_id or int(vm["vmid"]) == vm_name_id):
+        for vm in fullBackupInfo:            
             if (vm["vm_name"] == vm_name_id or vm["vmid"] == vm_name_id):
                 vmBackupJobs.append(vm)
         return vmBackupJobs
