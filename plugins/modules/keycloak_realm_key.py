@@ -17,17 +17,19 @@ short_description: Allows administration of Keycloak realm keys using Keycloak A
 version_added: 7.5.0
 
 description:
-  - This module allows the administration of Keycloak realm keys using the Keycloak REST API. It requires access to the REST API using OpenID Connect;
-    the user connecting and the realm being used must have the requisite access rights. In a default Keycloak installation, admin-cli and an admin
-    user would work, as would a separate realm definition with the scope tailored to your needs and a user having the expected roles.
-  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation at
-    U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html).
-    Aliases are provided so camelCased versions can be used as well.
-  - This module is unable to detect changes to the actual cryptographic key after importing it. However, if some other property is changed alongside
-    the cryptographic key, then the key will also get changed as a side-effect, as the JSON payload needs to include the private key. This can
-    be considered either a bug or a feature, as the alternative would be to always update the realm key whether it has changed or not.
-  - If certificate is not explicitly provided it will be dynamically created by Keycloak. Therefore comparing the current state of the certificate
-    to the desired state (which may be empty) is not possible.
+  - This module allows the administration of Keycloak realm keys using the Keycloak REST API. It requires access to the REST
+    API using OpenID Connect; the user connecting and the realm being used must have the requisite access rights. In a default
+    Keycloak installation, admin-cli and an admin user would work, as would a separate realm definition with the scope tailored
+    to your needs and a user having the expected roles.
+  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation
+    at U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html). Aliases are provided so camelCased versions can be used
+    as well.
+  - This module is unable to detect changes to the actual cryptographic key after importing it. However, if some other property
+    is changed alongside the cryptographic key, then the key will also get changed as a side-effect, as the JSON payload needs
+    to include the private key. This can be considered either a bug or a feature, as the alternative would be to always update
+    the realm key whether it has changed or not.
+  - If certificate is not explicitly provided it will be dynamically created by Keycloak. Therefore comparing the current
+    state of the certificate to the desired state (which may be empty) is not possible.
 attributes:
   check_mode:
     support: full
@@ -52,9 +54,9 @@ options:
     required: true
   force:
     description:
-      - Enforce the state of the private key and certificate. This is not automatically the case as this module is unable to determine the current
-        state of the private key and thus cannot trigger an update based on an actual divergence. That said, a private key update may happen even
-        if force is false as a side-effect of other changes.
+      - Enforce the state of the private key and certificate. This is not automatically the case as this module is unable
+        to determine the current state of the private key and thus cannot trigger an update based on an actual divergence.
+        That said, a private key update may happen even if force is false as a side-effect of other changes.
     default: false
     type: bool
   parent_id:
@@ -76,12 +78,14 @@ options:
     suboptions:
       active:
         description:
-          - Whether they key is active or inactive. Not to be confused with the state of the Ansible resource managed by the O(state) parameter.
+          - Whether they key is active or inactive. Not to be confused with the state of the Ansible resource managed by the
+            O(state) parameter.
         default: true
         type: bool
       enabled:
         description:
-          - Whether the key is enabled or disabled. Not to be confused with the state of the Ansible resource managed by the O(state) parameter.
+          - Whether the key is enabled or disabled. Not to be confused with the state of the Ansible resource managed by the
+            O(state) parameter.
         default: true
         type: bool
       priority:
@@ -92,30 +96,33 @@ options:
       algorithm:
         description:
           - Key algorithm.
-          - The values V(RS384), V(RS512), V(PS256), V(PS384), V(PS512), V(RSA1_5), V(RSA-OAEP), V(RSA-OAEP-256) have been added in community.general
-            8.2.0.
+          - The values V(RS384), V(RS512), V(PS256), V(PS384), V(PS512), V(RSA1_5), V(RSA-OAEP), V(RSA-OAEP-256) have been
+            added in community.general 8.2.0.
         default: RS256
         choices: ['RS256', 'RS384', 'RS512', 'PS256', 'PS384', 'PS512', 'RSA1_5', 'RSA-OAEP', 'RSA-OAEP-256']
         type: str
       private_key:
         description:
           - The private key as an ASCII string. Contents of the key must match O(config.algorithm) and O(provider_id).
-          - Please note that the module cannot detect whether the private key specified differs from the current state's private key. Use O(force=true)
-            to force the module to update the private key if you expect it to be updated.
+          - Please note that the module cannot detect whether the private key specified differs from the current state's private
+            key. Use O(force=true) to force the module to update the private key if you expect it to be updated.
         required: true
         type: str
       certificate:
         description:
-          - A certificate signed with the private key as an ASCII string. Contents of the key must match O(config.algorithm) and O(provider_id).
-          - If you want Keycloak to automatically generate a certificate using your private key then set this to an empty string.
+          - A certificate signed with the private key as an ASCII string. Contents of the key must match O(config.algorithm)
+            and O(provider_id).
+          - If you want Keycloak to automatically generate a certificate using your private key then set this to an empty
+            string.
         required: true
         type: str
 notes:
-  - Current value of the private key cannot be fetched from Keycloak. Therefore comparing its desired state to the current state is not possible.
-  - If certificate is not explicitly provided it will be dynamically created by Keycloak. Therefore comparing the current state of the certificate
-    to the desired state (which may be empty) is not possible.
-  - Due to the private key and certificate options the module is B(not fully idempotent). You can use O(force=true) to force the module to always
-    update if you know that the private key might have changed.
+  - Current value of the private key cannot be fetched from Keycloak. Therefore comparing its desired state to the current
+    state is not possible.
+  - If certificate is not explicitly provided it will be dynamically created by Keycloak. Therefore comparing the current
+    state of the certificate to the desired state (which may be empty) is not possible.
+  - Due to the private key and certificate options the module is B(not fully idempotent). You can use O(force=true) to force
+    the module to always update if you know that the private key might have changed.
 extends_documentation_fragment:
   - community.general.keycloak
   - community.general.keycloak.actiongroup_keycloak

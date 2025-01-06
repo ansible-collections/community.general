@@ -154,7 +154,7 @@ user:
   type: str
   sample: admin
 url:
-  description: Url to connect to the Jenkins server.
+  description: URL to connect to the Jenkins server.
   returned: success
   type: str
   sample: https://jenkins.mydomain.com
