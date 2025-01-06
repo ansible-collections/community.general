@@ -6,29 +6,29 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-  name: json_query
-  short_description: Select a single element or a data subset from a complex data structure
-  description:
-    - This filter lets you query a complex JSON structure and iterate over it using a loop structure.
-  positional: expr
-  options:
-    _input:
-      description:
-        - The JSON data to query.
-      type: any
-      required: true
-    expr:
-      description:
-        - The query expression.
-        - See U(http://jmespath.org/examples.html) for examples.
-      type: string
-      required: true
-  requirements:
-    - jmespath
-'''
+DOCUMENTATION = r"""
+name: json_query
+short_description: Select a single element or a data subset from a complex data structure
+description:
+  - This filter lets you query a complex JSON structure and iterate over it using a loop structure.
+positional: expr
+options:
+  _input:
+    description:
+      - The JSON data to query.
+    type: any
+    required: true
+  expr:
+    description:
+      - The query expression.
+      - See U(http://jmespath.org/examples.html) for examples.
+    type: string
+    required: true
+requirements:
+  - jmespath
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Define data to work on in the examples below
   ansible.builtin.set_fact:
     domain_definition:
@@ -99,13 +99,13 @@ EXAMPLES = '''
     msg: "{{ domain_definition | to_json | from_json | community.general.json_query(server_name_query) }}"
   vars:
     server_name_query: "domain.server[?contains(name,'server1')].port"
-'''
+"""
 
-RETURN = '''
-  _value:
-    description: The result of the query.
-    type: any
-'''
+RETURN = r"""
+_value:
+  description: The result of the query.
+  type: any
+"""
 
 from ansible.errors import AnsibleError, AnsibleFilterError
 

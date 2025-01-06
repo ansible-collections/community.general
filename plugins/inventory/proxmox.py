@@ -7,213 +7,225 @@ from __future__ import (absolute_import, division, print_function)
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    name: proxmox
-    short_description: Proxmox inventory source
-    version_added: "1.2.0"
-    author:
-        - Jeffrey van Pelt (@Thulium-Drake) <jeff@vanpelt.one>
-    requirements:
-        - requests >= 1.1
+DOCUMENTATION = r"""
+name: proxmox
+short_description: Proxmox inventory source
+version_added: "1.2.0"
+author:
+  - Jeffrey van Pelt (@Thulium-Drake) <jeff@vanpelt.one>
+requirements:
+  - requests >= 1.1
+description:
+  - Get inventory hosts from a Proxmox PVE cluster.
+  - Uses a configuration file as an inventory source, it must end in C(.proxmox.yml) or C(.proxmox.yaml).
+  - Will retrieve the first network interface with an IP for Proxmox nodes.
+  - Can retrieve LXC/QEMU configuration as facts.
+extends_documentation_fragment:
+  - constructed
+  - inventory_cache
+options:
+  plugin:
+    description: The name of this plugin, it should always be set to V(community.general.proxmox) for this plugin to recognize
+      it as its own.
+    required: true
+    choices: ['community.general.proxmox']
+    type: str
+  url:
     description:
-        - Get inventory hosts from a Proxmox PVE cluster.
-        - "Uses a configuration file as an inventory source, it must end in C(.proxmox.yml) or C(.proxmox.yaml)"
-        - Will retrieve the first network interface with an IP for Proxmox nodes.
-        - Can retrieve LXC/QEMU configuration as facts.
-    extends_documentation_fragment:
-        - constructed
-        - inventory_cache
-    options:
-      plugin:
-        description: The name of this plugin, it should always be set to V(community.general.proxmox) for this plugin to recognize it as its own.
-        required: true
-        choices: ['community.general.proxmox']
-        type: str
-      url:
-        description:
-          - URL to Proxmox cluster.
-          - If the value is not specified in the inventory configuration, the value of environment variable E(PROXMOX_URL) will be used instead.
-          - Since community.general 4.7.0 you can also use templating to specify the value of the O(url).
-        default: 'http://localhost:8006'
-        type: str
-        env:
-          - name: PROXMOX_URL
-            version_added: 2.0.0
-      user:
-        description:
-          - Proxmox authentication user.
-          - If the value is not specified in the inventory configuration, the value of environment variable E(PROXMOX_USER) will be used instead.
-          - Since community.general 4.7.0 you can also use templating to specify the value of the O(user).
-        required: true
-        type: str
-        env:
-          - name: PROXMOX_USER
-            version_added: 2.0.0
-      password:
-        description:
-          - Proxmox authentication password.
-          - If the value is not specified in the inventory configuration, the value of environment variable E(PROXMOX_PASSWORD) will be used instead.
-          - Since community.general 4.7.0 you can also use templating to specify the value of the O(password).
-          - If you do not specify a password, you must set O(token_id) and O(token_secret) instead.
-        type: str
-        env:
-          - name: PROXMOX_PASSWORD
-            version_added: 2.0.0
-      token_id:
-        description:
-          - Proxmox authentication token ID.
-          - If the value is not specified in the inventory configuration, the value of environment variable E(PROXMOX_TOKEN_ID) will be used instead.
-          - To use token authentication, you must also specify O(token_secret). If you do not specify O(token_id) and O(token_secret),
-            you must set a password instead.
-          - Make sure to grant explicit pve permissions to the token or disable 'privilege separation' to use the users' privileges instead.
-        version_added: 4.8.0
-        type: str
-        env:
-          - name: PROXMOX_TOKEN_ID
-      token_secret:
-        description:
-          - Proxmox authentication token secret.
-          - If the value is not specified in the inventory configuration, the value of environment variable E(PROXMOX_TOKEN_SECRET) will be used instead.
-          - To use token authentication, you must also specify O(token_id). If you do not specify O(token_id) and O(token_secret),
-            you must set a password instead.
-        version_added: 4.8.0
-        type: str
-        env:
-          - name: PROXMOX_TOKEN_SECRET
-      validate_certs:
-        description: Verify SSL certificate if using HTTPS.
-        type: boolean
-        default: true
-      group_prefix:
-        description: Prefix to apply to Proxmox groups.
-        default: proxmox_
-        type: str
-      facts_prefix:
-        description: Prefix to apply to LXC/QEMU config facts.
-        default: proxmox_
-        type: str
-      want_facts:
-        description:
-          - Gather LXC/QEMU configuration facts.
-          - When O(want_facts) is set to V(true) more details about QEMU VM status are possible, besides the running and stopped states.
-            Currently if the VM is running and it is suspended, the status will be running and the machine will be in C(running) group,
-            but its actual state will be paused. See O(qemu_extended_statuses) for how to retrieve the real status.
-        default: false
-        type: bool
-      qemu_extended_statuses:
-        description:
-          - Requires O(want_facts) to be set to V(true) to function. This will allow you to differentiate between C(paused) and C(prelaunch)
-            statuses of the QEMU VMs.
-          - This introduces multiple groups [prefixed with O(group_prefix)] C(prelaunch) and C(paused).
-        default: false
-        type: bool
-        version_added: 5.1.0
-      want_proxmox_nodes_ansible_host:
-        version_added: 3.0.0
-        description:
-          - Whether to set C(ansible_host) for proxmox nodes.
-          - When set to V(true) (default), will use the first available interface. This can be different from what you expect.
-          - The default of this option changed from V(true) to V(false) in community.general 6.0.0.
-        type: bool
-        default: false
-      exclude_nodes:
-        description: Exclude proxmox nodes and the nodes-group from the inventory output.
-        type: bool
-        default: false
-        version_added: 8.1.0
-      filters:
-        version_added: 4.6.0
-        description: A list of Jinja templates that allow filtering hosts.
-        type: list
-        elements: str
-        default: []
-      strict:
-        version_added: 2.5.0
-      compose:
-        version_added: 2.5.0
-      groups:
-        version_added: 2.5.0
-      keyed_groups:
-        version_added: 2.5.0
-'''
+      - URL to Proxmox cluster.
+      - If the value is not specified in the inventory configuration, the value of environment variable E(PROXMOX_URL) will
+        be used instead.
+      - Since community.general 4.7.0 you can also use templating to specify the value of the O(url).
+    default: 'http://localhost:8006'
+    type: str
+    env:
+      - name: PROXMOX_URL
+        version_added: 2.0.0
+  user:
+    description:
+      - Proxmox authentication user.
+      - If the value is not specified in the inventory configuration, the value of environment variable E(PROXMOX_USER) will
+        be used instead.
+      - Since community.general 4.7.0 you can also use templating to specify the value of the O(user).
+    required: true
+    type: str
+    env:
+      - name: PROXMOX_USER
+        version_added: 2.0.0
+  password:
+    description:
+      - Proxmox authentication password.
+      - If the value is not specified in the inventory configuration, the value of environment variable E(PROXMOX_PASSWORD)
+        will be used instead.
+      - Since community.general 4.7.0 you can also use templating to specify the value of the O(password).
+      - If you do not specify a password, you must set O(token_id) and O(token_secret) instead.
+    type: str
+    env:
+      - name: PROXMOX_PASSWORD
+        version_added: 2.0.0
+  token_id:
+    description:
+      - Proxmox authentication token ID.
+      - If the value is not specified in the inventory configuration, the value of environment variable E(PROXMOX_TOKEN_ID)
+        will be used instead.
+      - To use token authentication, you must also specify O(token_secret). If you do not specify O(token_id) and O(token_secret),
+        you must set a password instead.
+      - Make sure to grant explicit pve permissions to the token or disable 'privilege separation' to use the users' privileges
+        instead.
+    version_added: 4.8.0
+    type: str
+    env:
+      - name: PROXMOX_TOKEN_ID
+  token_secret:
+    description:
+      - Proxmox authentication token secret.
+      - If the value is not specified in the inventory configuration, the value of environment variable E(PROXMOX_TOKEN_SECRET)
+        will be used instead.
+      - To use token authentication, you must also specify O(token_id). If you do not specify O(token_id) and O(token_secret),
+        you must set a password instead.
+    version_added: 4.8.0
+    type: str
+    env:
+      - name: PROXMOX_TOKEN_SECRET
+  validate_certs:
+    description: Verify SSL certificate if using HTTPS.
+    type: boolean
+    default: true
+  group_prefix:
+    description: Prefix to apply to Proxmox groups.
+    default: proxmox_
+    type: str
+  facts_prefix:
+    description: Prefix to apply to LXC/QEMU config facts.
+    default: proxmox_
+    type: str
+  want_facts:
+    description:
+      - Gather LXC/QEMU configuration facts.
+      - When O(want_facts) is set to V(true) more details about QEMU VM status are possible, besides the running and stopped
+        states. Currently if the VM is running and it is suspended, the status will be running and the machine will be in
+        C(running) group, but its actual state will be paused. See O(qemu_extended_statuses) for how to retrieve the real
+        status.
+    default: false
+    type: bool
+  qemu_extended_statuses:
+    description:
+      - Requires O(want_facts) to be set to V(true) to function. This will allow you to differentiate between C(paused) and
+        C(prelaunch) statuses of the QEMU VMs.
+      - This introduces multiple groups [prefixed with O(group_prefix)] C(prelaunch) and C(paused).
+    default: false
+    type: bool
+    version_added: 5.1.0
+  want_proxmox_nodes_ansible_host:
+    version_added: 3.0.0
+    description:
+      - Whether to set C(ansible_host) for proxmox nodes.
+      - When set to V(true) (default), will use the first available interface. This can be different from what you expect.
+      - The default of this option changed from V(true) to V(false) in community.general 6.0.0.
+    type: bool
+    default: false
+  exclude_nodes:
+    description: Exclude proxmox nodes and the nodes-group from the inventory output.
+    type: bool
+    default: false
+    version_added: 8.1.0
+  filters:
+    version_added: 4.6.0
+    description: A list of Jinja templates that allow filtering hosts.
+    type: list
+    elements: str
+    default: []
+  strict:
+    version_added: 2.5.0
+  compose:
+    version_added: 2.5.0
+  groups:
+    version_added: 2.5.0
+  keyed_groups:
+    version_added: 2.5.0
+"""
 
-EXAMPLES = '''
-# Minimal example which will not gather additional facts for QEMU/LXC guests
-# By not specifying a URL the plugin will attempt to connect to the controller host on port 8006
-# my.proxmox.yml
-plugin: community.general.proxmox
-user: ansible@pve
-password: secure
-# Note that this can easily give you wrong values as ansible_host. See further below for
-# an example where this is set to `false` and where ansible_host is set with `compose`.
-want_proxmox_nodes_ansible_host: true
+EXAMPLES = r"""
+- |
+  # Minimal example which will not gather additional facts for QEMU/LXC guests
+  # By not specifying a URL the plugin will attempt to connect to the controller host on port 8006
+  # my.proxmox.yml
+  plugin: community.general.proxmox
+  user: ansible@pve
+  password: secure
+  # Note that this can easily give you wrong values as ansible_host. See further below for
+  # an example where this is set to `false` and where ansible_host is set with `compose`.
+  want_proxmox_nodes_ansible_host: true
 
-# Instead of login with password, proxmox supports api token authentication since release 6.2.
-plugin: community.general.proxmox
-user: ci@pve
-token_id: gitlab-1
-token_secret: fa256e9c-26ab-41ec-82da-707a2c079829
+- |
+  # Instead of login with password, proxmox supports api token authentication since release 6.2.
+  plugin: community.general.proxmox
+  user: ci@pve
+  token_id: gitlab-1
+  token_secret: fa256e9c-26ab-41ec-82da-707a2c079829
 
-# The secret can also be a vault string or passed via the environment variable TOKEN_SECRET.
-token_secret: !vault |
-          $ANSIBLE_VAULT;1.1;AES256
-          62353634333163633336343265623632626339313032653563653165313262343931643431656138
-          6134333736323265656466646539663134306166666237630a653363623262636663333762316136
-          34616361326263383766366663393837626437316462313332663736623066656237386531663731
-          3037646432383064630a663165303564623338666131353366373630656661333437393937343331
-          32643131386134396336623736393634373936356332623632306561356361323737313663633633
-          6231313333666361656537343562333337323030623732323833
+  # The secret can also be a vault string or passed via the environment variable TOKEN_SECRET.
+  token_secret: !vault |
+            $ANSIBLE_VAULT;1.1;AES256
+            62353634333163633336343265623632626339313032653563653165313262343931643431656138
+            6134333736323265656466646539663134306166666237630a653363623262636663333762316136
+            34616361326263383766366663393837626437316462313332663736623066656237386531663731
+            3037646432383064630a663165303564623338666131353366373630656661333437393937343331
+            32643131386134396336623736393634373936356332623632306561356361323737313663633633
+            6231313333666361656537343562333337323030623732323833
 
-# More complete example demonstrating the use of 'want_facts' and the constructed options
-# Note that using facts returned by 'want_facts' in constructed options requires 'want_facts=true'
-# my.proxmox.yml
-plugin: community.general.proxmox
-url: http://pve.domain.com:8006
-user: ansible@pve
-password: secure
-want_facts: true
-keyed_groups:
-    # proxmox_tags_parsed is an example of a fact only returned when 'want_facts=true'
-  - key: proxmox_tags_parsed
-    separator: ""
-    prefix: group
-groups:
-  webservers: "'web' in (proxmox_tags_parsed|list)"
-  mailservers: "'mail' in (proxmox_tags_parsed|list)"
-compose:
-  ansible_port: 2222
-# Note that this can easily give you wrong values as ansible_host. See further below for
-# an example where this is set to `false` and where ansible_host is set with `compose`.
-want_proxmox_nodes_ansible_host: true
+- |
+  # More complete example demonstrating the use of 'want_facts' and the constructed options
+  # Note that using facts returned by 'want_facts' in constructed options requires 'want_facts=true'
+  # my.proxmox.yml
+  plugin: community.general.proxmox
+  url: http://pve.domain.com:8006
+  user: ansible@pve
+  password: secure
+  want_facts: true
+  keyed_groups:
+      # proxmox_tags_parsed is an example of a fact only returned when 'want_facts=true'
+    - key: proxmox_tags_parsed
+      separator: ""
+      prefix: group
+  groups:
+    webservers: "'web' in (proxmox_tags_parsed|list)"
+    mailservers: "'mail' in (proxmox_tags_parsed|list)"
+  compose:
+    ansible_port: 2222
+  # Note that this can easily give you wrong values as ansible_host. See further below for
+  # an example where this is set to `false` and where ansible_host is set with `compose`.
+  want_proxmox_nodes_ansible_host: true
 
-# Using the inventory to allow ansible to connect via the first IP address of the VM / Container
-# (Default is connection by name of QEMU/LXC guests)
-# Note: my_inv_var demonstrates how to add a string variable to every host used by the inventory.
-# my.proxmox.yml
-plugin: community.general.proxmox
-url: http://192.168.1.2:8006
-user: ansible@pve
-password: secure
-validate_certs: false  # only do this when you trust the network!
-want_facts: true
-want_proxmox_nodes_ansible_host: false
-compose:
-  ansible_host: proxmox_ipconfig0.ip | default(proxmox_net0.ip) | ipaddr('address')
-  my_inv_var_1: "'my_var1_value'"
-  my_inv_var_2: >
-    "my_var_2_value"
+- |
+  # Using the inventory to allow ansible to connect via the first IP address of the VM / Container
+  # (Default is connection by name of QEMU/LXC guests)
+  # Note: my_inv_var demonstrates how to add a string variable to every host used by the inventory.
+  # my.proxmox.yml
+  plugin: community.general.proxmox
+  url: http://192.168.1.2:8006
+  user: ansible@pve
+  password: secure
+  validate_certs: false  # only do this when you trust the network!
+  want_facts: true
+  want_proxmox_nodes_ansible_host: false
+  compose:
+    ansible_host: proxmox_ipconfig0.ip | default(proxmox_net0.ip) | ipaddr('address')
+    my_inv_var_1: "'my_var1_value'"
+    my_inv_var_2: >
+      "my_var_2_value"
 
-# Specify the url, user and password using templating
-# my.proxmox.yml
-plugin: community.general.proxmox
-url: "{{ lookup('ansible.builtin.ini', 'url', section='proxmox', file='file.ini') }}"
-user: "{{ lookup('ansible.builtin.env','PM_USER') | default('ansible@pve') }}"
-password: "{{ lookup('community.general.random_string', base64=True) }}"
-# Note that this can easily give you wrong values as ansible_host. See further up for
-# an example where this is set to `false` and where ansible_host is set with `compose`.
-want_proxmox_nodes_ansible_host: true
-
-'''
+- |-
+  # Specify the url, user and password using templating
+  # my.proxmox.yml
+  plugin: community.general.proxmox
+  url: "{{ lookup('ansible.builtin.ini', 'url', section='proxmox', file='file.ini') }}"
+  user: "{{ lookup('ansible.builtin.env','PM_USER') | default('ansible@pve') }}"
+  password: "{{ lookup('community.general.random_string', base64=True) }}"
+  # Note that this can easily give you wrong values as ansible_host. See further up for
+  # an example where this is set to `false` and where ansible_host is set with `compose`.
+  want_proxmox_nodes_ansible_host: true
+"""
 
 import itertools
 import re
