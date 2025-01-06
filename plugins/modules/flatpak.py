@@ -179,7 +179,7 @@ stderr:
   description: Error output from flatpak binary.
   returned: When a flatpak command has been executed
   type: str
-  sample: "error: Error searching remote flathub: Can't find ref org.gnome.KDE"
+  sample: "error: Error searching remote flathub: Cannot find ref org.gnome.KDE"
 stdout:
   description: Output from flatpak binary.
   returned: When a flatpak command has been executed

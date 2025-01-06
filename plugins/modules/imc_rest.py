@@ -258,12 +258,13 @@ output:
   description: RAW XML output received from the Cisco IMC, with error details.
   returned: failed
   type: str
-  sample: >
+  sample: |
     <error cookie=""
       response="yes"
       errorCode="ERR-xml-parse-error"
       invocationResult="594"
-      errorDescr="XML PARSING ERROR: Element 'computeRackUnit', attribute 'admin_Power': The attribute 'admin_Power' is not allowed.\n"/>
+      errorDescr="XML PARSING ERROR: Element 'computeRackUnit', attribute 'admin_Power': The attribute 'admin_Power' is not allowed."
+    />
 """
 
 import os

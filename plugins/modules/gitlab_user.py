@@ -82,7 +82,7 @@ options:
     version_added: 3.1.0
   group:
     description:
-      - Id or Full path of parent group in the form of group/name.
+      - ID or Full path of parent group in the form of group/name.
       - Add user as a member to this group.
     type: str
   access_level:
