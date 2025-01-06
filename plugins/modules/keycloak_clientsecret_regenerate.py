@@ -17,12 +17,14 @@ short_description: Regenerate Keycloak client secret using Keycloak API
 version_added: 6.1.0
 
 description:
-  - This module allows you to regenerate a Keycloak client secret using the Keycloak REST API. It requires access to the REST API using OpenID Connect;
-    the user connecting and the client being used must have the requisite access rights. In a default Keycloak installation, admin-cli and an
-    admin user would work, as would a separate client definition with the scope tailored to your needs and a user having the expected roles.
-  - When regenerating a client secret, where possible provide the client's id (not client_id) to the module. This removes a lookup to the API
-    to translate the client_id into the client ID.
-  - 'Note that this module returns the client secret. To avoid this showing up in the logs, please add C(no_log: true) to the task.'
+  - This module allows you to regenerate a Keycloak client secret using the Keycloak REST API. It requires access to the REST
+    API using OpenID Connect; the user connecting and the client being used must have the requisite access rights. In a default
+    Keycloak installation, admin-cli and an admin user would work, as would a separate client definition with the scope tailored
+    to your needs and a user having the expected roles.
+  - When regenerating a client secret, where possible provide the client's ID (not client_id) to the module. This removes
+    a lookup to the API to translate the client_id into the client ID.
+  - 'Note that this module returns the client secret. To avoid this showing up in the logs, please add C(no_log: true) to
+    the task.'
 attributes:
   check_mode:
     support: full
@@ -41,12 +43,13 @@ options:
   id:
     description:
       - The unique identifier for this client.
-      - This parameter is not required for getting or generating a client secret but providing it will reduce the number of API calls required.
+      - This parameter is not required for getting or generating a client secret but providing it will reduce the number of
+        API calls required.
     type: str
 
   client_id:
     description:
-      - The client_id of the client. Passing this instead of id results in an extra API call.
+      - The client_id of the client. Passing this instead of ID results in an extra API call.
     aliases:
       - clientId
     type: str

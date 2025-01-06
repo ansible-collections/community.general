@@ -17,13 +17,14 @@ short_description: Allows administration of Keycloak client authorization scopes
 version_added: 6.6.0
 
 description:
-  - This module allows the administration of Keycloak client Authorization Scopes using the Keycloak REST API. Authorization Scopes are only available
-    if a client has Authorization enabled.
-  - This module requires access to the REST API using OpenID Connect; the user connecting and the realm being used must have the requisite access
-    rights. In a default Keycloak installation, admin-cli and an admin user would work, as would a separate realm definition with the scope tailored
-    to your needs and a user having the expected roles.
-  - The names of module options are snake_cased versions of the camelCase options used by Keycloak. The Authorization Services paths and payloads
-    have not officially been documented by the Keycloak project. U(https://www.puppeteers.net/blog/keycloak-authorization-services-rest-api-paths-and-payload/).
+  - This module allows the administration of Keycloak client Authorization Scopes using the Keycloak REST API. Authorization
+    Scopes are only available if a client has Authorization enabled.
+  - This module requires access to the REST API using OpenID Connect; the user connecting and the realm being used must have
+    the requisite access rights. In a default Keycloak installation, admin-cli and an admin user would work, as would a separate
+    realm definition with the scope tailored to your needs and a user having the expected roles.
+  - The names of module options are snake_cased versions of the camelCase options used by Keycloak. The Authorization Services
+    paths and payloads have not officially been documented by the Keycloak project.
+    U(https://www.puppeteers.net/blog/keycloak-authorization-services-rest-api-paths-and-payload/).
 attributes:
   check_mode:
     support: full

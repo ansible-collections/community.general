@@ -15,15 +15,17 @@ short_description: Allows administration of Keycloak user_rolemapping with the K
 version_added: 5.7.0
 
 description:
-  - This module allows you to add, remove or modify Keycloak user_rolemapping with the Keycloak REST API. It requires access to the REST API using
-    OpenID Connect; the user connecting and the client being used must have the requisite access rights. In a default Keycloak installation, admin-cli
-    and an admin user would work, as would a separate client definition with the scope tailored to your needs and a user having the expected roles.
-  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation at
-    U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html).
-  - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and will be returned that way by this module.
-    You may pass single values for attributes when calling the module, and this will be translated into a list suitable for the API.
-  - When updating a user_rolemapping, where possible provide the role ID to the module. This removes a lookup to the API to translate the name
-    into the role ID.
+  - This module allows you to add, remove or modify Keycloak user_rolemapping with the Keycloak REST API. It requires access
+    to the REST API using OpenID Connect; the user connecting and the client being used must have the requisite access rights.
+    In a default Keycloak installation, admin-cli and an admin user would work, as would a separate client definition with
+    the scope tailored to your needs and a user having the expected roles.
+  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation
+    at U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html).
+  - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and will be returned that
+    way by this module. You may pass single values for attributes when calling the module, and this will be translated into
+    a list suitable for the API.
+  - When updating a user_rolemapping, where possible provide the role ID to the module. This removes a lookup to the API to
+    translate the name into the role ID.
 attributes:
   check_mode:
     support: full
@@ -59,22 +61,26 @@ options:
     type: str
     description:
       - ID of the user to be mapped.
-      - This parameter is not required for updating or deleting the rolemapping but providing it will reduce the number of API calls required.
+      - This parameter is not required for updating or deleting the rolemapping but providing it will reduce the number of
+        API calls required.
   service_account_user_client_id:
     type: str
     description:
       - Client ID of the service-account-user to be mapped.
-      - This parameter is not required for updating or deleting the rolemapping but providing it will reduce the number of API calls required.
+      - This parameter is not required for updating or deleting the rolemapping but providing it will reduce the number of
+        API calls required.
   client_id:
     type: str
     description:
       - Name of the client to be mapped (different than O(cid)).
-      - This parameter is required if O(cid) is not provided (can be replaced by O(cid) to reduce the number of API calls that must be made).
+      - This parameter is required if O(cid) is not provided (can be replaced by O(cid) to reduce the number of API calls
+        that must be made).
   cid:
     type: str
     description:
       - ID of the client to be mapped.
-      - This parameter is not required for updating or deleting the rolemapping but providing it will reduce the number of API calls required.
+      - This parameter is not required for updating or deleting the rolemapping but providing it will reduce the number of
+        API calls required.
   roles:
     description:
       - Roles to be mapped to the user.
@@ -90,8 +96,8 @@ options:
         type: str
         description:
           - The unique identifier for this role_representation.
-          - This parameter is not required for updating or deleting a role_representation but providing it will reduce the number of API calls
-            required.
+          - This parameter is not required for updating or deleting a role_representation but providing it will reduce the
+            number of API calls required.
 extends_documentation_fragment:
   - community.general.keycloak
   - community.general.keycloak.actiongroup_keycloak

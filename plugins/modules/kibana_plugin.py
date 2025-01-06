@@ -102,7 +102,7 @@ name:
   returned: success
   type: str
 url:
-  description: The url from where the plugin is installed from.
+  description: The URL from where the plugin is installed from.
   returned: success
   type: str
 timeout:
