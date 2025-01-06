@@ -38,12 +38,12 @@ options:
     elements: str
     required: true
   path:
-    description: The base path where to install the Rust packages. Cargo automatically appends V(/bin). In other words,
-      V(/usr/local) will become V(/usr/local/bin).
+    description: The base path where to install the Rust packages. Cargo automatically appends V(/bin). In other words, V(/usr/local)
+      will become V(/usr/local/bin).
     type: path
   version:
-    description: The version to install. If O(name) contains multiple values, the module will try to install all of them
-      in this version.
+    description: The version to install. If O(name) contains multiple values, the module will try to install all of them in
+      this version.
     type: str
     required: false
   locked:

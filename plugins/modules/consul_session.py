@@ -37,10 +37,11 @@ options:
     type: str
   state:
     description:
-      - Whether the session should be present, in other words it should be created if it does not exist, or absent, removed if present. If created,
-        the O(id) for the session is returned in the output. If V(absent), O(id) is required to remove the session. Info for
-        a single session, all the sessions for a node or all available sessions can be retrieved by specifying V(info), V(node)
-        or V(list) for the O(state); for V(node) or V(info), the node O(name) or session O(id) is required as parameter.
+      - Whether the session should be present, in other words it should be created if it does not exist, or absent, removed
+        if present. If created, the O(id) for the session is returned in the output. If V(absent), O(id) is required to remove
+        the session. Info for a single session, all the sessions for a node or all available sessions can be retrieved by
+        specifying V(info), V(node) or V(list) for the O(state); for V(node) or V(info), the node O(name) or session O(id)
+        is required as parameter.
     choices: [absent, info, list, node, present]
     type: str
     default: present

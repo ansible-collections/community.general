@@ -40,9 +40,10 @@ options:
     type: str
   api_user_key_file:
     description:
-      - Full path and filename of the private key (in PEM format). If not set, then the value of the E(OCI_USER_KEY_FILE) variable,
-        if any, is used. This option is required if the private key is not specified through a configuration file (See O(config_file_location)).
-        If the key is encrypted with a pass-phrase, the O(api_user_key_pass_phrase) option must also be provided.
+      - Full path and filename of the private key (in PEM format). If not set, then the value of the E(OCI_USER_KEY_FILE)
+        variable, if any, is used. This option is required if the private key is not specified through a configuration file
+        (See O(config_file_location)). If the key is encrypted with a pass-phrase, the O(api_user_key_pass_phrase) option
+        must also be provided.
     type: path
   api_user_key_pass_phrase:
     description:

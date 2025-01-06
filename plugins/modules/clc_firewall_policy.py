@@ -54,7 +54,7 @@ options:
     elements: str
   firewall_policy_id:
     description:
-      - Id of the firewall policy. This is required to update or delete an existing firewall policy.
+      - ID of the firewall policy. This is required to update or delete an existing firewall policy.
     type: str
   source_account_alias:
     description:
@@ -109,7 +109,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 firewall_policy_id:
-  description: The firewall policy id.
+  description: The firewall policy ID.
   returned: success
   type: str
   sample: fc36f1bfd47242e488a9c44346438c05

@@ -27,7 +27,7 @@ attributes:
 options:
   server_ids:
     description:
-      - The list of CLC server Ids.
+      - The list of CLC server IDs.
     type: list
     required: true
     elements: str
@@ -83,7 +83,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 server_ids:
-  description: The list of server ids that are changed.
+  description: The list of server IDs that are changed.
   returned: success
   type: list
   sample: ["UC1TEST-SVR01", "UC1TEST-SVR02"]

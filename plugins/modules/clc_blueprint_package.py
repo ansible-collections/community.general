@@ -27,13 +27,13 @@ attributes:
 options:
   server_ids:
     description:
-      - A list of server Ids to deploy the blue print package.
+      - A list of server IDs to deploy the blue print package.
     type: list
     required: true
     elements: str
   package_id:
     description:
-      - The package id of the blue print.
+      - The package ID of the blue print.
     type: str
     required: true
   package_params:
@@ -71,7 +71,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 server_ids:
-  description: The list of server ids that are changed.
+  description: The list of server IDs that are changed.
   returned: success
   type: list
   sample: ["UC1TEST-SERVER1", "UC1TEST-SERVER2"]

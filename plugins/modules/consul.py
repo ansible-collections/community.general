@@ -16,9 +16,9 @@ description:
   - Registers services and checks for an agent with a Consul cluster. A service is some process running on the agent node
     that should be advertised by Consul's discovery mechanism. It may optionally supply a check definition, a periodic service
     test to notify the Consul cluster of service's health.
-  - Checks may also be registered per node, for example disk usage, or cpu usage and notify the health of the entire node to the cluster.
-    Service level checks do not require a check name or id as these are derived by Consul from the Service name and id respectively
-    by appending V(service:) Node level checks require a O(check_name) and optionally a O(check_id).
+  - Checks may also be registered per node, for example disk usage, or cpu usage and notify the health of the entire node
+    to the cluster. Service level checks do not require a check name or ID as these are derived by Consul from the Service
+    name and ID respectively by appending V(service:) Node level checks require a O(check_name) and optionally a O(check_id).
   - Currently, there is no complete way to retrieve the script, interval or TTL metadata for a registered check. Without this
     metadata it is not possible to tell if the data supplied with ansible represents a change to a check. As a result this
     does not attempt to determine changes and will always report a changed occurred. An API method is planned to supply this

@@ -14,9 +14,10 @@ class ModuleDocFragment(object):
     # Standard LDAP documentation fragment
     DOCUMENTATION = r"""
 notes:
-  - The default authentication settings will attempt to use a SASL EXTERNAL bind over a UNIX domain socket. This works well with the default Ubuntu
-    install for example, which includes a C(cn=peercred,cn=external,cn=auth) ACL rule allowing root to modify the server configuration. If you need
-    to use a simple bind to access your server, pass the credentials in O(bind_dn) and O(bind_pw).
+  - The default authentication settings will attempt to use a SASL EXTERNAL bind over a UNIX domain socket. This works well
+    with the default Ubuntu install for example, which includes a C(cn=peercred,cn=external,cn=auth) ACL rule allowing root
+    to modify the server configuration. If you need to use a simple bind to access your server, pass the credentials in O(bind_dn)
+    and O(bind_pw).
 options:
   bind_dn:
     description:

@@ -12,8 +12,8 @@ class ModuleDocFragment(object):
 options:
   force_create:
     description: Whether to attempt non-idempotent creation of a resource. By default, create resource is an idempotent operation,
-      and does not create the resource if it already exists. Setting this option to V(true), forcefully creates a copy of the
-      resource, even if it already exists. This option is mutually exclusive with O(key_by).
+      and does not create the resource if it already exists. Setting this option to V(true), forcefully creates a copy of
+      the resource, even if it already exists. This option is mutually exclusive with O(key_by).
     default: false
     type: bool
   key_by:

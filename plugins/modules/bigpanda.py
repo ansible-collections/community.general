@@ -75,7 +75,7 @@ options:
     default: "https://api.bigpanda.io"
   validate_certs:
     description:
-      - If V(false), SSL certificates for the target url will not be validated. This should only be used on personally controlled
+      - If V(false), SSL certificates for the target URL will not be validated. This should only be used on personally controlled
         sites using self-signed certificates.
     required: false
     default: true

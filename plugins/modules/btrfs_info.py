@@ -49,7 +49,7 @@ filesystems:
         - /dev/sda1
         - /dev/sdb1
     default_subvolume:
-      description: The id of the filesystem's default subvolume.
+      description: The ID of the filesystem's default subvolume.
       type: int
       sample: 5
     subvolumes:

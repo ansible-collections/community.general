@@ -297,7 +297,7 @@ instances:
       type: str
       sample: 43.0.0.1
     resource_group_id:
-      description: The id of the resource group to which the instance belongs.
+      description: The ID of the resource group to which the instance belongs.
       returned: always
       type: str
       sample: my-ecs-group

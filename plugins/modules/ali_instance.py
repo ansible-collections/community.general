@@ -172,7 +172,7 @@ options:
     type: int
   instance_ids:
     description:
-      - A list of instance ids. It is required when need to operate existing instances. If it is specified, O(count) will
+      - A list of instance IDs. It is required when need to operate existing instances. If it is specified, O(count) will
         lose efficacy.
     type: list
     elements: str
@@ -554,7 +554,7 @@ instances:
       type: str
       sample: 43.0.0.1
     resource_group_id:
-      description: The id of the resource group to which the instance belongs.
+      description: The ID of the resource group to which the instance belongs.
       returned: always
       type: str
       sample: my-ecs-group

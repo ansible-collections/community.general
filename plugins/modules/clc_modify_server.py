@@ -27,7 +27,7 @@ attributes:
 options:
   server_ids:
     description:
-      - A list of server Ids to modify.
+      - A list of server IDs to modify.
     type: list
     required: true
     elements: str
@@ -41,7 +41,7 @@ options:
     type: str
   anti_affinity_policy_id:
     description:
-      - The anti affinity policy id to be set for a hyper scale server. This is mutually exclusive with O(anti_affinity_policy_name).
+      - The anti affinity policy ID to be set for a hyper scale server. This is mutually exclusive with O(anti_affinity_policy_name).
     type: str
   anti_affinity_policy_name:
     description:
@@ -49,7 +49,7 @@ options:
     type: str
   alert_policy_id:
     description:
-      - The alert policy id to be associated to the server. This is mutually exclusive with O(alert_policy_name).
+      - The alert policy ID to be associated to the server. This is mutually exclusive with O(alert_policy_name).
     type: str
   alert_policy_name:
     description:
@@ -131,7 +131,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 server_ids:
-  description: The list of server ids that are changed.
+  description: The list of server IDs that are changed.
   returned: success
   type: list
   sample: ["UC1TEST-SVR01", "UC1TEST-SVR02"]
