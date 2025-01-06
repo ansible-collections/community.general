@@ -1,0 +1,3 @@
+bugfixes:
+  - "Inventory iocage fails when DHCP is enbled.
+    (https://github.com/ansible-collections/community.general/issues/9538, https://github.com/ansible-collections/community.general/pull/9539)."
