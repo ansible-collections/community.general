@@ -15,7 +15,8 @@ short_description: Check or wait for migrations between nodes
 description:
   - This can be used to check for migrations in a cluster. This makes it easy to do a rolling upgrade/update on Aerospike
     nodes.
-  - If waiting for migrations is not desired, simply just poll until port 3000 if available or C(asinfo -v status) returns ok.
+  - If waiting for migrations is not desired, simply just poll until port 3000 if available or C(asinfo -v status) returns
+    ok.
 author: "Albert Autin (@Alb0t)"
 extends_documentation_fragment:
   - community.general.attributes
