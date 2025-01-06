@@ -17,14 +17,16 @@ short_description: Allows administration of Keycloak realm using Keycloak API
 version_added: 3.0.0
 
 description:
-  - This module allows the administration of Keycloak realm using the Keycloak REST API. It requires access to the REST API using OpenID Connect;
-    the user connecting and the realm being used must have the requisite access rights. In a default Keycloak installation, admin-cli and an admin
-    user would work, as would a separate realm definition with the scope tailored to your needs and a user having the expected roles.
-  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation at
-    U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html).
-    Aliases are provided so camelCased versions can be used as well.
-  - The Keycloak API does not always sanity check inputs, for example you can set SAML-specific settings on an OpenID Connect client for instance and
-    also the other way around. B(Be careful). If you do not specify a setting, usually a sensible default is chosen.
+  - This module allows the administration of Keycloak realm using the Keycloak REST API. It requires access to the REST API
+    using OpenID Connect; the user connecting and the realm being used must have the requisite access rights. In a default
+    Keycloak installation, admin-cli and an admin user would work, as would a separate realm definition with the scope tailored
+    to your needs and a user having the expected roles.
+  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation
+    at U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html). Aliases are provided so camelCased versions can be used
+    as well.
+  - The Keycloak API does not always sanity check inputs, for example you can set SAML-specific settings on an OpenID Connect
+    client for instance and also the other way around. B(Be careful). If you do not specify a setting, usually a sensible
+    default is chosen.
 attributes:
   check_mode:
     support: full

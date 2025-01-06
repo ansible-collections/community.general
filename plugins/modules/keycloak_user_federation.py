@@ -16,11 +16,12 @@ short_description: Allows administration of Keycloak user federations using Keyc
 version_added: 3.7.0
 
 description:
-  - This module allows you to add, remove or modify Keycloak user federations using the Keycloak REST API. It requires access to the REST API using
-    OpenID Connect; the user connecting and the client being used must have the requisite access rights. In a default Keycloak installation, admin-cli
-    and an admin user would work, as would a separate client definition with the scope tailored to your needs and a user having the expected roles.
-  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation at
-    U(https://www.keycloak.org/docs-api/20.0.2/rest-api/index.html).
+  - This module allows you to add, remove or modify Keycloak user federations using the Keycloak REST API. It requires access
+    to the REST API using OpenID Connect; the user connecting and the client being used must have the requisite access rights.
+    In a default Keycloak installation, admin-cli and an admin user would work, as would a separate client definition with
+    the scope tailored to your needs and a user having the expected roles.
+  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation
+    at U(https://www.keycloak.org/docs-api/20.0.2/rest-api/index.html).
 attributes:
   check_mode:
     support: full
@@ -59,8 +60,8 @@ options:
 
   provider_id:
     description:
-      - Provider for this user federation. Built-in providers are V(ldap), V(kerberos), and V(sssd). Custom user storage providers can also be
-        used.
+      - Provider for this user federation. Built-in providers are V(ldap), V(kerberos), and V(sssd). Custom user storage providers
+        can also be used.
     aliases:
       - providerId
     type: str
@@ -90,12 +91,15 @@ options:
 
   bind_credential_update_mode:
     description:
-      - The value of the config parameter O(config.bindCredential) is redacted in the Keycloak responses. Comparing the redacted value with the
-        desired value always evaluates to not equal. This means the before and desired states are never equal if the parameter is set.
-      - Set to V(always) to include O(config.bindCredential) in the comparison of before and desired state. Because of the redacted value returned
-        by Keycloak the module will always detect a change and make an update if a O(config.bindCredential) value is set.
+      - The value of the config parameter O(config.bindCredential) is redacted in the Keycloak responses. Comparing the redacted
+        value with the desired value always evaluates to not equal. This means the before and desired states are never equal
+        if the parameter is set.
+      - Set to V(always) to include O(config.bindCredential) in the comparison of before and desired state. Because of the
+        redacted value returned by Keycloak the module will always detect a change and make an update if a O(config.bindCredential)
+        value is set.
       - Set to V(only_indirect) to exclude O(config.bindCredential) when comparing the before state with the desired state.
-        The value of O(config.bindCredential) will only be updated if there are other changes to the user federation that require an update.
+        The value of O(config.bindCredential) will only be updated if there are other changes to the user federation that
+        require an update.
     type: str
     default: always
     choices:
@@ -105,9 +109,9 @@ options:
 
   config:
     description:
-      - Dict specifying the configuration options for the provider; the contents differ depending on the value of O(provider_id). Examples are
-        given below for V(ldap), V(kerberos) and V(sssd). It is easiest to obtain valid config values by dumping an already-existing user federation
-        configuration through check-mode in the RV(existing) field.
+      - Dict specifying the configuration options for the provider; the contents differ depending on the value of O(provider_id).
+        Examples are given below for V(ldap), V(kerberos) and V(sssd). It is easiest to obtain valid config values by dumping
+        an already-existing user federation configuration through check-mode in the RV(existing) field.
       - The value V(sssd) has been supported since community.general 4.2.0.
     type: dict
     suboptions:
@@ -131,8 +135,8 @@ options:
 
       editMode:
         description:
-          - V(READ_ONLY) is a read-only LDAP store. V(WRITABLE) means data will be synced back to LDAP on demand. V(UNSYNCED) means user data
-            will be imported, but not synced back to LDAP.
+          - V(READ_ONLY) is a read-only LDAP store. V(WRITABLE) means data will be synced back to LDAP on demand. V(UNSYNCED)
+            means user data will be imported, but not synced back to LDAP.
         type: str
         choices:
           - READ_ONLY
@@ -141,7 +145,8 @@ options:
 
       syncRegistrations:
         description:
-          - Should newly created users be created within LDAP store? Priority effects which provider is chosen to sync the new user.
+          - Should newly created users be created within LDAP store? Priority effects which provider is chosen to sync the
+            new user.
         default: false
         type: bool
 
@@ -153,29 +158,31 @@ options:
 
       usernameLDAPAttribute:
         description:
-          - Name of LDAP attribute, which is mapped as Keycloak username. For many LDAP server vendors it can be V(uid). For Active directory
-            it can be V(sAMAccountName) or V(cn). The attribute should be filled for all LDAP user records you want to import from LDAP to Keycloak.
+          - Name of LDAP attribute, which is mapped as Keycloak username. For many LDAP server vendors it can be V(uid). For
+            Active directory it can be V(sAMAccountName) or V(cn). The attribute should be filled for all LDAP user records
+            you want to import from LDAP to Keycloak.
         type: str
 
       rdnLDAPAttribute:
         description:
-          - Name of LDAP attribute, which is used as RDN (top attribute) of typical user DN. Usually it is the same as Username LDAP attribute,
-            however it is not required. For example for Active directory, it is common to use V(cn) as RDN attribute when username attribute might
-            be V(sAMAccountName).
+          - Name of LDAP attribute, which is used as RDN (top attribute) of typical user DN. Usually it is the same as Username
+            LDAP attribute, however it is not required. For example for Active directory, it is common to use V(cn) as RDN
+            attribute when username attribute might be V(sAMAccountName).
         type: str
 
       uuidLDAPAttribute:
         description:
-          - Name of LDAP attribute, which is used as unique object identifier (UUID) for objects in LDAP. For many LDAP server vendors, it is
-            V(entryUUID); however some are different. For example for Active directory it should be V(objectGUID). If your LDAP server does not
-            support the notion of UUID, you can use any other attribute that is supposed to be unique among LDAP users in tree.
+          - Name of LDAP attribute, which is used as unique object identifier (UUID) for objects in LDAP. For many LDAP server
+            vendors, it is V(entryUUID); however some are different. For example for Active directory it should be V(objectGUID).
+            If your LDAP server does not support the notion of UUID, you can use any other attribute that is supposed to be
+            unique among LDAP users in tree.
         type: str
 
       userObjectClasses:
         description:
-          - All values of LDAP objectClass attribute for users in LDAP divided by comma. For example V(inetOrgPerson, organizationalPerson). Newly
-            created Keycloak users will be written to LDAP with all those object classes and existing LDAP user records are found just if they
-            contain all those object classes.
+          - All values of LDAP objectClass attribute for users in LDAP divided by comma. For example V(inetOrgPerson, organizationalPerson).
+            Newly created Keycloak users will be written to LDAP with all those object classes and existing LDAP user records
+            are found just if they contain all those object classes.
         type: str
 
       connectionUrl:
@@ -195,8 +202,8 @@ options:
 
       searchScope:
         description:
-          - For one level, the search applies only for users in the DNs specified by User DNs. For subtree, the search applies to the whole subtree.
-            See LDAP documentation for more details.
+          - For one level, the search applies only for users in the DNs specified by User DNs. For subtree, the search applies
+            to the whole subtree. See LDAP documentation for more details.
         default: '1'
         type: str
         choices:
@@ -205,7 +212,8 @@ options:
 
       authType:
         description:
-          - Type of the Authentication method used during LDAP Bind operation. It is used in most of the requests sent to the LDAP server.
+          - Type of the Authentication method used during LDAP Bind operation. It is used in most of the requests sent to
+            the LDAP server.
         default: 'none'
         type: str
         choices:
@@ -230,9 +238,9 @@ options:
 
       usePasswordModifyExtendedOp:
         description:
-          - Use the LDAPv3 Password Modify Extended Operation (RFC-3062). The password modify extended operation usually requires that LDAP user
-            already has password in the LDAP server. So when this is used with 'Sync Registrations', it can be good to add also 'Hardcoded LDAP
-            attribute mapper' with randomly generated initial password.
+          - Use the LDAPv3 Password Modify Extended Operation (RFC-3062). The password modify extended operation usually requires
+            that LDAP user already has password in the LDAP server. So when this is used with 'Sync Registrations', it can
+            be good to add also 'Hardcoded LDAP attribute mapper' with randomly generated initial password.
         default: false
         type: bool
 
@@ -250,11 +258,11 @@ options:
 
       useTruststoreSpi:
         description:
-          - Specifies whether LDAP connection will use the truststore SPI with the truststore configured in standalone.xml/domain.xml. V(always)
-            means that it will always use it. V(never) means that it will not use it. V(ldapsOnly) means that it will use if your connection URL
-            use ldaps.
-          - Note even if standalone.xml/domain.xml is not configured, the default Java cacerts or certificate specified by C(javax.net.ssl.trustStore)
-            property will be used.
+          - Specifies whether LDAP connection will use the truststore SPI with the truststore configured in standalone.xml/domain.xml.
+            V(always) means that it will always use it. V(never) means that it will not use it. V(ldapsOnly) means that it
+            will use if your connection URL use ldaps.
+          - Note even if standalone.xml/domain.xml is not configured, the default Java cacerts or certificate specified by
+            C(javax.net.ssl.trustStore) property will be used.
         default: ldapsOnly
         type: str
         choices:
@@ -295,8 +303,8 @@ options:
 
       connectionPoolingDebug:
         description:
-          - A string that indicates the level of debug output to produce. Example valid values are V(fine) (trace connection creation and removal)
-            and V(all) (all debugging information).
+          - A string that indicates the level of debug output to produce. Example valid values are V(fine) (trace connection
+            creation and removal) and V(all) (all debugging information).
         type: str
 
       connectionPoolingInitSize:
@@ -321,13 +329,14 @@ options:
 
       connectionPoolingTimeout:
         description:
-          - The number of milliseconds that an idle connection may remain in the pool without being closed and removed from the pool.
+          - The number of milliseconds that an idle connection may remain in the pool without being closed and removed from
+            the pool.
         type: int
 
       allowKerberosAuthentication:
         description:
-          - Enable/disable HTTP authentication of users with SPNEGO/Kerberos tokens. The data about authenticated users will be provisioned from
-            this LDAP server.
+          - Enable/disable HTTP authentication of users with SPNEGO/Kerberos tokens. The data about authenticated users will
+            be provisioned from this LDAP server.
         default: false
         type: bool
 
@@ -338,16 +347,17 @@ options:
 
       krbPrincipalAttribute:
         description:
-          - Name of the LDAP attribute, which refers to Kerberos principal. This is used to lookup appropriate LDAP user after successful Kerberos/SPNEGO
-            authentication in Keycloak. When this is empty, the LDAP user will be looked based on LDAP username corresponding to the first part
-            of his Kerberos principal. For instance, for principal C(john@KEYCLOAK.ORG), it will assume that LDAP username is V(john).
+          - Name of the LDAP attribute, which refers to Kerberos principal. This is used to lookup appropriate LDAP user after
+            successful Kerberos/SPNEGO authentication in Keycloak. When this is empty, the LDAP user will be looked based
+            on LDAP username corresponding to the first part of his Kerberos principal. For instance, for principal C(john@KEYCLOAK.ORG),
+            it will assume that LDAP username is V(john).
         type: str
         version_added: 8.1.0
 
       serverPrincipal:
         description:
-          - Full name of server principal for HTTP service including server and domain name. For example V(HTTP/host.foo.org@FOO.ORG). Use V(*)
-            to accept any service principal in the KeyTab file.
+          - Full name of server principal for HTTP service including server and domain name. For example V(HTTP/host.foo.org@FOO.ORG).
+            Use V(*) to accept any service principal in the KeyTab file.
         type: str
 
       keyTab:
@@ -362,8 +372,8 @@ options:
 
       useKerberosForPasswordAuthentication:
         description:
-          - Use Kerberos login module for authenticate username/password against Kerberos server instead of authenticating against LDAP server
-            with Directory Service API.
+          - Use Kerberos login module for authenticate username/password against Kerberos server instead of authenticating
+            against LDAP server with Directory Service API.
         default: false
         type: bool
 
@@ -429,8 +439,9 @@ options:
 
       referral:
         description:
-          - Specifies if LDAP referrals should be followed or ignored. Please note that enabling referrals can slow down authentication as it
-            allows the LDAP server to decide which other LDAP servers to use. This could potentially include untrusted servers.
+          - Specifies if LDAP referrals should be followed or ignored. Please note that enabling referrals can slow down authentication
+            as it allows the LDAP server to decide which other LDAP servers to use. This could potentially include untrusted
+            servers.
         type: str
         choices:
           - ignore
