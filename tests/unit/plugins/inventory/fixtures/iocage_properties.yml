@@ -3,7 +3,12 @@ _meta:
     test_101:
       iocage_basejail: 'yes'
       iocage_boot: 'off'
-      iocage_ip4: 10.1.0.101
+      iocage_ip4:
+        ip4:
+          - ifc: vnet0
+            ip: 10.1.0.101
+            mask: '24'
+        msg: ''
       iocage_ip6: '-'
       iocage_jid: '-'
       iocage_properties:
@@ -155,7 +160,12 @@ _meta:
     test_102:
       iocage_basejail: 'yes'
       iocage_boot: 'off'
-      iocage_ip4: 10.1.0.102
+      iocage_ip4:
+        ip4:
+          - ifc: vnet0
+            ip: 10.1.0.102
+            mask: '24'
+        msg: ''
       iocage_ip6: '-'
       iocage_jid: '-'
       iocage_properties:
@@ -307,7 +317,12 @@ _meta:
     test_103:
       iocage_basejail: 'yes'
       iocage_boot: 'off'
-      iocage_ip4: 10.1.0.103
+      iocage_ip4:
+        ip4:
+          - ifc: vnet0
+            ip: 10.1.0.103
+            mask: '24'
+        msg: ''
       iocage_ip6: '-'
       iocage_jid: '-'
       iocage_properties:

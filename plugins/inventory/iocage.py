@@ -125,10 +125,28 @@ from ansible.utils.display import Display
 display = Display()
 
 
-def _parse_ip4(ip4):
-    if ip4 == '-':
-        return ip4
-    return re.split('\\||/', ip4)[1]
+def _parse_ip4(ip4_addr):
+    ''' Return iocage_ip4 dictionary. default = {msg: '', ip4: []}.
+        If item matches ifc|IP or ifc|CIDR parse ifc, ip, and mask.
+        Otherwise, append item to msg.
+    '''
+
+    iocage_ip4 = {}
+    iocage_ip4['msg'] = ''
+    iocage_ip4['ip4'] = []
+
+    items = ip4_addr.split(',')
+    for item in items:
+        if re.match('^\\w+\\|(?:\\d{1,3}\\.){3}\\d{1,3}.*$', item):
+            i = re.split('\\||/', item)
+            if len(i) == 3:
+                iocage_ip4['ip4'].append({'ifc': i[0], 'ip': i[1], 'mask': i[2]})
+            else:
+                iocage_ip4['ip4'].append({'ifc': i[0], 'ip': i[1], 'mask': '-'})
+        else:
+            iocage_ip4['msg'] += item
+
+    return iocage_ip4
 
 
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
@@ -189,7 +207,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         cmd_list = cmd.copy()
         cmd_list.append('list')
-        cmd_list.append('--header')
         cmd_list.append('--long')
         try:
             p = Popen(cmd_list, stdout=PIPE, stderr=PIPE, env=my_env)
@@ -234,8 +251,12 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         return results
 
     def get_jails(self, t_stdout, results):
-        jails = [x.split() for x in t_stdout.splitlines()]
-        for jail in jails:
+        lines = t_stdout.splitlines()
+        if len(lines) < 5:
+            return
+        indices = [i for i, val in enumerate(lines[1]) if val == '|']
+        for line in lines[3::2]:
+            jail = [line[i + 1:j].strip() for i, j in zip(indices[:-1], indices[1:])]
             iocage_name = jail[1]
             results['_meta']['hostvars'][iocage_name] = {}
             results['_meta']['hostvars'][iocage_name]['iocage_jid'] = jail[0]

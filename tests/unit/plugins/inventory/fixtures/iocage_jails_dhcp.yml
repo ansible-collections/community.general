@@ -1,47 +1,47 @@
 _meta:
   hostvars:
-    test_101:
+    test_111:
       iocage_basejail: 'yes'
       iocage_boot: 'off'
       iocage_ip4:
         ip4:
-          - ifc: vnet0
-            ip: 10.1.0.101
-            mask: '24'
+          - ifc: epair0b
+            ip: 10.1.0.174
+            mask: '-'
         msg: ''
       iocage_ip6: '-'
-      iocage_jid: '-'
-      iocage_release: 13.4-RELEASE-p2
-      iocage_state: down
+      iocage_jid: '268'
+      iocage_release: 14.1-RELEASE-p6
+      iocage_state: up
       iocage_template: ansible_client
       iocage_type: jail
-    test_102:
+    test_112:
       iocage_basejail: 'yes'
       iocage_boot: 'off'
       iocage_ip4:
         ip4:
-          - ifc: vnet0
-            ip: 10.1.0.102
-            mask: '24'
+          - ifc: epair0b
+            ip: 10.1.0.147
+            mask: '-'
         msg: ''
       iocage_ip6: '-'
-      iocage_jid: '-'
-      iocage_release: 13.4-RELEASE-p2
-      iocage_state: down
+      iocage_jid: '269'
+      iocage_release: 14.1-RELEASE-p6
+      iocage_state: up
       iocage_template: ansible_client
       iocage_type: jail
-    test_103:
+    test_113:
       iocage_basejail: 'yes'
       iocage_boot: 'off'
       iocage_ip4:
         ip4:
-          - ifc: vnet0
-            ip: 10.1.0.103
-            mask: '24'
+          - ifc: epair0b
+            ip: 10.1.0.231
+            mask: '-'
         msg: ''
       iocage_ip6: '-'
-      iocage_jid: '-'
-      iocage_release: 13.4-RELEASE-p2
-      iocage_state: down
+      iocage_jid: '270'
+      iocage_release: 14.1-RELEASE-p6
+      iocage_state: up
       iocage_template: ansible_client
       iocage_type: jail
