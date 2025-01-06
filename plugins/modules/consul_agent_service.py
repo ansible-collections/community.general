@@ -70,8 +70,8 @@ options:
     type: int
   enable_tag_override:
     description:
-      - Specifies to disable the anti-entropy feature for this service's tags. If C(EnableTagOverride) is set to true then external
-        agents can update this service in the catalog and modify the tags.
+      - Specifies to disable the anti-entropy feature for this service's tags. If C(EnableTagOverride) is set to true then
+        external agents can update this service in the catalog and modify the tags.
     type: bool
     default: false
   weights:

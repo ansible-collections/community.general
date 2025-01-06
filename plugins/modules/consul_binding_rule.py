@@ -14,8 +14,8 @@ module: consul_binding_rule
 short_description: Manipulate Consul binding rules
 version_added: 8.3.0
 description:
-  - Allows the addition, modification and deletion of binding rules in a Consul cluster using the agent. For more details on
-    using and configuring binding rules, see U(https://developer.hashicorp.com/consul/api-docs/acl/binding-rules).
+  - Allows the addition, modification and deletion of binding rules in a Consul cluster using the agent. For more details
+    on using and configuring binding rules, see U(https://developer.hashicorp.com/consul/api-docs/acl/binding-rules).
 author:
   - Florian Apolloner (@apollo13)
 extends_documentation_fragment:
