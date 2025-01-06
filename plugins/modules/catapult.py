@@ -47,7 +47,7 @@ options:
   user_id:
     type: str
     description:
-      - User Id from API account page.
+      - User ID from API account page.
     required: true
   api_token:
     type: str
@@ -62,7 +62,7 @@ options:
 
 author: "Jonathan Mainguy (@Jmainguy)"
 notes:
-  - Will return changed even if the media url is wrong.
+  - Will return changed even if the media URL is wrong.
   - Will return changed if the destination number is invalid.
 """
 

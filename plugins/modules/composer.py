@@ -110,7 +110,8 @@ requirements:
   - php
   - composer installed in bin path (recommended C(/usr/local/bin)) or specified in O(composer_executable)
 notes:
-  - Default options that are always appended in each execution are C(--no-ansi), C(--no-interaction) and C(--no-progress) if available.
+  - Default options that are always appended in each execution are C(--no-ansi), C(--no-interaction) and C(--no-progress)
+    if available.
   - We received reports about issues on macOS if composer was installed by Homebrew. Please use the official install method
     to avoid issues.
 """
