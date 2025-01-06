@@ -16,16 +16,17 @@ short_description: Allows administration of Keycloak client_rolemapping with the
 version_added: 3.5.0
 
 description:
-  - This module allows you to add, remove or modify Keycloak client_rolemapping with the Keycloak REST API. It requires access to the REST API
-    using OpenID Connect; the user connecting and the client being used must have the requisite access rights. In a default Keycloak installation,
-    admin-cli and an admin user would work, as would a separate client definition with the scope tailored to your needs and a user having the
-    expected roles.
-  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation at
-    U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html).
-  - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and will be returned that way by this module.
-    You may pass single values for attributes when calling the module, and this will be translated into a list suitable for the API.
-  - When updating a client_rolemapping, where possible provide the role ID to the module. This removes a lookup to the API to translate the name
-    into the role ID.
+  - This module allows you to add, remove or modify Keycloak client_rolemapping with the Keycloak REST API. It requires access
+    to the REST API using OpenID Connect; the user connecting and the client being used must have the requisite access rights.
+    In a default Keycloak installation, admin-cli and an admin user would work, as would a separate client definition with
+    the scope tailored to your needs and a user having the expected roles.
+  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation
+    at U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html).
+  - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and will be returned that
+    way by this module. You may pass single values for attributes when calling the module, and this will be translated into
+    a list suitable for the API.
+  - When updating a client_rolemapping, where possible provide the role ID to the module. This removes a lookup to the API
+    to translate the name into the role ID.
 attributes:
   check_mode:
     support: full
@@ -38,7 +39,8 @@ options:
   state:
     description:
       - State of the client_rolemapping.
-      - On V(present), the client_rolemapping will be created if it does not yet exist, or updated with the parameters you provide.
+      - On V(present), the client_rolemapping will be created if it does not yet exist, or updated with the parameters you
+        provide.
       - On V(absent), the client_rolemapping will be removed if it exists.
     default: 'present'
     type: str
@@ -71,21 +73,22 @@ options:
           - Identify parent by ID.
           - Needs less API calls than using O(parents[].name).
           - A deep parent chain can be started at any point when first given parent is given as ID.
-          - Note that in principle both ID and name can be specified at the same time but current implementation only always use just one of them,
-            with ID being preferred.
+          - Note that in principle both ID and name can be specified at the same time but current implementation only always
+            use just one of them, with ID being preferred.
       name:
         type: str
         description:
           - Identify parent by name.
           - Needs more internal API calls than using O(parents[].id) to map names to ID's under the hood.
           - When giving a parent chain with only names it must be complete up to the top.
-          - Note that in principle both ID and name can be specified at the same time but current implementation only always use just one of them,
-            with ID being preferred.
+          - Note that in principle both ID and name can be specified at the same time but current implementation only always
+            use just one of them, with ID being preferred.
   gid:
     type: str
     description:
-      - Id of the group to be mapped.
-      - This parameter is not required for updating or deleting the rolemapping but providing it will reduce the number of API calls required.
+      - ID of the group to be mapped.
+      - This parameter is not required for updating or deleting the rolemapping but providing it will reduce the number of
+        API calls required.
   client_id:
     type: str
     description:
@@ -94,8 +97,9 @@ options:
   cid:
     type: str
     description:
-      - Id of the client to be mapped.
-      - This parameter is not required for updating or deleting the rolemapping but providing it will reduce the number of API calls required.
+      - ID of the client to be mapped.
+      - This parameter is not required for updating or deleting the rolemapping but providing it will reduce the number of
+        API calls required.
   roles:
     description:
       - Roles to be mapped to the group.
@@ -111,8 +115,8 @@ options:
         type: str
         description:
           - The unique identifier for this role_representation.
-          - This parameter is not required for updating or deleting a role_representation but providing it will reduce the number of API calls
-            required.
+          - This parameter is not required for updating or deleting a role_representation but providing it will reduce the
+            number of API calls required.
 extends_documentation_fragment:
   - community.general.keycloak
   - community.general.keycloak.actiongroup_keycloak

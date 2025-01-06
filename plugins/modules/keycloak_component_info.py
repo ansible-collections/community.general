@@ -34,9 +34,8 @@ options:
   provider_type:
     description:
       - Provider type of components.
-      - 'Examples: V(org.keycloak.storage.UserStorageProvider),
-        V(org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy), V(org.keycloak.keys.KeyProvider),
-        V(org.keycloak.userprofile.UserProfileProvider), V(org.keycloak.storage.ldap.mappers.LDAPStorageMapper).'
+      - 'Examples: V(org.keycloak.storage.UserStorageProvider), V(org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy),
+        V(org.keycloak.keys.KeyProvider), V(org.keycloak.userprofile.UserProfileProvider), V(org.keycloak.storage.ldap.mappers.LDAPStorageMapper).'
     type: str
   parent_id:
     description:
@@ -92,7 +91,6 @@ EXAMPLES = r"""
     realm: myrealm
     parent_id: "075ef2fa-19fc-4a6d-bf4c-249f57365fd2"
     provider_type: "org.keycloak.storage.ldap.mappers.LDAPStorageMapper"
-
 """
 
 RETURN = r"""

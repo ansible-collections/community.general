@@ -14,15 +14,17 @@ module: keycloak_group
 short_description: Allows administration of Keycloak groups using Keycloak API
 
 description:
-  - This module allows you to add, remove or modify Keycloak groups using the Keycloak REST API. It requires access to the REST API using OpenID Connect;
-    the user connecting and the client being used must have the requisite access rights. In a default Keycloak installation, admin-cli and an
-    admin user would work, as would a separate client definition with the scope tailored to your needs and a user having the expected roles.
-  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation at
-    U(https://www.keycloak.org/docs-api/20.0.2/rest-api/index.html).
-  - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and will be returned that way by this module.
-    You may pass single values for attributes when calling the module, and this will be translated into a list suitable for the API.
-  - When updating a group, where possible provide the group ID to the module. This removes a lookup to the API to translate the name into the
-    group ID.
+  - This module allows you to add, remove or modify Keycloak groups using the Keycloak REST API. It requires access to the
+    REST API using OpenID Connect; the user connecting and the client being used must have the requisite access rights. In
+    a default Keycloak installation, admin-cli and an admin user would work, as would a separate client definition with the
+    scope tailored to your needs and a user having the expected roles.
+  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation
+    at U(https://www.keycloak.org/docs-api/20.0.2/rest-api/index.html).
+  - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and will be returned that
+    way by this module. You may pass single values for attributes when calling the module, and this will be translated into
+    a list suitable for the API.
+  - When updating a group, where possible provide the group ID to the module. This removes a lookup to the API to translate
+    the name into the group ID.
 attributes:
   check_mode:
     support: full
@@ -36,8 +38,8 @@ options:
     description:
       - State of the group.
       - On V(present), the group will be created if it does not yet exist, or updated with the parameters you provide.
-      - On V(absent), the group will be removed if it exists. Be aware that absenting a group with subgroups will automatically delete all its
-        subgroups too.
+      - On V(absent), the group will be removed if it exists. Be aware that absenting a group with subgroups will automatically
+        delete all its subgroups too.
     default: 'present'
     type: str
     choices:
@@ -59,7 +61,8 @@ options:
     type: str
     description:
       - The unique identifier for this group.
-      - This parameter is not required for updating or deleting a group but providing it will reduce the number of API calls required.
+      - This parameter is not required for updating or deleting a group but providing it will reduce the number of API calls
+        required.
   attributes:
     type: dict
     description:
@@ -70,9 +73,10 @@ options:
     type: list
     description:
       - List of parent groups for the group to handle sorted top to bottom.
-      - Set this to create a group as a subgroup of another group or groups (parents) or when accessing an existing subgroup by name.
-      - Not necessary to set when accessing an existing subgroup by its C(ID) because in that case the group can be directly queried without necessarily
-        knowing its parent(s).
+      - Set this to create a group as a subgroup of another group or groups (parents) or when accessing an existing subgroup
+        by name.
+      - Not necessary to set when accessing an existing subgroup by its C(ID) because in that case the group can be directly
+        queried without necessarily knowing its parent(s).
     elements: dict
     suboptions:
       id:
@@ -81,19 +85,19 @@ options:
           - Identify parent by ID.
           - Needs less API calls than using O(parents[].name).
           - A deep parent chain can be started at any point when first given parent is given as ID.
-          - Note that in principle both ID and name can be specified at the same time but current implementation only always use just one of them,
-            with ID being preferred.
+          - Note that in principle both ID and name can be specified at the same time but current implementation only always
+            use just one of them, with ID being preferred.
       name:
         type: str
         description:
           - Identify parent by name.
           - Needs more internal API calls than using O(parents[].id) to map names to ID's under the hood.
           - When giving a parent chain with only names it must be complete up to the top.
-          - Note that in principle both ID and name can be specified at the same time but current implementation only always use just one of them,
-            with ID being preferred.
+          - Note that in principle both ID and name can be specified at the same time but current implementation only always
+            use just one of them, with ID being preferred.
 notes:
-  - Presently, the RV(end_state.realmRoles), RV(end_state.clientRoles), and RV(end_state.access) attributes returned by the Keycloak API are read-only
-    for groups. This limitation will be removed in a later version of this module.
+  - Presently, the RV(end_state.realmRoles), RV(end_state.clientRoles), and RV(end_state.access) attributes returned by the
+    Keycloak API are read-only for groups. This limitation will be removed in a later version of this module.
 extends_documentation_fragment:
   - community.general.keycloak
   - community.general.keycloak.actiongroup_keycloak
@@ -278,7 +282,8 @@ end_state:
       returned: always
       sample: []
     subGroups:
-      description: A list of groups that are children of this group. These groups will have the same parameters as documented here.
+      description: A list of groups that are children of this group. These groups will have the same parameters as documented
+        here.
       type: list
       returned: always
     clientRoles:

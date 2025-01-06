@@ -16,13 +16,15 @@ short_description: Allows administration of Keycloak roles using Keycloak API
 version_added: 3.4.0
 
 description:
-  - This module allows you to add, remove or modify Keycloak roles using the Keycloak REST API. It requires access to the REST API using OpenID Connect;
-    the user connecting and the client being used must have the requisite access rights. In a default Keycloak installation, admin-cli and an
-    admin user would work, as would a separate client definition with the scope tailored to your needs and a user having the expected roles.
-  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation at
-    U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html).
-  - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and will be returned that way by this module.
-    You may pass single values for attributes when calling the module, and this will be translated into a list suitable for the API.
+  - This module allows you to add, remove or modify Keycloak roles using the Keycloak REST API. It requires access to the
+    REST API using OpenID Connect; the user connecting and the client being used must have the requisite access rights. In
+    a default Keycloak installation, admin-cli and an admin user would work, as would a separate client definition with the
+    scope tailored to your needs and a user having the expected roles.
+  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation
+    at U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html).
+  - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and will be returned that
+    way by this module. You may pass single values for attributes when calling the module, and this will be translated into
+    a list suitable for the API.
 attributes:
   check_mode:
     support: full
@@ -62,7 +64,7 @@ options:
   client_id:
     type: str
     description:
-      - If the role is a client role, the client id under which it resides.
+      - If the role is a client role, the client ID under which it resides.
       - If this parameter is absent, the role is considered a realm role.
   attributes:
     type: dict
@@ -199,15 +201,15 @@ existing:
   description: Representation of existing role.
   returned: always
   type: dict
-  sample: {"attributes": {}, "clientRole": true, "composite": false, "containerId": "9f03eb61-a826-4771-a9fd-930e06d2d36a", "description": "My
-      client test role", "id": "561703dd-0f38-45ff-9a5a-0c978f794547", "name": "myrole"}
+  sample: {"attributes": {}, "clientRole": true, "composite": false, "containerId": "9f03eb61-a826-4771-a9fd-930e06d2d36a",
+    "description": "My client test role", "id": "561703dd-0f38-45ff-9a5a-0c978f794547", "name": "myrole"}
 
 end_state:
   description: Representation of role after module execution (sample is truncated).
   returned: on success
   type: dict
-  sample: {"attributes": {}, "clientRole": true, "composite": false, "containerId": "9f03eb61-a826-4771-a9fd-930e06d2d36a", "description": "My
-      updated client test role", "id": "561703dd-0f38-45ff-9a5a-0c978f794547", "name": "myrole"}
+  sample: {"attributes": {}, "clientRole": true, "composite": false, "containerId": "9f03eb61-a826-4771-a9fd-930e06d2d36a",
+    "description": "My updated client test role", "id": "561703dd-0f38-45ff-9a5a-0c978f794547", "name": "myrole"}
 """
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \

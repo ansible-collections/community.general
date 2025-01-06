@@ -14,11 +14,11 @@ module: keycloak_userprofile
 short_description: Allows managing Keycloak User Profiles
 
 description:
-  - This module allows you to create, update, or delete Keycloak User Profiles using the Keycloak API. You can also customize the "Unmanaged Attributes"
-    with it.
-  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation at
-    U(https://www.keycloak.org/docs-api/24.0.5/rest-api/index.html).
-    For compatibility reasons, the module also accepts the camelCase versions of the options.
+  - This module allows you to create, update, or delete Keycloak User Profiles using the Keycloak API. You can also customize
+    the "Unmanaged Attributes" with it.
+  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation
+    at U(https://www.keycloak.org/docs-api/24.0.5/rest-api/index.html). For compatibility reasons, the module also accepts
+    the camelCase versions of the options.
 version_added: "9.4.0"
 
 attributes:
@@ -33,7 +33,8 @@ options:
   state:
     description:
       - State of the User Profile provider.
-      - On V(present), the User Profile provider will be created if it does not yet exist, or updated with the parameters you provide.
+      - On V(present), the User Profile provider will be created if it does not yet exist, or updated with the parameters
+        you provide.
       - On V(absent), the User Profile provider will be removed if it exists.
     default: 'present'
     type: str
@@ -264,8 +265,8 @@ options:
               - ADMIN_VIEW
 
 notes:
-  - Currently, only a single V(declarative-user-profile) entry is supported for O(provider_id) (design of the Keyckoak API). However, there can
-    be multiple O(config.kc_user_profile_config[].attributes[]) entries.
+  - Currently, only a single V(declarative-user-profile) entry is supported for O(provider_id) (design of the Keyckoak API).
+    However, there can be multiple O(config.kc_user_profile_config[].attributes[]) entries.
 extends_documentation_fragment:
   - community.general.keycloak
   - community.general.keycloak.actiongroup_keycloak

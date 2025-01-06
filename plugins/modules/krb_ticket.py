@@ -50,21 +50,24 @@ options:
       - Use O(cache_name) as the ticket cache name and location.
       - If this option is not used, the default cache name and location are used.
       - The default credentials cache may vary between systems.
-      - If not set the the value of E(KRB5CCNAME) environment variable will be used instead, its value is used to name the default ticket cache.
+      - If not set the the value of E(KRB5CCNAME) environment variable will be used instead, its value is used to name the
+        default ticket cache.
     type: str
   lifetime:
     description:
       - Requests a ticket with the lifetime, if the O(lifetime) is not specified, the default ticket lifetime is used.
-      - Specifying a ticket lifetime longer than the maximum ticket lifetime (configured by each site) will not override the configured maximum
-        ticket lifetime.
-      - 'The value for O(lifetime) must be followed by one of the following suffixes: V(s) - seconds, V(m) - minutes, V(h) - hours, V(d) - days.'
+      - Specifying a ticket lifetime longer than the maximum ticket lifetime (configured by each site) will not override the
+        configured maximum ticket lifetime.
+      - 'The value for O(lifetime) must be followed by one of the following suffixes: V(s) - seconds, V(m) - minutes, V(h)
+        - hours, V(d) - days.'
       - You cannot mix units; a value of V(3h30m) will result in an error.
       - See U(https://web.mit.edu/kerberos/krb5-1.12/doc/basic/date_format.html) for reference.
     type: str
   start_time:
     description:
       - Requests a postdated ticket.
-      - Postdated tickets are issued with the invalid flag set, and need to be resubmitted to the KDC for validation before use.
+      - Postdated tickets are issued with the invalid flag set, and need to be resubmitted to the KDC for validation before
+        use.
       - O(start_time) specifies the duration of the delay before the ticket can become valid.
       - You can use absolute time formats, for example V(July 27, 2012 at 20:30) you would neet to set O(start_time=20120727203000).
       - You can also use time duration format similar to O(lifetime) or O(renewable).
@@ -73,8 +76,8 @@ options:
   renewable:
     description:
       - Requests renewable tickets, with a total lifetime equal to O(renewable).
-      - 'The value for O(renewable) must be followed by one of the following delimiters: V(s) - seconds, V(m) - minutes, V(h) - hours, V(d) -
-        days.'
+      - 'The value for O(renewable) must be followed by one of the following delimiters: V(s) - seconds, V(m) - minutes, V(h)
+        - hours, V(d) - days.'
       - You cannot mix units; a value of V(3h30m) will result in an error.
       - See U(https://web.mit.edu/kerberos/krb5-1.12/doc/basic/date_format.html) for reference.
     type: str
@@ -96,7 +99,8 @@ options:
     type: bool
   canonicalization:
     description:
-      - Requests canonicalization of the principal name, and allows the KDC to reply with a different client principal from the one requested.
+      - Requests canonicalization of the principal name, and allows the KDC to reply with a different client principal from
+        the one requested.
     type: bool
   enterprise:
     description:
