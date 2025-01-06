@@ -43,15 +43,15 @@ options:
     aliases: [ type ]
     type: dict
     suboptions:
-      name:
+      resource_name:
         description:
           - Resource type name
         type: str
-      standard:
+      resource_standard:
         description:
           - Resource type standard
         type: str
-      provider:
+      resource_provider:
         description:
           - Resource type provider
         type: str
@@ -59,8 +59,10 @@ options:
     description:
       - Resource option to create
     aliases: [ option ]
-    type: str
-  operation:
+    type: list
+    elements: str
+    default: []
+  resource_operation:
     description:
       - List of operations to associate with resource
     aliases: [ op ]
@@ -68,57 +70,35 @@ options:
     elements: dict
     default: []
     suboptions:
-      action:
+      operation_action:
         description:
           - Operation action to associate with resource
         type: str
-      option:
+      operation_option:
         description:
           - Operation option to associate with action
         type: str
-  meta:
+  resource_meta:
     description:
       - List of meta to associate with resource
     type: list
     elements: str
-  action:
+  resource_arguments:
     description:
       - Actions to associate with resource
     type: dict
     default: {}
     suboptions:
-      state:
+      argument_action:
         description:
-          - State to apply to resource
+          - Action to apply to resource
         type: str
-        choices: [ clone, master ]
-      option:
+        choices: [ clone, master, group ]
+      argument_option:
         description:
           - Option to associate with resource action
-        type: str
-  group:
-    description:
-      - Group to associate with resource
-    type: str
-  order:
-    description:
-    - Order to associate with resource
-    type: dict
-    default: {}
-    suboptions:
-      state:
-        description:
-          - Order state to associate with resource
-        type: str
-        choices: [ before, after ]
-      resource_id:
-        description:
-          - Other resource to associate created resource based on order
-        type: str
-  bundle:
-    description:
-      - Bundle to associate with resource
-    type: str
+        type: list
+        elements: str
   disabled:
     description:
       - Argument to disable resource
@@ -210,7 +190,7 @@ def create_cluster_resource(module, resource_name,
     if resource_meta is not None:
         for m in resource_meta:
             cmd += "meta %s " % m
-    
+
     if resource_arguments:
         cmd += "%s " % resource_arguments.get('argument_action')
         for option_argument in resource_arguments.get('argument_option'):
