@@ -40,8 +40,8 @@ options:
         contents. If the state is V(present) and O(value) is not set, the existing value associated to the key will be returned.
         The state V(absent) will remove the key/value pair, again C(changed) will be set to V(true) only if the key actually
         existed prior to the removal. An attempt can be made to obtain or free the lock associated with a key/value pair with
-        the states V(acquire) or V(release) respectively. A valid session must be supplied to make the attempt C(changed) will
-        be V(true) if the attempt is successful, V(false) otherwise.
+        the states V(acquire) or V(release) respectively. A valid session must be supplied to make the attempt C(changed)
+        will be V(true) if the attempt is successful, V(false) otherwise.
     type: str
     choices: [absent, acquire, present, release]
     default: present

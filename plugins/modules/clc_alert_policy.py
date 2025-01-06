@@ -36,11 +36,11 @@ options:
     type: str
   id:
     description:
-      - The alert policy id. This is mutually exclusive with O(name).
+      - The alert policy ID. This is mutually exclusive with O(name).
     type: str
   alert_recipients:
     description:
-      - A list of recipient email ids to notify the alert. This is required for O(state=present).
+      - A list of recipient email IDs to notify the alert. This is required for O(state=present).
     type: list
     elements: str
   metric:

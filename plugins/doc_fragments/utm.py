@@ -31,7 +31,8 @@ options:
   utm_token:
     description:
       - The token used to identify at the REST-API.
-      - See U(https://www.sophos.com/en-us/medialibrary/PDFs/documentation/UTMonAWS/Sophos-UTM-RESTful-API.pdf?la=en), Chapter 2.4.2.
+      - See U(https://www.sophos.com/en-us/medialibrary/PDFs/documentation/UTMonAWS/Sophos-UTM-RESTful-API.pdf?la=en), Chapter
+        2.4.2.
     type: str
     required: true
   utm_protocol:

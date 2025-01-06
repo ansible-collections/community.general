@@ -14,8 +14,8 @@ module: consul_role
 short_description: Manipulate Consul roles
 version_added: 7.5.0
 description:
-  - Allows the addition, modification and deletion of roles in a Consul cluster using the agent. For more details on using and
-    configuring ACLs, see U(https://www.consul.io/docs/guides/acl.html).
+  - Allows the addition, modification and deletion of roles in a Consul cluster using the agent. For more details on using
+    and configuring ACLs, see U(https://www.consul.io/docs/guides/acl.html).
 author:
   - Håkon Lerring (@Hakon)
 extends_documentation_fragment:
