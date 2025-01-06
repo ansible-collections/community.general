@@ -120,7 +120,7 @@ def gitlab_authentication(module, min_version=None):
             gitlab_oauth_token = resp_data["access_token"]
 
         gitlab_instance = gitlab.Gitlab(url=gitlab_url, ssl_verify=verify, private_token=gitlab_token,
-                                        oauth_token=gitlab_oauth_token, job_token=gitlab_job_token, api_version=4)
+                                        oauth_token=gitlab_oauth_token, job_token=gitlab_job_token, api_version=4, keep_base_url=True)
         gitlab_instance.auth()
     except (gitlab.exceptions.GitlabAuthenticationError, gitlab.exceptions.GitlabGetError) as e:
         module.fail_json(msg="Failed to connect to GitLab server: %s" % to_native(e))
