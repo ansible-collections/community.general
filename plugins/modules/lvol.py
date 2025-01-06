@@ -39,7 +39,7 @@ options:
     type: str
     description:
       - The size of the logical volume, according to lvcreate(8) C(--size), by default in megabytes or optionally with one
-        of [bBsSkKmMgGtTpPeE] units; or according to lvcreate(8) --extents as a percentage of [VG|PVS|FREE|ORIGIN]; Float
+        of [bBsSkKmMgGtTpPeE] units; or according to lvcreate(8) C(--extents) as a percentage of [VG|PVS|FREE|ORIGIN]; Float
         values must begin with a digit.
       - When resizing, apart from specifying an absolute size you may, according to lvextend(8)|lvreduce(8) C(--size), specify
         the amount to extend the logical volume with the prefix V(+) or the amount to reduce the logical volume by with prefix

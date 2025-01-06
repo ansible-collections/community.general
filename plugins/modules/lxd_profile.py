@@ -106,8 +106,8 @@ options:
   trust_password:
     description:
       - The client trusted password.
-      - You need to set this password on the LXD server before running this module using the following command. lxc config
-        set core.trust_password <some random password> See U(https://www.stgraber.org/2016/04/18/lxd-api-direct-interaction/).
+      - 'You need to set this password on the LXD server before running this module using the following command: C(lxc config
+        set core.trust_password <some random password>). See U(https://www.stgraber.org/2016/04/18/lxd-api-direct-interaction/).'
       - If O(trust_password) is set, this module send a request for authentication before sending any requests.
     required: false
     type: str

@@ -48,7 +48,6 @@ options:
   validate_certs:
     description:
       - If V(false), SSL certificates will not be validated. This should only be set to V(false) when no other option exists.
-        Prior to 1.9.3 the code defaulted to V(false).
     type: bool
     default: true
 """
