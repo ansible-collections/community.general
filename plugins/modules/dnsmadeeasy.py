@@ -37,8 +37,8 @@ options:
 
   domain:
     description:
-      - Domain to work with. Can be the domain name (for example V(mydomain.com)) or the numeric ID of the domain in DNS Made Easy
-        (for example V(839989)) for faster resolution.
+      - Domain to work with. Can be the domain name (for example V(mydomain.com)) or the numeric ID of the domain in DNS Made
+        Easy (for example V(839989)) for faster resolution.
     required: true
     type: str
 
@@ -65,7 +65,7 @@ options:
       - 'Record value. HTTPRED: <redirection URL>, MX: <priority> <target name>, NS: <name server>, PTR: <target name>, SRV:
         <priority> <weight> <port> <target name>, TXT: <text value>".'
       - If record_value is not specified; no changes will be made and the record will be returned in 'result' (in other words,
-        this module can be used to fetch a record's current id, type, and ttl).
+        this module can be used to fetch a record's current ID, type, and ttl).
     type: str
 
   record_ttl:
@@ -128,7 +128,7 @@ options:
 
   contactList:
     description:
-      - Name or id of the contact list that the monitor will notify.
+      - Name or ID of the contact list that the monitor will notify.
       - The default V('') means the Account Owner.
     type: str
 

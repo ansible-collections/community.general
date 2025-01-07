@@ -138,7 +138,7 @@ options:
     version_added: "6.2.0"
   group:
     description:
-      - Id or the full path of the group of which this projects belongs to.
+      - ID or the full path of the group of which this projects belongs to.
     type: str
   import_url:
     description:

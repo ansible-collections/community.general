@@ -26,7 +26,7 @@ options:
     aliases: ["name"]
     type: str
   newuniqueid:
-    description: If specified, the unique id specified will be changed to this.
+    description: If specified, the unique ID specified will be changed to this.
     type: str
   otptype:
     description:

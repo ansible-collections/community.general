@@ -35,12 +35,12 @@ attributes:
 options:
   project:
     description:
-      - Id or Full path of the project in the form of group/name.
+      - ID or Full path of the project in the form of group/name.
     required: true
     type: str
   hook_url:
     description:
-      - The url that you want GitLab to post to, this is used as the primary key for updates and deletion.
+      - The URL that you want GitLab to post to, this is used as the primary key for updates and deletion.
     required: true
     type: str
   state:

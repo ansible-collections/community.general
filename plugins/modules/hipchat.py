@@ -73,7 +73,7 @@ options:
   api:
     type: str
     description:
-      - API url if using a self-hosted hipchat server. For Hipchat API version 2 use the default URI with C(/v2) instead of
+      - API URL if using a self-hosted hipchat server. For Hipchat API version 2 use the default URI with C(/v2) instead of
         C(/v1).
     default: 'https://api.hipchat.com/v1'
 

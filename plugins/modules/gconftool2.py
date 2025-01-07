@@ -15,8 +15,8 @@ author:
   - Kenneth D. Evensen (@kevensen)
 short_description: Edit GNOME Configurations
 description:
-  - This module allows for the manipulation of GNOME 2 Configuration using C(gconftool-2). Please see the gconftool-2(1) man pages
-    for more details.
+  - This module allows for the manipulation of GNOME 2 Configuration using C(gconftool-2). Please see the gconftool-2(1) man
+    pages for more details.
 seealso:
   - name: C(gconftool-2) command manual page
     description: Manual page for the command.

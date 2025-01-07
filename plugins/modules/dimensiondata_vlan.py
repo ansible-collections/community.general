@@ -39,7 +39,7 @@ options:
     default: ''
   network_domain:
     description:
-      - The Id or name of the target network domain.
+      - The ID or name of the target network domain.
     required: true
     type: str
   private_ipv4_base_address:

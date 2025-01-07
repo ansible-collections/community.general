@@ -97,7 +97,7 @@ options:
   parent:
     description:
       - Allow to create subgroups.
-      - Id or Full path of parent group in the form of group/name.
+      - ID or Full path of parent group in the form of group/name.
     type: str
   path:
     description:

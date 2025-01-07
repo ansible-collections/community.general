@@ -30,9 +30,9 @@ notes:
     present everywhere. When it is missing, a simple string comparison between values is used, and there may be false positives,
     that is, Ansible may think that a value is being changed when it is not. This fallback will be removed in a future version
     of this module, at which point the module will stop working on hosts without C(gi.repository).
-  - Detection of existing, running D-Bus session, required to change settings using C(dconf), is not 100% reliable due to implementation
-    details of D-Bus daemon itself. This might lead to running applications not picking-up changes on-the-fly if options are
-    changed using Ansible and C(dbus-run-session).
+  - Detection of existing, running D-Bus session, required to change settings using C(dconf), is not 100% reliable due to
+    implementation details of D-Bus daemon itself. This might lead to running applications not picking-up changes on-the-fly
+    if options are changed using Ansible and C(dbus-run-session).
   - Keep in mind that the C(dconf) CLI tool, which this module wraps around, utilises an unusual syntax for the values (GVariant).
     For example, if you wanted to provide a string value, the correct syntax would be O(value="'myvalue'") - with single quotes
     as part of the Ansible parameter value.
