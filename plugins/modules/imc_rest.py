@@ -263,7 +263,7 @@ output:
       response="yes"
       errorCode="ERR-xml-parse-error"
       invocationResult="594"
-      errorDescr="XML PARSING ERROR: Element 'computeRackUnit', attribute 'admin_Power': The attribute 'admin_Power' is not allowed.\n"/>
+      errorDescr="XML PARSING ERROR: Element 'computeRackUnit', attribute 'admin_Power': The attribute 'admin_Power' is not allowed.\n" />
 """
 
 import os

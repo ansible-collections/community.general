@@ -96,7 +96,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 gunicorn:
-  description: Process id of gunicorn.
+  description: Process ID of gunicorn.
   returned: changed
   type: str
   sample: "1234"
