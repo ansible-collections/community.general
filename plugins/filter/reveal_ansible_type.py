@@ -29,23 +29,23 @@ EXAMPLES = r"""
 
 # String. AnsibleUnicode.
 - data: "abc"
-- result: '{{ data | community.general.reveal_ansible_type }}'
+  result: '{{ data | community.general.reveal_ansible_type }}'
 # result => AnsibleUnicode
 
 # String. AnsibleUnicode alias str.
 - alias: {"AnsibleUnicode": "str"}
-- data: "abc"
-- result: '{{ data | community.general.reveal_ansible_type(alias) }}'
+  data: "abc"
+  result: '{{ data | community.general.reveal_ansible_type(alias) }}'
 # result => str
 
 # List. All items are AnsibleUnicode.
 - data: ["a", "b", "c"]
-- result: '{{ data | community.general.reveal_ansible_type }}'
+  result: '{{ data | community.general.reveal_ansible_type }}'
 # result => list[AnsibleUnicode]
 
 # Dictionary. All keys are AnsibleUnicode. All values are AnsibleUnicode.
 - data: {"a": "foo", "b": "bar", "c": "baz"}
-- result: '{{ data | community.general.reveal_ansible_type }}'
+  result: '{{ data | community.general.reveal_ansible_type }}'
 # result => dict[AnsibleUnicode, AnsibleUnicode]
 
 # No substitution and no alias. Type of strings is str
@@ -88,26 +88,26 @@ EXAMPLES = r"""
 
 # Dictionary. The keys are integers or strings. All values are strings.
 - alias: {"AnsibleUnicode": "str"}
-- data: {1: 'a', 'b': 'b'}
-- result: '{{ data | community.general.reveal_ansible_type(alias) }}'
+  data: {1: 'a', 'b': 'b'}
+  result: '{{ data | community.general.reveal_ansible_type(alias) }}'
 # result => dict[int|str, str]
 
 # Dictionary. All keys are integers. All values are keys.
 - alias: {"AnsibleUnicode": "str"}
-- data: {1: 'a', 2: 'b'}
-- result: '{{ data | community.general.reveal_ansible_type(alias) }}'
+  data: {1: 'a', 2: 'b'}
+  result: '{{ data | community.general.reveal_ansible_type(alias) }}'
 # result => dict[int, str]
 
 # Dictionary. All keys are strings. Multiple types values.
 - alias: {"AnsibleUnicode": "str"}
-- data: {'a': 1, 'b': 1.1, 'c': 'abc', 'd': true, 'e': ['x', 'y', 'z'], 'f': {'x': 1, 'y': 2}}
-- result: '{{ data | community.general.reveal_ansible_type(alias) }}'
+  data: {'a': 1, 'b': 1.1, 'c': 'abc', 'd': true, 'e': ['x', 'y', 'z'], 'f': {'x': 1, 'y': 2}}
+  result: '{{ data | community.general.reveal_ansible_type(alias) }}'
 # result => dict[str, bool|dict|float|int|list|str]
 
 # List. Multiple types items.
 - alias: {"AnsibleUnicode": "str"}
-- data: [1, 2, 1.1, 'abc', true, ['x', 'y', 'z'], {'x': 1, 'y': 2}]
-- result: '{{ data | community.general.reveal_ansible_type(alias) }}'
+  data: [1, 2, 1.1, 'abc', true, ['x', 'y', 'z'], {'x': 1, 'y': 2}]
+  result: '{{ data | community.general.reveal_ansible_type(alias) }}'
 # result => list[bool|dict|float|int|list|str]
 """
 

@@ -60,25 +60,25 @@ EXAMPLES = r"""
 - t:
     - {before: k0_x0, after: a0}
     - {before: k1_x1, after: a1}
-- r: "{{ l | community.general.replace_keys(target=t) }}"
+  r: "{{ l | community.general.replace_keys(target=t) }}"
 
   # 2) Replace keys that starts with any of the attributes before.
 - t:
     - {before: k0, after: a0}
     - {before: k1, after: a1}
-- r: "{{ l | community.general.replace_keys(target=t, matching_parameter='starts_with') }}"
+  r: "{{ l | community.general.replace_keys(target=t, matching_parameter='starts_with') }}"
 
   # 3) Replace keys that ends with any of the attributes before.
 - t:
     - {before: x0, after: a0}
     - {before: x1, after: a1}
-- r: "{{ l | community.general.replace_keys(target=t, matching_parameter='ends_with') }}"
+  r: "{{ l | community.general.replace_keys(target=t, matching_parameter='ends_with') }}"
 
   # 4) Replace keys that match any regex of the attributes before.
 - t:
     - {before: "^.*0_x.*$", after: a0}
     - {before: "^.*1_x.*$", after: a1}
-- r: "{{ l | community.general.replace_keys(target=t, matching_parameter='regex') }}"
+  r: "{{ l | community.general.replace_keys(target=t, matching_parameter='regex') }}"
 
   # The results of above examples 1-4 are all the same.
 - r:
@@ -88,7 +88,7 @@ EXAMPLES = r"""
   # 5) If more keys match the same attribute before the last one will be used.
 - t:
     - {before: "^.*_x.*$", after: X}
-- r: "{{ l | community.general.replace_keys(target=t, matching_parameter='regex') }}"
+  r: "{{ l | community.general.replace_keys(target=t, matching_parameter='regex') }}"
 
   # gives
 
@@ -100,7 +100,7 @@ EXAMPLES = r"""
 - t:
     - {before: "^.*_x.*$", after: X}
     - {before: "^.*_x.*$", after: Y}
-- r: "{{ l | community.general.replace_keys(target=t, matching_parameter='regex') }}"
+  r: "{{ l | community.general.replace_keys(target=t, matching_parameter='regex') }}"
 
   # gives
 
@@ -115,7 +115,7 @@ EXAMPLES = r"""
 - t:
     - {before: a, after: X}
     - {before: aa, after: Y}
-- r: "{{ l | community.general.replace_keys(target=t, matching_parameter='starts_with') }}"
+  r: "{{ l | community.general.replace_keys(target=t, matching_parameter='starts_with') }}"
 
   # gives
 
