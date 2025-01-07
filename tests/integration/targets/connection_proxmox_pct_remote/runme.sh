@@ -6,13 +6,7 @@
 
 set -eux
 
-# Connection tests for POSIX platforms use this script by linking to it from the appropriate 'connection_' target dir.
-# The name of the inventory group to test is extracted from the directory name following the 'connection_' prefix.
-
-cp files/pct /usr/sbin/pct
-chown root:root /usr/sbin/pct
-chmod 755 /usr/sbin/pct
-
-"pip$ANSIBLE_TEST_PYTHON_VERSION" install paramiko
+ANSIBLE_ROLES_PATH=../ \
+    ansible-playbook dependencies.yml -v "$@"
 
 ./test.sh "$@"
