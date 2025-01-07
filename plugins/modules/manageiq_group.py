@@ -44,7 +44,7 @@ options:
   role_id:
     type: int
     description:
-      - The the group role id.
+      - The the group role ID.
     required: false
   role:
     type: str
@@ -56,7 +56,7 @@ options:
   tenant_id:
     type: int
     description:
-      - The tenant for the group identified by the tenant id.
+      - The tenant for the group identified by the tenant ID.
     required: false
     default:
   tenant:
@@ -172,7 +172,7 @@ group:
       returned: success
       type: str
     id:
-      description: The group id.
+      description: The group ID.
       returned: success
       type: int
     group_type:

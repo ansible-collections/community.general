@@ -49,7 +49,7 @@ options:
   parent_id:
     type: int
     description:
-      - The id of the parent tenant. If not supplied the root tenant is used.
+      - The ID of the parent tenant. If not supplied the root tenant is used.
       - The O(parent_id) takes president over O(parent) when supplied.
     required: false
     default:
@@ -140,7 +140,7 @@ tenant:
   type: complex
   contains:
     id:
-      description: The tenant id.
+      description: The tenant ID.
       returned: success
       type: int
     name:
@@ -152,7 +152,7 @@ tenant:
       returned: success
       type: str
     parent_id:
-      description: The id of the parent tenant.
+      description: The ID of the parent tenant.
       returned: success
       type: int
     quotas:

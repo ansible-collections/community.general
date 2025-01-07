@@ -33,8 +33,8 @@ options:
     type: str
   config:
     description:
-      - 'The config for the project (for example V({"features.profiles": "true"})).
-      - See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/projects/project_get).'
+      - 'The config for the project (for example V({"features.profiles": "true"})).'
+      - See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/projects/project_get).
       - If the project already exists and its "config" value in metadata obtained from C(GET /1.0/projects/<name>)
         U(https://documentation.ubuntu.com/lxd/en/latest/api/#/projects/project_get)
         are different, then this module tries to apply the configurations U(https://documentation.ubuntu.com/lxd/en/latest/api/#/projects/project_put).
@@ -48,8 +48,8 @@ options:
     type: str
   merge_project:
     description:
-      - Merge the configuration of the present project with the new desired configuration, instead of replacing it. If configuration is the same
-        after merged, no change will be made.
+      - Merge the configuration of the present project with the new desired configuration, instead of replacing it. If configuration
+        is the same after merged, no change will be made.
     required: false
     default: false
     type: bool
@@ -91,14 +91,14 @@ options:
   trust_password:
     description:
       - The client trusted password.
-      - 'You need to set this password on the LXD server before running this module using the following command: C(lxc config set core.trust_password
-        <some random password>) See U(https://www.stgraber.org/2016/04/18/lxd-api-direct-interaction/).'
+      - 'You need to set this password on the LXD server before running this module using the following command: C(lxc config
+        set core.trust_password <some random password>) See U(https://www.stgraber.org/2016/04/18/lxd-api-direct-interaction/).'
       - If O(trust_password) is set, this module send a request for authentication before sending any requests.
     required: false
     type: str
 notes:
-  - Projects must have a unique name. If you attempt to create a project with a name that already existed in the users namespace the module will
-    simply return as "unchanged".
+  - Projects must have a unique name. If you attempt to create a project with a name that already existed in the users namespace
+    the module will simply return as "unchanged".
 """
 
 EXAMPLES = r"""

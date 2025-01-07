@@ -46,8 +46,9 @@ options:
     default: ''
   linode_id:
     description:
-      - Unique ID of a linode server. This value is read-only in the sense that if you specify it on creation of a Linode it will not be used.
-        The Linode API generates these IDs and we can those generated value here to reference a Linode more specifically. This is useful for idempotence.
+      - Unique ID of a Linode server. This value is read-only in the sense that if you specify it on creation of a Linode
+        it will not be used. The Linode API generates these IDs and we can those generated value here to reference a Linode
+        more specifically. This is useful for idempotence.
     aliases: [lid]
     type: int
   additional_disks:

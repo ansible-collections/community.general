@@ -42,9 +42,9 @@ notes:
   - When using glibc mechanism, it will manage locales by editing C(/etc/locale.gen) and running C(locale-gen).
   - When using ubuntu_legacy mechanism, it will manage locales by editing C(/var/lib/locales/supported.d/local) and then running
     C(locale-gen).
-  - Please note that the code path that uses ubuntu_legacy mechanism has not been tested for a while, because Ubuntu is already using
-    the glibc mechanism. There is no support for that, given our inability to test it. Therefore, that mechanism is B(deprecated)
-    and will be removed in community.general 13.0.0.
+  - Please note that the code path that uses ubuntu_legacy mechanism has not been tested for a while, because Ubuntu is already
+    using the glibc mechanism. There is no support for that, given our inability to test it. Therefore, that mechanism is
+    B(deprecated) and will be removed in community.general 13.0.0.
   - Currently the module is B(only supported for Debian and Ubuntu) systems.
   - This module requires the package C(locales) installed in Debian and Ubuntu systems.
 """

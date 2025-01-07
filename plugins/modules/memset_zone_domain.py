@@ -13,9 +13,9 @@ module: memset_zone_domain
 author: "Simon Weald (@glitchcrab)"
 short_description: Create and delete domains in Memset DNS zones
 notes:
-  - Zone domains can be thought of as a collection of domains, all of which share the same DNS records (in other words, they point to the same IP). An API
-    key generated using the Memset customer control panel is needed with the following minimum scope - C(dns.zone_domain_create), C(dns.zone_domain_delete),
-    C(dns.zone_domain_list).
+  - Zone domains can be thought of as a collection of domains, all of which share the same DNS records (in other words, they
+    point to the same IP). An API key generated using the Memset customer control panel is needed with the following minimum
+    scope - C(dns.zone_domain_create), C(dns.zone_domain_delete), C(dns.zone_domain_list).
   - Currently this module can only create one domain at a time. Multiple domains should be created using C(loop).
 description:
   - Manage DNS zone domains in a Memset account.

@@ -43,14 +43,14 @@ options:
     required: false
     type: bool
     description:
-      - Enable or disable the service, independently of C(*.preset) file preference or running state. Mutually exclusive with O(preset). Will
-        take effect prior to O(state=reset).
+      - Enable or disable the service, independently of C(*.preset) file preference or running state. Mutually exclusive with
+        O(preset). Will take effect prior to O(state=reset).
   preset:
     required: false
     type: bool
     description:
-      - Enable or disable the service according to local preferences in C(*.preset) files. Mutually exclusive with O(enabled). Only has an effect
-        if set to true. Will take effect prior to O(state=reset).
+      - Enable or disable the service according to local preferences in C(*.preset) files. Mutually exclusive with O(enabled).
+        Only has an effect if set to true. Will take effect prior to O(state=reset).
   user:
     required: false
     default: false
@@ -145,7 +145,8 @@ state:
   type: str
   sample: "reloaded"
 status:
-  description: A dictionary with the key=value pairs returned by C(system-control show-json) or V(none) if the service is not loaded.
+  description: A dictionary with the key=value pairs returned by C(system-control show-json) or V(none) if the service is
+    not loaded.
   returned: success
   type: complex
   contains:

@@ -15,8 +15,8 @@ DOCUMENTATION = r"""
 module: ldap_entry
 short_description: Add or remove LDAP entries
 description:
-  - Add or remove LDAP entries. This module only asserts the existence or non-existence of an LDAP entry, not its attributes. To assert the attribute
-    values of an entry, see M(community.general.ldap_attrs).
+  - Add or remove LDAP entries. This module only asserts the existence or non-existence of an LDAP entry, not its attributes.
+    To assert the attribute values of an entry, see M(community.general.ldap_attrs).
 author:
   - Jiri Tyr (@jtyr)
 requirements:
@@ -29,18 +29,19 @@ attributes:
 options:
   attributes:
     description:
-      - If O(state=present), attributes necessary to create an entry. Existing entries are never modified. To assert specific attribute values
-        on an existing entry, use M(community.general.ldap_attrs) module instead.
+      - If O(state=present), attributes necessary to create an entry. Existing entries are never modified. To assert specific
+        attribute values on an existing entry, use M(community.general.ldap_attrs) module instead.
       - Each attribute value can be a string for single-valued attributes or a list of strings for multi-valued attributes.
-      - If you specify values for this option in YAML, please note that you can improve readability for long string values by using YAML block
-        modifiers as seen in the examples for this module.
-      - Note that when using values that YAML/ansible-core interprets as other types, like V(yes), V(no) (booleans), or V(2.10) (float), make
-        sure to quote them if these are meant to be strings. Otherwise the wrong values may be sent to LDAP.
+      - If you specify values for this option in YAML, please note that you can improve readability for long string values
+        by using YAML block modifiers as seen in the examples for this module.
+      - Note that when using values that YAML/ansible-core interprets as other types, like V(yes), V(no) (booleans), or V(2.10)
+        (float), make sure to quote them if these are meant to be strings. Otherwise the wrong values may be sent to LDAP.
     type: dict
     default: {}
   objectClass:
     description:
-      - If O(state=present), value or list of values to use when creating the entry. It can either be a string or an actual list of strings.
+      - If O(state=present), value or list of values to use when creating the entry. It can either be a string or an actual
+        list of strings.
     type: list
     elements: str
   state:

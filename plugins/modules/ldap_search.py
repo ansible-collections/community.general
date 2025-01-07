@@ -52,21 +52,22 @@ options:
     default: false
     type: bool
     description:
-      - Set to V(true) to return the full attribute schema of entries, not their attribute values. Overrides O(attrs) when provided.
+      - Set to V(true) to return the full attribute schema of entries, not their attribute values. Overrides O(attrs) when
+        provided.
   page_size:
     default: 0
     type: int
     description:
-      - The page size when performing a simple paged result search (RFC 2696). This setting can be tuned to reduce issues with timeouts and server
-        limits.
+      - The page size when performing a simple paged result search (RFC 2696). This setting can be tuned to reduce issues
+        with timeouts and server limits.
       - Setting the page size to V(0) (default) disables paged searching.
     version_added: 7.1.0
   base64_attributes:
     description:
       - If provided, all attribute values returned that are listed in this option will be Base64 encoded.
       - If the special value V(*) appears in this list, all attributes will be Base64 encoded.
-      - All other attribute values will be converted to UTF-8 strings. If they contain binary data, please note that invalid UTF-8 bytes will
-        be omitted.
+      - All other attribute values will be converted to UTF-8 strings. If they contain binary data, please note that invalid
+        UTF-8 bytes will be omitted.
     type: list
     elements: str
     version_added: 7.0.0
@@ -90,17 +91,15 @@ EXAMPLES = r"""
   register: ldap_group_gids
 """
 
-RESULTS = """
+RESULTS = r"""
 results:
   description:
     - For every entry found, one dictionary will be returned.
     - Every dictionary contains a key C(dn) with the entry's DN as a value.
-    - Every attribute of the entry found is added to the dictionary. If the key
-      has precisely one value, that value is taken directly, otherwise the key's
-      value is a list.
-    - Note that all values (for single-element lists) and list elements (for multi-valued
-      lists) will be UTF-8 strings. Some might contain Base64-encoded binary data; which
-      ones is determined by the O(base64_attributes) option.
+    - Every attribute of the entry found is added to the dictionary. If the key has precisely one value, that value is taken
+      directly, otherwise the key's value is a list.
+    - Note that all values (for single-element lists) and list elements (for multi-valued lists) will be UTF-8 strings. Some
+      might contain Base64-encoded binary data; which ones is determined by the O(base64_attributes) option.
   type: list
   elements: dict
 """

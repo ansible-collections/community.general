@@ -49,7 +49,7 @@ options:
   user_id:
     type: str
     description:
-      - The user id of the user.
+      - The user ID of the user.
   password:
     type: str
     description:

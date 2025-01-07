@@ -16,12 +16,12 @@ module: mail
 short_description: Send an email
 description:
   - This module is useful for sending emails from playbooks.
-  - One may wonder why automate sending emails? In complex environments there are from time to time processes that cannot be automated, either
-    because you lack the authority to make it so, or because not everyone agrees to a common approach.
-  - If you cannot automate a specific step, but the step is non-blocking, sending out an email to the responsible party to make them perform their
-    part of the bargain is an elegant way to put the responsibility in someone else's lap.
-  - Of course sending out a mail can be equally useful as a way to notify one or more people in a team that a specific action has been (successfully)
-    taken.
+  - One may wonder why automate sending emails? In complex environments there are from time to time processes that cannot
+    be automated, either because you lack the authority to make it so, or because not everyone agrees to a common approach.
+  - If you cannot automate a specific step, but the step is non-blocking, sending out an email to the responsible party to
+    make them perform their part of the bargain is an elegant way to put the responsibility in someone else's lap.
+  - Of course sending out a mail can be equally useful as a way to notify one or more people in a team that a specific action
+    has been (successfully) taken.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -115,11 +115,12 @@ options:
     default: plain
   secure:
     description:
-      - If V(always), the connection will only send email if the connection is Encrypted. If the server does not accept the encrypted connection
-        it will fail.
+      - If V(always), the connection will only send email if the connection is Encrypted. If the server does not accept the
+        encrypted connection it will fail.
       - If V(try), the connection will attempt to setup a secure SSL/TLS session, before trying to send.
       - If V(never), the connection will not attempt to setup a secure SSL/TLS session, before sending.
-      - If V(starttls), the connection will try to upgrade to a secure SSL/TLS connection, before sending. If it is unable to do so it will fail.
+      - If V(starttls), the connection will try to upgrade to a secure SSL/TLS connection, before sending. If it is unable
+        to do so it will fail.
     type: str
     choices: [always, never, starttls, try]
     default: try
