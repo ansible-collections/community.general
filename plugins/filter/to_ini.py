@@ -6,34 +6,34 @@
 
 from __future__ import absolute_import, division, print_function
 
-DOCUMENTATION = r'''
-  name: to_ini
-  short_description: Converts a dictionary to the INI file format
-  version_added: 8.2.0
-  author: Steffen Scheib (@sscheib)
-  description:
-    - Converts a dictionary to the INI file format.
-  options:
-    _input:
-      description: The dictionary that should be converted to the INI format.
-      type: dictionary
-      required: true
-'''
+DOCUMENTATION = r"""
+name: to_ini
+short_description: Converts a dictionary to the INI file format
+version_added: 8.2.0
+author: Steffen Scheib (@sscheib)
+description:
+  - Converts a dictionary to the INI file format.
+options:
+  _input:
+    description: The dictionary that should be converted to the INI format.
+    type: dictionary
+    required: true
+"""
 
-EXAMPLES = r'''
-  - name: Define a dictionary
-    ansible.builtin.set_fact:
-      my_dict:
-        section_name:
-          key_name: 'key value'
+EXAMPLES = r"""
+- name: Define a dictionary
+  ansible.builtin.set_fact:
+    my_dict:
+      section_name:
+        key_name: 'key value'
 
-        another_section:
-          connection: 'ssh'
+      another_section:
+        connection: 'ssh'
 
-  - name: Write dictionary to INI file
-    ansible.builtin.copy:
-      dest: /tmp/test.ini
-      content: '{{ my_dict | community.general.to_ini }}'
+- name: Write dictionary to INI file
+  ansible.builtin.copy:
+    dest: /tmp/test.ini
+    content: '{{ my_dict | community.general.to_ini }}'
 
   # /tmp/test.ini will look like this:
   # [section_name]
@@ -41,13 +41,13 @@ EXAMPLES = r'''
   #
   # [another_section]
   # connection = ssh
-'''
+"""
 
-RETURN = r'''
-  _value:
-    description: A string formatted as INI file.
-    type: string
-'''
+RETURN = r"""
+_value:
+  description: A string formatted as INI file.
+  type: string
+"""
 
 
 __metaclass__ = type
