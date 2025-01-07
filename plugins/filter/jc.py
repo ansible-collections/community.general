@@ -8,41 +8,41 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-  name: jc
-  short_description: Convert output of many shell commands and file-types to JSON
-  version_added: 1.1.0
-  author: Kelly Brazil (@kellyjonbrazil)
-  description:
-    - Convert output of many shell commands and file-types to JSON.
-    - Uses the L(jc library,https://github.com/kellyjonbrazil/jc).
-  positional: parser
-  options:
-    _input:
-      description: The data to convert.
-      type: string
-      required: true
-    parser:
-      description:
-        - The correct parser for the input data.
-        - For example V(ifconfig).
-        - "Note: use underscores instead of dashes (if any) in the parser module name."
-        - See U(https://github.com/kellyjonbrazil/jc#parsers) for the latest list of parsers.
-      type: string
-      required: true
-    quiet:
-      description: Set to V(false) to not suppress warnings.
-      type: boolean
-      default: true
-    raw:
-      description: Set to V(true) to return pre-processed JSON.
-      type: boolean
-      default: false
-  requirements:
-    - jc installed as a Python library (U(https://pypi.org/project/jc/))
-'''
+DOCUMENTATION = r"""
+name: jc
+short_description: Convert output of many shell commands and file-types to JSON
+version_added: 1.1.0
+author: Kelly Brazil (@kellyjonbrazil)
+description:
+  - Convert output of many shell commands and file-types to JSON.
+  - Uses the L(jc library,https://github.com/kellyjonbrazil/jc).
+positional: parser
+options:
+  _input:
+    description: The data to convert.
+    type: string
+    required: true
+  parser:
+    description:
+      - The correct parser for the input data.
+      - For example V(ifconfig).
+      - 'Note: use underscores instead of dashes (if any) in the parser module name.'
+      - See U(https://github.com/kellyjonbrazil/jc#parsers) for the latest list of parsers.
+    type: string
+    required: true
+  quiet:
+    description: Set to V(false) to not suppress warnings.
+    type: boolean
+    default: true
+  raw:
+    description: Set to V(true) to return pre-processed JSON.
+    type: boolean
+    default: false
+requirements:
+  - jc installed as a Python library (U(https://pypi.org/project/jc/))
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Install the prereqs of the jc filter (jc Python package) on the Ansible controller
   delegate_to: localhost
   ansible.builtin.pip:
@@ -68,13 +68,13 @@ EXAMPLES = '''
   #   "operating_system": "GNU/Linux",
   #   "processor": "x86_64"
   # }
-'''
+"""
 
-RETURN = '''
-  _value:
-    description: The processed output.
-    type: any
-'''
+RETURN = r"""
+_value:
+  description: The processed output.
+  type: any
+"""
 
 from ansible.errors import AnsibleError, AnsibleFilterError
 import importlib

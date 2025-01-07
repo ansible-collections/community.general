@@ -29,7 +29,7 @@ ansible_config: |
   stdout_callback = community.general.default_without_diff
 
 # Enable callback with environment variables:
-environment_variable: |
+environment_variable: |-
   ANSIBLE_STDOUT_CALLBACK=community.general.default_without_diff
 """
 

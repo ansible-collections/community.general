@@ -16,33 +16,33 @@ except ImportError:
     HAS_ZLIB = False
 
 
-DOCUMENTATION = '''
-  name: crc32
-  short_description: Generate a CRC32 checksum
-  version_added: 5.4.0
-  description:
-    - Checksum a string using CRC32 algorithm and return its hexadecimal representation.
-  options:
-    _input:
-      description:
-        - The string to checksum.
-      type: string
-      required: true
-  author:
-    - Julien Riou
-'''
-
-EXAMPLES = '''
-  - name: Checksum a test string
-    ansible.builtin.debug:
-      msg: "{{ 'test' | community.general.crc32 }}"
-'''
-
-RETURN = '''
-  _value:
-    description: CRC32 checksum.
+DOCUMENTATION = r"""
+name: crc32
+short_description: Generate a CRC32 checksum
+version_added: 5.4.0
+description:
+  - Checksum a string using CRC32 algorithm and return its hexadecimal representation.
+options:
+  _input:
+    description:
+      - The string to checksum.
     type: string
-'''
+    required: true
+author:
+  - Julien Riou
+"""
+
+EXAMPLES = r"""
+- name: Checksum a test string
+  ansible.builtin.debug:
+    msg: "{{ 'test' | community.general.crc32 }}"
+"""
+
+RETURN = r"""
+_value:
+  description: CRC32 checksum.
+  type: string
+"""
 
 
 def crc32s(value):

@@ -6,65 +6,59 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-  name: lists_mergeby
-  short_description: Merge two or more lists of dictionaries by a given attribute
-  version_added: 2.0.0
-  author: Vladimir Botka (@vbotka)
-  description:
-    - Merge two or more lists by attribute O(index). Optional
-      parameters O(recursive) and O(list_merge) control the merging of
-      the nested dictionaries and lists.
-    - The function C(merge_hash) from C(ansible.utils.vars) is used.
-    - To learn details on how to use the parameters O(recursive) and
-      O(list_merge) see Ansible User's Guide chapter "Using filters to
-      manipulate data" section R(Combining hashes/dictionaries, combine_filter) or the
-      filter P(ansible.builtin.combine#filter).
+DOCUMENTATION = r"""
+name: lists_mergeby
+short_description: Merge two or more lists of dictionaries by a given attribute
+version_added: 2.0.0
+author: Vladimir Botka (@vbotka)
+description:
+  - Merge two or more lists by attribute O(index). Optional parameters O(recursive) and O(list_merge) control the merging
+    of the nested dictionaries and lists.
+  - The function C(merge_hash) from C(ansible.utils.vars) is used.
+  - To learn details on how to use the parameters O(recursive) and O(list_merge) see Ansible User's Guide chapter "Using filters
+    to manipulate data" section R(Combining hashes/dictionaries, combine_filter) or the filter P(ansible.builtin.combine#filter).
+positional: another_list, index
+options:
+  _input:
+    description:
+      - A list of dictionaries, or a list of lists of dictionaries.
+      - The required type of the C(elements) is set to C(raw) because all elements of O(_input) can be either dictionaries
+        or lists.
+    type: list
+    elements: raw
+    required: true
+  another_list:
+    description:
+      - Another list of dictionaries, or a list of lists of dictionaries.
+      - This parameter can be specified multiple times.
+    type: list
+    elements: raw
+  index:
+    description:
+      - The dictionary key that must be present in every dictionary in every list that is used to merge the lists.
+    type: string
+    required: true
+  recursive:
+    description:
+      - Should the combine recursively merge nested dictionaries (hashes).
+      - B(Note:) It does not depend on the value of the C(hash_behaviour) setting in C(ansible.cfg).
+    type: boolean
+    default: false
+  list_merge:
+    description:
+      - Modifies the behaviour when the dictionaries (hashes) to merge contain arrays/lists.
+    type: string
+    default: replace
+    choices:
+      - replace
+      - keep
+      - append
+      - prepend
+      - append_rp
+      - prepend_rp
+"""
 
-  positional: another_list, index
-  options:
-    _input:
-      description:
-        - A list of dictionaries, or a list of lists of dictionaries.
-        - The required type of the C(elements) is set to C(raw)
-          because all elements of O(_input) can be either dictionaries
-          or lists.
-      type: list
-      elements: raw
-      required: true
-    another_list:
-      description:
-        - Another list of dictionaries, or a list of lists of dictionaries.
-        - This parameter can be specified multiple times.
-      type: list
-      elements: raw
-    index:
-      description:
-        - The dictionary key that must be present in every dictionary in every list that is used to
-          merge the lists.
-      type: string
-      required: true
-    recursive:
-      description:
-        - Should the combine recursively merge nested dictionaries (hashes).
-        - "B(Note:) It does not depend on the value of the C(hash_behaviour) setting in C(ansible.cfg)."
-      type: boolean
-      default: false
-    list_merge:
-      description:
-        - Modifies the behaviour when the dictionaries (hashes) to merge contain arrays/lists.
-      type: string
-      default: replace
-      choices:
-        - replace
-        - keep
-        - append
-        - prepend
-        - append_rp
-        - prepend_rp
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 # Some results below are manually formatted for better readability. The
 # dictionaries' keys will be sorted alphabetically in real output.
 
@@ -193,14 +187,14 @@ EXAMPLES = '''
 #  r:
 #    - {index: a, foo: {x:1, y: 3, z: 4}}
 #    - {index: b, foo: [Y1, Y2]}
-'''
+"""
 
-RETURN = '''
-  _value:
-    description: The merged list.
-    type: list
-    elements: dictionary
-'''
+RETURN = r"""
+_value:
+  description: The merged list.
+  type: list
+  elements: dictionary
+"""
 
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils.six import string_types

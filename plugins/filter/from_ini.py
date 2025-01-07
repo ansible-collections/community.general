@@ -6,43 +6,43 @@
 
 from __future__ import absolute_import, division, print_function
 
-DOCUMENTATION = r'''
-  name: from_ini
-  short_description: Converts INI text input into a dictionary
-  version_added: 8.2.0
-  author: Steffen Scheib (@sscheib)
-  description:
-    - Converts INI text input into a dictionary.
-  options:
-    _input:
-      description: A string containing an INI document.
-      type: string
-      required: true
-'''
+DOCUMENTATION = r"""
+name: from_ini
+short_description: Converts INI text input into a dictionary
+version_added: 8.2.0
+author: Steffen Scheib (@sscheib)
+description:
+  - Converts INI text input into a dictionary.
+options:
+  _input:
+    description: A string containing an INI document.
+    type: string
+    required: true
+"""
 
-EXAMPLES = r'''
-  - name: Slurp an INI file
-    ansible.builtin.slurp:
-      src: /etc/rhsm/rhsm.conf
-    register: rhsm_conf
+EXAMPLES = r"""
+- name: Slurp an INI file
+  ansible.builtin.slurp:
+    src: /etc/rhsm/rhsm.conf
+  register: rhsm_conf
 
-  - name: Display the INI file as dictionary
-    ansible.builtin.debug:
-      var: rhsm_conf.content | b64decode | community.general.from_ini
+- name: Display the INI file as dictionary
+  ansible.builtin.debug:
+    var: rhsm_conf.content | b64decode | community.general.from_ini
 
-  - name: Set a new dictionary fact with the contents of the INI file
-    ansible.builtin.set_fact:
-      rhsm_dict: >-
-        {{
-            rhsm_conf.content | b64decode | community.general.from_ini
-        }}
-'''
+- name: Set a new dictionary fact with the contents of the INI file
+  ansible.builtin.set_fact:
+    rhsm_dict: >-
+      {{
+          rhsm_conf.content | b64decode | community.general.from_ini
+      }}
+"""
 
-RETURN = '''
-  _value:
-    description: A dictionary representing the INI file.
-    type: dictionary
-'''
+RETURN = r"""
+_value:
+  description: A dictionary representing the INI file.
+  type: dictionary
+"""
 
 __metaclass__ = type
 

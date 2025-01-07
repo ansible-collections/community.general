@@ -7,22 +7,22 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
-  name: dict
-  short_description: Convert a list of tuples into a dictionary
-  version_added: 3.0.0
-  author: Felix Fontein (@felixfontein)
-  description:
-    - Convert a list of tuples into a dictionary. This is a filter version of the C(dict) function.
-  options:
-    _input:
-      description: A list of tuples (with exactly two elements).
-      type: list
-      elements: tuple
-      required: true
-'''
+DOCUMENTATION = r"""
+name: dict
+short_description: Convert a list of tuples into a dictionary
+version_added: 3.0.0
+author: Felix Fontein (@felixfontein)
+description:
+  - Convert a list of tuples into a dictionary. This is a filter version of the C(dict) function.
+options:
+  _input:
+    description: A list of tuples (with exactly two elements).
+    type: list
+    elements: tuple
+    required: true
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Convert list of tuples into dictionary
   ansible.builtin.set_fact:
     dictionary: "{{ [[1, 2], ['a', 'b']] | community.general.dict }}"
@@ -53,13 +53,13 @@ EXAMPLES = '''
   #     "k2": 42,
   #     "k3": "b"
   #   }
-'''
+"""
 
-RETURN = '''
-  _value:
-    description: A dictionary with the provided key-value pairs.
-    type: dictionary
-'''
+RETURN = r"""
+_value:
+  description: A dictionary with the provided key-value pairs.
+  type: dictionary
+"""
 
 
 def dict_filter(sequence):
