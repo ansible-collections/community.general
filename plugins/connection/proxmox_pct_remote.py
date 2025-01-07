@@ -237,7 +237,7 @@ notes:
   - >
     When NOT using this plugin as root, you need to have a become mechanism,
     e.g. C(sudo), installed on Proxmox and setup so we can run it without prompting for the password.
-    Inside the container we need a shell e.g. C(sh) and C(cat), for this plugin to work.
+    Inside the container, we need a shell, for example C(sh) and the C(cat) command to be available in the C(PATH) for this plugin to work.
 """
 
 EXAMPLES = r"""
