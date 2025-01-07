@@ -447,7 +447,7 @@ files:
   $modules/bearychat.py:
     maintainers: tonyseek
   $modules/bigpanda.py:
-    maintainers: hkariti
+    ignore: hkariti
   $modules/bitbucket_:
     maintainers: catcombo
   $modules/bootc_manage.py:
