@@ -40,8 +40,8 @@ options:
     type: str
   config:
     description:
-      - 'The config for the instance (for example V({"limits.memory": "4GB"})).
-      - See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/profiles/profile_get).'
+      - 'The config for the instance (for example V({"limits.memory": "4GB"})).'
+      - See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/profiles/profile_get).
       - If the profile already exists and its C(config) value in metadata obtained from GET /1.0/profiles/<name>
         U(https://documentation.ubuntu.com/lxd/en/latest/api/#/profiles/profile_get)
         are different, then this module tries to apply the configurations U(https://documentation.ubuntu.com/lxd/en/latest/api/#/profiles/profile_put).
@@ -50,8 +50,8 @@ options:
     type: dict
   devices:
     description:
-      - 'The devices for the profile (for example V({"rootfs": {"path": "/dev/kvm", "type": "unix-char"})).
-      - See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/profiles/profile_get).'
+      - 'The devices for the profile (for example V({"rootfs": {"path": "/dev/kvm", "type": "unix-char"})).'
+      - See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/profiles/profile_get).
     required: false
     type: dict
   new_name:
@@ -106,14 +106,14 @@ options:
   trust_password:
     description:
       - The client trusted password.
-      - You need to set this password on the LXD server before running this module using the following command. lxc config set core.trust_password
-        <some random password> See U(https://www.stgraber.org/2016/04/18/lxd-api-direct-interaction/).
-      - If trust_password is set, this module send a request for authentication before sending any requests.
+      - 'You need to set this password on the LXD server before running this module using the following command: C(lxc config
+        set core.trust_password <some random password>). See U(https://www.stgraber.org/2016/04/18/lxd-api-direct-interaction/).'
+      - If O(trust_password) is set, this module send a request for authentication before sending any requests.
     required: false
     type: str
 notes:
-  - Profiles must have a unique name. If you attempt to create a profile with a name that already existed in the users namespace the module will
-    simply return as "unchanged".
+  - Profiles must have a unique name. If you attempt to create a profile with a name that already existed in the users namespace
+    the module will simply return as "unchanged".
 """
 
 EXAMPLES = r"""
@@ -154,8 +154,8 @@ EXAMPLES = r"""
       community.general.lxd_profile:
         url: https://127.0.0.1:8443
         # These client_cert and client_key values are equal to the default values.
-        #client_cert: "{{ lookup('env', 'HOME') }}/.config/lxc/client.crt"
-        #client_key: "{{ lookup('env', 'HOME') }}/.config/lxc/client.key"
+        # client_cert: "{{ lookup('env', 'HOME') }}/.config/lxc/client.crt"
+        # client_key: "{{ lookup('env', 'HOME') }}/.config/lxc/client.key"
         trust_password: mypassword
         name: macvlan
         state: present

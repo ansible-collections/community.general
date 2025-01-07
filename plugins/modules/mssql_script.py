@@ -56,7 +56,8 @@ options:
     type: str
   transaction:
     description:
-      - If transactional mode is requested, start a transaction and commit the change only if the script succeed. Otherwise, rollback the transaction.
+      - If transactional mode is requested, start a transaction and commit the change only if the script succeed. Otherwise,
+        rollback the transaction.
       - If transactional mode is not requested (default), automatically commit the change.
     type: bool
     default: false
@@ -201,8 +202,8 @@ query_results_dict:
     queries:
       description:
         - List of result sets of each query.
-        - If a query returns no results, the results of this and all the following queries will not be included in the output. Use 'GO' keyword
-          to separate queries.
+        - If a query returns no results, the results of this and all the following queries will not be included in the output.
+          Use V(GO) keyword to separate queries.
       type: list
       elements: list
       contains:

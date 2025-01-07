@@ -17,8 +17,8 @@ requirements:
 author:
   - Luke Murphy (@decentral1se)
 notes:
-  - No Linode resizing is currently implemented. This module will, in time, replace the current Linode module which uses deprecated API bindings
-    on the Linode side.
+  - No Linode resizing is currently implemented. This module will, in time, replace the current Linode module which uses deprecated
+    API bindings on the Linode side.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -48,8 +48,8 @@ options:
     required: true
   group:
     description:
-      - The group that the instance should be marked under. Please note, that group labelling is deprecated but still supported. The encouraged
-        method for marking instances is to use tags.
+      - The group that the instance should be marked under. Please note, that group labelling is deprecated but still supported.
+        The encouraged method for marking instances is to use tags.
     type: str
   private_ip:
     description:
@@ -65,8 +65,8 @@ options:
     elements: str
   root_pass:
     description:
-      - The password for the root user. If not specified, one will be generated. This generated password will be available in the task success
-        JSON.
+      - The password for the root user. If not specified, one will be generated. This generated password will be available
+        in the task success JSON.
     type: str
   authorized_keys:
     description:
@@ -95,8 +95,8 @@ options:
     version_added: 1.3.0
   stackscript_data:
     description:
-      - An object containing arguments to any User Defined Fields present in the StackScript used when creating the instance. Only valid when
-        a O(stackscript_id) is provided.
+      - An object containing arguments to any User Defined Fields present in the StackScript used when creating the instance.
+        Only valid when a O(stackscript_id) is provided.
       - See U(https://www.linode.com/docs/api/stackscripts/).
     type: dict
     version_added: 1.3.0
