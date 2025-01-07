@@ -53,7 +53,7 @@ EXAMPLES = r"""
 
   # 2) Match keys that start with any of the items in the target.
 - t: [k0, k1]
-  : "{{ l | community.general.remove_keys(target=t, matching_parameter='starts_with') }}"
+  r: "{{ l | community.general.remove_keys(target=t, matching_parameter='starts_with') }}"
 
   # 3) Match keys that end with any of the items in target.
 - t: [x0, x1]
