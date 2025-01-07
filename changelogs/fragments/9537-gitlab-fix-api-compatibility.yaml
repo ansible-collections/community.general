@@ -1,0 +1,2 @@
+minor_changes:
+  - gitlab - improve compatibility for different API URLs (https://github.com/python-gitlab/python-gitlab/pull/2149).
