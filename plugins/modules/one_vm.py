@@ -80,7 +80,7 @@ options:
     description:
       - Wait for the instance to reach its desired state before returning. Keep in mind if you are waiting for instance to
         be in running state it does not mean that you will be able to SSH on that machine only that boot process have started
-        on that instance. See the example using the M(ansible.builtin.wait_for_instance) for details.
+        on that instance. See the example using the M(ansible.builtin.wait_for) for details.
     default: true
     type: bool
   wait_timeout:
