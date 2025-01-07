@@ -6,49 +6,49 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = r"""
-name: online
-author:
-  - Remy Leone (@remyleone)
-short_description: Scaleway (previously Online SAS or Online.net) inventory source
-description:
-  - Get inventory hosts from Scaleway (previously Online SAS or Online.net).
-options:
-  plugin:
-    description: Token that ensures this is a source file for the 'online' plugin.
-    type: string
-    required: true
-    choices: ['online', 'community.general.online']
-  oauth_token:
-    required: true
-    description: Online OAuth token.
-    type: string
-    env:
+DOCUMENTATION = r'''
+    name: online
+    author:
+      - Remy Leone (@remyleone)
+    short_description: Scaleway (previously Online SAS or Online.net) inventory source
+    description:
+        - Get inventory hosts from Scaleway (previously Online SAS or Online.net).
+    options:
+        plugin:
+            description: token that ensures this is a source file for the 'online' plugin.
+            type: string
+            required: true
+            choices: ['online', 'community.general.online']
+        oauth_token:
+            required: true
+            description: Online OAuth token.
+            type: string
+            env:
                 # in order of precedence
-      - name: ONLINE_TOKEN
-      - name: ONLINE_API_KEY
-      - name: ONLINE_OAUTH_TOKEN
-  hostnames:
-    description: List of preference about what to use as an hostname.
-    type: list
-    elements: string
-    default:
-      - public_ipv4
-    choices:
-      - public_ipv4
-      - private_ipv4
-      - hostname
-  groups:
-    description: List of groups.
-    type: list
-    elements: string
-    choices:
-      - location
-      - offer
-      - rpn
-"""
+                - name: ONLINE_TOKEN
+                - name: ONLINE_API_KEY
+                - name: ONLINE_OAUTH_TOKEN
+        hostnames:
+            description: List of preference about what to use as an hostname.
+            type: list
+            elements: string
+            default:
+                - public_ipv4
+            choices:
+                - public_ipv4
+                - private_ipv4
+                - hostname
+        groups:
+            description: List of groups.
+            type: list
+            elements: string
+            choices:
+                - location
+                - offer
+                - rpn
+'''
 
-EXAMPLES = r"""
+EXAMPLES = r'''
 # online_inventory.yml file in YAML format
 # Example command line: ansible-inventory --list -i online_inventory.yml
 
@@ -59,7 +59,7 @@ groups:
   - location
   - offer
   - rpn
-"""
+'''
 
 import json
 from sys import version as python_version
