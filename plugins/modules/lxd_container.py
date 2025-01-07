@@ -45,8 +45,8 @@ options:
     required: false
   config:
     description:
-      - 'The config for the instance (for example V({"limits.cpu": "2"})).
-      - See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/instances/instance_get).'
+      - 'The config for the instance (for example V({"limits.cpu": "2"})).'
+      - See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/instances/instance_get).
       - If the instance already exists and its "config" values in metadata obtained from the LXD API
         U(https://documentation.ubuntu.com/lxd/en/latest/api/#/instances/instance_get)
         are different, then this module tries to apply the configurations U(https://documentation.ubuntu.com/lxd/en/latest/api/#/instances/instance_put).
@@ -69,8 +69,8 @@ options:
     elements: str
   devices:
     description:
-      - 'The devices for the instance (for example V({ "rootfs": { "path": "/dev/kvm", "type": "unix-char" }})).
-      - See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/instances/instance_get).'
+      - 'The devices for the instance (for example V({ "rootfs": { "path": "/dev/kvm", "type": "unix-char" }})).'
+      - See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/instances/instance_get).
     type: dict
     required: false
   ephemeral:
@@ -101,16 +101,17 @@ options:
     type: str
   target:
     description:
-      - For cluster deployments. Will attempt to create an instance on a target node. If the instance exists elsewhere in a cluster, then it will
-        not be replaced or moved. The name should respond to same name of the node you see in C(lxc cluster list).
+      - For cluster deployments. Will attempt to create an instance on a target node. If the instance exists elsewhere in
+        a cluster, then it will not be replaced or moved. The name should respond to same name of the node you see in C(lxc
+        cluster list).
     type: str
     required: false
     version_added: 1.0.0
   timeout:
     description:
       - A timeout for changing the state of the instance.
-      - This is also used as a timeout for waiting until IPv4 addresses are set to the all network interfaces in the instance after starting or
-        restarting.
+      - This is also used as a timeout for waiting until IPv4 addresses are set to the all network interfaces in the instance
+        after starting or restarting.
     required: false
     default: 30
     type: int
@@ -126,8 +127,8 @@ options:
     version_added: 4.1.0
   wait_for_ipv4_addresses:
     description:
-      - If this is V(true), the C(lxd_container) waits until IPv4 addresses are set to the all network interfaces in the instance after starting
-        or restarting.
+      - If this is V(true), the C(lxd_container) waits until IPv4 addresses are set to the all network interfaces in the instance
+        after starting or restarting.
     required: false
     default: false
     type: bool
@@ -172,20 +173,21 @@ options:
   trust_password:
     description:
       - The client trusted password.
-      - 'You need to set this password on the LXD server before running this module using the following command: C(lxc config set core.trust_password
-        <some random password>). See U(https://www.stgraber.org/2016/04/18/lxd-api-direct-interaction/).'
+      - 'You need to set this password on the LXD server before running this module using the following command: C(lxc config
+        set core.trust_password <some random password>). See U(https://www.stgraber.org/2016/04/18/lxd-api-direct-interaction/).'
       - If trust_password is set, this module send a request for authentication before sending any requests.
     required: false
     type: str
 notes:
-  - Instances can be a container or a virtual machine, both of them must have unique name. If you attempt to create an instance with a name that
-    already existed in the users namespace the module will simply return as "unchanged".
-  - There are two ways to run commands inside a container or virtual machine, using the command module or using the ansible lxd connection plugin
-    bundled in Ansible >= 2.1, the later requires python to be installed in the instance which can be done with the command module.
-  - You can copy a file from the host to the instance with the Ansible M(ansible.builtin.copy) and M(ansible.builtin.template) module and the
-    P(community.general.lxd#connection) connection plugin. See the example below.
-  - You can copy a file in the created instance to the localhost with C(command=lxc file pull instance_name/dir/filename filename). See the first
-    example below.
+  - Instances can be a container or a virtual machine, both of them must have unique name. If you attempt to create an instance
+    with a name that already existed in the users namespace the module will simply return as "unchanged".
+  - There are two ways to run commands inside a container or virtual machine, using the command module or using the ansible
+    lxd connection plugin bundled in Ansible >= 2.1, the later requires python to be installed in the instance which can be
+    done with the command module.
+  - You can copy a file from the host to the instance with the Ansible M(ansible.builtin.copy) and M(ansible.builtin.template)
+    module and the P(community.general.lxd#connection) connection plugin. See the example below.
+  - You can copy a file in the created instance to the localhost with C(command=lxc file pull instance_name/dir/filename filename).
+    See the first example below.
   - Linuxcontainers.org has phased out LXC/LXD support with March 2024
     (U(https://discuss.linuxcontainers.org/t/important-notice-for-lxd-users-image-server/18479)).
     Currently only Ubuntu is still providing images.
@@ -316,8 +318,8 @@ EXAMPLES = r"""
       community.general.lxd_container:
         url: https://127.0.0.1:8443
         # These client_cert and client_key values are equal to the default values.
-        #client_cert: "{{ lookup('env', 'HOME') }}/.config/lxc/client.crt"
-        #client_key: "{{ lookup('env', 'HOME') }}/.config/lxc/client.key"
+        # client_cert: "{{ lookup('env', 'HOME') }}/.config/lxc/client.crt"
+        # client_key: "{{ lookup('env', 'HOME') }}/.config/lxc/client.key"
         trust_password: mypassword
         name: mycontainer
         state: restarted

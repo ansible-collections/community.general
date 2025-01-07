@@ -32,13 +32,13 @@ options:
   url:
     type: str
     description:
-      - Mattermost url (for example V(http://mattermost.yourcompany.com)).
+      - Mattermost URL (for example V(http://mattermost.yourcompany.com)).
     required: true
   api_key:
     type: str
     description:
-      - Mattermost webhook API key. Log into your Mattermost site, go to Menu -> Integration -> Incoming Webhook -> Add Incoming Webhook. This
-        will give you full URL. O(api_key) is the last part. U(http://mattermost.example.com/hooks/API_KEY).
+      - Mattermost webhook API key. Log into your Mattermost site, go to Menu -> Integration -> Incoming Webhook -> Add Incoming
+        Webhook. This will give you full URL. O(api_key) is the last part. U(http://mattermost.example.com/hooks/API_KEY).
     required: true
   text:
     type: str
@@ -75,7 +75,8 @@ options:
     version_added: 10.0.0
   validate_certs:
     description:
-      - If V(false), SSL certificates will not be validated. This should only be used on personally controlled sites using self-signed certificates.
+      - If V(false), SSL certificates will not be validated. This should only be used on personally controlled sites using
+        self-signed certificates.
     default: true
     type: bool
 """

@@ -157,8 +157,8 @@ options:
     description:
       - Define the state of a container.
       - If you clone a container using O(clone_name) the newly cloned container created in a stopped state.
-      - The running container will be stopped while the clone operation is happening and upon completion of the clone the original container state
-        will be restored.
+      - The running container will be stopped while the clone operation is happening and upon completion of the clone the
+        original container state will be restored.
     type: str
     default: started
   container_config:
@@ -171,17 +171,18 @@ requirements:
   - 'python3 >= 3.5 # OS Package'
   - 'python3-lxc # OS Package'
 notes:
-  - Containers must have a unique name. If you attempt to create a container with a name that already exists in the users namespace the module
-    will simply return as "unchanged".
-  - The O(container_command) can be used with any state except V(absent). If used with state V(stopped) the container will be V(started), the
-    command executed, and then the container V(stopped) again. Likewise if O(state=stopped) and the container does not exist it will be first
-    created, V(started), the command executed, and then V(stopped). If you use a C(|) in the variable you can use common script formatting within
-    the variable itself. The O(container_command) option will always execute as C(bash). When using O(container_command), a log file is created in
-    the C(/tmp/) directory which contains both C(stdout) and C(stderr) of any command executed.
-  - If O(archive=true) the system will attempt to create a compressed tarball of the running container. The O(archive) option supports LVM backed
-    containers and will create a snapshot of the running container when creating the archive.
-  - If your distro does not have a package for C(python3-lxc), which is a requirement for this module, it can be installed from source at
-    U(https://github.com/lxc/python3-lxc) or installed using C(pip install lxc).
+  - Containers must have a unique name. If you attempt to create a container with a name that already exists in the users
+    namespace the module will simply return as "unchanged".
+  - The O(container_command) can be used with any state except V(absent). If used with state V(stopped) the container will
+    be V(started), the command executed, and then the container V(stopped) again. Likewise if O(state=stopped) and the container
+    does not exist it will be first created, V(started), the command executed, and then V(stopped). If you use a C(|) in the
+    variable you can use common script formatting within the variable itself. The O(container_command) option will always
+    execute as C(bash). When using O(container_command), a log file is created in the C(/tmp/) directory which contains both
+    C(stdout) and C(stderr) of any command executed.
+  - If O(archive=true) the system will attempt to create a compressed tarball of the running container. The O(archive) option
+    supports LVM backed containers and will create a snapshot of the running container when creating the archive.
+  - If your distro does not have a package for C(python3-lxc), which is a requirement for this module, it can be installed
+    from source at U(https://github.com/lxc/python3-lxc) or installed using C(pip install lxc).
 """
 
 EXAMPLES = r"""
