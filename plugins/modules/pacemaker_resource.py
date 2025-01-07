@@ -77,23 +77,23 @@ options:
       operation_option:
         description:
           - Operation option to associate with action
-        type: str
+        type: list
+        elements: str
   resource_meta:
     description:
       - List of meta to associate with resource
     type: list
     elements: str
-  resource_arguments:
+  resource_argument:
     description:
       - Actions to associate with resource
     type: dict
-    default: {}
     suboptions:
       argument_action:
         description:
           - Action to apply to resource
         type: str
-        choices: [ clone, master, group ]
+        choices: [ clone, master, group, promotable ]
       argument_option:
         description:
           - Option to associate with resource action
@@ -121,9 +121,17 @@ EXAMPLES = '''
       state: create
       name: virtual-ip
       resource_type:
-        name: IPaddr2
-      resource_option: "ip=[192.168.1.2]"
-      group: master
+        resource_name: IPaddr2
+      resource_option:
+        - "ip=[192.168.1.2]"
+      resource_argument:
+        argument_action: group
+        argument_option:
+          - master
+      resource_operation:
+        - operation_action: monitor
+          operation_option:
+            - interval=20
 '''
 
 RETURN = '''
@@ -132,10 +140,9 @@ changed:
     type: bool
     returned: always
 out:
-    description: The output of the current state of the cluster. It return a
-                 list of the nodes state.
+    description: The output of the resource state of the cluster.
     type: str
-    sample: 'out: [["  overcloud-controller-0", " Online"]]}'
+    sample: 'out: [["  Assumed agent name ocf:heartbeat:IPaddr2 (deduced from IPaddr2)"]]}'
     returned: always
 rc:
     description: exit code of the module
@@ -169,7 +176,7 @@ def delete_cluster_resource(module, name):
 
 def create_cluster_resource(module, resource_name,
                             resource_type, resource_option, resource_operation,
-                            resource_meta, resource_arguments, disabled,
+                            resource_meta, resource_argument, disabled,
                             wait):
     cmd = "pcs resource create %s " % resource_name
 
@@ -185,15 +192,18 @@ def create_cluster_resource(module, resource_name,
     if resource_operation is not None:
         for op in resource_operation:
             cmd += "op %s " % op.get('operation_action')
-            cmd += "%s " % op.get('operation_option') if op.get('operation_option') is not None else ""
+            for operation_option in op.get('operation_option'):
+                cmd += "%s " % operation_option
 
     if resource_meta is not None:
         for m in resource_meta:
             cmd += "meta %s " % m
 
-    if resource_arguments:
-        cmd += "%s " % resource_arguments.get('argument_action')
-        for option_argument in resource_arguments.get('argument_option'):
+    if resource_argument is not None:
+        if resource_argument.get('argument_action') == "group":
+            cmd += "--"
+        cmd += "%s " % resource_argument.get('argument_action')
+        for option_argument in resource_argument.get('argument_option'):
             cmd += "%s " % option_argument
 
     cmd += "--disabled " if disabled else ""
@@ -222,11 +232,11 @@ def main():
         resource_option=dict(type='list', elements='str', default=list(), aliases=['option']),
         resource_operation=dict(type='list', elements='dict', default=list(), aliases=['op'], options=dict(
             operation_action=dict(type='str', default=None),
-            operation_option=dict(type='str', default=None),
+            operation_option=dict(type='list', elements='str', default=None),
         )),
         resource_meta=dict(type='list', elements='str', default=None),
-        resource_arguments=dict(type='dict', default=dict(), options=dict(
-            argument_action=dict(type='str', default=None, choices=['clone', 'master', 'group']),
+        resource_argument=dict(type='dict', default=None, options=dict(
+            argument_action=dict(type='str', default=None, choices=['clone', 'master', 'group', 'promotable']),
             argument_option=dict(type='list', elements='str', default=None),
         )),
         disabled=dict(type='bool', default=False),
@@ -237,14 +247,13 @@ def main():
         argument_spec,
         supports_check_mode=True,
     )
-    changed = False
     state = module.params['state']
     resource_name = module.params['name']
     resource_type = module.params['resource_type']
     resource_option = module.params['resource_option']
     resource_operation = module.params['resource_operation']
     resource_meta = module.params['resource_meta']
-    resource_arguments = module.params['resource_arguments']
+    resource_argument = module.params['resource_argument']
     disabled = module.params['disabled']
     wait = module.params['wait']
 
@@ -255,7 +264,7 @@ def main():
             module, resource_name)
         if rc:
             create_cluster_resource(module, resource_name, resource_type, resource_option,
-                                    resource_operation, resource_meta, resource_arguments, disabled, wait)
+                                    resource_operation, resource_meta, resource_argument, disabled, wait)
         else:
             module.exit_json(changed=False, out=initial_cluster_resource_state)
         rc, final_cluster_resource_state = get_cluster_resource_status(
