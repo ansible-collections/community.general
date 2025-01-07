@@ -459,7 +459,6 @@ files:
     maintainers: tonyseek
   $modules/bigpanda.py:
     ignore: hkariti
-    maintainers: hkariti
   $modules/bitbucket_:
     maintainers: catcombo
   $modules/bootc_manage.py:
