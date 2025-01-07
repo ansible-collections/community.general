@@ -39,7 +39,7 @@ options:
     description:
       - Password of the user to login into OpenNebula RPC server. If not set then the value of the E(ONE_PASSWORD) environment
         variable is used. if both O(api_username) or O(api_password) are not set, then it will try authenticate with ONE auth
-        file. Default path is "~/.one/one_auth".
+        file. Default path is C(~/.one/one_auth).
       - Set environment variable E(ONE_AUTH) to override this path.
     type: str
   template_name:
@@ -80,7 +80,7 @@ options:
     description:
       - Wait for the instance to reach its desired state before returning. Keep in mind if you are waiting for instance to
         be in running state it does not mean that you will be able to SSH on that machine only that boot process have started
-        on that instance, see 'wait_for' example for details.
+        on that instance. See the example using the M(ansible.builtin.wait_for_instance) for details.
     default: true
     type: bool
   wait_timeout:

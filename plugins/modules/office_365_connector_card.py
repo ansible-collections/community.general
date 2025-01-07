@@ -75,7 +75,7 @@ EXAMPLES = r"""
     webhook: https://outlook.office.com/webhook/GUID/IncomingWebhook/GUID/GUID
     summary: This is the summary property
     title: This is the **card's title** property
-    text: This is the card's text** property. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+    text: This is the **card's text** property. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
       tempor incididunt ut labore et dolore magna aliqua.
     color: E81123
     sections:

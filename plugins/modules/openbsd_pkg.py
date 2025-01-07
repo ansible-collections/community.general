@@ -64,7 +64,7 @@ options:
   clean:
     description:
       - When updating or removing packages, delete the extra configuration file(s) in the old packages which are annotated
-        with @extra in the packaging-list.
+        with C(@extra) in the packaging-list.
     type: bool
     default: false
   quick:
