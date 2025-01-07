@@ -136,7 +136,7 @@ from ansible_collections.community.general.plugins.module_utils.proxmox import (
 class ProxmoxBackupInfoAnsible(ProxmoxAnsible):
 
     # Get all backup information
-    def get_Jobs_List(self):
+    def get_jobs_list(self):
         try:
             backupJobs = self.proxmox_api.cluster.backup.get()
         except Exception as e:
@@ -144,7 +144,7 @@ class ProxmoxBackupInfoAnsible(ProxmoxAnsible):
         return backupJobs
 
     # Get VM information
-    def get_Vms_List(self):
+    def get_vms_list(self):
         try:
             vms = self.proxmox_api.cluster.resources.get(type='vm')
         except Exception as e:
@@ -152,9 +152,9 @@ class ProxmoxBackupInfoAnsible(ProxmoxAnsible):
         return vms
 
     # Get all backup information by VM id and VM name
-    def vms_Backup_Info(self):
-        backupList = self.get_Jobs_List()
-        vmInfo = self.get_Vms_List()
+    def vms_backup_info(self):
+        backupList = self.get_jobs_list()
+        vmInfo = self.get_vms_list()
         bkInfo = []
         for backupItem in backupList:
             nextrun = datetime.fromtimestamp(backupItem['next-run'])
@@ -177,8 +177,8 @@ class ProxmoxBackupInfoAnsible(ProxmoxAnsible):
         return bkInfo
 
     # Get proxmox backup information for a specific VM based on its VM id or VM name
-    def specific_VmBackup_Info(self, vm_name_id):
-        fullBackupInfo = self.vms_Backup_Info()
+    def specific_vmbackup_info(self, vm_name_id):
+        fullBackupInfo = self.vms_backup_info()
         vmBackupJobs = []
         for vm in fullBackupInfo:
             if (vm["vm_name"] == vm_name_id or vm["vmid"] == vm_name_id):
@@ -219,13 +219,13 @@ def main():
 
     # Update result value based on what requested (module args)
     if backup_jobs:
-        result['backup_info'] = proxmox.get_Jobs_List()
+        result['backup_info'] = proxmox.get_jobs_list()
     elif vm_id:
-        result['backup_info'] = proxmox.specific_VmBackup_Info(vm_id)
+        result['backup_info'] = proxmox.specific_vmbackup_info(vm_id)
     elif vm_name:
-        result['backup_info'] = proxmox.specific_VmBackup_Info(vm_name)
+        result['backup_info'] = proxmox.specific_vmbackup_info(vm_name)
     else:
-        result['backup_info'] = proxmox.vms_Backup_Info()
+        result['backup_info'] = proxmox.vms_backup_info()
 
     # Return result value
     module.exit_json(**result)
