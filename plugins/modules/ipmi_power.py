@@ -51,12 +51,12 @@ options:
   state:
     description:
       - Whether to ensure that the machine in desired state.
-      - "The choices for state are:"
-      - V(on) -- Request system turn on
-      - V(off) -- Request system turn off without waiting for OS to shutdown
-      - V(shutdown) -- Have system request OS proper shutdown
-      - V(reset) -- Request system reset without waiting for OS
-      - "V(boot) -- If system is off, then V(on), else V(reset)"
+      - 'The choices for state are:'
+      - V(on) -- Request system turn on.
+      - V(off) -- Request system turn off without waiting for OS to shutdown.
+      - V(shutdown) -- Have system request OS proper shutdown.
+      - V(reset) -- Request system reset without waiting for OS.
+      - V(boot) -- If system is off, then V(on), else V(reset).
       - Either this option or O(machine) is required.
     choices: ['on', 'off', shutdown, reset, boot]
     type: str

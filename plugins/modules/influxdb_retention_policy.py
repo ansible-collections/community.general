@@ -59,8 +59,9 @@ options:
     default: false
   shard_group_duration:
     description:
-      - Determines the time range covered by a shard group. If specified it must be at least one hour. If not provided, it is determined
-        by InfluxDB by the rentention policy's duration. Supports complex duration expressions with multiple units.
+      - Determines the time range covered by a shard group. If specified it must be at least one hour. If not provided, it
+        is determined by InfluxDB by the rentention policy's duration. Supports complex duration expressions with multiple
+        units.
     type: str
     version_added: '2.0.0'
 extends_documentation_fragment:

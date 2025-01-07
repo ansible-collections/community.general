@@ -14,8 +14,8 @@ module: hpilo_boot
 author: Dag Wieers (@dagwieers)
 short_description: Boot system using specific media through HP iLO interface
 description:
-  - 'This module boots a system through its HP iLO interface. The boot media can be one of: V(cdrom), V(floppy), V(hdd),
-    V(network), or V(usb).'
+  - 'This module boots a system through its HP iLO interface. The boot media can be one of: V(cdrom), V(floppy), V(hdd), V(network),
+    or V(usb).'
   - This module requires the hpilo python module.
 extends_documentation_fragment:
   - community.general.attributes
@@ -55,12 +55,12 @@ options:
   state:
     description:
       - The state of the boot media.
-      - "V(no_boot): Do not boot from the device"
-      - "V(boot_once): Boot from the device once and then notthereafter"
-      - "V(boot_always): Boot from the device each time the server is rebooted"
-      - "V(connect): Connect the virtual media device and set to boot_always"
-      - "V(disconnect): Disconnects the virtual media device and set to no_boot"
-      - "V(poweroff): Power off the server"
+      - 'V(no_boot): Do not boot from the device.'
+      - 'V(boot_once): Boot from the device once and then notthereafter.'
+      - 'V(boot_always): Boot from the device each time the server is rebooted.'
+      - 'V(connect): Connect the virtual media device and set to boot_always.'
+      - 'V(disconnect): Disconnects the virtual media device and set to no_boot.'
+      - 'V(poweroff): Power off the server.'
     default: boot_once
     type: str
     choices: ["boot_always", "boot_once", "connect", "disconnect", "no_boot", "poweroff"]
