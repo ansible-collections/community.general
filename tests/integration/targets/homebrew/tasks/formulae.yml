@@ -366,14 +366,6 @@
 
 # Test with homebrew tap
 - block:
-  - name: Make sure terraform tap is not installed
-    homebrew:
-      name: hashicorp/tap/terraform
-      state: absent
-      update_homebrew: false
-    become: true
-    become_user: "{{ brew_stat.stat.pw_name }}"
-
   - name: Tap terraform homebrew repository
     community.general.homebrew_tap:
       name: hashicorp/tap
