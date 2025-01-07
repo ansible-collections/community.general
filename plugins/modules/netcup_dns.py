@@ -35,7 +35,7 @@ options:
     type: str
   customer_id:
     description:
-      - Netcup customer id.
+      - Netcup customer ID.
     required: true
     type: int
   domain:
@@ -184,7 +184,7 @@ records:
       type: int
       sample: 0
     id:
-      description: Internal id of the record.
+      description: Internal ID of the record.
       returned: success
       type: int
       sample: 12345

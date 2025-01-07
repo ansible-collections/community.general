@@ -38,8 +38,8 @@ options:
     elements: str
   pesize:
     description:
-      - The size of the physical extent. O(pesize) must be a power of 2 of at least 1 sector (where the sector size is the largest sector size
-        of the PVs currently used in the VG), or at least 128KiB.
+      - The size of the physical extent. O(pesize) must be a power of 2 of at least 1 sector (where the sector size is the
+        largest sector size of the PVs currently used in the VG), or at least 128KiB.
       - O(pesize) can be optionally suffixed by a UNIT (k/K/m/M/g/G), default unit is megabyte.
     type: str
     default: "4"
@@ -63,8 +63,9 @@ options:
     description:
       - Control if the volume group exists and its state.
       - The states V(active) and V(inactive) implies V(present) state. Added in 7.1.0.
-      - If V(active) or V(inactive), the module manages the VG's logical volumes current state. The module also handles the VG's autoactivation
-        state if supported unless when creating a volume group and the autoactivation option specified in O(vg_options).
+      - If V(active) or V(inactive), the module manages the VG's logical volumes current state. The module also handles the
+        VG's autoactivation state if supported unless when creating a volume group and the autoactivation option specified
+        in O(vg_options).
     type: str
     choices: [absent, present, active, inactive]
     default: present

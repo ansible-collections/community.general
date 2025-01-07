@@ -57,12 +57,13 @@ options:
     type: str
   target:
     description:
-      - Location, on the remote host, of the dump file to read from or write to. Uncompressed SQL files (C(.sql)) files are supported.
+      - Location, on the remote host, of the dump file to read from or write to. Uncompressed SQL files (C(.sql)) files are
+        supported.
     type: str
   autocommit:
     description:
-      - Automatically commit the change only if the import succeed. Sometimes it is necessary to use autocommit=true, since some content can not
-        be changed within a transaction.
+      - Automatically commit the change only if the import succeed. Sometimes it is necessary to use autocommit=true, since
+        some content can not be changed within a transaction.
     type: bool
     default: false
 notes:

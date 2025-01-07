@@ -15,25 +15,21 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: ldap_inc
 short_description: Use the Modify-Increment LDAP V3 feature to increment an attribute value
 version_added: 10.2.0
 description:
   - Atomically increments the value of an attribute and return its new value.
 notes:
-  - When implemented by the directory server, the module uses the ModifyIncrement extension
-    defined in L(RFC4525, https://www.rfc-editor.org/rfc/rfc4525.html) and the control PostRead. This extension and the control are
-    implemented in OpenLdap but not all directory servers implement them. In this case, the
-    module automatically uses a more classic method based on two phases, first the current
-    value is read then the modify operation remove the old value and add the new one in a
-    single request. If the value has changed by a concurrent call then the remove action will
-    fail. Then the sequence is retried 3 times before raising an error to the playbook. In an
-    heavy modification environment, the module does not guarante to be systematically successful.
-  - This only deals with integer attribute of an existing entry. To modify attributes
-    of an entry, see M(community.general.ldap_attrs) or to add or remove whole entries,
-    see M(community.general.ldap_entry).
+  - When implemented by the directory server, the module uses the ModifyIncrement extension defined in L(RFC4525, https://www.rfc-editor.org/rfc/rfc4525.html)
+    and the control PostRead. This extension and the control are implemented in OpenLdap but not all directory servers implement
+    them. In this case, the module automatically uses a more classic method based on two phases, first the current value is
+    read then the modify operation remove the old value and add the new one in a single request. If the value has changed
+    by a concurrent call then the remove action will fail. Then the sequence is retried 3 times before raising an error to
+    the playbook. In an heavy modification environment, the module does not guarante to be systematically successful.
+  - This only deals with integer attribute of an existing entry. To modify attributes of an entry, see M(community.general.ldap_attrs)
+    or to add or remove whole entries, see M(community.general.ldap_entry).
 author:
   - Philippe Duveau (@pduveau)
 requirements:
@@ -71,11 +67,10 @@ options:
 extends_documentation_fragment:
   - community.general.ldap.documentation
   - community.general.attributes
+"""
 
-'''
 
-
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Increments uidNumber 1 Number for example.com
   community.general.ldap_inc:
     dn: "cn=uidNext,ou=unix-management,dc=example,dc=com"
@@ -90,10 +85,10 @@ EXAMPLES = r'''
     attributes:
       - uidNumber: "{{ ldap_uidNumber_sequence.value }}"
   when: ldap_uidNumber_sequence.incremented
-'''
+"""
 
 
-RETURN = r'''
+RETURN = r"""
 incremented:
   description:
     - It is set to V(true) if the attribute value has changed.
@@ -121,7 +116,7 @@ rfc4525:
   returned: success
   type: bool
   sample: true
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native, to_bytes
