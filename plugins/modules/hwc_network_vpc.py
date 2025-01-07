@@ -86,22 +86,22 @@ EXAMPLES = r"""
 RETURN = r"""
 id:
   description:
-    - The id of vpc.
+    - The ID of VPC.
   type: str
   returned: success
 name:
   description:
-    - The name of vpc.
+    - The name of VPC.
   type: str
   returned: success
 cidr:
   description:
-    - The range of available subnets in the vpc.
+    - The range of available subnets in the VPC.
   type: str
   returned: success
 status:
   description:
-    - The status of vpc.
+    - The status of VPC.
   type: str
   returned: success
 routes:
@@ -122,7 +122,7 @@ routes:
       returned: success
 enable_shared_snat:
   description:
-    - Show whether the shared snat is enabled.
+    - Show whether the shared SNAT is enabled.
   type: bool
   returned: success
 """

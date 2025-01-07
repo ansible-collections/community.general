@@ -38,7 +38,7 @@ options:
     type: str
   lunid:
     description:
-      - Lun id to be added.
+      - LUN ID to be added.
     required: true
     type: int
   state:

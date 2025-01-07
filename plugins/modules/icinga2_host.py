@@ -51,9 +51,9 @@ options:
       - If the O(url_username) parameter is not specified, the O(url_password) parameter will not be used.
   force_basic_auth:
     description:
-      - Httplib2, the library used by the uri module only sends authentication information when a webservice responds to an
-        initial request with a 401 status. Since some basic auth services do not properly send a 401, logins will fail. This
-        option forces the sending of the Basic authentication header upon initial request.
+      - C(httplib2), the library used by Ansible's HTTP request code only sends authentication information when a webservice responds to
+        an initial request with a 401 status. Since some basic auth services do not properly send a 401, logins will fail.
+        This option forces the sending of the Basic authentication header upon initial request.
     type: bool
     default: false
   client_cert:

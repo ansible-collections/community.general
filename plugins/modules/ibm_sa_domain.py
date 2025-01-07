@@ -36,7 +36,7 @@ options:
     type: str
   ldap_id:
     description:
-      - LDAP id to add to the domain.
+      - LDAP ID to add to the domain.
     required: false
     type: str
   size:

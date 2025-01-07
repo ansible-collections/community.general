@@ -35,7 +35,7 @@ attributes:
 options:
   project:
     description:
-      - Id or Full path of project in the form of group/name.
+      - ID or Full path of project in the form of group/name.
     required: true
     type: str
   title:
