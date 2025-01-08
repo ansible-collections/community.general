@@ -19,3 +19,4 @@ skip/rhel9.1
 skip/rhel9.2
 skip/rhel9.3
 skip/rhel9.4
+skip/rhel9.5
