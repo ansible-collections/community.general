@@ -14,7 +14,8 @@ module: pmem
 short_description: Configure Intel Optane Persistent Memory modules
 version_added: 4.5.0
 description:
-  - This module allows Configuring Intel Optane Persistent Memory modules (PMem) using C(ipmctl) and C(ndctl) command line tools.
+  - This module allows Configuring Intel Optane Persistent Memory modules (PMem) using C(ipmctl) and C(ndctl) command line
+    tools.
 requirements:
   - C(ipmctl) and C(ndctl) command line tools
   - xmltodict
@@ -29,7 +30,8 @@ options:
   appdirect:
     description:
       - Percentage of the total capacity to use in AppDirect Mode (V(0)-V(100)).
-      - Create AppDirect capacity utilizing hardware interleaving across the requested PMem modules if applicable given the specified target.
+      - Create AppDirect capacity utilizing hardware interleaving across the requested PMem modules if applicable given the
+        specified target.
       - Total of O(appdirect), O(memorymode) and O(reserved) must be V(100).
     type: int
   appdirect_interleaved:
@@ -44,8 +46,8 @@ options:
     type: int
   reserved:
     description:
-      - Percentage of the capacity to reserve (V(0)-V(100)). O(reserved) will not be mapped into the system physical address space and will be
-        presented as reserved capacity with Show Device and Show Memory Resources Commands.
+      - Percentage of the capacity to reserve (V(0)-V(100)). O(reserved) will not be mapped into the system physical address
+        space and will be presented as reserved capacity with Show Device and Show Memory Resources Commands.
       - O(reserved) will be set automatically if this is not configured.
     type: int
     required: false
@@ -100,8 +102,8 @@ options:
         choices: ['pmem', 'blk']
       size:
         description:
-          - The size of namespace. This option supports the suffixes V(k) or V(K) or V(KB) for KiB, V(m) or V(M) or V(MB) for MiB, V(g) or V(G)
-            or V(GB) for GiB and V(t) or V(T) or V(TB) for TiB.
+          - The size of namespace. This option supports the suffixes V(k) or V(K) or V(KB) for KiB, V(m) or V(M) or V(MB)
+            for MiB, V(g) or V(G) or V(GB) for GiB and V(t) or V(T) or V(TB) for TiB.
           - This option is required if multiple namespaces are configured.
           - If this option is not set, all of the available space of a region is configured.
         type: str

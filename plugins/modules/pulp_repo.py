@@ -34,9 +34,9 @@ options:
     type: str
   force_basic_auth:
     description:
-      - C(httplib2), the library used by the M(ansible.builtin.uri) module only sends authentication information when a webservice responds to an
-        initial request with a 401 status. Since some basic auth services do not properly send a 401, logins will fail. This option forces the
-        sending of the Basic authentication header upon initial request.
+      - C(httplib2), the library used by the M(ansible.builtin.uri) module only sends authentication information when a webservice
+        responds to an initial request with a 401 status. Since some basic auth services do not properly send a 401, logins
+        will fail. This option forces the sending of the Basic authentication header upon initial request.
     type: bool
     default: false
   generate_sqlite:
@@ -47,20 +47,22 @@ options:
     default: false
   feed_ca_cert:
     description:
-      - CA certificate string used to validate the feed source SSL certificate. This can be the file content or the path to the file.
+      - CA certificate string used to validate the feed source SSL certificate. This can be the file content or the path to
+        the file.
     type: str
     aliases: [importer_ssl_ca_cert]
   feed_client_cert:
     description:
-      - Certificate used as the client certificate when synchronizing the repository. This is used to communicate authentication information to
-        the feed source. The value to this option must be the full path to the certificate. The specified file may be the certificate itself or
-        a single file containing both the certificate and private key. This can be the file content or the path to the file.
+      - Certificate used as the client certificate when synchronizing the repository. This is used to communicate authentication
+        information to the feed source. The value to this option must be the full path to the certificate. The specified file
+        may be the certificate itself or a single file containing both the certificate and private key. This can be the file
+        content or the path to the file.
     type: str
     aliases: [importer_ssl_client_cert]
   feed_client_key:
     description:
-      - Private key to the certificate specified in O(feed_client_cert), assuming it is not included in the certificate file itself. This can
-        be the file content or the path to the file.
+      - Private key to the certificate specified in O(feed_client_cert), assuming it is not included in the certificate file
+        itself. This can be the file content or the path to the file.
     type: str
     aliases: [importer_ssl_client_key]
   name:
@@ -71,7 +73,7 @@ options:
     aliases: [repo]
   proxy_host:
     description:
-      - Proxy url setting for the pulp repository importer. This is in the format scheme://host.
+      - Proxy URL setting for the pulp repository importer. This is in the format V(scheme://host).
     required: false
     default:
     type: str
@@ -129,21 +131,22 @@ options:
     default: true
   state:
     description:
-      - The repo state. A state of V(sync) will queue a sync of the repo. This is asynchronous but not delayed like a scheduled sync. A state
-        of V(publish) will use the repository's distributor to publish the content.
+      - The repo state. A state of V(sync) will queue a sync of the repo. This is asynchronous but not delayed like a scheduled
+        sync. A state of V(publish) will use the repository's distributor to publish the content.
     default: present
     choices: ["present", "absent", "sync", "publish"]
     type: str
   url_password:
     description:
-      - The password for use in HTTP basic authentication to the pulp API. If the O(url_username) parameter is not specified, the O(url_password)
-        parameter will not be used.
+      - The password for use in HTTP basic authentication to the pulp API. If the O(url_username) parameter is not specified,
+        the O(url_password) parameter will not be used.
   url_username:
     description:
       - The username for use in HTTP basic authentication to the pulp API.
   validate_certs:
     description:
-      - If V(false), SSL certificates will not be validated. This should only be used on personally controlled sites using self-signed certificates.
+      - If V(false), SSL certificates will not be validated. This should only be used on personally controlled sites using
+        self-signed certificates.
     type: bool
     default: true
   wait_for_completion:
@@ -152,7 +155,8 @@ options:
     type: bool
     default: false
 notes:
-  - This module can currently only create distributors and importers on rpm repositories. Contributions to support other repo types are welcome.
+  - This module can currently only create distributors and importers on rpm repositories. Contributions to support other repo
+    types are welcome.
 extends_documentation_fragment:
   - ansible.builtin.url
   - community.general.attributes

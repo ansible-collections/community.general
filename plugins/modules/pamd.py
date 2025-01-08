@@ -16,7 +16,8 @@ author:
 short_description: Manage PAM Modules
 description:
   - Edit PAM service's type, control, module path and module arguments.
-  - In order for a PAM rule to be modified, the type, control and module_path must match an existing rule. See man(5) pam.d for details.
+  - In order for a PAM rule to be modified, the type, control and module_path must match an existing rule. See man(5) pam.d
+    for details.
 notes:
   - This module does not handle authselect profiles.
 extends_documentation_fragment:
@@ -70,7 +71,8 @@ options:
       - When O(state=updated), the O(module_arguments) will replace existing module_arguments.
       - When O(state=args_absent) args matching those listed in O(module_arguments) will be removed.
       - When O(state=args_present) any args listed in O(module_arguments) are added if missing from the existing rule.
-      - Furthermore, if the module argument takes a value denoted by C(=), the value will be changed to that specified in module_arguments.
+      - Furthermore, if the module argument takes a value denoted by C(=), the value will be changed to that specified in
+        module_arguments.
     type: list
     elements: str
   state:
@@ -91,7 +93,8 @@ options:
     default: /etc/pam.d
   backup:
     description:
-      - Create a backup file including the timestamp information so you can get the original file back if you somehow clobbered it incorrectly.
+      - Create a backup file including the timestamp information so you can get the original file back if you somehow clobbered
+        it incorrectly.
     type: bool
     default: false
 """
@@ -151,11 +154,7 @@ EXAMPLES = r"""
     type: auth
     control: required
     module_path: pam_faillock.so
-    module_arguments: 'preauth
-        silent
-        deny=3
-        unlock_time=604800
-        fail_interval=900'
+    module_arguments: 'preauth silent deny=3 unlock_time=604800 fail_interval=900'
     state: updated
 
 - name: Remove specific arguments from a rule

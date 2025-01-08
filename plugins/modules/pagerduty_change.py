@@ -31,7 +31,8 @@ attributes:
 options:
   integration_key:
     description:
-      - The integration key that identifies the service the change was made to. This can be found by adding an integration to a service in PagerDuty.
+      - The integration key that identifies the service the change was made to. This can be found by adding an integration
+        to a service in PagerDuty.
     required: true
     type: str
   summary:
@@ -81,8 +82,8 @@ options:
     type: str
   validate_certs:
     description:
-      - If V(false), SSL certificates for the target URL will not be validated. This should only be used on personally controlled sites using
-        self-signed certificates.
+      - If V(false), SSL certificates for the target URL will not be validated. This should only be used on personally controlled
+        sites using self-signed certificates.
     required: false
     default: true
     type: bool
