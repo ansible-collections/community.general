@@ -125,17 +125,17 @@ from ansible.utils.display import Display
 display = Display()
 
 
-def _parse_ip4(ip4_addr):
-    ''' Return iocage_ip4 dictionary. default = {msg: '', ip4: []}.
+def _parse_ip4(ip4):
+    ''' Return dictionary iocage_ip4_dict. default = {ip4: [], msg: ''}.
         If item matches ifc|IP or ifc|CIDR parse ifc, ip, and mask.
         Otherwise, append item to msg.
     '''
 
     iocage_ip4_dict = {}
-    iocage_ip4_dict['msg'] = ''
     iocage_ip4_dict['ip4'] = []
+    iocage_ip4_dict['msg'] = ''
 
-    items = ip4_addr.split(',')
+    items = ip4.split(',')
     for item in items:
         if re.match('^\\w+\\|(?:\\d{1,3}\\.){3}\\d{1,3}.*$', item):
             i = re.split('\\||/', item)
