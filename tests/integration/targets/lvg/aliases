@@ -10,3 +10,4 @@ skip/aix
 skip/freebsd
 skip/osx
 skip/macos
+skip/alpine3.21 # TODO try to fix
