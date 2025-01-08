@@ -58,10 +58,12 @@ DOCUMENTATION = '''
 '''
 
 EXAMPLES = '''
+---
 # gitlab_runners.yml
 plugin: community.general.gitlab_runners
 host: https://gitlab.com
 
+---
 # Example using constructed features to create groups and set ansible_host
 plugin: community.general.gitlab_runners
 host: https://gitlab.com
