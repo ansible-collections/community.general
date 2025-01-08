@@ -59,7 +59,7 @@ EXAMPLES = '''
 ---
 # file must be named vbox.yaml or vbox.yml
 plugin: community.general.virtualbox
-settings_password_file: /etc/virtulbox/secrets
+settings_password_file: /etc/virtualbox/secrets
 query:
   logged_in_users: /VirtualBox/GuestInfo/OS/LoggedInUsersList
 compose:
