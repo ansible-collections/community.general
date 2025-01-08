@@ -11,9 +11,9 @@ module: xen_orchestra_instance
 short_description: Management of instances on Xen Orchestra
 description:
   - Allows you to create/delete/restart/stop instances on Xen Orchestra.
-version_added: 9.2.0
+version_added: 10.3.0
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
   check_mode:
     support: none
@@ -66,9 +66,9 @@ options:
     type: bool
     default: false
 requirements:
-- websocket-client >= 1.0.0
+  - websocket-client >= 1.0.0
 author:
-- Samori Gorse (@shinuza) <samorigorse@gmail.com>
+  - Samori Gorse (@shinuza) <samorigorse@gmail.com>
 '''
 
 
