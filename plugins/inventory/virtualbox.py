@@ -56,15 +56,16 @@ DOCUMENTATION = '''
 '''
 
 EXAMPLES = '''
+---
 # file must be named vbox.yaml or vbox.yml
-simple_config_file:
-    plugin: community.general.virtualbox
-    settings_password_file: /etc/virtulbox/secrets
-    query:
-      logged_in_users: /VirtualBox/GuestInfo/OS/LoggedInUsersList
-    compose:
-      ansible_connection: ('indows' in vbox_Guest_OS)|ternary('winrm', 'ssh')
+plugin: community.general.virtualbox
+settings_password_file: /etc/virtualbox/secrets
+query:
+  logged_in_users: /VirtualBox/GuestInfo/OS/LoggedInUsersList
+compose:
+  ansible_connection: ('indows' in vbox_Guest_OS)|ternary('winrm', 'ssh')
 
+---
 # add hosts (all match with minishift vm) to the group container if any of the vms are in ansible_inventory'
 plugin: community.general.virtualbox
 groups:
