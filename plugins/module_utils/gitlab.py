@@ -121,10 +121,10 @@ def gitlab_authentication(module, min_version=None):
 
         if gitlab.__version__ >= LooseVersion('3.8.0'):
             gitlab_instance = gitlab.Gitlab(url=gitlab_url, ssl_verify=verify, private_token=gitlab_token,
-                                        oauth_token=gitlab_oauth_token, job_token=gitlab_job_token, api_version=4, keep_base_url=True)
+                                            oauth_token=gitlab_oauth_token, job_token=gitlab_job_token, api_version=4, keep_base_url=True)
         else:
             gitlab_instance = gitlab.Gitlab(url=gitlab_url, ssl_verify=verify, private_token=gitlab_token,
-                                        oauth_token=gitlab_oauth_token, job_token=gitlab_job_token, api_version=4)
+                                            oauth_token=gitlab_oauth_token, job_token=gitlab_job_token, api_version=4)
 
         gitlab_instance.auth()
     except (gitlab.exceptions.GitlabAuthenticationError, gitlab.exceptions.GitlabGetError) as e:
