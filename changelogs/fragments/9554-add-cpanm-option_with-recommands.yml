@@ -1,2 +1,2 @@
 minor_changes:
-  - cpanm - enable usage of option --with-recommands (https://github.com/ansible-collections/community.general/issues/9554).
+  - cpanm - enable usage of option ``--with-recommands`` (https://github.com/ansible-collections/community.general/issues/9554, https://github.com/ansible-collections/community.general/pull/9555).

@@ -59,9 +59,10 @@ options:
   withrecommands:
     description:
       - Installs dependencies declared as recommends per META spec.
-      - When these dependencies fail to install, cpanm continues the installation, since they're just recommendation/suggestion.
+      - When these dependencies fail to install, cpanm continues the installation, since they are just recommendation.
     type: bool
     default: false
+    version_added: 10.3.0
   version:
     description:
       - Version specification for the perl module. When O(mode) is V(new), C(cpanm) version operators are accepted.
