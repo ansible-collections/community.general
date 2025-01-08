@@ -3,10 +3,10 @@ _meta:
     test_111:
       iocage_basejail: 'yes'
       iocage_boot: 'off'
-      iocage_ip4: ''
       iocage_ip4_dict:
         ip4: []
         msg: 'DHCP (not running)'
+      iocage_ip4: '-'
       iocage_ip6: '-'
       iocage_jid: 'None'
       iocage_release: 14.1-RELEASE-p6
@@ -16,10 +16,10 @@ _meta:
     test_112:
       iocage_basejail: 'yes'
       iocage_boot: 'off'
-      iocage_ip4: ''
       iocage_ip4_dict:
         ip4: []
         msg: 'DHCP (not running)'
+      iocage_ip4: '-'
       iocage_ip6: '-'
       iocage_jid: 'None'
       iocage_release: 14.1-RELEASE-p6
@@ -29,10 +29,10 @@ _meta:
     test_113:
       iocage_basejail: 'yes'
       iocage_boot: 'off'
-      iocage_ip4: ''
       iocage_ip4_dict:
         ip4: []
         msg: 'DHCP (not running)'
+      iocage_ip4: '-'
       iocage_ip6: '-'
       iocage_jid: 'None'
       iocage_release: 14.1-RELEASE-p6
