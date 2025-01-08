@@ -131,22 +131,22 @@ def _parse_ip4(ip4_addr):
         Otherwise, append item to msg.
     '''
 
-    iocage_ip4 = {}
-    iocage_ip4['msg'] = ''
-    iocage_ip4['ip4'] = []
+    iocage_ip4_dict = {}
+    iocage_ip4_dict['msg'] = ''
+    iocage_ip4_dict['ip4'] = []
 
     items = ip4_addr.split(',')
     for item in items:
         if re.match('^\\w+\\|(?:\\d{1,3}\\.){3}\\d{1,3}.*$', item):
             i = re.split('\\||/', item)
             if len(i) == 3:
-                iocage_ip4['ip4'].append({'ifc': i[0], 'ip': i[1], 'mask': i[2]})
+                iocage_ip4_dict['ip4'].append({'ifc': i[0], 'ip': i[1], 'mask': i[2]})
             else:
-                iocage_ip4['ip4'].append({'ifc': i[0], 'ip': i[1], 'mask': '-'})
+                iocage_ip4_dict['ip4'].append({'ifc': i[0], 'ip': i[1], 'mask': '-'})
         else:
-            iocage_ip4['msg'] += item
+            iocage_ip4_dict['msg'] += item
 
-    return iocage_ip4
+    return iocage_ip4_dict
 
 
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
