@@ -56,6 +56,12 @@ options:
       - Only install dependencies.
     type: bool
     default: false
+  withrecommands:
+    description:
+      - Installs dependencies declared as recommends per META spec.
+      - When these dependencies fail to install, cpanm continues the installation, since they're just recommendation/suggestion.
+    type: bool
+    default: false
   version:
     description:
       - Version specification for the perl module. When O(mode) is V(new), C(cpanm) version operators are accepted.
@@ -167,6 +173,7 @@ class CPANMinus(ModuleHelper):
             mirror=dict(type='str'),
             mirror_only=dict(type='bool', default=False),
             installdeps=dict(type='bool', default=False),
+            withrecommands=dict(type='bool', default=False),
             executable=dict(type='path'),
             mode=dict(type='str', default='new', choices=['compatibility', 'new']),
             name_check=dict(type='str')
@@ -181,6 +188,7 @@ class CPANMinus(ModuleHelper):
         mirror=cmd_runner_fmt.as_opt_val('--mirror'),
         mirror_only=cmd_runner_fmt.as_bool("--mirror-only"),
         installdeps=cmd_runner_fmt.as_bool("--installdeps"),
+        withrecommands=cmd_runner_fmt.as_bool("--with-recommands"),
         pkg_spec=cmd_runner_fmt.as_list(),
         cpanm_version=cmd_runner_fmt.as_fixed("--version"),
     )
