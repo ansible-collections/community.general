@@ -34,7 +34,8 @@ options:
   token:
     type: str
     description:
-      - Rocket Chat Incoming Webhook integration token. This provides authentication to Rocket Chat's Incoming webhook for posting messages.
+      - Rocket Chat Incoming Webhook integration token. This provides authentication to Rocket Chat's Incoming webhook for
+        posting messages.
     required: true
   protocol:
     type: str
@@ -51,8 +52,8 @@ options:
   channel:
     type: str
     description:
-      - Channel to send the message to. If absent, the message goes to the channel selected for the O(token) specified during the creation of
-        webhook.
+      - Channel to send the message to. If absent, the message goes to the channel selected for the O(token) specified during
+        the creation of webhook.
   username:
     type: str
     description:
@@ -79,13 +80,15 @@ options:
       - 0
   validate_certs:
     description:
-      - If V(false), SSL certificates will not be validated. This should only be used on personally controlled sites using self-signed certificates.
+      - If V(false), SSL certificates will not be validated. This should only be used on personally controlled sites using
+        self-signed certificates.
     type: bool
     default: true
   color:
     type: str
     description:
-      - Allow text to use default colors - use the default of V(normal) to not send a custom color bar at the start of the message.
+      - Allow text to use default colors - use the default of V(normal) to not send a custom color bar at the start of the
+        message.
     default: 'normal'
     choices:
       - 'normal'
@@ -118,7 +121,8 @@ EXAMPLES = r"""
     link_names: 0
   delegate_to: localhost
 
-- name: Insert a color bar in front of the message for visibility purposes and use the default webhook icon and name configured in rocketchat
+- name: Insert a color bar in front of the message for visibility purposes and use the default webhook icon and name configured
+    in rocketchat
   community.general.rocketchat:
     token: thetoken/generatedby/rocketchat
     domain: chat.example.com

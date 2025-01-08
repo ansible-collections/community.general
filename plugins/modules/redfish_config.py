@@ -136,7 +136,7 @@ options:
   storage_subsystem_id:
     required: false
     description:
-      - Id of the Storage Subsystem on which the volume is to be created.
+      - ID of the Storage Subsystem on which the volume is to be created.
     type: str
     default: ''
     version_added: '7.3.0'
@@ -166,8 +166,8 @@ options:
     required: false
     description:
       - Setting dict of volume to be created.
-      - If C(CapacityBytes) key is not specified in this dictionary, the size of the volume will be determined by the Redfish service. It is possible
-        the size will not be the maximum available size.
+      - If C(CapacityBytes) key is not specified in this dictionary, the size of the volume will be determined by the Redfish
+        service. It is possible the size will not be the maximum available size.
     type: dict
     default: {}
     version_added: '7.5.0'
@@ -176,7 +176,8 @@ options:
     description:
       - SSL/TLS Ciphers to use for the request.
       - When a list is provided, all ciphers are joined in order with V(:).
-      - See the L(OpenSSL Cipher List Format,https://www.openssl.org/docs/manmaster/man1/openssl-ciphers.html#CIPHER-LIST-FORMAT) for more details.
+      - See the L(OpenSSL Cipher List Format,https://www.openssl.org/docs/manmaster/man1/openssl-ciphers.html#CIPHER-LIST-FORMAT)
+        for more details.
       - The available ciphers is dependent on the Python and OpenSSL/LibreSSL versions.
     type: list
     elements: str

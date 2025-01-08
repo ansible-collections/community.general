@@ -32,7 +32,8 @@ attributes:
 options:
   name:
     description:
-      - Name or list of names of the package(s) or file(s) to install, upgrade, or remove. Cannot be used in combination with O(upgrade).
+      - Name or list of names of the package(s) or file(s) to install, upgrade, or remove. Cannot be used in combination with
+        O(upgrade).
     aliases: [package, pkg]
     type: list
     elements: str
@@ -50,7 +51,8 @@ options:
   force:
     description:
       - When removing packages, forcefully remove them, without any checks. Same as O(extra_args="--nodeps --nodeps").
-      - When combined with O(update_cache), force a refresh of all package databases. Same as O(update_cache_extra_args="--refresh --refresh").
+      - When combined with O(update_cache), force a refresh of all package databases. Same as O(update_cache_extra_args="--refresh
+        --refresh").
     default: false
     type: bool
 
@@ -64,8 +66,8 @@ options:
   executable:
     description:
       - Path of the binary to use. This can either be C(pacman) or a pacman compatible AUR helper.
-      - Pacman compatibility is unfortunately ill defined, in particular, this modules makes extensive use of the C(--print-format) directive
-        which is known not to be implemented by some AUR helpers (notably, C(yay)).
+      - Pacman compatibility is unfortunately ill defined, in particular, this modules makes extensive use of the C(--print-format)
+        directive which is known not to be implemented by some AUR helpers (notably, C(yay)).
       - Beware that AUR helpers might behave unexpectedly and are therefore not recommended.
     default: pacman
     type: str
@@ -82,8 +84,8 @@ options:
       - Whether or not to refresh the master package lists.
       - This can be run as part of a package installation or as a separate step.
       - If not specified, it defaults to V(false).
-      - Please note that this option only had an influence on the module's C(changed) state if O(name) and O(upgrade) are not specified before
-        community.general 5.0.0. See the examples for how to keep the old behavior.
+      - Please note that this option only had an influence on the module's C(changed) state if O(name) and O(upgrade) are
+        not specified before community.general 5.0.0. See the examples for how to keep the old behavior.
     type: bool
 
   update_cache_extra_args:
@@ -114,27 +116,29 @@ options:
   reason_for:
     description:
       - Set the install reason for V(all) packages or only for V(new) packages.
-      - In case of O(state=latest) already installed packages which will be updated to a newer version are not counted as V(new).
+      - In case of O(state=latest) already installed packages which will be updated to a newer version are not counted as
+        V(new).
     default: new
     choices: [all, new]
     type: str
     version_added: 5.4.0
 
 notes:
-  - When used with a C(loop:) each package will be processed individually, it is much more efficient to pass the list directly to the O(name)
-    option.
-  - To use an AUR helper (O(executable) option), a few extra setup steps might be required beforehand. For example, a dedicated build user with
-    permissions to install packages could be necessary.
-  - 'In the tests, while using C(yay) as the O(executable) option, the module failed to install AUR packages with the error: C(error: target not
-    found: <pkg>).'
+  - When used with a C(loop:) each package will be processed individually, it is much more efficient to pass the list directly
+    to the O(name) option.
+  - To use an AUR helper (O(executable) option), a few extra setup steps might be required beforehand. For example, a dedicated
+    build user with permissions to install packages could be necessary.
+  - 'In the tests, while using C(yay) as the O(executable) option, the module failed to install AUR packages with the error:
+    C(error: target not found: <pkg>).'
 """
 
 RETURN = r"""
 packages:
   description:
     - A list of packages that have been changed.
-    - Before community.general 4.5.0 this was only returned when O(upgrade=true). In community.general 4.5.0, it was sometimes omitted when the
-      package list is empty, but since community.general 4.6.0 it is always returned when O(name) is specified or O(upgrade=true).
+    - Before community.general 4.5.0 this was only returned when O(upgrade=true). In community.general 4.5.0, it was sometimes
+      omitted when the package list is empty, but since community.general 4.6.0 it is always returned when O(name) is specified
+      or O(upgrade=true).
   returned: success and O(name) is specified or O(upgrade=true)
   type: list
   elements: str

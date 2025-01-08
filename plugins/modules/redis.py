@@ -72,14 +72,15 @@ options:
     type: str
   value:
     description:
-      - A redis config value. When memory size is needed, it is possible to specify it in the usual form of 1KB, 2M, 400MB where the base is 1024.
-        Units are case insensitive, in other words 1m = 1mb = 1M = 1MB.
+      - A redis config value. When memory size is needed, it is possible to specify it in the usual form of 1KB, 2M, 400MB
+        where the base is 1024. Units are case insensitive, in other words 1m = 1mb = 1M = 1MB.
     type: str
 
 notes:
-  - Requires the C(redis-py) Python package on the remote host. You can install it with pip
-    (C(pip install redis)) or with a package manager. U(https://github.com/andymccurdy/redis-py).
-  - If the redis master instance you are making replica of is password protected this needs to be in the C(redis.conf) in the C(masterauth) variable.
+  - Requires the C(redis-py) Python package on the remote host. You can install it with pip (C(pip install redis)) or with
+    a package manager. U(https://github.com/andymccurdy/redis-py).
+  - If the redis master instance you are making replica of is password protected this needs to be in the C(redis.conf) in
+    the C(masterauth) variable.
 seealso:
   - module: community.general.redis_info
 requirements: [redis]

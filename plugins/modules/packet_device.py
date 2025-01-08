@@ -111,8 +111,10 @@ options:
   state:
     description:
       - Desired state of the device.
-      - If set to V(present) (the default), the module call will return immediately after the device-creating HTTP request successfully returns.
-      - If set to V(active), the module call will block until all the specified devices are in state active due to the Packet API, or until O(wait_timeout).
+      - If set to V(present) (the default), the module call will return immediately after the device-creating HTTP request
+        successfully returns.
+      - If set to V(active), the module call will block until all the specified devices are in state active due to the Packet
+        API, or until O(wait_timeout).
     choices: [present, absent, active, inactive, rebooted]
     default: present
     type: str
@@ -133,7 +135,8 @@ options:
   wait_timeout:
     description:
       - How long (seconds) to wait either for automatic IP address assignment, or for the device to reach the V(active) state.
-      - If O(wait_for_public_IPv) is set and O(state=active), the module will wait for both events consequently, applying the timeout twice.
+      - If O(wait_for_public_IPv) is set and O(state=active), the module will wait for both events consequently, applying
+        the timeout twice.
     default: 900
     type: int
 
@@ -262,7 +265,7 @@ changed:
   returned: success
 
 devices:
-  description: Information about each device that was processed
+  description: Information about each device that was processed.
   type: list
   sample:
     - {

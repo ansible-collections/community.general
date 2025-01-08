@@ -14,32 +14,27 @@ DOCUMENTATION = r"""
 module: redhat_subscription
 short_description: Manage registration and subscriptions to RHSM using C(subscription-manager)
 description:
-  - Manage registration and subscription to the Red Hat Subscription Management entitlement platform using the C(subscription-manager) command,
-    registering using D-Bus if possible.
+  - Manage registration and subscription to the Red Hat Subscription Management entitlement platform using the C(subscription-manager)
+    command, registering using D-Bus if possible.
 author: "Barnaby Court (@barnabycourt)"
 notes:
-    - >-
-      The module tries to use the D-Bus C(rhsm) service (part of C(subscription-manager))
-      to register, starting from community.general 6.5.0: this is done so credentials
-      (username, password, activation keys) can be passed to C(rhsm) in a secure way.
-      C(subscription-manager) itself gets credentials only as arguments of command line
-      parameters, which is I(not) secure, as they can be easily stolen by checking the
-      process listing on the system. Due to limitations of the D-Bus interface of C(rhsm),
-      the module will I(not) use D-Bus for registration when trying either to register
-      using O(token), or when specifying O(environment), or when the system is old
-      (typically RHEL 7 older than 7.4, RHEL 6, and older).
-    - In order to register a system, subscription-manager requires either a username and password, or an activationkey and an Organization ID.
-    - Since 2.5 values for O(server_hostname), O(server_insecure), O(rhsm_baseurl),
-      O(server_proxy_hostname), O(server_proxy_port), O(server_proxy_user) and
-      O(server_proxy_password) are no longer taken from the C(/etc/rhsm/rhsm.conf)
-      config file and default to V(null).
-    - It is possible to interact with C(subscription-manager) only as root,
-      so root permissions are required to successfully run this module.
-    - Since community.general 6.5.0, credentials (that is, O(username) and O(password),
-      O(activationkey), or O(token)) are needed only in case the the system is not registered,
-      or O(force_register) is specified; this makes it possible to use the module to tweak an
-      already registered system, for example attaching pools to it (using O(pool_ids)),
-      and modifying the C(syspurpose) attributes (using O(syspurpose)).
+  - 'The module tries to use the D-Bus C(rhsm) service (part of C(subscription-manager)) to register, starting from community.general
+    6.5.0: this is done so credentials (username, password, activation keys) can be passed to C(rhsm) in a secure way. C(subscription-manager)
+    itself gets credentials only as arguments of command line parameters, which is I(not) secure, as they can be easily stolen
+    by checking the process listing on the system. Due to limitations of the D-Bus interface of C(rhsm), the module will I(not)
+    use D-Bus for registration when trying either to register using O(token), or when specifying O(environment), or when the
+    system is old (typically RHEL 7 older than 7.4, RHEL 6, and older).'
+  - In order to register a system, subscription-manager requires either a username and password, or an activationkey and an
+    Organization ID.
+  - Since 2.5 values for O(server_hostname), O(server_insecure), O(rhsm_baseurl), O(server_proxy_hostname), O(server_proxy_port),
+    O(server_proxy_user) and O(server_proxy_password) are no longer taken from the C(/etc/rhsm/rhsm.conf) config file and
+    default to V(null).
+  - It is possible to interact with C(subscription-manager) only as root, so root permissions are required to successfully
+    run this module.
+  - Since community.general 6.5.0, credentials (that is, O(username) and O(password), O(activationkey), or O(token)) are needed
+    only in case the the system is not registered, or O(force_register) is specified; this makes it possible to use the module
+    to tweak an already registered system, for example attaching pools to it (using O(pool_ids)), and modifying the C(syspurpose)
+    attributes (using O(syspurpose)).
 requirements:
   - subscription-manager
   - Optionally the C(dbus) Python library; this is usually included in the OS as it is used by C(subscription-manager).
@@ -120,7 +115,7 @@ options:
   auto_attach:
     description:
       - Upon successful registration, auto-consume available subscriptions.
-      - "Please note that the alias O(ignore:autosubscribe) was removed in community.general 9.0.0."
+      - Please note that the alias O(ignore:autosubscribe) was removed in community.general 9.0.0.
     type: bool
   activationkey:
     description:
@@ -136,10 +131,11 @@ options:
     type: str
   pool_ids:
     description:
-      - "Specify subscription pool IDs to consume.
-      - A pool ID may be specified as a C(string) - just the pool ID (for example V(0123456789abcdef0123456789abcdef)),
-        or as a C(dict) with the pool ID as the key, and a quantity as the value (for example V(0123456789abcdef0123456789abcdef: 2). If the
-        quantity is provided, it is used to consume multiple entitlements from a pool (the pool must support this)."
+      - Specify subscription pool IDs to consume.
+      - 'A pool ID may be specified as a C(string) - just the pool ID (for example
+        V(0123456789abcdef0123456789abcdef)), or as a C(dict) with the pool ID as the key, and a quantity as the value (for
+        example V(0123456789abcdef0123456789abcdef: 2). If the quantity is provided, it is used to consume multiple entitlements
+        from a pool (the pool must support this).'
     default: []
     type: list
     elements: raw
@@ -153,9 +149,9 @@ options:
     type: str
   consumer_id:
     description:
-      - "References an existing consumer ID to resume using a previous registration for this system. If the system's identity certificate is
-        lost or corrupted, this option allows it to resume using its previous identity and subscriptions. The default is to not specify a consumer
-        ID so a new ID is created."
+      - References an existing consumer ID to resume using a previous registration for this system. If the system's identity
+        certificate is lost or corrupted, this option allows it to resume using its previous identity and subscriptions. The
+        default is to not specify a consumer ID so a new ID is created.
     type: str
   force_register:
     description:
@@ -168,10 +164,11 @@ options:
     type: str
   syspurpose:
     description:
-      - Set syspurpose attributes in file C(/etc/rhsm/syspurpose/syspurpose.json) and synchronize these attributes with RHSM server. Syspurpose
-        attributes help attach the most appropriate subscriptions to the system automatically. When C(syspurpose.json) file already contains some
-        attributes, then new attributes overwrite existing attributes. When some attribute is not listed in the new list of attributes, the existing
-        attribute will be removed from C(syspurpose.json) file. Unknown attributes are ignored.
+      - Set syspurpose attributes in file C(/etc/rhsm/syspurpose/syspurpose.json) and synchronize these attributes with RHSM
+        server. Syspurpose attributes help attach the most appropriate subscriptions to the system automatically. When C(syspurpose.json)
+        file already contains some attributes, then new attributes overwrite existing attributes. When some attribute is not
+        listed in the new list of attributes, the existing attribute will be removed from C(syspurpose.json) file. Unknown
+        attributes are ignored.
     type: dict
     suboptions:
       usage:
@@ -189,8 +186,8 @@ options:
         elements: str
       sync:
         description:
-          - When this option is V(true), then syspurpose attributes are synchronized with RHSM server immediately. When this option is V(false),
-            then syspurpose attributes will be synchronized with RHSM server by rhsmcertd daemon.
+          - When this option is V(true), then syspurpose attributes are synchronized with RHSM server immediately. When this
+            option is V(false), then syspurpose attributes will be synchronized with RHSM server by rhsmcertd daemon.
         type: bool
         default: false
 """

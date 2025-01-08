@@ -63,7 +63,8 @@ options:
     aliases: [account_id]
     description:
       - ID of account to delete/modify.
-      - Can also be used in account creation to work around vendor issues where the ID of the new user is required in the POST request.
+      - Can also be used in account creation to work around vendor issues where the ID of the new user is required in the
+        POST request.
     type: str
   new_username:
     required: false
@@ -227,9 +228,9 @@ options:
     description:
       - Custom OEM properties for HTTP Multipart Push updates.
       - If set, then O(update_custom_oem_header) is required too.
-      - The properties will be passed raw without any validation or conversion by Ansible. This means the content can be a file, a string, or
-        any other data. If the content is a dict that should be converted to JSON, then the content must be converted to JSON before passing it
-        to this module using the P(ansible.builtin.to_json#filter) filter.
+      - The properties will be passed raw without any validation or conversion by Ansible. This means the content can be a
+        file, a string, or any other data. If the content is a dict that should be converted to JSON, then the content must
+        be converted to JSON before passing it to this module using the P(ansible.builtin.to_json#filter) filter.
     type: raw
     version_added: '10.1.0'
   update_custom_oem_mime_type:
@@ -327,7 +328,8 @@ options:
     description:
       - SSL/TLS Ciphers to use for the request.
       - When a list is provided, all ciphers are joined in order with V(:).
-      - See the L(OpenSSL Cipher List Format,https://www.openssl.org/docs/manmaster/man1/openssl-ciphers.html#CIPHER-LIST-FORMAT) for more details.
+      - See the L(OpenSSL Cipher List Format,https://www.openssl.org/docs/manmaster/man1/openssl-ciphers.html#CIPHER-LIST-FORMAT)
+        for more details.
       - The available ciphers is dependent on the Python and OpenSSL/LibreSSL versions.
     type: list
     elements: str

@@ -50,15 +50,16 @@ options:
     default: false
   annotation:
     description:
-      - A list of keyvalue-pairs of the form C(<+/-/:><key>[=<value>]). A V(+) denotes adding an annotation, a V(-) denotes removing an annotation,
-        and V(:) denotes modifying an annotation. If setting or modifying annotations, a value must be provided.
+      - A list of keyvalue-pairs of the form C(<+/-/:><key>[=<value>]). A V(+) denotes adding an annotation, a V(-) denotes
+        removing an annotation, and V(:) denotes modifying an annotation. If setting or modifying annotations, a value must
+        be provided.
     required: false
     type: list
     elements: str
   pkgsite:
     description:
-      - For C(pkgng) versions before 1.1.4, specify C(packagesite) to use for downloading packages.
-        If not specified, use settings from C(/usr/local/etc/pkg.conf).
+      - For C(pkgng) versions before 1.1.4, specify C(packagesite) to use for downloading packages. If not specified, use
+        settings from C(/usr/local/etc/pkg.conf).
       - For newer C(pkgng) versions, specify a the name of a repository configured in C(/usr/local/etc/pkg/repos).
     required: false
     type: str
@@ -76,7 +77,7 @@ options:
     type: path
   jail:
     description:
-      - Pkg will execute in the given jail name or id.
+      - Pkg will execute in the given jail name or ID.
       - Can not be used together with O(chroot) or O(rootdir) options.
     type: str
   autoremove:
@@ -103,8 +104,8 @@ options:
 author: "bleader (@bleader)"
 notes:
   - When using pkgsite, be careful that already in cache packages will not be downloaded again.
-  - When used with a C(loop:) each package will be processed individually, it is much more efficient to pass the list directly to the O(name)
-    option.
+  - When used with a C(loop:) each package will be processed individually, it is much more efficient to pass the list directly
+    to the O(name) option.
 """
 
 EXAMPLES = r"""

@@ -51,8 +51,8 @@ options:
     description:
       - The NIC emulator model.
     type: str
-    choices: ['e1000', 'e1000-82540em', 'e1000-82544gc', 'e1000-82545em', 'i82551', 'i82557b', 'i82559er', 'ne2k_isa', 'ne2k_pci', 'pcnet', 'rtl8139',
-      'virtio', 'vmxnet3']
+    choices: ['e1000', 'e1000-82540em', 'e1000-82544gc', 'e1000-82545em', 'i82551', 'i82557b', 'i82559er', 'ne2k_isa', 'ne2k_pci',
+      'pcnet', 'rtl8139', 'virtio', 'vmxnet3']
     default: virtio
   mtu:
     description:
