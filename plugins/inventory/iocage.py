@@ -70,14 +70,17 @@ DOCUMENTATION = '''
 '''
 
 EXAMPLES = '''
+---
 # file name must end with iocage.yaml or iocage.yml
 plugin: community.general.iocage
 host: 10.1.0.73
 user: admin
 
+---
 # user is not required if iocage is running on localhost (default)
 plugin: community.general.iocage
 
+---
 # run cryptography without legacy algorithms
 plugin: community.general.iocage
 host: 10.1.0.73
@@ -85,6 +88,7 @@ user: admin
 env:
   CRYPTOGRAPHY_OPENSSL_NO_LEGACY: 1
 
+---
 # enable cache
 plugin: community.general.iocage
 host: 10.1.0.73
@@ -93,6 +97,7 @@ env:
   CRYPTOGRAPHY_OPENSSL_NO_LEGACY: 1
 cache: true
 
+---
 # see inventory plugin ansible.builtin.constructed
 plugin: community.general.iocage
 host: 10.1.0.73
