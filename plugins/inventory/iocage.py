@@ -258,13 +258,16 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         for line in lines[3::2]:
             jail = [line[i + 1:j].strip() for i, j in zip(indices[:-1], indices[1:])]
             iocage_name = jail[1]
+            iocage_ip4_dict = _parse_ip4(jail[6])
+            iocage_ip4 = ','.join([d['ip'] for d in iocage_ip4_dict['ip4']])
             results['_meta']['hostvars'][iocage_name] = {}
             results['_meta']['hostvars'][iocage_name]['iocage_jid'] = jail[0]
             results['_meta']['hostvars'][iocage_name]['iocage_boot'] = jail[2]
             results['_meta']['hostvars'][iocage_name]['iocage_state'] = jail[3]
             results['_meta']['hostvars'][iocage_name]['iocage_type'] = jail[4]
             results['_meta']['hostvars'][iocage_name]['iocage_release'] = jail[5]
-            results['_meta']['hostvars'][iocage_name]['iocage_ip4'] = _parse_ip4(jail[6])
+            results['_meta']['hostvars'][iocage_name]['iocage_ip4_dict'] = iocage_ip4_dict
+            results['_meta']['hostvars'][iocage_name]['iocage_ip4'] = iocage_ip4
             results['_meta']['hostvars'][iocage_name]['iocage_ip6'] = jail[7]
             results['_meta']['hostvars'][iocage_name]['iocage_template'] = jail[8]
             results['_meta']['hostvars'][iocage_name]['iocage_basejail'] = jail[9]
