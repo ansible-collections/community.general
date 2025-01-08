@@ -108,15 +108,18 @@ DOCUMENTATION = r'''
 '''
 
 EXAMPLES = '''
+---
 # simple lxd.yml
 plugin: community.general.lxd
 url: unix:/var/snap/lxd/common/lxd/unix.socket
 
+---
 # simple lxd.yml including filter
 plugin: community.general.lxd
 url: unix:/var/snap/lxd/common/lxd/unix.socket
 state: RUNNING
 
+---
 # simple lxd.yml including virtual machines and containers
 plugin: community.general.lxd
 url: unix:/var/snap/lxd/common/lxd/unix.socket
