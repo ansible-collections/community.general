@@ -103,7 +103,8 @@ options:
   waitforlock:
     description:
       - The maximum amount of time C(puppet) should wait for an already running C(puppet) agent to finish before starting.
-      - If a number without unit is provided, it is assumed to be a number of seconds. Allowed units are V(m) for minutes and V(h) for hours.
+      - If a number without unit is provided, it is assumed to be a number of seconds. Allowed units are V(m) for minutes
+        and V(h) for hours.
     type: str
     version_added: 9.0.0
   verbose:
@@ -125,10 +126,10 @@ options:
     description:
       - The lang environment to use when running the puppet agent.
       - The default value, V(C), is supported on every system, but can lead to encoding errors if UTF-8 is used in the output.
-      - Use V(C.UTF-8) or V(en_US.UTF-8) or similar UTF-8 supporting locales in case of problems. You need to make sure the selected locale is
-        supported on the system the puppet agent runs on.
-      - Starting with community.general 9.1.0, you can use the value V(auto) and the module will try and determine the best parseable locale to
-        use.
+      - Use V(C.UTF-8) or V(en_US.UTF-8) or similar UTF-8 supporting locales in case of problems. You need to make sure the
+        selected locale is supported on the system the puppet agent runs on.
+      - Starting with community.general 9.1.0, you can use the value V(auto) and the module will try and determine the best
+        parseable locale to use.
     type: str
     default: C
     version_added: 8.6.0

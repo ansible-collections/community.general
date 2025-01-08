@@ -45,11 +45,13 @@ options:
       - Path to the pear executable.
   prompts:
     description:
-      - List of regular expressions that can be used to detect prompts during pear package installation to answer the expected question.
+      - List of regular expressions that can be used to detect prompts during pear package installation to answer the expected
+        question.
       - Prompts will be processed in the same order as the packages list.
       - You can optionally specify an answer to any question in the list.
       - If no answer is provided, the list item will only contain the regular expression.
-      - "To specify an answer, the item will be a dict with the regular expression as key and the answer as value C(my_regular_expression: 'an_answer')."
+      - "To specify an answer, the item will be a dict with the regular expression as key and the answer as value C(my_regular_expression:
+        'an_answer')."
       - You can provide a list containing items with or without answer.
       - A prompt list can be shorter or longer than the packages list but will issue a warning.
       - If you want to specify that a package will not need prompts in the middle of a list, V(null).
@@ -83,9 +85,9 @@ EXAMPLES = r"""
     prompts:
       - (.*)Enable internal debugging in APCu \[no\]: "yes"
 
-- name: Install multiple pear/pecl packages at once with prompts. Prompts will be processed on the same order as the packages order. If there
-    is more prompts than packages, packages without prompts will be installed without any prompt expected. If there is more packages than prompts,
-    additional prompts will be ignored.
+- name: Install multiple pear/pecl packages at once with prompts. Prompts will be processed on the same order as the packages
+    order. If there is more prompts than packages, packages without prompts will be installed without any prompt expected.
+    If there is more packages than prompts, additional prompts will be ignored.
   community.general.pear:
     name: pecl/gnupg, pecl/apcu
     state: present
@@ -93,9 +95,9 @@ EXAMPLES = r"""
       - I am a test prompt because gnupg doesnt asks anything
       - (.*)Enable internal debugging in APCu \[no\]: "yes"
 
-- name: Install multiple pear/pecl packages at once skipping the first prompt. Prompts will be processed on the same order as the packages order.
-    If there is more prompts than packages, packages without prompts will be installed without any prompt expected. If there is more packages
-    than prompts, additional prompts will be ignored.
+- name: Install multiple pear/pecl packages at once skipping the first prompt. Prompts will be processed on the same order
+    as the packages order. If there is more prompts than packages, packages without prompts will be installed without any
+    prompt expected. If there is more packages than prompts, additional prompts will be ignored.
   community.general.pear:
     name: pecl/gnupg, pecl/apcu
     state: present

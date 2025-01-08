@@ -20,8 +20,8 @@ extends_documentation_fragment:
 options:
   clients:
     description:
-      - A list of the pip executables that will be used to get the packages. They can be supplied with the full path or just the executable name,
-        for example V(pip3.7).
+      - A list of the pip executables that will be used to get the packages. They can be supplied with the full path or just
+        the executable name, for example V(pip3.7).
     default: ['pip']
     required: false
     type: list

@@ -73,21 +73,24 @@ options:
     required: true
   backup:
     description:
-      - Create a backup file including the timestamp information so you can get the original file back if you somehow clobbered it incorrectly.
+      - Create a backup file including the timestamp information so you can get the original file back if you somehow clobbered
+        it incorrectly.
     required: false
     type: bool
     default: false
   use_min:
     description:
       - If set to V(true), the minimal value will be used or conserved.
-      - If the specified value is inferior to the value in the file, file content is replaced with the new value, else content is not modified.
+      - If the specified value is inferior to the value in the file, file content is replaced with the new value, else content
+        is not modified.
     required: false
     type: bool
     default: false
   use_max:
     description:
       - If set to V(true), the maximal value will be used or conserved.
-      - If the specified value is superior to the value in the file, file content is replaced with the new value, else content is not modified.
+      - If the specified value is superior to the value in the file, file content is replaced with the new value, else content
+        is not modified.
     required: false
     type: bool
     default: false
