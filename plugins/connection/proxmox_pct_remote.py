@@ -382,6 +382,14 @@ EXAMPLES = r"""
 # ----------------------
 ---
 - hosts: lxc
+  # On nodes with many containers you might want to deactivate the devices facts
+  # or set `gather_facts: false` if you don't need them.
+  # More info on gathering fact subsets:
+  # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/setup_module.html
+  #
+  # gather_facts: true
+  #   gather_subset:
+  #     - "!devices"
   tasks:
     - name: Ping LXC container
       ansible.builtin.ping:
