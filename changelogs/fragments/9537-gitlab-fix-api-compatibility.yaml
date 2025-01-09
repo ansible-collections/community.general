@@ -1,2 +1,2 @@
 minor_changes:
-  - gitlab - improve compatibility for different API URLs (https://github.com/python-gitlab/python-gitlab/pull/2149).
+  - gitlab_* modules - improve compatibility for different API URLs when using gitlab-python 3.8.0 or newer (https://github.com/python-gitlab/python-gitlab/pull/2149).
