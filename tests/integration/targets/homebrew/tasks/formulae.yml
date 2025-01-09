@@ -386,4 +386,4 @@
         - terraform_install_result is changed
         - "terraform_install_result.msg == 'Package upgraded: hashicorp/tap/terraform'"
         - "terraform_install_result.changed_pkgs == ['hashicorp/tap/terraform']"
-        - "terraform_install_result.unchanged_pkgs == ['']"
+        - "terraform_install_result.unchanged_pkgs == []"
