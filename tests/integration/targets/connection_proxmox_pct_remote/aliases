@@ -9,7 +9,3 @@ needs/root
 needs/target/connection
 skip/docker
 skip/alpine
-skip/aix
-skip/osx
-skip/macos
-skip/freebsd
