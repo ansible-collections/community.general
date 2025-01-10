@@ -56,12 +56,17 @@ options:
       - Only install dependencies.
     type: bool
     default: false
-  withrecommands:
+  install_recommendations:
     description:
       - Installs dependencies declared as recommends per META spec.
       - When these dependencies fail to install, cpanm continues the installation, since they are just recommendation.
     type: bool
-    default: false
+    version_added: 10.3.0
+  install_suggestions:
+    description:
+      - Installs dependencies declared as suggested per META spec.
+      - When these dependencies fail to install, cpanm continues the installation, since they are just suggestion.
+    type: bool
     version_added: 10.3.0
   version:
     description:
@@ -174,7 +179,8 @@ class CPANMinus(ModuleHelper):
             mirror=dict(type='str'),
             mirror_only=dict(type='bool', default=False),
             installdeps=dict(type='bool', default=False),
-            withrecommands=dict(type='bool', default=False),
+            install_recommendations=dict(type='bool'),
+            install_suggestions=dict(type='bool'),
             executable=dict(type='path'),
             mode=dict(type='str', default='new', choices=['compatibility', 'new']),
             name_check=dict(type='str')
@@ -189,7 +195,8 @@ class CPANMinus(ModuleHelper):
         mirror=cmd_runner_fmt.as_opt_val('--mirror'),
         mirror_only=cmd_runner_fmt.as_bool("--mirror-only"),
         installdeps=cmd_runner_fmt.as_bool("--installdeps"),
-        withrecommands=cmd_runner_fmt.as_bool("--with-recommands"),
+        install_recommendations=cmd_runner_fmt.as_bool("--with-recommends", "--without-recommends", ignore_none=True),
+        install_suggestions=cmd_runner_fmt.as_bool("--with-suggests", "--without-suggests", ignore_none=True),
         pkg_spec=cmd_runner_fmt.as_list(),
         cpanm_version=cmd_runner_fmt.as_fixed("--version"),
     )
