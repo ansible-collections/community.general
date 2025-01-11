@@ -343,7 +343,8 @@ EXAMPLES = r"""
 
 - name: Wait for SSH to come up
   ansible.builtin.wait_for:
-  delegate_to: '{{ vm.instances[0].networks[0].ip }}'
+    port: 22
+    host: '{{ vm.instances[0].networks[0].ip }}'
 
 - name: Terminate VMs by ids
   community.general.one_vm:
