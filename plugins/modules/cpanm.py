@@ -274,7 +274,16 @@ class CPANMinus(ModuleHelper):
                 return
             pkg_spec = self.sanitize_pkg_spec_version(v[pkg_param], v.version)
 
-        with self.runner(['notest', 'locallib', 'mirror', 'mirror_only', 'installdeps', 'pkg_spec'], output_process=process) as ctx:
+        with self.runner([
+            'notest',
+            'locallib',
+            'mirror',
+            'mirror_only',
+            'installdeps',
+            'install_recommendations',
+            'install_suggestions',
+            'pkg_spec'
+        ], output_process=process) as ctx:
             self.changed = ctx.run(pkg_spec=pkg_spec)
 
 
