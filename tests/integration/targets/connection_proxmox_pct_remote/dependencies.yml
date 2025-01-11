@@ -5,15 +5,13 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - hosts: localhost
-  gather_facts: false
+  gather_facts: true
   serial: 1
   tasks:
     - name: Copy pct mock
       copy:
         src: files/pct
         dest: /usr/sbin/pct
-        owner: root
-        group: root
         mode: '0755'
     - name: Install paramiko
       pip:

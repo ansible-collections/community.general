@@ -9,3 +9,4 @@ needs/root
 needs/target/connection
 skip/docker
 skip/alpine
+skip/macos
