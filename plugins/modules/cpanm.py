@@ -58,13 +58,17 @@ options:
     default: false
   install_recommendations:
     description:
-      - Installs dependencies declared as recommends per META spec.
+      - If V(true), installs dependencies declared as recommends per META spec.
+      - If V(false), it ensures the dependencies declared as recommends are not installed, overriding any decision made earlier in E(PERL_CPANM_OPT).
+      - If parameter is not set, C(cpanm) will use its existing defaults.
       - When these dependencies fail to install, cpanm continues the installation, since they are just recommendation.
     type: bool
     version_added: 10.3.0
   install_suggestions:
     description:
-      - Installs dependencies declared as suggested per META spec.
+      - If V(true), installs dependencies declared as suggests per META spec.
+      - If V(false), it ensures the dependencies declared as suggests are not installed, overriding any decision made earlier in E(PERL_CPANM_OPT).
+      - If parameter is not set, C(cpanm) will use its existing defaults.
       - When these dependencies fail to install, cpanm continues the installation, since they are just suggestion.
     type: bool
     version_added: 10.3.0
