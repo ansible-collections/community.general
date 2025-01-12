@@ -8,13 +8,14 @@ DOCUMENTATION:
   short_description: Create a JSON patch by comparing two JSON files
   description:
     - This filter compares the input with the argument and computes a list of operations
-      that can be consumed by the P(community.general#json_patch_recipe) to change the input
+      that can be consumed by the P(community.general.json_patch_recipe#filter) to change the input
       to the argument.
   requirements:
     - jsonpatch
   version_added: 10.3.0
   author:
     - Stanislav Meduna (@numo68)
+  positional: target
   options:
     _input:
       description: A list or a dictionary representing a source JSON object, or a string containing a JSON object.
