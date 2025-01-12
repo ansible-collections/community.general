@@ -46,24 +46,27 @@ options:
       field:
         type: str
         description:
-          - The name of the field to search for within this item (optional, defaults to V(password), or V(document) if the item has an attachment).
+          - The name of the field to search for within this item (optional, defaults to V(password), or V(document) if the
+            item has an attachment).
       section:
         type: str
         description:
-          - The name of a section within this item containing the specified field (optional, will search all sections if not specified).
+          - The name of a section within this item containing the specified field (optional, will search all sections if not
+            specified).
       vault:
         type: str
         description:
-          - The name of the particular 1Password vault to search, useful if your 1Password user has access to multiple vaults (optional).
+          - The name of the particular 1Password vault to search, useful if your 1Password user has access to multiple vaults
+            (optional).
     required: true
   auto_login:
     type: dict
     description:
-      - A dictionary containing authentication details. If this is set, M(community.general.onepassword_info) will attempt to sign in to 1Password
-        automatically.
+      - A dictionary containing authentication details. If this is set, M(community.general.onepassword_info) will attempt
+        to sign in to 1Password automatically.
       - Without this option, you must have already logged in using the 1Password CLI before running Ansible.
-      - It is B(highly) recommended to store 1Password credentials in an Ansible Vault. Ensure that the key used to encrypt the Ansible Vault
-        is equal to or greater in strength than the 1Password master password.
+      - It is B(highly) recommended to store 1Password credentials in an Ansible Vault. Ensure that the key used to encrypt
+        the Ansible Vault is equal to or greater in strength than the 1Password master password.
     suboptions:
       subdomain:
         type: str
@@ -141,7 +144,8 @@ RETURN = r"""
 # One or more dictionaries for each matching item from 1Password, along with the appropriate fields.
 # This shows the response you would expect to receive from the third example documented above.
 onepassword:
-  description: Dictionary of each 1password item matching the given search terms, shows what would be returned from the third example above.
+  description: Dictionary of each 1password item matching the given search terms, shows what would be returned from the third
+    example above.
   returned: success
   type: dict
   sample:

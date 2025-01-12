@@ -29,13 +29,13 @@ options:
     type: str
   api_username:
     description:
-      - Name of the user to login into the OpenNebula OneFlow API server. If not set then the value of the E(ONEFLOW_USERNAME) environment variable
-        is used.
+      - Name of the user to login into the OpenNebula OneFlow API server. If not set then the value of the E(ONEFLOW_USERNAME)
+        environment variable is used.
     type: str
   api_password:
     description:
-      - Password of the user to login into OpenNebula OneFlow API server. If not set then the value of the E(ONEFLOW_PASSWORD) environment variable
-        is used.
+      - Password of the user to login into OpenNebula OneFlow API server. If not set then the value of the E(ONEFLOW_PASSWORD)
+        environment variable is used.
     type: str
   template_name:
     description:
@@ -55,8 +55,8 @@ options:
     type: str
   unique:
     description:
-      - Setting O(unique=true) will make sure that there is only one service instance running with a name set with O(service_name) when instantiating
-        a service from a template specified with O(template_id) or O(template_name). Check examples below.
+      - Setting O(unique=true) will make sure that there is only one service instance running with a name set with O(service_name)
+        when instantiating a service from a template specified with O(template_id) or O(template_name). Check examples below.
     type: bool
     default: false
   state:
@@ -68,8 +68,8 @@ options:
     type: str
   mode:
     description:
-      - Set permission mode of a service instance in octet format, for example V(0600) to give owner C(use) and C(manage) and nothing to group
-        and others.
+      - Set permission mode of a service instance in octet format, for example V(0600) to give owner C(use) and C(manage)
+        and nothing to group and others.
     type: str
   owner_id:
     description:
@@ -184,7 +184,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 service_id:
-  description: Service id.
+  description: Service ID.
   type: int
   returned: success
   sample: 153
@@ -194,7 +194,7 @@ service_name:
   returned: success
   sample: app1
 group_id:
-  description: Service's group id.
+  description: Service's group ID.
   type: int
   returned: success
   sample: 1
@@ -204,7 +204,7 @@ group_name:
   returned: success
   sample: one-users
 owner_id:
-  description: Service's owner id.
+  description: Service's owner ID.
   type: int
   returned: success
   sample: 143
@@ -224,7 +224,7 @@ mode:
   returned: success
   sample: 660
 roles:
-  description: List of dictionaries of roles, each role is described by name, cardinality, state and nodes ids.
+  description: List of dictionaries of roles, each role is described by name, cardinality, state and nodes IDs.
   type: list
   returned: success
   sample:

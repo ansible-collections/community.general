@@ -63,7 +63,7 @@ EXAMPLES = r"""
                 - relativeValue: 1
                   type: Enclosure
             permittedInterconnectTypeName: HP VC Flex-10/10D Module
-          # Alternatively you can inform permittedInterconnectTypeUri
+            # Alternatively you can inform permittedInterconnectTypeUri
   delegate_to: localhost
 
 - name: Ensure that the Logical Interconnect Group has the specified scopes

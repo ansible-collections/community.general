@@ -42,7 +42,7 @@ options:
     required: false
   name:
     description:
-      - Load balancer name used with present state. Used as identifier (id or name) when used with absent state. maxLength=128.
+      - Load balancer name used with present state. Used as identifier (ID or name) when used with absent state. maxLength=128.
     type: str
   health_check_test:
     description:
@@ -55,7 +55,7 @@ options:
     type: str
   health_check_path:
     description:
-      - Url to call for checking. Required for HTTP health check. maxLength=1000.
+      - URL to call for checking. Required for HTTP health check. maxLength=1000.
     type: str
     required: false
   health_check_parse:
@@ -85,8 +85,8 @@ options:
     required: false
   rules:
     description:
-      - A list of rule objects that will be set for the load balancer. Each rule must contain protocol, port_balancer, and port_server parameters,
-        in addition to source parameter, which is optional.
+      - A list of rule objects that will be set for the load balancer. Each rule must contain protocol, port_balancer, and
+        port_server parameters, in addition to source parameter, which is optional.
     type: list
     elements: dict
     default: []
@@ -97,29 +97,29 @@ options:
     required: false
   add_server_ips:
     description:
-      - A list of server identifiers (id or name) to be assigned to a load balancer. Used in combination with update state.
+      - A list of server identifiers (id or name) to be assigned to a load balancer. Used in combination with O(state=update).
     type: list
     elements: str
     required: false
     default: []
   remove_server_ips:
     description:
-      - A list of server IP ids to be unassigned from a load balancer. Used in combination with update state.
+      - A list of server IP IDs to be unassigned from a load balancer. Used in combination with O(state=update).
     type: list
     elements: str
     required: false
     default: []
   add_rules:
     description:
-      - A list of rules that will be added to an existing load balancer. It is syntax is the same as the one used for rules parameter. Used in
-        combination with update state.
+      - A list of rules that will be added to an existing load balancer. It is syntax is the same as the one used for rules
+        parameter. Used in combination with O(state=update).
     type: list
     elements: dict
     required: false
     default: []
   remove_rules:
     description:
-      - A list of rule ids that will be removed from an existing load balancer. Used in combination with update state.
+      - A list of rule IDs that will be removed from an existing load balancer. Used in combination with O(state=update).
     type: list
     elements: str
     required: false

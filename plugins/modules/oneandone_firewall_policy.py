@@ -46,8 +46,8 @@ options:
     type: str
   rules:
     description:
-      - A list of rules that will be set for the firewall policy. Each rule must contain protocol parameter, in addition to three optional parameters
-        (port_from, port_to, and source).
+      - A list of rules that will be set for the firewall policy. Each rule must contain protocol parameter, in addition to
+        three optional parameters (port_from, port_to, and source).
     type: list
     elements: dict
     default: []
@@ -60,22 +60,22 @@ options:
     default: []
   remove_server_ips:
     description:
-      - A list of server IP ids to be unassigned from a firewall policy. Used in combination with update state.
+      - A list of server IP IDs to be unassigned from a firewall policy. Used in combination with update state.
     type: list
     elements: str
     required: false
     default: []
   add_rules:
     description:
-      - A list of rules that will be added to an existing firewall policy. It is syntax is the same as the one used for rules parameter. Used
-        in combination with update state.
+      - A list of rules that will be added to an existing firewall policy. It is syntax is the same as the one used for rules
+        parameter. Used in combination with update state.
     type: list
     elements: dict
     required: false
     default: []
   remove_rules:
     description:
-      - A list of rule ids that will be removed from an existing firewall policy. Used in combination with update state.
+      - A list of rule IDs that will be removed from an existing firewall policy. Used in combination with update state.
     type: list
     elements: str
     required: false
