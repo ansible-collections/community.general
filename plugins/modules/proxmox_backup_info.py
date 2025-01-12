@@ -27,20 +27,23 @@ author:
 options:
   vm_name:
     description:
-      - The name of the Proxmox VM.
+      - The name of the Proxmox VM.      
       - If defined, the returned list will contain backup jobs that have been parsed and filtered based on O(vm_name) value.
+      - Mutually exclusive with O(vm_id) and O(backup_jobs).
     required: false
     type: str
   vm_id:
     description:
       - The ID of the Proxmox VM.
       - If defined, the returned list will contain backup jobs that have been parsed and filtered based on O(vm_id) value.
+      - Mutually exclusive with O(vm_name) and O(backup_jobs).
     required: false
     type: str
   backup_jobs:
     description:
       - If V(true), the module will return all backup jobs information.
       - If V(false), the module will parse all backup jobs based on VM IDs and return a list of VMs' backup information.
+      - Mutually exclusive with O(vm_id) and O(vm_name).
     required: false
     default: false
     type: bool
@@ -61,24 +64,24 @@ EXAMPLES = """
 
 - name: Print proxmox backup information for a specific VM based on its name
   proxmox_backup_info:
-      api_user: 'myUser@pam'
-      api_password: '*******'
-      api_host: '192.168.20.20'
-      vm_name: 'mailsrv'
+    api_user: 'myUser@pam'
+    api_password: '*******'
+    api_host: '192.168.20.20'
+    vm_name: 'mailsrv'
 
 - name: Print proxmox backup information for a specific VM based on its VM id
   proxmox_backup_info:
-      api_user: 'myUser@pam'
-      api_password: '*******'
-      api_host: '192.168.20.20'
-      vm_id: '150'
+    api_user: 'myUser@pam'
+    api_password: '*******'
+    api_host: '192.168.20.20'
+    vm_id: '150'
 
 - name: Print proxmox all backup job information
   proxmox_backup_info:
-      api_user: 'myUser@pam'
-      api_password: '*******'
-      api_host: '192.168.20.20'
-      backup_jobs: true
+    api_user: 'myUser@pam'
+    api_password: '*******'
+    api_host: '192.168.20.20'
+    backup_jobs: true
 """
 
 RETURN = """
@@ -122,7 +125,7 @@ backup_info:
       returned: on success
       type: str
     vmid:
-      description: The VM vmid.
+      description: The VM id.
       returned: on success
       type: str
 """
