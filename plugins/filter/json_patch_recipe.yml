@@ -11,7 +11,7 @@ DOCUMENTATION:
     - If there is a test operation in the list, the filter continues if the test
       succeeded and returns a None value otherwise.
   requirements:
-    - jsonpatch (on the controller)
+    - jsonpatch
   version_added: 10.3.0
   author:
     - Stanislav Meduna (@numo68)

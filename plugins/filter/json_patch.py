@@ -6,7 +6,7 @@
 from __future__ import absolute_import, annotations, division, print_function
 from json import loads
 from typing import TYPE_CHECKING
-from ansible.errors import AnsibleError, AnsibleFilterError, AnsibleOptionsError
+from ansible.errors import AnsibleFilterError, AnsibleOptionsError
 from ansible.module_utils.common.text.converters import to_native
 
 __metaclass__ = type  # pylint: disable=C0103
@@ -17,9 +17,12 @@ if TYPE_CHECKING:
 try:
     import jsonpatch
 
-    HAS_LIB = True
-except ImportError:
+except ImportError as exc:
     HAS_LIB = False
+    JSONPATCH_IMPORT_ERROR = exc
+else:
+    HAS_LIB = True
+    JSONPATCH_IMPORT_ERROR = None
 
 
 class FilterModule:
@@ -30,9 +33,9 @@ class FilterModule:
     ) -> object:
 
         if not HAS_LIB:
-            raise AnsibleError(
+            raise AnsibleFilterError(
                 'You need to install "jsonpatch" package prior to running "json_patch" filter'
-            )
+            ) from JSONPATCH_IMPORT_ERROR
 
         args = {"op": op, "path": path}
 
@@ -62,9 +65,9 @@ class FilterModule:
     def json_patch_recipe(self, inp: object, operations: list) -> object:
 
         if not HAS_LIB:
-            raise AnsibleError(
+            raise AnsibleFilterError(
                 'You need to install "jsonpatch" package prior to running "json_patch_recipe" filter'
-            )
+            ) from JSONPATCH_IMPORT_ERROR
 
         if not isinstance(operations, list):
             raise AnsibleOptionsError('"operations" needs to be a list')
@@ -86,9 +89,9 @@ class FilterModule:
     def json_diff(self, inp: object, target: object) -> list:
 
         if not HAS_LIB:
-            raise AnsibleError(
+            raise AnsibleFilterError(
                 'You need to install "jsonpatch" package prior to running "json_patch_recipe" filter'
-            )
+            ) from JSONPATCH_IMPORT_ERROR
 
         source = inp if isinstance(inp, (dict, list)) else loads(inp)
         destination = target if isinstance(target, (dict, list)) else loads(target)

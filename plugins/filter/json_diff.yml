@@ -8,10 +8,10 @@ DOCUMENTATION:
   short_description: Create a JSON patch by comparing two JSON files
   description:
     - This filter compares the input with the argument and computes a list of operations
-      that can be consumed by the P(community.general.json_patch_recipe) to change the input
+      that can be consumed by the P(community.general#json_patch_recipe) to change the input
       to the argument.
   requirements:
-    - jsonpatch (on the controller)
+    - jsonpatch
   version_added: 10.3.0
   author:
     - Stanislav Meduna (@numo68)
@@ -46,6 +46,10 @@ EXAMPLES: |
     ansible.builtin.debug:
       msg: "{{ input | community.general.json_diff(target) }}"
     vars:
-      input: {"foo": 1, "bar":{"baz": 2}, baw: [1, 2, 3], "hello": "day"}
-      target: {"foo": 1, "bar": {"baz": 2}, baw: [1, 3], "baq": {"baz": 2}, "hello": "night"}
-    # => [{"op": "add", "path": "/baq", "value": {"baz": 2}}, {"op": "remove", "path": "/baw/1"}, {"op": "replace", "path": "/hello", "value": "night"}]
+      input: {"foo": 1, "bar":{"baz": 2}, "baw": [1, 2, 3], "hello": "day"}
+      target: {"foo": 1, "bar": {"baz": 2}, "baw": [1, 3], "baq": {"baz": 2}, "hello": "night"}
+    # => [
+    #   {"op": "add", "path": "/baq", "value": {"baz": 2}},
+    #   {"op": "remove", "path": "/baw/1"},
+    #   {"op": "replace", "path": "/hello", "value": "night"}
+    # ]

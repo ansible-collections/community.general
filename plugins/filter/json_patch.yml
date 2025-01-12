@@ -11,7 +11,7 @@ DOCUMENTATION:
     - If the operation is a test, the filter returns an ummodified object if the test
       succeeded and a None value otherwise.
   requirements:
-    - jsonpatch (on the controller)
+    - jsonpatch
   version_added: 10.3.0
   author:
     - Stanislav Meduna (@numo68)
@@ -59,7 +59,7 @@ EXAMPLES: |
       msg: "{{ input | community.general.json_patch('add', '/1', {'baz': 'qux'}) }}"
     vars:
         input: ["foo": { "one": 1 }, "bar": { "two": 2 }]
-    # => [{"foo": {"one": 1}, {"baz": "qux"}, "bar": {"two": 2}}]
+    # => [{"foo": {"one": 1}}, {"baz": "qux"}, {"bar": {"two": 2}}]
 
   - name: Insert a new key into a dictionary
     ansible.builtin.debug:
