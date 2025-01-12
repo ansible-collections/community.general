@@ -25,7 +25,8 @@ attributes:
   check_mode:
     support: partial
     details:
-      - Note that check mode always returns C(changed=true) for existing templates, even if the template would not actually change.
+      - Note that check mode always returns C(changed=true) for existing templates, even if the template would not actually
+        change.
   diff_mode:
     support: none
 
@@ -36,8 +37,8 @@ options:
     type: int
   name:
     description:
-      - A O(name) of the template you would like to manage.
-        If a template with the given name does not exist it will be created, otherwise it will be managed by this module.
+      - A O(name) of the template you would like to manage. If a template with the given name does not exist it will be created,
+        otherwise it will be managed by this module.
     type: str
   template:
     description:
@@ -110,7 +111,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 id:
-  description: Template id.
+  description: Template ID.
   type: int
   returned: when O(state=present)
   sample: 153
@@ -124,7 +125,7 @@ template:
   type: dict
   returned: when O(state=present)
 group_id:
-  description: Template's group id.
+  description: Template's group ID.
   type: int
   returned: when O(state=present)
   sample: 1
@@ -134,7 +135,7 @@ group_name:
   returned: when O(state=present)
   sample: one-users
 owner_id:
-  description: Template's owner id.
+  description: Template's owner ID.
   type: int
   returned: when O(state=present)
   sample: 143

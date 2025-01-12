@@ -29,8 +29,8 @@ options:
     type: str
   options:
     description:
-      - 'List with options to gather additional information about an Ethernet Network and related resources. Options allowed: V(associatedProfiles)
-        and V(associatedUplinkGroups).'
+      - 'List with options to gather additional information about an Ethernet Network and related resources. Options allowed:
+        V(associatedProfiles) and V(associatedUplinkGroups).'
     type: list
     elements: str
 extends_documentation_fragment:

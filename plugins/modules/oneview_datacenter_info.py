@@ -30,7 +30,7 @@ options:
     type: str
   options:
     description:
-      - "Retrieve additional information. Options available: V(visualContent)."
+      - 'Retrieve additional information. Options available: V(visualContent).'
     type: list
     elements: str
 

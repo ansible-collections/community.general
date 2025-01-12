@@ -11,8 +11,8 @@ DOCUMENTATION = r"""
 module: oneandone_server
 short_description: Create, destroy, start, stop, and reboot a 1&1 Host server
 description:
-  - Create, destroy, update, start, stop, and reboot a 1&1 Host server. When the server is created it can optionally wait for it to be 'running'
-    before returning.
+  - Create, destroy, update, start, stop, and reboot a 1&1 Host server. When the server is created it can optionally wait
+    for it to be 'running' before returning.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -55,25 +55,26 @@ options:
     type: str
   fixed_instance_size:
     description:
-      - The instance size name or ID of the server. It is required only for 'present' state, and it is mutually exclusive with vcore, cores_per_processor,
-        ram, and hdds parameters.
+      - The instance size name or ID of the server. It is required only for 'present' state, and it is mutually exclusive
+        with vcore, cores_per_processor, ram, and hdds parameters.
       - 'The available choices are: V(S), V(M), V(L), V(XL), V(XXL), V(3XL), V(4XL), V(5XL).'
     type: str
   vcore:
     description:
-      - The total number of processors. It must be provided with cores_per_processor, ram, and hdds parameters.
+      - The total number of processors. It must be provided with O(cores_per_processor), O(ram), and O(hdds) parameters.
     type: int
   cores_per_processor:
     description:
-      - The number of cores per processor. It must be provided with vcore, ram, and hdds parameters.
+      - The number of cores per processor. It must be provided with O(vcore), O(ram), and O(hdds) parameters.
     type: int
   ram:
     description:
-      - The amount of RAM memory. It must be provided with with vcore, cores_per_processor, and hdds parameters.
+      - The amount of RAM memory. It must be provided with with O(vcore), O(cores_per_processor), and O(hdds) parameters.
     type: float
   hdds:
     description:
-      - A list of hard disks with nested "size" and "is_main" properties. It must be provided with vcore, cores_per_processor, and ram parameters.
+      - A list of hard disks with nested O(ignore:hdds[].size) and O(ignore:hdds[].is_main) properties. It must be provided with O(vcore),
+        O(cores_per_processor), and O(ram) parameters.
     type: list
     elements: dict
   private_network:
@@ -113,8 +114,8 @@ options:
     choices: ["cloud", "baremetal", "k8s_node"]
   wait:
     description:
-      - Wait for the server to be in state 'running' before returning. Also used for delete operation (set to V(false) if you do not want to wait
-        for each individual server to be deleted before moving on with other tasks).
+      - Wait for the server to be in state 'running' before returning. Also used for delete operation (set to V(false) if
+        you do not want to wait for each individual server to be deleted before moving on with other tasks).
     type: bool
     default: true
   wait_timeout:
@@ -129,8 +130,8 @@ options:
     default: 5
   auto_increment:
     description:
-      - When creating multiple servers at once, whether to differentiate hostnames by appending a count after them or substituting the count where
-        there is a %02d or %03d in the hostname string.
+      - When creating multiple servers at once, whether to differentiate hostnames by appending a count after them or substituting
+        the count where there is a %02d or %03d in the hostname string.
     type: bool
     default: true
 

@@ -43,8 +43,9 @@ options:
   pattern:
     type: str
     description:
-      - If the service does not respond to the 'running' command, name a substring to look for as would be found in the output of the C(ps) command
-        as a stand-in for a 'running' result. If the string is found, the service will be assumed to be running.
+      - If the service does not respond to the 'running' command, name a substring to look for as would be found in the output
+        of the C(ps) command as a stand-in for a 'running' result. If the string is found, the service will be assumed to
+        be running.
 notes:
   - One option other than O(name) is required.
 requirements:
