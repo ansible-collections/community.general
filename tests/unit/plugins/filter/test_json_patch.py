@@ -10,7 +10,7 @@ __metaclass__ = type  # pylint: disable=C0103
 import unittest
 import json
 from ansible_collections.community.general.plugins.filter.json_patch import FilterModule
-from ansible.errors import AnsibleError, AnsibleFilterError, AnsibleOptionsError
+from ansible.errors import AnsibleFilterError
 
 
 class TestJsonPatch(unittest.TestCase):
@@ -19,6 +19,9 @@ class TestJsonPatch(unittest.TestCase):
         self.json_patch = self.filter.filters()["json_patch"]
         self.json_diff = self.filter.filters()["json_diff"]
         self.json_patch_recipe = self.filter.filters()["json_patch_recipe"]
+
+
+    ### json_patch
 
     def test_patch_add_to_empty(self):
         result = json.dumps(
@@ -123,7 +126,7 @@ class TestJsonPatch(unittest.TestCase):
             self.json_patch({"a": 1, "b": {"c": 2}, "d": 3}, "remove", "/e")
         self.assertEqual(
             str(context.exception),
-            "JSON patch failed: can't remove a non-existent object 'e'",
+            "json_patch: patch failed: can't remove a non-existent object 'e'",
         )
 
     def test_patch_missing_lib(self):
@@ -131,11 +134,11 @@ class TestJsonPatch(unittest.TestCase):
             "ansible_collections.community.general.plugins.filter.json_patch.HAS_LIB",
             False,
         ):
-            with self.assertRaises(AnsibleError) as context:
+            with self.assertRaises(AnsibleFilterError) as context:
                 self.json_patch({}, "add", "/a", 1)
             self.assertEqual(
                 str(context.exception),
-                'You need to install "jsonpatch" package prior to running "json_patch" filter',
+                "You need to install 'jsonpatch' package prior to running 'json_patch' filter"
             )
 
     def test_patch_invalid_operation(self):
@@ -143,22 +146,65 @@ class TestJsonPatch(unittest.TestCase):
             self.json_patch({}, "invalid", "/a", 1)
         self.assertEqual(
             str(context.exception),
-            "JSON patch failed: Unknown operation 'invalid'",
+            "json_patch: unsupported 'op' argument: invalid",
+        )
+
+    def test_patch_arg_checking(self):
+        with self.assertRaises(AnsibleFilterError) as context:
+            self.json_patch(1, "add", "/a", 1)
+        self.assertEqual(
+            str(context.exception),
+            "json_patch: input is not dictionary, list or string",
+        )
+        with self.assertRaises(AnsibleFilterError) as context:
+            self.json_patch({}, 1, "/a", 1)
+        self.assertEqual(
+            str(context.exception),
+            "json_patch: 'op' argument is not a string",
+        )
+        with self.assertRaises(AnsibleFilterError) as context:
+            self.json_patch({}, None, "/a", 1)
+        self.assertEqual(
+            str(context.exception),
+            "json_patch: 'op' argument is not a string",
+        )
+        with self.assertRaises(AnsibleFilterError) as context:
+            self.json_patch({}, "add", 1, 1)
+        self.assertEqual(
+            str(context.exception),
+            "json_patch: 'path' argument is not a string",
+        )
+        with self.assertRaises(AnsibleFilterError) as context:
+            self.json_patch({}, "copy", "/a", **{"from":1})
+        self.assertEqual(
+            str(context.exception),
+            "json_patch: 'from' argument is not a string",
+        )
+
+    def test_patch_extra_kwarg(self):
+        with self.assertRaises(AnsibleFilterError) as context:
+            self.json_patch({}, "add", "/a", 1, invalid=True)
+        self.assertEqual(
+            str(context.exception),
+            "json_patch: unexpected keywords arguments: invalid",
         )
 
     def test_patch_missing_from(self):
-        with self.assertRaises(AnsibleOptionsError) as context:
+        with self.assertRaises(AnsibleFilterError) as context:
             self.json_patch({}, "copy", "/a", 1)
         self.assertEqual(
             str(context.exception),
-            '"copy" operation requires "from" parameter',
+            "json_patch: 'from' argument missing for 'copy' operation",
         )
-        with self.assertRaises(AnsibleOptionsError) as context:
+        with self.assertRaises(AnsibleFilterError) as context:
             self.json_patch({}, "move", "/a", 1)
         self.assertEqual(
             str(context.exception),
-            '"move" operation requires "from" parameter',
+            "json_patch: 'from' argument missing for 'move' operation",
         )
+
+
+    ### json_patch_recipe
 
     def test_patch_recipe_process(self):
         result = json.dumps(
@@ -201,11 +247,11 @@ class TestJsonPatch(unittest.TestCase):
             "ansible_collections.community.general.plugins.filter.json_patch.HAS_LIB",
             False,
         ):
-            with self.assertRaises(AnsibleError) as context:
+            with self.assertRaises(AnsibleFilterError) as context:
                 self.json_patch_recipe({}, [])
             self.assertEqual(
                 str(context.exception),
-                'You need to install "jsonpatch" package prior to running "json_patch_recipe" filter',
+                "You need to install 'jsonpatch' package prior to running 'json_patch_recipe' filter"
             )
 
     def test_patch_recipe_missing_from(self):
@@ -213,16 +259,19 @@ class TestJsonPatch(unittest.TestCase):
             self.json_patch_recipe({}, [{"op": "copy", "path": "/a"}])
         self.assertEqual(
             str(context.exception),
-            "JSON patch failed: The operation does not contain a 'from' member",
+            "json_patch_recipe: 'from' argument missing for 'copy' operation",
         )
 
     def test_patch_recipe_incorrect_type(self):
-        with self.assertRaises(AnsibleOptionsError) as context:
+        with self.assertRaises(AnsibleFilterError) as context:
             self.json_patch_recipe({}, "copy")
         self.assertEqual(
             str(context.exception),
-            '"operations" needs to be a list',
+            "json_patch_recipe: 'operations' needs to be a list",
         )
+
+
+    ### json_diff
 
     def test_diff_process(self):
         result = self.json_diff(
@@ -251,9 +300,23 @@ class TestJsonPatch(unittest.TestCase):
             "ansible_collections.community.general.plugins.filter.json_patch.HAS_LIB",
             False,
         ):
-            with self.assertRaises(AnsibleError) as context:
+            with self.assertRaises(AnsibleFilterError) as context:
                 self.json_diff({}, {})
             self.assertEqual(
                 str(context.exception),
-                'You need to install "jsonpatch" package prior to running "json_patch_recipe" filter',
+                "You need to install 'jsonpatch' package prior to running 'json_diff' filter"
             )
+
+    def test_diff_arg_checking(self):
+        with self.assertRaises(AnsibleFilterError) as context:
+            self.json_diff(1, {})
+        self.assertEqual(
+            str(context.exception),
+            "json_diff: input is not dictionary, list or string"
+        )
+        with self.assertRaises(AnsibleFilterError) as context:
+            self.json_diff({}, 1)
+        self.assertEqual(
+            str(context.exception),
+            "json_diff: target is not dictionary, list or string"
+        )

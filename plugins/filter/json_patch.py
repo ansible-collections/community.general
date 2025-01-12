@@ -6,13 +6,13 @@
 from __future__ import absolute_import, annotations, division, print_function
 from json import loads
 from typing import TYPE_CHECKING
-from ansible.errors import AnsibleFilterError, AnsibleOptionsError
+from ansible.errors import AnsibleFilterError
 from ansible.module_utils.common.text.converters import to_native
 
 __metaclass__ = type  # pylint: disable=C0103
 
 if TYPE_CHECKING:
-    from typing import Callable
+    from typing import Any, Callable, Union
 
 try:
     import jsonpatch
@@ -24,29 +24,75 @@ else:
     HAS_LIB = True
     JSONPATCH_IMPORT_ERROR = None
 
+OPERATIONS_AVAILABLE = ["add", "copy", "move", "remove", "replace", "test"]
+OPERATIONS_NEEDING_FROM = ["copy", "move"]
+OPERATIONS_NEEDING_VALUE = ["add", "replace", "test"]
+
 
 class FilterModule:
     """Filter plugin."""
 
+    def check_json_object(
+        self, filter_name: str, object_name: str, inp: Union[str, list, dict]
+    ):
+        if not isinstance(inp, (str, list, dict)):
+            raise AnsibleFilterError(
+                f"{filter_name}: {object_name} is not dictionary, list or string"
+            )
+
+    def check_patch_arguments(self, filter_name: str, args: dict):
+
+        if "op" not in args or not isinstance(args["op"], str):
+            raise AnsibleFilterError(f"{filter_name}: 'op' argument is not a string")
+
+        if args["op"] not in OPERATIONS_AVAILABLE:
+            raise AnsibleFilterError(
+                f"{filter_name}: unsupported 'op' argument: {args['op']}"
+            )
+
+        if "path" not in args or not isinstance(args["path"], str):
+            raise AnsibleFilterError(f"{filter_name}: 'path' argument is not a string")
+
+        if args["op"] in OPERATIONS_NEEDING_FROM:
+            if "from" not in args:
+                raise AnsibleFilterError(
+                    f"{filter_name}: 'from' argument missing for '{args['op']}' operation"
+                )
+            if not isinstance(args["from"], str):
+                raise AnsibleFilterError(
+                    f"{filter_name}: 'from' argument is not a string"
+                )
+
     def json_patch(
-        self, inp: object, op: str, path: str, value: object = None, **kwargs: dict
+        self,
+        inp: Union[str, list, dict],
+        op: str,
+        path: str,
+        value: Any = None,
+        **kwargs: dict,
     ) -> object:
 
         if not HAS_LIB:
             raise AnsibleFilterError(
-                'You need to install "jsonpatch" package prior to running "json_patch" filter'
+                "You need to install 'jsonpatch' package prior to running 'json_patch' filter"
             ) from JSONPATCH_IMPORT_ERROR
 
+        self.check_json_object("json_patch", "input", inp)
+
         args = {"op": op, "path": path}
+        from_arg = kwargs.pop("from", None)
 
-        if op not in ["remove"]:
+        if kwargs:
+            raise AnsibleFilterError(
+                f"json_patch: unexpected keywords arguments: {', '.join(kwargs.keys())}"
+            )
+
+        if op in OPERATIONS_NEEDING_VALUE:
             args["value"] = value
+        if op in OPERATIONS_NEEDING_FROM and from_arg is not None:
+            args["from"] = from_arg
 
-        if op in ["move", "copy"]:
-            if "from" in kwargs:
-                args["from"] = kwargs["from"]
-            else:
-                raise AnsibleOptionsError(f'"{op}" operation requires "from" parameter')
+        self.check_patch_arguments("json_patch", args)
 
         result = None
 
@@ -58,7 +104,7 @@ class FilterModule:
         except jsonpatch.JsonPatchTestFailed:
             pass
         except Exception as e:
-            raise AnsibleFilterError("JSON patch failed: %s" % to_native(e)) from e
+            raise AnsibleFilterError(f"json_patch: patch failed: {to_native(e)}") from e
 
         return result
 
@@ -66,13 +112,18 @@ class FilterModule:
 
         if not HAS_LIB:
             raise AnsibleFilterError(
-                'You need to install "jsonpatch" package prior to running "json_patch_recipe" filter'
+                "You need to install 'jsonpatch' package prior to running 'json_patch_recipe' filter"
             ) from JSONPATCH_IMPORT_ERROR
 
+        self.check_json_object("json_patch_recipe", "input", inp)
+
         if not isinstance(operations, list):
-            raise AnsibleOptionsError('"operations" needs to be a list')
+            raise AnsibleFilterError("json_patch_recipe: 'operations' needs to be a list")
 
         result = None
+
+        for args in operations:
+            self.check_patch_arguments("json_patch_recipe", args)
 
         try:
             result = jsonpatch.apply_patch(
@@ -82,7 +133,7 @@ class FilterModule:
         except jsonpatch.JsonPatchTestFailed:
             pass
         except Exception as e:
-            raise AnsibleFilterError("JSON patch failed: %s" % to_native(e)) from e
+            raise AnsibleFilterError(f"json_patch_recipe: patch failed: {to_native(e)}") from e
 
         return result
 
@@ -90,8 +141,11 @@ class FilterModule:
 
         if not HAS_LIB:
             raise AnsibleFilterError(
-                'You need to install "jsonpatch" package prior to running "json_patch_recipe" filter'
+                "You need to install 'jsonpatch' package prior to running 'json_diff' filter"
             ) from JSONPATCH_IMPORT_ERROR
+
+        self.check_json_object("json_diff", "input", inp)
+        self.check_json_object("json_diff", "target", target)
 
         source = inp if isinstance(inp, (dict, list)) else loads(inp)
         destination = target if isinstance(target, (dict, list)) else loads(target)
@@ -99,7 +153,7 @@ class FilterModule:
         try:
             result = list(jsonpatch.make_patch(source, destination))
         except Exception as e:
-            raise AnsibleFilterError("JSON patch failed: %s" % to_native(e)) from e
+            raise AnsibleFilterError(f"JSON diff failed: {to_native(e)}") from e
 
         return result
 

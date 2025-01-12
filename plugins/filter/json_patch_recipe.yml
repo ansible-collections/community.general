@@ -37,11 +37,11 @@ DOCUMENTATION:
           type: str
           required: true
         value:
-          description: Value to use in the operation.
+          description: Value to use in the operation. Ignored for copy, move and remove.
           type: raw
         from:
           description: The source location for the copy and move operation. Mandatory
-            for copy and move operations.
+            for copy and move operations, ignored otherwise.
           type: str
   seealso:
     - name: RFC 6902
