@@ -4,6 +4,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 ---
+anchors:
+  environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+test_cases:
 - id: install_zlibdev
   input:
     name: zlib-dev
@@ -13,7 +16,7 @@
   mocks:
     run_command:
     - command: [/testbin/opkg, --version]
-      environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: *env-def
       rc: 0
       out: ""
       err: ""

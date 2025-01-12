@@ -4,6 +4,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 ---
+anchors:
+  environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+test_cases:
 - id: test_simple_element_set
   input:
     state: present
@@ -17,7 +20,7 @@
   mocks:
     run_command:
     - command: [/testbin/gconftool-2, --version]
-      environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def
       rc: 0
       out: "3.2.6\n"
       err: ""

@@ -8,7 +8,7 @@ __metaclass__ = type
 
 
 from ansible_collections.community.general.plugins.modules import facter_facts
-from .helper import Helper, RunCommandMock  # pylint: disable=unused-import
+from .helper import Helper, RunCommandMock
 
 
-Helper.from_module(facter_facts, __name__)
+Helper.from_module(facter_facts, __name__, mocks=[RunCommandMock])

@@ -4,6 +4,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 ---
+anchors:
+  environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+test_cases:
 - id: test_set_handler
   input:
     handler: google-chrome.desktop
@@ -14,7 +17,7 @@
   mocks:
     run_command:
     - command: [/testbin/gio, --version]
-      environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def
       rc: 0
       out: "2.80.0\n"
       err: ""

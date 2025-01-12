@@ -4,6 +4,11 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 ---
+anchors:
+  environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+  environ_data: &env-data {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true, data: cool_password}
+  environ_norc: &env-norc {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+test_cases:
 - id: test_kinit_default
   input:
     state: present
@@ -13,12 +18,12 @@
   mocks:
     run_command:
     - command: [/testbin/klist]
-      environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: *env-def
       rc: 1
       out: ""
       err: ""
     - command: [/testbin/kinit]
-      environ: &env-data {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true, data: cool_password}
+      environ: *env-data
       rc: 0
       out: ""
       err: ""
@@ -54,7 +59,7 @@
       out: ""
       err: ""
     - command: [/testbin/kdestroy]
-      environ: &env-norc {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-norc
       rc: 0
       out: ""
       err: ""

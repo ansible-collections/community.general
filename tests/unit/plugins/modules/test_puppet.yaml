@@ -4,6 +4,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 ---
+anchors:
+  environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+test_cases:
 - id: puppet_agent_plain
   input: {}
   output:
@@ -11,7 +14,7 @@
   mocks:
     run_command:
     - command: [/testbin/puppet, config, print, agent_disabled_lockfile]
-      environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: *env-def
       rc: 0
       out: "blah, anything"
       err: ""
