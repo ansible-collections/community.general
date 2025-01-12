@@ -20,8 +20,7 @@ class TestJsonPatch(unittest.TestCase):
         self.json_diff = self.filter.filters()["json_diff"]
         self.json_patch_recipe = self.filter.filters()["json_patch_recipe"]
 
-
-    ### json_patch
+    # json_patch
 
     def test_patch_add_to_empty(self):
         result = json.dumps(
@@ -138,7 +137,7 @@ class TestJsonPatch(unittest.TestCase):
                 self.json_patch({}, "add", "/a", 1)
             self.assertEqual(
                 str(context.exception),
-                "You need to install 'jsonpatch' package prior to running 'json_patch' filter"
+                "You need to install 'jsonpatch' package prior to running 'json_patch' filter",
             )
 
     def test_patch_invalid_operation(self):
@@ -175,7 +174,7 @@ class TestJsonPatch(unittest.TestCase):
             "json_patch: 'path' argument is not a string",
         )
         with self.assertRaises(AnsibleFilterError) as context:
-            self.json_patch({}, "copy", "/a", **{"from":1})
+            self.json_patch({}, "copy", "/a", **{"from": 1})
         self.assertEqual(
             str(context.exception),
             "json_patch: 'from' argument is not a string",
@@ -203,8 +202,7 @@ class TestJsonPatch(unittest.TestCase):
             "json_patch: 'from' argument missing for 'move' operation",
         )
 
-
-    ### json_patch_recipe
+    # json_patch_recipe
 
     def test_patch_recipe_process(self):
         result = json.dumps(
@@ -251,7 +249,7 @@ class TestJsonPatch(unittest.TestCase):
                 self.json_patch_recipe({}, [])
             self.assertEqual(
                 str(context.exception),
-                "You need to install 'jsonpatch' package prior to running 'json_patch_recipe' filter"
+                "You need to install 'jsonpatch' package prior to running 'json_patch_recipe' filter",
             )
 
     def test_patch_recipe_missing_from(self):
@@ -270,8 +268,7 @@ class TestJsonPatch(unittest.TestCase):
             "json_patch_recipe: 'operations' needs to be a list",
         )
 
-
-    ### json_diff
+    # json_diff
 
     def test_diff_process(self):
         result = self.json_diff(
@@ -304,19 +301,18 @@ class TestJsonPatch(unittest.TestCase):
                 self.json_diff({}, {})
             self.assertEqual(
                 str(context.exception),
-                "You need to install 'jsonpatch' package prior to running 'json_diff' filter"
+                "You need to install 'jsonpatch' package prior to running 'json_diff' filter",
             )
 
     def test_diff_arg_checking(self):
         with self.assertRaises(AnsibleFilterError) as context:
             self.json_diff(1, {})
         self.assertEqual(
-            str(context.exception),
-            "json_diff: input is not dictionary, list or string"
+            str(context.exception), "json_diff: input is not dictionary, list or string"
         )
         with self.assertRaises(AnsibleFilterError) as context:
             self.json_diff({}, 1)
         self.assertEqual(
             str(context.exception),
-            "json_diff: target is not dictionary, list or string"
+            "json_diff: target is not dictionary, list or string",
         )
