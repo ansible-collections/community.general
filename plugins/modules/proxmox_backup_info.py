@@ -27,7 +27,7 @@ author:
 options:
   vm_name:
     description:
-      - The name of the Proxmox VM.      
+      - The name of the Proxmox VM.
       - If defined, the returned list will contain backup jobs that have been parsed and filtered based on O(vm_name) value.
       - Mutually exclusive with O(vm_id) and O(backup_jobs).
     required: false
