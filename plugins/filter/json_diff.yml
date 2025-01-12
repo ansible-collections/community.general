@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 DOCUMENTATION:
+  name: json_diff
   short_description: Create a JSON patch by comparing two JSON files
   description:
     - This filter compares the input with the argument and computes a list of operations
@@ -12,6 +13,8 @@ DOCUMENTATION:
   requirements:
     - jsonpatch (on the controller)
   version_added: 10.3.0
+  author:
+    - Stanislav Meduna (@numo68)
   options:
     _input:
       description: A list or a dictionary representing a source JSON object, or a string containing a JSON object.

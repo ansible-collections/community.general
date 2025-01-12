@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 DOCUMENTATION:
+  name: json_patch_recipe
   short_description: Apply JSON-Patch (RFC 6902) operations to an object
   description:
     - This filter sequentially applies JSON patch operations and returns a modified object.
@@ -12,6 +13,8 @@ DOCUMENTATION:
   requirements:
     - jsonpatch (on the controller)
   version_added: 10.3.0
+  author:
+    - Stanislav Meduna (@numo68)
   options:
     _input:
       description: A list or a dictionary representing a JSON object, or a string containing a JSON object.
