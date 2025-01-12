@@ -40,18 +40,6 @@ RETURN:
     description: A list of JSON patch operations to apply.
     type: list
     elements: dict
-    required: true
-    suboptions:
-      op:
-        description: Operation to perform (see RFC 6902).
-        type: str
-        choices: [add, copy, move, remove, replace]
-      path:
-        description: JSON Pointer path to the target location (see RFC 6901).
-        type: str
-      value:
-        description: Value to use in the operation.
-        type: raw
 
 EXAMPLES: |
   - name: Compute a difference
