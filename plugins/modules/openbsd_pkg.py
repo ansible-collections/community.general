@@ -44,8 +44,8 @@ options:
     type: str
   build:
     description:
-      - Build the package from source instead of downloading and installing a binary. Requires that the port source tree is already installed.
-        Automatically builds and installs the C(sqlports) package, if it is not already installed.
+      - Build the package from source instead of downloading and installing a binary. Requires that the port source tree is
+        already installed. Automatically builds and installs the C(sqlports) package, if it is not already installed.
       - Mutually exclusive with O(snapshot).
     type: bool
     default: false
@@ -63,8 +63,8 @@ options:
     type: path
   clean:
     description:
-      - When updating or removing packages, delete the extra configuration file(s) in the old packages which are annotated with @extra in the
-        packaging-list.
+      - When updating or removing packages, delete the extra configuration file(s) in the old packages which are annotated
+        with C(@extra) in the packaging-list.
     type: bool
     default: false
   quick:
@@ -73,8 +73,8 @@ options:
     type: bool
     default: false
 notes:
-  - When used with a C(loop:) each package will be processed individually, it is much more efficient to pass the list directly to the O(name)
-    option.
+  - When used with a C(loop:) each package will be processed individually, it is much more efficient to pass the list directly
+    to the O(name) option.
 """
 
 EXAMPLES = r"""

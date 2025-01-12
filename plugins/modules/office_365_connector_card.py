@@ -13,7 +13,8 @@ module: office_365_connector_card
 short_description: Use webhooks to create Connector Card messages within an Office 365 group
 description:
   - Creates Connector Card messages through Office 365 Connectors.
-  - See U(https://learn.microsoft.com/en-us/microsoftteams/platform/task-modules-and-cards/cards/cards-reference#connector-card-for-microsoft-365-groups).
+  - See
+    U(https://learn.microsoft.com/en-us/microsoftteams/platform/task-modules-and-cards/cards/cards-reference#connector-card-for-microsoft-365-groups).
 author: "Marc Sensenich (@marc-sensenich)"
 notes:
   - This module is not idempotent, therefore if the same task is run twice there will be two Connector Cards created.
@@ -74,8 +75,8 @@ EXAMPLES = r"""
     webhook: https://outlook.office.com/webhook/GUID/IncomingWebhook/GUID/GUID
     summary: This is the summary property
     title: This is the **card's title** property
-    text: This is the **card's text** property. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-      labore et dolore magna aliqua.
+    text: This is the **card's text** property. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+      tempor incididunt ut labore et dolore magna aliqua.
     color: E81123
     sections:
       - title: This is the **section's title** property
@@ -86,8 +87,8 @@ EXAMPLES = r"""
         hero_image:
           image: http://connectorsdemo.azurewebsites.net/images/WIN12_Scene_01.jpg
           title: This is the image's alternate text
-        text: This is the section's text property. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
-          ut labore et dolore magna aliqua.
+        text: This is the section's text property. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+          tempor incididunt ut labore et dolore magna aliqua.
         facts:
           - name: This is a fact name
             value: This is a fact value

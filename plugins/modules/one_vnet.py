@@ -22,7 +22,8 @@ attributes:
   check_mode:
     support: partial
     details:
-      - Note that check mode always returns C(changed=true) for existing networks, even if the network would not actually change.
+      - Note that check mode always returns C(changed=true) for existing networks, even if the network would not actually
+        change.
   diff_mode:
     support: none
 options:
@@ -33,8 +34,8 @@ options:
     type: int
   name:
     description:
-      - A O(name) of the network you would like to manage. If a network with the given name does not exist it will be created, otherwise it will
-        be managed by this module.
+      - A O(name) of the network you would like to manage. If a network with the given name does not exist it will be created,
+        otherwise it will be managed by this module.
     type: str
   template:
     description:
@@ -89,7 +90,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 id:
-  description: The network id.
+  description: The network ID.
   type: int
   returned: when O(state=present)
   sample: 153
@@ -116,12 +117,12 @@ user_id:
   returned: when O(state=present)
   sample: 1
 user_name:
-  description: The network's user id.
+  description: The network's user ID.
   type: str
   returned: when O(state=present)
   sample: oneadmin
 group_id:
-  description: The network's group id.
+  description: The network's group ID.
   type: int
   returned: when O(state=present)
   sample: 1
@@ -131,7 +132,7 @@ group_name:
   returned: when O(state=present)
   sample: one-users
 owner_id:
-  description: The network's owner id.
+  description: The network's owner ID.
   type: int
   returned: when O(state=present)
   sample: 143
@@ -207,7 +208,7 @@ bridge_type:
   returned: when O(state=present)
   sample: linux
 parent_network_id:
-  description: The network's parent network id.
+  description: The network's parent network ID.
   type: int
   returned: when O(state=present)
   sample: 1
