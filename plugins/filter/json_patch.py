@@ -70,7 +70,7 @@ class FilterModule:
         path: str,
         value: Any = None,
         **kwargs: dict,
-    ) -> object:
+    ) -> Any:
 
         if not HAS_LIB:
             raise AnsibleFilterError(
@@ -108,7 +108,7 @@ class FilterModule:
 
         return result
 
-    def json_patch_recipe(self, inp: object, operations: list) -> object:
+    def json_patch_recipe(self, inp: Union[str, list, dict], operations: list) -> Any:
 
         if not HAS_LIB:
             raise AnsibleFilterError(
@@ -118,7 +118,9 @@ class FilterModule:
         self.check_json_object("json_patch_recipe", "input", inp)
 
         if not isinstance(operations, list):
-            raise AnsibleFilterError("json_patch_recipe: 'operations' needs to be a list")
+            raise AnsibleFilterError(
+                "json_patch_recipe: 'operations' needs to be a list"
+            )
 
         result = None
 
@@ -133,11 +135,15 @@ class FilterModule:
         except jsonpatch.JsonPatchTestFailed:
             pass
         except Exception as e:
-            raise AnsibleFilterError(f"json_patch_recipe: patch failed: {to_native(e)}") from e
+            raise AnsibleFilterError(
+                f"json_patch_recipe: patch failed: {to_native(e)}"
+            ) from e
 
         return result
 
-    def json_diff(self, inp: object, target: object) -> list:
+    def json_diff(
+        self, inp: Union[str, list, dict], target: Union[str, list, dict]
+    ) -> list:
 
         if not HAS_LIB:
             raise AnsibleFilterError(
