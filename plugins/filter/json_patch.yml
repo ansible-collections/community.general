@@ -15,7 +15,7 @@ DOCUMENTATION:
   version_added: 10.3.0
   author:
     - Stanislav Meduna (@numo68)
-  positional: op, path, value, from
+  positional: op, path, value
   options:
     _input:
       description: A list or a dictionary representing a JSON object, or a string containing a JSON object.
@@ -35,7 +35,7 @@ DOCUMENTATION:
       type: raw
     from:
       description: The source location for the copy and move operation. Mandatory
-        for copy and move operations, ignored otherwise.
+        for copy and move operations, ignored otherwise. Keyword argument only.
       type: str
   seealso:
     - name: RFC 6902
