@@ -7,7 +7,7 @@ __metaclass__ = type
 
 
 from ansible_collections.community.general.plugins.modules import django_check
-from .helper import Helper, RunCommandMock  # pylint: disable=unused-import
+from .helper import Helper, RunCommandMock
 
 
-Helper.from_module(django_check, __name__)
+Helper.from_module(django_check, __name__, mocks=[RunCommandMock])

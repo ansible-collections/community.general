@@ -4,6 +4,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 ---
+anchors:
+  environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+test_cases:
 - id: command_success
   input:
     command: check
@@ -16,7 +19,7 @@
   mocks:
     run_command:
     - command: [/testbin/python, -m, django, --version]
-      environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def
       rc: 0
       out: "5.1.2\n"
       err: ""
