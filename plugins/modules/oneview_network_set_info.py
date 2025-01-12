@@ -30,8 +30,8 @@ options:
 
   options:
     description:
-      - 'List with options to gather information about Network Set. Option allowed: V(withoutEthernet). The option V(withoutEthernet) retrieves
-        the list of network_sets excluding Ethernet networks.'
+      - 'List with options to gather information about Network Set. Option allowed: V(withoutEthernet). The option V(withoutEthernet)
+        retrieves the list of network_sets excluding Ethernet networks.'
     type: list
     elements: str
 

@@ -32,12 +32,14 @@ options:
     type: str
   api_username:
     description:
-      - Name of the user to login into the OpenNebula RPC server. If not set then the value of the E(ONE_USERNAME) environment variable is used.
+      - Name of the user to login into the OpenNebula RPC server. If not set then the value of the E(ONE_USERNAME) environment
+        variable is used.
     type: str
   api_password:
     description:
-      - Password of the user to login into OpenNebula RPC server. If not set then the value of the E(ONE_PASSWORD) environment variable is used.
-        if both O(api_username) or O(api_password) are not set, then it will try authenticate with ONE auth file. Default path is "~/.one/one_auth".
+      - Password of the user to login into OpenNebula RPC server. If not set then the value of the E(ONE_PASSWORD) environment
+        variable is used. if both O(api_username) or O(api_password) are not set, then it will try authenticate with ONE auth
+        file. Default path is C(~/.one/one_auth).
       - Set environment variable E(ONE_AUTH) to override this path.
     type: str
   template_name:
@@ -55,7 +57,7 @@ options:
     type: bool
   instance_ids:
     description:
-      - 'A list of instance ids used for states: V(absent), V(running), V(rebooted), V(poweredoff).'
+      - 'A list of instance IDs used for states: V(absent), V(running), V(rebooted), V(poweredoff).'
     aliases: ['ids']
     type: list
     elements: int
@@ -76,9 +78,9 @@ options:
     type: bool
   wait:
     description:
-      - Wait for the instance to reach its desired state before returning. Keep in mind if you are waiting for instance to be in running state
-        it does not mean that you will be able to SSH on that machine only that boot process have started on that instance, see 'wait_for' example
-        for details.
+      - Wait for the instance to reach its desired state before returning. Keep in mind if you are waiting for instance to
+        be in running state it does not mean that you will be able to SSH on that machine only that boot process have started
+        on that instance. See the example using the M(ansible.builtin.wait_for) module for details.
     default: true
     type: bool
   wait_timeout:
@@ -104,13 +106,14 @@ options:
     elements: str
   count_attributes:
     description:
-      - A dictionary of key/value attributes that can only be used with O(exact_count) to determine how many nodes based on a specific attributes
-        criteria should be deployed. This can be expressed in multiple ways and is shown in the EXAMPLES section.
+      - A dictionary of key/value attributes that can only be used with O(exact_count) to determine how many nodes based on
+        a specific attributes criteria should be deployed. This can be expressed in multiple ways and is shown in the EXAMPLES
+        section.
     type: dict
   count_labels:
     description:
-      - A list of labels that can only be used with O(exact_count) to determine how many nodes based on a specific labels criteria should be deployed.
-        This can be expressed in multiple ways and is shown in the EXAMPLES section.
+      - A list of labels that can only be used with O(exact_count) to determine how many nodes based on a specific labels
+        criteria should be deployed. This can be expressed in multiple ways and is shown in the EXAMPLES section.
     type: list
     elements: str
   count:
@@ -120,13 +123,14 @@ options:
     type: int
   exact_count:
     description:
-      - Indicates how many instances that match O(count_attributes) and O(count_labels) parameters should be deployed. Instances are either created
-        or terminated based on this value.
+      - Indicates how many instances that match O(count_attributes) and O(count_labels) parameters should be deployed. Instances
+        are either created or terminated based on this value.
       - B(NOTE:) Instances with the least IDs will be terminated first.
     type: int
   mode:
     description:
-      - Set permission mode of the instance in octet format, for example V(0600) to give owner C(use) and C(manage) and nothing to group and others.
+      - Set permission mode of the instance in octet format, for example V(0600) to give owner C(use) and C(manage) and nothing
+        to group and others.
     type: str
   owner_id:
     description:
@@ -165,8 +169,8 @@ options:
       - Creates an image from a VM disk.
       - It is a dictionary where you have to specify C(name) of the new image.
       - Optionally you can specify C(disk_id) of the disk you want to save. By default C(disk_id) is 0.
-      - B(NOTE:) This operation will only be performed on the first VM (if more than one VM ID is passed) and the VM has to be in the C(poweredoff)
-        state.
+      - B(NOTE:) This operation will only be performed on the first VM (if more than one VM ID is passed) and the VM has to
+        be in the C(poweredoff) state.
       - Also this operation will fail if an image with specified C(name) already exists.
     type: dict
   persistent:
@@ -338,8 +342,9 @@ EXAMPLES = r"""
   register: vm
 
 - name: Wait for SSH to come up
-  ansible.builtin.wait_for_connection:
-  delegate_to: '{{ vm.instances[0].networks[0].ip }}'
+  ansible.builtin.wait_for:
+    port: 22
+    host: '{{ vm.instances[0].networks[0].ip }}'
 
 - name: Terminate VMs by ids
   community.general.one_vm:
@@ -427,7 +432,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 instances_ids:
-  description: A list of instances ids whose state is changed or which are fetched with O(instance_ids) option.
+  description: A list of instances IDs whose state is changed or which are fetched with O(instance_ids) option.
   type: list
   returned: success
   sample: [1234, 1235]
@@ -437,7 +442,7 @@ instances:
   returned: success
   contains:
     vm_id:
-      description: Vm id.
+      description: Vm ID.
       type: int
       sample: 153
     vm_name:
@@ -445,11 +450,11 @@ instances:
       type: str
       sample: foo
     template_id:
-      description: Vm's template id.
+      description: Vm's template ID.
       type: int
       sample: 153
     group_id:
-      description: Vm's group id.
+      description: Vm's group ID.
       type: int
       sample: 1
     group_name:
@@ -457,7 +462,7 @@ instances:
       type: str
       sample: one-users
     owner_id:
-      description: Vm's owner id.
+      description: Vm's owner ID.
       type: int
       sample: 143
     owner_name:
@@ -540,12 +545,13 @@ instances:
       }
 tagged_instances:
   description:
-    - A list of instances info based on a specific attributes and/or labels that are specified with O(count_attributes) and O(count_labels) options.
+    - A list of instances info based on a specific attributes and/or labels that are specified with O(count_attributes) and
+      O(count_labels) options.
   type: complex
   returned: success
   contains:
     vm_id:
-      description: Vm id.
+      description: Vm ID.
       type: int
       sample: 153
     vm_name:
@@ -553,11 +559,11 @@ tagged_instances:
       type: str
       sample: foo
     template_id:
-      description: Vm's template id.
+      description: Vm's template ID.
       type: int
       sample: 153
     group_id:
-      description: Vm's group id.
+      description: Vm's group ID.
       type: int
       sample: 1
     group_name:
@@ -565,7 +571,7 @@ tagged_instances:
       type: str
       sample: one-users
     owner_id:
-      description: Vm's user id.
+      description: Vm's user ID.
       type: int
       sample: 143
     owner_name:

@@ -154,7 +154,8 @@ msg:
   sample: "Action was successful"
 
 jobUri:
-  description: URI to use to monitor status of the operation. Returned for async commands such as Firmware Update, Firmware Activate.
+  description: URI to use to monitor status of the operation. Returned for async commands such as Firmware Update, Firmware
+    Activate.
   returned: when supported
   type: str
   sample: "https://ioma.wdc.com/Storage/Devices/openflex-data24-usalp03020qb0003/Jobs/FirmwareUpdate/"

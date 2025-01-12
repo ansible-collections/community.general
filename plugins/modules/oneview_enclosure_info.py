@@ -30,8 +30,8 @@ options:
     type: str
   options:
     description:
-      - 'List with options to gather additional information about an Enclosure and related resources. Options allowed: V(script), V(environmentalConfiguration),
-        and V(utilization). For the option V(utilization), you can provide specific parameters.'
+      - 'List with options to gather additional information about an Enclosure and related resources. Options allowed: V(script),
+        V(environmentalConfiguration), and V(utilization). For the option V(utilization), you can provide specific parameters.'
     type: list
     elements: raw
 
@@ -122,11 +122,12 @@ EXAMPLES = r"""
   ansible.builtin.debug:
     msg: "{{ result.enclosure_utilization }}"
 
-- name: "Gather information about an Enclosure with temperature data at a resolution of one sample per day, between two specified dates"
+- name: "Gather information about an Enclosure with temperature data at a resolution of one sample per day, between two
+    specified dates"
   community.general.oneview_enclosure_info:
     name: Test-Enclosure
     options:
-      - utilization:                 # optional
+      - utilization:               # optional
           fields: AmbientTemperature
           filter:
             - startDate=2016-07-01T14:29:42.000Z

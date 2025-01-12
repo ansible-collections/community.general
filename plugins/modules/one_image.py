@@ -157,7 +157,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 id:
-  description: Image id.
+  description: Image ID.
   type: int
   returned: when O(state=present), O(state=cloned), or O(state=renamed)
   sample: 153
@@ -167,7 +167,7 @@ name:
   returned: when O(state=present), O(state=cloned), or O(state=renamed)
   sample: app1
 group_id:
-  description: Image's group id.
+  description: Image's group ID.
   type: int
   returned: when O(state=present), O(state=cloned), or O(state=renamed)
   sample: 1
@@ -177,7 +177,7 @@ group_name:
   returned: when O(state=present), O(state=cloned), or O(state=renamed)
   sample: one-users
 owner_id:
-  description: Image's owner id.
+  description: Image's owner ID.
   type: int
   returned: when O(state=present), O(state=cloned), or O(state=renamed)
   sample: 143

@@ -13,12 +13,12 @@ DOCUMENTATION = r"""
 module: ovh_ip_failover
 short_description: Manage OVH IP failover address
 description:
-  - Manage OVH (French European hosting provider) IP Failover Address. For now, this module can only be used to move an IP failover (or failover
-    block) between services.
+  - Manage OVH (French European hosting provider) IP Failover Address. For now, this module can only be used to move an IP
+    failover (or failover block) between services.
 author: "Pascal HERAUD (@pascalheraud)"
 notes:
-  - Uses the python OVH API U(https://github.com/ovh/python-ovh). You have to create an application (a key and secret) with a consumer key as
-    described into U(https://docs.ovh.com/gb/en/customer/first-steps-with-ovh-api/).
+  - Uses the Python OVH API U(https://github.com/ovh/python-ovh). You have to create an application (a key and secret) with
+    a consumer key as described into U(https://docs.ovh.com/gb/en/customer/first-steps-with-ovh-api/).
 requirements:
   - ovh >=  0.4.8
 extends_documentation_fragment:
@@ -49,14 +49,15 @@ options:
     default: true
     type: bool
     description:
-      - If true, the module will wait for the IP address to be moved. If false, exit without waiting. The taskId will be returned in module output.
+      - If true, the module will wait for the IP address to be moved. If false, exit without waiting. The taskId will be returned
+        in module output.
   wait_task_completion:
     required: false
     default: 0
     description:
-      - If not 0, the module will wait for this task id to be completed. Use O(wait_task_completion) if you want to wait for completion of a previously
-        executed task with O(wait_completion=false). You can execute this module repeatedly on a list of failover IPs using O(wait_completion=false)
-        (see examples).
+      - If not 0, the module will wait for this task ID to be completed. Use O(wait_task_completion) if you want to wait for
+        completion of a previously executed task with O(wait_completion=false). You can execute this module repeatedly on
+        a list of failover IPs using O(wait_completion=false) (see examples).
     type: int
   application_key:
     required: true

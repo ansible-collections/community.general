@@ -22,7 +22,7 @@ extends_documentation_fragment:
 options:
   ids:
     description:
-      - A list of images ids whose facts you want to gather.
+      - A list of images IDs whose facts you want to gather.
       - Module can use integers too.
     aliases: ['id']
     type: list
@@ -30,8 +30,8 @@ options:
   name:
     description:
       - A O(name) of the image whose facts will be gathered.
-      - If the O(name) begins with V(~) the O(name) will be used as regex pattern,
-        which restricts the list of images (whose facts will be returned) whose names match specified regex.
+      - If the O(name) begins with V(~) the O(name) will be used as regex pattern, which restricts the list of images (whose
+        facts will be returned) whose names match specified regex.
       - Also, if the O(name) begins with V(~*) case-insensitive matching will be performed.
       - See examples for more details.
     type: str
@@ -84,7 +84,7 @@ images:
   returned: success
   contains:
     id:
-      description: The image's id.
+      description: The image's ID.
       type: int
       sample: 153
     name:
@@ -92,7 +92,7 @@ images:
       type: str
       sample: app1
     group_id:
-      description: The image's group id.
+      description: The image's group ID.
       type: int
       sample: 1
     group_name:
@@ -100,7 +100,7 @@ images:
       type: str
       sample: one-users
     owner_id:
-      description: The image's owner id.
+      description: The image's owner ID.
       type: int
       sample: 143
     owner_name:

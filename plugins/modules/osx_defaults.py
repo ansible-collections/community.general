@@ -18,8 +18,9 @@ author:
 short_description: Manage macOS user defaults
 description:
   - This module allows users to read, write, and delete macOS user defaults from Ansible scripts.
-  - MacOS applications and other programs use the defaults system to record user preferences and other information that must be maintained when
-    the applications are not running (such as default font for new documents, or the position of an Info panel).
+  - MacOS applications and other programs use the defaults system to record user preferences and other information that must
+    be maintained when the applications are not running (such as default font for new documents, or the position of an Info
+    panel).
 extends_documentation_fragment:
   - community.general.attributes
 attributes:

@@ -28,8 +28,8 @@ options:
   name:
     description:
       - Name of package(s) to install/remove.
-      - C(NAME=VERSION) syntax is also supported to install a package in a certain version. See the examples. This only works on Yocto based Linux
-        distributions (opkg>=0.3.2) and not for OpenWrt. This is supported since community.general 6.2.0.
+      - V(NAME=VERSION) syntax is also supported to install a package in a certain version. See the examples. This only works
+        on Yocto based Linux distributions (opkg>=0.3.2) and not for OpenWrt. This is supported since community.general 6.2.0.
     aliases: [pkg]
     required: true
     type: list
@@ -43,7 +43,8 @@ options:
   force:
     description:
       - The C(opkg --force) parameter used.
-      - State V("") is deprecated and will be removed in community.general 12.0.0. Please omit the parameter O(force) to obtain the same behavior.
+      - State V("") is deprecated and will be removed in community.general 12.0.0. Please omit the parameter O(force) to obtain
+        the same behavior.
     choices:
       - ""
       - "depends"

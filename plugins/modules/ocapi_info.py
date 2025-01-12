@@ -93,7 +93,8 @@ operationStatus:
   sample: "Activate needed"
 
 operationStatusId:
-  description: Integer value of status (corresponds to operationStatus). Applies to O(command=JobStatus). See OCAPI documentation for details.
+  description: Integer value of status (corresponds to operationStatus). Applies to O(command=JobStatus). See OCAPI documentation
+    for details.
   returned: when supported
   type: int
   sample: 65540
@@ -106,8 +107,8 @@ operationHealth:
 
 operationHealthId:
   description: >-
-    Integer value for health of the operation (corresponds to RV(operationHealth)). Applies to O(command=JobStatus). See OCAPI documentation for
-    details.
+    Integer value for health of the operation (corresponds to RV(operationHealth)). Applies to O(command=JobStatus). See OCAPI
+    documentation for details.
   returned: when supported
   type: str
   sample: "OK"
