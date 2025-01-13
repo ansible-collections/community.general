@@ -8,8 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: influxdb_write
 short_description: Write data points into InfluxDB
 description:
@@ -37,34 +36,33 @@ options:
 extends_documentation_fragment:
   - community.general.influxdb
   - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Write points into database
   community.general.influxdb_write:
-      hostname: "{{influxdb_ip_address}}"
-      database_name: "{{influxdb_database_name}}"
-      data_points:
-        - measurement: connections
-          tags:
-            host: server01
-            region: us-west
-          time: "{{ ansible_date_time.iso8601 }}"
-          fields:
-            value: 2000
-        - measurement: connections
-          tags:
-            host: server02
-            region: us-east
-          time: "{{ ansible_date_time.iso8601 }}"
-          fields:
-            value: 3000
-'''
+    hostname: "{{influxdb_ip_address}}"
+    database_name: "{{influxdb_database_name}}"
+    data_points:
+      - measurement: connections
+        tags:
+          host: server01
+          region: us-west
+        time: "{{ ansible_date_time.iso8601 }}"
+        fields:
+          value: 2000
+      - measurement: connections
+        tags:
+          host: server02
+          region: us-east
+        time: "{{ ansible_date_time.iso8601 }}"
+        fields:
+          value: 3000
+"""
 
-RETURN = r'''
+RETURN = r"""
 # only defaults
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native

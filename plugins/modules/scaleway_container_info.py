@@ -11,8 +11,7 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: scaleway_container_info
 short_description: Retrieve information on Scaleway Container
 version_added: 6.0.0
@@ -46,18 +45,18 @@ options:
     description:
       - Name of the container.
     required: true
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Get a container info
   community.general.scaleway_container_info:
     namespace_id: '{{ scw_container_namespace }}'
     region: fr-par
     name: my-awesome-container
   register: container_info_task
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 container:
   description: The container information.
   returned: always
@@ -67,7 +66,7 @@ container:
     description: Container used for testing scaleway_container ansible module
     domain_name: cnansibletestgfogtjod-cn-ansible-test.functions.fnc.fr-par.scw.cloud
     environment_variables:
-        MY_VAR: my_value
+      MY_VAR: my_value
     error_message: null
     http_option: ""
     id: c9070eb0-d7a4-48dd-9af3-4fb139890721
@@ -87,7 +86,7 @@ container:
         value: $argon2id$v=19$m=65536,t=1,p=2$tb6UwSPWx/rH5Vyxt9Ujfw$5ZlvaIjWwNDPxD9Rdght3NarJz4IETKjpvAU3mMSmFg
     status: created
     timeout: 300s
-'''
+"""
 
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
     SCALEWAY_REGIONS, scaleway_argument_spec, Scaleway,
@@ -97,8 +96,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 def info_strategy(api, wished_cn):
     cn_list = api.fetch_all_resources("containers")
-    cn_lookup = dict((fn["name"], fn)
-                     for fn in cn_list)
+    cn_lookup = {cn["name"]: cn for cn in cn_list}
 
     if wished_cn["name"] not in cn_lookup:
         msg = "Error during container lookup: Unable to find container named '%s' in namespace '%s'" % (wished_cn["name"],

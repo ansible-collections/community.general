@@ -7,7 +7,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: xfconf_info
 author:
   - "Alexei Znamensky (@russoz)"
@@ -25,25 +25,21 @@ attributes:
 options:
   channel:
     description:
-    - >
-      A Xfconf preference channel is a top-level tree key, inside of the
-      Xfconf repository that corresponds to the location for which all
-      application properties/keys are stored.
-    - If not provided, the module will list all available channels.
+      - A Xfconf preference channel is a top-level tree key, inside of the Xfconf repository that corresponds to the location
+        for which all application properties/keys are stored.
+      - If not provided, the module lists all available channels.
     type: str
   property:
     description:
-    - >
-      A Xfce preference key is an element in the Xfconf repository
-      that corresponds to an application preference.
-    - If provided, then O(channel) is required.
-    - If not provided and a O(channel) is provided, then the module will list all available properties in that O(channel).
+      - A Xfce preference key is an element in the Xfconf repository that corresponds to an application preference.
+      - If provided, then O(channel) is required.
+      - If not provided and a O(channel) is provided, then the module lists all available properties in that O(channel).
     type: str
 notes:
   - See man xfconf-query(1) for more details.
-'''
+"""
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Get list of all available channels
   community.general.xfconf_info: {}
   register: result
@@ -66,66 +62,73 @@ EXAMPLES = """
   register: result
 """
 
-RETURN = '''
-  channels:
-    description:
-      - List of available channels.
-      - Returned when the module receives no parameter at all.
-    returned: success
-    type: list
-    elements: str
-    sample:
+RETURN = r"""
+channels:
+  description:
+    - List of available channels.
+    - Returned when the module receives no parameter at all.
+  returned: success
+  type: list
+  elements: str
+  sample:
     - xfce4-desktop
     - displays
     - xsettings
     - xfwm4
-  properties:
-    description:
-      - List of available properties for a specific channel.
-      - Returned by passing only the O(channel) parameter to the module.
-    returned: success
-    type: list
-    elements: str
-    sample:
-      - /Gdk/WindowScalingFactor
-      - /Gtk/ButtonImages
-      - /Gtk/CursorThemeSize
-      - /Gtk/DecorationLayout
-      - /Gtk/FontName
-      - /Gtk/MenuImages
-      - /Gtk/MonospaceFontName
-      - /Net/DoubleClickTime
-      - /Net/IconThemeName
-      - /Net/ThemeName
-      - /Xft/Antialias
-      - /Xft/Hinting
-      - /Xft/HintStyle
-      - /Xft/RGBA
-  is_array:
-    description:
-      - Flag indicating whether the property is an array or not.
-    returned: success
-    type: bool
-  value:
-    description:
-      - The value of the property. Empty if the property is of array type.
-    returned: success
-    type: str
-    sample: Monospace 10
-  value_array:
-    description:
-      - The array value of the property. Empty if the property is not of array type.
-    returned: success
-    type: list
-    elements: str
-    sample:
-      - Main
-      - Work
-      - Tmp
-'''
+properties:
+  description:
+    - List of available properties for a specific channel.
+    - Returned by passing only the O(channel) parameter to the module.
+  returned: success
+  type: list
+  elements: str
+  sample:
+    - /Gdk/WindowScalingFactor
+    - /Gtk/ButtonImages
+    - /Gtk/CursorThemeSize
+    - /Gtk/DecorationLayout
+    - /Gtk/FontName
+    - /Gtk/MenuImages
+    - /Gtk/MonospaceFontName
+    - /Net/DoubleClickTime
+    - /Net/IconThemeName
+    - /Net/ThemeName
+    - /Xft/Antialias
+    - /Xft/Hinting
+    - /Xft/HintStyle
+    - /Xft/RGBA
+is_array:
+  description:
+    - Flag indicating whether the property is an array or not.
+  returned: success
+  type: bool
+value:
+  description:
+    - The value of the property. Empty if the property is of array type.
+  returned: success
+  type: str
+  sample: Monospace 10
+value_array:
+  description:
+    - The array value of the property. Empty if the property is not of array type.
+  returned: success
+  type: list
+  elements: str
+  sample:
+    - Main
+    - Work
+    - Tmp
+version:
+  description:
+    - The version of the C(xfconf-query) command.
+  returned: success
+  type: str
+  sample: 4.18.1
+  version_added: 10.2.0
+"""
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
-from ansible_collections.community.general.plugins.module_utils.xfconf import xfconf_runner
+from ansible_collections.community.general.plugins.module_utils.xfconf import xfconf_runner, get_xfconf_version
 
 
 class XFConfInfo(ModuleHelper):
@@ -139,9 +142,11 @@ class XFConfInfo(ModuleHelper):
         ),
         supports_check_mode=True,
     )
+    use_old_vardict = False
 
     def __init_module__(self):
         self.runner = xfconf_runner(self.module, check_rc=True)
+        self.vars.version = get_xfconf_version(self.runner)
         self.vars.set("list_arg", False, output=False)
         self.vars.set("is_array", False)
 
@@ -176,7 +181,7 @@ class XFConfInfo(ModuleHelper):
             proc = self._process_list_properties
 
         with self.runner.context('list_arg channel property', output_process=proc) as ctx:
-            result = ctx.run(**self.vars)
+            result = ctx.run(**self.vars.as_dict())
 
         if not self.vars.list_arg and self.vars.is_array:
             output = "value_array"

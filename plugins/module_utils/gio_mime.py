@@ -12,10 +12,12 @@ from ansible_collections.community.general.plugins.module_utils.cmd_runner impor
 def gio_mime_runner(module, **kwargs):
     return CmdRunner(
         module,
-        command=['gio', 'mime'],
+        command=['gio'],
         arg_formats=dict(
+            mime=cmd_runner_fmt.as_fixed('mime'),
             mime_type=cmd_runner_fmt.as_list(),
             handler=cmd_runner_fmt.as_list(),
+            version=cmd_runner_fmt.as_fixed('--version'),
         ),
         **kwargs
     )
@@ -28,5 +30,5 @@ def gio_mime_get(runner, mime_type):
         out = out.splitlines()[0]
         return out.split()[-1]
 
-    with runner("mime_type", output_process=process) as ctx:
+    with runner("mime mime_type", output_process=process) as ctx:
         return ctx.run(mime_type=mime_type)

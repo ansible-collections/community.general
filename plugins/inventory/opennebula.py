@@ -96,7 +96,8 @@ except ImportError:
 
 from ansible.errors import AnsibleError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable
-from ansible.module_utils.common.text.converters import to_native
+
+from ansible_collections.community.general.plugins.plugin_utils.unsafe import make_unsafe
 
 from collections import namedtuple
 import os
@@ -126,9 +127,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
                     authstring = fp.read().rstrip()
                 username, password = authstring.split(":")
             except (OSError, IOError):
-                raise AnsibleError("Could not find or read ONE_AUTH file at '{e}'".format(e=authfile))
+                raise AnsibleError(f"Could not find or read ONE_AUTH file at '{authfile}'")
             except Exception:
-                raise AnsibleError("Error occurs when reading ONE_AUTH file at '{e}'".format(e=authfile))
+                raise AnsibleError(f"Error occurs when reading ONE_AUTH file at '{authfile}'")
 
         auth_params = namedtuple('auth', ('url', 'username', 'password'))
 
@@ -141,7 +142,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
             nic = [nic]
 
         for net in nic:
-            return net['IP']
+            if net.get('IP'):
+                return net['IP']
 
         return False
 
@@ -163,13 +165,13 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         if not (auth.username and auth.password):
             raise AnsibleError('API Credentials missing. Check OpenNebula inventory file.')
         else:
-            one_client = pyone.OneServer(auth.url, session=auth.username + ':' + auth.password)
+            one_client = pyone.OneServer(auth.url, session=f"{auth.username}:{auth.password}")
 
         # get hosts (VMs)
         try:
             vm_pool = one_client.vmpool.infoextended(-2, -1, -1, 3)
         except Exception as e:
-            raise AnsibleError("Something happened during XML-RPC call: {e}".format(e=to_native(e)))
+            raise AnsibleError(f"Something happened during XML-RPC call: {e}")
 
         return vm_pool
 
@@ -196,6 +198,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
                     continue
 
             server['name'] = vm.NAME
+            server['id'] = vm.ID
+            if hasattr(vm.HISTORY_RECORDS, 'HISTORY') and vm.HISTORY_RECORDS.HISTORY:
+                server['host'] = vm.HISTORY_RECORDS.HISTORY[-1].HOSTNAME
             server['LABELS'] = labels
             server['v4_first_ip'] = self._get_vm_ipv4(vm)
             server['v6_first_ip'] = self._get_vm_ipv6(vm)
@@ -215,6 +220,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         filter_by_label = self.get_option('filter_by_label')
         servers = self._retrieve_servers(filter_by_label)
         for server in servers:
+            server = make_unsafe(server)
             hostname = server['name']
             # check for labels
             if group_by_labels and server['LABELS']:

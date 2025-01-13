@@ -9,6 +9,8 @@ edit_on_github:
   path_prefix: ''
 
 extra_links:
+  - description: Ask for help
+    url: https://forum.ansible.com/c/help/6/none
   - description: Submit a bug report
     url: https://github.com/ansible-collections/community.general/issues/new?assignees=&labels=&template=bug_report.yml
   - description: Request a feature
@@ -22,6 +24,10 @@ communication:
     - topic: General usage and support questions
       network: Libera
       channel: '#ansible'
-  mailing_lists:
-    - topic: Ansible Project List
-      url: https://groups.google.com/g/ansible-project
+  forums:
+    - topic: "Ansible Forum: General usage and support questions"
+      # The following URL directly points to the "Get Help" section
+      url: https://forum.ansible.com/c/help/6/none
+    - topic: "Ansible Forum: Discussions about the collection itself, not for specific modules or plugins"
+      # The following URL directly points to the "community-general" tag
+      url: https://forum.ansible.com/tag/community-general

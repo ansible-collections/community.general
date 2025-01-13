@@ -10,8 +10,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: java_keystore
 short_description: Create a Java keystore in JKS format
 description:
@@ -25,25 +24,22 @@ options:
   name:
     description:
       - Name of the certificate in the keystore.
-      - If the provided name does not exist in the keystore, the module
-        will re-create the keystore. This behavior changed in community.general 3.0.0,
-        before that the module would fail when the name did not match.
+      - If the provided name does not exist in the keystore, the module will re-create the keystore. This behavior changed
+        in community.general 3.0.0, before that the module would fail when the name did not match.
     type: str
     required: true
   certificate:
     description:
       - Content of the certificate used to create the keystore.
-      - If the fingerprint of the provided certificate does not match the
-        fingerprint of the certificate bundled in the keystore, the keystore
-        is regenerated with the provided certificate.
+      - If the fingerprint of the provided certificate does not match the fingerprint of the certificate bundled in the keystore,
+        the keystore is regenerated with the provided certificate.
       - Exactly one of O(certificate) or O(certificate_path) is required.
     type: str
   certificate_path:
     description:
       - Location of the certificate used to create the keystore.
-      - If the fingerprint of the provided certificate does not match the
-        fingerprint of the certificate bundled in the keystore, the keystore
-        is regenerated with the provided certificate.
+      - If the fingerprint of the provided certificate does not match the fingerprint of the certificate bundled in the keystore,
+        the keystore is regenerated with the provided certificate.
       - Exactly one of O(certificate) or O(certificate_path) is required.
     type: path
     version_added: '3.0.0'
@@ -66,10 +62,8 @@ options:
   password:
     description:
       - Password that should be used to secure the keystore.
-      - If the provided password fails to unlock the keystore, the module
-        will re-create the keystore with the new passphrase. This behavior
-        changed in community.general 3.0.0, before that the module would fail
-        when the password did not match.
+      - If the provided password fails to unlock the keystore, the module will re-create the keystore with the new passphrase.
+        This behavior changed in community.general 3.0.0, before that the module would fail when the password did not match.
     type: str
     required: true
   dest:
@@ -106,16 +100,13 @@ options:
   keystore_type:
     description:
       - Type of the Java keystore.
-      - When this option is omitted and the keystore doesn't already exist, the
-        behavior follows C(keytool)'s default store type which depends on
-        Java version; V(pkcs12) since Java 9 and V(jks) prior (may also
-        be V(pkcs12) if new default has been backported to this version).
-      - When this option is omitted and the keystore already exists, the current
-        type is left untouched, unless another option leads to overwrite the
-        keystore (in that case, this option behaves like for keystore creation).
-      - When O(keystore_type) is set, the keystore is created with this type if
-        it does not already exist, or is overwritten to match the given type in
-        case of mismatch.
+      - When this option is omitted and the keystore does not already exist, the behavior follows C(keytool)'s default store
+        type which depends on Java version; V(pkcs12) since Java 9 and V(jks) prior (may also be V(pkcs12) if new default
+        has been backported to this version).
+      - When this option is omitted and the keystore already exists, the current type is left untouched, unless another option
+        leads to overwrite the keystore (in that case, this option behaves like for keystore creation).
+      - When O(keystore_type) is set, the keystore is created with this type if it does not already exist, or is overwritten
+        to match the given type in case of mismatch.
     type: str
     choices:
       - jks
@@ -135,28 +126,24 @@ seealso:
   - module: community.crypto.openssl_pkcs12
   - module: community.general.java_cert
 notes:
-  - O(certificate) and O(private_key) require that their contents are available
-    on the controller (either inline in a playbook, or with the P(ansible.builtin.file#lookup) lookup),
-    while O(certificate_path) and O(private_key_path) require that the files are
-    available on the target host.
-  - By design, any change of a value of options O(keystore_type), O(name) or
-    O(password), as well as changes of key or certificate materials will cause
-    the existing O(dest) to be overwritten.
-'''
+  - O(certificate) and O(private_key) require that their contents are available on the controller (either inline in a playbook,
+    or with the P(ansible.builtin.file#lookup) lookup), while O(certificate_path) and O(private_key_path) require that the
+    files are available on the target host.
+  - By design, any change of a value of options O(keystore_type), O(name) or O(password), as well as changes of key or certificate
+    materials will cause the existing O(dest) to be overwritten.
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a keystore for the given certificate/private key pair (inline)
   community.general.java_keystore:
     name: example
     certificate: |
       -----BEGIN CERTIFICATE-----
-      h19dUZ2co2fI/ibYiwxWk4aeNE6KWvCaTQOMQ8t6Uo2XKhpL/xnjoAgh1uCQN/69
-      MG+34+RhUWzCfdZH7T8/qDxJw2kEPKluaYh7KnMsba+5jHjmtzix5QIDAQABo4IB
+      h19dUZ2co2f...
       -----END CERTIFICATE-----
     private_key: |
       -----BEGIN RSA PRIVATE KEY-----
-      DBVFTEVDVFJJQ0lURSBERSBGUkFOQ0UxFzAVBgNVBAsMDjAwMDIgNTUyMDgxMzE3
-      GLlDNMw/uHyME7gHFsqJA7O11VY6O5WQ4IDP3m/s5ZV6s+Nn6Lerz17VZ99
+      DBVFTEVDVFJ...
       -----END RSA PRIVATE KEY-----
     password: changeit
     dest: /etc/security/keystore.jks
@@ -176,9 +163,9 @@ EXAMPLES = '''
     private_key_path: /etc/ssl/private/ssl-cert-snakeoil.key
     password: changeit
     dest: /etc/security/keystore.jks
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 msg:
   description: Output from stdout of keytool/openssl command after execution of given command or an error.
   returned: changed and failure
@@ -192,17 +179,17 @@ err:
   sample: "Keystore password is too short - must be at least 6 characters\n"
 
 rc:
-  description: keytool/openssl command execution return value
+  description: Keytool/openssl command execution return value.
   returned: changed and failure
   type: int
   sample: "0"
 
 cmd:
-  description: Executed command to get action done
+  description: Executed command to get action done.
   returned: changed and failure
   type: str
   sample: "/usr/bin/openssl x509 -noout -in /tmp/user/1000/tmp8jd_lh23 -fingerprint -sha256"
-'''
+"""
 
 
 import os
@@ -472,7 +459,7 @@ class JavaKeystore:
 
         if self.keystore_type == 'pkcs12':
             # Preserve properties of the destination file, if any.
-            self.module.atomic_move(keystore_p12_path, self.keystore_path)
+            self.module.atomic_move(os.path.abspath(keystore_p12_path), os.path.abspath(self.keystore_path))
             self.update_permissions()
             self.result['changed'] = True
             return self.result

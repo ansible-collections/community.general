@@ -14,100 +14,101 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: pkgng
 short_description: Package manager for FreeBSD >= 9.0
 description:
-    - Manage binary packages for FreeBSD using 'pkgng' which is available in versions after 9.0.
+  - Manage binary packages for FreeBSD using C(pkgng) which is available in versions after 9.0.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    name:
-        description:
-            - Name or list of names of packages to install/remove.
-            - "With O(name=*), O(state=latest) will operate, but O(state=present) and O(state=absent) will be noops."
-        required: true
-        aliases: [pkg]
-        type: list
-        elements: str
-    state:
-        description:
-            - State of the package.
-        choices: [ 'present', 'latest', 'absent' ]
-        required: false
-        default: present
-        type: str
-    cached:
-        description:
-            - Use local package base instead of fetching an updated one.
-        type: bool
-        required: false
-        default: false
-    annotation:
-        description:
-            - A list of keyvalue-pairs of the form
-              C(<+/-/:><key>[=<value>]). A V(+) denotes adding an annotation, a
-              V(-) denotes removing an annotation, and V(:) denotes modifying an
-              annotation.
-              If setting or modifying annotations, a value must be provided.
-        required: false
-        type: list
-        elements: str
-    pkgsite:
-        description:
-            - For pkgng versions before 1.1.4, specify packagesite to use
-              for downloading packages. If not specified, use settings from
-              C(/usr/local/etc/pkg.conf).
-            - For newer pkgng versions, specify a the name of a repository
-              configured in C(/usr/local/etc/pkg/repos).
-        required: false
-        type: str
-    rootdir:
-        description:
-            - For pkgng versions 1.5 and later, pkg will install all packages
-              within the specified root directory.
-            - Can not be used together with O(chroot) or O(jail) options.
-        required: false
-        type: path
-    chroot:
-        description:
-            - Pkg will chroot in the specified environment.
-            - Can not be used together with O(rootdir) or O(jail) options.
-        required: false
-        type: path
-    jail:
-        description:
-            - Pkg will execute in the given jail name or id.
-            - Can not be used together with O(chroot) or O(rootdir) options.
-        type: str
-    autoremove:
-        description:
-            - Remove automatically installed packages which are no longer needed.
-        required: false
-        type: bool
-        default: false
-    ignore_osver:
-        description:
-            - Ignore FreeBSD OS version check, useful on -STABLE and -CURRENT branches.
-            - Defines the E(IGNORE_OSVERSION) environment variable.
-        required: false
-        type: bool
-        default: false
-        version_added: 1.3.0
+  name:
+    description:
+      - Name or list of names of packages to install/remove.
+      - With O(name=*), O(state=latest) will operate, but O(state=present) and O(state=absent) will be noops.
+    required: true
+    aliases: [pkg]
+    type: list
+    elements: str
+  state:
+    description:
+      - State of the package.
+    choices: ['present', 'latest', 'absent']
+    required: false
+    default: present
+    type: str
+  cached:
+    description:
+      - Use local package base instead of fetching an updated one.
+    type: bool
+    required: false
+    default: false
+  annotation:
+    description:
+      - A list of keyvalue-pairs of the form C(<+/-/:><key>[=<value>]). A V(+) denotes adding an annotation, a V(-) denotes
+        removing an annotation, and V(:) denotes modifying an annotation. If setting or modifying annotations, a value must
+        be provided.
+    required: false
+    type: list
+    elements: str
+  pkgsite:
+    description:
+      - For C(pkgng) versions before 1.1.4, specify C(packagesite) to use for downloading packages. If not specified, use
+        settings from C(/usr/local/etc/pkg.conf).
+      - For newer C(pkgng) versions, specify a the name of a repository configured in C(/usr/local/etc/pkg/repos).
+    required: false
+    type: str
+  rootdir:
+    description:
+      - For C(pkgng) versions 1.5 and later, pkg will install all packages within the specified root directory.
+      - Can not be used together with O(chroot) or O(jail) options.
+    required: false
+    type: path
+  chroot:
+    description:
+      - Pkg will chroot in the specified environment.
+      - Can not be used together with O(rootdir) or O(jail) options.
+    required: false
+    type: path
+  jail:
+    description:
+      - Pkg will execute in the given jail name or ID.
+      - Can not be used together with O(chroot) or O(rootdir) options.
+    type: str
+  autoremove:
+    description:
+      - Remove automatically installed packages which are no longer needed.
+    required: false
+    type: bool
+    default: false
+  ignore_osver:
+    description:
+      - Ignore FreeBSD OS version check, useful on C(-STABLE) and C(-CURRENT) branches.
+      - Defines the E(IGNORE_OSVERSION) environment variable.
+    required: false
+    type: bool
+    default: false
+    version_added: 1.3.0
+  use_globs:
+    description:
+      - Treat the package names as shell glob patterns.
+    required: false
+    type: bool
+    default: true
+    version_added: 9.3.0
 author: "bleader (@bleader)"
 notes:
-  - When using pkgsite, be careful that already in cache packages won't be downloaded again.
-  - When used with a C(loop:) each package will be processed individually,
-    it is much more efficient to pass the list directly to the O(name) option.
-'''
+  - When using pkgsite, be careful that already in cache packages will not be downloaded again.
+  - When used with a C(loop:) each package will be processed individually, it is much more efficient to pass the list directly
+    to the O(name) option.
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Install package foo
   community.general.pkgng:
     name: foo
@@ -127,7 +128,6 @@ EXAMPLES = '''
       - bar
     state: absent
 
-# "latest" support added in 2.7
 - name: Upgrade package baz
   community.general.pkgng:
     name: baz
@@ -137,7 +137,13 @@ EXAMPLES = '''
   community.general.pkgng:
     name: "*"
     state: latest
-'''
+
+- name: Upgrade foo/bar
+  community.general.pkgng:
+    name: foo/bar
+    state: latest
+    use_globs: false
+"""
 
 
 from collections import defaultdict
@@ -147,7 +153,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 def query_package(module, run_pkgng, name):
 
-    rc, out, err = run_pkgng('info', '-g', '-e', name)
+    rc, out, err = run_pkgng('info', '-e', name)
 
     return rc == 0
 
@@ -157,7 +163,7 @@ def query_update(module, run_pkgng, name):
     # Check to see if a package upgrade is available.
     # rc = 0, no updates available or package not installed
     # rc = 1, updates available
-    rc, out, err = run_pkgng('upgrade', '-g', '-n', name)
+    rc, out, err = run_pkgng('upgrade', '-n', name)
 
     return rc == 1
 
@@ -260,7 +266,7 @@ def install_packages(module, run_pkgng, packages, cached, state):
             action_count[action] += len(package_list)
             continue
 
-        pkgng_args = [action, '-g', '-U', '-y'] + package_list
+        pkgng_args = [action, '-U', '-y'] + package_list
         rc, out, err = run_pkgng(*pkgng_args)
         stdout += out
         stderr += err
@@ -290,7 +296,7 @@ def install_packages(module, run_pkgng, packages, cached, state):
 
 
 def annotation_query(module, run_pkgng, package, tag):
-    rc, out, err = run_pkgng('info', '-g', '-A', package)
+    rc, out, err = run_pkgng('info', '-A', package)
     match = re.search(r'^\s*(?P<tag>%s)\s*:\s*(?P<value>\w+)' % tag, out, flags=re.MULTILINE)
     if match:
         return match.group('value')
@@ -425,7 +431,9 @@ def main():
             rootdir=dict(required=False, type='path'),
             chroot=dict(required=False, type='path'),
             jail=dict(required=False, type='str'),
-            autoremove=dict(default=False, type='bool')),
+            autoremove=dict(default=False, type='bool'),
+            use_globs=dict(default=True, required=False, type='bool'),
+        ),
         supports_check_mode=True,
         mutually_exclusive=[["rootdir", "chroot", "jail"]])
 
@@ -465,6 +473,9 @@ def main():
 
     def run_pkgng(action, *args, **kwargs):
         cmd = [pkgng_path, dir_arg, action]
+
+        if p["use_globs"] and action in ('info', 'install', 'upgrade',):
+            args = ('-g',) + args
 
         pkgng_env = {'BATCH': 'yes'}
 

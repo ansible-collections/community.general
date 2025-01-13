@@ -8,100 +8,98 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: keycloak_component_info
 
-short_description: Retrive component info in Keycloak
+short_description: Retrieve component info in Keycloak
 
 version_added: 8.2.0
 
 description:
-    - This module retrive information on component from Keycloak.
+  - This module retrieve information on component from Keycloak.
+attributes:
+  action_group:
+    version_added: 10.2.0
+
 options:
-    realm:
-        description:
-            - The name of the realm.
-        required: true
-        type: str
-    name:
-        description:
-            - Name of the Component.
-        type: str
-    provider_type:
-        description:
-            - Provider type of components.
-            - "Example:
-                V(org.keycloak.storage.UserStorageProvider),
-                V(org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy),
-                V(org.keycloak.keys.KeyProvider),
-                V(org.keycloak.userprofile.UserProfileProvider),
-                V(org.keycloak.storage.ldap.mappers.LDAPStorageMapper)."
-        type: str
-    parent_id:
-        description:
-            - Container ID of the components.
-        type: str
+  realm:
+    description:
+      - The name of the realm.
+    required: true
+    type: str
+  name:
+    description:
+      - Name of the Component.
+    type: str
+  provider_type:
+    description:
+      - Provider type of components.
+      - 'Examples: V(org.keycloak.storage.UserStorageProvider), V(org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy),
+        V(org.keycloak.keys.KeyProvider), V(org.keycloak.userprofile.UserProfileProvider), V(org.keycloak.storage.ldap.mappers.LDAPStorageMapper).'
+    type: str
+  parent_id:
+    description:
+      - Container ID of the components.
+    type: str
 
 
 extends_documentation_fragment:
-    - community.general.keycloak
-    - community.general.attributes
-    - community.general.attributes.info_module
+  - community.general.keycloak
+  - community.general.keycloak.actiongroup_keycloak
+  - community.general.attributes
+  - community.general.attributes.info_module
 
 author:
-    - Andre Desrosiers (@desand01)
-'''
+  - Andre Desrosiers (@desand01)
+"""
 
-EXAMPLES = '''
-    - name: Retrive info of a UserStorageProvider named myldap
-      community.general.keycloak_component_info:
-        auth_keycloak_url: http://localhost:8080/auth
-        auth_sername: admin
-        auth_password: password
-        auth_realm: master
-        realm: myrealm
-        name: myldap
-        provider_type: org.keycloak.storage.UserStorageProvider
+EXAMPLES = r"""
+- name: Retrive info of a UserStorageProvider named myldap
+  community.general.keycloak_component_info:
+    auth_keycloak_url: http://localhost:8080/auth
+    auth_sername: admin
+    auth_password: password
+    auth_realm: master
+    realm: myrealm
+    name: myldap
+    provider_type: org.keycloak.storage.UserStorageProvider
 
-    - name: Retrive key info component
-      community.general.keycloak_component_info:
-        auth_keycloak_url: http://localhost:8080/auth
-        auth_sername: admin
-        auth_password: password
-        auth_realm: master
-        realm: myrealm
-        name: rsa-enc-generated
-        provider_type: org.keycloak.keys.KeyProvider
+- name: Retrive key info component
+  community.general.keycloak_component_info:
+    auth_keycloak_url: http://localhost:8080/auth
+    auth_sername: admin
+    auth_password: password
+    auth_realm: master
+    realm: myrealm
+    name: rsa-enc-generated
+    provider_type: org.keycloak.keys.KeyProvider
 
-    - name: Retrive all component from realm master
-      community.general.keycloak_component_info:
-        auth_keycloak_url: http://localhost:8080/auth
-        auth_sername: admin
-        auth_password: password
-        auth_realm: master
-        realm: myrealm
+- name: Retrive all component from realm master
+  community.general.keycloak_component_info:
+    auth_keycloak_url: http://localhost:8080/auth
+    auth_sername: admin
+    auth_password: password
+    auth_realm: master
+    realm: myrealm
 
-    - name: Retrive all sub components of parent component filter by type
-      community.general.keycloak_component_info:
-        auth_keycloak_url: http://localhost:8080/auth
-        auth_sername: admin
-        auth_password: password
-        auth_realm: master
-        realm: myrealm
-        parent_id: "075ef2fa-19fc-4a6d-bf4c-249f57365fd2"
-        provider_type: "org.keycloak.storage.ldap.mappers.LDAPStorageMapper"
+- name: Retrive all sub components of parent component filter by type
+  community.general.keycloak_component_info:
+    auth_keycloak_url: http://localhost:8080/auth
+    auth_sername: admin
+    auth_password: password
+    auth_realm: master
+    realm: myrealm
+    parent_id: "075ef2fa-19fc-4a6d-bf4c-249f57365fd2"
+    provider_type: "org.keycloak.storage.ldap.mappers.LDAPStorageMapper"
+"""
 
-
-'''
-
-RETURN = '''
+RETURN = r"""
 components:
   description: JSON representation of components.
   returned: always
   type: list
   elements: dict
-'''
+"""
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, \
     keycloak_argument_spec, get_token, KeycloakError

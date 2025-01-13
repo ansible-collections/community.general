@@ -9,13 +9,12 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: netcup_dns
 notes: []
 short_description: Manage Netcup DNS records
 description:
-  - "Manages DNS records via the Netcup API, see the docs U(https://ccp.netcup.net/run/webservice/servers/endpoint.php)."
+  - Manages DNS records using the Netcup API, see the docs U(https://ccp.netcup.net/run/webservice/servers/endpoint.php).
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -26,17 +25,17 @@ attributes:
 options:
   api_key:
     description:
-      - "API key for authentication, must be obtained via the netcup CCP (U(https://ccp.netcup.net))."
+      - API key for authentication, must be obtained using the netcup CCP (U(https://ccp.netcup.net)).
     required: true
     type: str
   api_password:
     description:
-      - "API password for authentication, must be obtained via the netcup CCP (U(https://ccp.netcup.net))."
+      - API password for authentication, must be obtained using the netcup CCP (U(https://ccp.netcup.net)).
     required: true
     type: str
   customer_id:
     description:
-      - Netcup customer id.
+      - Netcup customer ID.
     required: true
     type: int
   domain:
@@ -48,7 +47,7 @@ options:
     description:
       - Record to add or delete, supports wildcard (V(*)). Default is V(@) (that is, the zone name).
     default: "@"
-    aliases: [ name ]
+    aliases: [name]
     type: str
   type:
     description:
@@ -80,7 +79,7 @@ options:
       - Whether the record should exist or not.
     required: false
     default: present
-    choices: [ 'present', 'absent' ]
+    choices: ['present', 'absent']
     type: str
   timeout:
     description:
@@ -91,10 +90,9 @@ options:
 requirements:
   - "nc-dnsapi >= 0.1.3"
 author: "Nicolai Buchwitz (@nbuchwitz)"
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a record of type A
   community.general.netcup_dns:
     api_key: "..."
@@ -156,41 +154,41 @@ EXAMPLES = '''
     type: "A"
     value: "127.0.0.1"
     timeout: 30
+"""
 
-'''
-
-RETURN = '''
+RETURN = r"""
 records:
-    description: list containing all records
-    returned: success
-    type: complex
-    contains:
-        name:
-            description: the record name
-            returned: success
-            type: str
-            sample: fancy-hostname
-        type:
-            description: the record type
-            returned: success
-            type: str
-            sample: A
-        value:
-            description: the record destination
-            returned: success
-            type: str
-            sample: 127.0.0.1
-        priority:
-            description: the record priority (only relevant if type=MX)
-            returned: success
-            type: int
-            sample: 0
-        id:
-            description: internal id of the record
-            returned: success
-            type: int
-            sample: 12345
-'''
+  description: List containing all records.
+  returned: success
+  type: list
+  elements: dict
+  contains:
+    name:
+      description: The record name.
+      returned: success
+      type: str
+      sample: fancy-hostname
+    type:
+      description: The record type.
+      returned: success
+      type: str
+      sample: A
+    value:
+      description: The record destination.
+      returned: success
+      type: str
+      sample: 127.0.0.1
+    priority:
+      description: The record priority (only relevant if RV(records[].type=MX)).
+      returned: success
+      type: int
+      sample: 0
+    id:
+      description: Internal ID of the record.
+      returned: success
+      type: int
+      sample: 12345
+"""
 
 import traceback
 

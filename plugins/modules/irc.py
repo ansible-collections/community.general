@@ -9,8 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: irc
 short_description: Send a message to an IRC channel or a nick
 description:
@@ -26,12 +25,12 @@ options:
   server:
     type: str
     description:
-      - IRC server name/address
+      - IRC server name/address.
     default: localhost
   port:
     type: int
     description:
-      - IRC server port number
+      - IRC server port number.
     default: 6667
   nick:
     type: str
@@ -46,84 +45,80 @@ options:
   topic:
     type: str
     description:
-      - Set the channel topic
+      - Set the channel topic.
   color:
     type: str
     description:
       - Text color for the message.
     default: "none"
-    choices: [ "none", "white", "black", "blue", "green", "red", "brown", "purple", "orange", "yellow", "light_green", "teal", "light_cyan",
-               "light_blue", "pink", "gray", "light_gray"]
+    choices: ["none", "white", "black", "blue", "green", "red", "brown", "purple", "orange", "yellow", "light_green", "teal",
+      "light_cyan", "light_blue", "pink", "gray", "light_gray"]
     aliases: [colour]
   channel:
     type: str
     description:
-      - Channel name.  One of nick_to or channel needs to be set.  When both are set, the message will be sent to both of them.
+      - Channel name. One of nick_to or channel needs to be set. When both are set, the message will be sent to both of them.
   nick_to:
     type: list
     elements: str
     description:
-      - A list of nicknames to send the message to. One of nick_to or channel needs to be set.  When both are defined, the message will be sent to both of them.
+      - A list of nicknames to send the message to. One of nick_to or channel needs to be set. When both are defined, the
+        message will be sent to both of them.
   key:
     type: str
     description:
-      - Channel key
+      - Channel key.
   passwd:
     type: str
     description:
-      - Server password
+      - Server password.
   timeout:
     type: int
     description:
-      - Timeout to use while waiting for successful registration and join
-        messages, this is to prevent an endless loop
+      - Timeout to use while waiting for successful registration and join messages, this is to prevent an endless loop.
     default: 30
   use_tls:
     description:
-      - Designates whether TLS/SSL should be used when connecting to the IRC server
-      - O(use_tls) is available since community.general 8.1.0, before the option
-        was exlusively called O(use_ssl). The latter is now an alias of O(use_tls).
-      - B(Note:) for security reasons, you should always set O(use_tls=true) and
-        O(validate_certs=true) whenever possible.
-      - The option currently defaults to V(false). The default has been B(deprecated) and will
-        change to V(true) in community.general 10.0.0. To avoid deprecation warnings, explicitly
-        set this option to a value (preferably V(true)).
+      - Designates whether TLS/SSL should be used when connecting to the IRC server.
+      - O(use_tls) is available since community.general 8.1.0, before the option was exlusively called O(use_ssl). The latter
+        is now an alias of O(use_tls).
+      - B(Note:) for security reasons, you should always set O(use_tls=true) and O(validate_certs=true) whenever possible.
+      - The default of this option changed to V(true) in community.general 10.0.0.
     type: bool
+    default: true
     aliases:
       - use_ssl
   part:
     description:
-      - Designates whether user should part from channel after sending message or not.
-        Useful for when using a faux bot and not wanting join/parts between messages.
+      - Designates whether user should part from channel after sending message or not. Useful for when using a mock bot and
+        not wanting join/parts between messages.
     type: bool
     default: true
   style:
     type: str
     description:
-      - Text style for the message. Note italic does not work on some clients
-    choices: [ "bold", "underline", "reverse", "italic", "none" ]
+      - Text style for the message. Note italic does not work on some clients.
+    choices: ["bold", "underline", "reverse", "italic", "none"]
     default: none
   validate_certs:
     description:
       - If set to V(false), the SSL certificates will not be validated.
-      - This should always be set to V(true). Using V(false) is unsafe and should only be done
-        if the network between between Ansible and the IRC server is known to be safe.
-      - B(Note:) for security reasons, you should always set O(use_tls=true) and
-        O(validate_certs=true) whenever possible.
-      - The option currently defaults to V(false). The default has been B(deprecated) and will
-        change to V(true) in community.general 10.0.0. To avoid deprecation warnings, explicitly
-        set this option to a value (preferably V(true)).
+      - This should always be set to V(true). Using V(false) is unsafe and should only be done if the network between between
+        Ansible and the IRC server is known to be safe.
+      - B(Note:) for security reasons, you should always set O(use_tls=true) and O(validate_certs=true) whenever possible.
+      - The default of this option changed to V(true) in community.general 10.0.0.
     type: bool
+    default: true
     version_added: 8.1.0
 
 # informational: requirements for nodes
-requirements: [ socket ]
+requirements: [socket]
 author:
-    - "Jan-Piet Mens (@jpmens)"
-    - "Matt Martz (@sivel)"
-'''
+  - "Jan-Piet Mens (@jpmens)"
+  - "Matt Martz (@sivel)"
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Send a message to an IRC channel from nick ansible
   community.general.irc:
     server: irc.example.net
@@ -158,7 +153,7 @@ EXAMPLES = '''
     msg: 'All finished at {{ ansible_date_time.iso8601 }}'
     color: red
     nick: ansibleIRC
-'''
+"""
 
 # ===========================================
 # IRC module support methods.
@@ -313,8 +308,8 @@ def main():
             passwd=dict(no_log=True),
             timeout=dict(type='int', default=30),
             part=dict(type='bool', default=True),
-            use_tls=dict(type='bool', aliases=['use_ssl']),
-            validate_certs=dict(type='bool'),
+            use_tls=dict(type='bool', default=True, aliases=['use_ssl']),
+            validate_certs=dict(type='bool', default=True),
         ),
         supports_check_mode=True,
         required_one_of=[['channel', 'nick_to']]
@@ -337,25 +332,6 @@ def main():
     part = module.params["part"]
     style = module.params["style"]
     validate_certs = module.params["validate_certs"]
-
-    if use_tls is None:
-        module.deprecate(
-            'The default of use_tls will change to true in community.general 10.0.0.'
-            ' Set a value now (preferably true, if possible) to avoid the deprecation warning.',
-            version='10.0.0',
-            collection_name='community.general',
-        )
-        use_tls = False
-
-    if validate_certs is None:
-        if use_tls:
-            module.deprecate(
-                'The default of validate_certs will change to true in community.general 10.0.0.'
-                ' Set a value now (prefarably true, if possible) to avoid the deprecation warning.',
-                version='10.0.0',
-                collection_name='community.general',
-            )
-        validate_certs = False
 
     try:
         send_msg(msg, server, port, channel, nick_to, key, topic, nick, color, passwd, timeout, use_tls, validate_certs, part, style)

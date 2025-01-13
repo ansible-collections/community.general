@@ -7,8 +7,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: lxd_project
 short_description: Manage LXD projects
 version_added: 4.8.0
@@ -18,98 +17,91 @@ author: "Raymond Chang (@we10710aa)"
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    name:
-        description:
-          - Name of the project.
-        required: true
-        type: str
+  name:
     description:
-        description:
-          - Description of the project.
-        type: str
-    config:
-        description:
-          - 'The config for the project (for example V({"features.profiles": "true"})).
-            See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/projects/project_get).'
-          - If the project already exists and its "config" value in metadata
-            obtained from
-            C(GET /1.0/projects/<name>)
-            U(https://documentation.ubuntu.com/lxd/en/latest/api/#/projects/project_get)
-            are different, then this module tries to apply the configurations
-            U(https://documentation.ubuntu.com/lxd/en/latest/api/#/projects/project_put).
-        type: dict
-    new_name:
-        description:
-          - A new name of a project.
-          - If this parameter is specified a project will be renamed to this name.
-            See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/projects/project_post).
-        required: false
-        type: str
-    merge_project:
-        description:
-            - Merge the configuration of the present project with the new desired configuration,
-              instead of replacing it. If configuration is the same after merged, no change will be made.
-        required: false
-        default: false
-        type: bool
-    state:
-        choices:
-          - present
-          - absent
-        description:
-          - Define the state of a project.
-        required: false
-        default: present
-        type: str
-    url:
-        description:
-          - The Unix domain socket path or the https URL for the LXD server.
-        required: false
-        default: unix:/var/lib/lxd/unix.socket
-        type: str
-    snap_url:
-        description:
-          - The Unix domain socket path when LXD is installed by snap package manager.
-        required: false
-        default: unix:/var/snap/lxd/common/lxd/unix.socket
-        type: str
-    client_key:
-        description:
-          - The client certificate key file path.
-          - If not specified, it defaults to C($HOME/.config/lxc/client.key).
-        required: false
-        aliases: [ key_file ]
-        type: path
-    client_cert:
-        description:
-          - The client certificate file path.
-          - If not specified, it defaults to C($HOME/.config/lxc/client.crt).
-        required: false
-        aliases: [ cert_file ]
-        type: path
-    trust_password:
-        description:
-          - The client trusted password.
-          - 'You need to set this password on the LXD server before
-            running this module using the following command:
-            C(lxc config set core.trust_password <some random password>)
-            See U(https://www.stgraber.org/2016/04/18/lxd-api-direct-interaction/).'
-          - If O(trust_password) is set, this module send a request for
-            authentication before sending any requests.
-        required: false
-        type: str
+      - Name of the project.
+    required: true
+    type: str
+  description:
+    description:
+      - Description of the project.
+    type: str
+  config:
+    description:
+      - 'The config for the project (for example V({"features.profiles": "true"})).'
+      - See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/projects/project_get).
+      - If the project already exists and its "config" value in metadata obtained from C(GET /1.0/projects/<name>)
+        U(https://documentation.ubuntu.com/lxd/en/latest/api/#/projects/project_get)
+        are different, then this module tries to apply the configurations U(https://documentation.ubuntu.com/lxd/en/latest/api/#/projects/project_put).
+    type: dict
+  new_name:
+    description:
+      - A new name of a project.
+      - If this parameter is specified a project will be renamed to this name.
+      - See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/projects/project_post).
+    required: false
+    type: str
+  merge_project:
+    description:
+      - Merge the configuration of the present project with the new desired configuration, instead of replacing it. If configuration
+        is the same after merged, no change will be made.
+    required: false
+    default: false
+    type: bool
+  state:
+    choices:
+      - present
+      - absent
+    description:
+      - Define the state of a project.
+    required: false
+    default: present
+    type: str
+  url:
+    description:
+      - The Unix domain socket path or the https URL for the LXD server.
+    required: false
+    default: unix:/var/lib/lxd/unix.socket
+    type: str
+  snap_url:
+    description:
+      - The Unix domain socket path when LXD is installed by snap package manager.
+    required: false
+    default: unix:/var/snap/lxd/common/lxd/unix.socket
+    type: str
+  client_key:
+    description:
+      - The client certificate key file path.
+      - If not specified, it defaults to C($HOME/.config/lxc/client.key).
+    required: false
+    aliases: [key_file]
+    type: path
+  client_cert:
+    description:
+      - The client certificate file path.
+      - If not specified, it defaults to C($HOME/.config/lxc/client.crt).
+    required: false
+    aliases: [cert_file]
+    type: path
+  trust_password:
+    description:
+      - The client trusted password.
+      - 'You need to set this password on the LXD server before running this module using the following command: C(lxc config
+        set core.trust_password <some random password>) See U(https://www.stgraber.org/2016/04/18/lxd-api-direct-interaction/).'
+      - If O(trust_password) is set, this module send a request for authentication before sending any requests.
+    required: false
+    type: str
 notes:
-  - Projects must have a unique name. If you attempt to create a project
-    with a name that already existed in the users namespace the module will
-    simply return as "unchanged".
-'''
+  - Projects must have a unique name. If you attempt to create a project with a name that already existed in the users namespace
+    the module will simply return as "unchanged".
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # An example for creating a project
 - hosts: localhost
   connection: local
@@ -132,9 +124,9 @@ EXAMPLES = '''
         state: present
         config: {}
         description: my new project
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 old_state:
   description: The old state of the project.
   returned: success
@@ -184,7 +176,7 @@ actions:
   type: list
   elements: str
   sample: ["create"]
-'''
+"""
 
 from ansible_collections.community.general.plugins.module_utils.lxd import (
     LXDClient, LXDClientException, default_key_file, default_cert_file

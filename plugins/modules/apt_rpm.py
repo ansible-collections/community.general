@@ -11,8 +11,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: apt_rpm
 short_description: APT-RPM package manager
 description:
@@ -28,28 +27,37 @@ options:
   package:
     description:
       - List of packages to install, upgrade, or remove.
-      - Since community.general 8.0.0, may include paths to local C(.rpm) files
-        if O(state=installed) or O(state=present), requires C(rpm) python
-        module.
-    aliases: [ name, pkg ]
+      - Since community.general 8.0.0, may include paths to local C(.rpm) files if O(state=installed) or O(state=present),
+        requires C(rpm) Python module.
+    aliases: [name, pkg]
     type: list
     elements: str
   state:
     description:
       - Indicates the desired package state.
-    choices: [ absent, present, installed, removed ]
+      - Please note that V(present) and V(installed) are equivalent to V(latest) right now. This will change in the future.
+        To simply ensure that a package is installed, without upgrading it, use the V(present_not_latest) state.
+      - The states V(latest) and V(present_not_latest) have been added in community.general 8.6.0.
+    choices:
+      - absent
+      - present
+      - present_not_latest
+      - installed
+      - removed
+      - latest
     default: present
     type: str
   update_cache:
     description:
-      - Run the equivalent of C(apt-get update) before the operation. Can be run as part of the package installation or as a separate step.
+      - Run the equivalent of C(apt-get update) before the operation. Can be run as part of the package installation or as
+        a separate step.
       - Default is not to update the cache.
     type: bool
     default: false
   clean:
     description:
-      - Run the equivalent of C(apt-get clean) to clear out the local repository of retrieved package files. It removes everything but
-        the lock file from C(/var/cache/apt/archives/) and C(/var/cache/apt/archives/partial/).
+      - Run the equivalent of C(apt-get clean) to clear out the local repository of retrieved package files. It removes everything
+        but the lock file from C(/var/cache/apt/archives/) and C(/var/cache/apt/archives/partial/).
       - Can be run as part of the package installation (clean runs before install) or as a separate step.
     type: bool
     default: false
@@ -67,13 +75,12 @@ options:
     default: false
     version_added: 6.5.0
 requirements:
-  - C(rpm) python package (rpm bindings), optional. Required if O(package)
-    option includes local files.
+  - C(rpm) Python package (rpm bindings), optional. Required if O(package) option includes local files.
 author:
-- Evgenii Terechkov (@evgkrsk)
-'''
+  - Evgenii Terechkov (@evgkrsk)
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Install package foo
   community.general.apt_rpm:
     pkg: foo
@@ -112,7 +119,7 @@ EXAMPLES = '''
     update_cache: true
     dist_upgrade: true
     update_kernel: true
-'''
+"""
 
 import os
 import re
@@ -160,7 +167,7 @@ def local_rpm_package_name(path):
 def query_package(module, name):
     # rpm -q returns 0 if the package is installed,
     # 1 if it is not installed
-    rc, out, err = module.run_command("%s -q %s" % (RPM_PATH, name))
+    rc, out, err = module.run_command([RPM_PATH, "-q", name])
     if rc == 0:
         return True
     else:
@@ -180,7 +187,7 @@ def check_package_version(module, name):
     return False
 
 
-def query_package_provides(module, name):
+def query_package_provides(module, name, allow_upgrade=False):
     # rpm -q returns 0 if the package is installed,
     # 1 if it is not installed
     if name.endswith('.rpm'):
@@ -193,12 +200,13 @@ def query_package_provides(module, name):
 
         name = local_rpm_package_name(name)
 
-    rc, out, err = module.run_command("%s -q --provides %s" % (RPM_PATH, name))
+    rc, out, err = module.run_command([RPM_PATH, "-q", "--provides", name])
     if rc == 0:
+        if not allow_upgrade:
+            return True
         if check_package_version(module, name):
             return True
-    else:
-        return False
+    return False
 
 
 def update_package_db(module):
@@ -242,7 +250,7 @@ def remove_packages(module, packages):
         if not query_package(module, package):
             continue
 
-        rc, out, err = module.run_command("%s -y remove %s" % (APT_PATH, package), environ_update={"LANG": "C"})
+        rc, out, err = module.run_command([APT_PATH, "-y", "remove", package], environ_update={"LANG": "C"})
 
         if rc != 0:
             module.fail_json(msg="failed to remove %s: %s" % (package, err))
@@ -255,28 +263,28 @@ def remove_packages(module, packages):
     return (False, "package(s) already absent")
 
 
-def install_packages(module, pkgspec):
+def install_packages(module, pkgspec, allow_upgrade=False):
 
     if pkgspec is None:
         return (False, "Empty package list")
 
-    packages = ""
+    packages = []
     for package in pkgspec:
-        if not query_package_provides(module, package):
-            packages += "'%s' " % package
+        if not query_package_provides(module, package, allow_upgrade=allow_upgrade):
+            packages.append(package)
 
-    if len(packages) != 0:
-
-        rc, out, err = module.run_command("%s -y install %s" % (APT_PATH, packages), environ_update={"LANG": "C"})
+    if packages:
+        command = [APT_PATH, "-y", "install"] + packages
+        rc, out, err = module.run_command(command, environ_update={"LANG": "C"})
 
         installed = True
-        for packages in pkgspec:
-            if not query_package_provides(module, package):
+        for package in pkgspec:
+            if not query_package_provides(module, package, allow_upgrade=False):
                 installed = False
 
         # apt-rpm always have 0 for exit code if --force is used
         if rc or not installed:
-            module.fail_json(msg="'apt-get -y install %s' failed: %s" % (packages, err))
+            module.fail_json(msg="'%s' failed: %s" % (" ".join(command), err))
         else:
             return (True, "%s present(s)" % packages)
     else:
@@ -286,7 +294,7 @@ def install_packages(module, pkgspec):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(type='str', default='present', choices=['absent', 'installed', 'present', 'removed']),
+            state=dict(type='str', default='present', choices=['absent', 'installed', 'present', 'removed', 'present_not_latest', 'latest']),
             update_cache=dict(type='bool', default=False),
             clean=dict(type='bool', default=False),
             dist_upgrade=dict(type='bool', default=False),
@@ -299,6 +307,18 @@ def main():
         module.fail_json(msg="cannot find /usr/bin/apt-get and/or /usr/bin/rpm")
 
     p = module.params
+    if p['state'] in ['installed', 'present']:
+        module.deprecate(
+            'state=%s currently behaves unexpectedly by always upgrading to the latest version if'
+            ' the package is already installed. This behavior is deprecated and will change in'
+            ' community.general 11.0.0. You can use state=latest to explicitly request this behavior'
+            ' or state=present_not_latest to explicitly request the behavior that state=%s will have'
+            ' in community.general 11.0.0, namely that the package will not be upgraded if it is'
+            ' already installed.' % (p['state'], p['state']),
+            version='11.0.0',
+            collection_name='community.general',
+        )
+
     modified = False
     output = ""
 
@@ -320,8 +340,8 @@ def main():
         output += out
 
     packages = p['package']
-    if p['state'] in ['installed', 'present']:
-        (m, out) = install_packages(module, packages)
+    if p['state'] in ['installed', 'present', 'present_not_latest', 'latest']:
+        (m, out) = install_packages(module, packages, allow_upgrade=p['state'] != 'present_not_latest')
         modified = modified or m
         output += out
 

@@ -7,43 +7,41 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: oneview_fc_network
 short_description: Manage OneView Fibre Channel Network resources
 description:
-    - Provides an interface to manage Fibre Channel Network resources. Can create, update, and delete.
+  - Provides an interface to manage Fibre Channel Network resources. Can create, update, and delete.
 requirements:
-    - "hpOneView >= 4.0.0"
+  - "hpOneView >= 4.0.0"
 author: "Felipe Bulsoni (@fgbulsoni)"
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    state:
-        description:
-            - Indicates the desired state for the Fibre Channel Network resource.
-              V(present) will ensure data properties are compliant with OneView.
-              V(absent) will remove the resource from OneView, if it exists.
-        type: str
-        choices: ['present', 'absent']
-        required: true
-    data:
-        description:
-            - List with the Fibre Channel Network properties.
-        type: dict
-        required: true
+  state:
+    description:
+      - Indicates the desired state for the Fibre Channel Network resource.
+      - V(present) will ensure data properties are compliant with OneView.
+      - V(absent) will remove the resource from OneView, if it exists.
+    type: str
+    choices: ['present', 'absent']
+    required: true
+  data:
+    description:
+      - List with the Fibre Channel Network properties.
+    type: dict
+    required: true
 
 extends_documentation_fragment:
-    - community.general.oneview
-    - community.general.oneview.validateetag
-    - community.general.attributes
+  - community.general.oneview
+  - community.general.oneview.validateetag
+  - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Ensure that the Fibre Channel Network is present using the default configuration
   community.general.oneview_fc_network:
     config: "{{ config_file_path }}"
@@ -75,14 +73,14 @@ EXAMPLES = '''
     state: absent
     data:
       name: 'New FC Network'
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 fc_network:
-    description: Has the facts about the managed OneView FC Network.
-    returned: On state 'present'. Can be null.
-    type: dict
-'''
+  description: Has the facts about the managed OneView FC Network.
+  returned: On O(state=present). Can be null.
+  type: dict
+"""
 
 from ansible_collections.community.general.plugins.module_utils.oneview import OneViewModuleBase
 

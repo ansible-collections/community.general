@@ -1,0 +1,33 @@
+---
+# Copyright (c) 2020, Thales Netherlands
+# Copyright (c) 2021, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+common:
+  vars:
+    provider_instances:
+      servicedata1:
+        host: "{{ hostvars[groups['provider'] | first].inventory_hostname }}"
+        user: usr
+        pass: pwd
+      servicedata2:
+        host: down
+        user: usr2
+        pass: pwd2
+  hosts:
+    host1:
+    host2:
+
+consumer:
+  vars:
+    service_data: "{{ provider_instances.servicedata1 }}"
+    merge2__1: "{{ service_data }}"  # service_data is a variable only known to host2, so normally it´s not available for host1 that is performing the merge
+  hosts:
+    host2:
+
+provider:
+  vars:
+    merge_result: "{{ lookup('community.general.merge_variables', 'merge2__', pattern_type='prefix', groups=['consumer']) }}"
+  hosts:
+    host1:

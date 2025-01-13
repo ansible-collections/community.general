@@ -14,6 +14,7 @@ from ansible_collections.community.general.plugins.module_utils.module_helper im
 )
 
 
+# remove in 11.0.0
 def test_dependency_ctxmgr():
     ctx = DependencyCtxMgr("POTATOES", "Potatoes must be installed")
     with ctx:
@@ -36,6 +37,7 @@ def test_dependency_ctxmgr():
     assert ctx.has_it
 
 
+# remove in 11.0.0
 def test_variable_meta():
     meta = VarMeta()
     assert meta.output is True
@@ -51,6 +53,7 @@ def test_variable_meta():
     assert meta.diff_result is None
 
 
+# remove in 11.0.0
 def test_variable_meta_diff():
     meta = VarMeta(diff=True)
     assert meta.output is True
@@ -70,6 +73,7 @@ def test_variable_meta_diff():
     assert meta.diff_result == {"before": "abc", "after": "ghi"}
 
 
+# remove in 11.0.0
 def test_vardict():
     vd = VarDict()
     vd.set('a', 123)
@@ -99,6 +103,7 @@ def test_vardict():
     assert vd.diff() == {'before': {'a': 123}, 'after': {'a': 'new_a'}}, "diff={0}".format(vd.diff())
 
 
+# remove in 11.0.0
 def test_variable_meta_change():
     vd = VarDict()
     vd.set('a', 123, change=True)
@@ -119,28 +124,27 @@ def test_variable_meta_change():
     assert vd.has_changed('d')
 
 
-class MockMH(object):
-    changed = None
-
-    def _div(self, x, y):
-        return x / y
-
-    func_none = cause_changes()(_div)
-    func_onsucc = cause_changes(on_success=True)(_div)
-    func_onfail = cause_changes(on_failure=True)(_div)
-    func_onboth = cause_changes(on_success=True, on_failure=True)(_div)
-
-
-CAUSE_CHG_DECO_PARAMS = ['method', 'expect_exception', 'expect_changed']
+#
+# DEPRECATION NOTICE
+# Parameters on_success and on_failure are deprecated and will be removed in community.genral 12.0.0
+# Remove testcases with those params when releasing 12.0.0
+#
+CAUSE_CHG_DECO_PARAMS = ['deco_args', 'expect_exception', 'expect_changed']
 CAUSE_CHG_DECO = dict(
-    none_succ=dict(method='func_none', expect_exception=False, expect_changed=None),
-    none_fail=dict(method='func_none', expect_exception=True, expect_changed=None),
-    onsucc_succ=dict(method='func_onsucc', expect_exception=False, expect_changed=True),
-    onsucc_fail=dict(method='func_onsucc', expect_exception=True, expect_changed=None),
-    onfail_succ=dict(method='func_onfail', expect_exception=False, expect_changed=None),
-    onfail_fail=dict(method='func_onfail', expect_exception=True, expect_changed=True),
-    onboth_succ=dict(method='func_onboth', expect_exception=False, expect_changed=True),
-    onboth_fail=dict(method='func_onboth', expect_exception=True, expect_changed=True),
+    none_succ=dict(deco_args={}, expect_exception=False, expect_changed=None),
+    none_fail=dict(deco_args={}, expect_exception=True, expect_changed=None),
+    onsucc_succ=dict(deco_args=dict(on_success=True), expect_exception=False, expect_changed=True),
+    onsucc_fail=dict(deco_args=dict(on_success=True), expect_exception=True, expect_changed=None),
+    onfail_succ=dict(deco_args=dict(on_failure=True), expect_exception=False, expect_changed=None),
+    onfail_fail=dict(deco_args=dict(on_failure=True), expect_exception=True, expect_changed=True),
+    onboth_succ=dict(deco_args=dict(on_success=True, on_failure=True), expect_exception=False, expect_changed=True),
+    onboth_fail=dict(deco_args=dict(on_success=True, on_failure=True), expect_exception=True, expect_changed=True),
+    whensucc_succ=dict(deco_args=dict(when="success"), expect_exception=False, expect_changed=True),
+    whensucc_fail=dict(deco_args=dict(when="success"), expect_exception=True, expect_changed=None),
+    whenfail_succ=dict(deco_args=dict(when="failure"), expect_exception=False, expect_changed=None),
+    whenfail_fail=dict(deco_args=dict(when="failure"), expect_exception=True, expect_changed=True),
+    whenalways_succ=dict(deco_args=dict(when="always"), expect_exception=False, expect_changed=True),
+    whenalways_fail=dict(deco_args=dict(when="always"), expect_exception=True, expect_changed=True),
 )
 CAUSE_CHG_DECO_IDS = sorted(CAUSE_CHG_DECO.keys())
 
@@ -150,12 +154,20 @@ CAUSE_CHG_DECO_IDS = sorted(CAUSE_CHG_DECO.keys())
                           for param in CAUSE_CHG_DECO_PARAMS]
                           for tc in CAUSE_CHG_DECO_IDS],
                          ids=CAUSE_CHG_DECO_IDS)
-def test_cause_changes_deco(method, expect_exception, expect_changed):
+def test_cause_changes_deco(deco_args, expect_exception, expect_changed):
+
+    class MockMH(object):
+        changed = None
+
+        @cause_changes(**deco_args)
+        def div_(self, x, y):
+            return x / y
+
     mh = MockMH()
     if expect_exception:
         with pytest.raises(Exception):
-            getattr(mh, method)(1, 0)
+            mh.div_(1, 0)
     else:
-        getattr(mh, method)(9, 3)
+        mh.div_(9, 3)
 
     assert mh.changed == expect_changed

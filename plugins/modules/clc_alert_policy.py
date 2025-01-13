@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
 #
 # Copyright (c) 2015 CenturyLink
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -10,13 +9,16 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: clc_alert_policy
 short_description: Create or Delete Alert Policies at CenturyLink Cloud
 description:
   - An Ansible module to Create or Delete Alert Policies at CenturyLink Cloud.
 extends_documentation_fragment:
   - community.general.attributes
+  - community.general.clc
+author:
+  - "CLC Runner (@clc-runner)"
 attributes:
   check_mode:
     support: full
@@ -25,67 +27,45 @@ attributes:
 options:
   alias:
     description:
-      - The alias of your CLC Account
+      - The alias of your CLC Account.
     type: str
     required: true
   name:
     description:
-      - The name of the alert policy. This is mutually exclusive with id
+      - The name of the alert policy. This is mutually exclusive with O(id).
     type: str
   id:
     description:
-      - The alert policy id. This is mutually exclusive with name
+      - The alert policy ID. This is mutually exclusive with O(name).
     type: str
   alert_recipients:
     description:
-      - A list of recipient email ids to notify the alert.
-        This is required for state 'present'
+      - A list of recipient email IDs to notify the alert. This is required for O(state=present).
     type: list
     elements: str
   metric:
     description:
-      - The metric on which to measure the condition that will trigger the alert.
-        This is required for state 'present'
+      - The metric on which to measure the condition that will trigger the alert. This is required for O(state=present).
     type: str
-    choices: ['cpu','memory','disk']
+    choices: ['cpu', 'memory', 'disk']
   duration:
     description:
-      - The length of time in minutes that the condition must exceed the threshold.
-        This is required for state 'present'
+      - The length of time in minutes that the condition must exceed the threshold. This is required for O(state=present).
     type: str
   threshold:
     description:
-      - The threshold that will trigger the alert when the metric equals or exceeds it.
-        This is required for state 'present'
-        This number represents a percentage and must be a value between 5.0 - 95.0 that is a multiple of 5.0
+      - The threshold that will trigger the alert when the metric equals or exceeds it. This is required for O(state=present).
+        This number represents a percentage and must be a value between 5.0 - 95.0 that is a multiple of 5.0.
     type: int
   state:
     description:
       - Whether to create or delete the policy.
     type: str
     default: present
-    choices: ['present','absent']
-requirements:
-    - python = 2.7
-    - requests >= 2.5.0
-    - clc-sdk
-author: "CLC Runner (@clc-runner)"
-notes:
-    - To use this module, it is required to set the below environment variables which enables access to the
-      Centurylink Cloud
-          - CLC_V2_API_USERNAME, the account login id for the centurylink cloud
-          - CLC_V2_API_PASSWORD, the account password for the centurylink cloud
-    - Alternatively, the module accepts the API token and account alias. The API token can be generated using the
-      CLC account login and password via the HTTP api call @ https://api.ctl.io/v2/authentication/login
-          - CLC_V2_API_TOKEN, the API token generated from https://api.ctl.io/v2/authentication/login
-          - CLC_ACCT_ALIAS, the account alias associated with the centurylink cloud
-    - Users can set CLC_V2_API_URL to specify an endpoint for pointing to a different CLC environment.
-'''
+    choices: ['present', 'absent']
+"""
 
-EXAMPLES = '''
-# Note - You must set the CLC_V2_API_USERNAME And CLC_V2_API_PASSWD Environment variables before running these examples
-
----
+EXAMPLES = r"""
 - name: Create Alert Policy Example
   hosts: localhost
   gather_facts: false
@@ -96,8 +76,8 @@ EXAMPLES = '''
         alias: wfad
         name: 'alert for disk > 80%'
         alert_recipients:
-            - test1@centurylink.com
-            - test2@centurylink.com
+          - test1@centurylink.com
+          - test2@centurylink.com
         metric: 'disk'
         duration: '00:05:00'
         threshold: 80
@@ -121,11 +101,11 @@ EXAMPLES = '''
 
     - name: Debug
       ansible.builtin.debug: var=policy
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 policy:
-    description: The alert policy information
+    description: The alert policy information.
     returned: success
     type: dict
     sample:
@@ -162,7 +142,7 @@ policy:
                 }
             ]
         }
-'''
+"""
 
 __version__ = '${version}'
 

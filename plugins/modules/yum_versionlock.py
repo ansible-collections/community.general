@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: yum_versionlock
 version_added: 2.0.0
 short_description: Locks / unlocks a installed package(s) from being updated by yum package manager
@@ -32,62 +31,62 @@ options:
     elements: str
   state:
     description:
-    - If state is V(present), package(s) will be added to yum versionlock list.
-    - If state is V(absent), package(s) will be removed from yum versionlock list.
-    choices: [ 'absent', 'present' ]
+      - If state is V(present), package(s) is/are added to yum versionlock list.
+      - If state is V(absent), package(s) is/are removed from yum versionlock list.
+    choices: ['absent', 'present']
     type: str
     default: present
 notes:
-    - Requires yum-plugin-versionlock package on the remote node.
+  - Requires yum-plugin-versionlock package on the remote node.
 requirements:
-- yum
-- yum-versionlock
+  - yum
+  - yum-versionlock
 author:
-    - Florian Paul Azim Hoberg (@gyptazy)
-    - Amin Vakil (@aminvakil)
-'''
+  - Florian Paul Azim Hoberg (@gyptazy)
+  - Amin Vakil (@aminvakil)
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Prevent Apache / httpd from being updated
   community.general.yum_versionlock:
     state: present
     name:
-    - httpd
+      - httpd
 
 - name: Prevent Apache / httpd version 2.4.57-2 from being updated
   community.general.yum_versionlock:
     state: present
     name:
-    - httpd-0:2.4.57-2.el9
+      - httpd-0:2.4.57-2.el9
 
 - name: Prevent multiple packages from being updated
   community.general.yum_versionlock:
     state: present
     name:
-    - httpd
-    - nginx
-    - haproxy
-    - curl
+      - httpd
+      - nginx
+      - haproxy
+      - curl
 
 - name: Remove lock from Apache / httpd to be updated again
   community.general.yum_versionlock:
     state: absent
     name: httpd
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 packages:
-    description: A list of package(s) in versionlock list.
-    returned: success
-    type: list
-    elements: str
-    sample: [ 'httpd' ]
+  description: A list of package(s) in versionlock list.
+  returned: success
+  type: list
+  elements: str
+  sample: ['httpd']
 state:
-    description: State of package(s).
-    returned: success
-    type: str
-    sample: present
-'''
+  description: State of package(s).
+  returned: success
+  type: str
+  sample: present
+"""
 
 import re
 from ansible.module_utils.basic import AnsibleModule

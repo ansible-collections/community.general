@@ -8,45 +8,43 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: oneview_logical_interconnect_group
 short_description: Manage OneView Logical Interconnect Group resources
 description:
-    - Provides an interface to manage Logical Interconnect Group resources. Can create, update, or delete.
+  - Provides an interface to manage Logical Interconnect Group resources. Can create, update, or delete.
 requirements:
-    - hpOneView >= 4.0.0
+  - hpOneView >= 4.0.0
 author:
-    - Felipe Bulsoni (@fgbulsoni)
-    - Thiago Miotto (@tmiotto)
-    - Adriane Cardozo (@adriane-cardozo)
+  - Felipe Bulsoni (@fgbulsoni)
+  - Thiago Miotto (@tmiotto)
+  - Adriane Cardozo (@adriane-cardozo)
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    state:
-        description:
-            - Indicates the desired state for the Logical Interconnect Group resource.
-              V(absent) will remove the resource from OneView, if it exists.
-              V(present) will ensure data properties are compliant with OneView.
-        type: str
-        choices: [absent, present]
-        default: present
-    data:
-        description:
-            - List with the Logical Interconnect Group properties.
-        type: dict
-        required: true
+  state:
+    description:
+      - Indicates the desired state for the Logical Interconnect Group resource.
+      - V(absent) will remove the resource from OneView, if it exists.
+      - V(present) will ensure data properties are compliant with OneView.
+    type: str
+    choices: [absent, present]
+    default: present
+  data:
+    description:
+      - List with the Logical Interconnect Group properties.
+    type: dict
+    required: true
 extends_documentation_fragment:
-    - community.general.oneview
-    - community.general.oneview.validateetag
-    - community.general.attributes
+  - community.general.oneview
+  - community.general.oneview.validateetag
+  - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Ensure that the Logical Interconnect Group is present
   community.general.oneview_logical_interconnect_group:
     config: /etc/oneview/oneview_config.json
@@ -57,13 +55,13 @@ EXAMPLES = '''
       enclosureType: C7000
       interconnectMapTemplate:
         interconnectMapEntryTemplates:
-          - logicalDownlinkUri: ~
+          - logicalDownlinkUri:
             logicalLocation:
-                locationEntries:
-                    - relativeValue: 1
-                      type: Bay
-                    - relativeValue: 1
-                      type: Enclosure
+              locationEntries:
+                - relativeValue: 1
+                  type: Bay
+                - relativeValue: 1
+                  type: Enclosure
             permittedInterconnectTypeName: HP VC Flex-10/10D Module
             # Alternatively you can inform permittedInterconnectTypeUri
   delegate_to: localhost
@@ -95,14 +93,14 @@ EXAMPLES = '''
     data:
       name: New Logical Interconnect Group
   delegate_to: localhost
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 logical_interconnect_group:
-    description: Has the facts about the OneView Logical Interconnect Group.
-    returned: On state 'present'. Can be null.
-    type: dict
-'''
+  description: Has the facts about the OneView Logical Interconnect Group.
+  returned: On O(state=present). Can be null.
+  type: dict
+"""
 
 from ansible_collections.community.general.plugins.module_utils.oneview import OneViewModuleBase, OneViewModuleResourceNotFound
 

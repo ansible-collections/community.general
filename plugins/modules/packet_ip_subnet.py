@@ -10,26 +10,24 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: packet_ip_subnet
 
 short_description: Assign IP subnet to a bare metal server
 
 description:
-    - Assign or unassign IPv4 or IPv6 subnets to or from a device in the Packet host.
-    - IPv4 subnets must come from already reserved block.
-    - IPv6 subnets must come from publicly routable /56 block from your project.
-    - See U(https://support.packet.com/kb/articles/elastic-ips) for more info on IP block reservation.
-
+  - Assign or unassign IPv4 or IPv6 subnets to or from a device in the Packet host.
+  - IPv4 subnets must come from already reserved block.
+  - IPv6 subnets must come from publicly routable /56 block from your project.
+  - See U(https://support.packet.com/kb/articles/elastic-ips) for more info on IP block reservation.
 version_added: '0.2.0'
 
 author:
-    - Tomas Karasek (@t0mk) <tom.to.the.k@gmail.com>
-    - Nurfet Becirevic (@nurfet-becirevic) <nurfet.becirevic@gmail.com>
+  - Tomas Karasek (@t0mk) <tom.to.the.k@gmail.com>
+  - Nurfet Becirevic (@nurfet-becirevic) <nurfet.becirevic@gmail.com>
 
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 
 attributes:
   check_mode:
@@ -77,18 +75,20 @@ options:
   state:
     description:
       - Desired state of the IP subnet on the specified device.
-      - With O(state=present), you must specify either O(hostname) or O(device_id). Subnet with given CIDR will then be assigned to the specified device.
-      - With O(state=absent), you can specify either O(hostname) or O(device_id). The subnet will be removed from specified devices.
-      - If you leave both O(hostname) and O(device_id) empty, the subnet will be removed from any device it's assigned to.
+      - With O(state=present), you must specify either O(hostname) or O(device_id). Subnet with given CIDR will then be assigned
+        to the specified device.
+      - With O(state=absent), you can specify either O(hostname) or O(device_id). The subnet will be removed from specified
+        devices.
+      - If you leave both O(hostname) and O(device_id) empty, the subnet will be removed from any device it is assigned to.
     choices: ['present', 'absent']
     default: 'present'
     type: str
 
 requirements:
-     - "packet-python >= 1.35"
-'''
+  - "packet-python >= 1.35"
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # All the examples assume that you have your Packet API token in env var PACKET_API_TOKEN.
 # You can also pass it to the auth_token parameter of the module instead.
 
@@ -96,33 +96,33 @@ EXAMPLES = '''
   hosts: localhost
   tasks:
 
-  - packet_device:
-      project_id: 89b497ee-5afc-420a-8fb5-56984898f4df
-      hostnames: myserver
-      operating_system: ubuntu_16_04
-      plan: baremetal_0
-      facility: sjc1
-      state: active
+    - packet_device:
+        project_id: 89b497ee-5afc-420a-8fb5-56984898f4df
+        hostnames: myserver
+        operating_system: ubuntu_16_04
+        plan: baremetal_0
+        facility: sjc1
+        state: active
 
 # Pick an IPv4 address from a block allocated to your project.
 
-  - community.general.packet_ip_subnet:
-      project_id: 89b497ee-5afc-420a-8fb5-56984898f4df
-      hostname: myserver
-      cidr: "147.75.201.78/32"
+    - community.general.packet_ip_subnet:
+        project_id: 89b497ee-5afc-420a-8fb5-56984898f4df
+        hostname: myserver
+        cidr: "147.75.201.78/32"
 
 # Release IP address 147.75.201.78
 
 - name: Unassign IP address from any device in your project
   hosts: localhost
   tasks:
-  - community.general.packet_ip_subnet:
-      project_id: 89b497ee-5afc-420a-8fb5-56984898f4df
-      cidr: "147.75.201.78/32"
-      state: absent
-'''
+    - community.general.packet_ip_subnet:
+        project_id: 89b497ee-5afc-420a-8fb5-56984898f4df
+        cidr: "147.75.201.78/32"
+        state: absent
+"""
 
-RETURN = '''
+RETURN = r"""
 changed:
   description: True if an IP address assignments were altered in any way (created or removed).
   type: bool
@@ -140,7 +140,7 @@ subnet:
   sample:
     address: 147.75.90.241
     address_family: 4
-    assigned_to: { href : /devices/61f9aa5e-0530-47f5-97c2-113828e61ed0 }
+    assigned_to: {href: /devices/61f9aa5e-0530-47f5-97c2-113828e61ed0}
     cidr: 31
     created_at: '2017-08-07T15:15:30Z'
     enabled: true
@@ -153,7 +153,7 @@ subnet:
     network: 147.75.90.240
     public: true
   returned: success
-'''
+"""
 
 
 import uuid

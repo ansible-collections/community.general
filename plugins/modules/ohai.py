@@ -9,15 +9,12 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: ohai
 short_description: Returns inventory data from I(Ohai)
 description:
-  - Similar to the M(community.general.facter) module, this runs the I(Ohai) discovery program
-    (U(https://docs.chef.io/ohai.html)) on the remote host and
-    returns JSON inventory data.
-    I(Ohai) data is a bit more verbose and nested than I(facter).
+  - Similar to the M(community.general.facter) module, this runs the I(Ohai) discovery program (U(https://docs.chef.io/ohai.html))
+    on the remote host and returns JSON inventory data. I(Ohai) data is a bit more verbose and nested than I(facter).
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -27,16 +24,16 @@ attributes:
     support: none
 options: {}
 notes: []
-requirements: [ "ohai" ]
+requirements: ["ohai"]
 author:
   - "Ansible Core Team"
   - "Michael DeHaan (@mpdehaan)"
-'''
+"""
 
-EXAMPLES = '''
-# Retrieve (ohai) data from all Web servers and store in one-file per host
+EXAMPLES = r"""
 ansible webservers -m ohai --tree=/tmp/ohaidata
-'''
+...
+"""
 import json
 
 from ansible.module_utils.basic import AnsibleModule

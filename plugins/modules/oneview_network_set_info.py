@@ -7,45 +7,42 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: oneview_network_set_info
 short_description: Retrieve information about the OneView Network Sets
 description:
-    - Retrieve information about the Network Sets from OneView.
+  - Retrieve information about the Network Sets from OneView.
 requirements:
-    - hpOneView >= 2.0.1
+  - hpOneView >= 2.0.1
 author:
-    - Felipe Bulsoni (@fgbulsoni)
-    - Thiago Miotto (@tmiotto)
-    - Adriane Cardozo (@adriane-cardozo)
+  - Felipe Bulsoni (@fgbulsoni)
+  - Thiago Miotto (@tmiotto)
+  - Adriane Cardozo (@adriane-cardozo)
 attributes:
-    check_mode:
-        version_added: 3.3.0
-        # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
+  check_mode:
+    version_added: 3.3.0
+    # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
 options:
-    name:
-      description:
-        - Network Set name.
-      type: str
+  name:
+    description:
+      - Network Set name.
+    type: str
 
-    options:
-      description:
-        - "List with options to gather information about Network Set.
-          Option allowed: V(withoutEthernet).
-          The option V(withoutEthernet) retrieves the list of network_sets excluding Ethernet networks."
-      type: list
-      elements: str
+  options:
+    description:
+      - 'List with options to gather information about Network Set. Option allowed: V(withoutEthernet). The option V(withoutEthernet)
+        retrieves the list of network_sets excluding Ethernet networks.'
+    type: list
+    elements: str
 
 extends_documentation_fragment:
   - community.general.oneview
   - community.general.oneview.factsparams
   - community.general.attributes
   - community.general.attributes.info_module
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Gather information about all Network Sets
   community.general.oneview_network_set_info:
     hostname: 172.16.101.48
@@ -86,7 +83,7 @@ EXAMPLES = '''
     password: my_password
     api_version: 500
     options:
-        - withoutEthernet
+      - withoutEthernet
   no_log: true
   delegate_to: localhost
   register: result
@@ -118,7 +115,7 @@ EXAMPLES = '''
     api_version: 500
     name: Name of the Network Set
     options:
-        - withoutEthernet
+      - withoutEthernet
   no_log: true
   delegate_to: localhost
   register: result
@@ -126,14 +123,14 @@ EXAMPLES = '''
 - name: Print fetched information about Network Set found by name, excluding Ethernet networks
   ansible.builtin.debug:
     msg: "{{ result.network_sets }}"
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 network_sets:
-    description: Has all the OneView information about the Network Sets.
-    returned: Always, but can be empty.
-    type: dict
-'''
+  description: Has all the OneView information about the Network Sets.
+  returned: Always, but can be empty.
+  type: dict
+"""
 
 from ansible_collections.community.general.plugins.module_utils.oneview import OneViewModuleBase
 

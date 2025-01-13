@@ -9,88 +9,87 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: spectrum_device
 short_description: Creates/deletes devices in CA Spectrum
 description:
-    - This module allows you to create and delete devices in CA Spectrum U(https://www.ca.com/us/products/ca-spectrum.html).
-    - Tested on CA Spectrum 9.4.2, 10.1.1 and 10.2.1
+  - This module allows you to create and delete devices in CA Spectrum U(https://www.ca.com/us/products/ca-spectrum.html).
+  - Tested on CA Spectrum 9.4.2, 10.1.1 and 10.2.1.
 author: "Renato Orgito (@orgito)"
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    device:
-        type: str
-        aliases: [ host, name ]
-        required: true
-        description:
-            - IP address of the device.
-            - If a hostname is given, it will be resolved to the IP address.
-    community:
-        type: str
-        description:
-            - SNMP community used for device discovery.
-            - Required when O(state=present).
-        required: true
-    landscape:
-        type: str
-        required: true
-        description:
-            - Landscape handle of the SpectroServer to which add or remove the device.
-    state:
-        type: str
-        description:
-            - On V(present) creates the device when it does not exist.
-            - On V(absent) removes the device when it exists.
-        choices: ['present', 'absent']
-        default: 'present'
-    url:
-        type: str
-        aliases: [ oneclick_url ]
-        required: true
-        description:
-            - HTTP, HTTPS URL of the Oneclick server in the form V((http|https\)://host.domain[:port]).
-    url_username:
-        type: str
-        aliases: [ oneclick_user ]
-        required: true
-        description:
-            - Oneclick user name.
-    url_password:
-        type: str
-        aliases: [ oneclick_password ]
-        required: true
-        description:
-            - Oneclick user password.
-    use_proxy:
-        description:
-            - if V(false), it will not use a proxy, even if one is defined in an environment variable on the target hosts.
-        default: true
-        type: bool
-    validate_certs:
-        description:
-            - If V(false), SSL certificates will not be validated. This should only be used
-              on personally controlled sites using self-signed certificates.
-        default: true
-        type: bool
-    agentport:
-        type: int
-        required: false
-        description:
-            - UDP port used for SNMP discovery.
-        default: 161
+  device:
+    type: str
+    aliases: [host, name]
+    required: true
+    description:
+      - IP address of the device.
+      - If a hostname is given, it will be resolved to the IP address.
+  community:
+    type: str
+    description:
+      - SNMP community used for device discovery.
+      - Required when O(state=present).
+    required: true
+  landscape:
+    type: str
+    required: true
+    description:
+      - Landscape handle of the SpectroServer to which add or remove the device.
+  state:
+    type: str
+    description:
+      - On V(present) creates the device when it does not exist.
+      - On V(absent) removes the device when it exists.
+    choices: ['present', 'absent']
+    default: 'present'
+  url:
+    type: str
+    aliases: [oneclick_url]
+    required: true
+    description:
+      - HTTP, HTTPS URL of the Oneclick server in the form V((http|https\)://host.domain[:port]).
+  url_username:
+    type: str
+    aliases: [oneclick_user]
+    required: true
+    description:
+      - Oneclick user name.
+  url_password:
+    type: str
+    aliases: [oneclick_password]
+    required: true
+    description:
+      - Oneclick user password.
+  use_proxy:
+    description:
+      - If V(false), it will not use a proxy, even if one is defined in an environment variable on the target hosts.
+    default: true
+    type: bool
+  validate_certs:
+    description:
+      - If V(false), SSL certificates will not be validated. This should only be used on personally controlled sites using
+        self-signed certificates.
+    default: true
+    type: bool
+  agentport:
+    type: int
+    required: false
+    description:
+      - UDP port used for SNMP discovery.
+    default: 161
 notes:
-   -  The devices will be created inside the I(Universe) container of the specified landscape.
-   -  All the operations will be performed only on the specified landscape.
-'''
+  - The devices will be created inside the I(Universe) container of the specified landscape.
+  - All the operations will be performed only on the specified landscape.
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Add device to CA Spectrum
   local_action:
     module: spectrum_device
@@ -113,15 +112,15 @@ EXAMPLES = '''
     oneclick_password: password
     use_proxy: false
     state: absent
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 device:
-  description: device data when state = present
+  description: Device data when O(state=present).
   returned: success
   type: dict
   sample: {'model_handle': '0x1007ab', 'landscape': '0x100000', 'address': '10.10.5.1'}
-'''
+"""
 
 from socket import gethostbyname, gaierror
 import xml.etree.ElementTree as ET

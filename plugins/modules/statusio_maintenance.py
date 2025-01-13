@@ -9,127 +9,123 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
-
+DOCUMENTATION = r"""
 module: statusio_maintenance
 short_description: Create maintenance windows for your status.io dashboard
 description:
-  - Creates a maintenance window for status.io
-  - Deletes a maintenance window for status.io
+  - Creates or deletes a maintenance window for status.io.
 notes:
-  - You can use the apiary API url (http://docs.statusio.apiary.io/) to
-    capture API traffic
-  - Use start_date and start_time with minutes to set future maintenance window
+  - You can use the apiary API URL (U(http://docs.statusio.apiary.io/)) to capture API traffic.
+  - Use start_date and start_time with minutes to set future maintenance window.
 author: Benjamin Copeland (@bhcopeland) <ben@copeland.me.uk>
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    title:
-        type: str
-        description:
-            - A descriptive title for the maintenance window
-        default: "A new maintenance window"
-    desc:
-        type: str
-        description:
-            - Message describing the maintenance window
-        default: "Created by Ansible"
-    state:
-        type: str
-        description:
-            - Desired state of the package.
-        default: "present"
-        choices: ["present", "absent"]
-    api_id:
-        type: str
-        description:
-            - Your unique API ID from status.io
-        required: true
-    api_key:
-        type: str
-        description:
-            - Your unique API Key from status.io
-        required: true
-    statuspage:
-        type: str
-        description:
-            - Your unique StatusPage ID from status.io
-        required: true
-    url:
-        type: str
-        description:
-            - Status.io API URL. A private apiary can be used instead.
-        default: "https://api.status.io"
-    components:
-        type: list
-        elements: str
-        description:
-            - The given name of your component (server name)
-        aliases: ['component']
-    containers:
-        type: list
-        elements: str
-        description:
-            - The given name of your container (data center)
-        aliases: ['container']
-    all_infrastructure_affected:
-        description:
-            - If it affects all components and containers
-        type: bool
-        default: false
-    automation:
-        description:
-            - Automatically start and end the maintenance window
-        type: bool
-        default: false
-    maintenance_notify_now:
-        description:
-            - Notify subscribers now
-        type: bool
-        default: false
-    maintenance_notify_72_hr:
-        description:
-            - Notify subscribers 72 hours before maintenance start time
-        type: bool
-        default: false
-    maintenance_notify_24_hr:
-        description:
-            - Notify subscribers 24 hours before maintenance start time
-        type: bool
-        default: false
-    maintenance_notify_1_hr:
-        description:
-            - Notify subscribers 1 hour before maintenance start time
-        type: bool
-        default: false
-    maintenance_id:
-        type: str
-        description:
-            - The maintenance id number when deleting a maintenance window
-    minutes:
-        type: int
-        description:
-            - The length of time in UTC that the maintenance will run
-              (starting from playbook runtime)
-        default: 10
-    start_date:
-        type: str
-        description:
-            - Date maintenance is expected to start (Month/Day/Year) (UTC)
-            - End Date is worked out from start_date + minutes
-    start_time:
-        type: str
-        description:
-            - Time maintenance is expected to start (Hour:Minutes) (UTC)
-            - End Time is worked out from start_time + minutes
-'''
+  title:
+    type: str
+    description:
+      - A descriptive title for the maintenance window.
+    default: "A new maintenance window"
+  desc:
+    type: str
+    description:
+      - Message describing the maintenance window.
+    default: "Created by Ansible"
+  state:
+    type: str
+    description:
+      - Desired state of the package.
+    default: "present"
+    choices: ["present", "absent"]
+  api_id:
+    type: str
+    description:
+      - Your unique API ID from status.io.
+    required: true
+  api_key:
+    type: str
+    description:
+      - Your unique API Key from status.io.
+    required: true
+  statuspage:
+    type: str
+    description:
+      - Your unique StatusPage ID from status.io.
+    required: true
+  url:
+    type: str
+    description:
+      - Status.io API URL. A private apiary can be used instead.
+    default: "https://api.status.io"
+  components:
+    type: list
+    elements: str
+    description:
+      - The given name of your component (server name).
+    aliases: ['component']
+  containers:
+    type: list
+    elements: str
+    description:
+      - The given name of your container (data center).
+    aliases: ['container']
+  all_infrastructure_affected:
+    description:
+      - If it affects all components and containers.
+    type: bool
+    default: false
+  automation:
+    description:
+      - Automatically start and end the maintenance window.
+    type: bool
+    default: false
+  maintenance_notify_now:
+    description:
+      - Notify subscribers now.
+    type: bool
+    default: false
+  maintenance_notify_72_hr:
+    description:
+      - Notify subscribers 72 hours before maintenance start time.
+    type: bool
+    default: false
+  maintenance_notify_24_hr:
+    description:
+      - Notify subscribers 24 hours before maintenance start time.
+    type: bool
+    default: false
+  maintenance_notify_1_hr:
+    description:
+      - Notify subscribers 1 hour before maintenance start time.
+    type: bool
+    default: false
+  maintenance_id:
+    type: str
+    description:
+      - The maintenance ID number when deleting a maintenance window.
+  minutes:
+    type: int
+    description:
+      - The length of time in UTC that the maintenance will run (starting from playbook runtime).
+    default: 10
+  start_date:
+    type: str
+    description:
+      - Date maintenance is expected to start (Month/Day/Year) (UTC).
+      - End Date is worked out from O(start_date) + O(minutes).
+  start_time:
+    type: str
+    description:
+      - Time maintenance is expected to start (Hour:Minutes) (UTC).
+      - End Time is worked out from O(start_time) + O(minutes).
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a maintenance window for 10 minutes on server1, with automation to stop the maintenance
   community.general.statusio_maintenance:
     title: Router Upgrade from ansible
@@ -176,10 +172,9 @@ EXAMPLES = '''
     api_id: api_id
     api_key: api_key
     state: absent
-
-'''
+"""
 # TODO: Add RETURN documentation.
-RETURN = ''' # '''
+RETURN = """ # """
 
 import datetime
 import json
@@ -187,6 +182,10 @@ import json
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.urls import open_url
+
+from ansible_collections.community.general.plugins.module_utils.datetime import (
+    now,
+)
 
 
 def get_api_auth_headers(api_id, api_key, url, statuspage):
@@ -270,11 +269,11 @@ def get_date_time(start_date, start_time, minutes):
         except (NameError, ValueError):
             return 1, None, "Couldn't work out a valid date"
     else:
-        now = datetime.datetime.utcnow()
-        delta = now + datetime.timedelta(minutes=minutes)
+        now_t = now()
+        delta = now_t + datetime.timedelta(minutes=minutes)
         # start_date
-        returned_date.append(now.strftime("%m/%d/%Y"))
-        returned_date.append(now.strftime("%H:%M"))
+        returned_date.append(now_t.strftime("%m/%d/%Y"))
+        returned_date.append(now_t.strftime("%H:%M"))
         # end_date
         returned_date.append(delta.strftime("%m/%d/%Y"))
         returned_date.append(delta.strftime("%H:%M"))

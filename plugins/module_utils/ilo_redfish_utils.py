@@ -29,6 +29,7 @@ class iLORedfishUtils(RedfishUtils):
         result['ret'] = True
         data = response['data']
 
+        current_session = None
         if 'Oem' in data:
             if data["Oem"]["Hpe"]["Links"]["MySession"]["@odata.id"]:
                 current_session = data["Oem"]["Hpe"]["Links"]["MySession"]["@odata.id"]

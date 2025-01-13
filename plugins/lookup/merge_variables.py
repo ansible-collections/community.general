@@ -12,7 +12,7 @@ DOCUMENTATION = """
       - Mark Ettema (@m-a-r-k-e)
       - Alexander Petrenz (@alpex8)
     name: merge_variables
-    short_description: merge variables with a certain suffix
+    short_description: merge variables whose names match a given pattern
     description:
         - This lookup returns the merged result of all variables in scope that match the given prefixes, suffixes, or
           regular expressions, optionally.
@@ -149,7 +149,7 @@ class LookupModule(LookupBase):
         ret = []
         for term in terms:
             if not isinstance(term, str):
-                raise AnsibleError("Non-string type '{0}' passed, only 'str' types are allowed!".format(type(term)))
+                raise AnsibleError(f"Non-string type '{type(term)}' passed, only 'str' types are allowed!")
 
             if not self._groups:  # consider only own variables
                 ret.append(self._merge_vars(term, initial_value, variables))
@@ -157,7 +157,9 @@ class LookupModule(LookupBase):
                 cross_host_merge_result = initial_value
                 for host in variables["hostvars"]:
                     if self._is_host_in_allowed_groups(variables["hostvars"][host]["group_names"]):
-                        cross_host_merge_result = self._merge_vars(term, cross_host_merge_result, variables["hostvars"][host])
+                        host_variables = dict(variables["hostvars"].raw_get(host))
+                        host_variables["hostvars"] = variables["hostvars"]  # re-add hostvars
+                        cross_host_merge_result = self._merge_vars(term, cross_host_merge_result, host_variables)
                 ret.append(cross_host_merge_result)
 
         return ret
@@ -184,9 +186,9 @@ class LookupModule(LookupBase):
         return False
 
     def _merge_vars(self, search_pattern, initial_value, variables):
-        display.vvv("Merge variables with {0}: {1}".format(self._pattern_type, search_pattern))
+        display.vvv(f"Merge variables with {self._pattern_type}: {search_pattern}")
         var_merge_names = sorted([key for key in variables.keys() if self._var_matches(key, search_pattern)])
-        display.vvv("The following variables will be merged: {0}".format(var_merge_names))
+        display.vvv(f"The following variables will be merged: {var_merge_names}")
         prev_var_type = None
         result = None
 
@@ -195,7 +197,8 @@ class LookupModule(LookupBase):
             result = initial_value
 
         for var_name in var_merge_names:
-            var_value = self._templar.template(variables[var_name])  # Render jinja2 templates
+            with self._templar.set_temporary_context(available_variables=variables):  # tmp. switch renderer to context of current variables
+                var_value = self._templar.template(variables[var_name])  # Render jinja2 templates
             var_type = _verify_and_get_type(var_value)
 
             if prev_var_type is None:
@@ -223,8 +226,7 @@ class LookupModule(LookupBase):
                 dest[key] += value
             else:
                 if (key in dest) and dest[key] != value:
-                    msg = "The key '{0}' with value '{1}' will be overwritten with value '{2}' from '{3}.{0}'".format(
-                        key, dest[key], value, ".".join(path))
+                    msg = f"The key '{key}' with value '{dest[key]}' will be overwritten with value '{value}' from '{'.'.join(path)}.{key}'"
 
                     if self._override == "error":
                         raise AnsibleError(msg)

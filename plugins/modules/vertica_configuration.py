@@ -8,14 +8,13 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: vertica_configuration
 short_description: Updates Vertica configuration parameters
 description:
-    - Updates Vertica configuration parameters.
+  - Updates Vertica configuration parameters.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
   check_mode:
     support: full
@@ -24,51 +23,49 @@ attributes:
 options:
   parameter:
     description:
-        - Name of the parameter to update.
+      - Name of the parameter to update.
     required: true
     aliases: [name]
     type: str
   value:
     description:
-        - Value of the parameter to be set.
+      - Value of the parameter to be set.
     type: str
   db:
     description:
-        - Name of the Vertica database.
+      - Name of the Vertica database.
     type: str
   cluster:
     description:
-        - Name of the Vertica cluster.
+      - Name of the Vertica cluster.
     default: localhost
     type: str
   port:
     description:
-        - Vertica cluster port to connect to.
+      - Vertica cluster port to connect to.
     default: '5433'
     type: str
   login_user:
     description:
-        - The username used to authenticate with.
+      - The username used to authenticate with.
     default: dbadmin
     type: str
   login_password:
     description:
-        - The password used to authenticate with.
+      - The password used to authenticate with.
     type: str
 notes:
-  - The default authentication assumes that you are either logging in as or sudo'ing
-    to the C(dbadmin) account on the host.
-  - This module uses C(pyodbc), a Python ODBC database adapter. You must ensure
-    that C(unixODBC) and C(pyodbc) is installed on the host and properly configured.
-  - Configuring C(unixODBC) for Vertica requires C(Driver = /opt/vertica/lib64/libverticaodbc.so)
-    to be added to the C(Vertica) section of either C(/etc/odbcinst.ini) or C($HOME/.odbcinst.ini)
-    and both C(ErrorMessagesPath = /opt/vertica/lib64) and C(DriverManagerEncoding = UTF-16)
-    to be added to the C(Driver) section of either C(/etc/vertica.ini) or C($HOME/.vertica.ini).
-requirements: [ 'unixODBC', 'pyodbc' ]
+  - The default authentication assumes that you are either logging in as or sudo'ing to the C(dbadmin) account on the host.
+  - This module uses C(pyodbc), a Python ODBC database adapter. You must ensure that C(unixODBC) and C(pyodbc) is installed
+    on the host and properly configured.
+  - Configuring C(unixODBC) for Vertica requires C(Driver = /opt/vertica/lib64/libverticaodbc.so) to be added to the C(Vertica)
+    section of either C(/etc/odbcinst.ini) or C($HOME/.odbcinst.ini) and both C(ErrorMessagesPath = /opt/vertica/lib64) and
+    C(DriverManagerEncoding = UTF-16) to be added to the C(Driver) section of either C(/etc/vertica.ini) or C($HOME/.vertica.ini).
+requirements: ['unixODBC', 'pyodbc']
 author: "Dariusz Owczarek (@dareko)"
-'''
+"""
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Updating load_balance_policy
   community.general.vertica_configuration: name=failovertostandbyafter value='8 hours'
 """

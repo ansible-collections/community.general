@@ -7,8 +7,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: mssql_script
 
 short_description: Execute SQL scripts on a MSSQL database
@@ -17,77 +16,75 @@ version_added: "4.0.0"
 
 description:
   - Execute SQL scripts on a MSSQL database.
-
 extends_documentation_fragment:
   - community.general.attributes
 
 attributes:
-    check_mode:
-        support: partial
-        details:
-          - The script will not be executed in check mode.
-    diff_mode:
-        support: none
+  check_mode:
+    support: partial
+    details:
+      - The script will not be executed in check mode.
+  diff_mode:
+    support: none
 
 options:
-    name:
-        description: Database to run script against.
-        aliases: [ db ]
-        default: ''
-        type: str
-    login_user:
-        description: The username used to authenticate with.
-        type: str
-    login_password:
-        description: The password used to authenticate with.
-        type: str
-    login_host:
-        description: Host running the database.
-        type: str
-        required: true
-    login_port:
-        description: Port of the MSSQL server. Requires O(login_host) be defined as well.
-        default: 1433
-        type: int
-    script:
-        description:
-          - The SQL script to be executed.
-          - Script can contain multiple SQL statements. Multiple Batches can be separated by V(GO) command.
-          - Each batch must return at least one result set.
-        required: true
-        type: str
-    transaction:
-        description:
-          - If transactional mode is requested, start a transaction and commit the change only if the script succeed.
-            Otherwise, rollback the transaction.
-          - If transactional mode is not requested (default), automatically commit the change.
-        type: bool
-        default: false
-        version_added: 8.4.0
-    output:
-        description:
-          - With V(default) each row will be returned as a list of values. See RV(query_results).
-          - Output format V(dict) will return dictionary with the column names as keys. See RV(query_results_dict).
-          - V(dict) requires named columns to be returned by each query otherwise an error is thrown.
-        choices: [ "dict", "default" ]
-        default: 'default'
-        type: str
-    params:
-        description: |
-            Parameters passed to the script as SQL parameters.
-            (Query V('SELECT %(name\)s"') with V(example: '{"name": "John Doe"}).)'
-        type: dict
+  name:
+    description: Database to run script against.
+    aliases: [db]
+    default: ''
+    type: str
+  login_user:
+    description: The username used to authenticate with.
+    type: str
+  login_password:
+    description: The password used to authenticate with.
+    type: str
+  login_host:
+    description: Host running the database.
+    type: str
+    required: true
+  login_port:
+    description: Port of the MSSQL server. Requires O(login_host) be defined as well.
+    default: 1433
+    type: int
+  script:
+    description:
+      - The SQL script to be executed.
+      - Script can contain multiple SQL statements. Multiple Batches can be separated by V(GO) command.
+      - Each batch must return at least one result set.
+    required: true
+    type: str
+  transaction:
+    description:
+      - If transactional mode is requested, start a transaction and commit the change only if the script succeed. Otherwise,
+        rollback the transaction.
+      - If transactional mode is not requested (default), automatically commit the change.
+    type: bool
+    default: false
+    version_added: 8.4.0
+  output:
+    description:
+      - With V(default) each row will be returned as a list of values. See RV(query_results).
+      - Output format V(dict) will return dictionary with the column names as keys. See RV(query_results_dict).
+      - V(dict) requires named columns to be returned by each query otherwise an error is thrown.
+    choices: ["dict", "default"]
+    default: 'default'
+    type: str
+  params:
+    description: |-
+      Parameters passed to the script as SQL parameters.
+      (Query V('SELECT %(name\)s"') with V(example: '{"name": "John Doe"}).)'.
+    type: dict
 notes:
-   - Requires the pymssql Python package on the remote host. For Ubuntu, this
-     is as easy as C(pip install pymssql) (See M(ansible.builtin.pip).)
+  - Requires the pymssql Python package on the remote host. For Ubuntu, this is as easy as C(pip install pymssql) (See M(ansible.builtin.pip)).
 requirements:
-   - pymssql
+  - pymssql
 
 author:
-    - Kris Budde (@kbudde)
-'''
+  - Kris Budde (@kbudde)
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Check DB connection
   community.general.mssql_script:
     login_user: "{{ mssql_login_user }}"
@@ -140,11 +137,11 @@ EXAMPLES = r'''
   register: result_batches
 - assert:
     that:
-      - result_batches.query_results | length == 2  # two batch results
-      - result_batches.query_results[0] | length == 2  # two selects in first batch
-      - result_batches.query_results[0][0] | length == 1  # one row in first select
-      - result_batches.query_results[0][0][0] | length == 1  # one column in first row
-      - result_batches.query_results[0][0][0][0] == 'Batch 0 - Select 0'  # each row contains a list of values.
+      - result_batches.query_results | length == 2 # two batch results
+      - result_batches.query_results[0] | length == 2 # two selects in first batch
+      - result_batches.query_results[0][0] | length == 1 # one row in first select
+      - result_batches.query_results[0][0][0] | length == 1 # one column in first row
+      - result_batches.query_results[0][0][0][0] == 'Batch 0 - Select 0' # each row contains a list of values.
 
 - name: two batches with dict output
   community.general.mssql_script:
@@ -161,68 +158,68 @@ EXAMPLES = r'''
   register: result_batches_dict
 - assert:
     that:
-      - result_batches_dict.query_results_dict | length == 2  # two batch results
-      - result_batches_dict.query_results_dict[0] | length == 2  # two selects in first batch
-      - result_batches_dict.query_results_dict[0][0] | length == 1  # one row in first select
-      - result_batches_dict.query_results_dict[0][0][0]['b0s0'] == 'Batch 0 - Select 0'  # column 'b0s0' of first row
-'''
+      - result_batches_dict.query_results_dict | length == 2 # two batch results
+      - result_batches_dict.query_results_dict[0] | length == 2 # two selects in first batch
+      - result_batches_dict.query_results_dict[0][0] | length == 1 # one row in first select
+      - result_batches_dict.query_results_dict[0][0][0]['b0s0'] == 'Batch 0 - Select 0' # column 'b0s0' of first row
+"""
 
-RETURN = r'''
+RETURN = r"""
 query_results:
-    description: List of batches (queries separated by V(GO) keyword).
-    type: list
-    elements: list
-    returned: success and O(output=default)
-    sample: [[[["Batch 0 - Select 0"]], [["Batch 0 - Select 1"]]], [[["Batch 1 - Select 0"]]]]
-    contains:
-        queries:
-            description:
-              - List of result sets of each query.
-              - If a query returns no results, the results of this and all the following queries will not be included in the output.
-              - Use the V(GO) keyword in O(script) to separate queries.
-            type: list
-            elements: list
-            contains:
-                rows:
-                    description: List of rows returned by query.
-                    type: list
-                    elements: list
-                    contains:
-                        column_value:
-                            description:
-                              - List of column values.
-                              - Any non-standard JSON type is converted to string.
-                            type: list
-                            example: ["Batch 0 - Select 0"]
-                            returned: success, if output is default
+  description: List of batches (queries separated by V(GO) keyword).
+  type: list
+  elements: list
+  returned: success and O(output=default)
+  sample: [[[["Batch 0 - Select 0"]], [["Batch 0 - Select 1"]]], [[["Batch 1 - Select 0"]]]]
+  contains:
+    queries:
+      description:
+        - List of result sets of each query.
+        - If a query returns no results, the results of this and all the following queries will not be included in the output.
+        - Use the V(GO) keyword in O(script) to separate queries.
+      type: list
+      elements: list
+      contains:
+        rows:
+          description: List of rows returned by query.
+          type: list
+          elements: list
+          contains:
+            column_value:
+              description:
+                - List of column values.
+                - Any non-standard JSON type is converted to string.
+              type: list
+              example: ["Batch 0 - Select 0"]
+              returned: success, if output is default
 query_results_dict:
-    description: List of batches (queries separated by V(GO) keyword).
-    type: list
-    elements: list
-    returned: success and O(output=dict)
-    sample: [[[["Batch 0 - Select 0"]], [["Batch 0 - Select 1"]]], [[["Batch 1 - Select 0"]]]]
-    contains:
-        queries:
-            description:
-              - List of result sets of each query.
-              - If a query returns no results, the results of this and all the following queries will not be included in the output.
-                Use 'GO' keyword to separate queries.
-            type: list
-            elements: list
-            contains:
-                rows:
-                    description: List of rows returned by query.
-                    type: list
-                    elements: list
-                    contains:
-                         column_dict:
-                            description:
-                              - Dictionary of column names and values.
-                              - Any non-standard JSON type is converted to string.
-                            type: dict
-                            example: {"col_name": "Batch 0 - Select 0"}
-                            returned: success, if output is dict
-'''
+  description: List of batches (queries separated by V(GO) keyword).
+  type: list
+  elements: list
+  returned: success and O(output=dict)
+  sample: [[[["Batch 0 - Select 0"]], [["Batch 0 - Select 1"]]], [[["Batch 1 - Select 0"]]]]
+  contains:
+    queries:
+      description:
+        - List of result sets of each query.
+        - If a query returns no results, the results of this and all the following queries will not be included in the output.
+          Use V(GO) keyword to separate queries.
+      type: list
+      elements: list
+      contains:
+        rows:
+          description: List of rows returned by query.
+          type: list
+          elements: list
+          contains:
+            column_dict:
+              description:
+                - Dictionary of column names and values.
+                - Any non-standard JSON type is converted to string.
+              type: dict
+              example: {"col_name": "Batch 0 - Select 0"}
+              returned: success, if output is dict
+"""
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 import traceback

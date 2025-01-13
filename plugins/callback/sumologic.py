@@ -6,7 +6,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 name: sumologic
 type: notification
 short_description: Sends task result events to Sumologic
@@ -15,20 +15,21 @@ description:
   - This callback plugin will send task results as JSON formatted events to a Sumologic HTTP collector source.
 requirements:
   - Whitelisting this callback plugin
-  - 'Create a HTTP collector source in Sumologic and specify a custom timestamp format of V(yyyy-MM-dd HH:mm:ss ZZZZ) and a custom timestamp locator
-    of V("timestamp": "(.*\)")'
+  - 'Create a HTTP collector source in Sumologic and specify a custom timestamp format of V(yyyy-MM-dd HH:mm:ss ZZZZ) and
+    a custom timestamp locator of V("timestamp": "(.*\)")'
 options:
   url:
     description: URL to the Sumologic HTTP collector source.
+    type: str
     env:
       - name: SUMOLOGIC_URL
     ini:
       - section: callback_sumologic
         key: url
-'''
+"""
 
-EXAMPLES = '''
-examples: |
+EXAMPLES = r"""
+examples: |-
   To enable, add this to your ansible.cfg file in the defaults block
     [defaults]
     callback_whitelist = community.general.sumologic
@@ -39,19 +40,22 @@ examples: |
   Set the ansible.cfg variable in the callback_sumologic block
     [callback_sumologic]
     url = https://endpoint1.collection.us2.sumologic.com/receiver/v1/http/R8moSv1d8EW9LAUFZJ6dbxCFxwLH6kfCdcBfddlfxCbLuL-BN5twcTpMk__pYy_cDmp==
-'''
+"""
 
 import json
 import uuid
 import socket
 import getpass
 
-from datetime import datetime
 from os.path import basename
 
 from ansible.module_utils.urls import open_url
 from ansible.parsing.ajson import AnsibleJSONEncoder
 from ansible.plugins.callback import CallbackBase
+
+from ansible_collections.community.general.plugins.module_utils.datetime import (
+    now,
+)
 
 
 class SumologicHTTPCollectorSource(object):
@@ -84,8 +88,7 @@ class SumologicHTTPCollectorSource(object):
         data['uuid'] = result._task._uuid
         data['session'] = self.session
         data['status'] = state
-        data['timestamp'] = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S '
-                                                       '+0000')
+        data['timestamp'] = now().strftime('%Y-%m-%d %H:%M:%S +0000')
         data['host'] = self.host
         data['ip_address'] = self.ip_address
         data['user'] = self.user
@@ -123,7 +126,7 @@ class CallbackModule(CallbackBase):
 
     def _runtime(self, result):
         return (
-            datetime.utcnow() -
+            now() -
             self.start_datetimes[result._task._uuid]
         ).total_seconds()
 
@@ -144,10 +147,10 @@ class CallbackModule(CallbackBase):
         self.sumologic.ansible_playbook = basename(playbook._file_name)
 
     def v2_playbook_on_task_start(self, task, is_conditional):
-        self.start_datetimes[task._uuid] = datetime.utcnow()
+        self.start_datetimes[task._uuid] = now()
 
     def v2_playbook_on_handler_task_start(self, task):
-        self.start_datetimes[task._uuid] = datetime.utcnow()
+        self.start_datetimes[task._uuid] = now()
 
     def v2_runner_on_ok(self, result, **kwargs):
         self.sumologic.send_event(

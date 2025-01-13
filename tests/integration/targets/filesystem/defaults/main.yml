@@ -15,6 +15,7 @@ tested_filesystems:
   #     - 1.7.0 requires at least 30Mo
   #     - 1.10.0 requires at least 38Mo
   #     - resizefs asserts when initial fs is smaller than 60Mo and seems to require 1.10.0
+  bcachefs: {fssize: 20, grow: true, new_uuid: null}
   ext4: {fssize: 10, grow: true, new_uuid: 'random'}
   ext4dev: {fssize: 10, grow: true, new_uuid: 'random'}
   ext3: {fssize: 10, grow: true, new_uuid: 'random'}

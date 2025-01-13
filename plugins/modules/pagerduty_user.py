@@ -8,64 +8,63 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: pagerduty_user
 short_description: Manage a user account on PagerDuty
 description:
-    - This module manages the creation/removal of a user account on PagerDuty.
+  - This module manages the creation/removal of a user account on PagerDuty.
 version_added: '1.3.0'
 author: Zainab Alsaffar (@zanssa)
 requirements:
-    - pdpyras python module = 4.1.1
-    - PagerDuty API Access
+  - pdpyras python module = 4.1.1
+  - PagerDuty API Access
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    access_token:
-        description:
-            - An API access token to authenticate with the PagerDuty REST API.
-        required: true
-        type: str
-    pd_user:
-        description:
-            - Name of the user in PagerDuty.
-        required: true
-        type: str
-    pd_email:
-        description:
-            - The user's email address.
-            - O(pd_email) is the unique identifier used and cannot be updated using this module.
-        required: true
-        type: str
-    pd_role:
-        description:
-            - The user's role.
-        choices: ['global_admin', 'manager', 'responder', 'observer', 'stakeholder', 'limited_stakeholder', 'restricted_access']
-        default: 'responder'
-        type: str
-    state:
-        description:
-            - State of the user.
-            - On V(present), it creates a user if the user doesn't exist.
-            - On V(absent), it removes a user if the account exists.
-        choices: ['present', 'absent']
-        default: 'present'
-        type: str
-    pd_teams:
-        description:
-            - The teams to which the user belongs.
-            - Required if O(state=present).
-        type: list
-        elements: str
-'''
+  access_token:
+    description:
+      - An API access token to authenticate with the PagerDuty REST API.
+    required: true
+    type: str
+  pd_user:
+    description:
+      - Name of the user in PagerDuty.
+    required: true
+    type: str
+  pd_email:
+    description:
+      - The user's email address.
+      - O(pd_email) is the unique identifier used and cannot be updated using this module.
+    required: true
+    type: str
+  pd_role:
+    description:
+      - The user's role.
+    choices: ['global_admin', 'manager', 'responder', 'observer', 'stakeholder', 'limited_stakeholder', 'restricted_access']
+    default: 'responder'
+    type: str
+  state:
+    description:
+      - State of the user.
+      - On V(present), it creates a user if the user does not exist.
+      - On V(absent), it removes a user if the account exists.
+    choices: ['present', 'absent']
+    default: 'present'
+    type: str
+  pd_teams:
+    description:
+      - The teams to which the user belongs.
+      - Required if O(state=present).
+    type: list
+    elements: str
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Create a user account on PagerDuty
   community.general.pagerduty_user:
     access_token: 'Your_Access_token'
@@ -81,9 +80,9 @@ EXAMPLES = r'''
     pd_user: user_full_name
     pd_email: user_email
     state: "absent"
-'''
+"""
 
-RETURN = r''' # '''
+RETURN = r""" # """
 
 from os import path
 from ansible.module_utils.basic import AnsibleModule

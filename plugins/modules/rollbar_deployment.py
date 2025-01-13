@@ -9,14 +9,12 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: rollbar_deployment
 author: "Max Riveiro (@kavu)"
 short_description: Notify Rollbar about app deployments
 description:
-  - Notify Rollbar about app deployments
-    (see https://rollbar.com/docs/deploys_other/)
+  - Notify Rollbar about app deployments (see U(https://rollbar.com/docs/deploys_other/)).
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -33,7 +31,7 @@ options:
   environment:
     type: str
     description:
-      - Name of the environment being deployed, e.g. 'production'.
+      - Name of the environment being deployed, for example V(production).
     required: true
   revision:
     type: str
@@ -53,7 +51,7 @@ options:
   comment:
     type: str
     description:
-      - Deploy comment (e.g. what is being deployed).
+      - Deploy comment (for example what is being deployed).
     required: false
   url:
     type: str
@@ -63,31 +61,30 @@ options:
     default: 'https://api.rollbar.com/api/1/deploy/'
   validate_certs:
     description:
-      - If V(false), SSL certificates for the target url will not be validated.
-        This should only be used on personally controlled sites using
-        self-signed certificates.
+      - If V(false), SSL certificates for the target URL will not be validated. This should only be used on personally controlled
+        sites using self-signed certificates.
     required: false
     default: true
     type: bool
-'''
+"""
 
-EXAMPLES = '''
-  - name: Rollbar deployment notification
-    community.general.rollbar_deployment:
-    token: AAAAAA
-    environment: staging
-    user: ansible
-    revision: '4.2'
-    rollbar_user: admin
-    comment: Test Deploy
+EXAMPLES = r"""
+- name: Rollbar deployment notification
+  community.general.rollbar_deployment:
+  token: AAAAAA
+  environment: staging
+  user: ansible
+  revision: '4.2'
+  rollbar_user: admin
+  comment: Test Deploy
 
-  - name: Notify rollbar about current git revision deployment by current user
-    community.general.rollbar_deployment:
-    token: "{{ rollbar_access_token }}"
-    environment: production
-    revision: "{{ lookup('pipe', 'git rev-parse HEAD') }}"
-    user: "{{ lookup('env', 'USER') }}"
-'''
+- name: Notify rollbar about current git revision deployment by current user
+  community.general.rollbar_deployment:
+  token: "{{ rollbar_access_token }}"
+  environment: production
+  revision: "{{ lookup('pipe', 'git rev-parse HEAD') }}"
+  user: "{{ lookup('env', 'USER') }}"
+"""
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule

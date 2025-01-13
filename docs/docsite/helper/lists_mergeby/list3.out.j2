@@ -4,4 +4,4 @@ GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://w
 SPDX-License-Identifier: GPL-3.0-or-later
 #}
 list3:
-{{ list3|to_nice_yaml(indent=0) }}
+  {{ list3 | to_yaml(indent=2, sort_keys=false) | indent(2) }}

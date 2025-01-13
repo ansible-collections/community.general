@@ -1,2 +1,0 @@
-minor_changes:
-  - keycloak_user_federation - add option for ``krbPrincipalAttribute`` (https://github.com/ansible-collections/community.general/pull/7538).

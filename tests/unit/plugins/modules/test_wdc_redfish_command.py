@@ -289,7 +289,7 @@ def mock_get_firmware_inventory_version_1_2_3(*args, **kwargs):
     }
 
 
-ERROR_MESSAGE_UNABLE_TO_EXTRACT_BUNDLE_VERSION = "Unable to extract bundle version or multi-tenant status from update image tarfile"
+ERROR_MESSAGE_UNABLE_TO_EXTRACT_BUNDLE_VERSION = "Unable to extract bundle version or multi-tenant status or generation from update image file"
 ACTION_WAS_SUCCESSFUL_MESSAGE = "Action was successful"
 
 

@@ -8,8 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: imc_rest
 short_description: Manage Cisco IMC hardware through its REST API
 description:
@@ -32,75 +31,74 @@ attributes:
 options:
   hostname:
     description:
-    - IP Address or hostname of Cisco IMC, resolvable by Ansible control host.
+      - IP Address or hostname of Cisco IMC, resolvable by Ansible control host.
     required: true
-    aliases: [ host, ip ]
+    aliases: [host, ip]
     type: str
   username:
     description:
-    - Username used to login to the switch.
+      - Username used to login to the switch.
     default: admin
-    aliases: [ user ]
+    aliases: [user]
     type: str
   password:
     description:
-    - The password to use for authentication.
+      - The password to use for authentication.
     default: password
     type: str
   path:
     description:
-    - Name of the absolute path of the filename that includes the body
-      of the http request being sent to the Cisco IMC REST API.
-    - Parameter O(path) is mutual exclusive with parameter O(content).
-    aliases: [ 'src', 'config_file' ]
+      - Name of the absolute path of the filename that includes the body of the http request being sent to the Cisco IMC REST
+        API.
+      - Parameter O(path) is mutual exclusive with parameter O(content).
+    aliases: ['src', 'config_file']
     type: path
   content:
     description:
-    - When used instead of O(path), sets the content of the API requests directly.
-    - This may be convenient to template simple requests, for anything complex use the M(ansible.builtin.template) module.
-    - You can collate multiple IMC XML fragments and they will be processed sequentially in a single stream,
-      the Cisco IMC output is subsequently merged.
-    - Parameter O(content) is mutual exclusive with parameter O(path).
+      - When used instead of O(path), sets the content of the API requests directly.
+      - This may be convenient to template simple requests, for anything complex use the M(ansible.builtin.template) module.
+      - You can collate multiple IMC XML fragments and they will be processed sequentially in a single stream, the Cisco IMC
+        output is subsequently merged.
+      - Parameter O(content) is mutual exclusive with parameter O(path).
     type: str
   protocol:
     description:
-    - Connection protocol to use.
+      - Connection protocol to use.
     default: https
-    choices: [ http, https ]
+    choices: [http, https]
     type: str
   timeout:
     description:
-    - The socket level timeout in seconds.
-    - This is the time that every single connection (every fragment) can spend.
-      If this O(timeout) is reached, the module will fail with a
-      C(Connection failure) indicating that C(The read operation timed out).
+      - The socket level timeout in seconds.
+      - This is the time that every single connection (every fragment) can spend. If this O(timeout) is reached, the module
+        will fail with a C(Connection failure) indicating that C(The read operation timed out).
     default: 60
     type: int
   validate_certs:
     description:
-    - If V(false), SSL certificates will not be validated.
-    - This should only set to V(false) used on personally controlled sites using self-signed certificates.
+      - If V(false), SSL certificates will not be validated.
+      - This should only set to V(false) used on personally controlled sites using self-signed certificates.
     type: bool
     default: true
 notes:
-- The XML fragments don't need an authentication cookie, this is injected by the module automatically.
-- The Cisco IMC XML output is being translated to JSON using the Cobra convention.
-- Any configConfMo change requested has a return status of 'modified', even if there was no actual change
-  from the previous configuration. As a result, this module will always report a change on subsequent runs.
-  In case this behaviour is fixed in a future update to Cisco IMC, this module will automatically adapt.
-- If you get a C(Connection failure) related to C(The read operation timed out) increase the O(timeout)
-  parameter. Some XML fragments can take longer than the default timeout.
-- More information about the IMC REST API is available from
-  U(http://www.cisco.com/c/en/us/td/docs/unified_computing/ucs/c/sw/api/3_0/b_Cisco_IMC_api_301.html)
-'''
+  - The XML fragments do not need an authentication cookie, this is injected by the module automatically.
+  - The Cisco IMC XML output is being translated to JSON using the Cobra convention.
+  - Any configConfMo change requested has a return status of C(modified), even if there was no actual change from the previous
+    configuration. As a result, this module will always report a change on subsequent runs. In case this behaviour is fixed
+    in a future update to Cisco IMC, this module will automatically adapt.
+  - If you get a C(Connection failure) related to C(The read operation timed out) increase the O(timeout) parameter. Some
+    XML fragments can take longer than the default timeout.
+  - More information about the IMC REST API is available from
+    U(http://www.cisco.com/c/en/us/td/docs/unified_computing/ucs/c/sw/api/3_0/b_Cisco_IMC_api_301.html).
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Power down server
   community.general.imc_rest:
     hostname: '{{ imc_hostname }}'
     username: '{{ imc_username }}'
     password: '{{ imc_password }}'
-    validate_certs: false  # only do this when you trust the network!
+    validate_certs: false # only do this when you trust the network!
     content: |
       <configConfMo><inConfig>
         <computeRackUnit dn="sys/rack-unit-1" adminPower="down"/>
@@ -112,7 +110,7 @@ EXAMPLES = r'''
     hostname: '{{ imc_hostname }}'
     username: '{{ imc_username }}'
     password: '{{ imc_password }}'
-    validate_certs: false  # only do this when you trust the network!
+    validate_certs: false # only do this when you trust the network!
     timeout: 120
     content: |
       <!-- Configure Serial-on-LAN -->
@@ -137,7 +135,7 @@ EXAMPLES = r'''
     hostname: '{{ imc_hostname }}'
     username: '{{ imc_username }}'
     password: '{{ imc_password }}'
-    validate_certs: false  # only do this when you trust the network!
+    validate_certs: false # only do this when you trust the network!
     content: |
       <!-- Configure PXE boot -->
       <configConfMo><inConfig>
@@ -155,7 +153,7 @@ EXAMPLES = r'''
     hostname: '{{ imc_host }}'
     username: '{{ imc_username }}'
     password: '{{ imc_password }}'
-    validate_certs: false  # only do this when you trust the network!
+    validate_certs: false # only do this when you trust the network!
     content: |
       <configConfMo><inConfig>
         <lsbootStorage dn="sys/rack-unit-1/boot-policy/storage-read-write" access="read-write" order="1" type="storage"/>
@@ -167,11 +165,11 @@ EXAMPLES = r'''
     hostname: '{{ imc_host }}'
     username: '{{ imc_username }}'
     password: '{{ imc_password }}'
-    validate_certs: false  # only do this when you trust the network!
+    validate_certs: false # only do this when you trust the network!
     content: |
-        <configConfMo><inConfig>
-          <computeRackUnit dn="sys/rack-unit-1" usrLbl="Customer Lab - POD{{ pod_id }} - {{ inventory_hostname_short }}"/>
-        </inConfig></configConfMo>
+      <configConfMo><inConfig>
+        <computeRackUnit dn="sys/rack-unit-1" usrLbl="Customer Lab - POD{{ pod_id }} - {{ inventory_hostname_short }}"/>
+      </inConfig></configConfMo>
     delegate_to: localhost
 
 - name: Disable HTTP and increase session timeout to max value 10800 secs
@@ -179,22 +177,22 @@ EXAMPLES = r'''
     hostname: '{{ imc_host }}'
     username: '{{ imc_username }}'
     password: '{{ imc_password }}'
-    validate_certs: false  # only do this when you trust the network!
+    validate_certs: false # only do this when you trust the network!
     timeout: 120
     content: |
-        <configConfMo><inConfig>
-          <commHttp dn="sys/svc-ext/http-svc" adminState="disabled"/>
-        </inConfig></configConfMo>
+      <configConfMo><inConfig>
+        <commHttp dn="sys/svc-ext/http-svc" adminState="disabled"/>
+      </inConfig></configConfMo>
 
-        <configConfMo><inConfig>
-          <commHttps dn="sys/svc-ext/https-svc" adminState="enabled" sessionTimeout="10800"/>
-        </inConfig></configConfMo>
+      <configConfMo><inConfig>
+        <commHttps dn="sys/svc-ext/https-svc" adminState="enabled" sessionTimeout="10800"/>
+      </inConfig></configConfMo>
     delegate_to: localhost
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 aaLogin:
-  description: Cisco IMC XML output for the login, translated to JSON using Cobra convention
+  description: Cisco IMC XML output for the login, translated to JSON using Cobra convention.
   returned: success
   type: dict
   sample: |
@@ -208,27 +206,27 @@ aaLogin:
         "response": "yes"
     }
 configConfMo:
-  description: Cisco IMC XML output for any configConfMo XML fragments, translated to JSON using Cobra convention
+  description: Cisco IMC XML output for any configConfMo XML fragments, translated to JSON using Cobra convention.
   returned: success
   type: dict
   sample: |
 elapsed:
-  description: Elapsed time in seconds
+  description: Elapsed time in seconds.
   returned: always
   type: int
   sample: 31
 response:
-  description: HTTP response message, including content length
+  description: HTTP response message, including content length.
   returned: always
   type: str
   sample: OK (729 bytes)
 status:
-  description: The HTTP response status code
+  description: The HTTP response status code.
   returned: always
   type: dict
   sample: 200
 error:
-  description: Cisco IMC XML error output for last request, translated to JSON using Cobra convention
+  description: Cisco IMC XML error output for last request, translated to JSON using Cobra convention.
   returned: failed
   type: dict
   sample: |
@@ -240,24 +238,24 @@ error:
         "response": "yes"
     }
 error_code:
-  description: Cisco IMC error code
+  description: Cisco IMC error code.
   returned: failed
   type: str
   sample: ERR-xml-parse-error
 error_text:
-  description: Cisco IMC error message
+  description: Cisco IMC error message.
   returned: failed
   type: str
   sample: |
     XML PARSING ERROR: Element 'computeRackUnit', attribute 'admin_Power': The attribute 'admin_Power' is not allowed.
 input:
-  description: RAW XML input sent to the Cisco IMC, causing the error
+  description: RAW XML input sent to the Cisco IMC, causing the error.
   returned: failed
   type: str
   sample: |
     <configConfMo><inConfig><computeRackUnit dn="sys/rack-unit-1" admin_Power="down"/></inConfig></configConfMo>
 output:
-  description: RAW XML output received from the Cisco IMC, with error details
+  description: RAW XML output received from the Cisco IMC, with error details.
   returned: failed
   type: str
   sample: >
@@ -265,10 +263,9 @@ output:
       response="yes"
       errorCode="ERR-xml-parse-error"
       invocationResult="594"
-      errorDescr="XML PARSING ERROR: Element 'computeRackUnit', attribute 'admin_Power': The attribute 'admin_Power' is not allowed.\n"/>
-'''
+      errorDescr="XML PARSING ERROR: Element 'computeRackUnit', attribute 'admin_Power': The attribute 'admin_Power' is not allowed.\n" />
+"""
 
-import datetime
 import os
 import traceback
 
@@ -291,6 +288,10 @@ except ImportError:
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.six.moves import zip_longest
 from ansible.module_utils.urls import fetch_url
+
+from ansible_collections.community.general.plugins.module_utils.datetime import (
+    now,
+)
 
 
 def imc_response(module, rawoutput, rawinput=''):
@@ -320,8 +321,7 @@ def merge(one, two):
     ''' Merge two complex nested datastructures into one'''
     if isinstance(one, dict) and isinstance(two, dict):
         copy = dict(one)
-        # copy.update({key: merge(one.get(key, None), two[key]) for key in two})
-        copy.update(dict((key, merge(one.get(key, None), two[key])) for key in two))
+        copy.update({key: merge(one.get(key, None), two[key]) for key in two})
         return copy
 
     elif isinstance(one, list) and isinstance(two, list):
@@ -375,14 +375,14 @@ def main():
         else:
             module.fail_json(msg='Cannot find/access path:\n%s' % path)
 
-    start = datetime.datetime.utcnow()
+    start = now()
 
     # Perform login first
     url = '%s://%s/nuova' % (protocol, hostname)
     data = '<aaaLogin inName="%s" inPassword="%s"/>' % (username, password)
     resp, auth = fetch_url(module, url, data=data, method='POST', timeout=timeout)
     if resp is None or auth['status'] != 200:
-        result['elapsed'] = (datetime.datetime.utcnow() - start).seconds
+        result['elapsed'] = (now() - start).seconds
         module.fail_json(msg='Task failed with error %(status)s: %(msg)s' % auth, **result)
     result.update(imc_response(module, resp.read()))
 
@@ -415,7 +415,7 @@ def main():
             # Perform actual request
             resp, info = fetch_url(module, url, data=data, method='POST', timeout=timeout)
             if resp is None or info['status'] != 200:
-                result['elapsed'] = (datetime.datetime.utcnow() - start).seconds
+                result['elapsed'] = (now() - start).seconds
                 module.fail_json(msg='Task failed with error %(status)s: %(msg)s' % info, **result)
 
             # Merge results with previous results
@@ -431,7 +431,7 @@ def main():
             result['changed'] = ('modified' in results)
 
         # Report success
-        result['elapsed'] = (datetime.datetime.utcnow() - start).seconds
+        result['elapsed'] = (now() - start).seconds
         module.exit_json(**result)
     finally:
         logout(module, url, cookie, timeout)

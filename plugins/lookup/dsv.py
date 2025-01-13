@@ -22,6 +22,7 @@ options:
         required: true
     tenant:
         description: The first format parameter in the default O(url_template).
+        type: string
         env:
             - name: DSV_TENANT
         ini:
@@ -32,6 +33,7 @@ options:
         default: com
         description: The top-level domain of the tenant; the second format
             parameter in the default O(url_template).
+        type: string
         env:
             - name: DSV_TLD
         ini:
@@ -40,6 +42,7 @@ options:
         required: false
     client_id:
         description: The client_id with which to request the Access Grant.
+        type: string
         env:
             - name: DSV_CLIENT_ID
         ini:
@@ -48,6 +51,7 @@ options:
         required: true
     client_secret:
         description: The client secret associated with the specific O(client_id).
+        type: string
         env:
             - name: DSV_CLIENT_SECRET
         ini:
@@ -58,6 +62,7 @@ options:
         default: https://{}.secretsvaultcloud.{}/v1
         description: The path to prepend to the base URL to form a valid REST
             API request.
+        type: string
         env:
             - name: DSV_URL_TEMPLATE
         ini:
@@ -130,17 +135,17 @@ class LookupModule(LookupBase):
         result = []
 
         for term in terms:
-            display.debug("dsv_lookup term: %s" % term)
+            display.debug(f"dsv_lookup term: {term}")
             try:
                 path = term.lstrip("[/:]")
 
                 if path == "":
-                    raise AnsibleOptionsError("Invalid secret path: %s" % term)
+                    raise AnsibleOptionsError(f"Invalid secret path: {term}")
 
-                display.vvv(u"DevOps Secrets Vault GET /secrets/%s" % path)
+                display.vvv(f"DevOps Secrets Vault GET /secrets/{path}")
                 result.append(vault.get_secret_json(path))
             except SecretsVaultError as error:
                 raise AnsibleError(
-                    "DevOps Secrets Vault lookup failure: %s" % error.message
+                    f"DevOps Secrets Vault lookup failure: {error.message}"
                 )
         return result

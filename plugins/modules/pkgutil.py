@@ -12,63 +12,63 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: pkgutil
 short_description: OpenCSW package management on Solaris
 description:
-- This module installs, updates and removes packages from the OpenCSW project for Solaris.
-- Unlike the M(community.general.svr4pkg) module, it will resolve and download dependencies.
-- See U(https://www.opencsw.org/) for more information about the project.
+  - This module installs, updates and removes packages from the OpenCSW project for Solaris.
+  - Unlike the M(community.general.svr4pkg) module, it will resolve and download dependencies.
+  - See U(https://www.opencsw.org/) for more information about the project.
 author:
-- Alexander Winkler (@dermute)
-- David Ponessa (@scathatheworm)
+  - Alexander Winkler (@dermute)
+  - David Ponessa (@scathatheworm)
 extends_documentation_fragment:
-- community.general.attributes
+  - community.general.attributes
 attributes:
   check_mode:
     support: full
     details:
-      - In order to check the availability of packages, the catalog cache under C(/var/opt/csw/pkgutil) may be refreshed even in check mode.
+      - In order to check the availability of packages, the catalog cache under C(/var/opt/csw/pkgutil) may be refreshed even
+        in check mode.
   diff_mode:
     support: none
 options:
   name:
     description:
-    - The name of the package.
-    - When using O(state=latest), this can be V('*'), which updates all installed packages managed by pkgutil.
+      - The name of the package.
+      - When using O(state=latest), this can be V('*'), which updates all installed packages managed by pkgutil.
     type: list
     required: true
     elements: str
-    aliases: [ pkg ]
+    aliases: [pkg]
   site:
     description:
-    - The repository path to install the package from.
-    - Its global definition is in C(/etc/opt/csw/pkgutil.conf).
+      - The repository path to install the package from.
+      - Its global definition is in C(/etc/opt/csw/pkgutil.conf).
     required: false
     type: str
   state:
     description:
-    - Whether to install (V(present)/V(installed)), or remove (V(absent)/V(removed)) packages.
-    - The upgrade (V(latest)) operation will update/install the packages to the latest version available.
+      - Whether to install (V(present)/V(installed)), or remove (V(absent)/V(removed)) packages.
+      - The upgrade (V(latest)) operation will update/install the packages to the latest version available.
     type: str
     required: true
-    choices: [ absent, installed, latest, present, removed ]
+    choices: [absent, installed, latest, present, removed]
   update_catalog:
     description:
-    - If you always want to refresh your catalog from the mirror, even when it's not stale, set this to V(true).
+      - If you always want to refresh your catalog from the mirror, even when it is not stale, set this to V(true).
     type: bool
     default: false
   force:
     description:
-    - To allow the update process to downgrade packages to match what is present in the repository, set this to V(true).
-    - This is useful for rolling back to stable from testing, or similar operations.
+      - To allow the update process to downgrade packages to match what is present in the repository, set this to V(true).
+      - This is useful for rolling back to stable from testing, or similar operations.
     type: bool
     default: false
     version_added: 1.2.0
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Install a package
   community.general.pkgutil:
     name: CSWcommon
@@ -88,8 +88,8 @@ EXAMPLES = r'''
 - name: Install several packages
   community.general.pkgutil:
     name:
-    - CSWsudo
-    - CSWtop
+      - CSWsudo
+      - CSWtop
     state: present
 
 - name: Update all packages
@@ -102,9 +102,9 @@ EXAMPLES = r'''
     name: '*'
     state: latest
     force: true
-'''
+"""
 
-RETURN = r''' # '''
+RETURN = r""" # """
 
 from ansible.module_utils.basic import AnsibleModule
 

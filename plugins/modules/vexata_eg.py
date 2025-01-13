@@ -9,15 +9,13 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: vexata_eg
 short_description: Manage export groups on Vexata VX100 storage arrays
 description:
-    - Create or delete export groups on a Vexata VX100 array.
-    - An export group is a tuple of a volume group, initiator group and port
-      group that allows a set of volumes to be exposed to one or more hosts
-      through specific array ports.
+  - Create or delete export groups on a Vexata VX100 array.
+  - An export group is a tuple of a volume group, initiator group and port group that allows a set of volumes to be exposed
+    to one or more hosts through specific array ports.
 author:
   - Sandeep Kasargod (@vexata)
 attributes:
@@ -33,29 +31,28 @@ options:
     type: str
   state:
     description:
-    - Creates export group when present or delete when absent.
+      - Creates export group when present or delete when absent.
     default: present
-    choices: [ present, absent ]
+    choices: [present, absent]
     type: str
   vg:
     description:
-    - Volume group name.
+      - Volume group name.
     type: str
   ig:
     description:
-    - Initiator group name.
+      - Initiator group name.
     type: str
   pg:
     description:
-    - Port group name.
+      - Port group name.
     type: str
 extends_documentation_fragment:
-- community.general.vexata.vx100
-- community.general.attributes
+  - community.general.vexata.vx100
+  - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Create export group named db_export.
   community.general.vexata_eg:
     name: db_export
@@ -74,10 +71,10 @@ EXAMPLES = r'''
     array: vx100_ultra.test.com
     user: admin
     password: secret
-'''
+"""
 
-RETURN = r'''
-'''
+RETURN = r"""
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.vexata import (

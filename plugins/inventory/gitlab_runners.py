@@ -22,7 +22,7 @@ DOCUMENTATION = '''
         - Uses a YAML configuration file gitlab_runners.[yml|yaml].
     options:
         plugin:
-            description: The name of this plugin, it should always be set to 'gitlab_runners' for this plugin to recognize it as it's own.
+            description: The name of this plugin, it should always be set to 'gitlab_runners' for this plugin to recognize it as its own.
             type: str
             required: true
             choices:
@@ -58,10 +58,12 @@ DOCUMENTATION = '''
 '''
 
 EXAMPLES = '''
+---
 # gitlab_runners.yml
 plugin: community.general.gitlab_runners
 host: https://gitlab.com
 
+---
 # Example using constructed features to create groups and set ansible_host
 plugin: community.general.gitlab_runners
 host: https://gitlab.com
@@ -81,8 +83,9 @@ keyed_groups:
 '''
 
 from ansible.errors import AnsibleError, AnsibleParserError
-from ansible.module_utils.common.text.converters import to_native
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable
+
+from ansible_collections.community.general.plugins.plugin_utils.unsafe import make_unsafe
 
 try:
     import gitlab
@@ -105,11 +108,11 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
             else:
                 runners = gl.runners.all()
             for runner in runners:
-                host = str(runner['id'])
+                host = make_unsafe(str(runner['id']))
                 ip_address = runner['ip_address']
-                host_attrs = vars(gl.runners.get(runner['id']))['_attrs']
+                host_attrs = make_unsafe(vars(gl.runners.get(runner['id']))['_attrs'])
                 self.inventory.add_host(host, group='gitlab_runners')
-                self.inventory.set_variable(host, 'ansible_host', ip_address)
+                self.inventory.set_variable(host, 'ansible_host', make_unsafe(ip_address))
                 if self.get_option('verbose_output', True):
                     self.inventory.set_variable(host, 'gitlab_runner_attributes', host_attrs)
 
@@ -122,7 +125,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
                 # Create groups based on variable values and add the corresponding hosts to it
                 self._add_host_to_keyed_groups(self.get_option('keyed_groups'), host_attrs, host, strict=strict)
         except Exception as e:
-            raise AnsibleParserError('Unable to fetch hosts from GitLab API, this was the original exception: %s' % to_native(e))
+            raise AnsibleParserError(f'Unable to fetch hosts from GitLab API, this was the original exception: {e}')
 
     def verify_file(self, path):
         """Return the possibly of a file being consumable by this plugin."""

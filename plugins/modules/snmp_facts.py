@@ -9,87 +9,85 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: snmp_facts
 author:
-- Patrick Ogenstad (@ogenstad)
+  - Patrick Ogenstad (@ogenstad)
 short_description: Retrieve facts for a device using SNMP
 description:
-    - Retrieve facts for a device using SNMP, the facts will be
-      inserted to the ansible_facts key.
+  - Retrieve facts for a device using SNMP, the facts will be inserted to the C(ansible_facts) key.
 requirements:
-    - pysnmp
+  - pysnmp
 extends_documentation_fragment:
-    - community.general.attributes
-    - community.general.attributes.facts
-    - community.general.attributes.facts_module
+  - community.general.attributes
+  - community.general.attributes.facts
+  - community.general.attributes.facts_module
 attributes:
-    check_mode:
-        version_added: 3.3.0
-        # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
+  check_mode:
+    version_added: 3.3.0
+    # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
 options:
-    host:
-        description:
-            - Set to target SNMP server (normally C({{ inventory_hostname }})).
-        type: str
-        required: true
-    version:
-        description:
-            - SNMP Version to use, V(v2), V(v2c) or V(v3).
-        type: str
-        required: true
-        choices: [ v2, v2c, v3 ]
-    community:
-        description:
-            - The SNMP community string, required if O(version) is V(v2) or V(v2c).
-        type: str
-    level:
-        description:
-            - Authentication level.
-            - Required if O(version=v3).
-        type: str
-        choices: [ authNoPriv, authPriv ]
-    username:
-        description:
-            - Username for SNMPv3.
-            - Required if O(version=v3).
-        type: str
-    integrity:
-        description:
-            - Hashing algorithm.
-            - Required if O(version=v3).
-        type: str
-        choices: [ md5, sha ]
-    authkey:
-        description:
-            - Authentication key.
-            - Required O(version=v3).
-        type: str
-    privacy:
-        description:
-            - Encryption algorithm.
-            - Required if O(level=authPriv).
-        type: str
-        choices: [ aes, des ]
-    privkey:
-        description:
-            - Encryption key.
-            - Required if O(level=authPriv).
-        type: str
-    timeout:
-        description:
-            - Response timeout in seconds.
-        type: int
-        version_added: 2.3.0
-    retries:
-        description:
-            - Maximum number of request retries, 0 retries means just a single request.
-        type: int
-        version_added: 2.3.0
-'''
+  host:
+    description:
+      - Set to target SNMP server (normally C({{ inventory_hostname }})).
+    type: str
+    required: true
+  version:
+    description:
+      - SNMP Version to use, V(v2), V(v2c) or V(v3).
+    type: str
+    required: true
+    choices: [v2, v2c, v3]
+  community:
+    description:
+      - The SNMP community string, required if O(version) is V(v2) or V(v2c).
+    type: str
+  level:
+    description:
+      - Authentication level.
+      - Required if O(version=v3).
+    type: str
+    choices: [authNoPriv, authPriv]
+  username:
+    description:
+      - Username for SNMPv3.
+      - Required if O(version=v3).
+    type: str
+  integrity:
+    description:
+      - Hashing algorithm.
+      - Required if O(version=v3).
+    type: str
+    choices: [md5, sha]
+  authkey:
+    description:
+      - Authentication key.
+      - Required O(version=v3).
+    type: str
+  privacy:
+    description:
+      - Encryption algorithm.
+      - Required if O(level=authPriv).
+    type: str
+    choices: [aes, des]
+  privkey:
+    description:
+      - Encryption key.
+      - Required if O(level=authPriv).
+    type: str
+  timeout:
+    description:
+      - Response timeout in seconds.
+    type: int
+    version_added: 2.3.0
+  retries:
+    description:
+      - Maximum number of request retries, 0 retries means just a single request.
+    type: int
+    version_added: 2.3.0
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Gather facts with SNMP version 2
   community.general.snmp_facts:
     host: '{{ inventory_hostname }}'
@@ -108,9 +106,9 @@ EXAMPLES = r'''
     authkey: abc12345
     privkey: def6789
   delegate_to: localhost
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 ansible_sysdescr:
   description: A textual description of the entity.
   returned: success
@@ -127,7 +125,8 @@ ansible_sysuptime:
   type: int
   sample: 42388
 ansible_syscontact:
-  description: The textual identification of the contact person for this managed node, together with information on how to contact this person.
+  description: The textual identification of the contact person for this managed node, together with information on how to
+    contact this person.
   returned: success
   type: str
   sample: Me <me@example.org>
@@ -152,39 +151,39 @@ ansible_interfaces:
   type: dict
   sample: {
     "1": {
-        "adminstatus": "up",
-        "description": "",
-        "ifindex": "1",
-        "ipv4": [
-            {
-                "address": "127.0.0.1",
-                "netmask": "255.0.0.0"
-            }
-        ],
-        "mac": "",
-        "mtu": "65536",
-        "name": "lo",
-        "operstatus": "up",
-        "speed": "65536"
+      "adminstatus": "up",
+      "description": "",
+      "ifindex": "1",
+      "ipv4": [
+        {
+          "address": "127.0.0.1",
+          "netmask": "255.0.0.0"
+        }
+      ],
+      "mac": "",
+      "mtu": "65536",
+      "name": "lo",
+      "operstatus": "up",
+      "speed": "65536"
     },
     "2": {
-        "adminstatus": "up",
-        "description": "",
-        "ifindex": "2",
-        "ipv4": [
-            {
-                "address": "192.168.213.128",
-                "netmask": "255.255.255.0"
-            }
-        ],
-        "mac": "000a305a52a1",
-        "mtu": "1500",
-        "name": "Intel Corporation 82545EM Gigabit Ethernet Controller (Copper)",
-        "operstatus": "up",
-        "speed": "1500"
+      "adminstatus": "up",
+      "description": "",
+      "ifindex": "2",
+      "ipv4": [
+        {
+          "address": "192.168.213.128",
+          "netmask": "255.255.255.0"
+        }
+      ],
+      "mac": "000a305a52a1",
+      "mtu": "1500",
+      "name": "Intel Corporation 82545EM Gigabit Ethernet Controller (Copper)",
+      "operstatus": "up",
+      "speed": "1500"
     }
   }
-'''
+"""
 
 import binascii
 from collections import defaultdict
@@ -300,13 +299,19 @@ def main():
     deps.validate(module)
 
     cmdGen = cmdgen.CommandGenerator()
-    transport_opts = dict((k, m_args[k]) for k in ('timeout', 'retries') if m_args[k] is not None)
+    transport_opts = {
+        k: m_args[k]
+        for k in ('timeout', 'retries')
+        if m_args[k] is not None
+    }
 
     # Verify that we receive a community when using snmp v2
     if m_args['version'] in ("v2", "v2c"):
         if m_args['community'] is None:
             module.fail_json(msg='Community not set when using snmp version 2')
 
+    integrity_proto = None
+    privacy_proto = None
     if m_args['version'] == "v3":
         if m_args['username'] is None:
             module.fail_json(msg='Username not set when using snmp version 3')

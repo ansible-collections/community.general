@@ -8,7 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = """
+DOCUMENTATION = r"""
 module: ansible_galaxy_install
 author:
   - "Alexei Znamensky (@russoz)"
@@ -18,10 +18,13 @@ description:
   - This module allows the installation of Ansible collections or roles using C(ansible-galaxy).
 notes:
   - Support for B(Ansible 2.9/2.10) was removed in community.general 8.0.0.
-  - >
-    The module will try and run using the C(C.UTF-8) locale.
-    If that fails, it will try C(en_US.UTF-8).
-    If that one also fails, the module will fail.
+  - The module will try and run using the C(C.UTF-8) locale. If that fails, it will try C(en_US.UTF-8). If that one also fails,
+    the module will fail.
+seealso:
+  - name: C(ansible-galaxy) command manual page
+    description: Manual page for the command.
+    link: https://docs.ansible.com/ansible/latest/cli/ansible-galaxy.html
+
 requirements:
   - ansible-core 2.11 or newer
 extends_documentation_fragment:
@@ -32,20 +35,31 @@ attributes:
   diff_mode:
     support: none
 options:
+  state:
+    description:
+      - If O(state=present) then the collection or role will be installed. Note that the collections and roles are not updated
+        with this option.
+      - Currently the O(state=latest) is ignored unless O(type=collection), and it will ensure the collection is installed
+        and updated to the latest available version.
+      - Please note that O(force=true) can be used to perform upgrade regardless of O(type).
+    type: str
+    choices: [present, latest]
+    default: present
+    version_added: 9.1.0
   type:
     description:
       - The type of installation performed by C(ansible-galaxy).
       - If O(type=both), then O(requirements_file) must be passed and it may contain both roles and collections.
-      - "Note however that the opposite is not true: if using a O(requirements_file), then O(type) can be any of the three choices."
+      - 'Note however that the opposite is not true: if using a O(requirements_file), then O(type) can be any of the three
+        choices.'
     type: str
     choices: [collection, role, both]
     required: true
   name:
     description:
       - Name of the collection or role being installed.
-      - >
-        Versions can be specified with C(ansible-galaxy) usual formats.
-        For example, the collection V(community.docker:1.6.1) or the role V(ansistrano.deploy,3.8.0).
+      - Versions can be specified with C(ansible-galaxy) usual formats. For example, the collection V(community.docker:1.6.1)
+        or the role V(ansistrano.deploy,3.8.0).
       - O(name) and O(requirements_file) are mutually exclusive.
     type: str
   requirements_file:
@@ -57,9 +71,8 @@ options:
   dest:
     description:
       - The path to the directory containing your collections or roles, according to the value of O(type).
-      - >
-        Please notice that C(ansible-galaxy) will not install collections with O(type=both), when O(requirements_file)
-        contains both roles and collections and O(dest) is specified.
+      - Please notice that C(ansible-galaxy) will not install collections with O(type=both), when O(requirements_file) contains
+        both roles and collections and O(dest) is specified.
     type: path
   no_deps:
     description:
@@ -69,23 +82,14 @@ options:
     default: false
   force:
     description:
-      - Force overwriting an existing role or collection.
+      - Force overwriting existing roles and/or collections.
+      - It can be used for upgrading, but the module output will always report C(changed=true).
       - Using O(force=true) is mandatory when downgrading.
-    type: bool
-    default: false
-  ack_ansible29:
-    description:
-      - This option has no longer any effect and will be removed in community.general 9.0.0.
-    type: bool
-    default: false
-  ack_min_ansiblecore211:
-    description:
-      - This option has no longer any effect and will be removed in community.general 9.0.0.
     type: bool
     default: false
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Install collection community.network
   community.general.ansible_galaxy_install:
     type: collection
@@ -107,81 +111,86 @@ EXAMPLES = """
     type: collection
     name: community.network:3.0.2
     force: true
-
 """
 
-RETURN = """
-  type:
-    description: The value of the O(type) parameter.
-    type: str
-    returned: always
-  name:
-    description: The value of the O(name) parameter.
-    type: str
-    returned: always
-  dest:
-    description: The value of the O(dest) parameter.
-    type: str
-    returned: always
-  requirements_file:
-    description: The value of the O(requirements_file) parameter.
-    type: str
-    returned: always
-  force:
-    description: The value of the O(force) parameter.
-    type: bool
-    returned: always
-  installed_roles:
-    description:
-      - If O(requirements_file) is specified instead, returns dictionary with all the roles installed per path.
-      - If O(name) is specified, returns that role name and the version installed per path.
-    type: dict
-    returned: always when installing roles
-    contains:
-      "<path>":
-        description: Roles and versions for that path.
-        type: dict
-    sample:
-      /home/user42/.ansible/roles:
-        ansistrano.deploy: 3.9.0
-        baztian.xfce: v0.0.3
-      /custom/ansible/roles:
-        ansistrano.deploy: 3.8.0
-  installed_collections:
-    description:
-      - If O(requirements_file) is specified instead, returns dictionary with all the collections installed per path.
-      - If O(name) is specified, returns that collection name and the version installed per path.
-    type: dict
-    returned: always when installing collections
-    contains:
-      "<path>":
-        description: Collections and versions for that path
-        type: dict
-    sample:
-      /home/az/.ansible/collections/ansible_collections:
-        community.docker: 1.6.0
-        community.general: 3.0.2
-      /custom/ansible/ansible_collections:
-        community.general: 3.1.0
-  new_collections:
-    description: New collections installed by this module.
-    returned: success
-    type: dict
-    sample:
-      community.general: 3.1.0
-      community.docker: 1.6.1
-  new_roles:
-    description: New roles installed by this module.
-    returned: success
-    type: dict
-    sample:
-      ansistrano.deploy: 3.8.0
+RETURN = r"""
+type:
+  description: The value of the O(type) parameter.
+  type: str
+  returned: always
+name:
+  description: The value of the O(name) parameter.
+  type: str
+  returned: always
+dest:
+  description: The value of the O(dest) parameter.
+  type: str
+  returned: always
+requirements_file:
+  description: The value of the O(requirements_file) parameter.
+  type: str
+  returned: always
+force:
+  description: The value of the O(force) parameter.
+  type: bool
+  returned: always
+installed_roles:
+  description:
+    - If O(requirements_file) is specified instead, returns dictionary with all the roles installed per path.
+    - If O(name) is specified, returns that role name and the version installed per path.
+  type: dict
+  returned: always when installing roles
+  contains:
+    "<path>":
+      description: Roles and versions for that path.
+      type: dict
+  sample:
+    /home/user42/.ansible/roles:
+      ansistrano.deploy: 3.9.0
       baztian.xfce: v0.0.3
+    /custom/ansible/roles:
+      ansistrano.deploy: 3.8.0
+installed_collections:
+  description:
+    - If O(requirements_file) is specified instead, returns dictionary with all the collections installed per path.
+    - If O(name) is specified, returns that collection name and the version installed per path.
+  type: dict
+  returned: always when installing collections
+  contains:
+    "<path>":
+      description: Collections and versions for that path.
+      type: dict
+  sample:
+    /home/az/.ansible/collections/ansible_collections:
+      community.docker: 1.6.0
+      community.general: 3.0.2
+    /custom/ansible/ansible_collections:
+      community.general: 3.1.0
+new_collections:
+  description: New collections installed by this module.
+  returned: success
+  type: dict
+  sample:
+    community.general: 3.1.0
+    community.docker: 1.6.1
+new_roles:
+  description: New roles installed by this module.
+  returned: success
+  type: dict
+  sample:
+    ansistrano.deploy: 3.8.0
+    baztian.xfce: v0.0.3
+version:
+  description: Version of ansible-core for ansible-galaxy.
+  type: str
+  returned: always
+  sample: 2.17.4
+  version_added: 10.0.0
 """
 
 import re
 
-from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt as fmt
+from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper, ModuleHelperException
 
 
@@ -190,47 +199,40 @@ class AnsibleGalaxyInstall(ModuleHelper):
     _RE_LIST_PATH = re.compile(r'^# (?P<path>.*)$')
     _RE_LIST_COLL = re.compile(r'^(?P<elem>\w+\.\w+)\s+(?P<version>[\d\.]+)\s*$')
     _RE_LIST_ROLE = re.compile(r'^- (?P<elem>\w+\.\w+),\s+(?P<version>[\d\.]+)\s*$')
-    _RE_INSTALL_OUTPUT = None  # Set after determining ansible version, see __init_module__()
+    _RE_INSTALL_OUTPUT = re.compile(
+        r'^(?:(?P<collection>\w+\.\w+):(?P<cversion>[\d\.]+)|- (?P<role>\w+\.\w+) \((?P<rversion>[\d\.]+)\)) was installed successfully$'
+    )
     ansible_version = None
 
     output_params = ('type', 'name', 'dest', 'requirements_file', 'force', 'no_deps')
     module = dict(
         argument_spec=dict(
+            state=dict(type='str', choices=['present', 'latest'], default='present'),
             type=dict(type='str', choices=('collection', 'role', 'both'), required=True),
             name=dict(type='str'),
             requirements_file=dict(type='path'),
             dest=dict(type='path'),
             force=dict(type='bool', default=False),
             no_deps=dict(type='bool', default=False),
-            ack_ansible29=dict(
-                type='bool',
-                default=False,
-                removed_in_version='9.0.0',
-                removed_from_collection='community.general',
-            ),
-            ack_min_ansiblecore211=dict(
-                type='bool',
-                default=False,
-                removed_in_version='9.0.0',
-                removed_from_collection='community.general',
-            ),
         ),
         mutually_exclusive=[('name', 'requirements_file')],
         required_one_of=[('name', 'requirements_file')],
         required_if=[('type', 'both', ['requirements_file'])],
         supports_check_mode=False,
     )
+    use_old_vardict = False
 
     command = 'ansible-galaxy'
     command_args_formats = dict(
-        type=fmt.as_func(lambda v: [] if v == 'both' else [v]),
-        galaxy_cmd=fmt.as_list(),
-        requirements_file=fmt.as_opt_val('-r'),
-        dest=fmt.as_opt_val('-p'),
-        force=fmt.as_bool("--force"),
-        no_deps=fmt.as_bool("--no-deps"),
-        version=fmt.as_bool("--version"),
-        name=fmt.as_list(),
+        type=cmd_runner_fmt.as_func(lambda v: [] if v == 'both' else [v]),
+        galaxy_cmd=cmd_runner_fmt.as_list(),
+        upgrade=cmd_runner_fmt.as_bool("--upgrade"),
+        requirements_file=cmd_runner_fmt.as_opt_val('-r'),
+        dest=cmd_runner_fmt.as_opt_val('-p'),
+        force=cmd_runner_fmt.as_bool("--force"),
+        no_deps=cmd_runner_fmt.as_bool("--no-deps"),
+        version=cmd_runner_fmt.as_fixed("--version"),
+        name=cmd_runner_fmt.as_list(),
     )
 
     def _make_runner(self, lang):
@@ -248,31 +250,22 @@ class AnsibleGalaxyInstall(ModuleHelper):
             if not match:
                 self.do_raise("Unable to determine ansible-galaxy version from: {0}".format(line))
             version = match.group("version")
-            version = tuple(int(x) for x in version.split('.')[:3])
             return version
 
         try:
             runner = self._make_runner("C.UTF-8")
             with runner("version", check_rc=False, output_process=process) as ctx:
-                return runner, ctx.run(version=True)
-        except UnsupportedLocale as e:
+                return runner, ctx.run()
+        except UnsupportedLocale:
             runner = self._make_runner("en_US.UTF-8")
             with runner("version", check_rc=True, output_process=process) as ctx:
-                return runner, ctx.run(version=True)
+                return runner, ctx.run()
 
     def __init_module__(self):
-        # self.runner = CmdRunner(self.module, command=self.command, arg_formats=self.command_args_formats, force_lang=self.force_lang)
-        self.runner, self.ansible_version = self._get_ansible_galaxy_version()
+        self.runner, self.vars.version = self._get_ansible_galaxy_version()
+        self.ansible_version = tuple(int(x) for x in self.vars.version.split('.')[:3])
         if self.ansible_version < (2, 11):
-            self.module.fail_json(
-                msg="Support for Ansible 2.9 and ansible-base 2.10 has ben removed."
-            )
-        # Collection install output changed:
-        # ansible-base 2.10:  "coll.name (x.y.z)"
-        # ansible-core 2.11+: "coll.name:x.y.z"
-        self._RE_INSTALL_OUTPUT = re.compile(r'^(?:(?P<collection>\w+\.\w+)(?: \(|:)(?P<cversion>[\d\.]+)\)?'
-                                             r'|- (?P<role>\w+\.\w+) \((?P<rversion>[\d\.]+)\))'
-                                             r' was installed successfully$')
+            self.module.fail_json(msg="Support for Ansible 2.9 and ansible-base 2.10 has been removed.")
         self.vars.set("new_collections", {}, change=True)
         self.vars.set("new_roles", {}, change=True)
         if self.vars.type != "collection":
@@ -325,8 +318,9 @@ class AnsibleGalaxyInstall(ModuleHelper):
                 elif match.group("role"):
                     self.vars.new_roles[match.group("role")] = match.group("rversion")
 
-        with self.runner("type galaxy_cmd force no_deps dest requirements_file name", output_process=process) as ctx:
-            ctx.run(galaxy_cmd="install")
+        upgrade = (self.vars.type == "collection" and self.vars.state == "latest")
+        with self.runner("type galaxy_cmd upgrade force no_deps dest requirements_file name", output_process=process) as ctx:
+            ctx.run(galaxy_cmd="install", upgrade=upgrade)
             if self.verbosity > 2:
                 self.vars.set("run_info", ctx.run_info)
 

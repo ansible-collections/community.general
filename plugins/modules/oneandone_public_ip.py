@@ -7,13 +7,11 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: oneandone_public_ip
 short_description: Configure 1&1 public IPs
 description:
-  - Create, update, and remove public IPs.
-    This module has a dependency on 1and1 >= 1.0.
+  - Create, update, and remove public IPs. This module has a dependency on 1and1 >= 1.0.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -24,24 +22,23 @@ attributes:
 options:
   state:
     description:
-      - Define a public ip state to create, remove, or update.
+      - Define a public IP state to create, remove, or update.
     type: str
     required: false
     default: 'present'
-    choices: [ "present", "absent", "update" ]
+    choices: ["present", "absent", "update"]
   auth_token:
     description:
       - Authenticating API token provided by 1&1.
     type: str
   api_url:
     description:
-      - Custom API URL. Overrides the
-        ONEANDONE_API_URL environment variable.
+      - Custom API URL. Overrides the E(ONEANDONE_API_URL) environment variable.
     type: str
     required: false
   reverse_dns:
     description:
-      - Reverse DNS name. maxLength=256
+      - Reverse DNS name. maxLength=256.
     type: str
     required: false
   datacenter:
@@ -64,30 +61,30 @@ options:
     type: str
   wait:
     description:
-      - wait for the instance to be in state 'running' before returning
+      - Wait for the instance to be in state 'running' before returning.
     required: false
     default: true
     type: bool
   wait_timeout:
     description:
-      - how long before wait gives up, in seconds
+      - How long before wait gives up, in seconds.
     type: int
     default: 600
   wait_interval:
     description:
-      - Defines the number of seconds to wait when using the _wait_for methods
+      - Defines the number of seconds to wait when using the _wait_for methods.
     type: int
     default: 5
 
 requirements:
-     - "1and1"
+  - "1and1"
 
 author:
   - Amel Ajdinovic (@aajdinov)
   - Ethan Devenport (@edevenport)
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a public IP
   community.general.oneandone_public_ip:
     auth_token: oneandone_private_api_key
@@ -107,15 +104,15 @@ EXAMPLES = '''
     auth_token: oneandone_private_api_key
     public_ip_id: public ip id
     state: absent
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 public_ip:
-    description: Information about the public ip that was processed
-    type: dict
-    sample: '{"id": "F77CC589EBC120905B4F4719217BFF6D", "ip": "10.5.132.106"}'
-    returned: always
-'''
+  description: Information about the public IP that was processed.
+  type: dict
+  sample: '{"id": "F77CC589EBC120905B4F4719217BFF6D", "ip": "10.5.132.106"}'
+  returned: always
+"""
 
 import os
 from ansible.module_utils.basic import AnsibleModule

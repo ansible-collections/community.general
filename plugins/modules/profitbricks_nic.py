@@ -8,12 +8,11 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: profitbricks_nic
 short_description: Create or Remove a NIC
 description:
-  - This module allows you to create or restore a volume snapshot. This module has a dependency on profitbricks >= 1.0.0
+  - This module allows you to create or restore a volume snapshot. This module has a dependency on profitbricks >= 1.0.0.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -39,42 +38,42 @@ options:
     type: str
   lan:
     description:
-      - The LAN to place the NIC on. You can pass a LAN that doesn't exist and it will be created. Required on create.
+      - The LAN to place the NIC on. You can pass a LAN that does not exist and it will be created. Required on create.
     type: str
   subscription_user:
     description:
-      - The ProfitBricks username. Overrides the PB_SUBSCRIPTION_ID environment variable.
+      - The ProfitBricks username. Overrides the E(PB_SUBSCRIPTION_ID) environment variable.
     type: str
     required: true
   subscription_password:
     description:
-      - THe ProfitBricks password. Overrides the PB_PASSWORD environment variable.
+      - THe ProfitBricks password. Overrides the E(PB_PASSWORD) environment variable.
     type: str
     required: true
   wait:
     description:
-      - wait for the operation to complete before returning
+      - Wait for the operation to complete before returning.
     required: false
     default: true
     type: bool
   wait_timeout:
     description:
-      - how long before wait gives up, in seconds
+      - How long before wait gives up, in seconds.
     type: int
     default: 600
   state:
     description:
-      - Indicate desired state of the resource
-      - "The available choices are: V(present), V(absent)."
+      - Indicate desired state of the resource.
+      - 'The available choices are: V(present), V(absent).'
     type: str
     required: false
     default: 'present'
 
-requirements: [ "profitbricks" ]
+requirements: ["profitbricks"]
 author: Matt Baldwin (@baldwinSPC) <baldwin@stackpointcloud.com>
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a NIC
   community.general.profitbricks_nic:
     datacenter: Tardis One
@@ -90,7 +89,7 @@ EXAMPLES = '''
     name: 7341c2454f
     wait_timeout: 500
     state: absent
-'''
+"""
 
 import re
 import uuid

@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2021, Georg Gadinger <nilsding@nilsding.org>
+# Copyright (c) 2021, Jyrki Gadinger <nilsding@nilsding.org>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -9,8 +9,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: one_template
 
 short_description: Manages OpenNebula templates
@@ -21,27 +20,25 @@ requirements:
   - pyone
 
 description:
-  - "Manages OpenNebula templates."
-
+  - Manages OpenNebula templates.
 attributes:
   check_mode:
     support: partial
     details:
-      - Note that check mode always returns C(changed=true) for existing templates, even if the template would not actually change.
+      - Note that check mode always returns C(changed=true) for existing templates, even if the template would not actually
+        change.
   diff_mode:
     support: none
 
 options:
   id:
     description:
-      - A O(id) of the template you would like to manage.  If not set then a
-      - new template will be created with the given O(name).
+      - A O(id) of the template you would like to manage. If not set then a new template will be created with the given O(name).
     type: int
   name:
     description:
-      - A O(name) of the template you would like to manage.  If a template with
-      - the given name does not exist it will be created, otherwise it will be
-      - managed by this module.
+      - A O(name) of the template you would like to manage. If a template with the given name does not exist it will be created,
+        otherwise it will be managed by this module.
     type: str
   template:
     description:
@@ -60,10 +57,10 @@ extends_documentation_fragment:
   - community.general.attributes
 
 author:
-  - "Georg Gadinger (@nilsding)"
-'''
+  - "Jyrki Gadinger (@nilsding)"
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Fetch the TEMPLATE by id
   community.general.one_template:
     id: 6459
@@ -110,44 +107,44 @@ EXAMPLES = '''
   community.general.one_template:
     id: 6459
     state: absent
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 id:
-    description: template id
-    type: int
-    returned: when O(state=present)
-    sample: 153
+  description: Template ID.
+  type: int
+  returned: when O(state=present)
+  sample: 153
 name:
-    description: template name
-    type: str
-    returned: when O(state=present)
-    sample: app1
+  description: Template name.
+  type: str
+  returned: when O(state=present)
+  sample: app1
 template:
-    description: the parsed template
-    type: dict
-    returned: when O(state=present)
+  description: The parsed template.
+  type: dict
+  returned: when O(state=present)
 group_id:
-    description: template's group id
-    type: int
-    returned: when O(state=present)
-    sample: 1
+  description: Template's group ID.
+  type: int
+  returned: when O(state=present)
+  sample: 1
 group_name:
-    description: template's group name
-    type: str
-    returned: when O(state=present)
-    sample: one-users
+  description: Template's group name.
+  type: str
+  returned: when O(state=present)
+  sample: one-users
 owner_id:
-    description: template's owner id
-    type: int
-    returned: when O(state=present)
-    sample: 143
+  description: Template's owner ID.
+  type: int
+  returned: when O(state=present)
+  sample: 143
 owner_name:
-    description: template's owner name
-    type: str
-    returned: when O(state=present)
-    sample: ansible-test
-'''
+  description: Template's owner name.
+  type: str
+  returned: when O(state=present)
+  sample: ansible-test
+"""
 
 
 from ansible_collections.community.general.plugins.module_utils.opennebula import OpenNebulaModule

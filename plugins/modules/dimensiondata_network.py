@@ -14,8 +14,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: dimensiondata_network
 short_description: Create, update, and delete MCP 1.0 & 2.0 networks
 extends_documentation_fragment:
@@ -24,7 +23,7 @@ extends_documentation_fragment:
   - community.general.attributes
 
 description:
-  - Create, update, and delete MCP 1.0 & 2.0 networks
+  - Create, update, and delete MCP 1.0 & 2.0 networks.
 author: 'Aimon Bustardo (@aimonb)'
 attributes:
   check_mode:
@@ -55,9 +54,9 @@ options:
     choices: [present, absent]
     default: present
     type: str
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create an MCP 1.0 network
   community.general.dimensiondata_network:
     region: na
@@ -79,43 +78,43 @@ EXAMPLES = '''
     location: NA1
     name: mynet
     state: absent
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 network:
-    description: Dictionary describing the network.
-    returned: On success when O(state=present).
-    type: complex
-    contains:
-        id:
-            description: Network ID.
-            type: str
-            sample: "8c787000-a000-4050-a215-280893411a7d"
-        name:
-            description: Network name.
-            type: str
-            sample: "My network"
-        description:
-            description: Network description.
-            type: str
-            sample: "My network description"
-        location:
-            description: Datacenter location.
-            type: str
-            sample: NA3
-        status:
-            description: Network status. (MCP 2.0 only)
-            type: str
-            sample: NORMAL
-        private_net:
-            description: Private network subnet. (MCP 1.0 only)
-            type: str
-            sample: "10.2.3.0"
-        multicast:
-            description: Multicast enabled? (MCP 1.0 only)
-            type: bool
-            sample: false
-'''
+  description: Dictionary describing the network.
+  returned: On success when O(state=present).
+  type: complex
+  contains:
+    id:
+      description: Network ID.
+      type: str
+      sample: "8c787000-a000-4050-a215-280893411a7d"
+    name:
+      description: Network name.
+      type: str
+      sample: "My network"
+    description:
+      description: Network description.
+      type: str
+      sample: "My network description"
+    location:
+      description: Datacenter location.
+      type: str
+      sample: NA3
+    status:
+      description: Network status. (MCP 2.0 only).
+      type: str
+      sample: NORMAL
+    private_net:
+      description: Private network subnet. (MCP 1.0 only).
+      type: str
+      sample: "10.2.3.0"
+    multicast:
+      description: Multicast enabled? (MCP 1.0 only).
+      type: bool
+      sample: false
+"""
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule

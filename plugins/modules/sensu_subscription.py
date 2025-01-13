@@ -9,12 +9,15 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: sensu_subscription
 short_description: Manage Sensu subscriptions
 description:
-  - Manage which I(sensu channels) a machine should subscribe to
+  - Manage which I(sensu channels) a machine should subscribe to.
+deprecated:
+  removed_in: 13.0.0
+  why: Sensu Core and Sensu Enterprise products have been End of Life since 2019/20.
+  alternative: Use Sensu Go and its accompanying collection C(sensu.sensu_go).
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -26,41 +29,41 @@ options:
   name:
     type: str
     description:
-      - The name of the channel
+      - The name of the channel.
     required: true
   state:
     type: str
     description:
-      - Whether the machine should subscribe or unsubscribe from the channel
-    choices: [ 'present', 'absent' ]
+      - Whether the machine should subscribe or unsubscribe from the channel.
+    choices: ['present', 'absent']
     required: false
     default: present
   path:
     type: str
     description:
-      - Path to the subscriptions json file
+      - Path to the subscriptions JSON file.
     required: false
     default: /etc/sensu/conf.d/subscriptions.json
   backup:
     description:
-      - Create a backup file (if yes), including the timestamp information so you
-      - can get the original file back if you somehow clobbered it incorrectly.
+      - Create a backup file (if yes), including the timestamp information so you can get the original file back if you somehow
+        clobbered it incorrectly.
     type: bool
     required: false
     default: false
-requirements: [ ]
+requirements: []
 author: Anders Ingemann (@andsens)
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 reasons:
-    description: the reasons why the module changed or did not change something
-    returned: success
-    type: list
-    sample: ["channel subscription was absent and state is `present'"]
-'''
+  description: The reasons why the module changed or did not change something.
+  returned: success
+  type: list
+  sample: ["channel subscription was absent and state is `present'"]
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # Subscribe to the nginx channel
 - name: Subscribe to nginx checks
   community.general.sensu_subscription: name=nginx
@@ -68,7 +71,7 @@ EXAMPLES = '''
 # Unsubscribe from the common checks channel
 - name: Unsubscribe from common checks
   community.general.sensu_subscription: name=common state=absent
-'''
+"""
 
 import json
 import traceback

@@ -25,4 +25,28 @@
       - unset_result.diff.before == option_value + "\n"
       - unset_result.diff.after == "\n"
       - get_result.config_value == ''
+
+- import_tasks: setup_value.yml
+
+- name: unsetting value with value specified
+  git_config:
+    name: "{{ option_name }}"
+    scope: "{{ option_scope }}"
+    value: "{{ option_value }}"
+    state: absent
+  register: unset_result
+
+- name: getting value
+  git_config:
+    name: "{{ option_name }}"
+    scope: "{{ option_scope }}"
+  register: get_result
+
+- name: assert unset changed and deleted value
+  assert:
+    that:
+      - unset_result is changed
+      - unset_result.diff.before == option_value + "\n"
+      - unset_result.diff.after == "\n"
+      - get_result.config_value == ''
 ...

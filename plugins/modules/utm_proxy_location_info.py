@@ -9,38 +9,36 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: utm_proxy_location_info
 
 author:
-    - Johannes Brunswicker (@MatrixCrawler)
+  - Johannes Brunswicker (@MatrixCrawler)
 
 short_description: Create, update or destroy reverse_proxy location entry in Sophos UTM
 
 description:
-    - Create, update or destroy a reverse_proxy location entry in SOPHOS UTM.
-    - This module needs to have the REST Ability of the UTM to be activated.
-
+  - Create, update or destroy a reverse_proxy location entry in SOPHOS UTM.
+  - This module needs to have the REST Ability of the UTM to be activated.
 attributes:
-    check_mode:
-        version_added: 3.3.0
+  check_mode:
+    version_added: 3.3.0
         # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
 
 options:
-    name:
-        type: str
-        description:
-          - The name of the object. Will be used to identify the entry
-        required: true
+  name:
+    type: str
+    description:
+      - The name of the object. Will be used to identify the entry.
+    required: true
 
 extends_documentation_fragment:
-    - community.general.utm
-    - community.general.attributes
-    - community.general.attributes.info_module
-'''
+  - community.general.utm
+  - community.general.attributes
+  - community.general.attributes.info_module
+"""
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Remove UTM proxy_location
   community.general.utm_proxy_location_info:
     utm_host: sophos.host.name
@@ -48,63 +46,63 @@ EXAMPLES = """
     name: TestLocationEntry
 """
 
-RETURN = """
+RETURN = r"""
 result:
-    description: The utm object that was created
-    returned: success
-    type: complex
-    contains:
-        _ref:
-            description: The reference name of the object
-            type: str
-        _locked:
-            description: Whether or not the object is currently locked
-            type: bool
-        _type:
-            description: The type of the object
-            type: str
-        name:
-            description: The name of the object
-            type: str
-        access_control:
-            description: Whether to use access control state
-            type: str
-        allowed_networks:
-            description: List of allowed network reference names
-            type: list
-        auth_profile:
-            description: The auth profile reference name
-            type: str
-        backend:
-            description: The backend reference name
-            type: str
-        be_path:
-            description: The backend path
-            type: str
-        comment:
-            description: The comment string
-            type: str
-        denied_networks:
-            description: The list of the denied network names
-            type: list
-        hot_standby:
-            description: Use hot standby
-            type: bool
-        path:
-            description: Path name
-            type: str
-        status:
-            description: Whether the object is active or not
-            type: bool
-        stickysession_id:
-            description: The identifier of the stickysession
-            type: str
-        stickysession_status:
-            description: Whether to use stickysession or not
-            type: bool
-        websocket_passthrough:
-            description: Whether websocket passthrough will be used or not
-            type: bool
+  description: The utm object that was created.
+  returned: success
+  type: complex
+  contains:
+    _ref:
+      description: The reference name of the object.
+      type: str
+    _locked:
+      description: Whether or not the object is currently locked.
+      type: bool
+    _type:
+      description: The type of the object.
+      type: str
+    name:
+      description: The name of the object.
+      type: str
+    access_control:
+      description: Whether to use access control state.
+      type: str
+    allowed_networks:
+      description: List of allowed network reference names.
+      type: list
+    auth_profile:
+      description: The auth profile reference name.
+      type: str
+    backend:
+      description: The backend reference name.
+      type: str
+    be_path:
+      description: The backend path.
+      type: str
+    comment:
+      description: The comment string.
+      type: str
+    denied_networks:
+      description: The list of the denied network names.
+      type: list
+    hot_standby:
+      description: Use hot standby.
+      type: bool
+    path:
+      description: Path name.
+      type: str
+    status:
+      description: Whether the object is active or not.
+      type: bool
+    stickysession_id:
+      description: The identifier of the stickysession.
+      type: str
+    stickysession_status:
+      description: Whether to use stickysession or not.
+      type: bool
+    websocket_passthrough:
+      description: Whether websocket passthrough is used or not.
+      type: bool
 """
 
 from ansible_collections.community.general.plugins.module_utils.utm_utils import UTM, UTMModule

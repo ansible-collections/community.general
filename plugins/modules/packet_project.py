@@ -10,24 +10,22 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: packet_project
 
 short_description: Create/delete a project in Packet host
 
 description:
-    - Create/delete a project in Packet host.
-    - API is documented at U(https://www.packet.com/developers/api/#projects).
-
+  - Create/delete a project in Packet host.
+  - API is documented at U(https://www.packet.com/developers/api/#projects).
 version_added: '0.2.0'
 
 author:
-    - Tomas Karasek (@t0mk) <tom.to.the.k@gmail.com>
-    - Nurfet Becirevic (@nurfet-becirevic) <nurfet.becirevic@gmail.com>
+  - Tomas Karasek (@t0mk) <tom.to.the.k@gmail.com>
+  - Nurfet Becirevic (@nurfet-becirevic) <nurfet.becirevic@gmail.com>
 
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 
 attributes:
   check_mode:
@@ -51,13 +49,13 @@ options:
 
   auth_token:
     description:
-      - Packet api token. You can also supply it in environment variable E(PACKET_API_TOKEN).
+      - Packet API token. You can also supply it in environment variable E(PACKET_API_TOKEN).
     type: str
 
   name:
-     description:
-       - Name for/of the project.
-     type: str
+    description:
+      - Name for/of the project.
+    type: str
 
   org_id:
     description:
@@ -76,11 +74,10 @@ options:
     type: str
 
 requirements:
-    - "packet-python >= 1.40"
+  - "packet-python >= 1.40"
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 # All the examples assume that you have your Packet API token in env var PACKET_API_TOKEN.
 # You can also pass the api token in module param auth_token.
 
@@ -110,9 +107,9 @@ EXAMPLES = '''
     community.general.packet_project:
       name: "newer project"
       payment_method: "the other visa"
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 changed:
   description: True if a project was created or removed.
   type: bool
@@ -128,7 +125,7 @@ id:
   description: UUID of addressed project.
   type: str
   returned: success
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible.module_utils.common.text.converters import to_native

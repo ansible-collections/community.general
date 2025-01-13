@@ -13,16 +13,15 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: scaleway_compute
 short_description: Scaleway compute management module
 author: Remy Leone (@remyleone)
 description:
-    - "This module manages compute instances on Scaleway."
+  - This module manages compute instances on Scaleway.
 extends_documentation_fragment:
-    - community.general.scaleway
-    - community.general.attributes
+  - community.general.scaleway
+  - community.general.attributes
 
 attributes:
   check_mode:
@@ -35,35 +34,33 @@ options:
   public_ip:
     type: str
     description:
-    - Manage public IP on a Scaleway server
-    - Could be Scaleway IP address UUID
-    - V(dynamic) Means that IP is destroyed at the same time the host is destroyed
-    - V(absent) Means no public IP at all
+      - Manage public IP on a Scaleway server.
+      - Could be Scaleway IP address UUID.
+      - V(dynamic) Means that IP is destroyed at the same time the host is destroyed.
+      - V(absent) Means no public IP at all.
     default: absent
 
   enable_ipv6:
     description:
-      - Enable public IPv6 connectivity on the instance
+      - Enable public IPv6 connectivity on the instance.
     default: false
     type: bool
 
   image:
     type: str
     description:
-      - Image identifier used to start the instance with
+      - Image identifier used to start the instance with.
     required: true
 
   name:
     type: str
     description:
-      - Name of the instance
-
+      - Name of the instance.
   organization:
     type: str
     description:
       - Organization identifier.
       - Exactly one of O(project) and O(organization) must be specified.
-
   project:
     type: str
     description:
@@ -74,7 +71,7 @@ options:
   state:
     type: str
     description:
-     - Indicate desired state of the instance.
+      - Indicate desired state of the instance.
     default: present
     choices:
       - present
@@ -87,14 +84,14 @@ options:
     type: list
     elements: str
     description:
-    - List of tags to apply to the instance (5 max)
+      - List of tags to apply to the instance (5 max).
     required: false
     default: []
 
   region:
     type: str
     description:
-    - Scaleway compute zone
+      - Scaleway compute zone.
     required: true
     choices:
       - ams1
@@ -109,38 +106,38 @@ options:
   commercial_type:
     type: str
     description:
-    - Commercial name of the compute node
+      - Commercial name of the compute node.
     required: true
 
   wait:
     description:
-    - Wait for the instance to reach its desired state before returning.
+      - Wait for the instance to reach its desired state before returning.
     type: bool
     default: false
 
   wait_timeout:
     type: int
     description:
-    - Time to wait for the server to reach the expected state
+      - Time to wait for the server to reach the expected state.
     required: false
     default: 300
 
   wait_sleep_time:
     type: int
     description:
-    - Time to wait before every attempt to check the state of the server
+      - Time to wait before every attempt to check the state of the server.
     required: false
     default: 3
 
   security_group:
     type: str
     description:
-    - Security group unique identifier
-    - If no value provided, the default security group or current security group will be used
+      - Security group unique identifier.
+      - If no value provided, the default security group or current security group will be used.
     required: false
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a server
   community.general.scaleway_compute:
     name: foobar
@@ -174,15 +171,16 @@ EXAMPLES = '''
     project: 951df375-e094-4d26-97c1-ba548eeb9c42
     region: ams1
     commercial_type: VC1S
-'''
+"""
 
-RETURN = '''
-'''
+RETURN = r"""
+"""
 
 import datetime
 import time
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.datetime import now
 from ansible_collections.community.general.plugins.module_utils.scaleway import SCALEWAY_LOCATION, scaleway_argument_spec, Scaleway
 
 SCALEWAY_SERVER_STATES = (
@@ -235,9 +233,9 @@ def wait_to_complete_state_transition(compute_api, server, wait=None):
     wait_timeout = compute_api.module.params["wait_timeout"]
     wait_sleep_time = compute_api.module.params["wait_sleep_time"]
 
-    start = datetime.datetime.utcnow()
+    start = now()
     end = start + datetime.timedelta(seconds=wait_timeout)
-    while datetime.datetime.utcnow() < end:
+    while now() < end:
         compute_api.module.debug("We are going to wait for the server to finish its transition")
         if fetch_state(compute_api, server) not in SCALEWAY_TRANSITIONS_STATES:
             compute_api.module.debug("It seems that the server is not in transition anymore.")
@@ -585,9 +583,11 @@ def server_attributes_should_be_changed(compute_api, target_server, wished_serve
     compute_api.module.debug("Checking if server attributes should be changed")
     compute_api.module.debug("Current Server: %s" % target_server)
     compute_api.module.debug("Wished Server: %s" % wished_server)
-    debug_dict = dict((x, (target_server[x], wished_server[x]))
-                      for x in PATCH_MUTABLE_SERVER_ATTRIBUTES
-                      if x in target_server and x in wished_server)
+    debug_dict = {
+        x: (target_server[x], wished_server[x])
+        for x in PATCH_MUTABLE_SERVER_ATTRIBUTES
+        if x in target_server and x in wished_server
+    }
     compute_api.module.debug("Debug dict %s" % debug_dict)
     try:
         for key in PATCH_MUTABLE_SERVER_ATTRIBUTES:
@@ -613,7 +613,7 @@ def server_change_attributes(compute_api, target_server, wished_server):
             # When you are working with dict, only ID matter as we ask user to put only the resource ID in the playbook
             if isinstance(target_server[key], dict) and "id" in target_server[key] and wished_server[key]:
                 # Setting all key to current value except ID
-                key_dict = dict((x, target_server[key][x]) for x in target_server[key].keys() if x != "id")
+                key_dict = {x: target_server[key][x] for x in target_server[key].keys() if x != "id"}
                 # Setting ID to the user specified ID
                 key_dict["id"] = wished_server[key]
                 patch_payload[key] = key_dict

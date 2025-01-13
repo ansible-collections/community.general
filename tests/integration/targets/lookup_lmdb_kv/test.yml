@@ -19,13 +19,13 @@
       - item.0 == 'nl'
       - item.1 == 'Netherlands'
     vars:
-    - lmdb_kv_db: jp.mdb
+      lmdb_kv_db: jp.mdb
     with_community.general.lmdb_kv:
     - n*
   - assert:
       that:
       - item == 'Belgium'
     vars:
-    - lmdb_kv_db: jp.mdb
+      lmdb_kv_db: jp.mdb
     with_community.general.lmdb_kv:
     - be

@@ -14,15 +14,12 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: pubnub_blocks
 short_description: PubNub blocks management module
 description:
-  - "This module allows Ansible to interface with the PubNub BLOCKS
-    infrastructure by providing the following operations: create / remove,
-    start / stop and rename for blocks and create / modify / remove for event
-    handlers."
+  - 'This module allows Ansible to interface with the PubNub BLOCKS infrastructure by providing the following operations:
+    create / remove, start / stop and rename for blocks and create / modify / remove for event handlers.'
 author:
   - PubNub <support@pubnub.com> (@pubnub)
   - Sergey Mamontov <sergey@pubnub.com> (@parfeon)
@@ -39,38 +36,33 @@ options:
   email:
     description:
       - Email from account for which new session should be started.
-      - "Not required if O(cache) contains result of previous module call (in
-        same play)."
+      - Not required if O(cache) contains result of previous module call (in same play).
     required: false
     type: str
     default: ''
   password:
     description:
       - Password which match to account to which specified O(email) belong.
-      - "Not required if O(cache) contains result of previous module call (in
-        same play)."
+      - Not required if O(cache) contains result of previous module call (in same play).
     required: false
     type: str
     default: ''
   cache:
-    description: >
-       In case if single play use blocks management module few times it is
-       preferred to enabled 'caching' by making previous module to share
-       gathered artifacts and pass them to this parameter.
+    description: >-
+      In case if single play use blocks management module few times it is preferred to enabled 'caching' by making previous
+      module to share gathered artifacts and pass them to this parameter.
     required: false
     type: dict
     default: {}
   account:
     description:
-      - "Name of PubNub account for from which O(application) will be used to
-        manage blocks."
-      - "User's account will be used if value not set or empty."
+      - Name of PubNub account for from which O(application) will be used to manage blocks.
+      - User's account will be used if value not set or empty.
     type: str
     default: ''
   application:
     description:
-      - "Name of target PubNub application for which blocks configuration on
-        specific O(keyset) will be done."
+      - Name of target PubNub application for which blocks configuration on specific O(keyset) will be done.
     type: str
     required: true
   keyset:
@@ -80,8 +72,7 @@ options:
     required: true
   state:
     description:
-      - "Intended block state after event handlers creation / update process
-        will be completed."
+      - Intended block state after event handlers creation / update process will be completed.
     required: false
     default: 'present'
     choices: ['started', 'stopped', 'present', 'absent']
@@ -93,55 +84,45 @@ options:
     type: str
   description:
     description:
-        - Short block description which will be later visible on
-          admin.pubnub.com. Used only if block doesn't exists and won't change
-          description for existing block.
+      - Short block description which will be later visible on U(https://admin.pubnub.com).
+      - Used only if block does not exists and does not change description for existing block.
     required: false
     type: str
   event_handlers:
     description:
-      - "List of event handlers which should be updated for specified block
-        O(name)."
-      - "Each entry for new event handler should contain: C(name), C(src),
-        C(channels), C(event). C(name) used as event handler name which can be
-        used later to make changes to it."
+      - List of event handlers which should be updated for specified block O(name).
+      - 'Each entry for new event handler should contain: V(name), V(src), V(channels), V(event). V(name) used as event handler
+        name which can be used later to make changes to it.'
       - C(src) is full path to file with event handler code.
-      - "C(channels) is name of channel from which event handler is waiting
-        for events."
-      - "C(event) is type of event which is able to trigger event handler:
-        C(js-before-publish), C(js-after-publish), C(js-after-presence)."
-      - "Each entry for existing handlers should contain C(name) (so target
-        handler can be identified). Rest parameters (C(src), C(channels) and
-        C(event)) can be added if changes required for them."
-      - "It is possible to rename event handler by adding C(changes) key to
-        event handler payload and pass dictionary, which will contain single key
-        C(name), where new name should be passed."
-      - "To remove particular event handler it is possible to set C(state) for
-        it to C(absent) and it will be removed."
+      - V(channels) is name of channel from which event handler is waiting for events.
+      - 'V(event) is type of event which is able to trigger event handler: V(js-before-publish), V(js-after-publish), V(js-after-presence).'
+      - Each entry for existing handlers should contain C(name) (so target handler can be identified). Rest parameters (C(src),
+        C(channels) and C(event)) can be added if changes required for them.
+      - It is possible to rename event handler by adding C(changes) key to event handler payload and pass dictionary, which
+        will contain single key C(name), where new name should be passed.
+      - To remove particular event handler it is possible to set C(state) for it to C(absent) and it will be removed.
     required: false
     default: []
     type: list
     elements: dict
   changes:
     description:
-      - "List of fields which should be changed by block itself (doesn't
-        affect any event handlers)."
-      - "Possible options for change is: O(name)."
+      - List of fields which should be changed by block itself (does not affect any event handlers).
+      - 'Possible options for change is: O(name).'
     required: false
     default: {}
     type: dict
   validate_certs:
     description:
-      - "This key allow to try skip certificates check when performing REST API
-        calls. Sometimes host may have issues with certificates on it and this
-        will cause problems to call PubNub REST API."
+      - This key allow to try skip certificates check when performing REST API calls. Sometimes host may have issues with
+        certificates on it and this will cause problems to call PubNub REST API.
       - If check should be ignored V(false) should be passed to this parameter.
     required: false
     default: true
     type: bool
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # Event handler create example.
 - name: Create single event handler
   community.general.pubnub_blocks:
@@ -151,8 +132,7 @@ EXAMPLES = '''
     keyset: '{{ keyset_name }}'
     name: '{{ block_name }}'
     event_handlers:
-      -
-        src: '{{ path_to_handler_source }}'
+      - src: '{{ path_to_handler_source }}'
         name: '{{ handler_name }}'
         event: 'js-before-publish'
         channels: '{{ handler_channel }}'
@@ -166,8 +146,7 @@ EXAMPLES = '''
     keyset: '{{ keyset_name }}'
     name: '{{ block_name }}'
     event_handlers:
-      -
-        name: '{{ handler_name }}'
+      - name: '{{ handler_name }}'
         event: 'js-after-publish'
 
 # Stop block and event handlers.
@@ -199,8 +178,7 @@ EXAMPLES = '''
     name: '{{ block_name }}'
     state: present
     event_handlers:
-      -
-        src: '{{ path_to_handler_1_source }}'
+      - src: '{{ path_to_handler_1_source }}'
         name: '{{ event_handler_1_name }}'
         channels: '{{ event_handler_1_channel }}'
         event: 'js-before-publish'
@@ -213,8 +191,7 @@ EXAMPLES = '''
     name: '{{ block_name }}'
     state: present
     event_handlers:
-      -
-        src: '{{ path_to_handler_2_source }}'
+      - src: '{{ path_to_handler_2_source }}'
         name: '{{ event_handler_2_name }}'
         channels: '{{ event_handler_2_channel }}'
         event: 'js-before-publish'
@@ -226,17 +203,16 @@ EXAMPLES = '''
     keyset: '{{ keyset_name }}'
     name: '{{ block_name }}'
     state: started
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 module_cache:
   description:
-    - Cached account information. In case if with single play module
-      used few times it is better to pass cached data to next module calls to speed
-      up process.
+    - Cached account information. In case if with single play module used few times it is better to pass cached data to next
+      module calls to speed up process.
   type: dict
   returned: always
-'''
+"""
 import copy
 import os
 

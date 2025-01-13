@@ -8,13 +8,11 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: idrac_redfish_command
 short_description: Manages Out-Of-Band controllers using iDRAC OEM Redfish APIs
 description:
-  - Builds Redfish URIs locally and sends them to remote OOB controllers to
-    perform an action.
+  - Builds Redfish URIs locally and sends them to remote OOB controllers to perform an action.
   - For use with Dell iDRAC operations that require Redfish OEM extensions.
 extends_documentation_fragment:
   - community.general.attributes
@@ -66,34 +64,32 @@ options:
     version_added: '0.2.0'
 
 author: "Jose Delarosa (@jose-delarosa)"
-'''
+"""
 
-EXAMPLES = '''
-  - name: Create BIOS configuration job (schedule BIOS setting update)
-    community.general.idrac_redfish_command:
-      category: Systems
-      command: CreateBiosConfigJob
-      resource_id: System.Embedded.1
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-'''
+EXAMPLES = r"""
+- name: Create BIOS configuration job (schedule BIOS setting update)
+  community.general.idrac_redfish_command:
+    category: Systems
+    command: CreateBiosConfigJob
+    resource_id: System.Embedded.1
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+"""
 
-RETURN = '''
+RETURN = r"""
 msg:
-    description: Message with action result or error description
-    returned: always
-    type: str
-    sample: "Action was successful"
+  description: Message with action result or error description.
+  returned: always
+  type: str
+  sample: "Action was successful"
 return_values:
-    description: Dictionary containing command-specific response data from the action.
-    returned: on success
-    type: dict
-    version_added: 6.6.0
-    sample: {
-        "job_id": "/redfish/v1/Managers/iDRAC.Embedded.1/Jobs/JID_471269252011"
-    }
-'''
+  description: Dictionary containing command-specific response data from the action.
+  returned: on success
+  type: dict
+  version_added: 6.6.0
+  sample: {"job_id": "/redfish/v1/Managers/iDRAC.Embedded.1/Jobs/JID_471269252011"}
+"""
 
 import re
 from ansible.module_utils.basic import AnsibleModule

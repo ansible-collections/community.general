@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: sefcontext
 short_description: Manages SELinux file context mapping definitions
 description:
@@ -28,85 +27,85 @@ attributes:
 options:
   target:
     description:
-    - Target path (expression).
+      - Target path (expression).
     type: str
     required: true
-    aliases: [ path ]
+    aliases: [path]
   ftype:
     description:
-    - The file type that should have SELinux contexts applied.
-    - "The following file type options are available:"
-    - V(a) for all files,
-    - V(b) for block devices,
-    - V(c) for character devices,
-    - V(d) for directories,
-    - V(f) for regular files,
-    - V(l) for symbolic links,
-    - V(p) for named pipes,
-    - V(s) for socket files.
+      - The file type that should have SELinux contexts applied.
+      - 'The following file type options are available:'
+      - V(a) for all files,
+      - V(b) for block devices,
+      - V(c) for character devices,
+      - V(d) for directories,
+      - V(f) for regular files,
+      - V(l) for symbolic links,
+      - V(p) for named pipes,
+      - V(s) for socket files.
     type: str
-    choices: [ a, b, c, d, f, l, p, s ]
+    choices: [a, b, c, d, f, l, p, s]
     default: a
   setype:
     description:
-    - SELinux type for the specified O(target).
+      - SELinux type for the specified O(target).
     type: str
   substitute:
     description:
-    - Path to use to substitute file context(s) for the specified O(target). The context labeling for the O(target) subtree is made equivalent to this path.
-    - This is also referred to as SELinux file context equivalence and it implements the C(equal) functionality of the SELinux management tools.
+      - Path to use to substitute file context(s) for the specified O(target). The context labeling for the O(target) subtree
+        is made equivalent to this path.
+      - This is also referred to as SELinux file context equivalence and it implements the C(equal) functionality of the SELinux
+        management tools.
     version_added: 6.4.0
     type: str
-    aliases: [ equal ]
+    aliases: [equal]
   seuser:
     description:
-    - SELinux user for the specified O(target).
-    - Defaults to V(system_u) for new file contexts and to existing value when modifying file contexts.
+      - SELinux user for the specified O(target).
+      - Defaults to V(system_u) for new file contexts and to existing value when modifying file contexts.
     type: str
   selevel:
     description:
-    - SELinux range for the specified O(target).
-    - Defaults to V(s0) for new file contexts and to existing value when modifying file contexts.
+      - SELinux range for the specified O(target).
+      - Defaults to V(s0) for new file contexts and to existing value when modifying file contexts.
     type: str
-    aliases: [ serange ]
+    aliases: [serange]
   state:
     description:
-    - Whether the SELinux file context must be V(absent) or V(present).
-    - Specifying V(absent) without either O(setype) or O(substitute) deletes both SELinux type or path substitution mappings that match O(target).
+      - Whether the SELinux file context must be V(absent) or V(present).
+      - Specifying V(absent) without either O(setype) or O(substitute) deletes both SELinux type or path substitution mappings
+        that match O(target).
     type: str
-    choices: [ absent, present ]
+    choices: [absent, present]
     default: present
   reload:
     description:
-    - Reload SELinux policy after commit.
-    - Note that this does not apply SELinux file contexts to existing files.
+      - Reload SELinux policy after commit.
+      - Note that this does not apply SELinux file contexts to existing files.
     type: bool
     default: true
   ignore_selinux_state:
     description:
-    - Useful for scenarios (chrooted environment) that you can't get the real SELinux state.
+      - Useful for scenarios (chrooted environment) that you cannot get the real SELinux state.
     type: bool
     default: false
 notes:
-- The changes are persistent across reboots.
-- O(setype) and O(substitute) are mutually exclusive.
-- If O(state=present) then one of O(setype) or O(substitute) is mandatory.
-- The M(community.general.sefcontext) module does not modify existing files to the new
-  SELinux context(s), so it is advisable to first create the SELinux
-  file contexts before creating files, or run C(restorecon) manually
-  for the existing files that require the new SELinux file contexts.
-- Not applying SELinux fcontexts to existing files is a deliberate
-  decision as it would be unclear what reported changes would entail
-  to, and there's no guarantee that applying SELinux fcontext does
-  not pick up other unrelated prior changes.
+  - The changes are persistent across reboots.
+  - O(setype) and O(substitute) are mutually exclusive.
+  - If O(state=present) then one of O(setype) or O(substitute) is mandatory.
+  - The M(community.general.sefcontext) module does not modify existing files to the new SELinux context(s), so it is advisable
+    to first create the SELinux file contexts before creating files, or run C(restorecon) manually for the existing files
+    that require the new SELinux file contexts.
+  - Not applying SELinux fcontexts to existing files is a deliberate decision as it would be unclear what reported changes
+    would entail to, and there is no guarantee that applying SELinux fcontext does not pick up other unrelated prior changes.
 requirements:
-- libselinux-python
-- policycoreutils-python
+  - libselinux-python
+  - policycoreutils-python
 author:
-- Dag Wieers (@dagwieers)
-'''
+  - Dag Wieers (@dagwieers)
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Allow apache to modify files in /srv/git_repos
   community.general.sefcontext:
     target: '/srv/git_repos(/.*)?'
@@ -132,11 +131,11 @@ EXAMPLES = r'''
 
 - name: Apply new SELinux file context to filesystem
   ansible.builtin.command: restorecon -irv /srv/git_repos
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 # Default return values
-'''
+"""
 
 import traceback
 

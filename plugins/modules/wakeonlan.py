@@ -9,8 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: wakeonlan
 short_description: Send a magic Wake-on-LAN (WoL) broadcast packet
 description:
@@ -25,17 +24,17 @@ attributes:
 options:
   mac:
     description:
-    - MAC address to send Wake-on-LAN broadcast packet for.
+      - MAC address to send Wake-on-LAN broadcast packet for.
     required: true
     type: str
   broadcast:
     description:
-    - Network broadcast address to use for broadcasting magic Wake-on-LAN packet.
+      - Network broadcast address to use for broadcasting magic Wake-on-LAN packet.
     default: 255.255.255.255
     type: str
   port:
     description:
-    - UDP port to use for magic Wake-on-LAN packet.
+      - UDP port to use for magic Wake-on-LAN packet.
     default: 7
     type: int
 todo:
@@ -43,16 +42,16 @@ todo:
   - Enable check-mode support (when we have arping support)
   - Does not have SecureOn password support
 notes:
-  - This module sends a magic packet, without knowing whether it worked
-  - Only works if the target system was properly configured for Wake-on-LAN (in the BIOS and/or the OS)
-  - Some BIOSes have a different (configurable) Wake-on-LAN boot order (i.e. PXE first).
+  - This module sends a magic packet, without knowing whether it worked.
+  - Only works if the target system was properly configured for Wake-on-LAN (in the BIOS and/or the OS).
+  - Some BIOSes have a different (configurable) Wake-on-LAN boot order (in other words, PXE first).
 seealso:
-- module: community.windows.win_wakeonlan
+  - module: community.windows.win_wakeonlan
 author:
-- Dag Wieers (@dagwieers)
-'''
+  - Dag Wieers (@dagwieers)
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Send a magic Wake-on-LAN packet to 00:00:5E:00:53:66
   community.general.wakeonlan:
     mac: '00:00:5E:00:53:66'
@@ -63,11 +62,11 @@ EXAMPLES = r'''
     mac: 00:00:5E:00:53:66
     port: 9
   delegate_to: localhost
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 # Default return values
-'''
+"""
 import socket
 import struct
 import traceback

@@ -9,14 +9,16 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = """
----
+DOCUMENTATION = r"""
 module: proxmox_vm_info
 short_description: Retrieve information about one or more Proxmox VE virtual machines
 version_added: 7.2.0
 description:
   - Retrieve information about one or more Proxmox VE virtual machines.
 author: 'Sergei Antipov (@UnderGreen) <greendayonfire at gmail dot com>'
+attributes:
+  action_group:
+    version_added: 9.0.0
 options:
   node:
     description:
@@ -54,13 +56,21 @@ options:
       - pending
     default: none
     version_added: 8.1.0
+  network:
+    description:
+      - Whether to retrieve the current network status.
+      - Requires enabled/running qemu-guest-agent on qemu VMs.
+    type: bool
+    default: false
+    version_added: 9.1.0
 extends_documentation_fragment:
-    - community.general.proxmox.documentation
-    - community.general.attributes
-    - community.general.attributes.info_module
+  - community.general.proxmox.actiongroup_proxmox
+  - community.general.proxmox.documentation
+  - community.general.attributes
+  - community.general.attributes.info_module
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: List all existing virtual machines on node
   community.general.proxmox_vm_info:
     api_host: proxmoxhost
@@ -97,7 +107,7 @@ EXAMPLES = """
     config: current
 """
 
-RETURN = """
+RETURN = r"""
 proxmox_vms:
     description: List of virtual machines.
     returned: on success
@@ -168,7 +178,7 @@ class ProxmoxVmInfoAnsible(ProxmoxAnsible):
                 msg="Failed to retrieve VMs information from cluster resources: %s" % e
             )
 
-    def get_vms_from_nodes(self, cluster_machines, type, vmid=None, name=None, node=None, config=None):
+    def get_vms_from_nodes(self, cluster_machines, type, vmid=None, name=None, node=None, config=None, network=False):
         # Leave in dict only machines that user wants to know about
         filtered_vms = {
             vm: info for vm, info in cluster_machines.items() if not (
@@ -197,17 +207,23 @@ class ProxmoxVmInfoAnsible(ProxmoxAnsible):
                         config_type = 0 if config == "pending" else 1
                         # GET /nodes/{node}/qemu/{vmid}/config current=[0/1]
                         desired_vm["config"] = call_vm_getter(this_vm_id).config().get(current=config_type)
+                    if network:
+                        if type == "qemu":
+                            desired_vm["network"] = call_vm_getter(this_vm_id).agent("network-get-interfaces").get()['result']
+                        elif type == "lxc":
+                            desired_vm["network"] = call_vm_getter(this_vm_id).interfaces.get()
+
         return filtered_vms
 
-    def get_qemu_vms(self, cluster_machines, vmid=None, name=None, node=None, config=None):
+    def get_qemu_vms(self, cluster_machines, vmid=None, name=None, node=None, config=None, network=False):
         try:
-            return self.get_vms_from_nodes(cluster_machines, "qemu", vmid, name, node, config)
+            return self.get_vms_from_nodes(cluster_machines, "qemu", vmid, name, node, config, network)
         except Exception as e:
             self.module.fail_json(msg="Failed to retrieve QEMU VMs information: %s" % e)
 
-    def get_lxc_vms(self, cluster_machines, vmid=None, name=None, node=None, config=None):
+    def get_lxc_vms(self, cluster_machines, vmid=None, name=None, node=None, config=None, network=False):
         try:
-            return self.get_vms_from_nodes(cluster_machines, "lxc", vmid, name, node, config)
+            return self.get_vms_from_nodes(cluster_machines, "lxc", vmid, name, node, config, network)
         except Exception as e:
             self.module.fail_json(msg="Failed to retrieve LXC VMs information: %s" % e)
 
@@ -225,6 +241,7 @@ def main():
             type="str", choices=["none", "current", "pending"],
             default="none", required=False
         ),
+        network=dict(type="bool", default=False, required=False),
     )
     module_args.update(vm_info_args)
 
@@ -241,6 +258,7 @@ def main():
     vmid = module.params["vmid"]
     name = module.params["name"]
     config = module.params["config"]
+    network = module.params["network"]
 
     result = dict(changed=False)
 
@@ -252,12 +270,12 @@ def main():
     vms = {}
 
     if type == "lxc":
-        vms = proxmox.get_lxc_vms(cluster_machines, vmid, name, node, config)
+        vms = proxmox.get_lxc_vms(cluster_machines, vmid, name, node, config, network)
     elif type == "qemu":
-        vms = proxmox.get_qemu_vms(cluster_machines, vmid, name, node, config)
+        vms = proxmox.get_qemu_vms(cluster_machines, vmid, name, node, config, network)
     else:
-        vms = proxmox.get_qemu_vms(cluster_machines, vmid, name, node, config)
-        vms.update(proxmox.get_lxc_vms(cluster_machines, vmid, name, node, config))
+        vms = proxmox.get_qemu_vms(cluster_machines, vmid, name, node, config, network)
+        vms.update(proxmox.get_lxc_vms(cluster_machines, vmid, name, node, config, network))
 
     result["proxmox_vms"] = [info for vm, info in sorted(vms.items())]
     module.exit_json(**result)

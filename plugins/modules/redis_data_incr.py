@@ -8,24 +8,22 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: redis_data_incr
 short_description: Increment keys in Redis
 version_added: 4.0.0
 description:
-   - Increment integers or float keys in Redis database and get new value.
-   - Default increment for all keys is 1. For specific increments use the
-     O(increment_int) and O(increment_float) options.
+  - Increment integers or float keys in Redis database and get new value.
+  - Default increment for all keys is V(1). For specific increments use the O(increment_int) and O(increment_float) options.
 author: "Andreas Botzner (@paginabianca)"
 attributes:
   check_mode:
     support: partial
     details:
-      - For C(check_mode) to work, the specified O(login_user) needs permission to
-        run the C(GET) command on the key, otherwise the module will fail.
-      - When using C(check_mode) the module will try to calculate the value that
-        Redis would return. If the key is not present, 0.0 is used as value.
+      - For C(check_mode) to work, the specified O(login_user) needs permission to run the C(GET) command on the key, otherwise
+        the module will fail.
+      - When using C(check_mode) the module will try to calculate the value that Redis would return. If the key is not present,
+        V(0.0) is used as value.
   diff_mode:
     support: none
 options:
@@ -42,8 +40,7 @@ options:
   increment_float:
     description:
       - Float amount to increment the key by.
-      - This only works with keys that contain float values
-        in their string representation.
+      - This only works with keys that contain float values in their string representation.
     type: float
     required: false
 
@@ -53,12 +50,12 @@ extends_documentation_fragment:
   - community.general.attributes
 
 seealso:
-    - module: community.general.redis_data
-    - module: community.general.redis_data_info
-    - module: community.general.redis
-'''
+  - module: community.general.redis_data
+  - module: community.general.redis_data_info
+  - module: community.general.redis
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Increment integer key foo on localhost with no username and print new value
   community.general.redis_data_incr:
     login_host: localhost
@@ -77,11 +74,11 @@ EXAMPLES = '''
     login_password: somepass
     key: foo
     increment_float: '20.4'
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 value:
-  description: Incremented value of key
+  description: Incremented value of key.
   returned: on success
   type: float
   sample: '4039.4'
@@ -90,7 +87,7 @@ msg:
   returned: always
   type: str
   sample: 'Incremented key: foo by 20.4 to 65.9'
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.redis import (

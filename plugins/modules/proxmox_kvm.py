@@ -8,19 +8,20 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: proxmox_kvm
 short_description: Management of Qemu(KVM) Virtual Machines in Proxmox VE cluster
 description:
   - Allows you to create/delete/stop Qemu(KVM) Virtual Machines in Proxmox VE cluster.
-  - Since community.general 4.0.0 on, there are no more default values, see O(proxmox_default_behavior).
+  - Since community.general 4.0.0 on, there are no more default values.
 author: "Abdoul Bah (@helldorado) <bahabdoul at gmail.com>"
 attributes:
   check_mode:
     support: none
   diff_mode:
     support: none
+  action_group:
+    version_added: 9.0.0
 options:
   archive:
     description:
@@ -30,31 +31,26 @@ options:
   acpi:
     description:
       - Specify if ACPI should be enabled/disabled.
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(true).
     type: bool
   agent:
     description:
       - Specify if the QEMU Guest Agent should be enabled/disabled.
-      - Since community.general 5.5.0, this can also be a string instead of a boolean.
-        This allows to specify values such as V(enabled=1,fstrim_cloned_disks=1).
+      - Since community.general 5.5.0, this can also be a string instead of a boolean. This allows to specify values such
+        as V(enabled=1,fstrim_cloned_disks=1).
     type: str
   args:
     description:
       - Pass arbitrary arguments to kvm.
       - This option is for experts only!
-      - If O(proxmox_default_behavior) is set to V(compatibility), this option has a default of
-        V(-serial unix:/var/run/qemu-server/<vmid>.serial,server,nowait).
     type: str
   autostart:
     description:
       - Specify if the VM should be automatically restarted after crash (currently ignored in PVE API).
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(false).
     type: bool
   balloon:
     description:
       - Specify the amount of RAM for the VM in MB.
       - Using zero disables the balloon driver.
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(0).
     type: int
   bios:
     description:
@@ -66,59 +62,61 @@ options:
       - Specify the boot order -> boot on floppy V(a), hard disk V(c), CD-ROM V(d), or network V(n).
       - For newer versions of Proxmox VE, use a boot order like V(order=scsi0;net0;hostpci0).
       - You can combine to set order.
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(cnd).
     type: str
   bootdisk:
     description:
-      - 'Enable booting from specified disk. Format V((ide|sata|scsi|virtio\)\\d+).'
+      - Enable booting from specified disk. Format V((ide|sata|scsi|virtio\)\\d+).
     type: str
   cicustom:
     description:
-      - 'cloud-init: Specify custom files to replace the automatically generated ones at start.'
+      - 'Cloud-init: Specify custom files to replace the automatically generated ones at start.'
     type: str
     version_added: 1.3.0
   cipassword:
     description:
-      - 'cloud-init: password of default user to create.'
+      - 'Cloud-init: password of default user to create.'
     type: str
     version_added: 1.3.0
   citype:
     description:
-      - 'cloud-init: Specifies the cloud-init configuration format.'
+      - 'Cloud-init: Specifies the cloud-init configuration format.'
       - The default depends on the configured operating system type (V(ostype)).
       - We use the V(nocloud) format for Linux, and V(configdrive2) for Windows.
     type: str
     choices: ['nocloud', 'configdrive2']
     version_added: 1.3.0
+  ciupgrade:
+    description:
+      - 'Cloud-init: do an automatic package upgrade after the first boot.'
+    type: bool
+    version_added: 10.0.0
   ciuser:
     description:
-      - 'cloud-init: username of default user to create.'
+      - 'Cloud-init: username of default user to create.'
     type: str
     version_added: 1.3.0
   clone:
     description:
-      - Name of VM to be cloned. If O(vmid) is set, O(clone) can take an arbitrary value but is required for initiating the clone.
+      - Name of VM to be cloned. If O(vmid) is set, O(clone) can take an arbitrary value but is required for initiating the
+        clone.
     type: str
   cores:
     description:
       - Specify number of cores per socket.
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(1).
     type: int
   cpu:
     description:
       - Specify emulated CPU type.
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(kvm64).
     type: str
   cpulimit:
     description:
-      - Specify if CPU usage will be limited. Value 0 indicates no CPU limit.
-      - If the computer has 2 CPUs, it has total of '2' CPU time
+      - Specify if CPU usage will be limited. Value V(0) indicates no CPU limit.
+      - If the computer has 2 CPUs, it has total of '2' CPU time.
     type: int
   cpuunits:
     description:
       - Specify CPU weight for a VM.
-      - You can disable fair-scheduler configuration by setting this to 0
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(1000).
+      - You can disable fair-scheduler configuration by setting this to V(0).
     type: int
   delete:
     description:
@@ -146,24 +144,24 @@ options:
         type: str
       format:
         description:
-          - V(format) is the drive's backing file's data format. Please refer to the Proxmox VE Administrator Guide,
-           section Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for the latest
-           version, tables 3 to 14) to find out format supported by the provided storage backend.
+          - V(format) is the drive's backing file's data format. Please refer to the Proxmox VE Administrator Guide, section
+            Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for the latest version, tables
+            3 to 14) to find out format supported by the provided storage backend.
         type: str
       efitype:
         description:
           - V(efitype) indicates the size of the EFI disk.
           - V(2m) will allow for a 2MB EFI disk, which will be enough to persist boot order and new boot entries.
-          - V(4m) will allow for a 4MB EFI disk, which will additionally allow to store EFI keys in order to enable
-           Secure Boot
+          - V(4m) will allow for a 4MB EFI disk, which will additionally allow to store EFI keys in order to enable Secure
+            Boot.
         type: str
         choices:
           - 2m
           - 4m
       pre_enrolled_keys:
         description:
-          - V(pre_enrolled_keys) indicates whether EFI keys for Secure Boot should be enrolled V(1) in the VM firmware
-           upon creation or not (0).
+          - V(pre_enrolled_keys) indicates whether EFI keys for Secure Boot should be enrolled V(1) in the VM firmware upon
+            creation or not (0).
           - If set to V(1), Secure Boot will also be enabled by default when the VM is created.
         type: bool
     version_added: 4.5.0
@@ -171,20 +169,18 @@ options:
     description:
       - Allow to force stop VM.
       - Can be used with states V(stopped), V(restarted), and V(absent).
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(false).
+      - Requires parameter O(archive).
     type: bool
   format:
     description:
       - Target drive's backing file's data format.
-      - Used only with clone
+      - Used only with clone.
       - Use O(format=unspecified) and O(full=false) for a linked clone.
-      - Please refer to the Proxmox VE Administrator Guide, section Proxmox VE Storage (see
-        U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for the latest version, tables 3 to 14) to find out format
-        supported by the provided storage backend.
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(qcow2).
-        If O(proxmox_default_behavior) is set to V(no_defaults), not specifying this option is equivalent to setting it to V(unspecified).
+      - Please refer to the Proxmox VE Administrator Guide, section Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html)
+        for the latest version, tables 3 to 14) to find out format supported by the provided storage backend.
+      - Not specifying this option is equivalent to setting it to V(unspecified).
     type: str
-    choices: [ "cloop", "cow", "qcow", "qcow2", "qed", "raw", "vmdk", "unspecified" ]
+    choices: ["cloop", "cow", "qcow", "qcow2", "qed", "raw", "vmdk", "unspecified"]
   freeze:
     description:
       - Specify if PVE should freeze CPU at startup (use 'c' monitor command to start execution).
@@ -193,7 +189,7 @@ options:
     description:
       - Create a full copy of all disk. This is always done when you clone a normal VM.
       - For VM templates, we try to create a linked clone by default.
-      - Used only with clone
+      - Used only with clone.
     type: bool
     default: true
   hookscript:
@@ -205,12 +201,13 @@ options:
     description:
       - Specify a hash/dictionary of map host pci devices into guest. O(hostpci='{"key":"value", "key":"value"}').
       - Keys allowed are - C(hostpci[n]) where 0 ≤ n ≤ N.
-      - Values allowed are -  C("host="HOSTPCIID[;HOSTPCIID2...]",pcie="1|0",rombar="1|0",x-vga="1|0"").
-      - The C(host) parameter is Host PCI device pass through. HOSTPCIID syntax is C(bus:dev.func) (hexadecimal numbers).
-      - C(pcie=boolean) C(default=0) Choose the PCI-express bus (needs the q35 machine model).
-      - C(rombar=boolean) C(default=1) Specify whether or not the device's ROM will be visible in the guest's memory map.
-      - C(x-vga=boolean) C(default=0) Enable vfio-vga device support.
-      - /!\ This option allows direct access to host hardware. So it is no longer possible to migrate such machines - use with special care.
+      - Values allowed are - V("host="HOSTPCIID[;HOSTPCIID2...]",pcie="1|0",rombar="1|0",x-vga="1|0"").
+      - The C(host) parameter is Host PCI device pass through. HOSTPCIID syntax is V(bus:dev.func) (hexadecimal numbers).
+      - V(pcie=boolean) V(default=0) Choose the PCI-express bus (needs the q35 machine model).
+      - V(rombar=boolean) V(default=1) Specify whether or not the device's ROM will be visible in the guest's memory map.
+      - V(x-vga=boolean) V(default=0) Enable vfio-vga device support.
+      - /!\ This option allows direct access to host hardware. So it is no longer possible to migrate such machines - use
+        with special care.
     type: dict
   hotplug:
     description:
@@ -226,24 +223,24 @@ options:
   ide:
     description:
       - A hash/dictionary of volume used as IDE hard disk or CD-ROM. O(ide='{"key":"value", "key":"value"}').
-      - Keys allowed are - C(ide[n]) where 0 ≤ n ≤ 3.
-      - Values allowed are - C("storage:size,format=value").
-      - C(storage) is the storage identifier where to create the disk.
-      - C(size) is the size of the disk in GB.
-      - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol). Please refer to the Proxmox VE
-        Administrator Guide, section Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for
-        the latest version, tables 3 to 14) to find out format supported by the provided storage backend.
+      - Keys allowed are - V(ide[n]) where 0 ≤ n ≤ 3.
+      - Values allowed are - V("storage:size,format=value").
+      - V(storage) is the storage identifier where to create the disk.
+      - V(size) is the size of the disk in GB.
+      - V(format) is the drive's backing file's data format. V(qcow2|raw|subvol). Please refer to the Proxmox VE Administrator
+        Guide, section Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for the latest version,
+        tables 3 to 14) to find out format supported by the provided storage backend.
     type: dict
   ipconfig:
     description:
-      - 'cloud-init: Set the IP configuration.'
-      - A hash/dictionary of network ip configurations. O(ipconfig='{"key":"value", "key":"value"}').
-      - Keys allowed are - C(ipconfig[n]) where 0 ≤ n ≤ network interfaces.
-      - Values allowed are -  C("[gw=<GatewayIPv4>] [,gw6=<GatewayIPv6>] [,ip=<IPv4Format/CIDR>] [,ip6=<IPv6Format/CIDR>]").
-      - 'cloud-init: Specify IP addresses and gateways for the corresponding interface.'
+      - 'Cloud-init: Set the IP configuration.'
+      - A hash/dictionary of network IP configurations. O(ipconfig='{"key":"value", "key":"value"}').
+      - Keys allowed are - V(ipconfig[n]) where 0 ≤ n ≤ network interfaces.
+      - Values allowed are - V("[gw=<GatewayIPv4>] [,gw6=<GatewayIPv6>] [,ip=<IPv4Format/CIDR>] [,ip6=<IPv6Format/CIDR>]").
+      - 'Cloud-init: Specify IP addresses and gateways for the corresponding interface.'
       - IP addresses use CIDR notation, gateways are optional but they should be in the same subnet of specified IP address.
-      - The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided.
-      - For IPv6 the special string 'auto' can be used to use stateless autoconfiguration.
+      - The special string V(dhcp) can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided.
+      - For IPv6 the special string V(auto) can be used to use stateless autoconfiguration.
       - If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4.
     type: dict
     version_added: 1.3.0
@@ -254,7 +251,6 @@ options:
   kvm:
     description:
       - Enable/disable KVM hardware virtualization.
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(true).
     type: bool
   localtime:
     description:
@@ -269,12 +265,11 @@ options:
   machine:
     description:
       - Specifies the Qemu machine type.
-      - 'Type => V((pc|pc(-i440fx\)?-\\d+\\.\\d+(\\.pxe\)?|q35|pc-q35-\\d+\\.\\d+(\\.pxe\)?\)).'
+      - Type => V((pc|pc(-i440fx\)?-\\d+\\.\\d+(\\.pxe\)?|q35|pc-q35-\\d+\\.\\d+(\\.pxe\)?\)).
     type: str
   memory:
     description:
       - Memory size in MB for instance.
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(512).
     type: int
   migrate:
     description:
@@ -299,7 +294,7 @@ options:
     type: str
   nameservers:
     description:
-      - 'cloud-init: DNS server IP address(es).'
+      - 'Cloud-init: DNS server IP address(es).'
       - If unset, PVE host settings are used.
     type: list
     elements: str
@@ -309,10 +304,13 @@ options:
       - A hash/dictionary of network interfaces for the VM. O(net='{"key":"value", "key":"value"}').
       - Keys allowed are - C(net[n]) where 0 ≤ n ≤ N.
       - Values allowed are - C("model="XX:XX:XX:XX:XX:XX",bridge="value",rate="value",tag="value",firewall="1|0",trunks="vlanid"").
-      - Model is one of C(e1000 e1000-82540em e1000-82544gc e1000-82545em i82551 i82557b i82559er ne2k_isa ne2k_pci pcnet rtl8139 virtio vmxnet3).
+      - Model is one of C(e1000 e1000-82540em e1000-82544gc e1000-82545em i82551 i82557b i82559er ne2k_isa ne2k_pci pcnet
+        rtl8139 virtio vmxnet3).
       - C(XX:XX:XX:XX:XX:XX) should be an unique MAC address. This is automatically generated if not specified.
-      - The C(bridge) parameter can be used to automatically add the interface to a bridge device. The Proxmox VE standard bridge is called 'vmbr0'.
-      - Option C(rate) is used to limit traffic bandwidth from and to this interface. It is specified as floating point number, unit is 'Megabytes per second'.
+      - The C(bridge) parameter can be used to automatically add the interface to a bridge device. The Proxmox VE standard
+        bridge is called 'vmbr0'.
+      - Option C(rate) is used to limit traffic bandwidth from and to this interface. It is specified as floating point number,
+        unit is 'Megabytes per second'.
       - If you specify no bridge, we create a kvm 'user' (NATed) network device, which provides DHCP and DNS services.
     type: dict
   newid:
@@ -323,12 +321,12 @@ options:
   numa:
     description:
       - A hash/dictionaries of NUMA topology. O(numa='{"key":"value", "key":"value"}').
-      - Keys allowed are - C(numa[n]) where 0 ≤ n ≤ N.
-      - Values allowed are - C("cpu="<id[-id];...>",hostnodes="<id[-id];...>",memory="number",policy="(bind|interleave|preferred)"").
-      - C(cpus) CPUs accessing this NUMA node.
-      - C(hostnodes) Host NUMA nodes to use.
-      - C(memory) Amount of memory this NUMA node provides.
-      - C(policy) NUMA allocation policy.
+      - Keys allowed are - V(numa[n]) where 0 ≤ n ≤ N.
+      - Values allowed are - V("cpu="<id[-id];...>",hostnodes="<id[-id];...>",memory="number",policy="(bind|interleave|preferred)"").
+      - V(cpus) CPUs accessing this NUMA node.
+      - V(hostnodes) Host NUMA nodes to use.
+      - V(memory) Amount of memory this NUMA node provides.
+      - V(policy) NUMA allocation policy.
     type: dict
   numa_enabled:
     description:
@@ -337,13 +335,11 @@ options:
   onboot:
     description:
       - Specifies whether a VM will be started during system bootup.
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(true).
     type: bool
   ostype:
     description:
       - Specifies guest operating system. This is used to enable special optimization/features for specific operating systems.
       - The l26 is Linux 2.6/3.X Kernel.
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(l26).
     type: str
     choices: ['other', 'wxp', 'w2k', 'w2k3', 'w2k8', 'wvista', 'win7', 'win8', 'win10', 'win11', 'l24', 'l26', 'solaris']
   parallel:
@@ -368,23 +364,23 @@ options:
     description:
       - A hash/dictionary of volume used as sata hard disk or CD-ROM. O(sata='{"key":"value", "key":"value"}').
       - Keys allowed are - C(sata[n]) where 0 ≤ n ≤ 5.
-      - Values allowed are -  C("storage:size,format=value").
+      - Values allowed are - C("storage:size,format=value").
       - C(storage) is the storage identifier where to create the disk.
       - C(size) is the size of the disk in GB.
-      - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol). Please refer to the Proxmox VE
-        Administrator Guide, section Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for
-        the latest version, tables 3 to 14) to find out format supported by the provided storage backend.
+      - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol). Please refer to the Proxmox VE Administrator
+        Guide, section Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for the latest version,
+        tables 3 to 14) to find out format supported by the provided storage backend.
     type: dict
   scsi:
     description:
       - A hash/dictionary of volume used as SCSI hard disk or CD-ROM. O(scsi='{"key":"value", "key":"value"}').
       - Keys allowed are - C(scsi[n]) where 0 ≤ n ≤ 13.
-      - Values allowed are -  C("storage:size,format=value").
+      - Values allowed are - C("storage:size,format=value").
       - C(storage) is the storage identifier where to create the disk.
       - C(size) is the size of the disk in GB.
-      - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol). Please refer to the Proxmox VE
-        Administrator Guide, section Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for
-        the latest version, tables 3 to 14) to find out format supported by the provided storage backend.
+      - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol). Please refer to the Proxmox VE Administrator
+        Guide, section Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for the latest version,
+        tables 3 to 14) to find out format supported by the provided storage backend.
     type: dict
   scsihw:
     description:
@@ -393,7 +389,7 @@ options:
     choices: ['lsi', 'lsi53c810', 'virtio-scsi-pci', 'virtio-scsi-single', 'megasas', 'pvscsi']
   searchdomains:
     description:
-      - 'cloud-init: Sets DNS search domain(s).'
+      - 'Cloud-init: Sets DNS search domain(s).'
       - If unset, PVE host settings are used.
     type: list
     elements: str
@@ -403,7 +399,8 @@ options:
       - A hash/dictionary of serial device to create inside the VM. V('{"key":"value", "key":"value"}').
       - Keys allowed are - serial[n](str; required) where 0 ≤ n ≤ 3.
       - Values allowed are - V((/dev/.+|socket\)).
-      - /!\ If you pass through a host serial device, it is no longer possible to migrate such machines - use with special care.
+      - /!\ If you pass through a host serial device, it is no longer possible to migrate such machines - use with special
+        care.
     type: dict
   shares:
     description:
@@ -414,20 +411,20 @@ options:
     type: int
   skiplock:
     description:
-      - Ignore locks
+      - Ignore locks.
       - Only root is allowed to use this option.
     type: bool
   smbios:
     description:
       - Specifies SMBIOS type 1 fields.
-      - "Comma separated, Base64 encoded (optional) SMBIOS properties:"
-      - V([base64=<1|0>] [,family=<Base64 encoded string>])
-      - V([,manufacturer=<Base64 encoded string>])
-      - V([,product=<Base64 encoded string>])
-      - V([,serial=<Base64 encoded string>])
-      - V([,sku=<Base64 encoded string>])
-      - V([,uuid=<UUID>])
-      - V([,version=<Base64 encoded string>])
+      - Comma separated, Base64 encoded (optional) SMBIOS properties:.
+      - V([base64=<1|0>] [,family=<Base64 encoded string>]).
+      - V([,manufacturer=<Base64 encoded string>]).
+      - V([,product=<Base64 encoded string>]).
+      - V([,serial=<Base64 encoded string>]).
+      - V([,sku=<Base64 encoded string>]).
+      - V([,uuid=<UUID>]).
+      - V([,version=<Base64 encoded string>]).
     type: str
   snapname:
     description:
@@ -436,11 +433,10 @@ options:
   sockets:
     description:
       - Sets the number of CPU sockets. (1 - N).
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(1).
     type: int
   sshkeys:
     description:
-      - 'cloud-init: SSH key to assign to the default user. NOT TESTED with multiple keys but a multi-line value should work.'
+      - 'Cloud-init: SSH key to assign to the default user. NOT TESTED with multiple keys but a multi-line value should work.'
     type: str
     version_added: 1.3.0
   startdate:
@@ -457,7 +453,7 @@ options:
   state:
     description:
       - Indicates desired state of the instance.
-      - If V(current), the current state of the VM will be fetched. You can access it with C(results.status)
+      - If V(current), the current state of the VM will be fetched. You can access it with C(results.status).
       - V(template) was added in community.general 8.1.0.
     type: str
     choices: ['present', 'started', 'absent', 'stopped', 'restarted', 'current', 'template']
@@ -469,7 +465,6 @@ options:
   tablet:
     description:
       - Enables/disables the USB tablet device.
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(false).
     type: bool
   tags:
     description:
@@ -482,7 +477,7 @@ options:
   target:
     description:
       - Target node. Only allowed if the original VM is on shared storage.
-      - Used only with clone
+      - Used only with clone.
     type: str
   tdf:
     description:
@@ -491,12 +486,12 @@ options:
   template:
     description:
       - Enables/disables the template.
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(false).
     type: bool
   timeout:
     description:
       - Timeout for operations.
-      - When used with O(state=stopped) the option sets a graceful timeout for VM stop after which a VM will be forcefully stopped.
+      - When used with O(state=stopped) the option sets a graceful timeout for VM stop after which a VM will be forcefully
+        stopped.
     type: int
     default: 30
   tpmstate0:
@@ -517,19 +512,30 @@ options:
         default: '2.0'
     type: dict
     version_added: 7.1.0
+  usb:
+    description:
+      - A hash/dictionary of USB devices for the VM. O(usb='{"key":"value", "key":"value"}').
+      - Keys allowed are - C(usb[n]) where 0 ≤ n ≤ N.
+      - Values allowed are - C(host="value|spice",mapping="value",usb3="1|0").
+      - Host is either C(spice) or the USB id/port.
+      - Option C(mapping) is the mapped USB device name.
+      - Option C(usb3) enables USB 3 support.
+    type: dict
+    version_added: 9.0.0
   update:
     description:
       - If V(true), the VM will be updated with new value.
       - Because of the operations of the API and security reasons, I have disabled the update of the following parameters
-        O(net), O(virtio), O(ide), O(sata), O(scsi). Per example updating O(net) update the MAC address and C(virtio) create always new disk...
-        This security feature can be disabled by setting the O(update_unsafe) to V(true).
+        O(net), O(virtio), O(ide), O(sata), O(scsi). Per example updating O(net) update the MAC address and O(virtio) create
+        always new disk... This security feature can be disabled by setting the O(update_unsafe) to V(true).
       - Update of O(pool) is disabled. It needs an additional API endpoint not covered by this module.
     type: bool
     default: false
   update_unsafe:
     description:
-      - If V(true), do not enforce limitations on parameters O(net), O(virtio), O(ide), O(sata), O(scsi), O(efidisk0), and O(tpmstate0).
-        Use this option with caution because an improper configuration might result in a permanent loss of data (e.g. disk recreated).
+      - If V(true), do not enforce limitations on parameters O(net), O(virtio), O(ide), O(sata), O(scsi), O(efidisk0), and
+        O(tpmstate0). Use this option with caution because an improper configuration might result in a permanent loss of data
+        (for example disk recreated).
     type: bool
     default: false
     version_added: 8.4.0
@@ -539,52 +545,34 @@ options:
     type: int
   vga:
     description:
-      - Select VGA type. If you want to use high resolution modes (>= 1280x1024x16) then you should use option 'std' or 'vmware'.
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(std).
+      - Select VGA type. If you want to use high resolution modes (>= 1280x1024x16) then you should use option V(std) or V(vmware).
     type: str
     choices: ['std', 'cirrus', 'vmware', 'qxl', 'serial0', 'serial1', 'serial2', 'serial3', 'qxl2', 'qxl3', 'qxl4']
   virtio:
     description:
       - A hash/dictionary of volume used as VIRTIO hard disk. O(virtio='{"key":"value", "key":"value"}').
-      - Keys allowed are - C(virtio[n]) where 0 ≤ n ≤ 15.
-      - Values allowed are -  C("storage:size,format=value").
-      - C(storage) is the storage identifier where to create the disk.
-      - C(size) is the size of the disk in GB.
-      - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol). Please refer to the Proxmox VE
-        Administrator Guide, section Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html)
-        for the latest version, tables 3 to 14) to find out format supported by the provided storage backend.
+      - Keys allowed are - V(virtio[n]) where 0 ≤ n ≤ 15.
+      - Values allowed are - V(storage:size,format=value).
+      - V(storage) is the storage identifier where to create the disk.
+      - V(size) is the size of the disk in GB.
+      - V(format) is the drive's backing file's data format. V(qcow2|raw|subvol). Please refer to the Proxmox VE Administrator
+        Guide, section Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for the latest version,
+        tables 3 to 14) to find out format supported by the provided storage backend.
     type: dict
   watchdog:
     description:
       - Creates a virtual hardware watchdog device.
     type: str
-  proxmox_default_behavior:
-    description:
-     - As of community.general 4.0.0, various options no longer have default values.
-        These default values caused problems when users expected different behavior from Proxmox
-        by default or filled options which caused problems when set.
-      - The value V(compatibility) (default before community.general 4.0.0) will ensure that the default values
-        are used when the values are not explicitly specified by the user. The new default is V(no_defaults),
-        which makes sure these options have no defaults.
-      - This affects the O(acpi), O(autostart), O(balloon), O(boot), O(cores), O(cpu),
-        O(cpuunits), O(force), O(format), O(kvm), O(memory), O(onboot), O(ostype), O(sockets),
-        O(tablet), O(template), and O(vga) options.
-      - This option is deprecated and will be removed in community.general 10.0.0.
-    type: str
-    default: no_defaults
-    choices:
-      - compatibility
-      - no_defaults
-    version_added: "1.3.0"
 seealso:
   - module: community.general.proxmox_vm_info
 extends_documentation_fragment:
+  - community.general.proxmox.actiongroup_proxmox
   - community.general.proxmox.documentation
   - community.general.proxmox.selection
   - community.general.attributes
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create new VM with minimal options
   community.general.proxmox_kvm:
     api_user: root@pam
@@ -864,7 +852,7 @@ EXAMPLES = '''
     cores: 8
     memory: 16384
     net:
-        net0: virtio,bridge=vmbr1
+      net0: virtio,bridge=vmbr1
     update: true
     update_unsafe: true
 
@@ -904,10 +892,9 @@ EXAMPLES = '''
     node: sabrewulf
     hookscript: local:snippets/hookscript.pl
     update: true
+"""
 
-'''
-
-RETURN = '''
+RETURN = r"""
 vmid:
   description: The VM vmid.
   returned: success
@@ -919,11 +906,11 @@ status:
   type: str
   sample: running
 msg:
-  description: A short message
+  description: A short message.
   returned: always
   type: str
   sample: "VM kropta with vmid = 110 is running"
-'''
+"""
 
 import re
 import time
@@ -956,7 +943,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             self.module.fail_json(msg='Getting information for VM with vmid = %s failed with exception: %s' % (vmid, e))
 
         # Sanitize kwargs. Remove not defined args and ensure True and False converted to int.
-        kwargs = dict((k, v) for k, v in kwargs.items() if v is not None)
+        kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         # Convert all dict in kwargs to elements.
         # For hostpci[n], ide[n], net[n], numa[n], parallel[n], sata[n], scsi[n], serial[n], virtio[n]
@@ -982,7 +969,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
         proxmox_node = self.proxmox_api.nodes(node)
 
         # Sanitize kwargs. Remove not defined args and ensure True and False converted to int.
-        kwargs = dict((k, v) for k, v in kwargs.items() if v is not None)
+        kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         return proxmox_node.qemu(vmid).config.set(**kwargs) is None
 
@@ -1007,6 +994,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
         # Available only in PVE 4
         only_v4 = ['force', 'protection', 'skiplock']
         only_v6 = ['ciuser', 'cipassword', 'sshkeys', 'ipconfig', 'tags']
+        only_v8 = ['ciupgrade']
 
         # valid clone parameters
         valid_clone_params = ['format', 'full', 'pool', 'snapname', 'storage', 'target']
@@ -1017,8 +1005,8 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
         proxmox_node = self.proxmox_api.nodes(node)
 
         # Sanitize kwargs. Remove not defined args and ensure True and False converted to int.
-        kwargs = dict((k, v) for k, v in kwargs.items() if v is not None)
-        kwargs.update(dict([k, int(v)] for k, v in kwargs.items() if isinstance(v, bool)))
+        kwargs = {k: v for k, v in kwargs.items() if v is not None}
+        kwargs.update({k: int(v) for k, v in kwargs.items() if isinstance(v, bool)})
 
         version = self.version()
         pve_major_version = 3 if version < LooseVersion('4.0') else version.version[0]
@@ -1032,6 +1020,12 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
         # The features work only on PVE 6
         if pve_major_version < 6:
             for p in only_v6:
+                if p in kwargs:
+                    del kwargs[p]
+
+        # The features work only on PVE 8
+        if pve_major_version < 8:
+            for p in only_v8:
                 if p in kwargs:
                     del kwargs[p]
 
@@ -1068,7 +1062,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             if ('bios' not in kwargs) or ('ovmf' != kwargs['bios']):
                 self.module.fail_json(msg='efidisk0 cannot be used if bios is not set to ovmf. ')
 
-        # Flatten efidisk0 option to a string so that it's a string which is what Proxmoxer and the API expect
+        # Flatten efidisk0 option to a string so that it is a string which is what Proxmoxer and the API expect
         if 'efidisk0' in kwargs:
             efidisk0_str = ''
             # Regexp to catch underscores in keys name, to replace them after by hyphens
@@ -1083,7 +1077,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
                                       if 'storage' != k])
             kwargs['efidisk0'] = efidisk0_str
 
-        # Flatten tpmstate0 option to a string so that it's a string which is what Proxmoxer and the API expect
+        # Flatten tpmstate0 option to a string so that it is a string which is what Proxmoxer and the API expect
         if 'tpmstate0' in kwargs:
             kwargs['tpmstate0'] = '{storage}:1,version=v{version}'.format(
                 storage=kwargs['tpmstate0'].get('storage'),
@@ -1091,7 +1085,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             )
 
         # Convert all dict in kwargs to elements.
-        # For hostpci[n], ide[n], net[n], numa[n], parallel[n], sata[n], scsi[n], serial[n], virtio[n], ipconfig[n]
+        # For hostpci[n], ide[n], net[n], numa[n], parallel[n], sata[n], scsi[n], serial[n], virtio[n], ipconfig[n], usb[n]
         for k in list(kwargs.keys()):
             if isinstance(kwargs[k], dict):
                 kwargs.update(kwargs[k])
@@ -1129,10 +1123,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             kwargs['tags'] = ",".join(kwargs['tags'])
 
         # -args and skiplock require root@pam user - but can not use api tokens
-        if self.module.params['api_user'] == "root@pam" and self.module.params['args'] is None:
-            if not update and self.module.params['proxmox_default_behavior'] == 'compatibility':
-                kwargs['args'] = vm_args
-        elif self.module.params['api_user'] == "root@pam" and self.module.params['args'] is not None:
+        if self.module.params['api_user'] == "root@pam" and self.module.params['args'] is not None:
             kwargs['args'] = self.module.params['args']
         elif self.module.params['api_user'] != "root@pam" and self.module.params['args'] is not None:
             self.module.fail_json(msg='args parameter require root@pam user. ')
@@ -1149,7 +1140,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             for param in valid_clone_params:
                 if self.module.params[param] is not None:
                     clone_params[param] = self.module.params[param]
-            clone_params.update(dict([k, int(v)] for k, v in clone_params.items() if isinstance(v, bool)))
+            clone_params.update({k: int(v) for k, v in clone_params.items() if isinstance(v, bool)})
             taskid = proxmox_node.qemu(vmid).clone.post(newid=newid, name=name, **clone_params)
         else:
             taskid = proxmox_node.qemu.create(vmid=vmid, name=name, memory=memory, cpu=cpu, cores=cores, sockets=sockets, **kwargs)
@@ -1233,6 +1224,7 @@ def main():
         cicustom=dict(type='str'),
         cipassword=dict(type='str', no_log=True),
         citype=dict(type='str', choices=['nocloud', 'configdrive2']),
+        ciupgrade=dict(type='bool'),
         ciuser=dict(type='str'),
         clone=dict(type='str'),
         cores=dict(type='int'),
@@ -1308,6 +1300,7 @@ def main():
                            storage=dict(type='str', required=True),
                            version=dict(type='str', choices=['2.0', '1.2'], default='2.0')
                        )),
+        usb=dict(type='dict'),
         update=dict(type='bool', default=False),
         update_unsafe=dict(type='bool', default=False),
         vcpus=dict(type='int'),
@@ -1315,11 +1308,6 @@ def main():
         virtio=dict(type='dict'),
         vmid=dict(type='int'),
         watchdog=dict(),
-        proxmox_default_behavior=dict(type='str',
-                                      default='no_defaults',
-                                      choices=['compatibility', 'no_defaults'],
-                                      removed_from_collection='community.general',
-                                      removed_in_version='10.0.0'),
     )
     module_args.update(kvm_args)
 
@@ -1347,28 +1335,6 @@ def main():
     update_unsafe = bool(module.params['update_unsafe'])
     vmid = module.params['vmid']
     validate_certs = module.params['validate_certs']
-
-    if module.params['proxmox_default_behavior'] == 'compatibility':
-        old_default_values = dict(
-            acpi=True,
-            autostart=False,
-            balloon=0,
-            boot='cnd',
-            cores=1,
-            cpu='kvm64',
-            cpuunits=1000,
-            format='qcow2',
-            kvm=True,
-            memory=512,
-            ostype='l26',
-            sockets=1,
-            tablet=False,
-            template=False,
-            vga='std',
-        )
-        for param, value in old_default_values.items():
-            if module.params[param] is None:
-                module.params[param] = value
 
     if module.params['format'] == 'unspecified':
         module.params['format'] = None
@@ -1466,6 +1432,7 @@ def main():
                               cicustom=module.params['cicustom'],
                               cipassword=module.params['cipassword'],
                               citype=module.params['citype'],
+                              ciupgrade=module.params['ciupgrade'],
                               ciuser=module.params['ciuser'],
                               cpulimit=module.params['cpulimit'],
                               cpuunits=module.params['cpuunits'],
@@ -1513,6 +1480,7 @@ def main():
                               tdf=module.params['tdf'],
                               template=module.params['template'],
                               tpmstate0=module.params['tpmstate0'],
+                              usb=module.params['usb'],
                               vcpus=module.params['vcpus'],
                               vga=module.params['vga'],
                               virtio=module.params['virtio'],

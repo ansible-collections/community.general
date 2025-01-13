@@ -10,8 +10,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 author:
   - Alexander Bulimov (@abulimov)
   - quidame (@quidame)
@@ -29,32 +28,29 @@ attributes:
 options:
   state:
     description:
-      - If O(state=present), the filesystem is created if it doesn't already
-        exist, that is the default behaviour if O(state) is omitted.
-      - If O(state=absent), filesystem signatures on O(dev) are wiped if it
-        contains a filesystem (as known by C(blkid)).
-      - When O(state=absent), all other options but O(dev) are ignored, and the
-        module does not fail if the device O(dev) doesn't actually exist.
+      - If O(state=present), the filesystem is created if it does not already exist, that is the default behaviour if O(state)
+        is omitted.
+      - If O(state=absent), filesystem signatures on O(dev) are wiped if it contains a filesystem (as known by C(blkid)).
+      - When O(state=absent), all other options but O(dev) are ignored, and the module does not fail if the device O(dev)
+        does not actually exist.
     type: str
-    choices: [ present, absent ]
+    choices: [present, absent]
     default: present
     version_added: 1.3.0
   fstype:
-    choices: [ btrfs, ext2, ext3, ext4, ext4dev, f2fs, lvm, ocfs2, reiserfs, xfs, vfat, swap, ufs ]
+    choices: [bcachefs, btrfs, ext2, ext3, ext4, ext4dev, f2fs, lvm, ocfs2, reiserfs, xfs, vfat, swap, ufs]
     description:
-      - Filesystem type to be created. This option is required with
-        O(state=present) (or if O(state) is omitted).
-      - ufs support has been added in community.general 3.4.0.
+      - Filesystem type to be created. This option is required with O(state=present) (or if O(state) is omitted).
+      - Ufs support has been added in community.general 3.4.0.
+      - Bcachefs support has been added in community.general 8.6.0.
     type: str
     aliases: [type]
   dev:
     description:
-      - Target path to block device (Linux) or character device (FreeBSD) or
-        regular file (both).
-      - When setting Linux-specific filesystem types on FreeBSD, this module
-        only works when applying to regular files, aka disk images.
-      - Currently V(lvm) (Linux-only) and V(ufs) (FreeBSD-only) do not support
-        a regular file as their target O(dev).
+      - Target path to block device (Linux) or character device (FreeBSD) or regular file (both).
+      - When setting Linux-specific filesystem types on FreeBSD, this module only works when applying to regular files, aka
+        disk images.
+      - Currently V(lvm) (Linux-only) and V(ufs) (FreeBSD-only) do not support a regular file as their target O(dev).
       - Support for character devices on FreeBSD has been added in community.general 3.4.0.
     type: path
     required: true
@@ -67,12 +63,11 @@ options:
   resizefs:
     description:
       - If V(true), if the block device and filesystem size differ, grow the filesystem into the space.
-      - Supported for C(btrfs), C(ext2), C(ext3), C(ext4), C(ext4dev), C(f2fs), C(lvm), C(xfs), C(ufs) and C(vfat) filesystems.
-        Attempts to resize other filesystem types will fail.
-      - XFS Will only grow if mounted. Currently, the module is based on commands
-        from C(util-linux) package to perform operations, so resizing of XFS is
-        not supported on FreeBSD systems.
-      - vFAT will likely fail if C(fatresize < 1.04).
+      - Supported for C(bcachefs), C(btrfs), C(ext2), C(ext3), C(ext4), C(ext4dev), C(f2fs), C(lvm), C(xfs), C(ufs) and C(vfat)
+        filesystems. Attempts to resize other filesystem types will fail.
+      - XFS Will only grow if mounted. Currently, the module is based on commands from C(util-linux) package to perform operations,
+        so resizing of XFS is not supported on FreeBSD systems.
+      - VFAT will likely fail if C(fatresize < 1.04).
       - Mutually exclusive with O(uuid).
     type: bool
     default: false
@@ -86,38 +81,34 @@ options:
       - The UUID options specified in O(opts) take precedence over this value.
       - See xfs_admin(8) (C(xfs)), tune2fs(8) (C(ext2), C(ext3), C(ext4), C(ext4dev)) for possible values.
       - For O(fstype=lvm) the value is ignored, it resets the PV UUID if set.
-      - Supported for O(fstype) being one of C(ext2), C(ext3), C(ext4), C(ext4dev), C(lvm), or C(xfs).
+      - Supported for O(fstype) being one of C(bcachefs), C(ext2), C(ext3), C(ext4), C(ext4dev), C(lvm), or C(xfs).
       - This is B(not idempotent). Specifying this option will always result in a change.
       - Mutually exclusive with O(resizefs).
     type: str
     version_added: 7.1.0
 requirements:
-  - Uses specific tools related to the O(fstype) for creating or resizing a
-    filesystem (from packages e2fsprogs, xfsprogs, dosfstools, and so on).
-  - Uses generic tools mostly related to the Operating System (Linux or
-    FreeBSD) or available on both, as C(blkid).
+  - Uses specific tools related to the O(fstype) for creating or resizing a filesystem (from packages e2fsprogs, xfsprogs,
+    dosfstools, and so on).
+  - Uses generic tools mostly related to the Operating System (Linux or FreeBSD) or available on both, as C(blkid).
   - On FreeBSD, either C(util-linux) or C(e2fsprogs) package is required.
 notes:
-  - Potential filesystems on O(dev) are checked using C(blkid). In case C(blkid)
-    is unable to detect a filesystem (and in case C(fstyp) on FreeBSD is also
-    unable to detect a filesystem), this filesystem is overwritten even if
-    O(force) is V(false).
-  - On FreeBSD systems, both C(e2fsprogs) and C(util-linux) packages provide
-    a C(blkid) command that is compatible with this module. However, these
-    packages conflict with each other, and only the C(util-linux) package
-    provides the command required to not fail when O(state=absent).
+  - Potential filesystems on O(dev) are checked using C(blkid). In case C(blkid) is unable to detect a filesystem (and in
+    case C(fstyp) on FreeBSD is also unable to detect a filesystem), this filesystem is overwritten even if O(force) is V(false).
+  - On FreeBSD systems, both C(e2fsprogs) and C(util-linux) packages provide a C(blkid) command that is compatible with this
+    module. However, these packages conflict with each other, and only the C(util-linux) package provides the command required
+    to not fail when O(state=absent).
 seealso:
   - module: community.general.filesize
   - module: ansible.posix.mount
   - name: xfs_admin(8) manpage for Linux
-    description: Manual page of the GNU/Linux's xfs_admin implementation
+    description: Manual page of the GNU/Linux's xfs_admin implementation.
     link: https://man7.org/linux/man-pages/man8/xfs_admin.8.html
   - name: tune2fs(8) manpage for Linux
-    description: Manual page of the GNU/Linux's tune2fs implementation
+    description: Manual page of the GNU/Linux's tune2fs implementation.
     link: https://man7.org/linux/man-pages/man8/tune2fs.8.html
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a ext2 filesystem on /dev/sdb1
   community.general.filesystem:
     fstype: ext2
@@ -156,7 +147,7 @@ EXAMPLES = '''
     fstype: lvm
     dev: /dev/sdc
     uuid: random
-'''
+"""
 
 import os
 import platform
@@ -405,6 +396,48 @@ class Reiserfs(Filesystem):
     MKFS_FORCE_FLAGS = ['-q']
 
 
+class Bcachefs(Filesystem):
+    MKFS = 'mkfs.bcachefs'
+    MKFS_FORCE_FLAGS = ['--force']
+    MKFS_SET_UUID_OPTIONS = ['-U', '--uuid']
+    INFO = 'bcachefs'
+    GROW = 'bcachefs'
+    GROW_MAX_SPACE_FLAGS = ['device', 'resize']
+
+    def get_fs_size(self, dev):
+        """Return size in bytes of filesystem on device (integer)."""
+        dummy, stdout, dummy = self.module.run_command([self.module.get_bin_path(self.INFO),
+                                                        'show-super', str(dev)], check_rc=True)
+
+        for line in stdout.splitlines():
+            if "Size: " in line:
+                parts = line.split()
+                unit = parts[2]
+
+                base = None
+                exp = None
+
+                units_2 = ["B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"]
+                units_10 = ["B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
+
+                try:
+                    exp = units_2.index(unit)
+                    base = 1024
+                except ValueError:
+                    exp = units_10.index(unit)
+                    base = 1000
+
+                if exp == 0:
+                    value = int(parts[1])
+                else:
+                    value = float(parts[1])
+
+                if base is not None and exp is not None:
+                    return int(value * pow(base, exp))
+
+        raise ValueError(repr(stdout))
+
+
 class Btrfs(Filesystem):
     MKFS = 'mkfs.btrfs'
     INFO = 'btrfs'
@@ -567,6 +600,7 @@ class UFS(Filesystem):
 
 
 FILESYSTEMS = {
+    'bcachefs': Bcachefs,
     'ext2': Ext2,
     'ext3': Ext3,
     'ext4': Ext4,

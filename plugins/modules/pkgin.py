@@ -16,70 +16,67 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: pkgin
 short_description: Package manager for SmartOS, NetBSD, et al
 description:
-    - "The standard package manager for SmartOS, but also usable on NetBSD
-      or any OS that uses C(pkgsrc).  (Home: U(http://pkgin.net/))"
+  - 'The standard package manager for SmartOS, but also usable on NetBSD or any OS that uses C(pkgsrc). (Home: U(http://pkgin.net/)).'
 author:
-    - "Larry Gilbert (@L2G)"
-    - "Shaun Zinck (@szinck)"
-    - "Jasper Lievisse Adriaanse (@jasperla)"
+  - "Larry Gilbert (@L2G)"
+  - "Shaun Zinck (@szinck)"
+  - "Jasper Lievisse Adriaanse (@jasperla)"
 notes:
-    - "Known bug with pkgin < 0.8.0: if a package is removed and another
-      package depends on it, the other package will be silently removed as
-      well."
+  - 'Known bug with pkgin < 0.8.0: if a package is removed and another package depends on it, the other package will be silently
+    removed as well.'
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    name:
-        description:
-            - Name of package to install/remove;
-            - multiple names may be given, separated by commas
-        aliases: [pkg]
-        type: list
-        elements: str
-    state:
-        description:
-            - Intended state of the package
-        choices: [ 'present', 'absent' ]
-        default: present
-        type: str
-    update_cache:
-        description:
-          - Update repository database. Can be run with other steps or on it's own.
-        type: bool
-        default: false
-    upgrade:
-        description:
-          - Upgrade main packages to their newer versions
-        type: bool
-        default: false
-    full_upgrade:
-        description:
-          - Upgrade all packages to their newer versions
-        type: bool
-        default: false
-    clean:
-        description:
-          - Clean packages cache
-        type: bool
-        default: false
-    force:
-        description:
-          - Force package reinstall
-        type: bool
-        default: false
-'''
+  name:
+    description:
+      - Name of package to install/remove;
+      - Multiple names may be given, separated by commas.
+    aliases: [pkg]
+    type: list
+    elements: str
+  state:
+    description:
+      - Intended state of the package.
+    choices: ['present', 'absent']
+    default: present
+    type: str
+  update_cache:
+    description:
+      - Update repository database. Can be run with other steps or on its own.
+    type: bool
+    default: false
+  upgrade:
+    description:
+      - Upgrade main packages to their newer versions.
+    type: bool
+    default: false
+  full_upgrade:
+    description:
+      - Upgrade all packages to their newer versions.
+    type: bool
+    default: false
+  clean:
+    description:
+      - Clean packages cache.
+    type: bool
+    default: false
+  force:
+    description:
+      - Force package reinstall.
+    type: bool
+    default: false
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Install package foo
   community.general.pkgin:
     name: foo
@@ -125,7 +122,7 @@ EXAMPLES = '''
 - name: Clean packages cache (equivalent to pkgin clean)
   community.general.pkgin:
     clean: true
-'''
+"""
 
 
 import re
@@ -145,18 +142,18 @@ def query_package(module, name):
     """
 
     # test whether '-p' (parsable) flag is supported.
-    rc, out, err = module.run_command("%s -p -v" % PKGIN_PATH)
+    rc, out, err = module.run_command([PKGIN_PATH, "-p", "-v"])
 
     if rc == 0:
-        pflag = '-p'
+        pflag = ['-p']
         splitchar = ';'
     else:
-        pflag = ''
+        pflag = []
         splitchar = ' '
 
     # Use "pkgin search" to find the package. The regular expression will
     # only match on the complete name.
-    rc, out, err = module.run_command("%s %s search \"^%s$\"" % (PKGIN_PATH, pflag, name))
+    rc, out, err = module.run_command([PKGIN_PATH] + pflag + ["search", "^%s$" % name])
 
     # rc will not be 0 unless the search was a success
     if rc == 0:
@@ -234,22 +231,19 @@ def format_pkgin_command(module, command, package=None):
     # an empty string. Some commands (e.g. 'update') will ignore extra
     # arguments, however this behaviour cannot be relied on for others.
     if package is None:
-        package = ""
+        packages = []
+    else:
+        packages = [package]
 
     if module.params["force"]:
-        force = "-F"
+        force = ["-F"]
     else:
-        force = ""
-
-    vars = {"pkgin": PKGIN_PATH,
-            "command": command,
-            "package": package,
-            "force": force}
+        force = []
 
     if module.check_mode:
-        return "%(pkgin)s -n %(command)s %(package)s" % vars
+        return [PKGIN_PATH, "-n", command] + packages
     else:
-        return "%(pkgin)s -y %(force)s %(command)s %(package)s" % vars
+        return [PKGIN_PATH, "-y"] + force + [command] + packages
 
 
 def remove_packages(module, packages):

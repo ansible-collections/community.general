@@ -1,0 +1,89 @@
+---
+# Copyright (c) 2024, Michael Ilg (@Ilgmi)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create a service
+  community.general.consul_agent_service:
+    name: nginx
+    service_port: 80
+    address: localhost
+    tags:
+      - http
+    meta:
+      nginx_version: 1.25.3
+  register: result
+
+- set_fact:
+    nginx_service: "{{result.service}}"
+
+- assert:
+    that:
+      - result is changed
+      - result.service.ID is defined
+      - result.service.Service == 'nginx'
+      - result.service.Address == 'localhost'
+      - result.service.Port == 80
+      - result.service.Tags[0] == 'http'
+      - result.service.Meta.nginx_version is defined
+      - result.service.Meta.nginx_version == '1.25.3'
+      - result.service.ContentHash is defined
+
+- name: Update service
+  community.general.consul_agent_service:
+    id: "{{ nginx_service.ID }}"
+    name: "{{ nginx_service.Service }}"
+    service_port: 8080
+    address: 127.0.0.1
+    tags:
+      - http
+      - new_tag
+    meta:
+      nginx_version: 1.0.0
+      nginx: 1.25.3
+  register: result
+- assert:
+    that:
+      - result is changed
+      - result.service.ID is defined
+      - result.service.Service == 'nginx'
+      - result.service.Address == '127.0.0.1'
+      - result.service.Port == 8080
+      - result.service.Tags[0] == 'http'
+      - result.service.Tags[1] == 'new_tag'
+      - result.service.Meta.nginx_version is defined
+      - result.service.Meta.nginx_version == '1.0.0'
+      - result.service.Meta.nginx is defined
+      - result.service.Meta.nginx == '1.25.3'
+      - result.service.ContentHash is defined
+
+- name: Update service not changed when updating again without changes
+  community.general.consul_agent_service:
+    id: "{{ nginx_service.ID }}"
+    name: "{{ nginx_service.Service }}"
+    service_port: 8080
+    address: 127.0.0.1
+    tags:
+      - http
+      - new_tag
+    meta:
+      nginx_version: 1.0.0
+      nginx: 1.25.3
+  register: result
+
+- assert:
+    that:
+      - result is not changed
+      - result.operation is not defined
+
+- name: Remove service
+  community.general.consul_agent_service:
+    id: "{{ nginx_service.ID }}"
+    state: absent
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result is not failed
+      - result.operation == 'remove'

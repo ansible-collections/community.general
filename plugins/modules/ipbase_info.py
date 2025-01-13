@@ -8,13 +8,12 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: "ipbase_info"
 version_added: "7.0.0"
 short_description: "Retrieve IP geolocation and other facts of a host's IP address using the ipbase.com API"
 description:
-  - "Retrieve IP geolocation and other facts of a host's IP address using the ipbase.com API"
+  - Retrieve IP geolocation and other facts of a host's IP address using the ipbase.com API.
 author: "Dominik Kukacka (@dominikkukacka)"
 extends_documentation_fragment:
   - "community.general.attributes"
@@ -22,31 +21,31 @@ extends_documentation_fragment:
 options:
   ip:
     description:
-      - "The IP you want to get the info for. If not specified the API will detect the IP automatically."
+      - The IP you want to get the info for. If not specified the API will detect the IP automatically.
     required: false
     type: str
   apikey:
     description:
-      - "The API key for the request if you need more requests."
+      - The API key for the request if you need more requests.
     required: false
     type: str
   hostname:
     description:
-      - "If the O(hostname) parameter is set to V(true), the API response will contain the hostname of the IP."
+      - If the O(hostname) parameter is set to V(true), the API response will contain the hostname of the IP.
     required: false
     type: bool
     default: false
   language:
     description:
-      - "An ISO Alpha 2 Language Code for localizing the IP data"
+      - An ISO Alpha 2 Language Code for localizing the IP data.
     required: false
     type: str
     default: "en"
 notes:
-  - "Check U(https://ipbase.com/) for more information."
-'''
+  - Check U(https://ipbase.com/) for more information.
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: "Get IP geolocation information of the primary outgoing IP"
   community.general.ipbase_info:
   register: my_ip_info
@@ -64,12 +63,12 @@ EXAMPLES = '''
     hostname: true
     language: "de"
   register: my_ip_info
+"""
 
-'''
-
-RETURN = '''
+RETURN = r"""
 data:
-  description: "JSON parsed response from ipbase.com. Please refer to U(https://ipbase.com/docs/info) for the detailed structure of the response."
+  description: "JSON parsed response from ipbase.com. Please refer to U(https://ipbase.com/docs/info) for the detailed structure
+    of the response."
   returned: success
   type: dict
   sample: {
@@ -213,7 +212,7 @@ data:
       ]
     }
   }
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 

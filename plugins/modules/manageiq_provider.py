@@ -9,7 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: manageiq_provider
 short_description: Management of provider in ManageIQ
 extends_documentation_fragment:
@@ -19,7 +19,6 @@ extends_documentation_fragment:
 author: Daniel Korn (@dkorn)
 description:
   - The manageiq_provider module supports adding, updating, and deleting provider in ManageIQ.
-
 attributes:
   check_mode:
     support: none
@@ -30,7 +29,9 @@ options:
   state:
     type: str
     description:
-      - absent - provider should not exist, present - provider should be present, refresh - provider will be refreshed
+      - V(absent) - provider should not exist,
+      - V(present) - provider should be present,
+      - V(refresh) - provider will be refreshed.
     choices: ['absent', 'present', 'refresh']
     default: 'present'
   name:
@@ -47,30 +48,30 @@ options:
     default: 'default'
   provider_region:
     type: str
-    description: The provider region name to connect to (e.g. AWS region for Amazon).
+    description: The provider region name to connect to (for example AWS region for Amazon).
   host_default_vnc_port_start:
     type: str
-    description: The first port in the host VNC range. defaults to None.
+    description: The first port in the host VNC range.
   host_default_vnc_port_end:
     type: str
-    description: The last port in the host VNC range. defaults to None.
+    description: The last port in the host VNC range.
   subscription:
     type: str
-    description: Microsoft Azure subscription ID. defaults to None.
+    description: Microsoft Azure subscription ID.
   project:
     type: str
-    description: Google Compute Engine Project ID. defaults to None.
+    description: Google Compute Engine Project ID.
   azure_tenant_id:
     type: str
     description: Tenant ID. defaults to None.
-    aliases: [ keystone_v3_domain_id ]
+    aliases: [keystone_v3_domain_id]
   tenant_mapping_enabled:
     type: bool
     default: false
-    description: Whether to enable mapping of existing tenants. defaults to False.
+    description: Whether to enable mapping of existing tenants.
   api_version:
     type: str
-    description: The OpenStack Keystone API version. defaults to None.
+    description: The OpenStack Keystone API version.
     choices: ['v2', 'v3']
 
   provider:
@@ -79,32 +80,32 @@ options:
     suboptions:
       hostname:
         type: str
-        description: The provider's api hostname.
+        description: The provider's API hostname.
         required: true
       port:
         type: int
-        description: The provider's api port.
+        description: The provider's API port.
       userid:
         type: str
-        description: Provider's api endpoint authentication userid. defaults to None.
+        description: Provider's API endpoint authentication userid.
       password:
         type: str
-        description: Provider's api endpoint authentication password. defaults to None.
+        description: Provider's API endpoint authentication password.
       auth_key:
         type: str
-        description: Provider's api endpoint authentication bearer token. defaults to None.
+        description: Provider's API endpoint authentication bearer token.
       validate_certs:
-        description: Whether SSL certificates should be verified for HTTPS requests (deprecated). defaults to True.
+        description: Whether SSL certificates should be verified for HTTPS requests (deprecated).
         type: bool
         default: true
-        aliases: [ verify_ssl ]
+        aliases: [verify_ssl]
       security_protocol:
         type: str
-        description: How SSL certificates should be used for HTTPS requests. defaults to None.
-        choices: ['ssl-with-validation','ssl-with-validation-custom-ca','ssl-without-validation','non-ssl']
+        description: How SSL certificates should be used for HTTPS requests.
+        choices: ['ssl-with-validation', 'ssl-with-validation-custom-ca', 'ssl-without-validation', 'non-ssl']
       certificate_authority:
         type: str
-        description: The CA bundle string with custom certificates. defaults to None.
+        description: The CA bundle string with custom certificates.
       path:
         type: str
         description:
@@ -125,39 +126,38 @@ options:
         type: str
         description:
           - TODO needs documentation.
-
   metrics:
     description: Metrics endpoint connection information.
     type: dict
     suboptions:
       hostname:
         type: str
-        description: The provider's api hostname.
+        description: The provider's API hostname.
         required: true
       port:
         type: int
-        description: The provider's api port.
+        description: The provider's API port.
       userid:
         type: str
-        description: Provider's api endpoint authentication userid. defaults to None.
+        description: Provider's API endpoint authentication userid.
       password:
         type: str
-        description: Provider's api endpoint authentication password. defaults to None.
+        description: Provider's API endpoint authentication password.
       auth_key:
         type: str
-        description: Provider's api endpoint authentication bearer token. defaults to None.
+        description: Provider's API endpoint authentication bearer token.
       validate_certs:
-        description: Whether SSL certificates should be verified for HTTPS requests (deprecated). defaults to True.
+        description: Whether SSL certificates should be verified for HTTPS requests (deprecated).
         type: bool
         default: true
-        aliases: [ verify_ssl ]
+        aliases: [verify_ssl]
       security_protocol:
         type: str
-        choices: ['ssl-with-validation','ssl-with-validation-custom-ca','ssl-without-validation','non-ssl']
-        description: How SSL certificates should be used for HTTPS requests. defaults to None.
+        choices: ['ssl-with-validation', 'ssl-with-validation-custom-ca', 'ssl-without-validation', 'non-ssl']
+        description: How SSL certificates should be used for HTTPS requests.
       certificate_authority:
         type: str
-        description: The CA bundle string with custom certificates. defaults to None.
+        description: The CA bundle string with custom certificates.
       path:
         type: str
         description: Database name for oVirt metrics. Defaults to V(ovirt_engine_history).
@@ -177,35 +177,34 @@ options:
         type: str
         description:
           - TODO needs documentation.
-
   alerts:
     description: Alerts endpoint connection information.
     type: dict
     suboptions:
       hostname:
         type: str
-        description: The provider's api hostname.
+        description: The provider's API hostname.
         required: true
       port:
         type: int
-        description: The provider's api port.
+        description: The provider's API port.
       userid:
         type: str
-        description: Provider's api endpoint authentication userid. defaults to None.
+        description: Provider's API endpoint authentication userid. defaults to None.
       password:
         type: str
-        description: Provider's api endpoint authentication password. defaults to None.
+        description: Provider's API endpoint authentication password. defaults to None.
       auth_key:
         type: str
-        description: Provider's api endpoint authentication bearer token. defaults to None.
+        description: Provider's API endpoint authentication bearer token. defaults to None.
       validate_certs:
         type: bool
         description: Whether SSL certificates should be verified for HTTPS requests (deprecated). defaults to True.
         default: true
-        aliases: [ verify_ssl ]
+        aliases: [verify_ssl]
       security_protocol:
         type: str
-        choices: ['ssl-with-validation','ssl-with-validation-custom-ca','ssl-without-validation', 'non-ssl']
+        choices: ['ssl-with-validation', 'ssl-with-validation-custom-ca', 'ssl-without-validation', 'non-ssl']
         description: How SSL certificates should be used for HTTPS requests. defaults to None.
       certificate_authority:
         type: str
@@ -230,7 +229,6 @@ options:
         type: str
         description:
           - TODO needs documentation.
-
   ssh_keypair:
     description: SSH key pair used for SSH connections to all hosts in this provider.
     type: dict
@@ -250,10 +248,10 @@ options:
           - Whether certificates should be verified for connections.
         type: bool
         default: true
-        aliases: [ verify_ssl ]
+        aliases: [verify_ssl]
       security_protocol:
         type: str
-        choices: ['ssl-with-validation','ssl-with-validation-custom-ca','ssl-without-validation', 'non-ssl']
+        choices: ['ssl-with-validation', 'ssl-with-validation-custom-ca', 'ssl-without-validation', 'non-ssl']
         description:
           - TODO needs documentation.
       certificate_authority:
@@ -288,9 +286,9 @@ options:
         type: int
         description:
           - TODO needs documentation.
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a new provider in ManageIQ ('Hawkular' metrics)
   community.general.manageiq_provider:
     name: 'EngLab'
@@ -304,22 +302,7 @@ EXAMPLES = '''
       security_protocol: 'ssl-with-validation-custom-ca'
       certificate_authority: |
         -----BEGIN CERTIFICATE-----
-        FAKECERTsdKgAwIBAgIBATANBgkqhkiG9w0BAQsFADAmMSQwIgYDVQQDDBtvcGVu
-        c2hpZnQtc2lnbmVyQDE1MDMzMjAxMTkwHhcNMTcwODIxMTI1NTE5WhcNMjIwODIw
-        MTI1NTIwWjAmMSQwIgYDVQQDDBtvcGVuc2hpZnQtc2lnbmVyQDE1MDMzMjAxMTkw
-        ggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDUDnL2tQ2xf/zO7F7hmZ4S
-        ZuwKENdI4IYuWSxye4i3hPhKg6eKPzGzmDNWkIMDOrDAj1EgVSNPtPwsOL8OWvJm
-        AaTjr070D7ZGWWnrrDrWEClBx9Rx/6JAM38RT8Pu7c1hXBm0J81KufSLLYiZ/gOw
-        Znks5v5RUSGcAXvLkBJeATbsbh6fKX0RgQ3fFTvqQaE/r8LxcTN1uehPX1g5AaRa
-        z/SNDHaFtQlE3XcqAAukyMn4N5kdNcuwF3GlQ+tJnJv8SstPkfQcZbTMUQ7I2KpJ
-        ajXnMxmBhV5fCN4rb0QUNCrk2/B+EUMBY4MnxIakqNxnN1kvgI7FBbFgrHUe6QvJ
-        AgMBAAGjIzAhMA4GA1UdDwEB/wQEAwICpDAPBgNVHRMBAf8EBTADAQH/MA0GCSqG
-        SIb3DQEBCwUAA4IBAQAYRV57LUsqznSLZHA77o9+0fQetIE115DYP7wea42PODJI
-        QJ+JETEfoCr0+YOMAbVmznP9GH5cMTKEWHExcIpbMBU7nMZp6A3htcJgF2fgPzOA
-        aTUtzkuVCSrV//mbbYVxoFOc6sR3Br0wBs5+5iz3dBSt7xmgpMzZvqsQl655i051
-        gGSTIY3z5EJmBZBjwuTjal9mMoPGA4eoTPqlITJDHQ2bdCV2oDbc7zqupGrUfZFA
-        qzgieEyGzdCSRwjr1/PibA3bpwHyhD9CGD0PRVVTLhw6h6L5kuN1jA20OfzWxf/o
-        XUsdmRaWiF+l4s6Dcd56SuRp5SGNa2+vP9Of/FX5
+        FAKECERTsdKgAwI...
         -----END CERTIFICATE-----
     metrics:
       auth_key: 'topSecret'
@@ -330,22 +313,7 @@ EXAMPLES = '''
       security_protocol: 'ssl-with-validation-custom-ca'
       certificate_authority: |
         -----BEGIN CERTIFICATE-----
-        FAKECERTsdKgAwIBAgIBATANBgkqhkiG9w0BAQsFADAmMSQwIgYDVQQDDBtvcGVu
-        c2hpZnQtc2lnbmVyQDE1MDMzMjAxMTkwHhcNMTcwODIxMTI1NTE5WhcNMjIwODIw
-        MTI1NTIwWjAmMSQwIgYDVQQDDBtvcGVuc2hpZnQtc2lnbmVyQDE1MDMzMjAxMTkw
-        ggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDUDnL2tQ2xf/zO7F7hmZ4S
-        ZuwKENdI4IYuWSxye4i3hPhKg6eKPzGzmDNWkIMDOrDAj1EgVSNPtPwsOL8OWvJm
-        AaTjr070D7ZGWWnrrDrWEClBx9Rx/6JAM38RT8Pu7c1hXBm0J81KufSLLYiZ/gOw
-        Znks5v5RUSGcAXvLkBJeATbsbh6fKX0RgQ3fFTvqQaE/r8LxcTN1uehPX1g5AaRa
-        z/SNDHaFtQlE3XcqAAukyMn4N5kdNcuwF3GlQ+tJnJv8SstPkfQcZbTMUQ7I2KpJ
-        ajXnMxmBhV5fCN4rb0QUNCrk2/B+EUMBY4MnxIakqNxnN1kvgI7FBbFgrHUe6QvJ
-        AgMBAAGjIzAhMA4GA1UdDwEB/wQEAwICpDAPBgNVHRMBAf8EBTADAQH/MA0GCSqG
-        SIb3DQEBCwUAA4IBAQAYRV57LUsqznSLZHA77o9+0fQetIE115DYP7wea42PODJI
-        QJ+JETEfoCr0+YOMAbVmznP9GH5cMTKEWHExcIpbMBU7nMZp6A3htcJgF2fgPzOA
-        aTUtzkuVCSrV//mbbYVxoFOc6sR3Br0wBs5+5iz3dBSt7xmgpMzZvqsQl655i051
-        gGSTIY3z5EJmBZBjwuTjal9mMoPGA4eoTPqlITJDHQ2bdCV2oDbc7zqupGrUfZFA
-        qzgieEyGzdCSRwjr1/PibA3bpwHyhD9CGD0PRVVTLhw6h6L5kuN1jA20OfzWxf/o
-        XUsdmRaWiF+l4s6Dcd56SuRp5SGNa2+vP9Of/FX5
+        FAKECERTsdKgAwI...
         -----END CERTIFICATE-----
     manageiq_connection:
       url: 'https://127.0.0.1:80'
@@ -367,22 +335,7 @@ EXAMPLES = '''
       security_protocol: 'ssl-with-validation-custom-ca'
       certificate_authority: |
         -----BEGIN CERTIFICATE-----
-        FAKECERTsdKgAwIBAgIBATANBgkqhkiG9w0BAQsFADAmMSQwIgYDVQQDDBtvcGVu
-        c2hpZnQtc2lnbmVyQDE1MDMzMjAxMTkwHhcNMTcwODIxMTI1NTE5WhcNMjIwODIw
-        MTI1NTIwWjAmMSQwIgYDVQQDDBtvcGVuc2hpZnQtc2lnbmVyQDE1MDMzMjAxMTkw
-        ggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDUDnL2tQ2xf/zO7F7hmZ4S
-        ZuwKENdI4IYuWSxye4i3hPhKg6eKPzGzmDNWkIMDOrDAj1EgVSNPtPwsOL8OWvJm
-        AaTjr070D7ZGWWnrrDrWEClBx9Rx/6JAM38RT8Pu7c1hXBm0J81KufSLLYiZ/gOw
-        Znks5v5RUSGcAXvLkBJeATbsbh6fKX0RgQ3fFTvqQaE/r8LxcTN1uehPX1g5AaRa
-        z/SNDHaFtQlE3XcqAAukyMn4N5kdNcuwF3GlQ+tJnJv8SstPkfQcZbTMUQ7I2KpJ
-        ajXnMxmBhV5fCN4rb0QUNCrk2/B+EUMBY4MnxIakqNxnN1kvgI7FBbFgrHUe6QvJ
-        AgMBAAGjIzAhMA4GA1UdDwEB/wQEAwICpDAPBgNVHRMBAf8EBTADAQH/MA0GCSqG
-        SIb3DQEBCwUAA4IBAQAYRV57LUsqznSLZHA77o9+0fQetIE115DYP7wea42PODJI
-        QJ+JETEfoCr0+YOMAbVmznP9GH5cMTKEWHExcIpbMBU7nMZp6A3htcJgF2fgPzOA
-        aTUtzkuVCSrV//mbbYVxoFOc6sR3Br0wBs5+5iz3dBSt7xmgpMzZvqsQl655i051
-        gGSTIY3z5EJmBZBjwuTjal9mMoPGA4eoTPqlITJDHQ2bdCV2oDbc7zqupGrUfZFA
-        qzgieEyGzdCSRwjr1/PibA3bpwHyhD9CGD0PRVVTLhw6h6L5kuN1jA20OfzWxf/o
-        XUsdmRaWiF+l4s6Dcd56SuRp5SGNa2+vP9Of/FX5
+        FAKECERTsdKgAwI...
         -----END CERTIFICATE-----
     metrics:
       auth_key: 'topSecret'
@@ -392,22 +345,7 @@ EXAMPLES = '''
       security_protocol: 'ssl-with-validation-custom-ca'
       certificate_authority: |
         -----BEGIN CERTIFICATE-----
-        FAKECERTsdKgAwIBAgIBATANBgkqhkiG9w0BAQsFADAmMSQwIgYDVQQDDBtvcGVu
-        c2hpZnQtc2lnbmVyQDE1MDMzMjAxMTkwHhcNMTcwODIxMTI1NTE5WhcNMjIwODIw
-        MTI1NTIwWjAmMSQwIgYDVQQDDBtvcGVuc2hpZnQtc2lnbmVyQDE1MDMzMjAxMTkw
-        ggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDUDnL2tQ2xf/zO7F7hmZ4S
-        ZuwKENdI4IYuWSxye4i3hPhKg6eKPzGzmDNWkIMDOrDAj1EgVSNPtPwsOL8OWvJm
-        AaTjr070D7ZGWWnrrDrWEClBx9Rx/6JAM38RT8Pu7c1hXBm0J81KufSLLYiZ/gOw
-        Znks5v5RUSGcAXvLkBJeATbsbh6fKX0RgQ3fFTvqQaE/r8LxcTN1uehPX1g5AaRa
-        z/SNDHaFtQlE3XcqAAukyMn4N5kdNcuwF3GlQ+tJnJv8SstPkfQcZbTMUQ7I2KpJ
-        ajXnMxmBhV5fCN4rb0QUNCrk2/B+EUMBY4MnxIakqNxnN1kvgI7FBbFgrHUe6QvJ
-        AgMBAAGjIzAhMA4GA1UdDwEB/wQEAwICpDAPBgNVHRMBAf8EBTADAQH/MA0GCSqG
-        SIb3DQEBCwUAA4IBAQAYRV57LUsqznSLZHA77o9+0fQetIE115DYP7wea42PODJI
-        QJ+JETEfoCr0+YOMAbVmznP9GH5cMTKEWHExcIpbMBU7nMZp6A3htcJgF2fgPzOA
-        aTUtzkuVCSrV//mbbYVxoFOc6sR3Br0wBs5+5iz3dBSt7xmgpMzZvqsQl655i051
-        gGSTIY3z5EJmBZBjwuTjal9mMoPGA4eoTPqlITJDHQ2bdCV2oDbc7zqupGrUfZFA
-        qzgieEyGzdCSRwjr1/PibA3bpwHyhD9CGD0PRVVTLhw6h6L5kuN1jA20OfzWxf/o
-        XUsdmRaWiF+l4s6Dcd56SuRp5SGNa2+vP9Of/FX5
+        FAKECERTsdKgAwI...
         -----END CERTIFICATE-----
     manageiq_connection:
       url: 'https://127.0.0.1'
@@ -455,22 +393,7 @@ EXAMPLES = '''
       validate_certs: true
       certificate_authority: |
         -----BEGIN CERTIFICATE-----
-        FAKECERTsdKgAwIBAgIBATANBgkqhkiG9w0BAQsFADAmMSQwIgYDVQQDDBtvcGVu
-        c2hpZnQtc2lnbmVyQDE1MDMzMjAxMTkwHhcNMTcwODIxMTI1NTE5WhcNMjIwODIw
-        MTI1NTIwWjAmMSQwIgYDVQQDDBtvcGVuc2hpZnQtc2lnbmVyQDE1MDMzMjAxMTkw
-        ggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDUDnL2tQ2xf/zO7F7hmZ4S
-        ZuwKENdI4IYuWSxye4i3hPhKg6eKPzGzmDNWkIMDOrDAj1EgVSNPtPwsOL8OWvJm
-        AaTjr070D7ZGWWnrrDrWEClBx9Rx/6JAM38RT8Pu7c1hXBm0J81KufSLLYiZ/gOw
-        Znks5v5RUSGcAXvLkBJeATbsbh6fKX0RgQ3fFTvqQaE/r8LxcTN1uehPX1g5AaRa
-        z/SNDHaFtQlE3XcqAAukyMn4N5kdNcuwF3GlQ+tJnJv8SstPkfQcZbTMUQ7I2KpJ
-        ajXnMxmBhV5fCN4rb0QUNCrk2/B+EUMBY4MnxIakqNxnN1kvgI7FBbFgrHUe6QvJ
-        AgMBAAGjIzAhMA4GA1UdDwEB/wQEAwICpDAPBgNVHRMBAf8EBTADAQH/MA0GCSqG
-        SIb3DQEBCwUAA4IBAQAYRV57LUsqznSLZHA77o9+0fQetIE115DYP7wea42PODJI
-        QJ+JETEfoCr0+YOMAbVmznP9GH5cMTKEWHExcIpbMBU7nMZp6A3htcJgF2fgPzOA
-        aTUtzkuVCSrV//mbbYVxoFOc6sR3Br0wBs5+5iz3dBSt7xmgpMzZvqsQl655i051
-        gGSTIY3z5EJmBZBjwuTjal9mMoPGA4eoTPqlITJDHQ2bdCV2oDbc7zqupGrUfZFA
-        qzgieEyGzdCSRwjr1/PibA3bpwHyhD9CGD0PRVVTLhw6h6L5kuN1jA20OfzWxf/o
-        XUsdmRaWiF+l4s6Dcd56SuRp5SGNa2+vP9Of/FX5
+        FAKECERTsdKgAwI...
         -----END CERTIFICATE-----
     metrics:
       hostname: 'metrics.example.com'
@@ -480,22 +403,7 @@ EXAMPLES = '''
       validate_certs: true
       certificate_authority: |
         -----BEGIN CERTIFICATE-----
-        FAKECERTsdKgAwIBAgIBATANBgkqhkiG9w0BAQsFADAmMSQwIgYDVQQDDBtvcGVu
-        c2hpZnQtc2lnbmVyQDE1MDMzMjAxMTkwHhcNMTcwODIxMTI1NTE5WhcNMjIwODIw
-        MTI1NTIwWjAmMSQwIgYDVQQDDBtvcGVuc2hpZnQtc2lnbmVyQDE1MDMzMjAxMTkw
-        ggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDUDnL2tQ2xf/zO7F7hmZ4S
-        ZuwKENdI4IYuWSxye4i3hPhKg6eKPzGzmDNWkIMDOrDAj1EgVSNPtPwsOL8OWvJm
-        AaTjr070D7ZGWWnrrDrWEClBx9Rx/6JAM38RT8Pu7c1hXBm0J81KufSLLYiZ/gOw
-        Znks5v5RUSGcAXvLkBJeATbsbh6fKX0RgQ3fFTvqQaE/r8LxcTN1uehPX1g5AaRa
-        z/SNDHaFtQlE3XcqAAukyMn4N5kdNcuwF3GlQ+tJnJv8SstPkfQcZbTMUQ7I2KpJ
-        ajXnMxmBhV5fCN4rb0QUNCrk2/B+EUMBY4MnxIakqNxnN1kvgI7FBbFgrHUe6QvJ
-        AgMBAAGjIzAhMA4GA1UdDwEB/wQEAwICpDAPBgNVHRMBAf8EBTADAQH/MA0GCSqG
-        SIb3DQEBCwUAA4IBAQAYRV57LUsqznSLZHA77o9+0fQetIE115DYP7wea42PODJI
-        QJ+JETEfoCr0+YOMAbVmznP9GH5cMTKEWHExcIpbMBU7nMZp6A3htcJgF2fgPzOA
-        aTUtzkuVCSrV//mbbYVxoFOc6sR3Br0wBs5+5iz3dBSt7xmgpMzZvqsQl655i051
-        gGSTIY3z5EJmBZBjwuTjal9mMoPGA4eoTPqlITJDHQ2bdCV2oDbc7zqupGrUfZFA
-        qzgieEyGzdCSRwjr1/PibA3bpwHyhD9CGD0PRVVTLhw6h6L5kuN1jA20OfzWxf/o
-        XUsdmRaWiF+l4s6Dcd56SuRp5SGNa2+vP9Of/FX5
+        FAKECERTsdKgAwI...
         -----END CERTIFICATE-----
     manageiq_connection:
       url: 'https://127.0.0.1'
@@ -551,22 +459,7 @@ EXAMPLES = '''
       validate_certs: 'true'
       certificate_authority: |
         -----BEGIN CERTIFICATE-----
-        FAKECERTsdKgAwIBAgIBATANBgkqhkiG9w0BAQsFADAmMSQwIgYDVQQDDBtvcGVu
-        c2hpZnQtc2lnbmVyQDE1MDMzMjAxMTkwHhcNMTcwODIxMTI1NTE5WhcNMjIwODIw
-        MTI1NTIwWjAmMSQwIgYDVQQDDBtvcGVuc2hpZnQtc2lnbmVyQDE1MDMzMjAxMTkw
-        ggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDUDnL2tQ2xf/zO7F7hmZ4S
-        ZuwKENdI4IYuWSxye4i3hPhKg6eKPzGzmDNWkIMDOrDAj1EgVSNPtPwsOL8OWvJm
-        AaTjr070D7ZGWWnrrDrWEClBx9Rx/6JAM38RT8Pu7c1hXBm0J81KufSLLYiZ/gOw
-        Znks5v5RUSGcAXvLkBJeATbsbh6fKX0RgQ3fFTvqQaE/r8LxcTN1uehPX1g5AaRa
-        z/SNDHaFtQlE3XcqAAukyMn4N5kdNcuwF3GlQ+tJnJv8SstPkfQcZbTMUQ7I2KpJ
-        ajXnMxmBhV5fCN4rb0QUNCrk2/B+EUMBY4MnxIakqNxnN1kvgI7FBbFgrHUe6QvJ
-        AgMBAAGjIzAhMA4GA1UdDwEB/wQEAwICpDAPBgNVHRMBAf8EBTADAQH/MA0GCSqG
-        SIb3DQEBCwUAA4IBAQAYRV57LUsqznSLZHA77o9+0fQetIE115DYP7wea42PODJI
-        QJ+JETEfoCr0+YOMAbVmznP9GH5cMTKEWHExcIpbMBU7nMZp6A3htcJgF2fgPzOA
-        aTUtzkuVCSrV//mbbYVxoFOc6sR3Br0wBs5+5iz3dBSt7xmgpMzZvqsQl655i051
-        gGSTIY3z5EJmBZBjwuTjal9mMoPGA4eoTPqlITJDHQ2bdCV2oDbc7zqupGrUfZFA
-        qzgieEyGzdCSRwjr1/PibA3bpwHyhD9CGD0PRVVTLhw6h6L5kuN1jA20OfzWxf/o
-        XUsdmRaWiF+l4s6Dcd56SuRp5SGNa2+vP9Of/FX5
+        FAKECERTsdKgAwI...
         -----END CERTIFICATE-----
     ssh_keypair:
       hostname: director.example.com
@@ -590,22 +483,7 @@ EXAMPLES = '''
       validate_certs: 'true'
       certificate_authority: |
         -----BEGIN CERTIFICATE-----
-        FAKECERTsdKgAwIBAgIBATANBgkqhkiG9w0BAQsFADAmMSQwIgYDVQQDDBtvcGVu
-        c2hpZnQtc2lnbmVyQDE1MDMzMjAxMTkwHhcNMTcwODIxMTI1NTE5WhcNMjIwODIw
-        MTI1NTIwWjAmMSQwIgYDVQQDDBtvcGVuc2hpZnQtc2lnbmVyQDE1MDMzMjAxMTkw
-        ggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDUDnL2tQ2xf/zO7F7hmZ4S
-        ZuwKENdI4IYuWSxye4i3hPhKg6eKPzGzmDNWkIMDOrDAj1EgVSNPtPwsOL8OWvJm
-        AaTjr070D7ZGWWnrrDrWEClBx9Rx/6JAM38RT8Pu7c1hXBm0J81KufSLLYiZ/gOw
-        Znks5v5RUSGcAXvLkBJeATbsbh6fKX0RgQ3fFTvqQaE/r8LxcTN1uehPX1g5AaRa
-        z/SNDHaFtQlE3XcqAAukyMn4N5kdNcuwF3GlQ+tJnJv8SstPkfQcZbTMUQ7I2KpJ
-        ajXnMxmBhV5fCN4rb0QUNCrk2/B+EUMBY4MnxIakqNxnN1kvgI7FBbFgrHUe6QvJ
-        AgMBAAGjIzAhMA4GA1UdDwEB/wQEAwICpDAPBgNVHRMBAf8EBTADAQH/MA0GCSqG
-        SIb3DQEBCwUAA4IBAQAYRV57LUsqznSLZHA77o9+0fQetIE115DYP7wea42PODJI
-        QJ+JETEfoCr0+YOMAbVmznP9GH5cMTKEWHExcIpbMBU7nMZp6A3htcJgF2fgPzOA
-        aTUtzkuVCSrV//mbbYVxoFOc6sR3Br0wBs5+5iz3dBSt7xmgpMzZvqsQl655i051
-        gGSTIY3z5EJmBZBjwuTjal9mMoPGA4eoTPqlITJDHQ2bdCV2oDbc7zqupGrUfZFA
-        qzgieEyGzdCSRwjr1/PibA3bpwHyhD9CGD0PRVVTLhw6h6L5kuN1jA20OfzWxf/o
-        XUsdmRaWiF+l4s6Dcd56SuRp5SGNa2+vP9Of/FX5
+        FAKECERTsdKgAwI...
         -----END CERTIFICATE-----
     metrics:
       role: amqp
@@ -627,10 +505,10 @@ EXAMPLES = '''
       hostname: 'gce.example.com'
       auth_key: 'google_json_key'
       validate_certs: 'false'
-'''
+"""
 
-RETURN = '''
-'''
+RETURN = r"""
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.manageiq import ManageIQ, manageiq_argument_spec
@@ -715,7 +593,7 @@ def delete_nulls(h):
     if isinstance(h, list):
         return [delete_nulls(i) for i in h]
     if isinstance(h, dict):
-        return dict((k, delete_nulls(v)) for k, v in h.items() if v is not None)
+        return {k: delete_nulls(v) for k, v in h.items() if v is not None}
 
     return h
 

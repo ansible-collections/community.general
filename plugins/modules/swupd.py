@@ -10,13 +10,11 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: swupd
 short_description: Manages updates and bundles in ClearLinux systems
 description:
-  - Manages updates and bundles with the swupd bundle manager, which is used by the
-    Clear Linux Project for Intel Architecture.
+  - Manages updates and bundles with the swupd bundle manager, which is used by the Clear Linux Project for Intel Architecture.
 author: Alberto Murillo (@albertomurillo)
 extends_documentation_fragment:
   - community.general.attributes
@@ -28,19 +26,17 @@ attributes:
 options:
   contenturl:
     description:
-      - URL pointing to the contents of available bundles.
-        If not specified, the contents are retrieved from clearlinux.org.
+      - URL pointing to the contents of available bundles. If not specified, the contents are retrieved from clearlinux.org.
     type: str
   format:
     description:
-      - The format suffix for version file downloads. For example [1,2,3,staging,etc].
+      - The format suffix for version file downloads. For example V(1), V(2), V(3), and so on, or the special value V(staging).
         If not specified, the default format is used.
     type: str
   manifest:
     description:
-      - The manifest contains information about the bundles at certain version of the OS.
-        Specify a Manifest version to verify against that version or leave unspecified to
-        verify against the current version.
+      - The manifest contains information about the bundles at certain version of the OS. Specify a Manifest version to verify
+        against that version or leave unspecified to verify against the current version.
     aliases: [release, version]
     type: int
   name:
@@ -50,8 +46,8 @@ options:
     type: str
   state:
     description:
-      - Indicates the desired (I)bundle state. V(present) ensures the bundle
-        is installed while V(absent) ensures the (I)bundle is not installed.
+      - Indicates the desired (I)bundle state. V(present) ensures the bundle is installed while V(absent) ensures the (I)bundle
+        is not installed.
     default: present
     choices: [present, absent]
     type: str
@@ -73,9 +69,9 @@ options:
     description:
       - URL for version string download.
     type: str
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Update the OS to the latest version
   community.general.swupd:
     update: true
@@ -98,18 +94,18 @@ EXAMPLES = '''
   community.general.swupd:
     verify: true
     manifest: 12920
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 stdout:
-  description: stdout of swupd
+  description: C(stdout) of C(swupd).
   returned: always
   type: str
 stderr:
-  description: stderr of swupd
+  description: C(stderr) of C(swupd).
   returned: always
   type: str
-'''
+"""
 
 import os
 from ansible.module_utils.basic import AnsibleModule

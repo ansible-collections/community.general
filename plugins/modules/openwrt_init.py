@@ -8,52 +8,51 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: openwrt_init
 author:
-    - "Andrew Gaffney (@agaffney)"
+  - "Andrew Gaffney (@agaffney)"
 short_description: Manage services on OpenWrt
 description:
-    - Controls OpenWrt services on remote hosts.
+  - Controls OpenWrt services on remote hosts.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    name:
-        type: str
-        description:
-            - Name of the service.
-        required: true
-        aliases: ['service']
-    state:
-        type: str
-        description:
-            - V(started)/V(stopped) are idempotent actions that will not run commands unless necessary.
-            - V(restarted) will always bounce the service.
-            - V(reloaded) will always reload.
-        choices: [ 'started', 'stopped', 'restarted', 'reloaded' ]
-    enabled:
-        description:
-            - Whether the service should start on boot. B(At least one of state and enabled are required.)
-        type: bool
-    pattern:
-        type: str
-        description:
-        - If the service does not respond to the 'running' command, name a
-          substring to look for as would be found in the output of the C(ps)
-          command as a stand-in for a 'running' result.  If the string is found,
-          the service will be assumed to be running.
+  name:
+    type: str
+    description:
+      - Name of the service.
+    required: true
+    aliases: ['service']
+  state:
+    type: str
+    description:
+      - V(started)/V(stopped) are idempotent actions that will not run commands unless necessary.
+      - V(restarted) will always bounce the service.
+      - V(reloaded) will always reload.
+    choices: ['started', 'stopped', 'restarted', 'reloaded']
+  enabled:
+    description:
+      - Whether the service should start on boot. B(At least one of state and enabled are required).
+    type: bool
+  pattern:
+    type: str
+    description:
+      - If the service does not respond to the 'running' command, name a substring to look for as would be found in the output
+        of the C(ps) command as a stand-in for a 'running' result. If the string is found, the service will be assumed to
+        be running.
 notes:
-    - One option other than name is required.
+  - One option other than O(name) is required.
 requirements:
-    - An OpenWrt system (with python)
-'''
+  - An OpenWrt system (with python)
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Start service httpd, if not running
   community.general.openwrt_init:
     state: started
@@ -73,10 +72,10 @@ EXAMPLES = '''
   community.general.openwrt_init:
     name: httpd
     enabled: true
-'''
+"""
 
-RETURN = '''
-'''
+RETURN = r"""
+"""
 
 import os
 from ansible.module_utils.basic import AnsibleModule

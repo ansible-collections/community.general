@@ -19,8 +19,11 @@ DOCUMENTATION = '''
     options:
       _terms:
         description: list of keys to query
+        type: list
+        elements: string
       host:
         description: location of Redis host
+        type: string
         default: '127.0.0.1'
         env:
           - name: ANSIBLE_REDIS_HOST
@@ -113,5 +116,5 @@ class LookupModule(LookupBase):
                 ret.append(to_text(res))
             except Exception as e:
                 # connection failed or key not found
-                raise AnsibleError('Encountered exception while fetching {0}: {1}'.format(term, e))
+                raise AnsibleError(f'Encountered exception while fetching {term}: {e}')
         return ret

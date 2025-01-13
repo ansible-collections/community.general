@@ -19,6 +19,7 @@ from ansible.module_utils.common.text.converters import to_native, to_text
 URL_REALM_INFO = "{url}/realms/{realm}"
 URL_REALMS = "{url}/admin/realms"
 URL_REALM = "{url}/admin/realms/{realm}"
+URL_REALM_KEYS_METADATA = "{url}/admin/realms/{realm}/keys"
 
 URL_TOKEN = "{url}/realms/{realm}/protocol/openid-connect/token"
 URL_CLIENT = "{url}/admin/realms/{realm}/clients/{id}"
@@ -27,6 +28,9 @@ URL_CLIENTS = "{url}/admin/realms/{realm}/clients"
 URL_CLIENT_ROLES = "{url}/admin/realms/{realm}/clients/{id}/roles"
 URL_CLIENT_ROLE = "{url}/admin/realms/{realm}/clients/{id}/roles/{name}"
 URL_CLIENT_ROLE_COMPOSITES = "{url}/admin/realms/{realm}/clients/{id}/roles/{name}/composites"
+
+URL_CLIENT_ROLE_SCOPE_CLIENTS = "{url}/admin/realms/{realm}/clients/{id}/scope-mappings/clients/{scopeid}"
+URL_CLIENT_ROLE_SCOPE_REALM = "{url}/admin/realms/{realm}/clients/{id}/scope-mappings/realm"
 
 URL_REALM_ROLES = "{url}/admin/realms/{realm}/roles"
 URL_REALM_ROLE = "{url}/admin/realms/{realm}/roles/{name}"
@@ -182,8 +186,7 @@ def get_token(module_params):
             'password': auth_password,
         }
         # Remove empty items, for instance missing client_secret
-        payload = dict(
-            (k, v) for k, v in temp_payload.items() if v is not None)
+        payload = {k: v for k, v in temp_payload.items() if v is not None}
         try:
             r = json.loads(to_native(open_url(auth_url, method='POST',
                                               validate_certs=validate_certs, http_agent=http_agent, timeout=connection_timeout,
@@ -288,6 +291,37 @@ class KeycloakAPI(object):
 
         try:
             return json.loads(to_native(open_url(realm_info_url, method='GET', http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
+                                                 validate_certs=self.validate_certs).read()))
+
+        except HTTPError as e:
+            if e.code == 404:
+                return None
+            else:
+                self.fail_open_url(e, msg='Could not obtain realm %s: %s' % (realm, str(e)),
+                                   exception=traceback.format_exc())
+        except ValueError as e:
+            self.module.fail_json(msg='API returned incorrect JSON when trying to obtain realm %s: %s' % (realm, str(e)),
+                                  exception=traceback.format_exc())
+        except Exception as e:
+            self.module.fail_json(msg='Could not obtain realm %s: %s' % (realm, str(e)),
+                                  exception=traceback.format_exc())
+
+    def get_realm_keys_metadata_by_id(self, realm='master'):
+        """Obtain realm public info by id
+
+        :param realm: realm id
+
+        :return: None, or a 'KeysMetadataRepresentation'
+                 (https://www.keycloak.org/docs-api/latest/rest-api/index.html#KeysMetadataRepresentation)
+                 -- a dict containing the keys 'active' and 'keys', the former containing a mapping
+                 from algorithms to key-ids, the latter containing a list of dicts with key
+                 information.
+        """
+        realm_keys_metadata_url = URL_REALM_KEYS_METADATA.format(url=self.baseurl, realm=realm)
+
+        try:
+            return json.loads(to_native(open_url(realm_keys_metadata_url, method='GET', http_agent=self.http_agent, headers=self.restheaders,
                                                  timeout=self.connection_timeout,
                                                  validate_certs=self.validate_certs).read()))
 
@@ -1127,8 +1161,8 @@ class KeycloakAPI(object):
             # prefer an exception since this is almost certainly a programming error in the module itself.
             raise Exception("Unable to delete group - one of group ID or name must be provided.")
 
-        # only lookup the name if cid isn't provided.
-        # in the case that both are provided, prefer the ID, since it's one
+        # only lookup the name if cid is not provided.
+        # in the case that both are provided, prefer the ID, since it is one
         # less lookup.
         if cid is None and name is not None:
             for clientscope in self.get_clientscopes(realm=realm):
@@ -1466,6 +1500,23 @@ class KeycloakAPI(object):
             self.module.fail_json(msg="Could not fetch group %s in realm %s: %s"
                                       % (gid, realm, str(e)))
 
+    def get_subgroups(self, parent, realm="master"):
+        if 'subGroupCount' in parent:
+            # Since version 23, when GETting a group Keycloak does not
+            # return subGroups but only a subGroupCount.
+            # Children must be fetched in a second request.
+            if parent['subGroupCount'] == 0:
+                group_children = []
+            else:
+                group_children_url = URL_GROUP_CHILDREN.format(url=self.baseurl, realm=realm, groupid=parent['id'])
+                group_children = json.loads(to_native(open_url(group_children_url, method="GET", http_agent=self.http_agent, headers=self.restheaders,
+                                                               timeout=self.connection_timeout,
+                                                               validate_certs=self.validate_certs).read()))
+            subgroups = group_children
+        else:
+            subgroups = parent['subGroups']
+        return subgroups
+
     def get_group_by_name(self, name, realm="master", parents=None):
         """ Fetch a keycloak group within a realm based on its name.
 
@@ -1486,7 +1537,7 @@ class KeycloakAPI(object):
                 if not parent:
                     return None
 
-                all_groups = parent['subGroups']
+                all_groups = self.get_subgroups(parent, realm)
             else:
                 all_groups = self.get_groups(realm=realm)
 
@@ -1535,7 +1586,7 @@ class KeycloakAPI(object):
             return None
 
         for p in name_chain[1:]:
-            for sg in tmp['subGroups']:
+            for sg in self.get_subgroups(tmp):
                 pv, is_id = self._get_normed_group_parent(p)
 
                 if is_id:
@@ -1669,7 +1720,7 @@ class KeycloakAPI(object):
             raise Exception("Unable to delete group - one of group ID or name must be provided.")
 
         # only lookup the name if groupid isn't provided.
-        # in the case that both are provided, prefer the ID, since it's one
+        # in the case that both are provided, prefer the ID, since it is one
         # less lookup.
         if groupid is None and name is not None:
             for group in self.get_groups(realm=realm):
@@ -2021,7 +2072,7 @@ class KeycloakAPI(object):
 
     def get_authentication_flow_by_alias(self, alias, realm='master'):
         """
-        Get an authentication flow by it's alias
+        Get an authentication flow by its alias
         :param alias: Alias of the authentication flow to get.
         :param realm: Realm.
         :return: Authentication flow representation.
@@ -3079,6 +3130,105 @@ class KeycloakAPI(object):
                                                  validate_certs=self.validate_certs).read()))
         except Exception:
             return False
+
+    def get_client_role_scope_from_client(self, clientid, clientscopeid, realm="master"):
+        """ Fetch the roles associated with the client's scope for a specific client on the Keycloak server.
+        :param clientid: ID of the client from which to obtain the associated roles.
+        :param clientscopeid: ID of the client who owns the roles.
+        :param realm: Realm from which to obtain the scope.
+        :return: The client scope of roles from specified client.
+        """
+        client_role_scope_url = URL_CLIENT_ROLE_SCOPE_CLIENTS.format(url=self.baseurl, realm=realm, id=clientid, scopeid=clientscopeid)
+        try:
+            return json.loads(to_native(open_url(client_role_scope_url, method='GET', http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
+                                                 validate_certs=self.validate_certs).read()))
+        except Exception as e:
+            self.fail_open_url(e, msg='Could not fetch roles scope for client %s in realm %s: %s' % (clientid, realm, str(e)))
+
+    def update_client_role_scope_from_client(self, payload, clientid, clientscopeid, realm="master"):
+        """ Update and fetch the roles associated with the client's scope on the Keycloak server.
+        :param payload: List of roles to be added to the scope.
+        :param clientid: ID of the client to update scope.
+        :param clientscopeid: ID of the client who owns the roles.
+        :param realm: Realm from which to obtain the clients.
+        :return: The client scope of roles from specified client.
+        """
+        client_role_scope_url = URL_CLIENT_ROLE_SCOPE_CLIENTS.format(url=self.baseurl, realm=realm, id=clientid, scopeid=clientscopeid)
+        try:
+            open_url(client_role_scope_url, method='POST', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                     data=json.dumps(payload), validate_certs=self.validate_certs)
+
+        except Exception as e:
+            self.fail_open_url(e, msg='Could not update roles scope for client %s in realm %s: %s' % (clientid, realm, str(e)))
+
+        return self.get_client_role_scope_from_client(clientid, clientscopeid, realm)
+
+    def delete_client_role_scope_from_client(self, payload, clientid, clientscopeid, realm="master"):
+        """ Delete the roles contains in the payload from the client's scope on the Keycloak server.
+        :param payload: List of roles to be deleted.
+        :param clientid: ID of the client to delete roles from scope.
+        :param clientscopeid: ID of the client who owns the roles.
+        :param realm: Realm from which to obtain the clients.
+        :return: The client scope of roles from specified client.
+        """
+        client_role_scope_url = URL_CLIENT_ROLE_SCOPE_CLIENTS.format(url=self.baseurl, realm=realm, id=clientid, scopeid=clientscopeid)
+        try:
+            open_url(client_role_scope_url, method='DELETE', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                     data=json.dumps(payload), validate_certs=self.validate_certs)
+
+        except Exception as e:
+            self.fail_open_url(e, msg='Could not delete roles scope for client %s in realm %s: %s' % (clientid, realm, str(e)))
+
+        return self.get_client_role_scope_from_client(clientid, clientscopeid, realm)
+
+    def get_client_role_scope_from_realm(self, clientid, realm="master"):
+        """ Fetch the realm roles from the client's scope on the Keycloak server.
+        :param clientid: ID of the client from which to obtain the associated realm roles.
+        :param realm: Realm from which to obtain the clients.
+        :return: The client realm roles scope.
+        """
+        client_role_scope_url = URL_CLIENT_ROLE_SCOPE_REALM.format(url=self.baseurl, realm=realm, id=clientid)
+        try:
+            return json.loads(to_native(open_url(client_role_scope_url, method='GET', http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
+                                                 validate_certs=self.validate_certs).read()))
+        except Exception as e:
+            self.fail_open_url(e, msg='Could not fetch roles scope for client %s in realm %s: %s' % (clientid, realm, str(e)))
+
+    def update_client_role_scope_from_realm(self, payload, clientid, realm="master"):
+        """ Update and fetch the realm roles from the client's scope on the Keycloak server.
+        :param payload: List of realm roles to add.
+        :param clientid: ID of the client to update scope.
+        :param realm: Realm from which to obtain the clients.
+        :return: The client realm roles scope.
+        """
+        client_role_scope_url = URL_CLIENT_ROLE_SCOPE_REALM.format(url=self.baseurl, realm=realm, id=clientid)
+        try:
+            open_url(client_role_scope_url, method='POST', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                     data=json.dumps(payload), validate_certs=self.validate_certs)
+
+        except Exception as e:
+            self.fail_open_url(e, msg='Could not update roles scope for client %s in realm %s: %s' % (clientid, realm, str(e)))
+
+        return self.get_client_role_scope_from_realm(clientid, realm)
+
+    def delete_client_role_scope_from_realm(self, payload, clientid, realm="master"):
+        """ Delete the realm roles contains in the payload from the client's scope on the Keycloak server.
+        :param payload: List of realm roles to delete.
+        :param clientid: ID of the client to delete roles from scope.
+        :param realm: Realm from which to obtain the clients.
+        :return: The client realm roles scope.
+        """
+        client_role_scope_url = URL_CLIENT_ROLE_SCOPE_REALM.format(url=self.baseurl, realm=realm, id=clientid)
+        try:
+            open_url(client_role_scope_url, method='DELETE', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                     data=json.dumps(payload), validate_certs=self.validate_certs)
+
+        except Exception as e:
+            self.fail_open_url(e, msg='Could not delete roles scope for client %s in realm %s: %s' % (clientid, realm, str(e)))
+
+        return self.get_client_role_scope_from_realm(clientid, realm)
 
     def fail_open_url(self, e, msg, **kwargs):
         try:

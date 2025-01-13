@@ -120,10 +120,10 @@ class LookupModule(LookupBase):
         aws_secret_access_key = self.get_option('aws_secret_access_key')
         aws_session_token = self.get_option('aws_session_token')
 
-        context = dict(
-            (k, v) for k, v in kwargs.items()
+        context = {
+            k: v for k, v in kwargs.items()
             if k not in ('version', 'region', 'table', 'profile_name', 'aws_access_key_id', 'aws_secret_access_key', 'aws_session_token')
-        )
+        }
 
         kwargs_pass = {
             'profile_name': profile_name,
@@ -137,8 +137,8 @@ class LookupModule(LookupBase):
             try:
                 ret.append(credstash.getSecret(term, version, region, table, context=context, **kwargs_pass))
             except credstash.ItemNotFound:
-                raise AnsibleError('Key {0} not found'.format(term))
+                raise AnsibleError(f'Key {term} not found')
             except Exception as e:
-                raise AnsibleError('Encountered exception while fetching {0}: {1}'.format(term, e))
+                raise AnsibleError(f'Encountered exception while fetching {term}: {e}')
 
         return ret

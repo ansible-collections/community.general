@@ -7,37 +7,35 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: oneview_fc_network_info
 short_description: Retrieve the information about one or more of the OneView Fibre Channel Networks
 description:
-    - Retrieve the information about one or more of the Fibre Channel Networks from OneView.
+  - Retrieve the information about one or more of the Fibre Channel Networks from OneView.
 requirements:
-    - hpOneView >= 2.0.1
+  - hpOneView >= 2.0.1
 author:
-    - Felipe Bulsoni (@fgbulsoni)
-    - Thiago Miotto (@tmiotto)
-    - Adriane Cardozo (@adriane-cardozo)
+  - Felipe Bulsoni (@fgbulsoni)
+  - Thiago Miotto (@tmiotto)
+  - Adriane Cardozo (@adriane-cardozo)
 attributes:
-    check_mode:
-        version_added: 3.3.0
-        # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
+  check_mode:
+    version_added: 3.3.0
+    # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
 options:
-    name:
-      description:
-        - Fibre Channel Network name.
-      type: str
+  name:
+    description:
+      - Fibre Channel Network name.
+    type: str
 
 extends_documentation_fragment:
   - community.general.oneview
   - community.general.oneview.factsparams
   - community.general.attributes
   - community.general.attributes.info_module
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Gather information about all Fibre Channel Networks
   community.general.oneview_fc_network_info:
     config: /etc/oneview/oneview_config.json
@@ -73,14 +71,14 @@ EXAMPLES = '''
 - name: Print fetched information about Fibre Channel Network found by name
   ansible.builtin.debug:
     msg: "{{ result.fc_networks }}"
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 fc_networks:
-    description: Has all the OneView information about the Fibre Channel Networks.
-    returned: Always, but can be null.
-    type: dict
-'''
+  description: Has all the OneView information about the Fibre Channel Networks.
+  returned: Always, but can be null.
+  type: dict
+"""
 
 from ansible_collections.community.general.plugins.module_utils.oneview import OneViewModuleBase
 

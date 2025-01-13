@@ -17,8 +17,10 @@ description:
   This enables merging different trees in order of importance, or add role_vars to specific paths to influence different instances of the same role.
 options:
   _terms:
-    description: path(s) of files to read
+    description: Path(s) of files to read.
     required: true
+    type: list
+    elements: string
 '''
 
 EXAMPLES = r"""
@@ -156,7 +158,7 @@ def file_props(root, path):
     try:
         st = os.lstat(abspath)
     except OSError as e:
-        display.warning('filetree: Error using stat() on path %s (%s)' % (abspath, e))
+        display.warning(f'filetree: Error using stat() on path {abspath} ({e})')
         return None
 
     ret = dict(root=root, path=path)
@@ -170,7 +172,7 @@ def file_props(root, path):
         ret['state'] = 'file'
         ret['src'] = abspath
     else:
-        display.warning('filetree: Error file type of %s is not supported' % abspath)
+        display.warning(f'filetree: Error file type of {abspath} is not supported')
         return None
 
     ret['uid'] = st.st_uid
@@ -183,7 +185,7 @@ def file_props(root, path):
         ret['group'] = to_text(grp.getgrgid(st.st_gid).gr_name)
     except KeyError:
         ret['group'] = st.st_gid
-    ret['mode'] = '0%03o' % (stat.S_IMODE(st.st_mode))
+    ret['mode'] = f'0{stat.S_IMODE(st.st_mode):03o}'
     ret['size'] = st.st_size
     ret['mtime'] = st.st_mtime
     ret['ctime'] = st.st_ctime
@@ -210,7 +212,7 @@ class LookupModule(LookupBase):
             term_file = os.path.basename(term)
             dwimmed_path = self._loader.path_dwim_relative(basedir, 'files', os.path.dirname(term))
             path = os.path.join(dwimmed_path, term_file)
-            display.debug("Walking '{0}'".format(path))
+            display.debug(f"Walking '{path}'")
             for root, dirs, files in os.walk(path, topdown=True):
                 for entry in dirs + files:
                     relpath = os.path.relpath(os.path.join(root, entry), path)
@@ -219,7 +221,7 @@ class LookupModule(LookupBase):
                     if relpath not in [entry['path'] for entry in ret]:
                         props = file_props(path, relpath)
                         if props is not None:
-                            display.debug("  found '{0}'".format(os.path.join(path, relpath)))
+                            display.debug(f"  found '{os.path.join(path, relpath)}'")
                             ret.append(props)
 
         return ret

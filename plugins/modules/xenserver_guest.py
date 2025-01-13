@@ -8,43 +8,42 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: xenserver_guest
 short_description: Manages virtual machines running on Citrix Hypervisor/XenServer host or pool
-description: >
-   This module can be used to create new virtual machines from templates or other virtual machines,
-   modify various virtual machine components like network and disk, rename a virtual machine and
-   remove a virtual machine with associated components.
+description: >-
+  This module can be used to create new virtual machines from templates or other virtual machines, modify various virtual
+  machine components like network and disk, rename a virtual machine and remove a virtual machine with associated components.
 author:
-- Bojan Vitnik (@bvitnik) <bvitnik@mainstream.rs>
+  - Bojan Vitnik (@bvitnik) <bvitnik@mainstream.rs>
 notes:
-- Minimal supported version of XenServer is 5.6.
-- Module was tested with XenServer 6.5, 7.1, 7.2, 7.6, Citrix Hypervisor 8.0, XCP-ng 7.6 and 8.0.
-- 'To acquire XenAPI Python library, just run C(pip install XenAPI) on your Ansible Control Node. The library can also be found inside
-   Citrix Hypervisor/XenServer SDK (downloadable from Citrix website). Copy the XenAPI.py file from the SDK to your Python site-packages on your
-   Ansible Control Node to use it. Latest version of the library can also be acquired from GitHub:
-   U(https://raw.githubusercontent.com/xapi-project/xen-api/master/scripts/examples/python/XenAPI/XenAPI.py)'
-- 'If no scheme is specified in O(hostname), module defaults to C(http://) because C(https://) is problematic in most setups. Make sure you are
-   accessing XenServer host in trusted environment or use C(https://) scheme explicitly.'
-- 'To use C(https://) scheme for O(hostname) you have to either import host certificate to your OS certificate store or use O(validate_certs=false)
-   which requires XenAPI library from XenServer 7.2 SDK or newer and Python 2.7.9 or newer.'
-- 'Network configuration inside a guest OS, by using O(networks[].type), O(networks[].ip), O(networks[].gateway) etc. parameters, is supported on
-  XenServer 7.0 or newer for Windows guests by using official XenServer Guest agent support for network configuration. The module will try to
-  detect if such support is available and utilize it, else it will use a custom method of configuration via xenstore. Since XenServer Guest
-  agent only support None and Static types of network configuration, where None means DHCP configured interface, O(networks[].type) and O(networks[].type6)
-  values V(none) and V(dhcp) have same effect. More info here:
-  U(https://www.citrix.com/community/citrix-developer/citrix-hypervisor-developer/citrix-hypervisor-developing-products/citrix-hypervisor-staticip.html)'
-- 'On platforms without official support for network configuration inside a guest OS, network parameters will be written to xenstore
-  C(vm-data/networks/<vif_device>) key. Parameters can be inspected by using C(xenstore ls) and C(xenstore read) tools on \*nix guests or through
-  WMI interface on Windows guests. They can also be found in VM facts C(instance.xenstore_data) key as returned by the module. It is up to the user
-  to implement a boot time scripts or custom agent that will read the parameters from xenstore and configure network with given parameters.
-  Take note that for xenstore data to become available inside a guest, a VM restart is needed hence module will require VM restart if any
-  parameter is changed. This is a limitation of XenAPI and xenstore. Considering these limitations, network configuration through xenstore is most
-  useful for bootstrapping newly deployed VMs, much less for reconfiguring existing ones. More info here:
-  U(https://support.citrix.com/article/CTX226713)'
+  - Minimal supported version of XenServer is 5.6.
+  - Module was tested with XenServer 6.5, 7.1, 7.2, 7.6, Citrix Hypervisor 8.0, XCP-ng 7.6 and 8.0.
+  - 'To acquire XenAPI Python library, just run C(pip install XenAPI) on your Ansible Control Node. The library can also be
+    found inside Citrix Hypervisor/XenServer SDK (downloadable from Citrix website). Copy the C(XenAPI.py) file from the SDK
+    to your Python site-packages on your Ansible Control Node to use it. Latest version of the library can also be acquired
+    from GitHub: U(https://raw.githubusercontent.com/xapi-project/xen-api/master/scripts/examples/python/XenAPI/XenAPI.py).'
+  - If no scheme is specified in O(hostname), module defaults to C(http://) because C(https://) is problematic in most setups.
+    Make sure you are accessing XenServer host in trusted environment or use C(https://) scheme explicitly.
+  - To use C(https://) scheme for O(hostname) you have to either import host certificate to your OS certificate store or use
+    O(validate_certs=false) which requires XenAPI library from XenServer 7.2 SDK or newer and Python 2.7.9 or newer.
+  - 'Network configuration inside a guest OS, by using parameters O(networks[].type), O(networks[].ip), O(networks[].gateway)
+    and so on, is supported on XenServer 7.0 or newer for Windows guests by using official XenServer Guest agent support for
+    network configuration. The module tries to detect if such support is available and utilize it, else it uses a custom method
+    of configuration using xenstore. Since XenServer Guest agent only support None and Static types of network configuration,
+    where None means DHCP configured interface, O(networks[].type) and O(networks[].type6) values V(none) and V(dhcp) have
+    same effect. More info here:
+    U(https://web.archive.org/web/20180218110151/https://xenserver.org/blog/entry/set-windows-guest-vm-static-ip-address-in-xenserver.html).'
+  - 'On platforms without official support for network configuration inside a guest OS, network parameters are written to
+    xenstore C(vm-data/networks/<vif_device>) key. Parameters can be inspected by using C(xenstore ls) and C(xenstore read)
+    tools on \*nix guests or through WMI interface on Windows guests. They can also be found in VM facts C(instance.xenstore_data)
+    key as returned by the module. It is up to the user to implement a boot time scripts or custom agent that reads the parameters
+    from xenstore and configure network with given parameters. Take note that for xenstore data to become available inside
+    a guest, a VM restart is needed hence module requires VM restart if any parameter is changed. This is a limitation of
+    XenAPI and xenstore. Considering these limitations, network configuration through xenstore is most useful for bootstrapping
+    newly deployed VMs, much less for reconfiguring existing ones. More info here: U(https://support.citrix.com/article/CTX226713).'
 requirements:
-- XenAPI
+  - XenAPI
 attributes:
   check_mode:
     support: full
@@ -53,248 +52,255 @@ attributes:
 options:
   state:
     description:
-    - Specify the state VM should be in.
-    - If O(state) is set to V(present) and VM exists, ensure the VM configuration conforms to given parameters.
-    - If O(state) is set to V(present) and VM does not exist, then VM is deployed with given parameters.
-    - If O(state) is set to V(absent) and VM exists, then VM is removed with its associated components.
-    - If O(state) is set to V(poweredon) and VM does not exist, then VM is deployed with given parameters and powered on automatically.
+      - Specify the state VM should be in.
+      - If O(state) is set to V(present) and VM exists, ensure the VM configuration conforms to given parameters.
+      - If O(state) is set to V(present) and VM does not exist, then VM is deployed with given parameters.
+      - If O(state) is set to V(absent) and VM exists, then VM is removed with its associated components.
+      - If O(state) is set to V(poweredon) and VM does not exist, then VM is deployed with given parameters and powered on
+        automatically.
     type: str
     default: present
-    choices: [ present, absent, poweredon ]
+    choices: [present, absent, poweredon]
   name:
     description:
-    - Name of the VM to work with.
-    - VMs running on XenServer do not necessarily have unique names. The module will fail if multiple VMs with same name are found.
-    - In case of multiple VMs with same name, use O(uuid) to uniquely specify VM to manage.
-    - This parameter is case sensitive.
+      - Name of the VM to work with.
+      - VMs running on XenServer do not necessarily have unique names. The module fails if multiple VMs with same name are
+        found.
+      - In case of multiple VMs with same name, use O(uuid) to uniquely specify VM to manage.
+      - This parameter is case sensitive.
     type: str
-    aliases: [ name_label ]
+    aliases: [name_label]
   name_desc:
     description:
-    - VM description.
+      - VM description.
     type: str
   uuid:
     description:
-    - UUID of the VM to manage if known. This is XenServer's unique identifier.
-    - It is required if name is not unique.
-    - Please note that a supplied UUID will be ignored on VM creation, as XenServer creates the UUID internally.
+      - UUID of the VM to manage if known. This is XenServer's unique identifier.
+      - It is required if name is not unique.
+      - Please note that a supplied UUID is ignored on VM creation, as XenServer creates the UUID internally.
     type: str
   template:
     description:
-    - Name of a template, an existing VM (must be shut down) or a snapshot that should be used to create VM.
-    - Templates/VMs/snapshots on XenServer do not necessarily have unique names. The module will fail if multiple templates with same name are found.
-    - In case of multiple templates/VMs/snapshots with same name, use O(template_uuid) to uniquely specify source template.
-    - If VM already exists, this setting will be ignored.
-    - This parameter is case sensitive.
+      - Name of a template, an existing VM (must be shut down) or a snapshot that should be used to create VM.
+      - Templates/VMs/snapshots on XenServer do not necessarily have unique names. The module fails if multiple templates
+        with same name are found.
+      - In case of multiple templates/VMs/snapshots with same name, use O(template_uuid) to uniquely specify source template.
+      - If VM already exists, this setting is ignored.
+      - This parameter is case sensitive.
     type: str
-    aliases: [ template_src ]
+    aliases: [template_src]
   template_uuid:
     description:
-    - UUID of a template, an existing VM or a snapshot that should be used to create VM.
-    - It is required if template name is not unique.
+      - UUID of a template, an existing VM or a snapshot that should be used to create VM.
+      - It is required if template name is not unique.
     type: str
   is_template:
     description:
-    - Convert VM to template.
+      - Convert VM to template.
     type: bool
     default: false
   folder:
     description:
-    - Destination folder for VM.
-    - This parameter is case sensitive.
-    - 'Example:'
-    - '  folder: /folder1/folder2'
+      - Destination folder for VM.
+      - This parameter is case sensitive.
+      - 'Example: O(folder=/folder1/folder2).'
     type: str
   hardware:
     description:
-    - Manage VM's hardware parameters. VM needs to be shut down to reconfigure these parameters.
+      - Manage VM's hardware parameters. VM needs to be shut down to reconfigure these parameters.
     type: dict
     suboptions:
       num_cpus:
         description:
-        - Number of CPUs.
+          - Number of CPUs.
         type: int
       num_cpu_cores_per_socket:
         description:
-        - Number of Cores Per Socket. O(hardware.num_cpus) has to be a multiple of O(hardware.num_cpu_cores_per_socket).
+          - Number of Cores Per Socket. O(hardware.num_cpus) has to be a multiple of O(hardware.num_cpu_cores_per_socket).
         type: int
       memory_mb:
         description:
-        - Amount of memory in MB.
+          - Amount of memory in MB.
         type: int
   disks:
     description:
-    - A list of disks to add to VM.
-    - All parameters are case sensitive.
-    - Removing or detaching existing disks of VM is not supported.
-    - New disks are required to have either a O(disks[].size) or one of O(ignore:disks[].size_[tb,gb,mb,kb,b]) parameters specified.
-    - VM needs to be shut down to reconfigure disk size.
+      - A list of disks to add to VM.
+      - All parameters are case sensitive.
+      - Removing or detaching existing disks of VM is not supported.
+      - New disks are required to have either a O(disks[].size) or one of O(ignore:disks[].size_[tb,gb,mb,kb,b]) parameters
+        specified.
+      - VM needs to be shut down to reconfigure disk size.
     type: list
     elements: dict
-    aliases: [ disk ]
+    aliases: [disk]
     suboptions:
       size:
         description:
-        - 'Disk size with unit. Unit must be: V(b), V(kb), V(mb), V(gb), V(tb). VM needs to be shut down to reconfigure this parameter.'
-        - If no unit is specified, size is assumed to be in bytes.
+          - 'Disk size with unit. Unit must be: V(b), V(kb), V(mb), V(gb), V(tb). VM needs to be shut down to reconfigure
+            this parameter.'
+          - If no unit is specified, size is assumed to be in bytes.
         type: str
       size_b:
         description:
-        - Disk size in bytes.
+          - Disk size in bytes.
         type: str
       size_kb:
         description:
-        - Disk size in kilobytes.
+          - Disk size in kilobytes.
         type: str
       size_mb:
         description:
-        - Disk size in megabytes.
+          - Disk size in megabytes.
         type: str
       size_gb:
         description:
-        - Disk size in gigabytes.
+          - Disk size in gigabytes.
         type: str
       size_tb:
         description:
-        - Disk size in terabytes.
+          - Disk size in terabytes.
         type: str
       name:
         description:
-        - Disk name.
+          - Disk name.
         type: str
-        aliases: [ name_label ]
+        aliases: [name_label]
       name_desc:
         description:
-        - Disk description.
+          - Disk description.
         type: str
       sr:
         description:
-        - Storage Repository to create disk on. If not specified, will use default SR. Cannot be used for moving disk to other SR.
+          - Storage Repository to create disk on. If not specified, it uses default SR. Cannot be used for moving disk to
+            other SR.
         type: str
       sr_uuid:
         description:
-        - UUID of a SR to create disk on. Use if SR name is not unique.
+          - UUID of a SR to create disk on. Use if SR name is not unique.
         type: str
   cdrom:
     description:
-    - A CD-ROM configuration for the VM.
-    - All parameters are case sensitive.
+      - A CD-ROM configuration for the VM.
+      - All parameters are case sensitive.
     type: dict
     suboptions:
       type:
         description:
-        - The type of CD-ROM. With V(none) the CD-ROM device will be present but empty.
+          - The type of CD-ROM. When V(none) the CD-ROM device is present but empty.
         type: str
-        choices: [ none, iso ]
+        choices: [none, iso]
       iso_name:
         description:
-        - 'The file name of an ISO image from one of the XenServer ISO Libraries (implies O(cdrom.type=iso)).'
-        - Required if O(cdrom.type) is set to V(iso).
+          - The file name of an ISO image from one of the XenServer ISO Libraries (implies O(cdrom.type=iso)).
+          - Required if O(cdrom.type) is set to V(iso).
         type: str
   networks:
     description:
-    - A list of networks (in the order of the NICs).
-    - All parameters are case sensitive.
-    - Name is required for new NICs. Other parameters are optional in all cases.
+      - A list of networks (in the order of the NICs).
+      - All parameters are case sensitive.
+      - Name is required for new NICs. Other parameters are optional in all cases.
     type: list
     elements: dict
-    aliases: [ network ]
+    aliases: [network]
     suboptions:
-        name:
-          description:
+      name:
+        description:
           - Name of a XenServer network to attach the network interface to.
-          type: str
-          aliases: [ name_label ]
-        mac:
-          description:
+        type: str
+        aliases: [name_label]
+      mac:
+        description:
           - Customize MAC address of the interface.
-          type: str
-        type:
-          description:
-            - Type of IPv4 assignment. Value V(none) means whatever is default for OS.
-            - On some operating systems it could be DHCP configured (e.g. Windows) or unconfigured interface (e.g. Linux).
-          type: str
-          choices: [ none, dhcp, static ]
-        ip:
-          description:
-          - 'Static IPv4 address (implies O(networks[].type=static)). Can include prefix in format C(<IPv4 address>/<prefix>) instead of using C(netmask).'
-          type: str
-        netmask:
-          description:
+        type: str
+      type:
+        description:
+          - Type of IPv4 assignment. Value V(none) means whatever is default for OS.
+          - On some operating systems it could be DHCP configured (for example Windows) or unconfigured interface (for example
+            Linux).
+        type: str
+        choices: [none, dhcp, static]
+      ip:
+        description:
+          - Static IPv4 address (implies O(networks[].type=static)). Can include prefix in format C(<IPv4 address>/<prefix>)
+            instead of using C(netmask).
+        type: str
+      netmask:
+        description:
           - Static IPv4 netmask required for O(networks[].ip) if prefix is not specified.
-          type: str
-        gateway:
-          description:
+        type: str
+      gateway:
+        description:
           - Static IPv4 gateway.
-          type: str
-        type6:
-          description:
+        type: str
+      type6:
+        description:
           - Type of IPv6 assignment. Value V(none) means whatever is default for OS.
-          type: str
-          choices: [ none, dhcp, static ]
-        ip6:
-          description:
-          - 'Static IPv6 address (implies O(networks[].type6=static)) with prefix in format C(<IPv6 address>/<prefix>).'
-          type: str
-        gateway6:
-          description:
+        type: str
+        choices: [none, dhcp, static]
+      ip6:
+        description:
+          - Static IPv6 address (implies O(networks[].type6=static)) with prefix in format C(<IPv6 address>/<prefix>).
+        type: str
+      gateway6:
+        description:
           - Static IPv6 gateway.
-          type: str
+        type: str
   home_server:
     description:
-    - Name of a XenServer host that will be a Home Server for the VM.
-    - This parameter is case sensitive.
+      - Name of a XenServer host that is a Home Server for the VM.
+      - This parameter is case sensitive.
     type: str
   custom_params:
     description:
-    - Define a list of custom VM params to set on VM.
-    - Useful for advanced users familiar with managing VM params through xe CLI.
-    - A custom value object takes two fields O(custom_params[].key) and O(custom_params[].value) (see example below).
+      - Define a list of custom VM params to set on VM.
+      - Useful for advanced users familiar with managing VM params through C(xe) CLI.
+      - A custom value object takes two fields O(custom_params[].key) and O(custom_params[].value) (see example below).
     type: list
     elements: dict
     suboptions:
       key:
         description:
-        - VM param name.
+          - VM param name.
         type: str
         required: true
       value:
         description:
-        - VM param value.
+          - VM param value.
         type: raw
         required: true
   wait_for_ip_address:
     description:
-    - Wait until XenServer detects an IP address for the VM. If O(state) is set to V(absent), this parameter is ignored.
-    - This requires XenServer Tools to be preinstalled on the VM to work properly.
+      - Wait until XenServer detects an IP address for the VM. If O(state) is set to V(absent), this parameter is ignored.
+      - This requires XenServer Tools to be preinstalled on the VM to work properly.
     type: bool
     default: false
   state_change_timeout:
     description:
-    - 'By default, module will wait indefinitely for VM to acquire an IP address if O(wait_for_ip_address=true).'
-    - If this parameter is set to positive value, the module will instead wait specified number of seconds for the state change.
-    - In case of timeout, module will generate an error message.
+      - By default, the module waits indefinitely for VM to acquire an IP address if O(wait_for_ip_address=true).
+      - If this parameter is set to a positive value, the module instead waits the specified number of seconds for the state
+        change.
+      - In case of timeout, module generates an error message.
     type: int
     default: 0
   linked_clone:
     description:
-    - Whether to create a Linked Clone from the template, existing VM or snapshot. If no, will create a full copy.
-    - This is equivalent to C(Use storage-level fast disk clone) option in XenCenter.
+      - Whether to create a Linked Clone from the template, existing VM or snapshot. If V(false), it creates a full copy.
+      - This is equivalent to C(Use storage-level fast disk clone) option in XenCenter.
     type: bool
     default: false
   force:
     description:
-    - Ignore warnings and complete the actions.
-    - This parameter is useful for removing VM in running state or reconfiguring VM params that require VM to be shut down.
+      - Ignore warnings and complete the actions.
+      - This parameter is useful for removing VM in running state or reconfiguring VM params that require VM to be shut down.
     type: bool
     default: false
 extends_documentation_fragment:
-- community.general.xenserver.documentation
-- community.general.attributes
+  - community.general.xenserver.documentation
+  - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Create a VM from a template
   community.general.xenserver_guest:
     hostname: "{{ xenserver_hostname }}"
@@ -305,8 +311,8 @@ EXAMPLES = r'''
     state: poweredon
     template: CentOS 7
     disks:
-    - size_gb: 10
-      sr: my_sr
+      - size_gb: 10
+        sr: my_sr
     hardware:
       num_cpus: 6
       num_cpu_cores_per_socket: 3
@@ -315,8 +321,8 @@ EXAMPLES = r'''
       type: iso
       iso_name: guest-tools.iso
     networks:
-    - name: VM Network
-      mac: aa:bb:dd:aa:00:14
+      - name: VM Network
+        mac: aa:bb:dd:aa:00:14
     wait_for_ip_address: true
   delegate_to: localhost
   register: deploy
@@ -330,8 +336,8 @@ EXAMPLES = r'''
     name: testvm_6
     is_template: true
     disk:
-    - size_gb: 10
-      sr: my_sr
+      - size_gb: 10
+        sr: my_sr
     hardware:
       memory_mb: 512
       num_cpus: 1
@@ -365,8 +371,8 @@ EXAMPLES = r'''
     name: testvm_8
     state: present
     custom_params:
-    - key: HVM_boot_params
-      value: { "order": "ndc" }
+      - key: HVM_boot_params
+        value: {"order": "ndc"}
   delegate_to: localhost
 
 - name: Customize network parameters
@@ -376,154 +382,154 @@ EXAMPLES = r'''
     password: "{{ xenserver_password }}"
     name: testvm_10
     networks:
-    - name: VM Network
-      ip: 192.168.1.100/24
-      gateway: 192.168.1.1
-    - type: dhcp
+      - name: VM Network
+        ip: 192.168.1.100/24
+        gateway: 192.168.1.1
+      - type: dhcp
   delegate_to: localhost
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 instance:
-    description: Metadata about the VM
-    returned: always
-    type: dict
-    sample: {
-        "cdrom": {
-            "type": "none"
-        },
-        "customization_agent": "native",
-        "disks": [
-            {
-                "name": "testvm_11-0",
-                "name_desc": "",
-                "os_device": "xvda",
-                "size": 42949672960,
-                "sr": "Local storage",
-                "sr_uuid": "0af1245e-bdb0-ba33-1446-57a962ec4075",
-                "vbd_userdevice": "0"
-            },
-            {
-                "name": "testvm_11-1",
-                "name_desc": "",
-                "os_device": "xvdb",
-                "size": 42949672960,
-                "sr": "Local storage",
-                "sr_uuid": "0af1245e-bdb0-ba33-1446-57a962ec4075",
-                "vbd_userdevice": "1"
-            }
-        ],
-        "domid": "56",
-        "folder": "",
-        "hardware": {
-            "memory_mb": 8192,
-            "num_cpu_cores_per_socket": 2,
-            "num_cpus": 4
-        },
-        "home_server": "",
-        "is_template": false,
-        "name": "testvm_11",
+  description: Metadata about the VM.
+  returned: always
+  type: dict
+  sample: {
+    "cdrom": {
+      "type": "none"
+    },
+    "customization_agent": "native",
+    "disks": [
+      {
+        "name": "testvm_11-0",
         "name_desc": "",
-        "networks": [
-            {
-                "gateway": "192.168.0.254",
-                "gateway6": "fc00::fffe",
-                "ip": "192.168.0.200",
-                "ip6": [
-                    "fe80:0000:0000:0000:e9cb:625a:32c5:c291",
-                    "fc00:0000:0000:0000:0000:0000:0000:0001"
-                ],
-                "mac": "ba:91:3a:48:20:76",
-                "mtu": "1500",
-                "name": "Pool-wide network associated with eth1",
-                "netmask": "255.255.255.128",
-                "prefix": "25",
-                "prefix6": "64",
-                "vif_device": "0"
-            }
+        "os_device": "xvda",
+        "size": 42949672960,
+        "sr": "Local storage",
+        "sr_uuid": "0af1245e-bdb0-ba33-1446-57a962ec4075",
+        "vbd_userdevice": "0"
+      },
+      {
+        "name": "testvm_11-1",
+        "name_desc": "",
+        "os_device": "xvdb",
+        "size": 42949672960,
+        "sr": "Local storage",
+        "sr_uuid": "0af1245e-bdb0-ba33-1446-57a962ec4075",
+        "vbd_userdevice": "1"
+      }
+    ],
+    "domid": "56",
+    "folder": "",
+    "hardware": {
+      "memory_mb": 8192,
+      "num_cpu_cores_per_socket": 2,
+      "num_cpus": 4
+    },
+    "home_server": "",
+    "is_template": false,
+    "name": "testvm_11",
+    "name_desc": "",
+    "networks": [
+      {
+        "gateway": "192.168.0.254",
+        "gateway6": "fc00::fffe",
+        "ip": "192.168.0.200",
+        "ip6": [
+          "fe80:0000:0000:0000:e9cb:625a:32c5:c291",
+          "fc00:0000:0000:0000:0000:0000:0000:0001"
         ],
-        "other_config": {
-            "base_template_name": "Windows Server 2016 (64-bit)",
-            "import_task": "OpaqueRef:e43eb71c-45d6-5351-09ff-96e4fb7d0fa5",
-            "install-methods": "cdrom",
-            "instant": "true",
-            "mac_seed": "f83e8d8a-cfdc-b105-b054-ef5cb416b77e"
-        },
-        "platform": {
-            "acpi": "1",
-            "apic": "true",
-            "cores-per-socket": "2",
-            "device_id": "0002",
-            "hpet": "true",
-            "nx": "true",
-            "pae": "true",
-            "timeoffset": "-25200",
-            "vga": "std",
-            "videoram": "8",
-            "viridian": "true",
-            "viridian_reference_tsc": "true",
-            "viridian_time_ref_count": "true"
-        },
-        "state": "poweredon",
-        "uuid": "e3c0b2d5-5f05-424e-479c-d3df8b3e7cda",
-        "xenstore_data": {
-            "vm-data": ""
-        }
+        "mac": "ba:91:3a:48:20:76",
+        "mtu": "1500",
+        "name": "Pool-wide network associated with eth1",
+        "netmask": "255.255.255.128",
+        "prefix": "25",
+        "prefix6": "64",
+        "vif_device": "0"
+      }
+    ],
+    "other_config": {
+      "base_template_name": "Windows Server 2016 (64-bit)",
+      "import_task": "OpaqueRef:e43eb71c-45d6-5351-09ff-96e4fb7d0fa5",
+      "install-methods": "cdrom",
+      "instant": "true",
+      "mac_seed": "f83e8d8a-cfdc-b105-b054-ef5cb416b77e"
+    },
+    "platform": {
+      "acpi": "1",
+      "apic": "true",
+      "cores-per-socket": "2",
+      "device_id": "0002",
+      "hpet": "true",
+      "nx": "true",
+      "pae": "true",
+      "timeoffset": "-25200",
+      "vga": "std",
+      "videoram": "8",
+      "viridian": "true",
+      "viridian_reference_tsc": "true",
+      "viridian_time_ref_count": "true"
+    },
+    "state": "poweredon",
+    "uuid": "e3c0b2d5-5f05-424e-479c-d3df8b3e7cda",
+    "xenstore_data": {
+      "vm-data": ""
     }
+  }
 changes:
-    description: Detected or made changes to VM
-    returned: always
-    type: list
-    sample: [
+  description: Detected or made changes to VM.
+  returned: always
+  type: list
+  sample: [
+    {
+      "hardware": [
+        "num_cpus"
+      ]
+    },
+    {
+      "disks_changed": [
+        [],
+        [
+          "size"
+        ]
+      ]
+    },
+    {
+      "disks_new": [
         {
-            "hardware": [
-                "num_cpus"
-            ]
-        },
+          "name": "new-disk",
+          "name_desc": "",
+          "position": 2,
+          "size_gb": "4",
+          "vbd_userdevice": "2"
+        }
+      ]
+    },
+    {
+      "cdrom": [
+        "type",
+        "iso_name"
+      ]
+    },
+    {
+      "networks_changed": [
+        [
+          "mac"
+        ],
+      ]
+    },
+    {
+      "networks_new": [
         {
-            "disks_changed": [
-                [],
-                [
-                    "size"
-                ]
-            ]
-        },
-        {
-            "disks_new": [
-                {
-                    "name": "new-disk",
-                    "name_desc": "",
-                    "position": 2,
-                    "size_gb": "4",
-                    "vbd_userdevice": "2"
-                }
-            ]
-        },
-        {
-            "cdrom": [
-                "type",
-                "iso_name"
-            ]
-        },
-        {
-            "networks_changed": [
-                [
-                    "mac"
-                ],
-            ]
-        },
-        {
-            "networks_new": [
-                {
-                    "name": "Pool-wide network associated with eth2",
-                    "position": 1,
-                    "vif_device": "1"
-                }
-            ]
-        },
-        "need_poweredoff"
-    ]
-'''
+          "name": "Pool-wide network associated with eth2",
+          "position": 1,
+          "vif_device": "1"
+        }
+      ]
+    },
+    "need_poweredoff"
+  ]
+"""
 
 import re
 

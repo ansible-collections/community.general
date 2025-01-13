@@ -9,8 +9,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: dnsimple_info
 
 short_description: Pull basic info from DNSimple API
@@ -20,45 +19,45 @@ version_added: "4.2.0"
 description: Retrieve existing records and domains from DNSimple API.
 
 extends_documentation_fragment:
-    - community.general.attributes
-    - community.general.attributes.info_module
+  - community.general.attributes
+  - community.general.attributes.info_module
 
 options:
-    name:
-        description:
-          - The domain name to retrieve info from.
-          - Will return all associated records for this domain if specified.
-          - If not specified, will return all domains associated with the account ID.
-        type: str
+  name:
+    description:
+      - The domain name to retrieve info from.
+      - Will return all associated records for this domain if specified.
+      - If not specified, will return all domains associated with the account ID.
+    type: str
 
-    account_id:
-        description: The account ID to query.
-        required: true
-        type: str
+  account_id:
+    description: The account ID to query.
+    required: true
+    type: str
 
-    api_key:
-        description: The API key to use.
-        required: true
-        type: str
+  api_key:
+    description: The API key to use.
+    required: true
+    type: str
 
-    record:
-        description:
-          - The record to find.
-          - If specified, only this record will be returned instead of all records.
-        required: false
-        type: str
+  record:
+    description:
+      - The record to find.
+      - If specified, only this record will be returned instead of all records.
+    required: false
+    type: str
 
-    sandbox:
-        description: Whether or not to use sandbox environment.
-        required: false
-        default: false
-        type: bool
+  sandbox:
+    description: Whether or not to use sandbox environment.
+    required: false
+    default: false
+    type: bool
 
 author:
-    -  Edward Hilgendorf (@edhilgendorf)
-'''
+  - Edward Hilgendorf (@edhilgendorf)
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Get all domains from an account
   community.general.dnsimple_info:
     account_id: "1234"
@@ -76,15 +75,15 @@ EXAMPLES = r'''
     record: "subdomain"
     account_id: "1234"
     api_key: "1234"
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 dnsimple_domain_info:
-    description: Returns a list of dictionaries of all domains associated with the supplied account ID.
-    type: list
-    elements: dict
-    returned: success when O(name) is not specified
-    sample:
+  description: Returns a list of dictionaries of all domains associated with the supplied account ID.
+  type: list
+  elements: dict
+  returned: success when O(name) is not specified
+  sample:
     - account_id: 1234
       created_at: '2021-10-16T21:25:42Z'
       id: 123456
@@ -93,41 +92,41 @@ dnsimple_domain_info:
       reverse: false
       secondary: false
       updated_at: '2021-11-10T20:22:50Z'
-    contains:
-      account_id:
-        description: The account ID.
-        type: int
-      created_at:
-        description: When the domain entry was created.
-        type: str
-      id:
-        description: ID of the entry.
-        type: int
-      last_transferred_at:
-        description: Date the domain was transferred, or empty if not.
-        type: str
-      name:
-        description: Name of the record.
-        type: str
-      reverse:
-        description: Whether or not it is a reverse zone record.
-        type: bool
-      updated_at:
-        description: When the domain entry was updated.
-        type: str
+  contains:
+    account_id:
+      description: The account ID.
+      type: int
+    created_at:
+      description: When the domain entry was created.
+      type: str
+    id:
+      description: ID of the entry.
+      type: int
+    last_transferred_at:
+      description: Date the domain was transferred, or empty if not.
+      type: str
+    name:
+      description: Name of the record.
+      type: str
+    reverse:
+      description: Whether or not it is a reverse zone record.
+      type: bool
+    updated_at:
+      description: When the domain entry was updated.
+      type: str
 
 dnsimple_records_info:
-    description: Returns a list of dictionaries with all records for the domain supplied.
-    type: list
-    elements: dict
-    returned: success when O(name) is specified, but O(record) is not
-    sample:
+  description: Returns a list of dictionaries with all records for the domain supplied.
+  type: list
+  elements: dict
+  returned: success when O(name) is specified, but O(record) is not
+  sample:
     - content: ns1.dnsimple.com admin.dnsimple.com
       created_at: '2021-10-16T19:07:34Z'
       id: 12345
       name: 'catheadbiscuit'
-      parent_id: null
-      priority: null
+      parent_id:
+      priority:
       regions:
         - global
       system_record: true
@@ -135,55 +134,55 @@ dnsimple_records_info:
       type: SOA
       updated_at: '2021-11-15T23:55:51Z'
       zone_id: example.com
-    contains:
-      content:
-        description:  Content of the returned record.
-        type: str
-      created_at:
-        description: When the domain entry was created.
-        type: str
-      id:
-        description: ID of the entry.
-        type: int
-      name:
-        description: Name of the record.
-        type: str
-      parent_id:
-        description: Parent record or null.
-        type: int
-      priority:
-        description: Priority setting of the record.
-        type: str
-      regions:
-        description: List of regions where the record is available.
-        type: list
-      system_record:
-        description: Whether or not it is a system record.
-        type: bool
-      ttl:
-        description: Record TTL.
-        type: int
-      type:
-        description: Record type.
-        type: str
-      updated_at:
-        description: When the domain entry was updated.
-        type: str
-      zone_id:
-        description: ID of the zone that the record is associated with.
-        type: str
+  contains:
+    content:
+      description: Content of the returned record.
+      type: str
+    created_at:
+      description: When the domain entry was created.
+      type: str
+    id:
+      description: ID of the entry.
+      type: int
+    name:
+      description: Name of the record.
+      type: str
+    parent_id:
+      description: Parent record or null.
+      type: int
+    priority:
+      description: Priority setting of the record.
+      type: str
+    regions:
+      description: List of regions where the record is available.
+      type: list
+    system_record:
+      description: Whether or not it is a system record.
+      type: bool
+    ttl:
+      description: Record TTL.
+      type: int
+    type:
+      description: Record type.
+      type: str
+    updated_at:
+      description: When the domain entry was updated.
+      type: str
+    zone_id:
+      description: ID of the zone that the record is associated with.
+      type: str
 dnsimple_record_info:
-    description: Returns a list of dictionaries that match the record supplied.
-    returned: success when O(name) and O(record) are specified
-    type: list
-    elements: dict
-    sample:
+  description: Returns a list of dictionaries that match the record supplied.
+  returned: success when O(name) and O(record) are specified
+  type: list
+  elements: dict
+  sample:
     - content: 1.2.3.4
       created_at: '2021-11-15T23:55:51Z'
       id: 123456
       name: catheadbiscuit
-      parent_id: null
-      priority: null
+      parent_id:
+      priority:
       regions:
         - global
       system_record: false
@@ -191,44 +190,44 @@ dnsimple_record_info:
       type: A
       updated_at: '2021-11-15T23:55:51Z'
       zone_id: example.com
-    contains:
-      content:
-        description:  Content of the returned record.
-        type: str
-      created_at:
-        description: When the domain entry was created.
-        type: str
-      id:
-        description: ID of the entry.
-        type: int
-      name:
-        description: Name of the record.
-        type: str
-      parent_id:
-        description: Parent record or null.
-        type: int
-      priority:
-        description: Priority setting of the record.
-        type: str
-      regions:
-        description: List of regions where the record is available.
-        type: list
-      system_record:
-        description: Whether or not it is a system record.
-        type: bool
-      ttl:
-        description: Record TTL.
-        type: int
-      type:
-        description: Record type.
-        type: str
-      updated_at:
-        description: When the domain entry was updated.
-        type: str
-      zone_id:
-        description: ID of the zone that the record is associated with.
-        type: str
-'''
+  contains:
+    content:
+      description: Content of the returned record.
+      type: str
+    created_at:
+      description: When the domain entry was created.
+      type: str
+    id:
+      description: ID of the entry.
+      type: int
+    name:
+      description: Name of the record.
+      type: str
+    parent_id:
+      description: Parent record or null.
+      type: int
+    priority:
+      description: Priority setting of the record.
+      type: str
+    regions:
+      description: List of regions where the record is available.
+      type: list
+    system_record:
+      description: Whether or not it is a system record.
+      type: bool
+    ttl:
+      description: Record TTL.
+      type: int
+    type:
+      description: Record type.
+      type: str
+    updated_at:
+      description: When the domain entry was updated.
+      type: str
+    zone_id:
+      description: ID of the zone that the record is associated with.
+      type: str
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils import deps

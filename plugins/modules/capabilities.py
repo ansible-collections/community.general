@@ -8,48 +8,47 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: capabilities
 short_description: Manage Linux capabilities
 description:
-    - This module manipulates files privileges using the Linux capabilities(7) system.
+  - This module manipulates files privileges using the Linux capabilities(7) system.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    path:
-        description:
-            - Specifies the path to the file to be managed.
-        type: str
-        required: true
-        aliases: [ key ]
-    capability:
-        description:
-            - Desired capability to set (with operator and flags, if O(state=present)) or remove (if O(state=absent))
-        type: str
-        required: true
-        aliases: [ cap ]
-    state:
-        description:
-            - Whether the entry should be present or absent in the file's capabilities.
-        type: str
-        choices: [ absent, present ]
-        default: present
+  path:
+    description:
+      - Specifies the path to the file to be managed.
+    type: str
+    required: true
+    aliases: [key]
+  capability:
+    description:
+      - Desired capability to set (with operator and flags, if O(state=present)) or remove (if O(state=absent)).
+    type: str
+    required: true
+    aliases: [cap]
+  state:
+    description:
+      - Whether the entry should be present or absent in the file's capabilities.
+    type: str
+    choices: [absent, present]
+    default: present
 notes:
-    - The capabilities system will automatically transform operators and flags into the effective set,
-      so for example, C(cap_foo=ep) will probably become C(cap_foo+ep).
-    - This module does not attempt to determine the final operator and flags to compare,
-      so you will want to ensure that your capabilities argument matches the final capabilities.
+  - The capabilities system will automatically transform operators and flags into the effective set, so for example, C(cap_foo=ep)
+    will probably become C(cap_foo+ep).
+  - This module does not attempt to determine the final operator and flags to compare, so you will want to ensure that your
+    capabilities argument matches the final capabilities.
 author:
-- Nate Coraor (@natefoo)
-'''
+  - Nate Coraor (@natefoo)
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Set cap_sys_chroot+ep on /foo
   community.general.capabilities:
     path: /foo
@@ -61,7 +60,7 @@ EXAMPLES = r'''
     path: /bar
     capability: cap_net_bind_service
     state: absent
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -93,7 +92,7 @@ class CapabilitiesModule(object):
             if self.module.check_mode:
                 self.module.exit_json(changed=True, msg='capabilities changed')
             else:
-                # remove from current cap list if it's already set (but op/flags differ)
+                # remove from current cap list if it is already set (but op/flags differ)
                 current = list(filter(lambda x: x[0] != self.capability_tup[0], current))
                 # add new cap with correct op/flags
                 current.append(self.capability_tup)

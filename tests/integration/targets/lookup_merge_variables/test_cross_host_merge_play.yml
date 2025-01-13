@@ -1,0 +1,21 @@
+---
+# Copyright (c) 2020, Thales Netherlands
+# Copyright (c) 2021, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Test merge_variables lookup plugin (merging host reference variables)
+  hosts: host1
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Print merge result
+      ansible.builtin.debug:
+        msg: "{{ merge_result }}"
+    - name: Validate merge result
+      ansible.builtin.assert:
+        that:
+          - "merge_result | length == 3"
+          - "merge_result.host == 'host1'"
+          - "merge_result.user == 'usr'"
+          - "merge_result.pass == 'pwd'"

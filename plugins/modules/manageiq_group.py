@@ -8,8 +8,7 @@ from __future__ import (absolute_import, division, print_function)
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
-
+DOCUMENTATION = r"""
 module: manageiq_group
 
 short_description: Management of groups in ManageIQ
@@ -33,70 +32,69 @@ options:
   state:
     type: str
     description:
-    - absent - group should not exist, present - group should be.
+      - V(absent) - group should not exist,
+      - V(present) - group should exist.
     choices: ['absent', 'present']
     default: 'present'
   description:
     type: str
     description:
-    - The group description.
+      - The group description.
     required: true
-    default: null
   role_id:
     type: int
     description:
-    - The the group role id
+      - The the group role ID.
     required: false
-    default: null
   role:
     type: str
     description:
-    - The the group role name
-    - The O(role_id) has precedence over the O(role) when supplied.
+      - The the group role name.
+      - The O(role_id) has precedence over the O(role) when supplied.
     required: false
-    default: null
+    default:
   tenant_id:
     type: int
     description:
-    - The tenant for the group identified by the tenant id.
+      - The tenant for the group identified by the tenant ID.
     required: false
-    default: null
+    default:
   tenant:
     type: str
     description:
-    - The tenant for the group identified by the tenant name.
-    - The O(tenant_id) has precedence over the O(tenant) when supplied.
-    - Tenant names are case sensitive.
+      - The tenant for the group identified by the tenant name.
+      - The O(tenant_id) has precedence over the O(tenant) when supplied.
+      - Tenant names are case sensitive.
     required: false
-    default: null
+    default:
   managed_filters:
-    description: The tag values per category
+    description: The tag values per category.
     type: dict
     required: false
-    default: null
+    default:
   managed_filters_merge_mode:
     type: str
     description:
-    - In merge mode existing categories are kept or updated, new categories are added.
-    - In replace mode all categories will be replaced with the supplied O(managed_filters).
-    choices: [ merge, replace ]
+      - In merge mode existing categories are kept or updated, new categories are added.
+      - In replace mode all categories will be replaced with the supplied O(managed_filters).
+    choices: [merge, replace]
     default: replace
   belongsto_filters:
-    description: A list of strings with a reference to the allowed host, cluster or folder
+    description: A list of strings with a reference to the allowed host, cluster or folder.
     type: list
     elements: str
     required: false
-    default: null
+    default:
   belongsto_filters_merge_mode:
     type: str
     description:
-    - In merge mode existing settings are merged with the supplied O(belongsto_filters).
-    - In replace mode current values are replaced with the supplied O(belongsto_filters).
-    choices: [ merge, replace ]
+      - In merge mode existing settings are merged with the supplied O(belongsto_filters).
+      - In replace mode current values are replaced with the supplied O(belongsto_filters).
+    choices: [merge, replace]
     default: replace
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a group in ManageIQ with the role EvmRole-user and tenant 'my_tenant'
   community.general.manageiq_group:
     description: 'MyGroup-user'
@@ -106,7 +104,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false  # only do this when you trust the network!
+      validate_certs: false # only do this when you trust the network!
 
 - name: Create a group in ManageIQ with the role EvmRole-user and tenant with tenant_id 4
   community.general.manageiq_group:
@@ -117,33 +115,33 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false  # only do this when you trust the network!
+      validate_certs: false # only do this when you trust the network!
 
 - name:
-  - Create or update a group in ManageIQ with the role EvmRole-user and tenant my_tenant.
-  - Apply 3 prov_max_cpu and 2 department tags to the group.
-  - Limit access to a cluster for the group.
+    - Create or update a group in ManageIQ with the role EvmRole-user and tenant my_tenant.
+    - Apply 3 prov_max_cpu and 2 department tags to the group.
+    - Limit access to a cluster for the group.
   community.general.manageiq_group:
     description: 'MyGroup-user'
     role: 'EvmRole-user'
     tenant: my_tenant
     managed_filters:
       prov_max_cpu:
-      - '1'
-      - '2'
-      - '4'
+        - '1'
+        - '2'
+        - '4'
       department:
-      - defense
-      - engineering
+        - defense
+        - engineering
     managed_filters_merge_mode: replace
     belongsto_filters:
-    - "/belongsto/ExtManagementSystem|ProviderName/EmsFolder|Datacenters/EmsFolder|dc_name/EmsFolder|host/EmsCluster|Cluster name"
+      - "/belongsto/ExtManagementSystem|ProviderName/EmsFolder|Datacenters/EmsFolder|dc_name/EmsFolder|host/EmsCluster|Cluster name"
     belongsto_filters_merge_mode: merge
     manageiq_connection:
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false  # only do this when you trust the network!
+      validate_certs: false # only do this when you trust the network!
 
 - name: Delete a group in ManageIQ
   community.general.manageiq_group:
@@ -161,53 +159,53 @@ EXAMPLES = '''
     manageiq_connection:
       url: 'http://127.0.0.1:3000'
       token: 'sometoken'
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 group:
   description: The group.
   returned: success
   type: complex
   contains:
     description:
-      description: The group description
+      description: The group description.
       returned: success
       type: str
     id:
-      description: The group id
+      description: The group ID.
       returned: success
       type: int
     group_type:
-      description: The group type, system or user
+      description: The group type, system or user.
       returned: success
       type: str
     role:
-      description: The group role name
+      description: The group role name.
       returned: success
       type: str
     tenant:
-      description: The group tenant name
+      description: The group tenant name.
       returned: success
       type: str
     managed_filters:
-      description: The tag values per category
+      description: The tag values per category.
       returned: success
       type: dict
     belongsto_filters:
-      description: A list of strings with a reference to the allowed host, cluster or folder
+      description: A list of strings with a reference to the allowed host, cluster or folder.
       returned: success
       type: list
     created_on:
-      description: Group creation date
+      description: Group creation date.
       returned: success
       type: str
       sample: "2018-08-12T08:37:55+00:00"
     updated_on:
-      description: Group update date
+      description: Group update date.
       returned: success
       type: int
       sample: "2018-08-12T08:37:55+00:00"
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.manageiq import ManageIQ, manageiq_argument_spec

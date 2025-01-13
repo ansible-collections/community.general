@@ -7,7 +7,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: gitlab_milestone
 short_description: Creates/updates/deletes GitLab Milestones belonging to project or group
 version_added: 8.3.0
@@ -83,10 +83,10 @@ options:
           - Milestone's description.
         type: str
         default: null
-'''
+"""
 
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # same project's task can be executed for group
 - name: Create one milestone
   community.general.gitlab_milestone:
@@ -169,9 +169,9 @@ EXAMPLES = '''
     milestones:
       - title: milestone-abc123
       - title: milestone-two
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 milestones:
   description: Four lists of the milestones which were added, updated, removed or exist.
   returned: success
@@ -201,14 +201,13 @@ milestones_obj:
   description: API object.
   returned: success
   type: dict
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.api import basic_auth_argument_spec
 
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, gitlab_authentication, ensure_gitlab_package, find_group, find_project, gitlab
+    auth_argument_spec, gitlab_authentication, ensure_gitlab_package, find_group, find_project
 )
 from datetime import datetime
 
@@ -452,14 +451,7 @@ def main():
     milestone_list = module.params['milestones']
     state = module.params['state']
 
-    gitlab_version = gitlab.__version__
-    _min_gitlab = '3.2.0'
-    if LooseVersion(gitlab_version) < LooseVersion(_min_gitlab):
-        module.fail_json(msg="community.general.gitlab_milestone requires python-gitlab Python module >= %s "
-                             "(installed version: [%s]). Please upgrade "
-                             "python-gitlab to version %s or above." % (_min_gitlab, gitlab_version, _min_gitlab))
-
-    gitlab_instance = gitlab_authentication(module)
+    gitlab_instance = gitlab_authentication(module, min_version='3.2.0')
 
     # find_project can return None, but the other must exist
     gitlab_project_id = find_project(gitlab_instance, gitlab_project)

@@ -9,12 +9,11 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: ipinfoio_facts
 short_description: Retrieve IP geolocation facts of a host's IP address
 description:
-  - "Gather IP geolocation facts of a host's IP address using ipinfo.io API"
+  - Gather IP geolocation facts of a host's IP address using ipinfo.io API.
 author: "Aleksei Kostiuk (@akostyuk)"
 extends_documentation_fragment:
   - community.general.attributes
@@ -23,65 +22,65 @@ extends_documentation_fragment:
 options:
   timeout:
     description:
-      - HTTP connection timeout in seconds
+      - HTTP connection timeout in seconds.
     required: false
     default: 10
     type: int
   http_agent:
     description:
-      - Set http user agent
+      - Set http user agent.
     required: false
     default: "ansible-ipinfoio-module/0.0.1"
     type: str
 notes:
-  - "Check http://ipinfo.io/ for more information"
-'''
+  - Check U(http://ipinfo.io/) for more information.
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # Retrieve geolocation data of a host's IP address
 - name: Get IP geolocation data
   community.general.ipinfoio_facts:
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 ansible_facts:
-  description: "Dictionary of ip geolocation facts for a host's IP address"
+  description: "Dictionary of IP geolocation facts for a host's IP address."
   returned: changed
   type: complex
   contains:
     ip:
-      description: "Public IP address of a host"
+      description: "Public IP address of a host."
       type: str
       sample: "8.8.8.8"
     hostname:
-      description: Domain name
+      description: Domain name.
       type: str
       sample: "google-public-dns-a.google.com"
     country:
-      description: ISO 3166-1 alpha-2 country code
+      description: ISO 3166-1 alpha-2 country code.
       type: str
       sample: "US"
     region:
-      description: State or province name
+      description: State or province name.
       type: str
       sample: "California"
     city:
-      description: City name
+      description: City name.
       type: str
       sample: "Mountain View"
     loc:
-      description: Latitude and Longitude of the location
+      description: Latitude and Longitude of the location.
       type: str
       sample: "37.3860,-122.0838"
     org:
-      description: "organization's name"
+      description: "Organization's name."
       type: str
       sample: "AS3356 Level 3 Communications, Inc."
     postal:
-      description: Postal code
+      description: Postal code.
       type: str
       sample: "94035"
-'''
+"""
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible.module_utils.urls import fetch_url

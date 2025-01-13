@@ -9,15 +9,18 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: sensu_check
 short_description: Manage Sensu checks
 description:
   - Manage the checks that should be run on a machine by I(Sensu).
   - Most options do not have a default and will not be added to the check definition unless specified.
-  - All defaults except O(path), O(state), O(backup) and O(metric) are not managed by this module,
-  - they are simply specified for your convenience.
+  - All defaults except O(path), O(state), O(backup) and O(metric) are not managed by this module, they are simply specified
+    for your convenience.
+deprecated:
+  removed_in: 13.0.0
+  why: Sensu Core and Sensu Enterprise products have been End of Life since 2019/20.
+  alternative: Use Sensu Go and its accompanying collection C(sensu.sensu_go).
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -29,127 +32,126 @@ options:
   name:
     type: str
     description:
-      - The name of the check
-      - This is the key that is used to determine whether a check exists
+      - The name of the check.
+      - This is the key that is used to determine whether a check exists.
     required: true
   state:
     type: str
     description:
-      - Whether the check should be present or not
-    choices: [ 'present', 'absent' ]
+      - Whether the check should be present or not.
+    choices: ['present', 'absent']
     default: present
   path:
     type: str
     description:
-      - Path to the json file of the check to be added/removed.
+      - Path to the JSON file of the check to be added/removed.
       - Will be created if it does not exist (unless O(state=absent)).
-      - The parent folders need to exist when O(state=present), otherwise an error will be thrown
+      - The parent folders need to exist when O(state=present), otherwise an error will be thrown.
     default: /etc/sensu/conf.d/checks.json
   backup:
     description:
-      - Create a backup file (if yes), including the timestamp information so
-      - you can get the original file back if you somehow clobbered it incorrectly.
+      - Create a backup file (if yes), including the timestamp information so you can get the original file back if you somehow
+        clobbered it incorrectly.
     type: bool
     default: false
   command:
     type: str
     description:
-      - Path to the sensu check to run (not required when O(state=absent))
+      - Path to the sensu check to run (not required when O(state=absent)).
   handlers:
     type: list
     elements: str
     description:
-      - List of handlers to notify when the check fails
+      - List of handlers to notify when the check fails.
   subscribers:
     type: list
     elements: str
     description:
-      - List of subscribers/channels this check should run for
-      - See sensu_subscribers to subscribe a machine to a channel
+      - List of subscribers/channels this check should run for.
+      - See sensu_subscribers to subscribe a machine to a channel.
   interval:
     type: int
     description:
-      - Check interval in seconds
+      - Check interval in seconds.
   timeout:
     type: int
     description:
-      - Timeout for the check
+      - Timeout for the check.
       - If not specified, it defaults to 10.
   ttl:
     type: int
     description:
-      - Time to live in seconds until the check is considered stale
+      - Time to live in seconds until the check is considered stale.
   handle:
     description:
-      - Whether the check should be handled or not
+      - Whether the check should be handled or not.
       - Default is V(false).
     type: bool
   subdue_begin:
     type: str
     description:
-      - When to disable handling of check failures
+      - When to disable handling of check failures.
   subdue_end:
     type: str
     description:
-      - When to enable handling of check failures
+      - When to enable handling of check failures.
   dependencies:
     type: list
     elements: str
     description:
-      - Other checks this check depends on, if dependencies fail handling of this check will be disabled
+      - Other checks this check depends on, if dependencies fail handling of this check will be disabled.
   metric:
     description:
-      - Whether the check is a metric
+      - Whether the check is a metric.
     type: bool
     default: false
   standalone:
     description:
-      - Whether the check should be scheduled by the sensu client or server
-      - This option obviates the need for specifying the O(subscribers) option
+      - Whether the check should be scheduled by the sensu client or server.
+      - This option obviates the need for specifying the O(subscribers) option.
       - Default is V(false).
     type: bool
   publish:
     description:
       - Whether the check should be scheduled at all.
-      - You can still issue it via the sensu api
+      - You can still issue it using the sensu API.
       - Default is V(false).
     type: bool
   occurrences:
     type: int
     description:
-      - Number of event occurrences before the handler should take action
+      - Number of event occurrences before the handler should take action.
       - If not specified, defaults to 1.
   refresh:
     type: int
     description:
-      - Number of seconds handlers should wait before taking second action
+      - Number of seconds handlers should wait before taking second action.
   aggregate:
     description:
-      - Classifies the check as an aggregate check,
-      - making it available via the aggregate API
+      - Classifies the check as an aggregate check, making it available using the aggregate API.
       - Default is V(false).
     type: bool
   low_flap_threshold:
     type: int
     description:
-      - The low threshold for flap detection
+      - The low threshold for flap detection.
   high_flap_threshold:
     type: int
     description:
-      - The high threshold for flap detection
+      - The high threshold for flap detection.
   custom:
     type: dict
     description:
       - A hash/dictionary of custom parameters for mixing to the configuration.
-      - You can't rewrite others module parameters using this
+      - You cannot rewrite other module parameters using this.
   source:
     type: str
     description:
-      - The check source, used to create a JIT Sensu client for an external resource (e.g. a network switch).
+      - The check source, used to create a JIT Sensu client for an external resource (for example a network switch).
 author: "Anders Ingemann (@andsens)"
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # Fetch metrics about the CPU load every 60 seconds,
 # the sensu server has a handler called 'relay' which forwards stats to graphite
 - name: Get cpu metrics
@@ -177,7 +179,7 @@ EXAMPLES = '''
   community.general.sensu_check:
     name: check_disk_capacity
     state: absent
-'''
+"""
 
 import json
 import traceback

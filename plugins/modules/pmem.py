@@ -7,21 +7,20 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 author:
- - Masayoshi Mizuma (@mizumm)
+  - Masayoshi Mizuma (@mizumm)
 module: pmem
 short_description: Configure Intel Optane Persistent Memory modules
 version_added: 4.5.0
 description:
- - This module allows Configuring Intel Optane Persistent Memory modules
-   (PMem) using ipmctl and ndctl command line tools.
+  - This module allows Configuring Intel Optane Persistent Memory modules (PMem) using C(ipmctl) and C(ndctl) command line
+    tools.
 requirements:
- - ipmctl and ndctl command line tools
- - xmltodict
+  - C(ipmctl) and C(ndctl) command line tools
+  - xmltodict
 extends_documentation_fragment:
- - community.general.attributes
+  - community.general.attributes
 attributes:
   check_mode:
     support: none
@@ -30,33 +29,32 @@ attributes:
 options:
   appdirect:
     description:
-     - Percentage of the total capacity to use in AppDirect Mode (V(0)-V(100)).
-     - Create AppDirect capacity utilizing hardware interleaving across the
-       requested PMem modules if applicable given the specified target.
-     - Total of O(appdirect), O(memorymode) and O(reserved) must be V(100)
+      - Percentage of the total capacity to use in AppDirect Mode (V(0)-V(100)).
+      - Create AppDirect capacity utilizing hardware interleaving across the requested PMem modules if applicable given the
+        specified target.
+      - Total of O(appdirect), O(memorymode) and O(reserved) must be V(100).
     type: int
   appdirect_interleaved:
     description:
-     - Create AppDirect capacity that is interleaved any other PMem modules.
+      - Create AppDirect capacity that is interleaved any other PMem modules.
     type: bool
     required: false
     default: true
   memorymode:
     description:
-     - Percentage of the total capacity to use in Memory Mode (V(0)-V(100)).
+      - Percentage of the total capacity to use in Memory Mode (V(0)-V(100)).
     type: int
   reserved:
     description:
-     - Percentage of the capacity to reserve (V(0)-V(100)). O(reserved) will not be mapped
-       into the system physical address space and will be presented as reserved
-       capacity with Show Device and Show Memory Resources Commands.
-     - O(reserved) will be set automatically if this is not configured.
+      - Percentage of the capacity to reserve (V(0)-V(100)). O(reserved) will not be mapped into the system physical address
+        space and will be presented as reserved capacity with Show Device and Show Memory Resources Commands.
+      - O(reserved) will be set automatically if this is not configured.
     type: int
     required: false
   socket:
     description:
-     - This enables to set the configuration for each socket by using the socket ID.
-     - Total of O(appdirect), O(memorymode) and O(reserved) must be V(100) within one socket.
+      - This enables to set the configuration for each socket by using the socket ID.
+      - Total of O(appdirect), O(memorymode) and O(reserved) must be V(100) within one socket.
     type: list
     elements: dict
     suboptions:
@@ -66,18 +64,18 @@ options:
         required: true
       appdirect:
         description:
-         - Percentage of the total capacity to use in AppDirect Mode (V(0)-V(100)) within the socket ID.
+          - Percentage of the total capacity to use in AppDirect Mode (V(0)-V(100)) within the socket ID.
         type: int
         required: true
       appdirect_interleaved:
         description:
-         - Create AppDirect capacity that is interleaved any other PMem modules within the socket ID.
+          - Create AppDirect capacity that is interleaved any other PMem modules within the socket ID.
         type: bool
         required: false
         default: true
       memorymode:
         description:
-         - Percentage of the total capacity to use in Memory Mode (V(0)-V(100)) within the socket ID.
+          - Percentage of the total capacity to use in Memory Mode (V(0)-V(100)) within the socket ID.
         type: int
         required: true
       reserved:
@@ -86,86 +84,86 @@ options:
         type: int
   namespace:
     description:
-     - This enables to set the configuration for the namespace of the PMem.
+      - This enables to set the configuration for the namespace of the PMem.
     type: list
     elements: dict
     suboptions:
       mode:
         description:
-         - The mode of namespace. The detail of the mode is in the man page of ndctl-create-namespace.
+          - The mode of namespace. The detail of the mode is in the man page of ndctl-create-namespace.
         type: str
         required: true
         choices: ['raw', 'sector', 'fsdax', 'devdax']
       type:
         description:
-         - The type of namespace. The detail of the type is in the man page of ndctl-create-namespace.
+          - The type of namespace. The detail of the type is in the man page of ndctl-create-namespace.
         type: str
         required: false
         choices: ['pmem', 'blk']
       size:
         description:
-          - The size of namespace. This option supports the suffixes V(k) or V(K) or V(KB) for KiB,
-            V(m) or V(M) or V(MB) for MiB, V(g) or V(G) or V(GB) for GiB and V(t) or V(T) or V(TB) for TiB.
+          - The size of namespace. This option supports the suffixes V(k) or V(K) or V(KB) for KiB, V(m) or V(M) or V(MB)
+            for MiB, V(g) or V(G) or V(GB) for GiB and V(t) or V(T) or V(TB) for TiB.
           - This option is required if multiple namespaces are configured.
           - If this option is not set, all of the available space of a region is configured.
         type: str
         required: false
   namespace_append:
     description:
-     - Enable to append the new namespaces to the system.
-     - The default is V(false) so the all existing namespaces not listed in O(namespace) are removed.
+      - Enable to append the new namespaces to the system.
+      - The default is V(false) so the all existing namespaces not listed in O(namespace) are removed.
     type: bool
     default: false
     required: false
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 reboot_required:
-    description: Indicates that the system reboot is required to complete the PMem configuration.
-    returned: success
-    type: bool
-    sample: true
+  description: Indicates that the system reboot is required to complete the PMem configuration.
+  returned: success
+  type: bool
+  sample: true
 result:
-    description:
-     - Shows the value of AppDirect, Memory Mode and Reserved size in bytes.
-     - If O(socket) argument is provided, shows the values in each socket with C(socket) which contains the socket ID.
-     - If O(namespace) argument is provided, shows the detail of each namespace.
-    returned: success
-    type: list
-    elements: dict
-    contains:
-        appdirect:
-          description: AppDirect size in bytes.
-          type: int
-        memorymode:
-          description: Memory Mode size in bytes.
-          type: int
-        reserved:
-          description: Reserved size in bytes.
-          type: int
-        socket:
-          description: The socket ID to be configured.
-          type: int
-        namespace:
-          description: The list of the detail of namespace.
-          type: list
-    sample: [
-                {
-                    "appdirect": 111669149696,
-                    "memorymode": 970662608896,
-                    "reserved": 3626500096,
-                    "socket": 0
-                },
-                {
-                    "appdirect": 111669149696,
-                    "memorymode": 970662608896,
-                    "reserved": 3626500096,
-                    "socket": 1
-                }
-            ]
-'''
+  description:
+    - Shows the value of AppDirect, Memory Mode and Reserved size in bytes.
+    - If O(socket) argument is provided, shows the values in each socket with C(socket) which contains the socket ID.
+    - If O(namespace) argument is provided, shows the detail of each namespace.
+  returned: success
+  type: list
+  elements: dict
+  contains:
+    appdirect:
+      description: AppDirect size in bytes.
+      type: int
+    memorymode:
+      description: Memory Mode size in bytes.
+      type: int
+    reserved:
+      description: Reserved size in bytes.
+      type: int
+    socket:
+      description: The socket ID to be configured.
+      type: int
+    namespace:
+      description: The list of the detail of namespace.
+      type: list
+  sample: [
+    {
+      "appdirect": 111669149696,
+      "memorymode": 970662608896,
+      "reserved": 3626500096,
+      "socket": 0
+    },
+    {
+      "appdirect": 111669149696,
+      "memorymode": 970662608896,
+      "reserved": 3626500096,
+      "socket": 1
+    }
+  ]
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Configure the Pmem as AppDirect 10, Memory Mode 70, and the Reserved 20 percent.
   community.general.pmem:
     appdirect: 10
@@ -205,7 +203,7 @@ EXAMPLES = r'''
       - size: 320MB
         type: pmem
         mode: sector
-'''
+"""
 
 import json
 import re
@@ -538,7 +536,7 @@ class PersistentMemory(object):
             out = xmltodict.parse(goal, dict_constructor=dict)['ConfigGoalList']['ConfigGoal']
             for entry in out:
 
-                # Probably it's a bug of ipmctl to show the socket goal
+                # Probably it is a bug of ipmctl to show the socket goal
                 # which isn't specified by the -socket option.
                 # Anyway, filter the noise out here:
                 if skt and skt['id'] != int(entry['SocketID'], 16):

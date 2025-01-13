@@ -25,12 +25,14 @@ DOCUMENTATION = '''
       executable:
             description:
                 - Binary file to execute Hiera.
+            type: string
             default: '/usr/bin/hiera'
             env:
                 - name: ANSIBLE_HIERA_BIN
       config_file:
             description:
                 - File that describes the hierarchy of Hiera.
+            type: string
             default: '/etc/hiera.yaml'
             env:
                 - name: ANSIBLE_HIERA_CFG
@@ -77,8 +79,7 @@ class Hiera(object):
 
         pargs.extend(hiera_key)
 
-        rc, output, err = run_cmd("{0} -c {1} {2}".format(
-            self.hiera_bin, self.hiera_cfg, hiera_key[0]))
+        rc, output, err = run_cmd(f"{self.hiera_bin} -c {self.hiera_cfg} {hiera_key[0]}")
 
         return to_text(output.strip())
 

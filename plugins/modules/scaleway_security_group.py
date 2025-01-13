@@ -12,16 +12,15 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: scaleway_security_group
 short_description: Scaleway Security Group management module
 author: Antoine Barbare (@abarbare)
 description:
-    - "This module manages Security Group on Scaleway account U(https://developer.scaleway.com)."
+  - This module manages Security Group on Scaleway account U(https://developer.scaleway.com).
 extends_documentation_fragment:
-    - community.general.scaleway
-    - community.general.attributes
+  - community.general.scaleway
+  - community.general.attributes
 
 attributes:
   check_mode:
@@ -34,7 +33,7 @@ options:
     description:
       - Indicate desired state of the Security Group.
     type: str
-    choices: [ absent, present ]
+    choices: [absent, present]
     default: present
 
   organization:
@@ -79,21 +78,21 @@ options:
     description:
       - Default policy for incoming traffic.
     type: str
-    choices: [ accept, drop ]
+    choices: [accept, drop]
 
   outbound_default_policy:
     description:
       - Default policy for outcoming traffic.
     type: str
-    choices: [ accept, drop ]
+    choices: [accept, drop]
 
   organization_default:
     description:
       - Create security group to be the default one.
     type: bool
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a Security Group
   community.general.scaleway_security_group:
     state: present
@@ -106,9 +105,9 @@ EXAMPLES = '''
     outbound_default_policy: accept
     organization_default: false
   register: security_group_creation_task
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 data:
     description: This is only present when O(state=present).
     returned: when O(state=present)
@@ -127,7 +126,7 @@ data:
             "stateful": false
         }
     }
-'''
+"""
 
 from ansible_collections.community.general.plugins.module_utils.scaleway import SCALEWAY_LOCATION, scaleway_argument_spec, Scaleway
 from ansible.module_utils.basic import AnsibleModule
@@ -135,11 +134,11 @@ from uuid import uuid4
 
 
 def payload_from_security_group(security_group):
-    return dict(
-        (k, v)
+    return {
+        k: v
         for k, v in security_group.items()
         if k != 'id' and v is not None
-    )
+    }
 
 
 def present_strategy(api, security_group):
@@ -149,8 +148,7 @@ def present_strategy(api, security_group):
     if not response.ok:
         api.module.fail_json(msg='Error getting security groups "%s": "%s" (%s)' % (response.info['msg'], response.json['message'], response.json))
 
-    security_group_lookup = dict((sg['name'], sg)
-                                 for sg in response.json['security_groups'])
+    security_group_lookup = {sg['name']: sg for sg in response.json['security_groups']}
 
     if security_group['name'] not in security_group_lookup.keys():
         ret['changed'] = True
@@ -181,8 +179,7 @@ def absent_strategy(api, security_group):
     if not response.ok:
         api.module.fail_json(msg='Error getting security groups "%s": "%s" (%s)' % (response.info['msg'], response.json['message'], response.json))
 
-    security_group_lookup = dict((sg['name'], sg)
-                                 for sg in response.json['security_groups'])
+    security_group_lookup = {sg['name']: sg for sg in response.json['security_groups']}
     if security_group['name'] not in security_group_lookup.keys():
         return ret
 

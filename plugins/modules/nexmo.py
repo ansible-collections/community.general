@@ -9,11 +9,11 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: nexmo
-short_description: Send a SMS via nexmo
+short_description: Send a SMS using nexmo
 description:
-    - Send a SMS message via nexmo
+  - Send a SMS message using nexmo.
 author: "Matt Martz (@sivel)"
 attributes:
   check_mode:
@@ -24,42 +24,41 @@ options:
   api_key:
     type: str
     description:
-      - Nexmo API Key
+      - Nexmo API Key.
     required: true
   api_secret:
     type: str
     description:
-      - Nexmo API Secret
+      - Nexmo API Secret.
     required: true
   src:
     type: int
     description:
-       - Nexmo Number to send from
+      - Nexmo Number to send from.
     required: true
   dest:
     type: list
     elements: int
     description:
-      - Phone number(s) to send SMS message to
+      - Phone number(s) to send SMS message to.
     required: true
   msg:
     type: str
     description:
-      - Message to text to send. Messages longer than 160 characters will be
-        split into multiple messages
+      - Message to text to send. Messages longer than 160 characters will be split into multiple messages.
     required: true
   validate_certs:
     description:
-      - If V(false), SSL certificates will not be validated. This should only be used
-        on personally controlled sites using self-signed certificates.
+      - If V(false), SSL certificates will not be validated. This should only be used on personally controlled sites using
+        self-signed certificates.
     type: bool
     default: true
 extends_documentation_fragment:
   - ansible.builtin.url
   - community.general.attributes
-'''
+"""
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Send notification message via Nexmo
   community.general.nexmo:
     api_key: 640c8a53

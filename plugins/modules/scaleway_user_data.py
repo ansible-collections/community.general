@@ -13,17 +13,16 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: scaleway_user_data
 short_description: Scaleway user_data management module
 author: Remy Leone (@remyleone)
 description:
-    - This module manages user_data on compute instances on Scaleway.
-    - It can be used to configure cloud-init for instance.
+  - This module manages user_data on compute instances on Scaleway.
+  - It can be used to configure cloud-init for instance.
 extends_documentation_fragment:
-- community.general.scaleway
-- community.general.attributes
+  - community.general.scaleway
+  - community.general.attributes
 
 attributes:
   check_mode:
@@ -36,20 +35,20 @@ options:
   server_id:
     type: str
     description:
-    - Scaleway Compute instance ID of the server.
+      - Scaleway Compute instance ID of the server.
     required: true
 
   user_data:
     type: dict
     description:
-    - User defined data. Typically used with C(cloud-init).
-    - Pass your C(cloud-init) script here as a string.
+      - User defined data. Typically used with C(cloud-init).
+      - Pass your C(cloud-init) script here as a string.
     required: false
 
   region:
     type: str
     description:
-    - Scaleway compute zone.
+      - Scaleway compute zone.
     required: true
     choices:
       - ams1
@@ -60,19 +59,19 @@ options:
       - EMEA-FR-PAR2
       - waw1
       - EMEA-PL-WAW1
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Update the cloud-init
   community.general.scaleway_user_data:
     server_id: '5a33b4ab-57dd-4eb6-8b0a-d95eb63492ce'
     region: ams1
     user_data:
       cloud-init: 'final_message: "Hello World!"'
-'''
+"""
 
-RETURN = '''
-'''
+RETURN = r"""
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.scaleway import SCALEWAY_LOCATION, scaleway_argument_spec, Scaleway
@@ -129,10 +128,10 @@ def core(module):
         compute_api.module.fail_json(msg=msg)
 
     present_user_data_keys = user_data_list.json["user_data"]
-    present_user_data = dict(
-        (key, get_user_data(compute_api=compute_api, server_id=server_id, key=key))
+    present_user_data = {
+        key: get_user_data(compute_api=compute_api, server_id=server_id, key=key)
         for key in present_user_data_keys
-    )
+    }
 
     if present_user_data == user_data:
         module.exit_json(changed=changed, msg=user_data_list.json)
@@ -149,7 +148,7 @@ def core(module):
 
     # Then we patch keys that are different
     for key, value in user_data.items():
-        if key not in present_user_data or user_data[key] != present_user_data[key]:
+        if key not in present_user_data or value != present_user_data[key]:
 
             changed = True
             if compute_api.module.check_mode:

@@ -8,18 +8,16 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: rhsm_release
 short_description: Set or Unset RHSM Release version
 description:
   - Sets or unsets the release version used by RHSM repositories.
 notes:
-  - This module will fail on an unregistered system.
-    Use the M(community.general.redhat_subscription) module to register a system
-    prior to setting the RHSM release.
-  - It is possible to interact with C(subscription-manager) only as root,
-    so root permissions are required to successfully run this module.
+  - This module will fail on an unregistered system. Use the M(community.general.redhat_subscription) module to register a
+    system prior to setting the RHSM release.
+  - It is possible to interact with C(subscription-manager) only as root, so root permissions are required to successfully
+    run this module.
 requirements:
   - Red Hat Enterprise Linux 6+ with subscription-manager installed
 extends_documentation_fragment:
@@ -37,9 +35,9 @@ options:
     type: str
 author:
   - Sean Myers (@seandst)
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # Set release version to 7.1
 - name: Set RHSM release version
   community.general.rhsm_release:
@@ -53,15 +51,15 @@ EXAMPLES = '''
 # Unset release version
 - name: Unset RHSM release release
   community.general.rhsm_release:
-    release: null
-'''
+    release:
+"""
 
-RETURN = '''
+RETURN = r"""
 current_release:
-  description: The current RHSM release version value
+  description: The current RHSM release version value.
   returned: success
   type: str
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 

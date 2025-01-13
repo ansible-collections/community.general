@@ -9,13 +9,16 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: clc_server_snapshot
 short_description: Create, Delete and Restore server snapshots in CenturyLink Cloud
 description:
   - An Ansible module to Create, Delete and Restore server snapshots in CenturyLink Cloud.
 extends_documentation_fragment:
   - community.general.attributes
+  - community.general.clc
+author:
+  - "CLC Runner (@clc-runner)"
 attributes:
   check_mode:
     support: full
@@ -24,7 +27,7 @@ attributes:
 options:
   server_ids:
     description:
-      - The list of CLC server Ids.
+      - The list of CLC server IDs.
     type: list
     required: true
     elements: str
@@ -47,31 +50,16 @@ options:
     default: 'True'
     required: false
     type: str
-requirements:
-    - python = 2.7
-    - requests >= 2.5.0
-    - clc-sdk
-author: "CLC Runner (@clc-runner)"
-notes:
-    - To use this module, it is required to set the below environment variables which enables access to the
-      Centurylink Cloud
-          - CLC_V2_API_USERNAME, the account login id for the centurylink cloud
-          - CLC_V2_API_PASSWORD, the account password for the centurylink cloud
-    - Alternatively, the module accepts the API token and account alias. The API token can be generated using the
-      CLC account login and password via the HTTP api call @ https://api.ctl.io/v2/authentication/login
-          - CLC_V2_API_TOKEN, the API token generated from https://api.ctl.io/v2/authentication/login
-          - CLC_ACCT_ALIAS, the account alias associated with the centurylink cloud
-    - Users can set CLC_V2_API_URL to specify an endpoint for pointing to a different CLC environment.
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # Note - You must set the CLC_V2_API_USERNAME And CLC_V2_API_PASSWD Environment variables before running these examples
 
 - name: Create server snapshot
   community.general.clc_server_snapshot:
     server_ids:
-        - UC1TEST-SVR01
-        - UC1TEST-SVR02
+      - UC1TEST-SVR01
+      - UC1TEST-SVR02
     expiration_days: 10
     wait: true
     state: present
@@ -79,31 +67,27 @@ EXAMPLES = '''
 - name: Restore server snapshot
   community.general.clc_server_snapshot:
     server_ids:
-        - UC1TEST-SVR01
-        - UC1TEST-SVR02
+      - UC1TEST-SVR01
+      - UC1TEST-SVR02
     wait: true
     state: restore
 
 - name: Delete server snapshot
   community.general.clc_server_snapshot:
     server_ids:
-        - UC1TEST-SVR01
-        - UC1TEST-SVR02
+      - UC1TEST-SVR01
+      - UC1TEST-SVR02
     wait: true
     state: absent
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 server_ids:
-    description: The list of server ids that are changed
-    returned: success
-    type: list
-    sample:
-        [
-            "UC1TEST-SVR01",
-            "UC1TEST-SVR02"
-        ]
-'''
+  description: The list of server IDs that are changed.
+  returned: success
+  type: list
+  sample: ["UC1TEST-SVR01", "UC1TEST-SVR02"]
+"""
 
 __version__ = '${version}'
 

@@ -9,126 +9,114 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: lxd_profile
 short_description: Manage LXD profiles
 description:
-  - Management of LXD profiles
+  - Management of LXD profiles.
 author: "Hiroaki Nakamura (@hnakamur)"
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    name:
-        description:
-          - Name of a profile.
-        required: true
-        type: str
-    project:
-        description:
-         - 'Project of a profile.
-           See U(https://documentation.ubuntu.com/lxd/en/latest/projects/).'
-        type: str
-        required: false
-        version_added: 4.8.0
+  name:
     description:
-        description:
-          - Description of the profile.
-        type: str
-    config:
-        description:
-          - 'The config for the instance (e.g. {"limits.memory": "4GB"}).
-            See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/profiles/profile_get).'
-          - If the profile already exists and its "config" value in metadata
-            obtained from
-            GET /1.0/profiles/<name>
-            U(https://documentation.ubuntu.com/lxd/en/latest/api/#/profiles/profile_get)
-            are different, then this module tries to apply the configurations
-            U(https://documentation.ubuntu.com/lxd/en/latest/api/#/profiles/profile_put).
-          - Not all config values are supported to apply the existing profile.
-            Maybe you need to delete and recreate a profile.
-        required: false
-        type: dict
-    devices:
-        description:
-          - 'The devices for the profile
-            (e.g. {"rootfs": {"path": "/dev/kvm", "type": "unix-char"}).
-            See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/profiles/profile_get).'
-        required: false
-        type: dict
-    new_name:
-        description:
-          - A new name of a profile.
-          - If this parameter is specified a profile will be renamed to this name.
-            See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/profiles/profile_post).
-        required: false
-        type: str
-    merge_profile:
-        description:
-            - Merge the configuration of the present profile with the new desired configuration,
-              instead of replacing it.
-        required: false
-        default: false
-        type: bool
-        version_added: 2.1.0
-    state:
-        choices:
-          - present
-          - absent
-        description:
-          - Define the state of a profile.
-        required: false
-        default: present
-        type: str
-    url:
-        description:
-          - The unix domain socket path or the https URL for the LXD server.
-        required: false
-        default: unix:/var/lib/lxd/unix.socket
-        type: str
-    snap_url:
-        description:
-          - The unix domain socket path when LXD is installed by snap package manager.
-        required: false
-        default: unix:/var/snap/lxd/common/lxd/unix.socket
-        type: str
-    client_key:
-        description:
-          - The client certificate key file path.
-          - If not specified, it defaults to C($HOME/.config/lxc/client.key).
-        required: false
-        aliases: [ key_file ]
-        type: path
-    client_cert:
-        description:
-          - The client certificate file path.
-          - If not specified, it defaults to C($HOME/.config/lxc/client.crt).
-        required: false
-        aliases: [ cert_file ]
-        type: path
-    trust_password:
-        description:
-          - The client trusted password.
-          - You need to set this password on the LXD server before
-            running this module using the following command.
-            lxc config set core.trust_password <some random password>
-            See U(https://www.stgraber.org/2016/04/18/lxd-api-direct-interaction/)
-          - If trust_password is set, this module send a request for
-            authentication before sending any requests.
-        required: false
-        type: str
+      - Name of a profile.
+    required: true
+    type: str
+  project:
+    description:
+      - Project of a profile. See U(https://documentation.ubuntu.com/lxd/en/latest/projects/).
+    type: str
+    required: false
+    version_added: 4.8.0
+  description:
+    description:
+      - Description of the profile.
+    type: str
+  config:
+    description:
+      - 'The config for the instance (for example V({"limits.memory": "4GB"})).'
+      - See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/profiles/profile_get).
+      - If the profile already exists and its C(config) value in metadata obtained from GET /1.0/profiles/<name>
+        U(https://documentation.ubuntu.com/lxd/en/latest/api/#/profiles/profile_get)
+        are different, then this module tries to apply the configurations U(https://documentation.ubuntu.com/lxd/en/latest/api/#/profiles/profile_put).
+      - Not all config values are supported to apply the existing profile. Maybe you need to delete and recreate a profile.
+    required: false
+    type: dict
+  devices:
+    description:
+      - 'The devices for the profile (for example V({"rootfs": {"path": "/dev/kvm", "type": "unix-char"})).'
+      - See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/profiles/profile_get).
+    required: false
+    type: dict
+  new_name:
+    description:
+      - A new name of a profile.
+      - If this parameter is specified a profile will be renamed to this name.
+      - See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/profiles/profile_post).
+    required: false
+    type: str
+  merge_profile:
+    description:
+      - Merge the configuration of the present profile with the new desired configuration, instead of replacing it.
+    required: false
+    default: false
+    type: bool
+    version_added: 2.1.0
+  state:
+    choices:
+      - present
+      - absent
+    description:
+      - Define the state of a profile.
+    required: false
+    default: present
+    type: str
+  url:
+    description:
+      - The unix domain socket path or the https URL for the LXD server.
+    required: false
+    default: unix:/var/lib/lxd/unix.socket
+    type: str
+  snap_url:
+    description:
+      - The unix domain socket path when LXD is installed by snap package manager.
+    required: false
+    default: unix:/var/snap/lxd/common/lxd/unix.socket
+    type: str
+  client_key:
+    description:
+      - The client certificate key file path.
+      - If not specified, it defaults to C($HOME/.config/lxc/client.key).
+    required: false
+    aliases: [key_file]
+    type: path
+  client_cert:
+    description:
+      - The client certificate file path.
+      - If not specified, it defaults to C($HOME/.config/lxc/client.crt).
+    required: false
+    aliases: [cert_file]
+    type: path
+  trust_password:
+    description:
+      - The client trusted password.
+      - 'You need to set this password on the LXD server before running this module using the following command: C(lxc config
+        set core.trust_password <some random password>). See U(https://www.stgraber.org/2016/04/18/lxd-api-direct-interaction/).'
+      - If O(trust_password) is set, this module send a request for authentication before sending any requests.
+    required: false
+    type: str
 notes:
-  - Profiles must have a unique name. If you attempt to create a profile
-    with a name that already existed in the users namespace the module will
-    simply return as "unchanged".
-'''
+  - Profiles must have a unique name. If you attempt to create a profile with a name that already existed in the users namespace
+    the module will simply return as "unchanged".
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # An example for creating a profile
 - hosts: localhost
   connection: local
@@ -162,22 +150,22 @@ EXAMPLES = '''
 - hosts: localhost
   connection: local
   tasks:
-  - name: Create macvlan profile
-    community.general.lxd_profile:
-      url: https://127.0.0.1:8443
-      # These client_cert and client_key values are equal to the default values.
-      #client_cert: "{{ lookup('env', 'HOME') }}/.config/lxc/client.crt"
-      #client_key: "{{ lookup('env', 'HOME') }}/.config/lxc/client.key"
-      trust_password: mypassword
-      name: macvlan
-      state: present
-      config: {}
-      description: my macvlan profile
-      devices:
-        eth0:
-          nictype: macvlan
-          parent: br0
-          type: nic
+    - name: Create macvlan profile
+      community.general.lxd_profile:
+        url: https://127.0.0.1:8443
+        # These client_cert and client_key values are equal to the default values.
+        # client_cert: "{{ lookup('env', 'HOME') }}/.config/lxc/client.crt"
+        # client_key: "{{ lookup('env', 'HOME') }}/.config/lxc/client.key"
+        trust_password: mypassword
+        name: macvlan
+        state: present
+        config: {}
+        description: my macvlan profile
+        devices:
+          eth0:
+            nictype: macvlan
+            parent: br0
+            type: nic
 
 # An example for modify/merge a profile
 - hosts: localhost
@@ -214,11 +202,11 @@ EXAMPLES = '''
         name: macvlan
         new_name: macvlan2
         state: present
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 old_state:
-  description: The old state of the profile
+  description: The old state of the profile.
   returned: success
   type: str
   sample: "absent"
@@ -232,7 +220,7 @@ actions:
   returned: success
   type: list
   sample: ["create"]
-'''
+"""
 
 import os
 from ansible.module_utils.basic import AnsibleModule

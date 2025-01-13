@@ -7,14 +7,14 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: gitlab_project_variable
 short_description: Creates/updates/deletes GitLab Projects Variables
 description:
   - When a project variable does not exist, it will be created.
   - When a project variable does exist, its value will be updated when the values are different.
-  - Variables which are untouched in the playbook, but are not untouched in the GitLab project,
-    they stay untouched (O(purge=false)) or will be deleted (O(purge=true)).
+  - Variables which are untouched in the playbook, but are not untouched in the GitLab project, they stay untouched (O(purge=false))
+    or will be deleted (O(purge=true)).
 author:
   - "Markus Bergholz (@markuman)"
 requirements:
@@ -51,8 +51,8 @@ options:
   vars:
     description:
       - When the list element is a simple key-value pair, masked, raw and protected will be set to false.
-      - When the list element is a dict with the keys C(value), C(masked), C(raw) and C(protected), the user can
-        have full control about whether a value should be masked, raw, protected or both.
+      - When the list element is a dict with the keys C(value), C(masked), C(raw) and C(protected), the user can have full
+        control about whether a value should be masked, raw, protected or both.
       - Support for protected values requires GitLab >= 9.3.
       - Support for masked values requires GitLab >= 11.10.
       - Support for raw values requires GitLab >= 15.7.
@@ -61,8 +61,8 @@ options:
       - A C(value) must be a string or a number.
       - Field C(variable_type) must be a string with either V(env_var), which is the default, or V(file).
       - Field C(environment_scope) must be a string defined by scope environment.
-      - When a value is masked, it must be in Base64 and have a length of at least 8 characters.
-        See GitLab documentation on acceptable values for a masked variable (https://docs.gitlab.com/ce/ci/variables/#masked-variables).
+      - When a value is masked, it must be in Base64 and have a length of at least 8 characters. See GitLab documentation
+        on acceptable values for a masked variable (https://docs.gitlab.com/ce/ci/variables/#masked-variables).
     default: {}
     type: dict
   variables:
@@ -116,10 +116,10 @@ options:
           - Support for O(variables[].environment_scope) requires GitLab Premium >= 13.11.
         type: str
         default: '*'
-'''
+"""
 
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Set or update some CI/CD variables
   community.general.gitlab_project_variable:
     api_url: https://gitlab.com
@@ -190,9 +190,9 @@ EXAMPLES = '''
     state: absent
     vars:
       ACCESS_KEY_ID: abc123
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 project_variable:
   description: Four lists of the variablenames which were added, updated, removed or exist.
   returned: always
@@ -218,7 +218,7 @@ project_variable:
       returned: always
       type: list
       sample: ['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.api import basic_auth_argument_spec

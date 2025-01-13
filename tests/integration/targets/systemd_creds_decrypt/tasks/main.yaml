@@ -1,0 +1,58 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Test systemd_creds_decrypt
+  when:
+    - ansible_systemd.version is defined
+    - ansible_systemd.version | int >= 250
+  block:
+    - name: Encrypt secret
+      become: true
+      systemd_creds_encrypt:
+        name: api
+        not_after: +48hr
+        secret: access_token
+      register: encrypted_api_secret
+
+    - name: Print the encrypted secret
+      ansible.builtin.debug:
+        msg: "{{ encrypted_api_secret }}"
+
+    - name: Decrypt secret
+      community.general.systemd_creds_decrypt:
+        name: api
+        newline: false
+        secret: "{{ encrypted_api_secret.value }}"
+      register: decrypted_secret
+
+    - name: Print the decrypted secret
+      ansible.builtin.debug:
+        msg: "{{ decrypted_secret }}"
+
+    - name: Assert that the decrypted secret is the same as the original secret
+      ansible.builtin.assert:
+        that:
+          - decrypted_secret.value == 'access_token'
+        fail_msg: "Decrypted secret is not the same as the original secret"
+        success_msg: "Decrypted secret is the same as the original secret"
+
+    - name: Decrypt secret into hex
+      community.general.systemd_creds_decrypt:
+        name: api
+        newline: false
+        secret: "{{ encrypted_api_secret.value }}"
+        transcode: hex
+      register: decrypted_secret_hex
+
+    - name: Print the trancoded decrypted secret
+      ansible.builtin.debug:
+        msg: "{{ decrypted_secret_hex }}"
+
+    - name: Assert that the decrypted secret is the same as the original secret
+      ansible.builtin.assert:
+        that:
+          - decrypted_secret_hex.value == '6163636573735f746f6b656e'
+        fail_msg: "Decrypted secret is not the same as the original secret"
+        success_msg: "Decrypted secret is the same as the original secret"

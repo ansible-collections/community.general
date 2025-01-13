@@ -4,6 +4,16 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 ---
+anchors:
+  environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+  version_out: &version-output |
+    xfconf-query 4.18.1
+
+    Copyright (c) 2008-2023
+        The Xfce development team. All rights reserved.
+
+    Please report bugs to <https://gitlab.xfce.org/xfce/xfconf>.
+test_cases:
 - id: test_missing_input
   input: {}
   output:
@@ -21,9 +31,16 @@
     previous_value: '100'
     type: int
     value: '90'
-  run_command_calls:
+    version: "4.18.1"
+  mocks:
+    run_command:
+    - command: [/testbin/xfconf-query, --version]
+      environ: *env-def
+      rc: 0
+      out: *version-output
+      err: ""
     - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/inactive_opacity]
-      environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: *env-def
       rc: 0
       out: "100\n"
       err: ""
@@ -44,7 +61,14 @@
     previous_value: '90'
     type: int
     value: '90'
-  run_command_calls:
+    version: "4.18.1"
+  mocks:
+    run_command:
+    - command: [/testbin/xfconf-query, --version]
+      environ: *env-def
+      rc: 0
+      out: *version-output
+      err: ""
     - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/inactive_opacity]
       environ: *env-def
       rc: 0
@@ -61,13 +85,20 @@
     property: /general/SaveOnExit
     state: present
     value_type: bool
-    value: False
+    value: false
   output:
     changed: true
     previous_value: 'true'
     type: bool
     value: 'False'
-  run_command_calls:
+    version: "4.18.1"
+  mocks:
+    run_command:
+    - command: [/testbin/xfconf-query, --version]
+      environ: *env-def
+      rc: 0
+      out: *version-output
+      err: ""
     - command: [/testbin/xfconf-query, --channel, xfce4-session, --property, /general/SaveOnExit]
       environ: *env-def
       rc: 0
@@ -90,32 +121,39 @@
     previous_value: [Main, Work, Tmp]
     type: [string, string, string]
     value: [A, B, C]
-  run_command_calls:
+    version: "4.18.1"
+  mocks:
+    run_command:
+    - command: [/testbin/xfconf-query, --version]
+      environ: *env-def
+      rc: 0
+      out: *version-output
+      err: ""
     - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/workspace_names]
       environ: *env-def
       rc: 0
       out: "Value is an array with 3 items:\n\nMain\nWork\nTmp\n"
       err: ""
     - command:
-        - /testbin/xfconf-query
-        - --channel
-        - xfwm4
-        - --property
-        - /general/workspace_names
-        - --create
-        - --force-array
-        - --type
-        - string
-        - --set
-        - A
-        - --type
-        - string
-        - --set
-        - B
-        - --type
-        - string
-        - --set
-        - C
+      - /testbin/xfconf-query
+      - --channel
+      - xfwm4
+      - --property
+      - /general/workspace_names
+      - --create
+      - --force-array
+      - --type
+      - string
+      - --set
+      - A
+      - --type
+      - string
+      - --set
+      - B
+      - --type
+      - string
+      - --set
+      - C
       environ: *env-def
       rc: 0
       out: ""
@@ -132,32 +170,39 @@
     previous_value: [A, B, C]
     type: [string, string, string]
     value: [A, B, C]
-  run_command_calls:
+    version: "4.18.1"
+  mocks:
+    run_command:
+    - command: [/testbin/xfconf-query, --version]
+      environ: *env-def
+      rc: 0
+      out: *version-output
+      err: ""
     - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/workspace_names]
       environ: *env-def
       rc: 0
       out: "Value is an array with 3 items:\n\nA\nB\nC\n"
       err: ""
     - command:
-        - /testbin/xfconf-query
-        - --channel
-        - xfwm4
-        - --property
-        - /general/workspace_names
-        - --create
-        - --force-array
-        - --type
-        - string
-        - --set
-        - A
-        - --type
-        - string
-        - --set
-        - B
-        - --type
-        - string
-        - --set
-        - C
+      - /testbin/xfconf-query
+      - --channel
+      - xfwm4
+      - --property
+      - /general/workspace_names
+      - --create
+      - --force-array
+      - --type
+      - string
+      - --set
+      - A
+      - --type
+      - string
+      - --set
+      - B
+      - --type
+      - string
+      - --set
+      - C
       environ: *env-def
       rc: 0
       out: ""
@@ -170,9 +215,16 @@
   output:
     changed: true
     previous_value: [A, B, C]
-    type: null
-    value: null
-  run_command_calls:
+    type:
+    value:
+    version: "4.18.1"
+  mocks:
+    run_command:
+    - command: [/testbin/xfconf-query, --version]
+      environ: *env-def
+      rc: 0
+      out: *version-output
+      err: ""
     - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/workspace_names]
       environ: *env-def
       rc: 0

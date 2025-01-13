@@ -9,49 +9,49 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: logentries
 author: "Ivan Vanderbyl (@ivanvanderbyl)"
-short_description: Module for tracking logs via logentries.com
+short_description: Module for tracking logs using U(logentries.com)
 description:
-    - Sends logs to LogEntries in realtime
+  - Sends logs to LogEntries in realtime.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    path:
-        type: str
-        description:
-            - path to a log file
-        required: true
-    state:
-        type: str
-        description:
-            - following state of the log
-        choices: [ 'present', 'absent', 'followed', 'unfollowed' ]
-        required: false
-        default: present
-    name:
-        type: str
-        description:
-            - name of the log
-        required: false
-    logtype:
-        type: str
-        description:
-            - type of the log
-        required: false
-        aliases: [type]
+  path:
+    type: str
+    description:
+      - Path to a log file.
+    required: true
+  state:
+    type: str
+    description:
+      - Following state of the log.
+    choices: ['present', 'absent', 'followed', 'unfollowed']
+    required: false
+    default: present
+  name:
+    type: str
+    description:
+      - Name of the log.
+    required: false
+  logtype:
+    type: str
+    description:
+      - Type of the log.
+    required: false
+    aliases: [type]
 
 notes:
-    - Requires the LogEntries agent which can be installed following the instructions at logentries.com
-'''
-EXAMPLES = '''
+  - Requires the LogEntries agent which can be installed following the instructions at U(logentries.com).
+"""
+
+EXAMPLES = r"""
 - name: Track nginx logs
   community.general.logentries:
     path: /var/log/nginx/access.log
@@ -62,7 +62,7 @@ EXAMPLES = '''
   community.general.logentries:
     path: /var/log/nginx/error.log
     state: absent
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 

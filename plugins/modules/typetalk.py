@@ -9,12 +9,11 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: typetalk
 short_description: Send a message to typetalk
 description:
-  - Send a message to typetalk using typetalk API
+  - Send a message to typetalk using typetalk API.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -26,35 +25,35 @@ options:
   client_id:
     type: str
     description:
-      - OAuth2 client ID
+      - OAuth2 client ID.
     required: true
   client_secret:
     type: str
     description:
-      - OAuth2 client secret
+      - OAuth2 client secret.
     required: true
   topic:
     type: int
     description:
-      - topic id to post message
+      - Topic ID to post message.
     required: true
   msg:
     type: str
     description:
-      - message body
+      - Message body.
     required: true
-requirements: [ json ]
+requirements: [json]
 author: "Takashi Someda (@tksmd)"
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Send a message to typetalk
   community.general.typetalk:
     client_id: 12345
     client_secret: 12345
     topic: 1
     msg: install completed
-'''
+"""
 
 import json
 

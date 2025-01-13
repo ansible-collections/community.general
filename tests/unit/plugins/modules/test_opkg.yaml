@@ -4,15 +4,24 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 ---
+anchors:
+  environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+test_cases:
 - id: install_zlibdev
   input:
     name: zlib-dev
     state: present
   output:
     msg: installed 1 package(s)
-  run_command_calls:
+  mocks:
+    run_command:
+    - command: [/testbin/opkg, --version]
+      environ: *env-def
+      rc: 0
+      out: ""
+      err: ""
     - command: [/testbin/opkg, list-installed, zlib-dev]
-      environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: *env-def
       rc: 0
       out: ""
       err: ""
@@ -39,7 +48,13 @@
     state: present
   output:
     msg: package(s) already present
-  run_command_calls:
+  mocks:
+    run_command:
+    - command: [/testbin/opkg, --version]
+      environ: *env-def
+      rc: 0
+      out: ""
+      err: ""
     - command: [/testbin/opkg, list-installed, zlib-dev]
       environ: *env-def
       rc: 0
@@ -53,7 +68,13 @@
     force: reinstall
   output:
     msg: installed 1 package(s)
-  run_command_calls:
+  mocks:
+    run_command:
+    - command: [/testbin/opkg, --version]
+      environ: *env-def
+      rc: 0
+      out: ""
+      err: ""
     - command: [/testbin/opkg, list-installed, zlib-dev]
       environ: *env-def
       rc: 0
@@ -80,7 +101,13 @@
     state: present
   output:
     msg: installed 1 package(s)
-  run_command_calls:
+  mocks:
+    run_command:
+    - command: [/testbin/opkg, --version]
+      environ: *env-def
+      rc: 0
+      out: ""
+      err: ""
     - command: [/testbin/opkg, list-installed, zlib-dev]
       environ: *env-def
       rc: 0
@@ -109,7 +136,13 @@
     update_cache: true
   output:
     msg: installed 1 package(s)
-  run_command_calls:
+  mocks:
+    run_command:
+    - command: [/testbin/opkg, --version]
+      environ: *env-def
+      rc: 0
+      out: ""
+      err: ""
     - command: [/testbin/opkg, update]
       environ: *env-def
       rc: 0

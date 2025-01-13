@@ -8,7 +8,6 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = r"""
----
 module: proxmox_pool_member
 short_description: Add or delete members from Proxmox VE cluster pools
 description:
@@ -20,12 +19,14 @@ attributes:
     support: full
   diff_mode:
     support: full
+  action_group:
+    version_added: 9.0.0
 options:
   poolid:
     description:
       - The pool ID.
     type: str
-    aliases: [ "name" ]
+    aliases: ["name"]
     required: true
   member:
     description:
@@ -42,17 +43,18 @@ options:
     type: str
   state:
     description:
-     - Indicate desired state of the pool member.
+      - Indicate desired state of the pool member.
     choices: ['present', 'absent']
     default: present
     type: str
 
 extends_documentation_fragment:
-    - community.general.proxmox.documentation
-    - community.general.attributes
+  - community.general.proxmox.actiongroup_proxmox
+  - community.general.proxmox.documentation
+  - community.general.attributes
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Add new VM to Proxmox VE pool
   community.general.proxmox_pool_member:
     api_host: node1
@@ -90,7 +92,7 @@ EXAMPLES = """
     state: absent
 """
 
-RETURN = """
+RETURN = r"""
 poolid:
   description: The pool ID.
   returned: success

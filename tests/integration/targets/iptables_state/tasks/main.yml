@@ -29,6 +29,12 @@
       when:
         - xtables_lock is undefined
 
+    - name: include tasks to test partial restore files
+      include_tasks: tests/02-partial-restore.yml
+      when:
+        - xtables_lock is undefined
+
+
     - name: include tasks to test rollbacks
       include_tasks: tests/10-rollback.yml
       when:

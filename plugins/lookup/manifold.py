@@ -78,11 +78,13 @@ class ApiError(Exception):
 
 
 class ManifoldApiClient(object):
-    base_url = 'https://api.{api}.manifold.co/v1/{endpoint}'
     http_agent = 'python-manifold-ansible-1.0.0'
 
     def __init__(self, token):
         self._token = token
+
+    def _make_url(self, api, endpoint):
+        return f'https://api.{api}.manifold.co/v1/{endpoint}'
 
     def request(self, api, endpoint, *args, **kwargs):
         """
@@ -98,11 +100,11 @@ class ManifoldApiClient(object):
         """
 
         default_headers = {
-            'Authorization': "Bearer {0}".format(self._token),
+            'Authorization': f"Bearer {self._token}",
             'Accept': "*/*"  # Otherwise server doesn't set content-type header
         }
 
-        url = self.base_url.format(api=api, endpoint=endpoint)
+        url = self._make_url(api, endpoint)
 
         headers = default_headers
         arg_headers = kwargs.pop('headers', None)
@@ -110,23 +112,22 @@ class ManifoldApiClient(object):
             headers.update(arg_headers)
 
         try:
-            display.vvvv('manifold lookup connecting to {0}'.format(url))
+            display.vvvv(f'manifold lookup connecting to {url}')
             response = open_url(url, headers=headers, http_agent=self.http_agent, *args, **kwargs)
             data = response.read()
             if response.headers.get('content-type') == 'application/json':
                 data = json.loads(data)
             return data
         except ValueError:
-            raise ApiError('JSON response can\'t be parsed while requesting {url}:\n{json}'.format(json=data, url=url))
+            raise ApiError(f'JSON response can\'t be parsed while requesting {url}:\n{data}')
         except HTTPError as e:
-            raise ApiError('Server returned: {err} while requesting {url}:\n{response}'.format(
-                err=str(e), url=url, response=e.read()))
+            raise ApiError(f'Server returned: {e} while requesting {url}:\n{e.read()}')
         except URLError as e:
-            raise ApiError('Failed lookup url for {url} : {err}'.format(url=url, err=str(e)))
+            raise ApiError(f'Failed lookup url for {url} : {e}')
         except SSLValidationError as e:
-            raise ApiError('Error validating the server\'s certificate for {url}: {err}'.format(url=url, err=str(e)))
+            raise ApiError(f'Error validating the server\'s certificate for {url}: {e}')
         except ConnectionError as e:
-            raise ApiError('Error connecting to {url}: {err}'.format(url=url, err=str(e)))
+            raise ApiError(f'Error connecting to {url}: {e}')
 
     def get_resources(self, team_id=None, project_id=None, label=None):
         """
@@ -152,7 +153,7 @@ class ManifoldApiClient(object):
             query_params['label'] = label
 
         if query_params:
-            endpoint += '?' + urlencode(query_params)
+            endpoint += f"?{urlencode(query_params)}"
 
         return self.request(api, endpoint)
 
@@ -188,7 +189,7 @@ class ManifoldApiClient(object):
             query_params['label'] = label
 
         if query_params:
-            endpoint += '?' + urlencode(query_params)
+            endpoint += f"?{urlencode(query_params)}"
 
         return self.request(api, endpoint)
 
@@ -200,7 +201,7 @@ class ManifoldApiClient(object):
         :return:
         """
         api = 'marketplace'
-        endpoint = 'credentials?' + urlencode({'resource_id': resource_id})
+        endpoint = f"credentials?{urlencode({'resource_id': resource_id})}"
         return self.request(api, endpoint)
 
 
@@ -229,7 +230,7 @@ class LookupModule(LookupBase):
             if team:
                 team_data = client.get_teams(team)
                 if len(team_data) == 0:
-                    raise AnsibleError("Team '{0}' does not exist".format(team))
+                    raise AnsibleError(f"Team '{team}' does not exist")
                 team_id = team_data[0]['id']
             else:
                 team_id = None
@@ -237,7 +238,7 @@ class LookupModule(LookupBase):
             if project:
                 project_data = client.get_projects(project)
                 if len(project_data) == 0:
-                    raise AnsibleError("Project '{0}' does not exist".format(project))
+                    raise AnsibleError(f"Project '{project}' does not exist")
                 project_id = project_data[0]['id']
             else:
                 project_id = None
@@ -252,7 +253,7 @@ class LookupModule(LookupBase):
             if labels and len(resources_data) < len(labels):
                 fetched_labels = [r['body']['label'] for r in resources_data]
                 not_found_labels = [label for label in labels if label not in fetched_labels]
-                raise AnsibleError("Resource(s) {0} do not exist".format(', '.join(not_found_labels)))
+                raise AnsibleError(f"Resource(s) {', '.join(not_found_labels)} do not exist")
 
             credentials = {}
             cred_map = {}
@@ -262,17 +263,14 @@ class LookupModule(LookupBase):
                     for cred_key, cred_val in six.iteritems(resource_credentials[0]['body']['values']):
                         label = resource['body']['label']
                         if cred_key in credentials:
-                            display.warning("'{cred_key}' with label '{old_label}' was replaced by resource data "
-                                            "with label '{new_label}'".format(cred_key=cred_key,
-                                                                              old_label=cred_map[cred_key],
-                                                                              new_label=label))
+                            display.warning(f"'{cred_key}' with label '{cred_map[cred_key]}' was replaced by resource data with label '{label}'")
                         credentials[cred_key] = cred_val
                         cred_map[cred_key] = label
 
             ret = [credentials]
             return ret
         except ApiError as e:
-            raise AnsibleError('API Error: {0}'.format(str(e)))
+            raise AnsibleError(f'API Error: {e}')
         except AnsibleError as e:
             raise e
         except Exception:

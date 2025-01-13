@@ -1,2 +1,0 @@
-minor_changes:
-  - "bitwarden lookup plugin - add ``bw_session`` option, to pass session key instead of reading from env (https://github.com/ansible-collections/community.general/pull/7994)."

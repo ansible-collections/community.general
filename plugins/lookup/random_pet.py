@@ -95,6 +95,6 @@ class LookupModule(LookupBase):
 
         values = petname.Generate(words=words, separator=separator, letters=length)
         if prefix:
-            values = "%s%s%s" % (prefix, separator, values)
+            values = f"{prefix}{separator}{values}"
 
         return [values]

@@ -9,21 +9,18 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: sendgrid
 short_description: Sends an email with the SendGrid API
 description:
-  - "Sends an email with a SendGrid account through their API, not through
-    the SMTP service."
+  - Sends an email with a SendGrid account through their API, not through the SMTP service.
 notes:
-  - "This module is non-idempotent because it sends an email through the
-    external API. It is idempotent only in the case that the module fails."
-  - "Like the other notification modules, this one requires an external
-    dependency to work. In this case, you'll need an active SendGrid
-    account."
-  - "In order to use api_key, cc, bcc, attachments, from_name, html_body, headers
-    you must pip install sendgrid"
+  - This module is non-idempotent because it sends an email through the external API. It is idempotent only in the case that
+    the module fails.
+  - Like the other notification modules, this one requires an external dependency to work. In this case, you will need an
+    active SendGrid account.
+  - In order to use O(api_key), O(cc), O(bcc), O(attachments), O(from_name), O(html_body), and O(headers) you must C(pip install
+    sendgrid).
 requirements:
   - sendgrid Python library 1.6.22 or lower (Sendgrid API V2 supported)
 extends_documentation_fragment:
@@ -82,7 +79,7 @@ options:
   from_name:
     type: str
     description:
-      - The name you want to appear in the from field, i.e 'John Doe'.
+      - The name you want to appear in the from field, for example V(John Doe).
   html_body:
     description:
       - Whether the body is html content that should be rendered.
@@ -98,9 +95,9 @@ options:
       - The e-mail body content.
     required: true
 author: "Matt Makai (@makaimc)"
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Send an email to a single recipient that the deployment was successful
   community.general.sendgrid:
     username: "{{ sendgrid_username }}"
@@ -114,16 +111,16 @@ EXAMPLES = r'''
 
 - name: Send an email to more than one recipient that the build failed
   community.general.sendgrid:
-      username: "{{ sendgrid_username }}"
-      password: "{{ sendgrid_password }}"
-      from_address: "build@mycompany.com"
-      to_addresses:
-        - "ops@mycompany.com"
-        - "devteam@mycompany.com"
-      subject: "Build failure!."
-      body: "Unable to pull source repository from Git server."
+    username: "{{ sendgrid_username }}"
+    password: "{{ sendgrid_password }}"
+    from_address: "build@mycompany.com"
+    to_addresses:
+      - "ops@mycompany.com"
+      - "devteam@mycompany.com"
+    subject: "Build failure!."
+    body: "Unable to pull source repository from Git server."
   delegate_to: localhost
-'''
+"""
 
 # =======================================
 # sendgrid module support methods

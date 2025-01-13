@@ -9,222 +9,224 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: keycloak_user
 short_description: Create and configure a user in Keycloak
 description:
-    - This module creates, removes, or updates Keycloak users.
+  - This module creates, removes, or updates Keycloak users.
 version_added: 7.1.0
 options:
-    auth_username:
-        aliases: []
-    realm:
+  auth_username:
+    aliases: []
+  realm:
+    description:
+      - The name of the realm in which is the client.
+    default: master
+    type: str
+  username:
+    description:
+      - Username for the user.
+    required: true
+    type: str
+  id:
+    description:
+      - ID of the user on the Keycloak server if known.
+    type: str
+  enabled:
+    description:
+      - Enabled user.
+    type: bool
+  email_verified:
+    description:
+      - Check the validity of user email.
+    default: false
+    type: bool
+    aliases:
+      - emailVerified
+  first_name:
+    description:
+      - The user's first name.
+    required: false
+    type: str
+    aliases:
+      - firstName
+  last_name:
+    description:
+      - The user's last name.
+    required: false
+    type: str
+    aliases:
+      - lastName
+  email:
+    description:
+      - User email.
+    required: false
+    type: str
+  federation_link:
+    description:
+      - Federation Link.
+    required: false
+    type: str
+    aliases:
+      - federationLink
+  service_account_client_id:
+    description:
+      - Description of the client Application.
+    required: false
+    type: str
+    aliases:
+      - serviceAccountClientId
+  client_consents:
+    description:
+      - Client Authenticator Type.
+    type: list
+    elements: dict
+    default: []
+    aliases:
+      - clientConsents
+    suboptions:
+      client_id:
         description:
-            - The name of the realm in which is the client.
-        default: master
+          - Client ID of the client role. Not the technical ID of the client.
         type: str
-    username:
-        description:
-            - Username for the user.
         required: true
-        type: str
-    id:
-        description:
-            - ID of the user on the Keycloak server if known.
-        type: str
-    enabled:
-        description:
-            - Enabled user.
-        type: bool
-    email_verified:
-        description:
-            - Check the validity of user email.
-        default: false
-        type: bool
         aliases:
-            - emailVerified
-    first_name:
+          - clientId
+      roles:
         description:
-            - The user's first name.
-        required: false
-        type: str
-        aliases:
-            - firstName
-    last_name:
-        description:
-            - The user's last name.
-        required: false
-        type: str
-        aliases:
-            - lastName
-    email:
-        description:
-            - User email.
-        required: false
-        type: str
-    federation_link:
-        description:
-            - Federation Link.
-        required: false
-        type: str
-        aliases:
-            - federationLink
-    service_account_client_id:
-        description:
-            - Description of the client Application.
-        required: false
-        type: str
-        aliases:
-            - serviceAccountClientId
-    client_consents:
-        description:
-            - Client Authenticator Type.
+          - List of client roles to assign to the user.
         type: list
-        elements: dict
-        default: []
-        aliases:
-            - clientConsents
-        suboptions:
-            client_id:
-                description:
-                    - Client ID of the client role. Not the technical ID of the client.
-                type: str
-                required: true
-                aliases:
-                    - clientId
-            roles:
-                description:
-                    - List of client roles to assign to the user.
-                type: list
-                required: true
-                elements: str
-    groups:
-        description:
-            - List of groups for the user.
-        type: list
-        elements: dict
-        default: []
-        suboptions:
-            name:
-                description:
-                    - Name of the group.
-                type: str
-            state:
-                description:
-                    - Control whether the user must be member of this group or not.
-                choices: [ "present", "absent" ]
-                default: present
-                type: str
-    credentials:
-        description:
-            - User credentials.
-        default: []
-        type: list
-        elements: dict
-        suboptions:
-            type:
-                description:
-                    - Credential type.
-                type: str
-                required: true
-            value:
-                description:
-                    - Value of the credential.
-                type: str
-                required: true
-            temporary:
-                description:
-                    - If V(true), the users are required to reset their credentials at next login.
-                type: bool
-                default: false
-    required_actions:
-        description:
-            - RequiredActions user Auth.
-        default: []
-        type: list
+        required: true
         elements: str
-        aliases:
-            - requiredActions
-    federated_identities:
+  groups:
+    description:
+      - List of groups for the user.
+    type: list
+    elements: dict
+    default: []
+    suboptions:
+      name:
         description:
-            - List of IDPs of user.
-        default: []
-        type: list
-        elements: str
-        aliases:
-            - federatedIdentities
-    attributes:
-        description:
-            - List of user attributes.
-        required: false
-        type: list
-        elements: dict
-        suboptions:
-            name:
-                description:
-                    - Name of the attribute.
-                type: str
-            values:
-                description:
-                    - Values for the attribute as list.
-                type: list
-                elements: str
-            state:
-                description:
-                    - Control whether the attribute must exists or not.
-                choices: [ "present", "absent" ]
-                default: present
-                type: str
-    access:
-        description:
-            - list user access.
-        required: false
-        type: dict
-    disableable_credential_types:
-        description:
-            - list user Credential Type.
-        default: []
-        type: list
-        elements: str
-        aliases:
-            - disableableCredentialTypes
-    origin:
-        description:
-            - user origin.
-        required: false
+          - Name of the group.
         type: str
-    self:
+      state:
         description:
-            - user self administration.
-        required: false
-        type: str
-    state:
-        description:
-            - Control whether the user should exists or not.
-        choices: [ "present", "absent" ]
+          - Control whether the user must be member of this group or not.
+        choices: ["present", "absent"]
         default: present
         type: str
-    force:
+  credentials:
+    description:
+      - User credentials.
+    default: []
+    type: list
+    elements: dict
+    suboptions:
+      type:
         description:
-            - If V(true), allows to remove user and recreate it.
+          - Credential type.
+        type: str
+        required: true
+      value:
+        description:
+          - Value of the credential.
+        type: str
+        required: true
+      temporary:
+        description:
+          - If V(true), the users are required to reset their credentials at next login.
         type: bool
         default: false
+  required_actions:
+    description:
+      - RequiredActions user Auth.
+    default: []
+    type: list
+    elements: str
+    aliases:
+      - requiredActions
+  federated_identities:
+    description:
+      - List of IDPs of user.
+    default: []
+    type: list
+    elements: str
+    aliases:
+      - federatedIdentities
+  attributes:
+    description:
+      - List of user attributes.
+    required: false
+    type: list
+    elements: dict
+    suboptions:
+      name:
+        description:
+          - Name of the attribute.
+        type: str
+      values:
+        description:
+          - Values for the attribute as list.
+        type: list
+        elements: str
+      state:
+        description:
+          - Control whether the attribute must exists or not.
+        choices: ["present", "absent"]
+        default: present
+        type: str
+  access:
+    description:
+      - List user access.
+    required: false
+    type: dict
+  disableable_credential_types:
+    description:
+      - List user Credential Type.
+    default: []
+    type: list
+    elements: str
+    aliases:
+      - disableableCredentialTypes
+  origin:
+    description:
+      - User origin.
+    required: false
+    type: str
+  self:
+    description:
+      - User self administration.
+    required: false
+    type: str
+  state:
+    description:
+      - Control whether the user should exists or not.
+    choices: ["present", "absent"]
+    default: present
+    type: str
+  force:
+    description:
+      - If V(true), allows to remove user and recreate it.
+    type: bool
+    default: false
 extends_documentation_fragment:
-    - community.general.keycloak
-    - community.general.attributes
+  - community.general.keycloak
+  - community.general.keycloak.actiongroup_keycloak
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: full
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
+  action_group:
+    version_added: 10.2.0
 notes:
-    - The module does not modify the user ID of an existing user.
+  - The module does not modify the user ID of an existing user.
 author:
-    - Philippe Gauthier (@elfelip)
-'''
+  - Philippe Gauthier (@elfelip)
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a user user1
   community.general.keycloak_user:
     auth_keycloak_url: http://localhost:8080/auth
@@ -238,21 +240,21 @@ EXAMPLES = '''
     enabled: true
     emailVerified: false
     credentials:
-        - type: password
-          value: password
-          temporary: false
+      - type: password
+        value: password
+        temporary: false
     attributes:
-        - name: attr1
-          values:
-            - value1
-          state: present
-        - name: attr2
-          values:
-            - value2
-          state: absent
+      - name: attr1
+        values:
+          - value1
+        state: present
+      - name: attr2
+        values:
+          - value2
+        state: absent
     groups:
-        - name: group1
-          state: present
+      - name: group1
+        state: present
     state: present
 
 - name: Re-create a User
@@ -268,21 +270,21 @@ EXAMPLES = '''
     enabled: true
     emailVerified: false
     credentials:
-        - type: password
-          value: password
-          temporary: false
+      - type: password
+        value: password
+        temporary: false
     attributes:
-        - name: attr1
-          values:
-            - value1
-          state: present
-        - name: attr2
-          values:
-            - value2
-          state: absent
+      - name: attr1
+        values:
+          - value1
+        state: present
+      - name: attr2
+        values:
+          - value2
+        state: absent
     groups:
-        - name: group1
-          state: present
+      - name: group1
+        state: present
     state: present
 
 - name: Re-create a User
@@ -298,21 +300,21 @@ EXAMPLES = '''
     enabled: true
     emailVerified: false
     credentials:
-        - type: password
-          value: password
-          temporary: false
+      - type: password
+        value: password
+        temporary: false
     attributes:
-        - name: attr1
-          values:
-            - value1
-          state: present
-        - name: attr2
-          values:
-            - value2
-          state: absent
+      - name: attr1
+        values:
+          - value1
+        state: present
+      - name: attr2
+        values:
+          - value2
+        state: absent
     groups:
-        - name: group1
-          state: present
+      - name: group1
+        state: present
     state: present
     force: true
 
@@ -324,9 +326,9 @@ EXAMPLES = '''
     realm: master
     username: user1
     state: absent
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 msg:
   description: Message as to what action was taken.
   returned: always
@@ -341,14 +343,15 @@ existing:
   returned: on success
   type: dict
 end_state:
-  description: Representation of the user after module execution
+  description: Representation of the user after module execution.
   returned: on success
   type: dict
 changed:
   description: Return V(true) if the operation changed the user on the keycloak server, V(false) otherwise.
   returned: always
   type: bool
-'''
+"""
+
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
     keycloak_argument_spec, get_token, KeycloakError, is_struct_included
 from ansible.module_utils.basic import AnsibleModule

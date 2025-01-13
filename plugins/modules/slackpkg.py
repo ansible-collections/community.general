@@ -15,49 +15,47 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: slackpkg
 short_description: Package manager for Slackware >= 12.2
 description:
-    - Manage binary packages for Slackware using 'slackpkg' which
-      is available in versions after 12.2.
+  - Manage binary packages for Slackware using C(slackpkg) which is available in versions after 12.2.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    name:
-        description:
-            - name of package to install/remove
-        required: true
-        type: list
-        elements: str
-        aliases: [pkg]
+  name:
+    description:
+      - Name of package to install/remove.
+    required: true
+    type: list
+    elements: str
+    aliases: [pkg]
 
-    state:
-        description:
-            - State of the package, you can use V(installed) as an alias for V(present) and V(removed) as one for V(absent).
-        choices: [ 'present', 'absent', 'latest', 'installed', 'removed' ]
-        required: false
-        default: present
-        type: str
+  state:
+    description:
+      - State of the package, you can use V(installed) as an alias for V(present) and V(removed) as one for V(absent).
+    choices: ['present', 'absent', 'latest', 'installed', 'removed']
+    required: false
+    default: present
+    type: str
 
-    update_cache:
-        description:
-            - update the package database first
-        required: false
-        default: false
-        type: bool
+  update_cache:
+    description:
+      - Update the package database first.
+    required: false
+    default: false
+    type: bool
 
 author: Kim Nørgaard (@KimNorgaard)
-requirements: [ "Slackware >= 12.2" ]
-'''
+requirements: ["Slackware >= 12.2"]
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Install package foo
   community.general.slackpkg:
     name: foo
@@ -72,7 +70,7 @@ EXAMPLES = '''
   community.general.slackpkg:
     name: foo
     state: latest
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -106,9 +104,8 @@ def remove_packages(module, slackpkg_path, packages):
             continue
 
         if not module.check_mode:
-            rc, out, err = module.run_command("%s -default_answer=y -batch=on \
-                                              remove %s" % (slackpkg_path,
-                                                            package))
+            rc, out, err = module.run_command(
+                [slackpkg_path, "-default_answer=y", "-batch=on", "remove", package])
 
         if not module.check_mode and query_package(module, slackpkg_path,
                                                    package):
@@ -132,9 +129,8 @@ def install_packages(module, slackpkg_path, packages):
             continue
 
         if not module.check_mode:
-            rc, out, err = module.run_command("%s -default_answer=y -batch=on \
-                                              install %s" % (slackpkg_path,
-                                                             package))
+            rc, out, err = module.run_command(
+                [slackpkg_path, "-default_answer=y", "-batch=on", "install", package])
 
         if not module.check_mode and not query_package(module, slackpkg_path,
                                                        package):
@@ -155,9 +151,8 @@ def upgrade_packages(module, slackpkg_path, packages):
 
     for package in packages:
         if not module.check_mode:
-            rc, out, err = module.run_command("%s -default_answer=y -batch=on \
-                                              upgrade %s" % (slackpkg_path,
-                                                             package))
+            rc, out, err = module.run_command(
+                [slackpkg_path, "-default_answer=y", "-batch=on", "upgrade", package])
 
         if not module.check_mode and not query_package(module, slackpkg_path,
                                                        package):
@@ -174,7 +169,8 @@ def upgrade_packages(module, slackpkg_path, packages):
 
 
 def update_cache(module, slackpkg_path):
-    rc, out, err = module.run_command("%s -batch=on update" % (slackpkg_path))
+    rc, out, err = module.run_command(
+        [slackpkg_path, "-batch=on", "update"])
     if rc != 0:
         module.fail_json(msg="Could not update package cache")
 

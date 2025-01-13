@@ -7,42 +7,40 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: oneview_ethernet_network_info
 short_description: Retrieve the information about one or more of the OneView Ethernet Networks
 description:
-    - Retrieve the information about one or more of the Ethernet Networks from OneView.
+  - Retrieve the information about one or more of the Ethernet Networks from OneView.
 requirements:
-    - hpOneView >= 2.0.1
+  - hpOneView >= 2.0.1
 author:
-    - Felipe Bulsoni (@fgbulsoni)
-    - Thiago Miotto (@tmiotto)
-    - Adriane Cardozo (@adriane-cardozo)
+  - Felipe Bulsoni (@fgbulsoni)
+  - Thiago Miotto (@tmiotto)
+  - Adriane Cardozo (@adriane-cardozo)
 attributes:
-    check_mode:
-        version_added: 3.3.0
-        # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
+  check_mode:
+    version_added: 3.3.0
+    # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
 options:
-    name:
-      description:
-        - Ethernet Network name.
-      type: str
-    options:
-      description:
-        - "List with options to gather additional information about an Ethernet Network and related resources.
-          Options allowed: V(associatedProfiles) and V(associatedUplinkGroups)."
-      type: list
-      elements: str
+  name:
+    description:
+      - Ethernet Network name.
+    type: str
+  options:
+    description:
+      - 'List with options to gather additional information about an Ethernet Network and related resources. Options allowed:
+        V(associatedProfiles) and V(associatedUplinkGroups).'
+    type: list
+    elements: str
 extends_documentation_fragment:
   - community.general.oneview
   - community.general.oneview.factsparams
   - community.general.attributes
   - community.general.attributes.info_module
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Gather information about all Ethernet Networks
   community.general.oneview_ethernet_network_info:
     config: /etc/oneview/oneview_config.json
@@ -96,24 +94,24 @@ EXAMPLES = '''
 - name: Print fetched information about Ethernet Network Associated Uplink Groups
   ansible.builtin.debug:
     msg: "{{ result.enet_associated_uplink_groups }}"
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 ethernet_networks:
-    description: Has all the OneView information about the Ethernet Networks.
-    returned: Always, but can be null.
-    type: dict
+  description: Has all the OneView information about the Ethernet Networks.
+  returned: Always, but can be null.
+  type: dict
 
 enet_associated_profiles:
-    description: Has all the OneView information about the profiles which are using the Ethernet network.
-    returned: When requested, but can be null.
-    type: dict
+  description: Has all the OneView information about the profiles which are using the Ethernet network.
+  returned: When requested, but can be null.
+  type: dict
 
 enet_associated_uplink_groups:
-    description: Has all the OneView information about the uplink sets which are using the Ethernet network.
-    returned: When requested, but can be null.
-    type: dict
-'''
+  description: Has all the OneView information about the uplink sets which are using the Ethernet network.
+  returned: When requested, but can be null.
+  type: dict
+"""
 
 from ansible_collections.community.general.plugins.module_utils.oneview import OneViewModuleBase
 

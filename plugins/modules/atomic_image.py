@@ -8,52 +8,56 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: atomic_image
 short_description: Manage the container images on the atomic host platform
 description:
-    - Manage the container images on the atomic host platform.
-    - Allows to execute the commands specified by the RUN label in the container image when present.
+  - Manage the container images on the atomic host platform.
+  - Allows to execute the commands specified by the RUN label in the container image when present.
+deprecated:
+  removed_in: 13.0.0
+  why: Project Atomic was sunset by the end of 2019.
+  alternative: There is none.
 author:
-- Saravanan KR (@krsacme)
+  - Saravanan KR (@krsacme)
 notes:
-    - Host should support C(atomic) command.
+  - According to U(https://projectatomic.io/) the project has been sunset around 2019/2020, in favor of C(podman) and Fedora CoreOS.
 requirements:
   - atomic
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    backend:
-        description:
-          - Define the backend where the image is pulled.
-        choices: [ 'docker', 'ostree' ]
-        type: str
-    name:
-        description:
-          - Name of the container image.
-        required: true
-        type: str
-    state:
-        description:
-          - The state of the container image.
-          - The state V(latest) will ensure container image is upgraded to the latest version and forcefully restart container, if running.
-        choices: [ 'absent', 'latest', 'present' ]
-        default: 'latest'
-        type: str
-    started:
-        description:
-          - Start or Stop the container.
-        type: bool
-        default: true
-'''
+  backend:
+    description:
+      - Define the backend where the image is pulled.
+    choices: ['docker', 'ostree']
+    type: str
+  name:
+    description:
+      - Name of the container image.
+    required: true
+    type: str
+  state:
+    description:
+      - The state of the container image.
+      - The state V(latest) will ensure container image is upgraded to the latest version and forcefully restart container,
+        if running.
+    choices: ['absent', 'latest', 'present']
+    default: 'latest'
+    type: str
+  started:
+    description:
+      - Start or stop the container.
+    type: bool
+    default: true
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Execute the run command on rsyslog container image (atomic run rhel7/rsyslog)
   community.general.atomic_image:
     name: rhel7/rsyslog
@@ -64,15 +68,15 @@ EXAMPLES = r'''
     name: busybox
     state: latest
     backend: ostree
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 msg:
-    description: The command standard output
-    returned: always
-    type: str
-    sample: 'Using default tag: latest ...'
-'''
+  description: The command standard output.
+  returned: always
+  type: str
+  sample: 'Using default tag: latest ...'
+"""
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule

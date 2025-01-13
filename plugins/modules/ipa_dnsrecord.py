@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: ipa_dnsrecord
 author: Abhijeet Kasurde (@Akasurde)
 short_description: Manage FreeIPA DNS records
@@ -23,64 +22,66 @@ attributes:
 options:
   zone_name:
     description:
-    - The DNS zone name to which DNS record needs to be managed.
+      - The DNS zone name to which DNS record needs to be managed.
     required: true
     type: str
   record_name:
     description:
-    - The DNS record name to manage.
+      - The DNS record name to manage.
     required: true
     aliases: ["name"]
     type: str
   record_type:
     description:
-    - The type of DNS record name.
-    - Currently, 'A', 'AAAA', 'A6', 'CNAME', 'DNAME', 'NS', 'PTR', 'TXT', 'SRV' and 'MX' are supported.
-    - "'A6', 'CNAME', 'DNAME' and 'TXT' are added in version 2.5."
-    - "'SRV' and 'MX' are added in version 2.8."
-    - "'NS' are added in comunity.general 8.2.0."
+      - The type of DNS record name.
+      - Support for V(NS) was added in comunity.general 8.2.0.
+      - Support for V(SSHFP) was added in community.general 9.1.0.
     required: false
     default: 'A'
-    choices: ['A', 'AAAA', 'A6', 'CNAME', 'DNAME', 'MX', 'NS', 'PTR', 'SRV', 'TXT']
+    choices: ['A', 'AAAA', 'A6', 'CNAME', 'DNAME', 'MX', 'NS', 'PTR', 'SRV', 'TXT', 'SSHFP']
     type: str
   record_value:
     description:
-    - Manage DNS record name with this value.
-    - Mutually exclusive with O(record_values), and exactly one of O(record_value) and O(record_values) has to be specified.
-    - Use O(record_values) if you need to specify multiple values.
-    - In the case of 'A' or 'AAAA' record types, this will be the IP address.
-    - In the case of 'A6' record type, this will be the A6 Record data.
-    - In the case of 'CNAME' record type, this will be the hostname.
-    - In the case of 'DNAME' record type, this will be the DNAME target.
-    - In the case of 'NS' record type, this will be the name server hostname. Hostname must already have a valid A or AAAA record.
-    - In the case of 'PTR' record type, this will be the hostname.
-    - In the case of 'TXT' record type, this will be a text.
-    - In the case of 'SRV' record type, this will be a service record.
-    - In the case of 'MX' record type, this will be a mail exchanger record.
+      - Manage DNS record name with this value.
+      - Mutually exclusive with O(record_values), and exactly one of O(record_value) and O(record_values) has to be specified.
+      - Use O(record_values) if you need to specify multiple values.
+      - In the case of V(A) or V(AAAA) record types, this will be the IP address.
+      - In the case of V(A6) record type, this will be the A6 Record data.
+      - In the case of V(CNAME) record type, this will be the hostname.
+      - In the case of V(DNAME) record type, this will be the DNAME target.
+      - In the case of V(NS) record type, this will be the name server hostname. Hostname must already have a valid A or AAAA
+        record.
+      - In the case of V(PTR) record type, this will be the hostname.
+      - In the case of V(TXT) record type, this will be a text.
+      - In the case of V(SRV) record type, this will be a service record.
+      - In the case of V(MX) record type, this will be a mail exchanger record.
+      - In the case of V(SSHFP) record type, this will be an SSH fingerprint record.
     type: str
   record_values:
     description:
-    - Manage DNS record name with this value.
-    - Mutually exclusive with O(record_value), and exactly one of O(record_value) and O(record_values) has to be specified.
-    - In the case of 'A' or 'AAAA' record types, this will be the IP address.
-    - In the case of 'A6' record type, this will be the A6 Record data.
-    - In the case of 'CNAME' record type, this will be the hostname.
-    - In the case of 'DNAME' record type, this will be the DNAME target.
-    - In the case of 'NS' record type, this will be the name server hostname. Hostname must already have a valid A or AAAA record.
-    - In the case of 'PTR' record type, this will be the hostname.
-    - In the case of 'TXT' record type, this will be a text.
-    - In the case of 'SRV' record type, this will be a service record.
-    - In the case of 'MX' record type, this will be a mail exchanger record.
+      - Manage DNS record name with this value.
+      - Mutually exclusive with O(record_value), and exactly one of O(record_value) and O(record_values) has to be specified.
+      - In the case of V(A) or V(AAAA) record types, this will be the IP address.
+      - In the case of V(A6) record type, this will be the A6 Record data.
+      - In the case of V(CNAME) record type, this will be the hostname.
+      - In the case of V(DNAME) record type, this will be the DNAME target.
+      - In the case of V(NS) record type, this will be the name server hostname. Hostname must already have a valid A or AAAA
+        record.
+      - In the case of V(PTR) record type, this will be the hostname.
+      - In the case of V(TXT) record type, this will be a text.
+      - In the case of V(SRV) record type, this will be a service record.
+      - In the case of V(MX) record type, this will be a mail exchanger record.
+      - In the case of V(SSHFP) record type, this will be an SSH fingerprint record.
     type: list
     elements: str
   record_ttl:
     description:
-    - Set the TTL for the record.
-    - Applies only when adding a new or changing the value of O(record_value) or O(record_values).
+      - Set the TTL for the record.
+      - Applies only when adding a new or changing the value of O(record_value) or O(record_values).
     required: false
     type: int
   state:
-    description: State to ensure
+    description: State to ensure.
     required: false
     default: present
     choices: ["absent", "present"]
@@ -88,10 +89,9 @@ options:
 extends_documentation_fragment:
   - community.general.ipa.documentation
   - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Ensure dns record is present
   community.general.ipa_dnsrecord:
     ipa_host: spider.example.com
@@ -175,14 +175,28 @@ EXAMPLES = r'''
     ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: ChangeMe!
-'''
 
-RETURN = r'''
+- name: Retrieve the current sshfp fingerprints
+  ansible.builtin.command: ssh-keyscan -D localhost
+  register: ssh_hostkeys
+
+- name: Update the SSHFP records in DNS
+  community.general.ipa_dnsrecord:
+    name: "{{ inventory_hostname}}"
+    zone_name: example.com
+    record_type: 'SSHFP'
+    record_values: "{{ ssh_hostkeys.stdout.split('\n') | map('split', 'SSHFP ') | map('last') | list }}"
+    ipa_host: ipa.example.com
+    ipa_user: admin
+    ipa_pass: ChangeMe!
+"""
+
+RETURN = r"""
 dnsrecord:
   description: DNS record as returned by IPA API.
   returned: always
   type: dict
-'''
+"""
 
 import traceback
 
@@ -228,6 +242,8 @@ class DNSRecordIPAClient(IPAClient):
                 item.update(srvrecord=value)
             elif details['record_type'] == 'MX':
                 item.update(mxrecord=value)
+            elif details['record_type'] == 'SSHFP':
+                item.update(sshfprecord=value)
 
             self._post_json(method='dnsrecord_add', name=zone_name, item=item)
 
@@ -266,6 +282,8 @@ def get_dnsrecord_dict(details=None):
         module_dnsrecord.update(srvrecord=details['record_values'])
     elif details['record_type'] == 'MX' and details['record_values']:
         module_dnsrecord.update(mxrecord=details['record_values'])
+    elif details['record_type'] == 'SSHFP' and details['record_values']:
+        module_dnsrecord.update(sshfprecord=details['record_values'])
 
     if details.get('record_ttl'):
         module_dnsrecord.update(dnsttl=details['record_ttl'])
@@ -328,7 +346,7 @@ def ensure(module, client):
 
 
 def main():
-    record_types = ['A', 'AAAA', 'A6', 'CNAME', 'DNAME', 'NS', 'PTR', 'TXT', 'SRV', 'MX']
+    record_types = ['A', 'AAAA', 'A6', 'CNAME', 'DNAME', 'NS', 'PTR', 'TXT', 'SRV', 'MX', 'SSHFP']
     argument_spec = ipa_argument_spec()
     argument_spec.update(
         zone_name=dict(type='str', required=True),

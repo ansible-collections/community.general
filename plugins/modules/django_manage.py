@@ -10,13 +10,12 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: django_manage
 short_description: Manages a Django application
 description:
-  - Manages a Django application using the C(manage.py) application frontend to C(django-admin). With the
-    O(virtualenv) parameter, all management commands will be executed by the given C(virtualenv) installation.
+  - Manages a Django application using the C(manage.py) application frontend to C(django-admin). With the O(virtualenv) parameter,
+    all management commands will be executed by the given C(virtualenv) installation.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -27,24 +26,18 @@ attributes:
 options:
   command:
     description:
-      - The name of the Django management command to run. The commands listed below are built in this module and have some basic parameter validation.
-      - >
-        V(cleanup) - clean up old data from the database (deprecated in Django 1.5). This parameter will be
-        removed in community.general 9.0.0. Use V(clearsessions) instead.
+      - The name of the Django management command to run. The commands listed below are built in this module and have some
+        basic parameter validation.
       - V(collectstatic) - Collects the static files into C(STATIC_ROOT).
       - V(createcachetable) - Creates the cache tables for use with the database cache backend.
       - V(flush) - Removes all data from the database.
       - V(loaddata) - Searches for and loads the contents of the named O(fixtures) into the database.
       - V(migrate) - Synchronizes the database state with models and migrations.
-      - >
-        V(syncdb) - Synchronizes the database state with models and migrations (deprecated in Django 1.7).
-        This parameter will be removed in community.general 9.0.0. Use V(migrate) instead.
       - V(test) - Runs tests for all installed apps.
-      - >
-        V(validate) - Validates all installed models (deprecated in Django 1.7). This parameter will be
-        removed in community.general 9.0.0. Use V(check) instead.
-      - Other commands can be entered, but will fail if they are unknown to Django.  Other commands that may
-        prompt for user input should be run with the C(--noinput) flag.
+      - Other commands can be entered, but will fail if they are unknown to Django. Other commands that may prompt for user
+        input should be run with the C(--noinput) flag.
+      - Support for the values V(cleanup), V(syncdb), V(validate) was removed in community.general 9.0.0. See note about supported
+        versions of Django.
     type: str
     required: true
   project_path:
@@ -60,8 +53,8 @@ options:
     required: false
   pythonpath:
     description:
-      - A directory to add to the Python path. Typically used to include the settings module if it is located
-        external to the application directory.
+      - A directory to add to the Python path. Typically used to include the settings module if it is located external to
+        the application directory.
       - This would be equivalent to adding O(pythonpath)'s value to the E(PYTHONPATH) environment variable.
     type: path
     required: false
@@ -69,6 +62,7 @@ options:
   virtualenv:
     description:
       - An optional path to a C(virtualenv) installation to use while running the manage application.
+      - The virtual environment must exist, otherwise the module will fail.
     type: path
     aliases: [virtual_env]
   apps:
@@ -90,8 +84,7 @@ options:
     type: bool
   database:
     description:
-      - The database to target. Used by the V(createcachetable), V(flush), V(loaddata), V(syncdb),
-        and V(migrate) commands.
+      - The database to target. Used by the V(createcachetable), V(flush), V(loaddata), V(syncdb), and V(migrate) commands.
     type: str
     required: false
   failfast:
@@ -113,14 +106,13 @@ options:
     type: bool
   merge:
     description:
-      - Will run out-of-order or missing migrations as they are not rollback migrations, you can only use this
-        parameter with V(migrate) command.
+      - Will run out-of-order or missing migrations as they are not rollback migrations, you can only use this parameter with
+        V(migrate) command.
     required: false
     type: bool
   link:
     description:
-      - Will create links to the files instead of copying them, you can only use this parameter with
-        V(collectstatic) command.
+      - Will create links to the files instead of copying them, you can only use this parameter with V(collectstatic) command.
     required: false
     type: bool
   testrunner:
@@ -132,33 +124,23 @@ options:
     aliases: [test_runner]
   ack_venv_creation_deprecation:
     description:
-      - >-
-        When a O(virtualenv) is set but the virtual environment does not exist, the current behavior is
-        to create a new virtual environment. That behavior is deprecated and if that case happens it will
-        generate a deprecation warning. Set this flag to V(true) to suppress the deprecation warning.
-      - Please note that you will receive no further warning about this being removed until the module
-        will start failing in such cases from community.general 9.0.0 on.
+      - This option no longer has any effect since community.general 9.0.0.
+      - It will be removed from community.general 11.0.0.
     type: bool
     version_added: 5.8.0
 
 notes:
-  - >
-    B(ATTENTION - DEPRECATION): Support for Django releases older than 4.1 will be removed in
-    community.general version 9.0.0 (estimated to be released in May 2024).
-    Please notice that Django 4.1 requires Python 3.8 or greater.
-  - C(virtualenv) (U(http://www.virtualenv.org)) must be installed on the remote host if the O(virtualenv) parameter
-    is specified. This requirement is deprecated and will be removed in community.general version 9.0.0.
-  - This module will create a virtualenv if the O(virtualenv) parameter is specified and a virtual environment does not already
-    exist at the given location. This behavior is deprecated and will be removed in community.general version 9.0.0.
-  - The parameter O(virtualenv) will remain in use, but it will require the specified virtualenv to exist.
-    The recommended way to create one in Ansible is by using M(ansible.builtin.pip).
-  - This module assumes English error messages for the V(createcachetable) command to detect table existence,
-    unfortunately.
-  - To be able to use the V(migrate) command with django versions < 1.7, you must have C(south) installed and added
-    as an app in your settings.
-  - To be able to use the V(collectstatic) command, you must have enabled staticfiles in your settings.
-  - Your C(manage.py) application must be executable (C(rwxr-xr-x)), and must have a valid shebang,
-    for example C(#!/usr/bin/env python), for invoking the appropriate Python interpreter.
+  - 'B(ATTENTION): Support for Django releases older than 4.1 has been removed in community.general version 9.0.0. While the
+    module allows for free-form commands, not verifying the version of Django being used, it is B(strongly recommended) to
+    use a more recent version of the framework.'
+  - Please notice that Django 4.1 requires Python 3.8 or greater.
+  - This module will not create a virtualenv if the O(virtualenv) parameter is specified and a virtual environment does not
+    already exist at the given location. This behavior changed in community.general version 9.0.0.
+  - The recommended way to create a virtual environment in Ansible is by using M(ansible.builtin.pip).
+  - This module assumes English error messages for the V(createcachetable) command to detect table existence, unfortunately.
+  - To be able to use the V(collectstatic) command, you must have enabled C(staticfiles) in your settings.
+  - Your C(manage.py) application must be executable (C(rwxr-xr-x)), and must have a valid shebang, for example C(#!/usr/bin/env
+    python), for invoking the appropriate Python interpreter.
 seealso:
   - name: django-admin and manage.py Reference
     description: Reference for C(django-admin) or C(manage.py) commands.
@@ -169,16 +151,16 @@ seealso:
   - name: What Python version can I use with Django?
     description: From the Django FAQ, the response to Python requirements for the framework.
     link: https://docs.djangoproject.com/en/dev/faq/install/#what-python-version-can-i-use-with-django
-requirements: [ "virtualenv", "django" ]
+requirements: ["django >= 4.1"]
 author:
   - Alexei Znamensky (@russoz)
   - Scott Anderson (@tastychutney)
-'''
+"""
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Run cleanup on the application installed in django_dir
   community.general.django_manage:
-    command: cleanup
+    command: clearsessions
     project_path: "{{ django_dir }}"
 
 - name: Load the initial_data fixture into the application
@@ -189,7 +171,7 @@ EXAMPLES = """
 
 - name: Run syncdb on the application
   community.general.django_manage:
-    command: syncdb
+    command: migrate
     project_path: "{{ django_dir }}"
     settings: "{{ settings_app_name }}"
     pythonpath: "{{ settings_dir }}"
@@ -233,22 +215,7 @@ def _ensure_virtualenv(module):
     activate = os.path.join(vbin, 'activate')
 
     if not os.path.exists(activate):
-        # In version 9.0.0, if the venv is not found, it should fail_json() here.
-        if not module.params['ack_venv_creation_deprecation']:
-            module.deprecate(
-                'The behavior of "creating the virtual environment when missing" is being '
-                'deprecated and will be removed in community.general version 9.0.0. '
-                'Set the module parameter `ack_venv_creation_deprecation: true` to '
-                'prevent this message from showing up when creating a virtualenv.',
-                version='9.0.0',
-                collection_name='community.general',
-            )
-
-        virtualenv = module.get_bin_path('virtualenv', True)
-        vcmd = [virtualenv, venv_param]
-        rc, out_venv, err_venv = module.run_command(vcmd)
-        if rc != 0:
-            _fail(module, vcmd, out_venv, err_venv)
+        module.fail_json(msg='%s does not point to a valid virtual environment' % venv_param)
 
     os.environ["PATH"] = "%s:%s" % (vbin, os.environ["PATH"])
     os.environ["VIRTUAL_ENV"] = venv_param
@@ -266,11 +233,6 @@ def loaddata_filter_output(line):
     return "Installed" in line and "Installed 0 object" not in line
 
 
-def syncdb_filter_output(line):
-    return ("Creating table " in line) \
-        or ("Installed" in line and "Installed 0 object" not in line)
-
-
 def migrate_filter_output(line):
     return ("Migrating forwards " in line) \
         or ("Installed" in line and "Installed 0 object" not in line) \
@@ -283,13 +245,10 @@ def collectstatic_filter_output(line):
 
 def main():
     command_allowed_param_map = dict(
-        cleanup=(),
         createcachetable=('cache_table', 'database', ),
         flush=('database', ),
         loaddata=('database', 'fixtures', ),
-        syncdb=('database', ),
         test=('failfast', 'testrunner', 'apps', ),
-        validate=(),
         migrate=('apps', 'skip', 'merge', 'database',),
         collectstatic=('clear', 'link', ),
     )
@@ -301,7 +260,6 @@ def main():
     # forces --noinput on every command that needs it
     noinput_commands = (
         'flush',
-        'syncdb',
         'migrate',
         'test',
         'collectstatic',
@@ -333,7 +291,7 @@ def main():
             skip=dict(type='bool'),
             merge=dict(type='bool'),
             link=dict(type='bool'),
-            ack_venv_creation_deprecation=dict(type='bool'),
+            ack_venv_creation_deprecation=dict(type='bool', removed_in_version='11.0.0', removed_from_collection='community.general'),
         ),
     )
 
@@ -341,21 +299,6 @@ def main():
     command_bin = command_split[0]
     project_path = module.params['project_path']
     virtualenv = module.params['virtualenv']
-
-    try:
-        _deprecation = dict(
-            cleanup="clearsessions",
-            syncdb="migrate",
-            validate="check",
-        )
-        module.deprecate(
-            'The command {0} has been deprecated as it is no longer supported in recent Django versions.'
-            'Please use the command {1} instead that provide similar capability.'.format(command_bin, _deprecation[command_bin]),
-            version='9.0.0',
-            collection_name='community.general'
-        )
-    except KeyError:
-        pass
 
     for param in specific_params:
         value = module.params[param]

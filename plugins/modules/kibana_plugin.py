@@ -11,71 +11,70 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: kibana_plugin
 short_description: Manage Kibana plugins
 description:
-    - This module can be used to manage Kibana plugins.
+  - This module can be used to manage Kibana plugins.
 author: Thierno IB. BARRY (@barryib)
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-      support: full
-    diff_mode:
-      support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    name:
-      description:
+  name:
+    description:
       - Name of the plugin to install.
-      required: true
-      type: str
-    state:
-      description:
+    required: true
+    type: str
+  state:
+    description:
       - Desired state of a plugin.
-      choices: ["present", "absent"]
-      default: present
-      type: str
-    url:
-      description:
+    choices: ["present", "absent"]
+    default: present
+    type: str
+  url:
+    description:
       - Set exact URL to download the plugin from.
-      - For local file, prefix its absolute path with file://
-      type: str
-    timeout:
-      description:
-      - "Timeout setting: 30s, 1m, 1h etc."
-      default: 1m
-      type: str
-    plugin_bin:
-      description:
+      - For local file, prefix its absolute path with C(file://).
+    type: str
+  timeout:
+    description:
+      - 'Timeout setting: V(30s), V(1m), V(1h) and so on.'
+    default: 1m
+    type: str
+  plugin_bin:
+    description:
       - Location of the Kibana binary.
-      default: /opt/kibana/bin/kibana
-      type: path
-    plugin_dir:
-      description:
+    default: /opt/kibana/bin/kibana
+    type: path
+  plugin_dir:
+    description:
       - Your configured plugin directory specified in Kibana.
-      default: /opt/kibana/installedPlugins/
-      type: path
-    version:
-      description:
+    default: /opt/kibana/installedPlugins/
+    type: path
+  version:
+    description:
       - Version of the plugin to be installed.
       - If plugin exists with previous version, plugin will B(not) be updated unless O(force) is set to V(true).
-      type: str
-    force:
-      description:
+    type: str
+  force:
+    description:
       - Delete and re-install the plugin. Can be useful for plugins update.
-      type: bool
-      default: false
-    allow_root:
-      description:
+    type: bool
+    default: false
+  allow_root:
+    description:
       - Whether to allow C(kibana) and C(kibana-plugin) to be run as root. Passes the C(--allow-root) flag to these commands.
-      type: bool
-      default: false
-      version_added: 2.3.0
-'''
+    type: bool
+    default: false
+    version_added: 2.3.0
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Install Elasticsearch head plugin
   community.general.kibana_plugin:
     state: present
@@ -91,38 +90,38 @@ EXAMPLES = '''
   community.general.kibana_plugin:
     state: absent
     name: elasticsearch/marvel
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 cmd:
-    description: the launched command during plugin management (install / remove)
-    returned: success
-    type: str
+  description: The launched command during plugin management (install / remove).
+  returned: success
+  type: str
 name:
-    description: the plugin name to install or remove
-    returned: success
-    type: str
+  description: The plugin name to install or remove.
+  returned: success
+  type: str
 url:
-    description: the url from where the plugin is installed from
-    returned: success
-    type: str
+  description: The URL from where the plugin is installed from.
+  returned: success
+  type: str
 timeout:
-    description: the timeout for plugin download
-    returned: success
-    type: str
+  description: The timeout for plugin download.
+  returned: success
+  type: str
 stdout:
-    description: the command stdout
-    returned: success
-    type: str
+  description: The command stdout.
+  returned: success
+  type: str
 stderr:
-    description: the command stderr
-    returned: success
-    type: str
+  description: The command stderr.
+  returned: success
+  type: str
 state:
-    description: the state for the managed plugin
-    returned: success
-    type: str
-'''
+  description: The state for the managed plugin.
+  returned: success
+  type: str
+"""
 
 import os
 from ansible.module_utils.basic import AnsibleModule

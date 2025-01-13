@@ -55,6 +55,8 @@ class TestRedisInfoModule(ModuleTestCase):
                                                        'password': None,
                                                        'ssl': False,
                                                        'ssl_ca_certs': None,
+                                                       'ssl_certfile': None,
+                                                       'ssl_keyfile': None,
                                                        'ssl_cert_reqs': 'required'},))
             self.assertEqual(result.exception.args[0]['info']['redis_version'], '999.999.999')
 
@@ -74,6 +76,8 @@ class TestRedisInfoModule(ModuleTestCase):
                                                        'password': 'PASS',
                                                        'ssl': False,
                                                        'ssl_ca_certs': None,
+                                                       'ssl_certfile': None,
+                                                       'ssl_keyfile': None,
                                                        'ssl_cert_reqs': 'required'},))
             self.assertEqual(result.exception.args[0]['info']['redis_version'], '999.999.999')
 
@@ -87,6 +91,8 @@ class TestRedisInfoModule(ModuleTestCase):
                     'login_password': 'PASS',
                     'tls': True,
                     'ca_certs': '/etc/ssl/ca.pem',
+                    'client_cert_file': '/etc/ssl/client.pem',
+                    'client_key_file': '/etc/ssl/client.key',
                     'validate_certs': False
                 })
                 self.module.main()
@@ -96,6 +102,8 @@ class TestRedisInfoModule(ModuleTestCase):
                                                        'password': 'PASS',
                                                        'ssl': True,
                                                        'ssl_ca_certs': '/etc/ssl/ca.pem',
+                                                       'ssl_certfile': '/etc/ssl/client.pem',
+                                                       'ssl_keyfile': '/etc/ssl/client.key',
                                                        'ssl_cert_reqs': None},))
             self.assertEqual(result.exception.args[0]['info']['redis_version'], '999.999.999')
 

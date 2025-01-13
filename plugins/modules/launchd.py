@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: launchd
 author:
   - Martin Migasiewicz (@martinm82)
@@ -20,51 +19,53 @@ description:
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
-    check_mode:
-      support: full
-    diff_mode:
-      support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    name:
-      description:
+  name:
+    description:
       - Name of the service.
-      type: str
-      required: true
-    state:
-      description:
-      - V(started)/V(stopped) are idempotent actions that will not run
-        commands unless necessary.
-      - Launchd does not support V(restarted) nor V(reloaded) natively.
-        These will trigger a stop/start (restarted) or an unload/load
-        (reloaded).
-      - V(restarted) unloads and loads the service before start to ensure
-        that the latest job definition (plist) is used.
-      - V(reloaded) unloads and loads the service to ensure that the latest
-        job definition (plist) is used. Whether a service is started or
-        stopped depends on the content of the definition file.
-      type: str
-      choices: [ reloaded, restarted, started, stopped, unloaded ]
-    enabled:
-      description:
+    type: str
+    required: true
+  plist:
+    description:
+      - Name of the V(.plist) file for the service.
+      - Defaults to V({name}.plist).
+    type: str
+    version_added: 10.1.0
+  state:
+    description:
+      - V(started)/V(stopped) are idempotent actions that will not run commands unless necessary.
+      - Launchd does not support V(restarted) nor V(reloaded) natively. These will trigger a stop/start (restarted) or an
+        unload/load (reloaded).
+      - V(restarted) unloads and loads the service before start to ensure that the latest job definition (plist) is used.
+      - V(reloaded) unloads and loads the service to ensure that the latest job definition (plist) is used. Whether a service
+        is started or stopped depends on the content of the definition file.
+    type: str
+    choices: [reloaded, restarted, started, stopped, unloaded]
+  enabled:
+    description:
       - Whether the service should start on boot.
-      - B(At least one of state and enabled are required.)
-      type: bool
-    force_stop:
-      description:
+      - B(At least one of state and enabled are required).
+    type: bool
+  force_stop:
+    description:
       - Whether the service should not be restarted automatically by launchd.
-      - Services might have the 'KeepAlive' attribute set to true in a launchd configuration.
-        In case this is set to true, stopping a service will cause that launchd starts the service again.
-      - Set this option to V(true) to let this module change the 'KeepAlive' attribute to V(false).
-      type: bool
-      default: false
+      - Services might have the 'KeepAlive' attribute set to true in a launchd configuration. In case this is set to true,
+        stopping a service will cause that launchd starts the service again.
+      - Set this option to V(true) to let this module change the C(KeepAlive) attribute to V(false).
+    type: bool
+    default: false
 notes:
-- A user must privileged to manage services using this module.
+  - A user must privileged to manage services using this module.
 requirements:
-- A system managed by launchd
-- The plistlib python library
-'''
+  - A system managed by launchd
+  - The plistlib Python library
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Make sure spotify webhelper is started
   community.general.launchd:
     name: com.spotify.webhelper
@@ -100,11 +101,17 @@ EXAMPLES = r'''
   community.general.launchd:
     name: org.memcached
     state: unloaded
-'''
 
-RETURN = r'''
+- name: restart sshd
+  community.general.launchd:
+    name: com.openssh.sshd
+    plist: ssh.plist
+    state: restarted
+"""
+
+RETURN = r"""
 status:
-    description: Metadata about service status
+    description: Metadata about service status.
     returned: always
     type: dict
     sample:
@@ -114,7 +121,7 @@ status:
             "previous_pid": "82636",
             "previous_state": "running"
         }
-'''
+"""
 
 import os
 import plistlib
@@ -145,25 +152,31 @@ class ServiceState:
 
 
 class Plist:
-    def __init__(self, module, service):
+    def __init__(self, module, service, filename=None):
         self.__changed = False
         self.__service = service
+        if filename is not None:
+            self.__filename = filename
+        else:
+            self.__filename = '%s.plist' % service
 
         state, pid, dummy, dummy = LaunchCtlList(module, self.__service).run()
 
         # Check if readPlist is available or not
         self.old_plistlib = hasattr(plistlib, 'readPlist')
 
-        self.__file = self.__find_service_plist(self.__service)
+        self.__file = self.__find_service_plist(self.__filename)
         if self.__file is None:
-            msg = 'Unable to infer the path of %s service plist file' % self.__service
+            msg = 'Unable to find the plist file %s for service %s' % (
+                self.__filename, self.__service,
+            )
             if pid is None and state == ServiceState.UNLOADED:
                 msg += ' and it was not found among active services'
             module.fail_json(msg=msg)
         self.__update(module)
 
     @staticmethod
-    def __find_service_plist(service_name):
+    def __find_service_plist(filename):
         """Finds the plist file associated with a service"""
 
         launchd_paths = [
@@ -180,7 +193,6 @@ class Plist:
             except OSError:
                 continue
 
-            filename = '%s.plist' % service_name
             if filename in files:
                 return os.path.join(path, filename)
         return None
@@ -461,6 +473,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(type='str', required=True),
+            plist=dict(type='str'),
             state=dict(type='str', choices=['reloaded', 'restarted', 'started', 'stopped', 'unloaded']),
             enabled=dict(type='bool'),
             force_stop=dict(type='bool', default=False),
@@ -472,6 +485,7 @@ def main():
     )
 
     service = module.params['name']
+    plist_filename = module.params['plist']
     action = module.params['state']
     rc = 0
     out = err = ''
@@ -483,7 +497,7 @@ def main():
 
     # We will tailor the plist file in case one of the options
     # (enabled, force_stop) was specified.
-    plist = Plist(module, service)
+    plist = Plist(module, service, plist_filename)
     result['changed'] = plist.is_changed()
 
     # Gather information about the service to be controlled.
@@ -514,7 +528,8 @@ def main():
             result['status']['current_pid'] != result['status']['previous_pid']):
         result['changed'] = True
     if module.check_mode:
-        result['changed'] = True
+        if result['status']['current_state'] != action:
+            result['changed'] = True
     module.exit_json(**result)
 
 

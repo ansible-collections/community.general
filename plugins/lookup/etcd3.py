@@ -168,7 +168,7 @@ def etcd3_client(client_params):
         etcd = etcd3.client(**client_params)
         etcd.status()
     except Exception as exp:
-        raise AnsibleLookupError('Cannot connect to etcd cluster: %s' % (to_native(exp)))
+        raise AnsibleLookupError(f'Cannot connect to etcd cluster: {exp}')
     return etcd
 
 
@@ -204,7 +204,7 @@ class LookupModule(LookupBase):
         cnx_log = dict(client_params)
         if 'password' in cnx_log:
             cnx_log['password'] = '<redacted>'
-        display.verbose("etcd3 connection parameters: %s" % cnx_log)
+        display.verbose(f"etcd3 connection parameters: {cnx_log}")
 
         # connect to etcd3 server
         etcd = etcd3_client(client_params)
@@ -218,12 +218,12 @@ class LookupModule(LookupBase):
                         if val and meta:
                             ret.append({'key': to_native(meta.key), 'value': to_native(val)})
                 except Exception as exp:
-                    display.warning('Caught except during etcd3.get_prefix: %s' % (to_native(exp)))
+                    display.warning(f'Caught except during etcd3.get_prefix: {exp}')
             else:
                 try:
                     val, meta = etcd.get(term)
                     if val and meta:
                         ret.append({'key': to_native(meta.key), 'value': to_native(val)})
                 except Exception as exp:
-                    display.warning('Caught except during etcd3.get: %s' % (to_native(exp)))
+                    display.warning(f'Caught except during etcd3.get: {exp}')
         return ret

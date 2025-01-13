@@ -11,21 +11,12 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: ldap_entry
 short_description: Add or remove LDAP entries
 description:
-  - Add or remove LDAP entries. This module only asserts the existence or
-    non-existence of an LDAP entry, not its attributes. To assert the
-    attribute values of an entry, see M(community.general.ldap_attrs).
-notes:
-  - The default authentication settings will attempt to use a SASL EXTERNAL
-    bind over a UNIX domain socket. This works well with the default Ubuntu
-    install for example, which includes a cn=peercred,cn=external,cn=auth ACL
-    rule allowing root to modify the server configuration. If you need to use
-    a simple bind to access your server, pass the credentials in O(bind_dn)
-    and O(bind_pw).
+  - Add or remove LDAP entries. This module only asserts the existence or non-existence of an LDAP entry, not its attributes.
+    To assert the attribute values of an entry, see M(community.general.ldap_attrs).
 author:
   - Jiri Tyr (@jtyr)
 requirements:
@@ -38,24 +29,19 @@ attributes:
 options:
   attributes:
     description:
-      - If O(state=present), attributes necessary to create an entry. Existing
-        entries are never modified. To assert specific attribute values on an
-        existing entry, use M(community.general.ldap_attrs) module instead.
-      - Each attribute value can be a string for single-valued attributes or
-        a list of strings for multi-valued attributes.
-      - If you specify values for this option in YAML, please note that you can improve
-        readability for long string values by using YAML block modifiers as seen in the
-        examples for this module.
-      - Note that when using values that YAML/ansible-core interprets as other types,
-        like V(yes), V(no) (booleans), or V(2.10) (float), make sure to quote them if
-        these are meant to be strings. Otherwise the wrong values may be sent to LDAP.
+      - If O(state=present), attributes necessary to create an entry. Existing entries are never modified. To assert specific
+        attribute values on an existing entry, use M(community.general.ldap_attrs) module instead.
+      - Each attribute value can be a string for single-valued attributes or a list of strings for multi-valued attributes.
+      - If you specify values for this option in YAML, please note that you can improve readability for long string values
+        by using YAML block modifiers as seen in the examples for this module.
+      - Note that when using values that YAML/ansible-core interprets as other types, like V(yes), V(no) (booleans), or V(2.10)
+        (float), make sure to quote them if these are meant to be strings. Otherwise the wrong values may be sent to LDAP.
     type: dict
     default: {}
   objectClass:
     description:
-      - If O(state=present), value or list of values to use when creating
-        the entry. It can either be a string or an actual list of
-        strings.
+      - If O(state=present), value or list of values to use when creating the entry. It can either be a string or an actual
+        list of strings.
     type: list
     elements: str
   state:
@@ -66,19 +52,17 @@ options:
     type: str
   recursive:
     description:
-      - If O(state=delete), a flag indicating whether a single entry or the
-        whole branch must be deleted.
+      - If O(state=delete), a flag indicating whether a single entry or the whole branch must be deleted.
     type: bool
     default: false
     version_added: 4.6.0
 extends_documentation_fragment:
   - community.general.ldap.documentation
   - community.general.attributes
+"""
 
-'''
 
-
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Make sure we have a parent entry for users
   community.general.ldap_entry:
     dn: ou=users,dc=example,dc=com
@@ -103,19 +87,19 @@ EXAMPLES = """
     attributes:
       description: An LDAP Administrator
       roleOccupant:
-      - cn=Chocs Puddington,ou=Information Technology,dc=example,dc=com
-      - cn=Alice Stronginthebrain,ou=Information Technology,dc=example,dc=com
+        - cn=Chocs Puddington,ou=Information Technology,dc=example,dc=com
+        - cn=Alice Stronginthebrain,ou=Information Technology,dc=example,dc=com
       olcAccess:
-      - >-
-        {0}to attrs=userPassword,shadowLastChange
-        by self write
-        by anonymous auth
-        by dn="cn=admin,dc=example,dc=com" write
-        by * none'
-      - >-
-        {1}to dn.base="dc=example,dc=com"
-        by dn="cn=admin,dc=example,dc=com" write
-        by * read
+        - >-
+          {0}to attrs=userPassword,shadowLastChange
+          by self write
+          by anonymous auth
+          by dn="cn=admin,dc=example,dc=com" write
+          by * none'
+        - >-
+          {1}to dn.base="dc=example,dc=com"
+          by dn="cn=admin,dc=example,dc=com" write
+          by * read
 
 - name: Get rid of an old entry
   community.general.ldap_entry:
@@ -143,7 +127,7 @@ EXAMPLES = """
 """
 
 
-RETURN = """
+RETURN = r"""
 # Default return values
 """
 

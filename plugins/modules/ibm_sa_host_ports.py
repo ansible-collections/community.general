@@ -10,58 +10,55 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: ibm_sa_host_ports
 short_description: Add host ports on IBM Spectrum Accelerate Family storage systems
 
 description:
-    - "This module adds ports to or removes them from the hosts
-        on IBM Spectrum Accelerate Family storage systems."
-
+  - This module adds ports to or removes them from the hosts on IBM Spectrum Accelerate Family storage systems.
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 
 options:
-    host:
-        description:
-            - Host name.
-        required: true
-        type: str
-    state:
-        description:
-            - Host ports state.
-        default: "present"
-        choices: [ "present", "absent" ]
-        type: str
-    iscsi_name:
-        description:
-            - iSCSI initiator name.
-        required: false
-        type: str
-    fcaddress:
-        description:
-            - Fiber channel address.
-        required: false
-        type: str
-    num_of_visible_targets:
-        description:
-            - Number of visible targets.
-        required: false
-        type: str
+  host:
+    description:
+      - Host name.
+    required: true
+    type: str
+  state:
+    description:
+      - Host ports state.
+    default: "present"
+    choices: ["present", "absent"]
+    type: str
+  iscsi_name:
+    description:
+      - The iSCSI initiator name.
+    required: false
+    type: str
+  fcaddress:
+    description:
+      - Fiber channel address.
+    required: false
+    type: str
+  num_of_visible_targets:
+    description:
+      - Number of visible targets.
+    required: false
+    type: str
 
 extends_documentation_fragment:
   - community.general.ibm_storage
   - community.general.attributes
 
 author:
-    - Tzur Eliyahu (@tzure)
-'''
+  - Tzur Eliyahu (@tzure)
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Add ports for host.
   community.general.ibm_sa_host_ports:
     host: test_host
@@ -79,10 +76,9 @@ EXAMPLES = '''
     password: secret
     endpoints: hostdev-system
     state: absent
-
-'''
-RETURN = '''
-'''
+"""
+RETURN = r"""
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.ibm_sa_utils import (execute_pyxcli_command, connect_ssl,

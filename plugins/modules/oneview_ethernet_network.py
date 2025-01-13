@@ -7,46 +7,44 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: oneview_ethernet_network
 short_description: Manage OneView Ethernet Network resources
 description:
-    - Provides an interface to manage Ethernet Network resources. Can create, update, or delete.
+  - Provides an interface to manage Ethernet Network resources. Can create, update, or delete.
 requirements:
-    - hpOneView >= 3.1.0
+  - hpOneView >= 3.1.0
 author:
-    - Felipe Bulsoni (@fgbulsoni)
-    - Thiago Miotto (@tmiotto)
-    - Adriane Cardozo (@adriane-cardozo)
+  - Felipe Bulsoni (@fgbulsoni)
+  - Thiago Miotto (@tmiotto)
+  - Adriane Cardozo (@adriane-cardozo)
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    state:
-        description:
-            - Indicates the desired state for the Ethernet Network resource.
-                - V(present) will ensure data properties are compliant with OneView.
-                - V(absent) will remove the resource from OneView, if it exists.
-                - V(default_bandwidth_reset) will reset the network connection template to the default.
-        type: str
-        default: present
-        choices: [present, absent, default_bandwidth_reset]
-    data:
-        description:
-            - List with Ethernet Network properties.
-        type: dict
-        required: true
+  state:
+    description:
+      - Indicates the desired state for the Ethernet Network resource.
+      - V(present) will ensure data properties are compliant with OneView.
+      - V(absent) will remove the resource from OneView, if it exists.
+      - V(default_bandwidth_reset) will reset the network connection template to the default.
+    type: str
+    default: present
+    choices: [present, absent, default_bandwidth_reset]
+  data:
+    description:
+      - List with Ethernet Network properties.
+    type: dict
+    required: true
 extends_documentation_fragment:
-    - community.general.oneview
-    - community.general.oneview.validateetag
-    - community.general.attributes
+  - community.general.oneview
+  - community.general.oneview.validateetag
+  - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Ensure that the Ethernet Network is present using the default configuration
   community.general.oneview_ethernet_network:
     config: '/etc/oneview/oneview_config.json'
@@ -64,8 +62,8 @@ EXAMPLES = '''
       name: 'Test Ethernet Network'
       purpose: Management
       bandwidth:
-          maximumBandwidth: 3000
-          typicalBandwidth: 2000
+        maximumBandwidth: 3000
+        typicalBandwidth: 2000
   delegate_to: localhost
 
 - name: Ensure that the Ethernet Network is present with name 'Renamed Ethernet Network'
@@ -107,24 +105,24 @@ EXAMPLES = '''
     data:
       name: 'Test Ethernet Network'
   delegate_to: localhost
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 ethernet_network:
-    description: Has the facts about the Ethernet Networks.
-    returned: On state 'present'. Can be null.
-    type: dict
+  description: Has the facts about the Ethernet Networks.
+  returned: On O(state=present). Can be null.
+  type: dict
 
 ethernet_network_bulk:
-    description: Has the facts about the Ethernet Networks affected by the bulk insert.
-    returned: When 'vlanIdRange' attribute is in data argument. Can be null.
-    type: dict
+  description: Has the facts about the Ethernet Networks affected by the bulk insert.
+  returned: When V(vlanIdRange) attribute is in O(data) argument. Can be null.
+  type: dict
 
 ethernet_network_connection_template:
-    description: Has the facts about the Ethernet Network Connection Template.
-    returned: On state 'default_bandwidth_reset'. Can be null.
-    type: dict
-'''
+  description: Has the facts about the Ethernet Network Connection Template.
+  returned: On O(state=default_bandwidth_reset). Can be null.
+  type: dict
+"""
 
 from ansible_collections.community.general.plugins.module_utils.oneview import OneViewModuleBase, OneViewModuleResourceNotFound
 

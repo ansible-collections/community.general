@@ -9,69 +9,71 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: atomic_container
 short_description: Manage the containers on the atomic host platform
 description:
-    - Manage the containers on the atomic host platform.
-    - Allows to manage the lifecycle of a container on the atomic host platform.
+  - Manage the containers on the atomic host platform.
+  - Allows to manage the lifecycle of a container on the atomic host platform.
+deprecated:
+  removed_in: 13.0.0
+  why: Project Atomic was sunset by the end of 2019.
+  alternative: There is none.
 author: "Giuseppe Scrivano (@giuseppe)"
-notes:
-    - Host should support C(atomic) command
 requirements:
-    - atomic
+  - atomic
+notes:
+  - According to U(https://projectatomic.io/) the project has been sunset around 2019/2020, in favor of C(podman) and Fedora CoreOS.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
   check_mode:
     support: none
   diff_mode:
     support: none
 options:
-    backend:
-        description:
-          - Define the backend to use for the container.
-        required: true
-        choices: ["docker", "ostree"]
-        type: str
-    name:
-        description:
-          - Name of the container.
-        required: true
-        type: str
-    image:
-        description:
-          - The image to use to install the container.
-        required: true
-        type: str
-    rootfs:
-        description:
-          - Define the rootfs of the image.
-        type: str
-    state:
-        description:
-          - State of the container.
-        choices: ["absent", "latest", "present", "rollback"]
-        default: "latest"
-        type: str
-    mode:
-        description:
-          - Define if it is an user or a system container.
-        choices: ["user", "system"]
-        type: str
-    values:
-        description:
-            - Values for the installation of the container.
-            - This option is permitted only with mode 'user' or 'system'.
-            - The values specified here will be used at installation time as --set arguments for atomic install.
-        type: list
-        elements: str
-        default: []
-'''
+  backend:
+    description:
+      - Define the backend to use for the container.
+    required: true
+    choices: ["docker", "ostree"]
+    type: str
+  name:
+    description:
+      - Name of the container.
+    required: true
+    type: str
+  image:
+    description:
+      - The image to use to install the container.
+    required: true
+    type: str
+  rootfs:
+    description:
+      - Define the rootfs of the image.
+    type: str
+  state:
+    description:
+      - State of the container.
+    choices: ["absent", "latest", "present", "rollback"]
+    default: "latest"
+    type: str
+  mode:
+    description:
+      - Define if it is an user or a system container.
+    choices: ["user", "system"]
+    type: str
+  values:
+    description:
+      - Values for the installation of the container.
+      - This option is permitted only with mode 'user' or 'system'.
+      - The values specified here will be used at installation time as --set arguments for atomic install.
+    type: list
+    elements: str
+    default: []
+"""
 
-EXAMPLES = r'''
-
+EXAMPLES = r"""
 - name: Install the etcd system container
   community.general.atomic_container:
     name: etcd
@@ -80,7 +82,7 @@ EXAMPLES = r'''
     state: latest
     mode: system
     values:
-        - ETCD_NAME=etcd.server
+      - ETCD_NAME=etcd.server
 
 - name: Uninstall the etcd system container
   community.general.atomic_container:
@@ -89,15 +91,15 @@ EXAMPLES = r'''
     backend: ostree
     state: absent
     mode: system
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 msg:
-    description: The command standard output
-    returned: always
-    type: str
-    sample: 'Using default tag: latest ...'
-'''
+  description: The command standard output.
+  returned: always
+  type: str
+  sample: 'Using default tag: latest ...'
+"""
 
 # import module snippets
 import traceback

@@ -146,7 +146,7 @@ def serialize_groups(groups):
     return list(map(str, groups))
 
 
-@ pytest.fixture(scope="module")
+@pytest.fixture(scope="module")
 def inventory():
     r = InventoryModule()
     r.inventory = InventoryData()

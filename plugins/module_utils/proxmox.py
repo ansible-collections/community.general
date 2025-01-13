@@ -8,6 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 import traceback
+from time import sleep
 
 PROXMOXER_IMP_ERR = None
 try:
@@ -28,6 +29,9 @@ def proxmox_auth_argument_spec():
         api_host=dict(type='str',
                       required=True,
                       fallback=(env_fallback, ['PROXMOX_HOST'])
+                      ),
+        api_port=dict(type='int',
+                      fallback=(env_fallback, ['PROXMOX_PORT'])
                       ),
         api_user=dict(type='str',
                       required=True,
@@ -67,6 +71,8 @@ def ansible_to_proxmox_bool(value):
 
 class ProxmoxAnsible(object):
     """Base class for Proxmox modules"""
+    TASK_TIMED_OUT = 'timeout expired'
+
     def __init__(self, module):
         if not HAS_PROXMOXER:
             module.fail_json(msg=missing_required_lib('proxmoxer'), exception=PROXMOXER_IMP_ERR)
@@ -82,6 +88,7 @@ class ProxmoxAnsible(object):
 
     def _connect(self):
         api_host = self.module.params['api_host']
+        api_port = self.module.params['api_port']
         api_user = self.module.params['api_user']
         api_password = self.module.params['api_password']
         api_token_id = self.module.params['api_token_id']
@@ -89,6 +96,10 @@ class ProxmoxAnsible(object):
         validate_certs = self.module.params['validate_certs']
 
         auth_args = {'user': api_user}
+
+        if api_port:
+            auth_args['port'] = api_port
+
         if api_password:
             auth_args['password'] = api_password
         else:
@@ -158,6 +169,32 @@ class ProxmoxAnsible(object):
             return status['status'] == 'stopped' and status['exitstatus'] == 'OK'
         except Exception as e:
             self.module.fail_json(msg='Unable to retrieve API task ID from node %s: %s' % (node, e))
+
+    def api_task_complete(self, node_name, task_id, timeout):
+        """Wait until the task stops or times out.
+
+        :param node_name: Proxmox node name where the task is running.
+        :param task_id: ID of the running task.
+        :param timeout: Timeout in seconds to wait for the task to complete.
+        :return: Task completion status (True/False) and ``exitstatus`` message when status=False.
+        """
+        status = {}
+        while timeout:
+            try:
+                status = self.proxmox_api.nodes(node_name).tasks(task_id).status.get()
+            except Exception as e:
+                self.module.fail_json(msg='Unable to retrieve API task ID from node %s: %s' % (node_name, e))
+
+            if status['status'] == 'stopped':
+                if status['exitstatus'] == 'OK':
+                    return True, None
+                else:
+                    return False, status['exitstatus']
+            else:
+                timeout -= 1
+                if timeout <= 0:
+                    return False, ProxmoxAnsible.TASK_TIMED_OUT
+                sleep(1)
 
     def get_pool(self, poolid):
         """Retrieve pool information

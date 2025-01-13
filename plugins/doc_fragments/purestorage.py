@@ -10,18 +10,8 @@ __metaclass__ = type
 
 class ModuleDocFragment(object):
 
-    # Standard Pure Storage documentation fragment
-    DOCUMENTATION = r'''
-options:
-  - See separate platform section for more details
-requirements:
-  - See separate platform section for more details
-notes:
-  - Ansible modules are available for the following Pure Storage products: FlashArray, FlashBlade
-'''
-
     # Documentation fragment for FlashBlade
-    FB = r'''
+    FB = r"""
 options:
   fb_url:
     description:
@@ -33,14 +23,14 @@ options:
     type: str
 notes:
   - This module requires the C(purity_fb) Python library.
-  - You must set E(PUREFB_URL) and E(PUREFB_API) environment variables
-    if O(fb_url) and O(api_token) arguments are not passed to the module directly.
+  - You must set E(PUREFB_URL) and E(PUREFB_API) environment variables if O(fb_url) and O(api_token) arguments are not passed
+    to the module directly.
 requirements:
   - purity_fb >= 1.1
-'''
+"""
 
     # Documentation fragment for FlashArray
-    FA = r'''
+    FA = r"""
 options:
   fa_url:
     description:
@@ -54,8 +44,8 @@ options:
     required: true
 notes:
   - This module requires the C(purestorage) Python library.
-  - You must set E(PUREFA_URL) and E(PUREFA_API) environment variables
-    if O(fa_url) and O(api_token) arguments are not passed to the module directly.
+  - You must set E(PUREFA_URL) and E(PUREFA_API) environment variables if O(fa_url) and O(api_token) arguments are not passed
+    to the module directly.
 requirements:
   - purestorage
-'''
+"""

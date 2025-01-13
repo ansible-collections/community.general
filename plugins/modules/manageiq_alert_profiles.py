@@ -8,8 +8,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
-
+DOCUMENTATION = r"""
 module: manageiq_alert_profiles
 
 short_description: Configuration of alert profiles for ManageIQ
@@ -20,7 +19,6 @@ extends_documentation_fragment:
 author: Elad Alfassa (@elad661) <ealfassa@redhat.com>
 description:
   - The manageiq_alert_profiles module supports adding, updating and deleting alert profiles in ManageIQ.
-
 attributes:
   check_mode:
     support: none
@@ -31,35 +29,33 @@ options:
   state:
     type: str
     description:
-      - absent - alert profile should not exist,
-      - present - alert profile should exist,
+      - V(absent) - alert profile should not exist,
+      - V(present) - alert profile should exist.
     choices: ['absent', 'present']
     default: 'present'
   name:
     type: str
     description:
       - The unique alert profile name in ManageIQ.
-      - Required when state is "absent" or "present".
+    required: true
   resource_type:
     type: str
     description:
-      - The resource type for the alert profile in ManageIQ. Required when state is "present".
-    choices: ['Vm', 'ContainerNode', 'MiqServer', 'Host', 'Storage', 'EmsCluster',
-              'ExtManagementSystem', 'MiddlewareServer']
+      - The resource type for the alert profile in ManageIQ. Required when O(state=present).
+    choices: ['Vm', 'ContainerNode', 'MiqServer', 'Host', 'Storage', 'EmsCluster', 'ExtManagementSystem', 'MiddlewareServer']
   alerts:
     type: list
     elements: str
     description:
       - List of alert descriptions to assign to this profile.
-      - Required if state is "present"
+      - Required if O(state=present).
   notes:
     type: str
     description:
-      - Optional notes for this profile
+      - Optional notes for this profile.
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Add an alert profile to ManageIQ
   community.general.manageiq_alert_profiles:
     state: present
@@ -72,7 +68,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false  # only do this when you trust the network!
+      validate_certs: false # only do this when you trust the network!
 
 - name: Delete an alert profile from ManageIQ
   community.general.manageiq_alert_profiles:
@@ -82,11 +78,11 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false  # only do this when you trust the network!
-'''
+      validate_certs: false # only do this when you trust the network!
+"""
 
-RETURN = '''
-'''
+RETURN = r"""
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.manageiq import ManageIQ, manageiq_argument_spec
@@ -118,8 +114,7 @@ class ManageIQAlertProfiles(object):
         """
         alerts = []
         for alert_description in alert_descriptions:
-            alert = self.manageiq.find_collection_resource_or_fail("alert_definitions",
-                                                                   description=alert_description)
+            alert = self.manageiq.find_collection_resource_or_fail("alert_definitions", description=alert_description)
             alerts.append(alert['href'])
 
         return alerts
@@ -257,7 +252,7 @@ class ManageIQAlertProfiles(object):
 
 def main():
     argument_spec = dict(
-        name=dict(type='str'),
+        name=dict(type='str', required=True),
         resource_type=dict(type='str', choices=['Vm',
                                                 'ContainerNode',
                                                 'MiqServer',
@@ -274,8 +269,7 @@ def main():
     argument_spec.update(manageiq_argument_spec())
 
     module = AnsibleModule(argument_spec=argument_spec,
-                           required_if=[('state', 'present', ['name', 'resource_type']),
-                                        ('state', 'absent', ['name'])])
+                           required_if=[('state', 'present', ['resource_type', 'alerts'])])
 
     state = module.params['state']
     name = module.params['name']
@@ -283,8 +277,7 @@ def main():
     manageiq = ManageIQ(module)
     manageiq_alert_profiles = ManageIQAlertProfiles(manageiq)
 
-    existing_profile = manageiq.find_collection_resource_by("alert_definition_profiles",
-                                                            name=name)
+    existing_profile = manageiq.find_collection_resource_by("alert_definition_profiles", name=name)
 
     # we need to add or update the alert profile
     if state == "present":

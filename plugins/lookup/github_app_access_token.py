@@ -19,7 +19,7 @@ DOCUMENTATION = '''
       key_path:
         description:
         - Path to your private key.
-        required: true
+        - Either O(key_path) or O(private_key) must be specified.
         type: path
       app_id:
         description:
@@ -34,6 +34,12 @@ DOCUMENTATION = '''
         - Alternatively, you can use PyGithub (U(https://github.com/PyGithub/PyGithub)) to get your installation ID.
         required: true
         type: str
+      private_key:
+        description:
+        - GitHub App private key in PEM file format as string.
+        - Either O(key_path) or O(private_key) must be specified.
+        type: str
+        version_added: 10.0.0
       token_expiry:
         description:
         - How long the token should last for in seconds.
@@ -49,8 +55,8 @@ EXAMPLES = '''
     dest: /srv/checkout
   vars:
     github_token: >-
-      lookup('community.general.github_app_access_token', key_path='/home/to_your/key',
-             app_id='123456', installation_id='64209')
+      {{ lookup('community.general.github_app_access_token', key_path='/home/to_your/key',
+                app_id='123456', installation_id='64209') }}
 '''
 
 RETURN = '''
@@ -71,7 +77,7 @@ import time
 import json
 from ansible.module_utils.urls import open_url
 from ansible.module_utils.six.moves.urllib.error import HTTPError
-from ansible.errors import AnsibleError
+from ansible.errors import AnsibleError, AnsibleOptionsError
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
 
@@ -84,12 +90,14 @@ else:
 display = Display()
 
 
-def read_key(path):
+def read_key(path, private_key=None):
     try:
+        if private_key:
+            return jwk_from_pem(private_key.encode('utf-8'))
         with open(path, 'rb') as pem_file:
             return jwk_from_pem(pem_file.read())
     except Exception as e:
-        raise AnsibleError("Error while parsing key file: {0}".format(e))
+        raise AnsibleError(f"Error while parsing key file: {e}")
 
 
 def encode_jwt(app_id, jwk, exp=600):
@@ -102,7 +110,7 @@ def encode_jwt(app_id, jwk, exp=600):
     try:
         return jwt_instance.encode(payload, jwk, alg='RS256')
     except Exception as e:
-        raise AnsibleError("Error while encoding jwt: {0}".format(e))
+        raise AnsibleError(f"Error while encoding jwt: {e}")
 
 
 def post_request(generated_jwt, installation_id):
@@ -116,24 +124,24 @@ def post_request(generated_jwt, installation_id):
     except HTTPError as e:
         try:
             error_body = json.loads(e.read().decode())
-            display.vvv("Error returned: {0}".format(error_body))
+            display.vvv(f"Error returned: {error_body}")
         except Exception:
             error_body = {}
         if e.code == 404:
             raise AnsibleError("Github return error. Please confirm your installationd_id value is valid")
         elif e.code == 401:
             raise AnsibleError("Github return error. Please confirm your private key is valid")
-        raise AnsibleError("Unexpected data returned: {0} -- {1}".format(e, error_body))
+        raise AnsibleError(f"Unexpected data returned: {e} -- {error_body}")
     response_body = response.read()
     try:
         json_data = json.loads(response_body.decode('utf-8'))
     except json.decoder.JSONDecodeError as e:
-        raise AnsibleError("Error while dencoding JSON respone from github: {0}".format(e))
+        raise AnsibleError(f"Error while dencoding JSON respone from github: {e}")
     return json_data.get('token')
 
 
-def get_token(key_path, app_id, installation_id, expiry=600):
-    jwk = read_key(key_path)
+def get_token(key_path, app_id, installation_id, private_key, expiry=600):
+    jwk = read_key(key_path, private_key)
     generated_jwt = encode_jwt(app_id, jwk, exp=expiry)
     return post_request(generated_jwt, installation_id)
 
@@ -146,10 +154,16 @@ class LookupModule(LookupBase):
 
         self.set_options(var_options=variables, direct=kwargs)
 
+        if not (self.get_option("key_path") or self.get_option("private_key")):
+            raise AnsibleOptionsError("One of key_path or private_key is required")
+        if self.get_option("key_path") and self.get_option("private_key"):
+            raise AnsibleOptionsError("key_path and private_key are mutually exclusive")
+
         t = get_token(
             self.get_option('key_path'),
             self.get_option('app_id'),
             self.get_option('installation_id'),
+            self.get_option('private_key'),
             self.get_option('token_expiry'),
         )
 

@@ -4,6 +4,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 ---
+anchors:
+  environ: &env-def {check_rc: true}
+test_cases:
 - id: simple run
   output:
     ansible_facts:
@@ -11,9 +14,10 @@
         a: 1
         b: 2
         c: 3
-  run_command_calls:
+  mocks:
+    run_command:
     - command: [/testbin/facter, --json]
-      environ: &env-def {check_rc: true}
+      environ: *env-def
       rc: 0
       out: >
         { "a": 1, "b": 2, "c": 3 }
@@ -21,17 +25,18 @@
 - id: with args
   input:
     arguments:
-      - -p
-      - system_uptime
-      - timezone
-      - is_virtual
+    - -p
+    - system_uptime
+    - timezone
+    - is_virtual
   output:
     ansible_facts:
       facter:
         a: 1
         b: 2
         c: 3
-  run_command_calls:
+  mocks:
+    run_command:
     - command: [/testbin/facter, --json, -p, system_uptime, timezone, is_virtual]
       environ: *env-def
       rc: 0

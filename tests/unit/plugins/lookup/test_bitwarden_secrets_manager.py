@@ -45,6 +45,10 @@ MOCK_SECRETS = [
 class MockBitwardenSecretsManager(BitwardenSecretsManager):
 
     def _run(self, args, stdin=None):
+        # mock the --version call
+        if args[0] == "--version":
+            return "bws 1.0.0", "", 0
+
         # secret_id is the last argument passed to the bws CLI
         secret_id = args[-1]
         rc = 1

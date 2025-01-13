@@ -24,6 +24,8 @@ DOCUMENTATION = '''
       _terms:
         description: Identifier(s) (case-insensitive UUID or name) of item(s) to retrieve.
         required: true
+        type: list
+        elements: string
 
     extends_documentation_fragment:
       - community.general.onepassword
@@ -53,7 +55,7 @@ class OnePassCLIv2Doc(OnePassCLIv2):
     def get_raw(self, item_id, vault=None, token=None):
         args = ["document", "get", item_id]
         if vault is not None:
-            args = [*args, "--vault={0}".format(vault)]
+            args = [*args, f"--vault={vault}"]
 
         if self.service_account_token:
             if vault is None:

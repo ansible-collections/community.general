@@ -11,20 +11,18 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: git_config
 author:
   - Matthew Gamble (@djmattyg007)
   - Marius Gedminas (@mgedmin)
 requirements: ['git']
-short_description: Read and write git configuration
+short_description: Update git configuration
 description:
-  - The M(community.general.git_config) module changes git configuration by invoking C(git config).
-    This is needed if you do not want to use M(ansible.builtin.template) for the entire git
-    config file (for example because you need to change just C(user.email) in
-    /etc/.git/config).  Solutions involving M(ansible.builtin.command) are cumbersome or
-    do not work correctly in check mode.
+  - The M(community.general.git_config) module changes git configuration by invoking C(git config). This is needed if you
+    do not want to use M(ansible.builtin.template) for the entire git config file (for example because you need to change
+    just C(user.email) in C(/etc/.git/config)). Solutions involving M(ansible.builtin.command) are cumbersome or do not work
+    correctly in check mode.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -36,17 +34,17 @@ options:
   list_all:
     description:
       - List all settings (optionally limited to a given O(scope)).
+      - This option is B(deprecated) and will be removed from community.general 11.0.0. Please use M(community.general.git_config_info)
+        instead.
     type: bool
     default: false
   name:
     description:
-      - The name of the setting. If no value is supplied, the value will
-        be read from the config if it has been set.
+      - The name of the setting. If no value is supplied, the value will be read from the config if it has been set.
     type: str
   repo:
     description:
-      - Path to a git repository for reading and writing values from a
-        specific repo.
+      - Path to a git repository for reading and writing values from a specific repo.
     type: path
   file:
     description:
@@ -60,34 +58,34 @@ options:
       - If this is set to V(local), you must also specify the O(repo) parameter.
       - If this is set to V(file), you must also specify the O(file) parameter.
       - It defaults to system only when not using O(list_all=true).
-    choices: [ "file", "local", "global", "system" ]
+    choices: ["file", "local", "global", "system"]
     type: str
   state:
     description:
-      - "Indicates the setting should be set/unset.
-        This parameter has higher precedence than O(value) parameter:
-        when O(state=absent) and O(value) is defined, O(value) is discarded."
-    choices: [ 'present', 'absent' ]
+      - 'Indicates the setting should be set/unset. This parameter has higher precedence than O(value) parameter: when O(state=absent)
+        and O(value) is defined, O(value) is discarded.'
+    choices: ['present', 'absent']
     default: 'present'
     type: str
   value:
     description:
-      - When specifying the name of a single setting, supply a value to
-        set that setting to the given value.
+      - When specifying the name of a single setting, supply a value to set that setting to the given value.
+      - From community.general 11.0.0 on, O(value) will be required if O(state=present). To read values, use the M(community.general.git_config_info)
+        module instead.
     type: str
   add_mode:
     description:
-      - Specify if a value should replace the existing value(s) or if the new
-        value should be added alongside other values with the same name.
-      - This option is only relevant when adding/replacing values. If O(state=absent) or
-        values are just read out, this option is not considered.
-    choices: [ "add", "replace-all" ]
+      - Specify if a value should replace the existing value(s) or if the new value should be added alongside other values
+        with the same name.
+      - This option is only relevant when adding/replacing values. If O(state=absent) or values are just read out, this option
+        is not considered.
+    choices: ["add", "replace-all"]
     type: str
     default: "replace-all"
     version_added: 8.1.0
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Add a setting to ~/.gitconfig
   community.general.git_config:
     name: alias.ci
@@ -143,41 +141,17 @@ EXAMPLES = '''
     repo: /etc
     scope: local
     value: 'root@{{ ansible_fqdn }}'
+"""
 
-- name: Read individual values from git config
-  community.general.git_config:
-    name: alias.ci
-    scope: global
-
-- name: Scope system is also assumed when reading values, unless list_all=true
-  community.general.git_config:
-    name: alias.diffc
-
-- name: Read all values from git config
-  community.general.git_config:
-    list_all: true
-    scope: global
-
-- name: When list_all is yes and no scope is specified, you get configuration from all scopes
-  community.general.git_config:
-    list_all: true
-
-- name: Specify a repository to include local settings
-  community.general.git_config:
-    list_all: true
-    repo: /path/to/repo.git
-'''
-
-RETURN = '''
----
+RETURN = r"""
 config_value:
-  description: When O(list_all=false) and value is not set, a string containing the value of the setting in name
+  description: When O(list_all=false) and value is not set, a string containing the value of the setting in name.
   returned: success
   type: str
   sample: "vim"
 
 config_values:
-  description: When O(list_all=true), a dict containing key/value pairs of multiple configuration settings
+  description: When O(list_all=true), a dict containing key/value pairs of multiple configuration settings.
   returned: success
   type: dict
   sample:
@@ -185,7 +159,7 @@ config_values:
     color.ui: "auto"
     alias.diffc: "diff --cached"
     alias.remotev: "remote -v"
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -193,7 +167,7 @@ from ansible.module_utils.basic import AnsibleModule
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            list_all=dict(required=False, type='bool', default=False),
+            list_all=dict(required=False, type='bool', default=False, removed_in_version='11.0.0', removed_from_collection='community.general'),
             name=dict(type='str'),
             repo=dict(type='path'),
             file=dict(type='path'),
@@ -221,6 +195,14 @@ def main():
     unset = params['state'] == 'absent'
     new_value = params['value'] or ''
     add_mode = params['add_mode']
+
+    if not unset and not new_value and not params['list_all']:
+        module.deprecate(
+            'If state=present, a value must be specified from community.general 11.0.0 on.'
+            ' To read a config value, use the community.general.git_config_info module instead.',
+            version='11.0.0',
+            collection_name='community.general',
+        )
 
     scope = determine_scope(params)
     cwd = determine_cwd(scope, params)
@@ -263,7 +245,7 @@ def main():
         module.exit_json(changed=False, msg='', config_value=old_values[0] if old_values else '')
     elif unset and not out:
         module.exit_json(changed=False, msg='no setting to unset')
-    elif new_value in old_values and (len(old_values) == 1 or add_mode == "add"):
+    elif new_value in old_values and (len(old_values) == 1 or add_mode == "add") and not unset:
         module.exit_json(changed=False, msg="")
 
     # Until this point, the git config was just read and in case no change is needed, the module has already exited.

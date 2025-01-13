@@ -12,27 +12,17 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: ldap_attrs
 short_description: Add or remove multiple LDAP attribute values
 description:
   - Add or remove multiple LDAP attribute values.
 notes:
-  - This only deals with attributes on existing entries. To add or remove
-    whole entries, see M(community.general.ldap_entry).
-  - The default authentication settings will attempt to use a SASL EXTERNAL
-    bind over a UNIX domain socket. This works well with the default Ubuntu
-    install for example, which includes a cn=peercred,cn=external,cn=auth ACL
-    rule allowing root to modify the server configuration. If you need to use
-    a simple bind to access your server, pass the credentials in O(bind_dn)
-    and O(bind_pw).
-  - For O(state=present) and O(state=absent), all value comparisons are
-    performed on the server for maximum accuracy. For O(state=exact), values
-    have to be compared in Python, which obviously ignores LDAP matching
-    rules. This should work out in most cases, but it is theoretically
-    possible to see spurious changes when target and actual values are
-    semantically identical but lexically distinct.
+  - This only deals with attributes on existing entries. To add or remove whole entries, see M(community.general.ldap_entry).
+  - For O(state=present) and O(state=absent), all value comparisons are performed on the server for maximum accuracy. For
+    O(state=exact), values have to be compared in Python, which obviously ignores LDAP matching rules. This should work out
+    in most cases, but it is theoretically possible to see spurious changes when target and actual values are semantically
+    identical but lexically distinct.
 version_added: '0.2.0'
 author:
   - Jiri Tyr (@jtyr)
@@ -53,46 +43,39 @@ options:
     choices: [present, absent, exact]
     default: present
     description:
-      - The state of the attribute values. If V(present), all given attribute
-        values will be added if they're missing. If V(absent), all given
-        attribute values will be removed if present. If V(exact), the set of
-        attribute values will be forced to exactly those provided and no others.
-        If O(state=exact) and the attribute value is empty, all values for
+      - The state of the attribute values. If V(present), all given attribute values will be added if they are missing. If
+        V(absent), all given attribute values will be removed if present. If V(exact), the set of attribute values will be
+        forced to exactly those provided and no others. If O(state=exact) and the attribute value is empty, all values for
         this attribute will be removed.
   attributes:
     required: true
     type: dict
     description:
       - The attribute(s) and value(s) to add or remove.
-      - Each attribute value can be a string for single-valued attributes or
-        a list of strings for multi-valued attributes.
-      - If you specify values for this option in YAML, please note that you can improve
-        readability for long string values by using YAML block modifiers as seen in the
-        examples for this module.
-      - Note that when using values that YAML/ansible-core interprets as other types,
-        like V(yes), V(no) (booleans), or V(2.10) (float), make sure to quote them if
-        these are meant to be strings. Otherwise the wrong values may be sent to LDAP.
+      - Each attribute value can be a string for single-valued attributes or a list of strings for multi-valued attributes.
+      - If you specify values for this option in YAML, please note that you can improve readability for long string values
+        by using YAML block modifiers as seen in the examples for this module.
+      - Note that when using values that YAML/ansible-core interprets as other types, like V(yes), V(no) (booleans), or V(2.10)
+        (float), make sure to quote them if these are meant to be strings. Otherwise the wrong values may be sent to LDAP.
   ordered:
     required: false
     type: bool
     default: false
     description:
-      - If V(true), prepend list values with X-ORDERED index numbers in all
-        attributes specified in the current task. This is useful mostly with
-        C(olcAccess) attribute to easily manage LDAP Access Control Lists.
+      - If V(true), prepend list values with X-ORDERED index numbers in all attributes specified in the current task. This
+        is useful mostly with C(olcAccess) attribute to easily manage LDAP Access Control Lists.
 extends_documentation_fragment:
   - community.general.ldap.documentation
   - community.general.attributes
+"""
 
-'''
 
-
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Configure directory number 1 for example.com
   community.general.ldap_attrs:
     dn: olcDatabase={1}hdb,cn=config
     attributes:
-        olcSuffix: dc=example,dc=com
+      olcSuffix: dc=example,dc=com
     state: exact
 
 # The complex argument format is required here to pass a list of ACL strings.
@@ -100,17 +83,17 @@ EXAMPLES = r'''
   community.general.ldap_attrs:
     dn: olcDatabase={1}hdb,cn=config
     attributes:
-        olcAccess:
-          - >-
-            {0}to attrs=userPassword,shadowLastChange
-            by self write
-            by anonymous auth
-            by dn="cn=admin,dc=example,dc=com" write
-            by * none'
-          - >-
-            {1}to dn.base="dc=example,dc=com"
-            by dn="cn=admin,dc=example,dc=com" write
-            by * read
+      olcAccess:
+        - >-
+          {0}to attrs=userPassword,shadowLastChange
+          by self write
+          by anonymous auth
+          by dn="cn=admin,dc=example,dc=com" write
+          by * none'
+        - >-
+          {1}to dn.base="dc=example,dc=com"
+          by dn="cn=admin,dc=example,dc=com" write
+          by * read
     state: exact
 
 # An alternative approach with automatic X-ORDERED numbering
@@ -118,17 +101,17 @@ EXAMPLES = r'''
   community.general.ldap_attrs:
     dn: olcDatabase={1}hdb,cn=config
     attributes:
-        olcAccess:
-          - >-
-            to attrs=userPassword,shadowLastChange
-            by self write
-            by anonymous auth
-            by dn="cn=admin,dc=example,dc=com" write
-            by * none'
-          - >-
-            to dn.base="dc=example,dc=com"
-            by dn="cn=admin,dc=example,dc=com" write
-            by * read
+      olcAccess:
+        - >-
+          to attrs=userPassword,shadowLastChange
+          by self write
+          by anonymous auth
+          by dn="cn=admin,dc=example,dc=com" write
+          by * none'
+        - >-
+          to dn.base="dc=example,dc=com"
+          by dn="cn=admin,dc=example,dc=com" write
+          by * read
     ordered: true
     state: exact
 
@@ -136,23 +119,23 @@ EXAMPLES = r'''
   community.general.ldap_attrs:
     dn: olcDatabase={1}hdb,cn=config
     attributes:
-        olcDbIndex:
-            - objectClass eq
-            - uid eq
+      olcDbIndex:
+        - objectClass eq
+        - uid eq
 
 - name: Set up a root user, which we can use later to bootstrap the directory
   community.general.ldap_attrs:
     dn: olcDatabase={1}hdb,cn=config
     attributes:
-        olcRootDN: cn=root,dc=example,dc=com
-        olcRootPW: "{SSHA}tabyipcHzhwESzRaGA7oQ/SDoBZQOGND"
+      olcRootDN: cn=root,dc=example,dc=com
+      olcRootPW: "{SSHA}tabyipcHzhwESzRaGA7oQ/SDoBZQOGND"
     state: exact
 
 - name: Remove an attribute with a specific value
   community.general.ldap_attrs:
     dn: uid=jdoe,ou=people,dc=example,dc=com
     attributes:
-        description: "An example user account"
+      description: "An example user account"
     state: absent
     server_uri: ldap://localhost/
     bind_dn: cn=admin,dc=example,dc=com
@@ -162,22 +145,22 @@ EXAMPLES = r'''
   community.general.ldap_attrs:
     dn: uid=jdoe,ou=people,dc=example,dc=com
     attributes:
-        description: []
+      description: []
     state: exact
     server_uri: ldap://localhost/
     bind_dn: cn=admin,dc=example,dc=com
     bind_pw: password
-'''
+"""
 
 
-RETURN = r'''
+RETURN = r"""
 modlist:
-  description: list of modified parameters
+  description: List of modified parameters.
   returned: success
   type: list
   sample:
     - [2, "olcRootDN", ["cn=root,dc=example,dc=com"]]
-'''
+"""
 
 import traceback
 

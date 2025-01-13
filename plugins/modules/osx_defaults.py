@@ -10,18 +10,17 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: osx_defaults
 author:
 # DO NOT RE-ADD GITHUB HANDLE!
-- Franck Nijhof (!UNKNOWN)
+  - Franck Nijhof (!UNKNOWN)
 short_description: Manage macOS user defaults
 description:
-  - osx_defaults allows users to read, write, and delete macOS user defaults from Ansible scripts.
-  - macOS applications and other programs use the defaults system to record user preferences and other
-    information that must be maintained when the applications are not running (such as default font for new
-    documents, or the position of an Info panel).
+  - This module allows users to read, write, and delete macOS user defaults from Ansible scripts.
+  - MacOS applications and other programs use the defaults system to record user preferences and other information that must
+    be maintained when the applications are not running (such as default font for new documents, or the position of an Info
+    panel).
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -48,8 +47,15 @@ options:
     description:
       - The type of value to write.
     type: str
-    choices: [ array, bool, boolean, date, float, int, integer, string ]
+    choices: [array, bool, boolean, date, float, int, integer, string]
     default: string
+  check_type:
+    description:
+      - Checks if the type of the provided O(value) matches the type of an existing default.
+      - If the types do not match, raises an error.
+    type: bool
+    default: true
+    version_added: 8.6.0
   array_add:
     description:
       - Add new elements to the array for a key which has an array as its value.
@@ -65,7 +71,7 @@ options:
       - The state of the user defaults.
       - If set to V(list) will query the given parameter specified by O(key). Returns V(null) is nothing found or mis-spelled.
     type: str
-    choices: [ absent, list, present ]
+    choices: [absent, list, present]
     default: present
   path:
     description:
@@ -73,10 +79,10 @@ options:
     type: str
     default: /usr/bin:/usr/local/bin
 notes:
-    - Apple Mac caches defaults. You may need to logout and login to apply the changes.
-'''
+  - Apple Mac caches defaults. You may need to logout and login to apply the changes.
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Set boolean valued key for application domain
   community.general.osx_defaults:
     domain: com.apple.Safari
@@ -128,7 +134,7 @@ EXAMPLES = r'''
     domain: com.geekchimp.macable
     key: ExampleKeyToRemove
     state: absent
-'''
+"""
 
 from datetime import datetime
 import re
@@ -158,6 +164,7 @@ class OSXDefaults(object):
         self.domain = module.params['domain']
         self.host = module.params['host']
         self.key = module.params['key']
+        self.check_type = module.params['check_type']
         self.type = module.params['type']
         self.array_add = module.params['array_add']
         self.value = module.params['value']
@@ -349,10 +356,11 @@ class OSXDefaults(object):
             self.delete()
             return True
 
-        # There is a type mismatch! Given type does not match the type in defaults
-        value_type = type(self.value)
-        if self.current_value is not None and not isinstance(self.current_value, value_type):
-            raise OSXDefaultsException("Type mismatch. Type in defaults: %s" % type(self.current_value).__name__)
+        # Check if there is a type mismatch, e.g. given type does not match the type in defaults
+        if self.check_type:
+            value_type = type(self.value)
+            if self.current_value is not None and not isinstance(self.current_value, value_type):
+                raise OSXDefaultsException("Type mismatch. Type in defaults: %s" % type(self.current_value).__name__)
 
         # Current value matches the given value. Nothing need to be done. Arrays need extra care
         if self.type == "array" and self.current_value is not None and not self.array_add and \
@@ -383,6 +391,7 @@ def main():
             domain=dict(type='str', default='NSGlobalDomain'),
             host=dict(type='str'),
             key=dict(type='str', no_log=False),
+            check_type=dict(type='bool', default=True),
             type=dict(type='str', default='string', choices=['array', 'bool', 'boolean', 'date', 'float', 'int', 'integer', 'string']),
             array_add=dict(type='bool', default=False),
             value=dict(type='raw'),

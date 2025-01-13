@@ -20,21 +20,25 @@ DOCUMENTATION = '''
         - inventory_cache
     options:
       plugin:
-        description: The name of this plugin, it should always be set to V(community.general.cobbler) for this plugin to recognize it as it's own.
+        description: The name of this plugin, it should always be set to V(community.general.cobbler) for this plugin to recognize it as its own.
+        type: string
         required: true
         choices: [ 'cobbler', 'community.general.cobbler' ]
       url:
         description: URL to cobbler.
+        type: string
         default: 'http://cobbler/cobbler_api'
         env:
             - name: COBBLER_SERVER
       user:
         description: Cobbler authentication user.
+        type: string
         required: false
         env:
             - name: COBBLER_USER
       password:
         description: Cobbler authentication password.
+        type: string
         required: false
         env:
             - name: COBBLER_PASSWORD
@@ -114,9 +118,10 @@ password: secure
 import socket
 
 from ansible.errors import AnsibleError
-from ansible.module_utils.common.text.converters import to_text
 from ansible.plugins.inventory import BaseInventoryPlugin, Cacheable, to_safe_group_name
 from ansible.module_utils.six import text_type
+
+from ansible_collections.community.general.plugins.plugin_utils.unsafe import make_unsafe
 
 # xmlrpc
 try:
@@ -154,7 +159,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
             raise AnsibleError('Could not import xmlrpc client library')
 
         if self.connection is None:
-            self.display.vvvv('Connecting to %s\n' % self.cobbler_url)
+            self.display.vvvv(f'Connecting to {self.cobbler_url}\n')
             self.connection = xmlrpc_client.Server(self.cobbler_url, allow_none=True)
             self.token = None
             if self.get_option('user') is not None:
@@ -205,7 +210,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
         return self._cache[self.cache_key]['systems']
 
     def _add_safe_group_name(self, group, child=None):
-        group_name = self.inventory.add_group(to_safe_group_name('%s%s' % (self.get_option('group_prefix'), group.lower().replace(" ", ""))))
+        group_name = self.inventory.add_group(to_safe_group_name(f"{self.get_option('group_prefix')}{group.lower().replace(' ', '')}"))
         if child is not None:
             self.inventory.add_child(group_name, child)
         return group_name
@@ -237,16 +242,16 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
 
         for profile in self._get_profiles():
             if profile['parent']:
-                self.display.vvvv('Processing profile %s with parent %s\n' % (profile['name'], profile['parent']))
+                self.display.vvvv(f"Processing profile {profile['name']} with parent {profile['parent']}\n")
                 if not self._exclude_profile(profile['parent']):
                     parent_group_name = self._add_safe_group_name(profile['parent'])
-                    self.display.vvvv('Added profile parent group %s\n' % parent_group_name)
+                    self.display.vvvv(f'Added profile parent group {parent_group_name}\n')
                     if not self._exclude_profile(profile['name']):
                         group_name = self._add_safe_group_name(profile['name'])
-                        self.display.vvvv('Added profile group %s\n' % group_name)
+                        self.display.vvvv(f'Added profile group {group_name}\n')
                         self.inventory.add_child(parent_group_name, group_name)
             else:
-                self.display.vvvv('Processing profile %s without parent\n' % profile['name'])
+                self.display.vvvv(f"Processing profile {profile['name']} without parent\n")
                 # Create a hierarchy of profile names
                 profile_elements = profile['name'].split('-')
                 i = 0
@@ -254,12 +259,12 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                     profile_group = '-'.join(profile_elements[0:i + 1])
                     profile_group_child = '-'.join(profile_elements[0:i + 2])
                     if self._exclude_profile(profile_group):
-                        self.display.vvvv('Excluding profile %s\n' % profile_group)
+                        self.display.vvvv(f'Excluding profile {profile_group}\n')
                         break
                     group_name = self._add_safe_group_name(profile_group)
-                    self.display.vvvv('Added profile group %s\n' % group_name)
+                    self.display.vvvv(f'Added profile group {group_name}\n')
                     child_group_name = self._add_safe_group_name(profile_group_child)
-                    self.display.vvvv('Added profile child group %s to %s\n' % (child_group_name, group_name))
+                    self.display.vvvv(f'Added profile child group {child_group_name} to {group_name}\n')
                     self.inventory.add_child(group_name, child_group_name)
                     i = i + 1
 
@@ -267,27 +272,27 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
         self.group = to_safe_group_name(self.get_option('group'))
         if self.group is not None and self.group != '':
             self.inventory.add_group(self.group)
-            self.display.vvvv('Added site group %s\n' % self.group)
+            self.display.vvvv(f'Added site group {self.group}\n')
 
         ip_addresses = {}
         ipv6_addresses = {}
         for host in self._get_systems():
             # Get the FQDN for the host and add it to the right groups
             if self.inventory_hostname == 'system':
-                hostname = host['name']  # None
+                hostname = make_unsafe(host['name'])  # None
             else:
-                hostname = host['hostname']  # None
+                hostname = make_unsafe(host['hostname'])  # None
             interfaces = host['interfaces']
 
             if set(host['mgmt_classes']) & set(self.include_mgmt_classes):
-                self.display.vvvv('Including host %s in mgmt_classes %s\n' % (host['name'], host['mgmt_classes']))
+                self.display.vvvv(f"Including host {host['name']} in mgmt_classes {host['mgmt_classes']}\n")
             else:
                 if self._exclude_profile(host['profile']):
-                    self.display.vvvv('Excluding host %s in profile %s\n' % (host['name'], host['profile']))
+                    self.display.vvvv(f"Excluding host {host['name']} in profile {host['profile']}\n")
                     continue
 
                 if set(host['mgmt_classes']) & set(self.exclude_mgmt_classes):
-                    self.display.vvvv('Excluding host %s in mgmt_classes %s\n' % (host['name'], host['mgmt_classes']))
+                    self.display.vvvv(f"Excluding host {host['name']} in mgmt_classes {host['mgmt_classes']}\n")
                     continue
 
             # hostname is often empty for non-static IP hosts
@@ -296,22 +301,22 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                     if ivalue['management'] or not ivalue['static']:
                         this_dns_name = ivalue.get('dns_name', None)
                         if this_dns_name is not None and this_dns_name != "":
-                            hostname = this_dns_name
-                            self.display.vvvv('Set hostname to %s from %s\n' % (hostname, iname))
+                            hostname = make_unsafe(this_dns_name)
+                            self.display.vvvv(f'Set hostname to {hostname} from {iname}\n')
 
             if hostname == '':
-                self.display.vvvv('Cannot determine hostname for host %s, skipping\n' % host['name'])
+                self.display.vvvv(f"Cannot determine hostname for host {host['name']}, skipping\n")
                 continue
 
             self.inventory.add_host(hostname)
-            self.display.vvvv('Added host %s hostname %s\n' % (host['name'], hostname))
+            self.display.vvvv(f"Added host {host['name']} hostname {hostname}\n")
 
             # Add host to profile group
             if host['profile'] != '':
                 group_name = self._add_safe_group_name(host['profile'], child=hostname)
-                self.display.vvvv('Added host %s to profile group %s\n' % (hostname, group_name))
+                self.display.vvvv(f'Added host {hostname} to profile group {group_name}\n')
             else:
-                self.display.warning('Host %s has an empty profile\n' % (hostname))
+                self.display.warning(f'Host {hostname} has an empty profile\n')
 
             # Add host to groups specified by group_by fields
             for group_by in self.group_by:
@@ -321,7 +326,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                     groups = [host[group_by]] if isinstance(host[group_by], str) else host[group_by]
                 for group in groups:
                     group_name = self._add_safe_group_name(group, child=hostname)
-                    self.display.vvvv('Added host %s to group_by %s group %s\n' % (hostname, group_by, group_name))
+                    self.display.vvvv(f'Added host {hostname} to group_by {group_by} group {group_name}\n')
 
             # Add to group for this inventory
             if self.group is not None:
@@ -361,18 +366,18 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
             if ip_address is None and ip_address_first is not None:
                 ip_address = ip_address_first
             if ip_address is not None:
-                self.inventory.set_variable(hostname, 'cobbler_ipv4_address', ip_address)
+                self.inventory.set_variable(hostname, 'cobbler_ipv4_address', make_unsafe(ip_address))
             if ipv6_address is None and ipv6_address_first is not None:
                 ipv6_address = ipv6_address_first
             if ipv6_address is not None:
-                self.inventory.set_variable(hostname, 'cobbler_ipv6_address', ipv6_address)
+                self.inventory.set_variable(hostname, 'cobbler_ipv6_address', make_unsafe(ipv6_address))
 
             if self.get_option('want_facts'):
                 try:
-                    self.inventory.set_variable(hostname, 'cobbler', host)
+                    self.inventory.set_variable(hostname, 'cobbler', make_unsafe(host))
                 except ValueError as e:
-                    self.display.warning("Could not set host info for %s: %s" % (hostname, to_text(e)))
+                    self.display.warning(f"Could not set host info for {hostname}: {e}")
 
         if self.get_option('want_ip_addresses'):
-            self.inventory.set_variable(self.group, 'cobbler_ipv4_addresses', ip_addresses)
-            self.inventory.set_variable(self.group, 'cobbler_ipv6_addresses', ipv6_addresses)
+            self.inventory.set_variable(self.group, 'cobbler_ipv4_addresses', make_unsafe(ip_addresses))
+            self.inventory.set_variable(self.group, 'cobbler_ipv6_addresses', make_unsafe(ipv6_addresses))

@@ -25,7 +25,8 @@ options:
     _terms:
         description: The integer ID of the secret.
         required: true
-        type: int
+        type: list
+        elements: int
     secret_path:
         description: Indicate a full path of secret including folder and secret name when the secret ID is set to 0.
         required: false
@@ -52,6 +53,7 @@ options:
         version_added: 7.0.0
     base_url:
         description: The base URL of the server, for example V(https://localhost/SecretServer).
+        type: string
         env:
             - name: TSS_BASE_URL
         ini:
@@ -60,6 +62,7 @@ options:
         required: true
     username:
         description: The username with which to request the OAuth2 Access Grant.
+        type: string
         env:
             - name: TSS_USERNAME
         ini:
@@ -69,6 +72,7 @@ options:
         description:
             - The password associated with the supplied username.
             - Required when O(token) is not provided.
+        type: string
         env:
             - name: TSS_PASSWORD
         ini:
@@ -80,6 +84,7 @@ options:
           - The domain with which to request the OAuth2 Access Grant.
           - Optional when O(token) is not provided.
           - Requires C(python-tss-sdk) version 1.0.0 or greater.
+        type: string
         env:
             - name: TSS_DOMAIN
         ini:
@@ -92,6 +97,7 @@ options:
           - Existing token for Thycotic authorizer.
           - If provided, O(username) and O(password) are not needed.
           - Requires C(python-tss-sdk) version 1.0.0 or greater.
+        type: string
         env:
             - name: TSS_TOKEN
         ini:
@@ -102,6 +108,7 @@ options:
         default: /api/v1
         description: The path to append to the base URL to form a valid REST
             API request.
+        type: string
         env:
             - name: TSS_API_PATH_URI
         required: false
@@ -109,6 +116,7 @@ options:
         default: /oauth2/token
         description: The path to append to the base URL to form a valid OAuth2
             Access Grant request.
+        type: string
         env:
             - name: TSS_TOKEN_PATH_URI
         required: false
@@ -298,14 +306,14 @@ class TSSClient(object):
             return TSSClientV0(**server_parameters)
 
     def get_secret(self, term, secret_path, fetch_file_attachments, file_download_path):
-        display.debug("tss_lookup term: %s" % term)
+        display.debug(f"tss_lookup term: {term}")
         secret_id = self._term_to_secret_id(term)
         if secret_id == 0 and secret_path:
             fetch_secret_by_path = True
-            display.vvv(u"Secret Server lookup of Secret with path %s" % secret_path)
+            display.vvv(f"Secret Server lookup of Secret with path {secret_path}")
         else:
             fetch_secret_by_path = False
-            display.vvv(u"Secret Server lookup of Secret with ID %d" % secret_id)
+            display.vvv(f"Secret Server lookup of Secret with ID {secret_id}")
 
         if fetch_file_attachments:
             if fetch_secret_by_path:
@@ -317,12 +325,12 @@ class TSSClient(object):
                     if i['isFile']:
                         try:
                             file_content = i['itemValue'].content
-                            with open(os.path.join(file_download_path, str(obj['id']) + "_" + i['slug']), "wb") as f:
+                            with open(os.path.join(file_download_path, f"{obj['id']}_{i['slug']}"), "wb") as f:
                                 f.write(file_content)
                         except ValueError:
-                            raise AnsibleOptionsError("Failed to download {0}".format(str(i['slug'])))
+                            raise AnsibleOptionsError(f"Failed to download {i['slug']}")
                         except AttributeError:
-                            display.warning("Could not read file content for {0}".format(str(i['slug'])))
+                            display.warning(f"Could not read file content for {i['slug']}")
                         finally:
                             i['itemValue'] = "*** Not Valid For Display ***"
                 else:
@@ -335,9 +343,9 @@ class TSSClient(object):
                 return self._client.get_secret_json(secret_id)
 
     def get_secret_ids_by_folderid(self, term):
-        display.debug("tss_lookup term: %s" % term)
+        display.debug(f"tss_lookup term: {term}")
         folder_id = self._term_to_folder_id(term)
-        display.vvv(u"Secret Server lookup of Secret id's with Folder ID %d" % folder_id)
+        display.vvv(f"Secret Server lookup of Secret id's with Folder ID {folder_id}")
 
         return self._client.get_secret_ids_by_folderid(folder_id)
 
@@ -439,4 +447,4 @@ class LookupModule(LookupBase):
                     for term in terms
                 ]
         except SecretServerError as error:
-            raise AnsibleError("Secret Server lookup failure: %s" % error.message)
+            raise AnsibleError(f"Secret Server lookup failure: {error.message}")

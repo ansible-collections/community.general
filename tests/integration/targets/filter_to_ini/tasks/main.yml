@@ -16,6 +16,9 @@
       another_section:
         connection: 'ssh'
 
+      interpolate_test:
+        interpolate_test_key: '%'
+
 - name: 'Write INI file manually to {{ ini_test_file }}'
   ansible.builtin.copy:
     dest: '{{ ini_test_file }}'
@@ -25,6 +28,9 @@
 
       [another_section]
       connection = ssh
+
+      [interpolate_test]
+      interpolate_test_key = %
 
 - name: 'Slurp the manually created test file: {{ ini_test_file }}'
   ansible.builtin.slurp:
