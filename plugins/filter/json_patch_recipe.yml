@@ -44,7 +44,7 @@ DOCUMENTATION:
             for O(operations[].op=copy) and O(operations[].op=move), ignored otherwise.
           type: str
     fail_test:
-      description: If V(false), a failed O(op=test) will return V(none). If V(true), the filter
+      description: If V(false), a failed O(operations[].op=test) will return V(none). If V(true), the filter
         invocation will fail with an error.
       type: bool
       default: false
@@ -61,7 +61,7 @@ DOCUMENTATION:
 
 RETURN:
   _value:
-    description: A modified object or V(none) if O(operations[].=test), O(fail_test=false)
+    description: A modified object or V(none) if O(operations[].op=test), O(fail_test=false)
       and the test failed.
     type: any
     returned: always
