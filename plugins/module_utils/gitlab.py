@@ -127,7 +127,7 @@ def gitlab_authentication(module, min_version=None):
             'job_token': gitlab_job_token,
             'api_version': 4,
         }
-        if gitlab.__version__ >= LooseVersion('3.8.0'):
+        if LooseVersion(gitlab.__version__) >= LooseVersion('3.8.0'):
             kwargs['keep_base_url'] = True
         gitlab_instance = gitlab.Gitlab(**kwargs)
 
