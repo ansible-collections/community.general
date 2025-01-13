@@ -33,7 +33,7 @@ class FilterModule:
     """Filter plugin."""
 
     def check_json_object(
-        self, filter_name: str, object_name: str, inp: Union[str, list, dict]
+        self, filter_name: str, object_name: str, inp: Any
     ):
         if not isinstance(inp, (str, list, dict)):
             raise AnsibleFilterError(
@@ -84,7 +84,7 @@ class FilterModule:
 
         if kwargs:
             raise AnsibleFilterError(
-                f"json_patch: unexpected keywords arguments: {', '.join(kwargs.keys())}"
+                f"json_patch: unexpected keywords arguments: {', '.join(sorted(kwargs))}"
             )
 
         if op in OPERATIONS_NEEDING_VALUE:
@@ -104,7 +104,7 @@ class FilterModule:
         except jsonpatch.JsonPatchTestFailed:
             pass
         except Exception as e:
-            raise AnsibleFilterError(f"json_patch: patch failed: {to_native(e)}") from e
+            raise AnsibleFilterError(f"json_patch: patch failed: {e}") from e
 
         return result
 

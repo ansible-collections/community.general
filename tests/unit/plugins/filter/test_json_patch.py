@@ -8,7 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type  # pylint: disable=C0103
 
 import unittest
-import json
 from ansible_collections.community.general.plugins.filter.json_patch import FilterModule
 from ansible.errors import AnsibleFilterError
 
@@ -23,98 +22,54 @@ class TestJsonPatch(unittest.TestCase):
     # json_patch
 
     def test_patch_add_to_empty(self):
-        result = json.dumps(
-            self.json_patch({}, "add", "/a", 1),
-            sort_keys=True,
-            separators=(",", ":"),
-        )
-        self.assertEqual(result, '{"a":1}')
+        result = self.json_patch({}, "add", "/a", 1)
+        self.assertEqual(result, {"a": 1})
 
     def test_patch_add_to_dict(self):
-        result = json.dumps(
-            self.json_patch({"b": 2}, "add", "/a", 1),
-            sort_keys=True,
-            separators=(",", ":"),
-        )
-        self.assertEqual(result, '{"a":1,"b":2}')
+        result = self.json_patch({"b": 2}, "add", "/a", 1)
+        self.assertEqual(result, {"a": 1, "b": 2})
 
     def test_patch_add_to_array_index(self):
-        result = json.dumps(
-            self.json_patch([1, 2, 3], "add", "/1", 99),
-            sort_keys=True,
-            separators=(",", ":"),
-        )
-        self.assertEqual(result, "[1,99,2,3]")
+        result = self.json_patch([1, 2, 3], "add", "/1", 99)
+        self.assertEqual(result, [1, 99, 2, 3])
 
     def test_patch_add_to_array_last(self):
-        result = json.dumps(
-            self.json_patch({"a": [1, 2, 3]}, "add", "/a/-", 99),
-            sort_keys=True,
-            separators=(",", ":"),
-        )
-        self.assertEqual(result, '{"a":[1,2,3,99]}')
+        result = self.json_patch({"a": [1, 2, 3]}, "add", "/a/-", 99)
+        self.assertEqual(result, {"a": [1, 2, 3, 99]})
 
     def test_patch_add_from_string(self):
-        result = json.dumps(
-            self.json_patch("[1, 2, 3]", "add", "/-", 99),
-            sort_keys=True,
-            separators=(",", ":"),
-        )
-        self.assertEqual(result, "[1,2,3,99]")
+        result = self.json_patch("[1, 2, 3]", "add", "/-", 99)
+        self.assertEqual(result, [1, 2, 3, 99])
 
     def test_patch_path_escape(self):
-        result = json.dumps(
-            self.json_patch({}, "add", "/x~0~1y", 99),
-            sort_keys=True,
-            separators=(",", ":"),
-        )
-        self.assertEqual(result, '{"x~/y":99}')
+        result = self.json_patch({}, "add", "/x~0~1y", 99)
+        self.assertEqual(result, {"x~/y": 99})
 
     def test_patch_remove(self):
-        result = json.dumps(
-            self.json_patch({"a": 1, "b": {"c": 2}, "d": 3}, "remove", "/b"),
-            sort_keys=True,
-            separators=(",", ":"),
-        )
-        self.assertEqual(result, '{"a":1,"d":3}')
+        result = self.json_patch({"a": 1, "b": {"c": 2}, "d": 3}, "remove", "/b")
+        self.assertEqual(result, {"a": 1, "d": 3})
 
     def test_patch_replace(self):
-        result = json.dumps(
-            self.json_patch(
-                {"a": 1, "b": {"c": 2}, "d": 3}, "replace", "/b", {"x": 99}
-            ),
-            sort_keys=True,
-            separators=(",", ":"),
+        result = self.json_patch(
+            {"a": 1, "b": {"c": 2}, "d": 3}, "replace", "/b", {"x": 99}
         )
-        self.assertEqual(result, '{"a":1,"b":{"x":99},"d":3}')
+        self.assertEqual(result, {"a": 1, "b": {"x": 99}, "d": 3})
 
     def test_patch_copy(self):
-        result = json.dumps(
-            self.json_patch(
-                {"a": 1, "b": {"c": 2}, "d": 3}, "copy", "/d", **{"from": "/b"}
-            ),
-            sort_keys=True,
-            separators=(",", ":"),
+        result = self.json_patch(
+            {"a": 1, "b": {"c": 2}, "d": 3}, "copy", "/d", **{"from": "/b"}
         )
-        self.assertEqual(result, '{"a":1,"b":{"c":2},"d":{"c":2}}')
+        self.assertEqual(result, {"a": 1, "b": {"c": 2}, "d": {"c": 2}})
 
     def test_patch_move(self):
-        result = json.dumps(
-            self.json_patch(
-                {"a": 1, "b": {"c": 2}, "d": 3}, "move", "/d", **{"from": "/b"}
-            ),
-            sort_keys=True,
-            separators=(",", ":"),
+        result = self.json_patch(
+            {"a": 1, "b": {"c": 2}, "d": 3}, "move", "/d", **{"from": "/b"}
         )
-        self.assertEqual(result, '{"a":1,"d":{"c":2}}')
+        self.assertEqual(result, {"a": 1, "d": {"c": 2}})
 
     def test_patch_test_pass(self):
-        result = json.dumps(
-            self.json_patch({"a": 1, "b": {"c": 2}, "d": 3}, "test", "/b/c", 2),
-            sort_keys=True,
-            separators=(",", ":"),
-        )
-        self.assertEqual(result, '{"a":1,"b":{"c":2},"d":3}')
+        result = self.json_patch({"a": 1, "b": {"c": 2}, "d": 3}, "test", "/b/c", 2)
+        self.assertEqual(result, {"a": 1, "b": {"c": 2}, "d": 3})
 
     def test_patch_test_fail(self):
         result = self.json_patch({"a": 1, "b": {"c": 2}, "d": 3}, "test", "/b/c", 99)
@@ -205,28 +160,26 @@ class TestJsonPatch(unittest.TestCase):
     # json_patch_recipe
 
     def test_patch_recipe_process(self):
-        result = json.dumps(
-            self.json_patch_recipe(
-                {},
-                [
-                    {"op": "add", "path": "/foo", "value": 1},
-                    {"op": "add", "path": "/bar", "value": []},
-                    {"op": "add", "path": "/bar/-", "value": 2},
-                    {"op": "add", "path": "/bar/0", "value": 1},
-                    {"op": "remove", "path": "/bar/0"},
-                    {"op": "move", "from": "/foo", "path": "/baz"},
-                    {"op": "copy", "from": "/baz", "path": "/bax"},
-                    {"op": "copy", "from": "/baz", "path": "/bay"},
-                    {"op": "replace", "path": "/baz", "value": [10, 20, 30]},
-                    {"op": "add", "path": "/foo", "value": 1},
-                    {"op": "add", "path": "/foo", "value": 1},
-                    {"op": "test", "path": "/baz/1", "value": 20},
-                ],
-            ),
-            sort_keys=True,
-            separators=(",", ":"),
+        result = self.json_patch_recipe(
+            {},
+            [
+                {"op": "add", "path": "/foo", "value": 1},
+                {"op": "add", "path": "/bar", "value": []},
+                {"op": "add", "path": "/bar/-", "value": 2},
+                {"op": "add", "path": "/bar/0", "value": 1},
+                {"op": "remove", "path": "/bar/0"},
+                {"op": "move", "from": "/foo", "path": "/baz"},
+                {"op": "copy", "from": "/baz", "path": "/bax"},
+                {"op": "copy", "from": "/baz", "path": "/bay"},
+                {"op": "replace", "path": "/baz", "value": [10, 20, 30]},
+                {"op": "add", "path": "/foo", "value": 1},
+                {"op": "add", "path": "/foo", "value": 1},
+                {"op": "test", "path": "/baz/1", "value": 20},
+            ],
         )
-        self.assertEqual(result, '{"bar":[2],"bax":1,"bay":1,"baz":[10,20,30],"foo":1}')
+        self.assertEqual(
+            result, {"bar": [2], "bax": 1, "bay": 1, "baz": [10, 20, 30], "foo": 1}
+        )
 
     def test_patch_recipe_test_fail(self):
         result = self.json_patch_recipe(
@@ -282,14 +235,14 @@ class TestJsonPatch(unittest.TestCase):
             },
         )
 
-        # Sort according to op as the order is unstable
+        # Sort as the order is unstable
         self.assertEqual(
-            json.dumps(
-                sorted(result, key=lambda k: k["op"]),
-                separators=(":", ","),
-                sort_keys=False,
-            ),
-            '[{"op","add":"path","/baq":"value",{"baz",2}}:{"op","remove":"path","/baw/1"}:{"op","replace":"path","/hello":"value","night"}]',
+            sorted(result, key=lambda k: k["path"]),
+            [
+                {"op": "add", "path": "/baq", "value": {"baz": 2}},
+                {"op": "remove", "path": "/baw/1"},
+                {"op": "replace", "path": "/hello", "value": "night"},
+            ],
         )
 
     def test_diff_missing_lib(self):

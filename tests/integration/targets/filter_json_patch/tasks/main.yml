@@ -8,7 +8,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: test json_patch
+- name: Test json_patch
   assert:
     that:
       - > # Insert a new element into an array at a specified index
@@ -81,7 +81,7 @@
       foo: { one: 1 }
       bar: { two: 2 }
 
-- name: test json_patch_recipe
+- name: Test json_patch_recipe
   assert:
     that:
       - > # List of operations
@@ -119,21 +119,19 @@
         path: '/baz'
         value: [10, 20, 30]
 
-- name: test json_diff
+- name: Test json_diff
   assert:
-    that: # The order in the result array is not stable, check per key
+    that: # The order in the result array is not stable, sort by path
       - >
           input |
-            community.general.json_diff(target)
-          is contains({"op": "add", "path": "/baq", "value": {"baz": 2}})
-      - >
-          input |
-            community.general.json_diff(target)
-          is contains({"op": "remove", "path": "/baw/1"})
-      - >
-          input |
-            community.general.json_diff(target)
-          is contains({"op": "replace", "path": "/hello", "value": "night"})
+            community.general.json_diff(target) |
+            sort(attribute='path')
+          ==
+          [
+            {"op": "add", "path": "/baq", "value": {"baz": 2}},
+            {"op": "remove", "path": "/baw/1"},
+            {"op": "replace", "path": "/hello", "value": "night"},
+          ]
   vars:
     input: {"foo": 1, "bar":{"baz": 2}, "baw": [1, 2, 3], "hello": "day"}
     target: {"foo": 1, "bar": {"baz": 2}, "baw": [1, 3], "baq": {"baz": 2}, "hello": "night"}
