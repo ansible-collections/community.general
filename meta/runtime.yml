@@ -18,6 +18,7 @@ action_groups:
     - proxmox
     - proxmox_backup
     - proxmox_backup_info
+    - proxmox_backup_schedule
     - proxmox_disk
     - proxmox_domain_info
     - proxmox_group_info
