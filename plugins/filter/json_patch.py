@@ -7,7 +7,6 @@ from __future__ import absolute_import, annotations, division, print_function
 from json import loads
 from typing import TYPE_CHECKING
 from ansible.errors import AnsibleFilterError
-from ansible.module_utils.common.text.converters import to_native
 
 __metaclass__ = type  # pylint: disable=C0103
 
@@ -32,13 +31,21 @@ OPERATIONS_NEEDING_VALUE = ["add", "replace", "test"]
 class FilterModule:
     """Filter plugin."""
 
-    def check_json_object(
-        self, filter_name: str, object_name: str, inp: Any
-    ):
-        if not isinstance(inp, (str, list, dict)):
+    def check_json_object(self, filter_name: str, object_name: str, inp: Any):
+        if isinstance(inp, str):
+            try:
+                return loads(inp)
+            except Exception as e:
+                raise AnsibleFilterError(
+                    f"{filter_name}: could not decode JSON from {object_name}: {e}"
+                ) from e
+
+        if not isinstance(inp, (list, dict)):
             raise AnsibleFilterError(
                 f"{filter_name}: {object_name} is not dictionary, list or string"
             )
+
+        return inp
 
     def check_patch_arguments(self, filter_name: str, args: dict):
 
@@ -65,7 +72,7 @@ class FilterModule:
 
     def json_patch(
         self,
-        inp: Union[str, list, dict],
+        inp: Union[str, list, dict, bytes, bytearray],
         op: str,
         path: str,
         value: Any = None,
@@ -76,8 +83,6 @@ class FilterModule:
             raise AnsibleFilterError(
                 "You need to install 'jsonpatch' package prior to running 'json_patch' filter"
             ) from JSONPATCH_IMPORT_ERROR
-
-        self.check_json_object("json_patch", "input", inp)
 
         args = {"op": op, "path": path}
         from_arg = kwargs.pop("from", None)
@@ -92,15 +97,13 @@ class FilterModule:
         if op in OPERATIONS_NEEDING_FROM and from_arg is not None:
             args["from"] = from_arg
 
+        inp = self.check_json_object("json_patch", "input", inp)
         self.check_patch_arguments("json_patch", args)
 
         result = None
 
         try:
-            result = jsonpatch.apply_patch(
-                inp if isinstance(inp, (dict, list)) else loads(inp),
-                [args],
-            )
+            result = jsonpatch.apply_patch(inp, [args])
         except jsonpatch.JsonPatchTestFailed:
             pass
         except Exception as e:
@@ -108,14 +111,14 @@ class FilterModule:
 
         return result
 
-    def json_patch_recipe(self, inp: Union[str, list, dict], operations: list) -> Any:
+    def json_patch_recipe(
+        self, inp: Union[str, list, dict, bytes, bytearray], operations: list
+    ) -> Any:
 
         if not HAS_LIB:
             raise AnsibleFilterError(
                 "You need to install 'jsonpatch' package prior to running 'json_patch_recipe' filter"
             ) from JSONPATCH_IMPORT_ERROR
-
-        self.check_json_object("json_patch_recipe", "input", inp)
 
         if not isinstance(operations, list):
             raise AnsibleFilterError(
@@ -124,25 +127,23 @@ class FilterModule:
 
         result = None
 
+        inp = self.check_json_object("json_patch_recipe", "input", inp)
         for args in operations:
             self.check_patch_arguments("json_patch_recipe", args)
 
         try:
-            result = jsonpatch.apply_patch(
-                inp if isinstance(inp, (dict, list)) else loads(inp),
-                operations,
-            )
+            result = jsonpatch.apply_patch(inp, operations)
         except jsonpatch.JsonPatchTestFailed:
             pass
         except Exception as e:
-            raise AnsibleFilterError(
-                f"json_patch_recipe: patch failed: {to_native(e)}"
-            ) from e
+            raise AnsibleFilterError(f"json_patch_recipe: patch failed: {e}") from e
 
         return result
 
     def json_diff(
-        self, inp: Union[str, list, dict], target: Union[str, list, dict]
+        self,
+        inp: Union[str, list, dict, bytes, bytearray],
+        target: Union[str, list, dict, bytes, bytearray],
     ) -> list:
 
         if not HAS_LIB:
@@ -150,16 +151,13 @@ class FilterModule:
                 "You need to install 'jsonpatch' package prior to running 'json_diff' filter"
             ) from JSONPATCH_IMPORT_ERROR
 
-        self.check_json_object("json_diff", "input", inp)
-        self.check_json_object("json_diff", "target", target)
-
-        source = inp if isinstance(inp, (dict, list)) else loads(inp)
-        destination = target if isinstance(target, (dict, list)) else loads(target)
+        inp = self.check_json_object("json_diff", "input", inp)
+        target = self.check_json_object("json_diff", "target", target)
 
         try:
-            result = list(jsonpatch.make_patch(source, destination))
+            result = list(jsonpatch.make_patch(inp, target))
         except Exception as e:
-            raise AnsibleFilterError(f"JSON diff failed: {to_native(e)}") from e
+            raise AnsibleFilterError(f"JSON diff failed: {e}") from e
 
         return result
 
