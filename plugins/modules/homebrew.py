@@ -385,7 +385,7 @@ class Homebrew(object):
             self.outdated_packages.add(package_name)
 
     def _extract_package_name(self, package_detail, is_cask):
-        canonical_name = package_detail["token"] if is_cask else package_detail["name"]  # For ex: 'sqlite'
+        canonical_name = package_detail["full_token"] if is_cask else package_detail["full_name"]  # For ex: 'sqlite'
         all_valid_names = set(package_detail.get("aliases", []))  # For ex: {'sqlite3'}
         all_valid_names.add(canonical_name)
 
