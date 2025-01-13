@@ -1131,8 +1131,6 @@ files:
     maintainers: IamLunchbox
   $modules/proxmox_backup_info.py:
     maintainers: raoufnezhad mmayabi
-  $modules/proxmox_backup_schedule.py:
-    maintainers: raoufnezhad mmayabi
   $modules/proxmox_nic.py:
     maintainers: Kogelvis krauthosting
   $modules/proxmox_node_info.py:
