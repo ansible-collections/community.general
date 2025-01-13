@@ -157,6 +157,12 @@ class TestJsonPatch(unittest.TestCase):
             "json_patch: 'from' argument missing for 'move' operation",
         )
 
+    def test_patch_add_to_dict_binary(self):
+        result = self.json_patch(b'{"b": 2}', "add", "/a", 1)
+        self.assertEqual(result, {"a": 1, "b": 2})
+        result = self.json_patch(bytearray(b'{"b": 2}'), "add", "/a", 1)
+        self.assertEqual(result, {"a": 1, "b": 2})
+
     # json_patch_recipe
 
     def test_patch_recipe_process(self):

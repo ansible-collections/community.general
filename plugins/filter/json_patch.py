@@ -32,7 +32,7 @@ class FilterModule:
     """Filter plugin."""
 
     def check_json_object(self, filter_name: str, object_name: str, inp: Any):
-        if isinstance(inp, str):
+        if isinstance(inp, (str, bytes, bytearray)):
             try:
                 return loads(inp)
             except Exception as e:
