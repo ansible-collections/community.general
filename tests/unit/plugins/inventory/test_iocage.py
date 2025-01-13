@@ -20,14 +20,18 @@ def inventory():
     inv = InventoryModule()
     inv.inventory = InventoryData()
     inv.templar = Templar(None)
-    inv.jails = load_txt_data('tests/unit/plugins/inventory/fixtures/iocage_jails.txt')
-    inv.js_ok = load_yml_data('tests/unit/plugins/inventory/fixtures/iocage_jails.yml')
-    prpts_101 = load_txt_data('tests/unit/plugins/inventory/fixtures/iocage_properties_test_101.txt')
-    prpts_102 = load_txt_data('tests/unit/plugins/inventory/fixtures/iocage_properties_test_102.txt')
-    prpts_103 = load_txt_data('tests/unit/plugins/inventory/fixtures/iocage_properties_test_103.txt')
+    inv.jails = load_txt_data('tests/unit/plugins/inventory/fixtures/iocage/iocage_jails.txt')
+    inv.js_ok = load_yml_data('tests/unit/plugins/inventory/fixtures/iocage/iocage_jails.yml')
+    inv.jails_dhcp = load_txt_data('tests/unit/plugins/inventory/fixtures/iocage/iocage_jails_dhcp.txt')
+    inv.js_dhcp_ok = load_yml_data('tests/unit/plugins/inventory/fixtures/iocage/iocage_jails_dhcp.yml')
+    inv.jails_dhcp_nr = load_txt_data('tests/unit/plugins/inventory/fixtures/iocage/iocage_jails_dhcp_not_running.txt')
+    inv.js_dhcp_nr_ok = load_yml_data('tests/unit/plugins/inventory/fixtures/iocage/iocage_jails_dhcp_not_running.yml')
+    prpts_101 = load_txt_data('tests/unit/plugins/inventory/fixtures/iocage/iocage_properties_test_101.txt')
+    prpts_102 = load_txt_data('tests/unit/plugins/inventory/fixtures/iocage/iocage_properties_test_102.txt')
+    prpts_103 = load_txt_data('tests/unit/plugins/inventory/fixtures/iocage/iocage_properties_test_103.txt')
     inv.prpts = {'test_101': prpts_101, 'test_102': prpts_102, 'test_103': prpts_103}
-    inv.ps_ok = load_yml_data('tests/unit/plugins/inventory/fixtures/iocage_properties.yml')
-    inv.ok = load_yml_data('tests/unit/plugins/inventory/fixtures/iocage_inventory.yml')
+    inv.ps_ok = load_yml_data('tests/unit/plugins/inventory/fixtures/iocage/iocage_properties.yml')
+    inv.ok = load_yml_data('tests/unit/plugins/inventory/fixtures/iocage/iocage_inventory.yml')
     return inv
 
 
@@ -72,9 +76,21 @@ def test_verify_file(tmp_path, inventory):
 
 
 def test_get_jails(inventory):
+
+    # jails
     results = {'_meta': {'hostvars': {}}}
     inventory.get_jails(inventory.jails, results)
     assert results == inventory.js_ok
+
+    # jails_dhcp
+    results = {'_meta': {'hostvars': {}}}
+    inventory.get_jails(inventory.jails_dhcp, results)
+    assert results == inventory.js_dhcp_ok
+
+    # jails_dhcp_not_running
+    results = {'_meta': {'hostvars': {}}}
+    inventory.get_jails(inventory.jails_dhcp_nr, results)
+    assert results == inventory.js_dhcp_nr_ok
 
 
 def test_get_properties(inventory):
