@@ -170,8 +170,8 @@ BACKUP_JOB_SPECIFIC_BKID = {
     "type": "vzdump",
     "vmid": "100,101"
 }
-
-EXPECTED_DEL_BACKUP_SCHEDULE = [ "backup-001", "backup-002" ]
+EXPECTED_UPDATE_BACKUP_SCHEDULE = "True"
+EXPECTED_DEL_BACKUP_SCHEDULE = ["backup-001", "backup-002"]
 
 
 class TestProxmoxBackupScheduleModule(ModuleTestCase):
@@ -185,7 +185,9 @@ class TestProxmoxBackupScheduleModule(ModuleTestCase):
         self.connect_mock.return_value.cluster.resources.get.return_value = (
             RESOURCE_LIST
         )
-        self.connect_mock.return_value.cluster.backup.get.side_effect = lambda backup_id=None: BACKUP_JOBS if backup_id is None else [job for job in BACKUP_JOBS if job['id'] == backup_id]
+        self.connect_mock.return_value.cluster.backup.get.side_effect = (
+            lambda backup_id=None: BACKUP_JOBS if backup_id is None else [job for job in BACKUP_JOBS if job['id'] == backup_id]
+        )
 
     def tearDown(self):
         self.connect_mock.stop()
@@ -214,7 +216,7 @@ class TestProxmoxBackupScheduleModule(ModuleTestCase):
         result = exc_info.value.args[0]
 
         assert result['changed'] is True
-        assert result['backup_schedule'] == True
+        assert result['backup_schedule'] == EXPECTED_UPDATE_BACKUP_SCHEDULE
 
     def test_delete_vmid_from_backup(self):
         with pytest.raises(AnsibleExitJson) as exc_info:
