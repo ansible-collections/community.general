@@ -71,9 +71,16 @@ class TestJsonPatch(unittest.TestCase):
         result = self.json_patch({"a": 1, "b": {"c": 2}, "d": 3}, "test", "/b/c", 2)
         self.assertEqual(result, {"a": 1, "b": {"c": 2}, "d": 3})
 
-    def test_patch_test_fail(self):
+    def test_patch_test_fail_none(self):
         result = self.json_patch({"a": 1, "b": {"c": 2}, "d": 3}, "test", "/b/c", 99)
         self.assertIsNone(result)
+
+    def test_patch_test_fail_fail(self):
+        with self.assertRaises(AnsibleFilterError) as context:
+            self.json_patch(
+                {"a": 1, "b": {"c": 2}, "d": 3}, "test", "/b/c", 99, fail_test=True
+            )
+        self.assertTrue("json_patch: test operation failed" in str(context.exception))
 
     def test_patch_remove_nonexisting(self):
         with self.assertRaises(AnsibleFilterError) as context:
@@ -225,6 +232,35 @@ class TestJsonPatch(unittest.TestCase):
         self.assertEqual(
             str(context.exception),
             "json_patch_recipe: 'operations' needs to be a list",
+        )
+
+    def test_patch_recipe_test_fail_none(self):
+        result = self.json_patch_recipe(
+            {"a": 1, "b": {"c": 2}, "d": 3},
+            [{"op": "test", "path": "/b/c", "value": 99}],
+        )
+        self.assertIsNone(result)
+
+    def test_patch_recipe_test_fail_fail_pos(self):
+        with self.assertRaises(AnsibleFilterError) as context:
+            self.json_patch_recipe(
+                {"a": 1, "b": {"c": 2}, "d": 3},
+                [{"op": "test", "path": "/b/c", "value": 99}],
+                True,
+            )
+        self.assertTrue(
+            "json_patch_recipe: test operation failed" in str(context.exception)
+        )
+
+    def test_patch_recipe_test_fail_fail_kw(self):
+        with self.assertRaises(AnsibleFilterError) as context:
+            self.json_patch_recipe(
+                {"a": 1, "b": {"c": 2}, "d": 3},
+                [{"op": "test", "path": "/b/c", "value": 99}],
+                fail_test=True,
+            )
+        self.assertTrue(
+            "json_patch_recipe: test operation failed" in str(context.exception)
         )
 
     # json_diff

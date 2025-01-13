@@ -86,11 +86,15 @@ class FilterModule:
 
         args = {"op": op, "path": path}
         from_arg = kwargs.pop("from", None)
+        fail_test = kwargs.pop("fail_test", False)
 
         if kwargs:
             raise AnsibleFilterError(
                 f"json_patch: unexpected keywords arguments: {', '.join(sorted(kwargs))}"
             )
+
+        if not isinstance(fail_test, bool):
+            raise AnsibleFilterError("json_patch: 'fail_test' argument is not a bool")
 
         if op in OPERATIONS_NEEDING_VALUE:
             args["value"] = value
@@ -104,15 +108,24 @@ class FilterModule:
 
         try:
             result = jsonpatch.apply_patch(inp, [args])
-        except jsonpatch.JsonPatchTestFailed:
-            pass
+        except jsonpatch.JsonPatchTestFailed as e:
+            if fail_test:
+                raise AnsibleFilterError(
+                    f"json_patch: test operation failed: {e}"
+                ) from e
+            else:
+                pass
         except Exception as e:
             raise AnsibleFilterError(f"json_patch: patch failed: {e}") from e
 
         return result
 
     def json_patch_recipe(
-        self, inp: Union[str, list, dict, bytes, bytearray], operations: list
+        self,
+        inp: Union[str, list, dict, bytes, bytearray],
+        operations: list,
+        /,
+        fail_test: bool = False,
     ) -> Any:
 
         if not HAS_LIB:
@@ -125,6 +138,9 @@ class FilterModule:
                 "json_patch_recipe: 'operations' needs to be a list"
             )
 
+        if not isinstance(fail_test, bool):
+            raise AnsibleFilterError("json_patch: 'fail_test' argument is not a bool")
+
         result = None
 
         inp = self.check_json_object("json_patch_recipe", "input", inp)
@@ -133,8 +149,13 @@ class FilterModule:
 
         try:
             result = jsonpatch.apply_patch(inp, operations)
-        except jsonpatch.JsonPatchTestFailed:
-            pass
+        except jsonpatch.JsonPatchTestFailed as e:
+            if fail_test:
+                raise AnsibleFilterError(
+                    f"json_patch_recipe: test operation failed: {e}"
+                ) from e
+            else:
+                pass
         except Exception as e:
             raise AnsibleFilterError(f"json_patch_recipe: patch failed: {e}") from e
 
