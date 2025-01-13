@@ -2292,6 +2292,9 @@ class Nmcli(object):
                 if key == 'xmit_hash_policy':
                     cmd.extend(['+bond.options', 'xmit_hash_policy=%s' % value])
                     continue
+                if key == 'fail_over_mac':
+                    cmd.extend(['+bond.options', 'fail_over_mac=%s' % value])
+                    continue
                 cmd.extend([key, value])
 
         return self.execute_command(cmd)
