@@ -148,7 +148,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def get_cluster_resource_status(module, name):
-    cmd = ["pcs", "status", "resources", name]
+    cmd = ["pcs", "resource", "status", name]
     rc, out, err = module.run_command(cmd)
     status = []
     for o in out.splitlines():
@@ -186,13 +186,15 @@ def create_cluster_resource(module, resource_name,
 
     if resource_operation is not None:
         for op in resource_operation:
-            cmd.append("op %s" % op.get('operation_action'))
+            cmd.append("op")
+            cmd.append(op.get('operation_action'))
             for operation_option in op.get('operation_option'):
                 cmd.append(operation_option)
 
     if resource_meta is not None:
         for m in resource_meta:
-            cmd.append("meta %s" % m)
+            cmd.append("meta")
+            cmd.append(m)
 
     if resource_argument is not None:
         if resource_argument.get('argument_action') == "group":
@@ -259,33 +261,33 @@ def main():
     if state in ['create']:
         if module.check_mode:
             module.exit_json(changed=True)
-        was_created, initial_cluster_resource_state = get_cluster_resource_status(
+        resource_missing, initial_cluster_resource_state = get_cluster_resource_status(
             module, resource_name)
-        if not was_created:
+        if resource_missing:
             create_cluster_resource(module, resource_name, resource_type, resource_option,
                                     resource_operation, resource_meta, resource_argument, disabled, wait)
         else:
             module.exit_json(changed=False, out=initial_cluster_resource_state)
-        was_created, final_cluster_resource_state = get_cluster_resource_status(
+        resource_missing, final_cluster_resource_state = get_cluster_resource_status(
             module, resource_name)
-        if not was_created:
+        if not resource_missing:
             module.exit_json(changed=True, out=final_cluster_resource_state)
         else:
             module.fail_json(
                 msg="Failed to create cluster resource: %s" % final_cluster_resource_state)
 
     if state in ['delete']:
-        removed, initial_cluster_resource_state = get_cluster_resource_status(
+        resource_removed, initial_cluster_resource_state = get_cluster_resource_status(
             module, resource_name)
-        if not removed:
+        if not resource_removed:
             if module.check_mode:
                 module.exit_json(changed=True)
             delete_cluster_resource(module, resource_name)
         else:
             module.exit_json(changed=False, out=initial_cluster_resource_state)
-        removed, final_cluster_resource_state = get_cluster_resource_status(
+        resource_removed, final_cluster_resource_state = get_cluster_resource_status(
             module, resource_name)
-        if not removed:
+        if not resource_removed:
             module.fail_json(
                 msg="Failed to delete cluster resource: %s" % final_cluster_resource_state)
         else:
