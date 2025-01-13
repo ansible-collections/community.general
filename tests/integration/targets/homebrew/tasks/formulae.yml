@@ -363,3 +363,27 @@
         - "reinstall_result.msg == 'Package already installed: sqlite3'"
         - "reinstall_result.changed_pkgs == []"
         - "reinstall_result.unchanged_pkgs == ['sqlite3']"
+
+# Test with homebrew tap
+- block:
+  - name: Tap terraform homebrew repository
+    community.general.homebrew_tap:
+      name: hashicorp/tap
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+
+  - name: Install homebrew tap
+    community.general.homebrew:
+      name: hashicorp/tap/terraform
+      state: latest
+      update_homebrew: false
+    register: terraform_install_result
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+
+  - assert:
+      that:
+        - terraform_install_result is changed
+        - "terraform_install_result.msg == 'Package upgraded: hashicorp/tap/terraform'"
+        - "terraform_install_result.changed_pkgs == ['hashicorp/tap/terraform']"
+        - "terraform_install_result.unchanged_pkgs == []"
