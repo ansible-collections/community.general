@@ -1,0 +1,2 @@
+minor_changes:
+  - Add the parameter fail_over_mac to the module nmcli
