@@ -46,6 +46,14 @@ DOCUMENTATION = '''
                 O(host) with SSH and execute the command C(iocage list).
                 This option is not required if O(host) is V(localhost).
             type: str
+        sudo:
+            description:
+              - Enable execution as root.
+              - This requires passwordless sudo of the command C(iocage list*)
+              - If O(env) is used C(SETENV) tag is needed.
+              - For example C(admin ALL=(ALL) NOPASSWD:SETENV: /usr/local/bin/iocage list*)
+            type: boolean
+            default: false
         get_properties:
             description:
               - Get jails' properties.
@@ -85,6 +93,15 @@ plugin: community.general.iocage
 plugin: community.general.iocage
 host: 10.1.0.73
 user: admin
+env:
+  CRYPTOGRAPHY_OPENSSL_NO_LEGACY: 1
+
+---
+# execute as root
+plugin: community.general.iocage
+host: 10.1.0.73
+user: admin
+sudo: true
 env:
   CRYPTOGRAPHY_OPENSSL_NO_LEGACY: 1
 
@@ -196,6 +213,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     def get_inventory(self, path):
         host = self.get_option('host')
+        sudo = self.get_option('sudo')
         env = self.get_option('env')
         get_properties = self.get_option('get_properties')
 
@@ -208,9 +226,13 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             cmd.append("ssh")
             cmd.append(f"{user}@{host}")
             cmd.extend([f"{k}={v}" for k, v in env.items()])
-        cmd.append(self.IOCAGE)
 
         cmd_list = cmd.copy()
+        if sudo:
+            cmd_list.append('sudo')
+            if env:
+                cmd_list.append('--preserve-env')
+        cmd_list.append(self.IOCAGE)
         cmd_list.append('list')
         cmd_list.append('--long')
         try:
@@ -233,6 +255,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         if get_properties:
             for hostname, host_vars in results['_meta']['hostvars'].items():
                 cmd_get_properties = cmd.copy()
+                cmd_get_properties.append(self.IOCAGE)
                 cmd_get_properties.append("get")
                 cmd_get_properties.append("--all")
                 cmd_get_properties.append(f"{hostname}")
