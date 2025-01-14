@@ -51,7 +51,7 @@ DOCUMENTATION = '''
               - Enable execution as root.
               - This requires passwordless sudo of the command C(iocage list*)
               - If O(env) is used C(SETENV) tag is needed.
-              - For example C(admin ALL=(ALL) NOPASSWD:SETENV: /usr/local/bin/iocage list*)
+              - For example C('admin ALL=(ALL) NOPASSWD:SETENV: /usr/local/bin/iocage list*')
             type: boolean
             default: false
         get_properties:
