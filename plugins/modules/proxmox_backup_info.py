@@ -56,27 +56,27 @@ extends_documentation_fragment:
 """
 
 EXAMPLES = """
-- name: Print all backup information by VM id and VM name
+- name: Print all backup information by VM ID and VM name.
   proxmox_backup_info:
     api_user: 'myUser@pam'
     api_password: '*******'
     api_host: '192.168.20.20'
 
-- name: Print proxmox backup information for a specific VM based on its name
+- name: Print proxmox backup information for a specific VM based on its name.
   proxmox_backup_info:
     api_user: 'myUser@pam'
     api_password: '*******'
     api_host: '192.168.20.20'
     vm_name: 'mailsrv'
 
-- name: Print proxmox backup information for a specific VM based on its VM id
+- name: Print proxmox backup information for a specific VM based on its VM ID.
   proxmox_backup_info:
     api_user: 'myUser@pam'
     api_password: '*******'
     api_host: '192.168.20.20'
     vm_id: '150'
 
-- name: Print proxmox all backup job information
+- name: Print proxmox all backup job information.
   proxmox_backup_info:
     api_user: 'myUser@pam'
     api_password: '*******'
@@ -101,7 +101,7 @@ backup_info:
       returned: on success
       type: int
     id:
-      description: The backup job id.
+      description: The backup job ID.
       returned: on success
       type: str
     mode:
@@ -125,7 +125,7 @@ backup_info:
       returned: on success
       type: str
     vmid:
-      description: The VM id.
+      description: The VM ID.
       returned: on success
       type: str
 """
@@ -154,7 +154,7 @@ class ProxmoxBackupInfoAnsible(ProxmoxAnsible):
             self.module.fail_json(msg="Getting VMs info from cluster failed: %s" % e)
         return vms
 
-    # Get all backup information by VM id and VM name
+    # Get all backup information by VM ID and VM name
     def vms_backup_info(self):
         backupList = self.get_jobs_list()
         vmInfo = self.get_vms_list()
@@ -179,7 +179,7 @@ class ProxmoxBackupInfoAnsible(ProxmoxAnsible):
                 bkInfo.append(bkInfoData)
         return bkInfo
 
-    # Get proxmox backup information for a specific VM based on its VM id or VM name
+    # Get proxmox backup information for a specific VM based on its VM ID or VM name
     def specific_vmbackup_info(self, vm_name_id):
         fullBackupInfo = self.vms_backup_info()
         vmBackupJobs = []
