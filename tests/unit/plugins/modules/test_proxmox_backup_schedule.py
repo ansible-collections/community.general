@@ -26,7 +26,6 @@ from ansible_collections.community.general.tests.unit.plugins.modules.utils impo
     set_module_args,
 )
 import ansible_collections.community.general.plugins.module_utils.proxmox as proxmox_utils
-from deepdiff import DeepDiff
 
 RESOURCE_LIST = [
     {
