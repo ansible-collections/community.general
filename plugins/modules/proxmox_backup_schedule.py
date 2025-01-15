@@ -84,7 +84,6 @@ EXAMPLES = """
     api_host: '192.168.20.20'
     vm_id: 'VM ID'
     backup_action: 'delete_vmid'
-
 """
 
 RETURN = """
