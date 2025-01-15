@@ -361,3 +361,43 @@ test_cases:
         cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
         perl version 5.041005 (/usr/local/bin/perl)
       err: ""
+- id: install_dancer_with_recommends
+  input:
+    name: Dancer2
+    install_recommendations: true
+  output:
+    changed: true
+  mocks:
+    run_command:
+    - command: [/testbin/cpanm, --version]
+      environ: *env-def-true
+      rc: 0
+      out: |
+        cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
+        perl version 5.041005 (/usr/local/bin/perl)
+      err: ""
+    - command: [/testbin/cpanm, --with-recommends, Dancer2]
+      environ: *env-def-true
+      rc: 0
+      out: ""
+      err: ""
+- id: install_dancer_with_suggests
+  input:
+    name: Dancer2
+    install_suggestions: true
+  output:
+    changed: true
+  mocks:
+    run_command:
+    - command: [/testbin/cpanm, --version]
+      environ: *env-def-true
+      rc: 0
+      out: |
+        cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
+        perl version 5.041005 (/usr/local/bin/perl)
+      err: ""
+    - command: [/testbin/cpanm, --with-suggests, Dancer2]
+      environ: *env-def-true
+      rc: 0
+      out: ""
+      err: ""
