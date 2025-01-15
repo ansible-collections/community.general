@@ -158,8 +158,8 @@ class ProxmoxSetVMBackupAnsible(ProxmoxAnsible):
     def backup_delete_vmid(self, vm_id):
         bkID_delvm = []
         backupList = self.get_cluster_bklist()
-        for backupItem in backupList:
-            vmids = [num for num in backupItem['vmid'].split(',')]
+        for backupItem in backupList:            
+            vmids = list(backupItem['vmid'].split(','))
             if vm_id in vmids:
                 if len(vmids) > 1 :
                     vmids.remove(vm_id)
