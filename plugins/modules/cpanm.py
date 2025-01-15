@@ -56,6 +56,22 @@ options:
       - Only install dependencies.
     type: bool
     default: false
+  install_recommendations:
+    description:
+      - If V(true), installs dependencies declared as recommends per META spec.
+      - If V(false), it ensures the dependencies declared as recommends are not installed, overriding any decision made earlier in E(PERL_CPANM_OPT).
+      - If parameter is not set, C(cpanm) will use its existing defaults.
+      - When these dependencies fail to install, cpanm continues the installation, since they are just recommendation.
+    type: bool
+    version_added: 10.3.0
+  install_suggestions:
+    description:
+      - If V(true), installs dependencies declared as suggests per META spec.
+      - If V(false), it ensures the dependencies declared as suggests are not installed, overriding any decision made earlier in E(PERL_CPANM_OPT).
+      - If parameter is not set, C(cpanm) will use its existing defaults.
+      - When these dependencies fail to install, cpanm continues the installation, since they are just suggestion.
+    type: bool
+    version_added: 10.3.0
   version:
     description:
       - Version specification for the perl module. When O(mode) is V(new), C(cpanm) version operators are accepted.
@@ -167,6 +183,8 @@ class CPANMinus(ModuleHelper):
             mirror=dict(type='str'),
             mirror_only=dict(type='bool', default=False),
             installdeps=dict(type='bool', default=False),
+            install_recommendations=dict(type='bool'),
+            install_suggestions=dict(type='bool'),
             executable=dict(type='path'),
             mode=dict(type='str', default='new', choices=['compatibility', 'new']),
             name_check=dict(type='str')
@@ -181,6 +199,8 @@ class CPANMinus(ModuleHelper):
         mirror=cmd_runner_fmt.as_opt_val('--mirror'),
         mirror_only=cmd_runner_fmt.as_bool("--mirror-only"),
         installdeps=cmd_runner_fmt.as_bool("--installdeps"),
+        install_recommendations=cmd_runner_fmt.as_bool("--with-recommends", "--without-recommends", ignore_none=True),
+        install_suggestions=cmd_runner_fmt.as_bool("--with-suggests", "--without-suggests", ignore_none=True),
         pkg_spec=cmd_runner_fmt.as_list(),
         cpanm_version=cmd_runner_fmt.as_fixed("--version"),
     )
@@ -254,7 +274,16 @@ class CPANMinus(ModuleHelper):
                 return
             pkg_spec = self.sanitize_pkg_spec_version(v[pkg_param], v.version)
 
-        with self.runner(['notest', 'locallib', 'mirror', 'mirror_only', 'installdeps', 'pkg_spec'], output_process=process) as ctx:
+        with self.runner([
+            'notest',
+            'locallib',
+            'mirror',
+            'mirror_only',
+            'installdeps',
+            'install_recommendations',
+            'install_suggestions',
+            'pkg_spec'
+        ], output_process=process) as ctx:
             self.changed = ctx.run(pkg_spec=pkg_spec)
 
 
