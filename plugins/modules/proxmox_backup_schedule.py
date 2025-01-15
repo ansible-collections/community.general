@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2024 Marzieh Raoufnezhad <raoufnezhad@gmail.com>
+# Copyright (c) 2025 Marzieh Raoufnezhad <raoufnezhad@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -38,8 +38,8 @@ options:
     type: str
   backup_action:
     description:
-        - If V(update_vmid), the modeule will update backup job with new VM ID.
-        - If V(delete_vmid), the modeule will remove the VM ID from all backup jobs where the VM ID has existed.
+        - If V(update_vmid), the module will update backup job with new VM ID.
+        - If V(delete_vmid), the module will remove the VM ID from all backup jobs where the VM ID has existed.
     required: true
     type: str
 
@@ -51,7 +51,7 @@ extends_documentation_fragment:
 """
 
 EXAMPLES = """
-- name: Scheduling VM Backups base on VM name.
+- name: Scheduling VM Backups based on VM name.
   proxmox_backup_schedule:
     api_user: 'myUser@pam'
     api_password: '*******'
@@ -60,7 +60,7 @@ EXAMPLES = """
     backup_id: 'backup-b2adffdc-316e'
     backup_action: 'update_vmid'
 
-- name: Scheduling VM Backups base on VM ID.
+- name: Scheduling VM Backups based on VM ID.
   proxmox_backup_schedule:
     api_user: 'myUser@pam'
     api_password: '*******'
@@ -69,7 +69,7 @@ EXAMPLES = """
     backup_id: 'backup-b2adffdc-316e'
     backup_action: 'update_vmid'
 
-- name: Removing backup setting base on VM name.
+- name: Removing backup setting based on VM name.
   proxmox_backup_schedule:
     api_user: 'myUser@pam'
     api_password: '*******'
@@ -77,7 +77,7 @@ EXAMPLES = """
     vm_name: 'VM Name'
     backup_action: 'delete_vmid'
 
-- name: Removing backup setting base on VM ID.
+- name: Removing backup setting based on VM ID.
   proxmox_backup_schedule:
     api_user: 'myUser@pam'
     api_password: '*******'
