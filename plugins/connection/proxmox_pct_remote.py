@@ -727,6 +727,8 @@ class Connection(ConnectionBase):
                 for i in range(0, len(in_data), bufsize):
                     chan.send(in_data[i:i + bufsize])
                 chan.shutdown_write()
+            elif in_data == b'':
+                chan.shutdown_write()
 
         except socket.timeout:
             raise AnsibleError('ssh timed out waiting for privilege escalation.\n' + to_text(become_output))
@@ -744,6 +746,7 @@ class Connection(ConnectionBase):
     def put_file(self, in_path: str, out_path: str) -> None:
         """ transfer a file from local to remote """
 
+        display.vvv(f'PUT {in_path} TO {out_path}', host=self.get_option('remote_addr'))
         try:
             with open(in_path, 'rb') as f:
                 data = f.read()
@@ -766,6 +769,7 @@ class Connection(ConnectionBase):
     def fetch_file(self, in_path: str, out_path: str) -> None:
         """ save a remote file to the specified path """
 
+        display.vvv(f'FETCH {in_path} TO {out_path}', host=self.get_option('remote_addr'))
         try:
             returncode, stdout, stderr = self.exec_command(
                 ' '.join([

@@ -10,3 +10,10 @@ ANSIBLE_ROLES_PATH=../ \
     ansible-playbook dependencies.yml -v "$@"
 
 ./test.sh "$@"
+
+ansible-playbook plugin-specific-tests.yml -i "./test_connection.inventory" \
+    -e target_hosts="proxmox_pct_remote" \
+    -e action_prefix= \
+    -e local_tmp=/tmp/ansible-local \
+    -e remote_tmp=/tmp/ansible-remote \
+    "$@"
