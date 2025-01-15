@@ -33,7 +33,7 @@ options:
     required: false
     type: str
   backup_id:
-    description: The backup job id.
+    description: The backup job ID.
     required: false
     type: str
   backup_action:
@@ -115,7 +115,7 @@ class ProxmoxSetVMBackupAnsible(ProxmoxAnsible):
         try:
             specificBackupID = self.proxmox_api.cluster.backup.get(backup_id)
         except Exception as e:
-            self.module.fail_json(msg="Getting specific backup id failed: %s" % e)
+            self.module.fail_json(msg="Getting specific backup ID failed: %s" % e)
         return specificBackupID
 
     def set_vmid_backup(self, backup_id, bk_id_vmids):
@@ -132,7 +132,7 @@ class ProxmoxSetVMBackupAnsible(ProxmoxAnsible):
             self.module.fail_json(msg="Getting vms info from cluster failed: %s" % e)
         return vms
 
-    # convert vm name to vm id
+    # convert vm name to vm ID
     def vmname_2_vmid(self, vmname):
         vmInfo = self.get_vms_list()
         vms = [vm for vm in vmInfo if vm['name'] == vmname]
@@ -158,7 +158,7 @@ class ProxmoxSetVMBackupAnsible(ProxmoxAnsible):
     def backup_delete_vmid(self, vm_id):
         bkID_delvm = []
         backupList = self.get_cluster_bklist()
-        for backupItem in backupList:            
+        for backupItem in backupList:
             vmids = list(backupItem['vmid'].split(','))
             if vm_id in vmids:
                 if len(vmids) > 1 :
