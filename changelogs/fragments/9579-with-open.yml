@@ -1,0 +1,11 @@
+minor_changes:
+  - known_hosts - open file using ``open()`` as a context manager (https://github.com/ansible-collections/community.general/pull/9579).
+  - cloud_init_data_facts - open file using ``open()`` as a context manager (https://github.com/ansible-collections/community.general/pull/9579).
+  - cronvar - open file using ``open()`` as a context manager (https://github.com/ansible-collections/community.general/pull/9579).
+  - crypttab - open file using ``open()`` as a context manager (https://github.com/ansible-collections/community.general/pull/9579).
+  - parted - open file using ``open()`` as a context manager (https://github.com/ansible-collections/community.general/pull/9579).
+  - pulp_repo - open file using ``open()`` as a context manager (https://github.com/ansible-collections/community.general/pull/9579).
+  - redhat_subscription - open file using ``open()`` as a context manager (https://github.com/ansible-collections/community.general/pull/9579).
+  - solaris_zone - open file using ``open()`` as a context manager (https://github.com/ansible-collections/community.general/pull/9579).
+  - sorcery - open file using ``open()`` as a context manager (https://github.com/ansible-collections/community.general/pull/9579).
+  - timezone - open file using ``open()`` as a context manager (https://github.com/ansible-collections/community.general/pull/9579).
