@@ -15,6 +15,7 @@ from ansible_collections.community.general.plugins.module_utils.mh.deco import m
 class ModuleHelperBase(object):
     module = None
     ModuleHelperException = _MHE
+    # in 12.0.0 add 'debug' to the tuple
     _delegated_to_module = (
         'check_mode', 'get_bin_path', 'warn', 'deprecate',
     )
@@ -28,6 +29,7 @@ class ModuleHelperBase(object):
         if not isinstance(self.module, AnsibleModule):
             self.module = AnsibleModule(**self.module)
 
+        # in 12.0.0 remove this if statement entirely
         if hasattr(self, 'debug'):
             self.module.warn(
                 "This class has an attribute 'debug' defined. "
