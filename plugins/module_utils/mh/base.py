@@ -28,6 +28,16 @@ class ModuleHelperBase(object):
         if not isinstance(self.module, AnsibleModule):
             self.module = AnsibleModule(**self.module)
 
+        if hasattr(self, 'debug'):
+            self.module.warn(
+                "This class has an attribute 'debug' defined. "
+                "Method 'debug' will be an integral part of ModuleHelper in community.general "
+                "12.0.0, delegated to the underlying AnsibleModule object. "
+                "Please rename the existing attribute to prevent this message from showing."
+            )
+        else:
+            self._delegated_to_module = self._delegated_to_module + ('debug',)
+
     @property
     def diff_mode(self):
         return self.module._diff
