@@ -182,7 +182,7 @@ class FilterModule:
 
         return result
 
-    def filters(self) -> dict[str, Callable[[object, str, str, object], object]]:
+    def filters(self) -> dict[str, Callable[..., Any]]:
         """Map filter plugin names to their functions.
 
         Returns:
