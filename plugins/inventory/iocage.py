@@ -51,13 +51,13 @@ DOCUMENTATION = '''
               - Enable execution as root.
               - This requires passwordless sudo of the command C(iocage list*)
               - If O(env) is used C(SETENV) tag is needed.
-            type: boolean
+            type: bool
             default: false
         get_properties:
             description:
               - Get jails' properties.
                 Creates dictionary C(iocage_properties) for each added host.
-            type: boolean
+            type: bool
             default: false
         env:
             description: O(user)'s environment on O(host).
