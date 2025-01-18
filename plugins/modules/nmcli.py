@@ -382,7 +382,8 @@ options:
   fail_over_mac:
     description:
       - This is only used with bond - fail_over_mac.
-    type: int
+    type: str
+    choices=['none', 'active', 'follow']
     version_added: 10.3.0
   arp_interval:
     description:
@@ -2612,7 +2613,7 @@ def main():
             downdelay=dict(type='int'),
             updelay=dict(type='int'),
             xmit_hash_policy=dict(type='str'),
-            fail_over_mac=dict(type='int'),
+            fail_over_mac=dict(type='str', choices=['none', 'active', 'follow']),
             arp_interval=dict(type='int'),
             arp_ip_target=dict(type='str'),
             primary=dict(type='str'),
