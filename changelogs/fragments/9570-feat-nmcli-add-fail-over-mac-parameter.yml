@@ -1,2 +1,2 @@
 minor_changes:
-  - Add the parameter fail_over_mac to the module nmcli
+  - nmcli - add a option ``fail_over_mac`` (https://github.com/ansible-collections/community.general/issues/9570, https://github.com/ansible-collections/community.general/pull/9571).
