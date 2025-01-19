@@ -49,7 +49,7 @@ DOCUMENTATION = '''
         sudo:
             description:
               - Enable execution as root.
-              - This requires passwordless sudo of the command C(iocage list*)
+              - This requires passwordless sudo of the command C(iocage list*).
             type: bool
             default: false
         sudo_preserve_env:
