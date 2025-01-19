@@ -1,2 +1,2 @@
 minor_changes:
-  - ufw - Add support for vrrrp protocol. (https://github.com/ansible-collections/community.general/issues/9562)
+  - ufw - add support for ``vrrrp`` protocol (https://github.com/ansible-collections/community.general/issues/9562, https://github.com/ansible-collections/community.general/pull/9582).
