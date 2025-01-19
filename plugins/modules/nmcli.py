@@ -383,7 +383,7 @@ options:
     description:
       - This is only used with bond - fail_over_mac.
     type: str
-    choices=['none', 'active', 'follow']
+    choices: [none, active, follow]
     version_added: 10.3.0
   arp_interval:
     description:
