@@ -50,9 +50,14 @@ DOCUMENTATION = '''
             description:
               - Enable execution as root.
               - This requires passwordless sudo of the command C(iocage list*)
-              - If O(env) is used C(SETENV) tag is needed.
             type: bool
             default: false
+        sudo_preserve_env:
+            description:
+              - Preserve environment if O(sudo) is enabled.
+              - This requires C(SETENV) sudoers tag.
+            type: bool
+            default: true
         get_properties:
             description:
               - Get jails' properties.
@@ -214,6 +219,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def get_inventory(self, path):
         host = self.get_option('host')
         sudo = self.get_option('sudo')
+        sudo_preserve_env = self.get_option('sudo_preserve_env')
         env = self.get_option('env')
         get_properties = self.get_option('get_properties')
 
@@ -230,7 +236,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         cmd_list = cmd.copy()
         if sudo:
             cmd_list.append('sudo')
-            if env:
+            if sudo_preserve_env:
                 cmd_list.append('--preserve-env')
         cmd_list.append(self.IOCAGE)
         cmd_list.append('list')
