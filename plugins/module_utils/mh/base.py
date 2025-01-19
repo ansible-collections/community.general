@@ -31,11 +31,12 @@ class ModuleHelperBase(object):
 
         # in 12.0.0 remove this if statement entirely
         if hasattr(self, 'debug'):
-            self.module.warn(
-                "This class has an attribute 'debug' defined. "
+            self.deprecate(
+                f"This class ({cls}) has an attribute 'debug' defined and that is deprecated. "
                 "Method 'debug' will be an integral part of ModuleHelper in community.general "
                 "12.0.0, delegated to the underlying AnsibleModule object. "
-                "Please rename the existing attribute to prevent this message from showing."
+                "Please rename the existing attribute to prevent this message from showing.".format(cls=self.__class__.__name__),
+                version="12.0.0", collection="community.general"
             )
         else:
             self._delegated_to_module = self._delegated_to_module + ('debug',)
