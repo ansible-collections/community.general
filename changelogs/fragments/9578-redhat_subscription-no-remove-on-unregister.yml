@@ -1,0 +1,7 @@
+bugfixes:
+  - |
+    redhat_subscription - do not try to unsubscribe (i.e. remove subscriptions)
+    when unregistering a system: newer versions of subscription-manager, as
+    available in EL 10 and Fedora 41+, do not support entitlements anymore, and
+    thus unsubscribing will fail
+    (https://github.com/ansible-collections/community.general/pull/9578).
