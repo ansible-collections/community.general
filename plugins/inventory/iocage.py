@@ -59,6 +59,7 @@ DOCUMENTATION = '''
               - This requires C(SETENV) sudoers tag.
             type: bool
             default: false
+            version_added: 10.3.0
         get_properties:
             description:
               - Get jails' properties.
