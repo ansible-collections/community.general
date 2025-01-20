@@ -14,12 +14,12 @@ DOCUMENTATION = """
     requirements:
       - C(op) 1Password command line utility version 2 or later.
     short_description: Fetch SSH Keys stored in 1Password
-    version_added: "10.2.1"
+    version_added: "10.3.0"
     description:
       - P(community.general.onepassword_ssh_key#lookup) wraps C(op) command line utility to fetch ssh keys from 1Password.
     notes:
-      - By default, it returns the private key value in PKCS#8 format, unless 'ssh_format=true' is passed.
-      - The pluging works only for 'SSHKEY' type items.
+      - By default, it returns the private key value in PKCS#8 format, unless O(ssh_format=true) is passed.
+      - The pluging works only for C(SSHKEY) type items.
       - This plugin requires C(op) version 2 or later.
 
     options:
@@ -32,7 +32,7 @@ DOCUMENTATION = """
         description: Output key in SSH format if true. Otherwise, outputs in the default format.
         required: false
         default: false
-        type: bool        
+        type: bool
 
     extends_documentation_fragment:
       - community.general.onepassword
@@ -86,20 +86,31 @@ class OnePassCLIv2SSHKey(OnePassCLIv2):
         return self._run(args)
 
     def get_ssh_key(self, item_id, vault=None, token=None, ssh_format=False):
-        _, out, _ = self._get_raw(item_id, vault, token)
+        rc, out, err = self._get_raw(item_id, vault, token)
 
         data = json.loads(out)
 
         if data.get("category") != "SSH_KEY":
             raise AnsibleLookupError(f"Item {item_id} is not SSH Key")
 
-        for field in data.get("fields", {}):
-            if field.get("id") == "private_key" and field.get("type") == "SSHKEY":
-                return (
-                    field.get("ssh_formats", {}).get("openssh", {}).get("value", "")
-                    if ssh_format
-                    else field.get("value", "")
-                )
+        private_key_field = next(
+            (
+                field
+                for field in data.get("fields", {})
+                if field.get("id") == "private_key" and field.get("type") == "SSHKEY"
+            ),
+            None,
+        )
+        if not private_key_field:
+            raise AnsibleLookupError(f"No private key found for item {item_id}.")
+
+        if ssh_format:
+            return (
+                private_key_field.get("ssh_formats", {})
+                .get("openssh", {})
+                .get("value", "")
+            )
+        return private_key_field.get("value", "")
 
 
 class LookupModule(LookupBase):
@@ -132,8 +143,6 @@ class LookupModule(LookupBase):
         )
         op.assert_logged_in()
 
-        values = []
-        for term in terms:
-            values.append(op._cli.get_ssh_key(term, vault, ssh_format=ssh_format))
-
-        return [values]
+        return [
+            op._cli.get_ssh_key(term, vault, ssh_format=ssh_format) for term in terms
+        ]
