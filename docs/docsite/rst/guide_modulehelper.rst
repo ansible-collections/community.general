@@ -468,6 +468,11 @@ Additionally, MH will also delegate:
 - ``diff_mode`` to ``self.module._diff``
 - ``verbosity`` to ``self.module._verbosity``
 
+Starting in community.general 10.3.0, MH will also delegate the method ``debug`` to ``self.module``.
+If any existing module already has a ``debug`` attribute defined, a warning message will be generated,
+requesting it to be renamed. Upon the release of community.general 12.0.0, the delegation will be
+preemptive and will override any existing method or property in the subclasses.
+
 Decorators
 """"""""""
 
