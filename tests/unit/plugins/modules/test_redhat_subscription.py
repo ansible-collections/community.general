@@ -200,11 +200,6 @@ TEST_CASES = [
                     (0, 'system identity: b26df632-25ed-4452-8f89-0308bfd167cb', '')
                 ),
                 (
-                    ['/testbin/subscription-manager', 'remove', '--all'],
-                    {'check_rc': True},
-                    (0, '', '')
-                ),
-                (
                     ['/testbin/subscription-manager', 'unregister'],
                     {'check_rc': True},
                     (0, '', '')
