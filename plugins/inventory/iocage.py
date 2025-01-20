@@ -57,7 +57,7 @@ DOCUMENTATION = '''
               - Preserve environment if O(sudo) is enabled.
               - This requires C(SETENV) sudoers tag.
             type: bool
-            default: true
+            default: false
         get_properties:
             description:
               - Get jails' properties.
@@ -65,7 +65,9 @@ DOCUMENTATION = '''
             type: bool
             default: false
         env:
-            description: O(user)'s environment on O(host).
+            description:
+              - O(user)'s environment on O(host).
+              - Enable O(sudo_preserve_env) if O(sudo) is enabled.
             type: dict
             default: {}
     notes:
@@ -107,6 +109,7 @@ plugin: community.general.iocage
 host: 10.1.0.73
 user: admin
 sudo: true
+sudo_preserve_env: true
 env:
   CRYPTOGRAPHY_OPENSSL_NO_LEGACY: 1
 
