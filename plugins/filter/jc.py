@@ -5,8 +5,7 @@
 #
 # contributed by Kelly Brazil <kellyjonbrazil@gmail.com>
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 name: jc
