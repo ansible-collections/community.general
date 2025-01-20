@@ -1119,7 +1119,6 @@ def main():
             module.exit_json(changed=False, msg="System already unregistered.")
         else:
             try:
-                rhsm.unsubscribe()
                 rhsm.unregister()
             except Exception as e:
                 module.fail_json(msg="Failed to unregister: %s" % to_native(e))
