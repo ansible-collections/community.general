@@ -6,8 +6,7 @@
     Counter enabled Ansible callback plugin (See DOCUMENTATION for more information)
 '''
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 author: Unknown (!UNKNOWN)
