@@ -6,7 +6,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 author: Nils Stein (@mietzen) <github.nstein@mailbox.org>

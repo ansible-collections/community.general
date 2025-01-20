@@ -1,26 +1,26 @@
 minor_changes:
-  - chroot - adjust standard Python imports for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
-  - funcd - adjust standard Python imports for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
-  - incus - adjust standard Python imports for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
-  - iocage - adjust standard Python imports for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
-  - jail - adjust standard Python imports for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
-  - lxc - adjust standard Python imports for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
-  - lxd - adjust standard Python imports for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
-  - proxmox_pct_remote - adjust standard Python imports for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
-  - qubes - adjust standard Python imports for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
-  - saltstack - adjust standard Python imports for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
-  - zone - adjust standard Python imports for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
-  - cobbler - adjust standard Python imports for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
-  - gitlab_runners - adjust standard Python imports for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
-  - icinga2 - adjust standard Python imports for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
-  - iocage - adjust standard Python imports for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
-  - linode - adjust standard Python imports for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
-  - lxd - adjust standard Python imports for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
-  - nmap - adjust standard Python imports for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
-  - online - adjust standard Python imports for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
-  - opennebula - adjust standard Python imports for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
-  - proxmox - adjust standard Python imports for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
-  - scaleway - adjust standard Python imports for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
-  - stackpath_compute - adjust standard Python imports for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
-  - virtualbox - adjust standard Python imports for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
-  - xen_orchestra - adjust standard Python imports for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
+  - chroot - adjust standard preamble for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
+  - funcd - adjust standard preamble for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
+  - incus - adjust standard preamble for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
+  - iocage - adjust standard preamble for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
+  - jail - adjust standard preamble for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
+  - lxc - adjust standard preamble for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
+  - lxd - adjust standard preamble for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
+  - proxmox_pct_remote - adjust standard preamble for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
+  - qubes - adjust standard preamble for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
+  - saltstack - adjust standard preamble for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
+  - zone - adjust standard preamble for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
+  - cobbler - adjust standard preamble for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
+  - gitlab_runners - adjust standard preamble for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
+  - icinga2 - adjust standard preamble for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
+  - iocage - adjust standard preamble for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
+  - linode - adjust standard preamble for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
+  - lxd - adjust standard preamble for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
+  - nmap - adjust standard preamble for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
+  - online - adjust standard preamble for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
+  - opennebula - adjust standard preamble for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
+  - proxmox - adjust standard preamble for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
+  - scaleway - adjust standard preamble for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
+  - stackpath_compute - adjust standard preamble for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
+  - virtualbox - adjust standard preamble for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).
+  - xen_orchestra - adjust standard preamble for Python 3 (https://github.com/ansible-collections/community.general/pull/9584).

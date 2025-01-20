@@ -9,7 +9,6 @@
 # Written by: Kushal Das (https://github.com/kushaldas)
 
 from __future__ import annotations
-__metaclass__ = type
 
 
 DOCUMENTATION = r"""
