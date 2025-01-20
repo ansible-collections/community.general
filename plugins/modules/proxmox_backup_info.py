@@ -56,28 +56,28 @@ extends_documentation_fragment:
 """
 
 EXAMPLES = """
-- name: Print all backup information by VM ID and VM name.
-  proxmox_backup_info:
+- name: Print all backup information by VM ID and VM name
+  community.general.proxmox_backup_info:
     api_user: 'myUser@pam'
     api_password: '*******'
     api_host: '192.168.20.20'
 
-- name: Print proxmox backup information for a specific VM based on its name.
-  proxmox_backup_info:
+- name: Print Proxmox backup information for a specific VM based on its name
+  community.general.proxmox_backup_info:
     api_user: 'myUser@pam'
     api_password: '*******'
     api_host: '192.168.20.20'
     vm_name: 'mailsrv'
 
-- name: Print proxmox backup information for a specific VM based on its VM ID.
-  proxmox_backup_info:
+- name: Print Proxmox backup information for a specific VM based on its VM ID
+  community.general.proxmox_backup_info:
     api_user: 'myUser@pam'
     api_password: '*******'
     api_host: '192.168.20.20'
     vm_id: '150'
 
-- name: Print proxmox all backup job information.
-  proxmox_backup_info:
+- name: Print Proxmox all backup job information
+  community.general.proxmox_backup_info:
     api_user: 'myUser@pam'
     api_password: '*******'
     api_host: '192.168.20.20'
@@ -88,7 +88,7 @@ RETURN = """
 ---
 backup_info:
   description: The return value provides backup job information based on VM ID or VM name, or total backup job information.
-  returned: always, but can be empty
+  returned: on success, but can be empty
   type: list
   elements: dict
   contains:
