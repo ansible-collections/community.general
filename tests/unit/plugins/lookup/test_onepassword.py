@@ -10,7 +10,7 @@ import itertools
 import json
 import pytest
 
-from .onepassword_common import MOCK_ENTRIES
+from .onepassword_common import MOCK_ENTRIES, SSH_KEY_MOCK_ENTRIES
 
 from ansible.errors import AnsibleLookupError, AnsibleOptionsError
 from ansible.plugins.loader import lookup_loader
@@ -263,6 +263,23 @@ def test_op_lookup(mocker, cli_class, vault, queries, kwargs, output, expected):
     result = op_lookup.run(queries, vault=vault, **kwargs)
 
     assert result == expected
+
+
+@pytest.mark.parametrize(
+    ("vault", "queries", "kwargs", "output", "expected"),
+    (
+        (item["vault_name"], item["queries"], item.get("kwargs", {}), item["output"], item["expected"])
+        for item in SSH_KEY_MOCK_ENTRIES
+    )
+)
+def test_ssh_key(mocker, vault, queries, kwargs, output, expected):
+    mocker.patch("ansible_collections.community.general.plugins.lookup.onepassword.OnePass.assert_logged_in", return_value=True)
+    mocker.patch("ansible_collections.community.general.plugins.lookup.onepassword.OnePassCLIBase._run", return_value=(0, json.dumps(output), ""))
+
+    op_lookup = lookup_loader.get("community.general.onepassword_ssh_key")
+    result = op_lookup.run(queries, vault=vault, **kwargs)
+
+    assert result == expected    
 
 
 @pytest.mark.parametrize("op_fixture", OP_VERSION_FIXTURES)

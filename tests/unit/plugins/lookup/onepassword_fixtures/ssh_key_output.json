@@ -1,0 +1,57 @@
+{
+    "id": "wdtryfeh3jlx2dlanqgg4dqxmy",
+    "title": "ssh key",
+    "version": 1,
+    "vault": {
+      "id": "5auhrjy66hc7ndhe2wvym6gadv",
+      "name": "Personal"
+    },
+    "category": "SSH_KEY",
+    "last_edited_by": "LSGPJERUYBH7BFPHMZ2KKGL6AU",
+    "created_at": "2025-01-10T16:57:16Z",
+    "updated_at": "2025-01-10T16:57:16Z",
+    "additional_information": "SHA256:frHmQAgblahD5HHgNj2O714",
+    "fields": [
+      {
+        "id": "public_key",
+        "type": "STRING",
+        "label": "public key",
+        "value": "ssh-ed255.....",
+        "reference": "op://Personal/ssh key/public key"
+      },
+      {
+        "id": "fingerprint",
+        "type": "STRING",
+        "label": "fingerprint",
+        "value": "SHA256:frHmQAgy7zBKeFDxHMW0QltZ/5O4N8gD5HHgNj2O614",
+        "reference": "op://Personal/ssh key/fingerprint"
+      },
+      {
+        "id": "private_key",
+        "type": "SSHKEY",
+        "label": "private key",
+        "value": "-----BEGIN PRIVATE KEY-----\n..........=\n-----END PRIVATE KEY-----\n",
+        "reference": "op://Personal/ssh key/private key",
+        "ssh_formats": {
+          "openssh": {
+            "reference": "op://Personal/ssh key/private key?ssh-format=openssh",
+            "value": "-----BEGIN OPENSSH PRIVATE KEY-----\r\n.....\r\n-----END OPENSSH PRIVATE KEY-----\r\n"
+          }
+        }
+      },
+      {
+        "id": "key_type",
+        "type": "STRING",
+        "label": "key type",
+        "value": "ed25519",
+        "reference": "op://Personal/ssh key/key type"
+      },
+      {
+        "id": "notesPlain",
+        "type": "STRING",
+        "purpose": "NOTES",
+        "label": "notesPlain",
+        "reference": "op://Personal/ssh key/notesPlain"
+      }
+    ]
+  }
