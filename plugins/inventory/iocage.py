@@ -52,6 +52,7 @@ DOCUMENTATION = '''
               - This requires passwordless sudo of the command C(iocage list*).
             type: bool
             default: false
+            version_added: 10.3.0
         sudo_preserve_env:
             description:
               - Preserve environment if O(sudo) is enabled.
