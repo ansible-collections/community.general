@@ -279,7 +279,7 @@ def test_ssh_key(mocker, vault, queries, kwargs, output, expected):
     op_lookup = lookup_loader.get("community.general.onepassword_ssh_key")
     result = op_lookup.run(queries, vault=vault, **kwargs)
 
-    assert result == expected    
+    assert result == expected
 
 
 @pytest.mark.parametrize("op_fixture", OP_VERSION_FIXTURES)
