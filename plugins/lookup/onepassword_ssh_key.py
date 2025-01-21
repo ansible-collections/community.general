@@ -110,7 +110,7 @@ class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
         self.set_options(var_options=variables, direct=kwargs)
 
-        ssh_format = kwargs.get("ssh_format")
+        ssh_format = self.get_option("ssh_format")
         vault = self.get_option("vault")
         subdomain = self.get_option("subdomain")
         domain = self.get_option("domain", "1password.com")
