@@ -164,6 +164,14 @@ files:
     maintainers: Ajpantuso
   $filters/jc.py:
     maintainers: kellyjonbrazil
+  $filters/json_diff.yml:
+    maintainers: numo68
+  $filters/json_patch.py:
+    maintainers: numo68
+  $filters/json_patch.yml:
+    maintainers: numo68
+  $filters/json_patch_recipe.yml:
+    maintainers: numo68
   $filters/json_query.py: {}
   $filters/keep_keys.py:
     maintainers: vbotka

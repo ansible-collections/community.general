@@ -1,0 +1,56 @@
+---
+# Copyright (c) Stanislav Meduna (@numo68)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+DOCUMENTATION:
+  name: json_diff
+  short_description: Create a JSON patch by comparing two JSON files
+  description:
+    - This filter compares the input with the argument and computes a list of operations
+      that can be consumed by the P(community.general.json_patch_recipe#filter) to change the input
+      to the argument.
+  requirements:
+    - jsonpatch
+  version_added: 10.3.0
+  author:
+    - Stanislav Meduna (@numo68)
+  positional: target
+  options:
+    _input:
+      description: A list or a dictionary representing a source JSON object, or a string containing a JSON object.
+      type: raw
+      required: true
+    target:
+      description: A list or a dictionary representing a target JSON object, or a string containing a JSON object.
+      type: raw
+      required: true
+  seealso:
+    - name: RFC 6902
+      description: JavaScript Object Notation (JSON) Patch
+      link: https://datatracker.ietf.org/doc/html/rfc6902
+    - name: RFC 6901
+      description: JavaScript Object Notation (JSON) Pointer
+      link: https://datatracker.ietf.org/doc/html/rfc6901
+    - name: jsonpatch Python Package
+      description: A Python library for applying JSON patches
+      link: https://pypi.org/project/jsonpatch/
+
+RETURN:
+  _value:
+    description: A list of JSON patch operations to apply.
+    type: list
+    elements: dict
+
+EXAMPLES: |
+  - name: Compute a difference
+    ansible.builtin.debug:
+      msg: "{{ input | community.general.json_diff(target) }}"
+    vars:
+      input: {"foo": 1, "bar":{"baz": 2}, "baw": [1, 2, 3], "hello": "day"}
+      target: {"foo": 1, "bar": {"baz": 2}, "baw": [1, 3], "baq": {"baz": 2}, "hello": "night"}
+    # => [
+    #   {"op": "add", "path": "/baq", "value": {"baz": 2}},
+    #   {"op": "remove", "path": "/baw/1"},
+    #   {"op": "replace", "path": "/hello", "value": "night"}
+    # ]
