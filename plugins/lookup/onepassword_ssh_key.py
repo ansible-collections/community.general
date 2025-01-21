@@ -3,9 +3,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = """
 name: onepassword_ssh_key
@@ -39,14 +37,14 @@ extends_documentation_fragment:
 """
 
 EXAMPLES = """
-- name: Retrieve the private key of ssh key from 1Password
+- name: Retrieve the private SSH key from 1Password
   ansible.builtin.debug:
-    var: lookup('community.general.onepassword_ssh_key', 'SSH Key', ssh_format=true)
+    msg: "{{ lookup('community.general.onepassword_ssh_key', 'SSH Key', ssh_format=true) }}"
 """
 
 RETURN = """
   _raw:
-    description: Private key of SSH key
+    description: Private key of SSH keypair.
     type: list
     elements: string
 """
