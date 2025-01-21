@@ -770,6 +770,8 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
         self.params = self.module.params
 
     def run(self):
+        self.check_supported_features()
+
         state = self.params.get("state")
 
         vmid = self.params.get("vmid")
@@ -827,8 +829,6 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
             )
 
     def lxc_present(self, vmid, hostname, node, update, force):
-        self.check_supported_features()
-
         try:
             lxc = self.get_lxc_resource(vmid, hostname)
             vmid = vmid or lxc["id"].split("/")[-1]
