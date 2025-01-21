@@ -91,7 +91,7 @@ version:
 import re
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
-from ansible_collections.community.general.plugins.module_utils.snap import snap_runner
+from ansible_collections.community.general.plugins.module_utils.snap import snap_runner, get_version
 
 
 class SnapAlias(StateModuleHelper):
