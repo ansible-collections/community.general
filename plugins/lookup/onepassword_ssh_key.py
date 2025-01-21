@@ -13,10 +13,10 @@ DOCUMENTATION = """
       - Mohammed Babelly (@mohammedbabelly20)
     requirements:
       - C(op) 1Password command line utility version 2 or later.
-    short_description: Fetch SSH Keys stored in 1Password
+    short_description: Fetch SSH keys stored in 1Password
     version_added: "10.3.0"
     description:
-      - P(community.general.onepassword_ssh_key#lookup) wraps C(op) command line utility to fetch ssh keys from 1Password.
+      - P(community.general.onepassword_ssh_key#lookup) wraps C(op) command line utility to fetch SSH keys from 1Password.
     notes:
       - By default, it returns the private key value in PKCS#8 format, unless O(ssh_format=true) is passed.
       - The pluging works only for C(SSHKEY) type items.
@@ -29,14 +29,13 @@ DOCUMENTATION = """
         type: list
         elements: string
       ssh_format:
-        description: Output key in SSH format if true. Otherwise, outputs in the default format.
-        required: false
+        description: Output key in SSH format if V(true). Otherwise, outputs in the default format (PKCS#8).
         default: false
         type: bool
 
-    extends_documentation_fragment:
-      - community.general.onepassword
-      - community.general.onepassword.lookup
+extends_documentation_fragment:
+  - community.general.onepassword
+  - community.general.onepassword.lookup
 """
 
 EXAMPLES = """
@@ -64,10 +63,10 @@ from ansible.plugins.lookup import LookupBase
 
 class OnePassCLIv2SSHKey(OnePassCLIv2):
 
-    def _get_raw(self, item_id, vault=None, token=None):
+    def _get_raw(self, item_id, vault=None):
         args = ["item", "get", item_id, "--format", "json"]
         if vault is not None:
-            args = [*args, f"--vault={vault}"]
+            args.append(f"--vault={vault}")
 
         if self.service_account_token:
             if vault is None:
@@ -80,18 +79,15 @@ class OnePassCLIv2SSHKey(OnePassCLIv2):
             }
             return self._run(args, environment_update=environment_update)
 
-        if token is not None:
-            args = [*args, to_bytes("--session=") + token]
-
         return self._run(args)
 
-    def get_ssh_key(self, item_id, vault=None, token=None, ssh_format=False):
-        rc, out, err = self._get_raw(item_id, vault, token)
+    def get_ssh_key(self, item_id, vault=None, ssh_format=False):
+        rc, out, err = self._get_raw(item_id, vault)
 
         data = json.loads(out)
 
         if data.get("category") != "SSH_KEY":
-            raise AnsibleLookupError(f"Item {item_id} is not SSH Key")
+            raise AnsibleLookupError(f"Item {item_id} is not an SSH key")
 
         private_key_field = next(
             (
