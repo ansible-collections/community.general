@@ -588,11 +588,8 @@ def read_record(file_path, default=None):
     Reads the first line of a file and returns it.
     """
     try:
-        f = open(file_path, 'r')
-        try:
+        with open(file_path, 'r') as f:
             return f.readline().strip()
-        finally:
-            f.close()
     except IOError:
         return default
 
