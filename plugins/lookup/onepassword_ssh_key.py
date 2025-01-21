@@ -43,10 +43,10 @@ EXAMPLES = """
 """
 
 RETURN = """
-  _raw:
-    description: Private key of SSH keypair.
-    type: list
-    elements: string
+_raw:
+  description: Private key of SSH keypair.
+  type: list
+  elements: string  
 """
 import json
 
