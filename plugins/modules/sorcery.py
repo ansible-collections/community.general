@@ -460,15 +460,11 @@ def match_depends(module):
 
     if depends_new:
         try:
-            try:
-                fl = open(sorcery_depends, 'a')
-
+            with open(sorcery_depends, 'a') as fl:
                 for k in depends_new:
                     fl.write("%s:%s:%s:optional::\n" % (spell, k, depends[k]))
-            except IOError:
-                module.fail_json(msg="I/O error on the depends file")
-        finally:
-            fl.close()
+        except IOError:
+            module.fail_json(msg="I/O error on the depends file")
 
         depends_ok = False
 

@@ -396,7 +396,8 @@ class NosystemdTimezone(Timezone):
             self.conf_files['name'] = '/etc/sysconfig/clock'
             self.conf_files['hwclock'] = '/etc/sysconfig/clock'
             try:
-                f = open(self.conf_files['name'], 'r')
+                with open(self.conf_files['name'], 'r') as f:
+                    sysconfig_clock = f.read()
             except IOError as err:
                 if self._allow_ioerror(err, 'name'):
                     # If the config file doesn't exist detect the distribution and set regexps.
@@ -414,8 +415,6 @@ class NosystemdTimezone(Timezone):
                 # The key for timezone might be `ZONE` or `TIMEZONE`
                 # (the former is used in RHEL/CentOS and the latter is used in SUSE linux).
                 # So check the content of /etc/sysconfig/clock and decide which key to use.
-                sysconfig_clock = f.read()
-                f.close()
                 if re.search(r'^TIMEZONE\s*=', sysconfig_clock, re.MULTILINE):
                     # For SUSE
                     self.regexps['name'] = self.dist_regexps['SuSE']
@@ -448,15 +447,13 @@ class NosystemdTimezone(Timezone):
         """
         # Read the file
         try:
-            file = open(filename, 'r')
+            with open(filename, 'r') as file:
+                lines = file.readlines()
         except IOError as err:
             if self._allow_ioerror(err, key):
                 lines = []
             else:
                 self.abort('tried to configure %s using a file "%s", but could not read it' % (key, filename))
-        else:
-            lines = file.readlines()
-            file.close()
         # Find the all matched lines
         matched_indices = []
         for i, line in enumerate(lines):
@@ -473,18 +470,17 @@ class NosystemdTimezone(Timezone):
         lines.insert(insert_line, value)
         # Write the changes
         try:
-            file = open(filename, 'w')
+            with open(filename, 'w') as file:
+                file.writelines(lines)
         except IOError:
             self.abort('tried to configure %s using a file "%s", but could not write to it' % (key, filename))
-        else:
-            file.writelines(lines)
-            file.close()
         self.msg.append('Added 1 line and deleted %s line(s) on %s' % (len(matched_indices), filename))
 
     def _get_value_from_config(self, key, phase):
         filename = self.conf_files[key]
         try:
-            file = open(filename, mode='r')
+            with open(filename, mode='r') as file:
+                status = file.read()
         except IOError as err:
             if self._allow_ioerror(err, key):
                 if key == 'hwclock':
@@ -496,8 +492,6 @@ class NosystemdTimezone(Timezone):
             else:
                 self.abort('tried to configure %s using a file "%s", but could not read it' % (key, filename))
         else:
-            status = file.read()
-            file.close()
             try:
                 value = self.regexps[key].search(status).group(1)
             except AttributeError:
@@ -628,11 +622,11 @@ class SmartOSTimezone(Timezone):
         """
         if key == 'name':
             try:
-                f = open('/etc/default/init', 'r')
-                for line in f:
-                    m = re.match('^TZ=(.*)$', line.strip())
-                    if m:
-                        return m.groups()[0]
+                with open('/etc/default/init', 'r') as f:
+                    for line in f:
+                        m = re.match('^TZ=(.*)$', line.strip())
+                        if m:
+                            return m.groups()[0]
             except Exception:
                 self.module.fail_json(msg='Failed to read /etc/default/init')
         else:
@@ -811,9 +805,8 @@ class AIXTimezone(Timezone):
     def __get_timezone(self):
         """ Return the current value of TZ= in /etc/environment """
         try:
-            f = open('/etc/environment', 'r')
-            etcenvironment = f.read()
-            f.close()
+            with open('/etc/environment', 'r') as f:
+                etcenvironment = f.read()
         except Exception:
             self.module.fail_json(msg='Issue reading contents of /etc/environment')
 

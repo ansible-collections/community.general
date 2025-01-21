@@ -896,15 +896,14 @@ class TestWdcRedfishCommand(unittest.TestCase):
         bundle_tarfile = tarfile.open(os.path.join(self.tempdir, tar_name), "w")
         package_filename = "oobm-{0}.pkg".format(mock_firmware_version)
         package_filename_path = os.path.join(self.tempdir, package_filename)
-        package_file = open(package_filename_path, "w")
-        package_file.close()
+        with open(package_filename_path, "w"):
+            pass
         bundle_tarfile.add(os.path.join(self.tempdir, package_filename), arcname=package_filename)
         bin_filename = "firmware.bin"
         bin_filename_path = os.path.join(self.tempdir, bin_filename)
-        bin_file = open(bin_filename_path, "wb")
-        byte_to_write = b'\x80' if is_multi_tenant else b'\xFF'
-        bin_file.write(byte_to_write * 12)
-        bin_file.close()
+        with open(bin_filename_path, "wb") as bin_file:
+            byte_to_write = b'\x80' if is_multi_tenant else b'\xFF'
+            bin_file.write(byte_to_write * 12)
         for filename in [package_filename, bin_filename]:
             bundle_tarfile.add(os.path.join(self.tempdir, filename), arcname=filename)
         bundle_tarfile.close()

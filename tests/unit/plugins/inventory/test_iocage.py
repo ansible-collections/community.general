@@ -36,16 +36,14 @@ def inventory():
 
 
 def load_txt_data(path):
-    f = open(path, 'r')
-    s = f.read()
-    f.close()
+    with open(path, 'r') as f:
+        s = f.read()
     return s
 
 
 def load_yml_data(path):
-    f = open(path, 'r')
-    d = yaml.safe_load(f)
-    f.close()
+    with open(path, 'r') as f:
+        d = yaml.safe_load(f)
     return d
 
 
