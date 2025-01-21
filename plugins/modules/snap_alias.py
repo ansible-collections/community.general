@@ -84,7 +84,7 @@ version:
   description: Versions of snap components as reported by ``snap version``.
   type: dict
   return: always
-  verison_added: 10.3.0
+  version_added: 10.3.0
 """
 
 
