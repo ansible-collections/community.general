@@ -615,9 +615,7 @@ from ansible_collections.community.general.plugins.module_utils.proxmox import (
     ansible_to_proxmox_bool,
     proxmox_auth_argument_spec,
 )
-from ansible_collections.community.general.plugins.module_utils.version import (
-    LooseVersion,
-)
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 
 def get_proxmox_args():
