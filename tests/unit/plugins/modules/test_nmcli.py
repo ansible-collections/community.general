@@ -4397,6 +4397,7 @@ def test_bond_connection_unchanged(mocked_generic_connection_diff_check, capfd):
             downdelay=dict(type='int'),
             updelay=dict(type='int'),
             xmit_hash_policy=dict(type='str'),
+            fail_over_mac=dict(type='str', choices=['none', 'active', 'follow']),
             arp_interval=dict(type='int'),
             arp_ip_target=dict(type='str'),
             primary=dict(type='str'),

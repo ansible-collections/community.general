@@ -379,6 +379,12 @@ options:
       - This is only used with bond - xmit_hash_policy type.
     type: str
     version_added: 5.6.0
+  fail_over_mac:
+    description:
+      - This is only used with bond - fail_over_mac.
+    type: str
+    choices: [none, active, follow]
+    version_added: 10.3.0
   arp_interval:
     description:
       - This is only used with bond - ARP interval.
@@ -1691,6 +1697,7 @@ class Nmcli(object):
         self.downdelay = module.params['downdelay']
         self.updelay = module.params['updelay']
         self.xmit_hash_policy = module.params['xmit_hash_policy']
+        self.fail_over_mac = module.params['fail_over_mac']
         self.arp_interval = module.params['arp_interval']
         self.arp_ip_target = module.params['arp_ip_target']
         self.slavepriority = module.params['slavepriority']
@@ -1839,6 +1846,7 @@ class Nmcli(object):
                 'primary': self.primary,
                 'updelay': self.updelay,
                 'xmit_hash_policy': self.xmit_hash_policy,
+                'fail_over_mac': self.fail_over_mac,
             })
         elif self.type == 'bond-slave':
             if self.slave_type and self.slave_type != 'bond':
@@ -2286,6 +2294,9 @@ class Nmcli(object):
                 if key == 'xmit_hash_policy':
                     cmd.extend(['+bond.options', 'xmit_hash_policy=%s' % value])
                     continue
+                if key == 'fail_over_mac':
+                    cmd.extend(['+bond.options', 'fail_over_mac=%s' % value])
+                    continue
                 cmd.extend([key, value])
 
         return self.execute_command(cmd)
@@ -2602,6 +2613,7 @@ def main():
             downdelay=dict(type='int'),
             updelay=dict(type='int'),
             xmit_hash_policy=dict(type='str'),
+            fail_over_mac=dict(type='str', choices=['none', 'active', 'follow']),
             arp_interval=dict(type='int'),
             arp_ip_target=dict(type='str'),
             primary=dict(type='str'),
