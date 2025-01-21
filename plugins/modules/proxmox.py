@@ -188,7 +188,7 @@ options:
   storage:
     description:
       - Target storage.
-      - This Option is mutually exclusive with O(disk_volume) and O(mount_volumes).
+      - This option is mutually exclusive with O(disk_volume) and O(mount_volumes).
     type: str
     default: 'local'
   ostype:
@@ -228,7 +228,8 @@ options:
   update:
     description:
       - If V(true), the container will be updated with new values.
-      - The current default value of V(false) is deprecated and should be replaced with V(update=true) in version 11.0.0.
+      - The current default value of V(false) is deprecated and should will change to V(true) in community.general 11.0.0.
+        Please set O(update) explicitly to V(false) or V(true) to avoid surprises and get rid of the deprecation warning.
     type: bool
     version_added: 8.1.0
   force:
@@ -850,7 +851,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
             if update is None:
                 # TODO: Remove deprecation warning in version 11.0.0
                 self.module.deprecate(
-                    msg="The default value of False for 'update' has been deprecated and will be changed to True in version 11.0.0.",
+                    msg="The default value of false for 'update' has been deprecated and will be changed to true in version 11.0.0.",
                     version="11.0.0",
                     collection_name="community.general",
                 )
