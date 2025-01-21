@@ -114,8 +114,9 @@ options:
   proto:
     description:
       - TCP/IP protocol.
+      - The value V(vrrp) is supported since community.general 10.3.0.
     type: str
-    choices: [any, tcp, udp, ipv6, esp, ah, gre, igmp]
+    choices: [any, tcp, udp, ipv6, esp, ah, gre, igmp, vrrp]
     aliases: [protocol]
   name:
     description:
@@ -341,7 +342,7 @@ def main():
             from_port=dict(type='str'),
             to_ip=dict(type='str', default='any', aliases=['dest', 'to']),
             to_port=dict(type='str', aliases=['port']),
-            proto=dict(type='str', aliases=['protocol'], choices=['ah', 'any', 'esp', 'ipv6', 'tcp', 'udp', 'gre', 'igmp']),
+            proto=dict(type='str', aliases=['protocol'], choices=['ah', 'any', 'esp', 'ipv6', 'tcp', 'udp', 'gre', 'igmp', 'vrrp']),
             name=dict(type='str', aliases=['app']),
             comment=dict(type='str'),
         ),
