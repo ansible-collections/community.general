@@ -741,7 +741,10 @@ def get_ansible_module():
             ("state", "present", ("clone", "ostemplate", "update"), True),
         ],
         required_together=[("api_token_id", "api_token_secret")],
-        required_one_of=[("api_password", "api_token_id")],
+        required_one_of=[
+            ("api_password", "api_token_id"),
+            ("vmid", "hostname"),
+        ],
         mutually_exclusive=[
             # Creating a new container is done either by cloning an existing one, or based on a template.
             ("clone", "ostemplate", "update"),
@@ -776,18 +779,13 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
             self.module.fail_json(msg="Either VMID or hostname must be provided.")
 
         if state == "present":
-            if hostname is None:
-                self.module.fail_json(
-                    msg="Hostname must be provided when state is 'present'."
-                )
-            else:
-                self.lxc_present(
-                    vmid,
-                    hostname,
-                    node=self.params.get("node"),
-                    update=self.params.get("update"),
-                    force=self.params.get("force"),
-                )
+            self.lxc_present(
+                vmid,
+                hostname,
+                node=self.params.get("node"),
+                update=self.params.get("update"),
+                force=self.params.get("force"),
+            )
         elif state == "absent":
             self.lxc_absent(
                 vmid,
@@ -1603,7 +1601,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
         elif hostname:
             vm = self.get_lxc_resource_by_hostname(hostname)
 
-        vmid = vmid or vm["vmid"]
+        vmid = vm["vmid"]
         if vm["type"] != self.VZ_TYPE:
             identifier = self.format_vm_identifier(vmid, hostname)
             self.module.fail_json(
