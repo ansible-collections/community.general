@@ -856,12 +856,6 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
             if update:
                 # Update it if we should
                 identifier = self.format_vm_identifier(vmid, hostname)
-                features = self.params.get("features")
-                if features is not None:
-                    features = ",".join(features)
-                startup = self.params.get("startup")
-                if startup is not None:
-                    startup = ",".join(startup)
                 self.update_lxc_instance(
                     vmid,
                     node,
@@ -871,7 +865,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
                     description=self.params.get("description"),
                     disk=self.params.get("disk"),
                     disk_volume=self.params.get("disk_volume"),
-                    features=features,
+                    features=self.params.get("features"),
                     hookscript=self.params.get("hookscript"),
                     hostname=self.params.get("hostname"),
                     ip_address=self.params.get("ip_address"),
@@ -882,7 +876,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
                     netif=self.params.get("netif"),
                     onboot=ansible_to_proxmox_bool(self.params.get("onboot")),
                     searchdomain=self.params.get("searchdomain"),
-                    startup=startup,
+                    startup=self.params.get("startup"),
                     swap=self.params.get("swap"),
                     tags=self.params.get("tags"),
                     timezone=self.params.get("timezone"),
@@ -1046,6 +1040,11 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
 
         self.validate_tags(kwargs.get("tags", []))
 
+        if "features" in kwargs:
+            kwargs["features"] = ",".join(kwargs.pop("features"))
+        if "startup" in kwargs:
+            kwargs["startup"] = ",".join(kwargs.pop("startup"))
+
         disk_updates = self.process_disk_keys(
             vmid,
             node,
@@ -1121,13 +1120,6 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
             )
 
         if ostemplate is not None:
-            features = self.params.get("features")
-            if features is not None:
-                features = ",".join(features)
-            startup = self.params.get("startup")
-            if startup is not None:
-                startup = ",".join(startup)
-
             self.create_lxc_instance(
                 vmid,
                 node,
@@ -1139,7 +1131,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
                 description=self.params.get("description"),
                 disk=self.params.get("disk"),
                 disk_volume=self.params.get("disk_volume"),
-                features=features,
+                features=self.params.get("features"),
                 force=ansible_to_proxmox_bool(force),
                 hookscript=self.params.get("hookscript"),
                 hostname=hostname,
@@ -1155,7 +1147,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
                 pool=self.params.get("pool"),
                 pubkey=self.params.get("pubkey"),
                 searchdomain=self.params.get("searchdomain"),
-                startup=startup,
+                startup=self.params.get("startup"),
                 storage=self.params.get("storage"),
                 swap=self.params.get("swap"),
                 tags=self.params.get("tags"),
@@ -1200,6 +1192,12 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
 
         # Remove empty values from kwargs
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
+
+        if "features" in kwargs:
+            kwargs["features"] = ",".join(kwargs.pop("features"))
+
+        if "startup" in kwargs:
+            kwargs["startup"] = ",".join(kwargs.pop("startup"))
 
         self.validate_tags(kwargs.get("tags", []))
 
