@@ -80,6 +80,11 @@ snap_aliases:
   type: list
   elements: str
   returned: always
+version:
+  description: Versions of snap components as reported by ``snap version``.
+  type: dict
+  return: always
+  verison_added: 10.3.0
 """
 
 
@@ -112,6 +117,7 @@ class SnapAlias(StateModuleHelper):
 
     def __init_module__(self):
         self.runner = snap_runner(self.module)
+        self.vars.version = get_version(self.runner)
         self.vars.set("snap_aliases", self._aliases(), change=True, diff=True)
 
     def __quit_module__(self):
