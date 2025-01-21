@@ -1,0 +1,137 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Test json_patch
+  assert:
+    that:
+      - > # Insert a new element into an array at a specified index
+          list_input |
+            community.general.json_patch("add", "/1", {"baz": "qux"})
+          ==
+          [{"foo": {"one": 1}}, {"baz": "qux"}, {"bar": {"two": 2}}]
+      - > # Insert a new key into a dictionary
+          dict_input |
+            community.general.json_patch("add", "/bar/baz", "qux")
+          ==
+          {"foo": {"one": 1}, "bar": {"baz": "qux", "two": 2}}
+      - > # Input is a string
+          '{ "foo": { "one": 1 }, "bar": { "two": 2 } }' |
+            community.general.json_patch("add", "/bar/baz", "qux")
+          ==
+          {"foo": {"one": 1}, "bar": {"baz": "qux", "two": 2}}
+      - > # Existing key is replaced
+          dict_input |
+            community.general.json_patch("add", "/bar", "qux")
+          ==
+          {"foo": {"one": 1}, "bar": "qux"}
+      - > # Escaping tilde as ~0 and slash as ~1 in the path
+          {} |
+            community.general.json_patch("add", "/~0~1", "qux")
+          ==
+          {"~/": "qux"}
+      - > # Add at the end of the array
+          [1, 2, 3] |
+            community.general.json_patch("add", "/-", 4)
+          ==
+          [1, 2, 3, 4]
+      - > # Remove a key
+          dict_input |
+            community.general.json_patch("remove", "/bar")
+          ==
+          {"foo": {"one": 1} }
+      - > # Replace a value
+          dict_input |
+            community.general.json_patch("replace", "/bar", 2)
+          ==
+          {"foo": {"one": 1}, "bar": 2}
+      - > # Copy a value
+          dict_input |
+            community.general.json_patch("copy", "/baz", from="/bar")
+          ==
+          {"foo": {"one": 1}, "bar": { "two": 2 }, "baz": { "two": 2 }}
+      - > # Move a value
+          dict_input |
+            community.general.json_patch("move", "/baz", from="/bar")
+          ==
+          {"foo": {"one": 1}, "baz": { "two": 2 }}
+      - > # Successful test
+          dict_input |
+            community.general.json_patch("test", "/bar/two", 2) |
+            ternary("OK", "Failed")
+          ==
+          "OK"
+      - > # Unuccessful test
+          dict_input |
+            community.general.json_patch("test", "/bar/two", 9) |
+            ternary("OK", "Failed")
+          ==
+          "Failed"
+  vars:
+    list_input:
+      - foo: { one: 1 }
+      - bar: { two: 2 }
+    dict_input:
+      foo: { one: 1 }
+      bar: { two: 2 }
+
+- name: Test json_patch_recipe
+  assert:
+    that:
+      - > # List of operations
+          input |
+            community.general.json_patch_recipe(operations)
+          ==
+          {"bar":[2],"bax":1,"bay":1,"baz":[10,20,30]}
+  vars:
+    input: {}
+    operations:
+      - op: 'add'
+        path: '/foo'
+        value: 1
+      - op: 'add'
+        path: '/bar'
+        value: []
+      - op: 'add'
+        path: '/bar/-'
+        value: 2
+      - op: 'add'
+        path: '/bar/0'
+        value: 1
+      - op: 'remove'
+        path: '/bar/0'
+      - op: 'move'
+        from: '/foo'
+        path: '/baz'
+      - op: 'copy'
+        from: '/baz'
+        path: '/bax'
+      - op: 'copy'
+        from: '/baz'
+        path: '/bay'
+      - op: 'replace'
+        path: '/baz'
+        value: [10, 20, 30]
+
+- name: Test json_diff
+  assert:
+    that: # The order in the result array is not stable, sort by path
+      - >
+          input |
+            community.general.json_diff(target) |
+            sort(attribute='path')
+          ==
+          [
+            {"op": "add", "path": "/baq", "value": {"baz": 2}},
+            {"op": "remove", "path": "/baw/1"},
+            {"op": "replace", "path": "/hello", "value": "night"},
+          ]
+  vars:
+    input: {"foo": 1, "bar":{"baz": 2}, "baw": [1, 2, 3], "hello": "day"}
+    target: {"foo": 1, "bar": {"baz": 2}, "baw": [1, 3], "baq": {"baz": 2}, "hello": "night"}
