@@ -8,32 +8,32 @@ from __future__ import annotations
 DOCUMENTATION = """
 name: onepassword_ssh_key
 author:
-    - Mohammed Babelly (@mohammedbabelly20)
+  - Mohammed Babelly (@mohammedbabelly20)
 requirements:
-    - C(op) 1Password command line utility version 2 or later.
+  - C(op) 1Password command line utility version 2 or later.
 short_description: Fetch SSH keys stored in 1Password
 version_added: "10.3.0"
 description:
-    - P(community.general.onepassword_ssh_key#lookup) wraps C(op) command line utility to fetch SSH keys from 1Password.
+  - P(community.general.onepassword_ssh_key#lookup) wraps C(op) command line utility to fetch SSH keys from 1Password.
 notes:
-    - By default, it returns the private key value in PKCS#8 format, unless O(ssh_format=true) is passed.
-    - The pluging works only for C(SSHKEY) type items.
-    - This plugin requires C(op) version 2 or later.
+  - By default, it returns the private key value in PKCS#8 format, unless O(ssh_format=true) is passed.
+  - The pluging works only for C(SSHKEY) type items.
+  - This plugin requires C(op) version 2 or later.
 
 options:
-    _terms:
+  _terms:
     description: Identifier(s) (case-insensitive UUID or name) of item(s) to retrieve.
     required: true
     type: list
     elements: string
-    ssh_format:
+  ssh_format:
     description: Output key in SSH format if V(true). Otherwise, outputs in the default format (PKCS#8).
     default: false
     type: bool
 
 extends_documentation_fragment:
-- community.general.onepassword
-- community.general.onepassword.lookup
+  - community.general.onepassword
+  - community.general.onepassword.lookup
 """
 
 EXAMPLES = """
@@ -110,7 +110,7 @@ class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
         self.set_options(var_options=variables, direct=kwargs)
 
-        ssh_format = self.get_option("ssh_format")
+        ssh_format = kwargs.get("ssh_format")
         vault = self.get_option("vault")
         subdomain = self.get_option("subdomain")
         domain = self.get_option("domain", "1password.com")
