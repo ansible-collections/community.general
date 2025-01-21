@@ -170,7 +170,7 @@ options_changed:
 version:
   description: Versions of snap components as reported by ``snap version``.
   type: dict
-  return: always
+  returned: always
   version_added: 10.3.0
 """
 
