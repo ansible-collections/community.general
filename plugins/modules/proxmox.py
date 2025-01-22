@@ -41,13 +41,13 @@ options:
     type: str
   disk:
     description:
-      - This option was previously described as "hard disk size in GB for instance" however several formats describing
-        a lxc mount are permitted.
-      - Older versions of Proxmox will accept a numeric value for size using the O(storage) parameter to automatically
-        choose which storage to allocate from, however new versions enforce the C(<STORAGE>:<SIZE>) syntax.
-      - "Additional options are available by using some combination of the following key-value pairs as a
-        comma-delimited list C([volume=]<volume> [,acl=<1|0>] [,mountoptions=<opt[;opt...]>] [,quota=<1|0>]
-        [,replicate=<1|0>] [,ro=<1|0>] [,shared=<1|0>] [,size=<DiskSize>])."
+      - This option was previously described as "hard disk size in GB for instance" however several formats describing a lxc
+        mount are permitted.
+      - Older versions of Proxmox will accept a numeric value for size using the O(storage) parameter to automatically choose
+        which storage to allocate from, however new versions enforce the C(<STORAGE>:<SIZE>) syntax.
+      - "Additional options are available by using some combination of the following key-value pairs as a comma-delimited list
+        C([volume=]<volume> [,acl=<1|0>] [,mountoptions=<opt[;opt...]>] [,quota=<1|0>][,replicate=<1|0>] [,ro=<1|0>] [,shared=<1|0>]
+        [,size=<DiskSize>])."
       - See U(https://pve.proxmox.com/wiki/Linux_Container) for a full description.
       - This option is mutually exclusive with O(storage) and O(disk_volume).
     type: str
@@ -203,11 +203,11 @@ options:
     type: int
   nameserver:
     description:
-      - Sets DNS server IP address for a container
+      - Sets DNS server IP address for a container.
     type: str
   searchdomain:
     description:
-      - Sets DNS search domain for a container
+      - Sets DNS search domain for a container.
     type: str
   tags:
     description:
