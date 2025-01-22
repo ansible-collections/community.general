@@ -52,4 +52,4 @@ def snap_runner(module, **kwargs):
 def get_version(runner):
     with runner("version") as ctx:
         rc, out, err = ctx.run()
-    return dict(x.split() for x in out.splitlines())
+    return dict(x.split() for x in out.splitlines() if len(x.split()) == 2)
