@@ -121,7 +121,7 @@ options:
     type: str
     required: false
     description:
-      - Only used when O(operation) is V(transition), and a bit of a misnomer, it actually refers to the transition name.
+      - Only used when O(operation) is V(transition), and a bit of a misnomer, it actually refers to the transition name or id.
   assignee:
     type: str
     required: false
@@ -617,11 +617,20 @@ class JIRA(StateModuleHelper):
         tmeta = self.get(turl)
 
         target = self.vars.status
-        tid = None
+        if target.isdigit():
+          tid = target
+        else:
+          tid = None
+
         for t in tmeta['transitions']:
-            if t['name'] == target:
+            if tid == None:
+              if t['name'] == target:
                 tid = t['id']
                 break
+            else:
+              if tid == t['id']:
+                break
+
         else:
             raise ValueError("Failed find valid transition for '%s'" % target)
 
