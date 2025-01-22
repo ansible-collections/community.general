@@ -302,6 +302,18 @@ class BalancerMember(object):
     attributes = property(get_member_attributes)
     status = property(get_member_status, set_member_status)
 
+    def as_dict(self):
+        return {
+            "host": self.host,
+            "status": self.status,
+            "protocol": self.protocol,
+            "port": self.port,
+            "path": self.path,
+            "attributes": self.attributes,
+            "management_url": self.management_url,
+            "balancer_url": self.balancer_url
+        }
+
 
 class Balancer(object):
     """ Apache httpd 2.4 mod_proxy balancer object"""
@@ -388,16 +400,7 @@ def main():
     if module.params['member_host'] is None:
         json_output_list = []
         for member in mybalancer.members:
-            json_output_list.append({
-                "host": member.host,
-                "status": member.status,
-                "protocol": member.protocol,
-                "port": member.port,
-                "path": member.path,
-                "attributes": member.attributes,
-                "management_url": member.management_url,
-                "balancer_url": member.balancer_url
-            })
+            json_output_list.append(member.as_dict())
         module.exit_json(
             changed=False,
             members=json_output_list
@@ -424,16 +427,7 @@ def main():
                         member_status_after = member_status
                     if member_status_before != member_status_after:
                         changed = True
-                json_output = {
-                    "host": member.host,
-                    "status": member.status,
-                    "protocol": member.protocol,
-                    "port": member.port,
-                    "path": member.path,
-                    "attributes": member.attributes,
-                    "management_url": member.management_url,
-                    "balancer_url": member.balancer_url
-                }
+                json_output = member.as_dict()
         if member_exists:
             module.exit_json(
                 changed=changed,
