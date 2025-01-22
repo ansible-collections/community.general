@@ -8,7 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = """
+DOCUMENTATION = r"""
 ---
 module: proxmox
 short_description: Management of instances in Proxmox VE cluster
@@ -26,7 +26,7 @@ attributes:
 options:
   password:
     description:
-      - the instance root password
+      - Yhe instance root password.
     type: str
   hostname:
     description:
@@ -36,8 +36,8 @@ options:
     type: str
   ostemplate:
     description:
-      - The template for VM creating
-      - Required only for O(state=present)
+      - The template for VM creating.
+      - Required only for O(state=present).
     type: str
   disk:
     description:
@@ -93,15 +93,15 @@ options:
     type: int
   cpus:
     description:
-      - Numbers of allocated cpus for instance
+      - Number of allocated cpus for instance.
     type: int
   memory:
     description:
-      - Memory size in MB for instance
+      - Memory size in MB for instance.
     type: int
   swap:
     description:
-      - Swap memory size in MB for instance
+      - Swap memory size in MB for instance.
     type: int
   netif:
     description:
@@ -177,11 +177,11 @@ options:
         type: dict
   ip_address:
     description:
-      - specifies the address the container will be assigned
+      - Specifies the address the container will be assigned.
     type: str
   onboot:
     description:
-      - specifies whether a VM will be started during system bootup
+      - Specifies whether a VM will be started during system bootup.
     type: bool
   storage:
     description:
@@ -247,7 +247,7 @@ options:
     version_added: 2.3.0
   state:
     description:
-     - Indicate desired state of the instance
+     - Indicate desired state of the instance.
      - V(template) was added in community.general 8.1.0.
     type: str
     choices: ['present', 'started', 'absent', 'stopped', 'restarted', 'template']
