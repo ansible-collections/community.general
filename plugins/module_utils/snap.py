@@ -41,8 +41,15 @@ def snap_runner(module, **kwargs):
             options=cmd_runner_fmt.as_list(),
             info=cmd_runner_fmt.as_fixed("info"),
             dangerous=cmd_runner_fmt.as_bool("--dangerous"),
+            version=cmd_runner_fmt.as_fixed("version"),
         ),
         check_rc=False,
         **kwargs
     )
     return runner
+
+
+def get_version(runner):
+    with runner("version") as ctx:
+        rc, out, err = ctx.run()
+    return dict(x.split() for x in out.splitlines() if len(x.split()) == 2)

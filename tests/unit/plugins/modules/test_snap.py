@@ -376,6 +376,16 @@ issue_6803_kubectl_out = (
     "\r\u001b[0m\u001b[?25h\u001b[Kkubectl (1.27/stable) v1.27.2 from Canonical** installed\n"
 )
 
+
+default_env = {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False}
+default_version_out = """\
+snap    2.66.1+24.04
+snapd   2.66.1+24.04
+series  16
+ubuntu  24.04
+kernel  6.8.0-49-generic
+"""
+
 TEST_CASES = [
     dict(
         id="simple case",
@@ -385,29 +395,36 @@ TEST_CASES = [
         mocks=dict(
             run_command=[
                 dict(
+                    command=['/testbin/snap', 'version'],
+                    environ=default_env,
+                    rc=0,
+                    out=default_version_out,
+                    err="",
+                ),
+                dict(
                     command=['/testbin/snap', 'info', 'hello-world'],
-                    environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                    environ=default_env,
                     rc=0,
                     out='name: hello-world\n',
                     err="",
                 ),
                 dict(
                     command=['/testbin/snap', 'list'],
-                    environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                    environ=default_env,
                     rc=0,
                     out="",
                     err="",
                 ),
                 dict(
                     command=['/testbin/snap', 'install', 'hello-world'],
-                    environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                    environ=default_env,
                     rc=0,
                     out="hello-world (12345/stable) v12345 from Canonical** installed\n",
                     err="",
                 ),
                 dict(
                     command=['/testbin/snap', 'list'],
-                    environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                    environ=default_env,
                     rc=0,
                     out=(
                         "Name    Version      Rev    Tracking         Publisher    Notes"
@@ -429,36 +446,43 @@ TEST_CASES = [
         mocks=dict(
             run_command=[
                 dict(
+                    command=['/testbin/snap', 'version'],
+                    environ=default_env,
+                    rc=0,
+                    out=default_version_out,
+                    err="",
+                ),
+                dict(
                     command=['/testbin/snap', 'info', 'microk8s', 'kubectl'],
-                    environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                    environ=default_env,
                     rc=0,
                     out='name: microk8s\n---\nname: kubectl\n',
                     err="",
                 ),
                 dict(
                     command=['/testbin/snap', 'list'],
-                    environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                    environ=default_env,
                     rc=0,
                     out=issue_6803_status_out,
                     err="",
                 ),
                 dict(
                     command=['/testbin/snap', 'install', '--classic', 'microk8s'],
-                    environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                    environ=default_env,
                     rc=0,
                     out=issue_6803_microk8s_out,
                     err="",
                 ),
                 dict(
                     command=['/testbin/snap', 'install', '--classic', 'kubectl'],
-                    environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                    environ=default_env,
                     rc=0,
                     out=issue_6803_kubectl_out,
                     err="",
                 ),
                 dict(
                     command=['/testbin/snap', 'list'],
-                    environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                    environ=default_env,
                     rc=0,
                     out=(
                         "Name    Version      Rev    Tracking         Publisher    Notes"
