@@ -80,13 +80,18 @@ snap_aliases:
   type: list
   elements: str
   returned: always
+version:
+  description: Versions of snap components as reported by C(snap version).
+  type: dict
+  returned: always
+  version_added: 10.3.0
 """
 
 
 import re
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
-from ansible_collections.community.general.plugins.module_utils.snap import snap_runner
+from ansible_collections.community.general.plugins.module_utils.snap import snap_runner, get_version
 
 
 class SnapAlias(StateModuleHelper):
@@ -112,6 +117,7 @@ class SnapAlias(StateModuleHelper):
 
     def __init_module__(self):
         self.runner = snap_runner(self.module)
+        self.vars.version = get_version(self.runner)
         self.vars.set("snap_aliases", self._aliases(), change=True, diff=True)
 
     def __quit_module__(self):
