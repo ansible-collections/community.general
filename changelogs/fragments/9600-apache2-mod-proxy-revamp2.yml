@@ -1,0 +1,2 @@
+minor_changes:
+  - apache2_mod_proxy - change type of ``state`` to ``list`` of ``str`` elements. No change for the users (https://github.com/ansible-collections/community.general/pull/9600).
