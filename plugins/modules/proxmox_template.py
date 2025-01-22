@@ -313,7 +313,7 @@ def main():
         timeout=dict(type='int', default=30),
         force=dict(type='bool', default=False),
         state=dict(default='present', choices=['present', 'absent']),
-        checksum_algorithm=dict(default='sha256', choices=['md5', 'sha1', 'sha224', 'sha256', 'sha384', 'sh512']),
+        checksum_algorithm=dict(default='sha256', choices=['md5', 'sha1', 'sha224', 'sha256', 'sha384', 'sha512']),
         checksum=dict(type='str'),
         verify_checksum=dict(type='bool', default=False)
     )
