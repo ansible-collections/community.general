@@ -97,7 +97,7 @@ options:
       - sha224
       - sha256
       - sha384
-      - sh512
+      - sha512
     default: sha256
     version_added: 10.3.0
   checksum:
