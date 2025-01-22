@@ -1,0 +1,2 @@
+minor_changes:
+  - apache2_mod_proxy - better handling regexp extraction (https://github.com/ansible-collections/community.general/pull/9609).
