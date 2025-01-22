@@ -48,6 +48,7 @@ def snap_runner(module, **kwargs):
     )
     return runner
 
+
 def get_version(runner):
     with runner("version") as ctx:
         rc, out, err = ctx.run()
