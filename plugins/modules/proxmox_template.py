@@ -157,6 +157,7 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.community.general.plugins.module_utils.proxmox import (proxmox_auth_argument_spec, ProxmoxAnsible)
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 from ansible.module_utils.six.moves.urllib.parse import urlparse
+from urllib.parse import urlencode
 
 REQUESTS_TOOLBELT_ERR = None
 try:
@@ -235,6 +236,19 @@ class ProxmoxTemplateAnsible(ProxmoxAnsible):
             time.sleep(1)
         return False
 
+    def verify_checksum(self, node, storage, url, content_type, timeout, checksum, checksum_algorithm):
+        data = {
+          'url': url,
+          'content': content_type,
+          'filename': os.path.basename(url),
+          'checksum': checksum,
+          'checksum-algorithm': checksum_algorithm
+          }
+        try:
+            taskid = self.proxmox_api.nodes(node).storage(storage).post(f"download-url?{urlencode(data)}")
+            return self.task_status(node, taskid, timeout)
+        except Exception as e:
+            self.module.fail_json(msg="Checksum verification failed with error: %s" % (e))
 
 def main():
     module_args = proxmox_auth_argument_spec()
@@ -248,6 +262,9 @@ def main():
         timeout=dict(type='int', default=30),
         force=dict(type='bool', default=False),
         state=dict(default='present', choices=['present', 'absent']),
+        checksum_algorithm=dict(default='sha256', choices=['md5', 'sha1', 'sha224', 'sha256', 'sha384', 'sh512']),
+        checksum=dict(),
+        verify_required=dict(type='bool', default=False)
     )
     module_args.update(template_args)
 
@@ -265,6 +282,15 @@ def main():
     node = module.params['node']
     storage = module.params['storage']
     timeout = module.params['timeout']
+    verify_required = module.params['verify_required']
+
+    if verify_required:
+      checksum = module.params['checksum']
+      checksum_algorithm = module.params['checksum_algorithm']
+      if not checksum:
+        module.fail_json(msg='checksum parameter required if verify_required is true')
+      if not checksum_algorithm:
+        module.fail_json(msg='checksum algorithm parameter required if verify_required is true')
 
     if state == 'present':
         content_type = module.params['content_type']
@@ -303,6 +329,9 @@ def main():
                 elif not proxmox.delete_template(node, storage, content_type, template, timeout):
                     module.fail_json(changed=False, msg='failed to delete template with volid=%s:%s/%s' % (storage, content_type, template))
 
+            if verify_required:
+                if proxmox.verify_checksum(node, storage, url, content_type, timeout, checksum, checksum_algorithm):
+                    module.exit_json(changed=True, msg="checksum verified, template with volid=%s:%s/%s uploaded" % (storage, content_type, template))
             if proxmox.fetch_template(node, storage, content_type, url, timeout):
                 module.exit_json(changed=True, msg='template with volid=%s:%s/%s uploaded' % (storage, content_type, template))
 
