@@ -8,7 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 ---
 module: proxmox
 short_description: Management of instances in Proxmox VE cluster
@@ -30,14 +30,14 @@ options:
     type: str
   hostname:
     description:
-      - the instance hostname
-      - required only for O(state=present)
-      - must be unique if vmid is not passed
+      - The instance hostname.
+      - Required only for O(state=present).
+      - Must be unique if vmid is not passed.
     type: str
   ostemplate:
     description:
-      - the template for VM creating
-      - required only for O(state=present)
+      - The template for VM creating
+      - Required only for O(state=present)
     type: str
   disk:
     description:
@@ -93,19 +93,19 @@ options:
     type: int
   cpus:
     description:
-      - numbers of allocated cpus for instance
+      - Numbers of allocated cpus for instance
     type: int
   memory:
     description:
-      - memory size in MB for instance
+      - Memory size in MB for instance
     type: int
   swap:
     description:
-      - swap memory size in MB for instance
+      - Swap memory size in MB for instance
     type: int
   netif:
     description:
-      - specifies network interfaces for the container. As a hash/dictionary defining interfaces.
+      - Specifies network interfaces for the container. As a hash/dictionary defining interfaces.
     type: dict
   features:
     description:
@@ -199,15 +199,15 @@ options:
     version_added: 8.1.0
   cpuunits:
     description:
-      - CPU weight for a VM
+      - CPU weight for a VM.
     type: int
   nameserver:
     description:
-      - sets DNS server IP address for a container
+      - Sets DNS server IP address for a container
     type: str
   searchdomain:
     description:
-      - sets DNS search domain for a container
+      - Sets DNS search domain for a container
     type: str
   tags:
     description:
@@ -219,7 +219,7 @@ options:
     version_added: 6.2.0
   timeout:
     description:
-      - timeout for operations
+      - Timeout for operations.
     type: int
     default: 30
   update:
@@ -232,8 +232,8 @@ options:
     description:
       - Forcing operations.
       - Can be used only with states V(present), V(stopped), V(restarted).
-      - with O(state=present) force option allow to overwrite existing container.
-      - with states V(stopped), V(restarted) allow to force stop instance.
+      - With O(state=present) force option allow to overwrite existing container.
+      - With states V(stopped), V(restarted) allow to force stop instance.
     type: bool
     default: false
   purge:
@@ -254,7 +254,7 @@ options:
     default: present
   pubkey:
     description:
-      - Public key to add to /root/.ssh/authorized_keys. This was added on Proxmox 4.2, it is ignored for earlier versions
+      - Public key to add to /root/.ssh/authorized_keys. This was added on Proxmox 4.2, it is ignored for earlier versions.
     type: str
   unprivileged:
     description:
@@ -306,9 +306,9 @@ extends_documentation_fragment:
   - community.general.proxmox.documentation
   - community.general.proxmox.selection
   - community.general.attributes
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Create new container with minimal options
   community.general.proxmox:
     vmid: 100
@@ -599,7 +599,7 @@ EXAMPLES = r'''
     api_password: 1q2w3e
     api_host: node1
     state: absent
-'''
+"""
 
 import re
 import time
