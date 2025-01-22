@@ -618,18 +618,18 @@ class JIRA(StateModuleHelper):
 
         target = self.vars.status
         if target.isdigit():
-          tid = target
+            tid = target
         else:
-          tid = None
+            tid = None
 
         for t in tmeta['transitions']:
-            if tid == None:
-              if t['name'] == target:
-                tid = t['id']
-                break
+            if tid is None:
+                if t['name'] == target:
+                    tid = t['id']
+                    break
             else:
-              if tid == t['id']:
-                break
+                if tid == t['id']:
+                    break
 
         else:
             raise ValueError("Failed find valid transition for '%s'" % target)
