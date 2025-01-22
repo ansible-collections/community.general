@@ -1,0 +1,6 @@
+minor_changes:
+  - proxmox_template - Add support for checksum validation.
+  - proxmox_template - Adds option ``checksum_algorithm``
+  - proxmox_template - Adds option ``checksum``
+  - proxmox_template - Adds option ``verify_checksum``
+  - proxmox - Adds internal function for checking if api calls fail after finishing.
