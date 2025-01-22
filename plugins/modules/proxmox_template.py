@@ -10,7 +10,6 @@ __metaclass__ = type
 
 
 DOCUMENTATION = r"""
----
 module: proxmox_template
 short_description: Management of OS templates in Proxmox VE cluster
 description:
@@ -42,23 +41,20 @@ options:
     description:
       - The template name.
       - Required for O(state=absent) to delete a template.
-      - Required for O(state=present) to download an appliance container
-        template (pveam).
+      - Required for O(state=present) to download an appliance container template (pveam).
     type: str
   content_type:
     description:
       - Content type.
       - Required only for O(state=present).
     type: str
-    default: vztmpl
-    choices:
-      - vztmpl
-      - iso
+    default: 'vztmpl'
+    choices: ['vztmpl', 'iso']
   storage:
     description:
       - Target storage.
     type: str
-    default: local
+    default: 'local'
   timeout:
     description:
       - Timeout for operations.
@@ -66,57 +62,44 @@ options:
     default: 30
   force:
     description:
-      - It can only be used with O(state=present), existing template will be
-        overwritten.
+      - It can only be used with O(state=present), existing template will be overwritten.
     type: bool
     default: false
   state:
     description:
       - Indicate desired state of the template.
     type: str
-    choices:
-      - present
-      - absent
+    choices: [present, absent]
     default: present
   verify_checksum:
     description:
       - Indicate whether or not to validate with checksum.
-      - Both O(checksum) and O(checksum_algorithm) must be specified if this is
-        true.
+      - Both O(checksum) and O(checksum_algorithm) must be specified if this is V(true).
     type: bool
     default: false
     version_added: 10.3.0
   checksum_algorithm:
     description:
       - Algorithm used to verify the checksum.
-      - Must be provided if O(verify_checksum) is true
+      - Must be provided if O(verify_checksum=true).
     type: str
-    choices:
-      - md5
-      - sha1
-      - sha224
-      - sha256
-      - sha384
-      - sha512
-    default: sha256
+    choices: ['md5', 'sha1', 'sha224', 'sha256', 'sha384', 'sha512']
     version_added: 10.3.0
   checksum:
     description:
-      - The checksum to validate against. Must be provided if O(verify_checksum)
-        is true
+      - The checksum to validate against. Must be provided if O(verify_checksum=true).
+      - Checksums are often provided by software distributors to verify that a download is not corrupted.
+      - Checksums can usually be found on the distributors download page in the form of a file or string.
     type: str
     version_added: 10.3.0
 notes:
-  - Requires C(proxmoxer) and C(requests) modules on host. Those modules can be
-    installed with M(ansible.builtin.pip).
-  - C(proxmoxer) >= 1.2.0 requires C(requests_toolbelt) to upload files larger
-    than 256 MB.
+  - Requires C(proxmoxer) and C(requests) modules on host. Those modules can be installed with M(ansible.builtin.pip).
+  - C(proxmoxer) >= 1.2.0 requires C(requests_toolbelt) to upload files larger than 256 MB.
 author: Sergei Antipov (@UnderGreen)
 extends_documentation_fragment:
   - community.general.proxmox.actiongroup_proxmox
   - community.general.proxmox.documentation
   - community.general.attributes
-
 """
 
 EXAMPLES = r"""
@@ -187,7 +170,7 @@ EXAMPLES = r"""
     content_type: vztmpl
     template: ubuntu-20.04-standard_20.04-1_amd64.tar.gz
 
-- name: Download and verify a template's checksum.
+- name: Download and verify a template's checksum
   community.general.proxmox_template:
     node: uk-mc02
     api_user: root@pam
@@ -313,7 +296,7 @@ def main():
         timeout=dict(type='int', default=30),
         force=dict(type='bool', default=False),
         state=dict(default='present', choices=['present', 'absent']),
-        checksum_algorithm=dict(default='sha256', choices=['md5', 'sha1', 'sha224', 'sha256', 'sha384', 'sha512']),
+        checksum_algorithm=dict(choices=['md5', 'sha1', 'sha224', 'sha256', 'sha384', 'sha512']),
         checksum=dict(type='str'),
         verify_checksum=dict(type='bool', default=False)
     )
@@ -323,7 +306,7 @@ def main():
         argument_spec=module_args,
         required_together=[('api_token_id', 'api_token_secret')],
         required_one_of=[('api_password', 'api_token_id')],
-        required_if=[('state', 'absent', ['template'])],
+        required_if=[('state', 'absent', ['template']), ('verify_checksum', True, ['checksum', 'checksum_algorithm'])],
         mutually_exclusive=[("src", "url")],
     )
 
@@ -334,14 +317,8 @@ def main():
     storage = module.params['storage']
     timeout = module.params['timeout']
     verify_checksum = module.params['verify_checksum']
-
-    if verify_checksum:
-        checksum = module.params['checksum']
-        checksum_algorithm = module.params['checksum_algorithm']
-        if not checksum:
-            module.fail_json(msg='checksum parameter required if verify_checksum is true')
-        if not checksum_algorithm:
-            module.fail_json(msg='checksum algorithm parameter required if verify_checksum is true')
+    checksum = module.params['checksum']
+    checksum_algorithm = module.params['checksum_algorithm']
 
     if state == 'present':
         content_type = module.params['content_type']

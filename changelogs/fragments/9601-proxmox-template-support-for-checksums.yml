@@ -1,6 +1,2 @@
 minor_changes:
-  - proxmox_template - Add support for checksum validation. (https://github.com/ansible-collections/community.general/issues/9553, https://github.com/ansible-collections/community.general/pull/9601)
-  - proxmox_template - Adds option ``checksum_algorithm`` (https://github.com/ansible-collections/community.general/pull/9601)
-  - proxmox_template - Adds option ``checksum`` (https://github.com/ansible-collections/community.general/pull/9601)
-  - proxmox_template - Adds option ``verify_checksum`` (https://github.com/ansible-collections/community.general/pull/9601)
-  - proxmox - Adds internal function for checking if api calls fail after finishing. (https://github.com/ansible-collections/community.general/pull/9601)
+  - proxmox_template - Add support for checksum validation with new options ``checksum_algoritm``, ``checksum`` and ``verify_checksum`` (https://github.com/ansible-collections/community.general/pull/9601)
