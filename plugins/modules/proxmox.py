@@ -26,7 +26,7 @@ attributes:
 options:
   password:
     description:
-      - Yhe instance root password.
+      - The instance root password.
     type: str
   hostname:
     description:
