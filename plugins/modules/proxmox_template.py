@@ -233,10 +233,12 @@ class ProxmoxTemplateAnsible(ProxmoxAnsible):
         while timeout:
             if self.api_task_ok(node, taskid):
                 return True
+            elif self.api_task_failed(node, taskid):
+                self.module.fail_json(msg="Task error: %s" % self.proxmox_api.nodes(node).tasks(taskid).status.get()['exitstatus'])
             timeout = timeout - 1
             if timeout == 0:
                 self.module.fail_json(msg='Reached timeout while waiting for uploading/downloading template. Last line in task before timeout: %s' %
-                                      self.proxmox_api.nodes(node).tasks(taskid).log.get()[:1])
+                                      self.proxmox_api.nodes(node).tasks(taskid).log.get()[-1])
 
             time.sleep(1)
         return False
@@ -292,18 +294,11 @@ class ProxmoxTemplateAnsible(ProxmoxAnsible):
             'filename': os.path.basename(url),
             'checksum': checksum,
             'checksum-algorithm': checksum_algorithm}
-        task = {'status': None}
-
         try:
             taskid = self.proxmox_api.nodes(node).storage(storage).post("download-url?{}".format(urlencode(data)))
-            while task['status'] != 'stopped':
-                task = self.proxmox_api.nodes(node).tasks(taskid).status.get()
-                if task['exitstatus'] != 'OK':
-                    self.module.fail_json(msg="Checksum verification failed.")
-                else:
-                    return self.task_status(node, taskid, timeout)
+            return self.task_status(node, taskid, timeout)
         except Exception as e:
-            self.module.fail_json(msg="Checksum verification failed with error: %s" % (e))
+            self.module.fail_json(msg="Checksum mismatch: %s" % (e))
 
 
 def main():
@@ -344,7 +339,7 @@ def main():
         checksum = module.params['checksum']
         checksum_algorithm = module.params['checksum_algorithm']
         if not checksum:
-            module.fail_json(msg='checksum parameter required if verify_required is true')
+            module.fail_json(msg='checksum parameter required if verify_checksum is true')
         if not checksum_algorithm:
             module.fail_json(msg='checksum algorithm parameter required if verify_checksum is true')
 
