@@ -81,7 +81,7 @@ snap_aliases:
   elements: str
   returned: always
 version:
-  description: Versions of snap components as reported by ``snap version``.
+  description: Versions of snap components as reported by C(snap version).
   type: dict
   returned: always
   version_added: 10.3.0
