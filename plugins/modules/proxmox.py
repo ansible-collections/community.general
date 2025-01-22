@@ -8,7 +8,8 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r"""
+DOCUMENTATION = '''
+---
 module: proxmox
 short_description: Management of instances in Proxmox VE cluster
 description:
@@ -25,28 +26,28 @@ attributes:
 options:
   password:
     description:
-      - The instance root password.
+      - the instance root password
     type: str
   hostname:
     description:
-      - The instance hostname.
-      - Required only for O(state=present).
-      - Must be unique if vmid is not passed.
+      - the instance hostname
+      - required only for O(state=present)
+      - must be unique if vmid is not passed
     type: str
   ostemplate:
     description:
-      - The template for VM creating.
-      - Required only for O(state=present).
+      - the template for VM creating
+      - required only for O(state=present)
     type: str
   disk:
     description:
-      - This option was previously described as "hard disk size in GB for instance" however several formats describing a lxc
-        mount are permitted.
-      - Older versions of Proxmox will accept a numeric value for size using the O(storage) parameter to automatically choose
-        which storage to allocate from, however new versions enforce the C(<STORAGE>:<SIZE>) syntax.
-      - Additional options are available by using some combination of the following key-value pairs as a comma-delimited list
-        C([volume=]<volume> [,acl=<1|0>] [,mountoptions=<opt[;opt...]>] [,quota=<1|0>] [,replicate=<1|0>] [,ro=<1|0>] [,shared=<1|0>]
-        [,size=<DiskSize>]).
+      - This option was previously described as "hard disk size in GB for instance" however several formats describing
+        a lxc mount are permitted.
+      - Older versions of Proxmox will accept a numeric value for size using the O(storage) parameter to automatically
+        choose which storage to allocate from, however new versions enforce the C(<STORAGE>:<SIZE>) syntax.
+      - "Additional options are available by using some combination of the following key-value pairs as a
+        comma-delimited list C([volume=]<volume> [,acl=<1|0>] [,mountoptions=<opt[;opt...]>] [,quota=<1|0>]
+        [,replicate=<1|0>] [,ro=<1|0>] [,shared=<1|0>] [,size=<DiskSize>])."
       - See U(https://pve.proxmox.com/wiki/Linux_Container) for a full description.
       - This option is mutually exclusive with O(storage) and O(disk_volume).
     type: str
@@ -92,19 +93,19 @@ options:
     type: int
   cpus:
     description:
-      - Number of allocated cpus for instance.
+      - numbers of allocated cpus for instance
     type: int
   memory:
     description:
-      - Memory size in MB for instance.
+      - memory size in MB for instance
     type: int
   swap:
     description:
-      - Swap memory size in MB for instance.
+      - swap memory size in MB for instance
     type: int
   netif:
     description:
-      - Specifies network interfaces for the container. As a hash/dictionary defining interfaces.
+      - specifies network interfaces for the container. As a hash/dictionary defining interfaces.
     type: dict
   features:
     description:
@@ -116,8 +117,7 @@ options:
   startup:
     description:
       - Specifies the startup order of the container.
-      - Use C(order=#) where C(#) is a non-negative number to define the general startup order. Shutdown in done with reverse
-        ordering.
+      - Use C(order=#) where C(#) is a non-negative number to define the general startup order. Shutdown in done with reverse ordering.
       - Use C(up=#) where C(#) is in seconds, to specify a delay to wait before the next VM is started.
       - Use C(down=#) where C(#) is in seconds, to specify a delay to wait before the next VM is stopped.
     type: list
@@ -177,11 +177,11 @@ options:
         type: dict
   ip_address:
     description:
-      - Specifies the address the container will be assigned.
+      - specifies the address the container will be assigned
     type: str
   onboot:
     description:
-      - Specifies whether a VM will be started during system bootup.
+      - specifies whether a VM will be started during system bootup
     type: bool
   storage:
     description:
@@ -193,22 +193,21 @@ options:
     description:
       - Specifies the C(ostype) of the LXC container.
       - If set to V(auto), no C(ostype) will be provided on instance creation.
-    choices: ['auto', 'debian', 'devuan', 'ubuntu', 'centos', 'fedora', 'opensuse', 'archlinux', 'alpine', 'gentoo', 'nixos',
-      'unmanaged']
+    choices: ['auto', 'debian', 'devuan', 'ubuntu', 'centos', 'fedora', 'opensuse', 'archlinux', 'alpine', 'gentoo', 'nixos', 'unmanaged']
     type: str
     default: 'auto'
     version_added: 8.1.0
   cpuunits:
     description:
-      - CPU weight for a VM.
+      - CPU weight for a VM
     type: int
   nameserver:
     description:
-      - Sets DNS server IP address for a container.
+      - sets DNS server IP address for a container
     type: str
   searchdomain:
     description:
-      - Sets DNS search domain for a container.
+      - sets DNS search domain for a container
     type: str
   tags:
     description:
@@ -220,7 +219,7 @@ options:
     version_added: 6.2.0
   timeout:
     description:
-      - Timeout for operations.
+      - timeout for operations
     type: int
     default: 30
   update:
@@ -233,8 +232,8 @@ options:
     description:
       - Forcing operations.
       - Can be used only with states V(present), V(stopped), V(restarted).
-      - With O(state=present) force option allow to overwrite existing container.
-      - With states V(stopped), V(restarted) allow to force stop instance.
+      - with O(state=present) force option allow to overwrite existing container.
+      - with states V(stopped), V(restarted) allow to force stop instance.
     type: bool
     default: false
   purge:
@@ -248,14 +247,14 @@ options:
     version_added: 2.3.0
   state:
     description:
-      - Indicate desired state of the instance.
-      - V(template) was added in community.general 8.1.0.
+     - Indicate desired state of the instance
+     - V(template) was added in community.general 8.1.0.
     type: str
     choices: ['present', 'started', 'absent', 'stopped', 'restarted', 'template']
     default: present
   pubkey:
     description:
-      - Public key to add to /root/.ssh/authorized_keys. This was added on Proxmox 4.2, it is ignored for earlier versions.
+      - Public key to add to /root/.ssh/authorized_keys. This was added on Proxmox 4.2, it is ignored for earlier versions
     type: str
   unprivileged:
     description:
@@ -307,9 +306,9 @@ extends_documentation_fragment:
   - community.general.proxmox.documentation
   - community.general.proxmox.selection
   - community.general.attributes
-"""
+'''
 
-EXAMPLES = r"""
+EXAMPLES = r'''
 - name: Create new container with minimal options
   community.general.proxmox:
     vmid: 100
@@ -495,8 +494,8 @@ EXAMPLES = r"""
     hostname: example.org
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
     features:
-      - nesting=1
-      - mount=cifs,nfs
+     - nesting=1
+     - mount=cifs,nfs
 
 - name: >
     Create a linked clone of the template container with id 100. The newly created container with be a
@@ -600,7 +599,7 @@ EXAMPLES = r"""
     api_password: 1q2w3e
     api_host: node1
     state: absent
-"""
+'''
 
 import re
 import time
@@ -821,7 +820,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
                     if new_value not in current_values:
                         update_config = True
                         break
-            # if it is not a list (or string) just compare the current value
+            # if it's not a list (or string) just compare the current value
             else:
                 # some types don't match with the API, so forcing to string for comparison
                 if str(value) != str(current_config[arg]):
