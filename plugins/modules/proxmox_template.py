@@ -74,6 +74,7 @@ options:
   checksum_algorithm:
     description:
       - Algorithm used to verify the checksum.
+      - If specified, O(checksum) must also be specified.
     type: str
     choices: ['md5', 'sha1', 'sha224', 'sha256', 'sha384', 'sha512']
     version_added: 10.3.0
@@ -82,6 +83,7 @@ options:
       - The checksum to validate against.
       - Checksums are often provided by software distributors to verify that a download is not corrupted.
       - Checksums can usually be found on the distributors download page in the form of a file or string.
+      - If specified, O(checksum_algorithm) must also be specified.
     type: str
     version_added: 10.3.0
 notes:
