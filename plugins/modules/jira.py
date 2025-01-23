@@ -121,7 +121,8 @@ options:
     type: str
     required: false
     description:
-      - Only used when O(operation) is V(transition), and a bit of a misnomer, it actually refers to the transition name or id.
+      - Only used when O(operation) is V(transition), and a bit of a misnomer, it actually refers to the transition name or ID.
+      - Transition ID can used from community.general version 10.3.0 or greater.
   assignee:
     type: str
     required: false
@@ -616,7 +617,7 @@ class JIRA(StateModuleHelper):
         turl = self.vars.restbase + '/issue/' + self.vars.issue + "/transitions"
         tmeta = self.get(turl)
 
-        target = self.vars.status
+        target = self.vars.status.strip()
         if target.isdigit():
             tid = target
         else:
