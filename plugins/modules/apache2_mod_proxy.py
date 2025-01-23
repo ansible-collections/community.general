@@ -204,20 +204,14 @@ members:
 """
 
 import re
-import traceback
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible_collections.community.general.plugins.module_utils import deps
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.six import iteritems
 
-BEAUTIFUL_SOUP_IMP_ERR = None
-try:
+with deps.declare("BeautifulSoup"):
     from BeautifulSoup import BeautifulSoup
-except ImportError:
-    BEAUTIFUL_SOUP_IMP_ERR = traceback.format_exc()
-    HAS_BEAUTIFULSOUP = False
-else:
-    HAS_BEAUTIFULSOUP = True
 
 # balancer member attributes extraction regexp:
 EXPRESSION = re.compile(r"(b=([\w\.\-]+)&w=(https?|ajp|wss?|ftp|[sf]cgi)://([\w\.\-]+):?(\d*)([/\w\.\-]*)&?[\w\-\=]*)")
@@ -381,8 +375,7 @@ def main():
         supports_check_mode=True
     )
 
-    if HAS_BEAUTIFULSOUP is False:
-        module.fail_json(msg=missing_required_lib('BeautifulSoup'), exception=BEAUTIFUL_SOUP_IMP_ERR)
+    deps.validate(module)
 
     if module.params['state'] is not None:
         states = module.params['state']
