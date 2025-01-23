@@ -204,7 +204,7 @@ members:
 import re
 
 from ansible_collections.community.general.plugins.module_utils import deps
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.six import iteritems
 
@@ -373,7 +373,7 @@ def main():
         supports_check_mode=True
     )
 
-    deps.validate(self.module)
+    deps.validate(module)
 
     if module.params['state'] is not None:
         states = module.params['state']
