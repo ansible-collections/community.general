@@ -171,9 +171,8 @@ class ProxmoxAnsible(object):
             self.module.fail_json(msg='Unable to retrieve API task ID from node %s: %s' % (node, e))
 
     def api_task_failed(self, node, taskid):
-        '''
-            Explicitly check if the task stops but exits with a failed status
-        '''
+        """ Explicitly check if the task stops but exits with a failed status
+        """
         try:
             status = self.proxmox_api.nodes(node).tasks(taskid).status.get()
             return status['status'] == 'stopped' and status['exitstatus'] != 'OK'

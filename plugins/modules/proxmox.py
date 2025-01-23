@@ -247,8 +247,8 @@ options:
     version_added: 2.3.0
   state:
     description:
-     - Indicate desired state of the instance.
-     - V(template) was added in community.general 8.1.0.
+      - Indicate desired state of the instance.
+      - V(template) was added in community.general 8.1.0.
     type: str
     choices: ['present', 'started', 'absent', 'stopped', 'restarted', 'template']
     default: present
@@ -494,8 +494,8 @@ EXAMPLES = r"""
     hostname: example.org
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
     features:
-     - nesting=1
-     - mount=cifs,nfs
+      - nesting=1
+      - mount=cifs,nfs
 
 - name: >
     Create a linked clone of the template container with id 100. The newly created container with be a
@@ -820,7 +820,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
                     if new_value not in current_values:
                         update_config = True
                         break
-            # if it's not a list (or string) just compare the current value
+            # if it is not a list (or string) just compare the current value
             else:
                 # some types don't match with the API, so forcing to string for comparison
                 if str(value) != str(current_config[arg]):

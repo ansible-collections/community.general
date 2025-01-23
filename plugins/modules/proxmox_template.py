@@ -270,7 +270,9 @@ class ProxmoxTemplateAnsible(ProxmoxAnsible):
             time.sleep(1)
         return False
 
-    def verify_checksum(self, node, storage, url, content_type, timeout, checksum, checksum_algorithm):
+    def fetch_and_verify(self, node, storage, url, content_type, timeout, checksum, checksum_algorithm):
+        """ Fetch a template from a web url, then verify it using a checksum.
+        """
         data = {
             'url': url,
             'content': content_type,
@@ -306,7 +308,8 @@ def main():
         argument_spec=module_args,
         required_together=[('api_token_id', 'api_token_secret')],
         required_one_of=[('api_password', 'api_token_id')],
-        required_if=[('state', 'absent', ['template']), ('verify_checksum', True, ['checksum', 'checksum_algorithm'])],
+        required_if=[('state', 'absent', ['template']),
+                     ('verify_checksum', True, ['checksum', 'checksum_algorithm'])],
         mutually_exclusive=[("src", "url")],
     )
 
@@ -358,7 +361,7 @@ def main():
                     module.fail_json(changed=False, msg='failed to delete template with volid=%s:%s/%s' % (storage, content_type, template))
 
             if verify_checksum:
-                if proxmox.verify_checksum(node, storage, url, content_type, timeout, checksum, checksum_algorithm):
+                if proxmox.fetch_and_verify(node, storage, url, content_type, timeout, checksum, checksum_algorithm):
                     module.exit_json(changed=True, msg="Checksum verified, template with volid=%s:%s/%s uploaded" % (storage, content_type, template))
             if proxmox.fetch_template(node, storage, content_type, url, timeout):
                 module.exit_json(changed=True, msg='template with volid=%s:%s/%s uploaded' % (storage, content_type, template))
