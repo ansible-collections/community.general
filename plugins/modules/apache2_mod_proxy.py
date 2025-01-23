@@ -40,7 +40,8 @@ options:
     type: str
     description:
       - (IPv4|IPv6|FQDN) of the balancer member to get or to set attributes to. Port number is autodetected and should not
-        be specified here. If undefined, apache2_mod_proxy module will return a members list of dictionaries of all the current
+        be specified here.
+      - If undefined, the M(community.general.apache2_mod_proxy) module will return a members list of dictionaries of all the current
         balancer pool members' attributes.
   state:
     type: list
