@@ -220,14 +220,14 @@ else:
     HAS_BEAUTIFULSOUP = True
 
 # balancer member attributes extraction regexp:
-EXPRESSION = r"(b=([\w\.\-]+)&w=(https?|ajp|wss?|ftp|[sf]cgi)://([\w\.\-]+):?(\d*)([/\w\.\-]*)&?[\w\-\=]*)"
+EXPRESSION = re.compile(r"(b=([\w\.\-]+)&w=(https?|ajp|wss?|ftp|[sf]cgi)://([\w\.\-]+):?(\d*)([/\w\.\-]*)&?[\w\-\=]*)")
 # Apache2 server version extraction regexp:
-APACHE_VERSION_EXPRESSION = r"SERVER VERSION: APACHE/([\d.]+)"
+APACHE_VERSION_EXPRESSION = re.compile(r"SERVER VERSION: APACHE/([\d.]+)")
 
 
 def regexp_extraction(string, _regexp, groups=1):
     """ Returns the capture group (default=1) specified in the regexp, applied to the string """
-    regexp_search = re.search(string=str(string), pattern=str(_regexp))
+    regexp_search = _regexp.search(string)
     if regexp_search:
         if regexp_search.group(groups) != '':
             return str(regexp_search.group(groups))
@@ -251,7 +251,7 @@ class BalancerMember(object):
     """
 
     def __init__(self, management_url, balancer_url, module):
-        self.host = regexp_extraction(management_url, str(EXPRESSION), 4)
+        self.host = regexp_extraction(management_url, EXPRESSION, 4)
         self.management_url = str(management_url)
         self.protocol = regexp_extraction(management_url, EXPRESSION, 3)
         self.port = regexp_extraction(management_url, EXPRESSION, 5)
