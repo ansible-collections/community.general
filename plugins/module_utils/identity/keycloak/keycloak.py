@@ -324,27 +324,29 @@ class KeycloakAPI(object):
                 return e
 
         r = make_request_catching_401()
-        if not isinstance(r, Exception):
-            return r
 
-        # Authentication may have expired, re-authenticate with refresh token and retry
-        refresh_token = self.module.params.get('refresh_token')
-        if refresh_token is not None:
-            token = _get_token_using_refresh_token(self.module.params)
-            self.restheaders['Authorization'] = 'Bearer ' + token
+        if isinstance(r, Exception):
+            # Try to refresh token and retry, if available
+            refresh_token = self.module.params.get('refresh_token')
+            if refresh_token is not None:
+                token = _get_token_using_refresh_token(self.module.params)
+                self.restheaders['Authorization'] = 'Bearer ' + token
 
-            r = make_request_catching_401()
-            if not isinstance(r, Exception):
-                return r
+                r = make_request_catching_401()
 
-        # Retry once more with username and password
-        auth_username = self.module.params.get('auth_username')
-        auth_password = self.module.params.get('auth_password')
-        if auth_username is not None and auth_password is not None:
-            token = _get_token_using_credentials(self.module.params)
-            self.restheaders['Authorization'] = 'Bearer ' + token
+        if isinstance(r, Exception):
+            # Try to re-auth with username/password, if available
+            auth_username = self.module.params.get('auth_username')
+            auth_password = self.module.params.get('auth_password')
+            if auth_username is not None and auth_password is not None:
+                token = _get_token_using_credentials(self.module.params)
+                self.restheaders['Authorization'] = 'Bearer ' + token
 
-            r = make_request_catching_401()
+                r = make_request_catching_401()
+
+        if isinstance(r, Exception):
+            # Either no re-auth options were available, or they all failed
+            raise r
 
         return r
 
