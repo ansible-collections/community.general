@@ -40,7 +40,8 @@ options:
     type: str
     description:
       - (IPv4|IPv6|FQDN) of the balancer member to get or to set attributes to. Port number is autodetected and should not
-        be specified here. If undefined, apache2_mod_proxy module will return a members list of dictionaries of all the current
+        be specified here.
+      - If undefined, the M(community.general.apache2_mod_proxy) module will return a members list of dictionaries of all the current
         balancer pool members' attributes.
   state:
     type: list
@@ -112,7 +113,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 member:
-  description: specific balancer member information dictionary, returned when apache2_mod_proxy module is invoked with C(member_host) parameter.
+  description: Specific balancer member information dictionary, returned when the module is invoked with O(member_host) parameter.
   type: dict
   returned: success
   sample:
@@ -143,7 +144,8 @@ member:
       }
     }
 members:
-  description: list of member (defined above) dictionaries, returned when apache2_mod_proxy is invoked with no C(member_host) and state args.
+  description: List of member (defined above) dictionaries, returned when the module is invoked with no O(member_host) and
+    O(state) args.
   returned: success
   type: list
   sample:
