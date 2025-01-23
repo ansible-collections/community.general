@@ -1,0 +1,2 @@
+minor_changes:
+  - apache2_mod_proxy - simplified and improved string manipulation (https://github.com/ansible-collections/community.general/pull/9614).
