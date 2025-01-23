@@ -135,3 +135,36 @@
 - name: Debug
   debug:
     var: result
+
+- name: Create new realm role with invalid auth token, invalid refresh token, and valid username/password
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    token: "invalidtoken!!!"
+    refresh_token: "invalidrefreshtoken!!!"
+    realm: "{{ realm }}"
+    name: "{{ role }}"
+    description: "{{ keycloak_role_description }}"
+    state: present
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Remove created realm role
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: "{{ role }}"
+    state: absent
+  register: result
+
+- name: Debug
+  debug:
+    var: result

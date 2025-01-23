@@ -175,7 +175,7 @@ def _token_request(module_params, payload):
             % (auth_url, str(e)))
     except Exception as e:
         raise KeycloakError('Could not obtain access token from %s: %s'
-                            % (auth_url, str(e)))
+                            % (auth_url, str(e))) from e
 
     try:
         token = r['access_token']
@@ -329,10 +329,15 @@ class KeycloakAPI(object):
             # Try to refresh token and retry, if available
             refresh_token = self.module.params.get('refresh_token')
             if refresh_token is not None:
-                token = _get_token_using_refresh_token(self.module.params)
-                self.restheaders['Authorization'] = 'Bearer ' + token
+                try:
+                    token = _get_token_using_refresh_token(self.module.params)
+                    self.restheaders['Authorization'] = 'Bearer ' + token
 
-                r = make_request_catching_401()
+                    r = make_request_catching_401()
+                except KeycloakError as e:
+                    # Token refresh returns 400 if token is expired/invalid, so continue on if we get a 400
+                    if isinstance(e.__cause__, HTTPError) and e.__cause__.code != 400:
+                        raise e
 
         if isinstance(r, Exception):
             # Try to re-auth with username/password, if available
