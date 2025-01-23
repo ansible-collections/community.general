@@ -334,9 +334,9 @@ class KeycloakAPI(object):
             token = _get_token_using_refresh_token(self.module.params)
             self.restheaders['Authorization'] = 'Bearer ' + token
 
-        r = make_request_ignoring_401()
-        if r is not None:
-            return r
+            r = make_request_ignoring_401()
+            if r is not None:
+                return r
 
         # Retry once more with username and password
         auth_username = self.module.params.get('auth_username')
