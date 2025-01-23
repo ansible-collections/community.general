@@ -1,2 +1,2 @@
 minor_changes:
-  - nmcli - allow setting ``MTU`` parameter for ``ipip`` and ``gre`` interface types (https://github.com/ansible-collections/community.general/pull/9604).
+  - nmcli - allow setting ``mtu`` parameter for ``ipip`` and ``gre`` interface types (https://github.com/ansible-collections/community.general/pull/9604).
