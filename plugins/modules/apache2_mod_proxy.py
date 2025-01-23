@@ -43,11 +43,14 @@ options:
         be specified here. If undefined, apache2_mod_proxy module will return a members list of dictionaries of all the current
         balancer pool members' attributes.
   state:
-    type: str
+    type: list
+    elements: str
+    choices: [present, absent, enabled, disabled, drained, hot_standby, ignore_errors]
     description:
-      - Desired state of the member host. (absent|disabled),drained,hot_standby,ignore_errors can be simultaneously invoked
-        by separating them with a comma (for example V(state=drained,ignore_errors)).
-      - 'Accepted state values: [V(present), V(absent), V(enabled), V(disabled), V(drained), V(hot_standby), V(ignore_errors)].'
+      - Desired state of the member host.
+      - States can be simultaneously invoked by separating them with a comma (for example V(state=drained,ignore_errors)),
+        but it is recommended to specify them as a proper YAML list.
+      - States V(present) and V(absent) must be used without any other state.
   tls:
     description:
       - Use https to access balancer management page.
@@ -369,7 +372,7 @@ def main():
             balancer_vhost=dict(required=True, type='str'),
             balancer_url_suffix=dict(default="/balancer-manager/", type='str'),
             member_host=dict(type='str'),
-            state=dict(type='str'),
+            state=dict(type='list', elements='str', choices=['present', 'absent', 'enabled', 'disabled', 'drained', 'hot_standby', 'ignore_errors']),
             tls=dict(default=False, type='bool'),
             validate_certs=dict(default=True, type='bool')
         ),
@@ -380,15 +383,9 @@ def main():
         module.fail_json(msg=missing_required_lib('BeautifulSoup'), exception=BEAUTIFUL_SOUP_IMP_ERR)
 
     if module.params['state'] is not None:
-        states = module.params['state'].split(',')
+        states = module.params['state']
         if (len(states) > 1) and (("present" in states) or ("enabled" in states)):
             module.fail_json(msg="state present/enabled is mutually exclusive with other states!")
-        else:
-            for _state in states:
-                if _state not in ['present', 'absent', 'enabled', 'disabled', 'drained', 'hot_standby', 'ignore_errors']:
-                    module.fail_json(
-                        msg="State can only take values amongst 'present', 'absent', 'enabled', 'disabled', 'drained', 'hot_standby', 'ignore_errors'."
-                    )
     else:
         states = ['None']
 
