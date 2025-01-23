@@ -112,8 +112,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 member:
-  description: Specific balancer member information dictionary, returned when apache2_mod_proxy module is invoked with C(member_host)
-    parameter.
+  description: Specific balancer member information dictionary, returned when the module is invoked with O(member_host) parameter.
   type: dict
   returned: success
   sample:
@@ -144,8 +143,8 @@ member:
       }
     }
 members:
-  description: List of member (defined above) dictionaries, returned when apache2_mod_proxy is invoked with no C(member_host)
-    and state args.
+  description: List of member (defined above) dictionaries, returned when the module is invoked with no O(member_host) and
+    O(state) args.
   returned: success
   type: list
   sample:
