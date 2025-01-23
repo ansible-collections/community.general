@@ -257,13 +257,13 @@ class BalancerMember(object):
     def get_member_attributes(self):
         """ Returns a dictionary of a balancer member's attributes."""
 
-        balancer_member_page = fetch_url(self.module, self.management_url)
+        resp, info = fetch_url(self.module, self.management_url)
 
-        if balancer_member_page[1]['status'] != 200:
-            self.module.fail_json(msg="Could not get balancer_member_page, check for connectivity! " + balancer_member_page[1])
+        if info['status'] != 200:
+            self.module.fail_json(msg="Could not get balancer_member_page, check for connectivity! " + str(info))
         else:
             try:
-                soup = BeautifulSoup(balancer_member_page[0])
+                soup = BeautifulSoup(resp)
             except TypeError as exc:
                 self.module.fail_json(msg="Cannot parse balancer_member_page HTML! " + str(exc))
             else:
@@ -292,12 +292,12 @@ class BalancerMember(object):
                           'ignore_errors': '&w_status_I'}
 
         request_body = regexp_extraction(self.management_url, EXPRESSION, 1)
-        values_url = "".join("{0}={1}".format(url_param, 1 if values[mode] else 0) for mode, url_param in iteritems(values_mapping))
+        values_url = "".join("{0}={1}".format(url_param, 1 if values[mode] else 0) for mode, url_param in values_mapping.items())
         request_body = "{0}{1}".format(request_body, values_url)
 
-        response = fetch_url(self.module, self.management_url, data=request_body)
-        if response[1]['status'] != 200:
-            self.module.fail_json(msg="Could not set the member status! " + self.host + " " + response[1]['status'])
+        response, info = fetch_url(self.module, self.management_url, data=request_body)
+        if info['status'] != 200:
+            self.module.fail_json(msg="Could not set the member status! " + self.host + " " + info['status'])
 
     attributes = property(get_member_attributes)
     status = property(get_member_status, set_member_status)
@@ -332,11 +332,11 @@ class Balancer(object):
 
     def fetch_balancer_page(self):
         """ Returns the balancer management html page as a string for later parsing."""
-        page = fetch_url(self.module, str(self.url))
-        if page[1]['status'] != 200:
-            self.module.fail_json(msg="Could not get balancer page! HTTP status response: " + str(page[1]['status']))
+        resp, info = fetch_url(self.module, str(self.url))
+        if info['status'] != 200:
+            self.module.fail_json(msg="Could not get balancer page! HTTP status response: " + str(info['status']))
         else:
-            content = page[0].read()
+            content = resp.read()
             apache_version = regexp_extraction(content.upper(), APACHE_VERSION_EXPRESSION, 1)
             if apache_version:
                 if not re.search(pattern=r"2\.4\.[\d]*", string=apache_version):
