@@ -136,6 +136,38 @@
   debug:
     var: result
 
+- name: Create new realm role with invalid auth token and valid username/password
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    token: "invalidtoken!!!"
+    realm: "{{ realm }}"
+    name: "{{ role }}"
+    description: "{{ keycloak_role_description }}"
+    state: present
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Remove created realm role
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: "{{ role }}"
+    state: absent
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
 - name: Create new realm role with invalid auth token, invalid refresh token, and valid username/password
   community.general.keycloak_role:
     auth_keycloak_url: "{{ url }}"
@@ -168,3 +200,50 @@
 - name: Debug
   debug:
     var: result
+
+### Unhappy path tests
+
+- name: Fail to create new realm role with invalid username/password
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "invalid_password"
+    realm: "{{ realm }}"
+    name: "{{ role }}"
+    description: "{{ keycloak_role_description }}"
+    state: present
+  register: result
+  failed_when: >
+    (result.exception is not defined) or
+    ("HTTP Error 401: Unauthorized" not in result.msg)
+
+- name: Fail to create new realm role with invalid auth token
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    token: "invalidtoken!!!"
+    realm: "{{ realm }}"
+    name: "{{ role }}"
+    description: "{{ keycloak_role_description }}"
+    state: present
+  register: result
+  failed_when: >
+    (result.exception is not defined) or
+    ("HTTP Error 401: Unauthorized" not in result.msg)
+
+- name: Fail to create new realm role with invalid auth and refresh tokens, and invalid username/password
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "invalid_password"
+    token: "invalidtoken!!!"
+    refresh_token: "invalidtoken!!!"
+    realm: "{{ realm }}"
+    name: "{{ role }}"
+    description: "{{ keycloak_role_description }}"
+    state: present
+  register: result
+  failed_when: >
+    (result.exception is not defined) or
+    ("HTTP Error 401: Unauthorized" not in result.msg)
