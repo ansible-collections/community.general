@@ -399,7 +399,7 @@ def main():
         changed = False
         member_exists = False
         member_status = {'disabled': False, 'drained': False, 'hot_standby': False, 'ignore_errors': False}
-        for mode in member_status.keys():
+        for mode in member_status:
             for state in states:
                 if mode == state:
                     member_status[mode] = True
