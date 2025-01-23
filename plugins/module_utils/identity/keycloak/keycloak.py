@@ -152,7 +152,12 @@ def camel(words):
 
 
 class KeycloakError(Exception):
-    pass
+    def __init__(self, msg, authError=None):
+        self.msg = msg
+        self.authError = authError
+
+    def __str__(self):
+        return str(self.msg)
 
 
 def _token_request(module_params, payload):
@@ -175,7 +180,7 @@ def _token_request(module_params, payload):
             % (auth_url, str(e)))
     except Exception as e:
         raise KeycloakError('Could not obtain access token from %s: %s'
-                            % (auth_url, str(e))) from e
+                            % (auth_url, str(e)), authError=e)
 
     try:
         token = r['access_token']
@@ -336,7 +341,7 @@ class KeycloakAPI(object):
                     r = make_request_catching_401()
                 except KeycloakError as e:
                     # Token refresh returns 400 if token is expired/invalid, so continue on if we get a 400
-                    if isinstance(e.__cause__, HTTPError) and e.__cause__.code != 400:
+                    if e.authError is not None and e.authError.code != 400:
                         raise e
 
         if isinstance(r, Exception):
