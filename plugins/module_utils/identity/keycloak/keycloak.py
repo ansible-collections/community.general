@@ -312,7 +312,7 @@ class KeycloakAPI(object):
         self.http_agent = self.module.params.get('http_agent')
 
     def _request(self, url, method, data=None):
-        def make_request_ignoring_401():
+        def make_request_catching_401():
             try:
                 return open_url(url, method=method, data=data,
                                 http_agent=self.http_agent, headers=self.restheaders,
@@ -321,11 +321,10 @@ class KeycloakAPI(object):
             except HTTPError as e:
                 if e.code != 401:
                     raise e
+                return e
 
-            return None
-
-        r = make_request_ignoring_401()
-        if r is not None:
+        r = make_request_catching_401()
+        if not isinstance(r, Exception):
             return r
 
         # Authentication may have expired, re-authenticate with refresh token and retry
@@ -334,8 +333,8 @@ class KeycloakAPI(object):
             token = _get_token_using_refresh_token(self.module.params)
             self.restheaders['Authorization'] = 'Bearer ' + token
 
-            r = make_request_ignoring_401()
-            if r is not None:
+            r = make_request_catching_401()
+            if not isinstance(r, Exception):
                 return r
 
         # Retry once more with username and password
@@ -345,7 +344,9 @@ class KeycloakAPI(object):
             token = _get_token_using_credentials(self.module.params)
             self.restheaders['Authorization'] = 'Bearer ' + token
 
-        return make_request_ignoring_401()
+            r = make_request_catching_401()
+
+        return r
 
     def _request_and_deserialize(self, url, method, data=None):
         return json.loads(to_native(self._request(url, method, data).read()))
