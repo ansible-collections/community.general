@@ -9,7 +9,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 DOCUMENTATION = r"""
----
 module: proxmox
 short_description: Management of instances in Proxmox VE cluster
 description:
@@ -45,9 +44,9 @@ options:
         mount are permitted.
       - Older versions of Proxmox will accept a numeric value for size using the O(storage) parameter to automatically choose
         which storage to allocate from, however new versions enforce the C(<STORAGE>:<SIZE>) syntax.
-      - "Additional options are available by using some combination of the following key-value pairs as a comma-delimited list
-        C([volume=]<volume> [,acl=<1|0>] [,mountoptions=<opt[;opt...]>] [,quota=<1|0>][,replicate=<1|0>] [,ro=<1|0>] [,shared=<1|0>]
-        [,size=<DiskSize>])."
+      - Additional options are available by using some combination of the following key-value pairs as a comma-delimited list
+        C([volume=]<volume> [,acl=<1|0>] [,mountoptions=<opt[;opt...]>] [,quota=<1|0>] [,replicate=<1|0>] [,ro=<1|0>] [,shared=<1|0>]
+        [,size=<DiskSize>]).
       - See U(https://pve.proxmox.com/wiki/Linux_Container) for a full description.
       - This option is mutually exclusive with O(storage) and O(disk_volume).
     type: str
@@ -117,7 +116,8 @@ options:
   startup:
     description:
       - Specifies the startup order of the container.
-      - Use C(order=#) where C(#) is a non-negative number to define the general startup order. Shutdown in done with reverse ordering.
+      - Use C(order=#) where C(#) is a non-negative number to define the general startup order. Shutdown in done with reverse
+        ordering.
       - Use C(up=#) where C(#) is in seconds, to specify a delay to wait before the next VM is started.
       - Use C(down=#) where C(#) is in seconds, to specify a delay to wait before the next VM is stopped.
     type: list
@@ -193,7 +193,8 @@ options:
     description:
       - Specifies the C(ostype) of the LXC container.
       - If set to V(auto), no C(ostype) will be provided on instance creation.
-    choices: ['auto', 'debian', 'devuan', 'ubuntu', 'centos', 'fedora', 'opensuse', 'archlinux', 'alpine', 'gentoo', 'nixos', 'unmanaged']
+    choices: ['auto', 'debian', 'devuan', 'ubuntu', 'centos', 'fedora', 'opensuse', 'archlinux', 'alpine', 'gentoo', 'nixos',
+      'unmanaged']
     type: str
     default: 'auto'
     version_added: 8.1.0

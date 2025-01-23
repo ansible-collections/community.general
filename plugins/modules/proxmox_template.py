@@ -69,25 +69,17 @@ options:
     description:
       - Indicate desired state of the template.
     type: str
-    choices: [present, absent]
+    choices: ['present', 'absent']
     default: present
-  verify_checksum:
-    description:
-      - Indicate whether or not to validate with checksum.
-      - Both O(checksum) and O(checksum_algorithm) must be specified if this is V(true).
-    type: bool
-    default: false
-    version_added: 10.3.0
   checksum_algorithm:
     description:
       - Algorithm used to verify the checksum.
-      - Must be provided if O(verify_checksum=true).
     type: str
     choices: ['md5', 'sha1', 'sha224', 'sha256', 'sha384', 'sha512']
     version_added: 10.3.0
   checksum:
     description:
-      - The checksum to validate against. Must be provided if O(verify_checksum=true).
+      - The checksum to validate against.
       - Checksums are often provided by software distributors to verify that a download is not corrupted.
       - Checksums can usually be found on the distributors download page in the form of a file or string.
     type: str
@@ -177,7 +169,6 @@ EXAMPLES = r"""
     api_password: 1q2w3e
     api_host: node1
     url: ubuntu-20.04-standard_20.04-1_amd64.tar.gz
-    verify_checksum: true
     checksum_algorithm: sha256
     checksum: 65d860160bdc9b98abf72407e14ca40b609417de7939897d3b58d55787aaef69
 """
@@ -300,16 +291,14 @@ def main():
         state=dict(default='present', choices=['present', 'absent']),
         checksum_algorithm=dict(choices=['md5', 'sha1', 'sha224', 'sha256', 'sha384', 'sha512']),
         checksum=dict(type='str'),
-        verify_checksum=dict(type='bool', default=False)
     )
     module_args.update(template_args)
 
     module = AnsibleModule(
         argument_spec=module_args,
-        required_together=[('api_token_id', 'api_token_secret')],
+        required_together=[('api_token_id', 'api_token_secret'), ('checksum', 'checksum_algorithm')],
         required_one_of=[('api_password', 'api_token_id')],
-        required_if=[('state', 'absent', ['template']),
-                     ('verify_checksum', True, ['checksum', 'checksum_algorithm'])],
+        required_if=[('state', 'absent', ['template'])],
         mutually_exclusive=[("src", "url")],
     )
 
@@ -319,7 +308,6 @@ def main():
     node = module.params['node']
     storage = module.params['storage']
     timeout = module.params['timeout']
-    verify_checksum = module.params['verify_checksum']
     checksum = module.params['checksum']
     checksum_algorithm = module.params['checksum_algorithm']
 
@@ -360,7 +348,7 @@ def main():
                 elif not proxmox.delete_template(node, storage, content_type, template, timeout):
                     module.fail_json(changed=False, msg='failed to delete template with volid=%s:%s/%s' % (storage, content_type, template))
 
-            if verify_checksum:
+            if checksum:
                 if proxmox.fetch_and_verify(node, storage, url, content_type, timeout, checksum, checksum_algorithm):
                     module.exit_json(changed=True, msg="Checksum verified, template with volid=%s:%s/%s uploaded" % (storage, content_type, template))
             if proxmox.fetch_template(node, storage, content_type, url, timeout):
