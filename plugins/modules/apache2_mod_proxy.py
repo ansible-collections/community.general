@@ -246,7 +246,7 @@ class BalancerMember(object):
 
     def __init__(self, management_url, balancer_url, module):
         self.host = regexp_extraction(management_url, EXPRESSION, 4)
-        self.management_url = str(management_url)
+        self.management_url = management_url
         self.protocol = regexp_extraction(management_url, EXPRESSION, 3)
         self.port = regexp_extraction(management_url, EXPRESSION, 5)
         self.path = regexp_extraction(management_url, EXPRESSION, 6)
