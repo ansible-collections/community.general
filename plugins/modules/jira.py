@@ -122,12 +122,14 @@ options:
     required: false
     description:
       - Only used when O(operation) is V(transition), and a bit of a misnomer, it actually refers to the transition name.
+      - This is mutually exclusive with O(status_id).
   status_id:
     type: str
     required: false
     description:
-      - Only used when O(operation) is V(transition), and refers to the transition id.
-      - Transition ID can used from community.general version 10.3.0 or greater.
+      - Only used when O(operation) is V(transition), and refers to the transition ID.
+      - This is mutually exclusive with O(status).
+    version_added: 10.3.0
   assignee:
     type: str
     required: false
@@ -519,7 +521,8 @@ class JIRA(StateModuleHelper):
             ('operation', 'comment', ['issue', 'comment']),
             ('operation', 'workflow', ['issue', 'comment']),
             ('operation', 'fetch', ['issue']),
-            ('operation', 'transition', ['issue', 'status', 'status_id']),
+            ('operation', 'transition', ['issue']),
+            ('operation', 'transition', ['status', 'status_id'], True),
             ('operation', 'link', ['linktype', 'inwardissue', 'outwardissue']),
             ('operation', 'search', ['jql']),
         ),
@@ -633,16 +636,18 @@ class JIRA(StateModuleHelper):
             tid = self.vars.status_id.strip()
 
         for t in tmeta['transitions']:
-            if tid is None:
+            if target is not None::
                 if t['name'] == target:
                     tid = t['id']
                     break
             else:
                 if tid == t['id']:
                     break
-
         else:
-            raise ValueError("Failed find valid transition for '%s'" % target)
+            if target is not None:
+              raise ValueError("Failed find valid transition for '%s'" % target)
+            else:
+              raise ValueError("Failed find valid transition for ID '%s'" % tid)
 
         fields = dict(self.vars.fields)
         if self.vars.summary is not None:
