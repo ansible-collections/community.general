@@ -636,7 +636,7 @@ class JIRA(StateModuleHelper):
             tid = self.vars.status_id.strip()
 
         for t in tmeta['transitions']:
-            if target is not None::
+            if target is not None:
                 if t['name'] == target:
                     tid = t['id']
                     break
@@ -645,9 +645,9 @@ class JIRA(StateModuleHelper):
                     break
         else:
             if target is not None:
-              raise ValueError("Failed find valid transition for '%s'" % target)
+                raise ValueError("Failed find valid transition for '%s'" % target)
             else:
-              raise ValueError("Failed find valid transition for ID '%s'" % tid)
+                raise ValueError("Failed find valid transition for ID '%s'" % tid)
 
         fields = dict(self.vars.fields)
         if self.vars.summary is not None:
