@@ -121,7 +121,12 @@ options:
     type: str
     required: false
     description:
-      - Only used when O(operation) is V(transition), and a bit of a misnomer, it actually refers to the transition name or ID.
+      - Only used when O(operation) is V(transition), and a bit of a misnomer, it actually refers to the transition name.
+  status_id:
+    type: str
+    required: false
+    description:
+      - Only used when O(operation) is V(transition), and refers to the transition id.
       - Transition ID can used from community.general version 10.3.0 or greater.
   assignee:
     type: str
@@ -484,6 +489,7 @@ class JIRA(StateModuleHelper):
                 value=dict(type='str', required=True)
             )),
             status=dict(type='str', ),
+            status_id=dict(type='str', ),
             assignee=dict(type='str', ),
             fields=dict(default={}, type='dict'),
             linktype=dict(type='str', ),
@@ -499,6 +505,7 @@ class JIRA(StateModuleHelper):
             ['username', 'token'],
             ['password', 'token'],
             ['assignee', 'account_id'],
+            ['status', 'status_id']
         ],
         required_together=[
             ['username', 'password'],
@@ -512,7 +519,7 @@ class JIRA(StateModuleHelper):
             ('operation', 'comment', ['issue', 'comment']),
             ('operation', 'workflow', ['issue', 'comment']),
             ('operation', 'fetch', ['issue']),
-            ('operation', 'transition', ['issue', 'status']),
+            ('operation', 'transition', ['issue', 'status', 'status_id']),
             ('operation', 'link', ['linktype', 'inwardissue', 'outwardissue']),
             ('operation', 'search', ['jql']),
         ),
@@ -617,11 +624,13 @@ class JIRA(StateModuleHelper):
         turl = self.vars.restbase + '/issue/' + self.vars.issue + "/transitions"
         tmeta = self.get(turl)
 
-        target = self.vars.status.strip()
-        if target.isdigit():
-            tid = target
-        else:
-            tid = None
+        tid = None
+        target = None
+
+        if self.vars.status is not None:
+            target = self.vars.status.strip()
+        elif self.vars.status_id is not None:
+            tid = self.vars.status_id.strip()
 
         for t in tmeta['transitions']:
             if tid is None:
