@@ -319,11 +319,11 @@ class Balancer(object):
 
     def __init__(self, host, suffix, module, tls=False):
         if tls:
-            self.base_url = 'https://' + host
-            self.url = 'https://' + host + suffix
+            self.base_url = 'https://{0}'.format(host)
+            self.url = 'https://{0}{1}'.format(host, suffix)
         else:
-            self.base_url = 'http://' + host
-            self.url = 'http://' + host + suffix
+            self.base_url = 'http://{0}'.format(host)
+            self.url = 'http://{0}{1}'.format(host, suffix)
         self.module = module
         self.page = self.fetch_balancer_page()
 
@@ -424,7 +424,12 @@ def main():
                 member=json_output
             )
         else:
-            module.fail_json(msg=module.params['member_host'] + ' is not a member of the balancer ' + module.params['balancer_vhost'] + '!')
+            module.fail_json(
+                msg='{member_host} is not a member of the balancer {balancer_vhost}!'.format(
+                    member_host=module.params['member_host'],
+                    balancer_vhost=module.params['balancer_vhost'],
+                )
+            )
 
 
 if __name__ == '__main__':
