@@ -188,7 +188,7 @@ def _token_request(module_params, payload):
                             % (auth_url, str(e)), authError=e)
 
 
-def _get_token_using_credentials(module_params):
+def _request_token_using_credentials(module_params):
     client_id = module_params.get('auth_client_id')
     auth_username = module_params.get('auth_username')
     auth_password = module_params.get('auth_password')
@@ -207,7 +207,7 @@ def _get_token_using_credentials(module_params):
     return _token_request(module_params, payload)
 
 
-def _get_token_using_refresh_token(module_params):
+def _request_token_using_refresh_token(module_params):
     client_id = module_params.get('auth_client_id')
     refresh_token = module_params.get('refresh_token')
     client_secret = module_params.get('auth_client_secret')
@@ -233,7 +233,7 @@ def get_token(module_params):
     token = module_params.get('token')
 
     if token is None:
-        token = _get_token_using_credentials(module_params)
+        token = _request_token_using_credentials(module_params)
 
     return {
         'Authorization': 'Bearer ' + token,
@@ -332,7 +332,7 @@ class KeycloakAPI(object):
             refresh_token = self.module.params.get('refresh_token')
             if refresh_token is not None:
                 try:
-                    token = _get_token_using_refresh_token(self.module.params)
+                    token = _request_token_using_refresh_token(self.module.params)
                     self.restheaders['Authorization'] = 'Bearer ' + token
 
                     r = make_request_catching_401()
@@ -346,7 +346,7 @@ class KeycloakAPI(object):
             auth_username = self.module.params.get('auth_username')
             auth_password = self.module.params.get('auth_password')
             if auth_username is not None and auth_password is not None:
-                token = _get_token_using_credentials(self.module.params)
+                token = _request_token_using_credentials(self.module.params)
                 self.restheaders['Authorization'] = 'Bearer ' + token
 
                 r = make_request_catching_401()
