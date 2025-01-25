@@ -61,7 +61,7 @@ RESOURCE_LIST = [
         "cpu": 0,
         "id": "qemu/101",
         "template": 0,
-        "vmid": 101,
+        "vmid": "101",
         "type": "qemu"
     },
     {
@@ -81,7 +81,7 @@ RESOURCE_LIST = [
         "cpu": 0,
         "id": "qemu/102",
         "template": 0,
-        "vmid": 102,
+        "vmid": "102",
         "type": "qemu"
     }
 ]
