@@ -30,21 +30,18 @@ options:
       - The name of the Proxmox VM.
       - If defined, the returned list will contain backup jobs that have been parsed and filtered based on O(vm_name) value.
       - Mutually exclusive with O(vm_id) and O(backup_jobs).
-    required: false
     type: str
   vm_id:
     description:
       - The ID of the Proxmox VM.
       - If defined, the returned list will contain backup jobs that have been parsed and filtered based on O(vm_id) value.
       - Mutually exclusive with O(vm_name) and O(backup_jobs).
-    required: false
     type: str
   backup_jobs:
     description:
       - If V(true), the module will return all backup jobs information.
       - If V(false), the module will parse all backup jobs based on VM IDs and return a list of VMs' backup information.
       - Mutually exclusive with O(vm_id) and O(vm_name).
-    required: false
     default: false
     type: bool
 
