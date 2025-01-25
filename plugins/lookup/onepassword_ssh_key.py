@@ -60,26 +60,8 @@ from ansible.plugins.lookup import LookupBase
 
 class OnePassCLIv2SSHKey(OnePassCLIv2):
 
-    def _get_raw(self, item_id, vault=None):
-        args = ["item", "get", item_id, "--format", "json"]
-        if vault is not None:
-            args.append(f"--vault={vault}")
-
-        if self.service_account_token:
-            if vault is None:
-                raise AnsibleLookupError(
-                    "'vault' is required with 'service_account_token'"
-                )
-
-            environment_update = {
-                "OP_SERVICE_ACCOUNT_TOKEN": self.service_account_token
-            }
-            return self._run(args, environment_update=environment_update)
-
-        return self._run(args)
-
-    def get_ssh_key(self, item_id, vault=None, ssh_format=False):
-        rc, out, err = self._get_raw(item_id, vault)
+    def get_ssh_key(self, item_id, vault=None, token=None, ssh_format=False):
+        rc, out, err = self.get_raw(item_id, vault=vault, token=token)
 
         data = json.loads(out)
 
@@ -137,5 +119,6 @@ class LookupModule(LookupBase):
         op.assert_logged_in()
 
         return [
-            op._cli.get_ssh_key(term, vault, ssh_format=ssh_format) for term in terms
+            op._cli.get_ssh_key(term, vault, token=op.token, ssh_format=ssh_format)
+            for term in terms
         ]
