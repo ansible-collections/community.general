@@ -93,38 +93,47 @@ backup_info:
       description: The type of the backup.
       returned: on success
       type: str
+      sample: vzdump
     enabled:
       description: V(1) if backup is enabled else V(0).
       returned: on success
       type: int
+      sample: 1
     id:
       description: The backup job ID.
       returned: on success
       type: str
+      sample: backup-83831498-c631
     mode:
       description: The backup job mode such as snapshot.
       returned: on success
       type: str
+      sample: snapshot
     next-run:
       description: The next backup time.
       returned: on success
       type: str
+      sample: "2024-12-28 11:30:00"
     schedule:
       description: The backup job schedule.
       returned: on success
       type: str
+      sample: "sat 15:00"
     storage:
       description: The backup storage location.
       returned: on success
       type: str
+      sample: local
     vm_name:
       description: The VM name.
       returned: on success
       type: str
+      sample: test01
     vmid:
       description: The VM ID.
       returned: on success
       type: str
+      sample: "100"
 """
 
 from datetime import datetime
