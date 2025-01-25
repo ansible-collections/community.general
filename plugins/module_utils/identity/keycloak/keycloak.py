@@ -2978,7 +2978,7 @@ class KeycloakAPI(object):
         """
         client_role_scope_url = URL_CLIENT_ROLE_SCOPE_CLIENTS.format(url=self.baseurl, realm=realm, id=clientid, scopeid=clientscopeid)
         try:
-            return self._request_and_deserialize(client_role_scope_url)
+            return self._request_and_deserialize(client_role_scope_url, method='GET')
         except Exception as e:
             self.fail_request(e, msg='Could not fetch roles scope for client %s in realm %s: %s' % (clientid, realm, str(e)))
 
@@ -3024,7 +3024,7 @@ class KeycloakAPI(object):
         """
         client_role_scope_url = URL_CLIENT_ROLE_SCOPE_REALM.format(url=self.baseurl, realm=realm, id=clientid)
         try:
-            return self._request_and_deserialize(client_role_scope_url)
+            return self._request_and_deserialize(client_role_scope_url, method='GET')
         except Exception as e:
             self.fail_request(e, msg='Could not fetch roles scope for client %s in realm %s: %s' % (clientid, realm, str(e)))
 
