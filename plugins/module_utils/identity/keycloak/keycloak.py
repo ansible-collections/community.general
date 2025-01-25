@@ -174,21 +174,18 @@ def _token_request(module_params, payload):
         r = json.loads(to_native(open_url(auth_url, method='POST',
                                           validate_certs=validate_certs, http_agent=http_agent, timeout=connection_timeout,
                                           data=urlencode(payload)).read()))
+
+        return r['access_token']
     except ValueError as e:
         raise KeycloakError(
             'API returned invalid JSON when trying to obtain access token from %s: %s'
             % (auth_url, str(e)))
+    except KeyError:
+        raise KeycloakError(
+            'API did not include access_token field in response from %s' % auth_url)
     except Exception as e:
         raise KeycloakError('Could not obtain access token from %s: %s'
                             % (auth_url, str(e)), authError=e)
-
-    try:
-        token = r['access_token']
-    except KeyError:
-        raise KeycloakError(
-            'Could not obtain access token from %s' % auth_url)
-
-    return token
 
 
 def _get_token_using_credentials(module_params):
