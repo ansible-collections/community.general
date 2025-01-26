@@ -149,11 +149,13 @@ def keycloak_clientscope_type_module():
             ['default_clientscopes', 'optional_clientscopes']
         ]),
         required_together=([['auth_realm', 'auth_username', 'auth_password']]),
+        required_by={'refresh_token': 'auth_realm'},
         mutually_exclusive=[
             ['token', 'auth_realm'],
             ['token', 'auth_username'],
             ['token', 'auth_password']
-        ])
+        ],
+    )
 
     return module
 
