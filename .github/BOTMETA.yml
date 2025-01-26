@@ -307,6 +307,8 @@ files:
   $lookups/onepassword_raw.py:
     ignore: scottsb
     maintainers: azenk
+  $lookups/onepassword_ssh_key.py:
+    maintainers: mohammedbabelly20
   $lookups/passwordstore.py: {}
   $lookups/random_pet.py:
     maintainers: Akasurde
