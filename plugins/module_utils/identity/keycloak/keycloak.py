@@ -161,6 +161,20 @@ class KeycloakError(Exception):
 
 
 def _token_request(module_params, payload):
+    """ Obtains connection header with token for the authentication,
+    using the provided auth_username/auth_password
+    :param module_params: parameters of the module
+    :param payload:
+       type:
+           dict
+       description:
+           Authentication request payload. Must contain at least
+           'grant_type' and 'client_id', optionally 'client_secret',
+           along with parameters based on 'grant_type'; e.g.,
+           'username'/'password' for type 'password',
+           'refresh_token' for type 'refresh_token'.
+    :return: access token
+    """
     base_url = module_params.get('auth_keycloak_url')
     if not base_url.lower().startswith(('http', 'https')):
         raise KeycloakError("auth_url '%s' should either start with 'http' or 'https'." % base_url)
@@ -189,6 +203,11 @@ def _token_request(module_params, payload):
 
 
 def _request_token_using_credentials(module_params):
+    """ Obtains connection header with token for the authentication,
+    using the provided auth_username/auth_password
+    :param module_params: parameters of the module. Must include 'auth_username' and 'auth_password'.
+    :return: connection header
+    """
     client_id = module_params.get('auth_client_id')
     auth_username = module_params.get('auth_username')
     auth_password = module_params.get('auth_password')
@@ -208,6 +227,11 @@ def _request_token_using_credentials(module_params):
 
 
 def _request_token_using_refresh_token(module_params):
+    """ Obtains connection header with token for the authentication,
+    using the provided refresh_token
+    :param module_params: parameters of the module. Must include 'refresh_token'.
+    :return: connection header
+    """
     client_id = module_params.get('auth_client_id')
     refresh_token = module_params.get('refresh_token')
     client_secret = module_params.get('auth_client_secret')
@@ -226,9 +250,9 @@ def _request_token_using_refresh_token(module_params):
 
 def get_token(module_params):
     """ Obtains connection header with token for the authentication,
-        token already given or obtained from credentials
-        :param module_params: parameters of the module
-        :return: connection header
+    token already given or obtained from credentials
+    :param module_params: parameters of the module
+    :return: connection header
     """
     token = module_params.get('token')
 
@@ -314,6 +338,18 @@ class KeycloakAPI(object):
         self.http_agent = self.module.params.get('http_agent')
 
     def _request(self, url, method, data=None):
+        """ Makes a request to Keycloak and returns the raw response.
+        If a 401 is returned, attempts to re-authenticate
+        using first the module's refresh_token (if provided)
+        and then the module's username/password (if provided).
+        On successful re-authentication, the new token is stored
+        in the restheaders for future requests.
+
+        :param url: request path
+        :param method: request method (e.g., 'GET', 'POST', etc.)
+        :param data: (optional) data for request
+        :return: raw API response
+        """
         def make_request_catching_401():
             try:
                 return open_url(url, method=method, data=data,
@@ -358,6 +394,13 @@ class KeycloakAPI(object):
         return r
 
     def _request_and_deserialize(self, url, method, data=None):
+        """ Wraps the _request method with JSON deserialization of the response.
+
+        :param url: request path
+        :param method: request method (e.g., 'GET', 'POST', etc.)
+        :param data: (optional) data for request
+        :return: raw API response
+        """
         return json.loads(to_native(self._request(url, method, data).read()))
 
     def get_realm_info_by_id(self, realm='master'):
@@ -3058,6 +3101,16 @@ class KeycloakAPI(object):
         return self.get_client_role_scope_from_realm(clientid, realm)
 
     def fail_request(self, e, msg, **kwargs):
+        """ Triggers a module failure. This should be called
+        when an exception occurs during/after a request.
+        Attempts to parse the exception e as an HTTP error
+        and append it to msg.
+
+        :param e: exception which triggered the failure
+        :param msg: error message to display to the user
+        :param kwargs: additional arguments to pass to module.fail_json
+        :return: None
+        """
         try:
             if isinstance(e, HTTPError):
                 msg = "%s: %s" % (msg, to_native(e.read()))
@@ -3066,4 +3119,16 @@ class KeycloakAPI(object):
         self.module.fail_json(msg, **kwargs)
 
     def fail_open_url(self, e, msg, **kwargs):
+        """ DEPRECATED: Use fail_request instead.
+
+        Triggers a module failure. This should be called
+        when an exception occurs during/after a request.
+        Attempts to parse the exception e as an HTTP error
+        and append it to msg.
+
+        :param e: exception which triggered the failure
+        :param msg: error message to display to the user
+        :param kwargs: additional arguments to pass to module.fail_json
+        :return: None
+        """
         return self.fail_request(e, msg, **kwargs)
