@@ -122,6 +122,14 @@ options:
     required: false
     description:
       - Only used when O(operation) is V(transition), and a bit of a misnomer, it actually refers to the transition name.
+      - This is mutually exclusive with O(status_id).
+  status_id:
+    type: str
+    required: false
+    description:
+      - Only used when O(operation) is V(transition), and refers to the transition ID.
+      - This is mutually exclusive with O(status).
+    version_added: 10.3.0
   assignee:
     type: str
     required: false
@@ -483,6 +491,7 @@ class JIRA(StateModuleHelper):
                 value=dict(type='str', required=True)
             )),
             status=dict(type='str', ),
+            status_id=dict(type='str', ),
             assignee=dict(type='str', ),
             fields=dict(default={}, type='dict'),
             linktype=dict(type='str', ),
@@ -498,6 +507,7 @@ class JIRA(StateModuleHelper):
             ['username', 'token'],
             ['password', 'token'],
             ['assignee', 'account_id'],
+            ['status', 'status_id']
         ],
         required_together=[
             ['username', 'password'],
@@ -511,7 +521,8 @@ class JIRA(StateModuleHelper):
             ('operation', 'comment', ['issue', 'comment']),
             ('operation', 'workflow', ['issue', 'comment']),
             ('operation', 'fetch', ['issue']),
-            ('operation', 'transition', ['issue', 'status']),
+            ('operation', 'transition', ['issue']),
+            ('operation', 'transition', ['status', 'status_id'], True),
             ('operation', 'link', ['linktype', 'inwardissue', 'outwardissue']),
             ('operation', 'search', ['jql']),
         ),
@@ -616,14 +627,27 @@ class JIRA(StateModuleHelper):
         turl = self.vars.restbase + '/issue/' + self.vars.issue + "/transitions"
         tmeta = self.get(turl)
 
-        target = self.vars.status
         tid = None
+        target = None
+
+        if self.vars.status is not None:
+            target = self.vars.status.strip()
+        elif self.vars.status_id is not None:
+            tid = self.vars.status_id.strip()
+
         for t in tmeta['transitions']:
-            if t['name'] == target:
-                tid = t['id']
-                break
+            if target is not None:
+                if t['name'] == target:
+                    tid = t['id']
+                    break
+            else:
+                if tid == t['id']:
+                    break
         else:
-            raise ValueError("Failed find valid transition for '%s'" % target)
+            if target is not None:
+                raise ValueError("Failed find valid transition for '%s'" % target)
+            else:
+                raise ValueError("Failed find valid transition for ID '%s'" % tid)
 
         fields = dict(self.vars.fields)
         if self.vars.summary is not None:

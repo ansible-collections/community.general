@@ -1,0 +1,2 @@
+minor_changes:
+  - jira - transition operation now has ``status_id`` to directly reference wanted transition (https://github.com/ansible-collections/community.general/pull/9602).
