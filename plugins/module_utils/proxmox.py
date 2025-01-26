@@ -144,7 +144,7 @@ class ProxmoxAnsible(object):
                 return None
 
             self.module.fail_json(msg='No VM with name %s found' % name)
-        elif len(vms) > 1:
+        elif len(vms) > 1 and not choose_first_if_multiple:
             self.module.fail_json(msg='Multiple VMs with name %s found, provide vmid instead' % name)
 
         return vms[0]
