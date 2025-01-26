@@ -1,0 +1,2 @@
+security_fixes:
+  - keycloak_client - Sanitize ``saml.encryption.private.key`` so it does not show in the logs (https://github.com/ansible-collections/community.general/pull/9621).
