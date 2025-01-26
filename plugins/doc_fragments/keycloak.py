@@ -57,6 +57,12 @@ options:
     type: str
     version_added: 3.0.0
 
+  refresh_token:
+    description:
+      - Authentication refresh token for Keycloak API.
+    type: str
+    version_added: 10.3.0
+
   validate_certs:
     description:
       - Verify TLS certificates (do not disable this in production).
