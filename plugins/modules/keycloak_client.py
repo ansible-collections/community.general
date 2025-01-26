@@ -775,8 +775,11 @@ def sanitize_cr(clientrep):
         result['secret'] = 'no_log'
     if 'attributes' in result:
         attributes = result['attributes']
-        if isinstance(attributes, dict) and 'saml.signing.private.key' in attributes:
-            attributes['saml.signing.private.key'] = 'no_log'
+        if isinstance(attributes, dict):
+            if 'saml.signing.private.key' in attributes:
+                attributes['saml.signing.private.key'] = 'no_log'
+            if 'saml.encryption.private.key' in attributes:
+                attributes['saml.encryption.private.key'] = 'no_log'
     return normalise_cr(result)
 
 
