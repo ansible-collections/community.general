@@ -29,19 +29,17 @@ options:
   state:
     description:
       - Indicate desired state for cluster resource.
-    choices: [ create, delete ]
-    required: true
+    choices: [ present, absent ]
+    default: present
     type: str
   name:
     description:
       - Specify the resource name to create.
-    aliases: [ resource_id ]
     required: true
     type: str
   resource_type:
     description:
       - Resource type to create.
-    aliases: [ type ]
     type: dict
     suboptions:
       resource_name:
@@ -59,14 +57,12 @@ options:
   resource_option:
     description:
       - Specify the resource option to create.
-    aliases: [ option ]
     type: list
     elements: str
     default: []
   resource_operation:
     description:
       - List of operations to associate with resource.
-    aliases: [ op ]
     type: list
     elements: dict
     default: []
@@ -144,148 +140,127 @@ cluster_resources:
     returned: always
 '''
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
+from ansible_collections.community.general.plugins.module_utils.pacemaker import pacemaker_runner
 
 
-def get_cluster_resource_status(module, name):
-    cmd = ["pcs", "resource", "status", name]
-    rc, out, err = module.run_command(cmd)
-    status = [o.split(':') for o in out.splitlines()]
-    return rc, status
+class PacemakerResource(StateModuleHelper):
+    change_params = ('name', )
+    diff_params = ('name', )
+    output_params = ('status')
+    module = dict(
+        argument_spec=dict(
+            state=dict(type='str', default='present', choices=[
+                'present', 'absent']),
+            name=dict(type='str', required=True),
+            resource_type=dict(type='dict', options=dict(
+                resource_name=dict(type='str'),
+                resource_standard=dict(type='str'),
+                resource_provider=dict(type='str'),
+            )),
+            resource_option=dict(type='list', elements='str', default=list()),
+            resource_operation=dict(type='list', elements='dict', default=list(), options=dict(
+                operation_action=dict(type='str'),
+                operation_option=dict(type='list', elements='str'),
+            )),
+            resource_meta=dict(type='list', elements='str'),
+            resource_argument=dict(type='dict', options=dict(
+                argument_action=dict(type='str', choices=[
+                                   'clone', 'master', 'group', 'promotable']),
+                argument_option=dict(type='list', elements='str'),
+            )),
+            disabled=dict(type='bool', default=False),
+            wait=dict(type='int', default=300),
+        ),
+        required_if=[('state', 'present', ['resource_type', 'resource_option'])],
+        required_together=[('state', 'present', ['resource_type', 'resource_option'])],
+        supports_check_mode=True
+    )
+    use_old_vardict = False
+    default_state = "present"
 
+    def process_command_output(self, rc, out, err):
+        if err.rstrip() == self.does_not:
+            return None
+        if rc or len(err):
+            self.do_raise(
+                'pcs failed with error (rc={0}): {1}'.format(rc, err))
 
-def delete_cluster_resource(module, name):
-    cmd = ["pcs", "resource", "delete", name]
-    rc, out, err = module.run_command(cmd)
-    if rc == 1:
-        module.fail_json(
-            msg="Command execution failed.\nCommand: `%s`\nError: %s" % (cmd, err))
-    status = [o.split(':') for o in out.splitlines()]
-    return status
+        result = out.rstrip()
+        if "Value is an array with" in result:
+            result = result.split("\n")
+            result.pop(0)
+            result.pop(0)
 
+        return result
 
-def create_cluster_resource(module, resource_name,
-                            resource_type, resource_option, resource_operation,
-                            resource_meta, resource_argument, disabled,
-                            wait):
-    cmd = ["pcs", "resource", "create", resource_name]
-
-    if resource_type.get('resource_standard') is not None:
-        cmd.append(resource_type.get('resource_standard'))
-        if resource_type.get('resource_provider') is not None:
-            cmd.append(resource_type.get('resource_provider'))
-    cmd.append(resource_type.get('resource_name'))
-
-    if resource_option is not None:
-        for option in resource_option:
-            cmd.append(option)
-
-    if resource_operation is not None:
-        for op in resource_operation:
+    # Builds list with command to run
+    def _build_resource_operation(self):
+        cmd = []
+        for op in self.vars.resource_operation:
             cmd.append("op")
             cmd.append(op.get('operation_action'))
             for operation_option in op.get('operation_option'):
                 cmd.append(operation_option)
 
-    if resource_meta is not None:
-        for m in resource_meta:
-            cmd.append("meta")
-            cmd.append(m)
+        return cmd
 
-    if resource_argument is not None:
-        if resource_argument.get('argument_action') == "group":
-            cmd.append("--group")
+    def _build_resource_meta(self):
+        return ["meta {0}".format(m) for m in self.vars.resource_meta]
+
+    def _build_resource_argument(self):
+        cmd = []
+        if self.vars.resource_argument.get('argument_action') == 'group':
+            cmd.append('--group')
         else:
-            cmd.append(resource_argument.get('argument_action'))
-        for option_argument in resource_argument.get('argument_option'):
-            cmd.append(option_argument)
+            cmd.append(self.vars.resource_argument.get('argument_action'))
+        return cmd + list(self.vars.resource_argument.get('argument_option'))
 
-    if disabled:
-        cmd.append("--disabled")
+    def __init_module__(self):
+        self.runner = pacemaker_runner(self.module)
+        self.does_not = 'Pacemaker resource "{0}" does not exist or cannot be created'.format(
+            self.vars.name)
+        self.vars.set('previous_status', self._get())
+        self.vars.set_meta('status', initial_value=self.vars.previous_status)
 
-    if wait > 0:
-        cmd.append("--wait=%d" % wait)
+    def _get(self):
+        with self.runner('state name', output_process=self.process_command_output) as ctx:
+            return ctx.run(state='status', name=self.vars.name)
 
-    rc, out, err = module.run_command(cmd)
-    if rc == 1:
-        module.fail_json(
-            msg="Command execution failed.\nCommand: `%s`\nError: %s" % (cmd, err))
-    status = [o.split(':') for o in out.splitlines()]
-    return status
+    def state_absent(self):
+        with self.runner('state name', check_mode_skip=True) as ctx:
+            ctx.run(state=self.vars.state, name=self.vars.name)
+            self.vars.stdout = ctx.results_out
+            self.vars.stderr = ctx.results_err
+            self.vars.cmd = ctx.cmd
+        self.vars.value = None
+
+    def state_present(self):
+        # Build out our command lists here
+        self.vars.set('resource_type', self.vars.resource_type.get('resource_standard') +
+                      self.vars.resource_type.get('provider') + self.vars.resource_type.get('resource_name'))
+        self.vars.set('resource_option', self.vars.resource_option)
+        self.vars.set('resource_operation', self._build_resource_operation)
+        self.vars.set('resource_meta', self._build_resource_meta)
+        self.vars.set('resource_argument', self._build_resource_argument)
+
+        with self.runner(
+                'state name resource_type resource_option resource_operation resource_meta resource_argument disabled wait',
+                check_mode_skip=True) as ctx:
+            ctx.run(
+                state=self.vars.state,
+                name=self.vars.name,
+                resource_type=self.vars.resource_type,
+                resource_option=self.vars.resource_option,
+                resource_operation=self.vars.resource_operation,
+                resource_meta=self.vars.resource_meta,
+                resource_argument=self.resource_argument,
+                disabled=self.vars.disabled,
+                wait=self.vars.wait)
 
 
 def main():
-    argument_spec = dict(
-        state=dict(type='str', choices=[
-                   'create', 'delete'], required=True),
-        name=dict(type='str', aliases=['resource_id'], required=True),
-        resource_type=dict(type='dict', aliases=['type'], options=dict(
-            resource_name=dict(type='str'),
-            resource_standard=dict(type='str'),
-            resource_provider=dict(type='str'),
-        )),
-        resource_option=dict(type='list', elements='str', default=list(), aliases=['option']),
-        resource_operation=dict(type='list', elements='dict', default=list(), aliases=['op'], options=dict(
-            operation_action=dict(type='str'),
-            operation_option=dict(type='list', elements='str'),
-        )),
-        resource_meta=dict(type='list', elements='str'),
-        resource_argument=dict(type='dict', options=dict(
-            argument_action=dict(type='str', choices=['clone', 'master', 'group', 'promotable']),
-            argument_option=dict(type='list', elements='str'),
-        )),
-        disabled=dict(type='bool', default=False),
-        wait=dict(type='int', default=300),
-    )
-
-    module = AnsibleModule(
-        argument_spec,
-        supports_check_mode=True,
-    )
-    state = module.params['state']
-    resource_name = module.params['name']
-    resource_type = module.params['resource_type']
-    resource_option = module.params['resource_option']
-    resource_operation = module.params['resource_operation']
-    resource_meta = module.params['resource_meta']
-    resource_argument = module.params['resource_argument']
-    disabled = module.params['disabled']
-    wait = module.params['wait']
-
-    if state in ['create']:
-        if module.check_mode:
-            module.exit_json(changed=True)
-        resource_missing, initial_cluster_resource_state = get_cluster_resource_status(
-            module, resource_name)
-        if resource_missing:
-            create_cluster_resource(module, resource_name, resource_type, resource_option,
-                                    resource_operation, resource_meta, resource_argument, disabled, wait)
-        else:
-            module.exit_json(changed=False, out=initial_cluster_resource_state)
-        resource_missing, final_cluster_resource_state = get_cluster_resource_status(
-            module, resource_name)
-        if not resource_missing:
-            module.exit_json(changed=True, out=final_cluster_resource_state)
-        else:
-            module.fail_json(
-                msg="Failed to create cluster resource: %s" % final_cluster_resource_state)
-
-    if state in ['delete']:
-        resource_removed, initial_cluster_resource_state = get_cluster_resource_status(
-            module, resource_name)
-        if not resource_removed:
-            if module.check_mode:
-                module.exit_json(changed=True)
-            delete_cluster_resource(module, resource_name)
-        else:
-            module.exit_json(changed=False, out=initial_cluster_resource_state)
-        resource_removed, final_cluster_resource_state = get_cluster_resource_status(
-            module, resource_name)
-        if not resource_removed:
-            module.fail_json(
-                msg="Failed to delete cluster resource: %s" % final_cluster_resource_state)
-        else:
-            module.exit_json(changed=True, out=final_cluster_resource_state)
+    PacemakerResource.execute()
 
 
 if __name__ == '__main__':
