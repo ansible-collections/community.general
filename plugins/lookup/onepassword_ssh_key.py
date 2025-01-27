@@ -58,11 +58,8 @@ from ansible.errors import AnsibleLookupError
 from ansible.plugins.lookup import LookupBase
 
 
-class OnePassCLIv2SSHKey(OnePassCLIv2):
-
-    def get_ssh_key(self, item_id, vault=None, token=None, ssh_format=False):
-        rc, out, err = self.get_raw(item_id, vault=vault, token=token)
-
+class LookupModule(LookupBase):
+    def get_ssh_key(self, out, item_id, ssh_format=False):
         data = json.loads(out)
 
         if data.get("category") != "SSH_KEY":
@@ -87,8 +84,6 @@ class OnePassCLIv2SSHKey(OnePassCLIv2):
             )
         return private_key_field.get("value", "")
 
-
-class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
         self.set_options(var_options=variables, direct=kwargs)
 
@@ -114,11 +109,11 @@ class LookupModule(LookupBase):
             account_id=account_id,
             connect_host=connect_host,
             connect_token=connect_token,
-            cli_class=OnePassCLIv2SSHKey,
+            cli_class=OnePassCLIv2,
         )
         op.assert_logged_in()
 
         return [
-            op._cli.get_ssh_key(term, vault, token=op.token, ssh_format=ssh_format)
+            self.get_ssh_key(op.get_raw(term, vault), term, ssh_format=ssh_format)
             for term in terms
         ]
