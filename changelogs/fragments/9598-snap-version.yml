@@ -1,3 +1,0 @@
-minor_changes:
-  - snap - add return value ``version`` (https://github.com/ansible-collections/community.general/pull/9598).
-  - snap_alias - add return value ``version`` (https://github.com/ansible-collections/community.general/pull/9598).
