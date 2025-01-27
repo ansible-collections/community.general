@@ -1,0 +1,160 @@
+# -*- coding: utf-8 -*-
+# Copyright (c) Dexter Le (dextersydney2001@gmail.com)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+- id: test_missing_input
+  input: {}
+  output:
+    failed: true
+    msg: "missing required arguments: name, state"
+- id: test_create_minimal_input_resource_not_exist
+  input:
+    state: create
+    name: virtual-ip
+    resource_type:
+      resource_name: IPaddr2
+    resource_option:
+      - "ip=[192.168.999.5]"
+  output:
+    out: []
+  mocks:
+    run_command:
+    - command: [pcs, resource, status, virtual-ip]
+      environ: {}
+      rc: 1
+      out: ""
+      err: ""
+    - command: [pcs, resource, create, virtual-ip, IPaddr2, "ip=[192.168.999.5]", "--wait=300"]
+      environ: {}
+      rc: 0
+      out: ""
+      err: ""
+    - command: [pcs, resource, status, virtual-ip]
+      environ: {}
+      rc: 0
+      out: ""
+      err: ""
+- id: test_create_minimal_input_resource_failed_creation
+  input:
+    state: create
+    name: virtual-ip
+    resource_type:
+      resource_name: IPaddr2
+    resource_option:
+      - "ip=[192.168.999.5]"
+  output:
+    out: [["Command execution failed.
+        Command: `['pcs', 'resource', 'create', 'virtual-ip', 'IPaddr2', 'ip=[192.168.999.5]', '--wait=300']`
+        Error: Assumed agent name 'ocf:heartbeat:IPaddr2' (deduced from 'IPaddr2')
+        Waiting for the cluster to apply configuration changes (timeout: 300 seconds)...
+        Error: resource 'virtual-ip2' is not running on any node
+        Error: Errors have occurred, therefore pcs is unable to continue"]]
+  mocks:
+    run_command:
+    - command: [pcs, resource, status, virtual-ip]
+      environ: {}
+      rc: 1
+      out: ""
+      err: ""
+    - command: [pcs, resource, create, virtual-ip, IPaddr2, "ip=[192.168.999.5]", "--wait=300"]
+      environ: {}
+      rc: 1
+      out: ""
+      err: "Assumed agent name 'ocf:heartbeat:IPaddr2' (deduced from 'IPaddr2')
+            Waiting for the cluster to apply configuration changes (timeout: 300 seconds)...
+            Error: resource 'virtual-ip' is not running on any node
+            Error: Errors have occurred, therefore pcs is unable to continue"
+- id: test_delete_minimal_input_resource_not_exist
+  input:
+    state: delete
+    name: virtual-ip
+  output:
+    out: []
+  mocks:
+    run_command:
+    - command: [pcs, resource, status, virtual-ip]
+      environ: {}
+      rc: 1
+      out: ""
+      err: ""
+- id: test_delete_minimal_input_resource_exist
+  input:
+    state: delete
+    name: virtual-ip
+  output:
+    out: []
+  mocks:
+    run_command:
+    - command: [pcs, resource, status, virtual-ip]
+      environ: {}
+      rc: 0
+      out: ""
+      err: ""
+    - command: [pcs, resource, delete, virtual-ip]
+      environ: {}
+      rc: 0
+      out: ""
+      err: ""
+    - command: [pcs, resource, status, virtual-ip]
+      environ: {}
+      rc: 0
+      out: ""
+      err: ""
+
+# - id: test_delete_minimal_input_resource_not_exist
+#   input:
+#     state: delete
+#     name: virtual-ip
+#   output:
+#     msg: "Error: resource or tag id 'virtual-ip' not found"
+#   mocks:
+#     run_command:
+#     - command: [pcs, resource, status, virtual-ip]
+#       environ: *env-def
+#       rc: 1
+#       out: "Error: resource or tag id 'virtual-ip' not found"
+#       err: ""
+# - id: test_delete_minimal_input_resource_exist
+#   input:
+#     state: delete
+#     name: virtual-ip
+#   output:
+#     msg: "Deleting Resource - virtual-ip"
+#   mocks:
+#     run_command:
+#     - command: [pcs, resource, create, virtual-ip, IPaddr2, "ip=[192.168.999.5]"]
+#       environ: *env-def
+#       rc: 0
+#       out: "Assumed agent name ocf:heartbeat:IPaddr2 (deduced from IPaddr2)"
+#       err: ""
+#     - command: [pcs, resource, status, virtual-ip]
+#       environ: *env-def
+#       rc: 0
+#       out: ""
+#       err: ""
+#     - command: [pcs, resource, delete, virtual-ip]
+#       environ: *env-def
+#       rc: 0
+#       out: "Deleting Resource - virtual-ip"
+#       err: ""
+# - id: test_invalid_create_input
+#   input:
+#     state: create
+#     name: virtual-ip
+#   output:
+#     msg: "Usage: pcs resource create..."
+#   mocks:
+#     run_command:
+#     - command: [pcs, resource, status, virtual-ip]
+#       environ: *env-def
+#       rc: 0
+#       out: ""
+#       err: ""
+#     - comamnd: [pcs, resource, create, virtual-ip]
+#       environ: *env-def
+#       rc: 1
+#       out: ""
+#       err: "Usage: pcs resource create..."
+# 

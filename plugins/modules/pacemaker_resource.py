@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2016, Dexter Le <dextersydney2001@gmail.com>
+# Copyright (c) 2025, Dexter Le <dextersydney2001@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -140,7 +140,7 @@ RETURN = '''
 cluster_resources:
     description: The cluster resource output message.
     type: str
-    sample: '"Assumed agent name ocf:heartbeat:IPaddr2 (deduced from IPaddr2)"'
+    sample: "Assumed agent name ocf:heartbeat:IPaddr2 (deduced from IPaddr2)"
     returned: always
 '''
 
@@ -150,9 +150,7 @@ from ansible.module_utils.basic import AnsibleModule
 def get_cluster_resource_status(module, name):
     cmd = ["pcs", "resource", "status", name]
     rc, out, err = module.run_command(cmd)
-    status = []
-    for o in out.splitlines():
-        status.append(o.split(':'))
+    status = [o.split(':') for o in out.splitlines()]
     return rc, status
 
 
@@ -162,9 +160,7 @@ def delete_cluster_resource(module, name):
     if rc == 1:
         module.fail_json(
             msg="Command execution failed.\nCommand: `%s`\nError: %s" % (cmd, err))
-    status = []
-    for o in out.splitlines():
-        status.append(o.split(':'))
+    status = [o.split(':') for o in out.splitlines()]
     return status
 
 
@@ -214,9 +210,7 @@ def create_cluster_resource(module, resource_name,
     if rc == 1:
         module.fail_json(
             msg="Command execution failed.\nCommand: `%s`\nError: %s" % (cmd, err))
-    status = []
-    for o in out.splitlines():
-        status.append(o.split(':'))
+    status = [o.split(':') for o in out.splitlines()]
     return status
 
 
