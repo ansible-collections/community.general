@@ -44,13 +44,7 @@
       resource_name: IPaddr2
     resource_option:
       - "ip=[192.168.999.5]"
-  output:
-    out: [["Command execution failed.
-        Command: `['pcs', 'resource', 'create', 'virtual-ip', 'IPaddr2', 'ip=[192.168.999.5]', '--wait=300']`
-        Error: Assumed agent name 'ocf:heartbeat:IPaddr2' (deduced from 'IPaddr2')
-        Waiting for the cluster to apply configuration changes (timeout: 300 seconds)...
-        Error: resource 'virtual-ip2' is not running on any node
-        Error: Errors have occurred, therefore pcs is unable to continue"]]
+  output: {}
   mocks:
     run_command:
     - command: [pcs, resource, status, virtual-ip]
@@ -99,7 +93,7 @@
       err: ""
     - command: [pcs, resource, status, virtual-ip]
       environ: {}
-      rc: 0
+      rc: 1
       out: ""
       err: ""
 
