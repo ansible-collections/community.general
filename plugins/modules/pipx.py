@@ -382,12 +382,12 @@ class PipX(StateModuleHelper):
     def state_latest(self):
         if not self.vars.application or self.vars.force:
             self.changed = True
-            args_order = 'state index_url install_deps force python system_site_packages editable pip_args suffix name_source'
+            args_order = 'state global index_url install_deps force python system_site_packages editable pip_args suffix name_source'
             with self.runner(args_order, check_mode_skip=True) as ctx:
                 ctx.run(state='install', name_source=[self.vars.name, self.vars.source])
                 self._capture_results(ctx)
 
-        with self.runner('state include_injected index_url force editable pip_args name', check_mode_skip=True) as ctx:
+        with self.runner('state global include_injected index_url force editable pip_args name', check_mode_skip=True) as ctx:
             ctx.run(state='upgrade')
             self._capture_results(ctx)
 

@@ -267,3 +267,6 @@
 
     - name: Include testcase for PR 9103 upgrade --global
       ansible.builtin.include_tasks: testcase-9103-upgrade-global.yml
+
+    - name: Include testcase for issue 9619 latest --global
+      ansible.builtin.include_tasks: testcase-9619-latest-global.yml
