@@ -6,6 +6,19 @@ Community General Release Notes
 
 This changelog describes changes after version 7.0.0.
 
+v8.6.10
+=======
+
+Release Summary
+---------------
+
+Maintenance release with a security fix.
+
+Security Fixes
+--------------
+
+- keycloak_client - Sanitize ``saml.encryption.private.key`` so it does not show in the logs (https://github.com/ansible-collections/community.general/pull/9621).
+
 v8.6.9
 ======
 

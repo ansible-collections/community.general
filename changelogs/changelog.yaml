@@ -1685,3 +1685,13 @@ releases:
       - 8.6.9.yml
       - 9263-kc_authentication-api-priority.yaml
     release_date: '2024-12-31'
+  8.6.10:
+    changes:
+      release_summary: Maintenance release with a security fix.
+      security_fixes:
+        - keycloak_client - Sanitize ``saml.encryption.private.key`` so it does not
+          show in the logs (https://github.com/ansible-collections/community.general/pull/9621).
+    fragments:
+      - 8.6.10.yml
+      - 9621-keycloak_client-sanitize-saml-encryption-key.yml
+    release_date: '2025-01-27'
