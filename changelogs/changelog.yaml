@@ -1541,3 +1541,25 @@ releases:
       - 9363-dig-nonameservers.yml
       - 9490-htpasswd-permissions.yml
     release_date: '2024-12-31'
+  9.5.4:
+    changes:
+      bugfixes:
+        - 'redhat_subscription - do not try to unsubscribe (i.e. remove subscriptions)
+
+          when unregistering a system: newer versions of subscription-manager, as
+
+          available in EL 10 and Fedora 41+, do not support entitlements anymore,
+          and
+
+          thus unsubscribing will fail
+
+          (https://github.com/ansible-collections/community.general/pull/9578).
+
+          '
+      security_fixes:
+        - keycloak_client - Sanitize ``saml.encryption.private.key`` so it does not
+          show in the logs (https://github.com/ansible-collections/community.general/pull/9621).
+    fragments:
+      - 9578-redhat_subscription-no-remove-on-unregister.yml
+      - 9621-keycloak_client-sanitize-saml-encryption-key.yml
+    release_date: '2025-01-27'

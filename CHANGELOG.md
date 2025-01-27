@@ -2,40 +2,43 @@
 
 **Topics**
 
+- <a href="#v9-5-4">v9\.5\.4</a>
+    - <a href="#security-fixes">Security Fixes</a>
+    - <a href="#bugfixes">Bugfixes</a>
 - <a href="#v9-5-3">v9\.5\.3</a>
     - <a href="#release-summary">Release Summary</a>
     - <a href="#minor-changes">Minor Changes</a>
-    - <a href="#security-fixes">Security Fixes</a>
-    - <a href="#bugfixes">Bugfixes</a>
+    - <a href="#security-fixes-1">Security Fixes</a>
+    - <a href="#bugfixes-1">Bugfixes</a>
 - <a href="#v9-5-2">v9\.5\.2</a>
     - <a href="#release-summary-1">Release Summary</a>
     - <a href="#minor-changes-1">Minor Changes</a>
-    - <a href="#bugfixes-1">Bugfixes</a>
+    - <a href="#bugfixes-2">Bugfixes</a>
 - <a href="#v9-5-1">v9\.5\.1</a>
     - <a href="#release-summary-2">Release Summary</a>
     - <a href="#minor-changes-2">Minor Changes</a>
-    - <a href="#bugfixes-2">Bugfixes</a>
+    - <a href="#bugfixes-3">Bugfixes</a>
 - <a href="#v9-5-0">v9\.5\.0</a>
     - <a href="#release-summary-3">Release Summary</a>
     - <a href="#minor-changes-3">Minor Changes</a>
     - <a href="#deprecated-features">Deprecated Features</a>
-    - <a href="#bugfixes-3">Bugfixes</a>
+    - <a href="#bugfixes-4">Bugfixes</a>
     - <a href="#new-modules">New Modules</a>
 - <a href="#v9-4-0">v9\.4\.0</a>
     - <a href="#release-summary-4">Release Summary</a>
     - <a href="#minor-changes-4">Minor Changes</a>
     - <a href="#deprecated-features-1">Deprecated Features</a>
-    - <a href="#bugfixes-4">Bugfixes</a>
+    - <a href="#bugfixes-5">Bugfixes</a>
     - <a href="#new-modules-1">New Modules</a>
 - <a href="#v9-3-0">v9\.3\.0</a>
     - <a href="#release-summary-5">Release Summary</a>
     - <a href="#minor-changes-5">Minor Changes</a>
-    - <a href="#bugfixes-5">Bugfixes</a>
+    - <a href="#bugfixes-6">Bugfixes</a>
     - <a href="#new-modules-2">New Modules</a>
 - <a href="#v9-2-0">v9\.2\.0</a>
     - <a href="#release-summary-6">Release Summary</a>
     - <a href="#minor-changes-6">Minor Changes</a>
-    - <a href="#bugfixes-6">Bugfixes</a>
+    - <a href="#bugfixes-7">Bugfixes</a>
     - <a href="#new-plugins">New Plugins</a>
         - <a href="#filter">Filter</a>
         - <a href="#test">Test</a>
@@ -43,7 +46,7 @@
     - <a href="#release-summary-7">Release Summary</a>
     - <a href="#minor-changes-7">Minor Changes</a>
     - <a href="#deprecated-features-2">Deprecated Features</a>
-    - <a href="#bugfixes-7">Bugfixes</a>
+    - <a href="#bugfixes-8">Bugfixes</a>
     - <a href="#known-issues">Known Issues</a>
     - <a href="#new-plugins-1">New Plugins</a>
         - <a href="#filter-1">Filter</a>
@@ -51,15 +54,15 @@
 - <a href="#v9-0-1">v9\.0\.1</a>
     - <a href="#release-summary-8">Release Summary</a>
     - <a href="#minor-changes-8">Minor Changes</a>
-    - <a href="#bugfixes-8">Bugfixes</a>
+    - <a href="#bugfixes-9">Bugfixes</a>
 - <a href="#v9-0-0">v9\.0\.0</a>
     - <a href="#release-summary-9">Release Summary</a>
     - <a href="#minor-changes-9">Minor Changes</a>
     - <a href="#breaking-changes--porting-guide">Breaking Changes / Porting Guide</a>
     - <a href="#deprecated-features-3">Deprecated Features</a>
     - <a href="#removed-features-previously-deprecated">Removed Features \(previously deprecated\)</a>
-    - <a href="#security-fixes-1">Security Fixes</a>
-    - <a href="#bugfixes-9">Bugfixes</a>
+    - <a href="#security-fixes-2">Security Fixes</a>
+    - <a href="#bugfixes-10">Bugfixes</a>
     - <a href="#new-plugins-2">New Plugins</a>
         - <a href="#become">Become</a>
         - <a href="#callback">Callback</a>
@@ -69,6 +72,23 @@
         - <a href="#test-1">Test</a>
     - <a href="#new-modules-4">New Modules</a>
 This changelog describes changes after version 8\.0\.0\.
+
+<a id="v9-5-4"></a>
+## v9\.5\.4
+
+<a id="security-fixes"></a>
+### Security Fixes
+
+* keycloak\_client \- Sanitize <code>saml\.encryption\.private\.key</code> so it does not show in the logs \([https\://github\.com/ansible\-collections/community\.general/pull/9621](https\://github\.com/ansible\-collections/community\.general/pull/9621)\)\.
+
+<a id="bugfixes"></a>
+### Bugfixes
+
+* redhat\_subscription \- do not try to unsubscribe \(i\.e\. remove subscriptions\)
+  when unregistering a system\: newer versions of subscription\-manager\, as
+  available in EL 10 and Fedora 41\+\, do not support entitlements anymore\, and
+  thus unsubscribing will fail
+  \([https\://github\.com/ansible\-collections/community\.general/pull/9578](https\://github\.com/ansible\-collections/community\.general/pull/9578)\)\.
 
 <a id="v9-5-3"></a>
 ## v9\.5\.3
@@ -83,12 +103,12 @@ Regular bugfix release\.
 
 * proxmox module utils \- add method <code>api\_task\_complete</code> that can wait for task completion and return error message \([https\://github\.com/ansible\-collections/community\.general/pull/9256](https\://github\.com/ansible\-collections/community\.general/pull/9256)\)\.
 
-<a id="security-fixes"></a>
+<a id="security-fixes-1"></a>
 ### Security Fixes
 
 * keycloak\_authentication \- API calls did not properly set the <code>priority</code> during update resulting in incorrectly sorted authentication flows\. This apparently only affects Keycloak 25 or newer \([https\://github\.com/ansible\-collections/community\.general/pull/9263](https\://github\.com/ansible\-collections/community\.general/pull/9263)\)\.
 
-<a id="bugfixes"></a>
+<a id="bugfixes-1"></a>
 ### Bugfixes
 
 * dig lookup plugin \- correctly handle <code>NoNameserver</code> exception \([https\://github\.com/ansible\-collections/community\.general/pull/9363](https\://github\.com/ansible\-collections/community\.general/pull/9363)\, [https\://github\.com/ansible\-collections/community\.general/issues/9362](https\://github\.com/ansible\-collections/community\.general/issues/9362)\)\.
@@ -111,7 +131,7 @@ Regular bugfix release\.
 
 * proxmox inventory plugin \- fix urllib3 <code>InsecureRequestWarnings</code> not being suppressed when a token is used \([https\://github\.com/ansible\-collections/community\.general/pull/9099](https\://github\.com/ansible\-collections/community\.general/pull/9099)\)\.
 
-<a id="bugfixes-1"></a>
+<a id="bugfixes-2"></a>
 ### Bugfixes
 
 * dnf\_config\_manager \- fix hanging when prompting to import GPG keys \([https\://github\.com/ansible\-collections/community\.general/pull/9124](https\://github\.com/ansible\-collections/community\.general/pull/9124)\, [https\://github\.com/ansible\-collections/community\.general/issues/8830](https\://github\.com/ansible\-collections/community\.general/issues/8830)\)\.
@@ -138,7 +158,7 @@ Regular bugfix release\.
 
 * redfish\_utils module utils \- schedule a BIOS configuration job at next reboot when the BIOS config is changed \([https\://github\.com/ansible\-collections/community\.general/pull/9012](https\://github\.com/ansible\-collections/community\.general/pull/9012)\)\.
 
-<a id="bugfixes-2"></a>
+<a id="bugfixes-3"></a>
 ### Bugfixes
 
 * bitwarden lookup plugin \- support BWS v0\.3\.0 syntax breaking change \([https\://github\.com/ansible\-collections/community\.general/pull/9028](https\://github\.com/ansible\-collections/community\.general/pull/9028)\)\.
@@ -221,7 +241,7 @@ From now on\, new features will only go into community\.general 10\.x\.y\.
 
 * hipchat \- the hipchat service has been discontinued and the self\-hosted variant has been End of Life since 2020\. The module is therefore deprecated and will be removed from community\.general 11\.0\.0 if nobody provides compelling reasons to still keep it \([https\://github\.com/ansible\-collections/community\.general/pull/8919](https\://github\.com/ansible\-collections/community\.general/pull/8919)\)\.
 
-<a id="bugfixes-3"></a>
+<a id="bugfixes-4"></a>
 ### Bugfixes
 
 * cloudflare\_dns \- fix changing Cloudflare SRV records \([https\://github\.com/ansible\-collections/community\.general/issues/8679](https\://github\.com/ansible\-collections/community\.general/issues/8679)\, [https\://github\.com/ansible\-collections/community\.general/pull/8948](https\://github\.com/ansible\-collections/community\.general/pull/8948)\)\.
@@ -347,7 +367,7 @@ Bugfix and feature release\.
 * pipx \- support for versions of the command line tool <code>pipx</code> older than <code>1\.7\.0</code> is deprecated and will be removed in community\.general 11\.0\.0 \([https\://github\.com/ansible\-collections/community\.general/pull/8793](https\://github\.com/ansible\-collections/community\.general/pull/8793)\)\.
 * pipx\_info \- support for versions of the command line tool <code>pipx</code> older than <code>1\.7\.0</code> is deprecated and will be removed in community\.general 11\.0\.0 \([https\://github\.com/ansible\-collections/community\.general/pull/8793](https\://github\.com/ansible\-collections/community\.general/pull/8793)\)\.
 
-<a id="bugfixes-4"></a>
+<a id="bugfixes-5"></a>
 ### Bugfixes
 
 * gitlab\_group\_access\_token \- fix crash in check mode caused by attempted access to a newly created access token \([https\://github\.com/ansible\-collections/community\.general/pull/8796](https\://github\.com/ansible\-collections/community\.general/pull/8796)\)\.
@@ -397,7 +417,7 @@ Regular bugfix and feature release\.
 * proxmox inventory plugin \- add new fact for LXC interface details \([https\://github\.com/ansible\-collections/community\.general/pull/8713](https\://github\.com/ansible\-collections/community\.general/pull/8713)\)\.
 * redis\, redis\_info \- add <code>client\_cert</code> and <code>client\_key</code> options to specify path to certificate for Redis authentication  \([https\://github\.com/ansible\-collections/community\.general/pull/8654](https\://github\.com/ansible\-collections/community\.general/pull/8654)\)\.
 
-<a id="bugfixes-5"></a>
+<a id="bugfixes-6"></a>
 ### Bugfixes
 
 * gitlab\_runner \- fix <code>paused</code> parameter being ignored \([https\://github\.com/ansible\-collections/community\.general/pull/8648](https\://github\.com/ansible\-collections/community\.general/pull/8648)\)\.
@@ -435,7 +455,7 @@ Regular bugfix and feature release\.
 * virtualbox inventory plugin \- expose a new parameter <code>enable\_advanced\_group\_parsing</code> to change how the VirtualBox dynamic inventory parses VM groups \([https\://github\.com/ansible\-collections/community\.general/issues/8508](https\://github\.com/ansible\-collections/community\.general/issues/8508)\, [https\://github\.com/ansible\-collections/community\.general/pull/8510](https\://github\.com/ansible\-collections/community\.general/pull/8510)\)\.
 * wdc\_redfish\_command \- minor change to handle upgrade file for Redfish WD platforms \([https\://github\.com/ansible\-collections/community\.general/pull/8444](https\://github\.com/ansible\-collections/community\.general/pull/8444)\)\.
 
-<a id="bugfixes-6"></a>
+<a id="bugfixes-7"></a>
 ### Bugfixes
 
 * bitwarden lookup plugin \- fix <code>KeyError</code> in <code>search\_field</code> \([https\://github\.com/ansible\-collections/community\.general/issues/8549](https\://github\.com/ansible\-collections/community\.general/issues/8549)\, [https\://github\.com/ansible\-collections/community\.general/pull/8557](https\://github\.com/ansible\-collections/community\.general/pull/8557)\)\.
@@ -489,7 +509,7 @@ Regular feature and bugfix release\.
 * git\_config \- the <code>list\_all</code> option has been deprecated and will be removed in community\.general 11\.0\.0\. Use the <code>community\.general\.git\_config\_info</code> module instead \([https\://github\.com/ansible\-collections/community\.general/pull/8453](https\://github\.com/ansible\-collections/community\.general/pull/8453)\)\.
 * git\_config \- using <code>state\=present</code> without providing <code>value</code> is deprecated and will be disallowed in community\.general 11\.0\.0\. Use the <code>community\.general\.git\_config\_info</code> module instead to read a value \([https\://github\.com/ansible\-collections/community\.general/pull/8453](https\://github\.com/ansible\-collections/community\.general/pull/8453)\)\.
 
-<a id="bugfixes-7"></a>
+<a id="bugfixes-8"></a>
 ### Bugfixes
 
 * git\_config \- fix behavior of <code>state\=absent</code> if <code>value</code> is present \([https\://github\.com/ansible\-collections/community\.general/issues/8436](https\://github\.com/ansible\-collections/community\.general/issues/8436)\, [https\://github\.com/ansible\-collections/community\.general/pull/8452](https\://github\.com/ansible\-collections/community\.general/pull/8452)\)\.
@@ -537,7 +557,7 @@ Bugfix release for inclusion in Ansible 10\.0\.0rc1\.
 
 * ansible\_galaxy\_install \- minor refactor in the module \([https\://github\.com/ansible\-collections/community\.general/pull/8413](https\://github\.com/ansible\-collections/community\.general/pull/8413)\)\.
 
-<a id="bugfixes-8"></a>
+<a id="bugfixes-9"></a>
 ### Bugfixes
 
 * cpanm \- use new <code>VarDict</code> to prevent deprecation warning \([https\://github\.com/ansible\-collections/community\.general/issues/8410](https\://github\.com/ansible\-collections/community\.general/issues/8410)\, [https\://github\.com/ansible\-collections/community\.general/pull/8411](https\://github\.com/ansible\-collections/community\.general/pull/8411)\)\.
@@ -725,13 +745,13 @@ This is release 9\.0\.0 of <code>community\.general</code>\, released on 2024\-0
 * stackdriver \- this module relied on HTTPS APIs that do not exist anymore and was thus removed \([https\://github\.com/ansible\-collections/community\.general/pull/8198](https\://github\.com/ansible\-collections/community\.general/pull/8198)\)\.
 * webfaction\_\* modules \- these modules relied on HTTPS APIs that do not exist anymore and were thus removed \([https\://github\.com/ansible\-collections/community\.general/pull/8198](https\://github\.com/ansible\-collections/community\.general/pull/8198)\)\.
 
-<a id="security-fixes-1"></a>
+<a id="security-fixes-2"></a>
 ### Security Fixes
 
 * cobbler\, gitlab\_runners\, icinga2\, linode\, lxd\, nmap\, online\, opennebula\, proxmox\, scaleway\, stackpath\_compute\, virtualbox\, and xen\_orchestra inventory plugin \- make sure all data received from the remote servers is marked as unsafe\, so remote code execution by obtaining texts that can be evaluated as templates is not possible \([https\://www\.die\-welt\.net/2024/03/remote\-code\-execution\-in\-ansible\-dynamic\-inventory\-plugins/](https\://www\.die\-welt\.net/2024/03/remote\-code\-execution\-in\-ansible\-dynamic\-inventory\-plugins/)\, [https\://github\.com/ansible\-collections/community\.general/pull/8098](https\://github\.com/ansible\-collections/community\.general/pull/8098)\)\.
 * keycloak\_identity\_provider \- the client secret was not correctly sanitized by the module\. The return values <code>proposed</code>\, <code>existing</code>\, and <code>end\_state</code>\, as well as the diff\, did contain the client secret unmasked \([https\://github\.com/ansible\-collections/community\.general/pull/8355](https\://github\.com/ansible\-collections/community\.general/pull/8355)\)\.
 
-<a id="bugfixes-9"></a>
+<a id="bugfixes-10"></a>
 ### Bugfixes
 
 * aix\_filesystem \- fix <code>\_validate\_vg</code> not passing VG name to <code>lsvg\_cmd</code> \([https\://github\.com/ansible\-collections/community\.general/issues/8151](https\://github\.com/ansible\-collections/community\.general/issues/8151)\)\.

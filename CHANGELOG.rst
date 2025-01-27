@@ -6,6 +6,23 @@ Community General Release Notes
 
 This changelog describes changes after version 8.0.0.
 
+v9.5.4
+======
+
+Security Fixes
+--------------
+
+- keycloak_client - Sanitize ``saml.encryption.private.key`` so it does not show in the logs (https://github.com/ansible-collections/community.general/pull/9621).
+
+Bugfixes
+--------
+
+- redhat_subscription - do not try to unsubscribe (i.e. remove subscriptions)
+  when unregistering a system: newer versions of subscription-manager, as
+  available in EL 10 and Fedora 41+, do not support entitlements anymore, and
+  thus unsubscribing will fail
+  (https://github.com/ansible-collections/community.general/pull/9578).
+
 v9.5.3
 ======
 
