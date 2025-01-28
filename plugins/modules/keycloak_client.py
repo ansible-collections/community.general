@@ -761,6 +761,10 @@ def normalise_cr(clientrep, remove_ids=False):
             # Set to a default value.
             mapper['consentRequired'] = mapper.get('consentRequired', False)
 
+    if 'attributes' in clientrep:
+        for key, value in clientrep['attributes'].items():
+            if isinstance(value, bool):
+                clientrep['attributes'][key] = 'true' if value else 'false'
     return clientrep
 
 
@@ -1027,7 +1031,6 @@ def main():
                     result['diff'] = dict(before=sanitize_cr(before_norm),
                                           after=sanitize_cr(desired_norm))
                 result['changed'] = not is_struct_included(desired_norm, before_norm, CLIENT_META_DATA)
-
                 module.exit_json(**result)
 
             # do the update
