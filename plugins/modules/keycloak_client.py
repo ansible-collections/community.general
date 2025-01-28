@@ -1037,6 +1037,7 @@ def main():
                     result['diff'] = dict(before=sanitize_cr(before_norm),
                                           after=sanitize_cr(desired_norm))
                 result['changed'] = not is_struct_included(desired_norm, before_norm, CLIENT_META_DATA)
+
                 module.exit_json(**result)
 
             # do the update
