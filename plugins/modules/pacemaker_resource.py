@@ -14,7 +14,7 @@ module: pacemaker_resource
 short_description: Manage pacemaker resources
 author:
   - Dexter Le (@munchtoast)
-version_added: 10.3.0
+version_added: 10.4.0
 description:
   - This module can manage resources to a pacemaker cluster from Ansible using
     the pacemaker cli.
@@ -173,79 +173,45 @@ class PacemakerResource(StateModuleHelper):
             wait=dict(type='int', default=300),
         ),
         required_if=[('state', 'present', ['resource_type', 'resource_option'])],
-        required_together=[('state', 'present', ['resource_type', 'resource_option'])],
         supports_check_mode=True
     )
     use_old_vardict = False
     default_state = "present"
 
-    def process_command_output(self, rc, out, err):
-        if err.rstrip() == self.does_not:
-            return None
-        if rc or len(err):
-            self.do_raise(
-                'pcs failed with error (rc={0}): {1}'.format(rc, err))
-
-        result = out.rstrip()
-        if "Value is an array with" in result:
-            result = result.split("\n")
-            result.pop(0)
-            result.pop(0)
-
-        return result
-
-    # Builds list with command to run
-    def _build_resource_operation(self):
-        cmd = []
-        for op in self.vars.resource_operation:
-            cmd.append("op")
-            cmd.append(op.get('operation_action'))
-            for operation_option in op.get('operation_option'):
-                cmd.append(operation_option)
-
-        return cmd
-
-    def _build_resource_meta(self):
-        return ["meta {0}".format(m) for m in self.vars.resource_meta]
-
-    def _build_resource_argument(self):
-        cmd = []
-        if self.vars.resource_argument.get('argument_action') == 'group':
-            cmd.append('--group')
-        else:
-            cmd.append(self.vars.resource_argument.get('argument_action'))
-        return cmd + list(self.vars.resource_argument.get('argument_option'))
-
     def __init_module__(self):
         self.runner = pacemaker_runner(self.module)
-        self.does_not = 'Pacemaker resource "{0}" does not exist or cannot be created'.format(
+        self.does_not = "Error: resource or tag id '{0}' not found".format(
             self.vars.name)
-        self.vars.set('previous_status', self._get())
-        self.vars.set_meta('status', initial_value=self.vars.previous_status)
+        self.error_messages = ["Error: '{0}' already exists".format(self.vars.name), "Error: Resource '{0} does not exist".format(self.vars.name)]
+        self.vars.set('previous_value', self._get())
+        self.vars.set('_value', self.vars.previous_value, output=False, change=True)
+        self.vars.set_meta('value', initial_value=self.vars.previous_value)
+
+    def _process_command_output(self, fail_on_err, ignore_err_msg=""):
+        def process(rc, out, err):
+          if fail_on_err and rc != 0 and err and ignore_err_msg not in err:
+              self.do_raise(
+                'pcs failed with error (rc={0}): {1}'.format(rc, err))
+          out = out.rstrip()
+          self.vars.value = None if out == "" else out
+          return self.vars.value
+        return process
 
     def _get(self):
-        with self.runner('state name', output_process=self.process_command_output) as ctx:
-            return ctx.run(state='status', name=self.vars.name)
+        return self.runner('state name', output_process=self._process_command_output(False)).run(state='status')
 
     def state_absent(self):
-        with self.runner('state name', check_mode_skip=True) as ctx:
-            ctx.run(state=self.vars.state, name=self.vars.name)
+        with self.runner('state name', output_process=self._process_command_output(True, "does not exist"), check_mode_skip=True) as ctx:
+            ctx.run()
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err
             self.vars.cmd = ctx.cmd
-        self.vars.value = None
+        self.vars.set('new_value', None, fact=True)
+        self.vars._value = None
 
     def state_present(self):
-        # Build out our command lists here
-        self.vars.set('resource_type', self.vars.resource_type.get('resource_standard') +
-                      self.vars.resource_type.get('provider') + self.vars.resource_type.get('resource_name'))
-        self.vars.set('resource_option', self.vars.resource_option)
-        self.vars.set('resource_operation', self._build_resource_operation)
-        self.vars.set('resource_meta', self._build_resource_meta)
-        self.vars.set('resource_argument', self._build_resource_argument)
-
         with self.runner(
-                'state name resource_type resource_option resource_operation resource_meta resource_argument disabled wait',
+                'state name resource_type resource_option resource_operation resource_meta resource_argument disabled wait', output_process=self._process_command_output(True, "already exists"),
                 check_mode_skip=True) as ctx:
             ctx.run(
                 state=self.vars.state,
@@ -254,9 +220,14 @@ class PacemakerResource(StateModuleHelper):
                 resource_option=self.vars.resource_option,
                 resource_operation=self.vars.resource_operation,
                 resource_meta=self.vars.resource_meta,
-                resource_argument=self.resource_argument,
+                resource_argument=self.vars.resource_argument,
                 disabled=self.vars.disabled,
                 wait=self.vars.wait)
+        self.vars.stdout = ctx.results_out
+        self.vars.stderr = ctx.results_err
+        self.vars.cmd = ctx.cmd
+        self.vars.set('new_value', self._get(), fact=True)
+        self.vars._value = self.vars.new_value
 
 
 def main():
