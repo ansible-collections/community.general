@@ -758,6 +758,12 @@ def normalise_cr(clientrep, remove_ids=False):
             if remove_ids:
                 mapper.pop('id', None)
 
+            # Convert bool to string
+            if 'config' in mapper:
+                for key, value in mapper['config'].items():
+                    if isinstance(value, bool):
+                        mapper['config'][key] = 'true' if value else 'false'
+
             # Set to a default value.
             mapper['consentRequired'] = mapper.get('consentRequired', False)
 
