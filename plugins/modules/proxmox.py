@@ -1065,6 +1065,15 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
         if "netif" in kwargs:
             kwargs.update(kwargs.pop("netif"))
 
+        if "pubkey" in kwargs:
+            pubkey = kwargs.pop("pubkey")
+            if self.version() >= LooseVersion("4.2"):
+                kwargs["ssh-public-keys"] = pubkey
+            else:
+                self.module.warn(
+                    "'pubkey' is not supported for PVE 4.1 and below. Ignoring keyword."
+                )
+
         # fetch current config
         proxmox_node = self.proxmox_api.nodes(node)
         current_config = getattr(proxmox_node, self.VZ_TYPE)(vmid).config.get()
@@ -1215,7 +1224,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
         if "pubkey" in kwargs:
             pubkey = kwargs.pop("pubkey")
             if self.version() >= LooseVersion("4.2"):
-                kwargs["ssh-public-key"] = pubkey
+                kwargs["ssh-public-keys"] = pubkey
             else:
                 self.module.warn(
                     "'pubkey' is not supported for PVE 4.1 and below. Ignoring keyword."
