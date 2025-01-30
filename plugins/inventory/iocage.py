@@ -71,6 +71,15 @@ DOCUMENTATION = '''
               - Enable O(sudo_preserve_env) if O(sudo) is enabled.
             type: dict
             default: {}
+        hooks:
+            description:
+              - List of paths to the hook files in a jail.
+              - Content of the hook files is stored in the items of the list C(iocage_hooks).
+              - If a hook file is not available the item keeps the dash character C(-).
+              - The variable C(iocage_hooks) is not created if O(hooks) is empty.
+            type: list
+            elements: path
+            version_added: 10.3.0
     notes:
       - You might want to test the command C(ssh user@host iocage list -l) on
         the controller before using this inventory plugin with O(user) specified
@@ -142,6 +151,18 @@ keyed_groups:
     key: iocage_release
   - prefix: state
     key: iocage_state
+
+---
+# Read the file /var/db/dhclient-hook.address.epair0b in the jails and use it as ansible_host
+plugin: community.general.iocage
+host: 10.1.0.73
+user: admin
+hooks:
+  - /var/db/dhclient-hook.address.epair0b
+compose:
+  ansible_host: iocage_hooks.0
+groups:
+  test: inventory_hostname.startswith('test')
 '''
 
 import re
@@ -226,6 +247,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         sudo_preserve_env = self.get_option('sudo_preserve_env')
         env = self.get_option('env')
         get_properties = self.get_option('get_properties')
+        hooks = self.get_option('hooks')
 
         cmd = []
         my_env = os.environ.copy()
@@ -285,6 +307,50 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     raise AnsibleError(f'Failed to get properties: {e}') from e
 
                 self.get_properties(t_stdout, results, hostname)
+
+        if hooks:
+            cmd_get_pool = cmd.copy()
+            cmd_get_pool.append(self.IOCAGE)
+            cmd_get_pool.append('get')
+            cmd_get_pool.append('--pool')
+            try:
+                p = Popen(cmd_get_pool, stdout=PIPE, stderr=PIPE, env=my_env)
+                stdout, stderr = p.communicate()
+                if p.returncode != 0:
+                    raise AnsibleError(
+                        f'Failed to run cmd={cmd_get_pool}, rc={p.returncode}, stderr={to_native(stderr)}')
+                try:
+                    iocage_pool = to_text(stdout, errors='surrogate_or_strict').strip()
+                except UnicodeError as e:
+                    raise AnsibleError(f'Invalid (non unicode) input returned: {e}') from e
+            except Exception as e:
+                raise AnsibleError(f'Failed to get pool: {e}') from e
+
+            for hostname, host_vars in results['_meta']['hostvars'].items():
+                iocage_hooks = []
+                for hook in hooks:
+                    path = "/" + iocage_pool + "/iocage/jails/" + hostname + "/root" + hook
+                    cmd_cat_hook = cmd.copy()
+                    cmd_cat_hook.append('cat')
+                    cmd_cat_hook.append(path)
+                    try:
+                        p = Popen(cmd_cat_hook, stdout=PIPE, stderr=PIPE, env=my_env)
+                        stdout, stderr = p.communicate()
+                        if p.returncode != 0:
+                            iocage_hooks.append('-')
+                            continue
+
+                        try:
+                            iocage_hook = to_text(stdout, errors='surrogate_or_strict').strip()
+                        except UnicodeError as e:
+                            raise AnsibleError(f'Invalid (non unicode) input returned: {e}') from e
+
+                    except Exception:
+                        iocage_hooks.append('-')
+                    else:
+                        iocage_hooks.append(iocage_hook)
+
+                results['_meta']['hostvars'][hostname]['iocage_hooks'] = iocage_hooks
 
         return results
 
