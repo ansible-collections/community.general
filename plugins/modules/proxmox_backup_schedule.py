@@ -42,7 +42,7 @@ options:
         - If V(update_vmid), the module will update backup job with new VM ID.
         - If V(delete_vmid), the module will remove the VM ID from all backup jobs where the VM ID has existed.
     required: true
-    choices: [update_vmid, delete_vmid]
+    choices: ["update_vmid", "delete_vmid"]
     type: str
 
 extends_documentation_fragment:
@@ -180,7 +180,7 @@ def main():
         vm_name=dict(type='str'),
         vm_id=dict(type='str'),
         backup_id=dict(type='str'),
-        backup_action=dict(type='str', required=True)
+        backup_action=dict(choices=['update_vmid', 'delete_vmid'], required=True)
     )
     args.update(backup_schedule_args)
 
