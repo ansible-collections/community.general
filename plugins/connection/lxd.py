@@ -52,6 +52,7 @@ options:
       - User to login/authenticate as.
       - Can be set from the CLI via the C(--user) or C(-u) options.
     type: string
+    default: root
     vars:
       - name: ansible_user
       - name: ansible_ssh_user
