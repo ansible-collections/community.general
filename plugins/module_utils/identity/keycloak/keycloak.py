@@ -1953,7 +1953,7 @@ class KeycloakAPI(object):
             newSubFlow["provider"] = "registration-page-form"
             newSubFlow["type"] = "basic-flow"
             newSubFlow["description"] = ""
-            open_url(
+            return open_url(
                 URL_AUTHENTICATION_FLOW_EXECUTIONS_FLOW.format(
                     url=self.baseurl,
                     realm=realm,
@@ -1977,7 +1977,7 @@ class KeycloakAPI(object):
             newExec = {}
             newExec["provider"] = execution["providerId"]
             newExec["requirement"] = execution["requirement"]
-            open_url(
+            return open_url(
                 URL_AUTHENTICATION_FLOW_EXECUTIONS_EXECUTION.format(
                     url=self.baseurl,
                     realm=realm,
