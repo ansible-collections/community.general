@@ -1207,7 +1207,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
                                   proxmox_node.tasks(taskid).log.get()[:1])
             return False
         return True
-    
+
     def suspend_vm(self, vm, timeout, todisk):
         vmid = vm['vmid']
         proxmox_node = self.proxmox_api.nodes(vm['node'])
@@ -1217,6 +1217,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
                                   proxmox_node.tasks(taskid).log.get()[:1])
             return False
         return True
+
 
 def main():
     module_args = proxmox_auth_argument_spec()
