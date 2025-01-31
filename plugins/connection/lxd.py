@@ -55,7 +55,6 @@ options:
     default: root
     vars:
       - name: ansible_user
-      - name: ansible_ssh_user
     env:
       - name: ANSIBLE_REMOTE_USER
     ini:
