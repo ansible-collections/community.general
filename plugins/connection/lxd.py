@@ -106,29 +106,28 @@ class Connection(ConnectionBase):
             self._display.vvv(f"ESTABLISH LXD CONNECTION FOR USER: {self.get_option('remote_user')}", host=self._host())
             self._connected = True
 
-    def _build_exec_command(self, cmd) -> str:
-        """ build the command to execute on the lxd host """
+    def _build_command(self, cmd) -> str:
+        """build the command to execute on the lxd host"""
 
         exec_cmd = [self._lxc_cmd]
 
         if self.get_option("project"):
             exec_cmd.extend(["--project", self.get_option("project")])
 
+        exec_cmd.extend(["exec", f"{self.get_option('remote')}:{self._host()}", "--"])
+
         if self.get_option("remote_user") != "root":
             self._display.vvv(
                 f"INFO: Running as non-root user: {self.get_option('remote_user')}, trying to run 'lxc exec' with become method: {self.get_option('lxd_become_method')}",
                 host=self._host(),
             )
-            exec_cmd.extend([self.get_option("lxd_become_method"), self.get_option("remote_user")])
+            exec_cmd.extend(
+                [self.get_option("lxd_become_method"), self.get_option("remote_user")]
+            )
 
-        exec_cmd.extend([
-            "exec",
-            f"{self.get_option('remote')}:{self._host()}",
-            "--",
-            self.get_option("executable"), "-c", cmd
-        ])
+        exec_cmd.extend([self.get_option("executable"), "-c", cmd])
 
-        return  exec_cmd
+        return exec_cmd
 
     def exec_command(self, cmd, in_data=None, sudoable=True):
         """ execute a command on the lxd host """
@@ -136,7 +135,7 @@ class Connection(ConnectionBase):
 
         self._display.vvv(f"EXEC {cmd}", host=self._host())
 
-        local_cmd = self._build_exec_command(cmd)
+        local_cmd = self._build_command(cmd)
         self._display.vvvvv(f"EXEC {local_cmd}", host=self._host())
 
         local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
