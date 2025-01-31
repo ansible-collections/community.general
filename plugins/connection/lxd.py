@@ -35,6 +35,7 @@ options:
   lxd_become_method:
     description:
       - Become command used to switch to a non-root user.
+      - Is only used when O(remote_user) is not V(root).
     type: str
     default: /bin/su
     vars:
