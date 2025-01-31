@@ -685,6 +685,7 @@ class CloudflareAPI(object):
         else:
             search_value = content
 
+        zone_id = self._get_zone_id(params['zone'])
         records = self.get_dns_records(params['zone'], params['type'], search_record, search_value)
 
         for rr in records:
@@ -692,11 +693,11 @@ class CloudflareAPI(object):
                 if not ((rr['type'] == params['type']) and (rr['name'] == search_record) and (rr['content'] == content)):
                     self.changed = True
                     if not self.module.check_mode:
-                        result, info = self._cf_api_call('/zones/{0}/dns_records/{1}'.format(rr['zone_id'], rr['id']), 'DELETE')
+                        result, info = self._cf_api_call('/zones/{0}/dns_records/{1}'.format(zone_id, rr['id']), 'DELETE')
             else:
                 self.changed = True
                 if not self.module.check_mode:
-                    result, info = self._cf_api_call('/zones/{0}/dns_records/{1}'.format(rr['zone_id'], rr['id']), 'DELETE')
+                    result, info = self._cf_api_call('/zones/{0}/dns_records/{1}'.format(zone_id, rr['id']), 'DELETE')
         return self.changed
 
     def ensure_dns_record(self, **kwargs):
