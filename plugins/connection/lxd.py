@@ -39,6 +39,7 @@ options:
     default: /bin/su
     vars:
       - name: lxd_become_method
+    version_added: 10.4.0
   remote:
     description:
       - Name of the LXD remote to use.
