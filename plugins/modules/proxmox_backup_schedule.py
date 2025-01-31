@@ -90,7 +90,7 @@ EXAMPLES = """
 
 RETURN = """
 ---
-  backup_schedule:
+backup_schedule:
   description:
     - When backup_action is 'update_vmid', the backup_schedule will return True after successfully adding the VM ID to the backup job.
     - When backup_action is 'delete_vmid', the backup_schedule will return a list of backup job IDs where the VM ID has been removed.
