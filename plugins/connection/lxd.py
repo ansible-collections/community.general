@@ -103,7 +103,7 @@ class Connection(ConnectionBase):
         super(Connection, self)._connect()
 
         if not self._connected:
-            self._display.vvv(f"ESTABLISH LXD CONNECTION FOR USER: {self.get_option("remote_user")}", host=self._host())
+            self._display.vvv(f"ESTABLISH LXD CONNECTION FOR USER: {self.get_option('remote_user')}", host=self._host())
             self._connected = True
 
     def _build_exec_command(self, cmd) -> str:
