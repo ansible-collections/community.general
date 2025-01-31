@@ -73,11 +73,10 @@ class Connection(ConnectionBase):
         except ValueError:
             raise AnsibleError("lxc command not found in PATH")
 
-        if self._play_context.remote_user is not None and self._play_context.remote_user != 'root':
-            self._display.warning('Using non-root user with lxd connection is not recommended')
+        if self._play_context.remote_user is not None and self._play_context.remote_user != self.default_user:
             self._play_user = self._play_context.remote_user
         else:
-            self._play_user = None
+            self._play_user = self.default_user
 
     def _host(self):
         """ translate remote_addr to lxd (short) hostname """
@@ -88,7 +87,7 @@ class Connection(ConnectionBase):
         super(Connection, self)._connect()
 
         if not self._connected:
-            self._display.vvv("ESTABLISH LXD CONNECTION FOR USER: root", host=self._host())
+            self._display.vvv(f"ESTABLISH LXD CONNECTION FOR USER: {self._play_user}", host=self._host())
             self._connected = True
 
     def exec_command(self, cmd, in_data=None, sudoable=True):
