@@ -63,6 +63,7 @@ options:
         key: remote_user
     keyword:
       - name: remote_user
+    version_added: 10.4.0
   project:
     description:
       - Name of the LXD project to use.
