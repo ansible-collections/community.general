@@ -118,7 +118,8 @@ class Connection(ConnectionBase):
 
         if self.get_option("remote_user") != "root":
             self._display.vvv(
-                f"INFO: Running as non-root user: {self.get_option('remote_user')}, trying to run 'lxc exec' with become method: {self.get_option('lxd_become_method')}",
+                f"INFO: Running as non-root user: {self.get_option('remote_user')}, \
+                trying to run 'lxc exec' with become method: {self.get_option('lxd_become_method')}",
                 host=self._host(),
             )
             exec_cmd.extend(
