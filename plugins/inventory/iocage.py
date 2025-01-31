@@ -79,7 +79,7 @@ DOCUMENTATION = '''
               - The variable C(iocage_hooks) is not created if O(hooks) is empty.
             type: list
             elements: path
-            version_added: 10.3.0
+            version_added: 10.4.0
     notes:
       - You might want to test the command C(ssh user@host iocage list -l) on
         the controller before using this inventory plugin with O(user) specified
