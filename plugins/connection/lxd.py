@@ -123,7 +123,7 @@ class Connection(ConnectionBase):
                 host=self._host(),
             )
             exec_cmd.extend(
-                [self.get_option("lxd_become_method"), self.get_option("remote_user")]
+                [self.get_option("lxd_become_method"), self.get_option("remote_user"), "-c"]
             )
 
         exec_cmd.extend([self.get_option("executable"), "-c", cmd])
