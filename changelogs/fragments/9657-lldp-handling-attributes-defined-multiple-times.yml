@@ -1,0 +1,4 @@
+bugfixes:
+  - lldp - fix crash caused by certain lldpctl output where an attribute is defined as branch and leaf
+minor_changes:
+  - lldp - adds ``multivalues`` parameter to control behavior when lldpctl outputs an attribute multiple times
