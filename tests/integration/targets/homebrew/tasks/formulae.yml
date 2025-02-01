@@ -40,7 +40,6 @@
     homebrew:
       name: "{{ package_name }}"
       state: absent
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
 
@@ -48,7 +47,6 @@
     homebrew:
       name: "{{ package_name }}"
       state: present
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -64,7 +62,6 @@
     homebrew:
       name: "{{ package_name }}"
       state: present
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -80,7 +77,6 @@
     homebrew:
       name: "{{ package_name }}"
       state: unlinked
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -96,7 +92,6 @@
     homebrew:
       name: "{{ package_name }}"
       state: linked
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -112,7 +107,6 @@
     homebrew:
       name: "{{ package_name }}"
       state: absent
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -128,7 +122,6 @@
     homebrew:
       name: "{{ package_name }}"
       state: absent
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -144,7 +137,6 @@
     homebrew:
       name: "{{ package_name }}"
       state: latest
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -160,7 +152,6 @@
     homebrew:
       name: "{{ package_name }}"
       state: latest
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -182,7 +173,6 @@
     homebrew:
       name: "{{ package_names }}"
       state: absent
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
 
@@ -190,7 +180,6 @@
     homebrew:
       name: "{{ package_names[0] }}"
       state: present
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
 
@@ -198,7 +187,6 @@
     homebrew:
       name: "{{ package_names }}"
       state: present
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -214,7 +202,6 @@
     homebrew:
       name: "{{ package_names }}"
       state: present
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -230,7 +217,6 @@
     homebrew:
       name: "{{ package_names }}"
       state: unlinked
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -246,7 +232,6 @@
     homebrew:
       name: "{{ package_names }}"
       state: linked
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -262,7 +247,6 @@
     homebrew:
       name: "{{ package_names }}"
       state: absent
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -278,7 +262,6 @@
     homebrew:
       name: "{{ package_names }}"
       state: absent
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -294,7 +277,6 @@
     homebrew:
       name: "{{ package_names }}"
       state: latest
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -310,7 +292,6 @@
     homebrew:
       name: "{{ package_names }}"
       state: latest
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -328,7 +309,6 @@
     homebrew:
       name: "sqlite"
       state: absent
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
 
@@ -336,7 +316,6 @@
     homebrew:
       name: "sqlite3"
       state: present
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: install_result
@@ -352,7 +331,6 @@
     homebrew:
       name: "sqlite3"
       state: present
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: reinstall_result
@@ -376,7 +354,6 @@
     community.general.homebrew:
       name: hashicorp/tap/terraform
       state: latest
-      update_homebrew: false
     register: terraform_install_result
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
