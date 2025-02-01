@@ -7,228 +7,228 @@
 anchors:
   environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
 test_cases:
-- id: puppet_agent_plain
-  input: {}
-  output:
-    changed: false
-  mocks:
-    run_command:
-    - command: [/testbin/puppet, config, print, agent_disabled_lockfile]
-      environ: *env-def
-      rc: 0
-      out: "blah, anything"
-      err: ""
-    - command:
-      - /testbin/timeout
-      - -s
-      - "9"
-      - 30m
-      - /testbin/puppet
-      - agent
-      - --onetime
-      - --no-daemonize
-      - --no-usecacheonfailure
-      - --no-splay
-      - --detailed-exitcodes
-      - --verbose
-      - --color
-      - "0"
-      environ: *env-def
-      rc: 0
-      out: ""
-      err: ""
-- id: puppet_agent_certname
-  input:
-    certname: potatobox
-  output:
-    changed: false
-  mocks:
-    run_command:
-    - command: [/testbin/puppet, config, print, agent_disabled_lockfile]
-      environ: *env-def
-      rc: 0
-      out: "blah, anything"
-      err: ""
-    - command:
-      - /testbin/timeout
-      - -s
-      - "9"
-      - 30m
-      - /testbin/puppet
-      - agent
-      - --onetime
-      - --no-daemonize
-      - --no-usecacheonfailure
-      - --no-splay
-      - --detailed-exitcodes
-      - --verbose
-      - --color
-      - "0"
-      - --certname=potatobox
-      environ: *env-def
-      rc: 0
-      out: ""
-      err: ""
-- id: puppet_agent_tags_abc
-  input:
-    tags: [a, b, c]
-  output:
-    changed: false
-  mocks:
-    run_command:
-    - command: [/testbin/puppet, config, print, agent_disabled_lockfile]
-      environ: *env-def
-      rc: 0
-      out: "blah, anything"
-      err: ""
-    - command:
-      - /testbin/timeout
-      - -s
-      - "9"
-      - 30m
-      - /testbin/puppet
-      - agent
-      - --onetime
-      - --no-daemonize
-      - --no-usecacheonfailure
-      - --no-splay
-      - --detailed-exitcodes
-      - --verbose
-      - --color
-      - "0"
-      - --tags
-      - a,b,c
-      environ: *env-def
-      rc: 0
-      out: ""
-      err: ""
-- id: puppet_agent_skip_tags_def
-  input:
-    skip_tags: [d, e, f]
-  output:
-    changed: false
-  mocks:
-    run_command:
-    - command: [/testbin/puppet, config, print, agent_disabled_lockfile]
-      environ: *env-def
-      rc: 0
-      out: "blah, anything"
-      err: ""
-    - command:
-      - /testbin/timeout
-      - -s
-      - "9"
-      - 30m
-      - /testbin/puppet
-      - agent
-      - --onetime
-      - --no-daemonize
-      - --no-usecacheonfailure
-      - --no-splay
-      - --detailed-exitcodes
-      - --verbose
-      - --color
-      - "0"
-      - --skip_tags
-      - d,e,f
-      environ: *env-def
-      rc: 0
-      out: ""
-      err: ""
-- id: puppet_agent_noop_false
-  input:
-    noop: false
-  output:
-    changed: false
-  mocks:
-    run_command:
-    - command: [/testbin/puppet, config, print, agent_disabled_lockfile]
-      environ: *env-def
-      rc: 0
-      out: "blah, anything"
-      err: ""
-    - command:
-      - /testbin/timeout
-      - -s
-      - "9"
-      - 30m
-      - /testbin/puppet
-      - agent
-      - --onetime
-      - --no-daemonize
-      - --no-usecacheonfailure
-      - --no-splay
-      - --detailed-exitcodes
-      - --verbose
-      - --color
-      - "0"
-      - --no-noop
-      environ: *env-def
-      rc: 0
-      out: ""
-      err: ""
-- id: puppet_agent_noop_true
-  input:
-    noop: true
-  output:
-    changed: false
-  mocks:
-    run_command:
-    - command: [/testbin/puppet, config, print, agent_disabled_lockfile]
-      environ: *env-def
-      rc: 0
-      out: "blah, anything"
-      err: ""
-    - command:
-      - /testbin/timeout
-      - -s
-      - "9"
-      - 30m
-      - /testbin/puppet
-      - agent
-      - --onetime
-      - --no-daemonize
-      - --no-usecacheonfailure
-      - --no-splay
-      - --detailed-exitcodes
-      - --verbose
-      - --color
-      - "0"
-      - --noop
-      environ: *env-def
-      rc: 0
-      out: ""
-      err: ""
-- id: puppet_agent_waitforlock
-  input:
-    waitforlock: 30
-  output:
-    changed: false
-  mocks:
-    run_command:
-    - command: [/testbin/puppet, config, print, agent_disabled_lockfile]
-      environ: *env-def
-      rc: 0
-      out: "blah, anything"
-      err: ""
-    - command:
-      - /testbin/timeout
-      - -s
-      - "9"
-      - 30m
-      - /testbin/puppet
-      - agent
-      - --onetime
-      - --no-daemonize
-      - --no-usecacheonfailure
-      - --no-splay
-      - --detailed-exitcodes
-      - --verbose
-      - --color
-      - "0"
-      - --waitforlock
-      - "30"
-      environ: *env-def
-      rc: 0
-      out: ""
-      err: ""
+  - id: puppet_agent_plain
+    input: {}
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - command: [/testbin/puppet, config, print, agent_disabled_lockfile]
+          environ: *env-def
+          rc: 0
+          out: blah, anything
+          err: ''
+        - command:
+            - /testbin/timeout
+            - -s
+            - '9'
+            - 30m
+            - /testbin/puppet
+            - agent
+            - --onetime
+            - --no-daemonize
+            - --no-usecacheonfailure
+            - --no-splay
+            - --detailed-exitcodes
+            - --verbose
+            - --color
+            - '0'
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+  - id: puppet_agent_certname
+    input:
+      certname: potatobox
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - command: [/testbin/puppet, config, print, agent_disabled_lockfile]
+          environ: *env-def
+          rc: 0
+          out: blah, anything
+          err: ''
+        - command:
+            - /testbin/timeout
+            - -s
+            - '9'
+            - 30m
+            - /testbin/puppet
+            - agent
+            - --onetime
+            - --no-daemonize
+            - --no-usecacheonfailure
+            - --no-splay
+            - --detailed-exitcodes
+            - --verbose
+            - --color
+            - '0'
+            - --certname=potatobox
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+  - id: puppet_agent_tags_abc
+    input:
+      tags: [a, b, c]
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - command: [/testbin/puppet, config, print, agent_disabled_lockfile]
+          environ: *env-def
+          rc: 0
+          out: blah, anything
+          err: ''
+        - command:
+            - /testbin/timeout
+            - -s
+            - '9'
+            - 30m
+            - /testbin/puppet
+            - agent
+            - --onetime
+            - --no-daemonize
+            - --no-usecacheonfailure
+            - --no-splay
+            - --detailed-exitcodes
+            - --verbose
+            - --color
+            - '0'
+            - --tags
+            - a,b,c
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+  - id: puppet_agent_skip_tags_def
+    input:
+      skip_tags: [d, e, f]
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - command: [/testbin/puppet, config, print, agent_disabled_lockfile]
+          environ: *env-def
+          rc: 0
+          out: blah, anything
+          err: ''
+        - command:
+            - /testbin/timeout
+            - -s
+            - '9'
+            - 30m
+            - /testbin/puppet
+            - agent
+            - --onetime
+            - --no-daemonize
+            - --no-usecacheonfailure
+            - --no-splay
+            - --detailed-exitcodes
+            - --verbose
+            - --color
+            - '0'
+            - --skip_tags
+            - d,e,f
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+  - id: puppet_agent_noop_false
+    input:
+      noop: false
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - command: [/testbin/puppet, config, print, agent_disabled_lockfile]
+          environ: *env-def
+          rc: 0
+          out: blah, anything
+          err: ''
+        - command:
+            - /testbin/timeout
+            - -s
+            - '9'
+            - 30m
+            - /testbin/puppet
+            - agent
+            - --onetime
+            - --no-daemonize
+            - --no-usecacheonfailure
+            - --no-splay
+            - --detailed-exitcodes
+            - --verbose
+            - --color
+            - '0'
+            - --no-noop
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+  - id: puppet_agent_noop_true
+    input:
+      noop: true
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - command: [/testbin/puppet, config, print, agent_disabled_lockfile]
+          environ: *env-def
+          rc: 0
+          out: blah, anything
+          err: ''
+        - command:
+            - /testbin/timeout
+            - -s
+            - '9'
+            - 30m
+            - /testbin/puppet
+            - agent
+            - --onetime
+            - --no-daemonize
+            - --no-usecacheonfailure
+            - --no-splay
+            - --detailed-exitcodes
+            - --verbose
+            - --color
+            - '0'
+            - --noop
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+  - id: puppet_agent_waitforlock
+    input:
+      waitforlock: 30
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - command: [/testbin/puppet, config, print, agent_disabled_lockfile]
+          environ: *env-def
+          rc: 0
+          out: blah, anything
+          err: ''
+        - command:
+            - /testbin/timeout
+            - -s
+            - '9'
+            - 30m
+            - /testbin/puppet
+            - agent
+            - --onetime
+            - --no-daemonize
+            - --no-usecacheonfailure
+            - --no-splay
+            - --detailed-exitcodes
+            - --verbose
+            - --color
+            - '0'
+            - --waitforlock
+            - '30'
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
