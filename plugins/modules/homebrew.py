@@ -831,7 +831,7 @@ def main():
     p = module.params
 
     if p['name']:
-        packages = p['name']
+        packages = [package_name.lower() for package_name in p['name']]
     else:
         packages = None
 

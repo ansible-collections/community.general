@@ -364,3 +364,20 @@
         - "terraform_install_result.msg == 'Package upgraded: hashicorp/tap/terraform'"
         - "terraform_install_result.changed_pkgs == ['hashicorp/tap/terraform']"
         - "terraform_install_result.unchanged_pkgs == []"
+
+# Test irregular formulae name case
+- block:
+  - name: Install terraform from full tap name with irregular case
+    community.general.homebrew:
+      name: HasHicorp/TAp/tErRaForm
+      state: latest
+    register: terraform_install_result
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+
+  - assert:
+      that:
+        - terraform_install_result is changed
+        - "terraform_install_result.msg == 'Package upgraded: hashicorp/tap/terraform'"
+        - "terraform_install_result.changed_pkgs == ['hashicorp/tap/terraform']"
+        - "terraform_install_result.unchanged_pkgs == []"
