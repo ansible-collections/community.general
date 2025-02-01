@@ -308,9 +308,8 @@ class Rhsm(object):
             else:
                 cfg.set('main', 'enabled', '0')
 
-            fd = open(tmpfile, 'w+')
-            cfg.write(fd)
-            fd.close()
+            with open(tmpfile, 'w+') as fd:
+                cfg.write(fd)
             self.module.atomic_move(tmpfile, plugin_conf)
 
     def enable(self):
@@ -1119,7 +1118,6 @@ def main():
             module.exit_json(changed=False, msg="System already unregistered.")
         else:
             try:
-                rhsm.unsubscribe()
                 rhsm.unregister()
             except Exception as e:
                 module.fail_json(msg="Failed to unregister: %s" % to_native(e))

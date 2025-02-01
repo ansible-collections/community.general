@@ -111,6 +111,9 @@ files:
   $connections/lxd.py:
     labels: lxd
     maintainers: mattclay
+  $connections/proxmox_pct_remote.py:
+    labels: proxmox
+    maintainers: mietzen
   $connections/qubes.py:
     maintainers: kushaldas
   $connections/saltstack.py:
@@ -161,6 +164,14 @@ files:
     maintainers: Ajpantuso
   $filters/jc.py:
     maintainers: kellyjonbrazil
+  $filters/json_diff.yml:
+    maintainers: numo68
+  $filters/json_patch.py:
+    maintainers: numo68
+  $filters/json_patch.yml:
+    maintainers: numo68
+  $filters/json_patch_recipe.yml:
+    maintainers: numo68
   $filters/json_query.py: {}
   $filters/keep_keys.py:
     maintainers: vbotka
@@ -296,6 +307,8 @@ files:
   $lookups/onepassword_raw.py:
     ignore: scottsb
     maintainers: azenk
+  $lookups/onepassword_ssh_key.py:
+    maintainers: mohammedbabelly20
   $lookups/passwordstore.py: {}
   $lookups/random_pet.py:
     maintainers: Akasurde
@@ -1135,6 +1148,8 @@ files:
     maintainers: helldorado krauthosting
   $modules/proxmox_backup.py:
     maintainers: IamLunchbox
+  $modules/proxmox_backup_info.py:
+    maintainers: raoufnezhad mmayabi
   $modules/proxmox_nic.py:
     maintainers: Kogelvis krauthosting
   $modules/proxmox_node_info.py:

@@ -71,6 +71,21 @@ options:
     type: str
     choices: ['present', 'absent']
     default: present
+  checksum_algorithm:
+    description:
+      - Algorithm used to verify the checksum.
+      - If specified, O(checksum) must also be specified.
+    type: str
+    choices: ['md5', 'sha1', 'sha224', 'sha256', 'sha384', 'sha512']
+    version_added: 10.3.0
+  checksum:
+    description:
+      - The checksum to validate against.
+      - Checksums are often provided by software distributors to verify that a download is not corrupted.
+      - Checksums can usually be found on the distributors download page in the form of a file or string.
+      - If specified, O(checksum_algorithm) must also be specified.
+    type: str
+    version_added: 10.3.0
 notes:
   - Requires C(proxmoxer) and C(requests) modules on host. Those modules can be installed with M(ansible.builtin.pip).
   - C(proxmoxer) >= 1.2.0 requires C(requests_toolbelt) to upload files larger than 256 MB.
@@ -82,6 +97,7 @@ extends_documentation_fragment:
 """
 
 EXAMPLES = r"""
+---
 - name: Upload new openvz template with minimal options
   community.general.proxmox_template:
     node: uk-mc02
@@ -147,6 +163,16 @@ EXAMPLES = r"""
     storage: local
     content_type: vztmpl
     template: ubuntu-20.04-standard_20.04-1_amd64.tar.gz
+
+- name: Download and verify a template's checksum
+  community.general.proxmox_template:
+    node: uk-mc02
+    api_user: root@pam
+    api_password: 1q2w3e
+    api_host: node1
+    url: ubuntu-20.04-standard_20.04-1_amd64.tar.gz
+    checksum_algorithm: sha256
+    checksum: 65d860160bdc9b98abf72407e14ca40b609417de7939897d3b58d55787aaef69
 """
 
 import os
@@ -156,7 +182,7 @@ import traceback
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.community.general.plugins.module_utils.proxmox import (proxmox_auth_argument_spec, ProxmoxAnsible)
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
-from ansible.module_utils.six.moves.urllib.parse import urlparse
+from ansible.module_utils.six.moves.urllib.parse import urlparse, urlencode
 
 REQUESTS_TOOLBELT_ERR = None
 try:
@@ -183,6 +209,8 @@ class ProxmoxTemplateAnsible(ProxmoxAnsible):
         while timeout:
             if self.api_task_ok(node, taskid):
                 return True
+            elif self.api_task_failed(node, taskid):
+                self.module.fail_json(msg="Task error: %s" % self.proxmox_api.nodes(node).tasks(taskid).status.get()['exitstatus'])
             timeout = timeout - 1
             if timeout == 0:
                 self.module.fail_json(msg='Reached timeout while waiting for uploading/downloading template. Last line in task before timeout: %s' %
@@ -235,6 +263,21 @@ class ProxmoxTemplateAnsible(ProxmoxAnsible):
             time.sleep(1)
         return False
 
+    def fetch_and_verify(self, node, storage, url, content_type, timeout, checksum, checksum_algorithm):
+        """ Fetch a template from a web url, then verify it using a checksum.
+        """
+        data = {
+            'url': url,
+            'content': content_type,
+            'filename': os.path.basename(url),
+            'checksum': checksum,
+            'checksum-algorithm': checksum_algorithm}
+        try:
+            taskid = self.proxmox_api.nodes(node).storage(storage).post("download-url?{}".format(urlencode(data)))
+            return self.task_status(node, taskid, timeout)
+        except Exception as e:
+            self.module.fail_json(msg="Checksum mismatch: %s" % (e))
+
 
 def main():
     module_args = proxmox_auth_argument_spec()
@@ -248,12 +291,14 @@ def main():
         timeout=dict(type='int', default=30),
         force=dict(type='bool', default=False),
         state=dict(default='present', choices=['present', 'absent']),
+        checksum_algorithm=dict(choices=['md5', 'sha1', 'sha224', 'sha256', 'sha384', 'sha512']),
+        checksum=dict(type='str'),
     )
     module_args.update(template_args)
 
     module = AnsibleModule(
         argument_spec=module_args,
-        required_together=[('api_token_id', 'api_token_secret')],
+        required_together=[('api_token_id', 'api_token_secret'), ('checksum', 'checksum_algorithm')],
         required_one_of=[('api_password', 'api_token_id')],
         required_if=[('state', 'absent', ['template'])],
         mutually_exclusive=[("src", "url")],
@@ -265,6 +310,8 @@ def main():
     node = module.params['node']
     storage = module.params['storage']
     timeout = module.params['timeout']
+    checksum = module.params['checksum']
+    checksum_algorithm = module.params['checksum_algorithm']
 
     if state == 'present':
         content_type = module.params['content_type']
@@ -272,7 +319,7 @@ def main():
         url = module.params['url']
 
         # download appliance template
-        if content_type == 'vztmpl' and not (src or url) :
+        if content_type == 'vztmpl' and not (src or url):
             template = module.params['template']
 
             if not template:
@@ -303,6 +350,9 @@ def main():
                 elif not proxmox.delete_template(node, storage, content_type, template, timeout):
                     module.fail_json(changed=False, msg='failed to delete template with volid=%s:%s/%s' % (storage, content_type, template))
 
+            if checksum:
+                if proxmox.fetch_and_verify(node, storage, url, content_type, timeout, checksum, checksum_algorithm):
+                    module.exit_json(changed=True, msg="Checksum verified, template with volid=%s:%s/%s uploaded" % (storage, content_type, template))
             if proxmox.fetch_template(node, storage, content_type, url, timeout):
                 module.exit_json(changed=True, msg='template with volid=%s:%s/%s uploaded' % (storage, content_type, template))
 

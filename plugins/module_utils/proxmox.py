@@ -144,7 +144,7 @@ class ProxmoxAnsible(object):
                 return None
 
             self.module.fail_json(msg='No VM with name %s found' % name)
-        elif len(vms) > 1:
+        elif len(vms) > 1 and not choose_first_if_multiple:
             self.module.fail_json(msg='Multiple VMs with name %s found, provide vmid instead' % name)
 
         return vms[0]
@@ -167,6 +167,15 @@ class ProxmoxAnsible(object):
         try:
             status = self.proxmox_api.nodes(node).tasks(taskid).status.get()
             return status['status'] == 'stopped' and status['exitstatus'] == 'OK'
+        except Exception as e:
+            self.module.fail_json(msg='Unable to retrieve API task ID from node %s: %s' % (node, e))
+
+    def api_task_failed(self, node, taskid):
+        """ Explicitly check if the task stops but exits with a failed status
+        """
+        try:
+            status = self.proxmox_api.nodes(node).tasks(taskid).status.get()
+            return status['status'] == 'stopped' and status['exitstatus'] != 'OK'
         except Exception as e:
             self.module.fail_json(msg='Unable to retrieve API task ID from node %s: %s' % (node, e))
 

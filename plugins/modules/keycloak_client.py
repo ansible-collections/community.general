@@ -775,8 +775,11 @@ def sanitize_cr(clientrep):
         result['secret'] = 'no_log'
     if 'attributes' in result:
         attributes = result['attributes']
-        if isinstance(attributes, dict) and 'saml.signing.private.key' in attributes:
-            attributes['saml.signing.private.key'] = 'no_log'
+        if isinstance(attributes, dict):
+            if 'saml.signing.private.key' in attributes:
+                attributes['saml.signing.private.key'] = 'no_log'
+            if 'saml.encryption.private.key' in attributes:
+                attributes['saml.encryption.private.key'] = 'no_log'
     return normalise_cr(result)
 
 
@@ -921,7 +924,9 @@ def main():
                            supports_check_mode=True,
                            required_one_of=([['client_id', 'id'],
                                              ['token', 'auth_realm', 'auth_username', 'auth_password']]),
-                           required_together=([['auth_realm', 'auth_username', 'auth_password']]))
+                           required_together=([['auth_realm', 'auth_username', 'auth_password']]),
+                           required_by={'refresh_token': 'auth_realm'},
+                           )
 
     result = dict(changed=False, msg='', diff={}, proposed={}, existing={}, end_state={})
 

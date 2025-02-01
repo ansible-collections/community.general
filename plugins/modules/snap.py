@@ -167,6 +167,11 @@ options_changed:
   type: list
   returned: When any options have been changed/set
   version_added: 4.4.0
+version:
+  description: Versions of snap components as reported by C(snap version).
+  type: dict
+  returned: always
+  version_added: 10.3.0
 """
 
 import re
@@ -176,7 +181,7 @@ import numbers
 from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
-from ansible_collections.community.general.plugins.module_utils.snap import snap_runner
+from ansible_collections.community.general.plugins.module_utils.snap import snap_runner, get_version
 
 
 class Snap(StateModuleHelper):
@@ -210,6 +215,7 @@ class Snap(StateModuleHelper):
 
     def __init_module__(self):
         self.runner = snap_runner(self.module)
+        self.vars.version = get_version(self.runner)
         # if state=present there might be file names passed in 'name', in
         # which case they must be converted to their actual snap names, which
         # is done using the names_from_snaps() method calling 'snap info'.
