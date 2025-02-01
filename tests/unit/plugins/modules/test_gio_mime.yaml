@@ -39,8 +39,15 @@ test_cases:
     output:
       handler: google-chrome.desktop
       changed: true
+      stdout: Module executed in check mode
+      diff:
+        before:
+          handler: null
+        after:
+          handler: google-chrome.desktop
     flags:
-      skip: test helper does not support check mode yet
+      check: true
+      diff: true
     mocks:
       run_command:
         - command: [/testbin/gio, --version]
@@ -54,11 +61,6 @@ test_cases:
           out: ''
           err: >
             No default applications for “x-scheme-handler/http”
-        - command: [/testbin/gio, mime, x-scheme-handler/http, google-chrome.desktop]
-          environ: *env-def
-          rc: 0
-          out: "Set google-chrome.desktop as the default for x-scheme-handler/http\n"
-          err: ''
   - id: test_set_handler_idempot
     input:
       handler: google-chrome.desktop
@@ -66,6 +68,38 @@ test_cases:
     output:
       handler: google-chrome.desktop
       changed: false
+    mocks:
+      run_command:
+        - command: [/testbin/gio, --version]
+          environ: *env-def
+          rc: 0
+          out: "2.80.0\n"
+          err: ''
+        - command: [/testbin/gio, mime, x-scheme-handler/http]
+          environ: *env-def
+          rc: 0
+          out: |
+            Default application for “x-scheme-handler/https”: google-chrome.desktop
+            Registered applications:
+              brave-browser.desktop
+              firefox.desktop
+              google-chrome.desktop
+              firefox_firefox.desktop
+            Recommended applications:
+              brave-browser.desktop
+              firefox.desktop
+              google-chrome.desktop
+              firefox_firefox.desktop
+          err: ''
+  - id: test_set_handler_idempot_check
+    input:
+      handler: google-chrome.desktop
+      mime_type: x-scheme-handler/http
+    output:
+      handler: google-chrome.desktop
+      changed: false
+    flags:
+      check: true
     mocks:
       run_command:
         - command: [/testbin/gio, --version]
