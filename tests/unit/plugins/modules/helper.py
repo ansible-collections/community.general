@@ -35,7 +35,7 @@ class Helper(object):
         test_module = sys.modules[test_module_name]
         if test_spec is None:
             test_spec = test_module.__file__.replace('.py', '.yaml')
-        return Helper.from_file(test_module, ansible_module, test_spec)
+        return Helper.from_file(test_module, ansible_module, test_spec, mocks=mocks)
 
     def add_func_to_test_module(self, name, func):
         setattr(self.test_module, name, func)
