@@ -381,3 +381,55 @@
         - "terraform_install_result.msg == 'Package upgraded: hashicorp/tap/terraform'"
         - "terraform_install_result.changed_pkgs == ['hashicorp/tap/terraform']"
         - "terraform_install_result.unchanged_pkgs == []"
+
+# Test tap with no public fallback
+- block:
+  - name: Tap ascii-image-converter homebrew repository
+    community.general.homebrew_tap:
+      name: TheZoraiz/ascii-image-converter
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+
+  - name: Install ascii from full tap name
+    community.general.homebrew:
+      name: TheZoraiz/ascii-image-converter/ascii-image-converter
+      state: latest
+    register: ascii_install_result
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+
+  - assert:
+      that:
+        - ascii_install_result is changed
+        - "ascii_install_result.msg == 'Package upgraded: thezoraiz/ascii-image-converter/ascii-image-converter'"
+        - "ascii_install_result.changed_pkgs == ['thezoraiz/ascii-image-converter/ascii-image-converter']"
+        - "ascii_install_result.unchanged_pkgs == []"
+
+  - name: Remove ascii from full tap name
+    homebrew:
+      name: TheZoraiz/ascii-image-converter/ascii-image-converter
+      state: absent
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+
+  - name: Install ascii from regular name
+    community.general.homebrew:
+      name: ascii-image-converter
+      state: latest
+    register: ascii_install_result
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+
+  - assert:
+      that:
+        - ascii_install_result is changed
+        - "ascii_install_result.msg == 'Package upgraded: ascii-image-converter'"
+        - "ascii_install_result.changed_pkgs == ['ascii-image-converter']"
+        - "ascii_install_result.unchanged_pkgs == []"
+
+  - name: Remove ascii from regular name
+    homebrew:
+      name: ascii-image-converter
+      state: absent
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
