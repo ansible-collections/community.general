@@ -8,396 +8,396 @@ anchors:
   environ_true: &env-def-true {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
   environ_false: &env-def-false {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
 test_cases:
-- id: install_dancer_compatibility
-  input:
-    name: Dancer
-    mode: compatibility
-  output:
-    changed: true
-    cpanm_version: "1.7047"
-  mocks:
-    run_command:
-    - command: [/testbin/cpanm, --version]
-      environ: *env-def-true
-      rc: 0
-      out: |
-        cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
-        perl version 5.041005 (/usr/local/bin/perl)
-      err: ""
-    - command: [/testbin/perl, -le, 'use Dancer;']
-      environ: *env-def-false
-      rc: 2
-      out: ""
-      err: "error, not installed"
-    - command: [/testbin/cpanm, Dancer]
-      environ: *env-def-true
-      rc: 0
-      out: ""
-      err: ""
-- id: install_dancer_already_installed_compatibility
-  input:
-    name: Dancer
-    mode: compatibility
-  output:
-    changed: false
-  mocks:
-    run_command:
-    - command: [/testbin/cpanm, --version]
-      environ: *env-def-true
-      rc: 0
-      out: |
-        cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
-        perl version 5.041005 (/usr/local/bin/perl)
-      err: ""
-    - command: [/testbin/perl, -le, 'use Dancer;']
-      environ: *env-def-false
-      rc: 0
-      out: ""
-      err: ""
-- id: install_dancer
-  input:
-    name: Dancer
-  output:
-    changed: true
-  mocks:
-    run_command:
-    - command: [/testbin/cpanm, --version]
-      environ: *env-def-true
-      rc: 0
-      out: |
-        cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
-        perl version 5.041005 (/usr/local/bin/perl)
-      err: ""
-    - command: [/testbin/cpanm, Dancer]
-      environ: *env-def-true
-      rc: 0
-      out: ""
-      err: ""
-- id: install_distribution_file_compatibility
-  input:
-    name: MIYAGAWA/Plack-0.99_05.tar.gz
-    mode: compatibility
-  output:
-    changed: true
-  mocks:
-    run_command:
-    - command: [/testbin/cpanm, --version]
-      environ: *env-def-true
-      rc: 0
-      out: |
-        cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
-        perl version 5.041005 (/usr/local/bin/perl)
-      err: ""
-    - command: [/testbin/cpanm, MIYAGAWA/Plack-0.99_05.tar.gz]
-      environ: *env-def-true
-      rc: 0
-      out: ""
-      err: ""
-- id: install_distribution_file
-  input:
-    name: MIYAGAWA/Plack-0.99_05.tar.gz
-  output:
-    changed: true
-  mocks:
-    run_command:
-    - command: [/testbin/cpanm, --version]
-      environ: *env-def-true
-      rc: 0
-      out: |
-        cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
-        perl version 5.041005 (/usr/local/bin/perl)
-      err: ""
-    - command: [/testbin/cpanm, MIYAGAWA/Plack-0.99_05.tar.gz]
-      environ: *env-def-true
-      rc: 0
-      out: ""
-      err: ""
-- id: install_into_locallib
-  input:
-    name: Dancer
-    mode: new
-    locallib: /srv/webapps/my_app/extlib
-  output:
-    changed: true
-  mocks:
-    run_command:
-    - command: [/testbin/cpanm, --version]
-      environ: *env-def-true
-      rc: 0
-      out: |
-        cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
-        perl version 5.041005 (/usr/local/bin/perl)
-      err: ""
-    - command: [/testbin/cpanm, --local-lib, /srv/webapps/my_app/extlib, Dancer]
-      environ: *env-def-true
-      rc: 0
-      out: ""
-      err: ""
-- id: install_from_local_directory
-  input:
-    from_path: /srv/webapps/my_app/src/
-    mode: new
-  output:
-    changed: true
-  mocks:
-    run_command:
-    - command: [/testbin/cpanm, --version]
-      environ: *env-def-true
-      rc: 0
-      out: |
-        cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
-        perl version 5.041005 (/usr/local/bin/perl)
-      err: ""
-    - command: [/testbin/cpanm, /srv/webapps/my_app/src/]
-      environ: *env-def-true
-      rc: 0
-      out: ""
-      err: ""
-- id: install_into_locallib_no_unit_testing
-  input:
-    name: Dancer
-    notest: true
-    mode: new
-    locallib: /srv/webapps/my_app/extlib
-  output:
-    changed: true
-  mocks:
-    run_command:
-    - command: [/testbin/cpanm, --version]
-      environ: *env-def-true
-      rc: 0
-      out: |
-        cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
-        perl version 5.041005 (/usr/local/bin/perl)
-      err: ""
-    - command: [/testbin/cpanm, --notest, --local-lib, /srv/webapps/my_app/extlib, Dancer]
-      environ: *env-def-true
-      rc: 0
-      out: ""
-      err: ""
-- id: install_from_mirror
-  input:
-    name: Dancer
-    mode: new
-    mirror: "http://cpan.cpantesters.org/"
-  output:
-    changed: true
-  mocks:
-    run_command:
-    - command: [/testbin/cpanm, --version]
-      environ: *env-def-true
-      rc: 0
-      out: |
-        cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
-        perl version 5.041005 (/usr/local/bin/perl)
-      err: ""
-    - command: [/testbin/cpanm, --mirror, "http://cpan.cpantesters.org/", Dancer]
-      environ: *env-def-true
-      rc: 0
-      out: ""
-      err: ""
-- id: install_into_system_lib
-  input:
-    name: Dancer
-    mode: new
-    system_lib: true
-  output:
-    failed: true
-  mocks:
-    run_command: []
-- id: install_minversion_implicit
-  input:
-    name: Dancer
-    mode: new
-    version: "1.0"
-  output:
-    changed: true
-  mocks:
-    run_command:
-    - command: [/testbin/cpanm, --version]
-      environ: *env-def-true
-      rc: 0
-      out: |
-        cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
-        perl version 5.041005 (/usr/local/bin/perl)
-      err: ""
-    - command: [/testbin/cpanm, Dancer~1.0]
-      environ: *env-def-true
-      rc: 0
-      out: ""
-      err: ""
-- id: install_minversion_explicit
-  input:
-    name: Dancer
-    mode: new
-    version: "~1.5"
-  output:
-    changed: true
-  mocks:
-    run_command:
-    - command: [/testbin/cpanm, --version]
-      environ: *env-def-true
-      rc: 0
-      out: |
-        cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
-        perl version 5.041005 (/usr/local/bin/perl)
-      err: ""
-    - command: [/testbin/cpanm, Dancer~1.5]
-      environ: *env-def-true
-      rc: 0
-      out: ""
-      err: ""
-- id: install_specific_version
-  input:
-    name: Dancer
-    mode: new
-    version: "@1.7"
-  output:
-    changed: true
-  mocks:
-    run_command:
-    - command: [/testbin/cpanm, --version]
-      environ: *env-def-true
-      rc: 0
-      out: |
-        cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
-        perl version 5.041005 (/usr/local/bin/perl)
-      err: ""
-    - command: [/testbin/cpanm, Dancer@1.7]
-      environ: *env-def-true
-      rc: 0
-      out: ""
-      err: ""
-- id: install_specific_version_from_file_error
-  input:
-    name: MIYAGAWA/Plack-0.99_05.tar.gz
-    mode: new
-    version: "@1.7"
-  output:
-    failed: true
-    msg: parameter 'version' must not be used when installing from a file
-  mocks:
-    run_command:
-    - command: [/testbin/cpanm, --version]
-      environ: *env-def-true
-      rc: 0
-      out: |
-        cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
-        perl version 5.041005 (/usr/local/bin/perl)
-      err: ""
-- id: install_specific_version_from_directory_error
-  input:
-    from_path: ~/
-    mode: new
-    version: "@1.7"
-  output:
-    failed: true
-    msg: parameter 'version' must not be used when installing from a directory
-  mocks:
-    run_command:
-    - command: [/testbin/cpanm, --version]
-      environ: *env-def-true
-      rc: 0
-      out: |
-        cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
-        perl version 5.041005 (/usr/local/bin/perl)
-      err: ""
-- id: install_specific_version_from_git_url_explicit
-  input:
-    name: "git://github.com/plack/Plack.git"
-    mode: new
-    version: "@1.7"
-  output:
-    changed: true
-  mocks:
-    run_command:
-    - command: [/testbin/cpanm, --version]
-      environ: *env-def-true
-      rc: 0
-      out: |
-        cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
-        perl version 5.041005 (/usr/local/bin/perl)
-      err: ""
-    - command: [/testbin/cpanm, "git://github.com/plack/Plack.git@1.7"]
-      environ: *env-def-true
-      rc: 0
-      out: ""
-      err: ""
-- id: install_specific_version_from_git_url_implicit
-  input:
-    name: "git://github.com/plack/Plack.git"
-    mode: new
-    version: "2.5"
-  output:
-    changed: true
-  mocks:
-    run_command:
-    - command: [/testbin/cpanm, --version]
-      environ: *env-def-true
-      rc: 0
-      out: |
-        cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
-        perl version 5.041005 (/usr/local/bin/perl)
-      err: ""
-    - command: [/testbin/cpanm, "git://github.com/plack/Plack.git@2.5"]
-      environ: *env-def-true
-      rc: 0
-      out: ""
-      err: ""
-- id: install_version_operator_from_git_url_error
-  input:
-    name: "git://github.com/plack/Plack.git"
-    mode: new
-    version: "~2.5"
-  output:
-    failed: true
-    msg: operator '~' not allowed in version parameter when installing from git repository
-  mocks:
-    run_command:
-    - command: [/testbin/cpanm, --version]
-      environ: *env-def-true
-      rc: 0
-      out: |
-        cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
-        perl version 5.041005 (/usr/local/bin/perl)
-      err: ""
-- id: install_dancer_with_recommends
-  input:
-    name: Dancer2
-    install_recommendations: true
-  output:
-    changed: true
-  mocks:
-    run_command:
-    - command: [/testbin/cpanm, --version]
-      environ: *env-def-true
-      rc: 0
-      out: |
-        cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
-        perl version 5.041005 (/usr/local/bin/perl)
-      err: ""
-    - command: [/testbin/cpanm, --with-recommends, Dancer2]
-      environ: *env-def-true
-      rc: 0
-      out: ""
-      err: ""
-- id: install_dancer_with_suggests
-  input:
-    name: Dancer2
-    install_suggestions: true
-  output:
-    changed: true
-  mocks:
-    run_command:
-    - command: [/testbin/cpanm, --version]
-      environ: *env-def-true
-      rc: 0
-      out: |
-        cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
-        perl version 5.041005 (/usr/local/bin/perl)
-      err: ""
-    - command: [/testbin/cpanm, --with-suggests, Dancer2]
-      environ: *env-def-true
-      rc: 0
-      out: ""
-      err: ""
+  - id: install_dancer_compatibility
+    input:
+      name: Dancer
+      mode: compatibility
+    output:
+      changed: true
+      cpanm_version: '1.7047'
+    mocks:
+      run_command:
+        - command: [/testbin/cpanm, --version]
+          environ: *env-def-true
+          rc: 0
+          out: |
+            cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
+            perl version 5.041005 (/usr/local/bin/perl)
+          err: ''
+        - command: [/testbin/perl, -le, use Dancer;]
+          environ: *env-def-false
+          rc: 2
+          out: ''
+          err: error, not installed
+        - command: [/testbin/cpanm, Dancer]
+          environ: *env-def-true
+          rc: 0
+          out: ''
+          err: ''
+  - id: install_dancer_already_installed_compatibility
+    input:
+      name: Dancer
+      mode: compatibility
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - command: [/testbin/cpanm, --version]
+          environ: *env-def-true
+          rc: 0
+          out: |
+            cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
+            perl version 5.041005 (/usr/local/bin/perl)
+          err: ''
+        - command: [/testbin/perl, -le, use Dancer;]
+          environ: *env-def-false
+          rc: 0
+          out: ''
+          err: ''
+  - id: install_dancer
+    input:
+      name: Dancer
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/cpanm, --version]
+          environ: *env-def-true
+          rc: 0
+          out: |
+            cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
+            perl version 5.041005 (/usr/local/bin/perl)
+          err: ''
+        - command: [/testbin/cpanm, Dancer]
+          environ: *env-def-true
+          rc: 0
+          out: ''
+          err: ''
+  - id: install_distribution_file_compatibility
+    input:
+      name: MIYAGAWA/Plack-0.99_05.tar.gz
+      mode: compatibility
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/cpanm, --version]
+          environ: *env-def-true
+          rc: 0
+          out: |
+            cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
+            perl version 5.041005 (/usr/local/bin/perl)
+          err: ''
+        - command: [/testbin/cpanm, MIYAGAWA/Plack-0.99_05.tar.gz]
+          environ: *env-def-true
+          rc: 0
+          out: ''
+          err: ''
+  - id: install_distribution_file
+    input:
+      name: MIYAGAWA/Plack-0.99_05.tar.gz
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/cpanm, --version]
+          environ: *env-def-true
+          rc: 0
+          out: |
+            cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
+            perl version 5.041005 (/usr/local/bin/perl)
+          err: ''
+        - command: [/testbin/cpanm, MIYAGAWA/Plack-0.99_05.tar.gz]
+          environ: *env-def-true
+          rc: 0
+          out: ''
+          err: ''
+  - id: install_into_locallib
+    input:
+      name: Dancer
+      mode: new
+      locallib: /srv/webapps/my_app/extlib
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/cpanm, --version]
+          environ: *env-def-true
+          rc: 0
+          out: |
+            cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
+            perl version 5.041005 (/usr/local/bin/perl)
+          err: ''
+        - command: [/testbin/cpanm, --local-lib, /srv/webapps/my_app/extlib, Dancer]
+          environ: *env-def-true
+          rc: 0
+          out: ''
+          err: ''
+  - id: install_from_local_directory
+    input:
+      from_path: /srv/webapps/my_app/src/
+      mode: new
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/cpanm, --version]
+          environ: *env-def-true
+          rc: 0
+          out: |
+            cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
+            perl version 5.041005 (/usr/local/bin/perl)
+          err: ''
+        - command: [/testbin/cpanm, /srv/webapps/my_app/src/]
+          environ: *env-def-true
+          rc: 0
+          out: ''
+          err: ''
+  - id: install_into_locallib_no_unit_testing
+    input:
+      name: Dancer
+      notest: true
+      mode: new
+      locallib: /srv/webapps/my_app/extlib
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/cpanm, --version]
+          environ: *env-def-true
+          rc: 0
+          out: |
+            cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
+            perl version 5.041005 (/usr/local/bin/perl)
+          err: ''
+        - command: [/testbin/cpanm, --notest, --local-lib, /srv/webapps/my_app/extlib, Dancer]
+          environ: *env-def-true
+          rc: 0
+          out: ''
+          err: ''
+  - id: install_from_mirror
+    input:
+      name: Dancer
+      mode: new
+      mirror: http://cpan.cpantesters.org/
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/cpanm, --version]
+          environ: *env-def-true
+          rc: 0
+          out: |
+            cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
+            perl version 5.041005 (/usr/local/bin/perl)
+          err: ''
+        - command: [/testbin/cpanm, --mirror, http://cpan.cpantesters.org/, Dancer]
+          environ: *env-def-true
+          rc: 0
+          out: ''
+          err: ''
+  - id: install_into_system_lib
+    input:
+      name: Dancer
+      mode: new
+      system_lib: true
+    output:
+      failed: true
+    mocks:
+      run_command: []
+  - id: install_minversion_implicit
+    input:
+      name: Dancer
+      mode: new
+      version: '1.0'
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/cpanm, --version]
+          environ: *env-def-true
+          rc: 0
+          out: |
+            cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
+            perl version 5.041005 (/usr/local/bin/perl)
+          err: ''
+        - command: [/testbin/cpanm, Dancer~1.0]
+          environ: *env-def-true
+          rc: 0
+          out: ''
+          err: ''
+  - id: install_minversion_explicit
+    input:
+      name: Dancer
+      mode: new
+      version: ~1.5
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/cpanm, --version]
+          environ: *env-def-true
+          rc: 0
+          out: |
+            cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
+            perl version 5.041005 (/usr/local/bin/perl)
+          err: ''
+        - command: [/testbin/cpanm, Dancer~1.5]
+          environ: *env-def-true
+          rc: 0
+          out: ''
+          err: ''
+  - id: install_specific_version
+    input:
+      name: Dancer
+      mode: new
+      version: '@1.7'
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/cpanm, --version]
+          environ: *env-def-true
+          rc: 0
+          out: |
+            cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
+            perl version 5.041005 (/usr/local/bin/perl)
+          err: ''
+        - command: [/testbin/cpanm, Dancer@1.7]
+          environ: *env-def-true
+          rc: 0
+          out: ''
+          err: ''
+  - id: install_specific_version_from_file_error
+    input:
+      name: MIYAGAWA/Plack-0.99_05.tar.gz
+      mode: new
+      version: '@1.7'
+    output:
+      failed: true
+      msg: parameter 'version' must not be used when installing from a file
+    mocks:
+      run_command:
+        - command: [/testbin/cpanm, --version]
+          environ: *env-def-true
+          rc: 0
+          out: |
+            cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
+            perl version 5.041005 (/usr/local/bin/perl)
+          err: ''
+  - id: install_specific_version_from_directory_error
+    input:
+      from_path: ~/
+      mode: new
+      version: '@1.7'
+    output:
+      failed: true
+      msg: parameter 'version' must not be used when installing from a directory
+    mocks:
+      run_command:
+        - command: [/testbin/cpanm, --version]
+          environ: *env-def-true
+          rc: 0
+          out: |
+            cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
+            perl version 5.041005 (/usr/local/bin/perl)
+          err: ''
+  - id: install_specific_version_from_git_url_explicit
+    input:
+      name: git://github.com/plack/Plack.git
+      mode: new
+      version: '@1.7'
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/cpanm, --version]
+          environ: *env-def-true
+          rc: 0
+          out: |
+            cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
+            perl version 5.041005 (/usr/local/bin/perl)
+          err: ''
+        - command: [/testbin/cpanm, git://github.com/plack/Plack.git@1.7]
+          environ: *env-def-true
+          rc: 0
+          out: ''
+          err: ''
+  - id: install_specific_version_from_git_url_implicit
+    input:
+      name: git://github.com/plack/Plack.git
+      mode: new
+      version: '2.5'
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/cpanm, --version]
+          environ: *env-def-true
+          rc: 0
+          out: |
+            cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
+            perl version 5.041005 (/usr/local/bin/perl)
+          err: ''
+        - command: [/testbin/cpanm, git://github.com/plack/Plack.git@2.5]
+          environ: *env-def-true
+          rc: 0
+          out: ''
+          err: ''
+  - id: install_version_operator_from_git_url_error
+    input:
+      name: git://github.com/plack/Plack.git
+      mode: new
+      version: ~2.5
+    output:
+      failed: true
+      msg: operator '~' not allowed in version parameter when installing from git repository
+    mocks:
+      run_command:
+        - command: [/testbin/cpanm, --version]
+          environ: *env-def-true
+          rc: 0
+          out: |
+            cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
+            perl version 5.041005 (/usr/local/bin/perl)
+          err: ''
+  - id: install_dancer_with_recommends
+    input:
+      name: Dancer2
+      install_recommendations: true
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/cpanm, --version]
+          environ: *env-def-true
+          rc: 0
+          out: |
+            cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
+            perl version 5.041005 (/usr/local/bin/perl)
+          err: ''
+        - command: [/testbin/cpanm, --with-recommends, Dancer2]
+          environ: *env-def-true
+          rc: 0
+          out: ''
+          err: ''
+  - id: install_dancer_with_suggests
+    input:
+      name: Dancer2
+      install_suggestions: true
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/cpanm, --version]
+          environ: *env-def-true
+          rc: 0
+          out: |
+            cpanm (App::cpanminus) version 1.7047 (/usr/local/bin/cpanm)
+            perl version 5.041005 (/usr/local/bin/perl)
+          err: ''
+        - command: [/testbin/cpanm, --with-suggests, Dancer2]
+          environ: *env-def-true
+          rc: 0
+          out: ''
+          err: ''
