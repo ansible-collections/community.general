@@ -71,12 +71,12 @@ DOCUMENTATION = '''
               - Enable O(sudo_preserve_env) if O(sudo) is enabled.
             type: dict
             default: {}
-        hooks:
+        hooks_results:
             description:
-              - List of paths to the hook files in a jail.
-              - Content of the hook files is stored in the items of the list C(iocage_hooks).
-              - If a hook file is not available the item keeps the dash character C(-).
-              - The variable C(iocage_hooks) is not created if O(hooks) is empty.
+              - List of paths to the files in a jail.
+              - Content of the files is stored in the items of the list C(iocage_hooks).
+              - If a file is not available the item keeps the dash character C(-).
+              - The variable C(iocage_hooks) is not created if O(hooks_results) is empty.
             type: list
             elements: path
             version_added: 10.4.0
@@ -157,7 +157,7 @@ keyed_groups:
 plugin: community.general.iocage
 host: 10.1.0.73
 user: admin
-hooks:
+hooks_results:
   - /var/db/dhclient-hook.address.epair0b
 compose:
   ansible_host: iocage_hooks.0
@@ -247,7 +247,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         sudo_preserve_env = self.get_option('sudo_preserve_env')
         env = self.get_option('env')
         get_properties = self.get_option('get_properties')
-        hooks = self.get_option('hooks')
+        hooks_results = self.get_option('hooks_results')
 
         cmd = []
         my_env = os.environ.copy()
@@ -308,7 +308,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
                 self.get_properties(t_stdout, results, hostname)
 
-        if hooks:
+        if hooks_results:
             cmd_get_pool = cmd.copy()
             cmd_get_pool.append(self.IOCAGE)
             cmd_get_pool.append('get')
@@ -328,7 +328,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
             for hostname, host_vars in results['_meta']['hostvars'].items():
                 iocage_hooks = []
-                for hook in hooks:
+                for hook in hooks_results:
                     path = "/" + iocage_pool + "/iocage/jails/" + hostname + "/root" + hook
                     cmd_cat_hook = cmd.copy()
                     cmd_cat_hook.append('cat')
