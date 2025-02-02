@@ -161,6 +161,11 @@ class Connection(ConnectionBase):
 
         return process.returncode, stdout, stderr
 
+
+    def _get_remote_uid_gid(self) -> tuple[str, str]:
+        """ get the remote user and group id """
+        return "1000", "1000"
+
     def put_file(self, in_path, out_path):
         """ put a file from local to lxd """
         super(Connection, self).put_file(in_path, out_path)
@@ -173,13 +178,14 @@ class Connection(ConnectionBase):
         local_cmd = [self._lxc_cmd]
         if self.get_option("project"):
             local_cmd.extend(["--project", self.get_option("project")])
+
+        uid, gid = self._get_remote_uid_gid()
         local_cmd.extend([
-            "file", "push", "--gid", "1000", "--uid", "1000",
+            "file", "push", "--uid", uid, "--gid", gid,
             in_path,
             f"{self.get_option('remote')}:{self._host()}/{out_path}"
         ])
-
-        self._display.vvvvv(f"PUT COMMAND {local_cmd}", host=self._host())
+        self._display.vvvvv(f"PUT COMMAND: {local_cmd}", host=self._host())
 
         local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
 
