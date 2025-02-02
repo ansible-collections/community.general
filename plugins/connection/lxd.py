@@ -167,12 +167,12 @@ class Connection(ConnectionBase):
 
         rc, uid_out, err = self.exec_command("/bin/id -u")
         if rc != 0:
-            raise AnsibleError(f"Failed to get remote uid: {err.strip()}")
+            raise AnsibleError(f"Failed to get remote uid for user {self.get_option('remote_user')}: {err}")
         uid = uid_out.strip()
 
         rc, gid_out, err = self.exec_command("/bin/id -g")
         if rc != 0:
-            raise AnsibleError(f"Failed to get remote gid: {err.strip()}")
+            raise AnsibleError(f"Failed to get remote gid for user {self.get_option('remote_user')}: {err}")
         gid = gid_out.strip()
 
         return uid, gid
@@ -200,7 +200,6 @@ class Connection(ConnectionBase):
             in_path,
             f"{self.get_option('remote')}:{self._host()}/{out_path}"
         ])
-        self._display.vvvvv(f"PUT COMMAND: {local_cmd}", host=self._host())
 
         local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
 
