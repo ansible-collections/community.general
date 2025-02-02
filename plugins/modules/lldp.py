@@ -72,19 +72,19 @@ def gather_lldp(module):
             current_dict = output_dict
             for path_component in path_components:
                 current_dict[path_component] = current_dict.get(path_component, {})
-                if type(current_dict[path_component]) is not dict:
+                if not isinstance(current_dict[path_component], dict):
                     current_dict[path_component] = {'value': current_dict[path_component]}
                 current_dict = current_dict[path_component]
 
-            if final in current_dict and type(current_dict[final]) is dict:
+            if final in current_dict and isinstance(current_dict[final], dict):
                 current_dict = current_dict[final]
                 final = 'value'
 
             if final not in current_dict or not module.params['multivalues']:
                 current_dict[final] = value
-            elif type(current_dict[final]) is str:
+            elif isinstance(current_dict[final], str):
                 current_dict[final] = [current_dict[final], value]
-            elif type(current_dict[final]) is list:
+            elif isinstance(current_dict[final], list):
                 current_dict[final].append(value)
 
         return output_dict
@@ -92,7 +92,7 @@ def gather_lldp(module):
 
 def main():
     module_args = dict(
-        multivalues=dict(type='bool', equired=False, default=False)
+        multivalues=dict(type='bool', required=False, default=False)
     )
     module = AnsibleModule(module_args)
 
