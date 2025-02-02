@@ -6,6 +6,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
+import os
 import sys
 import json
 
@@ -13,49 +14,49 @@ import yaml
 import pytest
 
 
-from ansible.module_utils.common._collections_compat import Sequence
-
-
 class Helper(object):
     TEST_SPEC_VALID_SECTIONS = ["anchors", "test_cases"]
 
     @staticmethod
-    def from_spec(test_module, ansible_module, test_spec, mocks=None):
-        helper = Helper(test_module, ansible_module, test_spec=test_spec, mocks=mocks)
+    def from_spec(ansible_module, test_module, test_spec, mocks=None):
+        helper = Helper(ansible_module, test_module, test_spec=test_spec, mocks=mocks)
         return helper
 
     @staticmethod
-    def from_file(test_module, ansible_module, filename, mocks=None):
-        with open(filename, "r") as test_cases:
-            test_spec = yaml.safe_load(test_cases)
-        return Helper.from_spec(test_module, ansible_module, test_spec, mocks)
+    def from_file(ansible_module, test_module, test_spec_filehandle, mocks=None):
+        test_spec = yaml.safe_load(test_spec_filehandle)
+        return Helper.from_spec(ansible_module, test_module, test_spec, mocks)
 
+    # @TODO: calculate the test_module_name automatically, remove one more parameter
     @staticmethod
-    def from_module(ansible_module, test_module_name, test_spec=None, mocks=None):
+    def from_module(ansible_module, test_module_name, mocks=None):
         test_module = sys.modules[test_module_name]
-        if test_spec is None:
-            test_spec = test_module.__file__.replace('.py', '.yaml')
-        return Helper.from_file(test_module, ansible_module, test_spec, mocks=mocks)
+        extensions = ['.yaml', '.yml']
+        for ext in extensions:
+            test_spec_filename = test_module.__file__.replace('.py', ext)
+            if os.path.exists(test_spec_filename):
+                with open(test_spec_filename, "r") as test_spec_filehandle:
+                    return Helper.from_file(ansible_module, test_module, test_spec_filehandle, mocks=mocks)
+
+        raise Exception("Cannot find test case file for {0} with one of the extensions: {1}".format(test_module.__file__, extensions))
 
     def add_func_to_test_module(self, name, func):
         setattr(self.test_module, name, func)
 
-    def __init__(self, test_module, ansible_module, test_spec, mocks=None):
-        self.test_module = test_module
+    def __init__(self, ansible_module, test_module, test_spec, mocks=None):
         self.ansible_module = ansible_module
+        self.test_module = test_module
         self.test_cases = []
         self.fixtures = {}
-        if isinstance(test_spec, Sequence):
-            test_cases = test_spec
-        else:  # it is a dict
-            test_cases = test_spec['test_cases']
-            spec_diff = set(test_spec.keys()) - set(self.TEST_SPEC_VALID_SECTIONS)
-            if spec_diff:
-                raise ValueError("Test specification contain unknown keys: {0}".format(", ".join(spec_diff)))
+
+        spec_diff = set(test_spec.keys()) - set(self.TEST_SPEC_VALID_SECTIONS)
+        if spec_diff:
+            raise ValueError("Test specification contain unknown keys: {0}".format(", ".join(spec_diff)))
+
         self.mocks_map = {m.name: m for m in mocks} if mocks else {}
 
-        for test_case in test_cases:
-            tc = ModuleTestCase.make_test_case(test_case, test_module, self.mocks_map)
+        for spec_test_case in test_spec['test_cases']:
+            tc = ModuleTestCase.make_test_case(spec_test_case, test_module, self.mocks_map)
             self.test_cases.append(tc)
             self.fixtures.update(tc.fixtures)
         self.set_test_func()
