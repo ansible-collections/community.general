@@ -210,7 +210,7 @@ class Connection(ConnectionBase):
             ]
         )
 
-        self._display.vvvvv(f"PUT COMMAND {local_cmd}", host=self._host())
+        self._display.vvvvv(f"PUT {local_cmd}", host=self._host())
 
         local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
 
