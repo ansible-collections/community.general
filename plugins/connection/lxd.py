@@ -174,10 +174,12 @@ class Connection(ConnectionBase):
         if self.get_option("project"):
             local_cmd.extend(["--project", self.get_option("project")])
         local_cmd.extend([
-            "file", "push",
+            "file", "push", "--gid", "1000", "--uid", "1000",
             in_path,
             f"{self.get_option('remote')}:{self._host()}/{out_path}"
         ])
+
+        self._display.vvvvv(f"PUT COMMAND {local_cmd}", host=self._host())
 
         local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
 
