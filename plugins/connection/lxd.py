@@ -193,7 +193,7 @@ class Connection(ConnectionBase):
         if self.get_option("project"):
             local_cmd.extend(["--project", self.get_option("project")])
 
-        uid, gid = (-1, -1) # lxc file push defaults
+        uid, gid = (-1, -1)  # lxc file push defaults
         if self.get_option("remote_user") != "root":
             uid, gid = self._get_remote_uid_gid()
 
