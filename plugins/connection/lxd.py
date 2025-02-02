@@ -201,6 +201,8 @@ class Connection(ConnectionBase):
             f"{self.get_option('remote')}:{self._host()}/{out_path}"
         ])
 
+        self._display.vvvvv(f"PUT COMMAND {local_cmd}", host=self._host())
+
         local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
 
         process = Popen(local_cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE)
