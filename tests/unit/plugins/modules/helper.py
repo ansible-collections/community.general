@@ -38,7 +38,7 @@ class Helper(object):
                 with open(test_spec_filename, "r") as test_spec_filehandle:
                     return Helper.from_file(ansible_module, test_module, test_spec_filehandle, mocks=mocks)
 
-        raise Exception(f"Cannot find test case file for {0} with one of the extensions: {1}".format(test_module.__file__, extensions))
+        raise Exception("Cannot find test case file for {0} with one of the extensions: {1}".format(test_module.__file__, extensions))
 
     def add_func_to_test_module(self, name, func):
         setattr(self.test_module, name, func)
