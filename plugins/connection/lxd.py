@@ -161,22 +161,24 @@ class Connection(ConnectionBase):
 
         return process.returncode, stdout, stderr
 
-
     def _get_remote_uid_gid(self) -> tuple[int, int]:
         """Get the user and group id of 'remote_user' from the instance."""
 
         rc, uid_out, err = self.exec_command("/bin/id -u")
         if rc != 0:
-            raise AnsibleError(f"Failed to get remote uid for user {self.get_option('remote_user')}: {err}")
+            raise AnsibleError(
+                f"Failed to get remote uid for user {self.get_option('remote_user')}: {err}"
+            )
         uid = uid_out.strip()
 
         rc, gid_out, err = self.exec_command("/bin/id -g")
         if rc != 0:
-            raise AnsibleError(f"Failed to get remote gid for user {self.get_option('remote_user')}: {err}")
+            raise AnsibleError(
+                f"Failed to get remote gid for user {self.get_option('remote_user')}: {err}"
+            )
         gid = gid_out.strip()
 
         return int(uid), int(gid)
-
 
     def put_file(self, in_path, out_path):
         """ put a file from local to lxd """
@@ -193,13 +195,20 @@ class Connection(ConnectionBase):
 
         uid, gid = (-1, -1)
         if self.get_option("remote_user") != "root":
-          uid, gid = self._get_remote_uid_gid()
+            uid, gid = self._get_remote_uid_gid()
 
-        local_cmd.extend([
-            "file", "push", "--uid", str(uid), "--gid", str(gid),
-            in_path,
-            f"{self.get_option('remote')}:{self._host()}/{out_path}"
-        ])
+        local_cmd.extend(
+            [
+                "file",
+                "push",
+                "--uid",
+                str(uid),
+                "--gid",
+                str(gid),
+                in_path,
+                f"{self.get_option('remote')}:{self._host()}/{out_path}",
+            ]
+        )
 
         self._display.vvvvv(f"PUT COMMAND {local_cmd}", host=self._host())
 
