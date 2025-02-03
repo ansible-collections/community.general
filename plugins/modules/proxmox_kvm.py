@@ -455,6 +455,7 @@ options:
       - Indicates desired state of the instance.
       - If V(current), the current state of the VM will be fetched. You can access it with C(results.status).
       - V(template) was added in community.general 8.1.0.
+      - V(paused) and V(hibernated) were added in community.general 10.4.0.
     type: str
     choices: ['present', 'started', 'absent', 'stopped', 'restarted', 'current', 'template', 'paused', 'hibernated']
     default: present
