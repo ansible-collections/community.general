@@ -16,8 +16,7 @@ author:
   - Dexter Le (@munchtoast)
 version_added: 10.4.0
 description:
-  - This module can manage resources to a pacemaker cluster from Ansible using
-    the pacemaker cli.
+  - This module can manage resources in a Pacemaker cluster using the pacemaker CLI.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -165,8 +164,7 @@ class PacemakerResource(StateModuleHelper):
             )),
             resource_meta=dict(type='list', elements='str'),
             resource_argument=dict(type='dict', options=dict(
-                argument_action=dict(type='str', choices=[
-                                   'clone', 'master', 'group', 'promotable']),
+                argument_action=dict(type='str', choices=['clone', 'master', 'group', 'promotable']),
                 argument_option=dict(type='list', elements='str'),
             )),
             disabled=dict(type='bool', default=False),
@@ -189,12 +187,11 @@ class PacemakerResource(StateModuleHelper):
 
     def _process_command_output(self, fail_on_err, ignore_err_msg=""):
         def process(rc, out, err):
-          if fail_on_err and rc != 0 and err and ignore_err_msg not in err:
-              self.do_raise(
-                'pcs failed with error (rc={0}): {1}'.format(rc, err))
-          out = out.rstrip()
-          self.vars.value = None if out == "" else out
-          return self.vars.value
+            if fail_on_err and rc != 0 and err and ignore_err_msg not in err:
+                self.do_raise('pcs failed with error (rc={0}): {1}'.format(rc, err))
+            out = out.rstrip()
+            self.vars.value = None if out == "" else out
+            return self.vars.value
         return process
 
     def _get(self):
@@ -211,18 +208,10 @@ class PacemakerResource(StateModuleHelper):
 
     def state_present(self):
         with self.runner(
-                'state name resource_type resource_option resource_operation resource_meta resource_argument disabled wait', output_process=self._process_command_output(True, "already exists"),
+                'state name resource_type resource_option resource_operation resource_meta resource_argument disabled wait',
+                output_process=self._process_command_output(True, "already exists"),
                 check_mode_skip=True) as ctx:
-            ctx.run(
-                state=self.vars.state,
-                name=self.vars.name,
-                resource_type=self.vars.resource_type,
-                resource_option=self.vars.resource_option,
-                resource_operation=self.vars.resource_operation,
-                resource_meta=self.vars.resource_meta,
-                resource_argument=self.vars.resource_argument,
-                disabled=self.vars.disabled,
-                wait=self.vars.wait)
+            ctx.run()
         self.vars.stdout = ctx.results_out
         self.vars.stderr = ctx.results_err
         self.vars.cmd = ctx.cmd
