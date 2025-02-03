@@ -152,10 +152,10 @@ class ModuleTestCase:
             mocks=test_case_spec.get("mocks", {}),
             flags=test_case_spec.get("flags", {})
         )
-        tc.build_mocks(test_module, mocks_map)
+        tc.build_mocks(mocks_map)
         return tc
 
-    def build_mocks(self, test_module, mocks_map):
+    def build_mocks(self, mocks_map):
         for mock_name, mock_spec in self.mock_specs.items():
             try:
                 mock_class = mocks_map[mock_name]
