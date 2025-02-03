@@ -191,35 +191,35 @@ Top level
 
 At the top level there are two accepted keys:
 
-- ``anchors`` (*dict, Optional*)
-    Placeholder for you to define YAML anchors that can be repeated in the test cases.
+- ``anchors: dict``
+    Optional. Placeholder for you to define YAML anchors that can be repeated in the test cases.
     Its contents are never accessed directly by test Helper.
-- ``test_cases`` (*list, Mandatory*)
-    List of test cases, see below for definition.
+- ``test_cases: list``
+    Mandatory. List of test cases, see below for definition.
 
 Test cases
 ----------
 
 You write the test cases with five elements:
 
-- ``id`` (*str, Mandatory*)
-    Used to identify the test case.
-- ``flags`` (*dict, Optional*)
-    Flags controling the behavior of the test case. Accepted flags:
+- ``id: str``
+    Mandatory. Used to identify the test case.
+- ``flags: dict``
+    Optional. Flags controling the behavior of the test case. All flags are optional. Accepted flags:
 
-    * ``check`` (*bool, Optional*): set to ``true`` if the module is to be executed in **check mode**.
-    * ``diff`` (*bool, Optional*): set to ``true`` if the module is to be executed in **diff mode**.
-    * ``skip`` (*str, Optional*): set the test case to be skipped, providing the message for ``pytest.skip()``.
-    * ``xfail`` (*str, Optional*): set the test case to expect failure, providing the message for ``pytest.xfail()``.
-- ``input`` (*dict, Optional*)
-    Parameters for the Ansible module, it can be empty.
-- ``output`` (*dict, Optional*)
-    Expected return values from the Ansible module.
+    * ``check: bool``: set to ``true`` if the module is to be executed in **check mode**.
+    * ``diff: bool``: set to ``true`` if the module is to be executed in **diff mode**.
+    * ``skip: str``: set the test case to be skipped, providing the message for ``pytest.skip()``.
+    * ``xfail: str``: set the test case to expect failure, providing the message for ``pytest.xfail()``.
+- ``input: dict``
+    Optional. Parameters for the Ansible module, it can be empty.
+- ``output: dict``
+    Optional. Expected return values from the Ansible module.
     All RV names are used here are expected to be found in the module output, but not all RVs in the output must be here.
     It can include special RVs such as ``changed`` and ``diff``.
     It can be empty.
-- ``mocks`` (*dict, Optional*)
-    Mocked interactions, ``run_command`` being the only one supported for now.
+- ``mocks: dict``
+    Optional. Mocked interactions, ``run_command`` being the only one supported for now.
     Each key in this dictionary refers to one subclass of ``TestCaseMock`` (see more below) and contains a list of the interactions for that ``TestCaseMock``.
     All keys are expected to be named using snake case, as in ``run_command``.
     The Python class supporting the test case mock is constructed by converting the snake case name to a
@@ -236,20 +236,20 @@ RunCommandMock Specification
 
 For each interaction the structure is as follows:
 
-- ``command`` (*list OR str, Mandatory*)
-    The command that is expected to be executed by the module. It corresponds to the parameter ``args`` of the ``AnsibleModule.run_command()`` call.
+- ``command: Union[list, str]``
+    Mandatory. The command that is expected to be executed by the module. It corresponds to the parameter ``args`` of the ``AnsibleModule.run_command()`` call.
     It can be either a list or a string, though the list form is generally recommended.
-- ``environ`` (*dict, Mandatory*)
-    All other parameters passed to the ``AnsibleModule.run_command()`` call.
+- ``environ: dict``
+    Mandatory. All other parameters passed to the ``AnsibleModule.run_command()`` call.
     Most commonly used are ``environ_update`` and ``check_rc``.
     Must include all parameters the Ansible module uses in the ``AnsibleModule.run_command()`` call, otherwise the test will fail.
-- ``rc`` (*int, Mandatory*)
-    The return code for the command execution.
+- ``rc: int``
+    Mandatory. The return code for the command execution.
     As per usual in bash scripting, a value of ``0`` means success, whereas any other number is an error code.
-- ``out`` (*str, Mandatory*)
-    The *stdout* result of the command execution, as one single string containing zero or more lines.
-- ``err`` (*str, Mandatory*)
-    The *stderr* result of the command execution, as one single string containing zero or more lines.
+- ``out: str``
+    Mandatory. The *stdout* result of the command execution, as one single string containing zero or more lines.
+- ``err: str``
+    Mandatory. The *stderr* result of the command execution, as one single string containing zero or more lines.
 
 
 Test Helper Reference
@@ -381,7 +381,5 @@ Known issues/opportunities for improvement:
   might make Test Helper add its function before or after the other test functions.
   In the community.general collection the CI processes uses ``pytest-xdist`` to paralellize and distribute the tests,
   and it requires the order of the tests to be consistent.
-
-
 
 .. versionadded:: 7.5.0
