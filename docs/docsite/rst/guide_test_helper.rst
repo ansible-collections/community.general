@@ -218,7 +218,7 @@ You write the test cases with five elements:
     All RV names are used here are expected to be found in the module output, but not all RVs in the output must be here.
     It can include special RVs such as ``changed`` and ``diff``.
     It can be empty.
-* ``mocks`` (*dict, Optional*)
+- ``mocks`` (*dict, Optional*)
     Mocked interactions, ``run_command`` being the only one supported for now.
     Each key in this dictionary refers to one subclass of ``TestCaseMock`` (see more below) and contains a list of the interactions for that ``TestCaseMock``.
     All keys are expected to be named using snake case, as in ``run_command``.
