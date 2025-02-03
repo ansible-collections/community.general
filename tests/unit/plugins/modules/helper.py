@@ -152,25 +152,18 @@ class ModuleTestCase:
             mocks=test_case_spec.get("mocks", {}),
             flags=test_case_spec.get("flags", {})
         )
-        tc.build_mocks(test_module, mocks_map)
+        tc.build_mocks(mocks_map)
         return tc
 
-    def build_mocks(self, test_module, mocks_map):
+    def build_mocks(self, mocks_map):
         for mock_name, mock_spec in self.mock_specs.items():
-            mock_class = mocks_map.get(mock_name, self.get_mock_class(test_module, mock_name))
+            try:
+                mock_class = mocks_map[mock_name]
+            except KeyError:
+                raise Exception("Cannot find TestCaseMock class for: {0}".format(mock_name))
             self.mocks[mock_name] = mock_class.build_mock(mock_spec)
 
             self._fixtures.update(self.mocks[mock_name].fixtures())
-
-    @staticmethod
-    def get_mock_class(test_module, mock):
-        try:
-            class_name = "".join(x.capitalize() for x in mock.split("_")) + "Mock"
-            plugin_class = getattr(test_module, class_name)
-            assert issubclass(plugin_class, TestCaseMock), "Class {0} is not a subclass of TestCaseMock".format(class_name)
-            return plugin_class
-        except AttributeError:
-            raise ValueError("Cannot find class {0} for mock {1}".format(class_name, mock))
 
     @property
     def fixtures(self):
@@ -207,10 +200,6 @@ class ModuleTestCase:
 
 
 class TestCaseMock:
-    @property
-    def name(self):
-        raise NotImplementedError()
-
     @classmethod
     def build_mock(cls, mock_specs):
         return cls(mock_specs)
@@ -229,9 +218,7 @@ class TestCaseMock:
 
 
 class RunCommandMock(TestCaseMock):
-    @property
-    def name(self):
-        return "run_command"
+    name = "run_command"
 
     def __str__(self):
         return "<RunCommandMock specs={specs}>".format(specs=self.mock_specs)
