@@ -123,68 +123,68 @@ A real world example for that can be found at
 Test Specification
 """"""""""""""""""
 
-The strucutre of the test specification, in YAML is (excerpt from ``test_gio_mime.yaml``):
+The strucutre of the test specification, in YAML is (excerpt from ``test_opkg.yaml``):
 
 ..  code-block:: yaml
 
   ---
   anchors:
-    environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+    environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
   test_cases:
-    - id: test_set_handler
+    - id: install_zlibdev
       input:
-        handler: google-chrome.desktop
-        mime_type: x-scheme-handler/http
+        name: zlib-dev
+        state: present
       output:
-        handler: google-chrome.desktop
-        changed: true
+        msg: installed 1 package(s)
       mocks:
         run_command:
-          - command: [/testbin/gio, --version]
-            environ: *env-def
-            rc: 0
-            out: "2.80.0\n"
-            err: ''
-          - command: [/testbin/gio, mime, x-scheme-handler/http]
+          - command: [/testbin/opkg, --version]
             environ: *env-def
             rc: 0
             out: ''
-            err: >
-              No default applications for “x-scheme-handler/http”
-          - command: [/testbin/gio, mime, x-scheme-handler/http, google-chrome.desktop]
-            environ: *env-def
-            rc: 0
-            out: "Set google-chrome.desktop as the default for x-scheme-handler/http\n"
             err: ''
-    - id: test_set_handler_check
-      input:
-        handler: google-chrome.desktop
-        mime_type: x-scheme-handler/http
-      output:
-        handler: google-chrome.desktop
-        changed: true
-        stdout: Module executed in check mode
-        diff:
-          before:
-            handler: null
-          after:
-            handler: google-chrome.desktop
-      flags:
-        check: true
-        diff: true
-      mocks:
-        run_command:
-          - command: [/testbin/gio, --version]
-            environ: *env-def
-            rc: 0
-            out: "2.80.0\n"
-            err: ''
-          - command: [/testbin/gio, mime, x-scheme-handler/http]
+          - command: [/testbin/opkg, list-installed, zlib-dev]
             environ: *env-def
             rc: 0
             out: ''
-            err: >
-              No default applications for “x-scheme-handler/http”
+            err: ''
+          - command: [/testbin/opkg, install, zlib-dev]
+            environ: *env-def
+            rc: 0
+            out: |
+              Installing zlib-dev (1.2.11-6) to root...
+              Downloading https://downloads.openwrt.org/releases/22.03.0/packages/mips_24kc/base/zlib-dev_1.2.11-6_mips_24kc.ipk
+              Installing zlib (1.2.11-6) to root...
+              Downloading https://downloads.openwrt.org/releases/22.03.0/packages/mips_24kc/base/zlib_1.2.11-6_mips_24kc.ipk
+              Configuring zlib.
+              Configuring zlib-dev.
+            err: ''
+          - command: [/testbin/opkg, list-installed, zlib-dev]
+            environ: *env-def
+            rc: 0
+            out: |
+              zlib-dev - 1.2.11-6
+            err: ''
+    - id: install_zlibdev_present
+      input:
+        name: zlib-dev
+        state: present
+      output:
+        msg: package(s) already present
+      mocks:
+        run_command:
+          - command: [/testbin/opkg, --version]
+            environ: *env-def
+            rc: 0
+            out: ''
+            err: ''
+          - command: [/testbin/opkg, list-installed, zlib-dev]
+            environ: *env-def
+            rc: 0
+            out: |
+              zlib-dev - 1.2.11-6
+            err: ''
 
 Top level
 ---------
@@ -226,6 +226,7 @@ You write the test cases with five elements:
     camel case name with suffix ``Mock``, so for example ``run_command`` becomes ``RunCommandMock``.
     The test will fail if the Ansible module make a number of interactions different from what is specififed in the test case.
     The structure for that specification is dependent on the implementing class, see details below.
+
 
 TestCaseMocks Specifications
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -349,6 +350,7 @@ Creating TestCaseMocks
 To create a new ``TestCaseMock`` you must extend that class and implement the relevant parts:
 
 .. code-block:: python
+
     class ShrubberyMock(TestCaseMock):
         # this name is mandatory, it is the name used in the test specification
         name = "shrubbery"
@@ -360,10 +362,12 @@ To create a new ``TestCaseMock`` you must extend that class and implement the re
         def check(self, test_case, results):
             # verify the tst execution met the expectations of the test case
             # for example the function was called as many times as it should
+            ...
 
         def fixtures(self):
             # returns a dict mapping names to pytest fixtures that should be used for the test case
             # for example, in RunCommandMock it creates a fixture that patches AnsibleModule.get_bin_path
+            ...
 
 
 Caveats
