@@ -284,7 +284,7 @@ class SSHConfig(object):
         )
         if self.params.get('other_options'):
             for key, value in self.params.get('other_options').items():
-                args[key] = value
+                args[key] = str(value)
 
         config_changed = False
         hosts_changed = []
