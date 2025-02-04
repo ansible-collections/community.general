@@ -72,7 +72,7 @@ options:
     type: path
   identities_only:
     description:
-      - Specifies that SSH should only use the configured authentication identity and certificate files (either the default 
+      - Specifies that SSH should only use the configured authentication identity and certificate files (either the default
         files, or those explicitly configured in the C(ssh_config) files or passed on the ssh command-line), even if C(ssh-agent)
         or a C(PKCS11Provider) or C(SecurityKeyProvider) offers more identities.
     type: bool
@@ -146,7 +146,7 @@ options:
     type: dict
     version_added: 10.4.0
 requirements:
-- paramiko
+  - paramiko
 """
 
 EXAMPLES = r"""
