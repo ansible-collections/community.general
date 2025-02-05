@@ -330,7 +330,7 @@ def main():
             runrefresh=dict(required=False, default=False, type='bool'),
             description=dict(required=False),
             disable_gpg_check=dict(required=False, default=False, type='bool'),
-            autorefresh=dict(required=False, default=False, type='bool', aliases=['refresh']),
+            autorefresh=dict(required=False, default=True, type='bool', aliases=['refresh']),
             priority=dict(required=False, type='int'),
             enabled=dict(required=False, default=True, type='bool'),
             overwrite_multiple=dict(required=False, default=False, type='bool'),
