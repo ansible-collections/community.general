@@ -1,0 +1,2 @@
+bugfixes:
+  - host_add - fix. The module revoked existing host certificates even if ``user_certificates`` was not given. (https://github.com/ansible-collections/community.general/pull/9694).
