@@ -1,0 +1,2 @@
+bugfixes:
+  - module_utils/identity/keycloak - replaces missing return in get_role_composites method which caused it to return None instead of composite roles (https://github.com/ansible-collections/community.general/issues/9678)
