@@ -95,8 +95,10 @@ backup_schedule:
     - If V(update_vmid), the backup_schedule will return True after adding the VM ID to the backup job.
     - If V(delete_vmid), the backup_schedule will return a list of backup job IDs where the VM ID has existed after removing it.
   returned: always, but can be empty
-  type: any
-  sample: "true or ['backup-job-id1', 'backup-job-id2']"
+  type: raw
+  sample:
+    - true
+    - ['backup-job-id1', 'backup-job-id2']
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
