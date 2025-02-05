@@ -270,6 +270,10 @@ def ensure(module, client):
                     data = {}
                     for key in diff:
                         data[key] = module_host.get(key)
+                    if "usercertificate" not in data:
+                        data["usercertificate"] = [
+                            cert['__base64__'] for cert in ipa_host.get("usercertificate", [])
+                        ]
                     ipa_host_show = client.host_show(name=name)
                     if ipa_host_show.get('has_keytab', True) and (state == 'disabled' or module.params.get('random_password')):
                         client.host_disable(name=name)
