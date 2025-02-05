@@ -90,17 +90,13 @@ EXAMPLES = """
 
 RETURN = """
 ---
-update_result:
-  description: True if the VM ID was successfully added to the backup job.
-  returned: when backup_action is 'update_vmid'
-  type: bool
-  sample: true
-
-delete_result:
-  description: A list of backup job IDs where the VM ID has been removed.
-  returned: when backup_action is 'delete_vmid'
-  type: list
-  sample: ['backup-job-id1', 'backup-job-id2']
+backup_schedule:
+  description:
+    - If V(update_vmid), the backup_schedule will return True after adding the VM ID to the backup job.
+    - If V(delete_vmid), the backup_schedule will return a list of backup job IDs where the VM ID has existed after removing it.
+  returned: always, but can be empty
+  type: any
+  sample: "true or ['backup-job-id1', 'backup-job-id2']"
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
