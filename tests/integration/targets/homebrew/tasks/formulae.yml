@@ -344,7 +344,7 @@
 
 # Test install from homebrew tap
 - block:
-  - name: Tap hasicorp repository
+  - name: Tap hashicorp repository
     community.general.homebrew_tap:
       name: hashicorp/tap
     become: true
