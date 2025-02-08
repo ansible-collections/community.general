@@ -44,7 +44,7 @@ options:
     type: str
   type:
     description:
-      - Specifies which datasets types to display. Multiple values have to be provided in comma-separated form.
+      - Specifies which datasets types to display. Multiple values have to be provided as a list or in comma-separated form.
       - Value V(all) cannot be used together with other values.
     choices: ['all', 'filesystem', 'volume', 'snapshot', 'bookmark']
     default: [all]
