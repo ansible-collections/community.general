@@ -75,7 +75,7 @@
     state: present
   when:
     - ansible_system == 'Linux'
-    - ansible_os_family not in ['Suse', 'RedHat', 'Alpine']
+    - ansible_os_family not in ['Suse', 'RedHat', 'Alpine', 'Archlinux']
 
 - name: "Install reiserfs progs (FreeBSD)"
   ansible.builtin.package:
