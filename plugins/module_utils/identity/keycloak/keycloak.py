@@ -1856,7 +1856,7 @@ class KeycloakAPI(object):
             else:
                 composite_url = URL_REALM_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, name=quote(rolerep["name"], safe=''))
             # Get existing composites
-            self._request_and_deserialize(composite_url, method='GET')
+            return self._request_and_deserialize(composite_url, method='GET')
         except Exception as e:
             self.fail_request(e, msg='Could not get role %s composites in realm %s: %s'
                                      % (rolerep['name'], realm, str(e)))
