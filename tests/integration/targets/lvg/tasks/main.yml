@@ -24,6 +24,8 @@
 
     - import_tasks: test_grow_reduce.yml
 
+    - import_tasks: test_remove_extra_pvs.yml
+
     - import_tasks: test_pvresize.yml
 
     - import_tasks: test_active_change.yml

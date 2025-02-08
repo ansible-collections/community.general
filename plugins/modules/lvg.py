@@ -88,6 +88,12 @@ options:
     type: bool
     default: false
     version_added: 7.1.0
+  remove_extra_pvs:
+    description:
+    - Remove physical volumes from the volume group which are not in O(pvs)
+    type: bool
+    default: true
+    version_added: X.X.X
 seealso:
   - module: community.general.filesystem
   - module: community.general.lvol
@@ -383,6 +389,7 @@ def main():
             force=dict(type='bool', default=False),
             reset_vg_uuid=dict(type='bool', default=False),
             reset_pv_uuid=dict(type='bool', default=False),
+            remove_extra_pvs=dict(type="bool", default=True),
         ),
         required_if=[
             ['reset_pv_uuid', True, ['pvs']],
@@ -399,6 +406,7 @@ def main():
     vgoptions = module.params['vg_options'].split()
     reset_vg_uuid = module.boolean(module.params['reset_vg_uuid'])
     reset_pv_uuid = module.boolean(module.params['reset_pv_uuid'])
+    remove_extra_pvs = module.boolean(module.params["remove_extra_pvs"])
 
     this_vg = find_vg(module=module, vg=vg)
     present_state = state in ['present', 'active', 'inactive']
@@ -493,6 +501,9 @@ def main():
             current_devs = [os.path.realpath(pv['name']) for pv in pvs if pv['vg_name'] == vg]
             devs_to_remove = list(set(current_devs) - set(dev_list))
             devs_to_add = list(set(dev_list) - set(current_devs))
+            
+            if not remove_extra_pvs:
+                devs_to_remove = []
 
             if current_devs:
                 if present_state:
