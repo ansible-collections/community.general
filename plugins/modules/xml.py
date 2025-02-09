@@ -946,7 +946,8 @@ def main():
         except etree.XMLSyntaxError as e:
             module.fail_json(msg="Error while parsing document: %s (%s)" % (xml_file or 'xml_string', e))
     finally:
-        infile.close()
+        if infile:
+            infile.close()
 
     # Ensure we have the original copy to compare
     global orig_doc
