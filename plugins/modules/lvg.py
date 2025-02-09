@@ -90,10 +90,10 @@ options:
     version_added: 7.1.0
   remove_extra_pvs:
     description:
-    - Remove physical volumes from the volume group which are not in O(pvs)
+      - Remove physical volumes from the volume group which are not in O(pvs).
     type: bool
     default: true
-    version_added: X.X.X
+    version_added: 10.4.0
 seealso:
   - module: community.general.filesystem
   - module: community.general.lvol
