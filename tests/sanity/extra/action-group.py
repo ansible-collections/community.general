@@ -36,6 +36,11 @@ ACTION_GROUPS = {
         'exclusions': [],
         'doc_fragment': 'community.general.proxmox.actiongroup_proxmox',
     },
+    'profitbricks': {
+        'pattern': re.compile('^profitbricks(_.*)?$'),
+        'exclusions': [],
+        'doc_fragment': 'community.general.proxmox.actiongroup_profitbricks',
+    },
 }
 
 
