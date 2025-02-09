@@ -920,6 +920,7 @@ def main():
     elif LooseVersion('.'.join(to_native(f) for f in etree.LXML_VERSION)) < LooseVersion('3.0.0'):
         module.warn('Using lxml version lower than 3.0.0 does not guarantee predictable element attribute order.')
 
+    infile = None
     try:
         # Check if the file exists
         if xml_string:
