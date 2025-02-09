@@ -16,6 +16,8 @@ description:
     can optionally wait for it to be 'running' before returning. This module has a dependency on profitbricks >= 1.0.0.
 extends_documentation_fragment:
   - community.general.attributes
+  - community.general.profitbricks
+  - community.general.profitbricks.actiongroup_profitbricks
 attributes:
   check_mode:
     support: none
@@ -103,24 +105,6 @@ options:
       - The ID of the LAN you wish to add the servers to.
     type: int
     default: 1
-  subscription_user:
-    description:
-      - The ProfitBricks username. Overrides the E(PB_SUBSCRIPTION_ID) environment variable.
-    type: str
-  subscription_password:
-    description:
-      - THe ProfitBricks password. Overrides the E(PB_PASSWORD) environment variable.
-    type: str
-  wait:
-    description:
-      - Wait for the instance to be in state 'running' before returning.
-    type: bool
-    default: true
-  wait_timeout:
-    description:
-      - How long before wait gives up, in seconds.
-    type: int
-    default: 600
   remove_boot_volume:
     description:
       - Remove the bootVolume of the virtual machine you are destroying.
@@ -138,9 +122,6 @@ options:
     type: str
     choices: [SSD, HDD]
     default: HDD
-
-requirements:
-  - "profitbricks"
 author: Matt Baldwin (@baldwinSPC) <baldwin@stackpointcloud.com>
 """
 
@@ -597,8 +578,8 @@ def main():
             count=dict(type='int', default=1),
             auto_increment=dict(type='bool', default=True),
             instance_ids=dict(type='list', elements='str', default=[]),
-            subscription_user=dict(),
-            subscription_password=dict(no_log=True),
+            subscription_user=dict(required=True, ),
+            subscription_password=dict(required=True, no_log=True),
             location=dict(choices=LOCATIONS, default='us/las'),
             assign_public_ip=dict(type='bool', default=False),
             wait=dict(type='bool', default=True),

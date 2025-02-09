@@ -17,7 +17,7 @@ action_groups:
   proxmox:
     - proxmox
     - proxmox_backup
-    - proxmox_backup_info    
+    - proxmox_backup_info
     - proxmox_disk
     - proxmox_domain_info
     - proxmox_group_info
@@ -61,6 +61,12 @@ action_groups:
     - keycloak_user_federation
     - keycloak_user_rolemapping
     - keycloak_userprofile
+  profitbricks:
+    - profitbricks_datacenter
+    - profitbricks_nic
+    - profitbricks_volume_attachments
+    - profitbricks_volume
+    - profitbricks
 plugin_routing:
   callback:
     actionable:

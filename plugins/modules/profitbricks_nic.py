@@ -15,6 +15,8 @@ description:
   - This module allows you to create or restore a volume snapshot. This module has a dependency on profitbricks >= 1.0.0.
 extends_documentation_fragment:
   - community.general.attributes
+  - community.general.profitbricks
+  - community.general.profitbricks.actiongroup_profitbricks
 attributes:
   check_mode:
     support: none
@@ -40,27 +42,6 @@ options:
     description:
       - The LAN to place the NIC on. You can pass a LAN that does not exist and it will be created. Required on create.
     type: str
-  subscription_user:
-    description:
-      - The ProfitBricks username. Overrides the E(PB_SUBSCRIPTION_ID) environment variable.
-    type: str
-    required: true
-  subscription_password:
-    description:
-      - THe ProfitBricks password. Overrides the E(PB_PASSWORD) environment variable.
-    type: str
-    required: true
-  wait:
-    description:
-      - Wait for the operation to complete before returning.
-    required: false
-    default: true
-    type: bool
-  wait_timeout:
-    description:
-      - How long before wait gives up, in seconds.
-    type: int
-    default: 600
   state:
     description:
       - Indicate desired state of the resource.
@@ -68,8 +49,6 @@ options:
     type: str
     required: false
     default: 'present'
-
-requirements: ["profitbricks"]
 author: Matt Baldwin (@baldwinSPC) <baldwin@stackpointcloud.com>
 """
 

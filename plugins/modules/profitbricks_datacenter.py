@@ -16,6 +16,8 @@ description:
     module has a dependency on profitbricks >= 1.0.0.
 extends_documentation_fragment:
   - community.general.attributes
+  - community.general.profitbricks
+  - community.general.profitbricks.actiongroup_profitbricks
 attributes:
   check_mode:
     support: none
@@ -38,27 +40,6 @@ options:
     required: false
     default: us/las
     choices: ["us/las", "de/fra", "de/fkb"]
-  subscription_user:
-    description:
-      - The ProfitBricks username. Overrides the E(PB_SUBSCRIPTION_ID) environment variable.
-    type: str
-    required: false
-  subscription_password:
-    description:
-      - THe ProfitBricks password. Overrides the E(PB_PASSWORD) environment variable.
-    type: str
-    required: false
-  wait:
-    description:
-      - Wait for the datacenter to be created before returning.
-    required: false
-    default: true
-    type: bool
-  wait_timeout:
-    description:
-      - How long before wait gives up, in seconds.
-    type: int
-    default: 600
   state:
     description:
       - Create or terminate datacenters.
@@ -66,8 +47,6 @@ options:
     type: str
     required: false
     default: 'present'
-
-requirements: ["profitbricks"]
 author: Matt Baldwin (@baldwinSPC) <baldwin@stackpointcloud.com>
 """
 
@@ -213,8 +192,8 @@ def main():
             name=dict(),
             description=dict(),
             location=dict(choices=LOCATIONS, default='us/las'),
-            subscription_user=dict(),
-            subscription_password=dict(no_log=True),
+            subscription_user=dict(required=True),
+            subscription_password=dict(required=True, no_log=True),
             wait=dict(type='bool', default=True),
             wait_timeout=dict(default=600, type='int'),
             state=dict(default='present'),   # @TODO add choices
@@ -222,11 +201,6 @@ def main():
     )
     if not HAS_PB_SDK:
         module.fail_json(msg='profitbricks required for this module')
-
-    if not module.params.get('subscription_user'):
-        module.fail_json(msg='subscription_user parameter is required')
-    if not module.params.get('subscription_password'):
-        module.fail_json(msg='subscription_password parameter is required')
 
     subscription_user = module.params.get('subscription_user')
     subscription_password = module.params.get('subscription_password')
