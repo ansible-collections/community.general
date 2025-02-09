@@ -412,12 +412,51 @@
         - "ascii_install_result.changed_pkgs == ['thezoraiz/ascii-image-converter/ascii-image-converter']"
         - "ascii_install_result.unchanged_pkgs == []"
 
+  - name: Again install ascii from full tap name
+    community.general.homebrew:
+      name: TheZoraiz/ascii-image-converter/ascii-image-converter
+      state: latest
+    register: ascii_reinstall_result
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+
+  - assert:
+      that:
+        - ascii_reinstall_result is not changed
+        - "ascii_reinstall_result.msg == 'Package already upgraded: thezoraiz/ascii-image-converter/ascii-image-converter'"
+        - "ascii_reinstall_result.changed_pkgs == []"
+        - "ascii_reinstall_result.unchanged_pkgs == ['thezoraiz/ascii-image-converter/ascii-image-converter']"
+
   - name: Remove ascii from full tap name
     homebrew:
       name: TheZoraiz/ascii-image-converter/ascii-image-converter
       state: absent
+    register: ascii_uninstall_result
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
+
+  - assert:
+      that:
+        - ascii_uninstall_result is changed
+        - "ascii_uninstall_result.msg == 'Package uninstalled: thezoraiz/ascii-image-converter/ascii-image-converter'"
+        - "ascii_uninstall_result.changed_pkgs == ['thezoraiz/ascii-image-converter/ascii-image-converter']"
+        - "ascii_uninstall_result.unchanged_pkgs == []"
+
+  - name: Again remove ascii from full tap name
+    homebrew:
+      name: TheZoraiz/ascii-image-converter/ascii-image-converter
+      state: absent
+    register: ascii_again_uninstall_result
+
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+
+  - assert:
+      that:
+        - ascii_again_uninstall_result is not changed
+        - "ascii_again_uninstall_result.msg == 'Package already uninstalled: thezoraiz/ascii-image-converter/ascii-image-converter'"
+        - "ascii_again_uninstall_result.changed_pkgs == []"
+        - "ascii_again_uninstall_result.unchanged_pkgs == ['thezoraiz/ascii-image-converter/ascii-image-converter']"
 
   - name: Install ascii from regular name
     community.general.homebrew:
