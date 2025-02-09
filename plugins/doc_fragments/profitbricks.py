@@ -18,7 +18,7 @@ options:
     required: true
   subscription_password:
     description:
-      - THe ProfitBricks password. Overrides the E(PB_PASSWORD) environment variable.
+      - The ProfitBricks password. Overrides the E(PB_PASSWORD) environment variable.
     type: str
     required: true
   wait:
