@@ -920,29 +920,34 @@ def main():
     elif LooseVersion('.'.join(to_native(f) for f in etree.LXML_VERSION)) < LooseVersion('3.0.0'):
         module.warn('Using lxml version lower than 3.0.0 does not guarantee predictable element attribute order.')
 
-    # Check if the file exists
-    if xml_string:
-        infile = BytesIO(to_bytes(xml_string, errors='surrogate_or_strict'))
-    elif os.path.isfile(xml_file):
-        infile = open(xml_file, 'rb')
-    else:
-        module.fail_json(msg="The target XML source '%s' does not exist." % xml_file)
-
-    # Parse and evaluate xpath expression
-    if xpath is not None:
-        try:
-            etree.XPath(xpath)
-        except etree.XPathSyntaxError as e:
-            module.fail_json(msg="Syntax error in xpath expression: %s (%s)" % (xpath, e))
-        except etree.XPathEvalError as e:
-            module.fail_json(msg="Evaluation error in xpath expression: %s (%s)" % (xpath, e))
-
-    # Try to parse in the target XML file
+    infile = None
     try:
-        parser = etree.XMLParser(remove_blank_text=pretty_print, strip_cdata=strip_cdata_tags)
-        doc = etree.parse(infile, parser)
-    except etree.XMLSyntaxError as e:
-        module.fail_json(msg="Error while parsing document: %s (%s)" % (xml_file or 'xml_string', e))
+        # Check if the file exists
+        if xml_string:
+            infile = BytesIO(to_bytes(xml_string, errors='surrogate_or_strict'))
+        elif os.path.isfile(xml_file):
+            infile = open(xml_file, 'rb')
+        else:
+            module.fail_json(msg="The target XML source '%s' does not exist." % xml_file)
+
+        # Parse and evaluate xpath expression
+        if xpath is not None:
+            try:
+                etree.XPath(xpath)
+            except etree.XPathSyntaxError as e:
+                module.fail_json(msg="Syntax error in xpath expression: %s (%s)" % (xpath, e))
+            except etree.XPathEvalError as e:
+                module.fail_json(msg="Evaluation error in xpath expression: %s (%s)" % (xpath, e))
+
+        # Try to parse in the target XML file
+        try:
+            parser = etree.XMLParser(remove_blank_text=pretty_print, strip_cdata=strip_cdata_tags)
+            doc = etree.parse(infile, parser)
+        except etree.XMLSyntaxError as e:
+            module.fail_json(msg="Error while parsing document: %s (%s)" % (xml_file or 'xml_string', e))
+    finally:
+        if infile:
+            infile.close()
 
     # Ensure we have the original copy to compare
     global orig_doc
