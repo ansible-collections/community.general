@@ -319,3 +319,14 @@ class TestLookupModule(unittest.TestCase):
         # Non-Existent collection
         with self.assertRaises(BitwardenException):
             self.lookup.run(None, collection_name="nonexistent")
+
+    @patch('ansible_collections.community.general.plugins.lookup.bitwarden._bitwarden', new=MockBitwarden())
+    def test_bitwarden_plugin_result_count_check(self):
+        self.lookup.run(None, collection_id=MOCK_COLLECTION_ID, organization_id=MOCK_ORGANIZATION_ID, result_count=2)
+        with self.assertRaises(BitwardenException):
+            self.lookup.run(None, collection_id=MOCK_COLLECTION_ID, organization_id=MOCK_ORGANIZATION_ID,
+                            result_count=1)
+
+        self.lookup.run(None, organization_id=MOCK_ORGANIZATION_ID, result_count=3)
+        with self.assertRaises(BitwardenException):
+            self.lookup.run(None, organization_id=MOCK_ORGANIZATION_ID, result_count=0)

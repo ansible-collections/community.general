@@ -52,6 +52,11 @@ DOCUMENTATION = """
         description: Pass session key instead of reading from env.
         type: str
         version_added: 8.4.0
+      result_count:
+        description: Number of results expected for the lookup query. Task will fail if result_count
+            is set but doesn't match the number of query results. Leave empty to skip this check.
+        type: int
+        version_added: 10.5.0
 """
 
 EXAMPLES = """
@@ -94,6 +99,11 @@ EXAMPLES = """
   ansible.builtin.debug:
     msg: >-
       {{ lookup('community.general.bitwarden', None, collection_name='my_collections/test_collection') }}
+
+- name: "Get Bitwarden record named 'a_test', ensure there is exactly one match"
+  ansible.builtin.debug:
+    msg: >-
+      {{ lookup('community.general.bitwarden', 'a_test', result_count=1) }}
 """
 
 RETURN = """
@@ -248,6 +258,7 @@ class LookupModule(LookupBase):
         collection_id = self.get_option('collection_id')
         collection_name = self.get_option('collection_name')
         organization_id = self.get_option('organization_id')
+        result_count = self.get_option('result_count')
         _bitwarden.session = self.get_option('bw_session')
 
         if not _bitwarden.unlocked:
@@ -263,8 +274,14 @@ class LookupModule(LookupBase):
         else:
             collection_ids = [collection_id]
 
-        return [_bitwarden.get_field(field, term, search_field, collection_id, organization_id) for collection_id in
+        results = [_bitwarden.get_field(field, term, search_field, collection_id, organization_id) for collection_id in
                    collection_ids for term in terms]
+
+        if result_count is not None and len(results[0]) != result_count:
+            raise BitwardenException(
+                f"Number of results doesn't match result_count! ({len(results[0])} != {result_count})")
+
+        return results
 
 
 _bitwarden = Bitwarden()
