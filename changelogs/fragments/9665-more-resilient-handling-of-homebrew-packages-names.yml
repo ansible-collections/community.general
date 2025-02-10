@@ -1,0 +1,2 @@
+bugfixes:
+  - homebrew - make package name parsing more resilient (https://github.com/ansible-collections/community.general/pull/9665, https://github.com/ansible-collections/community.general/issues/9641).
