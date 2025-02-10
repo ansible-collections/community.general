@@ -1435,3 +1435,36 @@ releases:
           name: onepassword_ssh_key
           namespace: null
     release_date: '2025-01-27'
+  10.3.1:
+    changes:
+      bugfixes:
+        - cloudflare_dns - fix crash when deleting a DNS record or when updating a
+          record with ``solo=true`` (https://github.com/ansible-collections/community.general/issues/9652,
+          https://github.com/ansible-collections/community.general/pull/9649).
+        - homebrew - make package name parsing more resilient (https://github.com/ansible-collections/community.general/pull/9665,
+          https://github.com/ansible-collections/community.general/issues/9641).
+        - keycloak module utils - replaces missing return in get_role_composites method
+          which caused it to return None instead of composite roles (https://github.com/ansible-collections/community.general/issues/9678,
+          https://github.com/ansible-collections/community.general/pull/9691).
+        - keycloak_client - fix and improve existing tests. The module showed a diff
+          without actual changes, solved by improving the ``normalise_cr()`` function
+          (https://github.com/ansible-collections/community.general/pull/9644).
+        - proxmox - adds the ``pubkey`` parameter (back to) the ``update`` state (https://github.com/ansible-collections/community.general/issues/9642,
+          https://github.com/ansible-collections/community.general/pull/9645).
+        - proxmox - fixes a typo in the translation of the ``pubkey`` parameter to
+          proxmox' ``ssh-public-keys`` (https://github.com/ansible-collections/community.general/issues/9642,
+          https://github.com/ansible-collections/community.general/pull/9645).
+        - xml - ensure file descriptor is closed (https://github.com/ansible-collections/community.general/pull/9695).
+      minor_changes:
+        - onepassword_ssh_key - refactor to move code to lookup class (https://github.com/ansible-collections/community.general/pull/9633).
+      release_summary: Bugfix release.
+    fragments:
+      - 10.3.1.yml
+      - 9633-onepassword_ssh_key.yml
+      - 9644-kc_client-test-improvement-and-fix.yaml
+      - 9645-proxmox-fix-pubkey.yml
+      - 9649-cloudflare_dns-fix-crash-when-deleting-record.yml
+      - 9665-more-resilient-handling-of-homebrew-packages-names.yml
+      - 9691-keycloak-module-utils-replace-missing-return-in-get_role_composites.yml
+      - 9695-xml-close-file.yml
+    release_date: '2025-02-10'

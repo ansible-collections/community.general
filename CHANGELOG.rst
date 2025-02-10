@@ -6,6 +6,30 @@ Community General Release Notes
 
 This changelog describes changes after version 9.0.0.
 
+v10.3.1
+=======
+
+Release Summary
+---------------
+
+Bugfix release.
+
+Minor Changes
+-------------
+
+- onepassword_ssh_key - refactor to move code to lookup class (https://github.com/ansible-collections/community.general/pull/9633).
+
+Bugfixes
+--------
+
+- cloudflare_dns - fix crash when deleting a DNS record or when updating a record with ``solo=true`` (https://github.com/ansible-collections/community.general/issues/9652, https://github.com/ansible-collections/community.general/pull/9649).
+- homebrew - make package name parsing more resilient (https://github.com/ansible-collections/community.general/pull/9665, https://github.com/ansible-collections/community.general/issues/9641).
+- keycloak module utils - replaces missing return in get_role_composites method which caused it to return None instead of composite roles (https://github.com/ansible-collections/community.general/issues/9678, https://github.com/ansible-collections/community.general/pull/9691).
+- keycloak_client - fix and improve existing tests. The module showed a diff without actual changes, solved by improving the ``normalise_cr()`` function (https://github.com/ansible-collections/community.general/pull/9644).
+- proxmox - adds the ``pubkey`` parameter (back to) the ``update`` state (https://github.com/ansible-collections/community.general/issues/9642, https://github.com/ansible-collections/community.general/pull/9645).
+- proxmox - fixes a typo in the translation of the ``pubkey`` parameter to proxmox' ``ssh-public-keys`` (https://github.com/ansible-collections/community.general/issues/9642, https://github.com/ansible-collections/community.general/pull/9645).
+- xml - ensure file descriptor is closed (https://github.com/ansible-collections/community.general/pull/9695).
+
 v10.3.0
 =======
 
