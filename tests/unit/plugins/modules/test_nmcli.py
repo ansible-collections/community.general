@@ -1570,6 +1570,37 @@ macvlan.promiscuous:                    yes
 macvlan.tap:                            no
 """
 
+TESTCASE_VRF = [
+    {
+        'type': 'vrf',
+        'conn_name': 'non_existent_nw_device',
+        'ifname': 'vrf_not_exists',
+        'ip4': '10.10.10.10/24',
+        'gw4': '10.10.10.1',
+        'table': 10,
+        'state': 'present',
+        '_ansible_check_mode': False,
+    }
+]
+
+TESTCASE_VRF_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.interface-name:              vrf_not_exists
+connection.autoconnect:                 yes
+ipv4.method:                            manual
+ipv4.addresses:                         10.10.10.10/24
+ipv4.gateway:                           10.10.10.1
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
+table:                                  10
+802-3-ethernet.mtu:                     auto
+"""
+
 
 def mocker_set(mocker,
                connection_exists=False,
@@ -2033,6 +2064,13 @@ def mocked_loopback_connection_modify(mocker):
                    (0, TESTCASE_LOOPBACK_SHOW_OUTPUT, ""),
                    (0, "", ""),
                ))
+
+
+@pytest.fixture
+def mocked_vrf_connection_unchanged(mocker):
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_VRF_SHOW_OUTPUT, ""))
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_BOND, indirect=['patch_ansible_module'])
@@ -4911,3 +4949,76 @@ def test_add_second_ip4_address_to_loopback_connection(mocked_loopback_connectio
     results = json.loads(out)
     assert not results.get('failed')
     assert results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_VRF, indirect=['patch_ansible_module'])
+def test_create_vrf_con(mocked_generic_connection_create, capfd):
+    """
+    Test if VRF created
+    """
+
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    args, kwargs = arg_list[0]
+
+    assert args[0][0] == '/usr/bin/nmcli'
+    assert args[0][1] == 'con'
+    assert args[0][2] == 'add'
+    assert args[0][3] == 'type'
+    assert args[0][4] == 'vrf'
+    assert args[0][5] == 'con-name'
+    assert args[0][6] == 'non_existent_nw_device'
+
+    args_text = list(map(to_text, args[0]))
+    for param in ['ipv4.addresses', '10.10.10.10/24', 'ipv4.gateway', '10.10.10.1', 'table', '10']:
+        assert param in args_text
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_VRF, indirect=['patch_ansible_module'])
+def test_mod_vrf_conn(mocked_generic_connection_modify, capfd):
+    """
+    Test if VRF modified
+    """
+
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    args, kwargs = arg_list[0]
+
+    assert args[0][0] == '/usr/bin/nmcli'
+    assert args[0][1] == 'con'
+    assert args[0][2] == 'modify'
+    assert args[0][3] == 'non_existent_nw_device'
+
+    args_text = list(map(to_text, args[0]))
+    for param in ['ipv4.addresses', '10.10.10.10/24', 'ipv4.gateway', '10.10.10.1', 'table', '10']:
+        assert param in args_text
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_VRF, indirect=['patch_ansible_module'])
+def test_vrf_connection_unchanged(mocked_vrf_connection_unchanged, capfd):
+    """
+    Test : VRF connection unchanged
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert not results['changed']
