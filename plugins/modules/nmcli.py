@@ -79,13 +79,14 @@ options:
       - Type V(ovs-port) is added in community.general 8.6.0.
       - Type V(wireguard) is added in community.general 4.3.0.
       - Type V(vpn) is added in community.general 5.1.0.
+      - Type V(vrf) is added in community.general 10.4.0.
       - Using V(bond-slave), V(bridge-slave), or V(team-slave) implies V(ethernet) connection type with corresponding O(slave_type)
         option.
       - If you want to control non-ethernet connection attached to V(bond), V(bridge), or V(team) consider using O(slave_type)
         option.
     type: str
     choices: [bond, bond-slave, bridge, bridge-slave, dummy, ethernet, generic, gre, infiniband, ipip, macvlan, sit, team,
-      team-slave, vlan, vxlan, wifi, gsm, wireguard, ovs-bridge, ovs-port, ovs-interface, vpn, loopback]
+      team-slave, vlan, vxlan, wifi, gsm, wireguard, ovs-bridge, ovs-port, ovs-interface, vpn, vrf, loopback]
   mode:
     description:
       - This is the type of device or network connection that you wish to create for a bond or bridge.
@@ -103,7 +104,7 @@ options:
       - Type of the device of this slave's master connection (for example V(bond)).
       - Type V(ovs-port) is added in community.general 8.6.0.
     type: str
-    choices: ['bond', 'bridge', 'team', 'ovs-port']
+    choices: ['bond', 'bridge', 'team', 'ovs-port', 'vrf']
     version_added: 7.0.0
   master:
     description:
@@ -521,6 +522,11 @@ options:
       - Only used when O(type=gre).
     type: str
     version_added: 3.6.0
+  table:
+    description:
+      - This is only used with VRF - VRF table number.
+    type: int
+    version_added: 10.4.0
   zone:
     description:
       - The trust level of the connection.
@@ -1569,6 +1575,29 @@ EXAMPLES = r"""
     vlanid: 5
     state: present
 
+## Creating VRF and adding VLAN interface to it
+- name: Create VRF
+  community.general.nmcli:
+    type: vrf
+    ifname: vrf10
+    table: 10
+    state: present
+    conn_name: vrf10
+    method4: disabled
+    method6: disabled
+
+- name: Create VLAN interface inside VRF
+  community.general.nmcli:
+    conn_name: "eth0.124"
+    type: vlan
+    vlanid: "124"
+    vlandev: "eth0"
+    master: "vrf10"
+    slave_type: vrf
+    state: "present"
+    ip4: '192.168.124.50'
+    gw4: '192.168.124.1'
+
 ## Defining ip rules while setting a static IP
 ## table 'production' is set with id 200 in this example.
 - name: Set Static ips for interface with ip rules and routes
@@ -1755,6 +1784,9 @@ class Nmcli(object):
         else:
             self.ipv6_method = None
 
+        if self.type == "vrf":
+            self.table = module.params['table']
+
         self.edit_commands = []
 
         self.extra_options_validation()
@@ -1787,7 +1819,8 @@ class Nmcli(object):
 
         # IP address options.
         # The ovs-interface type can be both ip_conn_type and have a master
-        if (self.ip_conn_type and not self.master) or self.type == "ovs-interface":
+        # An interface that has a master but is of slave type vrf can have an IP address
+        if (self.ip_conn_type and (not self.master or self.slave_type == "vrf")) or self.type == "ovs-interface":
             options.update({
                 'ipv4.addresses': self.enforce_ipv4_cidr_notation(self.ip4),
                 'ipv4.dhcp-client-id': self.dhcp_client_id,
@@ -2001,6 +2034,10 @@ class Nmcli(object):
             options.update({
                 'infiniband.transport-mode': self.transport_mode,
             })
+        elif self.type == 'vrf':
+            options.update({
+                'table': self.table,
+            })
 
         if self.type == 'ethernet':
             if self.sriov:
@@ -2057,6 +2094,7 @@ class Nmcli(object):
             'vpn',
             'loopback',
             'ovs-interface',
+            'vrf'
         )
 
     @property
@@ -2528,7 +2566,7 @@ def main():
             conn_name=dict(type='str', required=True),
             conn_reload=dict(type='bool', default=False),
             master=dict(type='str'),
-            slave_type=dict(type='str', choices=['bond', 'bridge', 'team', 'ovs-port']),
+            slave_type=dict(type='str', choices=['bond', 'bridge', 'team', 'ovs-port', 'vrf']),
             ifname=dict(type='str'),
             type=dict(type='str',
                       choices=[
@@ -2556,6 +2594,7 @@ def main():
                           'ovs-interface',
                           'ovs-bridge',
                           'ovs-port',
+                          'vrf',
                       ]),
             ip4=dict(type='list', elements='str'),
             gw4=dict(type='str'),
@@ -2669,6 +2708,7 @@ def main():
             vpn=dict(type='dict'),
             transport_mode=dict(type='str', choices=['datagram', 'connected']),
             sriov=dict(type='dict'),
+            table=dict(type='int'),
         ),
         mutually_exclusive=[['never_default4', 'gw4'],
                             ['routes4_extended', 'routes4'],
