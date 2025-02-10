@@ -553,9 +553,7 @@ class OnePassCLIv2(OnePassCLIBase):
         environment_update = {"OP_SECRET_KEY": self.secret_key}
         return self._run(args, command_input=to_bytes(self.master_password), environment_update=environment_update)
 
-    def get_raw(self, item_id, vault=None, token=None):
-        args = ["item", "get", item_id, "--format", "json"]
-
+    def _add_parameters_and_run(self, args, vault=None, token=None):
         if self.account_id:
             args.extend(["--account", self.account_id])
 
@@ -581,6 +579,10 @@ class OnePassCLIv2(OnePassCLIBase):
             args += [to_bytes("--session=") + token]
 
         return self._run(args)
+
+    def get_raw(self, item_id, vault=None, token=None):
+        args = ["item", "get", item_id, "--format", "json"]
+        return self._add_parameters_and_run(args, vault=vault, token=token)
 
     def signin(self):
         self._check_required_params(['master_password'])
