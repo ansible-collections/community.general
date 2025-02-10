@@ -1,0 +1,40 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# test_grow_reduce already checks the base case with default parameters (remove additional PVs)
+
+- name: "Create volume group on first disk"
+  lvg:
+    vg: testvg
+    pvs: "{{ loop_device1 }}"
+
+- name: "get lvm facts"
+  setup:
+
+- debug: var=ansible_lvm
+
+- name: "Assert the testvg span only on first disk"
+  assert:
+    that:
+      - ansible_lvm.pvs[loop_device1].vg == "testvg"
+      - 'loop_device2 not in ansible_lvm.pvs or
+        ansible_lvm.pvs[loop_device2].vg == ""'
+
+- name: "Extend to second disk AND keep first disk"
+  lvg:
+    vg: testvg
+    pvs: "{{ loop_device2 }}"
+    remove_extra_pvs: false
+
+- name: "get lvm facts"
+  setup:
+
+- debug: var=ansible_lvm
+
+- name: "Assert the testvg spans on both disks"
+  assert:
+    that:
+      - ansible_lvm.pvs[loop_device1].vg == "testvg"
+      - ansible_lvm.pvs[loop_device2].vg == "testvg"
