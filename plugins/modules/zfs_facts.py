@@ -44,10 +44,12 @@ options:
     type: str
   type:
     description:
-      - Specifies which datasets types to display. Multiple values have to be provided in comma-separated form.
+      - Specifies which datasets types to display. Multiple values have to be provided as a list or in comma-separated form.
+      - Value V(all) cannot be used together with other values.
     choices: ['all', 'filesystem', 'volume', 'snapshot', 'bookmark']
-    default: all
-    type: str
+    default: [all]
+    type: list
+    elements: str
   depth:
     description:
       - Specifies recursion depth.
@@ -106,7 +108,6 @@ zfs_datasets:
 from collections import defaultdict
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six import iteritems
 
 
 SUPPORTED_TYPES = ['all', 'filesystem', 'volume', 'snapshot', 'bookmark']
@@ -132,10 +133,7 @@ class ZFSFacts(object):
 
         (rc, out, err) = self.module.run_command(cmd)
 
-        if rc == 0:
-            return True
-        else:
-            return False
+        return rc == 0
 
     def get_facts(self):
         cmd = [self.module.get_bin_path('zfs'), 'get', '-H']
@@ -148,40 +146,43 @@ class ZFSFacts(object):
             cmd.append('%s' % self.depth)
         if self.type:
             cmd.append('-t')
-            cmd.append(self.type)
+            cmd.append(','.join(self.type))
         cmd.extend(['-o', 'name,property,value', self.properties, self.name])
 
         (rc, out, err) = self.module.run_command(cmd)
 
-        if rc == 0:
-            for line in out.splitlines():
-                dataset, property, value = line.split('\t')
-
-                self._datasets[dataset].update({property: value})
-
-            for k, v in iteritems(self._datasets):
-                v.update({'name': k})
-                self.facts.append(v)
-
-            return {'ansible_zfs_datasets': self.facts}
-        else:
+        if rc != 0:
             self.module.fail_json(msg='Error while trying to get facts about ZFS dataset: %s' % self.name,
                                   stderr=err,
                                   rc=rc)
+
+        for line in out.splitlines():
+            dataset, property, value = line.split('\t')
+
+            self._datasets[dataset].update({property: value})
+
+        for k, v in self._datasets.items():
+            v.update({'name': k})
+            self.facts.append(v)
+
+        return {'ansible_zfs_datasets': self.facts}
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(required=True, aliases=['ds', 'dataset'], type='str'),
-            recurse=dict(required=False, default=False, type='bool'),
-            parsable=dict(required=False, default=False, type='bool'),
-            properties=dict(required=False, default='all', type='str'),
-            type=dict(required=False, default='all', type='str', choices=SUPPORTED_TYPES),
-            depth=dict(required=False, default=0, type='int')
+            recurse=dict(default=False, type='bool'),
+            parsable=dict(default=False, type='bool'),
+            properties=dict(default='all', type='str'),
+            type=dict(default='all', type='list', elements='str', choices=SUPPORTED_TYPES),
+            depth=dict(default=0, type='int')
         ),
         supports_check_mode=True
     )
+
+    if 'all' in module.params['type'] and len(module.params['type']) > 1:
+        module.fail_json(msg="Value 'all' for parameter 'type' is mutually exclusive with other values")
 
     zfs_facts = ZFSFacts(module)
 
@@ -195,10 +196,10 @@ def main():
     if zfs_facts.recurse:
         result['recurse'] = zfs_facts.recurse
 
-    if zfs_facts.dataset_exists():
-        result['ansible_facts'] = zfs_facts.get_facts()
-    else:
+    if not zfs_facts.dataset_exists():
         module.fail_json(msg='ZFS dataset %s does not exist!' % zfs_facts.name)
+
+    result['ansible_facts'] = zfs_facts.get_facts()
 
     module.exit_json(**result)
 
