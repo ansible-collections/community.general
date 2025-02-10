@@ -40,7 +40,6 @@
     homebrew:
       name: "{{ package_name }}"
       state: absent
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
 
@@ -48,7 +47,6 @@
     homebrew:
       name: "{{ package_name }}"
       state: present
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -64,7 +62,6 @@
     homebrew:
       name: "{{ package_name }}"
       state: present
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -80,7 +77,6 @@
     homebrew:
       name: "{{ package_name }}"
       state: unlinked
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -96,7 +92,6 @@
     homebrew:
       name: "{{ package_name }}"
       state: linked
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -112,7 +107,6 @@
     homebrew:
       name: "{{ package_name }}"
       state: absent
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -128,7 +122,6 @@
     homebrew:
       name: "{{ package_name }}"
       state: absent
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -144,7 +137,6 @@
     homebrew:
       name: "{{ package_name }}"
       state: latest
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -160,7 +152,6 @@
     homebrew:
       name: "{{ package_name }}"
       state: latest
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -182,7 +173,6 @@
     homebrew:
       name: "{{ package_names }}"
       state: absent
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
 
@@ -190,7 +180,6 @@
     homebrew:
       name: "{{ package_names[0] }}"
       state: present
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
 
@@ -198,7 +187,6 @@
     homebrew:
       name: "{{ package_names }}"
       state: present
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -214,7 +202,6 @@
     homebrew:
       name: "{{ package_names }}"
       state: present
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -230,7 +217,6 @@
     homebrew:
       name: "{{ package_names }}"
       state: unlinked
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -246,7 +232,6 @@
     homebrew:
       name: "{{ package_names }}"
       state: linked
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -262,7 +247,6 @@
     homebrew:
       name: "{{ package_names }}"
       state: absent
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -278,7 +262,6 @@
     homebrew:
       name: "{{ package_names }}"
       state: absent
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -294,7 +277,6 @@
     homebrew:
       name: "{{ package_names }}"
       state: latest
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -310,7 +292,6 @@
     homebrew:
       name: "{{ package_names }}"
       state: latest
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: package_result
@@ -328,7 +309,6 @@
     homebrew:
       name: "sqlite"
       state: absent
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
 
@@ -336,7 +316,6 @@
     homebrew:
       name: "sqlite3"
       state: present
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: install_result
@@ -352,7 +331,6 @@
     homebrew:
       name: "sqlite3"
       state: present
-      update_homebrew: false
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
     register: reinstall_result
@@ -364,19 +342,18 @@
         - "reinstall_result.changed_pkgs == []"
         - "reinstall_result.unchanged_pkgs == ['sqlite3']"
 
-# Test with homebrew tap
+# Test install from homebrew tap
 - block:
-  - name: Tap terraform homebrew repository
+  - name: Tap hashicorp repository
     community.general.homebrew_tap:
       name: hashicorp/tap
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
 
-  - name: Install homebrew tap
+  - name: Install terraform from tap
     community.general.homebrew:
       name: hashicorp/tap/terraform
       state: latest
-      update_homebrew: false
     register: terraform_install_result
     become: true
     become_user: "{{ brew_stat.stat.pw_name }}"
@@ -387,3 +364,118 @@
         - "terraform_install_result.msg == 'Package upgraded: hashicorp/tap/terraform'"
         - "terraform_install_result.changed_pkgs == ['hashicorp/tap/terraform']"
         - "terraform_install_result.unchanged_pkgs == []"
+
+  - name: Remove terraform
+    homebrew:
+      name: hashicorp/tap/terraform
+      state: absent
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+
+# Test irregular formulae name case
+- block:
+  - name: Install terraform from full tap name with irregular case
+    community.general.homebrew:
+      name: HasHicorp/TAp/tErRaForm
+      state: latest
+    register: terraform_install_result
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+
+  - assert:
+      that:
+        - terraform_install_result is changed
+        - "terraform_install_result.msg == 'Package upgraded: hashicorp/tap/terraform'"
+        - "terraform_install_result.changed_pkgs == ['hashicorp/tap/terraform']"
+        - "terraform_install_result.unchanged_pkgs == []"
+
+# Test tap with no public fallback
+- block:
+  - name: Tap ascii-image-converter homebrew repository
+    community.general.homebrew_tap:
+      name: TheZoraiz/ascii-image-converter
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+
+  - name: Install ascii from full tap name
+    community.general.homebrew:
+      name: TheZoraiz/ascii-image-converter/ascii-image-converter
+      state: latest
+    register: ascii_install_result
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+
+  - assert:
+      that:
+        - ascii_install_result is changed
+        - "ascii_install_result.msg == 'Package upgraded: thezoraiz/ascii-image-converter/ascii-image-converter'"
+        - "ascii_install_result.changed_pkgs == ['thezoraiz/ascii-image-converter/ascii-image-converter']"
+        - "ascii_install_result.unchanged_pkgs == []"
+
+  - name: Again install ascii from full tap name
+    community.general.homebrew:
+      name: TheZoraiz/ascii-image-converter/ascii-image-converter
+      state: latest
+    register: ascii_reinstall_result
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+
+  - assert:
+      that:
+        - ascii_reinstall_result is not changed
+        - "ascii_reinstall_result.msg == 'Package already upgraded: thezoraiz/ascii-image-converter/ascii-image-converter'"
+        - "ascii_reinstall_result.changed_pkgs == []"
+        - "ascii_reinstall_result.unchanged_pkgs == ['thezoraiz/ascii-image-converter/ascii-image-converter']"
+
+  - name: Remove ascii from full tap name
+    homebrew:
+      name: TheZoraiz/ascii-image-converter/ascii-image-converter
+      state: absent
+    register: ascii_uninstall_result
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+
+  - assert:
+      that:
+        - ascii_uninstall_result is changed
+        - "ascii_uninstall_result.msg == 'Package uninstalled: thezoraiz/ascii-image-converter/ascii-image-converter'"
+        - "ascii_uninstall_result.changed_pkgs == ['thezoraiz/ascii-image-converter/ascii-image-converter']"
+        - "ascii_uninstall_result.unchanged_pkgs == []"
+
+  - name: Again remove ascii from full tap name
+    homebrew:
+      name: TheZoraiz/ascii-image-converter/ascii-image-converter
+      state: absent
+    register: ascii_again_uninstall_result
+
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+
+  - assert:
+      that:
+        - ascii_again_uninstall_result is not changed
+        - "ascii_again_uninstall_result.msg == 'Package already uninstalled: thezoraiz/ascii-image-converter/ascii-image-converter'"
+        - "ascii_again_uninstall_result.changed_pkgs == []"
+        - "ascii_again_uninstall_result.unchanged_pkgs == ['thezoraiz/ascii-image-converter/ascii-image-converter']"
+
+  - name: Install ascii from regular name
+    community.general.homebrew:
+      name: ascii-image-converter
+      state: latest
+    register: ascii_install_result
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+
+  - assert:
+      that:
+        - ascii_install_result is changed
+        - "ascii_install_result.msg == 'Package upgraded: ascii-image-converter'"
+        - "ascii_install_result.changed_pkgs == ['ascii-image-converter']"
+        - "ascii_install_result.unchanged_pkgs == []"
+
+  - name: Remove ascii from regular name
+    homebrew:
+      name: ascii-image-converter
+      state: absent
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
