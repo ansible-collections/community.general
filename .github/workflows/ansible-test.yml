@@ -30,11 +30,6 @@ jobs:
       matrix:
         ansible:
           - '2.15'
-    # Ansible-test on various stable branches does not yet work well with cgroups v2.
-    # Since ubuntu-latest now uses Ubuntu 22.04, we need to fall back to the ubuntu-20.04
-    # image for these stable branches. The list of branches where this is necessary will
-    # shrink over time, check out https://github.com/ansible-collections/news-for-maintainers/issues/28
-    # for the latest list.
     runs-on: ubuntu-latest
     steps:
       - name: Perform sanity testing
@@ -47,11 +42,6 @@ jobs:
           testing-type: sanity
 
   units:
-    # Ansible-test on various stable branches does not yet work well with cgroups v2.
-    # Since ubuntu-latest now uses Ubuntu 22.04, we need to fall back to the ubuntu-20.04
-    # image for these stable branches. The list of branches where this is necessary will
-    # shrink over time, check out https://github.com/ansible-collections/news-for-maintainers/issues/28
-    # for the latest list.
     runs-on: ubuntu-latest
     name: EOL Units (Ⓐ${{ matrix.ansible }}+py${{ matrix.python }})
     strategy:
@@ -90,11 +80,6 @@ jobs:
           testing-type: units
 
   integration:
-    # Ansible-test on various stable branches does not yet work well with cgroups v2.
-    # Since ubuntu-latest now uses Ubuntu 22.04, we need to fall back to the ubuntu-20.04
-    # image for these stable branches. The list of branches where this is necessary will
-    # shrink over time, check out https://github.com/ansible-collections/news-for-maintainers/issues/28
-    # for the latest list.
     runs-on: ubuntu-latest
     name: EOL I (Ⓐ${{ matrix.ansible }}+${{ matrix.docker }}+py${{ matrix.python }}:${{ matrix.target }})
     strategy:
