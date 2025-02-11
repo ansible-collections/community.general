@@ -1119,7 +1119,8 @@ class RedfishUtils(object):
         key = "Actions"
         reset_type_values = ['On', 'ForceOff', 'GracefulShutdown',
                              'GracefulRestart', 'ForceRestart', 'Nmi',
-                             'ForceOn', 'PushPowerButton', 'PowerCycle']
+                             'ForceOn', 'PushPowerButton', 'PowerCycle',
+                             'FullPowerCycle']
 
         # command should be PowerOn, PowerForceOff, etc.
         if not command.startswith('Power'):
