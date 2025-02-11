@@ -91,6 +91,11 @@ notes:
     command C(iocage list -l).
   - The names of these variables correspond to the output columns.
   - The column C(NAME) is used to name the added host.
+  - The option O(hooks_results) expects the C(poolname) of a jail is mounted to
+    C(/poolname). For example, if you activate the pool C(iocage) this plugin
+    expects to find the O(hooks_results) items in the path
+    C(/iocage/iocage/jails/<name>/root). If you mount the C(poolname) to a
+    different path the easiest remedy is to create a symlink.
 '''
 
 EXAMPLES = r'''
