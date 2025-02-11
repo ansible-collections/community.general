@@ -1,0 +1,2 @@
+minor_changes:
+  - redfish_command - add ``PowerFullPowerCycle`` to power command options (https://github.com/ansible-collections/community.general/pull/9729).
