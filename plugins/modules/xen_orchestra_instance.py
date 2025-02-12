@@ -41,7 +41,12 @@ options:
     type: bool
     default: true
   state:
-    description: State in which the Virtual Machine should be.
+    description:
+      - State in which the Virtual Machine should be.
+      - If O(state=present) then O(template) and O(label) are required.
+      - If O(state=absent), O(state=started), O(state=stopped) or O(state=restarted) then O(vm_uid) is required.
+      - When state is O(present) then O(boot_after_create) can be used to boot the VM after creation.
+      - There is no idempotence guarantee when O(state=present), a new VM will always be created.
     type: str
     choices: ['present', 'started', 'absent', 'stopped', 'restarted']
     default: present
