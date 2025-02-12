@@ -12,7 +12,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 DOCUMENTATION = r"""
----
 module: ssh_config
 short_description: Manage SSH config for user
 version_added: '2.0.0'
