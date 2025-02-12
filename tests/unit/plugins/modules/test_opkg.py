@@ -8,7 +8,7 @@ __metaclass__ = type
 
 
 from ansible_collections.community.general.plugins.modules import opkg
-from .helper import Helper, RunCommandMock
+from .uthelper import UTHelper, RunCommandMock
 
 
-Helper.from_module(opkg, __name__, mocks=[RunCommandMock])
+UTHelper.from_module(opkg, __name__, mocks=[RunCommandMock])

@@ -9,7 +9,7 @@ __metaclass__ = type
 import sys
 
 from ansible_collections.community.general.plugins.modules import snap
-from .helper import Helper, RunCommandMock
+from .uthelper import UTHelper, RunCommandMock
 
 
 issue_6803_status_out = """Name    Version      Rev    Tracking         Publisher    Notes
@@ -501,4 +501,4 @@ TEST_SPEC = dict(
     ]
 )
 
-Helper.from_spec(snap, sys.modules[__name__], TEST_SPEC, mocks=[RunCommandMock])
+UTHelper.from_spec(snap, sys.modules[__name__], TEST_SPEC, mocks=[RunCommandMock])
