@@ -69,6 +69,10 @@ requirements:
   - websocket-client >= 1.0.0
 author:
   - Samori Gorse (@shinuza) <samorigorse@gmail.com>
+seealso:
+  - name: Xen Orchestra documentation
+    description: Official documentation of Xen Orchestra CLI.
+    link: https://docs.xen-orchestra.com/architecture#xo-cli-cli
 '''
 
 
