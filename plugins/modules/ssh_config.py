@@ -288,7 +288,7 @@ class SSHConfig(object):
                 if key not in args:
                     if not isinstance(value, string_types):
                         self.module.fail_json(msg="The other_options value provided for key %s must be a string" % key )
-                    args[key] = str(value)
+                    args[key] = value
 
         config_changed = False
         hosts_changed = []
