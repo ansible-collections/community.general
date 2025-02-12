@@ -23,7 +23,7 @@
     controlpersist: yes
     dynamicforward: '10080'
     other_options:
-      serveraliveinterval: 30
+      serveraliveinterval: '30'
     state: present
   register: options_add
   check_mode: true
@@ -60,7 +60,7 @@
     controlpersist: yes
     dynamicforward: '10080'
     other_options:
-      serveraliveinterval: 30
+      serveraliveinterval: '30'
     state: present
   register: options_add
 
@@ -86,7 +86,7 @@
     controlpersist: yes
     dynamicforward: '10080'
     other_options:
-      serveraliveinterval: 30
+      serveraliveinterval: '30'
     state: present
   register: options_add_again
 
@@ -131,7 +131,7 @@
     controlpersist: "600"
     dynamicforward: '11080'
     other_options:
-      serveraliveinterval: 30
+      serveraliveinterval: '30'
     state: present
   register: options_update
 
@@ -159,7 +159,7 @@
     controlpersist: "600"
     dynamicforward: '11080'
     other_options:
-      serveraliveinterval: 30
+      serveraliveinterval: '30'
     state: present
   register: options_update
 
@@ -301,7 +301,7 @@
     controlpersist: yes
     dynamicforward: '10080'
     other_options:
-      serveraliveinterval: 30
+      serveraliveinterval: '30'
     state: present
   register: options_add
   check_mode: true
@@ -338,7 +338,7 @@
     controlpersist: yes
     dynamicforward: '10080'
     other_options:
-      serveraliveinterval: 30
+      serveraliveinterval: '30'
     state: present
   register: options_add
 
@@ -364,7 +364,7 @@
     controlpersist: yes
     dynamicforward: '10080'
     other_options:
-      serveraliveinterval: 30
+      serveraliveinterval: '30'
     state: present
   register: options_add_again
 
@@ -409,7 +409,7 @@
     controlpersist: "600"
     dynamicforward: '11080'
     other_options:
-      serveraliveinterval: 30
+      serveraliveinterval: '30'
     state: present
   register: options_update
 
@@ -437,7 +437,7 @@
     controlpersist: "600"
     dynamicforward: '11080'
     other_options:
-      serveraliveinterval: 30
+      serveraliveinterval: '30'
     state: present
   register: options_update
 

@@ -159,7 +159,7 @@ EXAMPLES = r"""
     port: '2223'
     state: present
     other_options:
-      serveraliveinterval: 30
+      serveraliveinterval: '30'
 
 - name: Delete a host from the configuration
   community.general.ssh_config:
@@ -212,6 +212,7 @@ from copy import deepcopy
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.six import string_types
 from ansible_collections.community.general.plugins.module_utils._stormssh import ConfigParser, HAS_PARAMIKO, PARAMIKO_IMPORT_ERROR
 from ansible_collections.community.general.plugins.module_utils.ssh import determine_config_file
 
@@ -284,7 +285,10 @@ class SSHConfig(object):
         )
         if self.params.get('other_options'):
             for key, value in self.params.get('other_options').items():
-                args[key] = str(value)
+                if key not in args:
+                    if not isinstance(value, string_types):
+                        self.module.fail_json(msg="The other_options value provided for key %s must be a string" % key )
+                    args[key] = str(value)
 
         config_changed = False
         hosts_changed = []
