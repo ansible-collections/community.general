@@ -103,7 +103,7 @@ EXAMPLES = r'''
     user: user
     password: passw0rd
     validate_certs: false
-    state: stop
+    state: stopped
 
 - name: Restart an existing virtual machine
   community.general.xen_orchestra:
