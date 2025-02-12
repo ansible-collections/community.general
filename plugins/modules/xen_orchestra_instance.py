@@ -6,7 +6,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: xen_orchestra_instance
 short_description: Management of instances on Xen Orchestra
 description:
@@ -73,10 +73,10 @@ seealso:
   - name: Xen Orchestra documentation
     description: Official documentation of Xen Orchestra CLI.
     link: https://docs.xen-orchestra.com/architecture#xo-cli-cli
-'''
+"""
 
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Create a new virtual machine
   community.general.xen_orchestra:
     api_host: xen-orchestra.lab
@@ -120,7 +120,7 @@ EXAMPLES = r'''
     password: passw0rd
     validate_certs: false
     state: absent
-'''
+"""
 
 import json
 import ssl
