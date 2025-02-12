@@ -68,8 +68,9 @@ mechanism:
   description: Mechanism used to deploy the locales.
   type: str
   choices:
-    - glibc
+    - ubuntu_glibc
     - ubuntu_legacy
+    - glibc
   returned: success
   sample: glibc
   version_added: 10.2.0
@@ -119,13 +120,20 @@ class LocaleGen(StateModuleHelper):
                 available=SUPPORTED_LOCALES,
                 apply_change=self.apply_change_ubuntu_legacy,
             ),
-            glibc=dict(
+            ubuntu_glibc=dict(
                 available=SUPPORTED_LOCALES,
+                apply_change=self.apply_change_glibc,
+            ),
+            glibc=dict(
+                available=ETC_LOCALE_GEN,
                 apply_change=self.apply_change_glibc,
             ),
         )
 
-        if os.path.exists(ETC_LOCALE_GEN):
+        if os.path.exists(ETC_LOCALE_GEN) and os.path.exists(SUPPORTED_LOCALES):
+            self.vars.ubuntu_mode = False
+            self.vars.mechanism = "ubuntu_glibc"
+        elif os.path.exists(ETC_LOCALE_GEN) and not os.path.exists(SUPPORTED_LOCALES):
             self.vars.ubuntu_mode = False
             self.vars.mechanism = "glibc"
         elif os.path.exists(VAR_LIB_LOCALES):
