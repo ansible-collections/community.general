@@ -141,7 +141,8 @@ options:
     version_added: 10.1.0
   other_options:
     description:
-      - Provides the option to specify arbitrary general SSH config entry options via a dictionary
+      - Provides the option to specify arbitrary SSH config entry options via a dictionary.
+      - The values must be strings. Other values are rejected.
     type: dict
     version_added: 10.4.0
 requirements:
