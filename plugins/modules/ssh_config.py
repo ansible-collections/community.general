@@ -287,7 +287,7 @@ class SSHConfig(object):
             for key, value in self.params.get('other_options').items():
                 if key not in args:
                     if not isinstance(value, string_types):
-                        self.module.fail_json(msg="The other_options value provided for key %s must be a string" % key)
+                        self.module.fail_json(msg="The other_options value provided for key {key!r} must be a string, got {type}".format(key=key, type=type(value)))
                     args[key] = value
 
         config_changed = False
