@@ -53,8 +53,9 @@ DOCUMENTATION = """
         type: str
         version_added: 8.4.0
       result_count:
-        description: Number of results expected for the lookup query. Task will fail if result_count
-            is set but doesn't match the number of query results. Leave empty to skip this check.
+        description:
+          - Number of results expected for the lookup query. Task will fail if O(result_count)
+            is set but does not match the number of query results. Leave empty to skip this check.
         type: int
         version_added: 10.4.0
 """
