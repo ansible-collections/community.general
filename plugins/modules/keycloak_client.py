@@ -771,6 +771,7 @@ def normalise_cr(clientrep, remove_ids=False):
         for key, value in clientrep['attributes'].items():
             if isinstance(value, bool):
                 clientrep['attributes'][key] = str(value).lower()
+        clientrep['attributes'].pop('client.secret.creation.time', None)
     return clientrep
 
 
@@ -1036,7 +1037,7 @@ def main():
                 if module._diff:
                     result['diff'] = dict(before=sanitize_cr(before_norm),
                                           after=sanitize_cr(desired_norm))
-                result['changed'] = not is_struct_included(desired_norm, before_norm, CLIENT_META_DATA)
+                result['changed'] = desired_norm != before_norm
 
                 module.exit_json(**result)
 
