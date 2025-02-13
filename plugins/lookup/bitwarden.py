@@ -278,9 +278,10 @@ class LookupModule(LookupBase):
         results = [_bitwarden.get_field(field, term, search_field, collection_id, organization_id) for collection_id in
                    collection_ids for term in terms]
 
-        if result_count is not None and len(results[0]) != result_count:
-            raise BitwardenException(
-                f"Number of results doesn't match result_count! ({len(results[0])} != {result_count})")
+        for result in results:
+            if result_count is not None and len(result) != result_count:
+                raise BitwardenException(
+                    f"Number of results doesn't match result_count! ({len(result)} != {result_count})")
 
         return results
 
