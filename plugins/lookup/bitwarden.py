@@ -37,13 +37,13 @@ DOCUMENTATION = """
         description: Field to fetch. Leave unset to fetch whole response.
         type: str
       collection_id:
-        description: 
+        description:
             - Collection ID to filter results by collection. Leave unset to skip filtering.
             - O(collection_id) and O(collection_name) are mutually exclusive.
         type: str
         version_added: 6.3.0
       collection_name:
-        description: 
+        description:
             - Collection name to filter results by collection. Leave unset to skip filtering.
             - O(collection_id) and O(collection_name) are mutually exclusive.
         type: str
