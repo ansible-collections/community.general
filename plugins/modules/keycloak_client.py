@@ -720,7 +720,7 @@ end_state:
 """
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
-    keycloak_argument_spec, get_token, KeycloakError, is_struct_included
+    keycloak_argument_spec, get_token, KeycloakError
 from ansible.module_utils.basic import AnsibleModule
 import copy
 
@@ -966,14 +966,13 @@ def main():
     else:
         before_client = kc.get_client_by_id(cid, realm=realm)
 
-    if before_client is None:
-        before_client = {}
-
     # kc drops the variable 'authorizationServicesEnabled' if set to false
     # to minimize diff/changes we set it to false if not set by kc
-    if 'authorizationServicesEnabled' not in before_client:
+    if before_client and 'authorizationServicesEnabled' not in before_client:
         before_client['authorizationServicesEnabled'] = False
 
+    if before_client is None:
+        before_client = {}
 
     # Build a proposed changeset from parameters given to this module
     changeset = {}
