@@ -56,7 +56,7 @@ DOCUMENTATION = """
         description: Number of results expected for the lookup query. Task will fail if result_count
             is set but doesn't match the number of query results. Leave empty to skip this check.
         type: int
-        version_added: 10.5.0
+        version_added: 10.4.0
 """
 
 EXAMPLES = """
