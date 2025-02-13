@@ -37,11 +37,15 @@ DOCUMENTATION = """
         description: Field to fetch. Leave unset to fetch whole response.
         type: str
       collection_id:
-        description: Collection ID to filter results by collection. Leave unset to skip filtering.
+        description: 
+            - Collection ID to filter results by collection. Leave unset to skip filtering.
+            - O(collection_id) and O(collection_name) are mutually exclusive.
         type: str
         version_added: 6.3.0
       collection_name:
-        description: Collection name to filter results by collection. Leave unset to skip filtering.
+        description: 
+            - Collection name to filter results by collection. Leave unset to skip filtering.
+            - O(collection_id) and O(collection_name) are mutually exclusive.
         type: str
         version_added: 10.4.0
       organization_id:
@@ -119,7 +123,7 @@ RETURN = """
 
 from subprocess import Popen, PIPE
 
-from ansible.errors import AnsibleError
+from ansible.errors import AnsibleError, AnsibleOptionsError
 from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible.parsing.ajson import AnsibleJSONDecoder
 from ansible.plugins.lookup import LookupBase
@@ -268,7 +272,9 @@ class LookupModule(LookupBase):
         if not terms:
             terms = [None]
 
-        if collection_name and not collection_id:
+        if collection_name and collection_id:
+            raise AnsibleOptionsError("'collection_name' and 'collection_id' are mutually exclusive!")
+        elif collection_name:
             collection_ids = _bitwarden.get_collection_ids(collection_name, organization_id)
             if not collection_ids:
                 raise BitwardenException("No matching collections found!")
