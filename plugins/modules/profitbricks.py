@@ -14,6 +14,13 @@ short_description: Create, destroy, start, stop, and reboot a ProfitBricks virtu
 description:
   - Create, destroy, update, start, stop, and reboot a ProfitBricks virtual machine. When the virtual machine is created it
     can optionally wait for it to be 'running' before returning. This module has a dependency on profitbricks >= 1.0.0.
+deprecated:
+  removed_in: 11.0.0
+  why: Module relies on library unsupported since 2021.
+  alternative: >
+    Profitbricks has rebranded as Ionos Cloud and they provide a collection named ionoscloudsdk.ionoscloud.
+    Whilst it is likely it will provide the features of this module, that has not been verified.
+    Please refer to that collectionś documentation for more details.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:

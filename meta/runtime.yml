@@ -17,7 +17,7 @@ action_groups:
   proxmox:
     - proxmox
     - proxmox_backup
-    - proxmox_backup_info    
+    - proxmox_backup_info
     - proxmox_disk
     - proxmox_domain_info
     - proxmox_group_info
@@ -112,15 +112,15 @@ plugin_routing:
     atomic_container:
       deprecation:
         removal_version: 13.0.0
-        warning_text: Poject Atomic was sunset by the end of 2019.
+        warning_text: Project Atomic was sunset by the end of 2019.
     atomic_host:
       deprecation:
         removal_version: 13.0.0
-        warning_text: Poject Atomic was sunset by the end of 2019.
+        warning_text: Project Atomic was sunset by the end of 2019.
     atomic_image:
       deprecation:
         removal_version: 13.0.0
-        warning_text: Poject Atomic was sunset by the end of 2019.
+        warning_text: Project Atomic was sunset by the end of 2019.
     cisco_spark:
       redirect: community.general.cisco_webex
     consul_acl:
@@ -603,6 +603,26 @@ plugin_routing:
       redirect: community.postgresql.postgresql_user
     postgresql_user_obj_stat_info:
       redirect: community.postgresql.postgresql_user_obj_stat_info
+    profitbricks:
+      deprecation:
+        removal_version: 11.0.0
+        warning_text: Supporting library is unsupported since 2021.
+    profitbricks_datacenter:
+      deprecation:
+        removal_version: 11.0.0
+        warning_text: Supporting library is unsupported since 2021.
+    profitbricks_nic:
+      deprecation:
+        removal_version: 11.0.0
+        warning_text: Supporting library is unsupported since 2021.
+    profitbricks_volume:
+      deprecation:
+        removal_version: 11.0.0
+        warning_text: Supporting library is unsupported since 2021.
+    profitbricks_volume_attachments:
+      deprecation:
+        removal_version: 11.0.0
+        warning_text: Supporting library is unsupported since 2021.
     purefa_facts:
       tombstone:
         removal_version: 3.0.0
