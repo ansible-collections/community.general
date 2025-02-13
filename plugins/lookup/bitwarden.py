@@ -43,7 +43,7 @@ DOCUMENTATION = """
       collection_name:
         description: Collection name to filter results by collection. Leave unset to skip filtering.
         type: str
-        version_added: 10.5.0
+        version_added: 10.4.0
       organization_id:
         description: Organization ID to filter results by organization. Leave unset to skip filtering.
         type: str
