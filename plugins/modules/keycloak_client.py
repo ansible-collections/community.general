@@ -969,6 +969,12 @@ def main():
     if before_client is None:
         before_client = {}
 
+    # kc drops the variable 'authorizationServicesEnabled' if set to false
+    # to minimize diff/changes we set it to false if not set by kc
+    if 'authorizationServicesEnabled' not in before_client:
+        before_client['authorizationServicesEnabled'] = False
+
+
     # Build a proposed changeset from parameters given to this module
     changeset = {}
 
