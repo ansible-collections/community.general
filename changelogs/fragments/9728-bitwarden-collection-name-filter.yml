@@ -1,3 +1,2 @@
 minor_changes:
-  - bitwarden lookup - add new option to filter results by collection name
-  - bitwarden lookup - add new option to validate number of results
+  - bitwarden lookup plugin - add new option ``collection_name`` to filter results by collection name, and new option ``result_count`` to validate number of results (https://github.com/ansible-collections/community.general/pull/9728).
