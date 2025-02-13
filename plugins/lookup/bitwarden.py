@@ -244,7 +244,7 @@ class Bitwarden(object):
         # This includes things that matched in different fields.
         initial_matches = AnsibleJSONDecoder().raw_decode(out)[0]
 
-        # Filter to only return the id of a collections with exactly matching name
+        # Filter to only return the ID of a collections with exactly matching name
         return [item['id'] for item in initial_matches
                 if str(item.get('name')).lower() == collection_name.lower()]
 
