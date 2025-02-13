@@ -133,7 +133,7 @@ class LocaleGen(StateModuleHelper):
         if os.path.exists(ETC_LOCALE_GEN) and os.path.exists(SUPPORTED_LOCALES):
             self.vars.ubuntu_mode = False
             self.vars.mechanism = "ubuntu_glibc"
-        elif os.path.exists(ETC_LOCALE_GEN) and not os.path.exists(SUPPORTED_LOCALES):
+        elif os.path.exists(ETC_LOCALE_GEN):
             self.vars.ubuntu_mode = False
             self.vars.mechanism = "glibc"
         elif os.path.exists(VAR_LIB_LOCALES):
