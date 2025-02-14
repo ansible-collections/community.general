@@ -281,8 +281,11 @@ class LookupModule(LookupBase):
         else:
             collection_ids = [collection_id]
 
-        results = [_bitwarden.get_field(field, term, search_field, collection_id, organization_id) for collection_id in
-                   collection_ids for term in terms]
+        results = [
+            _bitwarden.get_field(field, term, search_field, collection_id, organization_id) 
+            for collection_id in collection_ids 
+            for term in terms
+        ]
 
         for result in results:
             if result_count is not None and len(result) != result_count:
