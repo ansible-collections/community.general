@@ -82,7 +82,7 @@ options:
     elements: str
   resource_argument:
     description:
-      - Actions to associate with resource.
+      - Action to associate with resource.
     type: dict
     suboptions:
       argument_action:

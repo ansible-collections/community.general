@@ -17,11 +17,7 @@ _state_map = {
 
 
 def fmt_resource_type(value):
-    cmd = []
-    for key in ['resource_standard', 'resource_provider', 'resource_name']:
-        if value.get(key) is not None:
-            cmd.append(value.get(key))
-    return cmd
+    return [value[k] for k in ['resource_standard', 'resource_provider', 'resource_name'] if value.get(k) is not None]
 
 
 def fmt_resource_operation(value):
@@ -36,12 +32,7 @@ def fmt_resource_operation(value):
 
 
 def fmt_resource_argument(value):
-    cmd = []
-    if value.get('argument_action') == 'group':
-        cmd.append('--group')
-    else:
-        cmd.append(value.get('argument_action'))
-    return cmd + list(value.get('argument_option'))
+    return ['--group' if value['argument_action'] == 'group' else value['argument_action']] + value['argument_option']
 
 
 def pacemaker_runner(module, **kwargs):
