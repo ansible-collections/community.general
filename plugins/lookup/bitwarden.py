@@ -38,8 +38,8 @@ DOCUMENTATION = """
         type: str
       collection_id:
         description:
-            - Collection ID to filter results by collection. Leave unset to skip filtering.
-            - O(collection_id) and O(collection_name) are mutually exclusive.
+          - Collection ID to filter results by collection. Leave unset to skip filtering.
+          - O(collection_id) and O(collection_name) are mutually exclusive.
         type: str
         version_added: 6.3.0
       collection_name:
