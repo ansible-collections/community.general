@@ -108,28 +108,28 @@ class Connection(ConnectionBase):
             self._connected = True
 
     def _build_command(self, cmd) -> str:
-          """build the command to execute on the incus host"""
+        """build the command to execute on the incus host"""
 
-          exec_cmd = [
-              self._incus_cmd,
-              "--project", self.get_option("project"),
-              "exec",
-              f"{self.get_option('remote')}:{self._instance()}",
-              "--"]
+        exec_cmd = [
+            self._incus_cmd,
+            "--project", self.get_option("project"),
+            "exec",
+            f"{self.get_option('remote')}:{self._instance()}",
+            "--"]
 
-          if self.get_option("remote_user") != "root":
-              self._display.vvv(
-                  f"INFO: Running as non-root user: {self.get_option('remote_user')}, \
-                  trying to run 'incus exec' with become method: {self.get_option('incus_become_method')}",
-                  host=self._instance(),
-              )
-              exec_cmd.extend(
-                  [self.get_option("incus_become_method"), self.get_option("remote_user"), "-c"]
-              )
+        if self.get_option("remote_user") != "root":
+            self._display.vvv(
+                f"INFO: Running as non-root user: {self.get_option('remote_user')}, \
+                trying to run 'incus exec' with become method: {self.get_option('incus_become_method')}",
+                host=self._instance(),
+            )
+            exec_cmd.extend(
+                [self.get_option("incus_become_method"), self.get_option("remote_user"), "-c"]
+            )
 
-          exec_cmd.extend([self.get_option("executable"), "-c", cmd])
+        exec_cmd.extend([self.get_option("executable"), "-c", cmd])
 
-          return exec_cmd
+        return exec_cmd
 
     def _instance(self):
         # Return only the leading part of the FQDN as the instance name
