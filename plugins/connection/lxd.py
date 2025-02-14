@@ -193,22 +193,29 @@ class Connection(ConnectionBase):
         if self.get_option("project"):
             local_cmd.extend(["--project", self.get_option("project")])
 
-        uid, gid = (-1, -1)  # lxc file push defaults
         if self.get_option("remote_user") != "root":
             uid, gid = self._get_remote_uid_gid()
-
-        local_cmd.extend(
-            [
-                "file",
-                "push",
-                "--uid",
-                str(uid),
-                "--gid",
-                str(gid),
-                in_path,
-                f"{self.get_option('remote')}:{self._host()}/{out_path}",
-            ]
-        )
+            local_cmd.extend(
+                [
+                    "file",
+                    "push",
+                    "--uid",
+                    str(uid),
+                    "--gid",
+                    str(gid),
+                    in_path,
+                    f"{self.get_option('remote')}:{self._host()}/{out_path}",
+                ]
+            )
+        else:
+            local_cmd.extend(
+                [
+                    "file",
+                    "push",
+                    in_path,
+                    f"{self.get_option('remote')}:{self._host()}/{out_path}",
+                ]
+            )
 
         self._display.vvvvv(f"PUT {local_cmd}", host=self._host())
 
