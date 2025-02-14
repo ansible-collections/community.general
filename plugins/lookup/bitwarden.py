@@ -282,8 +282,8 @@ class LookupModule(LookupBase):
             collection_ids = [collection_id]
 
         results = [
-            _bitwarden.get_field(field, term, search_field, collection_id, organization_id) 
-            for collection_id in collection_ids 
+            _bitwarden.get_field(field, term, search_field, collection_id, organization_id)
+            for collection_id in collection_ids
             for term in terms
         ]
 
