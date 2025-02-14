@@ -162,7 +162,7 @@ class Connection(ConnectionBase):
         return process.returncode, stdout, stderr
 
     def _get_remote_uid_gid(self) -> tuple[int, int]:
-        """Get the user and group id of 'remote_user' from the instance."""
+        """Get the user and group ID of 'remote_user' from the instance."""
 
         rc, uid_out, err = self.exec_command("/bin/id -u")
         if rc != 0:
