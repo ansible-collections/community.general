@@ -53,7 +53,7 @@
   assert:
     that:
       - result is changed
-      - result.end_state | selectattr("clientRole", "eq", false) | selectattr("name", "eq", "{{role}}") | list | count > 0
+      - result.end_state | selectattr("clientRole", "eq", false) | selectattr("name", "eq", role) | list | count > 0
 
 - name: Unmap a realm role from client service account
   vars:
@@ -74,8 +74,8 @@
     that:
       - result is changed
       - (result.end_state | length) == (result.existing | length) - 1
-      - result.existing | selectattr("clientRole", "eq", false) | selectattr("name", "eq", "{{role}}") | list | count > 0
-      - result.end_state | selectattr("clientRole", "eq", false) | selectattr("name", "eq", "{{role}}") | list | count == 0
+      - result.existing | selectattr("clientRole", "eq", false) | selectattr("name", "eq", role) | list | count > 0
+      - result.end_state | selectattr("clientRole", "eq", false) | selectattr("name", "eq", role) | list | count == 0
 
 - name: Delete existing realm role
   community.general.keycloak_role:
@@ -118,7 +118,7 @@
   assert:
     that:
       - result is changed
-      - result.end_state | selectattr("clientRole", "eq", true) | selectattr("name", "eq", "{{role}}") | list | count > 0
+      - result.end_state | selectattr("clientRole", "eq", true) | selectattr("name", "eq", role) | list | count > 0
 
 - name: Unmap a client role from client service account
   vars:
@@ -140,4 +140,4 @@
     that:
       - result is changed
       - result.end_state == []
-      - result.existing | selectattr("clientRole", "eq", true) | selectattr("name", "eq", "{{role}}") | list | count > 0
+      - result.existing | selectattr("clientRole", "eq", true) | selectattr("name", "eq", role) | list | count > 0
