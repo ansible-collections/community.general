@@ -32,7 +32,7 @@
   assert:
     that:
       - fetch_by_client_id_result.clientsecret_info.type == "secret"
-      - "{{ fetch_by_client_id_result.clientsecret_info.value | length }} >= 32"
+      - fetch_by_client_id_result.clientsecret_info.value | length >= 32
 
 - name: Keycloak Client fetch clientsecret by id
   community.general.keycloak_clientsecret_info: "{{ auth_args | combine(call_args) }}"
