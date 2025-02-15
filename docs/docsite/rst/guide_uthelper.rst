@@ -3,18 +3,18 @@
   GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
   SPDX-License-Identifier: GPL-3.0-or-later
 
-.. _ansible_collections.community.general.docsite.guide_test_helper:
+.. _ansible_collections.community.general.docsite.guide_uthelper:
 
-Test Helper Guide
-=================
+UTHelper Guide
+==============
 
 Introduction
 ^^^^^^^^^^^^
 
-The test helper was written to reduce the boilerplate code used in unit tests for modules.
+``UTHelper`` was written to reduce the boilerplate code used in unit tests for modules.
 It was originally written to handle tests of modules that run external commands using ``AnsibleModule.run_command()``.
 At the time of writing (Feb 2025) that remains the only type of tests you can use
-test Helper for, but it aims to provide support for other types of interactions.
+``UTHelper`` for, but it aims to provide support for other types of interactions.
 
 Until now, there are many different ways to implement unit tests that validate a module based on the execution of external commands. See some examples:
 
@@ -27,26 +27,26 @@ Until now, there are many different ways to implement unit tests that validate a
 As you can notice, there is no consistency in the way these tests are executed -
 they all do the same thing eventually, but each one is written in a very distinct way.
 
-The test Helper aims to:
+``UTHelper`` aims to:
 
 * provide a consistent idiom to define unit tests
-* reduce the code to a bare minimal ...
-* ... and making tests defined mostly as data
+* reduce the code to a bare minimal, and
+* define tests as data instead
 * allow the test cases definition to be expressed not only as a Python data structure but also as YAML content
 
 Quickstart
 """"""""""
 
-To use test helper, your test module will need only a bare minimal of code:
+To use UTHelper, your test module will need only a bare minimal of code:
 
 .. code-block:: python
 
     # tests/unit/plugin/modules/test_ansible_module.py
     from ansible_collections.community.general.plugins.modules import ansible_module
-    from .helper import Helper, RunCommandMock
+    from .uthelper import UTHelper, RunCommandMock
 
 
-    Helper.from_module(ansible_module, __name__, mocks=[RunCommandMock])
+    UTHelper.from_module(ansible_module, __name__, mocks=[RunCommandMock])
 
 Then, in the test specification file, you have:
 
@@ -62,7 +62,7 @@ Then, in the test specification file, you have:
           name: Roger the Shrubber
         output:
           shrubbery:
-            looks: notice
+            looks: nice
             price: not too expensive
           changed: true
           diff:
@@ -70,7 +70,7 @@ Then, in the test specification file, you have:
               shrubbery: null
             after:
               shrubbery:
-                looks: notice
+                looks: nice
                 price: not too expensive
         mocks:
           run_command:
@@ -86,25 +86,25 @@ Then, in the test specification file, you have:
 .. note::
 
     If you prefer to pick a different YAML file for the test cases, or if you prefer to define them in plain Python,
-    you can use the convenience methods ``Helper.from_file()`` and ``Helper.from_spec()``, respectively.
+    you can use the convenience methods ``UTHelper.from_file()`` and ``UTHelper.from_spec()``, respectively.
     See more details below.
 
 
-Using Test Helper
-^^^^^^^^^^^^^^^^^
+Using ``UTHelper``
+^^^^^^^^^^^^^^^^^^
 
 Test Module
 """""""""""
 
-The test helper is **strictly for unit tests**. To use it, you import the ``Helper`` class.
+``UTHelper`` is **strictly for unit tests**. To use it, you import the ``.uthelper.UTHelper`` class.
 As mentioned in different parts of this guide, there are three different mechanisms to load the test cases.
 
 .. seealso::
 
-    See the Helper class reference below for API details on the three different mechanisms.
+    See the UTHelper class reference below for API details on the three different mechanisms.
 
 
-The easies and most recommended way of using test Helper is literally the example shown.
+The easies and most recommended way of using ``UTHelper`` is literally the example shown.
 See a real world example at
 `test_gconftool2.py <https://github.com/ansible-collections/community.general/blob/10.3.0/tests/unit/plugins/modules/test_gconftool2.py>`_.
 
@@ -114,8 +114,7 @@ In that file it will expect to find the test specification expressed in YAML for
 
 If you prefer to read the test specifications a different file path, use ``from_file()`` passing the file handle for the YAML file.
 
-And, if for any reason you prefer or need to pass the data structure rather than dealing with YAML files, use
-the ``from_spec()`` method.
+And, if for any reason you prefer or need to pass the data structure rather than dealing with YAML files, use the ``from_spec()`` method.
 A real world example for that can be found at
 `test_snap.py <https://github.com/ansible-collections/community.general/blob/main/tests/unit/plugins/modules/test_snap.py>`_.
 
@@ -252,18 +251,18 @@ For each interaction the structure is as follows:
     Mandatory. The *stderr* result of the command execution, as one single string containing zero or more lines.
 
 
-Test Helper Reference
-^^^^^^^^^^^^^^^^^^^^^
+``UTHelper`` Reference
+^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:module:: .helper
+.. py:module:: .uthelper
 
-  .. py:class:: Helper
+  .. py:class:: UTHelper
 
     A class to encapsulate unit tests.
 
     .. py:staticmethod:: from_spec(ansible_module, test_module, test_spec, mocks=None)
 
-      Creates a Helper instance from a given test specification.
+      Creates an ``UTHelper`` instance from a given test specification.
 
       :param ansible_module: The Ansible module to be tested.
       :type ansible_module: module
@@ -273,8 +272,8 @@ Test Helper Reference
       :type test_spec: dict
       :param mocks: List of ``TestCaseMocks`` to be used during testing. Currently only ``RunCommandMock`` exists.
       :type mocks: list or None
-      :return: A test Helper instance.
-      :rtype: Helper
+      :return: An ``UTHelper`` instance.
+      :rtype: UTHelper
 
       Example usage of ``from_spec()``:
 
@@ -283,7 +282,7 @@ Test Helper Reference
           import sys
 
           from ansible_collections.community.general.plugins.modules import ansible_module
-          from .helper import Helper, RunCommandMock
+          from .uthelper import UTHelper, RunCommandMock
 
           TEST_SPEC = dict(
               test_cases=[
@@ -291,11 +290,11 @@ Test Helper Reference
               ]
           )
 
-          helper = Helper.from_spec(ansible_module, sys.modules[__name__], TEST_SPEC, mocks=[RunCommandMock])
+          helper = UTHelper.from_spec(ansible_module, sys.modules[__name__], TEST_SPEC, mocks=[RunCommandMock])
 
     .. py:staticmethod:: from_file(ansible_module, test_module, test_spec_filehandle, mocks=None)
 
-      Creates a Helper instance from a test specification file.
+      Creates an ``UTHelper`` instance from a test specification file.
 
       :param ansible_module: The Ansible module to be tested.
       :type ansible_module: module
@@ -305,8 +304,8 @@ Test Helper Reference
       :type test_spec_filehandle: file
       :param mocks: List of ``TestCaseMocks`` to be used during testing. Currently only ``RunCommandMock`` exists.
       :type mocks: list or None
-      :return: A test Helper instance.
-      :rtype: Helper
+      :return: An ``UTHelper`` instance.
+      :rtype: UTHelper
 
       Example usage of ``from_file()``:
 
@@ -315,14 +314,14 @@ Test Helper Reference
           import sys
 
           from ansible_collections.community.general.plugins.modules import ansible_module
-          from .helper import Helper, RunCommandMock
+          from .uthelper import UTHelper, RunCommandMock
 
           with open("test_spec.yaml", "r") as test_spec_filehandle:
-              helper = Helper.from_file(ansible_module, sys.modules[__name__], test_spec_filehandle, mocks=[RunCommandMock])
+              helper = UTHelper.from_file(ansible_module, sys.modules[__name__], test_spec_filehandle, mocks=[RunCommandMock])
 
     .. py:staticmethod:: from_module(ansible_module, test_module_name, mocks=None)
 
-      Creates a test helper instance from a given Ansible module and test module.
+      Creates an ``UTHelper`` instance from a given Ansible module and test module.
 
       :param ansible_module: The Ansible module to be tested.
       :type ansible_module: module
@@ -330,18 +329,18 @@ Test Helper Reference
       :type test_module_name: str
       :param mocks: List of ``TestCaseMocks`` to be used during testing. Currently only ``RunCommandMock`` exists.
       :type mocks: list or None
-      :return: A test Helper instance.
-      :rtype: Helper
+      :return: An ``UTHelper`` instance.
+      :rtype: UTHelper
 
       Example usage of ``from_module()``:
 
       .. code-block:: python
 
           from ansible_collections.community.general.plugins.modules import ansible_module
-          from .helper import Helper, RunCommandMock
+          from .uthelper import UTHelper, RunCommandMock
 
           # Example usage
-          helper = Helper.from_module(ansible_module, __name__, mocks=[RunCommandMock])
+          helper = UTHelper.from_module(ansible_module, __name__, mocks=[RunCommandMock])
 
 
 Creating TestCaseMocks
@@ -375,8 +374,8 @@ Caveats
 
 Known issues/opportunities for improvement:
 
-* Only one ``Helper`` per test module: Test Helper injects a test function with a fixed name into the module's namespace,
-  so placing a second ``Helper`` instance is going to overwrite the function created by the first one.
+* Only one ``UTHelper`` per test module: UTHelper injects a test function with a fixed name into the module's namespace,
+  so placing a second ``UTHelper`` instance is going to overwrite the function created by the first one.
 * Order of elements in module's namespace is not consistent across executions in Python 3.5, so if adding more tests to the test module
   might make Test Helper add its function before or after the other test functions.
   In the community.general collection the CI processes uses ``pytest-xdist`` to paralellize and distribute the tests,
