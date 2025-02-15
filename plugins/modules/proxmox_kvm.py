@@ -455,8 +455,9 @@ options:
       - Indicates desired state of the instance.
       - If V(current), the current state of the VM will be fetched. You can access it with C(results.status).
       - V(template) was added in community.general 8.1.0.
+      - V(paused) and V(hibernated) were added in community.general 10.4.0.
     type: str
-    choices: ['present', 'started', 'absent', 'stopped', 'restarted', 'current', 'template']
+    choices: ['present', 'started', 'absent', 'stopped', 'restarted', 'current', 'template', 'paused', 'hibernated']
     default: present
   storage:
     description:
@@ -1208,6 +1209,16 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             return False
         return True
 
+    def suspend_vm(self, vm, timeout, todisk):
+        vmid = vm['vmid']
+        proxmox_node = self.proxmox_api.nodes(vm['node'])
+        taskid = proxmox_node.qemu(vmid).status.suspend.post(todisk=(1 if todisk else 0), timeout=timeout)
+        if not self.wait_for_task(vm['node'], taskid):
+            self.module.fail_json(msg='Reached timeout while waiting for suspending VM. Last line in task before timeout: %s' %
+                                  proxmox_node.tasks(taskid).log.get()[:1])
+            return False
+        return True
+
 
 def main():
     module_args = proxmox_auth_argument_spec()
@@ -1287,7 +1298,7 @@ def main():
         sshkeys=dict(type='str', no_log=False),
         startdate=dict(type='str'),
         startup=dict(),
-        state=dict(default='present', choices=['present', 'absent', 'stopped', 'started', 'restarted', 'current', 'template']),
+        state=dict(default='present', choices=['present', 'absent', 'stopped', 'started', 'restarted', 'current', 'template', 'paused', 'hibernated']),
         storage=dict(type='str'),
         tablet=dict(type='bool'),
         tags=dict(type='list', elements='str'),
@@ -1610,6 +1621,23 @@ def main():
         status['status'] = current
         if status:
             module.exit_json(changed=False, vmid=vmid, msg="VM %s with vmid = %s is %s" % (name, vmid, current), **status)
+
+    elif state in ['paused', 'hibernated']:
+        if not vmid:
+            module.fail_json(msg='VM with name = %s does not exist in cluster' % name)
+
+        status = {}
+        try:
+            vm = proxmox.get_vm(vmid)
+            current = proxmox.proxmox_api.nodes(vm['node']).qemu(vmid).status.current.get()['status']
+            status['status'] = current
+            if current != 'running':
+                module.exit_json(changed=False, vmid=vmid, msg="VM %s is not running" % vmid, **status)
+
+            proxmox.suspend_vm(vm, force=module.params['force'], timeout=module.params['timeout'], todisk=(state == 'hibernated'))
+            module.exit_json(changed=True, vmid=vmid, msg="VM %s is suspending" % vmid, **status)
+        except Exception as e:
+            module.fail_json(vmid=vmid, msg="suspending of VM %s failed with exception: %s" % (vmid, e), **status)
 
 
 if __name__ == '__main__':
