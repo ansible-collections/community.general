@@ -60,7 +60,7 @@ options:
     default: true
   force:
     description:
-      - Shrink or remove operations of volumes requires this switch. Ensures that that filesystems get never corrupted/destroyed
+      - Shrink or remove operations of volumes requires this switch. Ensures that filesystems never get corrupted/destroyed
         by mistake.
     type: bool
     default: false

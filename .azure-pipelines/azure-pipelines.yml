@@ -43,8 +43,6 @@ variables:
     value: ansible_collections/community/general
   - name: coverageBranches
     value: main
-  - name: pipelinesCoverage
-    value: coverage
   - name: entryPoint
     value: tests/utils/shippable/shippable.sh
   - name: fetchDepth

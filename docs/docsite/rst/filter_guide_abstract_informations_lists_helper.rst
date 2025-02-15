@@ -65,7 +65,7 @@ All three statements are equivalent and give:
 
 .. note:: Be aware that in most cases, filter calls without any argument require ``flatten=true``, otherwise the input is returned as result. The reason for this is, that the input is considered as a variable argument and is wrapped by an additional outer list. ``flatten=true`` ensures that this list is removed before the input is processed by the filter logic.
 
-The filters ansplugin:`community.general.lists_difference#filter` or :ansplugin:`community.general.lists_symmetric_difference#filter` can be used in the same way as the filters in the examples above. They calculate the difference or the symmetric difference between two or more lists and preserve the item order.
+The filters :ansplugin:`community.general.lists_difference#filter` or :ansplugin:`community.general.lists_symmetric_difference#filter` can be used in the same way as the filters in the examples above. They calculate the difference or the symmetric difference between two or more lists and preserve the item order.
 
 For example, the symmetric difference of ``A``, ``B`` and ``C`` may be written as:
 
