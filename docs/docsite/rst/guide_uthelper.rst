@@ -244,7 +244,7 @@ The ``TestCaseMock`` subclass is free to define the expected data structure.
 RunCommandMock Specification
 """"""""""""""""""""""""""""
 
-``RunCommandMock`` expects a ``list`` in which elements follow the structure:
+``RunCommandMock`` mocks can be specified with the key ``run_command`` and it expects a ``list`` in which elements follow the structure:
 
 - ``command: Union[list, str]``
     Mandatory. The command that is expected to be executed by the module. It corresponds to the parameter ``args`` of the ``AnsibleModule.run_command()`` call.
