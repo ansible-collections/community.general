@@ -14,18 +14,18 @@ import yaml
 import pytest
 
 
-class Helper(object):
+class UTHelper(object):
     TEST_SPEC_VALID_SECTIONS = ["anchors", "test_cases"]
 
     @staticmethod
     def from_spec(ansible_module, test_module, test_spec, mocks=None):
-        helper = Helper(ansible_module, test_module, test_spec=test_spec, mocks=mocks)
+        helper = UTHelper(ansible_module, test_module, test_spec=test_spec, mocks=mocks)
         return helper
 
     @staticmethod
     def from_file(ansible_module, test_module, test_spec_filehandle, mocks=None):
         test_spec = yaml.safe_load(test_spec_filehandle)
-        return Helper.from_spec(ansible_module, test_module, test_spec, mocks)
+        return UTHelper.from_spec(ansible_module, test_module, test_spec, mocks)
 
     # @TODO: calculate the test_module_name automatically, remove one more parameter
     @staticmethod
@@ -36,7 +36,7 @@ class Helper(object):
             test_spec_filename = test_module.__file__.replace('.py', ext)
             if os.path.exists(test_spec_filename):
                 with open(test_spec_filename, "r") as test_spec_filehandle:
-                    return Helper.from_file(ansible_module, test_module, test_spec_filehandle, mocks=mocks)
+                    return UTHelper.from_file(ansible_module, test_module, test_spec_filehandle, mocks=mocks)
 
         raise Exception("Cannot find test case file for {0} with one of the extensions: {1}".format(test_module.__file__, extensions))
 

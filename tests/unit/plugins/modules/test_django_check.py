@@ -7,7 +7,7 @@ __metaclass__ = type
 
 
 from ansible_collections.community.general.plugins.modules import django_check
-from .helper import Helper, RunCommandMock
+from .uthelper import UTHelper, RunCommandMock
 
 
-Helper.from_module(django_check, __name__, mocks=[RunCommandMock])
+UTHelper.from_module(django_check, __name__, mocks=[RunCommandMock])
