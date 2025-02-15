@@ -20,3 +20,4 @@ sections:
       - guide_vardict
       - guide_cmdrunner
       - guide_modulehelper
+      - guide_uthelper
