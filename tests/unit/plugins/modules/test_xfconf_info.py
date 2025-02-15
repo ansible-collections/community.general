@@ -7,7 +7,7 @@ __metaclass__ = type
 
 
 from ansible_collections.community.general.plugins.modules import xfconf_info
-from .helper import Helper, RunCommandMock
+from .uthelper import UTHelper, RunCommandMock
 
 
-Helper.from_module(xfconf_info, __name__, mocks=[RunCommandMock])
+UTHelper.from_module(xfconf_info, __name__, mocks=[RunCommandMock])
