@@ -122,7 +122,58 @@ A real world example for that can be found at
 Test Specification
 """"""""""""""""""
 
-The strucutre of the test specification, in YAML is (excerpt from ``test_opkg.yaml``):
+The structure of the test specification data is described below.
+
+Top level
+---------
+
+At the top level there are two accepted keys:
+
+- ``anchors: dict``
+    Optional. Placeholder for you to define YAML anchors that can be repeated in the test cases.
+    Its contents are never accessed directly by test Helper.
+- ``test_cases: list``
+    Mandatory. List of test cases, see below for definition.
+
+Test cases
+----------
+
+You write the test cases with five elements:
+
+- ``id: str``
+    Mandatory. Used to identify the test case.
+
+- ``flags: dict``
+    Optional. Flags controling the behavior of the test case. All flags are optional. Accepted flags:
+
+    * ``check: bool``: set to ``true`` if the module is to be executed in **check mode**.
+    * ``diff: bool``: set to ``true`` if the module is to be executed in **diff mode**.
+    * ``skip: str``: set the test case to be skipped, providing the message for ``pytest.skip()``.
+    * ``xfail: str``: set the test case to expect failure, providing the message for ``pytest.xfail()``.
+
+- ``input: dict``
+    Optional. Parameters for the Ansible module, it can be empty.
+
+- ``output: dict``
+    Optional. Expected return values from the Ansible module.
+    All RV names are used here are expected to be found in the module output, but not all RVs in the output must be here.
+    It can include special RVs such as ``changed`` and ``diff``.
+    It can be empty.
+
+- ``mocks: dict``
+    Optional. Mocked interactions, ``run_command`` being the only one supported for now.
+    Each key in this dictionary refers to one subclass of ``TestCaseMock`` and its
+    structure is dictated by the ``TestCaseMock`` subclass implementation.
+    All keys are expected to be named using snake case, as in ``run_command``.
+    The ``TestCaseMock`` subclass is responsible for defining the name used in the test specification.
+    The structure for that specification is dependent on the implementing class.
+    See more details below for the implementation of ``RunCommandMock``
+
+Example using YAML
+------------------
+
+We recommend you use ``UTHelper`` reading the test specifications from a YAML file.
+See an example below of how one actually looks like (excerpt from ``test_opkg.yaml``):
 
 ..  code-block:: yaml
 
@@ -185,55 +236,15 @@ The strucutre of the test specification, in YAML is (excerpt from ``test_opkg.ya
               zlib-dev - 1.2.11-6
             err: ''
 
-Top level
----------
-
-At the top level there are two accepted keys:
-
-- ``anchors: dict``
-    Optional. Placeholder for you to define YAML anchors that can be repeated in the test cases.
-    Its contents are never accessed directly by test Helper.
-- ``test_cases: list``
-    Mandatory. List of test cases, see below for definition.
-
-Test cases
-----------
-
-You write the test cases with five elements:
-
-- ``id: str``
-    Mandatory. Used to identify the test case.
-- ``flags: dict``
-    Optional. Flags controling the behavior of the test case. All flags are optional. Accepted flags:
-
-    * ``check: bool``: set to ``true`` if the module is to be executed in **check mode**.
-    * ``diff: bool``: set to ``true`` if the module is to be executed in **diff mode**.
-    * ``skip: str``: set the test case to be skipped, providing the message for ``pytest.skip()``.
-    * ``xfail: str``: set the test case to expect failure, providing the message for ``pytest.xfail()``.
-- ``input: dict``
-    Optional. Parameters for the Ansible module, it can be empty.
-- ``output: dict``
-    Optional. Expected return values from the Ansible module.
-    All RV names are used here are expected to be found in the module output, but not all RVs in the output must be here.
-    It can include special RVs such as ``changed`` and ``diff``.
-    It can be empty.
-- ``mocks: dict``
-    Optional. Mocked interactions, ``run_command`` being the only one supported for now.
-    Each key in this dictionary refers to one subclass of ``TestCaseMock`` (see more below) and contains a list of the interactions for that ``TestCaseMock``.
-    All keys are expected to be named using snake case, as in ``run_command``.
-    The Python class supporting the test case mock is constructed by converting the snake case name to a
-    camel case name with suffix ``Mock``, so for example ``run_command`` becomes ``RunCommandMock``.
-    The test will fail if the Ansible module make a number of interactions different from what is specififed in the test case.
-    The structure for that specification is dependent on the implementing class, see details below.
-
-
 TestCaseMocks Specifications
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``TestCaseMock`` subclass is free to define the expected data structure.
 
 RunCommandMock Specification
 """"""""""""""""""""""""""""
 
-For each interaction the structure is as follows:
+``RunCommandMock`` expects a ``list`` in which elements follow the structure:
 
 - ``command: Union[list, str]``
     Mandatory. The command that is expected to be executed by the module. It corresponds to the parameter ``args`` of the ``AnsibleModule.run_command()`` call.
@@ -367,7 +378,6 @@ To create a new ``TestCaseMock`` you must extend that class and implement the re
             # returns a dict mapping names to pytest fixtures that should be used for the test case
             # for example, in RunCommandMock it creates a fixture that patches AnsibleModule.get_bin_path
             ...
-
 
 Caveats
 ^^^^^^^
