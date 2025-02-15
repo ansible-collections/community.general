@@ -1,0 +1,102 @@
+- name: Gather all units from shell
+  ansible.builtin.shell: systemctl list-units --no-pager --type service,target,socket --all --plain --no-legend
+  register: all_units
+
+- name: Assert command run successfully
+  ansible.builtin.assert:
+    that:
+      - all_units.rc == 0
+
+- name: Gather all units
+  community.general.systemd_facts:
+
+- name: Check all units exists
+  ansible.builtin.assert:
+    that: 
+      - ansible_facts.systemd_units is defined
+      - ansible_facts.systemd_units | length == all_units.stdout_lines | length
+    success_msg: "Success: All units collected."
+
+- name: Build all units list
+  set_fact:
+    shell_units: "{{ all_units.stdout_lines | map('split') | list }}"
+
+- name: Check all units properties
+  ansible.builtin.assert:
+    that:
+      - ansible_facts.systemd_units[item[0]].name == item[0]
+      - ansible_facts.systemd_units[item[0]].loadstate == item[1]
+      - ansible_facts.systemd_units[item[0]].activestate == item[2]
+      - ansible_facts.systemd_units[item[0]].substate == item[3]
+  loop: "{{ shell_units }}"
+  loop_control:
+    label: "{{ item[0] }}"
+
+- name: Gather systemd-journald.service properties from shell
+  ansible.builtin.shell: systemctl show systemd-journald.service -p Id,LoadState,ActiveState,SubState,FragmentPath,MainPID,ExecMainPID,UnitFileState,UnitFilePreset,Description,Restart
+  register: journald_prop
+
+- name: Assert command run successfully
+  ansible.builtin.assert:
+    that:
+      - journald_prop.rc == 0
+
+- name: Gather systemd-journald.service
+  community.general.systemd_facts:
+    select: true
+    unitname:
+      - systemd-journald.service
+
+- name: Check unit facts and all properties
+  ansible.builtin.assert:
+    that: 
+      - ansible_facts.systemd_units is defined
+      - ansible_facts.systemd_units['systemd-journald.service'] is defined
+      - ansible_facts.systemd_units['systemd-journald.service'].name is defined
+      - ansible_facts.systemd_units['systemd-journald.service'].loadstate is defined
+      - ansible_facts.systemd_units['systemd-journald.service'].activestate is defined
+      - ansible_facts.systemd_units['systemd-journald.service'].substate is defined
+      - ansible_facts.systemd_units['systemd-journald.service'].fragmentpath is defined
+      - ansible_facts.systemd_units['systemd-journald.service'].mainpid is defined
+      - ansible_facts.systemd_units['systemd-journald.service'].execmainpid is defined
+      - ansible_facts.systemd_units['systemd-journald.service'].unitfilestate is defined
+      - ansible_facts.systemd_units['systemd-journald.service'].unitfilepreset is defined
+    success_msg: "Success: All properties collected."
+
+- name: Create dict of properties from shell
+  ansible.builtin.set_fact:
+    journald_shell: "{{ dict(journald_prop.stdout_lines | map('split', '=', 1) | list) }}"
+
+- name: Check properties content
+  ansible.builtin.assert:
+    that:
+      - ansible_facts.systemd_units['systemd-journald.service'].name == journald_shell.Id
+      - ansible_facts.systemd_units['systemd-journald.service'].loadstate == journald_shell.LoadState
+      - ansible_facts.systemd_units['systemd-journald.service'].activestate == journald_shell.ActiveState
+      - ansible_facts.systemd_units['systemd-journald.service'].substate == journald_shell.SubState
+      - ansible_facts.systemd_units['systemd-journald.service'].fragmentpath == journald_shell.FragmentPath
+      - ansible_facts.systemd_units['systemd-journald.service'].mainpid == journald_shell.MainPID
+      - ansible_facts.systemd_units['systemd-journald.service'].execmainpid == journald_shell.ExecMainPID
+      - ansible_facts.systemd_units['systemd-journald.service'].unitfilestate == journald_shell.UnitFileState
+      - ansible_facts.systemd_units['systemd-journald.service'].unitfilepreset == journald_shell.UnitFilePreset
+    success_msg: "Success: Property values are correct."
+
+- name: Gather systemd-journald.service extra properties
+  community.general.systemd_facts:
+    select: true
+    unitname:
+      - systemd-journald.service
+    properties:
+      - Description
+      - Restart
+
+- name: Check new properties
+  ansible.builtin.assert:
+    that:
+      - ansible_facts.systemd_units is defined
+      - ansible_facts.systemd_units['systemd-journald.service'] is defined
+      - ansible_facts.systemd_units['systemd-journald.service'].description is defined
+      - ansible_facts.systemd_units['systemd-journald.service'].restart is defined
+      - ansible_facts.systemd_units['systemd-journald.service'].description == journald_shell.Description
+      - ansible_facts.systemd_units['systemd-journald.service'].restart == journald_shell.Restart
+    success_msg: "Success: Extra property values are correct."

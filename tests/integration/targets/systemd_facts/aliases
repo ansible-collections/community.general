@@ -1,0 +1,6 @@
+needs/root
+azp/posix/1
+skip/aix
+skip/freebsd
+skip/osx
+skip/macos
