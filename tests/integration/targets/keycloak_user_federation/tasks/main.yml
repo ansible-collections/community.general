@@ -64,7 +64,7 @@
     that:
       - result is changed
       - result.existing == {}
-      - result.end_state.name == "{{ federation }}"
+      - result.end_state.name == federation
 
 - name: Create new user federation in admin realm
   community.general.keycloak_user_federation:
@@ -117,7 +117,7 @@
     that:
       - result is changed
       - result.existing == {}
-      - result.end_state.name == "{{ federation }}"
+      - result.end_state.name == federation
 
 - name: Update existing user federation (no change)
   community.general.keycloak_user_federation:
@@ -170,9 +170,9 @@
     that:
       - result is not changed
       - result.existing != {}
-      - result.existing.name == "{{ federation }}"
+      - result.existing.name == federation
       - result.end_state != {}
-      - result.end_state.name == "{{ federation }}"
+      - result.end_state.name == federation
 
 - name: Update existing user federation (no change, admin realm)
   community.general.keycloak_user_federation:
@@ -225,9 +225,9 @@
     that:
       - result is not changed
       - result.existing != {}
-      - result.existing.name == "{{ federation }}"
+      - result.existing.name == federation
       - result.end_state != {}
-      - result.end_state.name == "{{ federation }}"
+      - result.end_state.name == federation
 
 - name: Update existing user federation (with change)
   community.general.keycloak_user_federation:
@@ -296,9 +296,9 @@
     that:
       - result is changed
       - result.existing != {}
-      - result.existing.name == "{{ federation }}"
+      - result.existing.name == federation
       - result.end_state != {}
-      - result.end_state.name == "{{ federation }}"
+      - result.end_state.name == federation
 
 - name: Delete existing user federation
   community.general.keycloak_user_federation:
@@ -411,7 +411,7 @@
     that:
       - result is changed
       - result.existing == {}
-      - result.end_state.name == "{{ federation }}"
+      - result.end_state.name == federation
 
 ## no point in retesting this, just doing it to clean up introduced server changes
 - name: Delete absent user federation
