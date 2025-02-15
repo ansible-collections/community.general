@@ -59,7 +59,17 @@ options:
       - The personal access token to log-in with.
       - Mutually exclusive with O(username) and O(password).
     version_added: 4.2.0
-
+  client_cert:
+    type:
+    description:
+      - Client certificate if required.
+      - Mutually exclusive with O(username) and O(password).
+  client_key:
+    type:
+    description:
+      - Client certificate key if required.
+      - Mutually exclusive with O(username) and O(password).
+    
   project:
     type: str
     required: false
@@ -446,6 +456,15 @@ EXAMPLES = r"""
     operation: attach
     attachment:
       filename: topsecretreport.xlsx
+
+# Support for client certificate
+- name: Create an issue
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    client_cert: '{{ path/to/client-cert }}'
+    client_key: '{{ path/to/client-key }}'
 """
 
 import base64
@@ -456,11 +475,13 @@ import os
 import random
 import string
 import traceback
+import ssl
+import urllib.request
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper, cause_changes
 from ansible.module_utils.six.moves.urllib.request import pathname2url
 from ansible.module_utils.common.text.converters import to_text, to_bytes, to_native
-from ansible.module_utils.urls import fetch_url
+from urllib.error import HTTPError
 
 
 class JIRA(StateModuleHelper):
@@ -480,6 +501,8 @@ class JIRA(StateModuleHelper):
             username=dict(type='str'),
             password=dict(type='str', no_log=True),
             token=dict(type='str', no_log=True),
+            client_cert=dict(type='path'),
+            client_key=dict(type='path'),
             project=dict(type='str', ),
             summary=dict(type='str', ),
             description=dict(type='str', ),
@@ -748,14 +771,7 @@ class JIRA(StateModuleHelper):
             "\r\n".join(lines)
         )
 
-    def request(
-            self,
-            url,
-            data=None,
-            method=None,
-            content_type='application/json',
-            additional_headers=None
-    ):
+    def request(self, url, data=None, method=None, content_type='application/json', additional_headers=None):
         if data and content_type == 'application/json':
             data = json.dumps(data)
 
@@ -763,60 +779,68 @@ class JIRA(StateModuleHelper):
         if isinstance(additional_headers, dict):
             headers = additional_headers.copy()
 
-        # NOTE: fetch_url uses a password manager, which follows the
-        # standard request-then-challenge basic-auth semantics. However as
-        # JIRA allows some unauthorised operations it doesn't necessarily
-        # send the challenge, so the request occurs as the anonymous user,
-        # resulting in unexpected results. To work around this we manually
-        # inject the auth header up-front to ensure that JIRA treats
-        # the requests as authorized for this user.
-
+        # Set up authentication headers based on token or username/password
         if self.vars.token is not None:
             headers.update({
                 "Content-Type": content_type,
                 "Authorization": "Bearer %s" % self.vars.token,
             })
         else:
-            auth = to_text(base64.b64encode(to_bytes('{0}:{1}'.format(self.vars.username, self.vars.password),
-                                                     errors='surrogate_or_strict')))
+            auth = to_text(base64.b64encode(to_bytes(f'{self.vars.username}:{self.vars.password}', errors='surrogate_or_strict')))
             headers.update({
                 "Content-Type": content_type,
-                "Authorization": "Basic %s" % auth,
+                "Authorization": f"Basic {auth}",
             })
 
-        response, info = fetch_url(
-            self.module, url, data=data, method=method, timeout=self.vars.timeout, headers=headers
-        )
+        if data:
+            data = data.encode('utf-8')
 
-        if info['status'] not in (200, 201, 204):
-            error = None
+        context = ssl.create_default_context()
+
+        if self.vars.client_cert and self.vars.client_key:
+            context.load_cert_chain(certfile=self.vars.client_cert, keyfile=self.vars.client_key)
+
+        req = urllib.request.Request(url, data=data, headers=headers, method=method)
+
+        for key, value in headers.items():
+            req.add_header(key, value)
+
+        try:
+            with urllib.request.urlopen(req, context=context) as response:
+                body = response.read()
+                if body:
+                    return json.loads(to_text(body, errors='surrogate_or_strict'))
+
+                return {}
+
+        except HTTPError as e:
+            error_body = e.read()
             try:
-                error = json.loads(info['body'])
+                error_json = json.loads(to_text(error_body, errors='surrogate_or_strict'))
+                if error_json:
+                    msg = []
+                    for key in ('errorMessages', 'errors'):
+                        if error_json.get(key):
+                            msg.append(to_native(error_json[key]))
+                    if msg:
+                        self.module.fail_json(msg=', '.join(msg))
+                    self.module.fail_json(msg=to_native(error_json))
             except Exception:
-                msg = 'The request "{method} {url}" returned the unexpected status code {status} {msg}\n{body}'.format(
-                    status=info['status'],
-                    msg=info['msg'],
-                    body=info.get('body'),
-                    url=url,
-                    method=method,
-                )
+                msg = f"The request {method} {url} returned status code {e.code} {e.msg}\n{e.read()}"
                 self.module.fail_json(msg=to_native(msg), exception=traceback.format_exc())
-            if error:
-                msg = []
-                for key in ('errorMessages', 'errors'):
-                    if error.get(key):
-                        msg.append(to_native(error[key]))
-                if msg:
-                    self.module.fail_json(msg=', '.join(msg))
-                self.module.fail_json(msg=to_native(error))
-            # Fallback print body, if it can't be decoded
-            self.module.fail_json(msg=to_native(info['body']))
 
-        body = response.read()
+        except Exception as e:
+            self.module.fail_json(msg=f"Request failed: {str(e)}")
 
-        if body:
-            return json.loads(to_text(body, errors='surrogate_or_strict'))
-        return {}
+    def post(self, url, data, content_type='application/json', additional_headers=None):
+        return self.request(url, data=data, method='POST', content_type=content_type,
+                            additional_headers=additional_headers)
+
+    def put(self, url, data):
+        return self.request(url, data=data, method='PUT')
+
+    def get(self, url):
+        return self.request(url)
 
     def post(self, url, data, content_type='application/json', additional_headers=None):
         return self.request(url, data=data, method='POST', content_type=content_type,
