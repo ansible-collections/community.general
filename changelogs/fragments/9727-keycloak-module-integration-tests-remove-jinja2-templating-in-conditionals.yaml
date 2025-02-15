@@ -1,2 +1,6 @@
 bugfixes:
-  - keycloak_clientsecret_info, keycloak_clientsecret_regenerate, keycloak_role, keycloak_user_federation, keycloak_user_rolemapping: fix broken integration tests and warnings in integration tests caused by jinja2 templating used in conditionals (https://github.com/ansible-collections/community.general/issues/9726).
+  - keycloak_clientsecret_info: fix integration test errors caused by jinja2 templating used in conditionals (https://github.com/ansible-collections/community.general/issues/9726).
+  - keycloak_clientsecret_regenerate: fix integration test errors caused by jinja2 templating used in conditionals (https://github.com/ansible-collections/community.general/issues/9726).
+  - keycloak_role: fix integration test errors caused by jinja2 templating used in conditionals (https://github.com/ansible-collections/community.general/issues/9726).
+  - keycloak_user_federation: fix integration test warnings caused by jinja2 templating used in conditionals (https://github.com/ansible-collections/community.general/issues/9726).
+  - keycloak_user_rolemapping: fix integration test warnings caused by jinja2 templating used in conditionals (https://github.com/ansible-collections/community.general/issues/9726).
