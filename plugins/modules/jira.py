@@ -475,19 +475,12 @@ import os
 import random
 import string
 import traceback
-import ssl
-import six
-
-if six.PY2:
-    import urllib2 as urllib_request
-    from urllib2 import HTTPError
-else:
-    import urllib.request as urllib_request
-    from urllib.error import HTTPError
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper, cause_changes
 from ansible.module_utils.six.moves.urllib.request import pathname2url
 from ansible.module_utils.common.text.converters import to_text, to_bytes, to_native
+from ansible.module_utils.urls import fetch_url
+
 
 
 class JIRA(StateModuleHelper):
@@ -777,7 +770,14 @@ class JIRA(StateModuleHelper):
             "\r\n".join(lines)
         )
 
-    def request(self, url, data=None, method=None, content_type='application/json', additional_headers=None):
+    def request(
+            self,
+            url,
+            data=None,
+            method=None,
+            content_type='application/json',
+            additional_headers=None
+    ):
         if data and content_type == 'application/json':
             data = json.dumps(data)
 
@@ -785,58 +785,60 @@ class JIRA(StateModuleHelper):
         if isinstance(additional_headers, dict):
             headers = additional_headers.copy()
 
-        # Set up authentication headers based on token or username/password
+        # NOTE: fetch_url uses a password manager, which follows the
+        # standard request-then-challenge basic-auth semantics. However as
+        # JIRA allows some unauthorised operations it doesn't necessarily
+        # send the challenge, so the request occurs as the anonymous user,
+        # resulting in unexpected results. To work around this we manually
+        # inject the auth header up-front to ensure that JIRA treats
+        # the requests as authorized for this user.
+
         if self.vars.token is not None:
             headers.update({
                 "Content-Type": content_type,
                 "Authorization": "Bearer %s" % self.vars.token,
             })
         else:
-            auth = to_text(base64.b64encode(to_bytes('%s:%s' % (self.vars.username, self.vars.password), errors='surrogate_or_strict')))
+            auth = to_text(base64.b64encode(to_bytes('{0}:{1}'.format(self.vars.username, self.vars.password),
+                                                     errors='surrogate_or_strict')))
             headers.update({
                 "Content-Type": content_type,
                 "Authorization": "Basic %s" % auth,
             })
 
-        if data:
-            data = data.encode('utf-8')
+        response, info = fetch_url(
+            self.module, url, data=data, method=method, timeout=self.vars.timeout, headers=headers
+        )
 
-        context = ssl.create_default_context()
-
-        if self.vars.client_cert and self.vars.client_key:
-            context.load_cert_chain(certfile=self.vars.client_cert, keyfile=self.vars.client_key)
-
-        req = urllib_request.Request(url, data=data, headers=headers, method=method)
-
-        for key, value in headers.items():
-            req.add_header(key, value)
-
-        try:
-            with urllib_request.urlopen(req, context=context) as response:
-                body = response.read()
-                if body:
-                    return json.loads(to_text(body, errors='surrogate_or_strict'))
-
-                return {}
-
-        except HTTPError as e:
-            error_body = e.read()
+        if info['status'] not in (200, 201, 204):
+            error = None
             try:
-                error_json = json.loads(to_text(error_body, errors='surrogate_or_strict'))
-                if error_json:
-                    msg = []
-                    for key in ('errorMessages', 'errors'):
-                        if error_json.get(key):
-                            msg.append(to_native(error_json[key]))
-                    if msg:
-                        self.module.fail_json(msg=', '.join(msg))
-                    self.module.fail_json(msg=to_native(error_json))
+                error = json.loads(info['body'])
             except Exception:
-                msg = "The request %s %s returned status code %s %s\n%s" % (method, url, e.code, e.msg, e.read())
+                msg = 'The request "{method} {url}" returned the unexpected status code {status} {msg}\n{body}'.format(
+                    status=info['status'],
+                    msg=info['msg'],
+                    body=info.get('body'),
+                    url=url,
+                    method=method,
+                )
                 self.module.fail_json(msg=to_native(msg), exception=traceback.format_exc())
+            if error:
+                msg = []
+                for key in ('errorMessages', 'errors'):
+                    if error.get(key):
+                        msg.append(to_native(error[key]))
+                if msg:
+                    self.module.fail_json(msg=', '.join(msg))
+                self.module.fail_json(msg=to_native(error))
+            # Fallback print body, if it can't be decoded
+            self.module.fail_json(msg=to_native(info['body']))
 
-        except Exception as e:
-            self.module.fail_json(msg="Request failed: %s" % str(e))
+        body = response.read()
+
+        if body:
+            return json.loads(to_text(body, errors='surrogate_or_strict'))
+        return {}
 
     def post(self, url, data, content_type='application/json', additional_headers=None):
         return self.request(url, data=data, method='POST', content_type=content_type,
