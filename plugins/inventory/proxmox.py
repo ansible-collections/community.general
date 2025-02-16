@@ -310,14 +310,14 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         data = []
         has_data = False
-        
+
         if self.use_cache:
             try:
                 data = self._cache[self.cache_key][url]
                 has_data = True
             except KeyError:
                 self.update_cache = True
-        
+
         if not has_data:
             s = self._get_session()
             while True:
