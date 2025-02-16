@@ -47,7 +47,6 @@
 
 - name: Gather systemd-journald.service
   community.general.systemd_facts:
-    select: true
     unitname:
       - systemd-journald.service
 
@@ -87,7 +86,6 @@
 
 - name: Gather systemd-journald.service extra properties
   community.general.systemd_facts:
-    select: true
     unitname:
       - systemd-journald.service
     properties:

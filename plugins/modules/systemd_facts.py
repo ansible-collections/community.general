@@ -11,26 +11,21 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: systemd_facts
-short_description: Gather C(systemd) unit facts.
+short_description: Gather C(systemd) unit facts
 description:
   - This module gathers facts about systemd units (services, targets, sockets).
   - It runs C(systemctl list-units) (or processes selected units) and collects properties
     for each unit using C(systemctl show).
   - Even if a unit has a loadstate of "not-found" or "masked", it is added to the fact,
     but only with the minimal properties ( name, loadstate, activestate, substate).
-  - When O(select) is used, the module first checks if the unit exists. If not, the unit
-    is recorded with minimal information.
+  - When O(unitname) and O(properties) are used, the module first checks if the unit exists,
+    then check if properties exist. If not, module fail.
   - The gathered information is added to ansible facts under the key systemd_units.
 version_added: "10.4.0"
 options:
-  select:
-    description:
-      - When set to V(true), only the units specified in O(unitname) are processed.
-    type: bool
-    default: false
   unitname:
     description:
-      - List of unit names to process when O(select) is V(true).
+      - List of unit names to process.
     type: list
     elements: str
     default: []
@@ -52,7 +47,6 @@ EXAMPLES = r'''
 # Gather facts for selected units with extra properties.
 - name: Gather facts for selected unit(s)
   community.general.systemd_facts:
-    select: true
     unitname:
       - sshd.service
       - sshd-keygen.target
@@ -68,7 +62,7 @@ ansible_facts:
   type: complex
   contains:
     systemd_units:
-      description: Properties of systemd units
+      description: Properties of systemd units.
       returned: always
       type: list
       elements: dict
@@ -80,7 +74,7 @@ ansible_facts:
           sample: sshd.service
         loadstate:
           description:
-          - The state of the unit's configuration load
+          - The state of the unit's configuration load.
           - Either V(loaded), V(not-found), V(masked).
           returned: always
           type: str
@@ -106,7 +100,7 @@ ansible_facts:
           sample: /usr/lib/systemd/system/sshd.service
         unitfilestate:
           description:
-          - The state of the unit file
+          - The state of the unit file.
           - Either V(enabled), V(disabled).
           returned: always
           type: str
@@ -119,12 +113,12 @@ ansible_facts:
           type: str
           sample: disabled
         mainpid:
-          description: The main process ID
+          description: The main process ID.
           returned: Only for service units.
           type: str
           sample: 798
         execmainpid:
-          description: The effective main process ID
+          description: The effective main process ID.
           returned: Only for service units.
           type: str
           sample: 798
@@ -156,7 +150,9 @@ def parse_show_output(output):
     for line in output.splitlines():
         if "=" in line:
             key, val = line.split("=", 1)
-            result[key.lower()] = val
+            key = key.lower()
+            if key not in result:
+                result[key] = val
     return result
 
 
@@ -189,9 +185,19 @@ def unit_exists(module, systemctl_bin, unit):
     return (rc == 0)
 
 
+def validate_unit_and_properties(module, systemctl_bin, unit, extra_properties):
+    rc, stdout, stderr = module.run_command([systemctl_bin, "show", unit, "-p", "LoadState"], use_unsafe_shell=True)
+    if rc != 0:
+        module.fail_json(msg="Unit '{0}' does not exist or is inaccessible.".format(unit))
+    if extra_properties:
+        unit_data = get_unit_properties(module, systemctl_bin, unit, extra_properties)
+        missing_props = [prop for prop in extra_properties if prop.lower() not in unit_data]
+        if missing_props:
+            module.fail_json(msg="The following properties do not exist for unit '{0}': {1}".format(unit, ", ".join(missing_props)))
+
+
 def main():
     module_args = dict(
-        select=dict(type='bool', default=False),
         unitname=dict(type='list', elements='str', default=[]),
         properties=dict(type='list', elements='str', default=[])
     )
@@ -211,12 +217,11 @@ def main():
         'target': ['FragmentPath', 'UnitFileState', 'UnitFilePreset'],
         'socket': ['FragmentPath', 'UnitFileState', 'UnitFilePreset']
     }
-
     state_props = ['LoadState', 'ActiveState', 'SubState']
 
     systemd_units = {}
 
-    if not module.params['select']:
+    if not module.params['unitname']:
         list_cmd = [
             systemctl_bin, "list-units",
             "--no-pager",
@@ -228,7 +233,6 @@ def main():
         list_output = run_command(module, list_cmd)
         for line in list_output.splitlines():
             tokens = line.split()
-
             if len(tokens) < 4:
                 continue
 
@@ -256,7 +260,6 @@ def main():
             props = base_properties.get(category, [])
             full_props = list(set(props + state_props))
             unit_data = get_unit_properties(module, systemctl_bin, unit_name, full_props)
-
             add_properties(fact, unit_data, full_props)
             systemd_units[unit_name] = fact
 
@@ -264,17 +267,14 @@ def main():
         selected_units = module.params['unitname']
         extra_properties = module.params['properties']
         if not selected_units:
-            module.fail_json(msg="When select is true, provide at least one unit name in 'unitname'.")
+            module.fail_json(msg="Provide at least one unit name in 'unitname'.")
 
         for unit in selected_units:
-            if not unit_exists(module, systemctl_bin, unit):
-                systemd_units[unit] = {"name": unit, "loadstate": "not-found", "activestate": "", "substate": ""}
-                continue
+            validate_unit_and_properties(module, systemctl_bin, unit, extra_properties)
 
             category = determine_category(unit)
             if not category:
-                systemd_units[unit] = {"name": unit, "loadstate": "unknown", "activestate": "", "substate": ""}
-                continue
+                module.fail_json(msg="Could not determine the category for unit '{0}'.".format(unit))
 
             props = base_properties.get(category, [])
             full_props = list(set(props + state_props + extra_properties))
