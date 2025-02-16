@@ -476,12 +476,18 @@ import random
 import string
 import traceback
 import ssl
-import urllib.request
+import six
+
+if six.PY2:
+    import urllib2 as urllib_request
+    from urllib2 import HTTPError
+else:
+    import urllib.request as urllib_request
+    from urllib.error import HTTPError
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper, cause_changes
 from ansible.module_utils.six.moves.urllib.request import pathname2url
 from ansible.module_utils.common.text.converters import to_text, to_bytes, to_native
-from urllib.error import HTTPError
 
 
 class JIRA(StateModuleHelper):
@@ -800,13 +806,13 @@ class JIRA(StateModuleHelper):
         if self.vars.client_cert and self.vars.client_key:
             context.load_cert_chain(certfile=self.vars.client_cert, keyfile=self.vars.client_key)
 
-        req = urllib.request.Request(url, data=data, headers=headers, method=method)
+        req = urllib_request.Request(url, data=data, headers=headers, method=method)
 
         for key, value in headers.items():
             req.add_header(key, value)
 
         try:
-            with urllib.request.urlopen(req, context=context) as response:
+            with urllib_request.urlopen(req, context=context) as response:
                 body = response.read()
                 if body:
                     return json.loads(to_text(body, errors='surrogate_or_strict'))
@@ -841,6 +847,7 @@ class JIRA(StateModuleHelper):
 
     def get(self, url):
         return self.request(url)
+
 
 def main():
     jira = JIRA()
