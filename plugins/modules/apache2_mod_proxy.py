@@ -19,7 +19,7 @@ description:
 extends_documentation_fragment:
   - community.general.attributes
 requirements:
-  - Python package C(BeautifulSoup).
+  - Python package C(BeautifulSoup) on Python 2, C(beautifulsoup4) on Python 3.
 attributes:
   check_mode:
     support: full
@@ -207,16 +207,21 @@ import re
 
 from ansible_collections.community.general.plugins.module_utils import deps
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.urls import fetch_url
-from ansible.module_utils.six import iteritems
+from ansible.module_utils.six import iteritems, PY2
 
-with deps.declare("BeautifulSoup"):
-    from BeautifulSoup import BeautifulSoup
+if PY2:
+    with deps.declare("BeautifulSoup"):
+        from BeautifulSoup import BeautifulSoup
+else:
+    with deps.declare("beautifulsoup4"):
+        from bs4 import BeautifulSoup
 
 # balancer member attributes extraction regexp:
-EXPRESSION = re.compile(r"(b=([\w\.\-]+)&w=(https?|ajp|wss?|ftp|[sf]cgi)://([\w\.\-]+):?(\d*)([/\w\.\-]*)&?[\w\-\=]*)")
+EXPRESSION = re.compile(to_text(r"(b=([\w\.\-]+)&w=(https?|ajp|wss?|ftp|[sf]cgi)://([\w\.\-]+):?(\d*)([/\w\.\-]*)&?[\w\-\=]*)"))
 # Apache2 server version extraction regexp:
-APACHE_VERSION_EXPRESSION = re.compile(r"SERVER VERSION: APACHE/([\d.]+)")
+APACHE_VERSION_EXPRESSION = re.compile(to_text(r"SERVER VERSION: APACHE/([\d.]+)"))
 
 
 def regexp_extraction(string, _regexp, groups=1):
@@ -266,11 +271,18 @@ class BalancerMember(object):
             except TypeError as exc:
                 self.module.fail_json(msg="Cannot parse balancer_member_page HTML! {0}".format(exc))
             else:
-                subsoup = soup.findAll('table')[1].findAll('tr')
-                keys = subsoup[0].findAll('th')
+                if PY2:
+                    subsoup = soup.findAll('table')[1].findAll('tr')
+                    keys = subsoup[0].findAll('th')
+                else:
+                    subsoup = soup.find_all('table')[1].find_all('tr')
+                    keys = subsoup[0].find_all('th')
                 for valuesset in subsoup[1::1]:
                     if re.search(pattern=self.host, string=str(valuesset)):
-                        values = valuesset.findAll('td')
+                        if PY2:
+                            values = valuesset.findAll('td')
+                        else:
+                            values = valuesset.find_all('td')
                         return {keys[x].string: values[x].string for x in range(0, len(keys))}
 
     def get_member_status(self):
@@ -296,7 +308,7 @@ class BalancerMember(object):
 
         response, info = fetch_url(self.module, self.management_url, data=request_body)
         if info['status'] != 200:
-            self.module.fail_json(msg="Could not set the member status! " + self.host + " " + info['status'])
+            self.module.fail_json(msg="Could not set the member status! {host} {status}".format(host=self.host, status=info['status']))
 
     attributes = property(get_member_attributes)
     status = property(get_member_status, set_member_status)
@@ -333,11 +345,15 @@ class Balancer(object):
         if info['status'] != 200:
             self.module.fail_json(msg="Could not get balancer page! HTTP status response: {0}".format(info['status']))
         else:
-            content = resp.read()
+            content = to_text(resp.read())
             apache_version = regexp_extraction(content.upper(), APACHE_VERSION_EXPRESSION, 1)
             if apache_version:
                 if not re.search(pattern=r"2\.4\.[\d]*", string=apache_version):
-                    self.module.fail_json(msg="This module only acts on an Apache2 2.4+ instance, current Apache2 version: " + str(apache_version))
+                    self.module.fail_json(
+                        msg="This module only acts on an Apache2 2.4+ instance, current Apache2 version: {version}".format(
+                            version=apache_version
+                        )
+                    )
                 return content
 
             self.module.fail_json(msg="Could not get the Apache server version from the balancer-manager")
@@ -349,7 +365,11 @@ class Balancer(object):
         except TypeError:
             self.module.fail_json(msg="Cannot parse balancer page HTML! {0}".format(self.page))
         else:
-            for element in soup.findAll('a')[1::1]:
+            if PY2:
+                elements = soup.findAll('a')
+            else:
+                elements = soup.find_all('a')
+            for element in elements[1::1]:
                 balancer_member_suffix = str(element.get('href'))
                 if not balancer_member_suffix:
                     self.module.fail_json(msg="Argument 'balancer_member_suffix' is empty!")
