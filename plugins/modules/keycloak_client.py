@@ -720,7 +720,7 @@ end_state:
 """
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
-    keycloak_argument_spec, get_token, KeycloakError, is_struct_included
+    keycloak_argument_spec, get_token, KeycloakError
 from ansible.module_utils.basic import AnsibleModule
 import copy
 
@@ -771,6 +771,7 @@ def normalise_cr(clientrep, remove_ids=False):
         for key, value in clientrep['attributes'].items():
             if isinstance(value, bool):
                 clientrep['attributes'][key] = str(value).lower()
+        clientrep['attributes'].pop('client.secret.creation.time', None)
     return clientrep
 
 
@@ -965,6 +966,11 @@ def main():
     else:
         before_client = kc.get_client_by_id(cid, realm=realm)
 
+    # kc drops the variable 'authorizationServicesEnabled' if set to false
+    # to minimize diff/changes we set it to false if not set by kc
+    if before_client and 'authorizationServicesEnabled' not in before_client:
+        before_client['authorizationServicesEnabled'] = False
+
     if before_client is None:
         before_client = {}
 
@@ -1036,7 +1042,7 @@ def main():
                 if module._diff:
                     result['diff'] = dict(before=sanitize_cr(before_norm),
                                           after=sanitize_cr(desired_norm))
-                result['changed'] = not is_struct_included(desired_norm, before_norm, CLIENT_META_DATA)
+                result['changed'] = desired_norm != before_norm
 
                 module.exit_json(**result)
 
