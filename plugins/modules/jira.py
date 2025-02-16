@@ -63,12 +63,14 @@ options:
     type: path
     description:
       - Client certificate if required.
-      - Mutually exclusive with O(username) and O(password).
+      - Can coexist with O(username) and O(password). Not mutually exclusive.
+    version_added: 10.4.0
   client_key:
     type: path
     description:
       - Client certificate key if required.
-      - Mutually exclusive with O(username) and O(password).
+      - Can coexist with O(username) and O(password). Not mutually exclusive.
+    version_added: 10.4.0
 
   project:
     type: str
@@ -457,7 +459,7 @@ EXAMPLES = r"""
     attachment:
       filename: topsecretreport.xlsx
 
-# Support for client certificate
+# Use username, password and client certificate
 - name: Create an issue
   community.general.jira:
     uri: '{{ server }}'
@@ -532,6 +534,7 @@ class JIRA(StateModuleHelper):
         ],
         required_together=[
             ['username', 'password'],
+            ['client_cert', 'client_key']
         ],
         required_one_of=[
             ['username', 'token'],
