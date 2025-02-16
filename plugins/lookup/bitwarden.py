@@ -37,9 +37,17 @@ DOCUMENTATION = """
         description: Field to fetch. Leave unset to fetch whole response.
         type: str
       collection_id:
-        description: Collection ID to filter results by collection. Leave unset to skip filtering.
+        description:
+          - Collection ID to filter results by collection. Leave unset to skip filtering.
+          - O(collection_id) and O(collection_name) are mutually exclusive.
         type: str
         version_added: 6.3.0
+      collection_name:
+        description:
+          - Collection name to filter results by collection. Leave unset to skip filtering.
+          - O(collection_id) and O(collection_name) are mutually exclusive.
+        type: str
+        version_added: 10.4.0
       organization_id:
         description: Organization ID to filter results by organization. Leave unset to skip filtering.
         type: str
@@ -48,6 +56,12 @@ DOCUMENTATION = """
         description: Pass session key instead of reading from env.
         type: str
         version_added: 8.4.0
+      result_count:
+        description:
+          - Number of results expected for the lookup query. Task will fail if O(result_count)
+            is set but does not match the number of query results. Leave empty to skip this check.
+        type: int
+        version_added: 10.4.0
 """
 
 EXAMPLES = """
@@ -85,6 +99,16 @@ EXAMPLES = """
   ansible.builtin.debug:
     msg: >-
       {{ lookup('community.general.bitwarden', None, collection_id='bafba515-af11-47e6-abe3-af1200cd18b2') }}
+
+- name: "Get all Bitwarden records from collection"
+  ansible.builtin.debug:
+    msg: >-
+      {{ lookup('community.general.bitwarden', None, collection_name='my_collections/test_collection') }}
+
+- name: "Get Bitwarden record named 'a_test', ensure there is exactly one match"
+  ansible.builtin.debug:
+    msg: >-
+      {{ lookup('community.general.bitwarden', 'a_test', result_count=1) }}
 """
 
 RETURN = """
@@ -99,7 +123,7 @@ RETURN = """
 
 from subprocess import Popen, PIPE
 
-from ansible.errors import AnsibleError
+from ansible.errors import AnsibleError, AnsibleOptionsError
 from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible.parsing.ajson import AnsibleJSONDecoder
 from ansible.plugins.lookup import LookupBase
@@ -211,6 +235,24 @@ class Bitwarden(object):
 
         return field_matches
 
+    def get_collection_ids(self, collection_name: str, organization_id=None) -> list[str]:
+        """Return matching IDs of collections whose name is equal to collection_name."""
+
+        # Prepare set of params for Bitwarden CLI
+        params = ['list', 'collections', '--search', collection_name]
+
+        if organization_id:
+            params.extend(['--organizationid', organization_id])
+
+        out, err = self._run(params)
+
+        # This includes things that matched in different fields.
+        initial_matches = AnsibleJSONDecoder().raw_decode(out)[0]
+
+        # Filter to only return the ID of a collections with exactly matching name
+        return [item['id'] for item in initial_matches
+                if str(item.get('name')).lower() == collection_name.lower()]
+
 
 class LookupModule(LookupBase):
 
@@ -219,7 +261,9 @@ class LookupModule(LookupBase):
         field = self.get_option('field')
         search_field = self.get_option('search')
         collection_id = self.get_option('collection_id')
+        collection_name = self.get_option('collection_name')
         organization_id = self.get_option('organization_id')
+        result_count = self.get_option('result_count')
         _bitwarden.session = self.get_option('bw_session')
 
         if not _bitwarden.unlocked:
@@ -228,7 +272,27 @@ class LookupModule(LookupBase):
         if not terms:
             terms = [None]
 
-        return [_bitwarden.get_field(field, term, search_field, collection_id, organization_id) for term in terms]
+        if collection_name and collection_id:
+            raise AnsibleOptionsError("'collection_name' and 'collection_id' are mutually exclusive!")
+        elif collection_name:
+            collection_ids = _bitwarden.get_collection_ids(collection_name, organization_id)
+            if not collection_ids:
+                raise BitwardenException("No matching collections found!")
+        else:
+            collection_ids = [collection_id]
+
+        results = [
+            _bitwarden.get_field(field, term, search_field, collection_id, organization_id)
+            for collection_id in collection_ids
+            for term in terms
+        ]
+
+        for result in results:
+            if result_count is not None and len(result) != result_count:
+                raise BitwardenException(
+                    f"Number of results doesn't match result_count! ({len(result)} != {result_count})")
+
+        return results
 
 
 _bitwarden = Bitwarden()
