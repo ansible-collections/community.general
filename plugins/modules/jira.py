@@ -59,6 +59,18 @@ options:
       - The personal access token to log-in with.
       - Mutually exclusive with O(username) and O(password).
     version_added: 4.2.0
+  client_cert:
+    type: path
+    description:
+      - Client certificate if required.
+      - In addition to O(username) and O(password) or O(token). Not mutually exclusive.
+    version_added: 10.4.0
+  client_key:
+    type: path
+    description:
+      - Client certificate key if required.
+      - In addition to O(username) and O(password) or O(token). Not mutually exclusive.
+    version_added: 10.4.0
 
   project:
     type: str
@@ -446,6 +458,23 @@ EXAMPLES = r"""
     operation: attach
     attachment:
       filename: topsecretreport.xlsx
+
+# Use username, password and client certificate authentification
+- name: Create an issue
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    client_cert: '{{ path/to/client-cert }}'
+    client_key: '{{ path/to/client-key }}'
+
+# Use token and client certificate authentification
+- name: Create an issue
+  community.general.jira:
+    uri: '{{ server }}'
+    token: '{{ token }}'
+    client_cert: '{{ path/to/client-cert }}'
+    client_key: '{{ path/to/client-key }}'
 """
 
 import base64
@@ -480,6 +509,8 @@ class JIRA(StateModuleHelper):
             username=dict(type='str'),
             password=dict(type='str', no_log=True),
             token=dict(type='str', no_log=True),
+            client_cert=dict(type='path'),
+            client_key=dict(type='path'),
             project=dict(type='str', ),
             summary=dict(type='str', ),
             description=dict(type='str', ),
@@ -511,6 +542,7 @@ class JIRA(StateModuleHelper):
         ],
         required_together=[
             ['username', 'password'],
+            ['client_cert', 'client_key']
         ],
         required_one_of=[
             ['username', 'token'],
