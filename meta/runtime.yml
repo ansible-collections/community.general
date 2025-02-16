@@ -123,6 +123,42 @@ plugin_routing:
         warning_text: Project Atomic was sunset by the end of 2019.
     cisco_spark:
       redirect: community.general.cisco_webex
+    clc_alert_policy:
+      deprecation:
+        removal_version: 11.0.0
+        warning_text: CenturyLink Cloud services went EOL in September 2023.
+    clc_blueprint_package:
+      deprecation:
+        removal_version: 11.0.0
+        warning_text: CenturyLink Cloud services went EOL in September 2023.
+    clc_firewall_policy:
+      deprecation:
+        removal_version: 11.0.0
+        warning_text: CenturyLink Cloud services went EOL in September 2023.
+    clc_group:
+      deprecation:
+        removal_version: 11.0.0
+        warning_text: CenturyLink Cloud services went EOL in September 2023.
+    clc_loadbalancer:
+      deprecation:
+        removal_version: 11.0.0
+        warning_text: CenturyLink Cloud services went EOL in September 2023.
+    clc_modify_server:
+      deprecation:
+        removal_version: 11.0.0
+        warning_text: CenturyLink Cloud services went EOL in September 2023.
+    clc_publicip:
+      deprecation:
+        removal_version: 11.0.0
+        warning_text: CenturyLink Cloud services went EOL in September 2023.
+    clc_server:
+      deprecation:
+        removal_version: 11.0.0
+        warning_text: CenturyLink Cloud services went EOL in September 2023.
+    clc_server_snapshot:
+      deprecation:
+        removal_version: 11.0.0
+        warning_text: CenturyLink Cloud services went EOL in September 2023.
     consul_acl:
       tombstone:
         removal_version: 10.0.0
