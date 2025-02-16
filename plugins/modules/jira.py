@@ -832,7 +832,6 @@ class JIRA(StateModuleHelper):
         except Exception as e:
             self.module.fail_json(msg="Request failed: %s" % str(e))
 
-
     def post(self, url, data, content_type='application/json', additional_headers=None):
         return self.request(url, data=data, method='POST', content_type=content_type,
                             additional_headers=additional_headers)
@@ -842,17 +841,6 @@ class JIRA(StateModuleHelper):
 
     def get(self, url):
         return self.request(url)
-
-    def post(self, url, data, content_type='application/json', additional_headers=None):
-        return self.request(url, data=data, method='POST', content_type=content_type,
-                            additional_headers=additional_headers)
-
-    def put(self, url, data):
-        return self.request(url, data=data, method='PUT')
-
-    def get(self, url):
-        return self.request(url)
-
 
 def main():
     jira = JIRA()
