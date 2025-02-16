@@ -1,0 +1,2 @@
+bugfixes:
+  - proxmox inventory plugin - proxmox inventory plugin did not update cache correctly after meta refresh_inventory.

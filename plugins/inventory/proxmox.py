@@ -309,14 +309,16 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def _get_json(self, url, ignore_errors=None):
 
         data = []
-
-        if self.use_cache and not self.update_cache:
-            try: 
+        has_data = False
+        
+        if self.use_cache:
+            try:
                 data = self._cache[self.cache_key][url]
+                has_data = True
             except KeyError:
                 self.update_cache = True
-
-        if not self.use_cache or self.update_cache:
+        
+        if not has_data:
             s = self._get_session()
             while True:
                 ret = s.get(url, headers=self.headers)
