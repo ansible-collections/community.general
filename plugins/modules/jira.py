@@ -482,7 +482,6 @@ from ansible.module_utils.common.text.converters import to_text, to_bytes, to_na
 from ansible.module_utils.urls import fetch_url
 
 
-
 class JIRA(StateModuleHelper):
     module = dict(
         argument_spec=dict(
