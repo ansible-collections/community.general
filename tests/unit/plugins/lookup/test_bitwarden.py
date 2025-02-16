@@ -13,7 +13,7 @@ from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible.errors import AnsibleError
 from ansible.module_utils import six
 from ansible.plugins.loader import lookup_loader
-from ansible_collections.community.general.plugins.lookup.bitwarden import Bitwarden
+from ansible_collections.community.general.plugins.lookup.bitwarden import Bitwarden, BitwardenException
 from ansible.parsing.ajson import AnsibleJSONEncoder
 
 MOCK_COLLECTION_ID = "3b12a9da-7c49-40b8-ad33-aede017a7ead"
@@ -131,7 +131,21 @@ MOCK_RECORDS = [
         "reprompt": 0,
         "revisionDate": "2024-14-15T11:30:00.000Z",
         "type": 1
-    }
+    },
+    {
+        "object": "collection",
+        "id": MOCK_COLLECTION_ID,
+        "organizationId": MOCK_ORGANIZATION_ID,
+        "name": "MOCK_COLLECTION",
+        "externalId": None
+    },
+    {
+        "object": "collection",
+        "id": "3b12a9da-7c49-40b8-ad33-aede017a8ead",
+        "organizationId": "3b12a9da-7c49-40b8-ad33-aede017a9ead",
+        "name": "some/other/collection",
+        "externalId": None
+    },
 ]
 
 
@@ -164,6 +178,9 @@ class MockBitwarden(Bitwarden):
 
                 items = []
                 for item in MOCK_RECORDS:
+                    if item.get('object') != 'item':
+                        continue
+
                     if search_value and not re.search(search_value, item.get('name')):
                         continue
                     if collection_to_filter and collection_to_filter not in item.get('collectionIds', []):
@@ -172,6 +189,35 @@ class MockBitwarden(Bitwarden):
                         continue
                     items.append(item)
                 return AnsibleJSONEncoder().encode(items), ''
+            elif args[1] == 'collections':
+                try:
+                    search_value = args[args.index('--search') + 1]
+                except ValueError:
+                    search_value = None
+
+                try:
+                    collection_to_filter = args[args.index('--collectionid') + 1]
+                except ValueError:
+                    collection_to_filter = None
+
+                try:
+                    organization_to_filter = args[args.index('--organizationid') + 1]
+                except ValueError:
+                    organization_to_filter = None
+
+                collections = []
+                for item in MOCK_RECORDS:
+                    if item.get('object') != 'collection':
+                        continue
+
+                    if search_value and not re.search(search_value, item.get('name')):
+                        continue
+                    if collection_to_filter and collection_to_filter not in item.get('collectionIds', []):
+                        continue
+                    if organization_to_filter and item.get('organizationId') != organization_to_filter:
+                        continue
+                    collections.append(item)
+                return AnsibleJSONEncoder().encode(collections), ''
 
         return '[]', ''
 
@@ -261,3 +307,26 @@ class TestLookupModule(unittest.TestCase):
     def test_bitwarden_plugin_full_collection_organization(self):
         self.assertEqual([MOCK_RECORDS[0], MOCK_RECORDS[2]], self.lookup.run(None,
                          collection_id=MOCK_COLLECTION_ID, organization_id=MOCK_ORGANIZATION_ID)[0])
+
+    @patch('ansible_collections.community.general.plugins.lookup.bitwarden._bitwarden', new=MockBitwarden())
+    def test_bitwarden_plugin_collection_name_filter(self):
+        # all passwords from MOCK_COLLECTION
+        self.assertEqual([MOCK_RECORDS[0], MOCK_RECORDS[2]], self.lookup.run(None,
+                                                                             collection_name="MOCK_COLLECTION")[0])
+        # Existing collection, no results
+        self.assertEqual([], self.lookup.run(None, collection_name="some/other/collection")[0])
+
+        # Non-Existent collection
+        with self.assertRaises(BitwardenException):
+            self.lookup.run(None, collection_name="nonexistent")
+
+    @patch('ansible_collections.community.general.plugins.lookup.bitwarden._bitwarden', new=MockBitwarden())
+    def test_bitwarden_plugin_result_count_check(self):
+        self.lookup.run(None, collection_id=MOCK_COLLECTION_ID, organization_id=MOCK_ORGANIZATION_ID, result_count=2)
+        with self.assertRaises(BitwardenException):
+            self.lookup.run(None, collection_id=MOCK_COLLECTION_ID, organization_id=MOCK_ORGANIZATION_ID,
+                            result_count=1)
+
+        self.lookup.run(None, organization_id=MOCK_ORGANIZATION_ID, result_count=3)
+        with self.assertRaises(BitwardenException):
+            self.lookup.run(None, organization_id=MOCK_ORGANIZATION_ID, result_count=0)
