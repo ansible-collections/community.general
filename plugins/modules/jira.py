@@ -70,6 +70,7 @@ options:
     description:
       - Client certificate key if required.
       - Mutually exclusive with O(username) and O(password).
+    version_added: 10.4.0
 
   project:
     type: str
