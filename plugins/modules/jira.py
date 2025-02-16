@@ -64,6 +64,7 @@ options:
     description:
       - Client certificate if required.
       - Mutually exclusive with O(username) and O(password).
+    version_added: 10.4.0
   client_key:
     type: path
     description:
