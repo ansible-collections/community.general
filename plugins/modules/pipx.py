@@ -200,13 +200,16 @@ version:
 """
 
 
+from ansible.module_utils.facts.compat import ansible_facts
+
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
 from ansible_collections.community.general.plugins.module_utils.pipx import pipx_runner, pipx_common_argspec, make_process_list
-
-from ansible.module_utils.facts.compat import ansible_facts
+from ansible_collections.community.general.plugins.module_utils.version import find_op, name_version_assert
 
 
 def _make_name(name, suffix):
+    if name is None:
+        return None
     return name if suffix is None else "{0}{1}".format(name, suffix)
 
 
@@ -258,12 +261,20 @@ class PipX(StateModuleHelper):
     use_old_vardict = False
 
     def _retrieve_installed(self):
-        name = _make_name(self.vars.name, self.vars.suffix)
+        name_op, op, version_op = find_op(self.vars.name)
+        if op:
+            name = _make_name(name_op, self.vars.suffix)
+        else:
+            name = _make_name(self.vars.name, self.vars.suffix)
         output_process = make_process_list(self, include_injected=True, name=name)
         installed = self.runner('_list global', output_process=output_process).run()
 
         if name is not None:
-            app_list = [app for app in installed if app['name'] == name]
+            app_list = [
+                app
+                for app in installed
+                if app['name'] == name and name_version_assert(self.vars.name, app['version'])
+            ]
             if app_list:
                 return {name: app_list[0]}
             else:
