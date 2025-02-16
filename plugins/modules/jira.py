@@ -60,16 +60,16 @@ options:
       - Mutually exclusive with O(username) and O(password).
     version_added: 4.2.0
   client_cert:
-    type:
+    type: path
     description:
       - Client certificate if required.
       - Mutually exclusive with O(username) and O(password).
   client_key:
-    type:
+    type: path
     description:
       - Client certificate key if required.
       - Mutually exclusive with O(username) and O(password).
-    
+
   project:
     type: str
     required: false
@@ -786,10 +786,10 @@ class JIRA(StateModuleHelper):
                 "Authorization": "Bearer %s" % self.vars.token,
             })
         else:
-            auth = to_text(base64.b64encode(to_bytes(f'{self.vars.username}:{self.vars.password}', errors='surrogate_or_strict')))
+            auth = to_text(base64.b64encode(to_bytes('%s:%s' % (self.vars.username, self.vars.password), errors='surrogate_or_strict')))
             headers.update({
                 "Content-Type": content_type,
-                "Authorization": f"Basic {auth}",
+                "Authorization": "Basic %s" % auth,
             })
 
         if data:
@@ -806,7 +806,7 @@ class JIRA(StateModuleHelper):
             req.add_header(key, value)
 
         try:
-            with urllib.request.urlopen(req, context=context) as response:
+            with urllib.urlopen(req, context=context) as response:
                 body = response.read()
                 if body:
                     return json.loads(to_text(body, errors='surrogate_or_strict'))
