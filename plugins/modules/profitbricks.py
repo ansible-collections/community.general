@@ -20,7 +20,7 @@ deprecated:
   alternative: >
     Profitbricks has rebranded as Ionos Cloud and they provide a collection named ionoscloudsdk.ionoscloud.
     Whilst it is likely it will provide the features of this module, that has not been verified.
-    Please refer to that collectionś documentation for more details.
+    Please refer to that collection's documentation for more details.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
