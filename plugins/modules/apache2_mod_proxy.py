@@ -267,7 +267,7 @@ class BalancerMember(object):
     def get_member_attributes(self):
         """ Returns a dictionary of a balancer member's attributes."""
 
-        resp, info = fetch_url(self.module, self.management_url)
+        resp, info = fetch_url(self.module, self.management_url, headers={'Referer': self.management_url})
 
         if info['status'] != 200:
             self.module.fail_json(msg="Could not get balancer_member_page, check for connectivity! {0}".format(info))
@@ -305,7 +305,7 @@ class BalancerMember(object):
         values_url = "".join("{0}={1}".format(url_param, 1 if values[mode] else 0) for mode, url_param in values_mapping.items())
         request_body = "{0}{1}".format(request_body, values_url)
 
-        response, info = fetch_url(self.module, self.management_url, data=request_body)
+        response, info = fetch_url(self.module, self.management_url, data=request_body, headers={'Referer': self.management_url})
         if info['status'] != 200:
             self.module.fail_json(msg="Could not set the member status! {host} {status}".format(host=self.host, status=info['status']))
 

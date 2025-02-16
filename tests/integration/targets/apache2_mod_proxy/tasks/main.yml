@@ -161,8 +161,7 @@
       - result.members[0].path is none
       - result.members[0].protocol == "http"
       - result.members[0].status.disabled == false
-      # TODO: state change isn't working
-      # - result.members[0].status.drained == true
+      - result.members[0].status.drained == true
       - result.members[0].status.hot_standby == false
       - result.members[0].status.ignore_errors == false
       - result.members[1].port in ["8080", "8081"]
@@ -171,7 +170,7 @@
       - result.members[1].path is none
       - result.members[1].protocol == "http"
       - result.members[1].status.disabled == false
-      # - result.members[1].status.drained == true
+      - result.members[1].status.drained == true
       - result.members[1].status.hot_standby == false
       - result.members[1].status.ignore_errors == false
 
@@ -200,8 +199,7 @@
       - result.members[0].host == "127.0.0.1"
       - result.members[0].path is none
       - result.members[0].protocol == "http"
-      # TODO: state change isn't working
-      # - result.members[0].status.disabled == true
+      - result.members[0].status.disabled == true
       - result.members[0].status.drained == false
       - result.members[0].status.hot_standby == false
       - result.members[0].status.ignore_errors == false
@@ -210,7 +208,7 @@
       - result.members[1].host == "127.0.0.1"
       - result.members[1].path is none
       - result.members[1].protocol == "http"
-      # - result.members[1].status.disabled == true
+      - result.members[1].status.disabled == true
       - result.members[1].status.drained == false
       - result.members[1].status.hot_standby == false
       - result.members[1].status.ignore_errors == false
@@ -222,10 +220,9 @@
     state: present
   register: result
 
-# TODO: state change isn't working
-# - assert:
-#     that:
-#       - result is changed
+- assert:
+    that:
+      - result is changed
 
 - name: Get all current balancer pool members attributes
   community.general.apache2_mod_proxy:
