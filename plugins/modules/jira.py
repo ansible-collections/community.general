@@ -806,7 +806,7 @@ class JIRA(StateModuleHelper):
             req.add_header(key, value)
 
         try:
-            with urllib.urlopen(req, context=context) as response:
+            with urllib.request.urlopen(req, context=context) as response:
                 body = response.read()
                 if body:
                     return json.loads(to_text(body, errors='surrogate_or_strict'))
@@ -826,11 +826,12 @@ class JIRA(StateModuleHelper):
                         self.module.fail_json(msg=', '.join(msg))
                     self.module.fail_json(msg=to_native(error_json))
             except Exception:
-                msg = f"The request {method} {url} returned status code {e.code} {e.msg}\n{e.read()}"
+                msg = "The request %s %s returned status code %s %s\n%s" % (method, url, e.code, e.msg, e.read())
                 self.module.fail_json(msg=to_native(msg), exception=traceback.format_exc())
 
         except Exception as e:
-            self.module.fail_json(msg=f"Request failed: {str(e)}")
+            self.module.fail_json(msg="Request failed: %s" % str(e))
+
 
     def post(self, url, data, content_type='application/json', additional_headers=None):
         return self.request(url, data=data, method='POST', content_type=content_type,
