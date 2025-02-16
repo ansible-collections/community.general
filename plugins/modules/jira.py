@@ -63,13 +63,13 @@ options:
     type: path
     description:
       - Client certificate if required.
-      - Can coexist with O(username) and O(password). Not mutually exclusive.
+      - In addition to O(username) and O(password) or O(token). Not mutually exclusive.
     version_added: 10.4.0
   client_key:
     type: path
     description:
       - Client certificate key if required.
-      - Can coexist with O(username) and O(password). Not mutually exclusive.
+      - In addition to O(username) and O(password) or O(token). Not mutually exclusive.
     version_added: 10.4.0
 
   project:
@@ -459,12 +459,20 @@ EXAMPLES = r"""
     attachment:
       filename: topsecretreport.xlsx
 
-# Use username, password and client certificate
+# Use username, password and client certificate authentification
 - name: Create an issue
   community.general.jira:
     uri: '{{ server }}'
     username: '{{ user }}'
     password: '{{ pass }}'
+    client_cert: '{{ path/to/client-cert }}'
+    client_key: '{{ path/to/client-key }}'
+
+# Use token and client certificate authentification
+- name: Create an issue
+  community.general.jira:
+    uri: '{{ server }}'
+    token: '{{ token }}'
     client_cert: '{{ path/to/client-cert }}'
     client_key: '{{ path/to/client-key }}'
 """
