@@ -14,6 +14,12 @@ module: clc_firewall_policy
 short_description: Create/delete/update firewall policies
 description:
   - Create or delete or update firewall policies on Centurylink Cloud.
+deprecated:
+  removed_in: 11.0.0
+  why: >
+    Lumen Public Cloud (formerly known as CenturyLink Cloud) has gone End-of-Life in September 2023.
+    See more at U(https://www.ctl.io/knowledge-base/release-notes/2023/lumen-public-cloud-platform-end-of-life-notice/?).
+  alternative: There is none.
 extends_documentation_fragment:
   - community.general.attributes
   - community.general.clc
