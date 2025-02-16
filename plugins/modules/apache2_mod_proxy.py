@@ -224,6 +224,12 @@ EXPRESSION = re.compile(to_text(r"(b=([\w\.\-]+)&w=(https?|ajp|wss?|ftp|[sf]cgi)
 APACHE_VERSION_EXPRESSION = re.compile(to_text(r"SERVER VERSION: APACHE/([\d.]+)"))
 
 
+def find_all(where, what):
+    if PY2:
+        return where.findAll(what)
+    return where.find_all(what)
+
+
 def regexp_extraction(string, _regexp, groups=1):
     """ Returns the capture group (default=1) specified in the regexp, applied to the string """
     regexp_search = _regexp.search(string)
@@ -271,18 +277,11 @@ class BalancerMember(object):
             except TypeError as exc:
                 self.module.fail_json(msg="Cannot parse balancer_member_page HTML! {0}".format(exc))
             else:
-                if PY2:
-                    subsoup = soup.findAll('table')[1].findAll('tr')
-                    keys = subsoup[0].findAll('th')
-                else:
-                    subsoup = soup.find_all('table')[1].find_all('tr')
-                    keys = subsoup[0].find_all('th')
+                subsoup = find_all(soup, 'table')[1].find_all('tr')
+                keys = find_all(subsoup[0], 'th')
                 for valuesset in subsoup[1::1]:
                     if re.search(pattern=self.host, string=str(valuesset)):
-                        if PY2:
-                            values = valuesset.findAll('td')
-                        else:
-                            values = valuesset.find_all('td')
+                        values = find_all(valuesset, 'td')
                         return {keys[x].string: values[x].string for x in range(0, len(keys))}
 
     def get_member_status(self):
@@ -365,10 +364,7 @@ class Balancer(object):
         except TypeError:
             self.module.fail_json(msg="Cannot parse balancer page HTML! {0}".format(self.page))
         else:
-            if PY2:
-                elements = soup.findAll('a')
-            else:
-                elements = soup.find_all('a')
+            elements = find_all(soup, 'a')
             for element in elements[1::1]:
                 balancer_member_suffix = str(element.get('href'))
                 if not balancer_member_suffix:
