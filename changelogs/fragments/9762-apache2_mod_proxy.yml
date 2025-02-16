@@ -1,0 +1,2 @@
+bugfixes:
+  - "apache2_mod_proxy - make compatible with Python 3 (https://github.com/ansible-collections/community.general/pull/9762)."
