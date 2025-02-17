@@ -813,7 +813,7 @@ def main():
                 result['diff'] = dict(before=before_realm_sanitized,
                                       after=sanitize_cr(after_realm))
 
-            result['msg'] = 'Realm %s has been updated.' % desired_realm['id']
+            result['msg'] = 'Realm %s has been updated.' % desired_realm['realm']
             module.exit_json(**result)
 
         else:
@@ -832,7 +832,7 @@ def main():
             result['proposed'] = {}
             result['end_state'] = {}
 
-            result['msg'] = 'Realm %s has been deleted.' % before_realm['id']
+            result['msg'] = 'Realm %s has been deleted.' % before_realm['realm']
 
     module.exit_json(**result)
 
