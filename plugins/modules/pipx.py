@@ -56,19 +56,21 @@ options:
     description:
       - The name of the application. In C(pipx) documentation it is also referred to as the name of the virtual environment
         where the application will be installed.
-      - If O(name) is a simple package name without version specifiers, then that name is used as the Python package name
+      - If O(name) is a simple package name with or without version specifiers, then that name is used as the Python package name
         to be installed.
-      - Use O(source) for passing package specifications or installing from URLs or directories.
+      - To install from URLs, directories, or archives, you must use this option to specify the package name and O(source) to specify its source.
+      - If you use a version specifier with O(name), then O(source) is ignored.
   source:
     type: str
     description:
+      - Use O(source) when installing a Python package from a local path, a VCS URL or compressed file.
       - Source for the package. This option is used when O(state=install) or O(state=latest), and it is ignored with other
         states.
-      - Use O(source) when installing a Python package with version specifier, or from a local path, from a VCS URL or compressed
-        file.
       - The value of this option is passed as-is to C(pipx).
       - O(name) is still required when using O(source) to establish the application name without fetching the package from
         a remote source.
+      - When using O(source) the execution is B(not idempotent), because determining the version of the package from the
+        source is almost as costly as installing it, so the module B(always) attempts the installation when using this option.
   install_apps:
     description:
       - Add apps from the injected packages.
