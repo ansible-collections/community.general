@@ -12,7 +12,9 @@ from ansible_collections.community.general.plugins.module_utils.cmd_runner impor
 _state_map = {
     "present": "create",
     "absent": "remove",
-    "status": "status"
+    "status": "status",
+    "enable": "enable",
+    "disable": "disable"
 }
 
 
@@ -47,7 +49,6 @@ def pacemaker_runner(module, **kwargs):
             resource_operation=cmd_runner_fmt.as_func(fmt_resource_operation),
             resource_meta=cmd_runner_fmt.stack(cmd_runner_fmt.as_opt_val)("meta"),
             resource_argument=cmd_runner_fmt.as_func(fmt_resource_argument),
-            disabled=cmd_runner_fmt.as_bool("--disabled"),
             wait=cmd_runner_fmt.as_opt_eq_val("--wait"),
         ),
         **kwargs

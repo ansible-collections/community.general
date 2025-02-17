@@ -110,3 +110,91 @@ test_cases:
       rc: 0
       out: ""
       err: "Attempting to stop: virtual-ip... Stopped\n"
+- id: test_enable_minimal_input_resource_not_exists
+  input:
+    state: enable
+    name: virtual-ip
+  output:
+    failed: true
+    msg: "pcs failed with error (rc=1): bundle/clone/group/resource/tag 'virtual-ip' does not exist"
+  mocks:
+    run_command:
+    - command: ["/testbin/pcs", resource, status, virtual-ip]
+      environ: *env-def
+      rc: 1
+      out: ""
+      err: ""
+    - command: ["/testbin/pcs", resource, enable, virtual-ip]
+      environ: *env-def
+      rc: 1
+      out: ""
+      err: "bundle/clone/group/resource/tag 'virtual-ip' does not exist"
+- id: test_enable_minimal_input_resource_exists
+  input:
+    state: enable
+    name: virtual-ip
+  output:
+    changed: true
+    previous_value: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Stopped (disabled)"
+    value: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Starting"
+  mocks:
+    run_command:
+    - command: ["/testbin/pcs", resource, status, virtual-ip]
+      environ: *env-def
+      rc: 0
+      out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Stopped (disabled)"
+      err: ""
+    - command: ["/testbin/pcs", resource, enable, virtual-ip]
+      environ: *env-def
+      rc: 0
+      out: ""
+      err: ""
+    - command: ["/testbin/pcs", resource, status, virtual-ip]
+      environ: *env-def
+      rc: 0
+      out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Starting"
+      err: ""
+- id: test_disable_minimal_input_resource_not_exists
+  input:
+    state: disable
+    name: virtual-ip
+  output:
+    failed: true
+    msg: "pcs failed with error (rc=1): bundle/clone/group/resource/tag 'virtual-ip' does not exist"
+  mocks:
+    run_command:
+    - command: ["/testbin/pcs", resource, status, virtual-ip]
+      environ: *env-def
+      rc: 1
+      out: ""
+      err: ""
+    - command: ["/testbin/pcs", resource, disable, virtual-ip]
+      environ: *env-def
+      rc: 1
+      out: ""
+      err: "bundle/clone/group/resource/tag 'virtual-ip' does not exist"
+- id: test_disable_minimal_input_resource_exists
+  input:
+    state: disable
+    name: virtual-ip
+  output:
+    changed: true
+    previous_value: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+    value: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Stopped (disabled)"
+  mocks:
+    run_command:
+    - command: ["/testbin/pcs", resource, status, virtual-ip]
+      environ: *env-def
+      rc: 0
+      out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+      err: ""
+    - command: ["/testbin/pcs", resource, disable, virtual-ip]
+      environ: *env-def
+      rc: 0
+      out: ""
+      err: ""
+    - command: ["/testbin/pcs", resource, status, virtual-ip]
+      environ: *env-def
+      rc: 0
+      out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Stopped (disabled)"
+      err: ""

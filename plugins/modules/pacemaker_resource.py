@@ -28,7 +28,7 @@ options:
   state:
     description:
       - Indicate desired state for cluster resource.
-    choices: [ present, absent ]
+    choices: [ present, absent, enable, disable ]
     default: present
     type: str
   name:
@@ -95,11 +95,6 @@ options:
           - Options to associate with resource action.
         type: list
         elements: str
-  disabled:
-    description:
-      - Specify argument to disable resource.
-    type: bool
-    default: false
   wait:
     description:
       - Timeout period for polling the resource creation.
@@ -150,7 +145,7 @@ class PacemakerResource(StateModuleHelper):
     module = dict(
         argument_spec=dict(
             state=dict(type='str', default='present', choices=[
-                'present', 'absent']),
+                'present', 'absent', 'enable', 'disable']),
             name=dict(type='str', required=True),
             resource_type=dict(type='dict', options=dict(
                 resource_name=dict(type='str'),
@@ -167,7 +162,6 @@ class PacemakerResource(StateModuleHelper):
                 argument_action=dict(type='str', choices=['clone', 'master', 'group', 'promotable']),
                 argument_option=dict(type='list', elements='str'),
             )),
-            disabled=dict(type='bool', default=False),
             wait=dict(type='int', default=300),
         ),
         required_if=[('state', 'present', ['resource_type', 'resource_option'])],
@@ -208,13 +202,31 @@ class PacemakerResource(StateModuleHelper):
 
     def state_present(self):
         with self.runner(
-                'state name resource_type resource_option resource_operation resource_meta resource_argument disabled wait',
+                'state name resource_type resource_option resource_operation resource_meta resource_argument wait',
                 output_process=self._process_command_output(True, "already exists"),
                 check_mode_skip=True) as ctx:
             ctx.run()
         self.vars.stdout = ctx.results_out
         self.vars.stderr = ctx.results_err
         self.vars.cmd = ctx.cmd
+        self.vars.set('new_value', self._get(), fact=True)
+        self.vars._value = self.vars.new_value
+
+    def state_enable(self):
+        with self.runner('state name', output_process=self._process_command_output(True, "not found"), check_mode_skip=True) as ctx:
+            ctx.run()
+            self.vars.stdout = ctx.results_out
+            self.vars.stderr = ctx.results_err
+            self.vars.cmd = ctx.cmd
+        self.vars.set('new_value', self._get(), fact=True)
+        self.vars._value = self.vars.new_value
+
+    def state_disable(self):
+        with self.runner('state name', output_process=self._process_command_output(True, "not found"), check_mode_skip=True) as ctx:
+            ctx.run()
+            self.vars.stdout = ctx.results_out
+            self.vars.stderr = ctx.results_err
+            self.vars.cmd = ctx.cmd
         self.vars.set('new_value', self._get(), fact=True)
         self.vars._value = self.vars.new_value
 
