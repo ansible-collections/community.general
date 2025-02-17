@@ -58,7 +58,7 @@ EXAMPLES = r'''
 '''
 
 RETURN = r'''
-resutls:
+units:
   description: Dictionary of systemd unit info keyed by unit name.
   returned: success
   type: dict
@@ -286,7 +286,7 @@ def main():
                 add_properties(fact, unit_data, full_props)
             results[unit] = fact
 
-    module.exit_json(changed=False, **results)
+    module.exit_json(changed=False, units=results)
 
 
 if __name__ == '__main__':
