@@ -57,11 +57,11 @@ DOCUMENTATION = '''
             description: Use wss when connecting to the Xen Orchestra API
             type: boolean
             default: true
-        use_vm_uuid:
+        use_vm_uuids:
             description: Import Xen VMs to inventory using their UUID as the VM entry name (If set to false use VM name labels instead of UUID)
             type: boolean
             default: true
-        use_host_uuid:
+        use_host_uuids:
             description: Import Xen Hosts to inventory using their UUID as the Host entry name (If set to false use Host name labels instead of UUID)
             type: boolean
             default: true
@@ -80,8 +80,8 @@ groups:
     kube_nodes: "'kube_node' in tags"
 compose:
     ansible_port: 2222
-use_vm_uuid: False
-use_host_uuid: True
+use_vm_uuids: False
+use_host_uuids: True
 
 '''
 
