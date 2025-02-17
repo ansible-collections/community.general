@@ -57,6 +57,14 @@ DOCUMENTATION = '''
             description: Use wss when connecting to the Xen Orchestra API
             type: boolean
             default: true
+        use_vm_uuid:
+            description: Import Xen VMs to inventory using their UUID as the VM entry name (If set to false use VM name labels instead of UUID)
+            type: boolean
+            default: true
+        use_host_uuid:
+            description: Import Xen Hosts to inventory using their UUID as the Host entry name (If set to false use Host name labels instead of UUID)
+            type: boolean
+            default: true
 '''
 
 
@@ -72,6 +80,8 @@ groups:
     kube_nodes: "'kube_node' in tags"
 compose:
     ansible_port: 2222
+use_vm_uuid: False
+use_host_uuid: True
 
 '''
 
@@ -197,9 +207,12 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     def _add_vms(self, vms, hosts, pools):
         for uuid, vm in vms.items():
+            if self.vm_entry_name_type == 'name_label':
+                entry_name = vm['name_label']
+            else:
+                entry_name = uuid
             group = 'with_ip'
             ip = vm.get('mainIpAddress')
-            entry_name = uuid
             power_state = vm['power_state'].lower()
             pool_name = self._pool_group_name_for_uuid(pools, vm['$poolId'])
             host_name = self._host_group_name_for_uuid(hosts, vm['$container'])
@@ -248,6 +261,10 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def _add_hosts(self, hosts, pools):
         for host in hosts.values():
             entry_name = host['uuid']
+            if self.host_entry_name_type == 'name_label':
+                entry_name = host['name_label']
+            else:
+                entry_name = host['uuid']
             group_name = f"xo_host_{clean_group_name(host['name_label'])}"
             pool_name = self._pool_group_name_for_uuid(pools, host['$poolId'])
 
@@ -336,6 +353,14 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self.validate_certs = self.get_option('validate_certs')
         if not self.get_option('use_ssl'):
             self.protocol = 'ws'
+        
+        self.vm_entry_name_type = 'uuid'
+        if not self.get_option('use_vm_uuids'):
+            self.vm_entry_name_type = 'name_label'
+
+        self.host_entry_name_type = 'uuid'
+        if not self.get_option('use_host_uuids'):
+            self.host_entry_name_type = 'name_label'
 
         objects = self._get_objects()
         self._populate(make_unsafe(objects))
