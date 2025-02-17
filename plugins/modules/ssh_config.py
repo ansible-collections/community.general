@@ -142,6 +142,7 @@ options:
   other_options:
     description:
       - Provides the option to specify arbitrary SSH config entry options via a dictionary.
+      - The key names must be lower case. Keys with upper case values are rejected.
       - The values must be strings. Other values are rejected.
     type: dict
     version_added: 10.4.0
@@ -285,6 +286,8 @@ class SSHConfig(object):
         )
         if self.params.get('other_options'):
             for key, value in self.params.get('other_options').items():
+                if key.lower() != key:
+                    self.module.fail_json(msg="The other_options key {key!r} must be lower case".format(key=key))
                 if key not in args:
                     if not isinstance(value, string_types):
                         self.module.fail_json(msg="The other_options value provided for key {key!r} must be a string, got {type}".format(key=key,
