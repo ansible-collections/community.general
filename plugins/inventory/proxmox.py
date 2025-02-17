@@ -308,12 +308,17 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     def _get_json(self, url, ignore_errors=None):
 
-        if not self.use_cache or url not in self._cache.get(self.cache_key, {}):
+        data = []
+        has_data = False
 
-            if self.cache_key not in self._cache:
-                self._cache[self.cache_key] = {'url': ''}
+        if self.use_cache:
+            try:
+                data = self._cache[self.cache_key][url]
+                has_data = True
+            except KeyError:
+                self.update_cache = True
 
-            data = []
+        if not has_data:
             s = self._get_session()
             while True:
                 ret = s.get(url, headers=self.headers)
@@ -339,9 +344,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                         data = data + json['data']
                     break
 
-            self._cache[self.cache_key][url] = data
-
-        return make_unsafe(self._cache[self.cache_key][url])
+        self._results[url] = data
+        return make_unsafe(data)
 
     def _get_nodes(self):
         return self._get_json(f"{self.proxmox_url}/api2/json/nodes")
@@ -680,10 +684,14 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self.exclude_nodes = self.get_option('exclude_nodes')
         self.cache_key = self.get_cache_key(path)
         self.use_cache = cache and self.get_option('cache')
+        self.update_cache = not cache and self.get_option('cache')
         self.host_filters = self.get_option('filters')
         self.group_prefix = self.get_option('group_prefix')
         self.facts_prefix = self.get_option('facts_prefix')
         self.strict = self.get_option('strict')
 
         # actually populate inventory
+        self._results = {}
         self._populate()
+        if self.update_cache:
+            self._cache[self.cache_key] = self._results
