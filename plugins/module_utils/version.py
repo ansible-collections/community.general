@@ -12,6 +12,7 @@ __metaclass__ = type
 
 import operator
 from functools import wraps
+from collections import UserDict
 
 from ansible.module_utils.compat.version import LooseVersion  # noqa: F401, pylint: disable=unused-import
 
@@ -23,14 +24,21 @@ def _version_compare(op):
     return _op
 
 
-version_ops = {
+version_ops = UserDict({
     '<=': _version_compare(operator.le),
     '>=': _version_compare(operator.ge),
     '<': _version_compare(operator.lt),
     '>': _version_compare(operator.gt),
     '==': _version_compare(operator.eq),
     '!=': _version_compare(operator.ne),
-}
+})
+
+setattr(version_ops, "le", version_ops["<="])
+setattr(version_ops, "ge", version_ops[">="])
+setattr(version_ops, "lt", version_ops["<"])
+setattr(version_ops, "gt", version_ops[">"])
+setattr(version_ops, "eq", version_ops["=="])
+setattr(version_ops, "ne", version_ops["!="])
 
 
 def find_op(name):
