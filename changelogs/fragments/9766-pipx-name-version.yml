@@ -1,0 +1,5 @@
+minor_changes:
+  - pipx - parameter `name` now accepts version specifiers (https://github.com/ansible-collections/community.general/pull/9766).
+  - version module utils - add operators comparing version arguments (https://github.com/ansible-collections/community.general/pull/9766).
+  - version module utils - add functions to support parsing and comparing versions of packages (https://github.com/ansible-collections/community.general/pull/9766).
+  - python_requirements_info - use new version comparing logic from ``version`` module util (https://github.com/ansible-collections/community.general/pull/9766).
