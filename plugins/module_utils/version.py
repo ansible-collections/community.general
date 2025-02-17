@@ -24,21 +24,14 @@ def _version_compare(op):
     return _op
 
 
-version_ops = UserDict({
+version_ops = {
     '<=': _version_compare(operator.le),
     '>=': _version_compare(operator.ge),
     '<': _version_compare(operator.lt),
     '>': _version_compare(operator.gt),
     '==': _version_compare(operator.eq),
     '!=': _version_compare(operator.ne),
-})
-
-setattr(version_ops, "le", version_ops["<="])
-setattr(version_ops, "ge", version_ops[">="])
-setattr(version_ops, "lt", version_ops["<"])
-setattr(version_ops, "gt", version_ops[">"])
-setattr(version_ops, "eq", version_ops["=="])
-setattr(version_ops, "ne", version_ops["!="])
+}
 
 
 def find_op(name):
