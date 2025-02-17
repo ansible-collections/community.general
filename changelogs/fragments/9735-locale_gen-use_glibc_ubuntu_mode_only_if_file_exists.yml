@@ -1,2 +1,2 @@
 bugfixes:
-  - "locale_gen - use ``glibc_ubuntu`` mode only if files for that exists (https://github.com/ansible-collections/community.general/pull/9735)."
+  - "locale_gen - use ``glibc`` mode only if files for that exists. In other case us ``other_glibc`` mode (https://github.com/ansible-collections/community.general/pull/9735)."

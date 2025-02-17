@@ -1,0 +1,52 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: "Non dnf RedHat systemd are not supported"
+  ansible.builtin.meta: "end_play"
+  when:
+    - "ansible_pkg_mgr == 'yum'"
+
+- name: "Prepare locale packages"
+  block:
+    - name: "Install locale packages for RedHat"
+      ansible.builtin.dnf:
+        name:
+          - "glibc-langpack-pl"
+          - "glibc-langpack-en"
+        state: "present"
+        update_cache: "yes"
+      when:
+        - "ansible_os_family == 'RedHat'"
+    - name: "Install locale packages for Archlinux"
+      community.general.pacman:
+        name: "glibc-locales"
+        state: "present"
+        update_cache: "yes"
+      when:
+        - "ansible_os_family == 'Archlinux'"
+
+- name: "Prepare locale.gen file for RedHat or Archlinux"
+  ansible.builtin.template:
+    src: "locale_gen.j2"
+    dest: "/etc/locale.gen"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+    force: "yes"
+
+- name: "Check for locale that pack are not installed"
+  locale_gen:
+    name: "ansible.UTF-8"
+    state: "present"
+  register: "locale_gen_locale_missed_result"
+  ignore_errors: true
+
+- name: "Deploy locales"
+  locale_gen:
+    name: "{{ item['locale'] + '.' + item['charset'] }}"
+    state: "present"
+  loop: "{{ vars['locale_list_simple'] | flatten(levels=1) }}"
+  loop_control:
+    label: "{{ 'Deploy locale: ' + item['locale'] }}"

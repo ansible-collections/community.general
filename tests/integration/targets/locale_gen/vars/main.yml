@@ -27,3 +27,11 @@ locale_list_basic:
   - localegen: de_CH.UTF-8
     locales: [de_CH.utf8]
     skip_removal: false
+
+# Simple locales list for non Debian distro
+
+locale_list_simple:
+  - locale: 'en_US'
+    charset: 'UTF-8'
+  - locale: 'pl_PL'
+    charset: 'UTF-8'
