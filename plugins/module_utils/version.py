@@ -12,7 +12,6 @@ __metaclass__ = type
 
 import operator
 from functools import wraps
-from collections import UserDict
 
 from ansible.module_utils.compat.version import LooseVersion  # noqa: F401, pylint: disable=unused-import
 
