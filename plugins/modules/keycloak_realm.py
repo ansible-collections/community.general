@@ -528,8 +528,7 @@ EXAMPLES = r"""
     auth_realm: master
     auth_username: USERNAME
     auth_password: PASSWORD
-    id: realm
-    realm: realm
+    realm: unique_realm_name
     state: present
 
 - name: Delete a Keycloak realm
@@ -539,7 +538,7 @@ EXAMPLES = r"""
     auth_realm: master
     auth_username: USERNAME
     auth_password: PASSWORD
-    id: test
+    realm: unique_realm_name
     state: absent
 """
 
@@ -554,7 +553,7 @@ proposed:
   description: Representation of proposed realm.
   returned: always
   type: dict
-  sample: {id: "test"}
+  sample: {realm: "test"}
 
 existing:
   description: Representation of existing realm (sample is truncated).
