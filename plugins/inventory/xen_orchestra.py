@@ -210,9 +210,16 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self._set_composite_vars(self.get_option('compose'), variables, name, strict=strict)
 
     def _add_vms(self, vms, hosts, pools):
+        vm_name_list = []
         for uuid, vm in vms.items():
             if self.vm_entry_name_type == 'name_label':
-                entry_name = vm['name_label']
+                if vm['name_label'] not in vm_name_list:
+                    entry_name = vm['name_label']
+                    vm_name_list.append(vm['name_label'])
+                else:
+                    vm_duplicate_count = vm_name_list.count(vm['name_label'])
+                    entry_name = vm['name_label'] + "_" + str(vm_duplicate_count)
+                    vm_name_list.append(vm['name_label'])
             else:
                 entry_name = uuid
             group = 'with_ip'
@@ -263,12 +270,19 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             self._apply_constructable(entry_name, self.inventory.get_host(entry_name).get_vars())
 
     def _add_hosts(self, hosts, pools):
+        host_name_list = []
         for host in hosts.values():
-            entry_name = host['uuid']
             if self.host_entry_name_type == 'name_label':
-                entry_name = host['name_label']
+                if host['name_label'] not in host_name_list:
+                    entry_name = host['name_label']
+                    host_name_list.append(host['name_label'])
+                else:
+                    host_duplicate_count = host_name_list.count(host['name_label'])
+                    entry_name = host['name_label'] + "_" + str(host_duplicate_count)
+                    host_name_list.append(host['name_label'])
             else:
                 entry_name = host['uuid']
+
             group_name = f"xo_host_{clean_group_name(host['name_label'])}"
             pool_name = self._pool_group_name_for_uuid(pools, host['$poolId'])
 
