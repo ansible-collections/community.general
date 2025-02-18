@@ -60,13 +60,13 @@ DOCUMENTATION = '''
         use_vm_uuid:
             description:
                 - Import Xen VMs to inventory using their UUID as the VM entry name.
-                - If set to false use VM name labels instead of UUID.
+                - If set to V(false) use VM name labels instead of UUID's.
             type: boolean
             default: true
         use_host_uuid:
             description:
                 - Import Xen Hosts to inventory using their UUID as the Host entry name.
-                - If set to false use Host name labels instead of UUID.
+                - If set to V(false) use Host name labels instead of UUID's.
             type: boolean
             default: true
 '''
