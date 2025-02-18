@@ -277,7 +277,7 @@ class BalancerMember(object):
             except TypeError as exc:
                 self.module.fail_json(msg="Cannot parse balancer_member_page HTML! {0}".format(exc))
             else:
-                subsoup = find_all(soup, 'table')[1].find_all('tr')
+                subsoup = find_all(find_all(soup, 'table')[1], 'tr')
                 keys = find_all(subsoup[0], 'th')
                 for valuesset in subsoup[1::1]:
                     if re.search(pattern=self.host, string=str(valuesset)):
