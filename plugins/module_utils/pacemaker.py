@@ -13,8 +13,8 @@ _state_map = {
     "present": "create",
     "absent": "remove",
     "status": "status",
-    "enable": "enable",
-    "disable": "disable"
+    "enabled": "enable",
+    "disabled": "disable"
 }
 
 
@@ -37,10 +37,10 @@ def fmt_resource_argument(value):
     return ['--group' if value['argument_action'] == 'group' else value['argument_action']] + value['argument_option']
 
 
-def pacemaker_runner(module, **kwargs):
+def pacemaker_runner(module, cli_action, **kwargs):
     runner = CmdRunner(
         module,
-        command=['pcs', 'resource'],
+        command=['pcs', cli_action],
         arg_formats=dict(
             state=cmd_runner_fmt.as_map(_state_map),
             name=cmd_runner_fmt.as_list(),

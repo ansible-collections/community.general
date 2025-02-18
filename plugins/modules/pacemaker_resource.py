@@ -28,7 +28,7 @@ options:
   state:
     description:
       - Indicate desired state for cluster resource.
-    choices: [ present, absent, enable, disable ]
+    choices: [ present, absent, enabled, disabled ]
     default: present
     type: str
   name:
@@ -145,7 +145,7 @@ class PacemakerResource(StateModuleHelper):
     module = dict(
         argument_spec=dict(
             state=dict(type='str', default='present', choices=[
-                'present', 'absent', 'enable', 'disable']),
+                'present', 'absent', 'enabled', 'disabled']),
             name=dict(type='str', required=True),
             resource_type=dict(type='dict', options=dict(
                 resource_name=dict(type='str'),
@@ -165,13 +165,13 @@ class PacemakerResource(StateModuleHelper):
             wait=dict(type='int', default=300),
         ),
         required_if=[('state', 'present', ['resource_type', 'resource_option'])],
-        supports_check_mode=True
+        supports_check_mode=True,
     )
     use_old_vardict = False
     default_state = "present"
 
     def __init_module__(self):
-        self.runner = pacemaker_runner(self.module)
+        self.runner = pacemaker_runner(self.module, cli_action='resource')
         self.does_not = "Error: resource or tag id '{0}' not found".format(
             self.vars.name)
         self.error_messages = ["Error: '{0}' already exists".format(self.vars.name), "Error: Resource '{0} does not exist".format(self.vars.name)]
@@ -212,7 +212,7 @@ class PacemakerResource(StateModuleHelper):
         self.vars.set('new_value', self._get(), fact=True)
         self.vars._value = self.vars.new_value
 
-    def state_enable(self):
+    def state_enabled(self):
         with self.runner('state name', output_process=self._process_command_output(True, "not found"), check_mode_skip=True) as ctx:
             ctx.run()
             self.vars.stdout = ctx.results_out
@@ -221,7 +221,7 @@ class PacemakerResource(StateModuleHelper):
         self.vars.set('new_value', self._get(), fact=True)
         self.vars._value = self.vars.new_value
 
-    def state_disable(self):
+    def state_disabled(self):
         with self.runner('state name', output_process=self._process_command_output(True, "not found"), check_mode_skip=True) as ctx:
             ctx.run()
             self.vars.stdout = ctx.results_out
