@@ -371,7 +371,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self.validate_certs = self.get_option('validate_certs')
         if not self.get_option('use_ssl'):
             self.protocol = 'ws'
-        
+
         self.vm_entry_name_type = 'uuid'
         if not self.get_option('use_vm_uuid'):
             self.vm_entry_name_type = 'name_label'
