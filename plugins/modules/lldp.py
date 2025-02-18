@@ -60,13 +60,19 @@ def gather_lldp(module):
         current_dict = {}
         lldp_entries = output.strip().split("\n")
 
+        final = ""
         for entry in lldp_entries:
             if entry.startswith('lldp'):
                 path, value = entry.strip().split("=", 1)
                 path = path.split(".")
                 path_components, final = path[:-1], path[-1]
-            else:
+            elif final in current_dict and isinstance(current_dict[final], str):
                 current_dict[final] += '\n' + entry
+                continue
+            elif final in current_dict and isinstance(current_dict[final], list):
+                current_dict[final][-1] += '\n' + entry
+                continue
+            else:
                 continue
 
             current_dict = output_dict
@@ -76,7 +82,7 @@ def gather_lldp(module):
                     current_dict[path_component] = {'value': current_dict[path_component]}
                 current_dict = current_dict[path_component]
 
-            if final in current_dict and isinstance(current_dict[final], dict):
+            if final in current_dict and isinstance(current_dict[final], dict) and module.params['multivalues']:
                 current_dict = current_dict[final]
                 final = 'value'
 
