@@ -1,0 +1,5 @@
+bugfixes:
+  - "apache2_mod_proxy - make compatible with Python 3 (https://github.com/ansible-collections/community.general/pull/9762)."
+  - "apache2_mod_proxy - passing the cluster's page as referer for the member's pages. This makes the module actually work again for halfway modern Apache versions.
+     According to some comments founds on the net the referer was required since at least 2019 for some versions of Apache 2
+     (https://github.com/ansible-collections/community.general/pull/9762)."

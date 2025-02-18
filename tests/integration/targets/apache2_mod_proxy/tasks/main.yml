@@ -1,0 +1,253 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- meta: end_play
+  when: ansible_os_family not in ['Debian', 'Suse']
+
+- name: Enable mod_proxy
+  community.general.apache2_module:
+    state: present
+    name: "{{ item }}"
+  loop:
+    - status
+    - proxy
+    - proxy_http
+    - proxy_balancer
+    - lbmethod_byrequests
+
+- name: Add port 81
+  lineinfile:
+    path: "/etc/apache2/{{ 'ports.conf' if ansible_os_family == 'Debian' else 'listen.conf' }}"
+    line: Listen 81
+
+- name: Set up virtual host
+  copy:
+    dest: "/etc/apache2/{{ 'sites-available' if ansible_os_family == 'Debian' else 'vhosts.d' }}/000-apache2_mod_proxy-test.conf"
+    content: |
+      <VirtualHost *:81>
+        <Proxy balancer://mycluster>
+          BalancerMember http://127.0.0.1:8080
+          BalancerMember http://127.0.0.1:8081
+        </Proxy>
+
+        <IfModule mod_evasive20.c>
+          DOSBlockingPeriod 0
+          DOSWhiteList 127.0.0.1
+          DOSWhiteList ::1
+        </IfModule>
+
+        <Location "/app/">
+          ProxyPreserveHost On
+          ProxyPass balancer://mycluster/
+          ProxyPassReverse balancer://mycluster/
+        </Location>
+
+        <Location "/balancer-manager">
+          SetHandler balancer-manager
+          Require all granted
+        </Location>
+      </VirtualHost>
+
+- name: Enable virtual host
+  file:
+    src: /etc/apache2/sites-available/000-apache2_mod_proxy-test.conf
+    dest: /etc/apache2/sites-enabled/000-apache2_mod_proxy-test.conf
+    owner: root
+    group: root
+    state: link
+  when: ansible_os_family not in ['Suse']
+
+- name: Restart Apache
+  service:
+    name: apache2
+    state: restarted
+
+- name: Install BeautifulSoup
+  pip:
+    name: "{{ 'BeautifulSoup' if ansible_python_version is version('3', '<') else 'BeautifulSoup4' }}"
+    extra_args: "-c {{ remote_constraints }}"
+
+- name: Get all current balancer pool members attributes
+  community.general.apache2_mod_proxy:
+    balancer_vhost: localhost:81
+  register: result
+
+- assert:
+    that:
+      - result is not changed
+      - result.members | length == 2
+      - result.members[0].port in ["8080", "8081"]
+      - result.members[0].balancer_url == "http://localhost:81/balancer-manager/"
+      - result.members[0].host == "127.0.0.1"
+      - result.members[0].path is none
+      - result.members[0].protocol == "http"
+      - result.members[1].port in ["8080", "8081"]
+      - result.members[1].balancer_url == "http://localhost:81/balancer-manager/"
+      - result.members[1].host == "127.0.0.1"
+      - result.members[1].path is none
+      - result.members[1].protocol == "http"
+
+- name: Enable member
+  community.general.apache2_mod_proxy:
+    balancer_vhost: localhost:81
+    member_host: 127.0.0.1
+    state: present
+  register: result
+
+- assert:
+    that:
+      - result is not changed
+
+- name: Get all current balancer pool members attributes
+  community.general.apache2_mod_proxy:
+    balancer_vhost: localhost:81
+  register: result
+
+- assert:
+    that:
+      - result is not changed
+      - result.members | length == 2
+      - result.members[0].port in ["8080", "8081"]
+      - result.members[0].balancer_url == "http://localhost:81/balancer-manager/"
+      - result.members[0].host == "127.0.0.1"
+      - result.members[0].path is none
+      - result.members[0].protocol == "http"
+      - result.members[0].status.disabled == false
+      - result.members[0].status.drained == false
+      - result.members[0].status.hot_standby == false
+      - result.members[0].status.ignore_errors == false
+      - result.members[1].port in ["8080", "8081"]
+      - result.members[1].balancer_url == "http://localhost:81/balancer-manager/"
+      - result.members[1].host == "127.0.0.1"
+      - result.members[1].path is none
+      - result.members[1].protocol == "http"
+      - result.members[1].status.disabled == false
+      - result.members[1].status.drained == false
+      - result.members[1].status.hot_standby == false
+      - result.members[1].status.ignore_errors == false
+
+- name: Drain member
+  community.general.apache2_mod_proxy:
+    balancer_vhost: localhost:81
+    member_host: 127.0.0.1
+    state: drained
+  register: result
+
+- assert:
+    that:
+      - result is changed
+
+# Note that since both members are on the same host, this always affects **both** members!
+
+- name: Get all current balancer pool members attributes
+  community.general.apache2_mod_proxy:
+    balancer_vhost: localhost:81
+  register: result
+
+- assert:
+    that:
+      - result is not changed
+      - result.members | length == 2
+      - result.members[0].port in ["8080", "8081"]
+      - result.members[0].balancer_url == "http://localhost:81/balancer-manager/"
+      - result.members[0].host == "127.0.0.1"
+      - result.members[0].path is none
+      - result.members[0].protocol == "http"
+      - result.members[0].status.disabled == false
+      - result.members[0].status.drained == true
+      - result.members[0].status.hot_standby == false
+      - result.members[0].status.ignore_errors == false
+      - result.members[1].port in ["8080", "8081"]
+      - result.members[1].balancer_url == "http://localhost:81/balancer-manager/"
+      - result.members[1].host == "127.0.0.1"
+      - result.members[1].path is none
+      - result.members[1].protocol == "http"
+      - result.members[1].status.disabled == false
+      - result.members[1].status.drained == true
+      - result.members[1].status.hot_standby == false
+      - result.members[1].status.ignore_errors == false
+
+- name: Disable member
+  community.general.apache2_mod_proxy:
+    balancer_vhost: localhost:81
+    member_host: 127.0.0.1
+    state: absent
+  register: result
+
+- assert:
+    that:
+      - result is changed
+
+- name: Get all current balancer pool members attributes
+  community.general.apache2_mod_proxy:
+    balancer_vhost: localhost:81
+  register: result
+
+- assert:
+    that:
+      - result is not changed
+      - result.members | length == 2
+      - result.members[0].port in ["8080", "8081"]
+      - result.members[0].balancer_url == "http://localhost:81/balancer-manager/"
+      - result.members[0].host == "127.0.0.1"
+      - result.members[0].path is none
+      - result.members[0].protocol == "http"
+      - result.members[0].status.disabled == true
+      - result.members[0].status.drained == false
+      - result.members[0].status.hot_standby == false
+      - result.members[0].status.ignore_errors == false
+      - result.members[1].port in ["8080", "8081"]
+      - result.members[1].balancer_url == "http://localhost:81/balancer-manager/"
+      - result.members[1].host == "127.0.0.1"
+      - result.members[1].path is none
+      - result.members[1].protocol == "http"
+      - result.members[1].status.disabled == true
+      - result.members[1].status.drained == false
+      - result.members[1].status.hot_standby == false
+      - result.members[1].status.ignore_errors == false
+
+- name: Enable member
+  community.general.apache2_mod_proxy:
+    balancer_vhost: localhost:81
+    member_host: 127.0.0.1
+    state: present
+  register: result
+
+- assert:
+    that:
+      - result is changed
+
+- name: Get all current balancer pool members attributes
+  community.general.apache2_mod_proxy:
+    balancer_vhost: localhost:81
+  register: result
+
+- assert:
+    that:
+      - result is not changed
+      - result.members | length == 2
+      - result.members[0].port in ["8080", "8081"]
+      - result.members[0].balancer_url == "http://localhost:81/balancer-manager/"
+      - result.members[0].host == "127.0.0.1"
+      - result.members[0].path is none
+      - result.members[0].protocol == "http"
+      - result.members[0].status.disabled == false
+      - result.members[0].status.drained == false
+      - result.members[0].status.hot_standby == false
+      - result.members[0].status.ignore_errors == false
+      - result.members[1].port in ["8080", "8081"]
+      - result.members[1].balancer_url == "http://localhost:81/balancer-manager/"
+      - result.members[1].host == "127.0.0.1"
+      - result.members[1].path is none
+      - result.members[1].protocol == "http"
+      - result.members[1].status.disabled == false
+      - result.members[1].status.drained == false
+      - result.members[1].status.hot_standby == false
+      - result.members[1].status.ignore_errors == false
