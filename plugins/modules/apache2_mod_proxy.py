@@ -18,10 +18,11 @@ description:
   - Set and/or get members' attributes of an Apache httpd 2.4 mod_proxy balancer
     pool, using HTTP POST and GET requests. The httpd mod_proxy balancer-member
     status page has to be enabled and accessible, as this module relies on parsing
-    this page. This module supports ansible check_mode, and requires BeautifulSoup
-    python module.
+    this page.
 extends_documentation_fragment:
   - community.general.attributes
+requirements:
+  - Python package C(BeautifulSoup) on Python 2, C(beautifulsoup4) on Python 3.
 attributes:
   check_mode:
     support: full
@@ -207,12 +208,16 @@ import re
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.urls import fetch_url
-from ansible.module_utils.six import iteritems
+from ansible.module_utils.six import iteritems, PY2
 
 BEAUTIFUL_SOUP_IMP_ERR = None
 try:
-    from BeautifulSoup import BeautifulSoup
+    if PY2:
+        from BeautifulSoup import BeautifulSoup
+    else:
+        from bs4 import BeautifulSoup
 except ImportError:
     BEAUTIFUL_SOUP_IMP_ERR = traceback.format_exc()
     HAS_BEAUTIFULSOUP = False
@@ -220,9 +225,15 @@ else:
     HAS_BEAUTIFULSOUP = True
 
 # balancer member attributes extraction regexp:
-EXPRESSION = r"(b=([\w\.\-]+)&w=(https?|ajp|wss?|ftp|[sf]cgi)://([\w\.\-]+):?(\d*)([/\w\.\-]*)&?[\w\-\=]*)"
+EXPRESSION = to_text(r"(b=([\w\.\-]+)&w=(https?|ajp|wss?|ftp|[sf]cgi)://([\w\.\-]+):?(\d*)([/\w\.\-]*)&?[\w\-\=]*)")
 # Apache2 server version extraction regexp:
-APACHE_VERSION_EXPRESSION = r"SERVER VERSION: APACHE/([\d.]+)"
+APACHE_VERSION_EXPRESSION = to_text(r"SERVER VERSION: APACHE/([\d.]+)")
+
+
+def find_all(where, what):
+    if PY2:
+        return where.findAll(what)
+    return where.find_all(what)
 
 
 def regexp_extraction(string, _regexp, groups=1):
@@ -262,7 +273,7 @@ class BalancerMember(object):
     def get_member_attributes(self):
         """ Returns a dictionary of a balancer member's attributes."""
 
-        balancer_member_page = fetch_url(self.module, self.management_url)
+        balancer_member_page = fetch_url(self.module, self.management_url, headers={'Referer': self.management_url})
 
         if balancer_member_page[1]['status'] != 200:
             self.module.fail_json(msg="Could not get balancer_member_page, check for connectivity! " + balancer_member_page[1])
@@ -272,11 +283,11 @@ class BalancerMember(object):
             except TypeError as exc:
                 self.module.fail_json(msg="Cannot parse balancer_member_page HTML! " + str(exc))
             else:
-                subsoup = soup.findAll('table')[1].findAll('tr')
-                keys = subsoup[0].findAll('th')
+                subsoup = find_all(find_all(soup, 'table')[1], 'tr')
+                keys = find_all(subsoup[0], 'th')
                 for valuesset in subsoup[1::1]:
                     if re.search(pattern=self.host, string=str(valuesset)):
-                        values = valuesset.findAll('td')
+                        values = find_all(valuesset, 'td')
                         return {keys[x].string: values[x].string for x in range(0, len(keys))}
 
     def get_member_status(self):
@@ -300,9 +311,9 @@ class BalancerMember(object):
         values_url = "".join("{0}={1}".format(url_param, 1 if values[mode] else 0) for mode, url_param in iteritems(values_mapping))
         request_body = "{0}{1}".format(request_body, values_url)
 
-        response = fetch_url(self.module, self.management_url, data=request_body)
+        response = fetch_url(self.module, self.management_url, data=request_body, headers={'Referer': self.management_url})
         if response[1]['status'] != 200:
-            self.module.fail_json(msg="Could not set the member status! " + self.host + " " + response[1]['status'])
+            self.module.fail_json(msg="Could not set the member status! {host} {status}".format(host=self.host, status=response[1]['status']))
 
     attributes = property(get_member_attributes)
     status = property(get_member_status, set_member_status)
@@ -329,11 +340,15 @@ class Balancer(object):
         if page[1]['status'] != 200:
             self.module.fail_json(msg="Could not get balancer page! HTTP status response: " + str(page[1]['status']))
         else:
-            content = page[0].read()
+            content = to_text(page[0].read())
             apache_version = regexp_extraction(content.upper(), APACHE_VERSION_EXPRESSION, 1)
             if apache_version:
                 if not re.search(pattern=r"2\.4\.[\d]*", string=apache_version):
-                    self.module.fail_json(msg="This module only acts on an Apache2 2.4+ instance, current Apache2 version: " + str(apache_version))
+                    self.module.fail_json(
+                        msg="This module only acts on an Apache2 2.4+ instance, current Apache2 version: {version}".format(
+                            version=apache_version
+                        )
+                    )
                 return content
             else:
                 self.module.fail_json(msg="Could not get the Apache server version from the balancer-manager")
@@ -345,7 +360,8 @@ class Balancer(object):
         except TypeError:
             self.module.fail_json(msg="Cannot parse balancer page HTML! " + str(self.page))
         else:
-            for element in soup.findAll('a')[1::1]:
+            elements = find_all(soup, 'a')
+            for element in elements[1::1]:
                 balancer_member_suffix = str(element.get('href'))
                 if not balancer_member_suffix:
                     self.module.fail_json(msg="Argument 'balancer_member_suffix' is empty!")
