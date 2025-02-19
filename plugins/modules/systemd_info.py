@@ -109,18 +109,7 @@ units:
   }
 '''
 
-import os
 from ansible.module_utils.basic import AnsibleModule
-
-
-def is_systemd():
-    if os.path.exists("/run/systemd/system"):
-        return True
-    try:
-        with open("/proc/1/comm", "r") as f:
-            return f.read().strip() == "systemd"
-    except Exception:
-        return False
 
 
 def run_command(module, cmd):
@@ -163,11 +152,13 @@ def determine_category(unit):
         return None
 
 
-def add_properties(fact, unit_data, prop_list):
+def extract_unit_properties(unit_data, prop_list):
+    extracted = {}
     for prop in prop_list:
         key = prop.lower()
         if key in unit_data:
-            fact[key] = unit_data[key]
+            extracted[key] = unit_data[key]
+    return extracted
 
 
 def unit_exists(module, systemctl_bin, unit):
@@ -207,10 +198,11 @@ def main():
         supports_check_mode=True
     )
 
-    if not is_systemd():
-        module.fail_json(msg="This module only runs on hosts using systemd as the init system.")
-
     systemctl_bin = module.get_bin_path('systemctl', required=True)
+    try:
+        run_command(module, [systemctl_bin, '--version'])
+    except Exception as e:
+        module.fail_json(msg="Failed to run systemctl: {0}".format(str(e)))
 
     base_properties = {
         'service': ['FragmentPath', 'UnitFileState', 'UnitFilePreset', 'MainPID', 'ExecMainPID'],
@@ -261,29 +253,33 @@ def main():
             props = base_properties.get(category, [])
             full_props = list(set(props + state_props))
             unit_data = get_unit_properties(module, systemctl_bin, unit_name, full_props)
-            add_properties(fact, unit_data, full_props)
+
+            fact.update(extract_unit_properties(unit_data, full_props))
             results[unit_name] = fact
 
     else:
         selected_units = module.params['unitname']
         extra_properties = module.params['extra_properties']
-        if not selected_units:
-            module.fail_json(msg="Provide at least one unit name in 'unitname'.")
 
         for unit in selected_units:
             validate_unit_and_properties(module, systemctl_bin, unit, extra_properties)
             category = determine_category(unit)
+
             if not category:
                 module.fail_json(msg="Could not determine the category for unit '{0}'.".format(unit))
+
             props = base_properties.get(category, [])
             full_props = list(set(props + state_props + extra_properties))
             unit_data = get_unit_properties(module, systemctl_bin, unit, full_props)
             fact = {"name": unit}
             minimal_keys = ["LoadState", "ActiveState", "SubState"]
-            add_properties(fact, unit_data, minimal_keys)
+
+            fact.update(extract_unit_properties(unit_data, minimal_keys))
+
             ls = unit_data.get("loadstate", "").lower()
             if ls not in ("not-found", "masked"):
-                add_properties(fact, unit_data, full_props)
+                fact.update(extract_unit_properties(unit_data, full_props))
+
             results[unit] = fact
 
     module.exit_json(changed=False, units=results)
