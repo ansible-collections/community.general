@@ -279,7 +279,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     host_name_list.append(host['name_label'])
                 else:
                     host_duplicate_count = host_name_list.count(host['name_label'])
-                    entry_name = host['name_label'] + "_" + str(host_duplicate_count)
+                    entry_name = f"{host['name_label']}_{host_duplicate_count}"
                     host_name_list.append(host['name_label'])
             else:
                 entry_name = host['uuid']
