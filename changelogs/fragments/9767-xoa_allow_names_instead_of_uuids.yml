@@ -1,2 +1,2 @@
 minor_changes:
-  - Add use_vm_uuid and use_host_uuid true/false options to allow switching over to using VM/Xen name labels instead of UUIDs as item names in ansible inventory
+  - xen_orchestra inventory plugin - add ``use_vm_uuid`` and ``use_host_uuid`` boolean options to allow switching over to using VM/Xen name labels instead of UUIDs as item names (https://github.com/ansible-collections/community.general/pull/9767).
