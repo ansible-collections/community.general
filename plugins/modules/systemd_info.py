@@ -16,8 +16,8 @@ description:
   - This module gathers info about systemd units (services, targets, sockets, mount).
   - It runs C(systemctl list-units) (or processes selected units) and collects properties
     for each unit using C(systemctl show).
-  - Even if a unit has a loadstate of "not-found" or "masked", it is returned,
-    but only with the minimal properties ( name, loadstate, activestate, substate).
+  - Even if a unit has a V(loadstate) of V(not-found) or V(masked), it is returned,
+    but only with the minimal properties (name, loadstate, activestate, substate).
   - When O(unitname) and O(extra_properties) are used, the module first checks if the unit exists,
     then check if properties exist. If not, module fail.
 version_added: "10.4.0"
@@ -25,6 +25,7 @@ options:
   unitname:
     description:
       - List of unit names to process.
+      - It supports .service, .target, .socket, and .mount units type.
     type: list
     elements: str
     default: []
@@ -36,9 +37,14 @@ options:
     default: []
 author:
   - Marco Noce (@NomakCooper)
+extends_documentation_fragment:
+  - community.general.systemd.documentation
+  - community.general.attributes
+  - community.general.attributes.info_module
 '''
 
 EXAMPLES = r'''
+---
 # Gather info for all systemd services, targets, sockets and mount
 - name: Gather all systemd unit info
   community.general.systemd_info:
@@ -113,9 +119,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def run_command(module, cmd):
-    rc, stdout, stderr = module.run_command(cmd, use_unsafe_shell=True)
-    if rc != 0:
-        module.fail_json(msg="Command '{0}' failed: {1}".format(" ".join(cmd), stderr.strip()))
+    rc, stdout, stderr = module.run_command(cmd, use_unsafe_shell=True, check_rc=True)
     return stdout.strip()
 
 
@@ -153,11 +157,10 @@ def determine_category(unit):
 
 
 def extract_unit_properties(unit_data, prop_list):
-    extracted = {}
-    for prop in prop_list:
-        key = prop.lower()
-        if key in unit_data:
-            extracted[key] = unit_data[key]
+    lowerprop = [x.lower() for x in prop_list]
+    extracted = {
+        prop: unit_data[prop] for prop in lowerprop if prop in unit_data
+    }
     return extracted
 
 
