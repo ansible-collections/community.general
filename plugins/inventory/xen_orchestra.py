@@ -63,6 +63,7 @@ DOCUMENTATION = '''
                 - If set to V(false) use VM name labels instead of UUID's.
             type: boolean
             default: true
+            version_added: 10.4.0
         use_host_uuid:
             description:
                 - Import Xen Hosts to inventory using their UUID as the Host entry name.
