@@ -19,7 +19,7 @@ test_cases:
     resource_type:
       resource_name: IPaddr2
     resource_option:
-      - "ip=[192.168.999.5]"
+      - "ip=[192.168.2.1]"
   output:
     changed: true
     previous_value:
@@ -31,7 +31,7 @@ test_cases:
       rc: 1
       out: ""
       err: ""
-    - command: ["/testbin/pcs", resource, create, virtual-ip, IPaddr2, "ip=[192.168.999.5]", "--wait=300"]
+    - command: ["/testbin/pcs", resource, create, virtual-ip, IPaddr2, "ip=[192.168.2.1]", "--wait=300"]
       environ: *env-def
       rc: 0
       out: ""
@@ -48,7 +48,7 @@ test_cases:
     resource_type:
       resource_name: IPaddr2
     resource_option:
-      - "ip=[192.168.999.5]"
+      - "ip=[192.168.2.1]"
   output:
     changed: false
     previous_value: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
@@ -60,7 +60,7 @@ test_cases:
       rc: 0
       out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
       err: ""
-    - command: ["/testbin/pcs", resource, create, virtual-ip, IPaddr2, "ip=[192.168.999.5]", "--wait=300"]
+    - command: ["/testbin/pcs", resource, create, virtual-ip, IPaddr2, "ip=[192.168.2.1]", "--wait=300"]
       environ: *env-def
       rc: 1
       out: ""

@@ -115,7 +115,7 @@ EXAMPLES = '''
       resource_type:
         resource_name: IPaddr2
       resource_option:
-        - "ip=[192.168.999.5]"
+        - "ip=[192.168.2.1]"
       resource_argument:
         argument_action: group
         argument_option:
