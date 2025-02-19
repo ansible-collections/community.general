@@ -572,16 +572,20 @@ class LookupModule(LookupBase):
         for term in terms:
             self.parse_params(term)   # parse the input into paramvals
             with self.opt_lock('readwrite'):
-                if self.check_pass():     # password exists
-                    if self.paramvals['overwrite']:
+                if self.check_pass():     # password file exists
+                    if self.paramvals['overwrite']:  # if "overwrite", always update password
                         with self.opt_lock('write'):
                             result.append(self.update_password())
-                    elif self.paramvals["subkey"] != "password" and not self.passdict.get(self.paramvals['subkey']):  # password exists but not the subkey
+                    elif (
+                        self.paramvals["subkey"] != "password"
+                        and not self.passdict.get(self.paramvals["subkey"])
+                        and self.paramvals["missing"] == "create"
+                    ):  # target is a subkey, this subkey is not in passdict BUT missing == create
                         with self.opt_lock('write'):
                             result.append(self.update_password())
                     else:
                         result.append(self.get_passresult())
-                else:                     # password does not exist
+                else:  # password does not exist
                     if self.paramvals['missing'] == 'create':
                         with self.opt_lock('write'):
                             if self.locked == 'write' and self.check_pass():  # lookup password again if under write lock
