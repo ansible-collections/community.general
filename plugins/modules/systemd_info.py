@@ -26,7 +26,7 @@ options:
     description:
       - List of unit names to process.
       - It supports .service, .target, .socket, and .mount units type.
-      - Each name must correspond to the full name of the systemd unit.
+      - Each name must correspond to the full name of the C(systemd) unit.
     type: list
     elements: str
     default: []
