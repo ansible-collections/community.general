@@ -17,15 +17,15 @@ description:
   - It runs C(systemctl list-units) (or processes selected units) and collects properties
     for each unit using C(systemctl show).
   - Even if a unit has a V(loadstate) of V(not-found) or V(masked), it is returned,
-    but only with the minimal properties (name, loadstate, activestate, substate).
+    but only with the minimal properties (V(name), V(loadstate), V(activestate), V(substate)).
   - When O(unitname) and O(extra_properties) are used, the module first checks if the unit exists,
-    then check if properties exist. If not, module fail.
+    then check if properties exist. If not, the module fails.
 version_added: "10.4.0"
 options:
   unitname:
     description:
       - List of unit names to process.
-      - It supports .service, .target, .socket, and .mount units type.
+      - It supports C(.service), C(.target), C(.socket), and C(.mount) units type.
       - Each name must correspond to the full name of the C(systemd) unit.
     type: list
     elements: str
@@ -33,6 +33,7 @@ options:
   extra_properties:
     description:
       - Additional properties to retrieve (appended to the default ones).
+      - Note that all property names are converted to lower-case.
     type: list
     elements: str
     default: []
@@ -59,7 +60,7 @@ EXAMPLES = r'''
       - sshd-keygen.target
       - -.mount
     extra_properties:
-        - Description
+      - Description
     register: results
 '''
 
@@ -68,6 +69,83 @@ units:
   description: Dictionary of systemd unit info keyed by unit name.
   returned: success
   type: dict
+  elements: dict
+  contains:
+    name:
+      description: Unit full name.
+      returned: always
+      type: str
+      sample: systemd-journald.service
+    loadstate:
+      description:
+        - The state of the unit's configuration load.
+        - Either V(loaded), V(not-found), V(masked).
+      returned: always
+      type: str
+      sample: loaded
+    activestate:
+      description:
+        - The current active state of the unit.
+        - Either V(active), V(inactive), V(failed).
+      returned: always
+      type: str
+      sample: active
+    substate:
+      description:
+        - The detailed sub state of the unit.
+        - Either V(running), V(dead), V(exited), V(failed), V(listening), V(active), V(mounted).
+      returned: always
+      type: str
+      sample: running
+    fragmentpath:
+      description: Path to the unit's fragment file.
+      returned: always except for C(.mount) units.
+      type: str
+      sample: /usr/lib/systemd/system/systemd-journald.service
+    unitfilepreset:
+      description:
+        - The preset configuration state for the unit file.
+        - Either V(enabled), V(disabled).
+      returned: always except for C(.mount) units.
+      type: str
+      sample: disabled
+    unitfilestate:
+      description:
+        - The actual configuration state for the unit file.
+        - Either V(enabled), V(disabled).
+      returned: always except for C(.mount) units.
+      type: str
+      sample: enabled
+    mainpid:
+      description: PID of the main process of the unit.
+      returned: only for C(.service) units.
+      type: str
+      sample: 798
+    execmainpid:
+      description: PID of the ExecStart process of the unit.
+      returned: only for C(.service) units.
+      type: str
+      sample: 799
+    options:
+      description: The mount options.
+      returned: only for C(.mount) units.
+      type: str
+      sample: rw,relatime,noquota
+    type:
+      description: The filesystem type of the mounted device.
+      returned: only for C(.mount) units.
+      type: str
+      sample: ext4
+    what:
+      description: The device that is mounted.
+      returned: only for C(.mount) units.
+      type: str
+      sample: /dev/sda1
+    where:
+      description: The mount point where the device is mounted.
+      returned: only for C(.mount) units.
+      type: str
+      sample: /
   sample: {
     "-.mount": {
         "activestate": "active",
@@ -135,10 +213,7 @@ def parse_show_output(output):
 
 
 def get_unit_properties(module, systemctl_bin, unit, prop_list):
-    if unit.startswith("-"):
-        cmd = [systemctl_bin, "show", "-p", ",".join(prop_list), "--", unit]
-    else:
-        cmd = [systemctl_bin, "show", unit, "-p", ",".join(prop_list)]
+    cmd = [systemctl_bin, "show", "-p", ",".join(prop_list), "--", unit]
     output = run_command(module, cmd)
     return parse_show_output(output)
 
@@ -165,19 +240,13 @@ def extract_unit_properties(unit_data, prop_list):
 
 
 def unit_exists(module, systemctl_bin, unit):
-    if unit.startswith("-"):
-        cmd = [systemctl_bin, "show", "-p", "LoadState", "--", unit]
-    else:
-        cmd = [systemctl_bin, "show", unit, "-p", "LoadState"]
+    cmd = [systemctl_bin, "show", "-p", "LoadState", "--", unit]
     rc, stdout, stderr = module.run_command(cmd)
     return (rc == 0)
 
 
 def validate_unit_and_properties(module, systemctl_bin, unit, extra_properties):
-    if unit.startswith("-"):
-        cmd = [systemctl_bin, "show", "-p", "LoadState", "--", unit]
-    else:
-        cmd = [systemctl_bin, "show", unit, "-p", "LoadState"]
+    cmd = [systemctl_bin, "show", "-p", "LoadState", "--", unit]
 
     output = run_command(module, cmd)
     if "loadstate=not-found" in output.lower():
