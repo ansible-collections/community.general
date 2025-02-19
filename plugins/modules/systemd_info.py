@@ -26,6 +26,7 @@ options:
     description:
       - List of unit names to process.
       - It supports .service, .target, .socket, and .mount units type.
+      - Each name must correspond to the full name of the systemd unit.
     type: list
     elements: str
     default: []
@@ -38,7 +39,6 @@ options:
 author:
   - Marco Noce (@NomakCooper)
 extends_documentation_fragment:
-  - community.general.systemd.documentation
   - community.general.attributes
   - community.general.attributes.info_module
 '''
@@ -119,7 +119,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def run_command(module, cmd):
-    rc, stdout, stderr = module.run_command(cmd, use_unsafe_shell=True, check_rc=True)
+    rc, stdout, stderr = module.run_command(cmd, check_rc=True)
     return stdout.strip()
 
 
@@ -169,7 +169,7 @@ def unit_exists(module, systemctl_bin, unit):
         cmd = [systemctl_bin, "show", "-p", "LoadState", "--", unit]
     else:
         cmd = [systemctl_bin, "show", unit, "-p", "LoadState"]
-    rc, stdout, stderr = module.run_command(cmd, use_unsafe_shell=True)
+    rc, stdout, stderr = module.run_command(cmd)
     return (rc == 0)
 
 
