@@ -70,6 +70,7 @@ DOCUMENTATION = '''
                 - If set to V(false) use Host name labels instead of UUID's.
             type: boolean
             default: true
+            version_added: 10.4.0.
 '''
 
 
