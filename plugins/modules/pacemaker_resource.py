@@ -110,12 +110,12 @@ EXAMPLES = '''
   tasks:
   - name: Create virtual-ip resource
     community.general.pacemaker_resource:
-      state: create
+      state: present
       name: virtual-ip
       resource_type:
         resource_name: IPaddr2
       resource_option:
-        - "ip=[192.168.1.2]"
+        - "ip=[192.168.999.5]"
       resource_argument:
         argument_action: group
         argument_option:
