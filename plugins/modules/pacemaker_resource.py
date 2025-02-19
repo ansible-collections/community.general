@@ -172,9 +172,6 @@ class PacemakerResource(StateModuleHelper):
 
     def __init_module__(self):
         self.runner = pacemaker_runner(self.module, cli_action='resource')
-        self.does_not = "Error: resource or tag id '{0}' not found".format(
-            self.vars.name)
-        self.error_messages = ["Error: '{0}' already exists".format(self.vars.name), "Error: Resource '{0} does not exist".format(self.vars.name)]
         self.vars.set('previous_value', self._get())
         self.vars.set('_value', self.vars.previous_value, output=False, change=True)
         self.vars.set_meta('value', initial_value=self.vars.previous_value)
