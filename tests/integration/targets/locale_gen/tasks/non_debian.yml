@@ -6,7 +6,7 @@
 - name: "Non dnf RedHat systemd are not supported"
   ansible.builtin.meta: "end_play"
   when:
-    - "ansible_pkg_mgr == 'yum'"
+    - ansible_pkg_mgr == 'yum'
 
 - name: "Prepare locale packages"
   block:
