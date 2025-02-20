@@ -63,14 +63,12 @@ DOCUMENTATION = '''
                 - If set to V(false) use VM name labels instead of UUID's.
             type: boolean
             default: true
-            version_added: 10.4.0
         use_host_uuid:
             description:
                 - Import Xen Hosts to inventory using their UUID as the Host entry name.
                 - If set to V(false) use Host name labels instead of UUID's.
             type: boolean
             default: true
-            version_added: 10.4.0.
 '''
 
 
@@ -213,6 +211,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     def _add_vms(self, vms, hosts, pools):
         vm_name_list = []
+        if not hasattr(self, 'vm_entry_name_type'):
+            self.vm_entry_name_type = 'uuid'
         for uuid, vm in vms.items():
             if self.vm_entry_name_type == 'name_label':
                 if vm['name_label'] not in vm_name_list:
@@ -220,7 +220,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     vm_name_list.append(vm['name_label'])
                 else:
                     vm_duplicate_count = vm_name_list.count(vm['name_label'])
-                    entry_name = f"{vm['name_label']}_{vm_duplicate_count}"
+                    entry_name = vm['name_label'] + "_" + str(vm_duplicate_count)
                     vm_name_list.append(vm['name_label'])
             else:
                 entry_name = uuid
@@ -273,6 +273,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     def _add_hosts(self, hosts, pools):
         host_name_list = []
+        if not hasattr(self, 'host_entry_name_type'):
+            self.host_entry_name_type = 'uuid'
         for host in hosts.values():
             if self.host_entry_name_type == 'name_label':
                 if host['name_label'] not in host_name_list:
@@ -280,7 +282,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     host_name_list.append(host['name_label'])
                 else:
                     host_duplicate_count = host_name_list.count(host['name_label'])
-                    entry_name = f"{host['name_label']}_{host_duplicate_count}"
+                    entry_name = host['name_label'] + "_" + str(host_duplicate_count)
                     host_name_list.append(host['name_label'])
             else:
                 entry_name = host['uuid']
