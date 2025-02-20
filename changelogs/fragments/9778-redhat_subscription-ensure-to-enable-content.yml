@@ -1,0 +1,7 @@
+bugfixes:
+  - |
+    redhat_subscription - use the "enable_content" option (when available) when
+    registering using D-Bus, to ensure that subscription-manager enables the
+    content on registration; this is particular important on EL 10+ and Fedora
+    41+
+    (https://github.com/ansible-collections/community.general/pull/9778).
