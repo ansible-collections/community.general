@@ -163,33 +163,38 @@ def parse_error(string):
 
 
 def install_plugin(module, plugin_bin, plugin_name, version, src, url, proxy_host, proxy_port, timeout, force):
-    cmd_args = [plugin_bin, PACKAGE_STATE_MAP["present"]]
+    cmd = [plugin_bin, PACKAGE_STATE_MAP["present"]]
     is_old_command = (os.path.basename(plugin_bin) == 'plugin')
 
     # Timeout and version are only valid for plugin, not elasticsearch-plugin
     if is_old_command:
         if timeout:
-            cmd_args.append("--timeout %s" % timeout)
+            cmd.append("--timeout")
+            cmd.append(timeout)
 
         if version:
             plugin_name = plugin_name + '/' + version
-            cmd_args[2] = plugin_name
+            cmd[2] = plugin_name
 
     if proxy_host and proxy_port:
-        cmd_args.append("-DproxyHost=%s -DproxyPort=%s" % (proxy_host, proxy_port))
+        java_opts = ["-Dhttp.proxyHost=%s" % proxy_host,
+                     "-Dhttp.proxyPort=%s" % proxy_port,
+                     "-Dhttps.proxyHost=%s" % proxy_host,
+                     "-Dhttps.proxyPort=%s" % proxy_port]
+        module.run_command_environ_update = dict(CLI_JAVA_OPTS=" ".join(java_opts),  # Elasticsearch 8.x
+                                                 ES_JAVA_OPTS=" ".join(java_opts))  # Older Elasticsearch versions
 
     # Legacy ES 1.x
     if url:
-        cmd_args.append("--url %s" % url)
+        cmd.append("--url")
+        cmd.append(url)
 
     if force:
-        cmd_args.append("--batch")
+        cmd.append("--batch")
     if src:
-        cmd_args.append(src)
+        cmd.append(src)
     else:
-        cmd_args.append(plugin_name)
-
-    cmd = " ".join(cmd_args)
+        cmd.append(plugin_name)
 
     if module.check_mode:
         rc, out, err = 0, "check mode", ""
@@ -204,9 +209,7 @@ def install_plugin(module, plugin_bin, plugin_name, version, src, url, proxy_hos
 
 
 def remove_plugin(module, plugin_bin, plugin_name):
-    cmd_args = [plugin_bin, PACKAGE_STATE_MAP["absent"], parse_plugin_repo(plugin_name)]
-
-    cmd = " ".join(cmd_args)
+    cmd = [plugin_bin, PACKAGE_STATE_MAP["absent"], parse_plugin_repo(plugin_name)]
 
     if module.check_mode:
         rc, out, err = 0, "check mode", ""
