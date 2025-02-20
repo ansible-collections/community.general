@@ -58,11 +58,15 @@ DOCUMENTATION = '''
             type: boolean
             default: true
         use_vm_uuid:
-            description: Import Xen VMs to inventory using their UUID as the VM entry name (If set to false use VM name labels instead of UUID)
+            description:
+                - Import Xen VMs to inventory using their UUID as the VM entry name.
+                - If set to V(false) use VM name labels instead of UUID's.
             type: boolean
             default: true
         use_host_uuid:
-            description: Import Xen Hosts to inventory using their UUID as the Host entry name (If set to false use Host name labels instead of UUID)
+            description:
+                - Import Xen Hosts to inventory using their UUID as the Host entry name.
+                - If set to V(false) use Host name labels instead of UUID's.
             type: boolean
             default: true
 '''
@@ -80,8 +84,8 @@ groups:
     kube_nodes: "'kube_node' in tags"
 compose:
     ansible_port: 2222
-use_vm_uuid: False
-use_host_uuid: True
+use_vm_uuid: false
+use_host_uuid: true
 
 '''
 
@@ -206,9 +210,18 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self._set_composite_vars(self.get_option('compose'), variables, name, strict=strict)
 
     def _add_vms(self, vms, hosts, pools):
+        vm_name_list = []
+        if not hasattr(self, 'vm_entry_name_type'):
+            self.vm_entry_name_type = 'uuid'
         for uuid, vm in vms.items():
             if self.vm_entry_name_type == 'name_label':
-                entry_name = vm['name_label']
+                if vm['name_label'] not in vm_name_list:
+                    entry_name = vm['name_label']
+                    vm_name_list.append(vm['name_label'])
+                else:
+                    vm_duplicate_count = vm_name_list.count(vm['name_label'])
+                    entry_name = vm['name_label'] + "_" + str(vm_duplicate_count)
+                    vm_name_list.append(vm['name_label'])
             else:
                 entry_name = uuid
             group = 'with_ip'
@@ -259,12 +272,21 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             self._apply_constructable(entry_name, self.inventory.get_host(entry_name).get_vars())
 
     def _add_hosts(self, hosts, pools):
+        host_name_list = []
+        if not hasattr(self, 'host_entry_name_type'):
+            self.host_entry_name_type = 'uuid'
         for host in hosts.values():
-            entry_name = host['uuid']
             if self.host_entry_name_type == 'name_label':
-                entry_name = host['name_label']
+                if host['name_label'] not in host_name_list:
+                    entry_name = host['name_label']
+                    host_name_list.append(host['name_label'])
+                else:
+                    host_duplicate_count = host_name_list.count(host['name_label'])
+                    entry_name = host['name_label'] + "_" + str(host_duplicate_count)
+                    host_name_list.append(host['name_label'])
             else:
                 entry_name = host['uuid']
+
             group_name = f"xo_host_{clean_group_name(host['name_label'])}"
             pool_name = self._pool_group_name_for_uuid(pools, host['$poolId'])
 
@@ -353,13 +375,13 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self.validate_certs = self.get_option('validate_certs')
         if not self.get_option('use_ssl'):
             self.protocol = 'ws'
-        
+
         self.vm_entry_name_type = 'uuid'
-        if not self.get_option('use_vm_uuids'):
+        if not self.get_option('use_vm_uuid'):
             self.vm_entry_name_type = 'name_label'
 
         self.host_entry_name_type = 'uuid'
-        if not self.get_option('use_host_uuids'):
+        if not self.get_option('use_host_uuid'):
             self.host_entry_name_type = 'name_label'
 
         objects = self._get_objects()
