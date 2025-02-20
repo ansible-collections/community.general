@@ -19,7 +19,7 @@
   loop_control:
     loop_var: locale_basic
   when:
-    - "ansible_distribution in ('Ubuntu', 'Debian')"
+    - ansible_os_family == 'Debian'
 
 - name: Run tests auto-detecting mechanism [Archlinux, RedHat]
   ansible.builtin.include_tasks:
