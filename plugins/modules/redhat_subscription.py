@@ -543,6 +543,45 @@ class Rhsm(object):
              (distro_version[0] == 9 and distro_version[1] >= 2) or
              distro_version[0] > 9)):
             dbus_force_option_works = True
+        # We need to use the 'enable_content' D-Bus option to ensure that
+        # content is enabled; sadly the option is available depending on the
+        # version of the distro, and also depending on which API/method is used
+        # for registration.
+        dbus_has_enable_content_option = False
+        if activationkey:
+            def supports_enable_content_for_activation_keys():
+                # subscription-manager in Fedora >= 41 has the new option.
+                if distro_id == 'fedora' and distro_version[0] >= 41:
+                    return True
+                # Assume EL distros here.
+                if distro_version[0] >= 10:
+                    return True
+                return False
+            dbus_has_enable_content_option = supports_enable_content_for_activation_keys()
+        else:
+            def supports_enable_content_for_credentials():
+                # subscription-manager in any supported Fedora version
+                # has the new option.
+                if distro_id == 'fedora':
+                    return True
+                # Check for RHEL 8 >= 8.6, or RHEL >= 9.
+                if distro_id == 'rhel' and \
+                   ((distro_version[0] == 8 and distro_version[1] >= 6) or
+                       distro_version[0] >= 9):
+                    return True
+                # CentOS: similar checks as for RHEL, with one extra bit:
+                # if the 2nd part of the version is empty, it means it is
+                # CentOS Stream, and thus we can assume it has the latest
+                # version of subscription-manager.
+                if distro_id == 'centos' and \
+                   ((distro_version[0] == 8 and
+                       (distro_version[1] >= 6 or distro_version_parts[1] == '')) or
+                       distro_version[0] >= 9):
+                    return True
+                # Unknown or old distro: assume it does not support
+                # the new option.
+                return False
+            dbus_has_enable_content_option = supports_enable_content_for_credentials()
 
         if force_register and not dbus_force_option_works and was_registered:
             self.unregister()
@@ -615,6 +654,8 @@ class Rhsm(object):
             register_opts[environment_key] = environment
         if force_register and dbus_force_option_works and was_registered:
             register_opts['force'] = True
+        if dbus_has_enable_content_option:
+            register_opts['enable_content'] = "1"
         # Wrap it as proper D-Bus dict
         register_opts = dbus.Dictionary(register_opts, signature='sv', variant_level=1)
 
