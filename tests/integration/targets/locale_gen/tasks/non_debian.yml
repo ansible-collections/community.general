@@ -16,7 +16,6 @@
           - "glibc-langpack-pl"
           - "glibc-langpack-en"
         state: "present"
-        update_cache: "yes"
       when:
         - "ansible_os_family == 'RedHat'"
     - name: "Install locale packages for Archlinux"
