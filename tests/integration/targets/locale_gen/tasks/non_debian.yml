@@ -8,24 +8,16 @@
   when:
     - ansible_pkg_mgr == 'yum'
 
-- name: "Prepare locale packages"
-  block:
-    - name: "Install locale packages for RedHat"
-      ansible.builtin.dnf:
-        name:
-          - "glibc-langpack-pl"
-          - "glibc-langpack-en"
-        state: "present"
-      when:
-        - "ansible_os_family == 'RedHat'"
-    - name: "Install locale packages for Archlinux"
-      community.general.pacman:
-        name: "glibc-locales"
-        state: "present"
-      when:
-        - "ansible_os_family == 'Archlinux'"
+- name: "Install locale packages for RedHat"
+  ansible.builtin.dnf:
+    name:
+      - "glibc-langpack-pl"
+      - "glibc-langpack-en"
+    state: "present"
+  when:
+    - "ansible_os_family == 'RedHat'"
 
-- name: "Prepare locale.gen file for RedHat or Archlinux"
+- name: "Prepare locale.gen file for RedHat"
   ansible.builtin.template:
     src: "locale_gen.j2"
     dest: "/etc/locale.gen"
@@ -33,6 +25,8 @@
     group: "root"
     mode: "0644"
     force: true
+  when:
+    - "ansible_os_family == 'RedHat'"
 
 - name: "Check for locale that pack are not installed"
   locale_gen:
