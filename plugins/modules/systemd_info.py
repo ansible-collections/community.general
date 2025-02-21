@@ -16,7 +16,7 @@ description:
   - This module gathers info about systemd units (services, targets, sockets, mount).
   - It runs C(systemctl list-units) (or processes selected units) and collects properties
     for each unit using C(systemctl show).
-  - Even if a unit has a RV(units[].loadstate) of V(not-found) or V(masked), it is returned,
+  - Even if a unit has a RV(units.loadstate) of V(not-found) or V(masked), it is returned,
     but only with the minimal properties (RV(units.name), RV(units.loadstate), RV(units.activestate), RV(units.substate)).
   - When O(unitname) and O(extra_properties) are used, the module first checks if the unit exists,
     then check if properties exist. If not, the module fails.
