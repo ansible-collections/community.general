@@ -33,7 +33,7 @@
     owner: "root"
     group: "root"
     mode: "0644"
-    force: "yes"
+    force: true
 
 - name: "Check for locale that pack are not installed"
   locale_gen:
