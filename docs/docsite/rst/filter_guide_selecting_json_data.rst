@@ -124,7 +124,7 @@ To get a hash map with all ports and names of a cluster:
         var: item
       loop: "{{ domain_definition | community.general.json_query(server_name_cluster1_query) }}"
       vars:
-        server_name_cluster1_query: "domain.server[?cluster=='cluster2'].{name: name, port: port}"
+        server_name_cluster1_query: "domain.server[?cluster=='cluster1'].{name: name, port: port}"
 
 To extract ports from all clusters with name starting with 'server1':
 
