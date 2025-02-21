@@ -16,8 +16,8 @@ description:
   - This module gathers info about systemd units (services, targets, sockets, mount).
   - It runs C(systemctl list-units) (or processes selected units) and collects properties
     for each unit using C(systemctl show).
-  - Even if a unit has a V(loadstate) of V(not-found) or V(masked), it is returned,
-    but only with the minimal properties (V(name), V(loadstate), V(activestate), V(substate)).
+  - Even if a unit has a RV(units[].loadstate) of V(not-found) or V(masked), it is returned,
+    but only with the minimal properties (RV(units[].name), RV(units[].loadstate), RV(units[].activestate), RV(units[].substate)).
   - When O(unitname) and O(extra_properties) are used, the module first checks if the unit exists,
     then check if properties exist. If not, the module fails.
 version_added: "10.4.0"
@@ -66,7 +66,9 @@ EXAMPLES = r'''
 
 RETURN = r'''
 units:
-  description: Dictionary of systemd unit info keyed by unit name.
+  description:
+    - Dictionary of systemd unit info keyed by unit name.
+    - Additional fields will be returned depending on the value of O(extra_properties).
   returned: success
   type: dict
   elements: dict
@@ -79,21 +81,21 @@ units:
     loadstate:
       description:
         - The state of the unit's configuration load.
-        - Either V(loaded), V(not-found), V(masked).
+        - The most common values are V(loaded), V(not-found), V(masked), but other values are possible as well.
       returned: always
       type: str
       sample: loaded
     activestate:
       description:
         - The current active state of the unit.
-        - Either V(active), V(inactive), V(failed).
+        - The most common values are V(active), V(inactive), V(failed), but other values are possible as well.
       returned: always
       type: str
       sample: active
     substate:
       description:
         - The detailed sub state of the unit.
-        - Either V(running), V(dead), V(exited), V(failed), V(listening), V(active), V(mounted).
+        - The most common values are V(running), V(dead), V(exited), V(failed), V(listening), V(active), V(mounted), but other values are possible as well.
       returned: always
       type: str
       sample: running
@@ -105,14 +107,14 @@ units:
     unitfilepreset:
       description:
         - The preset configuration state for the unit file.
-        - Either V(enabled), V(disabled).
+        - The most common values are V(enabled), V(disabled), V(static), but other values are possible as well.
       returned: always except for C(.mount) units.
       type: str
       sample: disabled
     unitfilestate:
       description:
         - The actual configuration state for the unit file.
-        - Either V(enabled), V(disabled).
+        - The most common values are V(enabled), V(disabled), V(static), but other values are possible as well.
       returned: always except for C(.mount) units.
       type: str
       sample: enabled
