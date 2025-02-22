@@ -139,6 +139,13 @@ options:
       - Sets the C(DynamicForward) option.
     type: str
     version_added: 10.1.0
+  other_options:
+    description:
+      - Provides the option to specify arbitrary SSH config entry options via a dictionary.
+      - The key names must be lower case. Keys with upper case values are rejected.
+      - The values must be strings. Other values are rejected.
+    type: dict
+    version_added: 10.4.0
 requirements:
   - paramiko
 """
@@ -152,6 +159,8 @@ EXAMPLES = r"""
     identity_file: "/home/akasurde/.ssh/id_rsa"
     port: '2223'
     state: present
+    other_options:
+      serveraliveinterval: '30'
 
 - name: Delete a host from the configuration
   community.general.ssh_config:
@@ -204,6 +213,7 @@ from copy import deepcopy
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.six import string_types
 from ansible_collections.community.general.plugins.module_utils._stormssh import ConfigParser, HAS_PARAMIKO, PARAMIKO_IMPORT_ERROR
 from ansible_collections.community.general.plugins.module_utils.ssh import determine_config_file
 
@@ -274,6 +284,17 @@ class SSHConfig(object):
             controlpersist=fix_bool_str(self.params.get('controlpersist')),
             dynamicforward=self.params.get('dynamicforward'),
         )
+        if self.params.get('other_options'):
+            for key, value in self.params.get('other_options').items():
+                if key.lower() != key:
+                    self.module.fail_json(msg="The other_options key {key!r} must be lower case".format(key=key))
+                if key not in args:
+                    if not isinstance(value, string_types):
+                        self.module.fail_json(msg="The other_options value provided for key {key!r} must be a string, got {type}".format(key=key,
+                                                                                                                                         type=type(value)))
+                    args[key] = value
+                else:
+                    self.module.fail_json(msg="Multiple values provided for key {key!r}".format(key=key))
 
         config_changed = False
         hosts_changed = []
@@ -361,6 +382,7 @@ def main():
             host_key_algorithms=dict(type='str', no_log=False),
             identity_file=dict(type='path'),
             identities_only=dict(type='bool'),
+            other_options=dict(type='dict'),
             port=dict(type='str'),
             proxycommand=dict(type='str', default=None),
             proxyjump=dict(type='str', default=None),
