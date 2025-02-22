@@ -22,6 +22,8 @@
     controlpath: "~/.ssh/sockets/%r@%h-%p"
     controlpersist: yes
     dynamicforward: '10080'
+    other_options:
+      serveraliveinterval: '30'
     state: present
   register: options_add
   check_mode: true
@@ -57,6 +59,8 @@
     controlpath: "~/.ssh/sockets/%r@%h-%p"
     controlpersist: yes
     dynamicforward: '10080'
+    other_options:
+      serveraliveinterval: '30'
     state: present
   register: options_add
 
@@ -81,6 +85,8 @@
     controlpath: "~/.ssh/sockets/%r@%h-%p"
     controlpersist: yes
     dynamicforward: '10080'
+    other_options:
+      serveraliveinterval: '30'
     state: present
   register: options_add_again
 
@@ -109,6 +115,7 @@
       - "'controlpath ~/.ssh/sockets/%r@%h-%p' in slurp_ssh_config['content'] | b64decode"
       - "'controlpersist yes' in slurp_ssh_config['content'] | b64decode"
       - "'dynamicforward 10080' in slurp_ssh_config['content'] | b64decode"
+      - "'serveraliveinterval 30' in slurp_ssh_config['content'] | b64decode"
 
 - name: Options - Update host
   community.general.ssh_config:
@@ -123,6 +130,8 @@
     controlpath: "~/.ssh/new-sockets/%r@%h-%p"
     controlpersist: "600"
     dynamicforward: '11080'
+    other_options:
+      serveraliveinterval: '30'
     state: present
   register: options_update
 
@@ -149,6 +158,8 @@
     controlpath: "~/.ssh/new-sockets/%r@%h-%p"
     controlpersist: "600"
     dynamicforward: '11080'
+    other_options:
+      serveraliveinterval: '30'
     state: present
   register: options_update
 
@@ -178,6 +189,7 @@
       - "'controlpath ~/.ssh/new-sockets/%r@%h-%p' in slurp_ssh_config['content'] | b64decode"
       - "'controlpersist 600' in slurp_ssh_config['content'] | b64decode"
       - "'dynamicforward 11080' in slurp_ssh_config['content'] | b64decode"
+      - "'serveraliveinterval 30' in slurp_ssh_config['content'] | b64decode"
 
 - name: Options - Ensure no update in case option exist in ssh_config file but wasn't defined in playbook
   community.general.ssh_config:
@@ -212,6 +224,7 @@
       - "'controlpath ~/.ssh/new-sockets/%r@%h-%p' in slurp_ssh_config['content'] | b64decode"
       - "'controlpersist 600' in slurp_ssh_config['content'] | b64decode"
       - "'dynamicforward 11080' in slurp_ssh_config['content'] | b64decode"
+      - "'serveraliveinterval 30' in slurp_ssh_config['content'] | b64decode"
 
 - name: Debug
   debug:
@@ -264,6 +277,7 @@
       - "'controlpath ~/.ssh/sockets/%r@%h-%p' not in slurp_ssh_config['content'] | b64decode"
       - "'controlpersist yes' not in slurp_ssh_config['content'] | b64decode"
       - "'dynamicforward 10080' not in slurp_ssh_config['content'] | b64decode"
+      - "'serveraliveinterval 30' not in slurp_ssh_config['content'] | b64decode"
 
 # Proxycommand and ProxyJump are mutually exclusive.
 # Reset ssh_config before testing options with proxyjump
@@ -286,6 +300,8 @@
     controlpath: "~/.ssh/sockets/%r@%h-%p"
     controlpersist: yes
     dynamicforward: '10080'
+    other_options:
+      serveraliveinterval: '30'
     state: present
   register: options_add
   check_mode: true
@@ -321,6 +337,8 @@
     controlpath: "~/.ssh/sockets/%r@%h-%p"
     controlpersist: yes
     dynamicforward: '10080'
+    other_options:
+      serveraliveinterval: '30'
     state: present
   register: options_add
 
@@ -345,6 +363,8 @@
     controlpath: "~/.ssh/sockets/%r@%h-%p"
     controlpersist: yes
     dynamicforward: '10080'
+    other_options:
+      serveraliveinterval: '30'
     state: present
   register: options_add_again
 
@@ -373,6 +393,7 @@
       - "'controlpath ~/.ssh/sockets/%r@%h-%p' in slurp_ssh_config['content'] | b64decode"
       - "'controlpersist yes' in slurp_ssh_config['content'] | b64decode"
       - "'dynamicforward 10080' in slurp_ssh_config['content'] | b64decode"
+      - "'serveraliveinterval 30' in slurp_ssh_config['content'] | b64decode"
 
 - name: Options - Update host
   community.general.ssh_config:
@@ -387,6 +408,8 @@
     controlpath: "~/.ssh/new-sockets/%r@%h-%p"
     controlpersist: "600"
     dynamicforward: '11080'
+    other_options:
+      serveraliveinterval: '30'
     state: present
   register: options_update
 
@@ -413,6 +436,8 @@
     controlpath: "~/.ssh/new-sockets/%r@%h-%p"
     controlpersist: "600"
     dynamicforward: '11080'
+    other_options:
+      serveraliveinterval: '30'
     state: present
   register: options_update
 
@@ -442,6 +467,7 @@
       - "'controlpath ~/.ssh/new-sockets/%r@%h-%p' in slurp_ssh_config['content'] | b64decode"
       - "'controlpersist 600' in slurp_ssh_config['content'] | b64decode"
       - "'dynamicforward 11080' in slurp_ssh_config['content'] | b64decode"
+      - "'serveraliveinterval 30' in slurp_ssh_config['content'] | b64decode"
 
 - name: Options - Ensure no update in case option exist in ssh_config file but wasn't defined in playbook
   community.general.ssh_config:
@@ -476,6 +502,7 @@
       - "'controlpath ~/.ssh/new-sockets/%r@%h-%p' in slurp_ssh_config['content'] | b64decode"
       - "'controlpersist 600' in slurp_ssh_config['content'] | b64decode"
       - "'dynamicforward 11080' in slurp_ssh_config['content'] | b64decode"
+      - "'serveraliveinterval 30' in slurp_ssh_config['content'] | b64decode"
 
 - name: Debug
   debug:
@@ -528,3 +555,4 @@
       - "'controlpath ~/.ssh/sockets/%r@%h-%p' not in slurp_ssh_config['content'] | b64decode"
       - "'controlpersist yes' not in slurp_ssh_config['content'] | b64decode"
       - "'dynamicforward 10080' not in slurp_ssh_config['content'] | b64decode"
+      - "'serveraliveinterval 30' not in slurp_ssh_config['content'] | b64decode"
