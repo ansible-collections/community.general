@@ -1,0 +1,2 @@
+minor_changes:
+  - ssh_config - add ``other_options`` option (https://github.com/ansible-collections/community.general/issues/8053, https://github.com/ansible-collections/community.general/pull/9684).
