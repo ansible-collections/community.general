@@ -70,6 +70,7 @@ mechanism:
   choices:
     - glibc
     - ubuntu_legacy
+    - other_glibc
   returned: success
   sample: glibc
   version_added: 10.2.0
@@ -123,11 +124,18 @@ class LocaleGen(StateModuleHelper):
                 available=SUPPORTED_LOCALES,
                 apply_change=self.apply_change_glibc,
             ),
+            other_glibc=dict(
+                available=ETC_LOCALE_GEN,
+                apply_change=self.apply_change_glibc,
+            ),
         )
 
-        if os.path.exists(ETC_LOCALE_GEN):
+        if os.path.exists(ETC_LOCALE_GEN) and os.path.exists(SUPPORTED_LOCALES):
             self.vars.ubuntu_mode = False
             self.vars.mechanism = "glibc"
+        elif os.path.exists(ETC_LOCALE_GEN):
+            self.vars.ubuntu_mode = False
+            self.vars.mechanism = "other_glibc"
         elif os.path.exists(VAR_LIB_LOCALES):
             self.vars.ubuntu_mode = True
             self.vars.mechanism = "ubuntu_legacy"
