@@ -81,21 +81,21 @@ units:
     loadstate:
       description:
         - The state of the unit's configuration load.
-        - The most common values are V(loaded), V(not-found), V(masked), but other values are possible as well.
+        - The most common values are V(loaded), V(not-found), and V(masked), but other values are possible as well.
       returned: always
       type: str
       sample: loaded
     activestate:
       description:
         - The current active state of the unit.
-        - The most common values are V(active), V(inactive), V(failed), but other values are possible as well.
+        - The most common values are V(active), V(inactive), and V(failed), but other values are possible as well.
       returned: always
       type: str
       sample: active
     substate:
       description:
         - The detailed sub state of the unit.
-        - The most common values are V(running), V(dead), V(exited), V(failed), V(listening), V(active), V(mounted), but other values are possible as well.
+        - The most common values are V(running), V(dead), V(exited), V(failed), V(listening), V(active), and V(mounted), but other values are possible as well.
       returned: always
       type: str
       sample: running
@@ -107,14 +107,14 @@ units:
     unitfilepreset:
       description:
         - The preset configuration state for the unit file.
-        - The most common values are V(enabled), V(disabled), V(static), but other values are possible as well.
+        - The most common values are V(enabled), V(disabled), and V(static), but other values are possible as well.
       returned: always except for C(.mount) units.
       type: str
       sample: disabled
     unitfilestate:
       description:
         - The actual configuration state for the unit file.
-        - The most common values are V(enabled), V(disabled), V(static), but other values are possible as well.
+        - The most common values are V(enabled), V(disabled), and V(static), but other values are possible as well.
       returned: always except for C(.mount) units.
       type: str
       sample: enabled
@@ -272,15 +272,9 @@ def main():
         supports_check_mode=True
     )
 
-    try:
-        systemctl_bin = module.get_bin_path('systemctl', required=True)
-    except Exception as e:
-        module.fail_json(msg="systemctl binary not found: {0}".format(str(e)))
+    systemctl_bin = module.get_bin_path('systemctl', required=True)
 
-    try:
-        run_command(module, [systemctl_bin, '--version'])
-    except Exception as e:
-        module.fail_json(msg="Failed to run systemctl: {0}".format(str(e)))
+    run_command(module, [systemctl_bin, '--version'])
 
     base_properties = {
         'service': ['FragmentPath', 'UnitFileState', 'UnitFilePreset', 'MainPID', 'ExecMainPID'],
