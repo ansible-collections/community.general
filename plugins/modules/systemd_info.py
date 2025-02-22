@@ -272,7 +272,11 @@ def main():
         supports_check_mode=True
     )
 
-    systemctl_bin = module.get_bin_path('systemctl', required=True)
+    try:
+        systemctl_bin = module.get_bin_path('systemctl', required=True)
+    except Exception as e:
+        module.fail_json(msg="systemctl binary not found: {0}".format(str(e)))
+
     try:
         run_command(module, [systemctl_bin, '--version'])
     except Exception as e:
@@ -325,7 +329,7 @@ def main():
                 continue
 
             props = base_properties.get(category, [])
-            full_props = list(set(props + state_props))
+            full_props = set(props + state_props)
             unit_data = get_unit_properties(module, systemctl_bin, unit_name, full_props)
 
             fact.update(extract_unit_properties(unit_data, full_props))
@@ -343,7 +347,7 @@ def main():
                 module.fail_json(msg="Could not determine the category for unit '{0}'.".format(unit))
 
             props = base_properties.get(category, [])
-            full_props = list(set(props + state_props + extra_properties))
+            full_props = set(props + state_props + extra_properties)
             unit_data = get_unit_properties(module, systemctl_bin, unit, full_props)
             fact = {"name": unit}
             minimal_keys = ["LoadState", "ActiveState", "SubState"]
