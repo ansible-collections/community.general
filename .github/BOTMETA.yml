@@ -1364,6 +1364,8 @@ files:
     maintainers: konstruktoid
   $modules/systemd_creds_encrypt.py:
     maintainers: konstruktoid
+  $modules/systemd_info.py:
+    maintainers: NomakCooper
   $modules/sysupgrade.py:
     maintainers: precurse
   $modules/taiga_issue.py:
