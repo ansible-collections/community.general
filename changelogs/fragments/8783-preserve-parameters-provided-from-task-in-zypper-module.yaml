@@ -1,0 +1,2 @@
+bugfixes:
+  - zypper-module - only read attributes ``enabled``, ``disable_gpg_check`` and ``autorefresh`` from local repo files, if the parameters were not already provided by the task parameters (https://github.com/ansible-collections/community.general/pull/9108).
