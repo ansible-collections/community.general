@@ -211,8 +211,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     def _add_vms(self, vms, hosts, pools):
         vm_name_list = []
-        if not hasattr(self, 'vm_entry_name_type'):
-            self.vm_entry_name_type = 'uuid'
         for uuid, vm in vms.items():
             if self.vm_entry_name_type == 'name_label':
                 if vm['name_label'] not in vm_name_list:
@@ -273,8 +271,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     def _add_hosts(self, hosts, pools):
         host_name_list = []
-        if not hasattr(self, 'host_entry_name_type'):
-            self.host_entry_name_type = 'uuid'
         for host in hosts.values():
             if self.host_entry_name_type == 'name_label':
                 if host['name_label'] not in host_name_list:
