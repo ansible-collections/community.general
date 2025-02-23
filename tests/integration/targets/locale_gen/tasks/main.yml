@@ -10,7 +10,7 @@
 
 - name: Bail out if not supported
   ansible.builtin.meta: end_play
-  when: ansible_distribution not in ('Ubuntu', 'Debian')
+  when: ansible_distribution not in ('Ubuntu', 'Debian', 'Archlinux')
 
 - name: Run tests auto-detecting mechanism
   ansible.builtin.include_tasks: basic.yml
