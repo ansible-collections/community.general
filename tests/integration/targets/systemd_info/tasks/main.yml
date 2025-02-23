@@ -22,4 +22,5 @@
     ansible_distribution == 'Fedora' or 
     (ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('15.04', '>=')) or 
     (ansible_distribution == 'Debian' and ansible_distribution_version is version('8', '>=')) or 
-    ansible_os_family == 'Suse'
+    ansible_os_family == 'Suse' or
+    ansible_distribution == 'Archlinux'

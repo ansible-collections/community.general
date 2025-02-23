@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Gather all units from shell
-  ansible.builtin.shell: systemctl list-units --no-pager --type service,target,socket,mount --all --plain --no-legend
+  ansible.builtin.command: systemctl list-units --no-pager --type service,target,socket,mount --all --plain --no-legend
   register: all_units
 
 - name: Assert command run successfully
@@ -38,7 +38,7 @@
     label: "{{ item[0] }}"
 
 - name: Gather systemd-journald.service properties from shell
-  ansible.builtin.shell: systemctl show systemd-journald.service -p Id,LoadState,ActiveState,SubState,FragmentPath,MainPID,ExecMainPID,UnitFileState,UnitFilePreset,Description,Restart
+  ansible.builtin.command: systemctl show systemd-journald.service -p Id,LoadState,ActiveState,SubState,FragmentPath,MainPID,ExecMainPID,UnitFileState,UnitFilePreset,Description,Restart
   register: journald_prop
 
 - name: Assert command run successfully
