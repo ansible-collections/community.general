@@ -793,15 +793,24 @@ def sanitize_cr(clientrep):
 
 def get_clientscope_id(kc, clientscope_name, realm):
     """Retrieves the id of a clientscope from its name
-    
+
     :param kc: the keycloak module instance
     :param clientscope_name: the name of the clientscope
-    :return: 
+    :return:
     """
     found_clientscope = kc.get_clientscope_by_name(clientscope_name, realm=realm)
     if not found_clientscope:
         raise Exception("The provided clientscope name was not found")
     return found_clientscope["id"]
+
+
+def nonify_absences(before, desired):
+    for k, v in before.items():
+        if k not in desired.keys():
+            desired[k] = None
+        elif isinstance(v, dict):
+            nonify_absences(v, desired[k])
+
 
 def main():
     """
@@ -936,7 +945,7 @@ def main():
             cid = before_client["id"]
     else:
         before_client = kc.get_client_by_id(cid, realm=realm)
-        
+
     if before_client is None:
         before_client = {}
     # Build a proposed changeset from parameters given to this module
@@ -1033,7 +1042,7 @@ def main():
                 before_norm = normalise_cr(before_client, remove_ids=True)
                 desired_client["attributes"] = dict((k,v) for k,v in desired_client["attributes"].items() if v is not None)
                 desired_norm = normalise_cr(desired_client, remove_ids=True)
-                
+
                 if module._diff:
                     result["diff"] = dict(
                         before=sanitize_cr(before_norm), after=sanitize_cr(desired_norm)
@@ -1042,9 +1051,12 @@ def main():
 
                 module.exit_json(**result)
 
+            # Necessary to clear values (e.g. themes)
+            nonify_absences(before_client, desired_client)
+
             # do the update
             kc.update_client(cid, desired_client, realm=realm)
-            
+
             # Handle clientscopes: unfortunately, they require other API calls
             for opt in ["optional", "default"]:
                 before_scopes = before_client.get("{}ClientScopes".format(opt))
@@ -1058,7 +1070,7 @@ def main():
                     else:
                         for scope in before_scopes:
                             kc.delete_clientscope_from_client(cid, get_clientscope_id(kc, scope, realm=realm), opt, realm=realm)
-                        
+
             after_client = kc.get_client_by_id(cid, realm=realm)
             if before_client == after_client:
                 result["changed"] = False
