@@ -1,2 +1,0 @@
-bugfixes:
-  - xml - ensure file descriptor is closed (https://github.com/ansible-collections/community.general/pull/9695).
