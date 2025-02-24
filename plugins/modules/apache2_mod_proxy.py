@@ -388,7 +388,7 @@ class ApacheModProxy(ModuleHelper):
     def __init_module__(self):
         deps.validate(self.module)
 
-        if len(self.vars.state) > 1 and ("present" in self.vars.state or "enabled" in self.vars.state):
+        if len(self.vars.state or []) > 1 and ("present" in self.vars.state or "enabled" in self.vars.state):
             self.do_raise(msg="states present/enabled are mutually exclusive with other states!")
 
         self.mybalancer = Balancer(self.module, self.vars.balancer_vhost, self.vars.balancer_url_suffix, tls=self.vars.tls)
@@ -400,7 +400,7 @@ class ApacheModProxy(ModuleHelper):
             member_exists = False
             member_status = {'disabled': False, 'drained': False, 'hot_standby': False, 'ignore_errors': False}
             for mode in member_status:
-                for state in self.vars.state:
+                for state in self.vars.state or []:
                     if mode == state:
                         member_status[mode] = True
                     elif mode == 'disabled' and state == 'absent':
