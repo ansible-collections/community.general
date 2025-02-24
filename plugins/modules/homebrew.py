@@ -399,7 +399,7 @@ class Homebrew(object):
             name = package_detail["name"]
             full_name = package_detail["full_name"]
 
-        tapped_name = package_detail["tap"] + "/" + name 
+        tapped_name = package_detail["tap"] + "/" + name
         aliases = package_detail.get("aliases", [])
 
         package_names = set([name, full_name, tapped_name] + aliases)
