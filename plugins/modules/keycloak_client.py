@@ -713,6 +713,7 @@ end_state:
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
     KeycloakAPI,
     camel,
+    nonify_absences,
     keycloak_argument_spec,
     get_token,
     KeycloakError,
@@ -802,14 +803,6 @@ def get_clientscope_id(kc, clientscope_name, realm):
     if not found_clientscope:
         raise Exception("The provided clientscope name was not found")
     return found_clientscope["id"]
-
-
-def nonify_absences(before, desired):
-    for k, v in before.items():
-        if k not in desired.keys():
-            desired[k] = None
-        elif isinstance(v, dict):
-            nonify_absences(v, desired[k])
 
 
 def main():

@@ -126,6 +126,14 @@ def camel(words):
     return words.split('_')[0] + ''.join(x.capitalize() or '_' for x in words.split('_')[1:])
 
 
+def nonify_absences(before, desired):
+    for k, v in before.items():
+        if k not in desired.keys():
+            desired[k] = None
+        elif isinstance(v, dict):
+            nonify_absences(v, desired[k])
+
+
 class KeycloakError(Exception):
     pass
 
