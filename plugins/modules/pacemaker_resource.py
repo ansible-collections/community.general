@@ -14,7 +14,7 @@ module: pacemaker_resource
 short_description: Manage pacemaker resources
 author:
   - Dexter Le (@munchtoast)
-version_added: 10.4.0
+version_added: 10.5.0
 description:
   - This module can manage resources in a Pacemaker cluster using the pacemaker CLI.
 extends_documentation_fragment:
@@ -139,9 +139,9 @@ from ansible_collections.community.general.plugins.module_utils.pacemaker import
 
 
 class PacemakerResource(StateModuleHelper):
-    change_params = ('name', )
-    diff_params = ('name', )
-    output_params = ('status')
+    change_params = ('value', )
+    diff_params = ('value', )
+    output_params = ('status', 'value')
     module = dict(
         argument_spec=dict(
             state=dict(type='str', default='present', choices=[
@@ -173,59 +173,54 @@ class PacemakerResource(StateModuleHelper):
     def __init_module__(self):
         self.runner = pacemaker_runner(self.module, cli_action='resource')
         self.vars.set('previous_value', self._get())
-        self.vars.set('_value', self.vars.previous_value, output=False, change=True)
-        self.vars.set_meta('value', initial_value=self.vars.previous_value)
+        self.vars.set('value', self.vars.previous_value, change=True, diff=True)
 
     def _process_command_output(self, fail_on_err, ignore_err_msg=""):
         def process(rc, out, err):
             if fail_on_err and rc != 0 and err and ignore_err_msg not in err:
                 self.do_raise('pcs failed with error (rc={0}): {1}'.format(rc, err))
             out = out.rstrip()
-            self.vars.value = None if out == "" else out
-            return self.vars.value
+            return None if out == "" else out
         return process
 
     def _get(self):
-        return self.runner('state name', output_process=self._process_command_output(False)).run(state='status')
+        with self.runner('state name', output_process=self._process_command_output(False)) as ctx:
+            return ctx.run(state='status')
 
     def state_absent(self):
         with self.runner('state name', output_process=self._process_command_output(True, "does not exist"), check_mode_skip=True) as ctx:
-            ctx.run()
+            self.vars.value = ctx.run()
+            self.vars.set('value', self._get())
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err
             self.vars.cmd = ctx.cmd
-        self.vars.set('new_value', None, fact=True)
-        self.vars._value = None
 
     def state_present(self):
         with self.runner(
                 'state name resource_type resource_option resource_operation resource_meta resource_argument wait',
                 output_process=self._process_command_output(True, "already exists"),
                 check_mode_skip=True) as ctx:
-            ctx.run()
-        self.vars.stdout = ctx.results_out
-        self.vars.stderr = ctx.results_err
-        self.vars.cmd = ctx.cmd
-        self.vars.set('new_value', self._get(), fact=True)
-        self.vars._value = self.vars.new_value
+            self.vars.value = ctx.run()
+            self.vars.set('value', self._get())
+            self.vars.stdout = ctx.results_out
+            self.vars.stderr = ctx.results_err
+            self.vars.cmd = ctx.cmd
 
     def state_enabled(self):
-        with self.runner('state name', output_process=self._process_command_output(True, "not found"), check_mode_skip=True) as ctx:
-            ctx.run()
+        with self.runner('state name', output_process=self._process_command_output(True, "Starting"), check_mode_skip=True) as ctx:
+            self.vars.value = ctx.run()
+            self.vars.set('value', self._get())
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err
             self.vars.cmd = ctx.cmd
-        self.vars.set('new_value', self._get(), fact=True)
-        self.vars._value = self.vars.new_value
 
     def state_disabled(self):
-        with self.runner('state name', output_process=self._process_command_output(True, "not found"), check_mode_skip=True) as ctx:
-            ctx.run()
+        with self.runner('state name', output_process=self._process_command_output(True, "Stopped"), check_mode_skip=True) as ctx:
+            self.vars.value = ctx.run()
+            self.vars.set('value', self._get())
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err
             self.vars.cmd = ctx.cmd
-        self.vars.set('new_value', self._get(), fact=True)
-        self.vars._value = self.vars.new_value
 
 
 def main():
