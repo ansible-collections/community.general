@@ -208,10 +208,9 @@ import re
 from ansible_collections.community.general.plugins.module_utils import deps
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper, ModuleHelperException
 
-from ansible.module_utils.six import raise_from
 from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.urls import fetch_url
-from ansible.module_utils.six import PY2
+from ansible.module_utils.six import raise_from, PY2
 
 if PY2:
     with deps.declare("BeautifulSoup"):
@@ -415,7 +414,7 @@ class ApacheModProxy(ModuleHelper):
                             member_status_after = member.status = member_status
                         else:
                             member_status_after = member_status
-                        self.changed = (member_status_before != member_status_after)
+                        self.changed |= (member_status_before != member_status_after)
                     self.vars.member = member.as_dict()
 
             if not member_exists:
