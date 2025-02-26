@@ -1,0 +1,2 @@
+minor_changes:
+  - apache2_mod_proxy - code simplification, no change in functionality (https://github.com/ansible-collections/community.general/pull/9457).
