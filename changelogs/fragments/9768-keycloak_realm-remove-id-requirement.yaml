@@ -1,0 +1,2 @@
+minor_changes:
+  - keycloak_realm - remove ID requirement when creating a realm to allow Keycloak generating its own realm ID (https://github.com/ansible-collections/community.general/pull/9768).
