@@ -378,6 +378,8 @@ files:
   $module_utils/oracle/oci_utils.py:
     labels: cloud
     maintainers: $team_oracle
+  $module_utils/pacemaker.py:
+    maintainers: munchtoast
   $module_utils/pipx.py:
     labels: pipx
     maintainers: russoz
@@ -1054,6 +1056,8 @@ files:
     maintainers: fraff
   $modules/pacemaker_cluster.py:
     maintainers: matbu
+  $modules/pacemaker_resource.py:
+    maintainers: munchtoast
   $modules/packet_:
     maintainers: nurfet-becirevic t0mk
   $modules/packet_device.py:
