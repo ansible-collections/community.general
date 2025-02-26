@@ -10,4 +10,41 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
+import operator
+from functools import wraps
+
 from ansible.module_utils.compat.version import LooseVersion  # noqa: F401, pylint: disable=unused-import
+
+
+def _version_compare(op):
+    @wraps(op)
+    def _op(a, b):
+        return op(LooseVersion(a), LooseVersion(b))
+    return _op
+
+
+version_ops = {
+    '<=': _version_compare(operator.le),
+    '>=': _version_compare(operator.ge),
+    '<': _version_compare(operator.lt),
+    '>': _version_compare(operator.gt),
+    '==': _version_compare(operator.eq),
+    '!=': _version_compare(operator.ne),
+}
+
+
+def find_op(name):
+    if name is None:
+        return None, None, None
+    for op in version_ops:
+        if op in name:
+            n, v = name.split(op)
+            return n, op, v
+    return None, None, None
+
+
+def name_version_assert(name, existing_version):
+    name_, op, op_version = find_op(name)
+    if not op:
+        return True
+    return version_ops[op](existing_version, op_version)

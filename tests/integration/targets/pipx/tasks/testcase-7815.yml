@@ -1,0 +1,63 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+##############################################################################
+- name: 7815-install application tox 3.24.0
+  community.general.pipx:
+    name: tox==3.24.0
+  register: install7815_tox_324
+
+- name: 7815-reinstall tox 3.24.0
+  community.general.pipx:
+    name: tox
+    state: reinstall
+  register: reinstall7815_tox_324
+
+- name: 7815-reinstall without name
+  community.general.pipx:
+    state: reinstall
+  register: reinstall7815_noname
+  ignore_errors: true
+
+- name: 7815-upgrade tox from 3.24.0
+  community.general.pipx:
+    name: tox
+    state: upgrade
+  register: upgrade7815_tox_324
+
+- name: 7815-upgrade without name
+  community.general.pipx:
+    state: upgrade
+  register: upgrade7815_noname
+  ignore_errors: true
+
+- name: 7815-downgrade tox 3.24.0
+  community.general.pipx:
+    name: tox<3.24.1
+    force: true
+  register: downgrade7815_tox_324
+
+- name: 7815-cleanup tox 3.24.0
+  community.general.pipx:
+    state: absent
+    name: tox
+  register: uninstall7815_tox_324
+
+- name: 7815-check assertions tox 3.24.0
+  assert:
+    that:
+      - install7815_tox_324 is changed
+      - "'tox' in install7815_tox_324.application"
+      - install7815_tox_324.application.tox.version == '3.24.0'
+      - reinstall7815_tox_324 is changed
+      - reinstall7815_tox_324.application.tox.version == '3.24.0'
+      - upgrade7815_tox_324 is changed
+      - upgrade7815_tox_324.application.tox.version != '3.24.0'
+      - downgrade7815_tox_324 is changed
+      - downgrade7815_tox_324.application.tox.version == '3.24.0'
+      - uninstall7815_tox_324 is changed
+      - "'tox' not in uninstall7815_tox_324.application"
+      - upgrade7815_noname is failed
+      - reinstall7815_noname is failed

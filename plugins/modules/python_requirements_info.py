@@ -121,25 +121,17 @@ not_found:
 
 import re
 import sys
-import operator
 
-HAS_DISTUTILS = False
+HAS_PKG_RESOURCES = False
 try:
     import pkg_resources
-    from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
-    HAS_DISTUTILS = True
+    HAS_PKG_RESOURCES = True
 except ImportError:
     pass
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.version import version_ops
 
-operations = {
-    '<=': operator.le,
-    '>=': operator.ge,
-    '<': operator.lt,
-    '>': operator.gt,
-    '==': operator.eq,
-}
 
 python_version_info = dict(
     major=sys.version_info[0],
@@ -157,9 +149,9 @@ def main():
         ),
         supports_check_mode=True,
     )
-    if not HAS_DISTUTILS:
+    if not HAS_PKG_RESOURCES:
         module.fail_json(
-            msg='Could not import "distutils" and "pkg_resources" libraries to introspect python environment.',
+            msg='Could not import "pkg_resources" library to introspect python environment.',
             python=sys.executable,
             python_version=sys.version,
             python_version_info=python_version_info,
@@ -178,8 +170,8 @@ def main():
         if not match:
             module.fail_json(msg="Failed to parse version requirement '{0}'. Must be formatted like 'ansible>2.6'".format(dep))
         pkg, op, version = match.groups()
-        if op is not None and op not in operations:
-            module.fail_json(msg="Failed to parse version requirement '{0}'. Operator must be one of >, <, <=, >=, or ==".format(dep))
+        if op is not None and op not in version_ops:
+            module.fail_json(msg="Failed to parse version requirement '{0}'. Operator must be one of: {1}".format(dep, ", ".join(version_ops)))
         try:
             existing = pkg_resources.get_distribution(pkg).version
         except pkg_resources.DistributionNotFound:
@@ -191,7 +183,7 @@ def main():
                 'installed': existing,
                 'desired': None,
             }
-        elif operations[op](LooseVersion(existing), LooseVersion(version)):
+        elif version_ops[op](existing, version):
             results['valid'][pkg] = {
                 'installed': existing,
                 'desired': dep,

@@ -270,3 +270,6 @@
 
     - name: Include testcase for issue 9619 latest --global
       ansible.builtin.include_tasks: testcase-9619-latest-global.yml
+
+- name: Include testcase for issue 1578
+  ansible.builtin.include_tasks: testcase-7815.yml

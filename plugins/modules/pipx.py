@@ -56,19 +56,21 @@ options:
     description:
       - The name of the application. In C(pipx) documentation it is also referred to as the name of the virtual environment
         where the application will be installed.
-      - If O(name) is a simple package name without version specifiers, then that name is used as the Python package name
+      - If O(name) is a simple package name with or without version specifiers, then that name is used as the Python package name
         to be installed.
-      - Use O(source) for passing package specifications or installing from URLs or directories.
+      - To install from URLs, directories, or archives, you must use this option to specify the package name and O(source) to specify its source.
+      - If you use a version specifier with O(name), then O(source) is ignored.
   source:
     type: str
     description:
+      - Use O(source) when installing a Python package from a local path, a VCS URL or compressed file.
       - Source for the package. This option is used when O(state=install) or O(state=latest), and it is ignored with other
         states.
-      - Use O(source) when installing a Python package with version specifier, or from a local path, from a VCS URL or compressed
-        file.
       - The value of this option is passed as-is to C(pipx).
       - O(name) is still required when using O(source) to establish the application name without fetching the package from
         a remote source.
+      - When using O(source) the execution is B(not idempotent), because determining the version of the package from the
+        source is almost as costly as installing it, so the module B(always) attempts the installation when using this option.
   install_apps:
     description:
       - Add apps from the injected packages.
@@ -200,13 +202,16 @@ version:
 """
 
 
+from ansible.module_utils.facts.compat import ansible_facts
+
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
 from ansible_collections.community.general.plugins.module_utils.pipx import pipx_runner, pipx_common_argspec, make_process_list
-
-from ansible.module_utils.facts.compat import ansible_facts
+from ansible_collections.community.general.plugins.module_utils.version import find_op, name_version_assert
 
 
 def _make_name(name, suffix):
+    if name is None:
+        return None
     return name if suffix is None else "{0}{1}".format(name, suffix)
 
 
@@ -258,12 +263,20 @@ class PipX(StateModuleHelper):
     use_old_vardict = False
 
     def _retrieve_installed(self):
-        name = _make_name(self.vars.name, self.vars.suffix)
+        name_op, op, version_op = find_op(self.vars.name)
+        if op:
+            name = _make_name(name_op, self.vars.suffix)
+        else:
+            name = _make_name(self.vars.name, self.vars.suffix)
         output_process = make_process_list(self, include_injected=True, name=name)
         installed = self.runner('_list global', output_process=output_process).run()
 
         if name is not None:
-            app_list = [app for app in installed if app['name'] == name]
+            app_list = [
+                app
+                for app in installed
+                if app['name'] == name and name_version_assert(self.vars.name, app['version'])
+            ]
             if app_list:
                 return {name: app_list[0]}
             else:
