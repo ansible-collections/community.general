@@ -8,6 +8,12 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+- name: Make sure setuptools is installed
+  pip:
+    name: setuptools
+    state: present
+  when: ansible_facts.distribution == 'MacOSX' and ansible_distribution_version is version('15', '>=')
+
 - name: run python_requirements_info module
   python_requirements_info:
   register: basic_info
