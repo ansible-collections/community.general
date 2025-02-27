@@ -456,6 +456,8 @@ class KeycloakAPI(object):
             self.module.fail_json(msg='Could not obtain realm %s: %s' % (realm, str(e)),
                                   exception=traceback.format_exc())
 
+    # The Keycloak API expects the realm name (like `master`) not the ID when fetching the realm data.
+    # See the Keycloak API docs: https://www.keycloak.org/docs-api/latest/rest-api/#_realms_admin
     def get_realm_by_id(self, realm='master'):
         """ Obtain realm representation by id
 

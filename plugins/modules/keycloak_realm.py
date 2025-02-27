@@ -528,8 +528,7 @@ EXAMPLES = r"""
     auth_realm: master
     auth_username: USERNAME
     auth_password: PASSWORD
-    id: realm
-    realm: realm
+    realm: unique_realm_name
     state: present
 
 - name: Delete a Keycloak realm
@@ -539,7 +538,7 @@ EXAMPLES = r"""
     auth_realm: master
     auth_username: USERNAME
     auth_password: PASSWORD
-    id: test
+    realm: unique_realm_name
     state: absent
 """
 
@@ -554,7 +553,7 @@ proposed:
   description: Representation of proposed realm.
   returned: always
   type: dict
-  sample: {id: "test"}
+  sample: {realm: "test"}
 
 existing:
   description: Representation of existing realm (sample is truncated).
@@ -767,9 +766,6 @@ def main():
         # Process a creation
         result['changed'] = True
 
-        if 'id' not in desired_realm:
-            module.fail_json(msg='id needs to be specified when creating a new realm')
-
         if module._diff:
             result['diff'] = dict(before='', after=sanitize_cr(desired_realm))
 
@@ -778,11 +774,11 @@ def main():
 
         # create it
         kc.create_realm(desired_realm)
-        after_realm = kc.get_realm_by_id(desired_realm['id'])
+        after_realm = kc.get_realm_by_id(desired_realm['realm'])
 
         result['end_state'] = sanitize_cr(after_realm)
 
-        result['msg'] = 'Realm %s has been created.' % desired_realm['id']
+        result['msg'] = 'Realm %s has been created.' % desired_realm['realm']
         module.exit_json(**result)
 
     else:
@@ -816,7 +812,7 @@ def main():
                 result['diff'] = dict(before=before_realm_sanitized,
                                       after=sanitize_cr(after_realm))
 
-            result['msg'] = 'Realm %s has been updated.' % desired_realm['id']
+            result['msg'] = 'Realm %s has been updated.' % desired_realm['realm']
             module.exit_json(**result)
 
         else:
@@ -835,7 +831,7 @@ def main():
             result['proposed'] = {}
             result['end_state'] = {}
 
-            result['msg'] = 'Realm %s has been deleted.' % before_realm['id']
+            result['msg'] = 'Realm %s has been deleted.' % before_realm['realm']
 
     module.exit_json(**result)
 
