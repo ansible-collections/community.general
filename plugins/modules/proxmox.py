@@ -1655,7 +1655,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
             proxmox_node = self.proxmox_api.nodes(node_name)
         except Exception as e:
             self.module.fail_json(msg="Unable to retrieve node information: %s" % e)
-        return getattr(proxmox_node, self.VZ_TYPE)(vmid).status.current.get()
+        return getattr(proxmox_node, self.VZ_TYPE)(vmid).status.current.get()['status']
 
     def format_vm_identifier(self, vmid, hostname):
         if vmid and hostname:
