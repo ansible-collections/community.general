@@ -5,7 +5,7 @@
 
 DOCUMENTATION:
   name: to_hours
-  short_description: Converte a duration string to hours
+  short_description: Converts a duration string to hours
   version_added: 0.2.0
   description:
     - Parse a human readable time duration string and convert to hours.
