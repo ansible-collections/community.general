@@ -5,7 +5,7 @@
 
 DOCUMENTATION:
   name: to_years
-  short_description: Converte a duration string to years
+  short_description: Converts a duration string to years
   version_added: 0.2.0
   description:
     - Parse a human readable time duration string and convert to years.
