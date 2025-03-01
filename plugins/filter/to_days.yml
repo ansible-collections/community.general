@@ -5,7 +5,7 @@
 
 DOCUMENTATION:
   name: to_days
-  short_description: Converte a duration string to days
+  short_description: Converts a duration string to days
   version_added: 0.2.0
   description:
     - Parse a human readable time duration string and convert to days.
