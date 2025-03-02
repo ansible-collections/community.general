@@ -20,13 +20,15 @@ description:
     but only with the minimal properties (RV(units.name), RV(units.loadstate), RV(units.activestate), RV(units.substate)).
   - When O(unitname) and O(extra_properties) are used, the module first checks if the unit exists,
     then check if properties exist. If not, the module fails.
+  - When O(unitname) is used with wildcard expressions, the module checks for units that match the indicated expressions,
+    if units are not present for all the indicated expressions, the module fails.
 version_added: "10.4.0"
 options:
   unitname:
     description:
       - List of unit names to process.
       - It supports C(.service), C(.target), C(.socket), and C(.mount) units type.
-      - Each name must correspond to the full name of the C(systemd) unit.
+      - Each name must correspond to the full name of the C(systemd) unit or to a wildcard expression like C(ssh*), C(*.service).
     type: list
     elements: str
     default: []
@@ -62,6 +64,13 @@ EXAMPLES = r'''
     extra_properties:
       - Description
     register: results
+
+# Gather info using wildcards/expression
+- name: Gather info of units that start with 'systemd-'
+  community.general.systemd_info:
+    unitname:
+      - 'systemd-*'
+  register: results
 '''
 
 RETURN = r'''
@@ -195,6 +204,7 @@ units:
   }
 '''
 
+import fnmatch
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -235,30 +245,7 @@ def determine_category(unit):
 
 def extract_unit_properties(unit_data, prop_list):
     lowerprop = [x.lower() for x in prop_list]
-    extracted = {
-        prop: unit_data[prop] for prop in lowerprop if prop in unit_data
-    }
-    return extracted
-
-
-def unit_exists(module, systemctl_bin, unit):
-    cmd = [systemctl_bin, "show", "-p", "LoadState", "--", unit]
-    rc, stdout, stderr = module.run_command(cmd)
-    return (rc == 0)
-
-
-def validate_unit_and_properties(module, systemctl_bin, unit, extra_properties):
-    cmd = [systemctl_bin, "show", "-p", "LoadState", "--", unit]
-
-    output = run_command(module, cmd)
-    if "loadstate=not-found" in output.lower():
-        module.fail_json(msg="Unit '{0}' does not exist or is inaccessible.".format(unit))
-
-    if extra_properties:
-        unit_data = get_unit_properties(module, systemctl_bin, unit, extra_properties)
-        missing_props = [prop for prop in extra_properties if prop.lower() not in unit_data]
-        if missing_props:
-            module.fail_json(msg="The following properties do not exist for unit '{0}': {1}".format(unit, ", ".join(missing_props)))
+    return {prop: unit_data[prop] for prop in lowerprop if prop in unit_data}
 
 
 def main():
@@ -273,7 +260,6 @@ def main():
     )
 
     systemctl_bin = module.get_bin_path('systemctl', required=True)
-
     run_command(module, [systemctl_bin, '--version'])
 
     base_properties = {
@@ -283,37 +269,39 @@ def main():
         'mount': ['Where', 'What', 'Options', 'Type']
     }
     state_props = ['LoadState', 'ActiveState', 'SubState']
-
     results = {}
 
+    list_cmd = [
+        systemctl_bin, "list-units",
+        "--no-pager",
+        "--type", "service,target,socket,mount",
+        "--all",
+        "--plain",
+        "--no-legend"
+    ]
+    list_output = run_command(module, list_cmd)
+    units_info = {}
+    for line in list_output.splitlines():
+        tokens = line.split()
+        if len(tokens) < 4:
+            continue
+        unit_name = tokens[0]
+        loadstate = tokens[1]
+        activestate = tokens[2]
+        substate = tokens[3]
+        units_info[unit_name] = {
+            "name": unit_name,
+            "loadstate": loadstate,
+            "activestate": activestate,
+            "substate": substate
+        }
+
+    property_cache = {}
+
     if not module.params['unitname']:
-        list_cmd = [
-            systemctl_bin, "list-units",
-            "--no-pager",
-            "--type", "service,target,socket,mount",
-            "--all",
-            "--plain",
-            "--no-legend"
-        ]
-        list_output = run_command(module, list_cmd)
-        for line in list_output.splitlines():
-            tokens = line.split()
-            if len(tokens) < 4:
-                continue
 
-            unit_name = tokens[0]
-            loadstate = tokens[1]
-            activestate = tokens[2]
-            substate = tokens[3]
-
-            fact = {
-                "name": unit_name,
-                "loadstate": loadstate,
-                "activestate": activestate,
-                "substate": substate
-            }
-
-            if loadstate in ("not-found", "masked"):
+        for unit_name, fact in units_info.items():
+            if fact["loadstate"].lower() in ("not-found", "masked"):
                 results[unit_name] = fact
                 continue
 
@@ -325,33 +313,54 @@ def main():
             props = base_properties.get(category, [])
             full_props = set(props + state_props)
             unit_data = get_unit_properties(module, systemctl_bin, unit_name, full_props)
-
             fact.update(extract_unit_properties(unit_data, full_props))
             results[unit_name] = fact
 
     else:
         selected_units = module.params['unitname']
         extra_properties = module.params['extra_properties']
+        resolved_units = {}
 
-        for unit in selected_units:
-            validate_unit_and_properties(module, systemctl_bin, unit, extra_properties)
-            category = determine_category(unit)
+        all_units = list(units_info.keys())
 
-            if not category:
-                module.fail_json(msg="Could not determine the category for unit '{0}'.".format(unit))
+        non_matching_patterns = []
+        for pattern in selected_units:
+            matches = [unit for unit in all_units if fnmatch.fnmatch(unit, pattern)]
+            if not matches:
+                non_matching_patterns.append(pattern)
+            else:
+                for match in matches:
+                    resolved_units[match] = True
 
-            props = base_properties.get(category, [])
-            full_props = set(props + state_props + extra_properties)
-            unit_data = get_unit_properties(module, systemctl_bin, unit, full_props)
-            fact = {"name": unit}
-            minimal_keys = ["LoadState", "ActiveState", "SubState"]
+        if not resolved_units:
+            module.fail_json(msg="No units match any of the provided patterns: {}".format(
+                ", ".join(non_matching_patterns)))
 
-            fact.update(extract_unit_properties(unit_data, minimal_keys))
-
-            ls = unit_data.get("loadstate", "").lower()
-            if ls not in ("not-found", "masked"):
-                fact.update(extract_unit_properties(unit_data, full_props))
-
+        for unit in sorted(resolved_units.keys()):
+            if units_info.get(unit, {}).get("loadstate", "").lower() in ("not-found", "masked"):
+                fact = units_info.get(unit, {"name": unit, "loadstate": "not-found"})
+            else:
+                category = determine_category(unit)
+                if not category:
+                    module.fail_json(msg="Could not determine the category for unit '{0}'.".format(unit))
+                props = base_properties.get(category, [])
+                full_props = set(props + state_props + extra_properties)
+                if unit not in property_cache:
+                    unit_data = get_unit_properties(module, systemctl_bin, unit, full_props)
+                    property_cache[unit] = unit_data
+                else:
+                    unit_data = property_cache[unit]
+                if extra_properties:
+                    missing_props = [prop for prop in extra_properties if prop.lower() not in unit_data]
+                    if missing_props:
+                        module.fail_json(msg="The following properties do not exist for unit '{0}': {1}".format(
+                            unit, ", ".join(missing_props)))
+                fact = {"name": unit}
+                minimal_keys = ["LoadState", "ActiveState", "SubState"]
+                fact.update(extract_unit_properties(unit_data, minimal_keys))
+                ls = unit_data.get("loadstate", "").lower()
+                if ls not in ("not-found", "masked"):
+                    fact.update(extract_unit_properties(unit_data, full_props))
             results[unit] = fact
 
     module.exit_json(changed=False, units=results)
