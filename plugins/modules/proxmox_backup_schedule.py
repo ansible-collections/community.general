@@ -150,7 +150,7 @@ class ProxmoxSetVMBackupAnsible(ProxmoxAnsible):
         if isinstance(bk_id_info, list):
             bk_id_info = bk_id_info[0]  # Access the first item in the list
         vms_id = bk_id_info['vmid'].split(',')
-        if vm_id not in vms_id:
+        if str(vm_id) not in vms_id:
             bk_id_vmids = bk_id_info['vmid'] + ',' + str(vm_id)
             self.set_vmid_backup(backup_id, bk_id_vmids)
             return True
@@ -164,9 +164,9 @@ class ProxmoxSetVMBackupAnsible(ProxmoxAnsible):
             if isinstance(bk_id_info, list):
                 bk_id_info = bk_id_info[0]  # Access the first item in the list
             vmids = bk_id_info['vmid'].split(',')
-            if vm_id in vmids:
+            if str(vm_id) in vmids:
                 if len(vmids) > 1:
-                    vmids.remove(vm_id)
+                    vmids.remove(str(vm_id))
                     new_vmids = ','.join(map(str, vmids))
                     self.set_vmid_backup(bk_id_info['id'], new_vmids)
                     return True
@@ -178,9 +178,9 @@ class ProxmoxSetVMBackupAnsible(ProxmoxAnsible):
             backupList = self.get_cluster_bklist()
             for backupItem in backupList:
                 vmids = list(backupItem['vmid'].split(','))
-                if vm_id in vmids:
+                if str(vm_id) in vmids:
                     if len(vmids) > 1:
-                        vmids.remove(vm_id)
+                        vmids.remove(str(vm_id))
                         new_vmids = ','.join(map(str, vmids))
                         self.set_vmid_backup(backupItem['id'], new_vmids)
                         bkID_delvm.append(backupItem['id'])
