@@ -376,6 +376,14 @@ EXAMPLES = r"""
     username: "{{ username }}"
     password: "{{ password }}"
 
+- name: Get power restore policy
+  community.general.redfish_info:
+    category: Systems
+    command: GetPowerRestorePolicy
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+
 - name: Check the availability of the service with a timeout of 5 seconds
   community.general.redfish_info:
     category: Service
@@ -402,7 +410,8 @@ CATEGORY_COMMANDS_ALL = {
     "Systems": ["GetSystemInventory", "GetPsuInventory", "GetCpuInventory",
                 "GetMemoryInventory", "GetNicInventory", "GetHealthReport",
                 "GetStorageControllerInventory", "GetDiskInventory", "GetVolumeInventory",
-                "GetBiosAttributes", "GetBootOrder", "GetBootOverride", "GetVirtualMedia", "GetBiosRegistries"],
+                "GetBiosAttributes", "GetBootOrder", "GetBootOverride", "GetVirtualMedia", "GetBiosRegistries",
+                "GetPowerRestorePolicy"],
     "Chassis": ["GetFanInventory", "GetPsuInventory", "GetChassisPower",
                 "GetChassisThermals", "GetChassisInventory", "GetHealthReport", "GetHPEThermalConfig", "GetHPEFanPercentMin"],
     "Accounts": ["ListUsers", "GetAccountServiceConfig"],
@@ -544,6 +553,8 @@ def main():
                     result["virtual_media"] = rf_utils.get_multi_virtualmedia(category)
                 elif command == "GetBiosRegistries":
                     result["bios_registries"] = rf_utils.get_bios_registries()
+                elif command == "GetPowerRestorePolicy":
+                    result["power_restore_policy"] = rf_utils.get_multi_power_restore_policy()
 
         elif category == "Chassis":
             # execute only if we find Chassis resource
