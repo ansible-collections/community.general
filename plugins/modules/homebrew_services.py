@@ -72,7 +72,7 @@ EXAMPLES = r"""
 - name: Remove the foo service (equivalent to `brew services stop foo`)
   community.general.homebrew_services:
     name: foo
-    service_state: absent
+    state: absent
 """
 
 RETURN = r"""
