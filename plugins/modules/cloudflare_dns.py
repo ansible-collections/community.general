@@ -551,6 +551,9 @@ class CloudflareAPI(object):
         try:
             content = resp.read()
         except AttributeError:
+            content = None
+
+        if not content:
             if info['body']:
                 content = info['body']
             else:
