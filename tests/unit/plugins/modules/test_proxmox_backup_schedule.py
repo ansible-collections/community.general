@@ -171,7 +171,7 @@ BACKUP_JOB_SPECIFIC_BKID = {
     "vmid": "100,101"
 }
 EXPECTED_UPDATE_BACKUP_SCHEDULE = True
-EXPECTED_DEL_BACKUP_SCHEDULE = ["backup-001", "backup-002"]
+EXPECTED_DEL_BACKUP_SCHEDULE = True 
 
 
 class TestProxmoxBackupScheduleModule(ModuleTestCase):
@@ -199,7 +199,7 @@ class TestProxmoxBackupScheduleModule(ModuleTestCase):
             self.module.main()
 
         result = exc_info.value.args[0]
-        assert result["msg"] == "missing required arguments: api_host, api_user, backup_action"
+        assert result["msg"] == "missing required arguments: api_host, api_user, state"
 
     def test_update_vmid_in_backup(self):
         with pytest.raises(AnsibleExitJson) as exc_info:
@@ -209,7 +209,7 @@ class TestProxmoxBackupScheduleModule(ModuleTestCase):
                 'api_password': 'supersecret',
                 'vm_name': 'test05',
                 'backup_id': 'backup-001',
-                'backup_action': 'update_vmid'
+                'state': 'present'
             })
             self.module.main()
 
@@ -225,7 +225,7 @@ class TestProxmoxBackupScheduleModule(ModuleTestCase):
                 'api_user': 'root@pam',
                 'api_password': 'supersecret',
                 'vm_id': 101,
-                'backup_action': 'delete_vmid'
+                'state': 'absent'
             })
             self.module.main()
 
