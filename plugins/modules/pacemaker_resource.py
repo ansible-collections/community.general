@@ -108,22 +108,22 @@ EXAMPLES = '''
   hosts: localhost
   gather_facts: false
   tasks:
-  - name: Create virtual-ip resource
-    community.general.pacemaker_resource:
-      state: present
-      name: virtual-ip
-      resource_type:
-        resource_name: IPaddr2
-      resource_option:
-        - "ip=[192.168.2.1]"
-      resource_argument:
-        argument_action: group
-        argument_option:
-          - master
-      resource_operation:
-        - operation_action: monitor
-          operation_option:
-            - interval=20
+    - name: Create virtual-ip resource
+      community.general.pacemaker_resource:
+        state: present
+        name: virtual-ip
+        resource_type:
+          resource_name: IPaddr2
+        resource_option:
+          - "ip=[192.168.2.1]"
+        resource_argument:
+          argument_action: group
+          argument_option:
+            - master
+        resource_operation:
+          - operation_action: monitor
+            operation_option:
+              - interval=20
 '''
 
 RETURN = '''
@@ -139,9 +139,6 @@ from ansible_collections.community.general.plugins.module_utils.pacemaker import
 
 
 class PacemakerResource(StateModuleHelper):
-    change_params = ('value', )
-    diff_params = ('value', )
-    output_params = ('status', 'value')
     module = dict(
         argument_spec=dict(
             state=dict(type='str', default='present', choices=[
@@ -189,7 +186,7 @@ class PacemakerResource(StateModuleHelper):
 
     def state_absent(self):
         with self.runner('state name', output_process=self._process_command_output(True, "does not exist"), check_mode_skip=True) as ctx:
-            self.vars.value = ctx.run()
+            ctx.run()
             self.vars.set('value', self._get())
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err
@@ -200,7 +197,7 @@ class PacemakerResource(StateModuleHelper):
                 'state name resource_type resource_option resource_operation resource_meta resource_argument wait',
                 output_process=self._process_command_output(True, "already exists"),
                 check_mode_skip=True) as ctx:
-            self.vars.value = ctx.run()
+            ctx.run()
             self.vars.set('value', self._get())
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err
@@ -208,7 +205,7 @@ class PacemakerResource(StateModuleHelper):
 
     def state_enabled(self):
         with self.runner('state name', output_process=self._process_command_output(True, "Starting"), check_mode_skip=True) as ctx:
-            self.vars.value = ctx.run()
+            ctx.run()
             self.vars.set('value', self._get())
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err
@@ -216,7 +213,7 @@ class PacemakerResource(StateModuleHelper):
 
     def state_disabled(self):
         with self.runner('state name', output_process=self._process_command_output(True, "Stopped"), check_mode_skip=True) as ctx:
-            self.vars.value = ctx.run()
+            ctx.run()
             self.vars.set('value', self._get())
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err
