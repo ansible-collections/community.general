@@ -171,7 +171,7 @@ BACKUP_JOB_SPECIFIC_BKID = {
     "vmid": "100,101"
 }
 EXPECTED_UPDATE_BACKUP_SCHEDULE = True
-EXPECTED_DEL_BACKUP_SCHEDULE = True 
+EXPECTED_DEL_BACKUP_SCHEDULE = True
 
 
 class TestProxmoxBackupScheduleModule(ModuleTestCase):
