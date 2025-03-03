@@ -3970,3 +3970,16 @@ class RedfishUtils(object):
             'ret': True,
             'entries': response['data']
         }
+
+    def get_power_restore_policy(self, systems_uri):
+        # Retrieve System resource
+        response = self.get_request(self.root_uri + systems_uri)
+        if response['ret'] is False:
+            return response
+        return {
+            'ret': True,
+            'entries': response['data']['PowerRestorePolicy']
+        }
+
+    def get_multi_power_restore_policy(self):
+        return self.aggregate_systems(self.get_power_restore_policy)
