@@ -13,7 +13,7 @@ DOCUMENTATION = """
 ---
 module: proxmox_backup_schedule
 
-short_description: Scheduling VM backups and removing it.
+short_description: Scheduling VM backups and removing them.
 
 version_added: 10.3.0
 
@@ -37,12 +37,12 @@ options:
   backup_id:
     description: The backup job ID.
     type: str
-  backup_action:
+  state:
     description:
-        - If V(update_vmid), the module will update backup job with new VM ID.
-        - If V(delete_vmid), the module will remove the VM ID from all backup jobs where the VM ID has existed.
+        - If V(present), the module will update backup job with new VM ID.
+        - If V(absent), the module will remove the VM ID from all backup jobs where the VM ID has existed.
     required: true
-    choices: ["update_vmid", "delete_vmid"]
+    choices: ["present", "absent"]
     type: str
 
 extends_documentation_fragment:
@@ -53,47 +53,47 @@ extends_documentation_fragment:
 """
 
 EXAMPLES = """
-- name: Scheduling VM Backups based on VM name.
+- name: Scheduling VM Backups based on VM name
   proxmox_backup_schedule:
     api_user: 'myUser@pam'
     api_password: '*******'
     api_host: '192.168.20.20'
     vm_name: 'VM Name'
     backup_id: 'backup-b2adffdc-316e'
-    backup_action: 'update_vmid'
+    state: 'present'
 
-- name: Scheduling VM Backups based on VM ID.
+- name: Scheduling VM Backups based on VM ID
   proxmox_backup_schedule:
     api_user: 'myUser@pam'
     api_password: '*******'
     api_host: '192.168.20.20'
     vm_id: 'VM ID'
     backup_id: 'backup-b2adffdc-316e'
-    backup_action: 'update_vmid'
+    state: 'present'
 
-- name: Removing backup setting based on VM name.
+- name: Removing backup setting based on VM name
   proxmox_backup_schedule:
     api_user: 'myUser@pam'
     api_password: '*******'
     api_host: '192.168.20.20'
     vm_name: 'VM Name'
-    backup_action: 'delete_vmid'
+    state: 'absent'
 
-- name: Removing backup setting based on VM ID.
+- name: Removing backup setting based on VM ID
   proxmox_backup_schedule:
     api_user: 'myUser@pam'
     api_password: '*******'
     api_host: '192.168.20.20'
     vm_id: 'VM ID'
-    backup_action: 'delete_vmid'
+    state: 'absent'
 """
 
 RETURN = """
 ---
 backup_schedule:
   description:
-    - If V(update_vmid), the backup_schedule will return True after adding the VM ID to the backup job.
-    - If V(delete_vmid), the backup_schedule will return a list of backup job IDs where the VM ID has existed after removing it.
+    - If V(present), the backup_schedule will return True after adding the VM ID to the backup job.
+    - If V(absent), the backup_schedule will return a list of backup job IDs where the VM ID has existed after removing it.
   returned: always, but can be empty
   type: raw
   sample:
@@ -143,7 +143,7 @@ class ProxmoxSetVMBackupAnsible(ProxmoxAnsible):
         return (vms[0]['vmid'])
 
     # add vmid to backup job
-    def backup_update_vmid(self, vm_id, backup_id):
+    def backup_present(self, vm_id, backup_id):
         bk_id_info = self.get_cluster_specific_bkjobid(backup_id)
 
         # If bk_id_info is a list, get the first item (assuming there's only one backup job returned)
@@ -154,22 +154,42 @@ class ProxmoxSetVMBackupAnsible(ProxmoxAnsible):
             bk_id_vmids = bk_id_info['vmid'] + ',' + str(vm_id)
             self.set_vmid_backup(backup_id, bk_id_vmids)
             return True
+        else:
+            return False
 
     # delete vmid from backup job
-    def backup_delete_vmid(self, vm_id):
-        bkID_delvm = []
-        backupList = self.get_cluster_bklist()
-        for backupItem in backupList:
-            vmids = list(backupItem['vmid'].split(','))
+    def backup_absent(self, vm_id, backup_id):
+        if backup_id:
+            bk_id_info = self.get_cluster_specific_bkjobid(backup_id)
+            if isinstance(bk_id_info, list):
+                bk_id_info = bk_id_info[0]  # Access the first item in the list
+            vmids = bk_id_info['vmid'].split(',')
             if vm_id in vmids:
                 if len(vmids) > 1:
                     vmids.remove(vm_id)
                     new_vmids = ','.join(map(str, vmids))
-                    self.set_vmid_backup(backupItem['id'], new_vmids)
-                    bkID_delvm.append(backupItem['id'])
+                    self.set_vmid_backup(bk_id_info['id'], new_vmids)
+                    return True
                 else:
-                    self.module.fail_json(msg="No more than one vmid is assigned to %s. You just can remove job." % backupItem['id'])
-        return bkID_delvm
+                    self.module.fail_json(msg="No more than one vmid is assigned to %s. You just can remove job." % bk_id_info['id'])
+            return False
+        else:
+            bkID_delvm = []
+            backupList = self.get_cluster_bklist()
+            for backupItem in backupList:
+                vmids = list(backupItem['vmid'].split(','))
+                if vm_id in vmids:
+                    if len(vmids) > 1:
+                        vmids.remove(vm_id)
+                        new_vmids = ','.join(map(str, vmids))
+                        self.set_vmid_backup(backupItem['id'], new_vmids)
+                        bkID_delvm.append(backupItem['id'])
+                    else:
+                        self.module.fail_json(msg="No more than one vmid is assigned to %s. You just can remove job." % backupItem['id'])
+            if bkID_delvm:
+                return True
+            else:
+                return False
 
 
 # main function
@@ -180,7 +200,7 @@ def main():
         vm_name=dict(type='str'),
         vm_id=dict(type='str'),
         backup_id=dict(type='str'),
-        backup_action=dict(choices=['update_vmid', 'delete_vmid'], required=True)
+        state=dict(choices=['present', 'absent'], required=True)
     )
     args.update(backup_schedule_args)
 
@@ -205,20 +225,22 @@ def main():
     vm_name = module.params['vm_name']
     vm_id = module.params['vm_id']
     backup_id = module.params['backup_id']
-    backup_action = module.params['backup_action']
+    state = module.params['state']
 
     if vm_name:
         vm_id = proxmox.vmname_2_vmid(vm_name)
 
-    if backup_action == 'update_vmid':
-        result['backup_schedule'] = proxmox.backup_update_vmid(vm_id, backup_id)
+    if state == 'present':
+        result['backup_schedule'] = proxmox.backup_present(vm_id, backup_id)
 
-    if backup_action == 'delete_vmid':
-        result['backup_schedule'] = proxmox.backup_delete_vmid(vm_id)
+    if state == 'absent':
+        result['backup_schedule'] = proxmox.backup_absent(vm_id, backup_id)
 
     if result['backup_schedule']:
         result['changed'] = True
-        result['message'] = 'The backup schedule has been changed successfully'
+        result['message'] = 'The backup schedule has been changed successfully.'
+    else:
+        result['message'] = 'The backup schedule did not change anything.'
 
     module.exit_json(**result)
 
