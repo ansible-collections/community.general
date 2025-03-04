@@ -28,7 +28,7 @@ options:
     description:
       - List of unit names to process.
       - It supports C(.service), C(.target), C(.socket), and C(.mount) units type.
-      - Each name must correspond to the full name of the C(systemd) unit or to a wildcard expression like C(ssh*), C(*.service).
+      - Each name must correspond to the full name of the C(systemd) unit or to a wildcard expression like V('ssh*') and V('*.service').
     type: list
     elements: str
     default: []
