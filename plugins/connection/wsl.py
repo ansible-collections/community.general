@@ -110,6 +110,7 @@ options:
     default: ""
     description:
       - Proxy information for running the connection via a jumphost.
+      - This option is supported by paramiko version 1.9.0 or newer.
     type: string
     env:
       - name: ANSIBLE_PARAMIKO_PROXY_COMMAND
