@@ -95,3 +95,12 @@
   - assert:
       that:
         - package_result is not changed
+
+  # This crashed on 4867eb4 - Ref: issue #9777
+  - name: Install cask using homelab/cask syntax 
+    homebrew: 
+      package: "homebrew/cask/{{ package_name }}"
+      state: present
+      update_homebrew: false
+    become: true 
+    become_user: "{{ brew_stat.stat.pw_name }}"
