@@ -321,6 +321,8 @@ from ansible.utils.display import Display
 from ansible.utils.path import makedirs_safe
 from binascii import hexlify
 from subprocess import list2cmdline
+from paramiko.client import SSHClient
+from paramiko.pkey import PKey
 
 
 display = Display()
@@ -335,6 +337,14 @@ def authenticity_msg(hostname: str, ktype: str, fingerprint: str) -> str:
     return msg
 
 
+# TODO why is this here? why are we even trying to verify whether paramiko exists?
+#      if this is really required, we cannot just put SSHClient in a variable and
+#      use that as a type hint... so what should we do?
+#      1. drop ansible.module_utils.compat.paramiko (which the ansible devel branch now marks this as deprecated)
+#         see https://github.com/ansible/ansible/blob/v2.18.3/lib/ansible/module_utils/compat/paramiko.py
+#         see deprecate('The paramiko compat import is deprecated', version='2.21')
+#             at https://github.com/ansible/ansible/blob/devel/lib/ansible/module_utils/compat/paramiko.py
+#      2. drop type hints.
 MissingHostKeyPolicy: type = object
 if paramiko:
     MissingHostKeyPolicy = paramiko.MissingHostKeyPolicy
@@ -354,7 +364,7 @@ class MyAddPolicy(MissingHostKeyPolicy):
         self.connection = connection
         self._options = connection._options
 
-    def missing_host_key(self, client, hostname, key) -> None:
+    def missing_host_key(self, client: SSHClient, hostname: str, key: PKey) -> None:
 
         if all((self.connection.get_option('host_key_checking'), not self.connection.get_option('host_key_auto_add'))):
 
