@@ -385,14 +385,34 @@ class Homebrew(object):
             self.outdated_packages.add(package_name)
 
     def _extract_package_name(self, package_detail, is_cask):
-        canonical_name = package_detail["full_token"] if is_cask else package_detail["full_name"]  # For ex: 'sqlite', might contain a tap prefix.
-        name = package_detail["token"] if is_cask else package_detail["name"]  # For ex: 'sqlite'
+        # "brew info" can lookup by name, full_name, token, full_token, or aliases
+        # In addition, any name can be prefixed by the tap.
+        # Any of these can be supplied by the user as the package name.  In case
+        # of ambiguity, where a given name might match multiple packages,
+        # formulae are preferred over casks. For all other ambiguities, the
+        # results are an error.  Note that in the homebrew/core and
+        # homebrew/cask taps, there are no "other" ambiguities.
+        if is_cask:  # according to brew info
+            name = package_detail["token"]
+            full_name = package_detail["full_token"]
+        else:
+            name = package_detail["name"]
+            full_name = package_detail["full_name"]
 
-        all_valid_names = set(package_detail.get("aliases", []))  # For ex: {'sqlite3'}
-        all_valid_names.update((canonical_name, name))
+        tapped_name = package_detail["tap"] + "/" + name
+        aliases = package_detail.get("aliases", [])
+
+        package_names = set([name, full_name, tapped_name] + aliases)
+
+        # Finally, identify which of all those package names was the one supplied by the user.
+        package_names = package_names & set(self.packages)
+        if len(package_names) != 1:
+            self.failed = True
+            self.message = "Package names are missing or ambiguous: " + ", ".join(str(p) for p in package_names)
+            raise HomebrewException(self.message)
 
         # Then make sure the user provided name resurface.
-        return (all_valid_names & set(self.packages)).pop()
+        return package_names.pop()
 
     def _get_packages_info(self):
         cmd = [
