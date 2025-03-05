@@ -1,0 +1,2 @@
+bugfixes:
+  - homebrew - fix crash when package names include tap (https://github.com/ansible-collections/community.general/issues/9777, https://github.com/ansible-collections/community.general/pull/9803).
