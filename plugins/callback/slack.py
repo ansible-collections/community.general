@@ -18,6 +18,12 @@ short_description: Sends play events to a Slack channel
 description:
   - This is an ansible callback plugin that sends status updates to a Slack channel during playbook execution.
 options:
+  http_agent:
+    description:
+      - User-Agent to use in the request.
+    type: string
+    version_added: "10.5.0"
+    default: ansible-httpget
   webhook_url:
     required: true
     description: Slack Webhook URL.
@@ -106,7 +112,7 @@ class CallbackModule(CallbackBase):
         self.username = self.get_option('username')
         self.show_invocation = (self._display.verbosity > 1)
         self.validate_certs = self.get_option('validate_certs')
-
+        self.http_agent = self.get_option('http_agent')
         if self.webhook_url is None:
             self.disabled = True
             self._display.warning('Slack Webhook URL was not provided. The '
@@ -132,8 +138,13 @@ class CallbackModule(CallbackBase):
         self._display.debug(data)
         self._display.debug(self.webhook_url)
         try:
-            response = open_url(self.webhook_url, data=data, validate_certs=self.validate_certs,
-                                headers=headers)
+            response = open_url(
+                self.webhook_url,
+                data=data,
+                validate_certs=self.validate_certs,
+                headers=headers,
+                http_agent=self.http_agent,
+            )
             return response.read()
         except Exception as e:
             self._display.warning(f'Could not submit message to Slack: {e}')
