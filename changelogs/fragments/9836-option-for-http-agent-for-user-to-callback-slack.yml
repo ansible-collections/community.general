@@ -1,0 +1,2 @@
+minor_changes:
+  - callback/slack - add ``http-agent`` option to enable the user to set a custom user agent for slack callback plugin (https://github.com/ansible-collections/community.general/pull/9836).
