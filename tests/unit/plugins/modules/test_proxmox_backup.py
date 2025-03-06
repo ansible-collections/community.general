@@ -247,20 +247,23 @@ class TestProxmoxBackup(ModuleTestCase):
         super(TestProxmoxBackup, self).tearDown()
 
     def test_proxmox_backup_without_argument(self):
-        set_module_args({})
-        with pytest.raises(AnsibleFailJson):
-            proxmox_backup.main()
+        with set_module_args({}):
+            with pytest.raises(AnsibleFailJson):
+                proxmox_backup.main()
 
     def test_create_backup_check_mode(self):
-        set_module_args({"api_user": "root@pam",
-                         "api_password": "secret",
-                         "api_host": "127.0.0.1",
-                         "mode": "all",
-                         "storage": "backup",
-                         "_ansible_check_mode": True,
-                         })
-        with pytest.raises(AnsibleExitJson) as exc_info:
-            proxmox_backup.main()
+        with set_module_args(
+            {
+                "api_user": "root@pam",
+                "api_password": "secret",
+                "api_host": "127.0.0.1",
+                "mode": "all",
+                "storage": "backup",
+                "_ansible_check_mode": True,
+            }
+        ):
+            with pytest.raises(AnsibleExitJson) as exc_info:
+                proxmox_backup.main()
 
         result = exc_info.value.args[0]
 
@@ -272,14 +275,15 @@ class TestProxmoxBackup(ModuleTestCase):
         assert self.mock_post_vzdump.call_count == 0
 
     def test_create_backup_all_mode(self):
-        set_module_args({"api_user": "root@pam",
-                         "api_password": "secret",
-                         "api_host": "127.0.0.1",
-                         "mode": "all",
-                         "storage": "backup",
-                         })
-        with pytest.raises(AnsibleExitJson) as exc_info:
-            proxmox_backup.main()
+        with set_module_args({
+            "api_user": "root@pam",
+            "api_password": "secret",
+            "api_host": "127.0.0.1",
+            "mode": "all",
+            "storage": "backup",
+        }):
+            with pytest.raises(AnsibleExitJson) as exc_info:
+                proxmox_backup.main()
 
         result = exc_info.value.args[0]
         assert result["changed"] is True
@@ -291,17 +295,18 @@ class TestProxmoxBackup(ModuleTestCase):
         assert self.mock_post_vzdump.call_count == 3
 
     def test_create_backup_include_mode_with_wait(self):
-        set_module_args({"api_user": "root@pam",
-                         "api_password": "secret",
-                         "api_host": "127.0.0.1",
-                         "mode": "include",
-                         "node": "node1",
-                         "storage": "backup",
-                         "vmids": [100],
-                         "wait": True
-                         })
-        with pytest.raises(AnsibleExitJson) as exc_info:
-            proxmox_backup.main()
+        with set_module_args({
+            "api_user": "root@pam",
+            "api_password": "secret",
+            "api_host": "127.0.0.1",
+            "mode": "include",
+            "node": "node1",
+            "storage": "backup",
+            "vmids": [100],
+            "wait": True
+        }):
+            with pytest.raises(AnsibleExitJson) as exc_info:
+                proxmox_backup.main()
 
         result = exc_info.value.args[0]
         assert result["changed"] is True
@@ -313,17 +318,18 @@ class TestProxmoxBackup(ModuleTestCase):
         assert self.mock_post_vzdump.call_count == 1
 
     def test_fail_insufficient_permissions(self):
-        set_module_args({"api_user": "root@pam",
-                         "api_password": "secret",
-                         "api_host": "127.0.0.1",
-                         "mode": "include",
-                         "storage": "backup",
-                         "performance_tweaks": "max-workers=2",
-                         "vmids": [100],
-                         "wait": True
-                         })
-        with pytest.raises(AnsibleFailJson) as exc_info:
-            proxmox_backup.main()
+        with set_module_args({
+            "api_user": "root@pam",
+            "api_password": "secret",
+            "api_host": "127.0.0.1",
+            "mode": "include",
+            "storage": "backup",
+            "performance_tweaks": "max-workers=2",
+            "vmids": [100],
+            "wait": True
+        }):
+            with pytest.raises(AnsibleFailJson) as exc_info:
+                proxmox_backup.main()
 
         result = exc_info.value.args[0]
         assert result["msg"] == "Insufficient permission: Performance_tweaks and bandwidth require 'Sys.Modify' permission for '/'"
@@ -331,17 +337,18 @@ class TestProxmoxBackup(ModuleTestCase):
         assert self.mock_post_vzdump.call_count == 0
 
     def test_fail_missing_node(self):
-        set_module_args({"api_user": "root@pam",
-                         "api_password": "secret",
-                         "api_host": "127.0.0.1",
-                         "mode": "include",
-                         "storage": "backup",
-                         "node": "nonexistingnode",
-                         "vmids": [100],
-                         "wait": True
-                         })
-        with pytest.raises(AnsibleFailJson) as exc_info:
-            proxmox_backup.main()
+        with set_module_args({
+            "api_user": "root@pam",
+            "api_password": "secret",
+            "api_host": "127.0.0.1",
+            "mode": "include",
+            "storage": "backup",
+            "node": "nonexistingnode",
+            "vmids": [100],
+            "wait": True
+        }):
+            with pytest.raises(AnsibleFailJson) as exc_info:
+                proxmox_backup.main()
 
         result = exc_info.value.args[0]
         assert result["msg"] == "Node nonexistingnode was specified, but does not exist on the cluster"
@@ -349,16 +356,17 @@ class TestProxmoxBackup(ModuleTestCase):
         assert self.mock_post_vzdump.call_count == 0
 
     def test_fail_missing_storage(self):
-        set_module_args({"api_user": "root@pam",
-                         "api_password": "secret",
-                         "api_host": "127.0.0.1",
-                         "mode": "include",
-                         "storage": "nonexistingstorage",
-                         "vmids": [100],
-                         "wait": True
-                         })
-        with pytest.raises(AnsibleFailJson) as exc_info:
-            proxmox_backup.main()
+        with set_module_args({
+            "api_user": "root@pam",
+            "api_password": "secret",
+            "api_host": "127.0.0.1",
+            "mode": "include",
+            "storage": "nonexistingstorage",
+            "vmids": [100],
+            "wait": True
+        }):
+            with pytest.raises(AnsibleFailJson) as exc_info:
+                proxmox_backup.main()
 
         result = exc_info.value.args[0]
         assert result["msg"] == "Storage nonexistingstorage does not exist in the cluster"
