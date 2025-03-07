@@ -221,6 +221,43 @@ def get_packages(module, patterns, only_installed=False):
     return packages_available_map_name_evrs
 
 
+def get_package_mgr():
+    for bin_path in (DNF_BIN,):
+        if os.path.exists(bin_path):
+            return "dnf5" if os.path.realpath(bin_path) == "/usr/bin/dnf5" else "dnf"
+    # fallback to dnf
+    return "dnf"
+
+
+def get_package_list(module, package_mgr="dnf"):
+    if package_mgr == "dnf":
+        return do_versionlock(module, "list").split()
+
+    package_list = []
+    if package_mgr == "dnf5":
+        stanza_start = False
+        package_name = None
+        for line in do_versionlock(module, "list").splitlines():
+            if line.startswith(("#", " ")):
+                continue
+            if line.startswith("Package name:"):
+                stanza_start = True
+                dummy, name = line.split(":", 1)
+                name = name.strip()
+                pkg_name = get_packages(module, patterns=[name])
+                package_name = "%s-%s.*" % (name, pkg_name[name].pop())
+                if package_name and package_name not in package_list:
+                    package_list.append(package_name)
+            if line.startswith("evr"):
+                dummy, package_version = line.split("=", 1)
+                package_version = package_version.strip()
+                if stanza_start:
+                    if package_name and package_name not in package_list:
+                        package_list.append(package_name)
+                    stanza_start = False
+    return package_list
+
+
 def main():
     module = AnsibleModule(
         argument_spec=dict(
@@ -239,9 +276,10 @@ def main():
     msg = ""
 
     # Check module pre-requisites.
-    if not os.path.exists(DNF_BIN):
-        module.fail_json(msg="%s was not found" % DNF_BIN)
-    if not os.path.exists(VERSIONLOCK_CONF):
+    global DNF_BIN
+    DNF_BIN = module.get_bin_path('dnf', True)
+    package_mgr = get_package_mgr()
+    if package_mgr == "dnf" and not os.path.exists(VERSIONLOCK_CONF):
         module.fail_json(msg="plugin versionlock is required")
 
     # Check incompatible options.
@@ -250,7 +288,7 @@ def main():
     if state != "clean" and not patterns:
         module.fail_json(msg="name list is required for %s state" % state)
 
-    locklist_pre = do_versionlock(module, "list").split()
+    locklist_pre = get_package_list(module, package_mgr=package_mgr)
 
     specs_toadd = []
     specs_todelete = []
@@ -329,7 +367,7 @@ def main():
         "specs_todelete": specs_todelete
     }
     if not module.check_mode:
-        response["locklist_post"] = do_versionlock(module, "list").split()
+        response["locklist_post"] = get_package_list(module, package_mgr=package_mgr)
     else:
         if state == "clean":
             response["locklist_post"] = []

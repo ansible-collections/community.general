@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - dnf_versionlock - add support for dnf5 (https://github.com/ansible-collections/community.general/issues/9556).
