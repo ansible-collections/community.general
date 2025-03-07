@@ -67,7 +67,7 @@
     state: present
     accessor_id: 07a7de84-c9c7-448a-99cc-beaf682efd21
     policies:
-      - id: "{{ create_result.token.Policies[-1].ID }}"
+      - name: foo-access2
   register: result
 
 - assert:

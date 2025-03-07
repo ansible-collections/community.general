@@ -220,7 +220,7 @@ def normalize_link_obj(api_obj, module_obj, key):
 
     for obj in module_objs:
         identifier = obj.get("ID")
-        name = obj.get("Name)")
+        name = obj.get("Name")
         if identifier and not name and identifier in id_to_name:
             obj["Name"] = id_to_name[identifier]
         if not identifier and name and name in name_to_id:
