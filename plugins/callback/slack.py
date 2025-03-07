@@ -20,10 +20,9 @@ description:
 options:
   http_agent:
     description:
-      - User-Agent to use in the request.
+      - HTTP user agent to use requests to Slack.
     type: string
     version_added: "10.5.0"
-    default: ansible-httpget
   webhook_url:
     required: true
     description: Slack Webhook URL.
