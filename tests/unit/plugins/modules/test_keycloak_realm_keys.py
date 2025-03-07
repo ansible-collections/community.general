@@ -139,15 +139,14 @@ class TestKeycloakRealmKeys(ModuleTestCase):
         ]
         changed = True
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_components=return_value_components_get, create_component=return_value_component_create) \
-                    as (mock_get_components, mock_get_component, mock_create_component, mock_update_component, mock_delete_component):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_components=return_value_components_get, create_component=return_value_component_create) \
+                        as (mock_get_components, mock_get_component, mock_create_component, mock_update_component, mock_delete_component):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         self.assertEqual(len(mock_get_components.mock_calls), 1)
         self.assertEqual(len(mock_get_component.mock_calls), 0)
@@ -232,16 +231,15 @@ class TestKeycloakRealmKeys(ModuleTestCase):
         ]
         changed = True
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_components=return_value_components_get,
-                                    update_component=return_value_component_update) \
-                    as (mock_get_components, mock_get_component, mock_create_component, mock_update_component, mock_delete_component):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_components=return_value_components_get,
+                                        update_component=return_value_component_update) \
+                        as (mock_get_components, mock_get_component, mock_create_component, mock_update_component, mock_delete_component):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         self.assertEqual(len(mock_get_components.mock_calls), 1)
         self.assertEqual(len(mock_get_component.mock_calls), 0)
@@ -277,15 +275,14 @@ class TestKeycloakRealmKeys(ModuleTestCase):
         ]
         changed = False
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_components=return_value_components_get) \
-                    as (mock_get_components, mock_get_component, mock_create_component, mock_update_component, mock_delete_component):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_components=return_value_components_get) \
+                        as (mock_get_components, mock_get_component, mock_create_component, mock_update_component, mock_delete_component):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         self.assertEqual(len(mock_get_components.mock_calls), 1)
         self.assertEqual(len(mock_get_component.mock_calls), 0)
@@ -356,15 +353,14 @@ class TestKeycloakRealmKeys(ModuleTestCase):
         ]
         changed = True
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_components=return_value_components_get, delete_component=return_value_component_delete) \
-                    as (mock_get_components, mock_get_component, mock_create_component, mock_update_component, mock_delete_component):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_components=return_value_components_get, delete_component=return_value_component_delete) \
+                        as (mock_get_components, mock_get_component, mock_create_component, mock_update_component, mock_delete_component):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         self.assertEqual(len(mock_get_components.mock_calls), 1)
         self.assertEqual(len(mock_get_component.mock_calls), 0)

@@ -238,19 +238,18 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
         return_value_mapper_created = [None, None]
         changed = True
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_identity_provider=return_value_idp_get, get_identity_provider_mappers=return_value_mappers_get,
-                                    create_identity_provider=return_value_idp_created, create_identity_provider_mapper=return_value_mapper_created,
-                                    get_realm_by_id=return_value_realm_get) \
-                    as (mock_get_identity_provider, mock_create_identity_provider, mock_update_identity_provider, mock_delete_identity_provider,
-                        mock_get_identity_provider_mappers, mock_create_identity_provider_mapper, mock_update_identity_provider_mapper,
-                        mock_delete_identity_provider_mapper, mock_get_realm_by_id):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_identity_provider=return_value_idp_get, get_identity_provider_mappers=return_value_mappers_get,
+                                        create_identity_provider=return_value_idp_created, create_identity_provider_mapper=return_value_mapper_created,
+                                        get_realm_by_id=return_value_realm_get) \
+                        as (mock_get_identity_provider, mock_create_identity_provider, mock_update_identity_provider, mock_delete_identity_provider,
+                            mock_get_identity_provider_mappers, mock_create_identity_provider_mapper, mock_update_identity_provider_mapper,
+                            mock_delete_identity_provider_mapper, mock_get_realm_by_id):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         self.assertEqual(len(mock_get_identity_provider.mock_calls), 2)
         self.assertEqual(len(mock_get_identity_provider_mappers.mock_calls), 1)
@@ -547,19 +546,18 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
         return_value_mapper_created = [None]
         changed = True
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_identity_provider=return_value_idp_get, get_identity_provider_mappers=return_value_mappers_get,
-                                    update_identity_provider=return_value_idp_updated, update_identity_provider_mapper=return_value_mapper_updated,
-                                    create_identity_provider_mapper=return_value_mapper_created, get_realm_by_id=return_value_realm_get) \
-                    as (mock_get_identity_provider, mock_create_identity_provider, mock_update_identity_provider, mock_delete_identity_provider,
-                        mock_get_identity_provider_mappers, mock_create_identity_provider_mapper, mock_update_identity_provider_mapper,
-                        mock_delete_identity_provider_mapper, mock_get_realm_by_id):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_identity_provider=return_value_idp_get, get_identity_provider_mappers=return_value_mappers_get,
+                                        update_identity_provider=return_value_idp_updated, update_identity_provider_mapper=return_value_mapper_updated,
+                                        create_identity_provider_mapper=return_value_mapper_created, get_realm_by_id=return_value_realm_get) \
+                        as (mock_get_identity_provider, mock_create_identity_provider, mock_update_identity_provider, mock_delete_identity_provider,
+                            mock_get_identity_provider_mappers, mock_create_identity_provider_mapper, mock_update_identity_provider_mapper,
+                            mock_delete_identity_provider_mapper, mock_get_realm_by_id):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         self.assertEqual(len(mock_get_identity_provider.mock_calls), 2)
         self.assertEqual(len(mock_get_identity_provider_mappers.mock_calls), 5)
@@ -697,19 +695,18 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
         return_value_mapper_created = [None]
         changed = False
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_identity_provider=return_value_idp_get, get_identity_provider_mappers=return_value_mappers_get,
-                                    update_identity_provider=return_value_idp_updated, update_identity_provider_mapper=return_value_mapper_updated,
-                                    create_identity_provider_mapper=return_value_mapper_created, get_realm_by_id=return_value_realm_get) \
-                    as (mock_get_identity_provider, mock_create_identity_provider, mock_update_identity_provider, mock_delete_identity_provider,
-                        mock_get_identity_provider_mappers, mock_create_identity_provider_mapper, mock_update_identity_provider_mapper,
-                        mock_delete_identity_provider_mapper, mock_get_realm_by_id):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_identity_provider=return_value_idp_get, get_identity_provider_mappers=return_value_mappers_get,
+                                        update_identity_provider=return_value_idp_updated, update_identity_provider_mapper=return_value_mapper_updated,
+                                        create_identity_provider_mapper=return_value_mapper_created, get_realm_by_id=return_value_realm_get) \
+                        as (mock_get_identity_provider, mock_create_identity_provider, mock_update_identity_provider, mock_delete_identity_provider,
+                            mock_get_identity_provider_mappers, mock_create_identity_provider_mapper, mock_update_identity_provider_mapper,
+                            mock_delete_identity_provider_mapper, mock_get_realm_by_id):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         self.assertEqual(len(mock_get_identity_provider.mock_calls), 1)
         self.assertEqual(len(mock_get_identity_provider_mappers.mock_calls), 2)
@@ -738,17 +735,16 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
         return_value_idp_get = [None]
         changed = False
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_identity_provider=return_value_idp_get) \
-                    as (mock_get_identity_provider, mock_create_identity_provider, mock_update_identity_provider, mock_delete_identity_provider,
-                        mock_get_identity_provider_mappers, mock_create_identity_provider_mapper, mock_update_identity_provider_mapper,
-                        mock_delete_identity_provider_mapper, mock_get_realm_by_id):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_identity_provider=return_value_idp_get) \
+                        as (mock_get_identity_provider, mock_create_identity_provider, mock_update_identity_provider, mock_delete_identity_provider,
+                            mock_get_identity_provider_mappers, mock_create_identity_provider_mapper, mock_update_identity_provider_mapper,
+                            mock_delete_identity_provider_mapper, mock_get_realm_by_id):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         self.assertEqual(len(mock_get_identity_provider.mock_calls), 1)
         self.assertEqual(len(mock_delete_identity_provider.mock_calls), 0)
@@ -844,18 +840,17 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
         return_value_idp_deleted = [None]
         changed = True
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_identity_provider=return_value_idp_get, get_identity_provider_mappers=return_value_mappers_get,
-                                    delete_identity_provider=return_value_idp_deleted, get_realm_by_id=return_value_realm_get) \
-                    as (mock_get_identity_provider, mock_create_identity_provider, mock_update_identity_provider, mock_delete_identity_provider,
-                        mock_get_identity_provider_mappers, mock_create_identity_provider_mapper, mock_update_identity_provider_mapper,
-                        mock_delete_identity_provider_mapper, mock_get_realm_by_id):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_identity_provider=return_value_idp_get, get_identity_provider_mappers=return_value_mappers_get,
+                                        delete_identity_provider=return_value_idp_deleted, get_realm_by_id=return_value_realm_get) \
+                        as (mock_get_identity_provider, mock_create_identity_provider, mock_update_identity_provider, mock_delete_identity_provider,
+                            mock_get_identity_provider_mappers, mock_create_identity_provider_mapper, mock_update_identity_provider_mapper,
+                            mock_delete_identity_provider_mapper, mock_get_realm_by_id):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         self.assertEqual(len(mock_get_identity_provider.mock_calls), 1)
         self.assertEqual(len(mock_get_identity_provider_mappers.mock_calls), 1)
