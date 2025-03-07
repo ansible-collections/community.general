@@ -47,8 +47,8 @@ class TestRedisInfoModule(ModuleTestCase):
         """Test without parameters"""
         with self.patch_redis_client(side_effect=FakeRedisClient) as redis_client:
             with self.assertRaises(AnsibleExitJson) as result:
-                set_module_args({})
-                self.module.main()
+                with set_module_args({}):
+                    self.module.main()
             self.assertEqual(redis_client.call_count, 1)
             self.assertEqual(redis_client.call_args, ({'host': 'localhost',
                                                        'port': 6379,
@@ -64,12 +64,12 @@ class TestRedisInfoModule(ModuleTestCase):
         """Test with all parameters"""
         with self.patch_redis_client(side_effect=FakeRedisClient) as redis_client:
             with self.assertRaises(AnsibleExitJson) as result:
-                set_module_args({
+                with set_module_args({
                     'login_host': 'test',
                     'login_port': 1234,
                     'login_password': 'PASS'
-                })
-                self.module.main()
+                }):
+                    self.module.main()
             self.assertEqual(redis_client.call_count, 1)
             self.assertEqual(redis_client.call_args, ({'host': 'test',
                                                        'port': 1234,
@@ -85,7 +85,7 @@ class TestRedisInfoModule(ModuleTestCase):
         """Test with tls parameters"""
         with self.patch_redis_client(side_effect=FakeRedisClient) as redis_client:
             with self.assertRaises(AnsibleExitJson) as result:
-                set_module_args({
+                with set_module_args({
                     'login_host': 'test',
                     'login_port': 1234,
                     'login_password': 'PASS',
@@ -94,8 +94,8 @@ class TestRedisInfoModule(ModuleTestCase):
                     'client_cert_file': '/etc/ssl/client.pem',
                     'client_key_file': '/etc/ssl/client.key',
                     'validate_certs': False
-                })
-                self.module.main()
+                }):
+                    self.module.main()
             self.assertEqual(redis_client.call_count, 1)
             self.assertEqual(redis_client.call_args, ({'host': 'test',
                                                        'port': 1234,
@@ -111,7 +111,7 @@ class TestRedisInfoModule(ModuleTestCase):
         """Test failure message"""
         with self.patch_redis_client(side_effect=FakeRedisClientFail) as redis_client:
             with self.assertRaises(AnsibleFailJson) as result:
-                set_module_args({})
-                self.module.main()
+                with set_module_args({}):
+                    self.module.main()
             self.assertEqual(redis_client.call_count, 1)
             self.assertEqual(result.exception.args[0]['msg'], 'unable to connect to database: Test Error')

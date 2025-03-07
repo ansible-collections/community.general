@@ -38,8 +38,8 @@ class TestDNSimple(ModuleTestCase):
     def test_without_required_parameters(self):
         """Failure must occurs when all parameters are missing"""
         with self.assertRaises(AnsibleFailJson):
-            set_module_args({})
-            self.module.main()
+            with set_module_args({}):
+                self.module.main()
 
     @patch('dnsimple.service.Identity.whoami')
     def test_account_token(self, mock_whoami):

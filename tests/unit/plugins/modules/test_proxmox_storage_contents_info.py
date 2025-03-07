@@ -76,14 +76,14 @@ class TestProxmoxStorageContentsInfo(ModuleTestCase):
 
     def test_module_fail_when_required_args_missing(self):
         with pytest.raises(AnsibleFailJson) as exc_info:
-            set_module_args({})
-            self.module.main()
+            with set_module_args({}):
+                self.module.main()
 
     def test_storage_contents_info(self):
         with pytest.raises(AnsibleExitJson) as exc_info:
-            set_module_args(get_module_args(node=NODE1, storage="datastore"))
-            expected_output = {}
-            self.module.main()
+            with set_module_args(get_module_args(node=NODE1, storage="datastore")):
+                expected_output = {}
+                self.module.main()
 
         result = exc_info.value.args[0]
         assert not result["changed"]

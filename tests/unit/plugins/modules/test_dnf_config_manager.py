@@ -305,22 +305,22 @@ class TestDNFConfigManager(ModuleTestCase):
         return result
 
     def test_get_repo_states(self):
-        set_module_args({})
-        self.set_command_mock(execute_return=(0, mock_repolist_crb_enabled, ''))
-        result = self.execute_module(changed=False)
+        with set_module_args({}):
+            self.set_command_mock(execute_return=(0, mock_repolist_crb_enabled, ''))
+            result = self.execute_module(changed=False)
         self.assertEqual(result['repo_states_pre'], expected_repo_states_crb_enabled)
         self.assertEqual(result['repo_states_post'], expected_repo_states_crb_enabled)
         self.assertEqual(result['changed_repos'], [])
         self.run_command.assert_has_calls(calls=[call_get_repo_states, call_get_repo_states], any_order=False)
 
     def test_enable_disabled_repo(self):
-        set_module_args({
+        with set_module_args({
             'name': ['crb'],
             'state': 'enabled'
-        })
-        side_effects = [(0, mock_repolist_crb_disabled, ''), (0, '', ''), (0, mock_repolist_crb_enabled, '')]
-        self.set_command_mock(execute_side_effect=side_effects)
-        result = self.execute_module(changed=True)
+        }):
+            side_effects = [(0, mock_repolist_crb_disabled, ''), (0, '', ''), (0, mock_repolist_crb_enabled, '')]
+            self.set_command_mock(execute_side_effect=side_effects)
+            result = self.execute_module(changed=True)
         self.assertEqual(result['repo_states_pre'], expected_repo_states_crb_disabled)
         self.assertEqual(result['repo_states_post'], expected_repo_states_crb_enabled)
         self.assertEqual(result['changed_repos'], ['crb'])
@@ -328,25 +328,25 @@ class TestDNFConfigManager(ModuleTestCase):
         self.run_command.assert_has_calls(calls=expected_calls, any_order=False)
 
     def test_enable_disabled_repo_check_mode(self):
-        set_module_args({
+        with set_module_args({
             'name': ['crb'],
             'state': 'enabled',
             '_ansible_check_mode': True
-        })
-        side_effects = [(0, mock_repolist_crb_disabled, ''), (0, mock_repolist_crb_disabled, '')]
-        self.set_command_mock(execute_side_effect=side_effects)
-        result = self.execute_module(changed=True)
+        }):
+            side_effects = [(0, mock_repolist_crb_disabled, ''), (0, mock_repolist_crb_disabled, '')]
+            self.set_command_mock(execute_side_effect=side_effects)
+            result = self.execute_module(changed=True)
         self.assertEqual(result['changed_repos'], ['crb'])
         self.run_command.assert_has_calls(calls=[call_get_repo_states], any_order=False)
 
     def test_disable_enabled_repo(self):
-        set_module_args({
+        with set_module_args({
             'name': ['crb'],
             'state': 'disabled'
-        })
-        side_effects = [(0, mock_repolist_crb_enabled, ''), (0, '', ''), (0, mock_repolist_crb_disabled, '')]
-        self.set_command_mock(execute_side_effect=side_effects)
-        result = self.execute_module(changed=True)
+        }):
+            side_effects = [(0, mock_repolist_crb_enabled, ''), (0, '', ''), (0, mock_repolist_crb_disabled, '')]
+            self.set_command_mock(execute_side_effect=side_effects)
+            result = self.execute_module(changed=True)
         self.assertEqual(result['repo_states_pre'], expected_repo_states_crb_enabled)
         self.assertEqual(result['repo_states_post'], expected_repo_states_crb_disabled)
         self.assertEqual(result['changed_repos'], ['crb'])
@@ -354,49 +354,49 @@ class TestDNFConfigManager(ModuleTestCase):
         self.run_command.assert_has_calls(calls=expected_calls, any_order=False)
 
     def test_crb_already_enabled(self):
-        set_module_args({
+        with set_module_args({
             'name': ['crb'],
             'state': 'enabled'
-        })
-        side_effects = [(0, mock_repolist_crb_enabled, ''), (0, mock_repolist_crb_enabled, '')]
-        self.set_command_mock(execute_side_effect=side_effects)
-        result = self.execute_module(changed=False)
+        }):
+            side_effects = [(0, mock_repolist_crb_enabled, ''), (0, mock_repolist_crb_enabled, '')]
+            self.set_command_mock(execute_side_effect=side_effects)
+            result = self.execute_module(changed=False)
         self.assertEqual(result['repo_states_pre'], expected_repo_states_crb_enabled)
         self.assertEqual(result['repo_states_post'], expected_repo_states_crb_enabled)
         self.assertEqual(result['changed_repos'], [])
         self.run_command.assert_has_calls(calls=[call_get_repo_states, call_get_repo_states], any_order=False)
 
     def test_get_repo_states_fail_no_status(self):
-        set_module_args({})
-        self.set_command_mock(execute_return=(0, mock_repolist_no_status, ''))
-        result = self.execute_module(failed=True)
+        with set_module_args({}):
+            self.set_command_mock(execute_return=(0, mock_repolist_no_status, ''))
+            result = self.execute_module(failed=True)
         self.assertEqual(result['msg'], 'dnf repolist parse failure: parsed another repo id before next status')
         self.run_command.assert_has_calls(calls=[call_get_repo_states], any_order=False)
 
     def test_get_repo_states_fail_status_before_id(self):
-        set_module_args({})
-        self.set_command_mock(execute_return=(0, mock_repolist_status_before_id, ''))
-        result = self.execute_module(failed=True)
+        with set_module_args({}):
+            self.set_command_mock(execute_return=(0, mock_repolist_status_before_id, ''))
+            result = self.execute_module(failed=True)
         self.assertEqual(result['msg'], 'dnf repolist parse failure: parsed status before repo id')
         self.run_command.assert_has_calls(calls=[call_get_repo_states], any_order=False)
 
     def test_failed__unknown_repo_id(self):
-        set_module_args({
+        with set_module_args({
             'name': ['fake']
-        })
-        self.set_command_mock(execute_return=(0, mock_repolist_crb_disabled, ''))
-        result = self.execute_module(failed=True)
+        }):
+            self.set_command_mock(execute_return=(0, mock_repolist_crb_disabled, ''))
+            result = self.execute_module(failed=True)
         self.assertEqual(result['msg'], "did not find repo with ID 'fake' in dnf repolist --all --verbose")
         self.run_command.assert_has_calls(calls=[call_get_repo_states], any_order=False)
 
     def test_failed_state_change_ineffective(self):
-        set_module_args({
+        with set_module_args({
             'name': ['crb'],
             'state': 'enabled'
-        })
-        side_effects = [(0, mock_repolist_crb_disabled, ''), (0, '', ''), (0, mock_repolist_crb_disabled, '')]
-        self.set_command_mock(execute_side_effect=side_effects)
-        result = self.execute_module(failed=True)
+        }):
+            side_effects = [(0, mock_repolist_crb_disabled, ''), (0, '', ''), (0, mock_repolist_crb_disabled, '')]
+            self.set_command_mock(execute_side_effect=side_effects)
+            result = self.execute_module(failed=True)
         self.assertEqual(result['msg'], "dnf config-manager failed to make 'crb' enabled")
         expected_calls = [call_get_repo_states, call_enable_crb, call_get_repo_states]
         self.run_command.assert_has_calls(calls=expected_calls, any_order=False)

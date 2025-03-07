@@ -127,9 +127,9 @@ EXPECTED_SINGLE_TASK = [
 
 @patch('ansible_collections.community.general.plugins.module_utils.proxmox.ProxmoxAnsible._connect')
 def test_without_required_parameters(connect_mock, capfd, mocker):
-    set_module_args({})
-    with pytest.raises(SystemExit):
-        proxmox_tasks_info.main()
+    with set_module_args({}):
+        with pytest.raises(SystemExit):
+            proxmox_tasks_info.main()
     out, err = capfd.readouterr()
     assert not err
     assert json.loads(out)['failed']
@@ -145,16 +145,17 @@ def mock_api_tasks_response(mocker):
 
 @patch('ansible_collections.community.general.plugins.module_utils.proxmox.ProxmoxAnsible._connect')
 def test_get_tasks(connect_mock, capfd, mocker):
-    set_module_args({'api_host': 'proxmoxhost',
-                     'api_user': 'root@pam',
-                     'api_password': 'supersecret',
-                     'node': NODE})
+    with set_module_args({
+        'api_host': 'proxmoxhost',
+        'api_user': 'root@pam',
+        'api_password': 'supersecret',
+        'node': NODE
+    }):
+        connect_mock.side_effect = lambda: mock_api_tasks_response(mocker)
+        proxmox_utils.HAS_PROXMOXER = True
 
-    connect_mock.side_effect = lambda: mock_api_tasks_response(mocker)
-    proxmox_utils.HAS_PROXMOXER = True
-
-    with pytest.raises(SystemExit):
-        proxmox_tasks_info.main()
+        with pytest.raises(SystemExit):
+            proxmox_tasks_info.main()
     out, err = capfd.readouterr()
     assert not err
     assert len(json.loads(out)['proxmox_tasks']) != 0
@@ -163,17 +164,18 @@ def test_get_tasks(connect_mock, capfd, mocker):
 
 @patch('ansible_collections.community.general.plugins.module_utils.proxmox.ProxmoxAnsible._connect')
 def test_get_single_task(connect_mock, capfd, mocker):
-    set_module_args({'api_host': 'proxmoxhost',
-                     'api_user': 'root@pam',
-                     'api_password': 'supersecret',
-                     'node': NODE,
-                     'task': TASK_UPID})
+    with set_module_args({
+        'api_host': 'proxmoxhost',
+        'api_user': 'root@pam',
+        'api_password': 'supersecret',
+        'node': NODE,
+        'task': TASK_UPID
+    }):
+        connect_mock.side_effect = lambda: mock_api_tasks_response(mocker)
+        proxmox_utils.HAS_PROXMOXER = True
 
-    connect_mock.side_effect = lambda: mock_api_tasks_response(mocker)
-    proxmox_utils.HAS_PROXMOXER = True
-
-    with pytest.raises(SystemExit):
-        proxmox_tasks_info.main()
+        with pytest.raises(SystemExit):
+            proxmox_tasks_info.main()
     out, err = capfd.readouterr()
     assert not err
     assert len(json.loads(out)['proxmox_tasks']) == 1
@@ -183,17 +185,18 @@ def test_get_single_task(connect_mock, capfd, mocker):
 
 @patch('ansible_collections.community.general.plugins.module_utils.proxmox.ProxmoxAnsible._connect')
 def test_get_non_existent_task(connect_mock, capfd, mocker):
-    set_module_args({'api_host': 'proxmoxhost',
-                     'api_user': 'root@pam',
-                     'api_password': 'supersecret',
-                     'node': NODE,
-                     'task': 'UPID:nonexistent'})
+    with set_module_args({
+        'api_host': 'proxmoxhost',
+        'api_user': 'root@pam',
+        'api_password': 'supersecret',
+        'node': NODE,
+        'task': 'UPID:nonexistent'
+    }):
+        connect_mock.side_effect = lambda: mock_api_tasks_response(mocker)
+        proxmox_utils.HAS_PROXMOXER = True
 
-    connect_mock.side_effect = lambda: mock_api_tasks_response(mocker)
-    proxmox_utils.HAS_PROXMOXER = True
-
-    with pytest.raises(SystemExit):
-        proxmox_tasks_info.main()
+        with pytest.raises(SystemExit):
+            proxmox_tasks_info.main()
     out, err = capfd.readouterr()
     assert not err
     assert json.loads(out)['failed']

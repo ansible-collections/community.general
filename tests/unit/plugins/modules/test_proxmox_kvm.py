@@ -57,11 +57,11 @@ class TestProxmoxKvmModule(ModuleTestCase):
 
     def test_module_fail_when_required_args_missing(self):
         with self.assertRaises(AnsibleFailJson):
-            set_module_args({})
-            self.module.main()
+            with set_module_args({}):
+                self.module.main()
 
     def test_module_exits_unchaged_when_provided_vmid_exists(self):
-        set_module_args(
+        with set_module_args(
             {
                 "api_host": "host",
                 "api_user": "user",
@@ -69,10 +69,10 @@ class TestProxmoxKvmModule(ModuleTestCase):
                 "vmid": "100",
                 "node": "pve",
             }
-        )
-        self.get_vm_mock.return_value = [{"vmid": "100"}]
-        with pytest.raises(AnsibleExitJson) as exc_info:
-            self.module.main()
+        ):
+            self.get_vm_mock.return_value = [{"vmid": "100"}]
+            with pytest.raises(AnsibleExitJson) as exc_info:
+                self.module.main()
 
         assert self.get_vm_mock.call_count == 1
         result = exc_info.value.args[0]
@@ -80,7 +80,7 @@ class TestProxmoxKvmModule(ModuleTestCase):
         assert result["msg"] == "VM with vmid <100> already exists"
 
     def test_vm_created_when_vmid_not_exist_but_name_already_exist(self):
-        set_module_args(
+        with set_module_args(
             {
                 "api_host": "host",
                 "api_user": "user",
@@ -89,10 +89,10 @@ class TestProxmoxKvmModule(ModuleTestCase):
                 "name": "existing.vm.local",
                 "node": "pve",
             }
-        )
-        self.get_vm_mock.return_value = None
-        with pytest.raises(AnsibleExitJson) as exc_info:
-            self.module.main()
+        ):
+            self.get_vm_mock.return_value = None
+            with pytest.raises(AnsibleExitJson) as exc_info:
+                self.module.main()
 
         assert self.get_vm_mock.call_count == 1
         assert self.get_node_mock.call_count == 1
@@ -101,7 +101,7 @@ class TestProxmoxKvmModule(ModuleTestCase):
         assert result["msg"] == "VM existing.vm.local with vmid 100 deployed"
 
     def test_vm_not_created_when_name_already_exist_and_vmid_not_set(self):
-        set_module_args(
+        with set_module_args(
             {
                 "api_host": "host",
                 "api_user": "user",
@@ -109,21 +109,21 @@ class TestProxmoxKvmModule(ModuleTestCase):
                 "name": "existing.vm.local",
                 "node": "pve",
             }
-        )
-        with patch.object(proxmox_utils.ProxmoxAnsible, "get_vmid") as get_vmid_mock:
-            get_vmid_mock.return_value = {
-                "vmid": 100,
-                "name": "existing.vm.local",
-            }
-            with pytest.raises(AnsibleExitJson) as exc_info:
-                self.module.main()
+        ):
+            with patch.object(proxmox_utils.ProxmoxAnsible, "get_vmid") as get_vmid_mock:
+                get_vmid_mock.return_value = {
+                    "vmid": 100,
+                    "name": "existing.vm.local",
+                }
+                with pytest.raises(AnsibleExitJson) as exc_info:
+                    self.module.main()
 
         assert get_vmid_mock.call_count == 1
         result = exc_info.value.args[0]
         assert result["changed"] is False
 
     def test_vm_created_when_name_doesnt_exist_and_vmid_not_set(self):
-        set_module_args(
+        with set_module_args(
             {
                 "api_host": "host",
                 "api_user": "user",
@@ -131,15 +131,15 @@ class TestProxmoxKvmModule(ModuleTestCase):
                 "name": "existing.vm.local",
                 "node": "pve",
             }
-        )
-        self.get_vm_mock.return_value = None
-        with patch.multiple(
-            proxmox_utils.ProxmoxAnsible, get_vmid=DEFAULT, get_nextvmid=DEFAULT
-        ) as utils_mock:
-            utils_mock["get_vmid"].return_value = None
-            utils_mock["get_nextvmid"].return_value = 101
-            with pytest.raises(AnsibleExitJson) as exc_info:
-                self.module.main()
+        ):
+            self.get_vm_mock.return_value = None
+            with patch.multiple(
+                proxmox_utils.ProxmoxAnsible, get_vmid=DEFAULT, get_nextvmid=DEFAULT
+            ) as utils_mock:
+                utils_mock["get_vmid"].return_value = None
+                utils_mock["get_nextvmid"].return_value = 101
+                with pytest.raises(AnsibleExitJson) as exc_info:
+                    self.module.main()
 
         assert utils_mock["get_vmid"].call_count == 1
         assert utils_mock["get_nextvmid"].call_count == 1

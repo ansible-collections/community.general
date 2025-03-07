@@ -114,25 +114,24 @@ class TestKeycloakUser(ModuleTestCase):
         return_update_user = None
         changed = True
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_user_by_username=return_value_get_user_by_username,
-                                    create_user=return_create_user,
-                                    update_user_groups_membership=return_value_update_user_groups_membership,
-                                    get_user_groups=return_get_user_groups,
-                                    update_user=return_update_user,
-                                    delete_user=return_delete_user) \
-                    as (mock_get_user_by_username,
-                        mock_create_user,
-                        mock_update_user_groups_membership,
-                        mock_get_user_groups,
-                        mock_delete_user,
-                        mock_update_user):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_user_by_username=return_value_get_user_by_username,
+                                        create_user=return_create_user,
+                                        update_user_groups_membership=return_value_update_user_groups_membership,
+                                        get_user_groups=return_get_user_groups,
+                                        update_user=return_update_user,
+                                        delete_user=return_delete_user) \
+                        as (mock_get_user_by_username,
+                            mock_create_user,
+                            mock_update_user_groups_membership,
+                            mock_get_user_groups,
+                            mock_delete_user,
+                            mock_update_user):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         self.assertEqual(mock_get_user_by_username.call_count, 1)
         self.assertEqual(mock_create_user.call_count, 1)
@@ -176,25 +175,24 @@ class TestKeycloakUser(ModuleTestCase):
         return_update_user = None
         changed = False
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_user_by_username=return_value_get_user_by_username,
-                                    create_user=return_create_user,
-                                    update_user_groups_membership=return_value_update_user_groups_membership,
-                                    get_user_groups=return_get_user_groups,
-                                    update_user=return_update_user,
-                                    delete_user=return_delete_user) \
-                    as (mock_get_user_by_username,
-                        mock_create_user,
-                        mock_update_user_groups_membership,
-                        mock_get_user_groups,
-                        mock_delete_user,
-                        mock_update_user):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_user_by_username=return_value_get_user_by_username,
+                                        create_user=return_create_user,
+                                        update_user_groups_membership=return_value_update_user_groups_membership,
+                                        get_user_groups=return_get_user_groups,
+                                        update_user=return_update_user,
+                                        delete_user=return_delete_user) \
+                        as (mock_get_user_by_username,
+                            mock_create_user,
+                            mock_update_user_groups_membership,
+                            mock_get_user_groups,
+                            mock_delete_user,
+                            mock_update_user):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         self.assertEqual(mock_get_user_by_username.call_count, 1)
         self.assertEqual(mock_create_user.call_count, 0)
@@ -257,25 +255,24 @@ class TestKeycloakUser(ModuleTestCase):
         ]
         changed = True
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_user_by_username=return_value_get_user_by_username,
-                                    create_user=return_create_user,
-                                    update_user_groups_membership=return_value_update_user_groups_membership,
-                                    get_user_groups=return_get_user_groups,
-                                    update_user=return_update_user,
-                                    delete_user=return_delete_user) \
-                    as (mock_get_user_by_username,
-                        mock_create_user,
-                        mock_update_user_groups_membership,
-                        mock_get_user_groups,
-                        mock_delete_user,
-                        mock_update_user):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_user_by_username=return_value_get_user_by_username,
+                                        create_user=return_create_user,
+                                        update_user_groups_membership=return_value_update_user_groups_membership,
+                                        get_user_groups=return_get_user_groups,
+                                        update_user=return_update_user,
+                                        delete_user=return_delete_user) \
+                        as (mock_get_user_by_username,
+                            mock_create_user,
+                            mock_update_user_groups_membership,
+                            mock_get_user_groups,
+                            mock_delete_user,
+                            mock_update_user):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         self.assertEqual(mock_get_user_by_username.call_count, 1)
         self.assertEqual(mock_create_user.call_count, 0)
@@ -319,25 +316,24 @@ class TestKeycloakUser(ModuleTestCase):
         return_update_user = None
         changed = True
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_user_by_username=return_value_get_user_by_username,
-                                    create_user=return_create_user,
-                                    update_user_groups_membership=return_value_update_user_groups_membership,
-                                    get_user_groups=return_get_user_groups,
-                                    update_user=return_update_user,
-                                    delete_user=return_delete_user) \
-                    as (mock_get_user_by_username,
-                        mock_create_user,
-                        mock_update_user_groups_membership,
-                        mock_get_user_groups,
-                        mock_delete_user,
-                        mock_update_user):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_user_by_username=return_value_get_user_by_username,
+                                        create_user=return_create_user,
+                                        update_user_groups_membership=return_value_update_user_groups_membership,
+                                        get_user_groups=return_get_user_groups,
+                                        update_user=return_update_user,
+                                        delete_user=return_delete_user) \
+                        as (mock_get_user_by_username,
+                            mock_create_user,
+                            mock_update_user_groups_membership,
+                            mock_get_user_groups,
+                            mock_delete_user,
+                            mock_update_user):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         self.assertEqual(mock_get_user_by_username.call_count, 1)
         self.assertEqual(mock_create_user.call_count, 0)
