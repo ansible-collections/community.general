@@ -207,20 +207,20 @@ class TestProxmoxBackupInfoModule(ModuleTestCase):
 
     def test_module_fail_when_required_args_missing(self):
         with pytest.raises(AnsibleFailJson) as exc_info:
-            set_module_args({})
-            self.module.main()
+            with set_module_args({}):
+                self.module.main()
 
         result = exc_info.value.args[0]
         assert result["msg"] == "missing required arguments: api_host, api_user"
 
     def test_get_all_backups_information(self):
         with pytest.raises(AnsibleExitJson) as exc_info:
-            set_module_args({
+            with set_module_args({
                 'api_host': 'proxmoxhost',
                 'api_user': 'root@pam',
                 'api_password': 'supersecret'
-            })
-            self.module.main()
+            }):
+                self.module.main()
 
         result = exc_info.value.args[0]
         assert result["backup_info"] == EXPECTED_BACKUP_OUTPUT
@@ -231,13 +231,13 @@ class TestProxmoxBackupInfoModule(ModuleTestCase):
             expected_output = [
                 backup for backup in EXPECTED_BACKUP_OUTPUT if backup["vm_name"] == vmname
             ]
-            set_module_args({
+            with set_module_args({
                 'api_host': 'proxmoxhost',
                 'api_user': 'root@pam',
                 'api_password': 'supersecret',
                 'vm_name': vmname
-            })
-            self.module.main()
+            }):
+                self.module.main()
 
         result = exc_info.value.args[0]
         assert result["backup_info"] == expected_output
@@ -249,13 +249,13 @@ class TestProxmoxBackupInfoModule(ModuleTestCase):
             expected_output = [
                 backup for backup in EXPECTED_BACKUP_OUTPUT if backup["vmid"] == vmid
             ]
-            set_module_args({
+            with set_module_args({
                 'api_host': 'proxmoxhost',
                 'api_user': 'root@pam',
                 'api_password': 'supersecret',
                 'vm_id': vmid
-            })
-            self.module.main()
+            }):
+                self.module.main()
         result = exc_info.value.args[0]
         assert result["backup_info"] == expected_output
         assert len(result["backup_info"]) == 1
@@ -263,13 +263,13 @@ class TestProxmoxBackupInfoModule(ModuleTestCase):
     def test_get_specific_backup_information_by_backupjobs(self):
         with pytest.raises(AnsibleExitJson) as exc_info:
             backupjobs = True
-            set_module_args({
+            with set_module_args({
                 'api_host': 'proxmoxhost',
                 'api_user': 'root@pam',
                 'api_password': 'supersecret',
                 'backup_jobs': backupjobs
-            })
-            self.module.main()
+            }):
+                self.module.main()
 
         result = exc_info.value.args[0]
         assert result["backup_info"] == EXPECTED_BACKUP_JOBS_OUTPUT

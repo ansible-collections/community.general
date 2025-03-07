@@ -34,18 +34,17 @@ class IPAKeytabModuleTestCase(ModuleTestCase):
         return exc.exception.args[0]
 
     def test_present(self):
-        set_module_args({
+        with set_module_args({
             'path': '/tmp/test.keytab',
             'principal': 'HTTP/freeipa-dc02.ipa.test',
             'ipa_host': 'freeipa-dc01.ipa.test',
             'state': 'present'
-        })
+        }):
+            self.module_main_command.side_effect = [
+                (0, '{}', ''),
+            ]
 
-        self.module_main_command.side_effect = [
-            (0, '{}', ''),
-        ]
-
-        result = self.module_main(AnsibleExitJson)
+            result = self.module_main(AnsibleExitJson)
 
         self.assertTrue(result['changed'])
         self.module_main_command.assert_has_calls([

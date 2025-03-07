@@ -48,7 +48,7 @@ class TestProxmoxTemplateModule(ModuleTestCase):
     def test_module_fail_when_toolbelt_not_installed_and_file_size_is_big(self, mock_stat):
         self.module.HAS_REQUESTS_TOOLBELT = False
         mock_stat.return_value.st_size = 268435460
-        set_module_args(
+        with set_module_args(
             {
                 "api_host": "host",
                 "api_user": "user",
@@ -57,9 +57,9 @@ class TestProxmoxTemplateModule(ModuleTestCase):
                 "src": "/tmp/mock.iso",
                 "content_type": "iso"
             }
-        )
-        with pytest.raises(AnsibleFailJson) as exc_info:
-            self.module.main()
+        ):
+            with pytest.raises(AnsibleFailJson) as exc_info:
+                self.module.main()
 
         result = exc_info.value.args[0]
         assert result["failed"] is True
