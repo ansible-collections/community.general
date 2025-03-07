@@ -127,32 +127,32 @@ class TestOcapiInfo(unittest.TestCase):
 
     def test_module_fail_when_required_args_missing(self):
         with self.assertRaises(AnsibleFailJson) as ansible_fail_json:
-            set_module_args({})
-            module.main()
+            with set_module_args({}):
+                module.main()
         self.assertIn("missing required arguments:", get_exception_message(ansible_fail_json))
 
     def test_module_fail_when_unknown_category(self):
         with self.assertRaises(AnsibleFailJson) as ansible_fail_json:
-            set_module_args({
+            with set_module_args({
                 'category': 'unknown',
                 'command': 'JobStatus',
                 'username': 'USERID',
                 'password': 'PASSW0RD=21',
                 'baseuri': MOCK_BASE_URI
-            })
-            module.main()
+            }):
+                module.main()
         self.assertIn("Invalid Category 'unknown", get_exception_message(ansible_fail_json))
 
     def test_module_fail_when_unknown_command(self):
         with self.assertRaises(AnsibleFailJson) as ansible_fail_json:
-            set_module_args({
+            with set_module_args({
                 'category': 'Jobs',
                 'command': 'unknown',
                 'username': 'USERID',
                 'password': 'PASSW0RD=21',
                 'baseuri': MOCK_BASE_URI
-            })
-            module.main()
+            }):
+                module.main()
         self.assertIn("Invalid Command 'unknown", get_exception_message(ansible_fail_json))
 
     def test_job_status_in_progress(self):
@@ -162,15 +162,15 @@ class TestOcapiInfo(unittest.TestCase):
                             delete_request=mock_delete_request,
                             post_request=mock_post_request):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                set_module_args({
+                with set_module_args({
                     'category': 'Jobs',
                     'command': 'JobStatus',
                     'job_name': MOCK_JOB_NAME_IN_PROGRESS,
                     'baseuri': MOCK_BASE_URI,
                     'username': 'USERID',
                     'password': 'PASSWORD=21'
-                })
-                module.main()
+                }):
+                    module.main()
             self.assertEqual(ACTION_WAS_SUCCESSFUL, get_exception_message(ansible_exit_json))
             response_data = ansible_exit_json.exception.args[0]
             self.assertEqual(MOCK_HTTP_RESPONSE_JOB_IN_PROGRESS["data"]["PercentComplete"], response_data["percentComplete"])
@@ -190,15 +190,15 @@ class TestOcapiInfo(unittest.TestCase):
                             delete_request=mock_delete_request,
                             post_request=mock_post_request):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                set_module_args({
+                with set_module_args({
                     'category': 'Jobs',
                     'command': 'JobStatus',
                     'job_name': MOCK_JOB_NAME_COMPLETE,
                     'baseuri': MOCK_BASE_URI,
                     'username': 'USERID',
                     'password': 'PASSWORD=21'
-                })
-                module.main()
+                }):
+                    module.main()
             self.assertEqual(ACTION_WAS_SUCCESSFUL, get_exception_message(ansible_exit_json))
             response_data = ansible_exit_json.exception.args[0]
             self.assertEqual(MOCK_HTTP_RESPONSE_JOB_COMPLETE["data"]["PercentComplete"], response_data["percentComplete"])
@@ -218,15 +218,15 @@ class TestOcapiInfo(unittest.TestCase):
                             delete_request=mock_delete_request,
                             post_request=mock_post_request):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                set_module_args({
+                with set_module_args({
                     'category': 'Jobs',
                     'command': 'JobStatus',
                     'job_name': MOCK_JOB_NAME_DOES_NOT_EXIST,
                     'baseuri': MOCK_BASE_URI,
                     'username': 'USERID',
                     'password': 'PASSWORD=21'
-                })
-                module.main()
+                }):
+                    module.main()
             self.assertEqual(ACTION_WAS_SUCCESSFUL, get_exception_message(ansible_exit_json))
             response_data = ansible_exit_json.exception.args[0]
             self.assertFalse(response_data["jobExists"])

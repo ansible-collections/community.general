@@ -13,9 +13,9 @@ from ansible_collections.community.general.tests.unit.plugins.modules.utils impo
 
 
 def test_terraform_without_argument(capfd):
-    set_module_args({})
-    with pytest.raises(SystemExit) as results:
-        terraform.main()
+    with set_module_args({}):
+        with pytest.raises(SystemExit) as results:
+            terraform.main()
 
     out, err = capfd.readouterr()
     assert not err
