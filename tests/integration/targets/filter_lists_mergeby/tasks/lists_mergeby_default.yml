@@ -6,7 +6,7 @@
 - name: Debug ansible_version
   debug:
     var: ansible_version
-  when: debug_test|d(false)|bool
+  when: debug_test|default(false)|bool
   tags: t0
 
 - name: 1. Test lists merged by attribute name
@@ -14,7 +14,7 @@
     - name: Test lists merged by attribute name debug
       debug:
         msg: "{{ list1 | community.general.lists_mergeby(list2, 'name') }}"
-      when: debug_test|d(false)|bool
+      when: debug_test|default(false)|bool
     - name: Test lists merged by attribute name assert
       assert:
         that:
@@ -27,7 +27,7 @@
     - name: Test list1 empty debug
       debug:
         msg: "{{ [] | community.general.lists_mergeby(list2, 'name') }}"
-      when: debug_test|d(false)|bool
+      when: debug_test|default(false)|bool
     - name: Test list1 empty assert
       assert:
         that:
@@ -40,7 +40,7 @@
     - name: Test all lists empty debug
       debug:
         msg: "{{ [] | community.general.lists_mergeby([], 'name') }}"
-      when: debug_test|d(false)|bool
+      when: debug_test|default(false)|bool
     - name: Test all lists empty assert
       assert:
         that:
@@ -58,7 +58,7 @@
     - name: First argument must be list debug
       debug:
         var: my_list
-      when: debug_test|d(false)|bool
+      when: debug_test|default(false)|bool
     - name: First argument must be list assert
       assert:
         that:
@@ -76,7 +76,7 @@
     - name: Second argument must be list set debug
       debug:
         var: my_list
-      when: debug_test|d(false)|bool
+      when: debug_test|default(false)|bool
     - name: Second argument must be list set assert
       assert:
         that:
@@ -94,7 +94,7 @@
     - name: First arguments after the lists must be string debug
       debug:
         var: my_list
-      when: debug_test|d(false)|bool
+      when: debug_test|default(false)|bool
     - name: First arguments after the lists must be string assert
       assert:
         that:
@@ -112,7 +112,7 @@
     - name: Elements of list must be dictionaries debug
       debug:
         var: my_list
-      when: debug_test|d(false)|bool
+      when: debug_test|default(false)|bool
     - name: Elements of list must be dictionaries assert
       assert:
         that:
@@ -128,7 +128,7 @@
     - name: Merge 3 lists by attribute name. 1 list in params. debug
       debug:
         var: my_list
-      when: debug_test|d(false)|bool
+      when: debug_test|default(false)|bool
     - name: Merge 3 lists by attribute name. 1 list in params. assert
       assert:
         that: my_list | difference(result1) | length == 0
@@ -142,7 +142,7 @@
     - name: Merge 3 lists by attribute name. No list in the params. debug
       debug:
         var: my_list
-      when: debug_test|d(false)|bool
+      when: debug_test|default(false)|bool
     - name: Merge 3 lists by attribute name. No list in the params. asset
       assert:
         that: my_list | difference(result1) | length == 0
@@ -162,7 +162,7 @@
             {{ my_list|to_nice_yaml|indent(2) }}
           my_list|difference(result100):
             {{ my_list|difference(result100)|to_nice_yaml|indent(2) }}
-      when: debug_test|d(false)|bool
+      when: debug_test|default(false)|bool
     - name: Merge 2 lists by attribute name. list_merge='replace'. assert
       assert:
         that: my_list | difference(result100) | length == 0

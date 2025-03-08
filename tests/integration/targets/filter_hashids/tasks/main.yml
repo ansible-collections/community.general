@@ -31,7 +31,7 @@
 
 - name: Register result of invalid salt
   debug:
-    var: "invalid_input | community.general.hashids_encode(salt=10)"
+    var: "single_int | community.general.hashids_encode(salt=10)"
   register: invalid_salt_message
   ignore_errors: true
 
@@ -42,7 +42,7 @@
 
 - name: Register result of invalid alphabet
   debug:
-    var: "invalid_input | community.general.hashids_encode(alphabet='abc')"
+    var: "single_int | community.general.hashids_encode(alphabet='abc')"
   register: invalid_alphabet_message
   ignore_errors: true
 
@@ -53,7 +53,7 @@
 
 - name: Register result of invalid min_length
   debug:
-    var: "invalid_input | community.general.hashids_encode(min_length='foo')"
+    var: "single_int | community.general.hashids_encode(min_length='foo')"
   register: invalid_min_length_message
   ignore_errors: true
 

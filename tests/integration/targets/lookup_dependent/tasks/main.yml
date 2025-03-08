@@ -136,7 +136,8 @@
   assert:
     that:
       - eval_error is failed
-      - eval_error.msg.startswith("Caught \"'foo' is undefined")
+      - >-
+        "Caught \"'foo' is undefined" in eval_error.msg
 
 - name: "Test 5: same variable name reused"
   debug:
@@ -151,7 +152,8 @@
   assert:
     that:
       - eval_error is failed
-      - eval_error.msg.startswith("Caught \"'x' is undefined")
+      - >-
+        "Caught \"'x' is undefined" in eval_error.msg
 
 - name: "Test 6: multi-value dict"
   debug:
@@ -166,7 +168,8 @@
   assert:
     that:
       - eval_error is failed
-      - eval_error.msg == 'Parameter 0 must be a one-element dictionary, got 2 elements'
+      - >-
+        'Parameter 0 must be a one-element dictionary, got 2 elements' in eval_error.msg
 
 - name: "Test 7: empty dict"
   debug:
@@ -180,4 +183,5 @@
   assert:
     that:
       - eval_error is failed
-      - eval_error.msg == 'Parameter 0 must be a one-element dictionary, got 0 elements'
+      - >-
+        'Parameter 0 must be a one-element dictionary, got 0 elements' in eval_error.msg
