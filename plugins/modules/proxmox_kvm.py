@@ -51,6 +51,7 @@ options:
       - device is either V(ich9-intel-hda) or V(intel-hda) or V(AC97).
       - Option C(driver) is V(none) or V(spice).
     type: dict
+    version_added: 10.5.0
   autostart:
     description:
       - Specify if the VM should be automatically restarted after crash (currently ignored in PVE API).
