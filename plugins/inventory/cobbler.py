@@ -106,8 +106,8 @@ DOCUMENTATION = '''
         version_added: 7.1.0
       facts_level:
         description:
-          - normal: Gather only system-level variables
-          - as_rendered: Gather all variables as rolled up by Cobbler
+          - normal - Gather only system-level variables
+          - as_rendered - Gather all variables as rolled up by Cobbler
         type: string
         choices: [ 'normal', 'as_rendered' ]
         default: normal
