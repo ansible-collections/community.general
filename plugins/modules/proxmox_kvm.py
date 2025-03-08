@@ -45,7 +45,7 @@ options:
     type: str
   audio:
     description:
-      - A hash/dictionary of audio devices for the VM. O(audio='{"key":"value", "key":"value"}').
+      - A hash/dictionary of audio devices for the VM. O(audio={"key":"value", "key":"value"}).
       - Keys allowed are - C(audio[n]) where 0 ≤ n ≤ N.
       - Values allowed are - C(device="ich9-intel-hda|intel-hda|AC97",driver="none|spice").
       - C(device) is either V(ich9-intel-hda) or V(intel-hda) or V(AC97).
