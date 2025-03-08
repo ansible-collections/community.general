@@ -48,7 +48,7 @@ options:
       - A hash/dictionary of audio devices for the VM. O(audio='{"key":"value", "key":"value"}').
       - Keys allowed are - C(audio[n]) where 0 ≤ n ≤ N.
       - Values allowed are - C(device="ich9-intel-hda|intel-hda|AC97",driver="none|spice").
-      - device is either V(ich9-intel-hda) or V(intel-hda) or V(AC97).
+      - C(device) is either V(ich9-intel-hda) or V(intel-hda) or V(AC97).
       - Option C(driver) is V(none) or V(spice).
     type: dict
     version_added: 10.5.0
