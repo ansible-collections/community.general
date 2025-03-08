@@ -1,0 +1,2 @@
+bugfixes:
+  - "dependent look plugin - make compatible with ansible-core's Data Tagging feature (https://github.com/ansible-collections/community.general/pull/9833)."
