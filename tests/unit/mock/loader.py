@@ -11,6 +11,7 @@ import os
 from ansible.errors import AnsibleParserError
 from ansible.parsing.dataloader import DataLoader
 from ansible.module_utils.common.text.converters import to_bytes, to_text
+from ansible_collections.community.internal_test_tools.tests.unit.utils.trust import make_trusted as _make_trusted
 
 
 class DictDataLoader(DataLoader):
@@ -25,10 +26,13 @@ class DictDataLoader(DataLoader):
         self._build_known_directories()
         self._vault_secrets = None
 
-    def load_from_file(self, path, cache=True, unsafe=False):
+    def load_from_file(self, path, cache='all', unsafe=False, json_only=False, trusted_as_template=False):  # pylint: disable=arguments-renamed
         path = to_text(path)
         if path in self._file_mapping:
-            return self.load(self._file_mapping[path], path)
+            data = self._file_mapping[path]
+            if trusted_as_template:
+                data = _make_trusted(data)
+            return self.load(data, os.path.abspath(path))
         return None
 
     # TODO: the real _get_file_contents returns a bytestring, so we actually convert the
