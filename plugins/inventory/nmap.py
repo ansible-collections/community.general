@@ -88,8 +88,8 @@ DOCUMENTATION = '''
             version_added: 6.1.0
         dns_servers:
             description: Specify which DNS servers to use for name resolution.
-            type: string
-            default: false
+            type: list
+            elements: string
         use_arp_ping:
             description: Whether to always (V(true)) use the quick ARP ping or (V(false)) a slower but more reliable method.
             type: boolean
