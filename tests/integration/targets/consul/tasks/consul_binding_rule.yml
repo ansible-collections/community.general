@@ -33,7 +33,7 @@
     that:
       - result is changed
       - result.binding_rule.AuthMethod == 'test'
-      - result.binding.Description == 'test-binding: my description'
+      - "result.binding_rule.Description == 'test-binding: my description'"
       - result.operation == 'create'
 
 - name: Update a binding rule
@@ -46,7 +46,7 @@
 - assert:
     that:
       - result is changed
-      - result.binding.Description == 'test-binding: my description'
+      - "result.binding_rule.Description == 'test-binding: my description'"
       - result.operation == 'update'
 
 - name: Update a binding rule (noop)
@@ -58,7 +58,7 @@
 - assert:
     that:
       - result is not changed
-      - result.binding.Description == 'test-binding: my description'
+      - "result.binding_rule.Description == 'test-binding: my description'"
       - result.operation is not defined
 
 - name: Delete a binding rule
