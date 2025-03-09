@@ -31,7 +31,6 @@ def systemd_info_runner(module, command, **kwargs):
         module,
         command=command,
         arg_formats=arg_formats,
-        environ_update={'LC_ALL': 'C', 'LANG': 'C'},
         check_rc=True,
         **kwargs
     )
