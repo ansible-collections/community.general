@@ -6,7 +6,7 @@
 - name: Debug ansible_version
   ansible.builtin.debug:
     var: ansible_version
-  when: debug_test|d(false)|bool
+  when: debug_test|default(false)|bool
   tags: t0
 
 - name: 1. Test valid hostnames. Default options.
@@ -14,7 +14,7 @@
     - name: "1. Default min_labels=1, allow_underscores=False"
       ansible.builtin.debug:
         msg: "hosts_invalid: {{ hosts_invalid }}"
-      when: debug_test|d(false)|bool
+      when: debug_test|default(false)|bool
     - name: Assert
       ansible.builtin.assert:
         that: hosts_invalid|difference(result)|length == 0
@@ -29,7 +29,7 @@
     - name: "2. allow_underscores=True, default min_labels=1"
       ansible.builtin.debug:
         msg: "hosts_invalid: {{ hosts_invalid }}"
-      when: debug_test|d(false)|bool
+      when: debug_test|default(false)|bool
     - name: Assert
       ansible.builtin.assert:
         that: hosts_invalid|difference(result)|length == 0
@@ -45,7 +45,7 @@
     - name: "3. allow_underscores=True, min_labels=2"
       ansible.builtin.debug:
         msg: "hosts_invalid: {{ hosts_invalid }}"
-      when: debug_test|d(false)|bool
+      when: debug_test|default(false)|bool
     - name: Assert
       ansible.builtin.assert:
         that: hosts_invalid|difference(result)|length == 0

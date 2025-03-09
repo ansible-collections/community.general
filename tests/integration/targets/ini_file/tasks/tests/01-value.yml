@@ -253,7 +253,7 @@
     path: "{{ output_file }}"
     section: mysqld
     option: "{{ item.o }}"
-    value: "{{ item.v | d(omit) }}"
+    value: "{{ item.v | default(omit) }}"
     allow_no_value: true
   loop:
     - { o: "skip-name-resolve" }
@@ -512,10 +512,10 @@
     - name: test-value 20 - Tests with empty strings
       ini_file:
         path: "{{ output_file }}"
-        section: "{{ item.section | d('extensions') }}"
+        section: "{{ item.section | default('extensions') }}"
         option: "{{ item.option }}"
         value: ""
-        allow_no_value: "{{ item.no_value | d(omit) }}"
+        allow_no_value: "{{ item.no_value | default(omit) }}"
       loop:
         - option: evolve
         - option: regress

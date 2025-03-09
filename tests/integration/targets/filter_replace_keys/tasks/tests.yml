@@ -6,7 +6,7 @@
 - name: Debug ansible_version
   ansible.builtin.debug:
     var: ansible_version
-  when: not quite_test | d(true) | bool
+  when: not (quiet_test | default(true) | bool)
   tags: ansible_version
 
 - name: Tests
@@ -19,13 +19,13 @@
     fail_msg: |
       [ERR] result:
       {{ result | to_yaml }}
-    quiet: "{{ quiet_test | d(true) | bool }}"
+    quiet: "{{ quiet_test | default(true) | bool }}"
   loop: "{{ tests | subelements('group') }}"
   loop_control:
     loop_var: i
-    label: "{{ i.1.mp | d('default') }}: {{ i.1.tt }}"
+    label: "{{ i.1.mp | default('default') }}: {{ i.1.tt }}"
   vars:
     input: "{{ i.0.input }}"
     target: "{{ i.1.tt }}"
-    mp: "{{ i.1.mp | d('default') }}"
+    mp: "{{ i.1.mp | default('default') }}"
     result: "{{ lookup('template', i.0.template) }}"

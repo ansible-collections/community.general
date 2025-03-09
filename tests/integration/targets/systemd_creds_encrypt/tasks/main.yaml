@@ -19,7 +19,7 @@
     - name: Assert encrypted secret output is base64 encoded
       ansible.builtin.assert:
         that:
-          - encrypted_secret.value | b64decode
+          - (encrypted_secret.value | b64decode) is truthy
         fail_msg: "Encrypted secret is not base64 encoded"
         success_msg: "Encrypted secret is base64 encoded"
 

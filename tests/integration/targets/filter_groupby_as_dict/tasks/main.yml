@@ -16,7 +16,7 @@
 
 - assert:
     that:
-      - result.msg == 'Input is not a sequence'
+      - result.msg is search('Input is not a sequence')
 
 - name: 'Test error: list element not a mapping'
   set_fact:
@@ -26,7 +26,7 @@
 
 - assert:
     that:
-      - "result.msg == 'Sequence element #0 is not a mapping'"
+      - "result.msg is search('Sequence element #0 is not a mapping')"
 
 - name: 'Test error: list element does not have attribute'
   set_fact:
@@ -36,7 +36,7 @@
 
 - assert:
     that:
-      - "result.msg == 'Attribute not contained in element #1 of sequence'"
+      - "result.msg is search('Attribute not contained in element #1 of sequence')"
 
 - name: 'Test error: attribute collision'
   set_fact:
@@ -46,4 +46,4 @@
 
 - assert:
     that:
-      - result.msg == "Multiple sequence entries have attribute value 'a'" or result.msg == "Multiple sequence entries have attribute value u'a'"
+      - result.msg is search("Multiple sequence entries have attribute value u?'a'")

@@ -22,7 +22,7 @@
 - assert:
     that:
       - simple_create_result is changed
-      - simple_create_result.token.AccessorID
+      - simple_create_result.token.AccessorID is truthy
       - simple_create_result.operation == 'create'
 
 - name: Create token
@@ -84,5 +84,5 @@
 - assert:
     that:
       - result is changed
-      - not result.token
+      - result.token is falsy
       - result.operation == 'remove'
