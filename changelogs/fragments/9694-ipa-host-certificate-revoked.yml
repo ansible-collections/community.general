@@ -1,0 +1,2 @@
+bugfixes:
+  - ipa_host - module revoked existing host certificates even if ``user_certificate`` was not given (https://github.com/ansible-collections/community.general/pull/9694).
