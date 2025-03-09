@@ -20,7 +20,7 @@ description:
 options:
   http_agent:
     description:
-      - HTTP user agent to use requests to Slack.
+      - HTTP user agent to use for requests to Slack.
     type: string
     version_added: "10.5.0"
   webhook_url:
