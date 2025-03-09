@@ -286,6 +286,7 @@ def validate_unit_and_properties(runner, unit, extra_properties, units_info, pro
         module.fail_json(msg="Unit '{0}' does not exist or is inaccessible.".format(unit))
 
     category = determine_category(unit)
+
     if not category:
         module.fail_json(msg="Could not determine the category for unit '{0}'.".format(unit))
 
@@ -309,6 +310,7 @@ def validate_unit_and_properties(runner, unit, extra_properties, units_info, pro
 def process_wildcards(selected_units, all_units, module):
     resolved_units = {}
     non_matching_patterns = []
+
     for pattern in selected_units:
         matches = fnmatch.filter(all_units, pattern)
         if not matches:
@@ -316,6 +318,7 @@ def process_wildcards(selected_units, all_units, module):
         else:
             for match in matches:
                 resolved_units[match] = True
+
     if not resolved_units:
         module.fail_json(msg="No units match any of the provided patterns: {}".format(", ".join(non_matching_patterns)))
 
