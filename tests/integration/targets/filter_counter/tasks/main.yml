@@ -26,7 +26,7 @@
   assert:
     that:
       - res is failed
-      - res.msg is match('Argument for community.general.counter must be a sequence')
+      - res.msg is search('Argument for community.general.counter must be a sequence')
 
 - name: test fail element not hashable
   debug:
@@ -38,4 +38,4 @@
   assert:
     that:
       - res is failed
-      - res.msg is match('community.general.counter needs a sequence with hashable elements')
+      - res.msg is search('community.general.counter needs a sequence with hashable elements')

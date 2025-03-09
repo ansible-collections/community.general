@@ -70,7 +70,7 @@
       async: "{{ ansible_timeout }}"
       poll: 0
       vars:
-        ansible_timeout: "{{ max_delay | d(300) }}"
+        ansible_timeout: "{{ max_delay | default(300) }}"
 
   rescue:
     - name: "explain expected failure"
@@ -179,7 +179,7 @@
       async: "{{ ansible_timeout }}"
       poll: 0
       vars:
-        ansible_timeout: "{{ max_delay | d(300) }}"
+        ansible_timeout: "{{ max_delay | default(300) }}"
 
   rescue:
     - name: "explain expected failure"

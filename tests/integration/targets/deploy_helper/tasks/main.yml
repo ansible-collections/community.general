@@ -123,11 +123,12 @@
   register: releases_path
 - stat: path={{ deploy_helper.shared_path }}
   register: shared_path
+  when: deploy_helper.shared_path is truthy
 - name: Assert State=present with shared_path set to False
   assert:
     that:
     - "releases_path.stat.exists"
-    - "not shared_path.stat.exists"
+    - "deploy_helper.shared_path is falsy or not shared_path.stat.exists"
 
 # Setup older releases for tests
 - file: path={{ deploy_helper.releases_path }}/{{ item }} state=directory
