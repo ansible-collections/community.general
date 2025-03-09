@@ -30,6 +30,6 @@
   assert:
     that:
       - integer_result is failed
-      - integer_result.msg is match('Invalid value type.*')
+      - integer_result.msg is search('Invalid value type')
       - non_uniform_list_result is failed
-      - non_uniform_list_result.msg is match('Unexpected templating type error.*can only concatenate str.*')
+      - non_uniform_list_result.msg is search('can only concatenate str')

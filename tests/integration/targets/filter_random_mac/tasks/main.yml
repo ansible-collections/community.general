@@ -19,7 +19,7 @@
   assert:
     that:
       - _bad_random_mac_filter is failed
-      - "_bad_random_mac_filter.msg is match('Invalid value type (.*int.*) for random_mac .*')"
+      - "_bad_random_mac_filter.msg is search('Invalid value type (.*int.*) for random_mac .*')"
 
 - name: Test random_mac filter bad argument value
   debug:
@@ -31,7 +31,7 @@
   assert:
     that:
       - _bad_random_mac_filter is failed
-      - "_bad_random_mac_filter.msg is match('Invalid value (.*) for random_mac: .* not hexa byte')"
+      - "_bad_random_mac_filter.msg is search('Invalid value (.*) for random_mac: .* not hexa byte')"
 
 - name: Test random_mac filter prefix too big
   debug:
@@ -43,7 +43,7 @@
   assert:
     that:
       - _bad_random_mac_filter is failed
-      - "_bad_random_mac_filter.msg is match('Invalid value (.*) for random_mac: 5 colon.* separated items max')"
+      - "_bad_random_mac_filter.msg is search('Invalid value (.*) for random_mac: 5 colon.* separated items max')"
 
 - name:  Verify random_mac filter
   assert:

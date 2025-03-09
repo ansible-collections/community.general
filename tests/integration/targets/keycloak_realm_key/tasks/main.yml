@@ -151,7 +151,8 @@
       - result.end_state.config.enabled == ["true"]
       - result.end_state.config.algorithm == ["RS256"]
       - result.end_state.config.priority == ["140"]
-      - result.msg == "Realm key testkey would be changed: config.priority ['150'] -> ['140']"
+      - >-
+        result.msg == "Realm key testkey would be changed: config.priority ['150'] -> ['140']"
 
 - name: Update custom realm key
   community.general.keycloak_realm_key:
@@ -184,7 +185,8 @@
       - result.end_state.config.enabled == ["true"]
       - result.end_state.config.algorithm == ["RS256"]
       - result.end_state.config.priority == ["140"]
-      - result.msg == "Realm key testkey changed: config.priority ['150'] -> ['140']"
+      - >-
+        result.msg == "Realm key testkey changed: config.priority ['150'] -> ['140']"
 
 - name: Update custom realm key (test for idempotency)
   community.general.keycloak_realm_key:
