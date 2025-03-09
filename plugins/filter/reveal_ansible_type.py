@@ -23,29 +23,29 @@ options:
 """
 
 EXAMPLES = r"""
-# Substitution converts str to AnsibleUnicode
-# -------------------------------------------
+# Substitution converts str to AnsibleUnicode or _AnsibleTaggedStr
+# ----------------------------------------------------------------
 
-# String. AnsibleUnicode.
+# String. AnsibleUnicode or _AnsibleTaggedStr.
 - data: "abc"
   result: '{{ data | community.general.reveal_ansible_type }}'
-# result => AnsibleUnicode
+# result => AnsibleUnicode (or _AnsibleTaggedStr)
 
-# String. AnsibleUnicode alias str.
-- alias: {"AnsibleUnicode": "str"}
+# String. AnsibleUnicode/_AnsibleTaggedStr alias str.
+- alias: {"AnsibleUnicode": "str", "_AnsibleTaggedStr": "str"}
   data: "abc"
   result: '{{ data | community.general.reveal_ansible_type(alias) }}'
 # result => str
 
-# List. All items are AnsibleUnicode.
+# List. All items are AnsibleUnicode/_AnsibleTaggedStr.
 - data: ["a", "b", "c"]
   result: '{{ data | community.general.reveal_ansible_type }}'
-# result => list[AnsibleUnicode]
+# result => list[AnsibleUnicode] or list[_AnsibleTaggedStr]
 
-# Dictionary. All keys are AnsibleUnicode. All values are AnsibleUnicode.
+# Dictionary. All keys and values are AnsibleUnicode/_AnsibleTaggedStr.
 - data: {"a": "foo", "b": "bar", "c": "baz"}
   result: '{{ data | community.general.reveal_ansible_type }}'
-# result => dict[AnsibleUnicode, AnsibleUnicode]
+# result => dict[AnsibleUnicode, AnsibleUnicode] or dict[_AnsibleTaggedStr, _AnsibleTaggedStr]
 
 # No substitution and no alias. Type of strings is str
 # ----------------------------------------------------
@@ -82,29 +82,43 @@ EXAMPLES = r"""
 - result: '{{ {"a": 1, "b": 2} | community.general.reveal_ansible_type }}'
 # result => dict[str, int]
 
-# Type of strings is AnsibleUnicode or str
-# ----------------------------------------
+# Type of strings is AnsibleUnicode, _AnsibleTaggedStr, or str
+# ------------------------------------------------------------
 
 # Dictionary. The keys are integers or strings. All values are strings.
-- alias: {"AnsibleUnicode": "str"}
+- alias:
+    AnsibleUnicode: str
+    _AnsibleTaggedStr: str
+    _AnsibleTaggedInt: int
   data: {1: 'a', 'b': 'b'}
   result: '{{ data | community.general.reveal_ansible_type(alias) }}'
 # result => dict[int|str, str]
 
 # Dictionary. All keys are integers. All values are keys.
-- alias: {"AnsibleUnicode": "str"}
+- alias:
+    AnsibleUnicode: str
+    _AnsibleTaggedStr: str
+    _AnsibleTaggedInt: int
   data: {1: 'a', 2: 'b'}
   result: '{{ data | community.general.reveal_ansible_type(alias) }}'
 # result => dict[int, str]
 
 # Dictionary. All keys are strings. Multiple types values.
-- alias: {"AnsibleUnicode": "str"}
+- alias:
+    AnsibleUnicode: str
+    _AnsibleTaggedStr: str
+    _AnsibleTaggedInt: int
+    _AnsibleTaggedFloat: float
   data: {'a': 1, 'b': 1.1, 'c': 'abc', 'd': true, 'e': ['x', 'y', 'z'], 'f': {'x': 1, 'y': 2}}
   result: '{{ data | community.general.reveal_ansible_type(alias) }}'
 # result => dict[str, bool|dict|float|int|list|str]
 
 # List. Multiple types items.
-- alias: {"AnsibleUnicode": "str"}
+- alias:
+    AnsibleUnicode: str
+    _AnsibleTaggedStr: str
+    _AnsibleTaggedInt: int
+    _AnsibleTaggedFloat: float
   data: [1, 2, 1.1, 'abc', true, ['x', 'y', 'z'], {'x': 1, 'y': 2}]
   result: '{{ data | community.general.reveal_ansible_type(alias) }}'
 # result => list[bool|dict|float|int|list|str]
@@ -122,6 +136,7 @@ from ansible_collections.community.general.plugins.plugin_utils.ansible_type imp
 def reveal_ansible_type(data, alias=None):
     """Returns data type"""
 
+    # TODO: expose use_native_type parameter
     return _ansible_type(data, alias)
 
 
