@@ -207,67 +207,26 @@ units:
 
 import fnmatch
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
+from ansible_collections.community.general.plugins.module_utils.systemd_info import systemd_info_runner
 
 
-def run_version(module, systemctl_bin):
-    runner = CmdRunner(
-        module,
-        command=systemctl_bin,
-        arg_formats=dict(
-            version=cmd_runner_fmt.as_fixed("--version")
-        ),
-        default_args_order="version",
-        environ_update={'LC_ALL': 'en_US.UTF-8', 'LANG': 'en_US.UTF-8'},
-        force_lang="en_US",
-        check_rc=True,
-    )
+def run_version(runner):
     with runner("version") as ctx:
         rc, stdout, stderr = ctx.run()
     return stdout.strip()
 
 
-def list_units(module, systemctl_bin):
-    runner = CmdRunner(
-        module,
-        command=systemctl_bin,
-        arg_formats=dict(
-            list_units=cmd_runner_fmt.as_fixed("list-units"),
-            no_pager=cmd_runner_fmt.as_fixed("--no-pager"),
-            typ=cmd_runner_fmt.as_fixed("--type"),
-            types=cmd_runner_fmt.as_fixed("service,target,socket,mount"),
-            all=cmd_runner_fmt.as_fixed("--all"),
-            plain=cmd_runner_fmt.as_fixed("--plain"),
-            no_legend=cmd_runner_fmt.as_fixed("--no-legend"),
-        ),
-        default_args_order="list_units no_pager typ types all plain no_legend",
-        environ_update={'LC_ALL': 'en_US.UTF-8', 'LANG': 'en_US.UTF-8'},
-        force_lang="en_US",
-        check_rc=True,
-    )
-    with runner("list_units no_pager typ types all plain no_legend") as ctx:
-        rc, stdout, stderr = ctx.run()
+def list_units(runner, types_value):
+    context = "list_units no_pager typ types all plain no_legend"
+    with runner(context) as ctx:
+        rc, stdout, stderr = ctx.run(types=types_value)
     return stdout.strip()
 
 
-def show_unit_properties(module, systemctl_bin, prop_list, unit):
+def show_unit_properties(runner, prop_list, unit):
     props_str = ",".join(prop_list)
-    runner = CmdRunner(
-        module,
-        command=systemctl_bin,
-        arg_formats=dict(
-            show=cmd_runner_fmt.as_fixed("show"),
-            p=cmd_runner_fmt.as_fixed("-p"),
-            props=cmd_runner_fmt.as_list(),
-            dashdash=cmd_runner_fmt.as_fixed("--"),
-            unit=cmd_runner_fmt.as_list(),
-        ),
-        default_args_order="show p props dashdash unit",
-        environ_update={'LC_ALL': 'en_US.UTF-8', 'LANG': 'en_US.UTF-8'},
-        force_lang="en_US",
-        check_rc=True,
-    )
-    with runner("show p props dashdash unit") as ctx:
+    context = "show p props dashdash unit"
+    with runner(context) as ctx:
         rc, stdout, stderr = ctx.run(props=props_str, unit=unit)
     return stdout.strip()
 
@@ -283,8 +242,8 @@ def parse_show_output(output):
     return result
 
 
-def get_unit_properties(module, systemctl_bin, unit, prop_list):
-    output = show_unit_properties(module, systemctl_bin, prop_list, unit)
+def get_unit_properties(runner, prop_list, unit):
+    output = show_unit_properties(runner, prop_list, unit)
     return parse_show_output(output)
 
 
@@ -322,7 +281,7 @@ def get_category_base_props(category):
     return base_props.get(category, [])
 
 
-def validate_unit_and_properties(module, systemctl_bin, unit, extra_properties, units_info, property_cache):
+def validate_unit_and_properties(runner, unit, extra_properties, units_info, property_cache):
     if not unit_exists(unit, units_info):
         module.fail_json(msg="Unit '{0}' does not exist or is inaccessible.".format(unit))
 
@@ -335,7 +294,7 @@ def validate_unit_and_properties(module, systemctl_bin, unit, extra_properties, 
     full_props = set(props + state_props + extra_properties)
 
     if unit not in property_cache:
-        unit_data = get_unit_properties(module, systemctl_bin, unit, full_props)
+        unit_data = get_unit_properties(runner, full_props, unit)
         property_cache[unit] = unit_data
     else:
         unit_data = property_cache[unit]
@@ -343,6 +302,7 @@ def validate_unit_and_properties(module, systemctl_bin, unit, extra_properties, 
         missing_props = [prop for prop in extra_properties if prop.lower() not in unit_data]
         if missing_props:
             module.fail_json(msg="The following properties do not exist for unit '{0}': {1}".format(unit, ", ".join(missing_props)))
+
     return True
 
 
@@ -358,15 +318,17 @@ def process_wildcards(selected_units, all_units, module):
                 resolved_units[match] = True
     if not resolved_units:
         module.fail_json(msg="No units match any of the provided patterns: {}".format(", ".join(non_matching_patterns)))
+
     return resolved_units, non_matching_patterns
 
 
-def process_unit(unit, extra_properties, units_info, property_cache, state_props, module, systemctl_bin):
+def process_unit(runner, unit, extra_properties, units_info, property_cache, state_props):
     if not unit_exists(unit, units_info):
         return units_info.get(unit, {"name": unit, "loadstate": "not-found"})
 
-    validate_unit_and_properties(module, systemctl_bin, unit, extra_properties, units_info, property_cache)
+    validate_unit_and_properties(runner, unit, extra_properties, units_info, property_cache)
     category = determine_category(unit)
+
     if not category:
         module.fail_json(msg="Could not determine the category for unit '{0}'.".format(unit))
 
@@ -377,6 +339,7 @@ def process_unit(unit, extra_properties, units_info, property_cache, state_props
     minimal_keys = ["LoadState", "ActiveState", "SubState"]
     fact.update(extract_unit_properties(unit_data, minimal_keys))
     ls = unit_data.get("loadstate", "").lower()
+
     if ls not in ("not-found", "masked"):
         fact.update(extract_unit_properties(unit_data, full_props))
 
@@ -384,6 +347,7 @@ def process_unit(unit, extra_properties, units_info, property_cache, state_props
 
 
 def main():
+    global module
     module_args = dict(
         unitname=dict(type='list', elements='str', default=[]),
         extra_properties=dict(type='list', elements='str', default=[])
@@ -391,12 +355,16 @@ def main():
     module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
     systemctl_bin = module.get_bin_path('systemctl', required=True)
 
-    run_version(module, systemctl_bin)
+    base_runner = systemd_info_runner(module, systemctl_bin)
+
+    run_version(base_runner)
 
     state_props = ['LoadState', 'ActiveState', 'SubState']
     results = {}
 
-    list_output = list_units(module, systemctl_bin)
+    unit_types = ["service", "target", "socket", "mount"]
+
+    list_output = list_units(base_runner, unit_types)
     units_info = {}
     for line in list_output.splitlines():
         tokens = line.split()
@@ -425,10 +393,7 @@ def main():
         units_to_process = list(units_info)
 
     for unit in units_to_process:
-        results[unit] = process_unit(
-            unit, extra_properties, units_info, property_cache,
-            state_props, module, systemctl_bin
-        )
+        results[unit] = process_unit(base_runner, unit, extra_properties, units_info, property_cache, state_props)
     module.exit_json(changed=False, units=results)
 
 
