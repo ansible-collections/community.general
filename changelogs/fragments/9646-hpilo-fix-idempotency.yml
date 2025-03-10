@@ -1,0 +1,2 @@
+minor_changes:
+  - "hpilo_boot - Fix module failing when trying to power on an already powered-on server (idempotency issue) (https://github.com/ansible-collections/community.general/pull/9646)."
