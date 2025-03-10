@@ -1,0 +1,2 @@
+minor_changes:
+  - audio - add missing audio hardware device handling for proxmox_kvm module (https://github.com/ansible-collections/community.general/issues/5192).

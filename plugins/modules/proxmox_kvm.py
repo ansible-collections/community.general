@@ -43,6 +43,15 @@ options:
       - Pass arbitrary arguments to kvm.
       - This option is for experts only!
     type: str
+  audio:
+    description:
+      - A hash/dictionary of audio devices for the VM. O(audio={"key":"value", "key":"value"}).
+      - Keys allowed are - C(audio[n]) where 0 ≤ n ≤ N.
+      - Values allowed are - C(device="ich9-intel-hda|intel-hda|AC97",driver="none|spice").
+      - C(device) is either V(ich9-intel-hda) or V(intel-hda) or V(AC97).
+      - Option C(driver) is V(none) or V(spice).
+    type: dict
+    version_added: 10.5.0
   autostart:
     description:
       - Specify if the VM should be automatically restarted after crash (currently ignored in PVE API).
@@ -1086,7 +1095,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             )
 
         # Convert all dict in kwargs to elements.
-        # For hostpci[n], ide[n], net[n], numa[n], parallel[n], sata[n], scsi[n], serial[n], virtio[n], ipconfig[n], usb[n]
+        # For audio[n], hostpci[n], ide[n], net[n], numa[n], parallel[n], sata[n], scsi[n], serial[n], virtio[n], ipconfig[n], usb[n]
         for k in list(kwargs.keys()):
             if isinstance(kwargs[k], dict):
                 kwargs.update(kwargs[k])
@@ -1227,6 +1236,7 @@ def main():
         acpi=dict(type='bool'),
         agent=dict(type='str'),
         args=dict(type='str'),
+        audio=dict(type='dict'),
         autostart=dict(type='bool'),
         balloon=dict(type='int'),
         bios=dict(choices=['seabios', 'ovmf']),
@@ -1435,6 +1445,7 @@ def main():
                               archive=module.params['archive'],
                               acpi=module.params['acpi'],
                               agent=module.params['agent'],
+                              audio=module.params['audio'],
                               autostart=module.params['autostart'],
                               balloon=module.params['balloon'],
                               bios=module.params['bios'],
