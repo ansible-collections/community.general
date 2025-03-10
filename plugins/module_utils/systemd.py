@@ -10,7 +10,7 @@ __metaclass__ = type
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
 
 
-def systemd_info_runner(module, command, **kwargs):
+def systemd_runner(module, command, **kwargs):
     arg_formats = dict(
         version=cmd_runner_fmt.as_fixed("--version"),
         list_units=cmd_runner_fmt.as_fixed("list-units"),

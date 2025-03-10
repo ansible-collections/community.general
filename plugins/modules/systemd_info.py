@@ -207,10 +207,10 @@ units:
 
 import fnmatch
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.systemd_info import systemd_info_runner
+from ansible_collections.community.general.plugins.module_utils.systemd import systemd_runner
 
 
-def run_version(runner):
+def get_version(runner):
     with runner("version") as ctx:
         rc, stdout, stderr = ctx.run()
     return stdout.strip()
@@ -358,9 +358,9 @@ def main():
     module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
     systemctl_bin = module.get_bin_path('systemctl', required=True)
 
-    base_runner = systemd_info_runner(module, systemctl_bin)
+    base_runner = systemd_runner(module, systemctl_bin)
 
-    run_version(base_runner)
+    get_version(base_runner)
 
     state_props = ['LoadState', 'ActiveState', 'SubState']
     results = {}
