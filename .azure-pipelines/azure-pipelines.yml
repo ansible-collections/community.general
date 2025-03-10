@@ -71,6 +71,20 @@ stages:
             - test: 3
             - test: 4
             - test: extra
+  - stage: Sanity_datatagging
+    displayName: Sanity datatagging
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          nameFormat: Test {0}
+          testFormat: datatagging/sanity/{0}
+          targets:
+            - test: 1
+            - test: 2
+            - test: 3
+            - test: 4
+            - test: extra
   - stage: Sanity_2_18
     displayName: Sanity 2.18
     dependsOn: []
@@ -119,6 +133,21 @@ stages:
         parameters:
           nameFormat: Python {0}
           testFormat: devel/units/{0}/1
+          targets:
+            - test: 3.8
+            - test: 3.9
+            - test: '3.10'
+            - test: '3.11'
+            - test: '3.12'
+            - test: '3.13'
+  - stage: Units_datatagging
+    displayName: Units datatagging
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          nameFormat: Python {0}
+          testFormat: datatagging/units/{0}/1
           targets:
             - test: 3.8
             - test: 3.9
@@ -200,6 +229,26 @@ stages:
             - 1
             - 2
             - 3
+  - stage: Remote_datatagging
+    displayName: Remote datatagging
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          testFormat: datatagging/{0}
+          targets:
+            - name: macOS 15.3
+              test: macos/15.3
+            - name: RHEL 9.5
+              test: rhel/9.5
+            - name: FreeBSD 14.2
+              test: freebsd/14.2
+            - name: FreeBSD 13.4
+              test: freebsd/13.4
+          groups:
+            - 1
+            - 2
+            - 3
   - stage: Remote_2_18
     displayName: Remote 2.18
     dependsOn: []
@@ -267,6 +316,26 @@ stages:
       - template: templates/matrix.yml
         parameters:
           testFormat: devel/linux/{0}
+          targets:
+            - name: Fedora 41
+              test: fedora41
+            - name: Alpine 3.21
+              test: alpine321
+            - name: Ubuntu 22.04
+              test: ubuntu2204
+            - name: Ubuntu 24.04
+              test: ubuntu2404
+          groups:
+            - 1
+            - 2
+            - 3
+  - stage: Docker_datatagging
+    displayName: Docker datatagging
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          testFormat: datatagging/linux/{0}
           targets:
             - name: Fedora 41
               test: fedora41
@@ -409,19 +478,23 @@ stages:
   - stage: Summary
     condition: succeededOrFailed()
     dependsOn:
+      - Sanity_datatagging
       - Sanity_devel
       - Sanity_2_18
       - Sanity_2_17
       - Sanity_2_16
+      - Units_datatagging
       - Units_devel
       - Units_2_18
       - Units_2_17
       - Units_2_16
       - Remote_devel_extra_vms
+      - Remote_datatagging
       - Remote_devel
       - Remote_2_18
       - Remote_2_17
       - Remote_2_16
+      - Docker_datatagging
       - Docker_devel
       - Docker_2_18
       - Docker_2_17
