@@ -22,7 +22,7 @@ test_cases:
         - "ip=[192.168.2.1]"
     output:
       changed: true
-      previous_value:
+      previous_value: null
       value: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
     mocks:
       run_command:
@@ -76,8 +76,8 @@ test_cases:
       name: virtual-ip
     output:
       changed: false
-      previous_value:
-      value:
+      previous_value: null
+      value: null
     mocks:
       run_command:
         - command: [/testbin/pcs, resource, status, virtual-ip]
@@ -102,7 +102,7 @@ test_cases:
     output:
       changed: true
       previous_value: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
-      value:
+      value: null
     mocks:
       run_command:
         - command: [/testbin/pcs, resource, status, virtual-ip]
