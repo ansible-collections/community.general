@@ -217,17 +217,16 @@ def get_version(runner):
 
 
 def list_units(runner, types_value):
-    context = "list_units no_pager typ types all plain no_legend"
+    context = "list_units typ types all plain no_legend"
     with runner(context) as ctx:
         rc, stdout, stderr = ctx.run(types=types_value)
     return stdout.strip()
 
 
 def show_unit_properties(runner, prop_list, unit):
-    props_str = ",".join(prop_list)
-    context = "show p props dashdash unit"
+    context = "show props dashdash unit"
     with runner(context) as ctx:
-        rc, stdout, stderr = ctx.run(props=props_str, unit=unit)
+        rc, stdout, stderr = ctx.run(props=prop_list, unit=unit)
     return stdout.strip()
 
 

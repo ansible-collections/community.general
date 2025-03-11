@@ -1,2 +1,2 @@
 minor_changes:
-  - systemd_info - add wildcards support (https://github.com/ansible-collections/community.general/pull/9821).
+  - systemd_info - add wildcard expression support in ``unitname`` option (https://github.com/ansible-collections/community.general/pull/9821).

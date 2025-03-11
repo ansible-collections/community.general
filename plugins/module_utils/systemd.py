@@ -13,16 +13,14 @@ from ansible_collections.community.general.plugins.module_utils.cmd_runner impor
 def systemd_runner(module, command, **kwargs):
     arg_formats = dict(
         version=cmd_runner_fmt.as_fixed("--version"),
-        list_units=cmd_runner_fmt.as_fixed("list-units"),
-        no_pager=cmd_runner_fmt.as_fixed("--no-pager"),
+        list_units=cmd_runner_fmt.as_fixed(["list-units", "--no-pager"]),
         typ=cmd_runner_fmt.as_fixed("--type"),
         types=cmd_runner_fmt.as_func(lambda v: [] if not v else [",".join(v)]),
         all=cmd_runner_fmt.as_fixed("--all"),
         plain=cmd_runner_fmt.as_fixed("--plain"),
         no_legend=cmd_runner_fmt.as_fixed("--no-legend"),
         show=cmd_runner_fmt.as_fixed("show"),
-        p=cmd_runner_fmt.as_fixed("-p"),
-        props=cmd_runner_fmt.as_list(),
+        props=cmd_runner_fmt.as_func(lambda v: [] if not v else ["-p", ",".join(v)]),
         dashdash=cmd_runner_fmt.as_fixed("--"),
         unit=cmd_runner_fmt.as_list(),
     )
