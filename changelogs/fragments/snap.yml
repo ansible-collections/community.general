@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - snap - handle IndexError while processing output (https://github.com/ansible-collections/community.general/issues/9656).

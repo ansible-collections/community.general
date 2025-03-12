@@ -84,7 +84,7 @@ options:
     default: false
     version_added: 7.2.0
 notes:
-  - Privileged operations, such as installing and configuring snaps, require root priviledges. This is only the case if the
+  - Privileged operations, such as installing and configuring snaps, require root privileges. This is only the case if the
     user has not logged in to the Snap Store.
 author:
   - Victor Carceler (@vcarceler) <vcarceler@iespuigcastellar.xeill.net>
@@ -315,8 +315,9 @@ class Snap(StateModuleHelper):
     def names_from_snaps(self, snaps):
         def process_one(rc, out, err):
             res = [line for line in out.split("\n") if line.startswith("name:")]
-            name = res[0].split()[1]
-            return [name]
+            if len(res) >= 1:
+                return [res[0].split()[1]]
+            return []
 
         def process_many(rc, out, err):
             # This needs to be "\n---" instead of just "---" because otherwise
