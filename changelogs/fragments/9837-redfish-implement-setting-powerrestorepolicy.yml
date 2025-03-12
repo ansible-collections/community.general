@@ -1,0 +1,2 @@
+minor_changes:
+  - redfish_config - add command ``SetPowerRestorePolicy`` to set the desired power state of the system when power is restored (https://github.com/ansible-collections/community.general/pull/9837).

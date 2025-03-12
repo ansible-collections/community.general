@@ -3983,3 +3983,7 @@ class RedfishUtils(object):
 
     def get_multi_power_restore_policy(self):
         return self.aggregate_systems(self.get_power_restore_policy)
+
+    def set_power_restore_policy(self, policy):
+        body = {'PowerRestorePolicy': policy}
+        return self.patch_request(self.root_uri + self.systems_uri, body, check_pyld=True)
