@@ -217,7 +217,7 @@ def get_version(runner):
 
 
 def list_units(runner, types_value):
-    context = "list_units typ types all plain no_legend"
+    context = "list_units types all plain no_legend"
     with runner(context) as ctx:
         rc, stdout, stderr = ctx.run(types=types_value)
     return stdout.strip()

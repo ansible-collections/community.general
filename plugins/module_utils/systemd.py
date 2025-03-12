@@ -14,8 +14,7 @@ def systemd_runner(module, command, **kwargs):
     arg_formats = dict(
         version=cmd_runner_fmt.as_fixed("--version"),
         list_units=cmd_runner_fmt.as_fixed(["list-units", "--no-pager"]),
-        typ=cmd_runner_fmt.as_fixed("--type"),
-        types=cmd_runner_fmt.as_func(lambda v: [] if not v else [",".join(v)]),
+        types=cmd_runner_fmt.as_func(lambda v: [] if not v else ["--type", ",".join(v)]),
         all=cmd_runner_fmt.as_fixed("--all"),
         plain=cmd_runner_fmt.as_fixed("--plain"),
         no_legend=cmd_runner_fmt.as_fixed("--no-legend"),
