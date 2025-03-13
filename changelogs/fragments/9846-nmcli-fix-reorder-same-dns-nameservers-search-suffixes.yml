@@ -1,0 +1,2 @@
+bugfixes:
+  - nmcli - enable changing only the order of DNS servers or search suffixes - fixes #8724
