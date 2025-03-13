@@ -251,6 +251,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
         self.include_profiles = self.get_option('include_profiles')
         self.group_by = self.get_option('group_by')
         self.inventory_hostname = self.get_option('inventory_hostname')
+        self.facts_level = self.get_option('facts_level')
         self.extra_groups = self.get_option('extra_groups')
 
         for profile in self._get_profiles():
@@ -386,33 +387,36 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
             if ipv6_address is not None:
                 self.inventory.set_variable(hostname, 'cobbler_ipv6_address', make_unsafe(ipv6_address))
 
-            if self.get_option('facts_level') == "as_rendered":
+            # If more facts are requested, gather them all from Cobbler
+            if self.facts_level == "as_rendered":
+                self.display.vvvv(f"Gathering all facts for {hostname}\n")
+                key = "mgmt_parameters"
                 if self.token is not None:
                     all_data = self.local_connection.get_system_as_rendered(host['name'], self.token)
                 else:
                     all_data = self.local_connection.get_system_as_rendered(host['name'])
-                key = "mgmt_parameters"
-            elif self.get_option('facts_level') == "normal":
-                all_data = host
-                key = "autoinstall_meta"
 
                 # If user requests extra groups to be added to the Cobbler inventory,
                 if self.extra_groups:
-
                     # Gather each extra group, split by ',' or ' '
                     for extra_group in split(',| ', self.extra_groups):
                         try:
                             # Gather each value of the extra group, split by ',' or ' '
                             # e.g. profile_role: 'test1,test2'
                             for entry in split(',| ', all_data[key][extra_group]):
+                                self.display.vvvv(f"Added {hostname} to group {entry}")
                                 self._add_safe_group_name(entry, child=hostname)
                         except KeyError as e:
                             self.display.vvvv(f"Could not find {e} value for {hostname}")
 
-                try:
-                    self.inventory.set_variable(hostname, 'cobbler', make_unsafe(all_data))
-                except ValueError as e:
-                    self.display.warning(f"Could not set host info for {hostname}: {e}")
+            elif self.facts_level == "normal":
+                key = "autoinstall_meta"
+                all_data = host
+
+            try:
+                self.inventory.set_variable(hostname, 'cobbler', make_unsafe(all_data))
+            except ValueError as e:
+                self.display.warning(f"Could not set host info for {hostname}: {e}")
 
         if self.get_option('want_ip_addresses'):
             self.inventory.set_variable(self.group, 'cobbler_ipv4_addresses', make_unsafe(ip_addresses))
