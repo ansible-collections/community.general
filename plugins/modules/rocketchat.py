@@ -206,11 +206,11 @@ def do_notify_rocketchat(module, domain, token, protocol, payload):
 
     rocketchat_incoming_webhook = ROCKETCHAT_INCOMING_WEBHOOK % (protocol, domain, token)
 
-    _, info = fetch_url(module, rocketchat_incoming_webhook, data=payload)
+    response, info = fetch_url(module, rocketchat_incoming_webhook, data=payload)
     if info['status'] != 200:
-        _, info = fetch_url(module, rocketchat_incoming_webhook, data="payload=" + payload)
+        response, info = fetch_url(module, rocketchat_incoming_webhook, data="payload=" + payload)
         if info['status'] != 200:
-          module.fail_json(msg="failed to send message, return status=%s" % str(info['status']))
+            module.fail_json(msg="failed to send message, return status=%s" % str(info['status']))
 
 
 def main():
