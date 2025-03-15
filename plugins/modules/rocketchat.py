@@ -195,7 +195,7 @@ def build_payload_for_rocketchat(module, text, channel, username, icon_url, icon
                 attachment['fallback'] = attachment['text']
             payload['attachments'].append(attachment)
 
-    payload = "payload=" + module.jsonify(payload)
+    payload = module.jsonify(payload)
     return payload
 
 
