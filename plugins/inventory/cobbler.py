@@ -334,14 +334,13 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
 
             # Add host to groups specified by group_by fields
             for group_by in self.group_by:
-                if host[group_by] == '<<inherit>>':
+                if host[group_by] == '<<inherit>>' or host[group_by] == '':
                     groups = []
                 else:
                     groups = [host[group_by]] if isinstance(host[group_by], str) else host[group_by]
                 for group in groups:
-                    if group:
-                        group_name = self._add_safe_group_name(group, child=hostname)
-                        self.display.vvvv(f'Added host {hostname} to group_by {group_by} group {group_name}\n')
+                    group_name = self._add_safe_group_name(group, child=hostname)
+                    self.display.vvvv(f'Added host {hostname} to group_by {group_by} group {group_name}\n')
 
             # Add to group for this inventory
             if self.group is not None:
