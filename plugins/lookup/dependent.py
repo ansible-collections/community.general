@@ -130,10 +130,22 @@ from ansible.template import Templar
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
+try:
+    from ansible.template import trust_as_template as _trust_as_template
+    HAS_DATATAGGING = True
+except ImportError:
+    HAS_DATATAGGING = False
+
 
 # Whether Templar has a cache, which can be controlled by Templar.template()'s cache option.
 # The cache was removed for ansible-core 2.14 (https://github.com/ansible/ansible/pull/78419)
 _TEMPLAR_HAS_TEMPLATE_CACHE = LooseVersion(ansible_version) < LooseVersion('2.14.0')
+
+
+def _make_safe(value):
+    if HAS_DATATAGGING and isinstance(value, str):
+        return _trust_as_template(value)
+    return value
 
 
 class LookupModule(LookupBase):
@@ -144,10 +156,13 @@ class LookupModule(LookupBase):
         ``variables`` are the variables to use.
         """
         templar.available_variables = variables or {}
-        expression = "{0}{1}{2}".format("{{", expression, "}}")
+        quoted_expression = "{0}{1}{2}".format("{{", expression, "}}")
         if _TEMPLAR_HAS_TEMPLATE_CACHE:
-            return templar.template(expression, cache=False)
-        return templar.template(expression)
+            return templar.template(quoted_expression, cache=False)
+        if hasattr(templar, 'evaluate_expression'):
+            # This is available since the Data Tagging PR has been merged
+            return templar.evaluate_expression(_make_safe(expression))
+        return templar.template(quoted_expression)
 
     def __process(self, result, terms, index, current, templar, variables):
         """Fills ``result`` list with evaluated items.

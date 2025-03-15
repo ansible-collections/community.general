@@ -69,7 +69,7 @@ class UTHelper(object):
     def set_test_func(self):
         @pytest.mark.parametrize('test_case', self.test_cases, ids=[tc.id for tc in self.test_cases])
         @pytest.mark.usefixtures(*self.fixtures)
-        def _test_module(mocker, capfd, patch_ansible_module, test_case):
+        def _test_module(mocker, capfd, patch_ansible_module_uthelper, test_case):
             """
             Run unit tests for each test case in self.test_cases
             """
@@ -79,8 +79,8 @@ class UTHelper(object):
                 args["_ansible_check_mode"] = test_case.flags.get("check")
             if test_case.flags.get("diff"):
                 args["_ansible_diff"] = test_case.flags.get("diff")
-            patch_ansible_module(args)
-            self.runner.run(mocker, capfd, test_case)
+            with patch_ansible_module_uthelper(args):
+                self.runner.run(mocker, capfd, test_case)
 
         self.add_func_to_test_module("test_module", _test_module)
 
