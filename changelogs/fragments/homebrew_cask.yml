@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - homebrew_cask - handle unusual brew version strings (https://github.com/ansible-collections/community.general/issues/8432, https://github.com/ansible-collections/community.general/pull/9881).

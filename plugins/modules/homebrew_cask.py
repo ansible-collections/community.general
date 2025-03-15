@@ -425,10 +425,7 @@ class HomebrewCask(object):
         cmd = base_opts + [self.current_cask]
         rc, out, err = self.module.run_command(cmd)
 
-        if rc == 0:
-            return True
-        else:
-            return False
+        return rc == 0
 
     def _get_brew_version(self):
         if self.brew_version:
@@ -436,11 +433,13 @@ class HomebrewCask(object):
 
         cmd = [self.brew_path, '--version']
 
-        rc, out, err = self.module.run_command(cmd, check_rc=True)
+        dummy, out, dummy = self.module.run_command(cmd, check_rc=True)
 
-        # get version string from first line of "brew --version" output
-        version = out.split('\n')[0].split(' ')[1]
-        self.brew_version = version
+        pattern = r"Homebrew (.*)(\d+\.\d+\.\d+)(-dirty)?"
+        rematch = re.search(pattern, out)
+        if not rematch:
+            self.module.fail_json(msg="Failed to match regex to get brew version", stdout=out)
+        self.brew_version = rematch.groups()[1]
         return self.brew_version
 
     def _brew_cask_command_is_deprecated(self):
