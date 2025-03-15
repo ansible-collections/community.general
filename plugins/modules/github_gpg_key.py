@@ -253,7 +253,7 @@ def ensure_gpg_key_present(headers, name, armored_public_key, check_mode):
         new_key = json.loads(response.json())
         if check_mode and new_key:
             response = open_url(
-                url=GITHUB_GPG_REST_API_URL + '/' + new_key['key_id'],
+                url=GITHUB_GPG_REST_API_URL + '/' + new_key['id'],
                 method='DELETE',
                 headers=headers
             )
