@@ -55,7 +55,7 @@ deleted_key:
     description: A GPG key that was deleted from GitHub. Only present on O(state=absent).
     type: list
     elements: dict
-    returned: changed or success 
+    returned: changed or success
     sample: {
         'id': 3,
         'name': "Octocat's GPG Key",
@@ -194,11 +194,12 @@ def ensure_gpg_key_absent(headers, gpg_key_id, check_mode):
 
     method = 'GET' if check_mode else 'DELETE'
     response = open_url(
-        url=GITHUB_GPG_REST_API_URL+'/'+gpg_key_id,
+        url=GITHUB_GPG_REST_API_URL + '/' + gpg_key_id,
         method=method,
         headers=headers
     )
-    if response.status == 200:
+    if (method == 'DELETE' and response.status == 204) \
+       or (method == 'GET' and response.status == 200):
         changed = True
         deleted_key = json.loads(response.read())
 
@@ -215,7 +216,7 @@ def ensure_gpg_key_present(headers, name, armored_public_key, check_mode):
 
     armored_public_key_parts = armored_public_key.splitlines()
     if (armored_public_key_parts[0] != '-----BEGIN PGP PUBLIC KEY BLOCK-----') \
-        or (armored_public_key_parts[-1] != '-----END PGP PUBLIC KEY BLOCK-----'):
+       or (armored_public_key_parts[-1] != '-----END PGP PUBLIC KEY BLOCK-----'):
         raise Exception('GPG key must have ASCII armor')
 
     response = open_url(
@@ -252,7 +253,7 @@ def ensure_gpg_key_present(headers, name, armored_public_key, check_mode):
         new_key = json.loads(response.json())
         if check_mode and new_key:
             response = open_url(
-                url=GITHUB_GPG_REST_API_URL+'/'+new_key['key_id'],
+                url=GITHUB_GPG_REST_API_URL + '/' + new_key['key_id'],
                 method='DELETE',
                 headers=headers
             )
@@ -265,8 +266,9 @@ def ensure_gpg_key_present(headers, name, armored_public_key, check_mode):
     return {
         'changed': changed,
         'matching_key': matching_key,
-        'new_key': new_key 
+        'new_key': new_key
     }
+
 
 def run_module(params, check_mode):
     headers = {
