@@ -3,7 +3,7 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
-# Test code for the github_gpg_key module.
+# Test code for the github_issue module.
 #
 # Copyright (c) 2024-2025, Austin Lucas Lake <git@austinlucaslake.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -13,18 +13,16 @@
   github_gpg_key:
     token: "{{ token }}"
     name: "{{ name }}"
-    armored_public_key: "{{ armored_public_key }}"
-  register: key1
+    armored_gpg_key: "{{ armored_gpg_key }}"
+  register: created_gpg_key
 
 - name: Delete GPG key 
   github_gpg_key:
     state: absent
     token: "{{ token }}"
-    gpg_key_id: "{{ gpg_key_id }}"
-  register: key2
+    name: "{{ name }}"
+  register: deleted_gpg_key
 
 - assert:
     that:
-      - key1.created_key.name == key2.deleted_key.name
-      - key1.created_key.key_id == key2.deleted_key.key_id
-      - key1.created_key.raw_key == key2.deleted_key.raw_key
+      - created_gpg_key.id == deleted_gpg_key[0].id
