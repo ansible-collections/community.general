@@ -195,7 +195,7 @@ def build_payload_for_rocketchat(module, text, channel, username, icon_url, icon
                 attachment['fallback'] = attachment['text']
             payload['attachments'].append(attachment)
 
-    payload = "payload=" + module.jsonify(payload)
+    payload = module.jsonify(payload)
     return payload
 
 
@@ -208,7 +208,9 @@ def do_notify_rocketchat(module, domain, token, protocol, payload):
 
     response, info = fetch_url(module, rocketchat_incoming_webhook, data=payload)
     if info['status'] != 200:
-        module.fail_json(msg="failed to send message, return status=%s" % str(info['status']))
+        response, info = fetch_url(module, rocketchat_incoming_webhook, data="payload=" + payload)
+        if info['status'] != 200:
+            module.fail_json(msg="failed to send message, return status=%s" % str(info['status']))
 
 
 def main():
