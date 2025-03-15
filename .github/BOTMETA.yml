@@ -404,6 +404,8 @@ files:
     maintainers: russoz
   $module_utils/ssh.py:
     maintainers: russoz
+  $module_utils/systemd.py:
+    maintainers: NomakCooper
   $module_utils/storage/hpe3par/hpe3par.py:
     maintainers: farhan7500 gautamphegde
   $module_utils/utm_utils.py:
