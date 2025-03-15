@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+# Derived from ../../connection_proxmox_pct_remote/files/pct Copyright (c) 2025 Nils Stein (@mietzen) <github.nstein@mailbox.org>
+# Copyright (c) 2025 Rui Lopes (@rgl) <ruilopes.com>
+# Copyright (c) 2025 Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Shell script to mock wsl.exe behavior
+
+set -euo pipefail
+
+function quote_args {
+  local quoted_args=()
+  for arg in "$@"; do
+    if [[ -z "$arg" || "$arg" =~ [^a-zA-Z0-9@%+=:,./-] ]]; then
+      local escaped_arg=${arg//\'/\'\\\'\'}
+      quoted_args+=("'$escaped_arg'")
+    else
+      quoted_args+=("$arg")
+    fi
+  done
+  echo -n "${quoted_args[@]}"
+}
+
+declare -a mock_args=()
+declare -a cmd_args=()
+wsl_distribution=""
+wsl_user=""
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --distribution|-d)
+      wsl_distribution="$2"
+      mock_args+=("$1" "$2")
+      shift 2
+      ;;
+    --user|-u)
+      wsl_user="$2"
+      mock_args+=("$1" "$2")
+      shift 2
+      ;;
+    --)
+      mock_args+=("$1")
+      shift
+      while [[ $# -gt 0 ]]; do
+        mock_args+=("$1")
+        cmd_args+=("$1")
+        shift
+      done
+      ;;
+    *)
+      >&2 echo "unexpected args: $@"
+      exit 1
+      ;;
+  esac
+done
+
+mock_cmd="wsl.exe $(quote_args "${mock_args[@]}")"
+cmd="$(quote_args "${cmd_args[@]}")"
+
+>&2 echo "[INFO] MOCKING: $mock_cmd"
+>&2 echo "[INFO] CMD: $cmd"
+
+tmp_dir="/tmp/ansible-remote/wsl/integration_test/wsl_distribution_${wsl_distribution}"
+
+mkdir -p "$tmp_dir"
+
+pushd "$tmp_dir" >/dev/null
+
+eval "$cmd"
+
+popd >/dev/null
