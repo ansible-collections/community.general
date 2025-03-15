@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - sudoers - display stdout and stderr raised while failed validation (https://github.com/ansible-collections/community.general/issues/9674, https://github.com/ansible-collections/community.general/pull/9871).

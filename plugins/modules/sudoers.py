@@ -246,7 +246,7 @@ class Sudoers(object):
         rc, stdout, stderr = self.module.run_command(check_command, data=self.content())
 
         if rc != 0:
-            raise Exception('Failed to validate sudoers rule:\n{stdout}'.format(stdout=stdout))
+            self.module.fail_json(msg='Failed to validate sudoers rule:\n{stdout}'.format(stdout=stdout or stderr), stdout=stdout, stderr=stderr)
 
     def run(self):
         if self.state == 'absent':
