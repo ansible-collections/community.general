@@ -105,3 +105,35 @@
       - journal_extra.units['systemd-journald.service'].description == journald_shell.Description
       - journal_extra.units['systemd-journald.service'].restart == journald_shell.Restart
     success_msg: "Success: Extra property values are correct."
+
+- name: Gather info using wildcard pattern for services
+  community.general.systemd_info:
+    unitname:
+      - '*.service'
+    extra_properties:
+      - Description
+  register: result_wildcards
+
+- name: Assert that at least one service unit was returned
+  ansible.builtin.assert:
+    that:
+      - result_wildcards.units | length > 0
+
+- name: Gather info using multiple wildcard patterns
+  community.general.systemd_info:
+    unitname:
+      - '*.service'
+      - 'ssh*'
+  register: result_multi
+
+- name: Debug multi-wildcard results
+  ansible.builtin.debug:
+    var: result_multi.units
+
+- name: Assert deduplication of units
+  ansible.builtin.assert:
+    that:
+      - unique_keys | length == all_keys | length
+  vars:
+    all_keys: "{{ result_multi.units | dict2items | map(attribute='key') | list }}"
+    unique_keys: "{{ all_keys | unique }}"
