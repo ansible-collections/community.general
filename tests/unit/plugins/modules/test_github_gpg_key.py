@@ -122,6 +122,7 @@ def delete_gpg_key_notfound_mock(url, request):
 
 class TestGithubRepo(unittest.TestCase):
     def setUp(self):
+<<<<<<< Updated upstream
         self.module = AnsibleModule(
             argument_spec=dict(
                 state=dict(type='str', default='present', choice=['present', 'absent']),
@@ -134,20 +135,44 @@ class TestGithubRepo(unittest.TestCase):
             required_if=[
                 ['state', 'present', ['armored_public_key']],
             ]
+=======
+        self.token = "github_access_token"
+        self.name = "GPG public key"
+        self.armored_public_key = "-----BEGIN PGP PUBLIC KEY BLOCK-----\r\n\n\nMy ASCII-armored GPG public key\r\n-----END PGP PUBLIC KEY BLOCK-----"
+        self.gpg_key_id = 123456789
+
+    @with_httmock(create_gpg_key_mock)
+    def test_create_gpg_key(self):
+        result = github_gpg_key.run_module(
+            params=dict(
+                state="present",
+                token=self.token,
+                name=self.name,
+                armored_public_key=self.armored_public_key
+            ),
+            check_mode=False
+>>>>>>> Stashed changes
         )
 
     @with_httmock(list_gpg_keys_mock)
     @with_httmock(create_gpg_key_mock)
     def test_create_gpg_key_repo(self):
         result = github_gpg_key.run_module(
-            module=self.module,
             params=dict(
+<<<<<<< Updated upstream
                 token="github_access_token",
                 name="GPG public key",
                 armored_public_key="-----BEGIN PGP PUBLIC KEY BLOCK-----\r\n\n\nMy ASCII-armored GPG public key\r\n-----END PGP PUBLIC KEY BLOCK-----",
                 state="present",
                 force=True
             )
+=======
+                state="absent",
+                token=self.token,
+                gpg_key_id=self.gpg_key_id
+            ),
+            check_mode=False
+>>>>>>> Stashed changes
         )
         self.assertEqual(result['changed'], True)
         self.assertEqual(result['key']['name'], 'GPG public key')
@@ -181,6 +206,7 @@ class TestGithubRepo(unittest.TestCase):
             )
         )
         self.assertEqual(result['changed'], False)
+
 
 
 if __name__ == "__main__":
