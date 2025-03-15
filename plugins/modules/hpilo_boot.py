@@ -188,9 +188,8 @@ def main():
         power_status = ilo.get_host_power_status()
 
         if not force and power_status == 'ON':
-            module.fail_json(msg='HP iLO (%s) reports that the server is already powered on !' % host)
-
-        if power_status == 'ON':
+           pass
+        elif power_status == 'ON':
             ilo.warm_boot_server()
 #            ilo.cold_boot_server()
             changed = True
