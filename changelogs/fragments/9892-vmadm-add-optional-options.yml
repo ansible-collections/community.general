@@ -1,0 +1,2 @@
+minor_changes:
+  - vmadm - add optional options (https://github.com/ansible-collections/community.general/pull/9892).
