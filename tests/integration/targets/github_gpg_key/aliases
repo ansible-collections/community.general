@@ -1,6 +1,7 @@
-# Copyright (c) Ansible Project
+# Copyright (c) 2024-2025, Austin Lucas Lake <git@austinlucaslake.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+unsupported
 azp/posix/1
 destructive

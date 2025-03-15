@@ -1,8 +1,9 @@
 ---
-# Copyright (c) Ansible Project
+# Copyright (c) 2024-2025, Austin Lucas Lake <git@austinlucaslake.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 token: # TODO
-name: # TODO
+name: My GPG Key
 armored_public_key: # TODO
+gpg_key_id: # TODO
