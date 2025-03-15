@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Austin Lucas Lake
+# Copyright (c) 2024-2025, Austin Lucas Lake, <git@austinlucaslake.com>
 # Based on tests/unit/plugins/modules/test_github_repo.py by Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -6,10 +6,10 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-import re
 import json
-import sys
+import datetime
 from httmock import with_httmock, urlmatch, response
+from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.plugins.modules import github_gpg_key
 
@@ -99,7 +99,7 @@ def create_gpg_key_mock(url, request):
         "can_encrypt_comms": False,
         "can_encrypt_storage": False,
         "can_certify": True,
-        "created_at": now_T.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "created_at": now_t.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "expires_at": None,
         "revoked": False,
         "raw_key": gpg_key.get("armored_public_key")
@@ -109,7 +109,7 @@ def create_gpg_key_mock(url, request):
 
 
 @urlmatch(netloc=r'api\.github\.com(:[0-9]+)?$', path=r'/user/gpg_keys/.*', method="delete")
-def delete_repo_mock(url, request):
+def delete_gpg_key_mock(url, request):
     # https://docs.github.com/en/rest/users/gpg-keys#delete-a-gpg-key-for-the-authenticated-user
     return response(204, None, None, None, 5, request)
 
@@ -156,7 +156,7 @@ class TestGithubRepo(unittest.TestCase):
     @with_httmock(delete_gpg_key_mock)
     def test_delete_user_repo(self):
         result = github_gpg_key.run_module(
-            module=self.module
+            module=self.module,
             params=dict(
                 token="github_access_token",
                 name="GPG public key",
@@ -168,10 +168,10 @@ class TestGithubRepo(unittest.TestCase):
         self.assertEqual(result['changed'], True)
 
     @with_httmock(list_gpg_keys_mock)
-    @with_httmock(delete_gpg_notfound_mock)
+    @with_httmock(delete_gpg_key_notfound_mock)
     def test_delete_gpg_key_notfound(self):
         result = github_gpg_key.run_module(
-            module=self.module
+            module=self.module,
             params=dict(
                 token="github_access_token",
                 name="GPG public key",

@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright 2024, Austin Lucas Lake <53884490+austinlucaslake@users.noreply.github.com>
+# Copyright (c) 2024-2025, Austin Lucas Lake <git@austinlucaslake.com>
 # Based on community.general.github_key module by Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -14,7 +14,7 @@ DOCUMENTATION = '''
 module: github_gpg_key
 author: Austin Lucas Lake (@austinlucaslake)
 short_description: Manage GitHub GPG keys
-version_added: 9.0.0
+version_added: 10.5.0
 description:
   - Creates or removes GitHub GPG keys for an authenticated user.
 extends_documentation_fragment:
@@ -48,7 +48,7 @@ options:
   force:
     description:
       - The default is V(true), which will replace the existing remote key
-        if it is different than O(pubkey). If V(false), the key will only be
+        if it is different than O(armored_public_key). If V(false), the key will only be
         set if no key with the given O(name) exists.
     type: bool
     default: true
@@ -62,7 +62,7 @@ deleted_keys:
     returned: When O(state=absent)
     sample: [{
         'id': 3,
-        'name': 'Octocat's GPG Key',
+        'name': "Octocat's GPG Key",
         'primary_key_id': 2,
         'key_id': '3262EFF25BA0D270',
         'public_key': 'xsBNBFayYZ...',
@@ -100,7 +100,7 @@ matching_keys:
     returned: When O(state=present)
     sample: [{
         'id': 3,
-        'name': 'Octocat's GPG Key',
+        'name': "Octocat's GPG Key",
         'primary_key_id': 2,
         'key_id': '3262EFF25BA0D270',
         'public_key': 'xsBNBFayYZ...',
@@ -137,7 +137,7 @@ key:
     returned: When O(state=present)
     sample: {
         'id': 3,
-        'name': 'Octocat's GPG Key',
+        'name': "Octocat's GPG Key",
         'primary_key_id': 2,
         'key_id': '3262EFF25BA0D270',
         'public_key': 'xsBNBFayYZ...',
@@ -239,39 +239,7 @@ def get_all_keys(session):
 def create_key(session, name, armored_public_key, check_mode):
     if check_mode:
         now_t = now()
-        return {
-            'id': 3,
-            'name': name,
-            'primary_key_id': 2,
-            'key_id': '3262EFF25BA0D270',
-            'public_key': 'xsBNBFayYZ...',
-            'emails': [{
-                'email': 'octocat@users.noreply.github.com',
-                'verified': True
-            }],
-            'subkeys': [{
-                'id': 4,
-                'primary_key_id': 3,
-                'key_id': '4A595D4C72EE49C7',
-                'public_key': 'zsBNBFayYZ...',
-                'emails': [],
-                'can_sign': False,
-                'can_encrypt_comms': True,
-                'can_encrypt_storage': True,
-                'can_certify': False,
-                'created_at': now_t.strftime('%Y-%m-%dT%H:%M:%SZ'),
-                'expires_at': None,
-                'revoked': False
-            }],
-            'can_sign': True,
-            'can_encrypt_comms': False,
-            'can_encrypt_storage': False,
-            'can_certify': True,
-            'created_at': now_t.strftime('%Y-%m-%dT%H:%M:%SZ'),
-            'expires_at': None,
-            'revoked': False,
-            'raw_key': armored_public_key
-        }
+        return {}
     else:
         return session.request(
             'POST',
@@ -342,7 +310,7 @@ def run_module(module, params, check_mode):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(type='str', default='present', choice=['present', 'absent']),
+            state=dict(type='str', default='present', choices=['present', 'absent']),
             token=dict(type='str', required=True, no_log=True),
             name=dict(type='str', required=True),
             armored_public_key=dict(type='str', no_log=True),
@@ -362,7 +330,7 @@ def main():
         )
         module.exit_json(**result)
     except Exception as e:
-        module.fail_json(str(e))
+        module.fail_json(msg=str(e))
 
 
 if __name__ == '__main__':
