@@ -86,6 +86,11 @@ DOCUMENTATION = '''
             type: boolean
             default: false
             version_added: 6.1.0
+        dns_servers:
+            description: Specify which DNS servers to use for name resolution.
+            type: list
+            elements: string
+            version_added: 10.5.0
         use_arp_ping:
             description: Whether to always (V(true)) use the quick ARP ping or (V(false)) a slower but more reliable method.
             type: boolean
@@ -230,6 +235,10 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
             if self.get_option('dns_resolve'):
                 cmd.append('-n')
+
+            if self.get_option('dns_servers'):
+                cmd.append('--dns-servers')
+                cmd.append(','.join(self.get_option('dns_servers')))
 
             if self.get_option('udp_scan'):
                 cmd.append('-sU')
