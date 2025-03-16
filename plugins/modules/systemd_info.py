@@ -13,7 +13,8 @@ DOCUMENTATION = r'''
 module: systemd_info
 short_description: Gather C(systemd) unit info
 description:
-  - This module gathers info about systemd units (services, targets, sockets, mount, timer).
+  - This module gathers info about systemd units (services, targets, sockets, mounts, timers).
+  - Timer units are supported since community.general 10.5.0.
   - It runs C(systemctl list-units) (or processes selected units) and collects properties
     for each unit using C(systemctl show).
   - In case a unit has multiple properties with the same name, only the value of the first one will be collected.
@@ -289,7 +290,7 @@ def get_category_base_props(category):
         'target': ['FragmentPath', 'UnitFileState', 'UnitFilePreset'],
         'socket': ['FragmentPath', 'UnitFileState', 'UnitFilePreset'],
         'mount': ['Where', 'What', 'Options', 'Type'],
-        'timer': ['FragmentPath', 'UnitFileState', 'UnitFilePreset']
+        'timer': ['FragmentPath', 'UnitFileState', 'UnitFilePreset'],
     }
     return base_props.get(category, [])
 
