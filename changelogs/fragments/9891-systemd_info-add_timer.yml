@@ -1,0 +1,2 @@
+minor_changes:
+  - systemd_info - extend support to timer units (https://github.com/ansible-collections/community.general/pull/9891).
