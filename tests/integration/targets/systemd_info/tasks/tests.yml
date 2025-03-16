@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Gather all units from shell
-  ansible.builtin.command: systemctl list-units --no-pager --type service,target,socket,mount --all --plain --no-legend
+  ansible.builtin.command: systemctl list-units --no-pager --type service,target,socket,mount,timer --all --plain --no-legend
   register: all_units
 
 - name: Assert command run successfully
@@ -137,3 +137,27 @@
   vars:
     all_keys: "{{ result_multi.units | dict2items | map(attribute='key') | list }}"
     unique_keys: "{{ all_keys | unique }}"
+
+- name: Gather info of systemd-tmpfiles-clean.timer and extra AccuracyUSec
+  community.general.systemd_info:
+    unitname:
+      - systemd-tmpfiles-clean.timer
+    extra_properties:
+      - AccuracyUSec
+  register: result_timer
+
+- name: Check timer unit properties
+  ansible.builtin.assert:
+    that:
+      - result_timer.units is defined
+      - result_timer.units['systemd-tmpfiles-clean.timer'] is defined
+      - result_timer.units['systemd-tmpfiles-clean.timer'].name is defined
+      - result_timer.units['systemd-tmpfiles-clean.timer'].loadstate is defined
+      - result_timer.units['systemd-tmpfiles-clean.timer'].activestate is defined
+      - result_timer.units['systemd-tmpfiles-clean.timer'].substate is defined
+      - result_timer.units['systemd-tmpfiles-clean.timer'].fragmentpath is defined
+      - result_timer.units['systemd-tmpfiles-clean.timer'].unitfilestate is defined
+      - result_timer.units['systemd-tmpfiles-clean.timer'].unitfilepreset is defined
+      - result_timer.units['systemd-tmpfiles-clean.timer'].accuracyusec is defined
+      - result_timer.units['systemd-tmpfiles-clean.timer'].accuracyusec | length > 0
+    success_msg: "Success: All properties collected."

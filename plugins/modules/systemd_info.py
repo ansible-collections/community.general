@@ -13,9 +13,11 @@ DOCUMENTATION = r'''
 module: systemd_info
 short_description: Gather C(systemd) unit info
 description:
-  - This module gathers info about systemd units (services, targets, sockets, mount).
+  - This module gathers info about systemd units (services, targets, sockets, mounts, timers).
+  - Timer units are supported since community.general 10.5.0.
   - It runs C(systemctl list-units) (or processes selected units) and collects properties
     for each unit using C(systemctl show).
+  - In case a unit has multiple properties with the same name, only the value of the first one will be collected.
   - Even if a unit has a RV(units.loadstate) of V(not-found) or V(masked), it is returned,
     but only with the minimal properties (RV(units.name), RV(units.loadstate), RV(units.activestate), RV(units.substate)).
   - When O(unitname) and O(extra_properties) are used, the module first checks if the unit exists,
@@ -27,7 +29,8 @@ options:
   unitname:
     description:
       - List of unit names to process.
-      - It supports C(.service), C(.target), C(.socket), and C(.mount) units type.
+      - It supports C(.service), C(.target), C(.socket), C(.mount) and C(.timer) units type.
+      - C(.timer) units are supported since community.general 10.5.0.
       - Each name must correspond to the full name of the C(systemd) unit or to a wildcard expression like V('ssh*') and V('*.service').
       - Wildcard expressions in O(unitname) are supported since community.general 10.5.0.
     type: list
@@ -49,7 +52,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 ---
-# Gather info for all systemd services, targets, sockets and mount
+# Gather info for all systemd services, targets, sockets, mount and timer
 - name: Gather all systemd unit info
   community.general.systemd_info:
   register: results
@@ -71,6 +74,15 @@ EXAMPLES = r'''
   community.general.systemd_info:
     unitname:
       - 'systemd-*'
+  register: results
+
+# Gather info for systemd-tmpfiles-clean.timer with extra properties
+- name: Gather info of systemd-tmpfiles-clean.timer and extra AccuracyUSec
+  community.general.systemd_info:
+    unitname:
+      - systemd-tmpfiles-clean.timer
+    extra_properties:
+      - AccuracyUSec
   register: results
 '''
 
@@ -255,6 +267,8 @@ def determine_category(unit):
         return 'socket'
     elif unit.endswith('.mount'):
         return 'mount'
+    elif unit.endswith('.timer'):
+        return 'timer'
     else:
         return None
 
@@ -275,7 +289,8 @@ def get_category_base_props(category):
         'service': ['FragmentPath', 'UnitFileState', 'UnitFilePreset', 'MainPID', 'ExecMainPID'],
         'target': ['FragmentPath', 'UnitFileState', 'UnitFilePreset'],
         'socket': ['FragmentPath', 'UnitFileState', 'UnitFilePreset'],
-        'mount': ['Where', 'What', 'Options', 'Type']
+        'mount': ['Where', 'What', 'Options', 'Type'],
+        'timer': ['FragmentPath', 'UnitFileState', 'UnitFilePreset'],
     }
     return base_props.get(category, [])
 
@@ -364,7 +379,7 @@ def main():
     state_props = ['LoadState', 'ActiveState', 'SubState']
     results = {}
 
-    unit_types = ["service", "target", "socket", "mount"]
+    unit_types = ["service", "target", "socket", "mount", "timer"]
 
     list_output = list_units(base_runner, unit_types)
     units_info = {}
