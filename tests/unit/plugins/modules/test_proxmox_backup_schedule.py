@@ -220,7 +220,7 @@ class TestProxmoxBackupScheduleModule(ModuleTestCase):
                 'api_host': 'proxmoxhost',
                 'api_user': 'root@pam',
                 'api_password': 'supersecret',
-                'vm_id': 101,
+                'vm_id': '101',
                 'state': 'absent'
             })
             self.module.main()
