@@ -132,7 +132,7 @@ RESOURCE_LIST = [
 ]
 
 BACKUP_JOBS = [
-    {
+{
         "type": "vzdump",
         "id": "backup-001",
         "storage": "local",
@@ -200,33 +200,35 @@ class TestProxmoxBackupScheduleModule(ModuleTestCase):
         assert result["msg"] == "missing required arguments: api_host, api_user, state"
 
     def test_update_vmid_in_backup(self):
-        with pytest.raises(AnsibleExitJson) as exc_info:
-            set_module_args({
-                'api_host': 'proxmoxhost',
-                'api_user': 'root@pam',
-                'api_password': 'supersecret',
-                'vm_name': 'test05',
-                'backup_id': 'backup-001',
-                'state': 'present'
-            })
-            self.module.main()
+        with patch('builtins.input', return_value='mocked input'):
+            with pytest.raises(AnsibleExitJson) as exc_info:
+                set_module_args({
+                    'api_host': 'proxmoxhost',
+                    'api_user': 'root@pam',
+                    'api_password': 'supersecret',
+                    'vm_name': 'test05',
+                    'backup_id': 'backup-001',
+                    'state': 'present'
+                })
+                self.module.main()
 
-        result = exc_info.value.args[0]
-        assert result['changed'] is True
+            result = exc_info.value.args[0]
+            assert result['changed'] is True
 
     def test_delete_vmid_from_backup(self):
-        with pytest.raises(AnsibleExitJson) as exc_info:
-            set_module_args({
-                'api_host': 'proxmoxhost',
-                'api_user': 'root@pam',
-                'api_password': 'supersecret',
-                'vm_id': '101',
-                'state': 'absent'
-            })
-            self.module.main()
+        with patch('builtins.input', return_value='mocked input'):
+            with pytest.raises(AnsibleExitJson) as exc_info:
+                set_module_args({
+                    'api_host': 'proxmoxhost',
+                    'api_user': 'root@pam',
+                    'api_password': 'supersecret',
+                    'vm_id': '101',
+                    'state': 'absent'
+                })
+                self.module.main()
 
-        result = exc_info.value.args[0]
-        assert result['changed'] is True
+            result = exc_info.value.args[0]
+            assert result['changed'] is True
 
 
 if __name__ == '__main__':
