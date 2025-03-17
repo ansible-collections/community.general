@@ -184,7 +184,9 @@ class TestProxmoxBackupScheduleModule(ModuleTestCase):
             RESOURCE_LIST
         )
         self.connect_mock.return_value.cluster.backup.get.side_effect = (
-            lambda backup_id=None: BACKUP_JOBS if backup_id is None else [job for job in BACKUP_JOBS if job['id'] == backup_id]
+            lambda backup_id=None: BACKUP_JOBS if backup_id is None else [
+                job for job in BACKUP_JOBS if job['id'] == backup_id
+            ]
         )
 
     def tearDown(self):
