@@ -1,0 +1,2 @@
+minor_changes:
+  - vmadm - add new options ``flexible_disk_size`` and ``owner_uuid`` (https://github.com/ansible-collections/community.general/pull/9892).

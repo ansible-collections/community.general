@@ -107,8 +107,9 @@ options:
   flexible_disk_size:
     required: false
     description:
-      - This sets an upper bound for the amount of space that a bhyve instance may use for its disks and snapshots of those disks (in MiBs)
+      - This sets an upper bound for the amount of space that a bhyve instance may use for its disks and snapshots of those disks (in MiBs).
     type: int
+    version_added: 10.5.0
   force:
     required: false
     description:
@@ -215,8 +216,9 @@ options:
   owner_uuid:
     required: false
     description:
-      - This parameter can be used for defining the UUID of an ´owner´ for this VM.
+      - Define the UUID of the owner of the VM.
     type: str
+    version_added: 10.5.0
   qemu_opts:
     required: false
     description:
