@@ -100,6 +100,11 @@ options:
     elements: dict
     description:
       - Define a list of attachments.
+  option_is_pre740:
+    description:
+      - If V(true), the payload matches Rocket Chat prior to 7.4.0 format
+    type: bool
+    default: true
 """
 
 EXAMPLES = r"""
