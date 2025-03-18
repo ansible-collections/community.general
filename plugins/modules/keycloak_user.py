@@ -101,6 +101,8 @@ options:
   groups:
     description:
       - List of groups for the user.
+        Groups can be referenced by their name, like "staff", or their path, like "/staff/engineering".
+        The path syntax allows you to reference subgroups, which is not possible otherwise.
     type: list
     elements: dict
     default: []
