@@ -132,7 +132,7 @@ RESOURCE_LIST = [
 ]
 
 BACKUP_JOBS = [
-{
+    {
         "type": "vzdump",
         "id": "backup-001",
         "storage": "local",
