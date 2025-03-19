@@ -100,11 +100,14 @@ options:
     elements: dict
     description:
       - Define a list of attachments.
-  option_is_pre740:
+  is_pre740:
     description:
       - If V(true), the payload matches Rocket Chat prior to 7.4.0 format
+      - The default value of the parameter can be set to false in a few months' time
+      - This parameter will be removed in a future release when Rocket Chat 7.4.0 is considered the minimum version to use
     type: bool
     default: true
+    version_added: 10.5.0
 """
 
 EXAMPLES = r"""
@@ -170,7 +173,7 @@ from ansible.module_utils.urls import fetch_url
 ROCKETCHAT_INCOMING_WEBHOOK = '%s://%s/hooks/%s'
 
 
-def build_payload_for_rocketchat(module, text, channel, username, icon_url, icon_emoji, link_names, color, attachments, option_is_pre740):
+def build_payload_for_rocketchat(module, text, channel, username, icon_url, icon_emoji, link_names, color, attachments, is_pre740):
     payload = {}
     if color == "normal" and text is not None:
         payload = dict(text=text)
@@ -201,7 +204,7 @@ def build_payload_for_rocketchat(module, text, channel, username, icon_url, icon
             payload['attachments'].append(attachment)
 
     payload = module.jsonify(payload)
-    if option_is_pre740:
+    if is_pre740:
         payload = "payload=" + module.jsonify(payload)
     return payload
 
@@ -233,7 +236,7 @@ def main():
             validate_certs=dict(default=True, type='bool'),
             color=dict(type='str', default='normal', choices=['normal', 'good', 'warning', 'danger']),
             attachments=dict(type='list', elements='dict', required=False),
-            option_is_pre740=dict(default=True, type='bool')
+            is_pre740=dict(default=True, type='bool')
         )
     )
 
@@ -248,9 +251,9 @@ def main():
     link_names = module.params['link_names']
     color = module.params['color']
     attachments = module.params['attachments']
-    option_is_pre740 = module.params['option_is_pre740']
+    is_pre740 = module.params['is_pre740']
 
-    payload = build_payload_for_rocketchat(module, text, channel, username, icon_url, icon_emoji, link_names, color, attachments, option_is_pre740)
+    payload = build_payload_for_rocketchat(module, text, channel, username, icon_url, icon_emoji, link_names, color, attachments, is_pre740)
     do_notify_rocketchat(module, domain, token, protocol, payload)
 
     module.exit_json(msg="OK")
