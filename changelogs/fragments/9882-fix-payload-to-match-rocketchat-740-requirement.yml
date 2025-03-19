@@ -1,4 +1,2 @@
-deprecated_features:
-  - >
-    RocketChat module - attribute ``option_is_pre740`` has been added to match the old payload. The argument default value could be set to false in a few months and then,
-    removed in a future release when Rocket Chat 7.4.0 is considered as a minimum version to be used (https://github.com/ansible-collections/community.general/pull/9882).
+minor_changes:
+  - rocketchat - parameter ``option_is_pre740`` has been added to control the format of the old payload (https://github.com/ansible-collections/community.general/pull/9882)
