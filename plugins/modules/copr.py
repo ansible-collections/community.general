@@ -77,6 +77,13 @@ EXAMPLES = r"""
   community.general.copr:
     state: absent
     name: '@copr/integration_tests'
+
+- name: Install Caddy
+  community.general.copr:
+    name: '@caddy/caddy'
+    chroot: fedora-rawhide-{{ ansible_facts.architecture }}
+    includepkgs:
+      - caddy
 """
 
 RETURN = r"""
