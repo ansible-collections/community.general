@@ -78,7 +78,9 @@ def as_list(ignore_none=None, min_len=0, max_len=None):
     return _ArgFormat(func, ignore_none=ignore_none)
 
 
-def as_fixed(args):
+def as_fixed(*args):
+    if len(args) == 1 and is_sequence(args[0]):
+        args = args[0]
     return _ArgFormat(lambda value: _ensure_list(args), ignore_none=False, ignore_missing_value=True)
 
 
