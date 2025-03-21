@@ -104,6 +104,12 @@ options:
     description:
       - Enables the firewall, allowing fwadm(1M) rules to be applied.
     type: bool
+  flexible_disk_size:
+    required: false
+    description:
+      - This sets an upper bound for the amount of space that a bhyve instance may use for its disks and snapshots of those disks (in MiBs).
+    type: int
+    version_added: 10.5.0
   force:
     required: false
     description:
@@ -207,6 +213,12 @@ options:
     description:
       - Consider the provisioning complete when the VM first starts, rather than when the VM has rebooted.
     type: bool
+  owner_uuid:
+    required: false
+    description:
+      - Define the UUID of the owner of the VM.
+    type: str
+    version_added: 10.5.0
   qemu_opts:
     required: false
     description:
@@ -633,9 +645,9 @@ def main():
         'str': [
             'boot', 'disk_driver', 'dns_domain', 'fs_allowed', 'hostname',
             'image_uuid', 'internal_metadata_namespace', 'kernel_version',
-            'limit_priv', 'nic_driver', 'qemu_opts', 'qemu_extra_opts',
-            'spice_opts', 'uuid', 'vga', 'zfs_data_compression',
-            'zfs_root_compression', 'zpool'
+            'limit_priv', 'nic_driver', 'owner_uuid', 'qemu_opts',
+            'qemu_extra_opts', 'spice_opts', 'uuid', 'vga',
+            'zfs_data_compression', 'zfs_root_compression', 'zpool'
         ],
         'bool': [
             'archive_on_delete', 'autoboot', 'delegate_dataset',
@@ -643,12 +655,12 @@ def main():
             'indestructible_zoneroot', 'maintain_resolvers', 'nowait'
         ],
         'int': [
-            'cpu_cap', 'cpu_shares', 'max_locked_memory', 'max_lwps',
-            'max_physical_memory', 'max_swap', 'mdata_exec_timeout',
-            'quota', 'ram', 'tmpfs', 'vcpus', 'virtio_txburst',
-            'virtio_txtimer', 'vnc_port', 'zfs_data_recsize',
-            'zfs_filesystem_limit', 'zfs_io_priority', 'zfs_root_recsize',
-            'zfs_snapshot_limit'
+            'cpu_cap', 'cpu_shares', 'flexible_disk_size',
+            'max_locked_memory', 'max_lwps', 'max_physical_memory',
+            'max_swap', 'mdata_exec_timeout', 'quota', 'ram',
+            'tmpfs', 'vcpus', 'virtio_txburst', 'virtio_txtimer',
+            'vnc_port', 'zfs_data_recsize', 'zfs_filesystem_limit',
+            'zfs_io_priority', 'zfs_root_recsize', 'zfs_snapshot_limit'
         ],
         'dict': ['customer_metadata', 'internal_metadata', 'routes'],
     }
