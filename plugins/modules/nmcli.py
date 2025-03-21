@@ -2514,9 +2514,11 @@ class Nmcli(object):
 
             if isinstance(current_value, list) and isinstance(value, list):
                 # compare values between two lists
-                if key in ('ipv4.addresses', 'ipv6.addresses'):
+                if key in ('ipv4.addresses', 'ipv6.addresses', 'ipv4.dns', 'ipv6.dns', 'ipv4.dns-search', 'ipv6.dns-search'):
                     # The order of IP addresses matters because the first one
                     # is the default source address for outbound connections.
+                    # Similarly, the order of DNS nameservers and search
+                    # suffixes is important.
                     changed |= current_value != value
                 else:
                     changed |= sorted(current_value) != sorted(value)
