@@ -267,24 +267,54 @@ In these descriptions ``value`` refers to the single parameter passed to the for
         +------------+-------------------------+
 
 - ``cmd_runner_fmt.as_fixed()``
-    This method receives one parameter ``arg``, the function expects no ``value`` - if one
-    is provided then it is ignored.
-    The function returns ``arg`` as-is.
+    This method defines one or more fixed arguments that are returned by the generated function
+    regardless whether ``value`` is passed to it or not.
 
-    - Creation:
-        ``cmd_runner_fmt.as_fixed("--version")``
+    This method accepts these arguments in one of three forms:
+
+        * one scalar parameter ``arg``, which will be returned as ``[arg]`` by the function, or
+        * one sequence parameter, such as a list, ``arg``, which will be returned by the function as ``arg[0]``, or
+        * multiple parameters ``args``, which will be returned as ``args`` directly by the function.
+
+    See the examples below for each one of those forms. And, stressing that the generated function expects no ``value`` - if one
+    is provided then it is ignored.
+
+    - Creation (one scalar argument):
+        * ``cmd_runner_fmt.as_fixed("--version")``
     - Examples:
-        +---------+-----------------------+
-        | Value   | Outcome               |
-        +=========+=======================+
-        |         | ``["--version"]``     |
-        +---------+-----------------------+
-        | 57      | ``["--version"]``     |
-        +---------+-----------------------+
+        +---------+--------------------------------------+
+        | Value   | Outcome                              |
+        +=========+======================================+
+        |         | * ``["--version"]``                  |
+        +---------+--------------------------------------+
+        | 57      | * ``["--version"]``                  |
+        +---------+--------------------------------------+
+
+    - Creation (one sequence argument):
+        * ``cmd_runner_fmt.as_fixed(["--list", "--json"])``
+    - Examples:
+        +---------+--------------------------------------+
+        | Value   | Outcome                              |
+        +=========+======================================+
+        |         | * ``["--list", "--json"]``           |
+        +---------+--------------------------------------+
+        | True    | * ``["--list", "--json"]``           |
+        +---------+--------------------------------------+
+
+    - Creation (multiple arguments):
+        * ``cmd_runner_fmt.as_fixed("--one", "--two", "--three")``
+    - Examples:
+        +---------+--------------------------------------+
+        | Value   | Outcome                              |
+        +=========+======================================+
+        |         | * ``["--one", "--two", "--three"]``  |
+        +---------+--------------------------------------+
+        | False   | * ``["--one", "--two", "--three"]``  |
+        +---------+--------------------------------------+
 
     - Note:
         This is the only special case in which a value can be missing for the formatting function.
-        The example also comes from the code in `Quickstart`_.
+        The first example here comes from the code in `Quickstart`_.
         In that case, the module has code to determine the command's version so that it can assert compatibility.
         There is no *value* to be passed for that CLI argument.
 
