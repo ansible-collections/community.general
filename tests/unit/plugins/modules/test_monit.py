@@ -10,7 +10,7 @@ import pytest
 
 from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.plugins.modules import monit
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson
 
 
 TEST_OUTPUT = """

@@ -13,7 +13,7 @@ import json
 from redis import __version__
 
 from ansible_collections.community.general.plugins.modules import redis_data
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args
 
 HAS_REDIS_USERNAME_OPTION = True
 if tuple(map(int, __version__.split('.'))) < (3, 4, 0):
