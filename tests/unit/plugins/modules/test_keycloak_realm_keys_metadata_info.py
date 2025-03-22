@@ -16,7 +16,7 @@ from ansible_collections.community.general.plugins.modules import \
     keycloak_realm_keys_metadata_info
 from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.tests.unit.compat.mock import patch
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import (
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson, ModuleTestCase, set_module_args)
 
 

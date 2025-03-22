@@ -12,7 +12,7 @@ from ansible_collections.community.general.plugins.modules import bitbucket_pipe
 from ansible_collections.community.general.plugins.modules.bitbucket_pipeline_known_host import HAS_PARAMIKO
 from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.tests.unit.compat.mock import patch
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, ModuleTestCase, set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleExitJson, ModuleTestCase, set_module_args
 
 
 class TestBucketPipelineKnownHostModule(ModuleTestCase):

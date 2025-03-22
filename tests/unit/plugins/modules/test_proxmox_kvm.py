@@ -23,7 +23,7 @@ from ansible_collections.community.general.tests.unit.compat.mock import (
     patch,
     DEFAULT,
 )
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import (
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
     AnsibleFailJson,
     ModuleTestCase,

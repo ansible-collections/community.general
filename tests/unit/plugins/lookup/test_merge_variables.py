@@ -8,7 +8,7 @@ __metaclass__ = type
 
 from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.tests.unit.compat.mock import patch
-from ansible_collections.community.general.tests.unit.mock.loader import DictDataLoader
+from ansible_collections.community.internal_test_tools.tests.unit.mock.loader import DictDataLoader
 
 from ansible.plugins import AnsiblePlugin
 from ansible.template import Templar

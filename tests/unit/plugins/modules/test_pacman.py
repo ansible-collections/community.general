@@ -9,7 +9,7 @@ __metaclass__ = type
 
 from ansible.module_utils import basic
 from ansible_collections.community.general.tests.unit.compat import mock
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import (
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
     AnsibleFailJson,
     set_module_args,

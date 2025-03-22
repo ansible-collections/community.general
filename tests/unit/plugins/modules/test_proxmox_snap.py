@@ -20,7 +20,7 @@ mandatory_py_version = pytest.mark.skipif(
 from ansible_collections.community.general.tests.unit.compat.mock import MagicMock, patch
 from ansible_collections.community.general.plugins.modules import proxmox_snap
 import ansible_collections.community.general.plugins.module_utils.proxmox as proxmox_utils
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args
 
 
 def get_resources(type):

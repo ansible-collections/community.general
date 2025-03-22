@@ -21,7 +21,7 @@ mandatory_py_version = pytest.mark.skipif(
 
 from ansible_collections.community.general.plugins.modules import proxmox_template
 from ansible_collections.community.general.tests.unit.compat.mock import patch, Mock
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import (
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleFailJson,
     ModuleTestCase,
     set_module_args,

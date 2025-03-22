@@ -14,7 +14,7 @@ proxmoxer = pytest.importorskip("proxmoxer")
 
 from ansible_collections.community.general.plugins.modules import proxmox_storage_contents_info
 from ansible_collections.community.general.tests.unit.compat.mock import patch
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import (
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
     AnsibleFailJson,
     ModuleTestCase,
