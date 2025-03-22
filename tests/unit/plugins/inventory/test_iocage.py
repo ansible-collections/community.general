@@ -13,6 +13,7 @@ import yaml
 from ansible.inventory.data import InventoryData
 from ansible.template import Templar
 from ansible_collections.community.general.plugins.inventory.iocage import InventoryModule
+from ansible_collections.community.internal_test_tools.tests.unit.utils.trust import make_trusted
 
 
 @pytest.fixture
@@ -49,7 +50,7 @@ def load_yml_data(path):
 
 def get_option(option):
     groups = {}
-    groups['test'] = "inventory_hostname.startswith('test')"
+    groups['test'] = make_trusted("inventory_hostname.startswith('test')")
 
     if option == 'groups':
         return groups
