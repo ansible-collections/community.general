@@ -12,7 +12,7 @@ import json
 
 from contextlib import contextmanager
 from io import BytesIO, StringIO
-from ansible_collections.community.general.tests.unit.compat import unittest
+from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
 from ansible.module_utils.six import PY3
 from ansible.module_utils.common.text.converters import to_bytes
 

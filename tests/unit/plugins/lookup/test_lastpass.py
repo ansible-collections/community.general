@@ -8,8 +8,8 @@ __metaclass__ = type
 
 from argparse import ArgumentParser
 
-from ansible_collections.community.general.tests.unit.compat import unittest
-from ansible_collections.community.general.tests.unit.compat.mock import patch
+from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
 
 from ansible.errors import AnsibleError
 from ansible.module_utils import six

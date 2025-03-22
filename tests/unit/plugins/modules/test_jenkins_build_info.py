@@ -5,8 +5,8 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-from ansible_collections.community.general.tests.unit.compat import unittest
-from ansible_collections.community.general.tests.unit.compat.mock import patch
+from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
 from ansible.module_utils import basic
 from ansible_collections.community.general.plugins.modules import jenkins_build_info
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (

@@ -10,7 +10,7 @@ from functools import partial
 
 import pytest
 
-from ansible_collections.community.general.tests.unit.compat.mock import MagicMock, PropertyMock
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import MagicMock, PropertyMock
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
 
 

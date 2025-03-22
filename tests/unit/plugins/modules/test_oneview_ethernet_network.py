@@ -9,7 +9,7 @@ __metaclass__ = type
 
 import yaml
 
-from ansible_collections.community.general.tests.unit.compat import unittest, mock
+from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest, mock
 from .oneview_module_loader import EthernetNetworkModule
 from .hpe_test_utils import OneViewBaseTestCase
 
