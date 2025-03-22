@@ -10,7 +10,7 @@ import sys
 from ansible_collections.community.general.plugins.modules import (
     pritunl_user_info,
 )
-from ansible_collections.community.general.tests.unit.compat.mock import patch
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
 from ansible_collections.community.general.tests.unit.plugins.module_utils.net_tools.pritunl.test_api import (
     PritunlListOrganizationMock,
     PritunlListUserMock,

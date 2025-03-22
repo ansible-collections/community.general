@@ -9,7 +9,7 @@ import re
 import json
 import sys
 from httmock import with_httmock, urlmatch, response
-from ansible_collections.community.general.tests.unit.compat import unittest
+from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
 from ansible_collections.community.general.plugins.modules import github_repo
 
 GITHUB_MINIMUM_PYTHON_VERSION = (2, 7)
