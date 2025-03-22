@@ -5,7 +5,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-from ansible_collections.community.general.tests.unit.compat import unittest
+from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
 from ansible_collections.community.general.plugins.module_utils.scaleway import SecretVariables, argon2
 
 

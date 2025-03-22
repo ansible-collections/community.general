@@ -11,7 +11,7 @@ __metaclass__ = type
 
 from ansible_collections.community.general.plugins.modules import icinga2_feature
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
-from ansible_collections.community.general.tests.unit.compat.mock import patch
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
 from ansible.module_utils import basic
 
 

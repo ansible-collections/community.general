@@ -12,7 +12,7 @@ import re
 import uuid
 from urllib3.response import HTTPResponse
 
-from ansible_collections.community.general.tests.unit.compat.mock import patch
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.community.general.plugins.modules import circonus_annotation
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args

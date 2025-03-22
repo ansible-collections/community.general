@@ -12,7 +12,7 @@ import sys
 from httmock import response  # noqa
 from httmock import urlmatch  # noqa
 
-from ansible_collections.community.general.tests.unit.compat import unittest
+from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
 
 import gitlab
 

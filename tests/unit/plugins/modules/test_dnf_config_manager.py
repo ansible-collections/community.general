@@ -7,7 +7,7 @@ from __future__ import (absolute_import, division, print_function)
 
 __metaclass__ = type
 
-from ansible_collections.community.general.tests.unit.compat.mock import patch, call
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch, call
 from ansible_collections.community.general.plugins.modules import dnf_config_manager as dnf_config_manager_module
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, \
     ModuleTestCase, set_module_args

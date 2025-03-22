@@ -13,7 +13,7 @@ import pytest
 from ansible_collections.community.general.plugins.modules import scaleway_private_network
 from ansible_collections.community.general.plugins.module_utils.scaleway import Scaleway, Response
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args
-from ansible_collections.community.general.tests.unit.compat.mock import patch
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
 
 
 def response_with_zero_network():

@@ -9,8 +9,8 @@ __metaclass__ = type
 import json
 
 from ansible_collections.community.general.plugins.modules.ipbase_info import IpbaseInfo
-from ansible_collections.community.general.tests.unit.compat import unittest
-from ansible_collections.community.general.tests.unit.compat.mock import Mock
+from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import Mock
 
 
 IPBASE_DATA = {

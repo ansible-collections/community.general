@@ -8,7 +8,7 @@ __metaclass__ = type
 import json
 
 import pytest
-from ansible_collections.community.general.tests.unit.compat import mock
+from ansible_collections.community.internal_test_tools.tests.unit.compat import mock
 from ansible_collections.community.general.plugins.modules import lxca_cmms
 
 

@@ -6,8 +6,8 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 from ansible.executor.task_result import TaskResult
-from ansible_collections.community.general.tests.unit.compat import unittest
-from ansible_collections.community.general.tests.unit.compat.mock import patch, Mock
+from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch, Mock
 from ansible_collections.community.general.plugins.callback.splunk import SplunkHTTPCollectorSource
 from datetime import datetime
 
