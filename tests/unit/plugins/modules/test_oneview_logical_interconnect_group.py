@@ -7,7 +7,7 @@ __metaclass__ = type
 
 from copy import deepcopy
 
-from ansible_collections.community.general.tests.unit.compat import unittest, mock
+from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest, mock
 from .hpe_test_utils import OneViewBaseTestCase
 from ansible_collections.community.general.plugins.modules.oneview_logical_interconnect_group import LogicalInterconnectGroupModule
 
