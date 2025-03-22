@@ -8,7 +8,7 @@ __metaclass__ = type
 import pytest
 
 from ansible_collections.community.general.plugins.modules import linode
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args
 
 from .linode_conftest import api_key, auth  # noqa: F401, pylint: disable=unused-import
 
