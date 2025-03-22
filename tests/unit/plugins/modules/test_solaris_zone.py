@@ -13,7 +13,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.modules import (
     solaris_zone
 )
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import (
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     set_module_args,
 )
 
