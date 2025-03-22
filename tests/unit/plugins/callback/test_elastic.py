@@ -7,8 +7,8 @@ __metaclass__ = type
 
 from ansible.playbook.task import Task
 from ansible.executor.task_result import TaskResult
-from ansible_collections.community.general.tests.unit.compat import unittest
-from ansible_collections.community.general.tests.unit.compat.mock import patch, MagicMock, Mock
+from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch, MagicMock, Mock
 from ansible_collections.community.general.plugins.callback.elastic import ElasticSource, TaskData
 from collections import OrderedDict
 import sys

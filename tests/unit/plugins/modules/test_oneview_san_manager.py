@@ -5,7 +5,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-from ansible_collections.community.general.tests.unit.compat import unittest, mock
+from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest, mock
 from .oneview_module_loader import SanManagerModule
 from .hpe_test_utils import OneViewBaseTestCase
 from copy import deepcopy

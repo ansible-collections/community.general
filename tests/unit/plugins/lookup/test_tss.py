@@ -8,8 +8,8 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-from ansible_collections.community.general.tests.unit.compat.unittest import TestCase
-from ansible_collections.community.general.tests.unit.compat.mock import (
+from ansible_collections.community.internal_test_tools.tests.unit.compat.unittest import TestCase
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import (
     patch,
     DEFAULT,
     MagicMock,
