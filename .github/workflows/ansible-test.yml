@@ -45,6 +45,8 @@ jobs:
           coverage: ${{ github.event_name == 'schedule' && 'always' || 'never' }}
           pull-request-change-detection: 'true'
           testing-type: sanity
+          pre-test-cmd: >-
+            git clone --depth=1 --single-branch https://github.com/ansible-collections/community.internal_test_tools.git ../../community/internal_test_tools
 
   units:
     # Ansible-test on various stable branches does not yet work well with cgroups v2.
@@ -170,6 +172,8 @@ jobs:
             git clone --depth=1 --single-branch https://github.com/ansible-collections/ansible.posix.git ../../ansible/posix
             ;
             git clone --depth=1 --single-branch https://github.com/ansible-collections/community.crypto.git ../../community/crypto
+            ;
+            git clone --depth=1 --single-branch https://github.com/ansible-collections/community.docker.git ../../community/docker
             ;
             git clone --depth=1 --single-branch https://github.com/ansible-collections/community.internal_test_tools.git ../../community/internal_test_tools
           pull-request-change-detection: 'true'
