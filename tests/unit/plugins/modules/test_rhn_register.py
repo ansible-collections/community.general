@@ -8,7 +8,7 @@ __metaclass__ = type
 import json
 import os
 
-from ansible_collections.community.general.tests.unit.compat.mock import mock_open
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import mock_open
 from ansible.module_utils import basic
 from ansible.module_utils.common.text.converters import to_native
 import ansible.module_utils.six
