@@ -14,7 +14,7 @@ from ansible.module_utils.six import string_types
 from ansible.module_utils.common._collections_compat import MutableMapping
 
 from ansible_collections.community.general.plugins.module_utils import deps
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args as _set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args as _set_module_args
 
 
 def _fix_ansible_args(args):
