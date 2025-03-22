@@ -7,7 +7,7 @@ __metaclass__ = type
 
 import random
 
-from ansible_collections.community.general.tests.unit.compat import unittest
+from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
 from ansible_collections.community.general.plugins.module_utils.cloud import _exponential_backoff, \
     _full_jitter_backoff
 
