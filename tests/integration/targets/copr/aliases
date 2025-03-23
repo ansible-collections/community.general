@@ -7,4 +7,3 @@ needs/root
 skip/macos
 skip/osx
 skip/freebsd
-disabled  # TODO
