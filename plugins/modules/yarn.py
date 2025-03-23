@@ -16,7 +16,8 @@ DOCUMENTATION = '''
 module: yarn
 short_description: Manage node.js packages with Yarn
 description:
-  - Manage node.js packages with the Yarn package manager (https://yarnpkg.com/)
+  - Manage Node.js packages with the Yarn package manager U(https://yarnpkg.com/).
+  - Note that at the moment, this module B(only works with Yarn Classic).
 author:
   - "David Gunter (@verkaufer)"
   - "Chris Hoffman (@chrishoffman), creator of NPM Ansible module)"
@@ -85,7 +86,7 @@ options:
     default: present
     choices: [ "present", "absent", "latest" ]
 requirements:
-    - Yarn installed in bin path (typically /usr/local/bin)
+  - Yarn Classic installed in bin path (typically C(/usr/local/bin))
 '''
 
 EXAMPLES = '''
