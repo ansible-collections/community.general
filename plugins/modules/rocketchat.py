@@ -102,7 +102,8 @@ options:
       - Define a list of attachments.
   is_pre740:
     description:
-      - If V(true), the payload matches Rocket.Chat prior to 7.4.0 format. This format has been used by the module since its inception, but is no longer supported by Rocket.Chat 7.4.0.
+      - If V(true), the payload matches Rocket.Chat prior to 7.4.0 format.
+        This format has been used by the module since its inception, but is no longer supported by Rocket.Chat 7.4.0.
       - The default value of the option will change to V(false) eventually.
       - This parameter will be removed in a future release when Rocket.Chat 7.4.0 becomes the minimum supported version.
     type: bool
