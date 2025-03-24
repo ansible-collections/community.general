@@ -1,2 +1,0 @@
-bugfixes:
-  - "nmcli - enable changing only the order of DNS servers or search suffixes (https://github.com/ansible-collections/community.general/issues/8724, https://github.com/ansible-collections/community.general/pull/9880)."
