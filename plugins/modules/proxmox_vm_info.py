@@ -200,7 +200,7 @@ class ProxmoxVmInfoAnsible(ProxmoxAnsible):
                 if desired_vm:
                     desired_vm.update(detected_vm)
                     desired_vm["vmid"] = this_vm_id
-                    desired_vm["template"] = proxmox_to_ansible_bool(desired_vm["template"])
+                    desired_vm["template"] = proxmox_to_ansible_bool(desired_vm.get("template", 0))
                     # When user wants to retrieve the VM configuration
                     if config != "none":
                         # pending = 0, current = 1
