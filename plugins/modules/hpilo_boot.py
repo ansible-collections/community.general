@@ -158,7 +158,7 @@ def main():
     image = module.params['image']
     state = module.params['state']
     force = module.params['force']
-    idempotent_boot_once = module.params['idempotent_boot_once'] 
+    idempotent_boot_once = module.params['idempotent_boot_once']
     ssl_version = getattr(hpilo.ssl, 'PROTOCOL_' + module.params.get('ssl_version').upper().replace('V', 'v'))
 
     ilo = hpilo.Ilo(host, login=login, password=password, ssl_version=ssl_version)
