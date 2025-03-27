@@ -148,8 +148,8 @@ options:
     type: dict
     description:
       - Specify details to upload a file to Slack. The file can include metadata such as an initial comment, alt text, snipped and title.
-      - See Slack's file upload API for details at U(https://api.slack.com/methods/files.getUploadURLExternal).
-      - See Slack's file upload API for details at U(https://api.slack.com/methods/files.completeUploadExternal).
+      - See Slack's file upload API for details at U(https://api.slack.com/methods/files.getUploadURLExternal) or
+        U(https://api.slack.com/methods/files.completeUploadExternal).
     suboptions:
       path:
         type: str
