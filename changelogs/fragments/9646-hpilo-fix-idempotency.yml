@@ -1,2 +1,2 @@
 minor_changes:
-  - "hpilo_boot - Fix module failing when trying to power on an already powered-on server (idempotency issue) (https://github.com/ansible-collections/community.general/pull/9646)."
+  - "hpilo_boot - Add option to get an idempotent behavior while powering on server (success instead of failure when using 'state: boot_once' option) (https://github.com/ansible-collections/community.general/pull/9646)."
