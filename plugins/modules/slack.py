@@ -176,6 +176,7 @@ options:
         type: str
         description:
           - Optional timestamp of parent message to thread this message, see U(https://api.slack.com/docs/message-threading).
+    version_added: 10.2.0
 """
 
 EXAMPLES = r"""
