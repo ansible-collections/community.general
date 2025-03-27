@@ -78,7 +78,7 @@ options:
     choices: ["SSLv3", "SSLv23", "TLSv1", "TLSv1_1", "TLSv1_2"]
   idempotent_boot_once:
     description:
-      - This makes the boot_once idempotent see github PR: https://github.com/ansible-collections/community.general/pull/9646
+      - "This makes the boot_once idempotent see github PR: https://github.com/ansible-collections/community.general/pull/9646"
     type: bool
     default: false
 requirements:
