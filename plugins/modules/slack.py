@@ -607,11 +607,18 @@ def upload_file_to_slack(module, token, channel, file_upload):
                 module.fail_json(
                     msg="Error during upload completion: %s (HTTP %s)" % (info['msg'], info['status'])
                 )
-            upload_url_data = json.load(response)
-        except ValueError:
-            module.fail_json(
-                msg="The Slack API response is not valid JSON: %s" % response.read()
-            )
+            try:
+                upload_url_data = json.load(response)
+            except ValueError:
+                module.fail_json(
+                    msg="The Slack API response is not valid JSON: %s" % response.read()
+                )
+            if not upload_url_data.get("ok"):
+                module.fail_json(
+                    msg="Failed to complete the upload: %s" % upload_url_data
+                )
+        except Exception as e:
+            module.fail_json(msg="Error uploading file: %s" % str(e))
         if not upload_url_data.get("ok"):
             module.fail_json(msg="Failed to complete the upload: %s" % upload_url_data)
         return upload_url_data
