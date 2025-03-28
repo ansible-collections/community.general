@@ -1,2 +1,2 @@
 minor_changes:
-  - "hpilo_boot - Add option to get an idempotent behavior while powering on server (success instead of failure when using 'state: boot_once' option) (https://github.com/ansible-collections/community.general/pull/9646)."
+  - "hpilo_boot - Add option to get an idempotent behavior while powering on server, resulting success instead of failure when using ``state: boot_once`` option (https://github.com/ansible-collections/community.general/pull/9646)."
