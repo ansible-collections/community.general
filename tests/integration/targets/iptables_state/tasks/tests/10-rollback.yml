@@ -73,6 +73,10 @@
         ansible_timeout: "{{ max_delay | default(300) }}"
 
   rescue:
+    - name: Show result
+      debug:
+        var: iptables_state
+
     - name: "explain expected failure"
       assert:
         that:
@@ -147,6 +151,10 @@
       poll: 0
 
   rescue:
+    - name: Show result
+      debug:
+        var: iptables_state
+
     - name: "explain expected failure"
       assert:
         that:
@@ -182,6 +190,10 @@
         ansible_timeout: "{{ max_delay | default(300) }}"
 
   rescue:
+    - name: Show result
+      debug:
+        var: iptables_state
+
     - name: "explain expected failure"
       assert:
         that:
