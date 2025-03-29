@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# Copyright (c) 2024, Matthias Colin <matthias.colin@maecia.com>
 # Copyright (c) 2020, Lee Goolsbee <lgoolsbee@atlassian.com>
 # Copyright (c) 2020, Michal Middleton <mm.404@icloud.com>
 # Copyright (c) 2017, Steve Pletcher <steve@steve-pletcher.com>
@@ -147,6 +148,39 @@ options:
       - 'never'
       - 'auto'
     version_added: 6.1.0
+  upload_file:
+    type: dict
+    description:
+      - Specify details to upload a file to Slack. The file can include metadata such as an initial comment, alt text, snipped and title.
+      - See Slack's file upload API for details at U(https://api.slack.com/methods/files.getUploadURLExternal) or
+        U(https://api.slack.com/methods/files.completeUploadExternal).
+    suboptions:
+      path:
+        type: str
+        description:
+          - Path to the file on the local system to upload.
+        required: true
+      initial_comment:
+        type: str
+        description:
+          - Optional comment to include when uploading the file.
+      alt_text:
+        type: str
+        description:
+          - Optional alternative text to describe the file.
+      snippet_type:
+        type: str
+        description:
+          - Optional snippet type for the file.
+      title:
+        type: str
+        description:
+          - Optional title for the uploaded file.
+      thread_ts:
+        type: str
+        description:
+          - Optional timestamp of parent message to thread this message, see U(https://api.slack.com/docs/message-threading).
+    version_added: 10.2.0
 """
 
 EXAMPLES = r"""
@@ -259,9 +293,23 @@ EXAMPLES = r"""
     channel: "{{ slack_response.channel }}"
     msg: Deployment complete!
     message_id: "{{ slack_response.ts }}"
+
+- name: Upload a file to Slack
+  community.general.slack:
+    token: thetoken/generatedby/slack
+    channel: 'ansible'
+    upload_file:
+      path: /path/to/file.txt
+      initial_comment: ''
+      alt_text: ''
+      snippet_type: ''
+      title: ''
+      thread_ts: ''
 """
 
 import re
+import json
+import os
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.urls import fetch_url
@@ -271,6 +319,9 @@ SLACK_INCOMING_WEBHOOK = 'https://hooks.slack.com/services/%s'
 SLACK_POSTMESSAGE_WEBAPI = 'https://slack.com/api/chat.postMessage'
 SLACK_UPDATEMESSAGE_WEBAPI = 'https://slack.com/api/chat.update'
 SLACK_CONVERSATIONS_HISTORY_WEBAPI = 'https://slack.com/api/conversations.history'
+SLACK_GET_UPLOAD_URL_EXTERNAL = 'https://slack.com/api/files.getUploadURLExternal'
+SLACK_COMPLETE_UPLOAD_EXTERNAL = 'https://slack.com/api/files.completeUploadExternal'
+SLACK_CONVERSATIONS_LIST_WEBAPI = 'https://slack.com/api/conversations.list'
 
 # Escaping quotes and apostrophes to avoid ending string prematurely in ansible call.
 # We do not escape other characters used as Slack metacharacters (e.g. &, <, >).
@@ -436,6 +487,150 @@ def do_notify_slack(module, domain, token, payload):
         return {'webhook': 'ok'}
 
 
+def get_channel_id(module, token, channel_name):
+    url = SLACK_CONVERSATIONS_LIST_WEBAPI
+    headers = {"Authorization": "Bearer " + token}
+    params = {
+        "types": "public_channel,private_channel,mpim,im",
+        "limit": 1000,
+        "exclude_archived": "true",
+    }
+    cursor = None
+    while True:
+        if cursor:
+            params["cursor"] = cursor
+        query = urlencode(params)
+        full_url = "%s?%s" % (url, query)
+        response, info = fetch_url(module, full_url, headers=headers, method="GET")
+        status = info.get("status")
+        if status != 200:
+            error_msg = info.get("msg", "Unknown error")
+            module.fail_json(
+                msg="Failed to retrieve channels: %s (HTTP %s)" % (error_msg, status)
+            )
+        try:
+            response_body = response.read().decode("utf-8") if response else ""
+            data = json.loads(response_body)
+        except ValueError as e:
+            module.fail_json(msg="JSON decode error: %s" % str(e))
+        if not data.get("ok"):
+            error = data.get("error", "Unknown error")
+            module.fail_json(msg="Slack API error: %s" % error)
+        channels = data.get("channels", [])
+        for channel in channels:
+            if channel.get("name") == channel_name:
+                channel_id = channel.get("id")
+                return channel_id
+        cursor = data.get("response_metadata", {}).get("next_cursor")
+        if not cursor:
+            break
+    module.fail_json(msg="Channel named '%s' not found." % channel_name)
+
+
+def upload_file_to_slack(module, token, channel, file_upload):
+    try:
+        file_path = file_upload["path"]
+        if not os.path.exists(file_path):
+            module.fail_json(msg="File not found: %s" % file_path)
+        # Step 1: Get upload URL
+        url = SLACK_GET_UPLOAD_URL_EXTERNAL
+        headers = {
+            "Authorization": "Bearer " + token,
+            "Content-Type": "application/x-www-form-urlencoded",
+        }
+        params = {
+            "filename": file_upload.get("filename", os.path.basename(file_path)),
+            "length": os.path.getsize(file_path),
+        }
+        if file_upload.get("alt_text"):
+            params["alt_text"] = file_upload.get("alt_text")
+        if file_upload.get("snippet_type"):
+            params["snippet_type"] = file_upload.get("snippet_type")
+        params = urlencode(params)
+        response, info = fetch_url(
+            module, "%s?%s" % (url, params), headers=headers, method="GET"
+        )
+        if info["status"] != 200:
+            module.fail_json(
+                msg="Error retrieving upload URL: %s (HTTP %s)" % (info['msg'], info['status'])
+            )
+        try:
+            upload_url_data = json.load(response)
+        except ValueError:
+            module.fail_json(
+                msg="The Slack API response is not valid JSON: %s" % response.read()
+            )
+        if not upload_url_data.get("ok"):
+            module.fail_json(
+                msg="Failed to retrieve upload URL: %s" % upload_url_data.get('error')
+            )
+        upload_url = upload_url_data["upload_url"]
+        file_id = upload_url_data["file_id"]
+        # Step 2: Upload file content
+        try:
+            with open(file_path, "rb") as file:
+                file_content = file.read()
+            response, info = fetch_url(
+                module,
+                upload_url,
+                data=file_content,
+                headers={"Content-Type": "application/octet-stream"},
+                method="POST",
+            )
+            if info["status"] != 200:
+                module.fail_json(
+                    msg="Error during file upload: %s (HTTP %s)" % (info['msg'], info['status'])
+                )
+        except IOError:
+            module.fail_json(msg="The file %s is not found." % file_path)
+        # Step 3: Complete upload
+        complete_url = SLACK_COMPLETE_UPLOAD_EXTERNAL
+        files_dict = {
+            "files": [
+                {
+                    "id": file_id,
+                }
+            ],
+            "channel_id": get_channel_id(module, token, channel),
+        }
+        if file_upload.get("title"):
+            files_dict["files"][0]["title"] = file_upload.get("title")
+        if file_upload.get("initial_comment"):
+            files_dict["initial_comment"] = file_upload.get("initial_comment")
+        if file_upload.get("thread_ts"):
+            files_dict["thread_ts"] = file_upload.get("thread_ts")
+        files_data = json.dumps(files_dict)
+        headers = {
+            "Authorization": "Bearer " + token,
+            "Content-Type": "application/json",
+        }
+        try:
+            response, info = fetch_url(
+                module, complete_url, data=files_data, headers=headers, method="POST"
+            )
+            if info["status"] != 200:
+                module.fail_json(
+                    msg="Error during upload completion: %s (HTTP %s)" % (info['msg'], info['status'])
+                )
+            try:
+                upload_url_data = json.load(response)
+            except ValueError:
+                module.fail_json(
+                    msg="The Slack API response is not valid JSON: %s" % response.read()
+                )
+            if not upload_url_data.get("ok"):
+                module.fail_json(
+                    msg="Failed to complete the upload: %s" % upload_url_data
+                )
+        except Exception as e:
+            module.fail_json(msg="Error uploading file: %s" % str(e))
+        if not upload_url_data.get("ok"):
+            module.fail_json(msg="Failed to complete the upload: %s" % upload_url_data)
+        return upload_url_data
+    except Exception as e:
+        module.fail_json(msg="Error uploading file: %s" % str(e))
+
+
 def main():
     module = AnsibleModule(
         argument_spec=dict(
@@ -455,6 +650,17 @@ def main():
             blocks=dict(type='list', elements='dict'),
             message_id=dict(type='str'),
             prepend_hash=dict(type='str', choices=['always', 'never', 'auto']),
+            upload_file=dict(
+                type="dict",
+                options=dict(
+                    path=dict(type="str", required=True),
+                    alt_text=dict(type="str"),
+                    snippet_type=dict(type="str"),
+                    initial_comment=dict(type="str"),
+                    thread_ts=dict(type="str"),
+                    title=dict(type="str"),
+                )
+            ),
         ),
         supports_check_mode=True,
     )
@@ -474,6 +680,20 @@ def main():
     blocks = module.params['blocks']
     message_id = module.params['message_id']
     prepend_hash = module.params['prepend_hash']
+    upload_file = module.params["upload_file"]
+
+    if upload_file:
+        try:
+            upload_response = upload_file_to_slack(
+                module=module, token=token, channel=channel, file_upload=upload_file
+            )
+            module.exit_json(
+                changed=True,
+                msg="File uploaded successfully",
+                upload_response=upload_response,
+            )
+        except Exception as e:
+            module.fail_json(msg="Failed to upload file: %s" % str(e))
 
     if prepend_hash is None:
         module.deprecate(
