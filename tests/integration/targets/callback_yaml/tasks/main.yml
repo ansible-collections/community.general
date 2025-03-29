@@ -67,7 +67,7 @@
           ANSIBLE_NOCOLOR: 'true'
           ANSIBLE_FORCE_COLOR: 'false'
           ANSIBLE_STDOUT_CALLBACK: community.general.yaml
-        playbook: |
+        playbook: !unsafe |
           - hosts: testhost
             gather_facts: false
             vars:
@@ -78,9 +78,7 @@
             tasks:
               - name: Test to_yaml
                 debug:
-                  msg: "{{ '{{' }}'{{ '{{' }}'{{ '}}' }} data | to_yaml {{ '{{' }}'{{ '}}' }}'{{ '}}' }}"
-        # The above should be:   msg: "{{ data | to_yaml }}"
-        # Unfortunately, the way Ansible handles templating, we need to do some funny 'escaping' tricks...
+                  msg: "{{ data | to_yaml }}"
         expected_output: [
           "",
           "PLAY [testhost] ****************************************************************",
