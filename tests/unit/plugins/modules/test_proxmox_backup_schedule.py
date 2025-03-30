@@ -158,19 +158,6 @@ BACKUP_JOBS = [
     }
 ]
 
-BACKUP_JOB_SPECIFIC_BKID = {
-    "enabled": 1,
-    "id": "backup-001",
-    "mailnotification": "always",
-    "mode": "snapshot",
-    "compress": "zstd",
-    "notes-template": "{{guestname}}",
-    "schedule": "06,18:30",
-    "storage": "local",
-    "type": "vzdump",
-    "vmid": "100,101"
-}
-
 
 class TestProxmoxBackupScheduleModule(ModuleTestCase):
     def setUp(self):
@@ -213,7 +200,7 @@ class TestProxmoxBackupScheduleModule(ModuleTestCase):
             })
             self.module.main()
         result = exc_info.value.args[0]
-        assert result['changed'] is True
+        assert result['changed'] == True
 
     def test_delete_vmid_from_backup(self):
         with pytest.raises(AnsibleExitJson) as exc_info:
@@ -226,7 +213,7 @@ class TestProxmoxBackupScheduleModule(ModuleTestCase):
             })
             self.module.main()
         result = exc_info.value.args[0]
-        assert result['changed'] is True
+        assert result['changed'] == True
 
 
 if __name__ == '__main__':
