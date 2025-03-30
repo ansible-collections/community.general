@@ -13,7 +13,7 @@ DOCUMENTATION = """
 ---
 module: proxmox_backup_schedule
 
-short_description: Schedule VM backups and remove them
+short_description: Schedule VM backups and removing them
 
 version_added: 10.5.0
 
@@ -108,12 +108,12 @@ EXAMPLES = """
 
 RETURN = """
 ---
-changed:
+backup_schedule:
   description:
-    - If V(present), the changed will return True after adding the VM ID to the backup job.
-    - If V(absent), the changed will return True after removing it from the backup job.
+    - If V(present), the backup_schedule will return True after adding the VM ID to the backup job.
+    - If V(absent), the backup_schedule will return True after removing it from the backup job.
   returned: always, but can be empty
-  type: bool
+  type: raw
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -246,13 +246,14 @@ def main():
         vm_id = proxmox.vmname_2_vmid(vm_name)
 
     if state == 'present':
-        backup_schedule = proxmox.backup_present(vm_id, backup_id)
+        backup_schedule_result = proxmox.backup_present(vm_id, backup_id)
 
     if state == 'absent':
-        backup_schedule = proxmox.backup_absent(vm_id, backup_id)
+        backup_schedule_result = proxmox.backup_absent(vm_id, backup_id)
 
-    if backup_schedule:
-        result['changed'] = True
+    if backup_schedule_result:
+        result['changed'] = backup_schedule_result
+        result['vm_id'] = vm_id
         result['message'] = 'The backup schedule has been changed successfully.'
     else:
         result['message'] = 'The backup schedule did not change anything.'
