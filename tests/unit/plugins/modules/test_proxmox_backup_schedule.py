@@ -212,7 +212,6 @@ class TestProxmoxBackupScheduleModule(ModuleTestCase):
                 'state': 'present'
             })
             self.module.main()
-        
         result = exc_info.value.args[0]
         assert result['changed'] is True
 
@@ -226,7 +225,6 @@ class TestProxmoxBackupScheduleModule(ModuleTestCase):
                 'state': 'absent'
             })
             self.module.main()
-        
         result = exc_info.value.args[0]
         assert result['changed'] is True
 
