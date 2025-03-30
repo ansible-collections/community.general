@@ -246,14 +246,13 @@ def main():
         vm_id = proxmox.vmname_2_vmid(vm_name)
 
     if state == 'present':
-        backup_schedule_result = proxmox.backup_present(vm_id, backup_id)
+        result['backup_schedule'] = proxmox.backup_present(vm_id, backup_id)
 
     if state == 'absent':
-        backup_schedule_result = proxmox.backup_absent(vm_id, backup_id)
+        result['backup_schedule'] = proxmox.backup_absent(vm_id, backup_id)
 
-    if backup_schedule_result:
-        result['changed'] = backup_schedule_result
-        result['vm_id'] = vm_id
+    if result['backup_schedule']:
+        result['changed'] = True
         result['message'] = 'The backup schedule has been changed successfully.'
     else:
         result['message'] = 'The backup schedule did not change anything.'
