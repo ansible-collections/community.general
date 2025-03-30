@@ -20,7 +20,7 @@ mandatory_py_version = pytest.mark.skipif(
 
 from ansible_collections.community.general.plugins.modules import proxmox_backup_schedule
 from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import (
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
     AnsibleFailJson,
     ModuleTestCase,
@@ -200,7 +200,7 @@ class TestProxmoxBackupScheduleModule(ModuleTestCase):
             })
             self.module.main()
         result = exc_info.value.args[0]
-        assert result['changed'] == True
+        assert result['changed'] is True
 
     def test_delete_vmid_from_backup(self):
         with pytest.raises(AnsibleExitJson) as exc_info:
@@ -213,7 +213,7 @@ class TestProxmoxBackupScheduleModule(ModuleTestCase):
             })
             self.module.main()
         result = exc_info.value.args[0]
-        assert result['changed'] == True
+        assert result['changed'] is True
 
 
 if __name__ == '__main__':
