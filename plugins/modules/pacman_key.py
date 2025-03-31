@@ -252,7 +252,7 @@ class PacmanKey(object):
         )
 
     def pacman_machine_key(self, keyring):
-        _, stdout, _ = self.gpg(['--list-secret-key'], keyring=keyring)
+        unused_rc, stdout, unused_stderr = self.gpg(['--list-secret-key'], keyring=keyring)
         return gpg_get_first(stdout.splitlines(), 'sec', 'key')
 
     def is_hexadecimal(self, string):
@@ -337,7 +337,7 @@ class PacmanKey(object):
 
     def key_is_trusted(self, keyring, keyid):
         """Check if key is signed and not expired."""
-        _, stdout, _ = self.gpg(['--check-signatures', keyid], keyring=keyring)
+        unused_rc, stdout, unused_stderr = self.gpg(['--check-signatures', keyid], keyring=keyring)
         return self.pacman_machine_key(keyring) in gpg_gather_all(stdout.splitlines(), 'sig', 'key')
 
 
