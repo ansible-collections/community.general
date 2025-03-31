@@ -248,8 +248,7 @@ class PacmanKey(object):
     def pacman_key(self, args, keyring, **kwargs):
         return self.module.run_command(
             [self.pacman_key_binary, '--gpgdir', keyring] + args,
-            **kwargs,
-        )
+            **kwargs)
 
     def pacman_machine_key(self, keyring):
         unused_rc, stdout, unused_stderr = self.gpg(['--list-secret-key'], keyring=keyring)
