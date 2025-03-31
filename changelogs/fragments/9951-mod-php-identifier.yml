@@ -1,0 +1,2 @@
+minor_changes:
+  - apache2_module - added workaround for new php module name (php7_module -> php_module)
