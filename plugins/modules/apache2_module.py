@@ -194,7 +194,7 @@ def create_apache_identifier(name):
 
     # re expressions to extract subparts of names
     re_workarounds = [
-        ('php7', re.compile(r'^(php7)[\d\.]+')),      
+        ('php', re.compile(r'^(php\d)\.')),
         ('php8', re.compile(r'^(php)[\d\.]+')),
     ]
 
