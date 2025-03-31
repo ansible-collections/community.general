@@ -129,10 +129,10 @@ from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.common.text.converters import to_native
 
 
-class GpgListResult:
+class GpgListResult(object):
     """Wraps gpg --list-* output."""
 
-    def __init__(self, line) -> None:
+    def __init__(self, line):
         self._parts = line.split(':')
 
     @property
