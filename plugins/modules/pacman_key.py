@@ -241,7 +241,7 @@ class PacmanKey(object):
     def gpg(self, args, keyring=None, **kwargs):
         cmd = [self.gpg_binary]
         if keyring:
-            cmd.append(f'--homedir={keyring}')
+            cmd.append('--homedir={keyring}'.format(keyring=keyring))
         cmd.extend(['--no-permission-warning', '--with-colons', '--quiet', '--batch', '--no-tty'])
         return self.module.run_command(cmd + args, **kwargs)
 
