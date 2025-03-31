@@ -194,7 +194,7 @@ def create_apache_identifier(name):
 
     # re expressions to extract subparts of names
     re_workarounds = [
-        ('php', re.compile(r'^(php\d)\.')),
+        ('php', re.compile(r'^(php)[\d\.]+')),
     ]
 
     for a2enmod_spelling, module_name in text_workarounds:
