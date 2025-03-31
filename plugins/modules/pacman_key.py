@@ -238,14 +238,14 @@ class PacmanKey(object):
                 module.exit_json(changed=True)
             module.exit_json(changed=False)
 
-    def gpg(self, args, /, keyring=None, **kwargs):
+    def gpg(self, args, keyring=None, **kwargs):
         cmd = [self.gpg_binary]
         if keyring:
             cmd.append(f'--homedir={keyring}')
         cmd.extend(['--no-permission-warning', '--with-colons', '--quiet', '--batch', '--no-tty'])
         return self.module.run_command(cmd + args, **kwargs)
 
-    def pacman_key(self, args, /, keyring, **kwargs):
+    def pacman_key(self, args, keyring, **kwargs):
         return self.module.run_command(
             [self.pacman_key_binary, '--gpgdir', keyring] + args,
             **kwargs,
