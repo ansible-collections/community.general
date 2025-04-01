@@ -146,9 +146,10 @@ def to_prettytable(data, *args, **kwargs):
     # Configure alignments
     _configure_alignments(table, field_names, kwargs.get('column_alignments', {}))
 
-    # Add rows
+    # Add rows - use add_row instead of add_rows for compatibility with older versions
     rows = [[item.get(col, "") for col in field_names] for item in data]
-    table.add_rows(rows)
+    for row in rows:
+        table.add_row(row)
 
     return to_text(table)
 
