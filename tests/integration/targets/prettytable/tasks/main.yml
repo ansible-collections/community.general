@@ -1,4 +1,13 @@
 ---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) 2020, Pavlo Bashynskyi (@levonet) <levonet@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 - name: Install required libs
   pip:
     name: prettytable
@@ -20,7 +29,11 @@
 
 - name: Load expected basic table output
   set_fact:
-    expected_basic_table: "{{ lookup('file', 'basic_table.txt') }}"
+    expected_basic_table_raw: "{{ lookup('file', 'basic_table.txt') }}"
+
+- name: Remove copyright header from expected output
+  set_fact:
+    expected_basic_table: "{{ expected_basic_table_raw.split('\n')[4:] | join('\n') }}"
 
 - name: Verify basic table output
   assert:
@@ -46,7 +59,11 @@
 
 - name: Load expected ordered table output
   set_fact:
-    expected_ordered_table: "{{ lookup('file', 'ordered_table.txt') }}"
+    expected_ordered_table_raw: "{{ lookup('file', 'ordered_table.txt') }}"
+
+- name: Remove copyright header from expected output
+  set_fact:
+    expected_ordered_table: "{{ expected_ordered_table_raw.split('\n')[4:] | join('\n') }}"
 
 - name: Verify ordered table output
   assert:
@@ -69,7 +86,11 @@
 
 - name: Load expected headers table output
   set_fact:
-    expected_headers_table: "{{ lookup('file', 'custom_headers.txt') }}"
+    expected_headers_table_raw: "{{ lookup('file', 'custom_headers.txt') }}"
+
+- name: Remove copyright header from expected output
+  set_fact:
+    expected_headers_table: "{{ expected_headers_table_raw.split('\n')[4:] | join('\n') }}"
 
 - name: Verify custom headers output
   assert:
@@ -92,7 +113,11 @@
 
 - name: Load expected aligned table output
   set_fact:
-    expected_aligned_table: "{{ lookup('file', 'aligned_table.txt') }}"
+    expected_aligned_table_raw: "{{ lookup('file', 'aligned_table.txt') }}"
+
+- name: Remove copyright header from expected output
+  set_fact:
+    expected_aligned_table: "{{ expected_aligned_table_raw.split('\n')[4:] | join('\n') }}"
 
 - name: Verify aligned table output
   assert:
@@ -152,7 +177,11 @@
 
 - name: Load expected empty table output
   set_fact:
-    expected_empty_table: "{{ lookup('file', 'empty_table.txt') }}"
+    expected_empty_table_raw: "{{ lookup('file', 'empty_table.txt') }}"
+
+- name: Remove copyright header from expected output
+  set_fact:
+    expected_empty_table: "{{ expected_empty_table_raw.split('\n')[4:] | join('\n') }}"
 
 - name: Verify empty table output
   assert:
