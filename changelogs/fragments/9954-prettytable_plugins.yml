@@ -1,4 +1,0 @@
----
-minor_changes:
-  - prettytable - New action plugin and module to format data as ASCII tables using the PrettyTable library
-  - to_prettytable filter - New filter plugin to format data as ASCII tables in Jinja2 templates using the PrettyTable library
