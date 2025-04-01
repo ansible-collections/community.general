@@ -1,0 +1,130 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) 2025, Timur Gadiev (@tgadiev)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install required libs
+  pip:
+    name: prettytable
+    state: present
+  delegate_to: localhost
+  become: false
+
+- name: Set test data
+  set_fact:
+    test_data:
+      - name: Alice
+        age: 25
+        role: admin
+      - name: Bob
+        age: 30
+        role: user
+    data_for_align:
+      - date: 2023-01-01
+        description: Office supplies
+        amount: 123.45
+
+# Test basic functionality
+- name: Test basic table creation
+  set_fact:
+    basic_table: '{{ test_data | community.general.to_prettytable }}'
+
+- name: Verify basic table output
+  assert:
+    that:
+      - basic_table | trim is defined
+      - basic_table | trim is not none
+
+# Test column ordering
+- name: Test column ordering
+  set_fact:
+    ordered_table: "{{ test_data | community.general.to_prettytable(column_order=['role', 'name', 'age']) }}"
+
+- name: Verify ordered table output
+  assert:
+    that:
+      - ordered_table | trim is defined
+      - ordered_table | trim is not none
+      - ordered_table | trim != basic_table | trim
+
+# Test custom headers
+- name: Test custom headers
+  set_fact:
+    headers_table: "{{ test_data | community.general.to_prettytable(header_names=['User Name', 'User Age', 'User Role']) }}"
+
+- name: Verify custom headers output
+  assert:
+    that:
+      - headers_table | trim is defined  
+      - headers_table | trim is not none
+      - "headers_table | trim is search('User Name')"
+      - "headers_table | trim is search('User Age')"
+      - "headers_table | trim is search('User Role')"
+
+# Test alignments
+- name: Test column alignments
+  set_fact:
+    aligned_table: "{{ data_for_align | community.general.to_prettytable(column_alignments={'amount': 'right', 'description': 'left', 'date': 'center'}) }}"
+
+- name: Verify aligned table output
+  assert:
+    that:
+      - aligned_table | trim is defined
+      - aligned_table | trim is not none
+
+# Test combined options
+- name: Test combined options
+  set_fact:
+    combined_table: "{{ test_data | community.general.to_prettytable(
+        column_order=['role', 'name', 'age'],
+        header_names=['Position', 'Full Name', 'Years'],
+        column_alignments={'name': 'center', 'age': 'right', 'role': 'left'}) }}"
+
+- name: Verify combined table output
+  assert:
+    that:
+      - combined_table | trim is defined
+      - combined_table | trim is not none
+      - "combined_table | trim is search('Position')"
+      - "combined_table | trim is search('Full Name')"
+      - "combined_table | trim is search('Years')"
+
+# Test empty data
+- name: Test empty data list
+  set_fact:
+    empty_table: "{{ [] | community.general.to_prettytable }}"
+
+- name: Verify empty table output
+  assert:
+    that:
+      - empty_table | trim == "++\n++" | trim
+
+# Test error conditions
+- name: Test non-list input (expect failure)
+  block:
+    - set_fact:
+        invalid_table: "{{ 'not_a_list' | community.general.to_prettytable }}"
+      register: failure_result
+      ignore_errors: true
+    - name: Verify error message for non-list input
+      assert:
+        that:
+          - failure_result is failed
+          - "'Expected a list of dictionaries, got a string' in failure_result.msg"
+
+- name: Test list with non-dictionary items (expect failure)
+  block:
+    - set_fact:
+        invalid_table: "{{ ['not_a_dict', 'also_not_a_dict'] | community.general.to_prettytable }}"
+      register: failure_result
+      ignore_errors: true
+    - name: Verify error message for non-dictionary items
+      assert:
+        that:
+          - failure_result is failed
+          - "'All items in the list must be dictionaries' in failure_result.msg"
