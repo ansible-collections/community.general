@@ -368,7 +368,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         # sort interface by iface name to make selection as stable as possible
         ret.sort(key=lambda x: x['iface'])
-        
+
         for iface in ret:
             try:
                 # only process interfaces adhering to these rules
