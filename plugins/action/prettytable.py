@@ -114,9 +114,10 @@ class ActionModule(ActionBase):
         # Configure alignments
         self._configure_alignments(table, field_names)
 
-        # Add rows
+        # Add rows - use add_row instead of add_rows for compatibility with older versions
         rows = [[item.get(col, "") for col in field_names] for item in data]
-        table.add_rows(rows)
+        for row in rows:
+            table.add_row(row)
 
         return table
 
