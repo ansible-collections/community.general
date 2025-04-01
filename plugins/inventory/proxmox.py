@@ -381,6 +381,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 if 'gateway' not in iface:
                     self.display.vvv(f"Interface {iface['iface']} on node {node} does not have a gateway")
                     continue
+                self.display.vv(f"Using interface {iface['iface']} on node {node} with address {iface['address']} as node ip for ansible_host")
                 return iface['address']
             except Exception:
                 continue
