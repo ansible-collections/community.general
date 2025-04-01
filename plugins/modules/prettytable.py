@@ -119,7 +119,7 @@ EXAMPLES = r'''
       - name: Bob
         age: 30
         role: user
-    column_order: 
+    column_order:
       - name
       - role
       - age
