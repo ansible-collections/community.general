@@ -364,7 +364,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         return ret['members']
 
     def _get_node_ip(self, node):
-        ret = self._get_json("%s/api2/json/nodes/%s/network" % (self.proxmox_url, node))
+        ret = self._get_json(f"{self.proxmox_url}/api2/json/nodes/{node}/network")
 
         # sort interface by iface name to make selection as stable as possible
         ret.sort(key=lambda x: x['iface'])
@@ -373,13 +373,13 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             try:
                 # only process interfaces adhering to these rules
                 if 'active' not in iface:
-                    self.display.vvv("Interface %s on node %s does not have an active state" % (iface['iface'], node))
+                    self.display.vvv(f"Interface {iface['iface']} on node {node} does not have an active state")
                     continue
                 if 'address' not in iface:
-                    self.display.vvv("Interface %s on node %s does not have an address" % (iface['iface'], node))
+                    self.display.vvv(f"Interface {iface['iface']} on node {node} does not have an address")
                     continue
                 if 'gateway' not in iface:
-                    self.display.vvv("Interface %s on node %s does not have a gateway" % (iface['iface'], node))
+                    self.display.vvv(f"Interface {iface['iface']} on node {node} does not have a gateway")
                     continue
                 return iface['address']
             except Exception:
