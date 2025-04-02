@@ -76,7 +76,7 @@ jobs:
           pre-test-cmd: >-
             mkdir -p ../../ansible
             ;
-            git clone --depth=1 --single-branch https://github.com/ansible-collections/community.internal_test_tools.git ../../community/internal_test_tools
+            git clone --depth=1 --single-branch --branch ci-data-tagging https://github.com/felixfontein/community.internal_test_tools.git ../../community/internal_test_tools
           pull-request-change-detection: 'true'
           target-python-version: ${{ matrix.python }}
           testing-type: units
@@ -160,7 +160,7 @@ jobs:
             ;
             git clone --depth=1 --single-branch https://github.com/ansible-collections/community.docker.git ../../community/docker
             ;
-            git clone --depth=1 --single-branch https://github.com/ansible-collections/community.internal_test_tools.git ../../community/internal_test_tools
+            git clone --depth=1 --single-branch --branch ci-data-tagging https://github.com/felixfontein/community.internal_test_tools.git ../../community/internal_test_tools
           pull-request-change-detection: 'true'
           target: ${{ matrix.target }}
           target-python-version: ${{ matrix.python }}

@@ -785,6 +785,12 @@ from ansible.vars.manager import VariableManager
 from ansible.plugins.callback.default import CallbackModule as Default
 from ansible.module_utils.common.text.converters import to_text
 
+try:
+    from ansible.template import trust_as_template  # noqa: F401, pylint: disable=unused-import
+    SUPPORTS_DATA_TAGGING = True
+except ImportError:
+    SUPPORTS_DATA_TAGGING = False
+
 
 class DummyStdout(object):
     def flush(self):
@@ -838,7 +844,10 @@ class CallbackModule(Default):
         return _ret
 
     def _using_diy(self, spec):
-        return (spec['msg'] is not None) and (spec['msg'] != spec['vars']['omit'])
+        sentinel = object()
+        omit = spec['vars'].get('omit', sentinel)
+        # With Data Tagging, omit is sentinel
+        return (spec['msg'] is not None) and (spec['msg'] != omit or omit is sentinel)
 
     def _parent_has_callback(self):
         return hasattr(super(CallbackModule, self), sys._getframe(1).f_code.co_name)
@@ -894,7 +903,7 @@ class CallbackModule(Default):
             )
         _ret.update(_all)
 
-        _ret.update(_ret.get(self.DIY_NS, {self.DIY_NS: CallbackDIYDict()}))
+        _ret.update(_ret.get(self.DIY_NS, {self.DIY_NS: {} if SUPPORTS_DATA_TAGGING else CallbackDIYDict()}))
 
         _ret[self.DIY_NS].update({'playbook': {}})
         _playbook_attributes = ['entries', 'file_name', 'basedir']
