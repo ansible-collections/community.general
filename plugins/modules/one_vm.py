@@ -659,7 +659,7 @@ from ansible.module_utils.common.dict_transformations import dict_merge
 from ansible_collections.community.general.plugins.module_utils.opennebula import flatten, render
 
 
-# https://docs.opennebula.io/6.10/integration_and_development/system_interfaces/api.html?highlight=updateconf#one-vm-updateconf
+# https://docs.opennebula.io/6.10/integration_and_development/system_interfaces/api.html#one-vm-updateconf
 UPDATECONF_ATTRIBUTES = {
     "OS": ["ARCH", "MACHINE", "KERNEL", "INITRD", "BOOTLOADER", "BOOT", "SD_DISK_BUS", "UUID", "FIRMWARE"],
     "CPU_MODEL": ["MODEL", "FEATURES"],
