@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2017, Milan Ilic <milani@nordeus.com>
 # Copyright (c) 2019, Jan Meerkamp <meerkamp@dvv.de>
+# Copyright (c) 2025, Tom Paine <github@aioue.net>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -658,13 +659,17 @@ from ansible.module_utils.common.dict_transformations import dict_merge
 from ansible_collections.community.general.plugins.module_utils.opennebula import flatten, render
 
 
+# https://docs.opennebula.io/6.10/integration_and_development/system_interfaces/api.html?highlight=updateconf#one-vm-updateconf
 UPDATECONF_ATTRIBUTES = {
-    "OS": ["ARCH", "MACHINE", "KERNEL", "INITRD", "BOOTLOADER", "BOOT", "SD_DISK_BUS", "UUID"],
-    "FEATURES": ["ACPI", "PAE", "APIC", "LOCALTIME", "HYPERV", "GUEST_AGENT"],
+    "OS": ["ARCH", "MACHINE", "KERNEL", "INITRD", "BOOTLOADER", "BOOT", "SD_DISK_BUS", "UUID", "FIRMWARE"],
+    "CPU_MODEL": ["MODEL", "FEATURES"],
+    "FEATURES": ["ACPI", "PAE", "APIC", "LOCALTIME", "HYPERV", "GUEST_AGENT", "VIRTIO_BLK_QUEUES", "VIRTIO_SCSI_QUEUES", "IOTHREADS"],
     "INPUT": ["TYPE", "BUS"],
-    "GRAPHICS": ["TYPE", "LISTEN", "PASSWD", "KEYMAP"],
-    "RAW": ["DATA", "DATA_VMX", "TYPE"],
+    "GRAPHICS": ["TYPE", "LISTEN", "PORT", "PASSWD", "KEYMAP", "COMMAND"],
+    "VIDEO": ["ATS", "IOMMU", "RESOLUTION", "TYPE", "VRAM"],
+    "RAW": ["DATA", "DATA_VMX", "TYPE", "VALIDATE"],
     "CONTEXT": [],
+    "BACKUP_CONFIG": ["FS_FREEZE", "KEEP_LAST", "BACKUP_VOLATILE", "MODE", "INCREMENT_MODE"]
 }
 
 
