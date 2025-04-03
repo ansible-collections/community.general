@@ -429,6 +429,10 @@ options:
       - MAC address of the connection.
       - Note this requires a recent kernel feature, originally introduced in 3.15 upstream kernel.
     type: str
+  infiniband_mac:
+    description:
+      - MAC address of the Infiniband IPoIB devices.
+    type: str
   slavepriority:
     description:
       - This is only used with 'bridge-slave' - [<0-63>] - STP priority of this slave.
@@ -1737,6 +1741,7 @@ class Nmcli(object):
         self.hairpin = module.params['hairpin']
         self.path_cost = module.params['path_cost']
         self.mac = module.params['mac']
+        self.infiniband_mac = module.params['infiniband_mac']
         self.runner = module.params['runner']
         self.runner_hwaddr_policy = module.params['runner_hwaddr_policy']
         self.runner_fast_rate = module.params['runner_fast_rate']
@@ -2034,6 +2039,10 @@ class Nmcli(object):
             options.update({
                 'infiniband.transport-mode': self.transport_mode,
             })
+            if self.infiniband_mac:
+                options.update({
+                    'infiniband.mac-address': self.infiniband_mac,
+                })
         elif self.type == 'vrf':
             options.update({
                 'table': self.table,
@@ -2708,9 +2717,12 @@ def main():
                               tap=dict(type='bool'))),
             wireguard=dict(type='dict'),
             vpn=dict(type='dict'),
-            transport_mode=dict(type='str', choices=['datagram', 'connected']),
             sriov=dict(type='dict'),
             table=dict(type='int'),
+            # infiniband specific vars
+            transport_mode=dict(type='str', choices=['datagram', 'connected']),
+            infiniband_mac=dict(type='str'),
+
         ),
         mutually_exclusive=[['never_default4', 'gw4'],
                             ['routes4_extended', 'routes4'],
