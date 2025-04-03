@@ -78,7 +78,7 @@ options:
     choices: ["SSLv3", "SSLv23", "TLSv1", "TLSv1_1", "TLSv1_2"]
   idempotent_boot_once:
     description:
-      - "This makes the boot_once idempotent see github PR: U(https://github.com/ansible-collections/community.general/pull/9646)."
+      - "This options makes boot_once succeed instead of failing when the server is already powered on."
     type: bool
     default: false
 requirements:
@@ -196,12 +196,12 @@ def main():
 
         if power_status == 'ON':
             if not force and not idempotent_boot_once:
-                module.deprecate(
-                    'The failure of the module when the server is already powered on is being deprecated.'
-                    ' Please set the parameter "idempotent_boot_once=true" to start using the new behavior.',
-                    version='11.0.0',
-                    collection_name='community.general'
-                )
+                # module.deprecate(
+                #     'The failure of the module when the server is already powered on is being deprecated.'
+                #     ' Please set the parameter "idempotent_boot_once=true" to start using the new behavior.',
+                #     version='11.0.0',
+                #     collection_name='community.general'
+                # )
                 module.fail_json(msg='HP iLO (%s) reports that the server is already powered on !' % host)
             elif not force and idempotent_boot_once:
                 pass
