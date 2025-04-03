@@ -422,6 +422,7 @@ record:
       sample: sample.com
 """
 
+from ipaddress import IPv6Address
 import json
 
 from ansible.module_utils.basic import AnsibleModule, env_fallback
@@ -477,7 +478,7 @@ class CloudflareAPI(object):
             self.value = self.value.rstrip('.').lower()
 
         if (self.type == 'AAAA') and (self.value is not None):
-            self.value = self.value.lower()
+            self.value = str(IPv6Address(self.value))
 
         if (self.type == 'SRV'):
             if (self.proto is not None) and (not self.proto.startswith('_')):
