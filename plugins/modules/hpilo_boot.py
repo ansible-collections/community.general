@@ -78,7 +78,7 @@ options:
     choices: ["SSLv3", "SSLv23", "TLSv1", "TLSv1_1", "TLSv1_2"]
   idempotent_boot_once:
     description:
-      - "This options makes boot_once succeed instead of failing when the server is already powered on."
+      - "This option makes O(state=boot_once) succeed instead of failing when the server is already powered on."
     type: bool
     default: false
 requirements:
