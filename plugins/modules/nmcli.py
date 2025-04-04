@@ -99,6 +99,10 @@ options:
     type: str
     choices: [datagram, connected]
     version_added: 5.8.0
+  infiniband_mac:
+    description:
+      - MAC address of the Infiniband IPoIB devices.
+    type: str
   slave_type:
     description:
       - Type of the device of this slave's master connection (for example V(bond)).
@@ -428,10 +432,6 @@ options:
     description:
       - MAC address of the connection.
       - Note this requires a recent kernel feature, originally introduced in 3.15 upstream kernel.
-    type: str
-  infiniband_mac:
-    description:
-      - MAC address of the Infiniband IPoIB devices.
     type: str
   slavepriority:
     description:
@@ -1741,7 +1741,6 @@ class Nmcli(object):
         self.hairpin = module.params['hairpin']
         self.path_cost = module.params['path_cost']
         self.mac = module.params['mac']
-        self.infiniband_mac = module.params['infiniband_mac']
         self.runner = module.params['runner']
         self.runner_hwaddr_policy = module.params['runner_hwaddr_policy']
         self.runner_fast_rate = module.params['runner_fast_rate']
@@ -1769,6 +1768,7 @@ class Nmcli(object):
         self.wireguard = module.params['wireguard']
         self.vpn = module.params['vpn']
         self.transport_mode = module.params['transport_mode']
+        self.infiniband_mac = module.params['infiniband_mac']
         self.sriov = module.params['sriov']
 
         if self.method4:
