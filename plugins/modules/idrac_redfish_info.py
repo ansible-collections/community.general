@@ -17,6 +17,7 @@ description:
 extends_documentation_fragment:
   - community.general.attributes
   - community.general.attributes.info_module
+  - community.general.redfish
 attributes:
   check_mode:
     version_added: 3.3.0
@@ -57,6 +58,12 @@ options:
       - Timeout in seconds for HTTP requests to iDRAC.
     default: 10
     type: int
+  validate_certs:
+    version_added: 10.6.0
+  ca_path:
+    version_added: 10.6.0
+  ciphers:
+    version_added: 10.6.0
 
 author: "Jose Delarosa (@jose-delarosa)"
 """
@@ -124,7 +131,7 @@ msg:
 """
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils
+from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils, REDFISH_COMMON_ARGUMENT_SPEC
 from ansible.module_utils.common.text.converters import to_native
 
 
@@ -177,16 +184,18 @@ CATEGORY_COMMANDS_ALL = {
 
 def main():
     result = {}
+    argument_spec = dict(
+        category=dict(required=True),
+        command=dict(required=True, type='list', elements='str'),
+        baseuri=dict(required=True),
+        username=dict(),
+        password=dict(no_log=True),
+        auth_token=dict(no_log=True),
+        timeout=dict(type='int', default=10)
+    )
+    argument_spec.update(REDFISH_COMMON_ARGUMENT_SPEC)
     module = AnsibleModule(
-        argument_spec=dict(
-            category=dict(required=True),
-            command=dict(required=True, type='list', elements='str'),
-            baseuri=dict(required=True),
-            username=dict(),
-            password=dict(no_log=True),
-            auth_token=dict(no_log=True),
-            timeout=dict(type='int', default=10)
-        ),
+        argument_spec,
         required_together=[
             ('username', 'password'),
         ],

@@ -17,6 +17,7 @@ description:
 extends_documentation_fragment:
   - community.general.attributes
   - community.general.attributes.info_module
+  - community.general.redfish
 attributes:
   check_mode:
     version_added: 3.3.0
@@ -71,16 +72,11 @@ options:
     type: str
     version_added: '6.1.0'
   ciphers:
-    required: false
-    description:
-      - SSL/TLS Ciphers to use for the request.
-      - When a list is provided, all ciphers are joined in order with V(:).
-      - See the L(OpenSSL Cipher List Format,https://www.openssl.org/docs/manmaster/man1/openssl-ciphers.html#CIPHER-LIST-FORMAT)
-        for more details.
-      - The available ciphers is dependent on the Python and OpenSSL/LibreSSL versions.
-    type: list
-    elements: str
     version_added: 9.2.0
+  validate_certs:
+    version_added: 10.6.0
+  ca_path:
+    version_added: 10.6.0
 
 author: "Jose Delarosa (@jose-delarosa)"
 """
@@ -404,7 +400,7 @@ result:
 """
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils
+from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils, REDFISH_COMMON_ARGUMENT_SPEC
 
 CATEGORY_COMMANDS_ALL = {
     "Systems": ["GetSystemInventory", "GetPsuInventory", "GetCpuInventory",
@@ -437,19 +433,20 @@ CATEGORY_COMMANDS_DEFAULT = {
 def main():
     result = {}
     category_list = []
+    argument_spec = dict(
+        category=dict(type='list', elements='str', default=['Systems']),
+        command=dict(type='list', elements='str'),
+        baseuri=dict(required=True),
+        username=dict(),
+        password=dict(no_log=True),
+        auth_token=dict(no_log=True),
+        timeout=dict(type='int', default=60),
+        update_handle=dict(),
+        manager=dict(),
+    )
+    argument_spec.update(REDFISH_COMMON_ARGUMENT_SPEC)
     module = AnsibleModule(
-        argument_spec=dict(
-            category=dict(type='list', elements='str', default=['Systems']),
-            command=dict(type='list', elements='str'),
-            baseuri=dict(required=True),
-            username=dict(),
-            password=dict(no_log=True),
-            auth_token=dict(no_log=True),
-            timeout=dict(type='int', default=60),
-            update_handle=dict(),
-            manager=dict(),
-            ciphers=dict(type='list', elements='str'),
-        ),
+        argument_spec,
         required_together=[
             ('username', 'password'),
         ],
@@ -476,12 +473,9 @@ def main():
     # manager
     manager = module.params['manager']
 
-    # ciphers
-    ciphers = module.params['ciphers']
-
     # Build root URI
     root_uri = "https://" + module.params['baseuri']
-    rf_utils = RedfishUtils(creds, root_uri, timeout, module, ciphers=ciphers)
+    rf_utils = RedfishUtils(creds, root_uri, timeout, module)
 
     # Build Category list
     if "all" in module.params['category']:

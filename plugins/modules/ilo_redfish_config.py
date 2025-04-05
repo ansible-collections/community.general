@@ -15,6 +15,7 @@ description:
   - For use with HPE iLO operations that require Redfish OEM extensions.
 extends_documentation_fragment:
   - community.general.attributes
+  - community.general.redfish
 attributes:
   check_mode:
     support: none
@@ -65,6 +66,12 @@ options:
     description:
       - Value of the attribute to be configured.
     type: str
+  validate_certs:
+    version_added: 10.6.0
+  ca_path:
+    version_added: 10.6.0
+  ciphers:
+    version_added: 10.6.0
 author:
   - "Bhavya B (@bhavya06)"
 """
@@ -113,25 +120,28 @@ CATEGORY_COMMANDS_ALL = {
 }
 
 from ansible_collections.community.general.plugins.module_utils.ilo_redfish_utils import iLORedfishUtils
+from ansible_collections.community.general.plugins.module_utils.redfish_utils import REDFISH_COMMON_ARGUMENT_SPEC
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
 
 def main():
     result = {}
+    argument_spec = dict(
+        category=dict(required=True, choices=list(
+            CATEGORY_COMMANDS_ALL.keys())),
+        command=dict(required=True, type='list', elements='str'),
+        baseuri=dict(required=True),
+        username=dict(),
+        password=dict(no_log=True),
+        auth_token=dict(no_log=True),
+        attribute_name=dict(required=True),
+        attribute_value=dict(type='str'),
+        timeout=dict(type='int', default=10)
+    )
+    argument_spec.update(REDFISH_COMMON_ARGUMENT_SPEC)
     module = AnsibleModule(
-        argument_spec=dict(
-            category=dict(required=True, choices=list(
-                CATEGORY_COMMANDS_ALL.keys())),
-            command=dict(required=True, type='list', elements='str'),
-            baseuri=dict(required=True),
-            username=dict(),
-            password=dict(no_log=True),
-            auth_token=dict(no_log=True),
-            attribute_name=dict(required=True),
-            attribute_value=dict(type='str'),
-            timeout=dict(type='int', default=10)
-        ),
+        argument_spec,
         required_together=[
             ('username', 'password'),
         ],
