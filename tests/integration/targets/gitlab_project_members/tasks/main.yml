@@ -13,8 +13,6 @@
   ansible.builtin.pip:
     name: python-gitlab
     state: present
-    extra_args: >-
-      --break-system-packages
 
 - name: Clean UP before tests
   community.general.gitlab_project_members:
