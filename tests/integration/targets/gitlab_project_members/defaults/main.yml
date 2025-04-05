@@ -16,3 +16,5 @@ dedicated_access_users:
     access_level: "developer"
   - name: username2
     access_level: "maintainer"
+  - name: username3
+    access_level: "owner"
