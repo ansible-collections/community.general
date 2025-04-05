@@ -1,2 +1,2 @@
 minor_changes:
-  - apache2_module - added workaround for new php module name (php7_module -> php_module)
+  - apache2_module - added workaround for new php module name, from ``php7_module`` to ``php_module`` (https://github.com/ansible-collections/community.general/pull/9951).
