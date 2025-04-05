@@ -17,6 +17,7 @@ description:
   - Manages OOB controller firmware. For example, Firmware Activate, Update and Activate.
 extends_documentation_fragment:
   - community.general.attributes
+  - community.general.redfish
 attributes:
   check_mode:
     support: full
@@ -87,6 +88,12 @@ options:
         description:
           - The password for retrieving the update image.
         type: str
+  validate_certs:
+    version_added: 10.6.0
+  ca_path:
+    version_added: 10.6.0
+  ciphers:
+    version_added: 10.6.0
 notes:
   - In the inventory, you can specify baseuri or ioms. See the EXAMPLES section.
   - Ioms is a list of FQDNs for the enclosure's IOMs.
@@ -195,6 +202,7 @@ msg:
 """
 
 from ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils import WdcRedfishUtils
+from ansible_collections.community.general.plugins.module_utils.redfish_utils import REDFISH_COMMON_ARGUMENT_SPEC
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
@@ -213,26 +221,28 @@ CATEGORY_COMMANDS_ALL = {
 
 
 def main():
-    module = AnsibleModule(
-        argument_spec=dict(
-            category=dict(required=True),
-            command=dict(required=True, type='list', elements='str'),
-            ioms=dict(type='list', elements='str'),
-            baseuri=dict(),
-            username=dict(),
-            password=dict(no_log=True),
-            auth_token=dict(no_log=True),
-            update_creds=dict(
-                type='dict',
-                options=dict(
-                    username=dict(),
-                    password=dict(no_log=True)
-                )
-            ),
-            resource_id=dict(),
-            update_image_uri=dict(),
-            timeout=dict(type='int', default=10)
+    argument_spec = dict(
+        category=dict(required=True),
+        command=dict(required=True, type='list', elements='str'),
+        ioms=dict(type='list', elements='str'),
+        baseuri=dict(),
+        username=dict(),
+        password=dict(no_log=True),
+        auth_token=dict(no_log=True),
+        update_creds=dict(
+            type='dict',
+            options=dict(
+                username=dict(),
+                password=dict(no_log=True)
+            )
         ),
+        resource_id=dict(),
+        update_image_uri=dict(),
+        timeout=dict(type='int', default=10)
+    )
+    argument_spec.update(REDFISH_COMMON_ARGUMENT_SPEC)
+    module = AnsibleModule(
+        argument_spec,
         required_together=[
             ('username', 'password'),
         ],
