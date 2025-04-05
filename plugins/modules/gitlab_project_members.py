@@ -68,6 +68,7 @@ options:
         description:
           - The access level for the user.
           - Required if O(state=present), user state is set to present.
+          - V(owner) was added in community.general 10.6.0.
         type: str
         choices: ['guest', 'reporter', 'developer', 'maintainer', 'owner']
         required: true
@@ -85,6 +86,7 @@ options:
       - Adds/remove users of the given access_level to match the given O(gitlab_user)/O(gitlab_users_access) list. If omitted
         do not purge orphaned members.
       - Is only used when O(state=present).
+      - V(owner) was added in community.general 10.6.0.
     type: list
     elements: str
     choices: ['guest', 'reporter', 'developer', 'maintainer', 'owner']
