@@ -17,7 +17,6 @@ from ansible_collections.community.general.plugins.modules import proxmox_backup
 from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
-    AnsibleFailJson,
     ModuleTestCase,
     set_module_args,
 )
