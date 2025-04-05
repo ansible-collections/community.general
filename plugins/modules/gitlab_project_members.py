@@ -48,6 +48,7 @@ options:
     description:
       - The access level for the user.
       - Required if O(state=present), user state is set to present.
+      - V(owner) was added in community.general 10.6.0.
     type: str
     choices: ['guest', 'reporter', 'developer', 'maintainer', 'owner']
   gitlab_users_access:
