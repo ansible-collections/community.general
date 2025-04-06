@@ -1,2 +1,2 @@
 minor_changes:
-  - cobbler inventory plugin - fix typos, request full rendered variables for Cobbler system, allow end user to specify extra groups, should not change currently expected behavior (https://github.com/ansible-collections/community.general/issues/9419).
+  - cobbler inventory plugin - request full rendered variables for Cobbler system, allow end user to specify extra groups, should not change currently expected behavior (https://github.com/ansible-collections/community.general/issues/9419, https://github.com/ansible-collections/community.general/pull/9420).

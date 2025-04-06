@@ -106,17 +106,20 @@ DOCUMENTATION = '''
         version_added: 7.1.0
       facts_level:
         description:
-          - "normal: Gather only system-level variables"
-          - "as_rendered: Gather all variables as rolled up by Cobbler"
+          - "Set to V(normal) to gather only system-level variables."
+          - "Set to V(as_rendered) to gather all variables as rolled up by Cobbler."
         type: string
         choices: [ 'normal', 'as_rendered' ]
         default: normal
+        version_added: 10.5.0
       extra_groups:
         description:
-          - Comma or space-separated string containing extra groups to be added to the Cobbler inventory
-          - Requires O(want_facts) to be set to V(true)
-        type: string
-        default: ""
+          - List containing extra groups to be added to the Cobbler inventory.
+          - Requires O(want_facts) to be set to V(true).
+        type: list
+        elements: string
+        default: []
+        version_added: 10.5.0
 '''
 
 EXAMPLES = '''
@@ -398,7 +401,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                 # If user requests extra groups to be added to the Cobbler inventory,
                 if self.extra_groups:
                     # Gather each extra group, split by ',' or ' '
-                    for extra_group in split(',| ', self.extra_groups):
+                    for extra_group in self.extra_groups:
                         try:
                             # Gather each value of the extra group, split by ',' or ' '
                             # e.g. profile_role: 'test1,test2'
