@@ -554,6 +554,8 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
                 ok_str = "CD-ROM was created on %s bus in VM %s"
             else:
                 config_str = self.module.params["storage"]
+                if not config_str:
+                    self.module.fail_json(msg="The storage option must be specified.")
                 if self.module.params.get("media") != "cdrom":
                     config_str += ":%s" % (self.module.params["size"])
                 ok_str = "Disk %s created in VM %s"
