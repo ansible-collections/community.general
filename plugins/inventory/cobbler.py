@@ -111,7 +111,7 @@ DOCUMENTATION = '''
         type: string
         choices: [ 'normal', 'as_rendered' ]
         default: normal
-        version_added: 10.5.0
+        version_added: 10.6.0
       extra_groups:
         description:
           - List containing extra groups to be added to the Cobbler inventory.
@@ -119,7 +119,7 @@ DOCUMENTATION = '''
         type: list
         elements: string
         default: []
-        version_added: 10.5.0
+        version_added: 10.6.0
 '''
 
 EXAMPLES = '''
