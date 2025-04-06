@@ -206,7 +206,7 @@ def build_payload_for_rocketchat(module, text, channel, username, icon_url, icon
 
     payload = module.jsonify(payload)
     if is_pre740:
-        payload = "payload=" + module.jsonify(payload)
+        payload = "payload=" + payload
     return payload
 
 
