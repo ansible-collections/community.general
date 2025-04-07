@@ -159,7 +159,9 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
     def __init__(self):
         super(InventoryModule, self).__init__()
         self.cache_key = None
-        self.cobbler_connection = None
+
+        if not HAS_XMLRPC_CLIENT:
+            raise AnsibleError('Could not import xmlrpc client library')
 
     def verify_file(self, path):
         valid = False
@@ -169,18 +171,6 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
             else:
                 self.display.vvv('Skipping due to inventory source not ending in "cobbler.yaml" nor "cobbler.yml"')
         return valid
-
-    def _get_connection(self):
-        if not HAS_XMLRPC_CLIENT:
-            raise AnsibleError('Could not import xmlrpc client library')
-
-        if self.cobbler_connection is None:
-            self.display.vvvv(f'Connecting to {self.cobbler_url}\n')
-            self.cobbler_connection = xmlrpc_client.Server(self.cobbler_url, allow_none=True)
-            self.token = None
-            if self.get_option('user') is not None:
-                self.token = self.cobbler_connection.login(text_type(self.get_option('user')), text_type(self.get_option('password')))
-        return self.cobbler_connection
 
     def _init_cache(self):
         if self.cache_key not in self._cache:
@@ -195,12 +185,11 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
 
     def _get_profiles(self):
         if not self.use_cache or 'profiles' not in self._cache.get(self.cache_key, {}):
-            self.local_connection = self._get_connection()
             try:
                 if self.token is not None:
-                    data = self.local_connection.get_profiles(self.token)
+                    data = self.cobbler.get_profiles(self.token)
                 else:
-                    data = self.local_connection.get_profiles()
+                    data = self.cobbler.get_profiles()
             except (socket.gaierror, socket.error, xmlrpc_client.ProtocolError):
                 self._reload_cache()
             else:
@@ -213,9 +202,18 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
         if not self.use_cache or 'systems' not in self._cache.get(self.cache_key, {}):
             try:
                 if self.token is not None:
-                    data = self.local_connection.get_systems(self.token)
+                    data = self.cobbler.get_systems(self.token)
                 else:
-                    data = self.local_connection.get_systems()
+                    data = self.cobbler.get_systems()
+
+                # If more facts are requested, gather them all from Cobbler
+                if self.facts_level == "as_rendered":
+                    for i, host in enumerate(data):
+                        self.display.vvvv(f"Gathering all facts for {host['name']}\n")
+                        if self.token is not None:
+                            data[i] = self.cobbler.get_system_as_rendered(host['name'], self.token)
+                        else:
+                            data[i] = self.cobbler.get_system_as_rendered(host['name'])
             except (socket.gaierror, socket.error, xmlrpc_client.ProtocolError):
                 self._reload_cache()
             else:
@@ -245,6 +243,12 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
 
         # get connection host
         self.cobbler_url = self.get_option('url')
+        self.display.vvvv(f'Connecting to {self.cobbler_url}\n')
+        self.cobbler = xmlrpc_client.Server(self.cobbler_url, allow_none=True)
+        self.token = None
+        if self.get_option('user') is not None:
+            self.token = self.cobbler.login(text_type(self.get_option('user')), text_type(self.get_option('password')))
+
         self.cache_key = self.get_cache_key(path)
         self.use_cache = cache and self.get_option('cache')
 
@@ -389,35 +393,23 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
             if ipv6_address is not None:
                 self.inventory.set_variable(hostname, 'cobbler_ipv6_address', make_unsafe(ipv6_address))
 
-            # If more facts are requested, gather them all from Cobbler
-            if self.facts_level == "as_rendered":
-                self.display.vvvv(f"Gathering all facts for {hostname}\n")
+            # If user requests extra groups to be added to the Cobbler inventory,
+            if self.facts_level == "as_rendered" and self.extra_groups:
+                # Gather each extra group, split by ',' or ' '
                 key = "mgmt_parameters"
-                if self.token is not None:
-                    all_data = self.local_connection.get_system_as_rendered(host['name'], self.token)
-                else:
-                    all_data = self.local_connection.get_system_as_rendered(host['name'])
-
-                # If user requests extra groups to be added to the Cobbler inventory,
-                if self.extra_groups:
-                    # Gather each extra group, split by ',' or ' '
-                    for extra_group in self.extra_groups:
-                        try:
-                            # Gather each value of the extra group, split by ',' or ' '
-                            # e.g. profile_role: 'test1,test2'
-                            for entry in split(',| ', all_data[key][extra_group]):
-                                self.display.vvvv(f"Added {hostname} to group {entry}")
-                                self._add_safe_group_name(entry, child=hostname)
-                        except KeyError as e:
-                            self.display.vvvv(f"Could not find {e} value for {hostname}")
-
-            elif self.facts_level == "normal":
-                key = "autoinstall_meta"
-                all_data = host
+                for extra_group in self.extra_groups:
+                    try:
+                        # Gather each value of the extra group, split by ',' or ' '
+                        # e.g. profile_role: 'test1,test2'
+                        for entry in split(',| ', host[key][extra_group]):
+                            self.display.vvvv(f"Added {hostname} to group {entry}")
+                            self._add_safe_group_name(entry, child=hostname)
+                    except KeyError as e:
+                        self.display.vvvv(f"Could not find {e} value for {hostname}")
 
             if self.get_option('want_facts'):
                 try:
-                    self.inventory.set_variable(hostname, 'cobbler', make_unsafe(all_data))
+                    self.inventory.set_variable(hostname, 'cobbler', make_unsafe(host))
                 except ValueError as e:
                     self.display.warning(f"Could not set host info for {hostname}: {e}")
 
