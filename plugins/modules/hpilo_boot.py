@@ -81,6 +81,7 @@ options:
       - "This option makes O(state=boot_once) succeed instead of failing when the server is already powered on."
     type: bool
     default: false
+    version_added: 10.6.0
 requirements:
   - python-hpilo
 notes:
