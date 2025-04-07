@@ -9,7 +9,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
   name: to_prettytable
   short_description: Format a list of dictionaries as an ASCII table
-  version_added: "8.0.0"
+  version_added: "10.6.0"
   author: Timur Gadiev (@tgadiev)
   description:
     - This filter takes a list of dictionaries and formats it as an ASCII table using the I(prettytable) Python library.
@@ -40,6 +40,7 @@ DOCUMENTATION = '''
 '''
 
 EXAMPLES = '''
+---
 - name: Display a list of users as a table
   vars:
     users:
@@ -108,25 +109,23 @@ def to_prettytable(data, *args, **kwargs):
             'You need to install "prettytable" Python module to use this filter'
         )
 
-    if not isinstance(data, list):
-        raise AnsibleFilterError(
-            "Expected a list of dictionaries, got a string"
-            if isinstance(data, string_types)
-            else f"Expected a list of dictionaries, got {type(data).__name__}"
-        )
-
     # Handle empty data
     if not data:
         return "++\n++"
 
-    # Check that all items are dictionaries
-    if not all(isinstance(item, dict) for item in data):
-        invalid_item = next(item for item in data if not isinstance(item, dict))
-        raise AnsibleFilterError(
-            "All items in the list must be dictionaries, got a string"
-            if isinstance(invalid_item, string_types)
-            else f"All items in the list must be dictionaries, got {type(invalid_item).__name__}"
-        )
+    # Helper function for type error messages
+    def type_error(obj, expected):
+        type_name = "string" if isinstance(obj, string_types) else type(obj).__name__
+        return f"Expected {expected}, got a {type_name}"
+
+    # Validate list type
+    if not isinstance(data, list):
+        raise AnsibleFilterError(type_error(data, "a list of dictionaries"))
+        
+    # Validate dictionary items
+    if data and not all(isinstance(item, dict) for item in data):
+        invalid_item = next((item for item in data if not isinstance(item, dict)), None)
+        raise AnsibleFilterError(type_error(invalid_item, "all items in the list to be dictionaries"))
 
     # Handle positional argument column order
     column_order = kwargs.get('column_order', None)
