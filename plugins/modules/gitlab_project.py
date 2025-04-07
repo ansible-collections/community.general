@@ -47,6 +47,7 @@ options:
   build_timeout:
     description:
       - Maximum number of seconds a CI job can run.
+      - If not specified on creation, GitLab will impose a default value.
     type: int
     version_added: "10.6.0"
   builds_access_level:
