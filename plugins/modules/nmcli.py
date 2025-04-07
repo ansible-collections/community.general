@@ -103,6 +103,7 @@ options:
     description:
       - MAC address of the Infiniband IPoIB devices.
     type: str
+    version_added: 10.6.0
   slave_type:
     description:
       - Type of the device of this slave's master connection (for example V(bond)).
