@@ -15,8 +15,6 @@ files:
     labels: action
   $actions/iptables_state.py:
     maintainers: quidame
-  $actions/prettytable.py:
-    maintainers: tgadiev
   $actions/shutdown.py:
     maintainers: nitzmahone samdoran aminvakil
   $becomes/:
@@ -1139,8 +1137,6 @@ files:
     keywords: doas dragonfly freebsd iocage jail netbsd openbsd opnsense pfsense
     labels: bsd portinstall
     maintainers: $team_bsd berenddeboer
-  $modules/prettytable.py:
-    maintainers: tgadiev
   $modules/pritunl_:
     maintainers: Lowess
   $modules/profitbricks:

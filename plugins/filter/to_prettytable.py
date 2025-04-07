@@ -121,7 +121,7 @@ def to_prettytable(data, *args, **kwargs):
     # Validate list type
     if not isinstance(data, list):
         raise AnsibleFilterError(type_error(data, "a list of dictionaries"))
-        
+
     # Validate dictionary items
     if data and not all(isinstance(item, dict) for item in data):
         invalid_item = next((item for item in data if not isinstance(item, dict)), None)
