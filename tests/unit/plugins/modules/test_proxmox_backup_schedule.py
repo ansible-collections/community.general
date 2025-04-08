@@ -183,23 +183,23 @@ class TestProxmoxBackupScheduleModule(ModuleTestCase):
 
     def test_module_fail_when_required_args_missing(self):
         with pytest.raises(AnsibleFailJson) as exc_info:
-            set_module_args({})
-            self.module.main()
+            with set_module_args({}):
+                self.module.main()
 
         result = exc_info.value.args[0]
         assert result["msg"] == "missing required arguments: api_host, api_user, state"
 
     def test_update_vmid_in_backup(self):
         with pytest.raises(AnsibleExitJson) as exc_info:
-            set_module_args({
+           with set_module_args({
                 'api_host': 'proxmoxhost',
                 'api_user': 'root@pam',
                 'api_password': 'supersecret',
                 'vm_name': 'test05',
                 'backup_id': 'backup-001',
                 'state': 'present'
-            })
-            self.module.main()
+            }):
+                self.module.main()
 
         result = exc_info.value.args[0]
 
@@ -208,14 +208,14 @@ class TestProxmoxBackupScheduleModule(ModuleTestCase):
 
     def test_delete_vmid_from_backup(self):
         with pytest.raises(AnsibleExitJson) as exc_info:
-            set_module_args({
+            with set_module_args({
                 'api_host': 'proxmoxhost',
                 'api_user': 'root@pam',
                 'api_password': 'supersecret',
                 'vm_id': 101,
                 'state': 'absent'
-            })
-            self.module.main()
+            }):
+                self.module.main()
 
         result = exc_info.value.args[0]
         assert result['changed'] is True
