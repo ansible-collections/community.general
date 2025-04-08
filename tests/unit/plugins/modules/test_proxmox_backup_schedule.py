@@ -191,7 +191,7 @@ class TestProxmoxBackupScheduleModule(ModuleTestCase):
 
     def test_update_vmid_in_backup(self):
         with pytest.raises(AnsibleExitJson) as exc_info:
-           with set_module_args({
+            with set_module_args({
                 'api_host': 'proxmoxhost',
                 'api_user': 'root@pam',
                 'api_password': 'supersecret',
