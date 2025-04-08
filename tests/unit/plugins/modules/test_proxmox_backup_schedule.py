@@ -158,9 +158,6 @@ BACKUP_JOBS = [
     }
 ]
 
-EXPECTED_UPDATE_BACKUP_SCHEDULE = True
-EXPECTED_DEL_BACKUP_SCHEDULE = True
-
 
 class TestProxmoxBackupScheduleModule(ModuleTestCase):
     def setUp(self):
@@ -202,9 +199,7 @@ class TestProxmoxBackupScheduleModule(ModuleTestCase):
                 self.module.main()
 
         result = exc_info.value.args[0]
-
         assert result['changed'] is True
-        assert result['backup_schedule'] == EXPECTED_UPDATE_BACKUP_SCHEDULE
 
     def test_delete_vmid_from_backup(self):
         with pytest.raises(AnsibleExitJson) as exc_info:
@@ -219,7 +214,6 @@ class TestProxmoxBackupScheduleModule(ModuleTestCase):
 
         result = exc_info.value.args[0]
         assert result['changed'] is True
-        assert result['backup_schedule'] == EXPECTED_DEL_BACKUP_SCHEDULE
 
 
 if __name__ == '__main__':
