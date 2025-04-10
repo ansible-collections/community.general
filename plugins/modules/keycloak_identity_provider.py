@@ -124,6 +124,15 @@ options:
       - providerId
     type: str
 
+  hide_on_login:
+    description:
+      - If hidden, login with this provider is possible only if requested explicitly, for example using the C(kc_idp_hint)
+      - Parameter was added in Keycloak 26, for older Keycloak versions use O(hide_on_login_page) in the O(config) dict
+    aliases:
+      - hideOnLogin
+    type: bool
+    version_added: 10.6.0
+
   config:
     description:
       - Dict specifying the configuration options for the provider; the contents differ depending on the value of O(provider_id).
@@ -490,6 +499,7 @@ def main():
         provider_id=dict(type='str', aliases=['providerId']),
         store_token=dict(type='bool', aliases=['storeToken']),
         trust_email=dict(type='bool', aliases=['trustEmail']),
+        hide_on_login=dict(type='bool', aliases=['hideOnLogin']),
         mappers=dict(type='list', elements='dict', options=mapper_spec),
     )
 
