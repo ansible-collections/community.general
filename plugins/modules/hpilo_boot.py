@@ -76,6 +76,12 @@ options:
     default: TLSv1
     type: str
     choices: ["SSLv3", "SSLv23", "TLSv1", "TLSv1_1", "TLSv1_2"]
+  idempotent_boot_once:
+    description:
+      - "This option makes O(state=boot_once) succeed instead of failing when the server is already powered on."
+    type: bool
+    default: false
+    version_added: 10.6.0
 requirements:
   - python-hpilo
 notes:
@@ -138,6 +144,7 @@ def main():
             image=dict(type='str'),
             state=dict(type='str', default='boot_once', choices=['boot_always', 'boot_once', 'connect', 'disconnect', 'no_boot', 'poweroff']),
             force=dict(type='bool', default=False),
+            idempotent_boot_once=dict(type='bool', default=False),
             ssl_version=dict(type='str', default='TLSv1', choices=['SSLv3', 'SSLv23', 'TLSv1', 'TLSv1_1', 'TLSv1_2']),
         )
     )
@@ -152,6 +159,7 @@ def main():
     image = module.params['image']
     state = module.params['state']
     force = module.params['force']
+    idempotent_boot_once = module.params['idempotent_boot_once']
     ssl_version = getattr(hpilo.ssl, 'PROTOCOL_' + module.params.get('ssl_version').upper().replace('V', 'v'))
 
     ilo = hpilo.Ilo(host, login=login, password=password, ssl_version=ssl_version)
@@ -187,13 +195,21 @@ def main():
 
         power_status = ilo.get_host_power_status()
 
-        if not force and power_status == 'ON':
-            module.fail_json(msg='HP iLO (%s) reports that the server is already powered on !' % host)
-
         if power_status == 'ON':
-            ilo.warm_boot_server()
-#            ilo.cold_boot_server()
-            changed = True
+            if not force and not idempotent_boot_once:
+                # module.deprecate(
+                #     'The failure of the module when the server is already powered on is being deprecated.'
+                #     ' Please set the parameter "idempotent_boot_once=true" to start using the new behavior.',
+                #     version='11.0.0',
+                #     collection_name='community.general'
+                # )
+                module.fail_json(msg='HP iLO (%s) reports that the server is already powered on !' % host)
+            elif not force and idempotent_boot_once:
+                pass
+            elif force:
+                ilo.warm_boot_server()
+    #            ilo.cold_boot_server()
+                changed = True
         else:
             ilo.press_pwr_btn()
 #            ilo.reset_server()
