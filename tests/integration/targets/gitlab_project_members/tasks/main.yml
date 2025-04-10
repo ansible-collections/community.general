@@ -10,7 +10,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Install required library
-  pip:
+  ansible.builtin.pip:
     name: python-gitlab
     state: present
 
@@ -20,6 +20,7 @@
     api_token: "{{ gitlab_api_access_token }}"
     project: "{{ gitlab_project }}"
     gitlab_user: "{{ username }}"
+    access_level: "{{ gitlab_access_level }}"
     state: absent
 
 - name: Add a User to A GitLab Project
@@ -58,6 +59,7 @@
     api_token: "{{ gitlab_api_access_token }}"
     project: "{{ gitlab_project }}"
     gitlab_user: "{{ username }}"
+    access_level: "{{ gitlab_access_level }}"
     state: absent
   register: remove_gitlab_project_members_state
 
@@ -72,6 +74,7 @@
     api_token: "{{ gitlab_api_access_token }}"
     project: "{{ gitlab_project }}"
     gitlab_user: "{{ username }}"
+    access_level: "{{ gitlab_access_level }}"
     state: absent
   register: remove_gitlab_project_members_state_again
 
@@ -90,15 +93,16 @@
     state: present
 
 - name: Remove a list of Users to A GitLab Project
-  community.general.gitlab_project_members::
+  community.general.gitlab_project_members:
     api_url: "{{ gitlab_server_url }}"
     api_token: "{{ gitlab_api_access_token }}"
     project: "{{ gitlab_project }}"
     gitlab_user: "{{ userlist }}"
+    access_level: "{{ gitlab_access_level }}"
     state: absent
 
 - name: Add a list of Users with Dedicated Access Levels to A GitLab Project
-  community.general.gitlab_project_members::
+  community.general.gitlab_project_members:
     api_url: "{{ gitlab_server_url }}"
     api_token: "{{ gitlab_api_access_token }}"
     project: "{{ gitlab_project }}"
@@ -106,7 +110,7 @@
     state: present
 
 - name: Remove a list of Users with Dedicated Access Levels to A GitLab Project
-  community.general.gitlab_project_members::
+  community.general.gitlab_project_members:
     api_url: "{{ gitlab_server_url }}"
     api_token: "{{ gitlab_api_access_token }}"
     project: "{{ gitlab_project }}"
@@ -114,11 +118,11 @@
     state: absent
 
 - name: Add a user, remove all others which might be on this access level
-  community.general.gitlab_project_members::
+  community.general.gitlab_project_members:
     api_url: "{{ gitlab_server_url }}"
     api_token: "{{ gitlab_api_access_token }}"
     project: "{{ gitlab_project }}"
     gitlab_user: "{{ username }}"
     access_level: "{{ gitlab_access_level }}"
-    pruge_users: "{{ gitlab_access_level }}"
+    purge_users: "{{ gitlab_access_level }}"
     state: present

@@ -1,0 +1,2 @@
+minor_changes:
+  - gitlab_project_members - extend choices parameter ``access_level`` by missing upstream valid value ``owner`` (https://github.com/ansible-collections/community.general/pull/9953).
