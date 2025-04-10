@@ -21,6 +21,7 @@ description:
   - Supports performing an action using POST method.
 extends_documentation_fragment:
   - community.general.attributes
+  - community.general.redfish
 attributes:
   check_mode:
     support: none
@@ -117,6 +118,12 @@ options:
     description:
       - The request body to patch or post.
     type: dict
+  validate_certs:
+    version_added: 10.6.0
+  ca_path:
+    version_added: 10.6.0
+  ciphers:
+    version_added: 10.6.0
 
 author: "Yuyan Pan (@panyy3)"
 """
@@ -297,7 +304,7 @@ redfish_facts:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
-from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils
+from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils, REDFISH_COMMON_ARGUMENT_SPEC
 
 
 class XCCRedfishUtils(RedfishUtils):
@@ -678,34 +685,36 @@ CATEGORY_COMMANDS_ALL = {
 
 def main():
     result = {}
-    module = AnsibleModule(
-        argument_spec=dict(
-            category=dict(required=True),
-            command=dict(required=True, type='list', elements='str'),
-            baseuri=dict(required=True),
-            username=dict(),
-            password=dict(no_log=True),
-            auth_token=dict(no_log=True),
-            timeout=dict(type='int', default=10),
-            resource_id=dict(),
-            virtual_media=dict(
-                type='dict',
-                options=dict(
-                    media_types=dict(type='list', elements='str', default=[]),
-                    image_url=dict(),
-                    inserted=dict(type='bool', default=True),
-                    write_protected=dict(type='bool', default=True),
-                    username=dict(),
-                    password=dict(no_log=True),
-                    transfer_protocol_type=dict(),
-                    transfer_method=dict(),
-                )
-            ),
-            resource_uri=dict(),
-            request_body=dict(
-                type='dict',
-            ),
+    argument_spec = dict(
+        category=dict(required=True),
+        command=dict(required=True, type='list', elements='str'),
+        baseuri=dict(required=True),
+        username=dict(),
+        password=dict(no_log=True),
+        auth_token=dict(no_log=True),
+        timeout=dict(type='int', default=10),
+        resource_id=dict(),
+        virtual_media=dict(
+            type='dict',
+            options=dict(
+                media_types=dict(type='list', elements='str', default=[]),
+                image_url=dict(),
+                inserted=dict(type='bool', default=True),
+                write_protected=dict(type='bool', default=True),
+                username=dict(),
+                password=dict(no_log=True),
+                transfer_protocol_type=dict(),
+                transfer_method=dict(),
+            )
         ),
+        resource_uri=dict(),
+        request_body=dict(
+            type='dict',
+        ),
+    )
+    argument_spec.update(REDFISH_COMMON_ARGUMENT_SPEC)
+    module = AnsibleModule(
+        argument_spec,
         required_together=[
             ('username', 'password'),
         ],

@@ -16,6 +16,7 @@ description:
   - For use with Dell iDRAC operations that require Redfish OEM extensions.
 extends_documentation_fragment:
   - community.general.attributes
+  - community.general.redfish
 attributes:
   check_mode:
     support: none
@@ -62,6 +63,12 @@ options:
       - ID of the System, Manager or Chassis to modify.
     type: str
     version_added: '0.2.0'
+  validate_certs:
+    version_added: 10.6.0
+  ca_path:
+    version_added: 10.6.0
+  ciphers:
+    version_added: 10.6.0
 
 author: "Jose Delarosa (@jose-delarosa)"
 """
@@ -93,7 +100,7 @@ return_values:
 
 import re
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils
+from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils, REDFISH_COMMON_ARGUMENT_SPEC
 from ansible.module_utils.common.text.converters import to_native
 
 
@@ -147,17 +154,19 @@ CATEGORY_COMMANDS_ALL = {
 def main():
     result = {}
     return_values = {}
+    argument_spec = dict(
+        category=dict(required=True),
+        command=dict(required=True, type='list', elements='str'),
+        baseuri=dict(required=True),
+        username=dict(),
+        password=dict(no_log=True),
+        auth_token=dict(no_log=True),
+        timeout=dict(type='int', default=10),
+        resource_id=dict()
+    )
+    argument_spec.update(REDFISH_COMMON_ARGUMENT_SPEC)
     module = AnsibleModule(
-        argument_spec=dict(
-            category=dict(required=True),
-            command=dict(required=True, type='list', elements='str'),
-            baseuri=dict(required=True),
-            username=dict(),
-            password=dict(no_log=True),
-            auth_token=dict(no_log=True),
-            timeout=dict(type='int', default=10),
-            resource_id=dict()
-        ),
+        argument_spec,
         required_together=[
             ('username', 'password'),
         ],

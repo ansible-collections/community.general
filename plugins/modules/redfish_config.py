@@ -17,6 +17,7 @@ description:
   - Manages OOB controller configuration settings.
 extends_documentation_fragment:
   - community.general.attributes
+  - community.general.redfish
 attributes:
   check_mode:
     support: none
@@ -181,16 +182,11 @@ options:
       - LastState
     version_added: '10.5.0'
   ciphers:
-    required: false
-    description:
-      - SSL/TLS Ciphers to use for the request.
-      - When a list is provided, all ciphers are joined in order with V(:).
-      - See the L(OpenSSL Cipher List Format,https://www.openssl.org/docs/manmaster/man1/openssl-ciphers.html#CIPHER-LIST-FORMAT)
-        for more details.
-      - The available ciphers is dependent on the Python and OpenSSL/LibreSSL versions.
-    type: list
-    elements: str
     version_added: 9.2.0
+  validate_certs:
+    version_added: 10.6.0
+  ca_path:
+    version_added: 10.6.0
 
 author:
   - "Jose Delarosa (@jose-delarosa)"
@@ -395,7 +391,7 @@ msg:
 """
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils
+from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils, REDFISH_COMMON_ARGUMENT_SPEC
 from ansible.module_utils.common.text.converters import to_native
 
 
@@ -411,40 +407,41 @@ CATEGORY_COMMANDS_ALL = {
 
 def main():
     result = {}
-    module = AnsibleModule(
-        argument_spec=dict(
-            category=dict(required=True),
-            command=dict(required=True, type='list', elements='str'),
-            baseuri=dict(required=True),
-            username=dict(),
-            password=dict(no_log=True),
-            auth_token=dict(no_log=True),
-            bios_attributes=dict(type='dict', default={}),
-            timeout=dict(type='int', default=60),
-            boot_order=dict(type='list', elements='str', default=[]),
-            network_protocols=dict(
-                type='dict',
-                default={}
-            ),
-            resource_id=dict(),
-            service_id=dict(),
-            nic_addr=dict(default='null'),
-            nic_config=dict(
-                type='dict',
-                default={}
-            ),
-            strip_etag_quotes=dict(type='bool', default=False),
-            hostinterface_config=dict(type='dict', default={}),
-            hostinterface_id=dict(),
-            sessions_config=dict(type='dict', default={}),
-            storage_subsystem_id=dict(type='str', default=''),
-            storage_none_volume_deletion=dict(type='bool', default=False),
-            volume_ids=dict(type='list', default=[], elements='str'),
-            secure_boot_enable=dict(type='bool', default=True),
-            volume_details=dict(type='dict', default={}),
-            power_restore_policy=dict(choices=['AlwaysOn', 'AlwaysOff', 'LastState']),
-            ciphers=dict(type='list', elements='str'),
+    argument_spec = dict(
+        category=dict(required=True),
+        command=dict(required=True, type='list', elements='str'),
+        baseuri=dict(required=True),
+        username=dict(),
+        password=dict(no_log=True),
+        auth_token=dict(no_log=True),
+        bios_attributes=dict(type='dict', default={}),
+        timeout=dict(type='int', default=60),
+        boot_order=dict(type='list', elements='str', default=[]),
+        network_protocols=dict(
+            type='dict',
+            default={}
         ),
+        resource_id=dict(),
+        service_id=dict(),
+        nic_addr=dict(default='null'),
+        nic_config=dict(
+            type='dict',
+            default={}
+        ),
+        strip_etag_quotes=dict(type='bool', default=False),
+        hostinterface_config=dict(type='dict', default={}),
+        hostinterface_id=dict(),
+        sessions_config=dict(type='dict', default={}),
+        storage_subsystem_id=dict(type='str', default=''),
+        storage_none_volume_deletion=dict(type='bool', default=False),
+        volume_ids=dict(type='list', default=[], elements='str'),
+        secure_boot_enable=dict(type='bool', default=True),
+        volume_details=dict(type='dict', default={}),
+        power_restore_policy=dict(choices=['AlwaysOn', 'AlwaysOff', 'LastState']),
+    )
+    argument_spec.update(REDFISH_COMMON_ARGUMENT_SPEC)
+    module = AnsibleModule(
+        argument_spec,
         required_together=[
             ('username', 'password'),
         ],
@@ -511,14 +508,10 @@ def main():
     # Power Restore Policy
     power_restore_policy = module.params['power_restore_policy']
 
-    # ciphers
-    ciphers = module.params['ciphers']
-
     # Build root URI
     root_uri = "https://" + module.params['baseuri']
     rf_utils = RedfishUtils(creds, root_uri, timeout, module,
-                            resource_id=resource_id, data_modification=True, strip_etag_quotes=strip_etag_quotes,
-                            ciphers=ciphers)
+                            resource_id=resource_id, data_modification=True, strip_etag_quotes=strip_etag_quotes)
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
