@@ -14,7 +14,9 @@
   vars:
     data: "abc"
     result: '{{ data | community.general.reveal_ansible_type }}'
-    dtype: 'AnsibleUnicode'
+    dtype:
+      - 'AnsibleUnicode'
+      - '_AnsibleTaggedStr'
 
 - name: String. AnsibleUnicode alias str.
   assert:
@@ -23,7 +25,7 @@
     fail_msg: '"abc" is {{ result }}'
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
-    alias: {"AnsibleUnicode": "str"}
+    alias: {"AnsibleUnicode": "str", "_AnsibleTaggedStr": "str"}
     data: "abc"
     result: '{{ data | community.general.reveal_ansible_type(alias) }}'
     dtype: 'str'
@@ -37,7 +39,9 @@
   vars:
     data: ["a", "b", "c"]
     result: '{{ data | community.general.reveal_ansible_type }}'
-    dtype: 'list[AnsibleUnicode]'
+    dtype:
+      - 'list[AnsibleUnicode]'
+      - 'list[_AnsibleTaggedStr]'
 
 - name: Dictionary. All keys are AnsibleUnicode. All values are AnsibleUnicode.
   assert:
@@ -48,7 +52,9 @@
   vars:
     data: {"a": "foo", "b": "bar", "c": "baz"}
     result: '{{ data | community.general.reveal_ansible_type }}'
-    dtype: 'dict[AnsibleUnicode, AnsibleUnicode]'
+    dtype:
+      - 'dict[AnsibleUnicode, AnsibleUnicode]'
+      - 'dict[_AnsibleTaggedStr, _AnsibleTaggedStr]'
 
 # No substitution and no alias. Type of strings is str
 # ----------------------------------------------------
@@ -143,7 +149,10 @@
     fail_msg: '{"1": "a", "b": "b"} is {{ result }}'
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
-    alias: {"AnsibleUnicode": "str"}
+    alias:
+      AnsibleUnicode: str
+      _AnsibleTaggedStr: str
+      _AnsibleTaggedInt: int
     data: {1: 'a', 'b': 'b'}
     result: '{{ data | community.general.reveal_ansible_type(alias) }}'
     dtype: dict[int|str, str]
@@ -155,7 +164,10 @@
     fail_msg: '{"1": "a", "2": "b"} is {{ result }}'
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
-    alias: {"AnsibleUnicode": "str"}
+    alias:
+      AnsibleUnicode: str
+      _AnsibleTaggedStr: str
+      _AnsibleTaggedInt: int
     data: {1: 'a', 2: 'b'}
     result: '{{ data | community.general.reveal_ansible_type(alias) }}'
     dtype: dict[int, str]
@@ -167,7 +179,11 @@
     fail_msg: '{"a": 1, "b": 1.1, "c": "abc", "d": true, "e": ["x", "y", "z"], "f": {"x": 1, "y": 2}} is {{ result }}'
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
-    alias: {"AnsibleUnicode": "str"}
+    alias:
+      AnsibleUnicode: str
+      _AnsibleTaggedStr: str
+      _AnsibleTaggedInt: int
+      _AnsibleTaggedFloat: float
     data: {'a': 1, 'b': 1.1, 'c': 'abc', 'd': True, 'e': ['x', 'y', 'z'], 'f': {'x': 1, 'y': 2}}
     result: '{{ data | community.general.reveal_ansible_type(alias) }}'
     dtype: dict[str, bool|dict|float|int|list|str]
@@ -179,7 +195,11 @@
     fail_msg: '[1, 2, 1.1, "abc", true, ["x", "y", "z"], {"x": 1, "y": 2}] is {{ result }}'
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
-    alias: {"AnsibleUnicode": "str"}
+    alias:
+      AnsibleUnicode: str
+      _AnsibleTaggedStr: str
+      _AnsibleTaggedInt: int
+      _AnsibleTaggedFloat: float
     data: [1, 2, 1.1, 'abc', True, ['x', 'y', 'z'], {'x': 1, 'y': 2}]
     result: '{{ data | community.general.reveal_ansible_type(alias) }}'
     dtype: list[bool|dict|float|int|list|str]
@@ -196,7 +216,10 @@
   vars:
     data: abc
     result: '{{ data | community.general.reveal_ansible_type }}'
-    dtype: ['AnsibleUnicode', 'str']
+    dtype:
+      - 'AnsibleUnicode'
+      - '_AnsibleTaggedStr'
+      - 'str'
 
 - name: float or int
   assert:
@@ -207,7 +230,11 @@
   vars:
     data: 123
     result: '{{ data | community.general.reveal_ansible_type }}'
-    dtype: ['float', 'int']
+    dtype:
+      - 'float'
+      - 'int'
+      - '_AnsibleTaggedInt'
+      - '_AnsibleTaggedFloat'
 
 - name: float or int
   assert:
@@ -218,7 +245,11 @@
   vars:
     data: 123.45
     result: '{{ data | community.general.reveal_ansible_type }}'
-    dtype: ['float', 'int']
+    dtype:
+      - 'float'
+      - 'int'
+      - '_AnsibleTaggedInt'
+      - '_AnsibleTaggedFloat'
 
 # Multiple alias
 # --------------
@@ -230,7 +261,11 @@
     fail_msg: '123 is {{ result }}'
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
-    alias: {"int": "number", "float": "number"}
+    alias:
+      int: number
+      float: number
+      _AnsibleTaggedInt: number
+      _AnsibleTaggedFloat: number
     data: 123
     result: '{{ data | community.general.reveal_ansible_type(alias) }}'
     dtype: number
@@ -242,7 +277,11 @@
     fail_msg: '123.45 is {{ result }}'
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
-    alias: {"int": "number", "float": "number"}
+    alias:
+      int: number
+      float: number
+      _AnsibleTaggedInt: number
+      _AnsibleTaggedFloat: number
     data: 123.45
     result: '{{ data | community.general.reveal_ansible_type(alias) }}'
     dtype: number
