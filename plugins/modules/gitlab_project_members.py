@@ -48,8 +48,9 @@ options:
     description:
       - The access level for the user.
       - Required if O(state=present), user state is set to present.
+      - V(owner) was added in community.general 10.6.0.
     type: str
-    choices: ['guest', 'reporter', 'developer', 'maintainer']
+    choices: ['guest', 'reporter', 'developer', 'maintainer', 'owner']
   gitlab_users_access:
     description:
       - Provide a list of user to access level mappings.
@@ -67,8 +68,9 @@ options:
         description:
           - The access level for the user.
           - Required if O(state=present), user state is set to present.
+          - V(owner) was added in community.general 10.6.0.
         type: str
-        choices: ['guest', 'reporter', 'developer', 'maintainer']
+        choices: ['guest', 'reporter', 'developer', 'maintainer', 'owner']
         required: true
     version_added: 3.7.0
   state:
@@ -84,9 +86,10 @@ options:
       - Adds/remove users of the given access_level to match the given O(gitlab_user)/O(gitlab_users_access) list. If omitted
         do not purge orphaned members.
       - Is only used when O(state=present).
+      - V(owner) was added in community.general 10.6.0.
     type: list
     elements: str
-    choices: ['guest', 'reporter', 'developer', 'maintainer']
+    choices: ['guest', 'reporter', 'developer', 'maintainer', 'owner']
     version_added: 3.7.0
 """
 
@@ -239,16 +242,16 @@ def main():
         project=dict(type='str', required=True),
         gitlab_user=dict(type='list', elements='str'),
         state=dict(type='str', default='present', choices=['present', 'absent']),
-        access_level=dict(type='str', choices=['guest', 'reporter', 'developer', 'maintainer']),
+        access_level=dict(type='str', choices=['guest', 'reporter', 'developer', 'maintainer', 'owner']),
         purge_users=dict(type='list', elements='str', choices=[
-                         'guest', 'reporter', 'developer', 'maintainer']),
+                         'guest', 'reporter', 'developer', 'maintainer', 'owner']),
         gitlab_users_access=dict(
             type='list',
             elements='dict',
             options=dict(
                 name=dict(type='str', required=True),
                 access_level=dict(type='str', choices=[
-                                  'guest', 'reporter', 'developer', 'maintainer'], required=True),
+                                  'guest', 'reporter', 'developer', 'maintainer', 'owner'], required=True),
             )
         ),
     ))
@@ -286,6 +289,7 @@ def main():
         'reporter': gitlab.const.REPORTER_ACCESS,
         'developer': gitlab.const.DEVELOPER_ACCESS,
         'maintainer': gitlab.const.MAINTAINER_ACCESS,
+        'owner': gitlab.const.OWNER_ACCESS,
     }
 
     gitlab_project = module.params['project']
