@@ -1,2 +1,2 @@
 minor_changes:
-  - java_cert module - param pkcs12_alias and cert_alias optional (https://github.com/ansible-collections/community.general/pull/9970).
+  - java_cert - the module no longer fails if the optional parameters ``pkcs12_alias`` and ``cert_alias`` are not provided (https://github.com/ansible-collections/community.general/pull/9970).
