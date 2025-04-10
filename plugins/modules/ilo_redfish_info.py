@@ -16,6 +16,7 @@ description:
 extends_documentation_fragment:
   - community.general.attributes
   - community.general.attributes.info_module
+  - community.general.redfish
 options:
   category:
     required: true
@@ -51,6 +52,12 @@ options:
       - Timeout in seconds for HTTP requests to iLO.
     default: 10
     type: int
+  validate_certs:
+    version_added: 10.6.0
+  ca_path:
+    version_added: 10.6.0
+  ciphers:
+    version_added: 10.6.0
 author:
   - "Bhavya B (@bhavya06)"
 """
@@ -108,21 +115,24 @@ CATEGORY_COMMANDS_DEFAULT = {
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.ilo_redfish_utils import iLORedfishUtils
+from ansible_collections.community.general.plugins.module_utils.redfish_utils import REDFISH_COMMON_ARGUMENT_SPEC
 
 
 def main():
     result = {}
     category_list = []
+    argument_spec = dict(
+        category=dict(required=True, type='list', elements='str'),
+        command=dict(required=True, type='list', elements='str'),
+        baseuri=dict(required=True),
+        username=dict(),
+        password=dict(no_log=True),
+        auth_token=dict(no_log=True),
+        timeout=dict(type='int', default=10)
+    )
+    argument_spec.update(REDFISH_COMMON_ARGUMENT_SPEC)
     module = AnsibleModule(
-        argument_spec=dict(
-            category=dict(required=True, type='list', elements='str'),
-            command=dict(required=True, type='list', elements='str'),
-            baseuri=dict(required=True),
-            username=dict(),
-            password=dict(no_log=True),
-            auth_token=dict(no_log=True),
-            timeout=dict(type='int', default=10)
-        ),
+        argument_spec,
         required_together=[
             ('username', 'password'),
         ],
