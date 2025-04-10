@@ -2041,9 +2041,7 @@ class Nmcli(object):
                 'infiniband.transport-mode': self.transport_mode,
             })
             if self.infiniband_mac:
-                options.update({
-                    'infiniband.mac-address': self.infiniband_mac,
-                })
+                options['infiniband.mac-address'] = self.infiniband_mac
         elif self.type == 'vrf':
             options.update({
                 'table': self.table,
