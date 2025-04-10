@@ -94,16 +94,32 @@ DOCUMENTATION = '''
         description: Prefix to apply to cobbler groups.
         default: cobbler_
       want_facts:
-        description: Toggle, if V(true) the plugin will retrieve host facts from the server.
+        description: Toggle, if V(true) the plugin will retrieve all host facts from the server.
         type: boolean
         default: true
       want_ip_addresses:
         description:
-          - Toggle, if V(true) the plugin will add a C(cobbler_ipv4_addresses) and C(cobbleer_ipv6_addresses) dictionary to the defined O(group) mapping
+          - Toggle, if V(true) the plugin will add a C(cobbler_ipv4_addresses) and C(cobbler_ipv6_addresses) dictionary to the defined O(group) mapping
             interface DNS names to IP addresses.
         type: boolean
         default: true
         version_added: 7.1.0
+      facts_level:
+        description:
+          - "Set to V(normal) to gather only system-level variables."
+          - "Set to V(as_rendered) to gather all variables as rolled up by Cobbler."
+        type: string
+        choices: [ 'normal', 'as_rendered' ]
+        default: normal
+        version_added: 10.6.0
+      extra_groups:
+        description:
+          - List containing extra groups to be added to the Cobbler inventory.
+          - Requires O(want_facts) to be set to V(true).
+        type: list
+        elements: string
+        default: []
+        version_added: 10.6.0
 '''
 
 EXAMPLES = '''
@@ -114,6 +130,7 @@ user: ansible-tester
 password: secure
 '''
 
+from re import split
 import socket
 
 from ansible.errors import AnsibleError
@@ -142,7 +159,9 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
     def __init__(self):
         super(InventoryModule, self).__init__()
         self.cache_key = None
-        self.connection = None
+
+        if not HAS_XMLRPC_CLIENT:
+            raise AnsibleError('Could not import xmlrpc client library')
 
     def verify_file(self, path):
         valid = False
@@ -152,18 +171,6 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
             else:
                 self.display.vvv('Skipping due to inventory source not ending in "cobbler.yaml" nor "cobbler.yml"')
         return valid
-
-    def _get_connection(self):
-        if not HAS_XMLRPC_CLIENT:
-            raise AnsibleError('Could not import xmlrpc client library')
-
-        if self.connection is None:
-            self.display.vvvv(f'Connecting to {self.cobbler_url}\n')
-            self.connection = xmlrpc_client.Server(self.cobbler_url, allow_none=True)
-            self.token = None
-            if self.get_option('user') is not None:
-                self.token = self.connection.login(text_type(self.get_option('user')), text_type(self.get_option('password')))
-        return self.connection
 
     def _init_cache(self):
         if self.cache_key not in self._cache:
@@ -178,12 +185,11 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
 
     def _get_profiles(self):
         if not self.use_cache or 'profiles' not in self._cache.get(self.cache_key, {}):
-            c = self._get_connection()
             try:
                 if self.token is not None:
-                    data = c.get_profiles(self.token)
+                    data = self.cobbler.get_profiles(self.token)
                 else:
-                    data = c.get_profiles()
+                    data = self.cobbler.get_profiles()
             except (socket.gaierror, socket.error, xmlrpc_client.ProtocolError):
                 self._reload_cache()
             else:
@@ -194,12 +200,20 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
 
     def _get_systems(self):
         if not self.use_cache or 'systems' not in self._cache.get(self.cache_key, {}):
-            c = self._get_connection()
             try:
                 if self.token is not None:
-                    data = c.get_systems(self.token)
+                    data = self.cobbler.get_systems(self.token)
                 else:
-                    data = c.get_systems()
+                    data = self.cobbler.get_systems()
+
+                # If more facts are requested, gather them all from Cobbler
+                if self.facts_level == "as_rendered":
+                    for i, host in enumerate(data):
+                        self.display.vvvv(f"Gathering all facts for {host['name']}\n")
+                        if self.token is not None:
+                            data[i] = self.cobbler.get_system_as_rendered(host['name'], self.token)
+                        else:
+                            data[i] = self.cobbler.get_system_as_rendered(host['name'])
             except (socket.gaierror, socket.error, xmlrpc_client.ProtocolError):
                 self._reload_cache()
             else:
@@ -229,6 +243,12 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
 
         # get connection host
         self.cobbler_url = self.get_option('url')
+        self.display.vvvv(f'Connecting to {self.cobbler_url}\n')
+        self.cobbler = xmlrpc_client.Server(self.cobbler_url, allow_none=True)
+        self.token = None
+        if self.get_option('user') is not None:
+            self.token = self.cobbler.login(text_type(self.get_option('user')), text_type(self.get_option('password')))
+
         self.cache_key = self.get_cache_key(path)
         self.use_cache = cache and self.get_option('cache')
 
@@ -238,6 +258,8 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
         self.include_profiles = self.get_option('include_profiles')
         self.group_by = self.get_option('group_by')
         self.inventory_hostname = self.get_option('inventory_hostname')
+        self.facts_level = self.get_option('facts_level')
+        self.extra_groups = self.get_option('extra_groups')
 
         for profile in self._get_profiles():
             if profile['parent']:
@@ -319,7 +341,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
 
             # Add host to groups specified by group_by fields
             for group_by in self.group_by:
-                if host[group_by] == '<<inherit>>':
+                if host[group_by] == '<<inherit>>' or host[group_by] == '':
                     groups = []
                 else:
                     groups = [host[group_by]] if isinstance(host[group_by], str) else host[group_by]
@@ -370,6 +392,20 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                 ipv6_address = ipv6_address_first
             if ipv6_address is not None:
                 self.inventory.set_variable(hostname, 'cobbler_ipv6_address', make_unsafe(ipv6_address))
+
+            # If user requests extra groups to be added to the Cobbler inventory,
+            if self.facts_level == "as_rendered" and self.extra_groups:
+                # Gather each extra group, split by ',' or ' '
+                key = "mgmt_parameters"
+                for extra_group in self.extra_groups:
+                    try:
+                        # Gather each value of the extra group, split by ',' or ' '
+                        # e.g. profile_role: 'test1,test2'
+                        for entry in split(',| ', host[key][extra_group]):
+                            self.display.vvvv(f"Added {hostname} to group {entry}")
+                            self._add_safe_group_name(entry, child=hostname)
+                    except KeyError as e:
+                        self.display.vvvv(f"Could not find {e} value for {hostname}")
 
             if self.get_option('want_facts'):
                 try:
