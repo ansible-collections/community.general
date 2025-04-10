@@ -315,12 +315,13 @@ def _export_public_cert_from_pkcs12(module, executable, pkcs_file, alias, passwo
         "-noprompt",
         "-keystore",
         pkcs_file,
-        "-alias",
-        alias,
         "-storetype",
         "pkcs12",
         "-rfc"
     ]
+    # Append optional alias
+    if alias:
+        export_cmd.extend(["-alias", alias])
     (export_rc, export_stdout, export_err) = module.run_command(export_cmd, data=password, check_rc=False)
 
     if export_rc != 0:
@@ -393,6 +394,10 @@ def import_pkcs12_path(module, executable, pkcs12_path, pkcs12_pass, pkcs12_alia
                        keystore_path, keystore_pass, keystore_alias, keystore_type):
     ''' Import pkcs12 from path into keystore located on
         keystore_path as alias '''
+    optional_aliases = {
+        "-destalias": keystore_alias,
+        "-srcalias": pkcs12_alias
+    }
     import_cmd = [
         executable,
         "-importkeystore",
@@ -401,13 +406,14 @@ def import_pkcs12_path(module, executable, pkcs12_path, pkcs12_pass, pkcs12_alia
         "pkcs12",
         "-srckeystore",
         pkcs12_path,
-        "-srcalias",
-        pkcs12_alias,
         "-destkeystore",
         keystore_path,
-        "-destalias",
-        keystore_alias
     ]
+    # Append optional aliases
+    for flag, value in optional_aliases.items():
+        if value:
+            import_cmd.extend([flag, value])
+
     import_cmd += _get_keystore_type_keytool_parameters(keystore_type)
 
     secret_data = "%s\n%s" % (keystore_pass, pkcs12_pass)
