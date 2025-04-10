@@ -1,0 +1,2 @@
+minor_changes:
+  - nmcli - add support for Infiniband MAC setting when ``type`` is ``infiniband`` (https://github.com/ansible-collections/community.general/pull/9962).
