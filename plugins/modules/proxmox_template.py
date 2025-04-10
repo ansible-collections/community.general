@@ -299,7 +299,6 @@ def main():
     module = AnsibleModule(
         argument_spec=module_args,
         required_together=[('api_token_id', 'api_token_secret'), ('checksum', 'checksum_algorithm')],
-        required_one_of=[('api_password', 'api_token_id')],
         required_if=[('state', 'absent', ['template'])],
         mutually_exclusive=[("src", "url")],
     )
