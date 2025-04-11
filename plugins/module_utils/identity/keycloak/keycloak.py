@@ -2224,6 +2224,24 @@ class KeycloakAPI(object):
         except Exception as e:
             self.fail_request(e, msg="Unable to add authenticationConfig %s: %s" % (executionId, str(e)))
 
+    def delete_authentication_config(self, configId, realm='master'):
+        """ Delete authenticator config
+
+        :param configId: id of authentification config
+        :param realm: realm of client to be deleted
+        :return: HTTPResponse object on success
+        """
+        try:
+            self._request(
+                URL_AUTHENTICATION_CONFIG.format(
+                    url=self.baseurl,
+                    realm=realm,
+                    id=configId),
+                method='DELETE'
+                )
+        except Exception as e:
+            self.fail_request(e, msg="Unable to delete authentication config %s: %s" % (configId, str(e)))
+
     def create_subflow(self, subflowName, flowAlias, realm='master', flowType='basic-flow'):
         """ Create new sublow on the flow
 
