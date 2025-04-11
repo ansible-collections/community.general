@@ -1,0 +1,166 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) 2025, Timur Gadiev (tgadiev@gmail.com)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install required libs
+  pip:
+    name: prettytable
+    state: present
+  delegate_to: localhost
+  become: false
+
+- name: Set test data
+  set_fact:
+    test_data:
+      - name: Alice
+        age: 25
+        role: admin
+      - name: Bob
+        age: 30
+        role: user
+    data_for_align:
+      - date: 2023-01-01
+        description: Office supplies
+        amount: 123.45
+
+# Test basic functionality
+- name: Test basic table creation
+  set_fact:
+    basic_table: '{{ test_data | community.general.to_prettytable }}'
+
+- name: Load expected basic table output
+  set_fact:
+    expected_basic_table_raw: "{{ lookup('file', 'basic_table.txt') }}"
+
+- name: Remove copyright header from expected output
+  set_fact:
+    expected_basic_table: "{{ expected_basic_table_raw.split('\n')[4:] | join('\n') }}"
+
+- name: Verify basic table output
+  assert:
+    that:
+      - basic_table == expected_basic_table
+
+# Test column ordering
+- name: Test column ordering
+  set_fact:
+    ordered_table: "{{ test_data | community.general.to_prettytable(column_order=['role', 'name', 'age']) }}"
+
+- name: Load expected ordered table output
+  set_fact:
+    expected_ordered_table_raw: "{{ lookup('file', 'ordered_table.txt') }}"
+
+- name: Remove copyright header from expected output
+  set_fact:
+    expected_ordered_table: "{{ expected_ordered_table_raw.split('\n')[4:] | join('\n') }}"
+
+- name: Verify ordered table output
+  assert:
+    that:
+      - ordered_table == expected_ordered_table
+
+# Test custom headers
+- name: Test custom headers
+  set_fact:
+    headers_table: "{{ test_data | community.general.to_prettytable(header_names=['User Name', 'User Age', 'User Role']) }}"
+
+- name: Load expected headers table output
+  set_fact:
+    expected_headers_table_raw: "{{ lookup('file', 'custom_headers.txt') }}"
+
+- name: Remove copyright header from expected output
+  set_fact:
+    expected_headers_table: "{{ expected_headers_table_raw.split('\n')[4:] | join('\n') }}"
+
+- name: Verify custom headers output
+  assert:
+    that:
+      - headers_table == expected_headers_table
+
+# Test alignments
+- name: Test column alignments
+  set_fact:
+    aligned_table: "{{ data_for_align | community.general.to_prettytable(column_alignments={'amount': 'right', 'description': 'left', 'date': 'center'}) }}"
+
+- name: Load expected aligned table output
+  set_fact:
+    expected_aligned_table_raw: "{{ lookup('file', 'aligned_table.txt') }}"
+
+- name: Remove copyright header from expected output
+  set_fact:
+    expected_aligned_table: "{{ expected_aligned_table_raw.split('\n')[4:] | join('\n') }}"
+
+- name: Verify aligned table output
+  assert:
+    that:
+      - aligned_table == expected_aligned_table
+
+# Test combined options
+- name: Test combined options
+  set_fact:
+    combined_table: "{{ test_data | community.general.to_prettytable(
+        column_order=['role', 'name', 'age'],
+        header_names=['Position', 'Full Name', 'Years'],
+        column_alignments={'name': 'center', 'age': 'right', 'role': 'left'}) }}"
+
+- name: Load expected combined table output
+  set_fact:
+    expected_combined_table_raw: "{{ lookup('file', 'combined_table.txt') }}"
+
+- name: Remove copyright header from expected output
+  set_fact:
+    expected_combined_table: "{{ expected_combined_table_raw.split('\n')[4:] | join('\n') }}"
+
+- name: Verify combined table output
+  assert:
+    that:
+      - combined_table == expected_combined_table
+
+# Test empty data
+- name: Test empty data list
+  set_fact:
+    empty_table: "{{ [] | community.general.to_prettytable }}"
+
+- name: Load expected empty table output
+  set_fact:
+    expected_empty_table_raw: "{{ lookup('file', 'empty_table.txt') }}"
+
+- name: Remove copyright header from expected output
+  set_fact:
+    expected_empty_table: "{{ expected_empty_table_raw.split('\n')[4:] | join('\n') }}"
+
+- name: Verify empty table output
+  assert:
+    that:
+      - empty_table == expected_empty_table
+
+# Test error conditions
+- name: Test non-list input (expect failure)
+  block:
+    - set_fact:
+        invalid_table: "{{ 'not_a_list' | community.general.to_prettytable }}"
+      register: failure_result
+      ignore_errors: true
+    - name: Verify error message for non-list input
+      assert:
+        that:
+          - failure_result is failed
+          - "'Expected a list of dictionaries, got a string' in failure_result.msg"
+
+- name: Test list with non-dictionary items (expect failure)
+  block:
+    - set_fact:
+        invalid_table: "{{ ['not_a_dict', 'also_not_a_dict'] | community.general.to_prettytable }}"
+      register: failure_result
+      ignore_errors: true
+    - name: Verify error message for non-dictionary items
+      assert:
+        that:
+          - failure_result is failed
+          - "'Expected all items in the list to be dictionaries, got a string' in failure_result.msg"
