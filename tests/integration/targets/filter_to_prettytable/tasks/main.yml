@@ -45,7 +45,7 @@
 - name: Verify basic table output
   assert:
     that:
-      - basic_table | trim == expected_basic_table | trim
+      - basic_table == expected_basic_table
 
 # Test column ordering
 - name: Test column ordering
@@ -63,7 +63,7 @@
 - name: Verify ordered table output
   assert:
     that:
-      - ordered_table | trim == expected_ordered_table | trim
+      - ordered_table == expected_ordered_table
 
 # Test custom headers
 - name: Test custom headers
@@ -81,7 +81,7 @@
 - name: Verify custom headers output
   assert:
     that:
-      - headers_table | trim == expected_headers_table | trim
+      - headers_table == expected_headers_table
 
 # Test alignments
 - name: Test column alignments
@@ -99,7 +99,7 @@
 - name: Verify aligned table output
   assert:
     that:
-      - aligned_table | trim == expected_aligned_table | trim
+      - aligned_table == expected_aligned_table
 
 # Test combined options
 - name: Test combined options
@@ -120,7 +120,7 @@
 - name: Verify combined table output
   assert:
     that:
-      - combined_table | trim == expected_combined_table | trim
+      - combined_table == expected_combined_table
 
 # Test empty data
 - name: Test empty data list
@@ -138,7 +138,7 @@
 - name: Verify empty table output
   assert:
     that:
-      - empty_table | trim == expected_empty_table | trim
+      - empty_table == expected_empty_table
 
 # Test error conditions
 - name: Test non-list input (expect failure)
