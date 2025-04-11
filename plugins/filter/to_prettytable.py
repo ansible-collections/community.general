@@ -29,13 +29,12 @@ DOCUMENTATION = '''
       type: list
       elements: string
     column_alignments:
-      description: Dictionary of column alignments. Keys are column names, values are alignments.
+      description: >-
+        Dictionary where keys are column names and values are alignment settings.
+        Valid alignment values are C(left), C(center), C(right), C(l), C(c), or C(r).
+        For example, {'name': 'left', 'id': 'right'} will align the 'name' column to the left
+        and the 'id' column to the right.
       type: dictionary
-      suboptions:
-        alignment:
-          description: Alignment for the column. Must be one of C(left), C(center), C(right), C(l), C(c), or C(r).
-          type: string
-          choices: [left, center, right, l, c, r]
 '''
 
 EXAMPLES = '''
@@ -127,7 +126,7 @@ def to_prettytable(data, *args, **kwargs):
         raise AnsibleFilterError(type_error(invalid_item, "all items in the list to be dictionaries"))
 
     # Handle positional argument column order
-    column_order = kwargs.get('column_order', None)
+    column_order = kwargs.pop('column_order', None)
     if args and not column_order:
         column_order = list(args)
 
@@ -138,11 +137,11 @@ def to_prettytable(data, *args, **kwargs):
     field_names = column_order or list(data[0].keys())
 
     # Set headers
-    header_names = kwargs.get('header_names', None)
+    header_names = kwargs.pop('header_names', None)
     table.field_names = header_names if header_names else field_names
 
     # Configure alignments
-    _configure_alignments(table, field_names, kwargs.get('column_alignments', {}))
+    _configure_alignments(table, field_names, kwargs.pop('column_alignments', {}))
 
     # Add rows - use add_row instead of add_rows for compatibility with older versions
     rows = [[item.get(col, "") for col in field_names] for item in data]
