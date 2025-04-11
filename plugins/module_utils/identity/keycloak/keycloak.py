@@ -2227,18 +2227,17 @@ class KeycloakAPI(object):
     def delete_authentication_config(self, configId, realm='master'):
         """ Delete authenticator config
 
-        :param configId: id of authentification config
-        :param realm: realm of client to be deleted
-        :return: HTTPResponse object on success
+        :param configId: id of authentication config
+        :param realm: realm of authentication config to be deleted
         """
         try:
+            # Send a DELETE request to remove the specified authentication config from the Keycloak server.
             self._request(
                 URL_AUTHENTICATION_CONFIG.format(
                     url=self.baseurl,
                     realm=realm,
                     id=configId),
-                method='DELETE'
-                )
+                method='DELETE')
         except Exception as e:
             self.fail_request(e, msg="Unable to delete authentication config %s: %s" % (configId, str(e)))
 
