@@ -94,7 +94,6 @@
           noOtpRequiredForHeaderPattern: "{{ keycloak_no_otp_required_pattern_orinale }}"
     state: present
 
-
 - name: Modified auth flow with new config
   community.general.keycloak_authentication:
     auth_keycloak_url: "{{ url }}"
@@ -167,4 +166,3 @@
     alias: "My conditionnal browser otp"
     state: absent
   register: result
-
