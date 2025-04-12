@@ -164,3 +164,39 @@
         that:
           - failure_result is failed
           - "'Expected all items in the list to be dictionaries, got a string' in failure_result.msg"
+
+- name: Test non-list column_order (expect failure)
+  block:
+    - set_fact:
+        invalid_table: "{{ test_data | community.general.to_prettytable(column_order=123) }}"
+      register: failure_result
+      ignore_errors: true
+    - name: Verify error message for non-list column_order
+      assert:
+        that:
+          - failure_result is failed
+          - "'Expected a list of column names, got a int' in failure_result.msg"
+
+- name: Test non-list header_names (expect failure)
+  block:
+    - set_fact:
+        invalid_table: "{{ test_data | community.general.to_prettytable(header_names='invalid_headers') }}"
+      register: failure_result
+      ignore_errors: true
+    - name: Verify error message for non-list header_names
+      assert:
+        that:
+          - failure_result is failed
+          - "'Expected a list of header names, got a string' in failure_result.msg"
+
+- name: Test unknown parameters (expect failure)
+  block:
+    - set_fact:
+        invalid_table: "{{ test_data | community.general.to_prettytable(unknown_param='value') }}"
+      register: failure_result
+      ignore_errors: true
+    - name: Verify error message for unknown parameters
+      assert:
+        that:
+          - failure_result is failed
+          - "'Unknown parameter(s) for to_prettytable filter: unknown_param' in failure_result.msg"
