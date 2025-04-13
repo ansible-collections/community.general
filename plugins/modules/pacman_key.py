@@ -78,7 +78,8 @@ options:
     default: /etc/pacman.d/gnupg
   state:
     description:
-      - Ensures that the key is present (added), trusted (signed and not expired) or absent (revoked).
+      - Ensures that the key is V(present) (added), V(trusted) (signed and not expired) or V(absent) (revoked).
+      - The state V(trusted) has been added in community.general 10.6.0.
     default: present
     choices: [absent, present, trusted]
     type: str
