@@ -194,7 +194,8 @@ options:
     description:
       - When O(instance_ids) is provided, updates running VMs with the C(updateconf) API call.
       - When new VMs are being created, emulates the C(updateconf) API call using direct template merge.
-      - Allows for complete modifications of the C(CONTEXT) L(attribute,https://docs.opennebula.io/6.10/integration_and_development/system_interfaces/api.html?highlight=updateconf#one-vm-updateconf).
+      - Allows for complete modifications of the C(CONTEXT) attribute. Refer to the L(API documentation,https://docs.opennebula.io/6.10/integration_and_development/system_interfaces/api.html#one-vm-updateconf).
+        Supported attributes include:
         - BACKUP_CONFIG: BACKUP_VOLATILE, FS_FREEZE, INCREMENT_MODE, KEEP_LAST, MODE
         - CONTEXT: (Any value, except ETH*. Variable substitution will be made)
         - CPU_MODEL: FEATURES, MODEL
@@ -668,7 +669,7 @@ from ansible.module_utils.common.dict_transformations import dict_merge
 from ansible_collections.community.general.plugins.module_utils.opennebula import flatten, render
 
 
-# https://docs.opennebula.io/6.10/integration_and_development/system_interfaces/api.html#one-vm-updateconf
+# Updateconf attributes documentation: https://docs.opennebula.io/6.10/integration_and_development/system_interfaces/api.html#one-vm-updateconf
 UPDATECONF_ATTRIBUTES = {
     "OS": ["ARCH", "MACHINE", "KERNEL", "INITRD", "BOOTLOADER", "BOOT", "SD_DISK_BUS", "UUID", "FIRMWARE"],
     "CPU_MODEL": ["MODEL", "FEATURES"],
@@ -678,7 +679,7 @@ UPDATECONF_ATTRIBUTES = {
     "VIDEO": ["ATS", "IOMMU", "RESOLUTION", "TYPE", "VRAM"],
     "RAW": ["DATA", "DATA_VMX", "TYPE", "VALIDATE"],
     "CONTEXT": [],
-    "BACKUP_CONFIG": ["FS_FREEZE", "KEEP_LAST", "BACKUP_VOLATILE", "MODE", "INCREMENT_MODE"],
+    "BACKUP_CONFIG": ["FS_FREEZE", "KEEP_LAST", "BACKUP_VOLATILE", "MODE", "INCREMENT_MODE"]
 }
 
 
