@@ -168,7 +168,9 @@ options:
   timeout:
     type: int
     default: 10
-    description: Number of seconds until the plugin gives up on failing to establish a TCP connection.
+    description:
+      - Number of seconds until the plugin gives up on failing to establish a TCP connection.
+      - This option is supported by paramiko version 2.2.0 or newer.
     ini:
       - section: defaults
         key: timeout
