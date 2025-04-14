@@ -2,53 +2,60 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-# Substitution converts str to AnsibleUnicode
-# -------------------------------------------
+# Substitution converts str to AnsibleUnicode/_AnsibleTaggedStr
+# -------------------------------------------------------------
 
-- name: String. AnsibleUnicode.
+- name: String. AnsibleUnicode/_AnsibleTaggedStr.
   assert:
-    that: result == dtype
-    success_msg: '"abc" is {{ dtype }}'
-    fail_msg: '"abc" is {{ result }}'
+    that: result in dtype
+    success_msg: '"abc" is one of {{ dtype }}'
+    fail_msg: '"abc" is {{ result }}, not one of {{ dtype }}'
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
     data: "abc"
     result: '{{ data | community.general.reveal_ansible_type }}'
-    dtype: 'AnsibleUnicode'
+    dtype:
+      - 'AnsibleUnicode'
+      - '_AnsibleTaggedStr'
 
-- name: String. AnsibleUnicode alias str.
+- name: String. AnsibleUnicode/_AnsibleTaggedStr alias str.
   assert:
-    that: result == dtype
-    success_msg: '"abc" is {{ dtype }}'
-    fail_msg: '"abc" is {{ result }}'
+    that: result in dtype
+    success_msg: '"abc" is one of {{ dtype }}'
+    fail_msg: '"abc" is {{ result }}, not one of {{ dtype }}'
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
-    alias: {"AnsibleUnicode": "str"}
+    alias: {"AnsibleUnicode": "str", "_AnsibleTaggedStr": "str"}
     data: "abc"
     result: '{{ data | community.general.reveal_ansible_type(alias) }}'
-    dtype: 'str'
+    dtype:
+      - 'str'
 
-- name: List. All items are AnsibleUnicode.
+- name: List. All items are AnsibleUnicode/_AnsibleTaggedStr.
   assert:
-    that: result == dtype
-    success_msg: '["a", "b", "c"] is {{ dtype }}'
-    fail_msg: '["a", "b", "c"] is {{ result }}'
+    that: result in dtype
+    success_msg: '["a", "b", "c"] is one of {{ dtype }}'
+    fail_msg: '["a", "b", "c"] is {{ result }}, not one of {{ dtype }}'
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
     data: ["a", "b", "c"]
     result: '{{ data | community.general.reveal_ansible_type }}'
-    dtype: 'list[AnsibleUnicode]'
+    dtype:
+      - 'list[AnsibleUnicode]'
+      - 'list[_AnsibleTaggedStr]'
 
-- name: Dictionary. All keys are AnsibleUnicode. All values are AnsibleUnicode.
+- name: Dictionary. All keys and values are AnsibleUnicode/_AnsibleTaggedStr.
   assert:
-    that: result == dtype
-    success_msg: '{"a": "foo", "b": "bar", "c": "baz"} is {{ dtype }}'
-    fail_msg: '{"a": "foo", "b": "bar", "c": "baz"} is {{ result }}'
+    that: result in dtype
+    success_msg: '{"a": "foo", "b": "bar", "c": "baz"} is one of {{ dtype }}'
+    fail_msg: '{"a": "foo", "b": "bar", "c": "baz"} is {{ result }}, not one of {{ dtype }}'
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
     data: {"a": "foo", "b": "bar", "c": "baz"}
     result: '{{ data | community.general.reveal_ansible_type }}'
-    dtype: 'dict[AnsibleUnicode, AnsibleUnicode]'
+    dtype:
+      - 'dict[AnsibleUnicode, AnsibleUnicode]'
+      - 'dict[_AnsibleTaggedStr, _AnsibleTaggedStr]'
 
 # No substitution and no alias. Type of strings is str
 # ----------------------------------------------------
@@ -57,7 +64,7 @@
   assert:
     that: result == dtype
     success_msg: '"abc" is {{ dtype }}'
-    fail_msg:  '"abc" is {{ result }}'
+    fail_msg:  '"abc" is {{ result }}, not {{ dtype }}'
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
     result: '{{ "abc" | community.general.reveal_ansible_type }}'
@@ -67,7 +74,7 @@
   assert:
     that: result == dtype
     success_msg: '123 is {{ dtype }}'
-    fail_msg:  '123 is {{ result }}'
+    fail_msg:  '123 is {{ result }}, not {{ dtype }}'
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
     result: '{{ 123 | community.general.reveal_ansible_type }}'
@@ -77,7 +84,7 @@
   assert:
     that: result == dtype
     success_msg: '123.45 is {{ dtype }}'
-    fail_msg:  '123.45 is {{ result }}'
+    fail_msg:  '123.45 is {{ result }}, not {{ dtype }}'
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
     result: '{{ 123.45 | community.general.reveal_ansible_type }}'
@@ -87,7 +94,7 @@
   assert:
     that: result == dtype
     success_msg: 'true is {{ dtype }}'
-    fail_msg:  'true is {{ result }}'
+    fail_msg:  'true is {{ result }}, not {{ dtype }}'
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
     result: '{{ true | community.general.reveal_ansible_type }}'
@@ -97,7 +104,7 @@
   assert:
     that: result == dtype
     success_msg: '["a", "b", "c"] is {{ dtype }}'
-    fail_msg:  '["a", "b", "c"] is {{ result }}'
+    fail_msg:  '["a", "b", "c"] is {{ result }}, not {{ dtype }}'
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
     result: '{{ ["a", "b", "c"] | community.general.reveal_ansible_type }}'
@@ -107,7 +114,7 @@
   assert:
     that: result == dtype
     success_msg: '[{"a": 1}, {"b": 2}] is {{ dtype }}'
-    fail_msg:  '[{"a": 1}, {"b": 2}] is {{ result }}'
+    fail_msg:  '[{"a": 1}, {"b": 2}] is {{ result }}, not {{ dtype }}'
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
     result: '{{ [{"a": 1}, {"b": 2}] | community.general.reveal_ansible_type }}'
@@ -117,7 +124,7 @@
   assert:
     that: result == dtype
     success_msg: '{"a": 1} is {{ dtype }}'
-    fail_msg:  '{"a": 1} is {{ result }}'
+    fail_msg:  '{"a": 1} is {{ result }}, not {{ dtype }}'
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
     result: '{{ {"a": 1} | community.general.reveal_ansible_type }}'
@@ -127,23 +134,23 @@
   assert:
     that: result == dtype
     success_msg: '{"a": 1, "b": 2} is {{ dtype }}'
-    fail_msg:  '{"a": 1, "b": 2} is {{ result }}'
+    fail_msg:  '{"a": 1, "b": 2} is {{ result }}, not {{ dtype }}'
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
     result: '{{ {"a": 1, "b": 2} | community.general.reveal_ansible_type }}'
     dtype: dict[str, int]
 
-# Type of strings is AnsibleUnicode or str
-# ----------------------------------------
+# Type of strings is AnsibleUnicode/_AnsibleTaggedStr or str
+# ----------------------------------------------------------
 
 - name: Dictionary. The keys are integers or strings. All values are strings.
   assert:
     that: result == dtype
     success_msg: 'data is {{ dtype }}'
-    fail_msg: 'data is {{ result }}'
+    fail_msg: 'data is {{ result }}, not {{ dtype }}'
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
-    alias: {"AnsibleUnicode": "str"}
+    alias: {"AnsibleUnicode": "str", "_AnsibleTaggedStr": "str", "_AnsibleTaggedInt": "int"}
     data: {1: 'a', 'b': 'b'}
     result: '{{ data | community.general.reveal_ansible_type(alias) }}'
     dtype: dict[int|str, str]
@@ -152,10 +159,10 @@
   assert:
     that: result == dtype
     success_msg: 'data is {{ dtype }}'
-    fail_msg: 'data is {{ result }}'
+    fail_msg: 'data is {{ result }}, not {{ dtype }}'
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
-    alias: {"AnsibleUnicode": "str"}
+    alias: {"AnsibleUnicode": "str", "_AnsibleTaggedStr": "str", "_AnsibleTaggedInt": "int"}
     data: {1: 'a', 2: 'b'}
     result: '{{ data | community.general.reveal_ansible_type(alias) }}'
     dtype: dict[int, str]
@@ -164,10 +171,10 @@
   assert:
     that: result == dtype
     success_msg: 'data is {{ dtype }}'
-    fail_msg: 'data is {{ result }}'
+    fail_msg: 'data is {{ result }}, not {{ dtype }}'
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
-    alias: {"AnsibleUnicode": "str"}
+    alias: {"AnsibleUnicode": "str", "_AnsibleTaggedStr": "str", "_AnsibleTaggedInt": "int", "_AnsibleTaggedFloat": "float"}
     data: {'a': 1, 'b': 1.1, 'c': 'abc', 'd': True, 'e': ['x', 'y', 'z'], 'f': {'x': 1, 'y': 2}}
     result: '{{ data | community.general.reveal_ansible_type(alias) }}'
     dtype: dict[str, bool|dict|float|int|list|str]
@@ -176,10 +183,10 @@
   assert:
     that: result == dtype
     success_msg: 'data is {{ dtype }}'
-    fail_msg: 'data is {{ result }}'
+    fail_msg: 'data is {{ result }}, not {{ dtype }}'
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
-    alias: {"AnsibleUnicode": "str"}
+    alias: {"AnsibleUnicode": "str", "_AnsibleTaggedStr": "str", "_AnsibleTaggedInt": "int", "_AnsibleTaggedFloat": "float"}
     data: [1, 2, 1.1, 'abc', True, ['x', 'y', 'z'], {'x': 1, 'y': 2}]
     result: '{{ data | community.general.reveal_ansible_type(alias) }}'
     dtype: list[bool|dict|float|int|list|str]
