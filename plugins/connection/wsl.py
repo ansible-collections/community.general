@@ -198,7 +198,7 @@ options:
   private_key_file:
     description:
       - Path to private key file to use for authentication.
-    type: string
+    type: path
     ini:
       - section: defaults
         key: private_key_file
