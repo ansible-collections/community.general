@@ -127,7 +127,7 @@ options:
   hide_on_login:
     description:
       - If hidden, login with this provider is possible only if requested explicitly, for example using the C(kc_idp_hint)
-      - Parameter was added in Keycloak 26, for older Keycloak versions use O(hide_on_login_page) in the O(config) dict
+      - Parameter was added in Keycloak 26, for older Keycloak versions use O(config.hide_on_login_page)
     aliases:
       - hideOnLogin
     type: bool
