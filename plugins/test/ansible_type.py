@@ -28,30 +28,36 @@ DOCUMENTATION = '''
 
 EXAMPLES = '''
 
-# Substitution converts str to AnsibleUnicode
-# -------------------------------------------
+# Substitution converts str to AnsibleUnicode or _AnsibleTaggedStr
+# ----------------------------------------------------------------
 
-# String. AnsibleUnicode.
-dtype: AnsibleUnicode
+# String. AnsibleUnicode or _AnsibleTaggedStr.
+dtype:
+  - AnsibleUnicode
+  - _AnsibleTaggedStr
 data: "abc"
 result: '{{ data is community.general.ansible_type(dtype) }}'
 # result => true
 
-# String. AnsibleUnicode alias str.
-alias: {"AnsibleUnicode": "str"}
+# String. AnsibleUnicode/_AnsibleTaggedStr alias str.
+alias: {"AnsibleUnicode": "str", "_AnsibleTaggedStr": "str"}
 dtype: str
 data: "abc"
 result: '{{ data is community.general.ansible_type(dtype, alias) }}'
 # result => true
 
-# List. All items are AnsibleUnicode.
-dtype: list[AnsibleUnicode]
+# List. All items are AnsibleUnicode/_AnsibleTaggedStr.
+dtype:
+  - list[AnsibleUnicode]
+  - list[_AnsibleTaggedStr]
 data: ["a", "b", "c"]
 result: '{{ data is community.general.ansible_type(dtype) }}'
 # result => true
 
-# Dictionary. All keys are AnsibleUnicode. All values are AnsibleUnicode.
-dtype: dict[AnsibleUnicode, AnsibleUnicode]
+# Dictionary. All keys and values are AnsibleUnicode/_AnsibleTaggedStr.
+dtype:
+  - dict[AnsibleUnicode, AnsibleUnicode]
+  - dict[_AnsibleTaggedStr, _AnsibleTaggedStr]
 data: {"a": "foo", "b": "bar", "c": "baz"}
 result: '{{ data is community.general.ansible_type(dtype) }}'
 # result => true
@@ -99,32 +105,46 @@ dtype: dict[str, int]
 result: '{{ {"a": 1, "b": 2} is community.general.ansible_type(dtype) }}'
 # result => true
 
-# Type of strings is AnsibleUnicode or str
-# ----------------------------------------
+# Type of strings is AnsibleUnicode, _AnsibleTaggedStr, or str
+# ------------------------------------------------------------
 
 # Dictionary. The keys are integers or strings. All values are strings.
-alias: {"AnsibleUnicode": "str"}
+alias:
+  AnsibleUnicode: str
+  _AnsibleTaggedStr: str
+  _AnsibleTaggedInt: int
 dtype: dict[int|str, str]
 data: {1: 'a', 'b': 'b'}
 result: '{{ data is community.general.ansible_type(dtype, alias) }}'
 # result => true
 
 # Dictionary. All keys are integers. All values are keys.
-alias: {"AnsibleUnicode": "str"}
+alias:
+  AnsibleUnicode: str
+  _AnsibleTaggedStr: str
+  _AnsibleTaggedInt: int
 dtype: dict[int, str]
 data: {1: 'a', 2: 'b'}
 result: '{{ data is community.general.ansible_type(dtype, alias) }}'
 # result => true
 
 # Dictionary. All keys are strings. Multiple types values.
-alias: {"AnsibleUnicode": "str"}
+alias:
+  AnsibleUnicode: str
+  _AnsibleTaggedStr: str
+  _AnsibleTaggedInt: int
+  _AnsibleTaggedFloat: float
 dtype: dict[str, bool|dict|float|int|list|str]
 data: {'a': 1, 'b': 1.1, 'c': 'abc', 'd': True, 'e': ['x', 'y', 'z'], 'f': {'x': 1, 'y': 2}}
 result: '{{ data is community.general.ansible_type(dtype, alias) }}'
 # result => true
 
 # List. Multiple types items.
-alias: {"AnsibleUnicode": "str"}
+alias:
+  AnsibleUnicode: str
+  _AnsibleTaggedStr: str
+  _AnsibleTaggedInt: int
+  _AnsibleTaggedFloat: float
 dtype: list[bool|dict|float|int|list|str]
 data: [1, 2, 1.1, 'abc', True, ['x', 'y', 'z'], {'x': 1, 'y': 2}]
 result: '{{ data is community.general.ansible_type(dtype, alias) }}'
@@ -133,20 +153,20 @@ result: '{{ data is community.general.ansible_type(dtype, alias) }}'
 # Option dtype is list
 # --------------------
 
-# AnsibleUnicode or str
-dtype: ['AnsibleUnicode', 'str']
+# AnsibleUnicode, _AnsibleTaggedStr, or str
+dtype: ['AnsibleUnicode', '_AnsibleTaggedStr', 'str']
 data: abc
 result: '{{ data is community.general.ansible_type(dtype) }}'
 # result => true
 
 # float or int
-dtype: ['float', 'int']
+dtype: ['float', 'int', "_AnsibleTaggedInt", "_AnsibleTaggedFloat"]
 data: 123
 result: '{{ data is community.general.ansible_type(dtype) }}'
 # result => true
 
 # float or int
-dtype: ['float', 'int']
+dtype: ['float', 'int', "_AnsibleTaggedInt", "_AnsibleTaggedFloat"]
 data: 123.45
 result: '{{ data is community.general.ansible_type(dtype) }}'
 # result => true
@@ -155,14 +175,22 @@ result: '{{ data is community.general.ansible_type(dtype) }}'
 # --------------
 
 # int alias number
-alias: {"int": "number", "float": "number"}
+alias:
+    int: number
+    float: number
+    _AnsibleTaggedInt: number
+    _AnsibleTaggedFloat: float
 dtype: number
 data: 123
 result: '{{ data is community.general.ansible_type(dtype, alias) }}'
 # result => true
 
 # float alias number
-alias: {"int": "number", "float": "number"}
+alias:
+    int: number
+    float: number
+    _AnsibleTaggedInt: number
+    _AnsibleTaggedFloat: float
 dtype: number
 data: 123.45
 result: '{{ data is community.general.ansible_type(dtype, alias) }}'
@@ -192,6 +220,7 @@ def ansible_type(data, dtype, alias=None):
     else:
         data_types = dtype
 
+    # TODO: expose use_native_type parameter
     return _ansible_type(data, alias) in data_types
 
 

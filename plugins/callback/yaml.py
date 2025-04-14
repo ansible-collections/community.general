@@ -53,29 +53,77 @@ def should_use_block(value):
     return False
 
 
-class MyDumper(AnsibleDumper):
-    def represent_scalar(self, tag, value, style=None):
-        """Uses block style for multi-line strings"""
-        if style is None:
-            if should_use_block(value):
-                style = '|'
-                # we care more about readable than accuracy, so...
-                # ...no trailing space
-                value = value.rstrip()
-                # ...and non-printable characters
-                value = ''.join(x for x in value if x in string.printable or ord(x) >= 0xA0)
-                # ...tabs prevent blocks from expanding
-                value = value.expandtabs()
-                # ...and odd bits of whitespace
-                value = re.sub(r'[\x0b\x0c\r]', '', value)
-                # ...as does trailing space
-                value = re.sub(r' +\n', '\n', value)
-            else:
-                style = self.default_style
-        node = yaml.representer.ScalarNode(tag, value, style=style)
-        if self.alias_key is not None:
-            self.represented_objects[self.alias_key] = node
-        return node
+try:
+    class MyDumper(AnsibleDumper):  # pylint: disable=inherit-non-class
+        def represent_scalar(self, tag, value, style=None):
+            """Uses block style for multi-line strings"""
+            if style is None:
+                if should_use_block(value):
+                    style = '|'
+                    # we care more about readable than accuracy, so...
+                    # ...no trailing space
+                    value = value.rstrip()
+                    # ...and non-printable characters
+                    value = ''.join(x for x in value if x in string.printable or ord(x) >= 0xA0)
+                    # ...tabs prevent blocks from expanding
+                    value = value.expandtabs()
+                    # ...and odd bits of whitespace
+                    value = re.sub(r'[\x0b\x0c\r]', '', value)
+                    # ...as does trailing space
+                    value = re.sub(r' +\n', '\n', value)
+                else:
+                    style = self.default_style
+            node = yaml.representer.ScalarNode(tag, value, style=style)
+            if self.alias_key is not None:
+                self.represented_objects[self.alias_key] = node
+            return node
+except:  # noqa: E722, pylint: disable=bare-except
+    # This happens with Data Tagging, see https://github.com/ansible/ansible/issues/84781
+    # Until there is a better solution we'll resort to using ansible-core internals.
+    from ansible._internal._yaml import _dumper
+    import typing as t
+
+    class MyDumper(_dumper._BaseDumper):
+        # This code is mostly taken from ansible._internal._yaml._dumper
+        @classmethod
+        def _register_representers(cls) -> None:
+            cls.add_multi_representer(_dumper.AnsibleTaggedObject, cls.represent_ansible_tagged_object)
+            cls.add_multi_representer(_dumper.Tripwire, cls.represent_tripwire)
+            cls.add_multi_representer(_dumper.c.Mapping, _dumper.SafeRepresenter.represent_dict)
+            cls.add_multi_representer(_dumper.c.Sequence, _dumper.SafeRepresenter.represent_list)
+
+        def represent_ansible_tagged_object(self, data):
+            if ciphertext := _dumper.VaultHelper.get_ciphertext(data, with_tags=False):
+                return self.represent_scalar('!vault', ciphertext, style='|')
+
+            return self.represent_data(_dumper.AnsibleTagHelper.as_native_type(data))  # automatically decrypts encrypted strings
+
+        def represent_tripwire(self, data: _dumper.Tripwire) -> t.NoReturn:
+            data.trip()
+
+        # The following function is the same as in the try/except
+        def represent_scalar(self, tag, value, style=None):
+            """Uses block style for multi-line strings"""
+            if style is None:
+                if should_use_block(value):
+                    style = '|'
+                    # we care more about readable than accuracy, so...
+                    # ...no trailing space
+                    value = value.rstrip()
+                    # ...and non-printable characters
+                    value = ''.join(x for x in value if x in string.printable or ord(x) >= 0xA0)
+                    # ...tabs prevent blocks from expanding
+                    value = value.expandtabs()
+                    # ...and odd bits of whitespace
+                    value = re.sub(r'[\x0b\x0c\r]', '', value)
+                    # ...as does trailing space
+                    value = re.sub(r' +\n', '\n', value)
+                else:
+                    style = self.default_style
+            node = yaml.representer.ScalarNode(tag, value, style=style)
+            if self.alias_key is not None:
+                self.represented_objects[self.alias_key] = node
+            return node
 
 
 class CallbackModule(Default):
