@@ -99,6 +99,11 @@ options:
     type: str
     choices: [datagram, connected]
     version_added: 5.8.0
+  infiniband_mac:
+    description:
+      - MAC address of the Infiniband IPoIB devices.
+    type: str
+    version_added: 10.6.0
   slave_type:
     description:
       - Type of the device of this slave's master connection (for example V(bond)).
@@ -1764,6 +1769,7 @@ class Nmcli(object):
         self.wireguard = module.params['wireguard']
         self.vpn = module.params['vpn']
         self.transport_mode = module.params['transport_mode']
+        self.infiniband_mac = module.params['infiniband_mac']
         self.sriov = module.params['sriov']
 
         if self.method4:
@@ -2034,6 +2040,8 @@ class Nmcli(object):
             options.update({
                 'infiniband.transport-mode': self.transport_mode,
             })
+            if self.infiniband_mac:
+                options['infiniband.mac-address'] = self.infiniband_mac
         elif self.type == 'vrf':
             options.update({
                 'table': self.table,
@@ -2708,9 +2716,12 @@ def main():
                               tap=dict(type='bool'))),
             wireguard=dict(type='dict'),
             vpn=dict(type='dict'),
-            transport_mode=dict(type='str', choices=['datagram', 'connected']),
             sriov=dict(type='dict'),
             table=dict(type='int'),
+            # infiniband specific vars
+            transport_mode=dict(type='str', choices=['datagram', 'connected']),
+            infiniband_mac=dict(type='str'),
+
         ),
         mutually_exclusive=[['never_default4', 'gw4'],
                             ['routes4_extended', 'routes4'],
