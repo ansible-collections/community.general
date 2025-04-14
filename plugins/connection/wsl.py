@@ -406,13 +406,13 @@ class Connection(ConnectionBase):
 
         sock_kwarg = {}
         if proxy_command:
-            replacers = {
+            replacers: t.Dict[str, str] = {
                 '%h': self.get_option('remote_addr'),
-                '%p': port,
+                '%p': str(port),
                 '%r': self.get_option('remote_user')
             }
             for find, replace in replacers.items():
-                proxy_command = proxy_command.replace(find, str(replace))
+                proxy_command = proxy_command.replace(find, replace)
             try:
                 sock_kwarg = {'sock': paramiko.ProxyCommand(proxy_command)}
                 display.vvv(f'CONFIGURE PROXY COMMAND FOR CONNECTION: {proxy_command}', host=self.get_option('remote_addr'))
