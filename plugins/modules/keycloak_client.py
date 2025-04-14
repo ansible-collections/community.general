@@ -775,6 +775,13 @@ def normalise_cr(clientrep, remove_ids=False):
     return clientrep
 
 
+def normalize_kc_resp(clientrep):
+    # kc drops the variable 'authorizationServicesEnabled' if set to false
+    # to minimize diff/changes we set it to false if not set by kc
+    if clientrep and 'authorizationServicesEnabled' not in clientrep:
+        clientrep['authorizationServicesEnabled'] = False
+
+
 def sanitize_cr(clientrep):
     """ Removes probably sensitive details from a client representation.
 
@@ -966,10 +973,7 @@ def main():
     else:
         before_client = kc.get_client_by_id(cid, realm=realm)
 
-    # kc drops the variable 'authorizationServicesEnabled' if set to false
-    # to minimize diff/changes we set it to false if not set by kc
-    if before_client and 'authorizationServicesEnabled' not in before_client:
-        before_client['authorizationServicesEnabled'] = False
+    normalize_kc_resp(before_client)
 
     if before_client is None:
         before_client = {}
@@ -1050,6 +1054,8 @@ def main():
             kc.update_client(cid, desired_client, realm=realm)
 
             after_client = kc.get_client_by_id(cid, realm=realm)
+            normalize_kc_resp(after_client)
+
             if before_client == after_client:
                 result['changed'] = False
             if module._diff:
