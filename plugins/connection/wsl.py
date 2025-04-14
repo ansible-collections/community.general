@@ -323,6 +323,16 @@ from binascii import hexlify
 from subprocess import list2cmdline
 
 
+if t.TYPE_CHECKING and paramiko:
+    from paramiko import MissingHostKeyPolicy
+    from paramiko.client import SSHClient
+    from paramiko.pkey import PKey
+else:
+    MissingHostKeyPolicy: type = object
+    SSHClient: type = object
+    PKey: type = object
+
+
 display = Display()
 
 
@@ -333,11 +343,6 @@ def authenticity_msg(hostname: str, ktype: str, fingerprint: str) -> str:
     Are you sure you want to continue connecting (yes/no)?
     """
     return msg
-
-
-MissingHostKeyPolicy: type = object
-if paramiko:
-    MissingHostKeyPolicy = paramiko.MissingHostKeyPolicy
 
 
 class MyAddPolicy(MissingHostKeyPolicy):
@@ -354,7 +359,7 @@ class MyAddPolicy(MissingHostKeyPolicy):
         self.connection = connection
         self._options = connection._options
 
-    def missing_host_key(self, client, hostname, key) -> None:
+    def missing_host_key(self, client: SSHClient, hostname: str, key: PKey) -> None:
 
         if all((self.connection.get_option('host_key_checking'), not self.connection.get_option('host_key_auto_add'))):
 
