@@ -44,6 +44,12 @@ options:
       - This option is only used on creation, not for updates.
     type: path
     version_added: "4.2.0"
+  build_timeout:
+    description:
+      - Maximum number of seconds a CI job can run.
+      - If not specified on creation, GitLab will impose a default value.
+    type: int
+    version_added: "10.6.0"
   builds_access_level:
     description:
       - V(private) means that repository CI/CD is allowed only to project members.
@@ -430,6 +436,7 @@ class GitLabProject(object):
         project_options = {
             'allow_merge_on_skipped_pipeline': options['allow_merge_on_skipped_pipeline'],
             'builds_access_level': options['builds_access_level'],
+            'build_timeout': options['build_timeout'],
             'ci_config_path': options['ci_config_path'],
             'container_expiration_policy': options['container_expiration_policy'],
             'container_registry_access_level': options['container_registry_access_level'],
@@ -591,6 +598,7 @@ def main():
         allow_merge_on_skipped_pipeline=dict(type='bool'),
         avatar_path=dict(type='path'),
         builds_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
+        build_timeout=dict(type='int'),
         ci_config_path=dict(type='str'),
         container_expiration_policy=dict(type='dict', default=None, options=dict(
             cadence=dict(type='str', choices=["1d", "7d", "14d", "1month", "3month"]),
@@ -664,6 +672,7 @@ def main():
     allow_merge_on_skipped_pipeline = module.params['allow_merge_on_skipped_pipeline']
     avatar_path = module.params['avatar_path']
     builds_access_level = module.params['builds_access_level']
+    build_timeout = module.params['build_timeout']
     ci_config_path = module.params['ci_config_path']
     container_expiration_policy = module.params['container_expiration_policy']
     container_registry_access_level = module.params['container_registry_access_level']
@@ -748,6 +757,7 @@ def main():
             "allow_merge_on_skipped_pipeline": allow_merge_on_skipped_pipeline,
             "avatar_path": avatar_path,
             "builds_access_level": builds_access_level,
+            "build_timeout": build_timeout,
             "ci_config_path": ci_config_path,
             "container_expiration_policy": container_expiration_policy,
             "container_registry_access_level": container_registry_access_level,
