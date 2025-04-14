@@ -214,6 +214,17 @@ options:
     cli:
       - name: private_key_file
         option: "--private-key"
+  user_known_hosts_file:
+    description:
+      - Path to the user known hosts file.
+      - Used to verify the ssh hosts keys.
+    type: path
+    default: ~/.ssh/known_hosts
+    ini:
+      - section: paramiko_connection
+        key: user_known_hosts_file
+    vars:
+      - name: ansible_paramiko_user_known_hosts_file
   wsl_distribution:
     description:
       - WSL distribution name
@@ -452,10 +463,10 @@ class Connection(ConnectionBase):
         if self._log_channel is not None:
             ssh.set_log_channel(self._log_channel)
 
-        self.keyfile = os.path.expanduser('~/.ssh/known_hosts')
+        self.keyfile = os.path.expanduser(self.get_option('user_known_hosts_file'))
 
         if self.get_option('host_key_checking'):
-            for ssh_known_hosts in ('/etc/ssh/ssh_known_hosts', '/etc/openssh/ssh_known_hosts'):
+            for ssh_known_hosts in ('/etc/ssh/ssh_known_hosts', '/etc/openssh/ssh_known_hosts', self.keyfile):
                 try:
                     ssh.load_system_host_keys(ssh_known_hosts)
                     break
