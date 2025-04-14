@@ -9,11 +9,15 @@ from __future__ import annotations
 from ansible.errors import (
     AnsibleError,
     AnsibleFilterError,
-    AnsibleFilterTypeError,
 )
 
 from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.common.collections import is_sequence
+
+try:
+    from ansible.errors import AnsibleTypeError
+except ImportError:
+    from ansible.errors import AnsibleFilterTypeError as AnsibleTypeError
 
 try:
     from hashids import Hashids
@@ -63,7 +67,7 @@ def hashids_encode(nums, salt=None, alphabet=None, min_length=None):
     try:
         hashid = hashids.encode(*nums)
     except TypeError as e:
-        raise AnsibleFilterTypeError(
+        raise AnsibleTypeError(
             "Data to encode must by a tuple or list of ints: %s" % to_native(e)
         )
 
