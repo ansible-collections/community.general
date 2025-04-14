@@ -195,16 +195,16 @@ options:
       - When O(instance_ids) is provided, updates running VMs with the C(updateconf) API call.
       - When new VMs are being created, emulates the C(updateconf) API call using direct template merge.
       - Allows for complete modifications of the C(CONTEXT) attribute.
-      - Supported attributes include:
-        BACKUP_CONFIG: BACKUP_VOLATILE, FS_FREEZE, INCREMENT_MODE, KEEP_LAST, MODE
-        CONTEXT: (Any value, except ETH*. Variable substitution will be made)
-        CPU_MODEL: FEATURES, MODEL
-        FEATURES: ACPI, APIC, GUEST_AGENT, HYPERV, IOTHREADS, LOCALTIME, PAE, VIRTIO_BLK_QUEUES, VIRTIO_SCSI_QUEUES
-        GRAPHICS: COMMAND, KEYMAP, LISTEN, PASSWD, PORT, TYPE
-        INPUT: BUS, TYPE
-        OS: ARCH, BOOT, BOOTLOADER, FIRMWARE, INITRD, KERNEL, KERNEL_CMD, MACHINE, ROOT, SD_DISK_BUS, UUID
-        RAW: DATA, DATA_VMX, TYPE, VALIDATE
-        VIDEO: ATS, IOMMU, RESOLUTION, TYPE, VRAM
+      - Supported attributes include
+        C(BACKUP_CONFIG:) BACKUP_VOLATILE, FS_FREEZE, INCREMENT_MODE, KEEP_LAST, MODE)
+        C(CONTEXT:) (Any value, except ETH*. Variable substitution will be made)
+        C(CPU_MODEL:) FEATURES, MODEL
+        C(FEATURES:) ACPI, APIC, GUEST_AGENT, HYPERV, IOTHREADS, LOCALTIME, PAE, VIRTIO_BLK_QUEUES, VIRTIO_SCSI_QUEUES
+        C(GRAPHICS:) COMMAND, KEYMAP, LISTEN, PASSWD, PORT, TYPE
+        C(INPUT:) BUS, TYPE
+        C(OS:) ARCH, BOOT, BOOTLOADER, FIRMWARE, INITRD, KERNEL, KERNEL_CMD, MACHINE, ROOT, SD_DISK_BUS, UUID
+        C(RAW:) DATA, DATA_VMX, TYPE, VALIDATE
+        C(VIDEO:) ATS, IOMMU, RESOLUTION, TYPE, VRAM
     type: dict
     version_added: 6.3.0
 author:
