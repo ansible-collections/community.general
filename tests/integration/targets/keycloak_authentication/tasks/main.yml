@@ -2,14 +2,28 @@
 # Copyright (c) Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-- name: Install jmespath
+- name: Install required packages
   pip:
-    name: jmespath
+    name:
+      - jmespath
+      - requests
   register: result
-#  environment: 
-#    https_proxy: http://10.249.120.90:8080
-#    http_proxy: http://10.249.120.90:8080
   until: result is success
+
+- name: Start container
+  community.docker.docker_container:
+    name: mykeycloak
+    image: "quay.io/keycloak/keycloak:{{ keycloak_version }}"
+    command: start-dev
+    env:
+      KC_HTTP_RELATIVE_PATH: /auth
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: password
+    ports:
+      - "{{ keycloak_port }}:8080"
+    detach: true
+    auto_remove: true
+    memory: 2200M
 
 - name: Wait for Keycloak
   uri:
@@ -140,16 +154,14 @@
   ansible.builtin.uri:
     url: "{{ url }}/admin/realms/{{ realm }}/partial-export?exportClients=false&exportGroupsAndRoles=false"
     method: POST
-    return_content: true
-    status_code: 200
     headers:
-      X-Requested-By: "Jenkins"
       Accept: application/json
       User-agent: Ansible
       Authorization: "Bearer {{ access_token }}"
     body_format: form-urlencoded
     body: {}
   register: exported_realm
+  no_log: true
 
 - name: Assert `my-conditional-otp-config` exists only once
   ansible.builtin.assert:
@@ -166,3 +178,8 @@
     alias: "My conditionnal browser otp"
     state: absent
   register: result
+
+- name: Remove container
+  community.docker.docker_container:
+    name: mykeycloak
+    state: absent

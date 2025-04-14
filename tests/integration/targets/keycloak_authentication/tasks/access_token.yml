@@ -6,10 +6,8 @@
   ansible.builtin.uri:
     url: "{{ url }}/realms/{{ admin_realm }}/protocol/openid-connect/token"
     method: POST
-    return_content: true
     status_code: 200
     headers:
-      X-Requested-By: "Jenkins"
       Accept: application/json
       User-agent: Ansible
     body_format: form-urlencoded
