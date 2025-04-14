@@ -1,0 +1,2 @@
+bugfixes:
+  - "hashids and unicode_normalize filter plugins - avoid deprecated ``AnsibleFilterTypeError`` on ansible-core 2.19 (https://github.com/ansible-collections/community.general/pull/9992)."
