@@ -157,8 +157,8 @@ options:
     default: 30
     description:
       - Configures, in seconds, the amount of time to wait for the SSH
-        banner to be presented. This option is supported by paramiko
-        version 1.15.0 or newer.
+        banner to be presented.
+      - This option is supported by paramiko version 1.15.0 or newer.
     ini:
       - section: paramiko_connection
         key: banner_timeout
