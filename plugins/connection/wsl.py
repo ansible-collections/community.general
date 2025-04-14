@@ -298,6 +298,7 @@ all:
         boot_time_command: systemctl show -p ActiveEnterTimestamp init.scope
 """
 
+import io
 import os
 import pathlib
 import shlex
@@ -314,6 +315,7 @@ from ansible_collections.community.general.plugins.module_utils._filelock import
 from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
 from ansible.module_utils.compat.paramiko import PARAMIKO_IMPORT_ERR, paramiko
 from ansible.module_utils.compat.version import LooseVersion
+from ansible.playbook.play_context import PlayContext
 from ansible.plugins.connection import ConnectionBase
 from ansible.utils.display import Display
 from ansible.utils.path import makedirs_safe
@@ -387,7 +389,7 @@ class Connection(ConnectionBase):
     transport = 'community.general.wsl'
     _log_channel: str | None = None
 
-    def __init__(self, play_context, new_stdin, *args, **kwargs):
+    def __init__(self, play_context: PlayContext, new_stdin: io.TextIOWrapper | None = None, *args: t.Any, **kwargs: t.Any):
         super(Connection, self).__init__(play_context, new_stdin, *args, **kwargs)
 
     def _set_log_channel(self, name: str) -> None:
