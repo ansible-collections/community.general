@@ -623,7 +623,7 @@ class Connection(ConnectionBase):
                 if password_prompt:
                     if self.become:
                         become_pass = self.become.get_option('become_pass')
-                        chan.sendall(to_bytes(become_pass, errors='surrogate_or_strict') + b'\n')
+                        chan.sendall(to_bytes(become_pass + '\n', errors='surrogate_or_strict'))
                     else:
                         raise AnsibleError('A password is required but none was supplied')
                 else:
