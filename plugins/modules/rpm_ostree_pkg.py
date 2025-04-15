@@ -78,7 +78,7 @@ EXAMPLES = r"""
   register: rpm_ostree_pkg
   until: rpm_ostree_pkg is not failed
   retries: 10
-  dealy: 30
+  delay: 30
 """
 
 RETURN = r"""
