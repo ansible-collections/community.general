@@ -107,13 +107,6 @@ EXAMPLES = """
 """
 
 RETURN = """
----
-changed:
-  description:
-    - If V(present), the backup_schedule will return True after adding the VM ID to the backup job.
-    - If V(absent), the backup_schedule will return True after removing it from the backup job.
-  returned: always, but can be empty
-  type: bool
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
