@@ -39,8 +39,8 @@ options:
     type: str
   state:
     description:
-        - If V(present), the module will update backup job with new VM ID.
-        - If V(absent), the module will remove the VM ID from all backup jobs where the VM ID has existed.
+        - If V(present), ensure that VM is present in the backup job on defined O(backup_id).
+        - If V(absent), ensure that VM is not present in the backup job if O(backup_id) is defined, and otherwise, it should not exist in any of the backup jobs.
     required: true
     choices: ["present", "absent"]
     type: str
@@ -53,7 +53,7 @@ extends_documentation_fragment:
 """
 
 EXAMPLES = """
-- name: Scheduling VM Backups based on VM name
+- name: Ensure that VM is present in the backup job
   proxmox_backup_schedule:
     api_user: 'myUser@pam'
     api_password: '*******'
@@ -62,7 +62,7 @@ EXAMPLES = """
     backup_id: 'backup-b2adffdc-316e'
     state: 'present'
 
-- name: Scheduling VM Backups based on VM ID
+- name: Ensure that vmid is present in the backup job
   proxmox_backup_schedule:
     api_user: 'myUser@pam'
     api_password: '*******'
@@ -71,7 +71,7 @@ EXAMPLES = """
     backup_id: 'backup-b2adffdc-316e'
     state: 'present'
 
-- name: Removing backup setting based on VM name
+- name: Ensure that there is no scheduled backup for VM name within all backup jobs
   proxmox_backup_schedule:
     api_user: 'myUser@pam'
     api_password: '*******'
@@ -79,7 +79,7 @@ EXAMPLES = """
     vm_name: 'VM Name'
     state: 'absent'
 
-- name: Removing backup setting based on VM ID
+- name: Ensure that there is no scheduled backup for vmid within all backup jobs
   proxmox_backup_schedule:
     api_user: 'myUser@pam'
     api_password: '*******'
@@ -87,7 +87,7 @@ EXAMPLES = """
     vm_id: 'VM ID'
     state: 'absent'
 
-- name: Removing backup setting based on VM name from specific backup job
+- name: Ensure that there is no scheduled backup for VM within specific backup job
   proxmox_backup_schedule:
     api_user: 'myUser@pam'
     api_password: '*******'
@@ -96,7 +96,7 @@ EXAMPLES = """
     backup_id: 'backup-b2adffdc-316e'
     state: 'absent'
 
-- name: Removing backup setting based on VM ID from specific backup job
+- name: Ensure that there is no scheduled backup for vmid within specific backup job
   proxmox_backup_schedule:
     api_user: 'myUser@pam'
     api_password: '*******'
