@@ -40,7 +40,7 @@ options:
   state:
     description:
         - If V(present), ensure that VM is present in the backup job on defined O(backup_id).
-        - If V(absent), ensure that VM is not present in the backup job if O(backup_id) is defined, and otherwise, it should not exist in any of the backup jobs.
+        - If V(absent), ensure that VM is not present in the backup job if O(backup_id) is defined and otherwise, it should not exist in any of the backup jobs.
     required: true
     choices: ["present", "absent"]
     type: str
