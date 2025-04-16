@@ -195,16 +195,16 @@ options:
       - When O(instance_ids) is provided, updates running VMs with the C(updateconf) API call.
       - When new VMs are being created, emulates the C(updateconf) API call using direct template merge.
       - Allows for complete modifications of the C(CONTEXT) attribute.
-      - Supported attributes include
-        C(BACKUP_CONFIG:) BACKUP_VOLATILE, FS_FREEZE, INCREMENT_MODE, KEEP_LAST, MODE)
-        C(CONTEXT:) (Any value, except ETH*. Variable substitution will be made)
-        C(CPU_MODEL:) FEATURES, MODEL
-        C(FEATURES:) ACPI, APIC, GUEST_AGENT, HYPERV, IOTHREADS, LOCALTIME, PAE, VIRTIO_BLK_QUEUES, VIRTIO_SCSI_QUEUES
-        C(GRAPHICS:) COMMAND, KEYMAP, LISTEN, PASSWD, PORT, TYPE
-        C(INPUT:) BUS, TYPE
-        C(OS:) ARCH, BOOT, BOOTLOADER, FIRMWARE, INITRD, KERNEL, KERNEL_CMD, MACHINE, ROOT, SD_DISK_BUS, UUID
-        C(RAW:) DATA, DATA_VMX, TYPE, VALIDATE
-        C(VIDEO:) ATS, IOMMU, RESOLUTION, TYPE, VRAM
+      - Supported attributes include:
+      - B(BACKUP_CONFIG:) V(BACKUP_VOLATILE), V(FS_FREEZE), V(INCREMENT_MODE), V(KEEP_LAST), V(MODE);
+      - B(CONTEXT:) (Any value, except V(ETH*). Variable substitution will be made);
+      - B(CPU_MODEL:) V(FEATURES), V(MODEL);
+      - B(FEATURES:) V(ACPI), V(APIC), V(GUEST_AGENT), V(HYPERV), V(IOTHREADS), V(LOCALTIME), V(PAE), V(VIRTIO_BLK_QUEUES), V(VIRTIO_SCSI_QUEUES);
+      - B(GRAPHICS:) V(COMMAND), V(KEYMAP), V(LISTEN), V(PASSWD), V(PORT), V(TYPE);
+      - B(INPUT:) V(BUS), V(TYPE);
+      - B(OS:) V(ARCH), V(BOOT), V(BOOTLOADER), V(FIRMWARE), V(INITRD), V(KERNEL), V(KERNEL_CMD), V(MACHINE), V(ROOT), V(SD_DISK_BUS), V(UUID);
+      - B(RAW:) V(DATA), V(DATA_VMX), V(TYPE), V(VALIDATE);
+      - B(VIDEO:) V(ATS), V(IOMMU), V(RESOLUTION), V(TYPE), V(VRAM).
     type: dict
     version_added: 6.3.0
 author:
