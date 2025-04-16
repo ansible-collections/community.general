@@ -366,11 +366,26 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def _get_node_ip(self, node):
         ret = self._get_json(f"{self.proxmox_url}/api2/json/nodes/{node}/network")
 
+        # sort interface by iface name to make selection as stable as possible
+        ret.sort(key=lambda x: x['iface'])
+
         for iface in ret:
             try:
+                # only process interfaces adhering to these rules
+                if 'active' not in iface:
+                    self.display.vvv(f"Interface {iface['iface']} on node {node} does not have an active state")
+                    continue
+                if 'address' not in iface:
+                    self.display.vvv(f"Interface {iface['iface']} on node {node} does not have an address")
+                    continue
+                if 'gateway' not in iface:
+                    self.display.vvv(f"Interface {iface['iface']} on node {node} does not have a gateway")
+                    continue
+                self.display.vv(f"Using interface {iface['iface']} on node {node} with address {iface['address']} as node ip for ansible_host")
                 return iface['address']
             except Exception:
-                return None
+                continue
+        return None
 
     def _get_lxc_interfaces(self, properties, node, vmid):
         status_key = self._fact('status')
