@@ -122,14 +122,10 @@ class Sysrc(object):
         return err.find("unknown variable") > 0 or out.find("unknown variable") > 0
 
     def exists(self):
-        # sysrc doesn't really use exit codes
-        (rc, out, err) = self.run_sysrc(self.name)
-        if self.value is None:
-            regex = "%s: " % re.escape(self.name)
-        else:
-            regex = "%s: %s$" % (re.escape(self.name), re.escape(self.value))
-
-        return not self.has_unknown_variable(out, err) and re.match(regex, out) is not None
+        # sysrc doesn't really use exit codes. Read all variables.
+        (rc, out, err) = self.run_sysrc('-e', '-a')
+        conf = dict([i.split('=') for i in out.splitlines()])
+        return self.name in conf
 
     def contains(self):
         (rc, out, err) = self.run_sysrc('-n', self.name)
