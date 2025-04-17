@@ -273,7 +273,7 @@
 
 - name: create directory
   file:
-    path: "{{remote_tmp_dir | expanduser}}/zypper2"
+    path: "{{ remote_tmp_dir | expanduser }}/zypper2"
     state: directory
 
 - name: copy spec file
