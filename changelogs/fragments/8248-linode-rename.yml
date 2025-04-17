@@ -1,0 +1,4 @@
+bugfixes:
+  - "linode inventory plugin - linode_api4 renamed the IPv6 ``pools`` to ``ranges`` in version 5.4.1. The plugin now checks the package
+     version to use the appropriate name (https://github.com/ansible-collections/community.general/issues/8213,
+     https://github.com/ansible-collections/community.general/pull/8248)."
