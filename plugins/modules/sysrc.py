@@ -125,7 +125,10 @@ class Sysrc(object):
         # sysrc doesn't really use exit codes. Read all variables.
         (rc, out, err) = self.run_sysrc('-e', '-a')
         conf = dict([i.split('=') for i in out.splitlines()])
-        return self.name in conf
+        if self.value is None:
+            return self.name in conf
+        else:
+            return self.name in conf and conf[self.name] == f'"{self.value}"'
 
     def contains(self):
         (rc, out, err) = self.run_sysrc('-n', self.name)
@@ -138,13 +141,10 @@ class Sysrc(object):
         if self.exists():
             return
 
-        if self.module.check_mode:
-            self.changed = True
-            return
+        if not self.module.check_mode:
+            (rc, out, err) = self.run_sysrc("%s=%s" % (self.name, self.value))
 
-        (rc, out, err) = self.run_sysrc("%s=%s" % (self.name, self.value))
-        if out.find("%s:" % self.name) == 0 and re.search("-> %s$" % re.escape(self.value), out) is not None:
-            self.changed = True
+        self.changed = True
 
     def absent(self):
         if not self.exists():
