@@ -122,7 +122,13 @@ class Sysrc(object):
         return err.find("unknown variable") > 0 or out.find("unknown variable") > 0
 
     def exists(self):
-        # sysrc doesn't really use exit codes. Read all variables.
+        """
+        Test the name is in the file. If a value is defined test name=value
+        is in the file. These tests are necessary because sysrc doesn't use exit
+        codes. Instead, let sysrc read the file's content and create a
+        dictionary comprising the configuration. Use this dictionary to preform
+        the tests.
+        """
         (rc, out, err) = self.run_sysrc('-e', '-a')
         conf = dict([i.split('=') for i in out.splitlines()])
         if self.value is None:
