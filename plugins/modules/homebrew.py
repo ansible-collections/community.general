@@ -399,6 +399,13 @@ class Homebrew(object):
             name = package_detail["name"]
             full_name = package_detail["full_name"]
 
+        if not package_detail["tap"]:
+            # This can happen if an already installed package has been
+            # subsequently withdrawn by homebrew. See issue #10012.
+            self.failed = True
+            self.message = "No tap found for package '{0}'.".format(name)
+            raise HomebrewException(self.message)
+
         tapped_name = package_detail["tap"] + "/" + name
         aliases = package_detail.get("aliases", [])
 
