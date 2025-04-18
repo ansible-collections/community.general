@@ -747,7 +747,7 @@ def get_ansible_module():
         ],
         mutually_exclusive=[
             # Creating a new container is done either by cloning an existing one, or based on a template.
-            ("clone", "ostemplate", "update"),
+            ("clone", "ostemplate"),
             ("disk", "disk_volume"),
             ("storage", "disk_volume"),
             ("mounts", "mount_volumes"),
