@@ -32,6 +32,7 @@ options:
   handler:
     description:
       - Default handler will be set for the MIME type.
+      - The desktop file must be installed in the system
     type: str
     required: true
 notes:
@@ -76,7 +77,7 @@ stderr:
 # TODO: Update
   sample: 'gio: Failed to load info for handler "never-existed.desktop"'
 version:
-  description: Version of xdg-utils.
+  description: Version of xdg-mime.
   type: str
   returned: always
   sample: "xdg-mime 1.2.1"
