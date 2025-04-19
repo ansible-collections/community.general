@@ -1,0 +1,2 @@
+minor_changes:
+  - zypper - adds ``skip_post_errors`` that allows to skip RPM post-install errors (Zypper return code 107) (https://github.com/ansible-collections/community.general/issues/9972).

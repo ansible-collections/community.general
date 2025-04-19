@@ -158,6 +158,13 @@ options:
     description:
       - Adds C(--quiet) option to I(zypper) install/update command.
     version_added: '10.2.0'
+  skip_post_errors:
+    type: bool
+    required: false
+    default: false
+    description:
+      - When set to V(true), ignore I(zypper) return code 107 (post install script errors).
+    version_added: '10.6.0'
 notes:
   - When used with a C(loop:) each package is processed individually, it is much more efficient to pass the list directly
     to the O(name) option.
@@ -248,6 +255,12 @@ EXAMPLES = r"""
     state: present
   environment:
     ZYPP_LOCK_TIMEOUT: 20
+
+- name: Install the package with post-install error without failing
+  community.general.zypper:
+    name: <package_with_post_install_error>
+    state: present
+    skip_post_errors: true
 """
 
 import os.path
@@ -344,12 +357,13 @@ def parse_zypper_xml(m, cmd, fail_not_found=True, packages=None):
             m.fail_json(msg=errmsg, rc=rc, stdout=stdout, stderr=stderr, cmd=cmd)
         else:
             return {}, rc, stdout, stderr
-    elif rc in [0, 102, 103, 106]:
+    elif rc in [0, 102, 103, 106, 107]:
         # zypper exit codes
         # 0: success
         # 106: signature verification failed
         # 102: ZYPPER_EXIT_INF_REBOOT_NEEDED - Returned after a successful installation of a patch which requires reboot of computer.
         # 103: zypper was upgraded, run same command again
+        # 107: ZYPPER_EXIT_INF_RPM_SCRIPT_FAILED -  Some of the packages %post install scripts returned an error, but package is installed.
         if packages is None:
             firstrun = True
             packages = {}
@@ -368,14 +382,18 @@ def parse_zypper_xml(m, cmd, fail_not_found=True, packages=None):
             # if this was the first run and it failed with 103
             # run zypper again with the same command to complete update
             return parse_zypper_xml(m, cmd, fail_not_found=fail_not_found, packages=packages)
+        if rc == 107 and m.params['skip_post_errors'] and firstrun:
+            # if this was the first run and it failed with 107 with skip_post_errors flag
+            # run zypper again with the same command to complete update
+            return parse_zypper_xml(m, cmd, fail_not_found=fail_not_found, packages=packages)
 
-        # apply simple_errors logic to rc 0,102,103,106
+        # apply simple_errors logic to rc 0,102,103,106,107
         if m.params['simple_errors']:
             stdout = get_simple_errors(dom) or stdout
 
         return packages, rc, stdout, stderr
 
-    # apply simple_errors logic to rc other than 0,102,103,106
+    # apply simple_errors logic to rc other than 0,102,103,106,107
     if m.params['simple_errors']:
         stdout = get_simple_errors(dom) or stdout
 
@@ -602,6 +620,7 @@ def main():
             clean_deps=dict(required=False, default=False, type='bool'),
             simple_errors=dict(required=False, default=False, type='bool'),
             quiet=dict(required=False, default=True, type='bool'),
+            skip_post_errors=dict(required=False, default=False, type='bool'),
         ),
         supports_check_mode=True
     )
