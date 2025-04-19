@@ -1,7 +1,0 @@
-{
-    "include_symlinks": true,
-    "prefixes": [
-        "plugins/"
-    ],
-    "output": "path-message"
-}

@@ -6,6 +6,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
+import glob
 import sys
 
 import yaml
@@ -13,9 +14,6 @@ import yaml
 
 def main():
     """Main entry point."""
-    paths = sys.argv[1:] or sys.stdin.read().splitlines()
-    paths = [path for path in paths if path.endswith('/aliases')]
-
     with open('.azure-pipelines/azure-pipelines.yml', 'rb') as f:
         azp = yaml.safe_load(f)
 
@@ -27,6 +25,9 @@ def main():
             for group in job['parameters']['groups']:
                 allowed_targets.add('azp/posix/{0}'.format(group))
 
+    paths = glob.glob("tests/integration/targets/*/aliases")
+
+    has_errors = False
     for path in paths:
         targets = []
         skip = False
@@ -56,10 +57,14 @@ def main():
             if 'targets/setup_' in path:
                 continue
             print('%s: %s' % (path, 'found no targets'))
+            has_errors = True
         for target in targets:
             if target not in allowed_targets:
                 print('%s: %s' % (path, 'found invalid target "{0}"'.format(target)))
+                has_errors = True
+
+    return 1 if has_errors else 0
 
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())
