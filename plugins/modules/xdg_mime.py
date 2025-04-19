@@ -38,14 +38,13 @@ options:
 notes:
   - This module is a thin wrapper around xdg-mime tool.
   - See man xdg-mime(1) for more details.
-# TODO: Update
 seealso:
-  - name: C(gio) command manual page
+  - name: C(xdg-mime) command manual page
     description: Manual page for the command.
-    link: https://man.archlinux.org/man/gio.1
-  - name: GIO Documentation
-    description: Reference documentation for the GIO API..
-    link: https://docs.gtk.org/gio/
+    link: https://portland.freedesktop.org/doc/xdg-mime.html
+  - name: xdg-utils Documentation
+    description: Reference documentation for xdg-utils.
+    link: https://www.freedesktop.org/wiki/Software/xdg-utils/
 """
 
 EXAMPLES = r"""
@@ -68,14 +67,13 @@ stdout:
     - The output of the C(xdg-mime) command.
   returned: success
   type: str
-  sample: Set google-chrome.desktop as the default for x-scheme-handler/https
+  sample: ''
 stderr:
   description:
     - The error output of the C(xdg-mime) command.
   returned: failure
   type: str
-# TODO: Update
-  sample: 'gio: Failed to load info for handler "never-existed.desktop"'
+  sample: ''
 version:
   description: Version of xdg-mime.
   type: str
