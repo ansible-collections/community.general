@@ -259,7 +259,12 @@ class GithubDeployKey(object):
             key_id = response_body["id"]
             self.module.exit_json(changed=True, msg="Deploy key successfully added", id=key_id)
         elif status_code == 422:
-            self.module.exit_json(changed=False, msg="Deploy key already exists")
+            # there might be multiple reasons for a 422
+            # so we must check if the reason is that the key already exists
+            if self.get_existing_key():
+                self.module.exit_json(changed=False, msg="Deploy key already exists")
+            else:
+                self.handle_error(method="POST", info=info)
         else:
             self.handle_error(method="POST", info=info)
 
