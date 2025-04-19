@@ -1,0 +1,15 @@
+# Derived from ../connection_proxmox_pct_remote/test_connection.inventory Copyright (c) 2025 Nils Stein (@mietzen) <github.nstein@mailbox.org>
+# Copyright (c) 2025 Rui Lopes (@rgl) <ruilopes.com>
+# Copyright (c) 2025 Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+[wsl]
+wsl-pipelining    ansible_ssh_pipelining=true
+wsl-no-pipelining ansible_ssh_pipelining=false
+[wsl:vars]
+ansible_host=localhost
+ansible_user=root
+ansible_python_interpreter="{{ ansible_playbook_python }}"
+ansible_connection=community.general.wsl
+wsl_distribution=test

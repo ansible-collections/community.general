@@ -119,6 +119,8 @@ files:
   $connections/saltstack.py:
     labels: saltstack
     maintainers: mscherer
+  $connections/wsl.py:
+    maintainers: rgl
   $connections/zone.py:
     maintainers: $team_ansible_core
   $doc_fragments/:

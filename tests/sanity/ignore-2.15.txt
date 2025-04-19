@@ -1,4 +1,5 @@
 .azure-pipelines/scripts/publish-codecov.py replace-urlopen
+plugins/connection/wsl.py yamllint:unparsable-with-libyaml
 plugins/inventory/gitlab_runners.py yamllint:unparsable-with-libyaml
 plugins/inventory/iocage.py yamllint:unparsable-with-libyaml
 plugins/inventory/linode.py yamllint:unparsable-with-libyaml
