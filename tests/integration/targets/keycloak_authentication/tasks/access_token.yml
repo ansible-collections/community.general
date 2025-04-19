@@ -1,0 +1,25 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+- name: Get access token
+  ansible.builtin.uri:
+    url: "{{ url }}/realms/{{ admin_realm }}/protocol/openid-connect/token"
+    method: POST
+    status_code: 200
+    headers:
+      Accept: application/json
+      User-agent: Ansible
+    body_format: form-urlencoded
+    body:
+      grant_type: "password"
+      client_id: "admin-cli"
+      username: "{{ admin_user }}"
+      password: "{{ admin_password }}"
+  register: token_response
+  no_log: true
+
+- name: Extract access token
+  ansible.builtin.set_fact:
+    access_token: "{{ token_response.json['access_token'] }}"
+  no_log: true
