@@ -1,0 +1,2 @@
+minor_changes:
+  - proxmox - add support for creating and updating containers in the same task (https://github.com/ansible-collections/community.general/pull/10010)
