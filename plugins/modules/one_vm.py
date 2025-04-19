@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2017, Milan Ilic <milani@nordeus.com>
 # Copyright (c) 2019, Jan Meerkamp <meerkamp@dvv.de>
+# Copyright (c) 2025, Tom Paine <github@aioue.net>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -194,6 +195,16 @@ options:
       - When O(instance_ids) is provided, updates running VMs with the C(updateconf) API call.
       - When new VMs are being created, emulates the C(updateconf) API call using direct template merge.
       - Allows for complete modifications of the C(CONTEXT) attribute.
+      - "Supported attributes include:"
+      - B(BACKUP_CONFIG:) V(BACKUP_VOLATILE), V(FS_FREEZE), V(INCREMENT_MODE), V(KEEP_LAST), V(MODE);
+      - B(CONTEXT:) (Any value, except V(ETH*). Variable substitution will be made);
+      - B(CPU_MODEL:) V(FEATURES), V(MODEL);
+      - B(FEATURES:) V(ACPI), V(APIC), V(GUEST_AGENT), V(HYPERV), V(IOTHREADS), V(LOCALTIME), V(PAE), V(VIRTIO_BLK_QUEUES), V(VIRTIO_SCSI_QUEUES);
+      - B(GRAPHICS:) V(COMMAND), V(KEYMAP), V(LISTEN), V(PASSWD), V(PORT), V(TYPE);
+      - B(INPUT:) V(BUS), V(TYPE);
+      - B(OS:) V(ARCH), V(BOOT), V(BOOTLOADER), V(FIRMWARE), V(INITRD), V(KERNEL), V(KERNEL_CMD), V(MACHINE), V(ROOT), V(SD_DISK_BUS), V(UUID);
+      - B(RAW:) V(DATA), V(DATA_VMX), V(TYPE), V(VALIDATE);
+      - B(VIDEO:) V(ATS), V(IOMMU), V(RESOLUTION), V(TYPE), V(VRAM).
     type: dict
     version_added: 6.3.0
 author:
@@ -658,13 +669,17 @@ from ansible.module_utils.common.dict_transformations import dict_merge
 from ansible_collections.community.general.plugins.module_utils.opennebula import flatten, render
 
 
+# Updateconf attributes documentation: https://docs.opennebula.io/6.10/integration_and_development/system_interfaces/api.html#one-vm-updateconf
 UPDATECONF_ATTRIBUTES = {
-    "OS": ["ARCH", "MACHINE", "KERNEL", "INITRD", "BOOTLOADER", "BOOT", "SD_DISK_BUS", "UUID"],
-    "FEATURES": ["ACPI", "PAE", "APIC", "LOCALTIME", "HYPERV", "GUEST_AGENT"],
+    "OS": ["ARCH", "MACHINE", "KERNEL", "INITRD", "BOOTLOADER", "BOOT", "SD_DISK_BUS", "UUID", "FIRMWARE"],
+    "CPU_MODEL": ["MODEL", "FEATURES"],
+    "FEATURES": ["ACPI", "PAE", "APIC", "LOCALTIME", "HYPERV", "GUEST_AGENT", "VIRTIO_BLK_QUEUES", "VIRTIO_SCSI_QUEUES", "IOTHREADS"],
     "INPUT": ["TYPE", "BUS"],
-    "GRAPHICS": ["TYPE", "LISTEN", "PASSWD", "KEYMAP"],
-    "RAW": ["DATA", "DATA_VMX", "TYPE"],
+    "GRAPHICS": ["TYPE", "LISTEN", "PORT", "PASSWD", "KEYMAP", "COMMAND"],
+    "VIDEO": ["ATS", "IOMMU", "RESOLUTION", "TYPE", "VRAM"],
+    "RAW": ["DATA", "DATA_VMX", "TYPE", "VALIDATE"],
     "CONTEXT": [],
+    "BACKUP_CONFIG": ["FS_FREEZE", "KEEP_LAST", "BACKUP_VOLATILE", "MODE", "INCREMENT_MODE"],
 }
 
 
