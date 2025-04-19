@@ -79,9 +79,7 @@ version:
   description: Version of xdg-utils.
   type: str
   returned: always
-  # TODO: Update
-  sample: "2.80.0"
-  version_added: 10.0.0
+  sample: "xdg-mime 1.2.1"
 """
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
@@ -109,7 +107,7 @@ class XdgMime(ModuleHelper):
     def __run__(self):
         check_mode_return = (0, 'Module executed in check mode', '')
         if self.vars.has_changed:
-            with self.runner.context(args_order="default mime_type handler", check_mode_skip=True, check_mode_return=check_mode_return) as ctx:
+            with self.runner.context(args_order="default handler mime_type", check_mode_skip=True, check_mode_return=check_mode_return) as ctx:
                 rc, out, err = ctx.run()
                 self.vars.stdout = out
                 self.vars.stderr = err
