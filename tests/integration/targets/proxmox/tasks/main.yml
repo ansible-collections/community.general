@@ -165,6 +165,8 @@
         name: test-instance
         clone: 'yes'
         state: present
+        tags:
+          - TagWithUppercaseChars
         timeout: 500
       register: results_kvm
 
