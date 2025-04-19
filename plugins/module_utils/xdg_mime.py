@@ -8,6 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
+import json
 
 
 def xdg_mime_runner(module, **kwargs):
@@ -27,7 +28,7 @@ def xdg_mime_runner(module, **kwargs):
 
 def xdg_mime_get(runner, mime_type):
     def process(rc, out, err):
-        if err.startswith("No default applications for"):
+        if not out.strip():
             return None
         out = out.splitlines()[0]
         return out.split()[-1]
