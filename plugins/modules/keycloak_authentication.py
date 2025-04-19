@@ -308,6 +308,8 @@ def create_or_update_executions(kc, config, realm='master'):
                         }
                         # add the execution configuration
                         if new_exec["authenticationConfig"] is not None:
+                            if "authenticationConfig" in execution and "id" in execution["authenticationConfig"]:
+                                kc.delete_authentication_config(execution["authenticationConfig"]["id"], realm=realm)
                             kc.add_authenticationConfig_to_execution(updated_exec["id"], new_exec["authenticationConfig"], realm=realm)
                         for key in new_exec:
                             # remove unwanted key for the next API call
