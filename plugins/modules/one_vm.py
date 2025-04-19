@@ -195,7 +195,7 @@ options:
       - When O(instance_ids) is provided, updates running VMs with the C(updateconf) API call.
       - When new VMs are being created, emulates the C(updateconf) API call using direct template merge.
       - Allows for complete modifications of the C(CONTEXT) attribute.
-      - Supported attributes include
+      - "Supported attributes include:"
       - B(BACKUP_CONFIG:) V(BACKUP_VOLATILE), V(FS_FREEZE), V(INCREMENT_MODE), V(KEEP_LAST), V(MODE);
       - B(CONTEXT:) (Any value, except V(ETH*). Variable substitution will be made);
       - B(CPU_MODEL:) V(FEATURES), V(MODEL);
