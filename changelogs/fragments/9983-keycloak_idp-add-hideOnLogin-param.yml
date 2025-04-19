@@ -1,0 +1,2 @@
+bugfixes:
+  - keycloak_identity_provider - add ``hideOnLogin`` parameter to the module, the old parameter ``config/hideOnLoginPage`` is kept for compatibility (https://github.com/ansible-collections/community.general/pull/9983).
