@@ -8,7 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
-import json
 
 
 def xdg_mime_runner(module, **kwargs):
