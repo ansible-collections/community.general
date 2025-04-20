@@ -102,3 +102,29 @@ test_cases:
           out: |
             google-chrome.desktop
           err: ''
+  - id: test_set_invalid_handler
+    input:
+      handler: google-chrome.desktopX
+      mime_type: x-scheme-handler/http
+    output:
+      failed: true
+      msg: 'Module failed with exception: rc = 1'
+    mocks:
+      run_command:
+        - command: [/testbin/xdg-mime, --version]
+          environ: *env-def
+          rc: 0
+          out: "1.2.1\n"
+          err: ''
+        - command: [/testbin/xdg-mime, query, default, x-scheme-handler/http]
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - command: [/testbin/xdg-mime, default, google-chrome.desktopX, x-scheme-handler/http]
+          environ: *env-def
+          rc: 1
+          out: ''
+          err: |
+            xdg-mime: malformed argument 'google-chrome.desktopX', expected *.desktop
+            Try 'xdg-mime --help' for more information.
