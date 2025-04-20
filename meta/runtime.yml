@@ -98,6 +98,10 @@ plugin_routing:
       redirect: community.google.gcp_storage_file
     hashi_vault:
       redirect: community.hashi_vault.hashi_vault
+    manifold:
+      deprecation:
+        removal_version: 11.0.0
+        warning_text: Company was acquired in 2021 and service was ceased afterwards.
     nios:
       redirect: infoblox.nios_modules.nios_lookup
     nios_next_ip:
