@@ -85,7 +85,7 @@ EXAMPLES = r"""
     password: '9s36?;fyNp'
     owner: root
     group: www-data
-    mode: 0640
+    mode: '0640'
 
 - name: Remove a user from a password file
   community.general.htpasswd:

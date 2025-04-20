@@ -1226,10 +1226,7 @@ EXAMPLES = r"""
 # second_tenant_ip: "204.0.113.77/23"
 # ```
 
-
-
 ## playbook-add.yml example
-
 - hosts: openstack-stage
   remote_user: root
   tasks:
@@ -1264,7 +1261,7 @@ EXAMPLES = r"""
       with_items:
         - '{{ nmcli_team_slave }}'
 
-###### Working with all cloud nodes - Bonding
+##### Working with all cloud nodes - Bonding
     - name: Try nmcli add bond - conn_name only & ip4 gw4 mode
       community.general.nmcli:
         type: bond
