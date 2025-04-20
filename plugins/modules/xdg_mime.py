@@ -73,7 +73,9 @@ stderr:
     - The error output of the C(xdg-mime) command.
   returned: failure
   type: str
-  sample: ''
+  sample: |
+    xdg-mime: malformed argument 'google-chrome.desktopX', expected *.desktop
+    Try 'xdg-mime --help' for more information.
 version:
   description: Version of xdg-mime.
   type: str
