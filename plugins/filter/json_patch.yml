@@ -94,7 +94,7 @@ EXAMPLES: |
     vars:
       input: {}
     # => {"~/": "qux"}
-    
+
   - name: Add at the end of the array
     ansible.builtin.debug:
       msg: "{{ input | community.general.json_patch('add', '/-', 4) }}"
@@ -136,7 +136,7 @@ EXAMPLES: |
     vars:
       input: { "foo": { "one": 1 }, "bar": { "two": 2 } }
     # => OK
-  
+
   - name: Unuccessful test
     ansible.builtin.debug:
       msg: "{{ input | community.general.json_patch('test', '/bar/two', 9) | ternary('OK', 'Failed') }}"
