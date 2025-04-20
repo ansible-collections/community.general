@@ -6,60 +6,60 @@
 
 from __future__ import annotations
 
-DOCUMENTATION = '''
-    name: stackpath_compute
-    short_description: StackPath Edge Computing inventory source
-    version_added: 1.2.0
-    author:
-        - UNKNOWN (@shayrybak)
-    extends_documentation_fragment:
-        - inventory_cache
-        - constructed
+DOCUMENTATION = r"""
+name: stackpath_compute
+short_description: StackPath Edge Computing inventory source
+version_added: 1.2.0
+author:
+  - UNKNOWN (@shayrybak)
+deprecated:
+  removed_in: 11.0.0
+  why: Stackpath (the company) ceased its operations in June 2024. The API URL this plugin relies on is not found in DNS.
+  alternative: There is none.
+extends_documentation_fragment:
+  - inventory_cache
+  - constructed
+description:
+  - Get inventory hosts from StackPath Edge Computing.
+  - Uses a YAML configuration file that ends with stackpath_compute.(yml|yaml).
+options:
+  plugin:
     description:
-        - Get inventory hosts from StackPath Edge Computing.
-        - Uses a YAML configuration file that ends with stackpath_compute.(yml|yaml).
-    options:
-        plugin:
-            description:
-                - A token that ensures this is a source file for the plugin.
-            required: true
-            type: string
-            choices: ['community.general.stackpath_compute']
-        client_id:
-            description:
-                - An OAuth client ID generated from the API Management section of the StackPath customer portal
-                  U(https://control.stackpath.net/api-management).
-            required: true
-            type: str
-        client_secret:
-            description:
-                - An OAuth client secret generated from the API Management section of the StackPath customer portal
-                  U(https://control.stackpath.net/api-management).
-            required: true
-            type: str
-        stack_slugs:
-            description:
-                - A list of Stack slugs to query instances in. If no entry then get instances in all stacks on the account.
-            type: list
-            elements: str
-        use_internal_ip:
-            description:
-                - Whether or not to use internal IP addresses, If false, uses external IP addresses, internal otherwise.
-                - If an instance doesn't have an external IP it will not be returned when this option is set to false.
-            type: bool
-'''
+      - A token that ensures this is a source file for the plugin.
+    required: true
+    type: string
+    choices: ['community.general.stackpath_compute']
+  client_id:
+    description:
+      - An OAuth client ID generated from the API Management section of the StackPath customer portal U(https://control.stackpath.net/api-management).
+    required: true
+    type: str
+  client_secret:
+    description:
+      - An OAuth client secret generated from the API Management section of the StackPath customer portal U(https://control.stackpath.net/api-management).
+    required: true
+    type: str
+  stack_slugs:
+    description:
+      - A list of Stack slugs to query instances in. If no entry then get instances in all stacks on the account.
+    type: list
+    elements: str
+  use_internal_ip:
+    description:
+      - Whether or not to use internal IP addresses, If false, uses external IP addresses, internal otherwise.
+      - If an instance doesn't have an external IP it will not be returned when this option is set to false.
+    type: bool
+"""
 
-EXAMPLES = '''
-# Example using credentials to fetch all workload instances in a stack.
----
+EXAMPLES = r"""
 plugin: community.general.stackpath_compute
 client_id: my_client_id
 client_secret: my_client_secret
 stack_slugs:
-- my_first_stack_slug
-- my_other_stack_slug
+  - my_first_stack_slug
+  - my_other_stack_slug
 use_internal_ip: false
-'''
+"""
 
 import traceback
 import json
