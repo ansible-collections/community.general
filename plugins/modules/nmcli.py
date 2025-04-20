@@ -1121,7 +1121,7 @@ options:
 
 EXAMPLES = r"""
 # These examples are using the following inventory:
-#
+
 # ## Directory layout:
 #
 # |_/inventory/cloud-hosts
@@ -1132,7 +1132,7 @@ EXAMPLES = r"""
 # |          /playbook-add.yml
 # |          /playbook-del.yml
 # ```
-#
+
 # ## inventory examples
 # ### groups_vars
 # ```yml
@@ -1225,6 +1225,7 @@ EXAMPLES = r"""
 # tenant_ip: "203.0.113.77/23"
 # second_tenant_ip: "204.0.113.77/23"
 # ```
+
 
 ## playbook-add.yml example
 - hosts: openstack-stage
