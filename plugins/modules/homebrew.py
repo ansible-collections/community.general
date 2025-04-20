@@ -399,17 +399,14 @@ class Homebrew(object):
             name = package_detail["name"]
             full_name = package_detail["full_name"]
 
-        if not package_detail["tap"]:
-            # This can happen if an already installed package has been
-            # subsequently withdrawn by homebrew. See issue #10012.
-            self.failed = True
-            self.message = "No tap found for package '{0}'.".format(name)
-            raise HomebrewException(self.message)
-
-        tapped_name = package_detail["tap"] + "/" + name
+        # Issue #9803: name can include the tap as a prefix, in order to
+        # disambiguate, e.g. casks from identically named formulae.
+        #
+        # Issue #10012: package_detail["tap"] is None if package is no longer
+        # available.
+        tapped_name = [package_detail["tap"] + "/" + name] if package_detail["tap"] else []
         aliases = package_detail.get("aliases", [])
-
-        package_names = set([name, full_name, tapped_name] + aliases)
+        package_names = set([name, full_name] + tapped_name + aliases)
 
         # Finally, identify which of all those package names was the one supplied by the user.
         package_names = package_names & set(self.packages)
