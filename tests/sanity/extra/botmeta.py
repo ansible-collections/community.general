@@ -123,7 +123,8 @@ class BotmetaCheck:
         if not all_maintainers and not should_have_no_maintainer:
             self.report_error(f'{self.botmeta_filename}:0:0: No (active or inactive) maintainer mentioned for {filename}')
         if all_maintainers and should_have_no_maintainer:
-            self.report_error(f'{self.botmeta_filename}:0:0: Please remove {filename} from the ignore list of {sys.argv[0]}')
+            own_path = os.path.relpath(__file__, os.getcwd())
+            self.report_error(f'{self.botmeta_filename}:0:0: Please remove {filename} from the ignore list of {own_path}')
 
     def run(self) -> None:
         try:
