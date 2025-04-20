@@ -5,76 +5,81 @@
 
 from __future__ import annotations
 
-DOCUMENTATION = '''
-    name: xen_orchestra
-    short_description: Xen Orchestra inventory source
-    version_added: 4.1.0
-    author:
-        - Dom Del Nano (@ddelnano) <ddelnano@gmail.com>
-        - Samori Gorse (@shinuza) <samorigorse@gmail.com>
-    requirements:
-        - websocket-client >= 1.0.0
+DOCUMENTATION = r"""
+name: xen_orchestra
+short_description: Xen Orchestra inventory source
+version_added: 4.1.0
+author:
+  - Dom Del Nano (@ddelnano) <ddelnano@gmail.com>
+  - Samori Gorse (@shinuza) <samorigorse@gmail.com>
+requirements:
+  - websocket-client >= 1.0.0
+description:
+  - Get inventory hosts from a Xen Orchestra deployment.
+  - Uses a configuration file as an inventory source, it must end in C(.xen_orchestra.yml) or C(.xen_orchestra.yaml).
+extends_documentation_fragment:
+  - constructed
+  - inventory_cache
+options:
+  plugin:
+    description: The name of this plugin, it should always be set to V(community.general.xen_orchestra) for this plugin to
+      recognize it as its own.
+    required: true
+    choices: ['community.general.xen_orchestra']
+    type: str
+  api_host:
     description:
-        - Get inventory hosts from a Xen Orchestra deployment.
-        - 'Uses a configuration file as an inventory source, it must end in C(.xen_orchestra.yml) or C(.xen_orchestra.yaml).'
-    extends_documentation_fragment:
-        - constructed
-        - inventory_cache
-    options:
-        plugin:
-            description: The name of this plugin, it should always be set to V(community.general.xen_orchestra) for this plugin to recognize it as its own.
-            required: true
-            choices: ['community.general.xen_orchestra']
-            type: str
-        api_host:
-            description:
-                - API host to XOA API.
-                - If the value is not specified in the inventory configuration, the value of environment variable E(ANSIBLE_XO_HOST) will be used instead.
-            type: str
-            env:
-                - name: ANSIBLE_XO_HOST
-        user:
-            description:
-                - Xen Orchestra user.
-                - If the value is not specified in the inventory configuration, the value of environment variable E(ANSIBLE_XO_USER) will be used instead.
-            required: true
-            type: str
-            env:
-                - name: ANSIBLE_XO_USER
-        password:
-            description:
-                - Xen Orchestra password.
-                - If the value is not specified in the inventory configuration, the value of environment variable E(ANSIBLE_XO_PASSWORD) will be used instead.
-            required: true
-            type: str
-            env:
-                - name: ANSIBLE_XO_PASSWORD
-        validate_certs:
-            description: Verify TLS certificate if using HTTPS.
-            type: boolean
-            default: true
-        use_ssl:
-            description: Use wss when connecting to the Xen Orchestra API
-            type: boolean
-            default: true
-        use_vm_uuid:
-            description:
-                - Import Xen VMs to inventory using their UUID as the VM entry name.
-                - If set to V(false) use VM name labels instead of UUIDs.
-            type: boolean
-            default: true
-            version_added: 10.4.0
-        use_host_uuid:
-            description:
-                - Import Xen Hosts to inventory using their UUID as the Host entry name.
-                - If set to V(false) use Host name labels instead of UUIDs.
-            type: boolean
-            default: true
-            version_added: 10.4.0
-'''
+      - API host to XOA API.
+      - If the value is not specified in the inventory configuration, the value of environment variable E(ANSIBLE_XO_HOST)
+        will be used instead.
+    type: str
+    env:
+      - name: ANSIBLE_XO_HOST
+  user:
+    description:
+      - Xen Orchestra user.
+      - If the value is not specified in the inventory configuration, the value of environment variable E(ANSIBLE_XO_USER)
+        will be used instead.
+    required: true
+    type: str
+    env:
+      - name: ANSIBLE_XO_USER
+  password:
+    description:
+      - Xen Orchestra password.
+      - If the value is not specified in the inventory configuration, the value of environment variable E(ANSIBLE_XO_PASSWORD)
+        will be used instead.
+    required: true
+    type: str
+    env:
+      - name: ANSIBLE_XO_PASSWORD
+  validate_certs:
+    description: Verify TLS certificate if using HTTPS.
+    type: boolean
+    default: true
+  use_ssl:
+    description: Use wss when connecting to the Xen Orchestra API.
+    type: boolean
+    default: true
+  use_vm_uuid:
+    description:
+      - Import Xen VMs to inventory using their UUID as the VM entry name.
+      - If set to V(false) use VM name labels instead of UUIDs.
+    type: boolean
+    default: true
+    version_added: 10.4.0
+  use_host_uuid:
+    description:
+      - Import Xen Hosts to inventory using their UUID as the Host entry name.
+      - If set to V(false) use Host name labels instead of UUIDs.
+    type: boolean
+    default: true
+    version_added: 10.4.0
+"""
 
 
-EXAMPLES = '''
+EXAMPLES = r"""
+---
 # file must be named xen_orchestra.yaml or xen_orchestra.yml
 plugin: community.general.xen_orchestra
 api_host: 192.168.1.255
@@ -83,13 +88,12 @@ password: xo_pwd
 validate_certs: true
 use_ssl: true
 groups:
-    kube_nodes: "'kube_node' in tags"
+  kube_nodes: "'kube_node' in tags"
 compose:
-    ansible_port: 2222
+  ansible_port: 2222
 use_vm_uuid: false
 use_host_uuid: true
-
-'''
+"""
 
 import json
 import ssl

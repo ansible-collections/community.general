@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-DOCUMENTATION = """
+DOCUMENTATION = r"""
 name: onepassword_ssh_key
 author:
   - Mohammed Babelly (@mohammedbabelly20)
@@ -19,7 +19,6 @@ notes:
   - By default, it returns the private key value in PKCS#8 format, unless O(ssh_format=true) is passed.
   - The pluging works only for C(SSHKEY) type items.
   - This plugin requires C(op) version 2 or later.
-
 options:
   _terms:
     description: Identifier(s) (case-insensitive UUID or name) of item(s) to retrieve.
@@ -36,13 +35,14 @@ extends_documentation_fragment:
   - community.general.onepassword.lookup
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
+---
 - name: Retrieve the private SSH key from 1Password
   ansible.builtin.debug:
     msg: "{{ lookup('community.general.onepassword_ssh_key', 'SSH Key', ssh_format=true) }}"
 """
 
-RETURN = """
+RETURN = r"""
 _raw:
   description: Private key of SSH keypair.
   type: list

@@ -8,65 +8,69 @@ from __future__ import (absolute_import, division, print_function)
 
 __metaclass__ = type
 
-DOCUMENTATION = r'''
-    name: random_pet
-    author:
-      - Abhijeet Kasurde (@Akasurde)
-    short_description: Generates random pet names
-    version_added: '3.1.0'
-    requirements:
-      - petname U(https://github.com/dustinkirkland/python-petname)
+DOCUMENTATION = r"""
+name: random_pet
+author:
+  - Abhijeet Kasurde (@Akasurde)
+short_description: Generates random pet names
+version_added: '3.1.0'
+requirements:
+  - petname U(https://github.com/dustinkirkland/python-petname)
+description:
+  - Generates random pet names that can be used as unique identifiers for the resources.
+options:
+  words:
     description:
-      - Generates random pet names that can be used as unique identifiers for the resources.
-    options:
-      words:
-        description:
-        - The number of words in the pet name.
-        default: 2
-        type: int
-      length:
-        description:
-        - The maximal length of every component of the pet name.
-        - Values below 3 will be set to 3 by petname.
-        default: 6
-        type: int
-      prefix:
-        description: A string to prefix with the name.
-        type: str
-      separator:
-        description: The character to separate words in the pet name.
-        default: "-"
-        type: str
-'''
+      - The number of words in the pet name.
+    default: 2
+    type: int
+  length:
+    description:
+      - The maximal length of every component of the pet name.
+      - Values below 3 will be set to 3 by petname.
+    default: 6
+    type: int
+  prefix:
+    description: A string to prefix with the name.
+    type: str
+  separator:
+    description: The character to separate words in the pet name.
+    default: "-"
+    type: str
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
+---
 - name: Generate pet name
   ansible.builtin.debug:
     var: lookup('community.general.random_pet')
-  # Example result: 'loving-raptor'
+# Example result: 'loving-raptor'
 
+---
 - name: Generate pet name with 3 words
   ansible.builtin.debug:
     var: lookup('community.general.random_pet', words=3)
-  # Example result: 'fully-fresh-macaw'
+# Example result: 'fully-fresh-macaw'
 
+---
 - name: Generate pet name with separator
   ansible.builtin.debug:
     var: lookup('community.general.random_pet', separator="_")
-  # Example result: 'causal_snipe'
+# Example result: 'causal_snipe'
 
+---
 - name: Generate pet name with length
   ansible.builtin.debug:
     var: lookup('community.general.random_pet', length=7)
-  # Example result: 'natural-peacock'
-'''
+# Example result: 'natural-peacock'
+"""
 
-RETURN = r'''
-  _raw:
-    description: A one-element list containing a random pet name
-    type: list
-    elements: str
-'''
+RETURN = r"""
+_raw:
+  description: A one-element list containing a random pet name.
+  type: list
+  elements: str
+"""
 
 try:
     import petname

@@ -6,36 +6,38 @@ from __future__ import (absolute_import, division, print_function)
 
 __metaclass__ = type
 
-DOCUMENTATION = """
-    name: bitwarden_secrets_manager
-    author:
-      - jantari (@jantari)
-    requirements:
-      - bws (command line utility)
-    short_description: Retrieve secrets from Bitwarden Secrets Manager
-    version_added: 7.2.0
-    description:
-      - Retrieve secrets from Bitwarden Secrets Manager.
-    options:
-      _terms:
-        description: Secret ID(s) to fetch values for.
-        required: true
-        type: list
-        elements: str
-      bws_access_token:
-        description: The BWS access token to use for this lookup.
-        env:
-          - name: BWS_ACCESS_TOKEN
-        required: true
-        type: str
+DOCUMENTATION = r"""
+name: bitwarden_secrets_manager
+author:
+  - jantari (@jantari)
+requirements:
+  - bws (command line utility)
+short_description: Retrieve secrets from Bitwarden Secrets Manager
+version_added: 7.2.0
+description:
+  - Retrieve secrets from Bitwarden Secrets Manager.
+options:
+  _terms:
+    description: Secret ID(s) to fetch values for.
+    required: true
+    type: list
+    elements: str
+  bws_access_token:
+    description: The BWS access token to use for this lookup.
+    env:
+      - name: BWS_ACCESS_TOKEN
+    required: true
+    type: str
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
+---
 - name: Get a secret relying on the BWS_ACCESS_TOKEN environment variable for authentication
   ansible.builtin.debug:
     msg: >-
       {{ lookup("community.general.bitwarden_secrets_manager", "2bc23e48-4932-40de-a047-5524b7ddc972") }}
 
+---
 - name: Get a secret passing an explicit access token for authentication
   ansible.builtin.debug:
     msg: >-
@@ -47,26 +49,30 @@ EXAMPLES = """
         )
       }}
 
+---
 - name: Get two different secrets each using a different access token for authentication
   ansible.builtin.debug:
     msg:
-      - '{{ lookup("community.general.bitwarden_secrets_manager", "2bc23e48-4932-40de-a047-5524b7ddc972", bws_access_token=token1) }}'
-      - '{{ lookup("community.general.bitwarden_secrets_manager", "9d89af4c-eb5d-41f5-bb0f-4ae81215c768", bws_access_token=token2) }}'
+      - '{{ lookup("community.general.bitwarden_secrets_manager", "2bc23e48-4932-40de-a047-5524b7ddc972", bws_access_token=token1)
+        }}'
+      - '{{ lookup("community.general.bitwarden_secrets_manager", "9d89af4c-eb5d-41f5-bb0f-4ae81215c768", bws_access_token=token2)
+        }}'
   vars:
     token1: "9.4f570d14-4b54-42f5-bc07-60f4450b1db5.YmluYXJ5LXNvbWV0aGluZy0xMjMK:d2h5IGhlbGxvIHRoZXJlCg=="
     token2: "1.69b72797-6ea9-4687-a11e-848e41a30ae6.YW5zaWJsZSBpcyBncmVhdD8K:YW5zaWJsZSBpcyBncmVhdAo="
 
+---
 - name: Get just the value of a secret
   ansible.builtin.debug:
     msg: >-
       {{ lookup("community.general.bitwarden_secrets_manager", "2bc23e48-4932-40de-a047-5524b7ddc972").value }}
 """
 
-RETURN = """
-  _raw:
-    description: List containing one or more secrets.
-    type: list
-    elements: dict
+RETURN = r"""
+_raw:
+  description: List containing one or more secrets.
+  type: list
+  elements: dict
 """
 
 from subprocess import Popen, PIPE
