@@ -78,7 +78,7 @@ version:
   description: Version of xdg-mime.
   type: str
   returned: always
-  sample: "xdg-mime 1.2.1"
+  sample: "1.2.1"
 """
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
