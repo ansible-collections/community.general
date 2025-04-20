@@ -20,7 +20,7 @@ test_cases:
         - command: [/testbin/xdg-mime, --version]
           environ: *env-def
           rc: 0
-          out: "xdg-mime 1.2.1\n"
+          out: "1.2.1\n"
           err: ''
         - command: [/testbin/xdg-mime, query, default, x-scheme-handler/http]
           environ: *env-def
@@ -53,7 +53,7 @@ test_cases:
         - command: [/testbin/xdg-mime, --version]
           environ: *env-def
           rc: 0
-          out: "xdg-mime 1.2.1\n"
+          out: "1.2.1\n"
           err: ''
         - command: [/testbin/xdg-mime, query, default, x-scheme-handler/http]
           environ: *env-def
@@ -72,7 +72,7 @@ test_cases:
         - command: [/testbin/xdg-mime, --version]
           environ: *env-def
           rc: 0
-          out: "xdg-mime 1.2.1\n"
+          out: "1.2.1\n"
           err: ''
         - command: [/testbin/xdg-mime, query, default, x-scheme-handler/http]
           environ: *env-def
@@ -94,7 +94,7 @@ test_cases:
         - command: [/testbin/xdg-mime, --version]
           environ: *env-def
           rc: 0
-          out: "xdg-mime 1.2.1\n"
+          out: "1.2.1\n"
           err: ''
         - command: [/testbin/xdg-mime, query, default, x-scheme-handler/http]
           environ: *env-def

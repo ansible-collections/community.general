@@ -100,7 +100,7 @@ class XdgMime(ModuleHelper):
         self.runner = xdg_mime_runner(self.module, check_rc=True)
         with self.runner("version") as ctx:
             rc, out, err = ctx.run()
-            self.vars.version = out.strip()
+            self.vars.version = out.replace("xdg-mime ", "").strip()
         self.vars.set_meta("handler", initial_value=xdg_mime_get(self.runner, self.vars.mime_type), diff=True, change=True)
 
     def __run__(self):
