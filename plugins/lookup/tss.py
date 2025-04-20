@@ -128,7 +128,6 @@ _list:
 """
 
 EXAMPLES = r"""
----
 - hosts: localhost
   vars:
     secret: >-
@@ -150,7 +149,6 @@ EXAMPLES = r"""
                            value_name='itemValue'))['password']
           }}
 
----
 - hosts: localhost
   vars:
     secret: >-
@@ -173,7 +171,6 @@ EXAMPLES = r"""
                            value_name='itemValue'))['password']
           }}
 
----
 - hosts: localhost
   vars:
     secret_password: >-
@@ -189,7 +186,6 @@ EXAMPLES = r"""
     - ansible.builtin.debug:
         msg: the password is {{ secret_password }}
 
----
 # Private key stores into certificate file which is attached with secret.
 # If fetch_attachments=True then private key file will be download on specified path
 # and file content will display in debug message.
@@ -215,7 +211,6 @@ EXAMPLES = r"""
                            value_name='itemValue'))['private-key']
           }}
 
----
 # If fetch_secret_ids_from_folder=true then secret IDs are in a folder is fetched based on folder ID
 - hosts: localhost
   vars:
@@ -236,7 +231,6 @@ EXAMPLES = r"""
               secret
           }}
 
----
 # If secret ID is 0 and secret_path has value then secret is fetched by secret path
 - hosts: localhost
   vars:

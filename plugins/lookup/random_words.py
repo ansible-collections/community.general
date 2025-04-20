@@ -50,25 +50,21 @@ options:
 """
 
 EXAMPLES = r"""
----
 - name: Generate password with default settings
   ansible.builtin.debug:
     var: lookup('community.general.random_words')
 # Example result: 'traitor gigabyte cesarean unless aspect clear'
 
----
 - name: Generate password with six, five character, words
   ansible.builtin.debug:
     var: lookup('community.general.random_words', min_length=5, max_length=5)
 # Example result: 'brink banjo getup staff trump comfy'
 
----
 - name: Generate password with three capitalized words and the '-' delimiter
   ansible.builtin.debug:
     var: lookup('community.general.random_words', numwords=3, delimiter='-', case='capitalize')
 # Example result: 'Overlabor-Faucet-Coastline'
 
----
 - name: Generate password with three words without any delimiter
   ansible.builtin.debug:
     var: lookup('community.general.random_words', numwords=3, delimiter='')

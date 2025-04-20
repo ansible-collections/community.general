@@ -71,7 +71,6 @@ options:
 """
 
 EXAMPLES = r"""
----
 # Some example variables, they can be defined anywhere as long as they are in scope
 test_init_list:
   - "list init item 1"
@@ -91,7 +90,6 @@ testb__test_dict:
   ports:
     - 3
 
----
 # Merge variables that end with '__test_dict' and store the result in a variable 'example_a'
 example_a: "{{ lookup('community.general.merge_variables', '__test_dict', pattern_type='suffix') }}"
 
@@ -100,7 +98,6 @@ example_a: "{{ lookup('community.general.merge_variables', '__test_dict', patter
 #   - 1
 #   - 3
 
----
 # Merge variables that match the '^.+__test_list$' regular expression, starting with an initial value and store the
 # result in a variable 'example_b'
 example_b: "{{ lookup('community.general.merge_variables', '^.+__test_list$', initial_value=test_init_list) }}"

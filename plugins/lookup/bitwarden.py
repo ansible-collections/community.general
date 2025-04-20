@@ -64,57 +64,48 @@ options:
 """
 
 EXAMPLES = r"""
----
 - name: "Get 'password' from all Bitwarden records named 'a_test'"
   ansible.builtin.debug:
     msg: >-
       {{ lookup('community.general.bitwarden', 'a_test', field='password') }}
 
----
 - name: "Get 'password' from Bitwarden record with ID 'bafba515-af11-47e6-abe3-af1200cd18b2'"
   ansible.builtin.debug:
     msg: >-
       {{ lookup('community.general.bitwarden', 'bafba515-af11-47e6-abe3-af1200cd18b2', search='id', field='password') |
       first }}
 
----
 - name: "Get 'password' from all Bitwarden records named 'a_test' from collection"
   ansible.builtin.debug:
     msg: >-
       {{ lookup('community.general.bitwarden', 'a_test', field='password', collection_id='bafba515-af11-47e6-abe3-af1200cd18b2')
       }}
 
----
 - name: "Get list of all full Bitwarden records named 'a_test'"
   ansible.builtin.debug:
     msg: >-
       {{ lookup('community.general.bitwarden', 'a_test') }}
 
----
 - name: "Get custom field 'api_key' from all Bitwarden records named 'a_test'"
   ansible.builtin.debug:
     msg: >-
       {{ lookup('community.general.bitwarden', 'a_test', field='api_key') }}
 
----
 - name: "Get 'password' from all Bitwarden records named 'a_test', using given session key"
   ansible.builtin.debug:
     msg: >-
       {{ lookup('community.general.bitwarden', 'a_test', field='password', bw_session='bXZ9B5TXi6...') }}
 
----
 - name: "Get all Bitwarden records from collection"
   ansible.builtin.debug:
     msg: >-
       {{ lookup('community.general.bitwarden', None, collection_id='bafba515-af11-47e6-abe3-af1200cd18b2') }}
 
----
 - name: "Get all Bitwarden records from collection"
   ansible.builtin.debug:
     msg: >-
       {{ lookup('community.general.bitwarden', None, collection_name='my_collections/test_collection') }}
 
----
 - name: "Get Bitwarden record named 'a_test', ensure there is exactly one match"
   ansible.builtin.debug:
     msg: >-
