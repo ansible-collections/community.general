@@ -32,7 +32,7 @@ options:
   handler:
     description:
       - Default handler will be set for the MIME type.
-      - The desktop file must be installed in the system
+      - The desktop file must be installed in the system.
     type: str
     required: true
 notes:
@@ -48,7 +48,7 @@ seealso:
 """
 
 EXAMPLES = r"""
-- name: Set chrome as the default handler for https
+- name: Set Chrome as the default handler for https
   community.general.xdg_mime:
     mime_type: x-scheme-handler/https
     handler: google-chrome.desktop
@@ -62,20 +62,6 @@ handler:
   returned: success
   type: str
   sample: google-chrome.desktop
-stdout:
-  description:
-    - The output of the C(xdg-mime) command.
-  returned: success
-  type: str
-  sample: ''
-stderr:
-  description:
-    - The error output of the C(xdg-mime) command.
-  returned: failure
-  type: str
-  sample: |
-    xdg-mime: malformed argument 'google-chrome.desktopX', expected *.desktop
-    Try 'xdg-mime --help' for more information.
 version:
   description: Version of xdg-mime.
   type: str
@@ -88,10 +74,10 @@ from ansible_collections.community.general.plugins.module_utils.xdg_mime import 
 
 
 class XdgMime(ModuleHelper):
-    output_params = ['handler']
+    output_params = ['handlers']
     module = dict(
         argument_spec=dict(
-            mime_type=dict(type='str', required=True),
+            mime_type=dict(type='list', elements='str', required=True),
             handler=dict(type='str', required=True),
         ),
         supports_check_mode=True,
@@ -100,19 +86,29 @@ class XdgMime(ModuleHelper):
 
     def __init_module__(self):
         self.runner = xdg_mime_runner(self.module, check_rc=True)
+
         with self.runner("version") as ctx:
             rc, out, err = ctx.run()
             self.vars.version = out.replace("xdg-mime ", "").strip()
-        self.vars.set_meta("handler", initial_value=xdg_mime_get(self.runner, self.vars.mime_type), diff=True, change=True)
+
+        self.vars.handlers = []
+
+        for mime in self.vars.mime_type:
+            handler_value = xdg_mime_get(self.runner, mime)
+            self.vars.handlers.append(handler_value)
 
     def __run__(self):
         check_mode_return = (0, 'Module executed in check mode', '')
-        if self.vars.has_changed:
+
+        if not all([h == self.vars.handler for h in self.vars.handlers]):
+            self.changed = True
+
+        if self.has_changed:
             with self.runner.context(args_order="default handler mime_type", check_mode_skip=True, check_mode_return=check_mode_return) as ctx:
                 rc, out, err = ctx.run()
                 self.vars.stdout = out
                 self.vars.stderr = err
-                self.vars.set("run_info", ctx.run_info, verbosity=4)
+                self.vars.set("run_info", ctx.run_info, verbosity=1)
 
 
 def main():
