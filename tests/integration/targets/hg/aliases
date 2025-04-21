@@ -4,3 +4,4 @@
 
 azp/posix/2
 skip/aix
+skip/macos
