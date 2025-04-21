@@ -72,4 +72,4 @@ class PackageVersion:
             return ver in requirement.specifier
 
         except InvalidVersion as e:
-            raise_from(ValueError("Invalid version '{0}': {1}".format(version_str, e))
+            raise_from(ValueError("Invalid version '{0}': {1}".format(version_str, e)))
