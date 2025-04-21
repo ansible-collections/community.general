@@ -56,12 +56,15 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
-handler:
+handlers:
   description:
-    - The handler set as default.
+    - List of handlers set as default.
   returned: success
-  type: str
-  sample: google-chrome.desktop
+  type: list
+  elements: str
+  sample:
+    - google-chrome.desktop
+    - firefox.desktop
 version:
   description: Version of xdg-mime.
   type: str
@@ -74,7 +77,7 @@ from ansible_collections.community.general.plugins.module_utils.xdg_mime import 
 
 
 class XdgMime(ModuleHelper):
-    output_params = ['handler']
+    output_params = ['handlers']
     module = dict(
         argument_spec=dict(
             mime_type=dict(type='list', elements='str', required=True),
@@ -84,6 +87,8 @@ class XdgMime(ModuleHelper):
     )
     use_old_vardict = False
 
+    temp_handlers = []
+
     def __init_module__(self):
         self.runner = xdg_mime_runner(self.module, check_rc=True)
 
@@ -91,16 +96,14 @@ class XdgMime(ModuleHelper):
             rc, out, err = ctx.run()
             self.vars.version = out.replace("xdg-mime ", "").strip()
 
-        self.vars.handlers = []
-
         for mime in self.vars.mime_type:
             handler_value = xdg_mime_get(self.runner, mime)
-            self.vars.handlers.append(handler_value)
+            self.temp_handlers.append(handler_value)
 
     def __run__(self):
         check_mode_return = (0, 'Module executed in check mode', '')
 
-        if not all([h == self.vars.handler for h in self.vars.handlers]):
+        if not all([h == self.vars.handler for h in self.temp_handlers]):
             self.changed = True
 
         if self.has_changed:
@@ -109,6 +112,12 @@ class XdgMime(ModuleHelper):
                 self.vars.stdout = out
                 self.vars.stderr = err
                 self.vars.set("run_info", ctx.run_info, verbosity=1)
+
+            self.vars.handlers = []
+
+            for mime in self.vars.mime_type:
+                handler_value = xdg_mime_get(self.runner, mime)
+                self.vars.handlers.append(handler_value)
 
 
 def main():

@@ -13,7 +13,8 @@ test_cases:
       handler: google-chrome.desktop
       mime_type: x-scheme-handler/http
     output:
-      handler: google-chrome.desktop
+      handlers:
+        - google-chrome.desktop
       changed: true
     mocks:
       run_command:
@@ -37,14 +38,15 @@ test_cases:
       handler: google-chrome.desktop
       mime_type: x-scheme-handler/http
     output:
-      handler: google-chrome.desktop
+      handlers:
+        - google-chrome.desktop
       changed: true
       stdout: Module executed in check mode
       diff:
         before:
-          handler: null
+          handlers: null
         after:
-          handler: google-chrome.desktop
+          handlers: google-chrome.desktop
     flags:
       check: true
       diff: true
@@ -65,7 +67,8 @@ test_cases:
       handler: google-chrome.desktop
       mime_type: x-scheme-handler/http
     output:
-      handler: google-chrome.desktop
+      handlers:
+        - google-chrome.desktop
       changed: false
     mocks:
       run_command:
@@ -85,7 +88,8 @@ test_cases:
       handler: google-chrome.desktop
       mime_type: x-scheme-handler/http
     output:
-      handler: google-chrome.desktop
+      handlers:
+        - google-chrome.desktop
       changed: false
     flags:
       check: true
