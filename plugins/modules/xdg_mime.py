@@ -17,7 +17,7 @@ author:
 short_description: Set default handler for MIME type, for applications using XDG tools
 version_added: 10.6.0
 description:
-  - This module allows configuring the default handler for a specific MIME type, to be used by applications that use XDG.
+  - This module allows configuring the default handler for specific MIME types when you use applications that rely on XDG.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
