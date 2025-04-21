@@ -26,6 +26,12 @@
   shell: apt-get -y update && apt-get -y install mercurial
   when: ansible_facts.pkg_mgr == 'apt'
 
+- name: install packages (apk)
+  package:
+    name: mercurial
+    state: present
+  when: ansible_facts.pkg_mgr in ['apk', 'community.general.apk']
+
 - name: install mercurial (dnf)
   dnf:
     name: mercurial
@@ -35,6 +41,11 @@
   yum:
     name: mercurial
   when: ansible_facts.pkg_mgr == 'yum'
+
+- name: install mercurial (pacman)
+  package:
+    name: mercurial
+  when: ansible_facts.pkg_mgr in ['pacman', 'community.general.pacman']
 
 - name: install mercurial (pkgng)
   package:
