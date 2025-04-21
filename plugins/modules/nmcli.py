@@ -1227,7 +1227,6 @@ EXAMPLES = r"""
 # ```
 
 
-
 ## playbook-add.yml example
 
 - hosts: openstack-stage
@@ -1264,7 +1263,7 @@ EXAMPLES = r"""
       with_items:
         - '{{ nmcli_team_slave }}'
 
-###### Working with all cloud nodes - Bonding
+##### Working with all cloud nodes - Bonding
     - name: Try nmcli add bond - conn_name only & ip4 gw4 mode
       community.general.nmcli:
         type: bond
