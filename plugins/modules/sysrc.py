@@ -122,14 +122,19 @@ class Sysrc(object):
         return err.find("unknown variable") > 0 or out.find("unknown variable") > 0
 
     def exists(self):
-        # sysrc doesn't really use exit codes
-        (rc, out, err) = self.run_sysrc(self.name)
+        """
+        Tests whether the name is in the file.  If parameter value is defined,
+        then tests whether name=value is in the file.  These tests are necessary
+        because sysrc doesn't use exit codes.  Instead, let sysrc read the
+        file's content and create a dictionary comprising the configuration.
+        Use this dictionary to preform the tests.
+        """
+        (rc, out, err) = self.run_sysrc('-e', '-a')
+        conf = dict([i.split('=') for i in out.splitlines()])
         if self.value is None:
-            regex = "%s: " % re.escape(self.name)
+            return self.name in conf
         else:
-            regex = "%s: %s$" % (re.escape(self.name), re.escape(self.value))
-
-        return not self.has_unknown_variable(out, err) and re.match(regex, out) is not None
+            return self.name in conf and conf[self.name] == '"%s"' % self.value
 
     def contains(self):
         (rc, out, err) = self.run_sysrc('-n', self.name)
@@ -142,13 +147,10 @@ class Sysrc(object):
         if self.exists():
             return
 
-        if self.module.check_mode:
-            self.changed = True
-            return
+        if not self.module.check_mode:
+            (rc, out, err) = self.run_sysrc("%s=%s" % (self.name, self.value))
 
-        (rc, out, err) = self.run_sysrc("%s=%s" % (self.name, self.value))
-        if out.find("%s:" % self.name) == 0 and re.search("-> %s$" % re.escape(self.value), out) is not None:
-            self.changed = True
+        self.changed = True
 
     def absent(self):
         if not self.exists():
