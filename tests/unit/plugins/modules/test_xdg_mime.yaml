@@ -8,35 +8,40 @@
 ---
 anchors:
   environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+  input: &input
+    mime_types: x-scheme-handler/http
+    handler: google-chrome.desktop
+  get_version: &get_version
+    command: [/testbin/xdg-mime, --version]
+    environ: *env-def
+    rc: 0
+    out: "xdg-mime 1.2.1\n"
+    err: ''
+  query_mime_type: &query_mime_type
+    command: [/testbin/xdg-mime, query, default, x-scheme-handler/http]
+    environ: *env-def
+    rc: 0
+    out: ''
+    err: ''
+  set_handler: &set_handler
+    command: [/testbin/xdg-mime, default, google-chrome.desktop, x-scheme-handler/http]
+    environ: *env-def
+    rc: 0
+    out: ''
+    err: ''
 test_cases:
   - id: test_set_handler
-    input:
-      handler: google-chrome.desktop
-      mime_types: x-scheme-handler/http
+    input: *input
     output:
       current_handlers: ['']
       changed: true
     mocks:
       run_command:
-        - command: [/testbin/xdg-mime, --version]
-          environ: *env-def
-          rc: 0
-          out: "xdg-mime 1.2.1\n"
-          err: ''
-        - command: [/testbin/xdg-mime, query, default, x-scheme-handler/http]
-          environ: *env-def
-          rc: 0
-          out: ''
-          err: ''
-        - command: [/testbin/xdg-mime, default, google-chrome.desktop, x-scheme-handler/http]
-          environ: *env-def
-          rc: 0
-          out: ''
-          err: ''
+        - *get_version
+        - *query_mime_type
+        - *set_handler
   - id: test_set_handler_check
-    input:
-      handler: google-chrome.desktop
-      mime_types: x-scheme-handler/http
+    input: *input
     output:
       current_handlers: ['google-chrome.desktop']
       changed: false
@@ -44,41 +49,23 @@ test_cases:
       check: true
     mocks:
       run_command:
-        - command: [/testbin/xdg-mime, --version]
-          environ: *env-def
-          rc: 0
-          out: "xdg-mime 1.2.1\n"
-          err: ''
-        - command: [/testbin/xdg-mime, query, default, x-scheme-handler/http]
-          environ: *env-def
-          rc: 0
+        - *get_version
+        - <<: *query_mime_type
           out: |
             google-chrome.desktop
-          err: ''
   - id: test_set_handler_idempot
-    input:
-      handler: google-chrome.desktop
-      mime_types: x-scheme-handler/http
+    input: *input
     output:
       current_handlers: ['google-chrome.desktop']
       changed: false
     mocks:
       run_command:
-        - command: [/testbin/xdg-mime, --version]
-          environ: *env-def
-          rc: 0
-          out: "xdg-mime 1.2.1\n"
-          err: ''
-        - command: [/testbin/xdg-mime, query, default, x-scheme-handler/http]
-          environ: *env-def
-          rc: 0
+        - *get_version
+        - <<: *query_mime_type
           out: |
             google-chrome.desktop
-          err: ''
   - id: test_set_handler_idempot_check
-    input:
-      handler: google-chrome.desktop
-      mime_types: x-scheme-handler/http
+    input: *input
     output:
       current_handlers: ['google-chrome.desktop']
       changed: false
@@ -86,29 +73,17 @@ test_cases:
       check: true
     mocks:
       run_command:
-        - command: [/testbin/xdg-mime, --version]
-          environ: *env-def
-          rc: 0
-          out: "xdg-mime 1.2.1\n"
-          err: ''
-        - command: [/testbin/xdg-mime, query, default, x-scheme-handler/http]
-          environ: *env-def
-          rc: 0
+        - *get_version
+        - <<: *query_mime_type
           out: |
             google-chrome.desktop
-          err: ''
   - id: test_set_invalid_handler
     input:
+      <<: *input
       handler: google-chrome.desktopX
-      mime_types: x-scheme-handler/http
     output:
       failed: true
       msg: Handler must be a .desktop file
     mocks:
       run_command:
-        - command: [/testbin/xdg-mime, --version]
-          environ: *env-def
-          rc: 0
-          out: "xdg-mime 1.2.1\n"
-          err: ''
-
+        - *get_version
