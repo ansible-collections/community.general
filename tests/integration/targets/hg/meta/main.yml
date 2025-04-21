@@ -6,3 +6,4 @@
 dependencies:
   - setup_pkg_mgr
   - setup_remote_tmp_dir
+  - setup_epel
