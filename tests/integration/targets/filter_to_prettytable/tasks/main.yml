@@ -314,7 +314,7 @@
 - name: Test column_alignments with more elements than available fields (expect failure)
   block:
     - set_fact:
-        invalid_table: "{{ test_data | community.general.to_prettytable(column_alignments={'name': 'left', 'age': 'right', 'role': 'center', 'extra_field': 'left', 'another_extra': 'center'}) }}"
+        invalid_table: "{{ test_data | community.general.to_prettytable(column_alignments={'name': 'center', 'age': 'right', 'role': 'left', 'extra': 'center', 'another': 'left'}) }}"
       register: failure_result
       ignore_errors: true
     - name: Verify error message for column_alignments with too many elements
@@ -323,6 +323,60 @@
           - failure_result is failed
           - >
             "'column_alignments' has more elements" in failure_result.msg
+
+- name: Test non-dictionary column_alignments (expect failure)
+  block:
+    - set_fact:
+        invalid_table: "{{ test_data | community.general.to_prettytable(column_alignments='invalid') }}"
+      register: failure_result
+      ignore_errors: true
+    - name: Verify error message for non-dictionary column_alignments
+      assert:
+        that:
+          - failure_result is failed
+          - >
+            "Expected a dictionary for column_alignments, got a string" in failure_result.msg
+
+- name: Test non-string keys in column_alignments (expect failure)
+  block:
+    - set_fact:
+        invalid_table: "{{ test_data | community.general.to_prettytable(column_alignments={123: 'center'}) }}"
+      register: failure_result
+      ignore_errors: true
+    - name: Verify error message for non-string keys in column_alignments
+      assert:
+        that:
+          - failure_result is failed
+          - >
+            "Keys in 'column_alignments' must be strings, got int" in failure_result.msg
+
+- name: Test non-string values in column_alignments (expect failure)
+  block:
+    - set_fact:
+        invalid_table: "{{ test_data | community.general.to_prettytable(column_alignments={'name': 123}) }}"
+      register: failure_result
+      ignore_errors: true
+    - name: Verify error message for non-string values in column_alignments
+      assert:
+        that:
+          - failure_result is failed
+          - >
+            "Values in 'column_alignments' must be strings, got int" in failure_result.msg
+
+- name: Test invalid alignment value in column_alignments (expect failure)
+  block:
+    - set_fact:
+        invalid_table: "{{ test_data | community.general.to_prettytable(column_alignments={'name': 'invalid'}) }}"
+      register: failure_result
+      ignore_errors: true
+    - name: Verify error message for invalid alignment value in column_alignments
+      assert:
+        that:
+          - failure_result is failed
+          - >
+            "Invalid alignment 'invalid' in 'column_alignments'" in failure_result.msg
+          - >
+            "Valid alignments are" in failure_result.msg
 
 # Test using explicit python script to create dictionary with mixed key types
 - name: Create test data with numeric keys

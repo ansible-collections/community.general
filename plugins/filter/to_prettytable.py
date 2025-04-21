@@ -211,9 +211,10 @@ def _configure_alignments(table, field_names, column_alignments):
 
     for col_name, alignment in column_alignments.items():
         if col_name in field_names:
+            # We already validated alignment is a string and a valid value in the main function
+            # Just apply it here
             alignment = alignment.lower()
-            if alignment in valid_alignments:
-                table.align[col_name] = alignment[0]
+            table.align[col_name] = alignment[0]
 
 
 def to_prettytable(data, *args, **kwargs):
@@ -300,9 +301,30 @@ def to_prettytable(data, *args, **kwargs):
     # === Process alignments ===
     # Get column alignments and validate
     column_alignments = kwargs.pop('column_alignments', {})
+    valid_alignments = {"left", "center", "right", "l", "c", "r"}
+
+    # Validate column_alignments is a dictionary
+    if not isinstance(column_alignments, dict):
+        raise AnsibleFilterError(_type_error(column_alignments, "a dictionary for column_alignments"))
+
+    # Validate column_alignments keys and values
+    for key, value in column_alignments.items():
+        # Check that keys are strings
+        if not isinstance(key, string_types):
+            raise AnsibleFilterError(f"Keys in 'column_alignments' must be strings, got {type(key).__name__}")
+
+        # Check that values are strings
+        if not isinstance(value, string_types):
+            raise AnsibleFilterError(f"Values in 'column_alignments' must be strings, got {type(value).__name__}")
+
+        # Check that values are valid alignments
+        if value.lower() not in valid_alignments:
+            raise AnsibleFilterError(
+                f"Invalid alignment '{value}' in 'column_alignments'. "
+                f"Valid alignments are: {', '.join(sorted(valid_alignments))}")
 
     # Validate column_alignments doesn't have more keys than fields
-    if isinstance(column_alignments, dict) and len(column_alignments) > max_fields:
+    if len(column_alignments) > max_fields:
         raise AnsibleFilterError(
             f"'column_alignments' has more elements ({len(column_alignments)}) than available fields in data ({max_fields})")
 
