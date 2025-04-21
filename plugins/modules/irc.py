@@ -124,7 +124,7 @@ EXAMPLES = r"""
     server: irc.example.net
     use_tls: true
     validate_certs: true
-    channel: #t1
+    channel: '#t1'
     msg: Hello world
 
 - name: Send a message to an IRC channel
@@ -134,7 +134,7 @@ EXAMPLES = r"""
     server: irc.example.net
     use_tls: true
     validate_certs: true
-    channel: #t1
+    channel: '#t1'
     msg: 'All finished at {{ ansible_date_time.iso8601 }}'
     color: red
     nick: ansibleIRC
@@ -146,7 +146,7 @@ EXAMPLES = r"""
     server: irc.example.net
     use_tls: true
     validate_certs: true
-    channel: #t1
+    channel: '#t1'
     nick_to:
       - nick1
       - nick2

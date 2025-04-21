@@ -120,7 +120,7 @@ EXAMPLES = r"""
   community.general.btrfs_subvolume:
     name: /@
     snapshot_source: /
-    default: Yes
+    default: true
     filesystem_device: /dev/vda2
 
 - name: Create a snapshot of the /@ subvolume and recursively creating intermediate subvolumes as required
