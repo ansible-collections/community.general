@@ -112,7 +112,7 @@ test_cases:
       mime_type: x-scheme-handler/http
     output:
       failed: true
-      msg: 'Handler must be a .desktop file'
+      msg: Handler must be a .desktop file
     mocks:
       run_command:
         - command: [/testbin/xdg-mime, --version]
