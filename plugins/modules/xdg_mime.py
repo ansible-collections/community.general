@@ -26,9 +26,9 @@ attributes:
   diff_mode:
     support: none
 options:
-  mime_type:
+  mime_types:
     description:
-      - MIME type(s) for which a default handler will be set.
+      - one or more MIME type for which a default handler will be set.
     type: list
     elements: str
     required: true
@@ -55,12 +55,12 @@ seealso:
 EXAMPLES = r"""
 - name: Set Chrome as the default handler for HTTPS
   community.general.xdg_mime:
-    mime_type: x-scheme-handler/https
+    mime_types: x-scheme-handler/https
     handler: google-chrome.desktop
   register: result
 - name: Set Chrome as the default handler for HTTP/HTTPS
   community.general.xdg_mime:
-    mime_type:
+    mime_types:
       - x-scheme-handler/http
       - x-scheme-handler/https
     handler: google-chrome.desktop
@@ -93,7 +93,7 @@ class XdgMime(ModuleHelper):
 
     module = dict(
         argument_spec=dict(
-            mime_type=dict(type='list', elements='str', required=True),
+            mime_types=dict(type='list', elements='str', required=True),
             handler=dict(type='str', required=True),
         ),
         supports_check_mode=True,
@@ -108,7 +108,7 @@ class XdgMime(ModuleHelper):
             self.vars.version = out.replace("xdg-mime ", "").strip()
 
         self.vars.current_handlers = []
-        for mime in self.vars.mime_type:
+        for mime in self.vars.mime_types:
             handler_value = xdg_mime_get(self.runner, mime)
             if not handler_value:
                 handler_value = ''
@@ -124,7 +124,7 @@ class XdgMime(ModuleHelper):
             self.changed = True
 
         if self.has_changed():
-            with self.runner.context(args_order="default handler mime_type", check_mode_skip=True, check_mode_return=check_mode_return) as ctx:
+            with self.runner.context(args_order="default handler mime_types", check_mode_skip=True, check_mode_return=check_mode_return) as ctx:
                 rc, out, err = ctx.run()
                 self.vars.stdout = out
                 self.vars.stderr = err

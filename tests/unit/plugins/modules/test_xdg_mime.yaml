@@ -12,7 +12,7 @@ test_cases:
   - id: test_set_handler
     input:
       handler: google-chrome.desktop
-      mime_type: x-scheme-handler/http
+      mime_types: x-scheme-handler/http
     output:
       current_handlers: ['']
       changed: true
@@ -36,7 +36,7 @@ test_cases:
   - id: test_set_handler_check
     input:
       handler: google-chrome.desktop
-      mime_type: x-scheme-handler/http
+      mime_types: x-scheme-handler/http
     output:
       current_handlers: ['google-chrome.desktop']
       changed: false
@@ -58,7 +58,7 @@ test_cases:
   - id: test_set_handler_idempot
     input:
       handler: google-chrome.desktop
-      mime_type: x-scheme-handler/http
+      mime_types: x-scheme-handler/http
     output:
       current_handlers: ['google-chrome.desktop']
       changed: false
@@ -78,7 +78,7 @@ test_cases:
   - id: test_set_handler_idempot_check
     input:
       handler: google-chrome.desktop
-      mime_type: x-scheme-handler/http
+      mime_types: x-scheme-handler/http
     output:
       current_handlers: ['google-chrome.desktop']
       changed: false
@@ -100,7 +100,7 @@ test_cases:
   - id: test_set_invalid_handler
     input:
       handler: google-chrome.desktopX
-      mime_type: x-scheme-handler/http
+      mime_types: x-scheme-handler/http
     output:
       failed: true
       msg: Handler must be a .desktop file

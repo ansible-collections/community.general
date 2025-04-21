@@ -17,7 +17,7 @@ def xdg_mime_runner(module, **kwargs):
         arg_formats=dict(
             default=cmd_runner_fmt.as_fixed('default'),
             query=cmd_runner_fmt.as_fixed('query'),
-            mime_type=cmd_runner_fmt.as_list(),
+            mime_types=cmd_runner_fmt.as_list(),
             handler=cmd_runner_fmt.as_list(),
             version=cmd_runner_fmt.as_fixed('--version'),
         ),
@@ -32,5 +32,5 @@ def xdg_mime_get(runner, mime_type):
         out = out.splitlines()[0]
         return out.split()[-1]
 
-    with runner("query default mime_type", output_process=process) as ctx:
-        return ctx.run(mime_type=mime_type)
+    with runner("query default mime_types", output_process=process) as ctx:
+        return ctx.run(mime_types=mime_type)
