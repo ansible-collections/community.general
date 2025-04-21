@@ -34,10 +34,10 @@ options:
     required: true
   handler:
     description:
-      - Default handler will be set for the MIME type.
+      - Sets the default handler for the specified MIME types.
       - The desktop file must be installed in the system.
         If the desktop file is not installed, the module
-        will not fail, but the handler will not be set either.
+        does not fail, but the handler is not set either.
       - You must pass a handler in the form V(*.desktop), otherwise the module fails.
     type: str
     required: true
