@@ -1696,7 +1696,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
 
     def validate_tags(self, tags):
         """Check if the specified tags are valid."""
-        re_tag = re.compile(r"^[a-z0-9_][a-z0-9_\-\+\.]*$")
+        re_tag = re.compile(r"^[a-zA-Z0-9_][a-zA-Z0-9_\-\+\.]*$")
         for tag in tags:
             if not re_tag.match(tag):
                 self.module.fail_json(msg="%s is not a valid tag" % tag)
