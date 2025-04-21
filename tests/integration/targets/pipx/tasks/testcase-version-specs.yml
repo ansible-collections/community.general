@@ -33,6 +33,14 @@
   register: install_tox_extras
   ignore_errors: true  # Some versions might not have this extra
 
+- pip:
+    name: setuptools
+
+- name: Check version of packaging
+  community.general.python_requirements_info:
+    dependencies:
+      - packaging<=25.0
+
 - name: install tox with invalid version specifier
   community.general.pipx:
     name: "tox>>>>>4.0.0"
