@@ -2827,29 +2827,33 @@ class KeycloakAPI(object):
 
     def get_user_groups(self, user_id, realm='master'):
         """
-        Get groups for a user.
+        Get the group names for a user.
         :param user_id: User ID
         :param realm: Realm
-        :return: Representation of the client groups.
+        :return: The client group names as a list of strings.
+        """
+        user_groups = self.get_user_group_details(user_id, realm)
+        return [user_group['name'] for user_group in user_groups if 'name' in user_group]
+
+    def get_user_group_details(self, user_id, realm='master'):
+        """
+        Get the group details for a user.
+        :param user_id: User ID
+        :param realm: Realm
+        :return: The client group details as a list of dictionaries.
         """
         try:
-            groups = []
-            user_groups_url = URL_USER_GROUPS.format(
-                url=self.baseurl,
-                realm=realm,
-                id=user_id)
-            user_groups = json.load(
-                self._request(
-                    user_groups_url,
-                    method='GET'))
-            for user_group in user_groups:
-                groups.append(user_group["name"])
-            return groups
+            user_groups_url = URL_USER_GROUPS.format(url=self.baseurl, realm=realm, id=user_id)
+            return self._request_and_deserialize(user_groups_url, method='GET')
         except Exception as e:
             self.fail_request(e, msg='Could not get groups for user %s in realm %s: %s'
                                      % (user_id, realm, str(e)))
 
     def add_user_in_group(self, user_id, group_id, realm='master'):
+        """DEPRECATED: Call add_user_to_group(...) instead. This method is scheduled for removal in community.general 13.0.0."""
+        return self.add_user_to_group(user_id, group_id, realm)
+
+    def add_user_to_group(self, user_id, group_id, realm='master'):
         """
         Add a user to a group.
         :param user_id: User ID
@@ -2867,7 +2871,7 @@ class KeycloakAPI(object):
                 user_group_url,
                 method='PUT')
         except Exception as e:
-            self.fail_request(e, msg='Could not add user %s in group %s in realm %s: %s'
+            self.fail_request(e, msg='Could not add user %s to group %s in realm %s: %s'
                                      % (user_id, group_id, realm, str(e)))
 
     def remove_user_from_group(self, user_id, group_id, realm='master'):
@@ -2898,49 +2902,72 @@ class KeycloakAPI(object):
         :param realm: Realm
         :return: True if group membership has been changed. False Otherwise.
         """
-        changed = False
         try:
-            user_existing_groups = self.get_user_groups(
-                user_id=userrep['id'],
-                realm=realm)
-            groups_to_add_and_remove = self.extract_groups_to_add_to_and_remove_from_user(groups)
-            # If group membership need to be changed
-            if not is_struct_included(groups_to_add_and_remove['add'], user_existing_groups):
-                # Get available groups in the realm
-                realm_groups = self.get_groups(realm=realm)
-                for realm_group in realm_groups:
-                    if "name" in realm_group and realm_group["name"] in groups_to_add_and_remove['add']:
-                        self.add_user_in_group(
-                            user_id=userrep["id"],
-                            group_id=realm_group["id"],
-                            realm=realm)
-                        changed = True
-                    elif "name" in realm_group and realm_group['name'] in groups_to_add_and_remove['remove']:
-                        self.remove_user_from_group(
-                            user_id=userrep['id'],
-                            group_id=realm_group['id'],
-                            realm=realm)
-                        changed = True
-            return changed
+            groups_to_add, groups_to_remove = self.extract_groups_to_add_to_and_remove_from_user(groups)
+            if not groups_to_add and not groups_to_remove:
+                return False
+
+            user_groups = self.get_user_group_details(user_id=userrep['id'], realm=realm)
+            user_group_names = [user_group['name'] for user_group in user_groups if 'name' in user_group]
+            user_group_paths = [user_group['path'] for user_group in user_groups if 'path' in user_group]
+
+            groups_to_add = [group_to_add for group_to_add in groups_to_add
+                             if group_to_add not in user_group_names and group_to_add not in user_group_paths]
+            groups_to_remove = [group_to_remove for group_to_remove in groups_to_remove
+                                if group_to_remove in user_group_names or group_to_remove in user_group_paths]
+            if not groups_to_add and not groups_to_remove:
+                return False
+
+            for group_to_add in groups_to_add:
+                realm_group = self.find_group_by_path(group_to_add, realm=realm)
+                if realm_group:
+                    self.add_user_to_group(user_id=userrep['id'], group_id=realm_group['id'], realm=realm)
+
+            for group_to_remove in groups_to_remove:
+                realm_group = self.find_group_by_path(group_to_remove, realm=realm)
+                if realm_group:
+                    self.remove_user_from_group(user_id=userrep['id'], group_id=realm_group['id'], realm=realm)
+
+            return True
         except Exception as e:
             self.module.fail_json(msg='Could not update group membership for user %s in realm %s: %s'
-                                      % (userrep['id]'], realm, str(e)))
+                                      % (userrep['username'], realm, e))
 
     def extract_groups_to_add_to_and_remove_from_user(self, groups):
-        groups_extract = {}
         groups_to_add = []
         groups_to_remove = []
-        if isinstance(groups, list) and len(groups) > 0:
+        if isinstance(groups, list):
             for group in groups:
                 group_name = group['name'] if isinstance(group, dict) and 'name' in group else group
-                if isinstance(group, dict) and ('state' not in group or group['state'] == 'present'):
-                    groups_to_add.append(group_name)
-                else:
-                    groups_to_remove.append(group_name)
-        groups_extract['add'] = groups_to_add
-        groups_extract['remove'] = groups_to_remove
+                if isinstance(group, dict):
+                    if 'state' not in group or group['state'] == 'present':
+                        groups_to_add.append(group_name)
+                    else:
+                        groups_to_remove.append(group_name)
+        return groups_to_add, groups_to_remove
 
-        return groups_extract
+    def find_group_by_path(self, target, realm='master'):
+        """
+        Finds a realm group by path, e.g. '/my/group'.
+        The path is formed by prepending a '/' character to `target` unless it's already present.
+        This adds support for finding top level groups by name and subgroups by path.
+        """
+        groups = self.get_groups(realm=realm)
+        path = target if target.startswith('/') else '/' + target
+        for segment in path.split('/'):
+            if not segment:
+                continue
+            abort = True
+            for group in groups:
+                if group['path'] == path:
+                    return self.get_group_by_groupid(group['id'], realm=realm)
+                if group['name'] == segment:
+                    groups = self.get_subgroups(group, realm=realm)
+                    abort = False
+                    break
+            if abort:
+                break
+        return None
 
     def convert_user_group_list_of_str_to_list_of_dict(self, groups):
         list_of_groups = []

@@ -101,6 +101,9 @@ options:
   groups:
     description:
       - List of groups for the user.
+        Groups can be referenced by their name, like V(staff), or their path, like V(/staff/engineering).
+        The path syntax allows you to reference subgroups, which is not possible otherwise.
+        This is possible since community.general 10.6.0.
     type: list
     elements: dict
     default: []
