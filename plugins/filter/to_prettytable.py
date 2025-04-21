@@ -308,7 +308,7 @@ def to_prettytable(data, *args, **kwargs):
 
     # Check for unknown parameters
     if kwargs:
-        raise AnsibleFilterError(f"Unknown parameter(s) for to_prettytable filter: {', '.join(kwargs.keys())}")
+        raise AnsibleFilterError(f"Unknown parameter(s) for to_prettytable filter: {', '.join(sorted(kwargs))}")
 
     # === Build the table ===
     table = prettytable.PrettyTable()

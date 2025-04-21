@@ -282,7 +282,8 @@
       assert:
         that:
           - failure_result is failed
-          - "\"'column_order' and 'header_names' must have the same number of elements\" in failure_result.msg"
+          - >
+            "'column_order' and 'header_names' must have the same number of elements" in failure_result.msg
 
 - name: Test column_order with more elements than available fields (expect failure)
   block:
@@ -294,7 +295,8 @@
       assert:
         that:
           - failure_result is failed
-          - "\"'column_order' has more elements\" in failure_result.msg"
+          - >
+            "'column_order' has more elements" in failure_result.msg
 
 - name: Test header_names with more elements than available fields (expect failure)
   block:
@@ -306,7 +308,8 @@
       assert:
         that:
           - failure_result is failed
-          - "\"'header_names' has more elements\" in failure_result.msg"
+          - >
+            "'header_names' has more elements" in failure_result.msg
 
 - name: Test column_alignments with more elements than available fields (expect failure)
   block:
@@ -318,7 +321,8 @@
       assert:
         that:
           - failure_result is failed
-          - "\"'column_alignments' has more elements\" in failure_result.msg"
+          - >
+            "'column_alignments' has more elements" in failure_result.msg
 
 # Test using explicit python script to create dictionary with mixed key types
 - name: Create test data with numeric keys
