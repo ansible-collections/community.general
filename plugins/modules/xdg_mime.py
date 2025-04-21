@@ -35,7 +35,7 @@ options:
       - Default handler will be set for the MIME type.
       - The desktop file must be installed in the system.
         If the desktop file is not installed, the module
-        will not fail, but the handler will not be set either. 
+        will not fail, but the handler will not be set either.
     type: str
     required: true
 notes:
@@ -97,6 +97,7 @@ from ansible_collections.community.general.plugins.module_utils.xdg_mime import 
 
 class XdgMime(ModuleHelper):
     output_params = ['before_handlers', 'after_handlers']
+    diff_params = ['before_handlers', 'after_handlers']
     module = dict(
         argument_spec=dict(
             mime_type=dict(type='list', elements='str', required=True),
@@ -122,14 +123,14 @@ class XdgMime(ModuleHelper):
 
     def __run__(self):
         check_mode_return = (0, 'Module executed in check mode', '')
-      
+
         if not self.vars.handler.endswith(".desktop"):
             self.do_raise(msg="Handler must be a .desktop file")
 
         if any(h != self.vars.handler for h in self.vars.before_handlers):
             self.changed = True
 
-        if self.has_changed:
+        if self.vars.has_changed:
             with self.runner.context(args_order="default handler mime_type", check_mode_skip=True, check_mode_return=check_mode_return) as ctx:
                 rc, out, err = ctx.run()
                 self.vars.stdout = out
