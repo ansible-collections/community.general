@@ -64,9 +64,18 @@ EXAMPLES = r"""
   """
 
 RETURN = r"""
-handlers:
+after_handlers:
   description:
-    - List of handlers set as default.
+    - List of handlers set by the module.
+  returned: success
+  type: list
+  elements: str
+  sample:
+    - google-chrome.desktop
+    - google-chrome.desktop
+before_handlers:
+  description:
+    - List of handlers currently set.
   returned: success
   type: list
   elements: str
@@ -85,7 +94,7 @@ from ansible_collections.community.general.plugins.module_utils.xdg_mime import 
 
 
 class XdgMime(ModuleHelper):
-    output_params = ['handlers']
+    output_params = ['before_handlers', 'after_handlers']
     module = dict(
         argument_spec=dict(
             mime_type=dict(type='list', elements='str', required=True),
@@ -95,8 +104,6 @@ class XdgMime(ModuleHelper):
     )
     use_old_vardict = False
 
-    temp_handlers = []
-
     def __init_module__(self):
         self.runner = xdg_mime_runner(self.module, check_rc=True)
 
@@ -104,18 +111,19 @@ class XdgMime(ModuleHelper):
             rc, out, err = ctx.run()
             self.vars.version = out.replace("xdg-mime ", "").strip()
 
+        self.vars.before_handlers = []
+
         for mime in self.vars.mime_type:
             handler_value = xdg_mime_get(self.runner, mime)
-            self.temp_handlers.append(handler_value)
-        
-        self.vars.handlers = []
-        self.vars.set_meta("handlers", initial_value=self.temp_handlers, diff=True, change=True)
+            if handler_value:
+              self.vars.before_handlers.append(handler_value)
+        # self.vars.set_meta("before_handlers", initial_value=self.vars.before_handlers, diff=True, change=True)
 
     def __run__(self):
         check_mode_return = (0, 'Module executed in check mode', '')
 
-        if any(h != self.vars.handler for h in self.temp_handlers):
-            self.changed
+        if any(h != self.vars.handler for h in self.vars.before_handlers):
+            self.changed = True
 
         if self.has_changed:
             with self.runner.context(args_order="default handler mime_type", check_mode_skip=True, check_mode_return=check_mode_return) as ctx:
@@ -124,12 +132,12 @@ class XdgMime(ModuleHelper):
                 self.vars.stderr = err
                 self.vars.set("run_info", ctx.run_info, verbosity=1)
 
-            self.vars.handlers = []
+        self.vars.after_handlers = []
 
-            for mime in self.vars.mime_type:
-                handler_value = xdg_mime_get(self.runner, mime)
-                self.vars.handlers.append(handler_value)
-
+        for mime in self.vars.mime_type:
+            handler_value = xdg_mime_get(self.runner, mime)
+            if handler_value:
+                self.vars.after_handlers.append(handler_value)
 
 def main():
     XdgMime.execute()
