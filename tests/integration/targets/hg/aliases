@@ -5,3 +5,4 @@
 azp/posix/2
 skip/aix
 skip/macos
+disabled  # TODO osdn.net is out of business, so cloning a repo from there does not work
