@@ -70,7 +70,6 @@ stages:
             - test: 2
             - test: 3
             - test: 4
-            - test: extra
   - stage: Sanity_2_18
     displayName: Sanity 2.18
     dependsOn: []
