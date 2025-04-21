@@ -34,6 +34,8 @@ options:
     description:
       - Default handler will be set for the MIME type.
       - The desktop file must be installed in the system.
+        If the desktop file is not installed, the module
+        will not fail, but the handler will not be set either. 
     type: str
     required: true
 notes:
