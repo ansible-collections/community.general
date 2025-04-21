@@ -107,12 +107,15 @@ class XdgMime(ModuleHelper):
         for mime in self.vars.mime_type:
             handler_value = xdg_mime_get(self.runner, mime)
             self.temp_handlers.append(handler_value)
+        
+        self.vars.handlers = []
+        self.vars.set_meta("handlers", initial_value=self.temp_handlers, diff=True, change=True)
 
     def __run__(self):
         check_mode_return = (0, 'Module executed in check mode', '')
 
         if any(h != self.vars.handler for h in self.temp_handlers):
-            self.changed = True
+            self.changed
 
         if self.has_changed:
             with self.runner.context(args_order="default handler mime_type", check_mode_skip=True, check_mode_return=check_mode_return) as ctx:
