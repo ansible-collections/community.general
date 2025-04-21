@@ -3,5 +3,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 azp/posix/2
-skip/python3
 skip/aix
+skip/macos
+disabled  # TODO osdn.net is out of business, so cloning a repo from there does not work
