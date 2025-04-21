@@ -60,7 +60,7 @@ options:
       - If O(name) is a simple package name without version specifiers, then that name is used as the Python package name
         to be installed.
       - Starting in community.general 10.7.0, you can use package specifiers when O(state=present) or O(state=install). For example, O(name=tox<4.0.0).
-      - Please note that when you use O(sate=present) and O(name) with version specifiers, the module will NOT reinstall/upgrade/downgrade the
+      - Please note that when you use O(state=present) and O(name) with version specifiers, the module will NOT reinstall/upgrade/downgrade the
         application, even if the version specifier is not satisfied by the existing application. To ensure the reinstallation of the application
         you must use O(force=true).
       - Use O(source) for installing from URLs or directories.
@@ -154,11 +154,6 @@ options:
 requirements:
   - When using O(name) with version specifiers, the Python package `packaging` is required.
   - If the package `packaging` is at a cersion lesse than `22.0.0`, it will fail silently when processing invalid specifiers, like `tox<<<<4.0`.
-notes:
-  -
-  - This first implementation does not verify whether a specified version constraint has been installed or not. Hence, when
-    using version operators, C(pipx) module will always try to execute the operation, even when the application was previously
-    installed. This feature will be added in the future.
 author:
   - "Alexei Znamensky (@russoz)"
 """
