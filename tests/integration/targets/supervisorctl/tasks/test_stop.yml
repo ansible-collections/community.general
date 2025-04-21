@@ -34,8 +34,9 @@
       - (result is changed and result_with_auth is skip) or (result is skip and result_with_auth is changed)
 
 - name: "check that service isn't running"
-  script: "files/sendProcessStdin.py 'pys:py1' 1 \
-    '{{ credentials.username }}' '{{ credentials.password }}'"
+  script:
+    cmd: "files/sendProcessStdin.py 'pys:py1' 1 '{{ credentials.username }}' '{{ credentials.password }}'"
+    executable: "{{ ansible_facts.python.executable }}"
   register: is_py1_alive
   failed_when: is_py1_alive is success
 
