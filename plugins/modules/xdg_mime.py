@@ -26,8 +26,9 @@ attributes:
 options:
   mime_type:
     description:
-      - MIME type for which a default handler will be set.
-    type: str
+      - MIME type(s) for which a default handler will be set.
+    type: list
+    elements: str
     required: true
   handler:
     description:
@@ -53,7 +54,14 @@ EXAMPLES = r"""
     mime_type: x-scheme-handler/https
     handler: google-chrome.desktop
   register: result
-"""
+- name: Set Chrome as the default handler for HTTP/HTTPS
+  community.general.xdg_mime:
+    mime_type:
+      - x-scheme-handler/http
+      - x-scheme-handler/https
+    handler: google-chrome.desktop
+  register: result
+  """
 
 RETURN = r"""
 handlers:
@@ -103,7 +111,7 @@ class XdgMime(ModuleHelper):
     def __run__(self):
         check_mode_return = (0, 'Module executed in check mode', '')
 
-        if not all([h == self.vars.handler for h in self.temp_handlers]):
+        if any(h != self.vars.handler for h in self.temp_handlers):
             self.changed = True
 
         if self.has_changed:
