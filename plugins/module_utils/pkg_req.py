@@ -16,11 +16,12 @@ with deps.declare("packaging"):
     from packaging.version import parse as parse_version, InvalidVersion
 
 
-class PackageVersion:
-    def __init__(self, module):
+class PackageRequirement:
+    def __init__(self, module, name):
         self.module = module
+        self.parsed_name, self.requirement = self.parse_spec(name)
 
-    def parse_package_name(self, name):
+    def parse_spec(self, name):
         """
         Parse a package name that may include version specifiers using PEP 508.
         Returns a tuple of (name, requirement) where requirement is of type packaging.requirements.Requirement and it may be None.
@@ -52,24 +53,23 @@ class PackageVersion:
         except Exception as e:
             raise_from(ValueError("Invalid package specification for '{0}': {1}".format(name, e)), e)
 
-    def version_fulfills_spec(self, version_str, requirement):
+    def matches_version(self, version):
         """
         Check if a version string fulfills a version specifier.
 
-        :param version_str: Version string to check
-        :param requirement: Requirement object (packaging.requirements.Requirement)
+        :param version: Version string to check
         :return: True if version fulfills the requirement, False otherwise
-        :raises ValueError: If version_str is invalid
+        :raises ValueError: If version is invalid
         """
         # If no spec provided, any version is valid
-        if not requirement:
+        if not self.requirement:
             return True
 
         try:
             # Parse version string
-            ver = parse_version(version_str)
+            ver = parse_version(version)
 
-            return ver in requirement.specifier
+            return ver in self.requirement.specifier
 
         except InvalidVersion as e:
-            raise_from(ValueError("Invalid version '{0}': {1}".format(version_str, e)))
+            raise_from(ValueError("Invalid version '{0}': {1}".format(version, e)))

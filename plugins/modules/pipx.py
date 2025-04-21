@@ -208,7 +208,7 @@ version:
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
 from ansible_collections.community.general.plugins.module_utils.pipx import pipx_runner, pipx_common_argspec, make_process_list
-from ansible_collections.community.general.plugins.module_utils.pkg_specs import PackageVersion
+from ansible_collections.community.general.plugins.module_utils.pkg_req import PackageRequirement
 
 from ansible.module_utils.facts.compat import ansible_facts
 
@@ -280,8 +280,10 @@ class PipX(StateModuleHelper):
             facts = ansible_facts(self.module, gather_subset=['python'])
             self.command = [facts['python']['executable'], '-m', 'pipx']
         self.runner = pipx_runner(self.module, self.command)
-        self.package_version = PackageVersion(self.module)
-        self.parsed_name, self.parsed_req = self.package_version.parse_package_name(self.vars.name)
+
+        pkg_req = PackageRequirement(self.module, self.vars.name)
+        self.parsed_name = pkg_req.parsed_name
+        self.parsed_req = pkg_req.requirement
         self.app_name = _make_name(self.parsed_name, self.vars.suffix)
 
         self.vars.set('application', self._retrieve_installed(), change=True, diff=True)
