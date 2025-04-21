@@ -1228,6 +1228,7 @@ EXAMPLES = r"""
 
 
 ## playbook-add.yml example
+
 - hosts: openstack-stage
   remote_user: root
   tasks:
