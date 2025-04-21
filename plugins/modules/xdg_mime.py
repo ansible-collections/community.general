@@ -48,7 +48,7 @@ seealso:
 """
 
 EXAMPLES = r"""
-- name: Set Chrome as the default handler for https
+- name: Set Chrome as the default handler for HTTPS
   community.general.xdg_mime:
     mime_type: x-scheme-handler/https
     handler: google-chrome.desktop
@@ -74,7 +74,7 @@ from ansible_collections.community.general.plugins.module_utils.xdg_mime import 
 
 
 class XdgMime(ModuleHelper):
-    output_params = ['handlers']
+    output_params = ['handler']
     module = dict(
         argument_spec=dict(
             mime_type=dict(type='list', elements='str', required=True),
