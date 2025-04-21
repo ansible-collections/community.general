@@ -31,14 +31,6 @@ exclusions = [
 doc_fragment = "community.general.consul.actiongroup_consul"
 
 [[sessions.extra_checks.action_groups_config]]
-name = "keycloak"
-pattern = "^keycloak_.*$"
-exclusions = [
-    "keycloak_realm_info",
-]
-doc_fragment = "community.general.keycloak.actiongroup_keycloak"
-
-[[sessions.extra_checks.action_groups_config]]
 name = "proxmox"
 pattern = "^proxmox(_.*)?$"
 exclusions = []
