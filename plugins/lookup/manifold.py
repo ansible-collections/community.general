@@ -13,6 +13,10 @@ DOCUMENTATION = '''
     short_description: get credentials from Manifold.co
     description:
         - Retrieves resources' credentials from Manifold.co
+    deprecated:
+        removed_in: 11.0.0
+        why: Manifold (the company) has been acquired in 2021 and the services used by this plugin are no longer operational.
+        alternative: There is none.
     options:
         _terms:
             description:
