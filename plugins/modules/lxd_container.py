@@ -342,7 +342,7 @@ EXAMPLES = r"""
 # nodes - 'node01' and 'node02'. In 'target:', 'node01' and 'node02' are names of LXD cluster
 # members that LXD cluster recognizes, not ansible inventory names, see: 'lxc cluster list'.
 # LXD API calls can be made to any LXD member, in this example, we send API requests to
-#'node01.example.com', which matches ansible inventory name.
+# 'node01.example.com', which matches ansible inventory name.
 - hosts: node01.example.com
   tasks:
     - name: Create LXD container
