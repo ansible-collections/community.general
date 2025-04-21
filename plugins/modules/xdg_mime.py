@@ -14,7 +14,7 @@ DOCUMENTATION = r"""
 module: xdg_mime
 author:
   - "Marcos Alano (@mhalano)"
-short_description: Set default handler for MIME type, for applications using XDG tools
+short_description: Set default handler for MIME types, for applications using XDG tools
 version_added: 10.6.0
 description:
   - This module allows configuring the default handler for specific MIME types when you use applications that rely on XDG.
