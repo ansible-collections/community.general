@@ -90,7 +90,7 @@ from ansible_collections.community.general.plugins.module_utils.xdg_mime import 
 
 
 class XdgMime(ModuleHelper):
-    output_params = ('handler')
+    output_params = ['handler']
 
     module = dict(
         argument_spec=dict(
