@@ -22,6 +22,8 @@
   when: credentials.username != ''
 
 - command: "supervisorctl -c {{ remote_dir }}/supervisord.conf {% if credentials.username %}-u {{ credentials.username }} -p {{ credentials.password }}{% endif %} status"
+  register: result_cmd
+  failed_when: result_cmd.rc not in [0, 3]
 
 - name: check that service is started
   assert:
