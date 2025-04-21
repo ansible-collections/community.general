@@ -1,9 +1,9 @@
 minor_changes:
-  - keycloak module_utils - user groups can now be referenced by their name, like "staff", or their path, like
-    "/staff/engineering".
+  - keycloak module_utils - user groups can now be referenced by their name, like ``staff``, or their path, like
+    ``/staff/engineering``.
     The path syntax allows users to reference subgroups, which is not possible otherwise
     (https://github.com/ansible-collections/community.general/pull/9898).
-  - keycloak_user module - user groups can now be referenced by their name, like "staff", or their path, like
-    "/staff/engineering".
+  - keycloak_user module - user groups can now be referenced by their name, like ``staff``, or their path, like
+    ``/staff/engineering``.
     The path syntax allows users to reference subgroups, which is not possible otherwise
     (https://github.com/ansible-collections/community.general/pull/9898).

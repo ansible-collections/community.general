@@ -2833,7 +2833,7 @@ class KeycloakAPI(object):
                                      % (user_id, realm, str(e)))
 
     def add_user_in_group(self, user_id, group_id, realm='master'):
-        """DEPRECATED: Call add_user_to_group(...) instead. This method is scheduled for removal in version 13.0.0."""
+        """DEPRECATED: Call add_user_to_group(...) instead. This method is scheduled for removal in community.general 13.0.0."""
         return self.add_user_to_group(user_id, group_id, realm)
 
     def add_user_to_group(self, user_id, group_id, realm='master'):
