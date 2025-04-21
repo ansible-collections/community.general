@@ -79,7 +79,7 @@ current_handlers:
     - google-chrome.desktop
     - firefox.desktop
 version:
-  description: Version of xdg-mime.
+  description: Version of the C(xdg-mime) tool.
   type: str
   returned: always
   sample: "1.2.1"
