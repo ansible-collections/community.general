@@ -107,6 +107,9 @@ class XdgMime(ModuleHelper):
             rc, out, err = ctx.run()
             self.vars.version = out.replace("xdg-mime ", "").strip()
 
+        if not self.vars.handler.endswith(".desktop"):
+            self.do_raise(msg="Handler must be a .desktop file")
+
         self.vars.current_handlers = []
         for mime in self.vars.mime_types:
             handler_value = xdg_mime_get(self.runner, mime)
@@ -116,9 +119,6 @@ class XdgMime(ModuleHelper):
 
     def __run__(self):
         check_mode_return = (0, 'Module executed in check mode', '')
-
-        if not self.vars.handler.endswith(".desktop"):
-            self.do_raise(msg="Handler must be a .desktop file")
 
         if any(h != self.vars.handler for h in self.vars.current_handlers):
             self.changed = True
