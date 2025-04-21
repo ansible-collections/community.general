@@ -22,6 +22,8 @@
   when: credentials.username != ''
 
 - command: "supervisorctl -c {{ remote_dir }}/supervisord.conf {% if credentials.username %}-u {{ credentials.username }} -p {{ credentials.password }}{% endif %} status"
+  register: result_cmd
+  failed_when: result_cmd.rc not in [0, 3]
 
 - name: check that service is started
   assert:
@@ -30,8 +32,9 @@
       - (result is changed and result_with_auth is skip) or (result is skip and result_with_auth is changed)
 
 - name: check that service is running (part1) # py1.log content is checked below
-  script: "files/sendProcessStdin.py 'pys:py1' 2 \
-    '{{ credentials.username }}' '{{ credentials.password }}'"
+  script:
+    cmd: "files/sendProcessStdin.py 'pys:py1' 2 '{{ credentials.username }}' '{{ credentials.password }}'"
+    executable: "{{ ansible_facts.python.executable }}"
 
 - name: try again to start py1 service (without auth)
   supervisorctl:

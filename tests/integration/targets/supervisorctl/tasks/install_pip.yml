@@ -5,5 +5,5 @@
 
 - name: install supervisord
   pip:
-    name: supervisor<4.0.0  # supervisor version 4.0.0 fails tests
+    name: supervisor
     state: present
