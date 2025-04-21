@@ -52,7 +52,7 @@ class PackageVersion:
             return req.name, req
 
         except Exception as e:
-            raise_from(ValueError(f"Invalid package specification for '{name}': {str(e)}"), e)
+            raise_from(ValueError("Invalid package specification for '{0}': {1}".format(name, e)), e)
 
     def version_fulfills_spec(self, version_str, requirement):
         """
