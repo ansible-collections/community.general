@@ -1,2 +1,0 @@
-bugfixes:
-  - "github_deploy_key - check that key really exists on 422 to avoid masking other errors (https://github.com/ansible-collections/community.general/issues/6718, https://github.com/ansible-collections/community.general/pull/10011)."
