@@ -28,7 +28,7 @@ attributes:
 options:
   mime_types:
     description:
-      - one or more MIME type for which a default handler will be set.
+      - One or more MIME types for which a default handler will be set.
     type: list
     elements: str
     required: true
