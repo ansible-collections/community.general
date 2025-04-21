@@ -1,0 +1,2 @@
+deprecated_features:
+  - stackpath_compute inventory plugin - plugin is deprecated and will be removed in community.general 11.0.0 (https://github.com/ansible-collections/community.general/pull/10026).
