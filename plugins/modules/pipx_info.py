@@ -160,7 +160,7 @@ class PipXInfo(ModuleHelper):
     def __run__(self):
         output_process = make_process_list(self, **self.vars.as_dict())
         with self.runner('_list global', output_process=output_process) as ctx:
-            self.vars.application = ctx.run()
+            self.vars.application = [v for v in ctx.run().values()]
             self._capture_results(ctx)
 
     def _capture_results(self, ctx):
