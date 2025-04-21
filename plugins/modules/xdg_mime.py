@@ -66,7 +66,7 @@ EXAMPLES = r"""
       - x-scheme-handler/https
     handler: google-chrome.desktop
   register: result
-  """
+"""
 
 RETURN = r"""
 current_handlers:
