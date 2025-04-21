@@ -38,6 +38,7 @@ options:
       - The desktop file must be installed in the system.
         If the desktop file is not installed, the module
         will not fail, but the handler will not be set either.
+      - You must pass a handler in the form V(*.desktop), otherwise the module fails.
     type: str
     required: true
 notes:
