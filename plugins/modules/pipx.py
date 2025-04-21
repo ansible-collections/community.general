@@ -59,7 +59,7 @@ options:
         where the application is installed.
       - If O(name) is a simple package name without version specifiers, then that name is used as the Python package name
         to be installed.
-      - Package specifiers may be passed along, for example O(name=tox<4.0.0).
+      - Starting in community.general 10.7.0, you can use package specifiers when O(state=present) or O(state=install). For example, O(name=tox<4.0.0).
       - Use O(source) for installing from URLs or directories.
   source:
     type: str
@@ -71,6 +71,7 @@ options:
       - The value of this option is passed as-is to C(pipx).
       - O(name) is still required when using O(source) to establish the application name without fetching the package from
         a remote source.
+      - The module is not idempotent when using O(source).
   install_apps:
     description:
       - Add apps from the injected packages.
