@@ -147,6 +147,7 @@ class XdgMime(ModuleHelper):
                 self.vars.after_handlers.append(handler_value)
 
 
+
 def main():
     XdgMime.execute()
 
