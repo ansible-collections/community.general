@@ -50,7 +50,6 @@
       - "'tox' in install_tox_extras.application"
       - "install_tox_extras.application.tox.version is version('3.24.0', '>=')"
       - "install_tox_extras.application.tox.version is version('4.0.0', '<')"
-      - "'Invalid package specification' in install_tox_invalid.msg"
       - uninstall_tox_final is changed
       - "'tox' not in uninstall_tox_final.application"
 
@@ -68,3 +67,4 @@
       assert:
         that:
           - install_tox_invalid is failed
+          - "'Invalid package specification' in install_tox_invalid.msg"
