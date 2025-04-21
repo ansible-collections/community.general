@@ -94,6 +94,128 @@ from ansible.module_utils._text import to_text
 from ansible.module_utils.six import string_types
 
 
+def _type_error(obj, expected):
+    """Generate a consistent type error message.
+
+    Args:
+        obj: The object with incorrect type
+        expected: Description of expected type
+
+    Returns:
+        Formatted error message string
+    """
+    type_name = "string" if isinstance(obj, string_types) else type(obj).__name__
+    return f"Expected {expected}, got a {type_name}"
+
+
+def _validate_list_param(param, param_name, ensure_strings=True):
+    """Validate a parameter is a list and optionally ensure all elements are strings.
+
+    Args:
+        param: The parameter to validate
+        param_name: The name of the parameter for error messages
+        ensure_strings: Whether to check that all elements are strings
+
+    Raises:
+        AnsibleFilterError: If validation fails
+    """
+    # Map parameter names to their original error message format
+    error_messages = {
+        "column_order": "a list of column names",
+        "header_names": "a list of header names"
+    }
+
+    # Use the specific error message if available, otherwise use a generic one
+    error_msg = error_messages.get(param_name, f"a list for {param_name}")
+
+    if not isinstance(param, list):
+        raise AnsibleFilterError(_type_error(param, error_msg))
+
+    if ensure_strings:
+        for item in param:
+            if not isinstance(item, string_types):
+                # Maintain original error message format
+                if param_name == "column_order":
+                    error_msg = "a string for column name"
+                elif param_name == "header_names":
+                    error_msg = "a string for header name"
+                else:
+                    error_msg = f"a string for {param_name} element"
+                raise AnsibleFilterError(_type_error(item, error_msg))
+
+
+def _match_key(item_dict, lookup_key):
+    """Find a matching key in a dictionary, handling type conversion.
+
+    Args:
+        item_dict: Dictionary to search in
+        lookup_key: Key to look for, possibly needing type conversion
+
+    Returns:
+        The matching key or None if no match found
+    """
+    # Direct key match
+    if lookup_key in item_dict:
+        return lookup_key
+
+    # Try boolean conversion for 'true'/'false' strings
+    if isinstance(lookup_key, string_types):
+        if lookup_key.lower() == 'true' and True in item_dict:
+            return True
+        if lookup_key.lower() == 'false' and False in item_dict:
+            return False
+
+        # Try numeric conversion for string numbers
+        if lookup_key.isdigit() and int(lookup_key) in item_dict:
+            return int(lookup_key)
+
+    # No match found
+    return None
+
+
+def _build_key_maps(data):
+    """Build mappings between string keys and original keys.
+
+    Args:
+        data: Dictionary with keys to map
+
+    Returns:
+        Tuple of (key_map, reverse_key_map)
+    """
+    key_map = {}
+    reverse_key_map = {}
+
+    first_dict = data[0]
+    for orig_key in first_dict.keys():
+        # Store string version of the key
+        str_key = to_text(orig_key)
+        key_map[str_key] = orig_key
+        # Also store lowercase version for case-insensitive lookups
+        reverse_key_map[str_key.lower()] = orig_key
+
+    return key_map, reverse_key_map
+
+
+def _configure_alignments(table, field_names, column_alignments):
+    """Configure column alignments for the table.
+
+    Args:
+        table: The PrettyTable instance to configure
+        field_names: List of field names to align
+        column_alignments: Dict of column alignments
+    """
+    valid_alignments = {"left", "center", "right", "l", "c", "r"}
+
+    if not isinstance(column_alignments, dict):
+        return
+
+    for col_name, alignment in column_alignments.items():
+        if col_name in field_names:
+            alignment = alignment.lower()
+            if alignment in valid_alignments:
+                table.align[col_name] = alignment[0]
+
+
 def to_prettytable(data, *args, **kwargs):
     """Convert a list of dictionaries to an ASCII table.
 
@@ -117,54 +239,41 @@ def to_prettytable(data, *args, **kwargs):
     if not data:
         return "++\n++"
 
-    # Helper function for type error messages
-    def type_error(obj, expected):
-        type_name = "string" if isinstance(obj, string_types) else type(obj).__name__
-        return f"Expected {expected}, got a {type_name}"
-
+    # === Input validation ===
     # Validate list type
     if not isinstance(data, list):
-        raise AnsibleFilterError(type_error(data, "a list of dictionaries"))
+        raise AnsibleFilterError(_type_error(data, "a list of dictionaries"))
 
     # Validate dictionary items
     if data and not all(isinstance(item, dict) for item in data):
         invalid_item = next((item for item in data if not isinstance(item, dict)), None)
-        raise AnsibleFilterError(type_error(invalid_item, "all items in the list to be dictionaries"))
-
-    # Handle positional argument column order
-    column_order = kwargs.pop('column_order', None)
-    if column_order is not None and not isinstance(column_order, list):
-        raise AnsibleFilterError(type_error(column_order, "a list of column names"))
-
-    # Validate column_order elements are strings if provided
-    if column_order is not None:
-        for col in column_order:
-            if not isinstance(col, string_types):
-                raise AnsibleFilterError(type_error(col, "a string for column name"))
-
-    # Handle positional args and validate
-    if args:
-        if column_order is not None:
-            raise AnsibleFilterError("Cannot use both positional arguments and the 'column_order' keyword argument")
-
-        # Validate args contains strings
-        for arg in args:
-            if not isinstance(arg, string_types):
-                raise AnsibleFilterError(type_error(arg, "a string for column name"))
-        column_order = list(args)
-
-    # Create the table and configure it
-    table = prettytable.PrettyTable()
-    # PrettyTable expects all field names to be strings
+        raise AnsibleFilterError(_type_error(invalid_item, "all items in the list to be dictionaries"))
 
     # Get the maximum number of fields in the first dictionary
     max_fields = len(data[0].keys())
 
-    # Validate column_order doesn't exceed the number of fields
-    if column_order is not None and len(column_order) > max_fields:
-        raise AnsibleFilterError(
-            f"'column_order' has more elements ({len(column_order)}) than available fields in data ({max_fields})")
+    # === Process column order ===
+    # Handle both positional and keyword column_order
+    column_order = kwargs.pop('column_order', None)
 
+    # Check for conflict between args and column_order
+    if args and column_order is not None:
+        raise AnsibleFilterError("Cannot use both positional arguments and the 'column_order' keyword argument")
+
+    # Use positional args if provided
+    if args:
+        column_order = list(args)
+
+    # Validate column_order
+    if column_order is not None:
+        _validate_list_param(column_order, "column_order")
+
+        # Validate column_order doesn't exceed the number of fields
+        if len(column_order) > max_fields:
+            raise AnsibleFilterError(
+                f"'column_order' has more elements ({len(column_order)}) than available fields in data ({max_fields})")
+
+    # === Process headers ===
     # Determine field names and ensure they are strings
     if column_order:
         field_names = column_order
@@ -172,30 +281,23 @@ def to_prettytable(data, *args, **kwargs):
         # Use field names from first dictionary, ensuring all are strings
         field_names = [to_text(k) for k in data[0].keys()]
 
-    # Set headers
+    # Process custom headers
     header_names = kwargs.pop('header_names', None)
-    if header_names is not None and not isinstance(header_names, list):
-        raise AnsibleFilterError(type_error(header_names, "a list of header names"))
-
-    # Validate header_names elements are strings if provided
     if header_names is not None:
-        for header in header_names:
-            if not isinstance(header, string_types):
-                raise AnsibleFilterError(type_error(header, "a string for header name"))
+        _validate_list_param(header_names, "header_names")
 
-    # Validate header_names doesn't exceed the number of fields
-    if header_names is not None and len(header_names) > max_fields:
-        raise AnsibleFilterError(
-            f"'header_names' has more elements ({len(header_names)}) than available fields in data ({max_fields})")
+        # Validate header_names doesn't exceed the number of fields
+        if len(header_names) > max_fields:
+            raise AnsibleFilterError(
+                f"'header_names' has more elements ({len(header_names)}) than available fields in data ({max_fields})")
 
-    # Validate that column_order and header_names have the same size if both provided
-    if column_order is not None and header_names is not None and len(column_order) != len(header_names):
-        raise AnsibleFilterError(
-            f"'column_order' and 'header_names' must have the same number of elements. "
-            f"Got {len(column_order)} columns and {len(header_names)} headers.")
+        # Validate that column_order and header_names have the same size if both provided
+        if column_order is not None and len(column_order) != len(header_names):
+            raise AnsibleFilterError(
+                f"'column_order' and 'header_names' must have the same number of elements. "
+                f"Got {len(column_order)} columns and {len(header_names)} headers.")
 
-    table.field_names = header_names if header_names else field_names
-
+    # === Process alignments ===
     # Get column alignments and validate
     column_alignments = kwargs.pop('column_alignments', {})
 
@@ -208,51 +310,23 @@ def to_prettytable(data, *args, **kwargs):
     if kwargs:
         raise AnsibleFilterError(f"Unknown parameter(s) for to_prettytable filter: {', '.join(kwargs.keys())}")
 
-    # Important: Set the field_names FIRST - this must be done before configuring alignments
-    # If header_names is provided, use those for the table display instead of field_names
+    # === Build the table ===
+    table = prettytable.PrettyTable()
+
+    # Set the field names for display
     display_names = header_names if header_names is not None else field_names
     table.field_names = [to_text(name) for name in display_names]
 
-    # Configure alignments AFTER setting field_names
-    # The column_alignments dict keys must match the actual field names in the table
+    # Configure alignments after setting field_names
     _configure_alignments(table, display_names, column_alignments)
 
-    # Add rows - use add_row instead of add_rows for compatibility with older versions
-    # Create a robust mapping between stringified keys and original keys
+    # Build key maps only if not using explicit column_order
     key_map = {}
     reverse_key_map = {}
-
-    # Helper function for case-insensitive key lookup - returns the ORIGINAL key to be used for lookup
-    def find_key_match(item_dict, lookup_key):
-        # Direct key match
-        if lookup_key in item_dict:
-            return lookup_key
-
-        # Try boolean conversion for 'true'/'false' strings
-        if lookup_key.lower() == 'true' and True in item_dict:
-            return True
-        if lookup_key.lower() == 'false' and False in item_dict:
-            return False
-
-        # Try numeric conversion for string numbers
-        if lookup_key.isdigit() and int(lookup_key) in item_dict:
-            return int(lookup_key)
-
-        # No match found
-        return None
-
-    # Build the mapping of string representations to actual keys
     if not column_order:  # Only needed when using original dictionary keys
-        first_dict = data[0]
-        for orig_key in first_dict.keys():
-            # Store string version of the key
-            str_key = to_text(orig_key)
-            key_map[str_key] = orig_key
-            # Also store lowercase version for case-insensitive lookups
-            reverse_key_map[str_key.lower()] = orig_key
+        key_map, reverse_key_map = _build_key_maps(data)
 
     # Process each row
-    rows = []
     for item in data:
         row = []
         for col in field_names:
@@ -261,43 +335,20 @@ def to_prettytable(data, *args, **kwargs):
                 row.append(item.get(key_map[col], ""))
             else:
                 # Try to find a matching key in the item
-                matched_key = find_key_match(item, col)
+                matched_key = _match_key(item, col)
                 if matched_key is not None:
                     row.append(item.get(matched_key, ""))
                 else:
                     # Try case-insensitive lookup as last resort
-                    lower_col = col.lower()
+                    lower_col = col.lower() if isinstance(col, string_types) else str(col).lower()
                     if lower_col in reverse_key_map:
                         row.append(item.get(reverse_key_map[lower_col], ""))
                     else:
                         # No match found
                         row.append("")
-        rows.append(row)
-
-    for row in rows:
         table.add_row(row)
 
     return to_text(table)
-
-
-def _configure_alignments(table, field_names, column_alignments):
-    """Configure column alignments for the table.
-
-    Args:
-        table: The PrettyTable instance to configure
-        field_names: List of field names to align
-        column_alignments: Dict of column alignments
-    """
-    valid_alignments = {"left", "center", "right", "l", "c", "r"}
-
-    if not isinstance(column_alignments, dict):
-        return
-
-    for col_name, alignment in column_alignments.items():
-        if col_name in field_names:
-            alignment = alignment.lower()
-            if alignment in valid_alignments:
-                table.align[col_name] = alignment[0]
 
 
 class FilterModule(object):

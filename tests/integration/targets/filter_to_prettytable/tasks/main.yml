@@ -97,6 +97,23 @@
     that:
       - headers_table == expected_headers_table
 
+# Test selective column ordering with custom headers (subset of keys)
+- name: Test selective column ordering with custom headers
+  set_fact:
+    selective_ordered_headers_table: "{{ test_data | community.general.to_prettytable(column_order=['name', 'role'], header_names=['User Name', 'User Role']) }}"
+    expected_selective_headers_table: |-
+      +-----------+-----------+
+      | User Name | User Role |
+      +-----------+-----------+
+      |   Alice   |   admin   |
+      |    Bob    |    user   |
+      +-----------+-----------+
+
+- name: Verify selective column ordering with custom headers
+  assert:
+    that:
+      - selective_ordered_headers_table == expected_selective_headers_table
+
 # Test alignments
 - name: Test column alignments
   set_fact:
@@ -314,8 +331,9 @@
         role: user
         1: ID002
 
-- name: Define expected output for numeric key test
+- name: Test prettytable with mixed key types
   set_fact:
+    mixed_key_table: "{{ mixed_key_data | community.general.to_prettytable }}"
     expected_mixed_key_table: |-
       +-------+-------+-------+
       |  name |  role |   1   |
@@ -324,18 +342,15 @@
       |  Bob  |  user | ID002 |
       +-------+-------+-------+
 
-- name: Test prettytable with mixed key types
-  set_fact:
-    mixed_key_table: "{{ mixed_key_data | community.general.to_prettytable }}"
-
 - name: Verify mixed key types were handled correctly
   assert:
     that:
       - mixed_key_table == expected_mixed_key_table
 
 # Test column ordering with numeric keys
-- name: Define expected output for column ordering with numeric keys
+- name: Test column ordering with numeric keys
   set_fact:
+    mixed_ordered_table: "{{ mixed_key_data | community.general.to_prettytable(column_order=['1', 'name', 'role']) }}"
     expected_ordered_numeric_table: |-
       +-------+-------+-------+
       |   1   |  name |  role |
@@ -344,18 +359,15 @@
       | ID002 |  Bob  |  user |
       +-------+-------+-------+
 
-- name: Test column ordering with numeric keys
-  set_fact:
-    mixed_ordered_table: "{{ mixed_key_data | community.general.to_prettytable(column_order=['1', 'name', 'role']) }}"
-
 - name: Verify column ordering with numeric keys
   assert:
     that:
       - mixed_ordered_table == expected_ordered_numeric_table
 
 # Test custom headers with numeric keys
-- name: Define expected output for custom headers with numeric keys
+- name: Test custom headers with numeric keys
   set_fact:
+    mixed_headers_table: "{{ mixed_key_data | community.general.to_prettytable(header_names=['Name', 'Role', 'ID']) }}"
     expected_headers_numeric_table: |-
       +-------+-------+-------+
       |  Name |  Role |   ID  |
@@ -364,18 +376,15 @@
       |  Bob  |  user | ID002 |
       +-------+-------+-------+
 
-- name: Test custom headers with numeric keys
-  set_fact:
-    mixed_headers_table: "{{ mixed_key_data | community.general.to_prettytable(header_names=['Name', 'Role', 'ID']) }}"
-
 - name: Verify custom headers with numeric keys
   assert:
     that:
       - mixed_headers_table == expected_headers_numeric_table
 
 # Test column alignments with numeric keys
-- name: Define expected output for column alignments with numeric keys
+- name: Test column alignments with numeric keys
   set_fact:
+    mixed_aligned_table: "{{ mixed_key_data | community.general.to_prettytable(column_alignments={'1': 'right', 'name': 'left', 'role': 'center'}) }}"
     expected_aligned_numeric_table: |-
       +-------+-------+-------+
       | name  |  role |     1 |
@@ -383,10 +392,6 @@
       | Alice | admin | ID001 |
       | Bob   |  user | ID002 |
       +-------+-------+-------+
-
-- name: Test column alignments with numeric keys
-  set_fact:
-    mixed_aligned_table: "{{ mixed_key_data | community.general.to_prettytable(column_alignments={'1': 'right', 'name': 'left', 'role': 'center'}) }}"
 
 - name: Verify column alignments with numeric keys
   assert:
@@ -399,15 +404,16 @@
     boolean_data:
       - name: Alice
         role: admin
-        true: 'Yes'    # String key that would be a boolean in YAML
-        false: 'No'    # String key that would be a boolean in YAML
+        true: 'Yes'
+        false: 'No'
       - name: Bob
         role: user
         true: 'No'
         false: 'Yes'
 
-- name: Define expected output for boolean-like key test
+- name: Test prettytable with boolean-like string keys
   set_fact:
+    bool_table: "{{ boolean_data | community.general.to_prettytable }}"
     expected_bool_table: |-
       +-------+-------+------+-------+
       |  name |  role | True | False |
@@ -416,18 +422,15 @@
       |  Bob  |  user |  No  |  Yes  |
       +-------+-------+------+-------+
 
-- name: Test prettytable with boolean-like string keys
-  set_fact:
-    bool_table: "{{ boolean_data | community.general.to_prettytable }}"
-
 - name: Verify boolean-like keys were handled correctly
   assert:
     that:
       - bool_table == expected_bool_table
 
 # Test that column_order with capitalized boolean names works via case-insensitive matching
-- name: Define expected output for column ordering with boolean keys
+- name: Test column ordering with capitalized boolean names
   set_fact:
+    bool_ordered_table: "{{ boolean_data | community.general.to_prettytable(column_order=['True', 'False', 'name', 'role']) }}"
     expected_bool_ordered_table: |-
       +------+-------+-------+-------+
       | True | False |  name |  role |
@@ -436,18 +439,15 @@
       |  No  |  Yes  |  Bob  |  user |
       +------+-------+-------+-------+
 
-- name: Test column ordering with capitalized boolean names
-  set_fact:
-    bool_ordered_table: "{{ boolean_data | community.general.to_prettytable(column_order=['True', 'False', 'name', 'role']) }}"
-
 - name: Verify that 'True' in column_order works with 'true' keys
   assert:
     that:
       - bool_ordered_table == expected_bool_ordered_table
 
 # Test column alignments with boolean-like string keys
-- name: Define expected output for column alignments with boolean keys
+- name: Test column alignments with boolean-like string keys
   set_fact:
+    bool_aligned_table: "{{ boolean_data | community.general.to_prettytable(column_alignments={'true': 'right', 'false': 'center', 'name': 'left'}) }}"
     expected_bool_aligned_table: |-
       +-------+-------+------+-------+
       | name  |  role | True | False |
@@ -455,10 +455,6 @@
       | Alice | admin | Yes  |   No  |
       | Bob   |  user |  No  |  Yes  |
       +-------+-------+------+-------+
-
-- name: Test column alignments with boolean-like string keys
-  set_fact:
-    bool_aligned_table: "{{ boolean_data | community.general.to_prettytable(column_alignments={'true': 'right', 'false': 'center', 'name': 'left'}) }}"
 
 - name: Verify column alignments with boolean-like string keys
   assert:
