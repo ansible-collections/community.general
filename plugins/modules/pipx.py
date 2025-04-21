@@ -153,7 +153,7 @@ options:
     version_added: 9.4.0
 requirements:
   - When using O(name) with version specifiers, the Python package `packaging` is required.
-  - If the package `packaging` is at a cersion lesse than `22.0.0`, it will fail silently when processing invalid specifiers, like `tox<<<<4.0`.
+  - If the package `packaging` is at a version lesser than `22.0.0`, it will fail silently when processing invalid specifiers, like `tox<<<<4.0`.
 author:
   - "Alexei Znamensky (@russoz)"
 """
