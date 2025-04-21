@@ -5,6 +5,8 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+# TODO: Add support for diff mode
+
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
@@ -22,7 +24,7 @@ attributes:
   check_mode:
     support: full
   diff_mode:
-    support: full
+    support: none
 options:
   mime_type:
     description:
@@ -66,18 +68,9 @@ EXAMPLES = r"""
   """
 
 RETURN = r"""
-after_handlers:
+current_handlers:
   description:
-    - List of handlers set by the module.
-  returned: success
-  type: list
-  elements: str
-  sample:
-    - google-chrome.desktop
-    - google-chrome.desktop
-before_handlers:
-  description:
-    - List of handlers currently set.
+    - Currently set handlers for the passed MIME types.
   returned: success
   type: list
   elements: str
@@ -96,8 +89,9 @@ from ansible_collections.community.general.plugins.module_utils.xdg_mime import 
 
 
 class XdgMime(ModuleHelper):
-    output_params = ['before_handlers', 'after_handlers']
-    diff_params = ['before_handlers', 'after_handlers']
+    output_params = ('current_handlers')
+    diff_params = ('mime_type', 'handler', 'current_handlers')
+
     module = dict(
         argument_spec=dict(
             mime_type=dict(type='list', elements='str', required=True),
@@ -114,12 +108,12 @@ class XdgMime(ModuleHelper):
             rc, out, err = ctx.run()
             self.vars.version = out.replace("xdg-mime ", "").strip()
 
-        self.vars.before_handlers = []
+        self.vars.current_handlers = []
         for mime in self.vars.mime_type:
             handler_value = xdg_mime_get(self.runner, mime)
             if not handler_value:
                 handler_value = ''
-            self.vars.before_handlers.append(handler_value)
+            self.vars.current_handlers.append(handler_value)
 
     def __run__(self):
         check_mode_return = (0, 'Module executed in check mode', '')
@@ -127,24 +121,15 @@ class XdgMime(ModuleHelper):
         if not self.vars.handler.endswith(".desktop"):
             self.do_raise(msg="Handler must be a .desktop file")
 
-        if any(h != self.vars.handler for h in self.vars.before_handlers):
+        if any(h != self.vars.handler for h in self.vars.current_handlers):
             self.changed = True
 
-        if self.vars.has_changed:
+        if self.has_changed():
             with self.runner.context(args_order="default handler mime_type", check_mode_skip=True, check_mode_return=check_mode_return) as ctx:
                 rc, out, err = ctx.run()
                 self.vars.stdout = out
                 self.vars.stderr = err
                 self.vars.set("run_info", ctx.run_info, verbosity=1)
-
-        self.vars.after_handlers = []
-        for mime in self.vars.mime_type:
-            if not self.check_mode:
-                handler_value = xdg_mime_get(self.runner, mime)
-            else:
-                handler_value = self.vars.handler
-            if handler_value:
-                self.vars.after_handlers.append(handler_value)
 
 
 def main():
