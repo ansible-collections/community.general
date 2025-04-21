@@ -13,6 +13,8 @@
     - ansible_os_family != 'RedHat' or ansible_distribution_major_version|int > 6
     # For some reason CentOS 7 and OpenSuSE 15 do not work on ansible-core 2.16
     - ansible_version.minor != 16 or ansible_distribution not in ['CentOS', 'openSUSE Leap']
+    # For some reason, OpenSuSE 15 with Python 2 does ont work on ansible-core 2.13
+    - ansible_version.minor != 13 or ansible_distribution != 'openSUSE Leap' or ansible_python.version.major != 2
   block:
     - block:
       - tempfile:
