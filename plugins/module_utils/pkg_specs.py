@@ -23,17 +23,17 @@ class PackageVersion:
     def parse_package_name(self, name):
         """
         Parse a package name that may include version specifiers using PEP 508.
-        Returns a tuple of (name, version_spec) where version_spec may be None.
+        Returns a tuple of (name, requirement) where requirement is of type packaging.requirements.Requirement and it may be None.
 
         Example inputs:
-            "package"                     -> ("package", None)
-            "package>=1.0"                -> ("package", ">=1.0")
-            "package>=1.0,<2.0"           -> ("package", ">=1.0,<2.0")
-            "package[extra]>=1.0"         -> ("package", "[extra]>=1.0")
-            "package[foo,bar]>=1.0,!=1.5" -> ("package", "[foo,bar]>=1.0,!=1.5")
+            "package"
+            "package>=1.0"
+            "package>=1.0,<2.0"
+            "package[extra]>=1.0"
+            "package[foo,bar]>=1.0,!=1.5"
 
         :param name: Package name with optional version specifiers and extras
-        :return: Tuple of (name, version_spec)
+        :return: Tuple of (name, requirement)
         :raises ValueError: If the package specification is invalid
         """
         if not name:
@@ -58,8 +58,8 @@ class PackageVersion:
 
         :param version_str: Version string to check
         :param requirement: Requirement object (packaging.requirements.Requirement)
-        :return: True if version fulfills the spec, False otherwise
-        :raises ValueError: If version_str or spec_str is invalid
+        :return: True if version fulfills the requirement, False otherwise
+        :raises ValueError: If version_str is invalid
         """
         # If no spec provided, any version is valid
         if not requirement:
