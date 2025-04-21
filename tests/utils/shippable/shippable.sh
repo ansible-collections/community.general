@@ -67,10 +67,6 @@ fi
 
 export ANSIBLE_COLLECTIONS_PATHS="${PWD}/../../../"
 
-if [ "${test}" == "sanity/extra" ]; then
-    retry pip install junit-xml --disable-pip-version-check
-fi
-
 # START: HACK install dependencies
 
 # Nothing further should be added to this list.
@@ -79,7 +75,7 @@ retry git clone --depth=1 --single-branch https://github.com/ansible-collections
 # NOTE: we're installing with git to work around Galaxy being a huge PITA (https://github.com/ansible/galaxy/issues/2429)
 # retry ansible-galaxy -vvv collection install community.internal_test_tools
 
-if [ "${script}" != "sanity" ] && [ "${script}" != "units" ] && [ "${test}" != "sanity/extra" ]; then
+if [ "${script}" != "sanity" ] && [ "${script}" != "units" ]; then
     # To prevent Python dependencies on other collections only install other collections for integration tests
     retry git clone --depth=1 --single-branch https://github.com/ansible-collections/ansible.posix.git "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/ansible/posix"
     retry git clone --depth=1 --single-branch https://github.com/ansible-collections/community.crypto.git "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/crypto"
