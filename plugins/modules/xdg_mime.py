@@ -42,7 +42,7 @@ options:
     type: str
     required: true
 notes:
-  - This module is a thin wrapper around xdg-mime tool.
+  - This module is a thin wrapper around C(xdg-mime) tool.
   - See man xdg-mime(1) for more details.
 seealso:
   - name: C(xdg-mime) command manual page
