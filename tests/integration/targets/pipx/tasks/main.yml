@@ -6,7 +6,7 @@
 - name: Determine pipx level
   block:
     - name: Install pipx>=1.7.0
-      pip:
+      ansible.builtin.pip:
         name: pipx>=1.7.0
     - name: Set has_pipx170 fact true
       ansible.builtin.set_fact:
@@ -16,9 +16,24 @@
       ansible.builtin.set_fact:
         has_pipx170: false
     - name: Install pipx (no version spec)
-      pip:
+      ansible.builtin.pip:
         name: pipx
 
+- name: Determine packaging level
+  block:
+    - name: Install packaging>=22.0
+      ansible.builtin.pip:
+        name: packaging>=22.0
+    - name: Set has_packaging22 fact true
+      ansible.builtin.set_fact:
+        has_packaging22: true
+  rescue:
+    - name: Set has_packaging22 fact false
+      ansible.builtin.set_fact:
+        has_packaging22: false
+    - name: Install has_packaging (no version spec)
+      ansible.builtin.pip:
+        name: packaging
 
 ##############################################################################
 - name: ensure application tox is uninstalled
