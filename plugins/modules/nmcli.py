@@ -1121,7 +1121,7 @@ options:
 
 EXAMPLES = r"""
 # These examples are using the following inventory:
-
+#
 # ## Directory layout:
 #
 # |_/inventory/cloud-hosts
@@ -1132,7 +1132,7 @@ EXAMPLES = r"""
 # |          /playbook-add.yml
 # |          /playbook-del.yml
 # ```
-
+#
 # ## inventory examples
 # ### groups_vars
 # ```yml
