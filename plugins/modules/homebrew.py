@@ -402,8 +402,8 @@ class Homebrew(object):
         # Issue #9803: name can include the tap as a prefix, in order to
         # disambiguate, e.g. casks from identically named formulae.
         #
-        # Issue #10012: package_detail["tap"] is None if package is no longer
-        # available.
+        # Issue https://github.com/ansible-collections/community.general/issues/10012:
+        # package_detail["tap"] is None if package is no longer available.
         tapped_name = [package_detail["tap"] + "/" + name] if package_detail["tap"] else []
         aliases = package_detail.get("aliases", [])
         package_names = set([name, full_name] + tapped_name + aliases)
