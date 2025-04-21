@@ -964,6 +964,10 @@ plugin_routing:
       redirect: community.docker.docker_swarm
     kubevirt:
       redirect: community.kubevirt.kubevirt
+    stackpath_compute:
+      deprecation:
+        removal_version: 11.0.0
+        warning_text: The company and the service were sunset in June 2024.
   filter:
     path_join:
       # The ansible.builtin.path_join filter has been added in ansible-base 2.10.
