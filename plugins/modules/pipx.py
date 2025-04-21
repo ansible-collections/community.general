@@ -60,6 +60,9 @@ options:
       - If O(name) is a simple package name without version specifiers, then that name is used as the Python package name
         to be installed.
       - Starting in community.general 10.7.0, you can use package specifiers when O(state=present) or O(state=install). For example, O(name=tox<4.0.0).
+      - Please note that when you use O(sate=present) and O(name) with version specifiers, the module will NOT reinstall/upgrade/downgrade the
+        application, even if the version specifier is not satisfied by the existing application. To ensure the reinstallation of the application
+        you must use O(force=true).
       - Use O(source) for installing from URLs or directories.
   source:
     type: str
@@ -95,6 +98,7 @@ options:
     description:
       - Force modification of the application's virtual environment. See C(pipx) for details.
       - Only used when O(state=install), O(state=upgrade), O(state=upgrade_all), O(state=latest), or O(state=inject).
+      - The module is not idempotent when O(force=true).
     type: bool
     default: false
   include_injected:
@@ -147,7 +151,11 @@ options:
         with O(community.general.pipx_info#module:include_raw=true) and obtaining the content from the RV(community.general.pipx_info#module:raw_output).
     type: path
     version_added: 9.4.0
+requirements:
+  - When using O(name) with version specifiers, the Python package `packaging` is required.
+  - If the package `packaging` is at a cersion lesse than `22.0.0`, it will fail silently when processing invalid specifiers, like `tox<<<<4.0`.
 notes:
+  -
   - This first implementation does not verify whether a specified version constraint has been installed or not. Hence, when
     using version operators, C(pipx) module will always try to execute the operation, even when the application was previously
     installed. This feature will be added in the future.
@@ -262,18 +270,13 @@ class PipX(StateModuleHelper):
     use_old_vardict = False
 
     def _retrieve_installed(self):
-        name = _make_name(self.parsed_name, self.vars.suffix)
         output_process = make_process_list(self, include_injected=True)
         installed = self.runner('_list global', output_process=output_process).run()
 
-        if name is not None:
-            return {
-                k: v
-                for k, v in installed.items()
-                if k == name and self.package_version.version_fulfills_spec(v['version'], self.parsed_req)
-            }
+        if self.app_name is None:
+            return installed
 
-        return installed
+        return {k: v for k, v in installed.items() if k == self.app_name}
 
     def __init_module__(self):
         if self.vars.executable:
@@ -284,6 +287,7 @@ class PipX(StateModuleHelper):
         self.runner = pipx_runner(self.module, self.command)
         self.package_version = PackageVersion(self.module)
         self.parsed_name, self.parsed_req = self.package_version.parse_package_name(self.vars.name)
+        self.app_name = _make_name(self.parsed_name, self.vars.suffix)
 
         self.vars.set('application', self._retrieve_installed(), change=True, diff=True)
 
@@ -305,7 +309,7 @@ class PipX(StateModuleHelper):
         if self.parsed_req and not self.vars.source:
             self.vars.source = self.vars.name
 
-        if not self.vars.application or self.vars.force:
+        if self.vars.force or not self.vars.application.get(self.app_name):
             self.changed = True
             args_order = 'state global index_url install_deps force python system_site_packages editable pip_args suffix name_source'
             with self.runner(args_order, check_mode_skip=True) as ctx:

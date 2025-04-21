@@ -33,6 +33,17 @@
   register: install_tox_extras
   ignore_errors: true  # Some versions might not have this extra
 
+- name: Install tox with higher version specifier
+  community.general.pipx:
+    name: "tox>=4.0.0"
+  register: install_tox_higher_version
+
+- name: Install tox with higher version specifier (force)
+  community.general.pipx:
+    name: "tox>=4.0.0"
+    force: true
+  register: install_tox_higher_version_force
+
 - name: Cleanup tox
   community.general.pipx:
     state: absent
@@ -50,6 +61,8 @@
       - "'tox' in install_tox_extras.application"
       - "install_tox_extras.application.tox.version is version('3.24.0', '>=')"
       - "install_tox_extras.application.tox.version is version('4.0.0', '<')"
+      - install_tox_higher_version is not changed
+      - install_tox_higher_version_force is changed
       - uninstall_tox_final is changed
       - "'tox' not in uninstall_tox_final.application"
 
