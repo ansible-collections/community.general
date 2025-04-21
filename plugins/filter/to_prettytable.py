@@ -57,6 +57,10 @@ EXAMPLES = '''
   debug:
     msg: "{{ users | community.general.to_prettytable('role', 'name', 'age') }}"
 
+- name: Display a table with selective column output (only show name and role fields)
+  debug:
+    msg: "{{ users | community.general.to_prettytable(column_order=['name', 'role']) }}"
+
 - name: Display a table with custom headers
   debug:
     msg: "{{ users | community.general.to_prettytable(header_names=['User Name', 'User Age', 'User Role']) }}"
@@ -131,30 +135,145 @@ def to_prettytable(data, *args, **kwargs):
     column_order = kwargs.pop('column_order', None)
     if column_order is not None and not isinstance(column_order, list):
         raise AnsibleFilterError(type_error(column_order, "a list of column names"))
-    if args and not column_order:
+
+    # Validate column_order elements are strings if provided
+    if column_order is not None:
+        for col in column_order:
+            if not isinstance(col, string_types):
+                raise AnsibleFilterError(type_error(col, "a string for column name"))
+
+    # Handle positional args and validate
+    if args:
+        if column_order is not None:
+            raise AnsibleFilterError("Cannot use both positional arguments and the 'column_order' keyword argument")
+
+        # Validate args contains strings
+        for arg in args:
+            if not isinstance(arg, string_types):
+                raise AnsibleFilterError(type_error(arg, "a string for column name"))
         column_order = list(args)
 
     # Create the table and configure it
     table = prettytable.PrettyTable()
+    # PrettyTable expects all field names to be strings
 
-    # Determine field names
-    field_names = column_order or list(data[0].keys())
+    # Get the maximum number of fields in the first dictionary
+    max_fields = len(data[0].keys())
+
+    # Validate column_order doesn't exceed the number of fields
+    if column_order is not None and len(column_order) > max_fields:
+        raise AnsibleFilterError(
+            f"'column_order' has more elements ({len(column_order)}) than available fields in data ({max_fields})")
+
+    # Determine field names and ensure they are strings
+    if column_order:
+        field_names = column_order
+    else:
+        # Use field names from first dictionary, ensuring all are strings
+        field_names = [to_text(k) for k in data[0].keys()]
 
     # Set headers
     header_names = kwargs.pop('header_names', None)
     if header_names is not None and not isinstance(header_names, list):
         raise AnsibleFilterError(type_error(header_names, "a list of header names"))
+
+    # Validate header_names elements are strings if provided
+    if header_names is not None:
+        for header in header_names:
+            if not isinstance(header, string_types):
+                raise AnsibleFilterError(type_error(header, "a string for header name"))
+
+    # Validate header_names doesn't exceed the number of fields
+    if header_names is not None and len(header_names) > max_fields:
+        raise AnsibleFilterError(
+            f"'header_names' has more elements ({len(header_names)}) than available fields in data ({max_fields})")
+
+    # Validate that column_order and header_names have the same size if both provided
+    if column_order is not None and header_names is not None and len(column_order) != len(header_names):
+        raise AnsibleFilterError(
+            f"'column_order' and 'header_names' must have the same number of elements. "
+            f"Got {len(column_order)} columns and {len(header_names)} headers.")
+
     table.field_names = header_names if header_names else field_names
 
-    # Configure alignments
-    _configure_alignments(table, field_names, kwargs.pop('column_alignments', {}))
+    # Get column alignments and validate
+    column_alignments = kwargs.pop('column_alignments', {})
+
+    # Validate column_alignments doesn't have more keys than fields
+    if isinstance(column_alignments, dict) and len(column_alignments) > max_fields:
+        raise AnsibleFilterError(
+            f"'column_alignments' has more elements ({len(column_alignments)}) than available fields in data ({max_fields})")
 
     # Check for unknown parameters
     if kwargs:
         raise AnsibleFilterError(f"Unknown parameter(s) for to_prettytable filter: {', '.join(kwargs.keys())}")
 
+    # Important: Set the field_names FIRST - this must be done before configuring alignments
+    # If header_names is provided, use those for the table display instead of field_names
+    display_names = header_names if header_names is not None else field_names
+    table.field_names = [to_text(name) for name in display_names]
+
+    # Configure alignments AFTER setting field_names
+    # The column_alignments dict keys must match the actual field names in the table
+    _configure_alignments(table, display_names, column_alignments)
+
     # Add rows - use add_row instead of add_rows for compatibility with older versions
-    rows = [[item.get(col, "") for col in field_names] for item in data]
+    # Create a robust mapping between stringified keys and original keys
+    key_map = {}
+    reverse_key_map = {}
+
+    # Helper function for case-insensitive key lookup - returns the ORIGINAL key to be used for lookup
+    def find_key_match(item_dict, lookup_key):
+        # Direct key match
+        if lookup_key in item_dict:
+            return lookup_key
+
+        # Try boolean conversion for 'true'/'false' strings
+        if lookup_key.lower() == 'true' and True in item_dict:
+            return True
+        if lookup_key.lower() == 'false' and False in item_dict:
+            return False
+
+        # Try numeric conversion for string numbers
+        if lookup_key.isdigit() and int(lookup_key) in item_dict:
+            return int(lookup_key)
+
+        # No match found
+        return None
+
+    # Build the mapping of string representations to actual keys
+    if not column_order:  # Only needed when using original dictionary keys
+        first_dict = data[0]
+        for orig_key in first_dict.keys():
+            # Store string version of the key
+            str_key = to_text(orig_key)
+            key_map[str_key] = orig_key
+            # Also store lowercase version for case-insensitive lookups
+            reverse_key_map[str_key.lower()] = orig_key
+
+    # Process each row
+    rows = []
+    for item in data:
+        row = []
+        for col in field_names:
+            # Try direct mapping first
+            if col in key_map:
+                row.append(item.get(key_map[col], ""))
+            else:
+                # Try to find a matching key in the item
+                matched_key = find_key_match(item, col)
+                if matched_key is not None:
+                    row.append(item.get(matched_key, ""))
+                else:
+                    # Try case-insensitive lookup as last resort
+                    lower_col = col.lower()
+                    if lower_col in reverse_key_map:
+                        row.append(item.get(reverse_key_map[lower_col], ""))
+                    else:
+                        # No match found
+                        row.append("")
+        rows.append(row)
+
     for row in rows:
         table.add_row(row)
 

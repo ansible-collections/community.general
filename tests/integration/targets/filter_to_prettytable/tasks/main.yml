@@ -33,14 +33,13 @@
 - name: Test basic table creation
   set_fact:
     basic_table: '{{ test_data | community.general.to_prettytable }}'
-
-- name: Load expected basic table output
-  set_fact:
-    expected_basic_table_raw: "{{ lookup('file', 'basic_table.txt') }}"
-
-- name: Remove copyright header from expected output
-  set_fact:
-    expected_basic_table: "{{ expected_basic_table_raw.split('\n')[4:] | join('\n') }}"
+    expected_basic_table: |-
+      +-------+-----+-------+
+      |  name | age |  role |
+      +-------+-----+-------+
+      | Alice |  25 | admin |
+      |  Bob  |  30 |  user |
+      +-------+-----+-------+
 
 - name: Verify basic table output
   assert:
@@ -51,32 +50,47 @@
 - name: Test column ordering
   set_fact:
     ordered_table: "{{ test_data | community.general.to_prettytable(column_order=['role', 'name', 'age']) }}"
-
-- name: Load expected ordered table output
-  set_fact:
-    expected_ordered_table_raw: "{{ lookup('file', 'ordered_table.txt') }}"
-
-- name: Remove copyright header from expected output
-  set_fact:
-    expected_ordered_table: "{{ expected_ordered_table_raw.split('\n')[4:] | join('\n') }}"
+    expected_ordered_table: |-
+      +-------+-------+-----+
+      |  role |  name | age |
+      +-------+-------+-----+
+      | admin | Alice |  25 |
+      |  user |  Bob  |  30 |
+      +-------+-------+-----+
 
 - name: Verify ordered table output
   assert:
     that:
       - ordered_table == expected_ordered_table
 
+# Test selective column ordering (subset of keys)
+- name: Test selective column ordering
+  set_fact:
+    selective_ordered_table: "{{ test_data | community.general.to_prettytable(column_order=['name', 'role']) }}"
+    expected_selective_table: |-
+      +-------+-------+
+      |  name |  role |
+      +-------+-------+
+      | Alice | admin |
+      |  Bob  |  user |
+      +-------+-------+
+
+- name: Verify selective column ordering
+  assert:
+    that:
+      - selective_ordered_table == expected_selective_table
+
 # Test custom headers
 - name: Test custom headers
   set_fact:
     headers_table: "{{ test_data | community.general.to_prettytable(header_names=['User Name', 'User Age', 'User Role']) }}"
-
-- name: Load expected headers table output
-  set_fact:
-    expected_headers_table_raw: "{{ lookup('file', 'custom_headers.txt') }}"
-
-- name: Remove copyright header from expected output
-  set_fact:
-    expected_headers_table: "{{ expected_headers_table_raw.split('\n')[4:] | join('\n') }}"
+    expected_headers_table: |-
+      +-----------+----------+-----------+
+      | User Name | User Age | User Role |
+      +-----------+----------+-----------+
+      |   Alice   |    25    |   admin   |
+      |    Bob    |    30    |    user   |
+      +-----------+----------+-----------+
 
 - name: Verify custom headers output
   assert:
@@ -87,14 +101,12 @@
 - name: Test column alignments
   set_fact:
     aligned_table: "{{ data_for_align | community.general.to_prettytable(column_alignments={'amount': 'right', 'description': 'left', 'date': 'center'}) }}"
-
-- name: Load expected aligned table output
-  set_fact:
-    expected_aligned_table_raw: "{{ lookup('file', 'aligned_table.txt') }}"
-
-- name: Remove copyright header from expected output
-  set_fact:
-    expected_aligned_table: "{{ expected_aligned_table_raw.split('\n')[4:] | join('\n') }}"
+    expected_aligned_table: |-
+      +------------+-----------------+--------+
+      |    date    | description     | amount |
+      +------------+-----------------+--------+
+      | 2023-01-01 | Office supplies | 123.45 |
+      +------------+-----------------+--------+
 
 - name: Verify aligned table output
   assert:
@@ -107,15 +119,14 @@
     combined_table: "{{ test_data | community.general.to_prettytable(
         column_order=['role', 'name', 'age'],
         header_names=['Position', 'Full Name', 'Years'],
-        column_alignments={'name': 'center', 'age': 'right', 'role': 'left'}) }}"
-
-- name: Load expected combined table output
-  set_fact:
-    expected_combined_table_raw: "{{ lookup('file', 'combined_table.txt') }}"
-
-- name: Remove copyright header from expected output
-  set_fact:
-    expected_combined_table: "{{ expected_combined_table_raw.split('\n')[4:] | join('\n') }}"
+        column_alignments={'role': 'left', 'name': 'center', 'age': 'right'}) }}"
+    expected_combined_table: |-
+      +----------+-----------+-------+
+      | Position | Full Name | Years |
+      +----------+-----------+-------+
+      |  admin   |   Alice   |   25  |
+      |   user   |    Bob    |   30  |
+      +----------+-----------+-------+
 
 - name: Verify combined table output
   assert:
@@ -126,14 +137,9 @@
 - name: Test empty data list
   set_fact:
     empty_table: "{{ [] | community.general.to_prettytable }}"
-
-- name: Load expected empty table output
-  set_fact:
-    expected_empty_table_raw: "{{ lookup('file', 'empty_table.txt') }}"
-
-- name: Remove copyright header from expected output
-  set_fact:
-    expected_empty_table: "{{ expected_empty_table_raw.split('\n')[4:] | join('\n') }}"
+    expected_empty_table: |-
+      ++
+      ++
 
 - name: Verify empty table output
   assert:
@@ -200,3 +206,261 @@
         that:
           - failure_result is failed
           - "'Unknown parameter(s) for to_prettytable filter: unknown_param' in failure_result.msg"
+
+- name: Test both positional args and column_order (expect failure)
+  block:
+    - set_fact:
+        invalid_table: "{{ test_data | community.general.to_prettytable('role', 'name', column_order=['name', 'age', 'role']) }}"
+      register: failure_result
+      ignore_errors: true
+    - name: Verify error message for using both positional args and column_order
+      assert:
+        that:
+          - failure_result is failed
+          - '"Cannot use both positional arguments and the ''column_order'' keyword argument" in failure_result.msg'
+
+- name: Test non-string values in positional args (expect failure)
+  block:
+    - set_fact:
+        invalid_table: "{{ test_data | community.general.to_prettytable('name', 123, 'role') }}"
+      register: failure_result
+      ignore_errors: true
+    - name: Verify error message for non-string values in positional args
+      assert:
+        that:
+          - failure_result is failed
+          - "'Expected a string for column name, got a int' in failure_result.msg"
+
+- name: Test non-string values in column_order (expect failure)
+  block:
+    - set_fact:
+        invalid_table: "{{ test_data | community.general.to_prettytable(column_order=['name', 123, 'role']) }}"
+      register: failure_result
+      ignore_errors: true
+    - name: Verify error message for non-string values in column_order
+      assert:
+        that:
+          - failure_result is failed
+          - "'Expected a string for column name, got a int' in failure_result.msg"
+
+- name: Test non-string values in header_names (expect failure)
+  block:
+    - set_fact:
+        invalid_table: "{{ test_data | community.general.to_prettytable(header_names=['User Name', 456, 'User Role']) }}"
+      register: failure_result
+      ignore_errors: true
+    - name: Verify error message for non-string values in header_names
+      assert:
+        that:
+          - failure_result is failed
+          - "'Expected a string for header name, got a int' in failure_result.msg"
+
+- name: Test mismatched sizes of column_order and header_names (expect failure)
+  block:
+    - set_fact:
+        invalid_table: "{{ test_data | community.general.to_prettytable(column_order=['name', 'age', 'role'], header_names=['User Name', 'User Age']) }}"
+      register: failure_result
+      ignore_errors: true
+    - name: Verify error message for mismatched sizes
+      assert:
+        that:
+          - failure_result is failed
+          - "\"'column_order' and 'header_names' must have the same number of elements\" in failure_result.msg"
+
+- name: Test column_order with more elements than available fields (expect failure)
+  block:
+    - set_fact:
+        invalid_table: "{{ test_data | community.general.to_prettytable(column_order=['name', 'age', 'role', 'extra_field', 'another_extra']) }}"
+      register: failure_result
+      ignore_errors: true
+    - name: Verify error message for column_order with too many elements
+      assert:
+        that:
+          - failure_result is failed
+          - "\"'column_order' has more elements\" in failure_result.msg"
+
+- name: Test header_names with more elements than available fields (expect failure)
+  block:
+    - set_fact:
+        invalid_table: "{{ test_data | community.general.to_prettytable(header_names=['User Name', 'User Age', 'User Role', 'Extra Field', 'Another Extra']) }}"
+      register: failure_result
+      ignore_errors: true
+    - name: Verify error message for header_names with too many elements
+      assert:
+        that:
+          - failure_result is failed
+          - "\"'header_names' has more elements\" in failure_result.msg"
+
+- name: Test column_alignments with more elements than available fields (expect failure)
+  block:
+    - set_fact:
+        invalid_table: "{{ test_data | community.general.to_prettytable(column_alignments={'name': 'left', 'age': 'right', 'role': 'center', 'extra_field': 'left', 'another_extra': 'center'}) }}"
+      register: failure_result
+      ignore_errors: true
+    - name: Verify error message for column_alignments with too many elements
+      assert:
+        that:
+          - failure_result is failed
+          - "\"'column_alignments' has more elements\" in failure_result.msg"
+
+# Test using explicit python script to create dictionary with mixed key types
+- name: Create test data with numeric keys
+  set_fact:
+    mixed_key_data:
+      - name: Alice
+        role: admin
+        1: ID001
+      - name: Bob
+        role: user
+        1: ID002
+
+- name: Define expected output for numeric key test
+  set_fact:
+    expected_mixed_key_table: |-
+      +-------+-------+-------+
+      |  name |  role |   1   |
+      +-------+-------+-------+
+      | Alice | admin | ID001 |
+      |  Bob  |  user | ID002 |
+      +-------+-------+-------+
+
+- name: Test prettytable with mixed key types
+  set_fact:
+    mixed_key_table: "{{ mixed_key_data | community.general.to_prettytable }}"
+
+- name: Verify mixed key types were handled correctly
+  assert:
+    that:
+      - mixed_key_table == expected_mixed_key_table
+
+# Test column ordering with numeric keys
+- name: Define expected output for column ordering with numeric keys
+  set_fact:
+    expected_ordered_numeric_table: |-
+      +-------+-------+-------+
+      |   1   |  name |  role |
+      +-------+-------+-------+
+      | ID001 | Alice | admin |
+      | ID002 |  Bob  |  user |
+      +-------+-------+-------+
+
+- name: Test column ordering with numeric keys
+  set_fact:
+    mixed_ordered_table: "{{ mixed_key_data | community.general.to_prettytable(column_order=['1', 'name', 'role']) }}"
+
+- name: Verify column ordering with numeric keys
+  assert:
+    that:
+      - mixed_ordered_table == expected_ordered_numeric_table
+
+# Test custom headers with numeric keys
+- name: Define expected output for custom headers with numeric keys
+  set_fact:
+    expected_headers_numeric_table: |-
+      +-------+-------+-------+
+      |  Name |  Role |   ID  |
+      +-------+-------+-------+
+      | Alice | admin | ID001 |
+      |  Bob  |  user | ID002 |
+      +-------+-------+-------+
+
+- name: Test custom headers with numeric keys
+  set_fact:
+    mixed_headers_table: "{{ mixed_key_data | community.general.to_prettytable(header_names=['Name', 'Role', 'ID']) }}"
+
+- name: Verify custom headers with numeric keys
+  assert:
+    that:
+      - mixed_headers_table == expected_headers_numeric_table
+
+# Test column alignments with numeric keys
+- name: Define expected output for column alignments with numeric keys
+  set_fact:
+    expected_aligned_numeric_table: |-
+      +-------+-------+-------+
+      | name  |  role |     1 |
+      +-------+-------+-------+
+      | Alice | admin | ID001 |
+      | Bob   |  user | ID002 |
+      +-------+-------+-------+
+
+- name: Test column alignments with numeric keys
+  set_fact:
+    mixed_aligned_table: "{{ mixed_key_data | community.general.to_prettytable(column_alignments={'1': 'right', 'name': 'left', 'role': 'center'}) }}"
+
+- name: Verify column alignments with numeric keys
+  assert:
+    that:
+      - mixed_aligned_table == expected_aligned_numeric_table
+
+# Test with boolean-like string keys
+- name: Create test data with boolean-like string keys
+  set_fact:
+    boolean_data:
+      - name: Alice
+        role: admin
+        true: 'Yes'    # String key that would be a boolean in YAML
+        false: 'No'    # String key that would be a boolean in YAML
+      - name: Bob
+        role: user
+        true: 'No'
+        false: 'Yes'
+
+- name: Define expected output for boolean-like key test
+  set_fact:
+    expected_bool_table: |-
+      +-------+-------+------+-------+
+      |  name |  role | True | False |
+      +-------+-------+------+-------+
+      | Alice | admin | Yes  |   No  |
+      |  Bob  |  user |  No  |  Yes  |
+      +-------+-------+------+-------+
+
+- name: Test prettytable with boolean-like string keys
+  set_fact:
+    bool_table: "{{ boolean_data | community.general.to_prettytable }}"
+
+- name: Verify boolean-like keys were handled correctly
+  assert:
+    that:
+      - bool_table == expected_bool_table
+
+# Test that column_order with capitalized boolean names works via case-insensitive matching
+- name: Define expected output for column ordering with boolean keys
+  set_fact:
+    expected_bool_ordered_table: |-
+      +------+-------+-------+-------+
+      | True | False |  name |  role |
+      +------+-------+-------+-------+
+      | Yes  |   No  | Alice | admin |
+      |  No  |  Yes  |  Bob  |  user |
+      +------+-------+-------+-------+
+
+- name: Test column ordering with capitalized boolean names
+  set_fact:
+    bool_ordered_table: "{{ boolean_data | community.general.to_prettytable(column_order=['True', 'False', 'name', 'role']) }}"
+
+- name: Verify that 'True' in column_order works with 'true' keys
+  assert:
+    that:
+      - bool_ordered_table == expected_bool_ordered_table
+
+# Test column alignments with boolean-like string keys
+- name: Define expected output for column alignments with boolean keys
+  set_fact:
+    expected_bool_aligned_table: |-
+      +-------+-------+------+-------+
+      | name  |  role | True | False |
+      +-------+-------+------+-------+
+      | Alice | admin | Yes  |   No  |
+      | Bob   |  user |  No  |  Yes  |
+      +-------+-------+------+-------+
+
+- name: Test column alignments with boolean-like string keys
+  set_fact:
+    bool_aligned_table: "{{ boolean_data | community.general.to_prettytable(column_alignments={'true': 'right', 'false': 'center', 'name': 'left'}) }}"
+
+- name: Verify column alignments with boolean-like string keys
+  assert:
+    that:
+      - bool_aligned_table == expected_bool_aligned_table
