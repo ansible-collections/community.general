@@ -1,0 +1,48 @@
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-FileCopyrightText: 2025 Felix Fontein <felix@fontein.de>
+
+[collection_sources]
+"ansible.posix" = "git+https://github.com/ansible-collections/ansible.posix.git,main"
+"community.crypto" = "git+https://github.com/ansible-collections/community.crypto.git,main"
+"community.docker" = "git+https://github.com/ansible-collections/community.docker.git,main"
+"community.internal_test_tools" = "git+https://github.com/ansible-collections/community.internal_test_tools.git,main"
+
+[sessions]
+
+[sessions.docs_check]
+validate_collection_refs="all"
+
+[sessions.license_check]
+
+[sessions.extra_checks]
+run_no_unwanted_files = true
+no_unwanted_files_module_extensions = [".py"]
+no_unwanted_files_yaml_extensions = [".yml"]
+run_action_groups = true
+
+[[sessions.extra_checks.action_groups_config]]
+name = "consul"
+pattern = "^consul_.*$"
+exclusions = [
+    "consul_acl_bootstrap",
+    "consul_kv",
+]
+doc_fragment = "community.general.consul.actiongroup_consul"
+
+[[sessions.extra_checks.action_groups_config]]
+name = "keycloak"
+pattern = "^keycloak_.*$"
+exclusions = [
+    "keycloak_realm_info",
+]
+doc_fragment = "community.general.keycloak.actiongroup_keycloak"
+
+[[sessions.extra_checks.action_groups_config]]
+name = "proxmox"
+pattern = "^proxmox(_.*)?$"
+exclusions = []
+doc_fragment = "community.general.proxmox.actiongroup_proxmox"
+
+[sessions.build_import_check]
+run_galaxy_importer = true
