@@ -1126,7 +1126,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
 
         # VM tags are expected to be valid and presented as a comma/semi-colon delimited string
         if 'tags' in kwargs:
-            re_tag = re.compile(r'^[a-z0-9_][a-z0-9_\-\+\.]*$')
+            re_tag = re.compile(r'^[a-zA-Z0-9_][a-zA-Z0-9_\-\+\.]*$')
             for tag in kwargs['tags']:
                 if not re_tag.match(tag):
                     self.module.fail_json(msg='%s is not a valid tag' % tag)
