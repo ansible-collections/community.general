@@ -76,20 +76,12 @@ def make_process_list(mod_helper, **kwargs):
         if not out:
             return []
 
-        results = []
+        results = {}
         raw_data = json.loads(out)
         if kwargs.get("include_raw"):
             mod_helper.vars.raw_output = raw_data
 
-        if kwargs["name"]:
-            if kwargs["name"] in raw_data['venvs']:
-                data = {kwargs["name"]: raw_data['venvs'][kwargs["name"]]}
-            else:
-                data = {}
-        else:
-            data = raw_data['venvs']
-
-        for venv_name, venv in data.items():
+        for venv_name, venv in raw_data['venvs'].items():
             entry = {
                 'name': venv_name,
                 'version': venv['metadata']['main_package']['package_version'],
@@ -99,7 +91,7 @@ def make_process_list(mod_helper, **kwargs):
                 entry['injected'] = {k: v['package_version'] for k, v in venv['metadata']['injected_packages'].items()}
             if kwargs.get("include_deps"):
                 entry['dependencies'] = list(venv['metadata']['main_package']['app_paths_of_dependencies'])
-            results.append(entry)
+            results[venv_name] = entry
 
         return results
 

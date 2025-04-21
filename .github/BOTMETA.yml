@@ -387,6 +387,8 @@ files:
   $module_utils/pipx.py:
     labels: pipx
     maintainers: russoz
+  $module_utils/pkg_specs.py:
+    maintainers: russoz
   $module_utils/python_runner.py:
     maintainers: russoz
   $module_utils/puppet.py:

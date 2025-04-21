@@ -54,11 +54,13 @@ options:
   name:
     type: str
     description:
-      - The name of the application. In C(pipx) documentation it is also referred to as the name of the virtual environment
-        where the application will be installed.
+      - The name of the application and also the name of the Python package being installed.
+      - In C(pipx) documentation it is also referred to as the name of the virtual environment
+        where the application is installed.
       - If O(name) is a simple package name without version specifiers, then that name is used as the Python package name
         to be installed.
-      - Use O(source) for passing package specifications or installing from URLs or directories.
+      - Package specifiers may be passed along, for example O(name=tox<4.0.0).
+      - Use O(source) for installing from URLs or directories.
   source:
     type: str
     description:
@@ -202,6 +204,7 @@ version:
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
 from ansible_collections.community.general.plugins.module_utils.pipx import pipx_runner, pipx_common_argspec, make_process_list
+from ansible_collections.community.general.plugins.module_utils.pkg_specs import PackageVersion
 
 from ansible.module_utils.facts.compat import ansible_facts
 
@@ -258,16 +261,16 @@ class PipX(StateModuleHelper):
     use_old_vardict = False
 
     def _retrieve_installed(self):
-        name = _make_name(self.vars.name, self.vars.suffix)
-        output_process = make_process_list(self, include_injected=True, name=name)
+        name = _make_name(self.parsed_name, self.vars.suffix)
+        output_process = make_process_list(self, include_injected=True)
         installed = self.runner('_list global', output_process=output_process).run()
 
         if name is not None:
-            app_list = [app for app in installed if app['name'] == name]
-            if app_list:
-                return {name: app_list[0]}
-            else:
-                return {}
+            return {
+                k: v
+                for k, v in installed.items()
+                if k == name and self.package_version.version_fulfills_spec(v['version'], self.parsed_req)
+            }
 
         return installed
 
@@ -278,6 +281,8 @@ class PipX(StateModuleHelper):
             facts = ansible_facts(self.module, gather_subset=['python'])
             self.command = [facts['python']['executable'], '-m', 'pipx']
         self.runner = pipx_runner(self.module, self.command)
+        self.package_version = PackageVersion(self.module)
+        self.parsed_name, self.parsed_req = self.package_version.parse_package_name(self.vars.name)
 
         self.vars.set('application', self._retrieve_installed(), change=True, diff=True)
 
@@ -295,11 +300,15 @@ class PipX(StateModuleHelper):
         self.vars.set('run_info', ctx.run_info, verbosity=4)
 
     def state_install(self):
+        # If we have a version spec and no source, use the version spec as source
+        if self.parsed_req and not self.vars.source:
+            self.vars.source = self.vars.name
+
         if not self.vars.application or self.vars.force:
             self.changed = True
             args_order = 'state global index_url install_deps force python system_site_packages editable pip_args suffix name_source'
             with self.runner(args_order, check_mode_skip=True) as ctx:
-                ctx.run(name_source=[self.vars.name, self.vars.source])
+                ctx.run(name_source=[self.parsed_name, self.vars.source])
                 self._capture_results(ctx)
 
     state_present = state_install
