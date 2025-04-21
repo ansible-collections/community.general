@@ -4,5 +4,4 @@
 
 azp/posix/2
 destructive
-skip/python3
 skip/aix
