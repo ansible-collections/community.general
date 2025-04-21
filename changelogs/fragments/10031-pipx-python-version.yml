@@ -1,0 +1,6 @@
+minor_changes:
+  - pipx module_utils - filtering application list by name now happens in the modules (https://github.com/ansible-collections/community.general/pull/10031).
+  - pipx_info - filtering application list by name now happens in the module  (https://github.com/ansible-collections/community.general/pull/10031).
+  - >
+    pipx - parameter ``name`` now accepts Python package specifiers
+    (https://github.com/ansible-collections/community.general/issues/7815, https://github.com/ansible-collections/community.general/pull/10031).
