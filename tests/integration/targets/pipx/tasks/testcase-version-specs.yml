@@ -14,12 +14,12 @@
 
 - name: Install tox with version specifier in name
   community.general.pipx:
-    name: tox>=3.24.0,<4.0.0
+    name: tox>=3.22.0,<3.27.0
   register: install_tox_version
 
 - name: Install tox with same version specifier (idempotency check)
   community.general.pipx:
-    name: tox>=3.24.0,<4.0.0
+    name: tox>=3.22.0,<3.27.0
   register: install_tox_version_again
 
 - name: Ensure tox is uninstalled again
@@ -29,18 +29,18 @@
 
 - name: Install tox with extras and version
   community.general.pipx:
-    name: "tox[testing]>=3.24.0,<4.0.0"
+    name: "tox[testing]>=3.22.0,<3.27.0"
   register: install_tox_extras
   ignore_errors: true  # Some versions might not have this extra
 
 - name: Install tox with higher version specifier
   community.general.pipx:
-    name: "tox>=4.0.0"
+    name: "tox>=3.27.0"
   register: install_tox_higher_version
 
 - name: Install tox with higher version specifier (force)
   community.general.pipx:
-    name: "tox>=4.0.0"
+    name: "tox>=3.27.0"
     force: true
   register: install_tox_higher_version_force
 
@@ -55,12 +55,12 @@
     that:
       - install_tox_version is changed
       - "'tox' in install_tox_version.application"
-      - "install_tox_version.application.tox.version is version('3.24.0', '>=')"
-      - "install_tox_version.application.tox.version is version('4.0.0', '<')"
+      - "install_tox_version.application.tox.version is version('3.22.0', '>=')"
+      - "install_tox_version.application.tox.version is version('3.27.0', '<')"
       - install_tox_version_again is not changed
       - "'tox' in install_tox_extras.application"
-      - "install_tox_extras.application.tox.version is version('3.24.0', '>=')"
-      - "install_tox_extras.application.tox.version is version('4.0.0', '<')"
+      - "install_tox_extras.application.tox.version is version('3.22.0', '>=')"
+      - "install_tox_extras.application.tox.version is version('3.27.0', '<')"
       - install_tox_higher_version is not changed
       - install_tox_higher_version_force is changed
       - uninstall_tox_final is changed
@@ -72,7 +72,7 @@
   block:
     - name: Install tox with invalid version specifier
       community.general.pipx:
-        name: "tox>>>>>4.0.0"
+        name: "tox>>>>>3.27.0"
       register: install_tox_invalid
       ignore_errors: true
 
