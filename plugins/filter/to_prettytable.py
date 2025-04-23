@@ -6,37 +6,37 @@
 from __future__ import (absolute_import, division, print_function)
 
 DOCUMENTATION = '''
-  name: to_prettytable
-  short_description: Format a list of dictionaries as an ASCII table
-  version_added: "10.7.0"
-  author: Timur Gadiev (@tgadiev)
-  description:
-    - This filter takes a list of dictionaries and formats it as an ASCII table using the I(prettytable) Python library.
-  requirements:
-    - prettytable
-  options:
-    _input:
-      description: A list of dictionaries to format.
-      type: list
-      elements: dictionary
-      required: true
-    column_order:
-      description: List of column names to specify the order of columns in the table.
-      type: list
-      elements: string
-    header_names:
-      description: List of custom header names to use instead of dictionary keys.
-      type: list
-      elements: string
-    column_alignments:
-      description:
-        - >-
-          Dictionary where keys are column names and values are alignment settings.
-          Valid alignment values are C(left), C(center), C(right), C(l), C(c), or C(r).
-        - >-
-          For example, V({'name': 'left', 'id': 'right'}) will align the C(name) column to the left
-          and the C(id) column to the right.
-      type: dictionary
+name: to_prettytable
+short_description: Format a list of dictionaries as an ASCII table
+version_added: "10.7.0"
+author: Timur Gadiev (@tgadiev)
+description:
+- This filter takes a list of dictionaries and formats it as an ASCII table using the I(prettytable) Python library.
+requirements:
+- prettytable
+options:
+_input:
+    description: A list of dictionaries to format.
+    type: list
+    elements: dictionary
+    required: true
+column_order:
+    description: List of column names to specify the order of columns in the table.
+    type: list
+    elements: string
+header_names:
+    description: List of custom header names to use instead of dictionary keys.
+    type: list
+    elements: string
+column_alignments:
+    description:
+    - >-
+        Dictionary where keys are column names and values are alignment settings.
+        Valid alignment values are C(left), C(center), C(right), C(l), C(c), or C(r).
+    - >-
+        For example, V({'name': 'left', 'id': 'right'}) will align the C(name) column to the left
+        and the C(id) column to the right.
+    type: dictionary
 '''
 
 EXAMPLES = '''
@@ -249,7 +249,7 @@ def to_prettytable(data, *args, **kwargs):
         raise TypeValidationError(invalid_item, "all items in the list to be dictionaries")
 
     # Get the maximum number of fields in the first dictionary
-    max_fields = len(data[0].keys())
+    max_fields = len(data[0])
 
     # === Process column order ===
     # Handle both positional and keyword column_order
@@ -278,7 +278,7 @@ def to_prettytable(data, *args, **kwargs):
         field_names = column_order
     else:
         # Use field names from first dictionary, ensuring all are strings
-        field_names = [to_text(k) for k in data[0].keys()]
+        field_names = [to_text(k) for k in data[0]]
 
     # Process custom headers
     header_names = kwargs.pop('header_names', None)
