@@ -94,18 +94,16 @@ from ansible.module_utils._text import to_text
 from ansible.module_utils.six import string_types
 
 
-def _type_error(obj, expected):
-    """Generate a consistent type error message.
+class TypeValidationError(AnsibleFilterError):
+    """Custom exception for type validation errors.
 
     Args:
         obj: The object with incorrect type
         expected: Description of expected type
-
-    Returns:
-        Formatted error message string
     """
-    type_name = "string" if isinstance(obj, string_types) else type(obj).__name__
-    return f"Expected {expected}, got a {type_name}"
+    def __init__(self, obj, expected):
+        type_name = "string" if isinstance(obj, string_types) else type(obj).__name__
+        super().__init__(f"Expected {expected}, got a {type_name}")
 
 
 def _validate_list_param(param, param_name, ensure_strings=True):
@@ -129,7 +127,7 @@ def _validate_list_param(param, param_name, ensure_strings=True):
     error_msg = error_messages.get(param_name, f"a list for {param_name}")
 
     if not isinstance(param, list):
-        raise AnsibleFilterError(_type_error(param, error_msg))
+        raise TypeValidationError(param, error_msg)
 
     if ensure_strings:
         for item in param:
@@ -141,7 +139,7 @@ def _validate_list_param(param, param_name, ensure_strings=True):
                     error_msg = "a string for header name"
                 else:
                     error_msg = f"a string for {param_name} element"
-                raise AnsibleFilterError(_type_error(item, error_msg))
+                raise TypeValidationError(item, error_msg)
 
 
 def _match_key(item_dict, lookup_key):
@@ -243,12 +241,12 @@ def to_prettytable(data, *args, **kwargs):
     # === Input validation ===
     # Validate list type
     if not isinstance(data, list):
-        raise AnsibleFilterError(_type_error(data, "a list of dictionaries"))
+        raise TypeValidationError(data, "a list of dictionaries")
 
     # Validate dictionary items
     if data and not all(isinstance(item, dict) for item in data):
         invalid_item = next((item for item in data if not isinstance(item, dict)), None)
-        raise AnsibleFilterError(_type_error(invalid_item, "all items in the list to be dictionaries"))
+        raise TypeValidationError(invalid_item, "all items in the list to be dictionaries")
 
     # Get the maximum number of fields in the first dictionary
     max_fields = len(data[0].keys())
@@ -305,17 +303,17 @@ def to_prettytable(data, *args, **kwargs):
 
     # Validate column_alignments is a dictionary
     if not isinstance(column_alignments, dict):
-        raise AnsibleFilterError(_type_error(column_alignments, "a dictionary for column_alignments"))
+        raise TypeValidationError(column_alignments, "a dictionary for column_alignments")
 
     # Validate column_alignments keys and values
     for key, value in column_alignments.items():
         # Check that keys are strings
         if not isinstance(key, string_types):
-            raise AnsibleFilterError(f"Keys in 'column_alignments' must be strings, got {type(key).__name__}")
+            raise TypeValidationError(key, "a string for column_alignments key")
 
         # Check that values are strings
         if not isinstance(value, string_types):
-            raise AnsibleFilterError(f"Values in 'column_alignments' must be strings, got {type(value).__name__}")
+            raise TypeValidationError(value, "a string for column_alignments value")
 
         # Check that values are valid alignments
         if value.lower() not in valid_alignments:

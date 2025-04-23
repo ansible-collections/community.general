@@ -348,7 +348,7 @@
         that:
           - failure_result is failed
           - >
-            "Keys in 'column_alignments' must be strings, got int" in failure_result.msg
+            "Expected a string for column_alignments key, got a int" in failure_result.msg
 
 - name: Test non-string values in column_alignments (expect failure)
   block:
@@ -361,7 +361,7 @@
         that:
           - failure_result is failed
           - >
-            "Values in 'column_alignments' must be strings, got int" in failure_result.msg
+            "Expected a string for column_alignments value, got a int" in failure_result.msg
 
 - name: Test invalid alignment value in column_alignments (expect failure)
   block:
