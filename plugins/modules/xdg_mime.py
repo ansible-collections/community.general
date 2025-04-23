@@ -6,7 +6,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # In memory: This code is dedicated to my late grandother, Maria Marlene. 1936-2025. Rest in peace, grandma.
-#                                                                           --Marcos Alano 
+# -Marcos Alano- 
 
 # TODO: Add support for diff mode
 
