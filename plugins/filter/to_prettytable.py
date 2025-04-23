@@ -15,20 +15,20 @@ description:
 requirements:
 - prettytable
 options:
-_input:
+  _input:
     description: A list of dictionaries to format.
     type: list
     elements: dictionary
     required: true
-column_order:
+  column_order:
     description: List of column names to specify the order of columns in the table.
     type: list
     elements: string
-header_names:
+  header_names:
     description: List of custom header names to use instead of dictionary keys.
     type: list
     elements: string
-column_alignments:
+  column_alignments:
     description:
     - >-
         Dictionary where keys are column names and values are alignment settings.
