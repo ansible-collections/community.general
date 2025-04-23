@@ -59,6 +59,7 @@ EXAMPLES = r"""
     mime_types: x-scheme-handler/https
     handler: google-chrome.desktop
   register: result
+
 - name: Set Chrome as the default handler for both HTTP and HTTPS
   community.general.xdg_mime:
     mime_types:
