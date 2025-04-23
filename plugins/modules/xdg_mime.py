@@ -5,6 +5,8 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+# In memory: This code is dedicated to my late grandother, Maria Marlene. 1936-2025. Rest in peace, grandma.
+
 # TODO: Add support for diff mode
 
 from __future__ import absolute_import, division, print_function
