@@ -78,9 +78,9 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-  _value:
-    description: The formatted ASCII table.
-    type: string
+_value:
+  description: The formatted ASCII table.
+  type: string
 '''
 
 try:
