@@ -31,7 +31,7 @@ EXAMPLES: |
       list1: [1, 2, 5, 3, 4, 10]
       list2: [1, 2, 3, 4, 5, 11, 99]
   # => [1, 2, 5, 3, 4]
-  
+
   - name: Return the intersection of list1, list2 and list3.
     ansible.builtin.debug:
       msg: "{{ [list1, list2, list3] | community.general.lists_intersect(flatten=true) }}"
