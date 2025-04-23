@@ -8,7 +8,7 @@ from __future__ import (absolute_import, division, print_function)
 DOCUMENTATION = '''
   name: to_prettytable
   short_description: Format a list of dictionaries as an ASCII table
-  version_added: "10.6.0"
+  version_added: "10.7.0"
   author: Timur Gadiev (@tgadiev)
   description:
     - This filter takes a list of dictionaries and formats it as an ASCII table using the I(prettytable) Python library.
