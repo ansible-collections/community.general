@@ -32,7 +32,7 @@ EXAMPLES: |
       list2: [1, 2, 3, 4, 5, 11, 99]
       list3: [1, 2, 3, 4, 5, 10, 99, 101]
   # => [1, 2, 5, 3, 4, 10, 11, 99, 101]
-  
+
   - name: Return the union of list1 and list2.
     ansible.builtin.debug:
       msg: "{{ [list1, list2] | community.general.lists_union(flatten=true) }}"
