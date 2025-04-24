@@ -1447,6 +1447,8 @@ files:
     maintainers: dinoocch the-maldridge
   $modules/xcc_:
     maintainers: panyy3 renxulei
+  $modules/xen_orchestra_instance.py:
+    maintainers: shinuza
   $modules/xenserver_:
     maintainers: bvitnik
   $modules/xenserver_facts.py:
