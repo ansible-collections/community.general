@@ -7,8 +7,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
-import os
-from ansible.module_utils.basic import AnsibleModule
 
 
 DOCUMENTATION = r'''
@@ -77,6 +75,10 @@ msg:
 '''
 
 
+import os
+from ansible.module_utils.basic import AnsibleModule
+
+
 def get_pv_status(module, device):
     """Check if the device is already a PV."""
     cmd = ['pvs', '--noheadings', '--readonly', device]
@@ -104,7 +106,7 @@ def rescan_device(module, device):
                 f.write('1')
             return True
         except IOError as e:
-            module.warn(f"Failed to rescan device {device}: {str(e)}")
+            module.warn("Failed to rescan device {0}: {1}".format(device, str(e)))
             return False
     else:
         module.warn(f"Rescan path not found for device {device}")
