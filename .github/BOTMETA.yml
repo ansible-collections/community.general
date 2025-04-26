@@ -1437,6 +1437,8 @@ files:
     maintainers: mhalano
   $modules/xen_orchestra_instance.py:
     maintainers: shinuza
+  $modules/xdg_mime.py:
+    maintainers: mhalano
   $modules/xenserver_:
     maintainers: bvitnik
   $modules/xenserver_facts.py:
