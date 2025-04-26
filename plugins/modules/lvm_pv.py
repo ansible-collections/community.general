@@ -5,14 +5,17 @@
 # Based on lvol module by Jeroen Hoekx <jeroen.hoekx@dsquare.be>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
+import os
+from ansible.module_utils.basic import AnsibleModule
+
 
 DOCUMENTATION = r'''
 ---
-module: lpv
+module: lvm_pv
 short_description: Manage LVM Physical Volumes
+version_added: "1.0.0"
 description:
   - Creates, resizes or removes LVM Physical Volumes.
 author:
@@ -36,7 +39,7 @@ options:
     default: false
   resize:
     description:
-      - Resize PV to device size when state=present.
+      - Resize PV to device size when O(state=present).
     type: bool
     default: false
 notes:
@@ -46,21 +49,21 @@ notes:
 
 EXAMPLES = r'''
 - name: Creating physical volume on /dev/sdb
-  community.general.lpv:
+  community.general.lvm_pv:
     device: /dev/sdb
 
-- name: Resizing existing PV
-  community.general.lpv:
+- name: Creating and resizing (if needed) physical volume
+  community.general.lvm_pv:
     device: /dev/sdb
     resize: true
 
 - name: Removing physical volume that is not part of any volume group
-  community.general.lpv:
+  community.general.lvm_pv:
     device: /dev/sdb
     state: absent
 
 - name: Force removing physical volume that is already part of a volume group
-  community.general.lpv:
+  community.general.lvm_pv:
     device: /dev/sdb
     force: true
     state: absent
@@ -73,13 +76,12 @@ msg:
   type: str
 '''
 
-import os
-from ansible.module_utils.basic import AnsibleModule
 
 def get_pv_status(module, device):
     """Check if the device is already a PV."""
     cmd = ['pvs', '--noheadings', '--readonly', device]
     return module.run_command(cmd)[0] == 0
+
 
 def get_pv_size(module, device):
     """Get current PV size in bytes."""
@@ -89,12 +91,13 @@ def get_pv_size(module, device):
         module.fail_json(msg="Failed to get PV size: %s" % err)
     return int(out.strip())
 
+
 def rescan_device(module, device):
     """Perform storage rescan for the device."""
     # Extract the base device name (e.g., /dev/sdb -> sdb)
     base_device = os.path.basename(device)
-    rescan_path = f"/sys/block/{base_device}/device/rescan"
-    
+    rescan_path = "/sys/block/{0}/device/rescan".format(base_device)
+
     if os.path.exists(rescan_path):
         try:
             with open(rescan_path, 'w') as f:
@@ -106,6 +109,7 @@ def rescan_device(module, device):
     else:
         module.warn(f"Rescan path not found for device {device}")
         return False
+
 
 def main():
     module = AnsibleModule(
@@ -193,6 +197,7 @@ def main():
         msg = "PV %s: %s" % (device, ', '.join(actions))
 
     module.exit_json(changed=changed, msg=msg)
+
 
 if __name__ == '__main__':
     main()

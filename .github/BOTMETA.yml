@@ -905,6 +905,8 @@ files:
     maintainers: nerzhul
   $modules/lvg.py:
     maintainers: abulimov
+  $modules/lvm_pv.py:
+    maintainers: klention
   $modules/lvg_rename.py:
     maintainers: lszomor
   $modules/lvol.py:
