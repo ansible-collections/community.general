@@ -41,8 +41,8 @@ options:
 
 EXAMPLES = '''
 ---
-- name: Display a list of users as a table
-  vars:
+- name: Set a list of users
+  ansible.builtin.set_fact:
     users:
       - name: Alice
         age: 25
@@ -50,31 +50,60 @@ EXAMPLES = '''
       - name: Bob
         age: 30
         role: user
-  debug:
-    msg: "{{ users | community.general.to_prettytable }}"
+
+- name: Display a list of users as a table
+  ansible.builtin.debug:
+    msg: >-
+      {{
+        users | community.general.to_prettytable
+      }}
 
 - name: Display a table with custom column ordering
-  debug:
-    msg: "{{ users | community.general.to_prettytable('role', 'name', 'age') }}"
+  ansible.builtin.debug:
+    msg: >-
+      {{
+        users | community.general.to_prettytable(
+          column_order=['role', 'name', 'age']
+        )
+      }}
 
 - name: Display a table with selective column output (only show name and role fields)
-  debug:
-    msg: "{{ users | community.general.to_prettytable(column_order=['name', 'role']) }}"
+  ansible.builtin.debug:
+    msg: >-
+      {{
+        users | community.general.to_prettytable(
+          column_order=['name', 'role']
+        )
+      }}
 
 - name: Display a table with custom headers
-  debug:
-    msg: "{{ users | community.general.to_prettytable(header_names=['User Name', 'User Age', 'User Role']) }}"
+  ansible.builtin.debug:
+    msg: >-
+      {{
+        users | community.general.to_prettytable(
+          header_names=['User Name', 'User Age', 'User Role']
+        )
+      }}
 
 - name: Display a table with custom alignments
-  debug:
-    msg: "{{ users | community.general.to_prettytable(column_alignments={'name': 'center', 'age': 'right', 'role': 'left'}) }}"
+  ansible.builtin.debug:
+    msg: >-
+      {{
+        users | community.general.to_prettytable(
+          column_alignments={'name': 'center', 'age': 'right', 'role': 'left'}
+        )
+      }}
 
 - name: Combine multiple options
-  debug:
-    msg: "{{ users | community.general.to_prettytable(
-        column_order=['role', 'name', 'age'],
-        header_names=['Position', 'Full Name', 'Years'],
-        column_alignments={'name': 'center', 'age': 'right', 'role': 'left'}) }}"
+  ansible.builtin.debug:
+    msg: >-
+      {{
+        users | community.general.to_prettytable(
+          column_order=['role', 'name', 'age'],
+          header_names=['Position', 'Full Name', 'Years'],
+          column_alignments={'name': 'center', 'age': 'right', 'role': 'left'}
+        )
+      }}
 '''
 
 RETURN = '''
