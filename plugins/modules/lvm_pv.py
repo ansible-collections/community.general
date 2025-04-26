@@ -109,7 +109,7 @@ def rescan_device(module, device):
             module.warn("Failed to rescan device {0}: {1}".format(device, str(e)))
             return False
     else:
-        module.warn(f"Rescan path not found for device {device}")
+        module.warn("Rescan path not found for device {0}".format(device))
         return False
 
 
