@@ -419,6 +419,8 @@ files:
   $module_utils/wdc_redfish_utils.py:
     labels: wdc_redfish_utils
     maintainers: $team_wdc
+  $module_utils/xdg_mime.py:
+    maintainers: mhalano
   $module_utils/xenserver.py:
     labels: xenserver
     maintainers: bvitnik
@@ -1447,6 +1449,8 @@ files:
     maintainers: dinoocch the-maldridge
   $modules/xcc_:
     maintainers: panyy3 renxulei
+  $modules/xdg_mime.py:
+    maintainers: mhalano
   $modules/xenserver_:
     maintainers: bvitnik
   $modules/xenserver_facts.py:
