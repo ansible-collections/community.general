@@ -76,13 +76,18 @@ section above, but there are more elements that will take part in it.
     from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
 
     class MyTest(ModuleHelper):
+        # behavior for module paramaters ONLY, see below for further information
         output_params = ()
         change_params = ()
         diff_params = ()
-        facts_name = None
         facts_params = ()
+
+        facts_name = None   # used if generating facts, from parameters or otherwise
+
+        # transitional variables for the new VarDict implementation, see information below
         use_old_vardict = True
         mute_vardict_deprecation = False
+
         module = dict(
             argument_spec=dict(...),
             # ...
@@ -211,9 +216,10 @@ One of the attributes in that metadata marks the variable for output, and MH mak
     There are two ways to prevent that from happening:
 
         #.  Set ``mute_vardict_deprecation = True`` and the deprecation will be silenced. If the module still uses the old ``VarDict``,
-            it will not be able to update to community.general 11.0.0 (Spring 2026) upon its release.
-        #.  Set ``use_old_vardict = False`` to make the MH module use the new ``VarDict`` immediatelly.
-            The new ``VarDict`` and its use is documented and this is the recommended way to handle this.
+            it will not be able to update to community.general 11.0.0 (Spring 2025) upon its release.
+        #.  Set ``use_old_vardict = False`` to make the MH module use the new ``VarDict`` immediately.
+            We strongly recommend you use the new ``VarDict``, for that you make sure to consult its documentation at
+            :ref:`ansible_collections.community.general.docsite.guide_vardict`.
 
     .. code-block:: python
 
@@ -233,6 +239,11 @@ If you want to include some module parameters in the output, list them in the ``
         output_params = ('state', 'name')
         ...
 
+.. important::
+
+    The variable names listed in ``output_params`` **must be module parameters**, as in parameters listed in the module's ``argument_spec``.
+    Names not found in ``argument_spec`` are silently ignored.
+
 Another neat feature provided by MH by using ``VarDict`` is the automatic tracking of changes when setting the metadata ``change=True``.
 Again, to enable this feature for module parameters, you must list them in the ``change_params`` class variable.
 
@@ -242,6 +253,11 @@ Again, to enable this feature for module parameters, you must list them in the `
         # example from community.general.xfconf
         change_params = ('value', )
         ...
+
+.. important::
+
+    The variable names listed in ``change_params`` **must be module parameters**, as in parameters listed in the module's ``argument_spec``.
+    Names not found in ``argument_spec`` are silently ignored.
 
 .. seealso::
 
@@ -259,6 +275,11 @@ With that, MH will automatically generate the diff output for variables that hav
     def __run__(self):
         # example from community.general.gio_mime
         self.vars.set_meta("handler", initial_value=gio_mime_get(self.runner, self.vars.mime_type), diff=True, change=True)
+
+.. important::
+
+    The variable names listed in ``diff_params`` **must be module parameters**, as in parameters listed in the module's ``argument_spec``.
+    Names not found in ``argument_spec`` are silently ignored.
 
 Moreover, if a module is set to return *facts* instead of return values, then again use the metadata ``fact=True`` and ``fact_params`` for module parameters.
 Additionally, you must specify ``facts_name``, as in:
@@ -282,6 +303,11 @@ That generates an Ansible fact like:
     - name: Print volume facts
       debug:
         msg: Volume fact is {{ ansible_facts.volume_facts.volume }}
+
+.. important::
+
+    The variable names listed in ``fact_params`` **must be module parameters**, as in parameters listed in the module's ``argument_spec``.
+    Names not found in ``argument_spec`` are silently ignored.
 
 .. important::
 
