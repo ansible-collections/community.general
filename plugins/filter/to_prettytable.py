@@ -307,7 +307,7 @@ def to_prettytable(data, *args, **kwargs):
         field_names = column_order
     else:
         # Use field names from first dictionary, ensuring all are strings
-        field_names = [to_text(k) for k in data[0]]
+        field_names = [to_text(k) for k in data[0]] if data else []
 
     # Process custom headers
     header_names = kwargs.pop('header_names', None)
