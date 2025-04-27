@@ -278,7 +278,7 @@ def to_prettytable(data, *args, **kwargs):
         raise TypeValidationError(invalid_item, "all items in the list to be dictionaries")
 
     # Get the maximum number of fields in the first dictionary
-    max_fields = len(data[0])
+    max_fields = len(data[0]) if data else 0
 
     # === Process column order ===
     # Handle both positional and keyword column_order
