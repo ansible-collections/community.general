@@ -29,7 +29,7 @@ options:
       - The value to return when the collection could not be found.
       - By default, V(none) is returned.
     type: string
-    default:
+    default: ~
   result_no_version:
     description:
       - The value to return when the collection has no version number.

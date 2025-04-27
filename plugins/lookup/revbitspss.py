@@ -50,12 +50,12 @@ EXAMPLES = r"""
   vars:
     secret: >-
       {{
-          lookup(
-              'community.general.revbitspss',
-              'UUIDPAM', 'DB_PASS',
-              base_url='https://server-url-here',
-              api_key='API_KEY_GOES_HERE'
-          )
+        lookup(
+          'community.general.revbitspss',
+          'UUIDPAM', 'DB_PASS',
+          base_url='https://server-url-here',
+          api_key='API_KEY_GOES_HERE'
+        )
       }}
   tasks:
     - ansible.builtin.debug:

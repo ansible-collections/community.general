@@ -132,13 +132,13 @@ EXAMPLES = r"""
   vars:
     secret: >-
       {{
-          lookup(
-              'community.general.tss',
-              102,
-              base_url='https://secretserver.domain.com/SecretServer/',
-              username='user.name',
-              password='password'
-          )
+        lookup(
+          'community.general.tss',
+          102,
+          base_url='https://secretserver.domain.com/SecretServer/',
+          username='user.name',
+          password='password'
+        )
       }}
   tasks:
     - ansible.builtin.debug:
@@ -153,14 +153,14 @@ EXAMPLES = r"""
   vars:
     secret: >-
       {{
-          lookup(
-              'community.general.tss',
-              102,
-              base_url='https://secretserver.domain.com/SecretServer/',
-              username='user.name',
-              password='password',
-              domain='domain'
-          )
+        lookup(
+          'community.general.tss',
+          102,
+          base_url='https://secretserver.domain.com/SecretServer/',
+          username='user.name',
+          password='password',
+          domain='domain'
+        )
       }}
   tasks:
     - ansible.builtin.debug:
@@ -175,12 +175,12 @@ EXAMPLES = r"""
   vars:
     secret_password: >-
       {{
-          ((lookup(
-              'community.general.tss',
-              102,
-              base_url='https://secretserver.domain.com/SecretServer/',
-              token='thycotic_access_token',
-          )  | from_json).get('items') | items2dict(key_name='slug', value_name='itemValue'))['password']
+        ((lookup(
+          'community.general.tss',
+          102,
+          base_url='https://secretserver.domain.com/SecretServer/',
+          token='thycotic_access_token',
+        ) | from_json).get('items') | items2dict(key_name='slug', value_name='itemValue'))['password']
       }}
   tasks:
     - ansible.builtin.debug:
@@ -193,14 +193,14 @@ EXAMPLES = r"""
   vars:
     secret: >-
       {{
-          lookup(
-              'community.general.tss',
-              102,
-              fetch_attachments=True,
-              file_download_path='/home/certs',
-              base_url='https://secretserver.domain.com/SecretServer/',
-              token='thycotic_access_token'
-          )
+        lookup(
+          'community.general.tss',
+          102,
+          fetch_attachments=True,
+          file_download_path='/home/certs',
+          base_url='https://secretserver.domain.com/SecretServer/',
+          token='thycotic_access_token'
+        )
       }}
   tasks:
     - ansible.builtin.debug:
@@ -216,13 +216,13 @@ EXAMPLES = r"""
   vars:
     secret: >-
       {{
-          lookup(
-              'community.general.tss',
-              102,
-              fetch_secret_ids_from_folder=true,
-              base_url='https://secretserver.domain.com/SecretServer/',
-              token='thycotic_access_token'
-          )
+        lookup(
+          'community.general.tss',
+          102,
+          fetch_secret_ids_from_folder=true,
+          base_url='https://secretserver.domain.com/SecretServer/',
+          token='thycotic_access_token'
+        )
       }}
   tasks:
     - ansible.builtin.debug:
@@ -236,14 +236,14 @@ EXAMPLES = r"""
   vars:
     secret: >-
       {{
-          lookup(
-              'community.general.tss',
-              0,
-              secret_path='\folderName\secretName'
-              base_url='https://secretserver.domain.com/SecretServer/',
-              username='user.name',
-              password='password'
-          )
+        lookup(
+          'community.general.tss',
+          0,
+          secret_path='\folderName\secretName'
+          base_url='https://secretserver.domain.com/SecretServer/',
+          username='user.name',
+          password='password'
+        )
       }}
   tasks:
     - ansible.builtin.debug:

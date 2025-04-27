@@ -116,8 +116,7 @@ EXAMPLES = r"""
 
 - name: "connect to etcd3 with a client certificate"
   ansible.builtin.debug:
-    msg: "{{ lookup('community.general.etcd3', 'foo/bar', cert_cert='/etc/ssl/etcd/client.pem', cert_key='/etc/ssl/etcd/client.key')
-      }}"
+    msg: "{{ lookup('community.general.etcd3', 'foo/bar', cert_cert='/etc/ssl/etcd/client.pem', cert_key='/etc/ssl/etcd/client.key') }}"
 """
 
 RETURN = r"""

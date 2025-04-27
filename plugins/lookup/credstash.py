@@ -67,8 +67,7 @@ EXAMPLES = r"""
 
 - name: "Test credstash lookup plugin -- get the company's github password"
   ansible.builtin.debug:
-    msg: "Credstash lookup! {{ lookup('community.general.credstash', 'company-github-password', table='company-passwords')
-      }}"
+    msg: "Credstash lookup! {{ lookup('community.general.credstash', 'company-github-password', table='company-passwords') }}"
 
 - name: Example play using the 'context' feature
   hosts: localhost
@@ -84,8 +83,7 @@ EXAMPLES = r"""
 
     - name: "Test credstash lookup plugin -- get the password with a context defined here"
       ansible.builtin.debug:
-        msg: "{{ lookup('community.general.credstash', 'some-password', context=dict(app='my_app', environment='production'))
-          }}"
+        msg: "{{ lookup('community.general.credstash', 'some-password', context=dict(app='my_app', environment='production')) }}"
 """
 
 RETURN = r"""

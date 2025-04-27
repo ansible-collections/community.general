@@ -43,22 +43,22 @@ EXAMPLES = r"""
 - name: Generate pet name
   ansible.builtin.debug:
     var: lookup('community.general.random_pet')
-# Example result: 'loving-raptor'
+  # Example result: 'loving-raptor'
 
 - name: Generate pet name with 3 words
   ansible.builtin.debug:
     var: lookup('community.general.random_pet', words=3)
-# Example result: 'fully-fresh-macaw'
+  # Example result: 'fully-fresh-macaw'
 
 - name: Generate pet name with separator
   ansible.builtin.debug:
     var: lookup('community.general.random_pet', separator="_")
-# Example result: 'causal_snipe'
+  # Example result: 'causal_snipe'
 
 - name: Generate pet name with length
   ansible.builtin.debug:
     var: lookup('community.general.random_pet', length=7)
-# Example result: 'natural-peacock'
+  # Example result: 'natural-peacock'
 """
 
 RETURN = r"""

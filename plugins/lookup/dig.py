@@ -131,8 +131,7 @@ EXAMPLES = r"""
 - ansible.builtin.debug:
     msg: "Reverse DNS for 192.0.2.5 is {{ lookup('community.general.dig', '5.2.0.192.in-addr.arpa.', qtype='PTR') }}"
 - ansible.builtin.debug:
-    msg: "Querying 198.51.100.23 for IPv4 address for example.com. produces {{ lookup('dig', 'example.com', '@198.51.100.23')
-      }}"
+    msg: "Querying 198.51.100.23 for IPv4 address for example.com. produces {{ lookup('dig', 'example.com', '@198.51.100.23') }}"
 
 - ansible.builtin.debug:
     msg: "XMPP service for gmail.com. is available at {{ item.target }} on port {{ item.port }}"

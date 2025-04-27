@@ -40,7 +40,7 @@ EXAMPLES = r"""
     - admin: admin_user_data
     - key: admin_ssh_keys[item.admin.key]
   loop_control:
-  # Makes the output readable, so that it doesn't contain the whole subdictionaries and lists
+    # Makes the output readable, so that it doesn't contain the whole subdictionaries and lists
     label: "{{ [item.admin.key, 'active' if item.key.active else 'inactive', item.key.public_key] }}"
   vars:
     admin_user_data:
@@ -73,7 +73,7 @@ EXAMPLES = r"""
     state: "{{ 'absent' if (item.entry.value.absent | default(False)) else 'present' }}"
     overwrite: true
   loop_control:
-  # Makes the output readable, so that it doesn't contain the whole subdictionaries and lists
+    # Makes the output readable, so that it doesn't contain the whole subdictionaries and lists
     label: |-
       {{ [item.zone.key, item.prefix.key, item.entry.key,
           item.entry.value.ttl | default(3600),
