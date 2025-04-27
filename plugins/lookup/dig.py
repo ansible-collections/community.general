@@ -82,9 +82,9 @@ options:
     type: int
     version_added: 9.5.0
 notes:
-  - ALL is not a record per-se, merely the listed fields are available for any record results you retrieve in the form of
+  - V(ALL) is not a record in itself, merely the listed fields are available for any record results you retrieve in the form of
     a dictionary.
-  - While the 'dig' lookup plugin supports anything which dnspython supports out of the box, only a subset can be converted
+  - While the plugin supports anything which C(dnspython) supports out of the box, only a subset can be converted
     into a dictionary.
   - If you need to obtain the AAAA record (IPv6 address), you must specify the record type explicitly. Syntax for specifying
     the record type is shown in the examples below.
@@ -179,7 +179,7 @@ _list:
         - Algorithm, digest_type, key_tag, digest.
     HINFO:
       description:
-        - Cpu, os.
+        - CPU, OS.
     LOC:
       description:
         - Latitude, longitude, altitude, size, horizontal_precision, vertical_precision.

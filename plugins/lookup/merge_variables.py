@@ -63,7 +63,7 @@ options:
         key: override
   groups:
     description:
-      - Search for variables accross hosts that belong to the given groups. This allows to collect configuration pieces accross
+      - Search for variables across hosts that belong to the given groups. This allows to collect configuration pieces across
         different hosts (for example a service on a host with its database on another host).
     type: list
     elements: str

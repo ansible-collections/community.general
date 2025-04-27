@@ -72,14 +72,12 @@ EXAMPLES = r"""
 - name: "Get 'password' from Bitwarden record with ID 'bafba515-af11-47e6-abe3-af1200cd18b2'"
   ansible.builtin.debug:
     msg: >-
-      {{ lookup('community.general.bitwarden', 'bafba515-af11-47e6-abe3-af1200cd18b2', search='id', field='password') |
-      first }}
+      {{ lookup('community.general.bitwarden', 'bafba515-af11-47e6-abe3-af1200cd18b2', search='id', field='password') | first }}
 
 - name: "Get 'password' from all Bitwarden records named 'a_test' from collection"
   ansible.builtin.debug:
     msg: >-
-      {{ lookup('community.general.bitwarden', 'a_test', field='password', collection_id='bafba515-af11-47e6-abe3-af1200cd18b2')
-      }}
+      {{ lookup('community.general.bitwarden', 'a_test', field='password', collection_id='bafba515-af11-47e6-abe3-af1200cd18b2') }}
 
 - name: "Get list of all full Bitwarden records named 'a_test'"
   ansible.builtin.debug:

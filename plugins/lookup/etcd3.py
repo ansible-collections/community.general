@@ -32,7 +32,7 @@ options:
     default: false
   endpoints:
     description:
-      - Counterpart of E(ETCDCTL_ENDPOINTS) environment variable. Specify the etcd3 connection with and URL form, for example
+      - Counterpart of E(ETCDCTL_ENDPOINTS) environment variable. Specify the etcd3 connection with an URL form, for example
         V(https://hostname:2379), or V(<host>:<port>) form.
       - The V(host) part is overwritten by O(host) option, if defined.
       - The V(port) part is overwritten by O(port) option, if defined.

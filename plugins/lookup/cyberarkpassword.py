@@ -39,8 +39,8 @@ options:
     description: For extra_params values please check parameters for clipasswordsdk in CyberArk's "Credential Provider and
       ASCP Implementation Guide".
 notes:
-  - For Ansible on Windows, please change the -parameters (-p, -d, and -o) to /parameters (/p, /d, and /o) and change the
-    location of CLIPasswordSDK.exe.
+  - For Ansible on Windows, please change the -parameters (C(-p), C(-d), and C(-o)) to /parameters (C(/p), C(/d), and C(/o)) and change the
+    location of C(CLIPasswordSDK.exe).
 """
 
 EXAMPLES = r"""
