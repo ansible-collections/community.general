@@ -151,7 +151,7 @@
       - combined_table == expected_combined_table
 
 # Test empty data
-- name: Test empty data list
+- name: Test empty data list with no parameters
   set_fact:
     empty_table: "{{ [] | community.general.to_prettytable }}"
     expected_empty_table: |-
@@ -162,6 +162,135 @@
   assert:
     that:
       - empty_table == expected_empty_table
+
+# Test empty data with column_order
+- name: Test empty data list with column_order
+  set_fact:
+    empty_with_columns: "{{ [] | community.general.to_prettytable(column_order=['name', 'age', 'role']) }}"
+    expected_empty_with_columns: |-
+      +------+-----+------+
+      | name | age | role |
+      +------+-----+------+
+      +------+-----+------+
+
+- name: Verify empty table with column_order
+  assert:
+    that:
+      - empty_with_columns == expected_empty_with_columns
+
+# Test empty data with header_names
+- name: Test empty data list with header_names
+  set_fact:
+    empty_with_headers: "{{ [] | community.general.to_prettytable(header_names=['User Name', 'User Age', 'User Role']) }}"
+    expected_empty_with_headers: |-
+      +-----------+----------+-----------+
+      | User Name | User Age | User Role |
+      +-----------+----------+-----------+
+      +-----------+----------+-----------+
+
+- name: Verify empty table with header_names
+  assert:
+    that:
+      - empty_with_headers == expected_empty_with_headers
+
+# Test empty data with combined parameters
+- name: Test empty data with combined parameters
+  set_fact:
+    empty_combined: "{{ [] | community.general.to_prettytable(
+      column_order=['role', 'name', 'age'],
+      header_names=['Position', 'Full Name', 'Years'],
+      column_alignments={'role': 'left', 'name': 'center', 'age': 'right'}) }}"
+    expected_empty_combined: |-
+      +----------+-----------+-------+
+      | Position | Full Name | Years |
+      +----------+-----------+-------+
+      +----------+-----------+-------+
+
+- name: Verify empty table with combined parameters
+  assert:
+    that:
+      - empty_combined == expected_empty_combined
+
+# Test validation with empty data
+- name: Test empty data with non-list column_order (expect failure)
+  block:
+    - set_fact:
+        invalid_table: "{{ [] | community.general.to_prettytable(column_order=123) }}"
+      register: failure_result
+      ignore_errors: true
+    - name: Verify error message for empty data with invalid column_order
+      assert:
+        that:
+          - failure_result is failed
+          - >
+            "Expected a list of column names, got a int" in failure_result.msg
+
+- name: Test empty data with non-list header_names (expect failure)
+  block:
+    - set_fact:
+        invalid_table: "{{ [] | community.general.to_prettytable(header_names='invalid_headers') }}"
+      register: failure_result
+      ignore_errors: true
+    - name: Verify error message for empty data with invalid header_names
+      assert:
+        that:
+          - failure_result is failed
+          - >
+            "Expected a list of header names, got a string" in failure_result.msg
+          
+- name: Test empty data with non-dictionary column_alignments (expect failure)
+  block:
+    - set_fact:
+        invalid_table: "{{ [] | community.general.to_prettytable(column_alignments='invalid') }}"
+      register: failure_result
+      ignore_errors: true
+    - name: Verify error message for empty data with invalid column_alignments
+      assert:
+        that:
+          - failure_result is failed
+          - >
+            "Expected a dictionary for column_alignments, got a string" in failure_result.msg
+
+- name: Test empty data with non-string values in column_alignments (expect failure)
+  block:
+    - set_fact:
+        invalid_table: "{{ [] | community.general.to_prettytable(column_alignments={'name': 123}) }}"
+      register: failure_result
+      ignore_errors: true
+    - name: Verify error message for empty data with non-string values in column_alignments
+      assert:
+        that:
+          - failure_result is failed
+          - >
+            "Expected a string for column_alignments value, got a int" in failure_result.msg
+          
+- name: Test empty data with invalid alignment value in column_alignments (expect failure)
+  block:
+    - set_fact:
+        invalid_table: "{{ [] | community.general.to_prettytable(column_alignments={'name': 'invalid'}) }}"
+      register: failure_result
+      ignore_errors: true
+    - name: Verify error message for empty data with invalid alignment value
+      assert:
+        that:
+          - failure_result is failed
+          - >
+            "Invalid alignment 'invalid' in 'column_alignments'" in failure_result.msg
+          - >
+            "Valid alignments are" in failure_result.msg
+
+- name: Test empty data with mismatched column_order and header_names (expect failure)
+  block:
+    - set_fact:
+        invalid_table: "{{ [] | community.general.to_prettytable(column_order=['a', 'b', 'c'], header_names=['X', 'Y']) }}"
+      register: failure_result
+      ignore_errors: true
+    - name: Verify error message for empty data with mismatched lengths
+      assert:
+        that:
+          - failure_result is failed
+          - >
+            "'column_order' and 'header_names' must have the same number of elements" in failure_result.msg
 
 # Test error conditions
 - name: Test non-list input (expect failure)
@@ -174,7 +303,8 @@
       assert:
         that:
           - failure_result is failed
-          - "'Expected a list of dictionaries, got a string' in failure_result.msg"
+          - >
+            "Expected a list of dictionaries, got a string" in failure_result.msg
 
 - name: Test list with non-dictionary items (expect failure)
   block:
@@ -186,7 +316,8 @@
       assert:
         that:
           - failure_result is failed
-          - "'Expected all items in the list to be dictionaries, got a string' in failure_result.msg"
+          - >
+            "Expected all items in the list to be dictionaries, got a string" in failure_result.msg
 
 - name: Test non-list column_order (expect failure)
   block:
@@ -198,7 +329,8 @@
       assert:
         that:
           - failure_result is failed
-          - "'Expected a list of column names, got a int' in failure_result.msg"
+          - >
+            "Expected a list of column names, got a int" in failure_result.msg
 
 - name: Test non-list header_names (expect failure)
   block:
@@ -210,7 +342,8 @@
       assert:
         that:
           - failure_result is failed
-          - "'Expected a list of header names, got a string' in failure_result.msg"
+          - >
+            "Expected a list of header names, got a string" in failure_result.msg
 
 - name: Test unknown parameters (expect failure)
   block:
@@ -222,7 +355,8 @@
       assert:
         that:
           - failure_result is failed
-          - "'Unknown parameter(s) for to_prettytable filter: unknown_param' in failure_result.msg"
+          - >
+            "Unknown parameter(s) for to_prettytable filter: unknown_param" in failure_result.msg
 
 - name: Test both positional args and column_order (expect failure)
   block:
@@ -234,7 +368,8 @@
       assert:
         that:
           - failure_result is failed
-          - '"Cannot use both positional arguments and the ''column_order'' keyword argument" in failure_result.msg'
+          - >
+            "Cannot use both positional arguments and the 'column_order' keyword argument" in failure_result.msg
 
 - name: Test non-string values in positional args (expect failure)
   block:
@@ -246,7 +381,8 @@
       assert:
         that:
           - failure_result is failed
-          - "'Expected a string for column name, got a int' in failure_result.msg"
+          - >
+            "Expected a string for column name, got a int" in failure_result.msg
 
 - name: Test non-string values in column_order (expect failure)
   block:
@@ -258,7 +394,8 @@
       assert:
         that:
           - failure_result is failed
-          - "'Expected a string for column name, got a int' in failure_result.msg"
+          - >
+            "Expected a string for column name, got a int" in failure_result.msg
 
 - name: Test non-string values in header_names (expect failure)
   block:
@@ -270,7 +407,8 @@
       assert:
         that:
           - failure_result is failed
-          - "'Expected a string for header name, got a int' in failure_result.msg"
+          - >
+            "Expected a string for header name, got a int" in failure_result.msg
 
 - name: Test mismatched sizes of column_order and header_names (expect failure)
   block:

@@ -11,9 +11,9 @@ short_description: Format a list of dictionaries as an ASCII table
 version_added: "10.7.0"
 author: Timur Gadiev (@tgadiev)
 description:
-- This filter takes a list of dictionaries and formats it as an ASCII table using the I(prettytable) Python library.
+  - This filter takes a list of dictionaries and formats it as an ASCII table using the I(prettytable) Python library.
 requirements:
-- prettytable
+  - prettytable
 options:
   _input:
     description: A list of dictionaries to format.
@@ -204,13 +204,17 @@ def _build_key_maps(data):
     """Build mappings between string keys and original keys.
 
     Args:
-        data: Dictionary with keys to map
+        data: List of dictionaries with keys to map
 
     Returns:
         Tuple of (key_map, reverse_key_map)
     """
     key_map = {}
     reverse_key_map = {}
+
+    # Check if the data list is not empty
+    if not data:
+        return key_map, reverse_key_map
 
     first_dict = data[0]
     for orig_key in first_dict.keys():
@@ -263,22 +267,19 @@ def to_prettytable(data, *args, **kwargs):
             'You need to install "prettytable" Python module to use this filter'
         )
 
-    # Handle empty data
-    if not data:
-        return "++\n++"
-
     # === Input validation ===
     # Validate list type
     if not isinstance(data, list):
         raise TypeValidationError(data, "a list of dictionaries")
 
-    # Validate dictionary items
+    # Validate dictionary items if list is not empty
     if data and not all(isinstance(item, dict) for item in data):
         invalid_item = next((item for item in data if not isinstance(item, dict)), None)
         raise TypeValidationError(invalid_item, "all items in the list to be dictionaries")
 
-    # Get the maximum number of fields in the first dictionary
-    max_fields = len(data[0]) if data else 0
+    # Get sample dictionary to determine fields - empty if no data
+    sample_dict = data[0] if data else {}
+    max_fields = len(sample_dict)
 
     # === Process column order ===
     # Handle both positional and keyword column_order
@@ -296,8 +297,8 @@ def to_prettytable(data, *args, **kwargs):
     if column_order is not None:
         _validate_list_param(column_order, "column_order")
 
-        # Validate column_order doesn't exceed the number of fields
-        if len(column_order) > max_fields:
+        # Validate column_order doesn't exceed the number of fields (skip if data is empty)
+        if data and len(column_order) > max_fields:
             raise AnsibleFilterError(
                 f"'column_order' has more elements ({len(column_order)}) than available fields in data ({max_fields})")
 
@@ -307,15 +308,15 @@ def to_prettytable(data, *args, **kwargs):
         field_names = column_order
     else:
         # Use field names from first dictionary, ensuring all are strings
-        field_names = [to_text(k) for k in data[0]] if data else []
+        field_names = [to_text(k) for k in sample_dict]
 
     # Process custom headers
     header_names = kwargs.pop('header_names', None)
     if header_names is not None:
         _validate_list_param(header_names, "header_names")
 
-        # Validate header_names doesn't exceed the number of fields
-        if len(header_names) > max_fields:
+        # Validate header_names doesn't exceed the number of fields (skip if data is empty)
+        if data and len(header_names) > max_fields:
             raise AnsibleFilterError(
                 f"'header_names' has more elements ({len(header_names)}) than available fields in data ({max_fields})")
 
@@ -350,8 +351,8 @@ def to_prettytable(data, *args, **kwargs):
                 f"Invalid alignment '{value}' in 'column_alignments'. "
                 f"Valid alignments are: {', '.join(sorted(valid_alignments))}")
 
-    # Validate column_alignments doesn't have more keys than fields
-    if len(column_alignments) > max_fields:
+    # Validate column_alignments doesn't have more keys than fields (skip if data is empty)
+    if data and len(column_alignments) > max_fields:
         raise AnsibleFilterError(
             f"'column_alignments' has more elements ({len(column_alignments)}) than available fields in data ({max_fields})")
 
@@ -369,13 +370,17 @@ def to_prettytable(data, *args, **kwargs):
     # Configure alignments after setting field_names
     _configure_alignments(table, display_names, column_alignments)
 
-    # Build key maps only if not using explicit column_order
+    # Build key maps only if not using explicit column_order and we have data
     key_map = {}
     reverse_key_map = {}
-    if not column_order:  # Only needed when using original dictionary keys
+    if not column_order and data:  # Only needed when using original dictionary keys and we have data
         key_map, reverse_key_map = _build_key_maps(data)
 
-    # Process each row
+    # If we have an empty list with no custom parameters, return a simple empty table
+    if not data and not column_order and not header_names and not column_alignments:
+        return "++\n++"
+
+    # Process each row if we have data
     for item in data:
         row = []
         for col in field_names:
