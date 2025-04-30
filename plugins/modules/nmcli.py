@@ -1335,7 +1335,7 @@ EXAMPLES = r'''
     community.general.nmcli:
       conn_name: my-eth1
       state: up
-      reload: true
+      conn_reload: true
 
   - name: Add second ip4 address
     community.general.nmcli:
