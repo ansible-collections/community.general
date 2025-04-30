@@ -10,6 +10,7 @@ IFS='/:' read -ra args <<< "$1"
 
 ansible_version="${args[0]}"
 script="${args[1]}"
+after_script="${args[2]}"
 
 function join {
     local IFS="$1";
@@ -71,6 +72,9 @@ export ANSIBLE_COLLECTIONS_PATHS="${PWD}/../../../"
 
 COMMUNITY_CRYPTO_BRANCH=main
 if [ "${ansible_version}" == "2.16" ]; then
+    COMMUNITY_CRYPTO_BRANCH=stable-2
+fi
+if [ "${script}" == "linux" ] && [ "$after_script" == "ubuntu2004" ]; then
     COMMUNITY_CRYPTO_BRANCH=stable-2
 fi
 
