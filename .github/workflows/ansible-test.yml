@@ -171,7 +171,7 @@ jobs:
             ;
             git clone --depth=1 --single-branch https://github.com/ansible-collections/ansible.posix.git ../../ansible/posix
             ;
-            git clone --depth=1 --single-branch https://github.com/ansible-collections/community.crypto.git ../../community/crypto
+            git clone --depth=1 --single-branch --branch stable-2 https://github.com/ansible-collections/community.crypto.git ../../community/crypto
             ;
             git clone --depth=1 --single-branch https://github.com/ansible-collections/community.docker.git ../../community/docker
             ;
