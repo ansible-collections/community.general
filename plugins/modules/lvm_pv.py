@@ -13,36 +13,38 @@ DOCUMENTATION = r'''
 ---
 module: lvm_pv
 short_description: Manage LVM Physical Volumes
-version_added: "1.0.0"
+version_added: "10.7.0"
 description:
-  - Creates, resizes or removes LVM Physical Volumes.
+- Creates, resizes or removes LVM Physical Volumes.
 author:
-  - Klention Mali (@klention)
+- Klention Mali (@klention)
 options:
   device:
     description:
-      - Path to the block device to manage.
+    - Path to the block device to manage.
     type: str
     required: true
   state:
     description:
-      - Control if the physical volume exists.
+    - Control if the physical volume exists.
     type: str
     choices: [ present, absent ]
     default: present
   force:
     description:
-      - Force dangerous operations (equivalent to C(pvcreate -f) or C(pvremove -ff)).
+    - Force the operation.
+    - When O(state=present) (creating a PV), this uses C(pvcreate -f) to force creation.
+    - When O(state=absent) (removing a PV), this uses C(pvremove -ff) to force removal even if part of a volume group.
     type: bool
     default: false
   resize:
     description:
-      - Resize PV to device size when O(state=present).
+    - Resize PV to device size when O(state=present).
     type: bool
     default: false
 notes:
-  - Requires LVM2 utilities installed on the target system.
-  - Device path must exist when creating a PV.
+- Requires LVM2 utilities installed on the target system.
+- Device path must exist when creating a PV.
 '''
 
 EXAMPLES = r'''
@@ -88,9 +90,7 @@ def get_pv_status(module, device):
 def get_pv_size(module, device):
     """Get current PV size in bytes."""
     cmd = ['pvs', '--noheadings', '--nosuffix', '--units', 'b', '-o', 'pv_size', device]
-    rc, out, err = module.run_command(cmd)
-    if rc != 0:
-        module.fail_json(msg="Failed to get PV size: %s" % err)
+    rc, out, err = module.run_command(cmd, check_rc=True)
     return int(out.strip())
 
 
@@ -148,9 +148,7 @@ def main():
                 if force:
                     cmd.append('-f')
                 cmd.append(device)
-                rc, out, err = module.run_command(cmd)
-                if rc != 0:
-                    module.fail_json(msg="Failed to create PV: %s" % err)
+                rc, out, err = module.run_command(cmd, check_rc=True)
                 changed = True
                 actions.append('created')
             is_pv = True
@@ -162,9 +160,7 @@ def main():
                 if rescan_device(module, device):
                     actions.append('rescanned')
                 original_size = get_pv_size(module, device)
-                rc, out, err = module.run_command(['pvresize', device])
-                if rc != 0:
-                    module.fail_json(msg="PV resize failed: %s" % err)
+                rc, out, err = module.run_command(['pvresize', device], check_rc=True)
                 new_size = get_pv_size(module, device)
                 if new_size != original_size:
                     changed = True
@@ -178,26 +174,19 @@ def main():
         if is_pv:
             if module.check_mode:
                 changed = True
-                actions.append('would be removed')
-            else:
-                cmd = ['pvremove']
+                cmd = ['pvremove', '-y']
                 if force:
-                    cmd.extend(['-ff', '-y'])
-                else:
-                    cmd.append('-y')
+                    cmd.append('-ff')
+
                 cmd.append(device)
-                rc, out, err = module.run_command(cmd)
-                if rc != 0:
-                    module.fail_json(msg="Failed to remove PV: %s" % err)
-                changed = True
+                rc, out, err = module.run_command(cmd, check_rc=True)
                 actions.append('removed')
 
     # Generate final message
-    if not actions:
-        msg = "No changes needed for PV %s" % device
-    else:
+    if actions:
         msg = "PV %s: %s" % (device, ', '.join(actions))
-
+    else:
+        msg = "No changes needed for PV %s" % device
     module.exit_json(changed=changed, msg=msg)
 
 
