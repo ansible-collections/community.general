@@ -166,6 +166,7 @@ jobs:
           integration-continue-on-error: 'false'
           integration-diff: 'false'
           integration-retry-on-error: 'true'
+          # TODO: remove "--branch stable-2" from community.crypto install once we're only using ansible-core 2.17 or newer!
           pre-test-cmd: >-
             mkdir -p ../../ansible
             ;
