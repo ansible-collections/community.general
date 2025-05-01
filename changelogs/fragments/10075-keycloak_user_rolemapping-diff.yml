@@ -1,0 +1,2 @@
+bugfixes:
+  - "keycloak_user_rolemapping - fix ``--diff`` mode (https://github.com/ansible-collections/community.general/issues/10067, https://github.com/ansible-collections/community.general/pull/10075)."
