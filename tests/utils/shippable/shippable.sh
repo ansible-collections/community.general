@@ -10,6 +10,7 @@ IFS='/:' read -ra args <<< "$1"
 
 ansible_version="${args[0]}"
 script="${args[1]}"
+after_script="${args[2]}"
 
 function join {
     local IFS="$1";
@@ -81,10 +82,18 @@ if [ "${script}" != "sanity" ] || [ "${test}" == "sanity/extra" ]; then
     # retry ansible-galaxy -vvv collection install community.internal_test_tools
 fi
 
+COMMUNITY_CRYPTO_BRANCH=main
+if [ "${ansible_version}" == "2.16" ]; then
+    COMMUNITY_CRYPTO_BRANCH=stable-2
+fi
+if [ "${script}" == "linux" ] && [ "$after_script" == "ubuntu2004" ]; then
+    COMMUNITY_CRYPTO_BRANCH=stable-2
+fi
+
 if [ "${script}" != "sanity" ] && [ "${script}" != "units" ] && [ "${test}" != "sanity/extra" ]; then
     # To prevent Python dependencies on other collections only install other collections for integration tests
     retry git clone --depth=1 --single-branch https://github.com/ansible-collections/ansible.posix.git "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/ansible/posix"
-    retry git clone --depth=1 --single-branch https://github.com/ansible-collections/community.crypto.git "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/crypto"
+    retry git clone --depth=1 --single-branch --branch "${COMMUNITY_CRYPTO_BRANCH}" https://github.com/ansible-collections/community.crypto.git "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/crypto"
     # NOTE: we're installing with git to work around Galaxy being a huge PITA (https://github.com/ansible/galaxy/issues/2429)
     # retry ansible-galaxy -vvv collection install ansible.posix
     # retry ansible-galaxy -vvv collection install community.crypto
