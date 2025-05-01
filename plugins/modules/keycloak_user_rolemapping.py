@@ -350,7 +350,7 @@ def main():
             # Assign roles
             result['changed'] = True
             if module._diff:
-                result['diff'] = dict(before=assigned_roles_before, after=update_roles)
+                result['diff'] = dict(before={"roles": assigned_roles_before}, after={"roles": update_roles})
             if module.check_mode:
                 module.exit_json(**result)
             kc.add_user_rolemapping(uid=uid, cid=cid, role_rep=update_roles, realm=realm)
@@ -365,7 +365,7 @@ def main():
             # Remove mapping of role
             result['changed'] = True
             if module._diff:
-                result['diff'] = dict(before=assigned_roles_before, after=update_roles)
+                result['diff'] = dict(before={"roles": assigned_roles_before}, after={"roles": update_roles})
             if module.check_mode:
                 module.exit_json(**result)
             kc.delete_user_rolemapping(uid=uid, cid=cid, role_rep=update_roles, realm=realm)
