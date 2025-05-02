@@ -45,6 +45,11 @@ DOCUMENTATION = '''
         description: Fallback to cached results if connection to cobbler fails.
         type: boolean
         default: false
+      connection_timeout:
+        description: Timeout to connect to cobbler server.
+        type: int
+        required: false
+        version_added: 10.7.0
       exclude_mgmt_classes:
         description: Management classes to exclude from inventory.
         type: list
@@ -142,6 +147,18 @@ except ImportError:
         HAS_XMLRPC_CLIENT = False
 
 
+class TimeoutTransport (xmlrpc_client.SafeTransport):
+    def __init__(self, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
+        super(TimeoutTransport, self).__init__()
+        self._timeout = timeout
+        self.context = None
+
+    def make_connection(self, host):
+        conn = xmlrpc_client.SafeTransport.make_connection(self, host)
+        conn.timeout = self._timeout
+        return conn
+
+
 class InventoryModule(BaseInventoryPlugin, Cacheable):
     ''' Host inventory parser for ansible using cobbler as source. '''
 
@@ -235,7 +252,12 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
         # get connection host
         self.cobbler_url = self.get_option('url')
         self.display.vvvv(f'Connecting to {self.cobbler_url}\n')
-        self.cobbler = xmlrpc_client.Server(self.cobbler_url, allow_none=True)
+
+        if 'connection_timeout' in self._options:
+            self.cobbler = xmlrpc_client.Server(self.cobbler_url, allow_none=True,
+                                                transport=TimeoutTransport(timeout=self.get_option('connection_timeout')))
+        else:
+            self.cobbler = xmlrpc_client.Server(self.cobbler_url, allow_none=True)
         self.token = None
         if self.get_option('user') is not None:
             self.token = self.cobbler.login(text_type(self.get_option('user')), text_type(self.get_option('password')))
