@@ -1,0 +1,2 @@
+minor_changes:
+  - cobbler inventory plugin - add ``connection_timeout`` option to specify the connection timeout to the cobbler server (https://github.com/ansible-collections/community.general/pull/11063).
