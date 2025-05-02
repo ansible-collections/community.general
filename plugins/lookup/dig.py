@@ -152,73 +152,73 @@ _list:
   contains:
     ALL:
       description:
-        - Owner, ttl, type.
+        - C(owner), C(ttl), C(type).
     A:
       description:
-        - Address.
+        - C(address).
     AAAA:
       description:
-        - Address.
+        - C(address).
     CAA:
       description:
-        - Flags.
-        - Tag.
-        - Value.
+        - C(flags).
+        - C(tag).
+        - C(value).
       version_added: 6.3.0
     CNAME:
       description:
-        - Target.
+        - C(target).
     DNAME:
       description:
-        - Target.
+        - C(target).
     DNSKEY:
       description:
-        - Flags, algorithm, protocol, key.
+        - C(flags), C(algorithm), C(protocol), C(key).
     DS:
       description:
-        - Algorithm, digest_type, key_tag, digest.
+        - C(algorithm), C(digest_type), C(key_tag), C(digest).
     HINFO:
       description:
-        - CPU, OS.
+        - C(cpu), C(os).
     LOC:
       description:
-        - Latitude, longitude, altitude, size, horizontal_precision, vertical_precision.
+        - C(latitude), C(longitude), C(altitude), C(size), C(horizontal_precision), C(vertical_precision).
     MX:
       description:
-        - Preference, exchange.
+        - C(preference), C(exchange).
     NAPTR:
       description:
-        - Order, preference, flags, service, regexp, replacement.
+        - C(order), C(preference), C(flags), C(service), C(regexp), C(replacement).
     NS:
       description:
-        - Target.
+        - C(target).
     NSEC3PARAM:
       description:
-        - Algorithm, flags, iterations, salt.
+        - C(algorithm), C(flags), C(iterations), C(salt).
     PTR:
       description:
-        - Target.
+        - C(target).
     RP:
       description:
-        - Mbox, txt.
+        - C(mbox), C(txt).
     SOA:
       description:
-        - Mname, rname, serial, refresh, retry, expire, minimum.
+        - C(mname), C(rname), C(serial), C(refresh), C(retry), C(expire), C(minimum).
     SPF:
       description:
-        - Strings.
+        - C(strings).
     SRV:
       description:
-        - Priority, weight, port, target.
+        - C(priority), C(weight), C(port), C(target).
     SSHFP:
       description:
-        - Algorithm, fp_type, fingerprint.
+        - C(algorithm), C(fp_type), C(fingerprint).
     TLSA:
       description:
-        - Usage, selector, mtype, cert.
+        - C(usage), C(selector), C(mtype), C(cert).
     TXT:
       description:
-        - Strings.
+        - C(strings).
 """
 
 from ansible.errors import AnsibleError
