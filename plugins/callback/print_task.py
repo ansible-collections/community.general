@@ -13,8 +13,6 @@ short_description: Prints playbook task snippet to job output
 description:
   - This is an Ansible callback plugin that will print the currently executing
     playbook task to the job output.
-author:
-  - Max Mitschke
 requirements:
   - enable in configuration
 '''
@@ -23,6 +21,7 @@ requirements:
 import yaml
 
 from ansible.plugins.callback import CallbackBase
+
 
 class CallbackModule(CallbackBase):
     """
