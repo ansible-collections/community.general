@@ -210,6 +210,8 @@ files:
     maintainers: resmo
   $filters/to_months.yml:
     maintainers: resmo
+  $filters/to_prettytable.py:
+    maintainers: tgadiev
   $filters/to_seconds.yml:
     maintainers: resmo
   $filters/to_time_unit.yml:
