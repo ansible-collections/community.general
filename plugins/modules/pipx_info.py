@@ -146,6 +146,7 @@ class PipXInfo(ModuleHelper):
     )
     use_old_vardict = False
 
+    # silly comment to trigger test
     def __init_module__(self):
         if self.vars.executable:
             self.command = [self.vars.executable]
