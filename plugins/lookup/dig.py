@@ -145,7 +145,7 @@ EXAMPLES = r"""
 RETURN = r"""
 _list:
   description:
-    - List of composed strings or dictionaries with key and value If a dictionary, fields shows the keys returned depending
+    - List of composed strings or of dictionaries, with fields depending
       on query type.
   type: list
   elements: raw
