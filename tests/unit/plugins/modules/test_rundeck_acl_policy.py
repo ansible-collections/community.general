@@ -1,5 +1,8 @@
 # tests/unit/plugins/modules/test_rundeck_acl_policy.py
 
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
+
 import pytest
 from ansible_collections.community.general.plugins.modules import rundeck_acl_policy
 from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
@@ -30,7 +33,7 @@ PROJECT_TABLE = [
 
 @pytest.mark.parametrize("project, prefix", PROJECT_TABLE)
 @patch.object(rundeck_acl_policy, 'api_request')
-def test_acl_create(api_request_mock, project, prefix) -> None:
+def test_acl_create(api_request_mock, project, prefix):
     """Test creating a new ACL, both system-level and project-level."""
     name = "my_policy"
     policy = "test_policy_yaml"
