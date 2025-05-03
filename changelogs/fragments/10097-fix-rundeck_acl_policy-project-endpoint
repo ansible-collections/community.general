@@ -1,0 +1,2 @@
+bugfixes:
+  - Fix rundeck_acl_policy posts/puts project acls to wrong endpoint
