@@ -30,7 +30,7 @@ class CallbackModule(CallbackBase):
     """
     CALLBACK_VERSION = 2.0
     CALLBACK_TYPE = 'aggregate'
-    CALLBACK_NAME = 'print_task'
+    CALLBACK_NAME = 'community.general.print_task'
 
     CALLBACK_NEEDS_ENABLED = True
 
@@ -39,10 +39,11 @@ class CallbackModule(CallbackBase):
         self._printed_message = False
 
     def _print_task(self, task):
-        task_snippet = yaml.load(str([task._ds.copy()]), Loader=yaml.Loader)
-        task_yaml = yaml.dump(task_snippet, sort_keys=False)
-        self._display.v(f"\n{task_yaml}\n")
-        self._printed_message = True
+        if hasattr(task, '_ds'):
+          task_snippet = yaml.load(str([task._ds.copy()]), Loader=yaml.Loader)
+          task_yaml = yaml.dump(task_snippet, sort_keys=False)
+          self._display.v(f"\n{task_yaml}\n")
+          self._printed_message = True
 
     def v2_playbook_on_task_start(self, task, is_conditional):
         self._printed_message = False
