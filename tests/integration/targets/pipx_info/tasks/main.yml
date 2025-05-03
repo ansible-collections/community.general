@@ -9,10 +9,13 @@
     extra_args: --user
 
 ##############################################################################
-- name: ensure application tox is uninstalled
+- name: ensure applications are uninstalled
   community.general.pipx:
+    name: "{{ item }}"
     state: absent
-    name: tox
+  loop:
+    - tox
+    - pylint
 
 - name: retrieve applications (empty)
   community.general.pipx_info: {}
