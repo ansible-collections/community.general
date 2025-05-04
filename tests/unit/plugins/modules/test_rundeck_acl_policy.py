@@ -59,13 +59,13 @@ def test_acl_create(api_request_mock, project, prefix):
     # should have done GET → POST → GET
     assert api_request_mock.call_count == 3
     args, kwargs = api_request_mock.call_args_list[1]
-    assert kwargs['endpoint'] == f"{prefix}/{name}.aclpolicy"
+    assert kwargs['endpoint'] == "%s/%s.aclpolicy" % (prefix, name)
     assert kwargs['method'] == 'POST'
 
 
 @pytest.mark.parametrize("project, prefix", PROJECT_TABLE)
 @patch.object(rundeck_acl_policy, 'api_request')
-def test_acl_unchanged(api_request_mock, project, prefix) -> None:
+def test_acl_unchanged(api_request_mock, project, prefix):
     """Test no-op when existing ACL contents match the desired policy."""
     name = "unchanged_policy"
     policy = "same_policy_yaml"
@@ -88,14 +88,14 @@ def test_acl_unchanged(api_request_mock, project, prefix) -> None:
     # only a single GET
     assert api_request_mock.call_count == 1
     args, kwargs = api_request_mock.call_args
-    assert kwargs['endpoint'] == f"{prefix}/{name}.aclpolicy"
+    assert kwargs['endpoint'] == "%s/%s.aclpolicy" % (prefix, name)
     # default method is GET
     assert kwargs.get('method', 'GET') == 'GET'
 
 
 @pytest.mark.parametrize("project, prefix", PROJECT_TABLE)
 @patch.object(rundeck_acl_policy, 'api_request')
-def test_acl_remove(api_request_mock, project, prefix) -> None:
+def test_acl_remove(api_request_mock, project, prefix):
     """Test removing an existing ACL, both system- and project-level."""
     name = "remove_me"
     # GET finds it, DELETE removes it
@@ -120,13 +120,13 @@ def test_acl_remove(api_request_mock, project, prefix) -> None:
     # GET → DELETE
     assert api_request_mock.call_count == 2
     args, kwargs = api_request_mock.call_args_list[1]
-    assert kwargs['endpoint'] == f"{prefix}/{name}.aclpolicy"
+    assert kwargs['endpoint'] == "%s/%s.aclpolicy"% (prefix, name)
     assert kwargs['method'] == 'DELETE'
 
 
 @pytest.mark.parametrize("project, prefix", PROJECT_TABLE)
 @patch.object(rundeck_acl_policy, 'api_request')
-def test_acl_remove_nonexistent(api_request_mock, project, prefix) -> None:
+def test_acl_remove_nonexistent(api_request_mock, project, prefix):
     """Test removing a non-existent ACL results in no change."""
     name = "not_there"
     # GET returns 404
@@ -148,5 +148,5 @@ def test_acl_remove_nonexistent(api_request_mock, project, prefix) -> None:
     # only the initial GET
     assert api_request_mock.call_count == 1
     args, kwargs = api_request_mock.call_args
-    assert kwargs['endpoint'] == f"{prefix}/{name}.aclpolicy"
+    assert kwargs['endpoint'] == "%s/%s.aclpolicy" % (prefix, name)
     assert kwargs.get('method', 'GET') == 'GET'
