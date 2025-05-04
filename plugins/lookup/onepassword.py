@@ -8,39 +8,40 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    name: onepassword
-    author:
-      - Scott Buchanan (@scottsb)
-      - Andrew Zenk (@azenk)
-      - Sam Doran (@samdoran)
-    short_description: Fetch field values from 1Password
-    description:
-      - P(community.general.onepassword#lookup) wraps the C(op) command line utility to fetch specific field values from 1Password.
-    requirements:
-      - C(op) 1Password command line utility
-    options:
-      _terms:
-        description: Identifier(s) (case-insensitive UUID or name) of item(s) to retrieve.
-        required: true
-        type: list
-        elements: string
-      account_id:
-        version_added: 7.5.0
-      domain:
-        version_added: 3.2.0
-      field:
-        description: Field to return from each matching item (case-insensitive).
-        default: 'password'
-        type: str
-      service_account_token:
-        version_added: 7.1.0
-    extends_documentation_fragment:
-      - community.general.onepassword
-      - community.general.onepassword.lookup
-'''
+DOCUMENTATION = r"""
+name: onepassword
+author:
+  - Scott Buchanan (@scottsb)
+  - Andrew Zenk (@azenk)
+  - Sam Doran (@samdoran)
+short_description: Fetch field values from 1Password
+description:
+  - P(community.general.onepassword#lookup) wraps the C(op) command line utility to fetch specific field values from 1Password.
+requirements:
+  - C(op) 1Password command line utility
+options:
+  _terms:
+    description: Identifier(s) (case-insensitive UUID or name) of item(s) to retrieve.
+    required: true
+    type: list
+    elements: string
+  account_id:
+    version_added: 7.5.0
+  domain:
+    version_added: 3.2.0
+  field:
+    description: Field to return from each matching item (case-insensitive).
+    default: 'password'
+    type: str
+  service_account_token:
+    version_added: 7.1.0
+extends_documentation_fragment:
+  - community.general.onepassword
+  - community.general.onepassword.lookup
+"""
 
-EXAMPLES = """
+EXAMPLES = r"""
+---
 # These examples only work when already signed in to 1Password
 - name: Retrieve password for KITT when already signed in to 1Password
   ansible.builtin.debug:
@@ -56,32 +57,24 @@ EXAMPLES = """
 
 - name: Retrieve password for HAL when not signed in to 1Password
   ansible.builtin.debug:
-    var: lookup('community.general.onepassword',
-                'HAL 9000',
-                subdomain='Discovery',
-                master_password=vault_master_password)
+    var: lookup('community.general.onepassword', 'HAL 9000', subdomain='Discovery', master_password=vault_master_password)
 
 - name: Retrieve password for HAL when never signed in to 1Password
   ansible.builtin.debug:
-    var: lookup('community.general.onepassword',
-                'HAL 9000',
-                subdomain='Discovery',
-                master_password=vault_master_password,
-                username='tweety@acme.com',
-                secret_key=vault_secret_key)
+    var: >-
+      lookup('community.general.onepassword', 'HAL 9000', subdomain='Discovery', master_password=vault_master_password,
+             username='tweety@acme.com', secret_key=vault_secret_key)
 
 - name: Retrieve password from specific account
   ansible.builtin.debug:
-    var: lookup('community.general.onepassword',
-                'HAL 9000',
-                account_id='abc123')
+    var: lookup('community.general.onepassword', 'HAL 9000', account_id='abc123')
 """
 
-RETURN = """
-  _raw:
-    description: Field data requested.
-    type: list
-    elements: str
+RETURN = r"""
+_raw:
+  description: Field data requested.
+  type: list
+  elements: str
 """
 
 import abc

@@ -7,18 +7,18 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    name: keyring
-    author:
-      - Samuel Boucher (!UNKNOWN) <boucher.samuel.c@gmail.com>
-    requirements:
-      - keyring (python library)
-    short_description: grab secrets from the OS keyring
-    description:
-      - Allows you to access data stored in the OS provided keyring/keychain.
-'''
+DOCUMENTATION = r"""
+name: keyring
+author:
+  - Samuel Boucher (!UNKNOWN) <boucher.samuel.c@gmail.com>
+requirements:
+  - keyring (python library)
+short_description: grab secrets from the OS keyring
+description:
+  - Allows you to access data stored in the OS provided keyring/keychain.
+"""
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: output secrets to screen (BAD IDEA)
   ansible.builtin.debug:
     msg: "Password: {{item}}"
@@ -31,11 +31,11 @@ EXAMPLES = """
     login_user: joe
 """
 
-RETURN = """
-  _raw:
-    description: Secrets stored.
-    type: list
-    elements: str
+RETURN = r"""
+_raw:
+  description: Secrets stored.
+  type: list
+  elements: str
 """
 
 HAS_KEYRING = True

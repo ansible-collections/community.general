@@ -6,31 +6,31 @@ from __future__ import (absolute_import, division, print_function)
 
 __metaclass__ = type
 
-DOCUMENTATION = """
-    name: bitwarden_secrets_manager
-    author:
-      - jantari (@jantari)
-    requirements:
-      - bws (command line utility)
-    short_description: Retrieve secrets from Bitwarden Secrets Manager
-    version_added: 7.2.0
-    description:
-      - Retrieve secrets from Bitwarden Secrets Manager.
-    options:
-      _terms:
-        description: Secret ID(s) to fetch values for.
-        required: true
-        type: list
-        elements: str
-      bws_access_token:
-        description: The BWS access token to use for this lookup.
-        env:
-          - name: BWS_ACCESS_TOKEN
-        required: true
-        type: str
+DOCUMENTATION = r"""
+name: bitwarden_secrets_manager
+author:
+  - jantari (@jantari)
+requirements:
+  - bws (command line utility)
+short_description: Retrieve secrets from Bitwarden Secrets Manager
+version_added: 7.2.0
+description:
+  - Retrieve secrets from Bitwarden Secrets Manager.
+options:
+  _terms:
+    description: Secret ID(s) to fetch values for.
+    required: true
+    type: list
+    elements: str
+  bws_access_token:
+    description: The BWS access token to use for this lookup.
+    env:
+      - name: BWS_ACCESS_TOKEN
+    required: true
+    type: str
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Get a secret relying on the BWS_ACCESS_TOKEN environment variable for authentication
   ansible.builtin.debug:
     msg: >-
@@ -62,11 +62,11 @@ EXAMPLES = """
       {{ lookup("community.general.bitwarden_secrets_manager", "2bc23e48-4932-40de-a047-5524b7ddc972").value }}
 """
 
-RETURN = """
-  _raw:
-    description: List containing one or more secrets.
-    type: list
-    elements: dict
+RETURN = r"""
+_raw:
+  description: List containing one or more secrets.
+  type: list
+  elements: dict
 """
 
 from subprocess import Popen, PIPE

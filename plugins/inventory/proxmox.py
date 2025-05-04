@@ -155,7 +155,11 @@ user: ci@pve
 token_id: gitlab-1
 token_secret: fa256e9c-26ab-41ec-82da-707a2c079829
 
+---
 # The secret can also be a vault string or passed via the environment variable TOKEN_SECRET.
+plugin: community.general.proxmox
+user: ci@pve
+token_id: gitlab-1
 token_secret: !vault |
           $ANSIBLE_VAULT;1.1;AES256
           62353634333163633336343265623632626339313032653563653165313262343931643431656138
@@ -216,7 +220,6 @@ password: "{{ lookup('community.general.random_string', base64=True) }}"
 # Note that this can easily give you wrong values as ansible_host. See further up for
 # an example where this is set to `false` and where ansible_host is set with `compose`.
 want_proxmox_nodes_ansible_host: true
-
 '''
 
 import itertools

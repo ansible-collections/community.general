@@ -6,62 +6,64 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    author: Unknown (!UNKNOWN)
-    name: cyberarkpassword
-    short_description: get secrets from CyberArk AIM
-    requirements:
-      - CyberArk AIM tool installed
+DOCUMENTATION = r"""
+author: Unknown (!UNKNOWN)
+name: cyberarkpassword
+short_description: get secrets from CyberArk AIM
+requirements:
+  - CyberArk AIM tool installed
+description:
+  - Get secrets from CyberArk AIM.
+options:
+  _command:
+    description: Cyberark CLI utility.
+    type: string
+    env:
+      - name: AIM_CLIPASSWORDSDK_CMD
+    default: '/opt/CARKaim/sdk/clipasswordsdk'
+  appid:
+    description: Defines the unique ID of the application that is issuing the password request.
+    type: string
+    required: true
+  query:
+    description: Describes the filter criteria for the password retrieval.
+    type: string
+    required: true
+  output:
     description:
-      - Get secrets from CyberArk AIM.
-    options :
-      _command:
-        description: Cyberark CLI utility.
-        type: string
-        env:
-          - name: AIM_CLIPASSWORDSDK_CMD
-        default: '/opt/CARKaim/sdk/clipasswordsdk'
-      appid:
-        description: Defines the unique ID of the application that is issuing the password request.
-        type: string
-        required: true
-      query:
-        description: Describes the filter criteria for the password retrieval.
-        type: string
-        required: true
-      output:
-        description:
-          - Specifies the desired output fields separated by commas.
-          - "They could be: Password, PassProps.<property>, PasswordChangeInProcess"
-        type: string
-        default: 'password'
-      _extra:
-        description: for extra_params values please check parameters for clipasswordsdk in CyberArk's "Credential Provider and ASCP Implementation Guide"
-    notes:
-      - For Ansible on Windows, please change the -parameters (-p, -d, and -o) to /parameters (/p, /d, and /o) and change the location of CLIPasswordSDK.exe.
-'''
-
-EXAMPLES = """
-  - name: passing options to the lookup
-    ansible.builtin.debug:
-        msg: '{{ lookup("community.general.cyberarkpassword", cyquery) }}'
-    vars:
-      cyquery:
-        appid: "app_ansible"
-        query: "safe=CyberArk_Passwords;folder=root;object=AdminPass"
-        output: "Password,PassProps.UserName,PassProps.Address,PasswordChangeInProcess"
-
-
-  - name: used in a loop
-    ansible.builtin.debug:
-        msg: "{{item}}"
-    with_community.general.cyberarkpassword:
-        appid: 'app_ansible'
-        query: 'safe=CyberArk_Passwords;folder=root;object=AdminPass'
-        output: 'Password,PassProps.UserName,PassProps.Address,PasswordChangeInProcess'
+      - Specifies the desired output fields separated by commas.
+      - 'They could be: Password, PassProps.<property>, PasswordChangeInProcess.'
+    type: string
+    default: 'password'
+  _extra:
+    description: For extra_params values please check parameters for clipasswordsdk in CyberArk's "Credential Provider and
+      ASCP Implementation Guide".
+notes:
+  - For Ansible on Windows, please change the -parameters (C(-p), C(-d), and C(-o)) to /parameters (C(/p), C(/d), and C(/o)) and change the
+    location of C(CLIPasswordSDK.exe).
 """
 
-RETURN = """
+EXAMPLES = r"""
+- name: passing options to the lookup
+  ansible.builtin.debug:
+    msg: '{{ lookup("community.general.cyberarkpassword", cyquery) }}'
+  vars:
+    cyquery:
+      appid: "app_ansible"
+      query: "safe=CyberArk_Passwords;folder=root;object=AdminPass"
+      output: "Password,PassProps.UserName,PassProps.Address,PasswordChangeInProcess"
+
+
+- name: used in a loop
+  ansible.builtin.debug:
+    msg: "{{item}}"
+  with_community.general.cyberarkpassword:
+    appid: 'app_ansible'
+    query: 'safe=CyberArk_Passwords;folder=root;object=AdminPass'
+    output: 'Password,PassProps.UserName,PassProps.Address,PasswordChangeInProcess'
+"""
+
+RETURN = r"""
 _result:
   description: A list containing one dictionary.
   type: list
@@ -69,12 +71,12 @@ _result:
   contains:
     password:
       description:
-        - The actual value stored
+        - The actual value stored.
     passprops:
-      description: properties assigned to the entry
+      description: Properties assigned to the entry.
       type: dictionary
     passwordchangeinprocess:
-      description: did the password change?
+      description: Did the password change?
 """
 
 import os
