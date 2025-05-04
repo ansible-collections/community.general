@@ -6,22 +6,23 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 name: filetree
 author: Dag Wieers (@dagwieers) <dag@wieers.com>
 short_description: recursively match all files in a directory tree
 description:
-- This lookup enables you to template a complete tree of files on a target system while retaining permissions and ownership.
-- Supports directories, files and symlinks, including SELinux and other file properties.
-- If you provide more than one path, it will implement a first_found logic, and will not process entries it already processed in previous paths.
-  This enables merging different trees in order of importance, or add role_vars to specific paths to influence different instances of the same role.
+  - This lookup enables you to template a complete tree of files on a target system while retaining permissions and ownership.
+  - Supports directories, files and symlinks, including SELinux and other file properties.
+  - If you provide more than one path, it will implement a first_found logic, and will not process entries it already processed
+    in previous paths. This enables merging different trees in order of importance, or add role_vars to specific paths to
+    influence different instances of the same role.
 options:
   _terms:
     description: Path(s) of files to read.
     required: true
     type: list
     elements: string
-'''
+"""
 
 EXAMPLES = r"""
 - name: Create directories
@@ -59,61 +60,61 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
-  _raw:
-    description: List of dictionaries with file information.
-    type: list
-    elements: dict
-    contains:
-        src:
-          description:
-          - Full path to file.
-          - Not returned when RV(_raw[].state) is set to V(directory).
-          type: path
-        root:
-          description: Allows filtering by original location.
-          type: path
-        path:
-          description: Contains the relative path to root.
-          type: path
-        mode:
-          description: The permissions the resulting file or directory.
-          type: str
-        state:
-          description: TODO
-          type: str
-        owner:
-          description: Name of the user that owns the file/directory.
-          type: raw
-        group:
-          description: Name of the group that owns the file/directory.
-          type: raw
-        seuser:
-          description: The user part of the SELinux file context.
-          type: raw
-        serole:
-          description: The role part of the SELinux file context.
-          type: raw
-        setype:
-          description: The type part of the SELinux file context.
-          type: raw
-        selevel:
-          description: The level part of the SELinux file context.
-          type: raw
-        uid:
-          description: Owner ID of the file/directory.
-          type: int
-        gid:
-          description: Group ID of the file/directory.
-          type: int
-        size:
-          description: Size of the target.
-          type: int
-        mtime:
-          description: Time of last modification.
-          type: float
-        ctime:
-          description: Time of last metadata update or creation (depends on OS).
-          type: float
+_raw:
+  description: List of dictionaries with file information.
+  type: list
+  elements: dict
+  contains:
+    src:
+      description:
+        - Full path to file.
+        - Not returned when RV(_raw[].state) is set to V(directory).
+      type: path
+    root:
+      description: Allows filtering by original location.
+      type: path
+    path:
+      description: Contains the relative path to root.
+      type: path
+    mode:
+      description: The permissions the resulting file or directory.
+      type: str
+    state:
+      description: TODO.
+      type: str
+    owner:
+      description: Name of the user that owns the file/directory.
+      type: raw
+    group:
+      description: Name of the group that owns the file/directory.
+      type: raw
+    seuser:
+      description: The user part of the SELinux file context.
+      type: raw
+    serole:
+      description: The role part of the SELinux file context.
+      type: raw
+    setype:
+      description: The type part of the SELinux file context.
+      type: raw
+    selevel:
+      description: The level part of the SELinux file context.
+      type: raw
+    uid:
+      description: Owner ID of the file/directory.
+      type: int
+    gid:
+      description: Group ID of the file/directory.
+      type: int
+    size:
+      description: Size of the target.
+      type: int
+    mtime:
+      description: Time of last modification.
+      type: float
+    ctime:
+      description: Time of last metadata update or creation (depends on OS).
+      type: float
 """
 import os
 import pwd

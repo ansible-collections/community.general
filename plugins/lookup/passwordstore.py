@@ -7,167 +7,168 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
-    name: passwordstore
-    author:
-      - Patrick Deelman (!UNKNOWN) <patrick@patrickdeelman.nl>
-    short_description: manage passwords with passwordstore.org's pass utility
+DOCUMENTATION = r"""
+name: passwordstore
+author:
+  - Patrick Deelman (!UNKNOWN) <patrick@patrickdeelman.nl>
+short_description: manage passwords with passwordstore.org's pass utility
+description:
+  - Enables Ansible to retrieve, create or update passwords from the passwordstore.org pass utility. It can also retrieve,
+    create or update YAML style keys stored as multilines in the passwordfile.
+  - To avoid problems when accessing multiple secrets at once, add C(auto-expand-secmem) to C(~/.gnupg/gpg-agent.conf). Where
+    this is not possible, consider using O(lock=readwrite) instead.
+options:
+  _terms:
+    description: Query key.
+    required: true
+  directory:
     description:
-      - Enables Ansible to retrieve, create or update passwords from the passwordstore.org pass utility.
-        It can also retrieve, create or update YAML style keys stored as multilines in the passwordfile.
-      - To avoid problems when accessing multiple secrets at once, add C(auto-expand-secmem) to
-        C(~/.gnupg/gpg-agent.conf). Where this is not possible, consider using O(lock=readwrite) instead.
-    options:
-      _terms:
-        description: query key.
-        required: true
-      directory:
-        description:
-          - The directory of the password store.
-          - If O(backend=pass), the default is V(~/.password-store) is used.
-          - If O(backend=gopass), then the default is the C(path) field in C(~/.config/gopass/config.yml),
-            falling back to V(~/.local/share/gopass/stores/root) if C(path) is not defined in the gopass config.
-        type: path
-        vars:
-          - name: passwordstore
-        env:
-          - name: PASSWORD_STORE_DIR
-      create:
-        description: Create the password or the subkey if it does not already exist. Takes precedence over O(missing).
-        type: bool
-        default: false
-      overwrite:
-        description: Overwrite the password or the subkey if it does already exist.
-        type: bool
-        default: false
-      umask:
-        description:
-          - Sets the umask for the created V(.gpg) files. The first octed must be greater than 3 (user readable).
-          - Note pass' default value is V('077').
-        type: string
-        env:
-          - name: PASSWORD_STORE_UMASK
-        version_added: 1.3.0
-      returnall:
-        description: Return all the content of the password, not only the first line.
-        type: bool
-        default: false
-      subkey:
-        description:
-          - By default return a specific subkey of the password. When set to V(password), always returns the first line.
-          - With O(overwrite=true), it will create the subkey and return it.
-        type: str
-        default: password
-      userpass:
-        description: Specify a password to save, instead of a generated one.
-        type: str
-      length:
-        description: The length of the generated password.
-        type: integer
-        default: 16
-      backup:
-        description: Used with O(overwrite=true). Backup the previous password or subkey in a subkey.
-        type: bool
-        default: false
-      nosymbols:
-        description: Use alphanumeric characters.
-        type: bool
-        default: false
-      missing:
-        description:
-          - List of preference about what to do if the password file is missing.
-          - If O(create=true), the value for this option is ignored and assumed to be V(create).
-          - If set to V(error), the lookup will error out if the passname does not exist.
-          - If set to V(create), the passname will be created with the provided length O(length) if it does not exist.
-          - If set to V(empty) or V(warn), will return a V(none) in case the passname does not exist.
-            When using C(lookup) and not C(query), this will be translated to an empty string.
-        version_added: 3.1.0
-        type: str
-        default: error
-        choices:
-          - error
-          - warn
-          - empty
-          - create
-      lock:
-        description:
-          - How to synchronize operations.
-          - The default of V(write) only synchronizes write operations.
-          - V(readwrite) synchronizes all operations (including read). This makes sure that gpg-agent is never called in parallel.
-          - V(none) does not do any synchronization.
-        ini:
-          - section: passwordstore_lookup
-            key: lock
-        type: str
-        default: write
-        choices:
-          - readwrite
-          - write
-          - none
-        version_added: 4.5.0
-      locktimeout:
-        description:
-          - Lock timeout applied when O(lock) is not V(none).
-          - Time with a unit suffix, V(s), V(m), V(h) for seconds, minutes, and hours, respectively. For example, V(900s) equals V(15m).
-          - Correlates with C(pinentry-timeout) in C(~/.gnupg/gpg-agent.conf), see C(man gpg-agent) for details.
-        ini:
-          - section: passwordstore_lookup
-            key: locktimeout
-        type: str
-        default: 15m
-        version_added: 4.5.0
-      backend:
-        description:
-          - Specify which backend to use.
-          - Defaults to V(pass), passwordstore.org's original pass utility.
-          - V(gopass) support is incomplete.
-        ini:
-          - section: passwordstore_lookup
-            key: backend
-        vars:
-          - name: passwordstore_backend
-        type: str
-        default: pass
-        choices:
-          - pass
-          - gopass
-        version_added: 5.2.0
-      timestamp:
-        description: Add the password generation information to the end of the file.
-        type: bool
-        default: true
-        version_added: 8.1.0
-      preserve:
-        description: Include the old (edited) password inside the pass file.
-        type: bool
-        default: true
-        version_added: 8.1.0
-      missing_subkey:
-        description:
-          - Preference about what to do if the password subkey is missing.
-          - If set to V(error), the lookup will error out if the subkey does not exist.
-          - If set to V(empty) or V(warn), will return a V(none) in case the subkey does not exist.
-        version_added: 8.6.0
-        type: str
-        default: empty
-        choices:
-          - error
-          - warn
-          - empty
-        ini:
-          - section: passwordstore_lookup
-            key: missing_subkey
-    notes:
-      - The lookup supports passing all options as lookup parameters since community.general 6.0.0.
-'''
-EXAMPLES = """
+      - The directory of the password store.
+      - If O(backend=pass), the default is V(~/.password-store) is used.
+      - If O(backend=gopass), then the default is the C(path) field in C(~/.config/gopass/config.yml), falling back to V(~/.local/share/gopass/stores/root)
+        if C(path) is not defined in the gopass config.
+    type: path
+    vars:
+      - name: passwordstore
+    env:
+      - name: PASSWORD_STORE_DIR
+  create:
+    description: Create the password or the subkey if it does not already exist. Takes precedence over O(missing).
+    type: bool
+    default: false
+  overwrite:
+    description: Overwrite the password or the subkey if it does already exist.
+    type: bool
+    default: false
+  umask:
+    description:
+      - Sets the umask for the created V(.gpg) files. The first octed must be greater than 3 (user readable).
+      - Note pass' default value is V('077').
+    type: string
+    env:
+      - name: PASSWORD_STORE_UMASK
+    version_added: 1.3.0
+  returnall:
+    description: Return all the content of the password, not only the first line.
+    type: bool
+    default: false
+  subkey:
+    description:
+      - By default return a specific subkey of the password. When set to V(password), always returns the first line.
+      - With O(overwrite=true), it will create the subkey and return it.
+    type: str
+    default: password
+  userpass:
+    description: Specify a password to save, instead of a generated one.
+    type: str
+  length:
+    description: The length of the generated password.
+    type: integer
+    default: 16
+  backup:
+    description: Used with O(overwrite=true). Backup the previous password or subkey in a subkey.
+    type: bool
+    default: false
+  nosymbols:
+    description: Use alphanumeric characters.
+    type: bool
+    default: false
+  missing:
+    description:
+      - List of preference about what to do if the password file is missing.
+      - If O(create=true), the value for this option is ignored and assumed to be V(create).
+      - If set to V(error), the lookup will error out if the passname does not exist.
+      - If set to V(create), the passname will be created with the provided length O(length) if it does not exist.
+      - If set to V(empty) or V(warn), will return a V(none) in case the passname does not exist. When using C(lookup) and
+        not C(query), this will be translated to an empty string.
+    version_added: 3.1.0
+    type: str
+    default: error
+    choices:
+      - error
+      - warn
+      - empty
+      - create
+  lock:
+    description:
+      - How to synchronize operations.
+      - The default of V(write) only synchronizes write operations.
+      - V(readwrite) synchronizes all operations (including read). This makes sure that gpg-agent is never called in parallel.
+      - V(none) does not do any synchronization.
+    ini:
+      - section: passwordstore_lookup
+        key: lock
+    type: str
+    default: write
+    choices:
+      - readwrite
+      - write
+      - none
+    version_added: 4.5.0
+  locktimeout:
+    description:
+      - Lock timeout applied when O(lock) is not V(none).
+      - Time with a unit suffix, V(s), V(m), V(h) for seconds, minutes, and hours, respectively. For example, V(900s) equals
+        V(15m).
+      - Correlates with C(pinentry-timeout) in C(~/.gnupg/gpg-agent.conf), see C(man gpg-agent) for details.
+    ini:
+      - section: passwordstore_lookup
+        key: locktimeout
+    type: str
+    default: 15m
+    version_added: 4.5.0
+  backend:
+    description:
+      - Specify which backend to use.
+      - Defaults to V(pass), passwordstore.org's original pass utility.
+      - V(gopass) support is incomplete.
+    ini:
+      - section: passwordstore_lookup
+        key: backend
+    vars:
+      - name: passwordstore_backend
+    type: str
+    default: pass
+    choices:
+      - pass
+      - gopass
+    version_added: 5.2.0
+  timestamp:
+    description: Add the password generation information to the end of the file.
+    type: bool
+    default: true
+    version_added: 8.1.0
+  preserve:
+    description: Include the old (edited) password inside the pass file.
+    type: bool
+    default: true
+    version_added: 8.1.0
+  missing_subkey:
+    description:
+      - Preference about what to do if the password subkey is missing.
+      - If set to V(error), the lookup will error out if the subkey does not exist.
+      - If set to V(empty) or V(warn), will return a V(none) in case the subkey does not exist.
+    version_added: 8.6.0
+    type: str
+    default: empty
+    choices:
+      - error
+      - warn
+      - empty
+    ini:
+      - section: passwordstore_lookup
+        key: missing_subkey
+notes:
+  - The lookup supports passing all options as lookup parameters since community.general 6.0.0.
+"""
+EXAMPLES = r"""
 ansible.cfg: |
   [passwordstore_lookup]
   lock=readwrite
   locktimeout=45s
   missing_subkey=warn
 
-tasks.yml: |
+tasks.yml: |-
   ---
 
   # Debug is used for examples, BAD IDEA to show passwords on screen
@@ -233,10 +234,10 @@ tasks.yml: |
       passfilecontent: "{{ lookup('community.general.passwordstore', 'example/test', returnall=true)}}"
 """
 
-RETURN = """
+RETURN = r"""
 _raw:
   description:
-    - a password
+    - A password.
   type: list
   elements: str
 """

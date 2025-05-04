@@ -10,44 +10,43 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 DOCUMENTATION = r"""
-    name: random_words
-    author:
-      - Thomas Sjögren (@konstruktoid)
-    short_description: Return a number of random words
-    version_added: "4.0.0"
-    requirements:
-      - xkcdpass U(https://github.com/redacted/XKCD-password-generator)
+name: random_words
+author:
+  - Thomas Sjögren (@konstruktoid)
+short_description: Return a number of random words
+version_added: "4.0.0"
+requirements:
+  - xkcdpass U(https://github.com/redacted/XKCD-password-generator)
+description:
+  - Returns a number of random words. The output can for example be used for passwords.
+  - See U(https://xkcd.com/936/) for background.
+options:
+  numwords:
     description:
-      - Returns a number of random words. The output can for example be used for
-        passwords.
-      - See U(https://xkcd.com/936/) for background.
-    options:
-      numwords:
-        description:
-          - The number of words.
-        default: 6
-        type: int
-      min_length:
-        description:
-          - Minimum length of words to make password.
-        default: 5
-        type: int
-      max_length:
-        description:
-          - Maximum length of words to make password.
-        default: 9
-        type: int
-      delimiter:
-        description:
-          - The delimiter character between words.
-        default: " "
-        type: str
-      case:
-        description:
-          - The method for setting the case of each word in the passphrase.
-        choices: ["alternating", "upper", "lower", "random", "capitalize"]
-        default: "lower"
-        type: str
+      - The number of words.
+    default: 6
+    type: int
+  min_length:
+    description:
+      - Minimum length of words to make password.
+    default: 5
+    type: int
+  max_length:
+    description:
+      - Maximum length of words to make password.
+    default: 9
+    type: int
+  delimiter:
+    description:
+      - The delimiter character between words.
+    default: " "
+    type: str
+  case:
+    description:
+      - The method for setting the case of each word in the passphrase.
+    choices: ["alternating", "upper", "lower", "random", "capitalize"]
+    default: "lower"
+    type: str
 """
 
 EXAMPLES = r"""
@@ -74,10 +73,10 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
-  _raw:
-    description: A single-element list containing random words.
-    type: list
-    elements: str
+_raw:
+  description: A single-element list containing random words.
+  type: list
+  elements: str
 """
 
 from ansible.errors import AnsibleLookupError

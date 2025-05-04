@@ -12,54 +12,55 @@ author: RevBits (@RevBits) <info@revbits.com>
 short_description: Get secrets from RevBits PAM server
 version_added: 4.1.0
 description:
-    - Uses the revbits_ansible Python SDK to get Secrets from RevBits PAM
-      Server using API key authentication with the REST API.
+  - Uses the revbits_ansible Python SDK to get Secrets from RevBits PAM Server using API key authentication with the REST
+    API.
 requirements:
-    - revbits_ansible - U(https://pypi.org/project/revbits_ansible/)
+  - revbits_ansible - U(https://pypi.org/project/revbits_ansible/)
 options:
-    _terms:
-        description:
-            - This will be an array of keys for secrets which you want to fetch from RevBits PAM.
-        required: true
-        type: list
-        elements: string
-    base_url:
-        description:
-            - This will be the base URL of the server, for example V(https://server-url-here).
-        required: true
-        type: string
-    api_key:
-        description:
-            - This will be the API key for authentication. You can get it from the RevBits PAM secret manager module.
-        required: true
-        type: string
+  _terms:
+    description:
+      - This will be an array of keys for secrets which you want to fetch from RevBits PAM.
+    required: true
+    type: list
+    elements: string
+  base_url:
+    description:
+      - This will be the base URL of the server, for example V(https://server-url-here).
+    required: true
+    type: string
+  api_key:
+    description:
+      - This will be the API key for authentication. You can get it from the RevBits PAM secret manager module.
+    required: true
+    type: string
 """
 
 RETURN = r"""
 _list:
-    description:
-        - The JSON responses which you can access with defined keys.
-        - If you are fetching secrets named as UUID, PASSWORD it will gives you the dict of all secrets.
-    type: list
-    elements: dict
+  description:
+    - The JSON responses which you can access with defined keys.
+    - If you are fetching secrets named as UUID, PASSWORD it will gives you the dict of all secrets.
+  type: list
+  elements: dict
 """
 
 EXAMPLES = r"""
+---
 - hosts: localhost
   vars:
-      secret: >-
-        {{
-            lookup(
-                'community.general.revbitspss',
-                'UUIDPAM', 'DB_PASS',
-                base_url='https://server-url-here',
-                api_key='API_KEY_GOES_HERE'
-            )
-        }}
+    secret: >-
+      {{
+        lookup(
+          'community.general.revbitspss',
+          'UUIDPAM', 'DB_PASS',
+          base_url='https://server-url-here',
+          api_key='API_KEY_GOES_HERE'
+        )
+      }}
   tasks:
-      - ansible.builtin.debug:
-          msg: >
-            UUIDPAM is {{ (secret['UUIDPAM']) }} and DB_PASS is {{ (secret['DB_PASS']) }}
+    - ansible.builtin.debug:
+        msg: >-
+          UUIDPAM is {{ (secret['UUIDPAM']) }} and DB_PASS is {{ (secret['DB_PASS']) }}
 """
 
 from ansible.plugins.lookup import LookupBase

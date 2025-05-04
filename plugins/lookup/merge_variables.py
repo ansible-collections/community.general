@@ -6,72 +6,71 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = """
-    author:
-      - Roy Lenferink (@rlenferink)
-      - Mark Ettema (@m-a-r-k-e)
-      - Alexander Petrenz (@alpex8)
-    name: merge_variables
-    short_description: merge variables whose names match a given pattern
+DOCUMENTATION = r"""
+author:
+  - Roy Lenferink (@rlenferink)
+  - Mark Ettema (@m-a-r-k-e)
+  - Alexander Petrenz (@alpex8)
+name: merge_variables
+short_description: merge variables whose names match a given pattern
+description:
+  - This lookup returns the merged result of all variables in scope that match the given prefixes, suffixes, or regular expressions,
+    optionally.
+version_added: 6.5.0
+options:
+  _terms:
     description:
-        - This lookup returns the merged result of all variables in scope that match the given prefixes, suffixes, or
-          regular expressions, optionally.
-    version_added: 6.5.0
-    options:
-      _terms:
-        description:
-          - Depending on the value of O(pattern_type), this is a list of prefixes, suffixes, or regular expressions
-            that will be used to match all variables that should be merged.
-        required: true
-        type: list
-        elements: str
-      pattern_type:
-        description:
-          - Change the way of searching for the specified pattern.
-        type: str
-        default: 'regex'
-        choices:
-          - prefix
-          - suffix
-          - regex
-        env:
-          - name: ANSIBLE_MERGE_VARIABLES_PATTERN_TYPE
-        ini:
-          - section: merge_variables_lookup
-            key: pattern_type
-      initial_value:
-        description:
-          - An initial value to start with.
-        type: raw
-      override:
-        description:
-          - Return an error, print a warning or ignore it when a key will be overwritten.
-          - The default behavior V(error) makes the plugin fail when a key would be overwritten.
-          - When V(warn) and V(ignore) are used, note that it is important to know that the variables
-            are sorted by name before being merged. Keys for later variables in this order will overwrite
-            keys of the same name for variables earlier in this order. To avoid potential confusion,
-            better use O(override=error) whenever possible.
-        type: str
-        default: 'error'
-        choices:
-          - error
-          - warn
-          - ignore
-        env:
-          - name: ANSIBLE_MERGE_VARIABLES_OVERRIDE
-        ini:
-          - section: merge_variables_lookup
-            key: override
-      groups:
-        description:
-          - Search for variables accross hosts that belong to the given groups. This allows to collect configuration pieces
-            accross different hosts (for example a service on a host with its database on another host).
-        type: list
-        elements: str
-        version_added: 8.5.0
+      - Depending on the value of O(pattern_type), this is a list of prefixes, suffixes, or regular expressions that will
+        be used to match all variables that should be merged.
+    required: true
+    type: list
+    elements: str
+  pattern_type:
+    description:
+      - Change the way of searching for the specified pattern.
+    type: str
+    default: 'regex'
+    choices:
+      - prefix
+      - suffix
+      - regex
+    env:
+      - name: ANSIBLE_MERGE_VARIABLES_PATTERN_TYPE
+    ini:
+      - section: merge_variables_lookup
+        key: pattern_type
+  initial_value:
+    description:
+      - An initial value to start with.
+    type: raw
+  override:
+    description:
+      - Return an error, print a warning or ignore it when a key will be overwritten.
+      - The default behavior V(error) makes the plugin fail when a key would be overwritten.
+      - When V(warn) and V(ignore) are used, note that it is important to know that the variables are sorted by name before
+        being merged. Keys for later variables in this order will overwrite keys of the same name for variables earlier in
+        this order. To avoid potential confusion, better use O(override=error) whenever possible.
+    type: str
+    default: 'error'
+    choices:
+      - error
+      - warn
+      - ignore
+    env:
+      - name: ANSIBLE_MERGE_VARIABLES_OVERRIDE
+    ini:
+      - section: merge_variables_lookup
+        key: override
+  groups:
+    description:
+      - Search for variables across hosts that belong to the given groups. This allows to collect configuration pieces across
+        different hosts (for example a service on a host with its database on another host).
+    type: list
+    elements: str
+    version_added: 8.5.0
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 # Some example variables, they can be defined anywhere as long as they are in scope
 test_init_list:
   - "list init item 1"
@@ -91,7 +90,6 @@ testb__test_dict:
   ports:
     - 3
 
-
 # Merge variables that end with '__test_dict' and store the result in a variable 'example_a'
 example_a: "{{ lookup('community.general.merge_variables', '__test_dict', pattern_type='suffix') }}"
 
@@ -99,7 +97,6 @@ example_a: "{{ lookup('community.general.merge_variables', '__test_dict', patter
 # ports:
 #   - 1
 #   - 3
-
 
 # Merge variables that match the '^.+__test_list$' regular expression, starting with an initial value and store the
 # result in a variable 'example_b'
@@ -112,12 +109,12 @@ example_b: "{{ lookup('community.general.merge_variables', '^.+__test_list$', in
 #   - "test b item 1"
 """
 
-RETURN = """
-  _raw:
-    description: In case the search matches list items, a list will be returned. In case the search matches dicts, a
-     dict will be returned.
-    type: raw
-    elements: raw
+RETURN = r"""
+_raw:
+  description: In case the search matches list items, a list will be returned. In case the search matches dicts, a dict will
+    be returned.
+  type: raw
+  elements: raw
 """
 
 import re
