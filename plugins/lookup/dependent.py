@@ -6,31 +6,30 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = """
+DOCUMENTATION = r"""
 name: dependent
 short_description: Composes a list with nested elements of other lists or dicts which can depend on previous loop variables
 author: Felix Fontein (@felixfontein)
 version_added: 3.1.0
 description:
-  - "Takes the input lists and returns a list with elements that are lists, dictionaries,
-     or template expressions which evaluate to lists or dicts, composed of the elements of
-     the input evaluated lists and dictionaries."
+  - Takes the input lists and returns a list with elements that are lists, dictionaries, or template expressions which evaluate
+    to lists or dicts, composed of the elements of the input evaluated lists and dictionaries.
 options:
   _terms:
     description:
-      - A list where the elements are one-element dictionaries, mapping a name to a string, list, or dictionary.
-        The name is the index that is used in the result object. The value is iterated over as described below.
+      - A list where the elements are one-element dictionaries, mapping a name to a string, list, or dictionary. The name
+        is the index that is used in the result object. The value is iterated over as described below.
       - If the value is a list, it is simply iterated over.
-      - If the value is a dictionary, it is iterated over and returned as if they would be processed by the
-        P(ansible.builtin.dict2items#filter) filter.
-      - If the value is a string, it is evaluated as Jinja2 expressions which can access the previously chosen
-        elements with C(item.<index_name>). The result must be a list or a dictionary.
+      - If the value is a dictionary, it is iterated over and returned as if they would be processed by the P(ansible.builtin.dict2items#filter)
+        filter.
+      - If the value is a string, it is evaluated as Jinja2 expressions which can access the previously chosen elements with
+        C(item.<index_name>). The result must be a list or a dictionary.
     type: list
     elements: dict
     required: true
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Install/remove public keys for active admin users
   ansible.posix.authorized_key:
     user: "{{ item.admin.key }}"
@@ -76,9 +75,9 @@ EXAMPLES = """
   loop_control:
     # Makes the output readable, so that it doesn't contain the whole subdictionaries and lists
     label: |-
-        {{ [item.zone.key, item.prefix.key, item.entry.key,
-            item.entry.value.ttl | default(3600),
-            item.entry.value.absent | default(False), item.entry.value.value] }}
+      {{ [item.zone.key, item.prefix.key, item.entry.key,
+          item.entry.value.ttl | default(3600),
+          item.entry.value.absent | default(False), item.entry.value.value] }}
   with_community.general.dependent:
     - zone: dns_setup
     - prefix: item.zone.value
@@ -89,36 +88,36 @@ EXAMPLES = """
         '':
           A:
             value:
-            - 1.2.3.4
+              - 1.2.3.4
           AAAA:
             value:
-            - "2a01:1:2:3::1"
+              - "2a01:1:2:3::1"
         'test._domainkey':
           TXT:
             ttl: 300
             value:
-            - '"k=rsa; t=s; p=MIGfMA..."'
+              - '"k=rsa; t=s; p=MIGfMA..."'
       example.org:
         'www':
           A:
             value:
-            - 1.2.3.4
-            - 5.6.7.8
+              - 1.2.3.4
+              - 5.6.7.8
 """
 
-RETURN = """
-  _list:
-    description:
-      - A list composed of dictionaries whose keys are the variable names from the input list.
-    type: list
-    elements: dict
-    sample:
-      - key1: a
-        key2: test
-      - key1: a
-        key2: foo
-      - key1: b
-        key2: bar
+RETURN = r"""
+_list:
+  description:
+    - A list composed of dictionaries whose keys are the variable names from the input list.
+  type: list
+  elements: dict
+  sample:
+    - key1: a
+      key2: test
+    - key1: a
+      key2: foo
+    - key1: b
+      key2: bar
 """
 
 from ansible.errors import AnsibleLookupError

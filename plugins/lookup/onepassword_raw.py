@@ -8,35 +8,36 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    name: onepassword_raw
-    author:
-      - Scott Buchanan (@scottsb)
-      - Andrew Zenk (@azenk)
-      - Sam Doran (@samdoran)
-    requirements:
-      - C(op) 1Password command line utility
-    short_description: Fetch an entire item from 1Password
-    description:
-      - P(community.general.onepassword_raw#lookup) wraps C(op) command line utility to fetch an entire item from 1Password.
-    options:
-      _terms:
-        description: Identifier(s) (case-insensitive UUID or name) of item(s) to retrieve.
-        required: true
-        type: list
-        elements: string
-      account_id:
-        version_added: 7.5.0
-      domain:
-        version_added: 6.0.0
-      service_account_token:
-        version_added: 7.1.0
-    extends_documentation_fragment:
-      - community.general.onepassword
-      - community.general.onepassword.lookup
-'''
+DOCUMENTATION = r"""
+name: onepassword_raw
+author:
+  - Scott Buchanan (@scottsb)
+  - Andrew Zenk (@azenk)
+  - Sam Doran (@samdoran)
+requirements:
+  - C(op) 1Password command line utility
+short_description: Fetch an entire item from 1Password
+description:
+  - P(community.general.onepassword_raw#lookup) wraps C(op) command line utility to fetch an entire item from 1Password.
+options:
+  _terms:
+    description: Identifier(s) (case-insensitive UUID or name) of item(s) to retrieve.
+    required: true
+    type: list
+    elements: string
+  account_id:
+    version_added: 7.5.0
+  domain:
+    version_added: 6.0.0
+  service_account_token:
+    version_added: 7.1.0
+extends_documentation_fragment:
+  - community.general.onepassword
+  - community.general.onepassword.lookup
+"""
 
-EXAMPLES = """
+EXAMPLES = r"""
+---
 - name: Retrieve all data about Wintermute
   ansible.builtin.debug:
     var: lookup('community.general.onepassword_raw', 'Wintermute')
@@ -46,11 +47,11 @@ EXAMPLES = """
     var: lookup('community.general.onepassword_raw', 'Wintermute', subdomain='Turing', vault_password='DmbslfLvasjdl')
 """
 
-RETURN = """
-  _raw:
-    description: Entire item requested.
-    type: list
-    elements: dict
+RETURN = r"""
+_raw:
+  description: Entire item requested.
+  type: list
+  elements: dict
 """
 
 import json

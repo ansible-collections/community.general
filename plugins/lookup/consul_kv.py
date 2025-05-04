@@ -7,109 +7,109 @@ from __future__ import (absolute_import, division, print_function)
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    author: Unknown (!UNKNOWN)
-    name: consul_kv
-    short_description: Fetch metadata from a Consul key value store.
+DOCUMENTATION = r"""
+author: Unknown (!UNKNOWN)
+name: consul_kv
+short_description: Fetch metadata from a Consul key value store
+description:
+  - Lookup metadata for a playbook from the key value store in a Consul cluster. Values can be easily set in the kv store
+    with simple rest commands.
+  - C(curl -X PUT -d 'some-value' http://localhost:8500/v1/kv/ansible/somedata).
+requirements:
+  - 'python-consul python library U(https://python-consul.readthedocs.io/en/latest/#installation)'
+options:
+  _raw:
+    description: List of key(s) to retrieve.
+    type: list
+    elements: string
+  recurse:
+    type: boolean
+    description: If true, will retrieve all the values that have the given key as prefix.
+    default: false
+  index:
     description:
-      - Lookup metadata for a playbook from the key value store in a Consul cluster.
-        Values can be easily set in the kv store with simple rest commands
-      - C(curl -X PUT -d 'some-value' http://localhost:8500/v1/kv/ansible/somedata)
-    requirements:
-      - 'python-consul python library U(https://python-consul.readthedocs.io/en/latest/#installation)'
-    options:
-      _raw:
-        description: List of key(s) to retrieve.
-        type: list
-        elements: string
-      recurse:
-        type: boolean
-        description: If true, will retrieve all the values that have the given key as prefix.
-        default: false
-      index:
-        description:
-          - If the key has a value with the specified index then this is returned allowing access to historical values.
-        type: int
-      datacenter:
-        description:
-          - Retrieve the key from a consul datacenter other than the default for the consul host.
-        type: str
-      token:
-        description: The acl token to allow access to restricted values.
-        type: str
-      host:
-        default: localhost
-        type: str
-        description:
-          - The target to connect to, must be a resolvable address.
-          - Will be determined from E(ANSIBLE_CONSUL_URL) if that is set.
-        ini:
-          - section: lookup_consul
-            key: host
-      port:
-        description:
-          - The port of the target host to connect to.
-          - If you use E(ANSIBLE_CONSUL_URL) this value will be used from there.
-        type: int
-        default: 8500
-      scheme:
-        default: http
-        type: str
-        description:
-          - Whether to use http or https.
-          - If you use E(ANSIBLE_CONSUL_URL) this value will be used from there.
-      validate_certs:
-        default: true
-        description: Whether to verify the TLS connection or not.
-        type: bool
-        env:
-          - name: ANSIBLE_CONSUL_VALIDATE_CERTS
-        ini:
-          - section: lookup_consul
-            key: validate_certs
-      client_cert:
-        description: The client cert to verify the TLS connection.
-        type: str
-        env:
-          - name: ANSIBLE_CONSUL_CLIENT_CERT
-        ini:
-          - section: lookup_consul
-            key: client_cert
-      url:
-        description:
-          - The target to connect to.
-          - "Should look like this: V(https://my.consul.server:8500)."
-        type: str
-        version_added: 1.0.0
-        env:
-          - name: ANSIBLE_CONSUL_URL
-        ini:
-          - section: lookup_consul
-            key: url
-'''
-
-EXAMPLES = """
-  - ansible.builtin.debug:
-      msg: 'key contains {{item}}'
-    with_community.general.consul_kv:
-      - 'key/to/retrieve'
-
-  - name: Parameters can be provided after the key be more specific about what to retrieve
-    ansible.builtin.debug:
-      msg: 'key contains {{item}}'
-    with_community.general.consul_kv:
-      - 'key/to recurse=true token=E6C060A9-26FB-407A-B83E-12DDAFCB4D98'
-
-  - name: retrieving a KV from a remote cluster on non default port
-    ansible.builtin.debug:
-      msg: "{{ lookup('community.general.consul_kv', 'my/key', host='10.10.10.10', port=2000) }}"
+      - If the key has a value with the specified index then this is returned allowing access to historical values.
+    type: int
+  datacenter:
+    description:
+      - Retrieve the key from a consul datacenter other than the default for the consul host.
+    type: str
+  token:
+    description: The acl token to allow access to restricted values.
+    type: str
+  host:
+    default: localhost
+    type: str
+    description:
+      - The target to connect to, must be a resolvable address.
+      - Will be determined from E(ANSIBLE_CONSUL_URL) if that is set.
+    ini:
+      - section: lookup_consul
+        key: host
+  port:
+    description:
+      - The port of the target host to connect to.
+      - If you use E(ANSIBLE_CONSUL_URL) this value will be used from there.
+    type: int
+    default: 8500
+  scheme:
+    default: http
+    type: str
+    description:
+      - Whether to use http or https.
+      - If you use E(ANSIBLE_CONSUL_URL) this value will be used from there.
+  validate_certs:
+    default: true
+    description: Whether to verify the TLS connection or not.
+    type: bool
+    env:
+      - name: ANSIBLE_CONSUL_VALIDATE_CERTS
+    ini:
+      - section: lookup_consul
+        key: validate_certs
+  client_cert:
+    description: The client cert to verify the TLS connection.
+    type: str
+    env:
+      - name: ANSIBLE_CONSUL_CLIENT_CERT
+    ini:
+      - section: lookup_consul
+        key: client_cert
+  url:
+    description:
+      - The target to connect to.
+      - 'Should look like this: V(https://my.consul.server:8500).'
+    type: str
+    version_added: 1.0.0
+    env:
+      - name: ANSIBLE_CONSUL_URL
+    ini:
+      - section: lookup_consul
+        key: url
 """
 
-RETURN = """
-  _raw:
-    description:
-      - Value(s) stored in consul.
-    type: dict
+EXAMPLES = r"""
+- ansible.builtin.debug:
+    msg: 'key contains {{item}}'
+  with_community.general.consul_kv:
+    - 'key/to/retrieve'
+
+- name: Parameters can be provided after the key be more specific about what to retrieve
+  ansible.builtin.debug:
+    msg: 'key contains {{item}}'
+  with_community.general.consul_kv:
+    - 'key/to recurse=true token=E6C060A9-26FB-407A-B83E-12DDAFCB4D98'
+
+- name: retrieving a KV from a remote cluster on non default port
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.consul_kv', 'my/key', host='10.10.10.10', port=2000) }}"
+"""
+
+RETURN = r"""
+_raw:
+  description:
+    - Value(s) stored in consul.
+  type: dict
 """
 
 from ansible.module_utils.six.moves.urllib.parse import urlparse
