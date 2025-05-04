@@ -5,66 +5,65 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = """
-    name: bitwarden
-    author:
-      - Jonathan Lung (@lungj) <lungj@heresjono.com>
-    requirements:
-      - bw (command line utility)
-      - be logged into bitwarden
-      - bitwarden vault unlocked
-      - E(BW_SESSION) environment variable set
-    short_description: Retrieve secrets from Bitwarden
-    version_added: 5.4.0
+DOCUMENTATION = r"""
+name: bitwarden
+author:
+  - Jonathan Lung (@lungj) <lungj@heresjono.com>
+requirements:
+  - bw (command line utility)
+  - be logged into bitwarden
+  - bitwarden vault unlocked
+  - E(BW_SESSION) environment variable set
+short_description: Retrieve secrets from Bitwarden
+version_added: 5.4.0
+description:
+  - Retrieve secrets from Bitwarden.
+options:
+  _terms:
+    description: Key(s) to fetch values for from login info.
+    required: true
+    type: list
+    elements: str
+  search:
     description:
-      - Retrieve secrets from Bitwarden.
-    options:
-      _terms:
-        description: Key(s) to fetch values for from login info.
-        required: true
-        type: list
-        elements: str
-      search:
-        description:
-          - Field to retrieve, for example V(name) or V(id).
-          - If set to V(id), only zero or one element can be returned.
-            Use the Jinja C(first) filter to get the only list element.
-          - If set to V(None) or V(''), or if O(_terms) is empty, records are not filtered by fields.
-        type: str
-        default: name
-        version_added: 5.7.0
-      field:
-        description: Field to fetch. Leave unset to fetch whole response.
-        type: str
-      collection_id:
-        description:
-          - Collection ID to filter results by collection. Leave unset to skip filtering.
-          - O(collection_id) and O(collection_name) are mutually exclusive.
-        type: str
-        version_added: 6.3.0
-      collection_name:
-        description:
-          - Collection name to filter results by collection. Leave unset to skip filtering.
-          - O(collection_id) and O(collection_name) are mutually exclusive.
-        type: str
-        version_added: 10.4.0
-      organization_id:
-        description: Organization ID to filter results by organization. Leave unset to skip filtering.
-        type: str
-        version_added: 8.5.0
-      bw_session:
-        description: Pass session key instead of reading from env.
-        type: str
-        version_added: 8.4.0
-      result_count:
-        description:
-          - Number of results expected for the lookup query. Task will fail if O(result_count)
-            is set but does not match the number of query results. Leave empty to skip this check.
-        type: int
-        version_added: 10.4.0
+      - Field to retrieve, for example V(name) or V(id).
+      - If set to V(id), only zero or one element can be returned. Use the Jinja C(first) filter to get the only list element.
+      - If set to V(None) or V(''), or if O(_terms) is empty, records are not filtered by fields.
+    type: str
+    default: name
+    version_added: 5.7.0
+  field:
+    description: Field to fetch. Leave unset to fetch whole response.
+    type: str
+  collection_id:
+    description:
+      - Collection ID to filter results by collection. Leave unset to skip filtering.
+      - O(collection_id) and O(collection_name) are mutually exclusive.
+    type: str
+    version_added: 6.3.0
+  collection_name:
+    description:
+      - Collection name to filter results by collection. Leave unset to skip filtering.
+      - O(collection_id) and O(collection_name) are mutually exclusive.
+    type: str
+    version_added: 10.4.0
+  organization_id:
+    description: Organization ID to filter results by organization. Leave unset to skip filtering.
+    type: str
+    version_added: 8.5.0
+  bw_session:
+    description: Pass session key instead of reading from env.
+    type: str
+    version_added: 8.4.0
+  result_count:
+    description:
+      - Number of results expected for the lookup query. Task will fail if O(result_count) is set but does not match the number
+        of query results. Leave empty to skip this check.
+    type: int
+    version_added: 10.4.0
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: "Get 'password' from all Bitwarden records named 'a_test'"
   ansible.builtin.debug:
     msg: >-
@@ -111,14 +110,14 @@ EXAMPLES = """
       {{ lookup('community.general.bitwarden', 'a_test', result_count=1) }}
 """
 
-RETURN = """
-  _raw:
-    description:
-      - A one-element list that contains a list of requested fields or JSON objects of matches.
-      - If you use C(query), you get a list of lists. If you use C(lookup) without C(wantlist=true),
-        this always gets reduced to a list of field values or JSON objects.
-    type: list
-    elements: list
+RETURN = r"""
+_raw:
+  description:
+    - A one-element list that contains a list of requested fields or JSON objects of matches.
+    - If you use C(query), you get a list of lists. If you use C(lookup) without C(wantlist=true), this always gets reduced
+      to a list of field values or JSON objects.
+  type: list
+  elements: list
 """
 
 from subprocess import Popen, PIPE

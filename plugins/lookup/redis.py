@@ -6,50 +6,50 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    name: redis
-    author:
-      - Jan-Piet Mens (@jpmens) <jpmens(at)gmail.com>
-      - Ansible Core Team
-    short_description: fetch data from Redis
-    description:
-      - This lookup returns a list of results from a Redis DB corresponding to a list of items given to it
-    requirements:
-      - redis (python library https://github.com/andymccurdy/redis-py/)
-    options:
-      _terms:
-        description: list of keys to query
-        type: list
-        elements: string
-      host:
-        description: location of Redis host
-        type: string
-        default: '127.0.0.1'
-        env:
-          - name: ANSIBLE_REDIS_HOST
-        ini:
-          - section: lookup_redis
-            key: host
-      port:
-        description: port on which Redis is listening on
-        default: 6379
-        type: int
-        env:
-          - name: ANSIBLE_REDIS_PORT
-        ini:
-          - section: lookup_redis
-            key: port
-      socket:
-        description: path to socket on which to query Redis, this option overrides host and port options when set.
-        type: path
-        env:
-          - name: ANSIBLE_REDIS_SOCKET
-        ini:
-          - section: lookup_redis
-            key: socket
-'''
+DOCUMENTATION = r"""
+name: redis
+author:
+  - Jan-Piet Mens (@jpmens) <jpmens(at)gmail.com>
+  - Ansible Core Team
+short_description: fetch data from Redis
+description:
+  - This lookup returns a list of results from a Redis DB corresponding to a list of items given to it.
+requirements:
+  - redis (python library https://github.com/andymccurdy/redis-py/)
+options:
+  _terms:
+    description: List of keys to query.
+    type: list
+    elements: string
+  host:
+    description: Location of Redis host.
+    type: string
+    default: '127.0.0.1'
+    env:
+      - name: ANSIBLE_REDIS_HOST
+    ini:
+      - section: lookup_redis
+        key: host
+  port:
+    description: Port on which Redis is listening on.
+    default: 6379
+    type: int
+    env:
+      - name: ANSIBLE_REDIS_PORT
+    ini:
+      - section: lookup_redis
+        key: port
+  socket:
+    description: Path to socket on which to query Redis, this option overrides host and port options when set.
+    type: path
+    env:
+      - name: ANSIBLE_REDIS_SOCKET
+    ini:
+      - section: lookup_redis
+        key: socket
+"""
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: query redis for somekey (default or configured settings used)
   ansible.builtin.debug:
     msg: "{{ lookup('community.general.redis', 'somekey') }}"
@@ -66,12 +66,11 @@ EXAMPLES = """
 - name: use list directly with a socket
   ansible.builtin.debug:
     msg: "{{ lookup('community.general.redis', 'key1', 'key2', socket='/var/tmp/redis.sock') }}"
-
 """
 
-RETURN = """
+RETURN = r"""
 _raw:
-  description: value(s) stored in Redis
+  description: Value(s) stored in Redis.
   type: list
   elements: str
 """

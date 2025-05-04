@@ -6,40 +6,40 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    author:
-      - Juan Manuel Parrilla (@jparrill)
-    name: hiera
-    short_description: get info from hiera data
-    requirements:
-      - hiera (command line utility)
+DOCUMENTATION = r"""
+author:
+  - Juan Manuel Parrilla (@jparrill)
+name: hiera
+short_description: get info from hiera data
+requirements:
+  - hiera (command line utility)
+description:
+  - Retrieves data from an Puppetmaster node using Hiera as ENC.
+options:
+  _terms:
     description:
-        - Retrieves data from an Puppetmaster node using Hiera as ENC.
-    options:
-      _terms:
-            description:
-                - The list of keys to lookup on the Puppetmaster.
-            type: list
-            elements: string
-            required: true
-      executable:
-            description:
-                - Binary file to execute Hiera.
-            type: string
-            default: '/usr/bin/hiera'
-            env:
-                - name: ANSIBLE_HIERA_BIN
-      config_file:
-            description:
-                - File that describes the hierarchy of Hiera.
-            type: string
-            default: '/etc/hiera.yaml'
-            env:
-                - name: ANSIBLE_HIERA_CFG
+      - The list of keys to lookup on the Puppetmaster.
+    type: list
+    elements: string
+    required: true
+  executable:
+    description:
+      - Binary file to execute Hiera.
+    type: string
+    default: '/usr/bin/hiera'
+    env:
+      - name: ANSIBLE_HIERA_BIN
+  config_file:
+    description:
+      - File that describes the hierarchy of Hiera.
+    type: string
+    default: '/etc/hiera.yaml'
+    env:
+      - name: ANSIBLE_HIERA_CFG
 # FIXME: incomplete options .. _terms? environment/fqdn?
-'''
+"""
 
-EXAMPLES = """
+EXAMPLES = r"""
 # All this examples depends on hiera.yml that describes the hierarchy
 
 - name: "a value from Hiera 'DB'"
@@ -55,12 +55,12 @@ EXAMPLES = """
     msg: "{{ lookup('community.general.hiera', 'foo fqdn=puppet01.localdomain') }}"
 """
 
-RETURN = """
-    _raw:
-        description:
-            - a value associated with input key
-        type: list
-        elements: str
+RETURN = r"""
+_raw:
+  description:
+    - A value associated with input key.
+  type: list
+  elements: str
 """
 
 from ansible.plugins.lookup import LookupBase

@@ -6,89 +6,92 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    name: dig
-    author: Jan-Piet Mens (@jpmens) <jpmens(at)gmail.com>
-    short_description: query DNS using the dnspython library
-    requirements:
-      - dnspython (python library, http://www.dnspython.org/)
+DOCUMENTATION = r"""
+name: dig
+author: Jan-Piet Mens (@jpmens) <jpmens(at)gmail.com>
+short_description: query DNS using the dnspython library
+requirements:
+  - dnspython (python library, http://www.dnspython.org/)
+description:
+  - The dig lookup runs queries against DNS servers to retrieve DNS records for a specific name (FQDN - fully qualified domain
+    name). It is possible to lookup any DNS record in this manner.
+  - There is a couple of different syntaxes that can be used to specify what record should be retrieved, and for which name.
+    It is also possible to explicitly specify the DNS server(s) to use for lookups.
+  - In its simplest form, the dig lookup plugin can be used to retrieve an IPv4 address (DNS A record) associated with FQDN.
+  - In addition to (default) A record, it is also possible to specify a different record type that should be queried. This
+    can be done by either passing-in additional parameter of format qtype=TYPE to the dig lookup, or by appending /TYPE to
+    the FQDN being queried.
+  - If multiple values are associated with the requested record, the results will be returned as a comma-separated list. In
+    such cases you may want to pass option C(wantlist=true) to the lookup call, or alternatively use C(query) instead of C(lookup),
+    which will result in the record values being returned as a list over which you can iterate later on.
+  - By default, the lookup will rely on system-wide configured DNS servers for performing the query. It is also possible to
+    explicitly specify DNS servers to query using the @DNS_SERVER_1,DNS_SERVER_2,...,DNS_SERVER_N notation. This needs to
+    be passed-in as an additional parameter to the lookup.
+options:
+  _terms:
+    description: Domain(s) to query.
+    type: list
+    elements: str
+  qtype:
     description:
-      - The dig lookup runs queries against DNS servers to retrieve DNS records for a specific name (FQDN - fully qualified domain name).
-        It is possible to lookup any DNS record in this manner.
-      - There is a couple of different syntaxes that can be used to specify what record should be retrieved, and for which name.
-         It is also possible to explicitly specify the DNS server(s) to use for lookups.
-      - In its simplest form, the dig lookup plugin can be used to retrieve an IPv4 address (DNS A record) associated with FQDN
-      - In addition to (default) A record, it is also possible to specify a different record type that should be queried.
-        This can be done by either passing-in additional parameter of format qtype=TYPE to the dig lookup, or by appending /TYPE to the FQDN being queried.
-      - If multiple values are associated with the requested record, the results will be returned as a comma-separated list.
-        In such cases you may want to pass option C(wantlist=true) to the lookup call, or alternatively use C(query) instead of C(lookup),
-        which will result in the record values being returned as a list over which you can iterate later on.
-      - By default, the lookup will rely on system-wide configured DNS servers for performing the query.
-        It is also possible to explicitly specify DNS servers to query using the @DNS_SERVER_1,DNS_SERVER_2,...,DNS_SERVER_N notation.
-        This needs to be passed-in as an additional parameter to the lookup
-    options:
-      _terms:
-        description: Domain(s) to query.
-        type: list
-        elements: str
-      qtype:
-        description:
-            - Record type to query.
-            - V(DLV) has been removed in community.general 6.0.0.
-            - V(CAA) has been added in community.general 6.3.0.
-        type: str
-        default: 'A'
-        choices: [A, ALL, AAAA, CAA, CNAME, DNAME, DNSKEY, DS, HINFO, LOC, MX, NAPTR, NS, NSEC3PARAM, PTR, RP, RRSIG, SOA, SPF, SRV, SSHFP, TLSA, TXT]
-      flat:
-        description: If 0 each record is returned as a dictionary, otherwise a string.
-        type: int
-        default: 1
-      retry_servfail:
-        description: Retry a nameserver if it returns SERVFAIL.
-        default: false
-        type: bool
-        version_added: 3.6.0
-      fail_on_error:
-        description:
-          - Abort execution on lookup errors.
-          - The default for this option will likely change to V(true) in the future.
-            The current default, V(false), is used for backwards compatibility, and will result in empty strings
-            or the string V(NXDOMAIN) in the result in case of errors.
-        default: false
-        type: bool
-        version_added: 5.4.0
-      real_empty:
-        description:
-          - Return empty result without empty strings, and return empty list instead of V(NXDOMAIN).
-          - The default for this option will likely change to V(true) in the future.
-          - This option will be forced to V(true) if multiple domains to be queried are specified.
-        default: false
-        type: bool
-        version_added: 6.0.0
-      class:
-        description:
-          - "Class."
-        type: str
-        default: 'IN'
-      tcp:
-        description: Use TCP to lookup DNS records.
-        default: false
-        type: bool
-        version_added: 7.5.0
-      port:
-        description: Use port as target port when looking up DNS records.
-        default: 53
-        type: int
-        version_added: 9.5.0
-    notes:
-      - ALL is not a record per-se, merely the listed fields are available for any record results you retrieve in the form of a dictionary.
-      - While the 'dig' lookup plugin supports anything which dnspython supports out of the box, only a subset can be converted into a dictionary.
-      - If you need to obtain the AAAA record (IPv6 address), you must specify the record type explicitly.
-        Syntax for specifying the record type is shown in the examples below.
-      - The trailing dot in most of the examples listed is purely optional, but is specified for completeness/correctness sake.
-'''
+      - Record type to query.
+      - V(DLV) has been removed in community.general 6.0.0.
+      - V(CAA) has been added in community.general 6.3.0.
+    type: str
+    default: 'A'
+    choices: [A, ALL, AAAA, CAA, CNAME, DNAME, DNSKEY, DS, HINFO, LOC, MX, NAPTR, NS, NSEC3PARAM, PTR, RP, RRSIG, SOA, SPF,
+      SRV, SSHFP, TLSA, TXT]
+  flat:
+    description: If 0 each record is returned as a dictionary, otherwise a string.
+    type: int
+    default: 1
+  retry_servfail:
+    description: Retry a nameserver if it returns SERVFAIL.
+    default: false
+    type: bool
+    version_added: 3.6.0
+  fail_on_error:
+    description:
+      - Abort execution on lookup errors.
+      - The default for this option will likely change to V(true) in the future. The current default, V(false), is used for
+        backwards compatibility, and will result in empty strings or the string V(NXDOMAIN) in the result in case of errors.
+    default: false
+    type: bool
+    version_added: 5.4.0
+  real_empty:
+    description:
+      - Return empty result without empty strings, and return empty list instead of V(NXDOMAIN).
+      - The default for this option will likely change to V(true) in the future.
+      - This option will be forced to V(true) if multiple domains to be queried are specified.
+    default: false
+    type: bool
+    version_added: 6.0.0
+  class:
+    description:
+      - Class.
+    type: str
+    default: 'IN'
+  tcp:
+    description: Use TCP to lookup DNS records.
+    default: false
+    type: bool
+    version_added: 7.5.0
+  port:
+    description: Use port as target port when looking up DNS records.
+    default: 53
+    type: int
+    version_added: 9.5.0
+notes:
+  - V(ALL) is not a record in itself, merely the listed fields are available for any record results you retrieve in the form of
+    a dictionary.
+  - While the plugin supports anything which C(dnspython) supports out of the box, only a subset can be converted
+    into a dictionary.
+  - If you need to obtain the AAAA record (IPv6 address), you must specify the record type explicitly. Syntax for specifying
+    the record type is shown in the examples below.
+  - The trailing dot in most of the examples listed is purely optional, but is specified for completeness/correctness sake.
+"""
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Simple A record (IPV4 address) lookup for example.com
   ansible.builtin.debug:
     msg: "{{ lookup('community.general.dig', 'example.com.')}}"
@@ -139,83 +142,83 @@ EXAMPLES = """
     msg: "{{ lookup('community.general.dig', 'example.org./A', retry_servfail=true) }}"
 """
 
-RETURN = """
-  _list:
-    description:
-      - List of composed strings or dictionaries with key and value
-        If a dictionary, fields shows the keys returned depending on query type
-    type: list
-    elements: raw
-    contains:
-       ALL:
-           description:
-               - owner, ttl, type
-       A:
-           description:
-               - address
-       AAAA:
-           description:
-               - address
-       CAA:
-           description:
-               - flags
-               - tag
-               - value
-           version_added: 6.3.0
-       CNAME:
-           description:
-               - target
-       DNAME:
-           description:
-               - target
-       DNSKEY:
-            description:
-                - flags, algorithm, protocol, key
-       DS:
-            description:
-                - algorithm, digest_type, key_tag, digest
-       HINFO:
-            description:
-                -  cpu, os
-       LOC:
-            description:
-                - latitude, longitude, altitude, size, horizontal_precision, vertical_precision
-       MX:
-            description:
-                - preference, exchange
-       NAPTR:
-            description:
-                - order, preference, flags, service, regexp, replacement
-       NS:
-            description:
-                - target
-       NSEC3PARAM:
-            description:
-                - algorithm, flags, iterations, salt
-       PTR:
-            description:
-                - target
-       RP:
-            description:
-                - mbox, txt
-       SOA:
-            description:
-                - mname, rname, serial, refresh, retry, expire, minimum
-       SPF:
-            description:
-                - strings
-       SRV:
-            description:
-                - priority, weight, port, target
-       SSHFP:
-            description:
-                - algorithm, fp_type, fingerprint
-       TLSA:
-            description:
-                - usage, selector, mtype, cert
-       TXT:
-            description:
-                - strings
+RETURN = r"""
+_list:
+  description:
+    - List of composed strings or of dictionaries, with fields depending
+      on query type.
+  type: list
+  elements: raw
+  contains:
+    ALL:
+      description:
+        - C(owner), C(ttl), C(type).
+    A:
+      description:
+        - C(address).
+    AAAA:
+      description:
+        - C(address).
+    CAA:
+      description:
+        - C(flags).
+        - C(tag).
+        - C(value).
+      version_added: 6.3.0
+    CNAME:
+      description:
+        - C(target).
+    DNAME:
+      description:
+        - C(target).
+    DNSKEY:
+      description:
+        - C(flags), C(algorithm), C(protocol), C(key).
+    DS:
+      description:
+        - C(algorithm), C(digest_type), C(key_tag), C(digest).
+    HINFO:
+      description:
+        - C(cpu), C(os).
+    LOC:
+      description:
+        - C(latitude), C(longitude), C(altitude), C(size), C(horizontal_precision), C(vertical_precision).
+    MX:
+      description:
+        - C(preference), C(exchange).
+    NAPTR:
+      description:
+        - C(order), C(preference), C(flags), C(service), C(regexp), C(replacement).
+    NS:
+      description:
+        - C(target).
+    NSEC3PARAM:
+      description:
+        - C(algorithm), C(flags), C(iterations), C(salt).
+    PTR:
+      description:
+        - C(target).
+    RP:
+      description:
+        - C(mbox), C(txt).
+    SOA:
+      description:
+        - C(mname), C(rname), C(serial), C(refresh), C(retry), C(expire), C(minimum).
+    SPF:
+      description:
+        - C(strings).
+    SRV:
+      description:
+        - C(priority), C(weight), C(port), C(target).
+    SSHFP:
+      description:
+        - C(algorithm), C(fp_type), C(fingerprint).
+    TLSA:
+      description:
+        - C(usage), C(selector), C(mtype), C(cert).
+    TXT:
+      description:
+        - C(strings).
 """
 
 from ansible.errors import AnsibleError

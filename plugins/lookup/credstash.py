@@ -6,54 +6,54 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    author: Unknown (!UNKNOWN)
-    name: credstash
-    short_description: retrieve secrets from Credstash on AWS
-    requirements:
-      - credstash (python library)
-    description:
-      - "Credstash is a small utility for managing secrets using AWS's KMS and DynamoDB: https://github.com/fugue/credstash"
-    options:
-      _terms:
-        description: term or list of terms to lookup in the credit store
-        type: list
-        elements: string
-        required: true
-      table:
-        description: name of the credstash table to query
-        type: str
-        default: 'credential-store'
-      version:
-        description: Credstash version
-        type: str
-        default: ''
-      region:
-        description: AWS region
-        type: str
-      profile_name:
-        description: AWS profile to use for authentication
-        type: str
-        env:
-          - name: AWS_PROFILE
-      aws_access_key_id:
-        description: AWS access key ID
-        type: str
-        env:
-          - name: AWS_ACCESS_KEY_ID
-      aws_secret_access_key:
-        description: AWS access key
-        type: str
-        env:
-          - name: AWS_SECRET_ACCESS_KEY
-      aws_session_token:
-        description: AWS session token
-        type: str
-        env:
-          - name: AWS_SESSION_TOKEN
-'''
+DOCUMENTATION = r"""
+author: Unknown (!UNKNOWN)
+name: credstash
+short_description: retrieve secrets from Credstash on AWS
+requirements:
+  - credstash (python library)
+description:
+  - "Credstash is a small utility for managing secrets using AWS's KMS and DynamoDB: https://github.com/fugue/credstash."
+options:
+  _terms:
+    description: Term or list of terms to lookup in the credit store.
+    type: list
+    elements: string
+    required: true
+  table:
+    description: Name of the credstash table to query.
+    type: str
+    default: 'credential-store'
+  version:
+    description: Credstash version.
+    type: str
+    default: ''
+  region:
+    description: AWS region.
+    type: str
+  profile_name:
+    description: AWS profile to use for authentication.
+    type: str
+    env:
+      - name: AWS_PROFILE
+  aws_access_key_id:
+    description: AWS access key ID.
+    type: str
+    env:
+      - name: AWS_ACCESS_KEY_ID
+  aws_secret_access_key:
+    description: AWS access key.
+    type: str
+    env:
+      - name: AWS_SECRET_ACCESS_KEY
+  aws_session_token:
+    description: AWS session token.
+    type: str
+    env:
+      - name: AWS_SESSION_TOKEN
+"""
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: first use credstash to store your secrets
   ansible.builtin.shell: credstash put my-github-password secure123
 
@@ -77,20 +77,20 @@ EXAMPLES = """
       environment: production
   tasks:
 
-  - name: "Test credstash lookup plugin -- get the password with a context passed as a variable"
-    ansible.builtin.debug:
-      msg: "{{ lookup('community.general.credstash', 'some-password', context=context) }}"
+    - name: "Test credstash lookup plugin -- get the password with a context passed as a variable"
+      ansible.builtin.debug:
+        msg: "{{ lookup('community.general.credstash', 'some-password', context=context) }}"
 
-  - name: "Test credstash lookup plugin -- get the password with a context defined here"
-    ansible.builtin.debug:
-      msg: "{{ lookup('community.general.credstash', 'some-password', context=dict(app='my_app', environment='production')) }}"
+    - name: "Test credstash lookup plugin -- get the password with a context defined here"
+      ansible.builtin.debug:
+        msg: "{{ lookup('community.general.credstash', 'some-password', context=dict(app='my_app', environment='production')) }}"
 """
 
-RETURN = """
-  _raw:
-    description:
-      - Value(s) stored in Credstash.
-    type: str
+RETURN = r"""
+_raw:
+  description:
+    - Value(s) stored in Credstash.
+  type: str
 """
 
 from ansible.errors import AnsibleError
