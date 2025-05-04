@@ -40,10 +40,10 @@ class CallbackModule(CallbackBase):
 
     def _print_task(self, task):
         if hasattr(task, '_ds'):
-          task_snippet = yaml.load(str([task._ds.copy()]), Loader=yaml.Loader)
-          task_yaml = yaml.dump(task_snippet, sort_keys=False)
-          self._display.v(f"\n{task_yaml}\n")
-          self._printed_message = True
+            task_snippet = yaml.load(str([task._ds.copy()]), Loader=yaml.Loader)
+            task_yaml = yaml.dump(task_snippet, sort_keys=False)
+            self._display.v(f"\n{task_yaml}\n")
+            self._printed_message = True
 
     def v2_playbook_on_task_start(self, task, is_conditional):
         self._printed_message = False
