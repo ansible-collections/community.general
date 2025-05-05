@@ -44,7 +44,42 @@ If you want to test a PR locally, refer to [our testing guide](https://github.co
 
 If you find any inconsistencies or places in this document which can be improved, feel free to raise an issue or pull request to fix it.
 
-## Run sanity, unit or integration tests locally
+## Run sanity or unit locally (with antsibull-nox)
+
+The easiest way to run sanity and unit tests locally is to use [antsibull-nox](https://ansible.readthedocs.io/projects/antsibull-nox/).
+(If you have [nox](https://nox.thea.codes/en/stable/) installed, it will automatically install antsibull-nox in a virtual environment for you.)
+
+### Sanity tests
+
+The following commands show how to run sanity tests:
+
+```.bash
+# Run sanity tests for all files in the collection:
+nox -e ansible-test-sanity-devel
+
+# Run sanity tests for the given files and directories:
+nox -e ansible-test-sanity-devel -- plugins/modules/system/pids.py tests/integration/targets/pids/
+```
+
+### Unit tests
+
+The following commands show how to run unit tests:
+
+```.bash
+# Run all unit tests:
+nox -e ansible-test-units-devel
+
+# Run all unit tests for one Python version (a lot faster):
+nox -e ansible-test-units-devel -- --python 3.13
+
+# Run a specific unit test (for the nmcli module) for one Python version:
+nox -e ansible-test-units-devel -- --python 3.13 tests/unit/plugins/modules/net_tools/test_nmcli.py
+```
+
+## Run sanity, unit or integration tests locally (with ansible-test)
+
+Instead of using antsibull-nox, you can also run sanity and unit tests with ansible-test directly.
+This also allows you to run integration tests.
 
 You have to check out the repository into a specific path structure to be able to run `ansible-test`. The path to the git checkout must end with `.../ansible_collections/community/general`. Please see [our testing guide](https://github.com/ansible/community-docs/blob/main/test_pr_locally_guide.rst) for instructions on how to check out the repository into a correct path structure. The short version of these instructions is:
 

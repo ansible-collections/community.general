@@ -46,3 +46,9 @@ doc_fragment = "community.general.proxmox.actiongroup_proxmox"
 
 [sessions.build_import_check]
 run_galaxy_importer = true
+
+[sessions.ansible_test_sanity]
+include_devel = true
+
+[sessions.ansible_test_units]
+include_devel = true
