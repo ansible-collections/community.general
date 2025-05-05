@@ -51,15 +51,20 @@ The easiest way to run sanity and unit tests locally is to use [antsibull-nox](h
 
 ### Sanity tests
 
-The following commands show how to run sanity tests:
+The following commands show how to run ansible-test sanity tests:
 
 ```.bash
-# Run sanity tests for all files in the collection:
-nox -e ansible-test-sanity-devel
+# Run basic sanity tests for all files in the collection:
+nox -Re ansible-test-sanity-devel
 
-# Run sanity tests for the given files and directories:
-nox -e ansible-test-sanity-devel -- plugins/modules/system/pids.py tests/integration/targets/pids/
+# Run basic sanity tests for the given files and directories:
+nox -Re ansible-test-sanity-devel -- plugins/modules/system/pids.py tests/integration/targets/pids/
+
+# Run all other sanity tests for all files in the collection:
+nox -R
 ```
+
+If you replace `-Re` with `-e`, respectively. leave `-R` away, then the virtual environments will be re-created. The `-R` re-uses them (if they already exist).
 
 ### Unit tests
 
@@ -67,16 +72,18 @@ The following commands show how to run unit tests:
 
 ```.bash
 # Run all unit tests:
-nox -e ansible-test-units-devel
+nox -Re ansible-test-units-devel
 
 # Run all unit tests for one Python version (a lot faster):
-nox -e ansible-test-units-devel -- --python 3.13
+nox -Re ansible-test-units-devel -- --python 3.13
 
 # Run a specific unit test (for the nmcli module) for one Python version:
-nox -e ansible-test-units-devel -- --python 3.13 tests/unit/plugins/modules/net_tools/test_nmcli.py
+nox -Re ansible-test-units-devel -- --python 3.13 tests/unit/plugins/modules/net_tools/test_nmcli.py
 ```
 
-## Run sanity, unit or integration tests locally (with ansible-test)
+If you replace `-Re` with `-e`, then the virtual environments will be re-created. The `-R` re-uses them (if they already exist).
+
+## Run basic sanity, unit or integration tests locally (with ansible-test)
 
 Instead of using antsibull-nox, you can also run sanity and unit tests with ansible-test directly.
 This also allows you to run integration tests.
@@ -91,15 +98,15 @@ cd ~/dev/ansible_collections/community/general
 
 Then you can run `ansible-test` (which is a part of [ansible-core](https://pypi.org/project/ansible-core/)) inside the checkout. The following example commands expect that you have installed Docker or Podman. Note that Podman has only been supported by more recent ansible-core releases. If you are using Docker, the following will work with Ansible 2.9+.
 
-### Sanity tests
+### Basic sanity tests
 
-The following commands show how to run sanity tests:
+The following commands show how to run basic sanity tests:
 
 ```.bash
-# Run sanity tests for all files in the collection:
+# Run basic sanity tests for all files in the collection:
 ansible-test sanity --docker -v
 
-# Run sanity tests for the given files and directories:
+# Run basic sanity tests for the given files and directories:
 ansible-test sanity --docker -v plugins/modules/system/pids.py tests/integration/targets/pids/
 ```
 
