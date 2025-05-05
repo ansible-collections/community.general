@@ -105,6 +105,13 @@ ansible-test sanity --docker -v plugins/modules/system/pids.py tests/integration
 
 ### Unit tests
 
+Note that for running unit tests, you need to install required collections in the same folder structure that `community.general` is checked out in.
+Right now, you need to install [`community.internal_test_tools`](https://github.com/ansible-collections/community.internal_test_tools).
+If you want to use the latest version from GitHub, you can run:
+```
+git clone https://github.com/ansible-collections/community.internal_test_tools.git ~/dev/ansible_collections/community/internal_test_tools
+```
+
 The following commands show how to run unit tests:
 
 ```.bash
@@ -119,6 +126,16 @@ ansible-test units --docker -v --python 3.8 tests/unit/plugins/modules/net_tools
 ```
 
 ### Integration tests
+
+Note that for running integration tests, you need to install required collections in the same folder structure that `community.general` is checked out in.
+Right now, depending on the test, you need to install [`ansible.posix`](https://github.com/ansible-collections/ansible.posix), [`community.crypto`](https://github.com/ansible-collections/community.crypto), and [`community.docker`](https://github.com/ansible-collections/community.docker):
+If you want to use the latest versions from GitHub, you can run:
+```
+mkdir -p ~/dev/ansible_collections/ansible
+git clone https://github.com/ansible-collections/ansible.posix.git ~/dev/ansible_collections/ansible/posix
+git clone https://github.com/ansible-collections/community.crypto.git ~/dev/ansible_collections/community/crypto
+git clone https://github.com/ansible-collections/community.docker.git ~/dev/ansible_collections/community/docker
+```
 
 The following commands show how to run integration tests:
 
