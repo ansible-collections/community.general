@@ -13,7 +13,6 @@ minor_changes:
   - "lxd inventory plugin - clean up string conversions (https://github.com/ansible-collections/community.general/pull/9379)."
   - "nmap inventory plugin - clean up string conversions (https://github.com/ansible-collections/community.general/pull/9379)."
   - "opennebula inventory plugin - clean up string conversions (https://github.com/ansible-collections/community.general/pull/9379)."
-  - "proxmox inventory plugin - clean up string conversions (https://github.com/ansible-collections/community.general/pull/9379)."
   - "scaleway inventory plugin - clean up string conversions (https://github.com/ansible-collections/community.general/pull/9379)."
   - "virtualbox inventory plugin - clean up string conversions (https://github.com/ansible-collections/community.general/pull/9379)."
   - "cyberarkpassword lookup plugin - clean up string conversions (https://github.com/ansible-collections/community.general/pull/9379)."
