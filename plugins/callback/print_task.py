@@ -18,7 +18,12 @@ requirements:
 '''
 
 
-import yaml
+from yaml import load, dump
+
+try:
+    from yaml import CSafeLoader as SafeLoader
+except ImportError:
+    from yaml import SafeLoader
 
 from ansible.plugins.callback import CallbackBase
 
@@ -39,8 +44,8 @@ class CallbackModule(CallbackBase):
 
     def _print_task(self, task):
         if hasattr(task, '_ds'):
-            task_snippet = yaml.load(str([task._ds.copy()]), Loader=yaml.Loader)
-            task_yaml = yaml.dump(task_snippet, sort_keys=False)
+            task_snippet = load(str([task._ds.copy()]), Loader=SafeLoader)
+            task_yaml = dump(task_snippet, sort_keys=False)
             self._display.v(f"\n{task_yaml}\n")
             self._printed_message = True
 
