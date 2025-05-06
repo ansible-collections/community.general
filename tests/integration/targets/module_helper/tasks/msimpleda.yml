@@ -11,11 +11,10 @@
     attr2_depr_dict_dt:
       msg: Attribute attr2 is deprecated
       version: 9.9.9
-      plugin:
-        requested_name: msimpleda
-        resolved_name: msimpleda
-        type: module
-      collection_name: null  # should be "community.general"; this will hopefully change back because this seriously sucks
+      collection_name: community.general
+      deprecator:
+        resolved_name: community.general
+        type: collection
 
 - name: test msimpleda 1
   msimpleda:
