@@ -120,7 +120,7 @@ def test_acl_remove(api_request_mock, project, prefix):
     # GET → DELETE
     assert api_request_mock.call_count == 2
     args, kwargs = api_request_mock.call_args_list[1]
-    assert kwargs['endpoint'] == "%s/%s.aclpolicy"% (prefix, name)
+    assert kwargs['endpoint'] == "%s/%s.aclpolicy" % (prefix, name)
     assert kwargs['method'] == 'DELETE'
 
 
