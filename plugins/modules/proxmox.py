@@ -890,6 +890,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
                 self.module.exit_json(
                     changed=False, vmid=vmid, msg="VM %s already exists." % identifier
                 )
+            identifier = self.format_vm_identifier(vmid, lxc["name"])
             self.module.debug(
                 "VM %s already exists, but we don't update and instead forcefully recreate it."
                 % identifier
