@@ -369,6 +369,9 @@ options:
     description:
       - Revert a pending change.
     type: str
+  rng0:
+    description: RNG device
+    type: str
   sata:
     description:
       - A hash/dictionary of volume used as sata hard disk or CD-ROM. O(sata='{"key":"value", "key":"value"}').
@@ -1295,6 +1298,7 @@ def main():
         protection=dict(type='bool'),
         reboot=dict(type='bool'),
         revert=dict(type='str'),
+        rng0=dict(type='str'),
         sata=dict(type='dict'),
         scsi=dict(type='dict'),
         scsihw=dict(choices=['lsi', 'lsi53c810', 'virtio-scsi-pci', 'virtio-scsi-single', 'megasas', 'pvscsi']),
@@ -1485,6 +1489,7 @@ def main():
                               pool=module.params['pool'],
                               protection=module.params['protection'],
                               reboot=module.params['reboot'],
+                              rng0=module.params['rng0'],
                               sata=module.params['sata'],
                               scsi=module.params['scsi'],
                               scsihw=module.params['scsihw'],
