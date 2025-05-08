@@ -17,6 +17,12 @@ requirements:
   - enable in configuration
 '''
 
+EXAMPLES = r'''
+ansible.cfg: >
+    # Enable plugin
+    [defaults]
+    callbacks_enabled=community.general.print_task
+'''
 
 from yaml import load, dump
 
