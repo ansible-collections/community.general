@@ -12,6 +12,7 @@ import re
 import time
 import tarfile
 import os
+import requests
 
 from ansible.module_utils.urls import fetch_file
 from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils
@@ -177,10 +178,10 @@ class WdcRedfishUtils(RedfishUtils):
                 'msg': "FWActivate requested"}
 
     def _get_bundle_version(self,
-                            bundle_uri):
+                            bundle_uri, https=False):
         """Get the firmware version from a bundle file, and whether or not it is multi-tenant.
 
-        Only supports HTTP at this time.  Assumes URI exists and is a tarfile.
+        Supports both HTTP and HTTPS.  Assumes URI exists and is a tarfile.
         Looks for a file oobm-[version].pkg, such as 'oobm-4.0.13.pkg`.  Extracts the version number
         from that filename (in the above example, the version number is "4.0.13".
 
@@ -195,11 +196,25 @@ class WdcRedfishUtils(RedfishUtils):
         and bundle generation. Either value will be None if unable to determine.
         :rtype: str or None, bool or None
         """
-        bundle_temp_filename = fetch_file(module=self.module,
-                                          url=bundle_uri)
         bundle_version = None
         is_multi_tenant = None
         gen = None
+        if https is False:
+            bundle_temp_filename = fetch_file(module=self.module,
+                                          url=bundle_uri)
+        else :
+            bufsize = 65536
+            # Parse the URL
+            parsed_url = urlparse(bundle_uri)
+            file_name = os.path.basename(parsed_url.path)
+            r = requests.get(bundle_uri, verify=False, stream=True)
+            bundle_temp_filename = os.path.join("/tmp", file_name)
+            if r.status_code != 200:
+                return bundle_version, is_multi_tenant, gen
+            else:
+                with open(bundle_temp_filename, 'wb') as f:
+                    for chunk in r.iter_content(chunk_size=bufsize):
+                        f.write(chunk)
 
         # If not tarfile, then if the file has "MMG2" or "DPG2" at 2048th byte
         # then the bundle is for MM or DP G2
@@ -303,8 +318,12 @@ class WdcRedfishUtils(RedfishUtils):
 
         # Check the FW version in the bundle file, and compare it to what is already on the IOMs
 
+        if "https" in bundle_uri:
+            bundle_firmware_version, is_bundle_multi_tenant, bundle_gen = self._get_bundle_version(bundle_uri, True)
+        else:
+            bundle_firmware_version, is_bundle_multi_tenant, bundle_gen = self._get_bundle_version(bundle_uri, False)
         # Bundle version number
-        bundle_firmware_version, is_bundle_multi_tenant, bundle_gen = self._get_bundle_version(bundle_uri)
+        #bundle_firmware_version, is_bundle_multi_tenant, bundle_gen = self._get_bundle_version(bundle_uri)
         if bundle_firmware_version is None or is_bundle_multi_tenant is None or bundle_gen is None:
             return {
                 'ret': False,
