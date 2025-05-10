@@ -1,0 +1,2 @@
+bugfixes:
+  - rundeck_acl_policy - ensure that project ACLs are sent to the correct endpoint (https://github.com/ansible-collections/community.general/pull/10097).
