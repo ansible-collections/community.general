@@ -77,6 +77,8 @@ files:
   $callbacks/opentelemetry.py:
     keywords: opentelemetry observability
     maintainers: v1v
+  $callbacks/print_task.py:
+    maintainers: demonpig
   $callbacks/say.py:
     keywords: brew cask darwin homebrew macosx macports osx
     labels: macos say
