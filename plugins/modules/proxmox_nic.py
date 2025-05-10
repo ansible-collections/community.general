@@ -262,7 +262,7 @@ def main():
     module = AnsibleModule(
         argument_spec=module_args,
         required_together=[('api_token_id', 'api_token_secret')],
-        required_one_of=[('name', 'vmid'), ('api_password', 'api_token_id')],
+        required_one_of=[('name', 'vmid')],
         supports_check_mode=True,
     )
 
