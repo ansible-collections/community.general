@@ -268,21 +268,21 @@ from ansible.module_utils.common.text.converters import to_bytes, to_text
 
 def match_opt(option, line):
     option = re.escape(option)
-    return re.match('([#;]?)( |\t)*(%s)( |\t)*(=|$)( |\t)*(.*)' % option, line)
+    return re.match('( |\t)*([#;]?)( |\t)*(%s)( |\t)*(=|$)( |\t)*(.*)' % option, line)
 
 
 def match_active_opt(option, line):
     option = re.escape(option)
-    return re.match('()( |\t)*(%s)( |\t)*(=|$)( |\t)*(.*)' % option, line)
+    return re.match('()()( |\t)*(%s)( |\t)*(=|$)( |\t)*(.*)' % option, line)
 
 
 def update_section_line(option, changed, section_lines, index, changed_lines, ignore_spaces, newline, msg):
     option_changed = None
     if ignore_spaces:
         old_match = match_opt(option, section_lines[index])
-        if not old_match.group(1):
+        if not old_match.group(2):
             new_match = match_opt(option, newline)
-            option_changed = old_match.group(7) != new_match.group(7)
+            option_changed = old_match.group(8) != new_match.group(8)
     if option_changed is None:
         option_changed = section_lines[index] != newline
     if option_changed:
@@ -299,7 +299,7 @@ def check_section_has_values(section_has_values, section_lines):
         for condition in section_has_values:
             for line in section_lines:
                 match = match_opt(condition["option"], line)
-                if match and (len(condition["values"]) == 0 or match.group(7) in condition["values"]):
+                if match and (len(condition["values"]) == 0 or match.group(8) in condition["values"]):
                     break
             else:
                 return False
@@ -432,8 +432,8 @@ def do_ini(module, filename, section=None, section_has_values=None, option=None,
         for index, line in enumerate(section_lines):
             if match_function(option, line):
                 match = match_function(option, line)
-                if values and match.group(7) in values:
-                    matched_value = match.group(7)
+                if values and match.group(8) in values:
+                    matched_value = match.group(8)
                     if not matched_value and allow_no_value:
                         # replace existing option with no value line(s)
                         newline = u'%s\n' % option
@@ -505,7 +505,7 @@ def do_ini(module, filename, section=None, section_has_values=None, option=None,
                     section_lines = new_section_lines
             elif not exclusive and len(values) > 0:
                 # delete specified option=value line(s)
-                new_section_lines = [i for i in section_lines if not (match_active_opt(option, i) and match_active_opt(option, i).group(7) in values)]
+                new_section_lines = [i for i in section_lines if not (match_active_opt(option, i) and match_active_opt(option, i).group(8) in values)]
                 if section_lines != new_section_lines:
                     changed = True
                     msg = 'option changed'
