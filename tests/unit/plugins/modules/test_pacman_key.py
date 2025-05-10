@@ -17,8 +17,9 @@ MOCK_BIN_PATH = '/mocked/path'
 TESTING_KEYID = '14F26682D0916CDD81E37B6D61B7B526D98F0353'
 TESTING_KEYFILE_PATH = '/tmp/pubkey.asc'
 
-# gpg --{show,list}-key output (key present)
-GPG_SHOWKEY_OUTPUT = '''tru::1:1616373715:0:3:1:5
+# gpg --{show,list}-key output (key present, but expired)
+GPG_SHOWKEY_OUTPUT_EXPIRED = """
+tru::1:1616373715:0:3:1:5
 pub:-:4096:1:61B7B526D98F0353:1437155332:::-:::scSC::::::23::0:
 fpr:::::::::14F26682D0916CDD81E37B6D61B7B526D98F0353:
 uid:-::::1437155332::E57D1F9BFF3B404F9F30333629369B08DF5E2161::Mozilla Software Releases <release@mozilla.com>::::::::::0:
@@ -27,24 +28,76 @@ fpr:::::::::F2EF4E6E6AE75B95F11F1EB51C69C4E55E9905DB:
 sub:e:4096:1:BBBEBDBB24C6F355:1498143157:1561215157:::::s::::::23:
 fpr:::::::::DCEAC5D96135B91C4EA672ABBBBEBDBB24C6F355:
 sub:e:4096:1:F1A6668FBB7D572E:1559247338:1622319338:::::s::::::23:
-fpr:::::::::097B313077AE62A02F84DA4DF1A6668FBB7D572E:'''
+fpr:::::::::097B313077AE62A02F84DA4DF1A6668FBB7D572E:
+""".strip()
+
+# gpg --{show,list}-key output (key present and trusted)
+GPG_SHOWKEY_OUTPUT_TRUSTED = """
+tru::1:1616373715:0:3:1:5
+pub:f:4096:1:61B7B526D98F0353:1437155332:::-:::scSC::::::23::0:
+fpr:::::::::14F26682D0916CDD81E37B6D61B7B526D98F0353:
+uid:f::::1437155332::E57D1F9BFF3B404F9F30333629369B08DF5E2161::Mozilla Software Releases <release@mozilla.com>::::::::::0:
+sub:e:4096:1:1C69C4E55E9905DB:1437155572:1500227572:::::s::::::23:
+fpr:::::::::F2EF4E6E6AE75B95F11F1EB51C69C4E55E9905DB:
+sub:e:4096:1:BBBEBDBB24C6F355:1498143157:1561215157:::::s::::::23:
+fpr:::::::::DCEAC5D96135B91C4EA672ABBBBEBDBB24C6F355:
+sub:e:4096:1:F1A6668FBB7D572E:1559247338:1622319338:::::s::::::23:
+fpr:::::::::097B313077AE62A02F84DA4DF1A6668FBB7D572E:
+""".strip()
+
+GPG_LIST_SECRET_KEY_OUTPUT = """
+sec:u:2048:1:58FCCBCC131FCCAB:1406639814:::u:::scSC:::+:::23::0:
+fpr:::::::::AC0F357BE07F1493C34DCAB258FCCBCC131FCCAB:
+grp:::::::::C1227FFDD039AD942F777EA0639E1F1EAA96AB12:
+uid:u::::1406639814::79311EDEA01302E0DBBB2F33AE799F8BB677652F::Pacman Keyring Master Key <pacman@localhost>::::::::::0:
+""".lstrip()
+
+GPG_CHECK_SIGNATURES_OUTPUT = """
+tru::1:1742507906:1750096255:3:1:5
+pub:f:4096:1:61B7B526D98F0353:1437155332:::-:::scSC::::::23:1742507897:1 https\x3a//185.125.188.26\x3a443:
+fpr:::::::::14F26682D0916CDD81E37B6D61B7B526D98F0353:
+uid:f::::1437155332::E57D1F9BFF3B404F9F30333629369B08DF5E2161::Mozilla Software Releases <release@mozilla.com>:::::::::1742507897:1:
+sig:!::1:61B7B526D98F0353:1437155332::::Mozilla Software Releases <release@mozilla.com>:13x:::::2:
+sig:!::1:58FCCBCC131FCCAB:1742507905::::Pacman Keyring Master Key <pacman@localhost>:10l::AC0F357BE07F1493C34DCAB258FCCBCC131FCCAB:::8:
+sub:f:4096:1:E36D3B13F3D93274:1683308659:1746380659:::::s::::::23:
+fpr:::::::::ADD7079479700DCADFDD5337E36D3B13F3D93274:
+sig:!::1:61B7B526D98F0353:1683308659::::Mozilla Software Releases <release@mozilla.com>:18x::14F26682D0916CDD81E37B6D61B7B526D98F0353:::10:
+sub:e:4096:1:1C69C4E55E9905DB:1437155572:1500227572:::::s::::::23:
+fpr:::::::::F2EF4E6E6AE75B95F11F1EB51C69C4E55E9905DB:
+sig:!::1:61B7B526D98F0353:1437155572::::Mozilla Software Releases <release@mozilla.com>:18x:::::2:
+sub:e:4096:1:BBBEBDBB24C6F355:1498143157:1561215157:::::s::::::23:
+fpr:::::::::DCEAC5D96135B91C4EA672ABBBBEBDBB24C6F355:
+sig:!::1:61B7B526D98F0353:1498143157::::Mozilla Software Releases <release@mozilla.com>:18x::14F26682D0916CDD81E37B6D61B7B526D98F0353:::8:
+sub:e:4096:1:F1A6668FBB7D572E:1559247338:1622319338:::::s::::::23:
+fpr:::::::::097B313077AE62A02F84DA4DF1A6668FBB7D572E:
+sig:!::1:61B7B526D98F0353:1559247338::::Mozilla Software Releases <release@mozilla.com>:18x::14F26682D0916CDD81E37B6D61B7B526D98F0353:::10:
+sub:e:4096:1:EBE41E90F6F12F6D:1621282261:1684354261:::::s::::::23:
+fpr:::::::::4360FE2109C49763186F8E21EBE41E90F6F12F6D:
+sig:!::1:61B7B526D98F0353:1621282261::::Mozilla Software Releases <release@mozilla.com>:18x::14F26682D0916CDD81E37B6D61B7B526D98F0353:::10:
+""".strip()
 
 # gpg --{show,list}-key output (key absent)
-GPG_NOKEY_OUTPUT = '''gpg: error reading key: No public key
-tru::1:1616373715:0:3:1:5'''
+GPG_NOKEY_OUTPUT = """
+gpg: error reading key: No public key
+tru::1:1616373715:0:3:1:5
+""".strip()
 
 # pacman-key output (successful invocation)
-PACMAN_KEY_SUCCESS = '''==> Updating trust database...
-gpg: next trustdb check due at 2021-08-02'''
+PACMAN_KEY_SUCCESS = """
+==> Updating trust database...
+gpg: next trustdb check due at 2021-08-02
+""".strip()
 
 # expected command for gpg --list-keys KEYID
 RUN_CMD_LISTKEYS = [
     MOCK_BIN_PATH,
+    '--homedir=/etc/pacman.d/gnupg',
+    '--no-permission-warning',
     '--with-colons',
+    '--quiet',
     '--batch',
     '--no-tty',
     '--no-default-keyring',
-    '--keyring=/etc/pacman.d/gnupg/pubring.gpg',
     '--list-keys',
     TESTING_KEYID,
 ]
@@ -52,10 +105,12 @@ RUN_CMD_LISTKEYS = [
 # expected command for gpg --show-keys KEYFILE
 RUN_CMD_SHOW_KEYFILE = [
     MOCK_BIN_PATH,
+    '--no-permission-warning',
     '--with-colons',
-    '--with-fingerprint',
+    '--quiet',
     '--batch',
     '--no-tty',
+    '--with-fingerprint',
     '--show-keys',
     TESTING_KEYFILE_PATH,
 ]
@@ -69,6 +124,29 @@ RUN_CMD_LSIGN_KEY = [
     TESTING_KEYID,
 ]
 
+RUN_CMD_LIST_SECRET_KEY = [
+    MOCK_BIN_PATH,
+    '--homedir=/etc/pacman.d/gnupg',
+    '--no-permission-warning',
+    '--with-colons',
+    '--quiet',
+    '--batch',
+    '--no-tty',
+    '--list-secret-key',
+]
+
+# expected command for gpg --check-signatures
+RUN_CMD_CHECK_SIGNATURES = [
+    MOCK_BIN_PATH,
+    '--homedir=/etc/pacman.d/gnupg',
+    '--no-permission-warning',
+    '--with-colons',
+    '--quiet',
+    '--batch',
+    '--no-tty',
+    '--check-signatures',
+    TESTING_KEYID,
+]
 
 TESTCASES = [
     #
@@ -152,7 +230,7 @@ TESTCASES = [
                     {'check_rc': False},
                     (
                         0,
-                        GPG_SHOWKEY_OUTPUT,
+                        GPG_SHOWKEY_OUTPUT_EXPIRED,
                         '',
                     ),
                 ),
@@ -222,7 +300,7 @@ TESTCASES = [
                     {'check_rc': False},
                     (
                         0,
-                        GPG_SHOWKEY_OUTPUT,
+                        GPG_SHOWKEY_OUTPUT_EXPIRED,
                         '',
                     ),
                 ),
@@ -248,7 +326,79 @@ TESTCASES = [
                     {'check_rc': False},
                     (
                         0,
-                        GPG_SHOWKEY_OUTPUT,
+                        GPG_SHOWKEY_OUTPUT_EXPIRED,
+                        '',
+                    ),
+                ),
+            ],
+            'changed': False,
+        },
+    ],
+    # state present, ensure_trusted & key expired
+    [
+        {
+            'state': 'present',
+            'ensure_trusted': True,
+            'id': TESTING_KEYID,
+            'data': 'FAKEDATA',
+            '_ansible_check_mode': True,
+        },
+        {
+            'id': 'state_present_trusted_key_expired',
+            'run_command.calls': [
+                (
+                    RUN_CMD_LISTKEYS,
+                    {
+                        'check_rc': False,
+                    },
+                    (
+                        0,
+                        GPG_SHOWKEY_OUTPUT_EXPIRED,
+                        '',
+                    ),
+                ),
+            ],
+            'changed': True,
+        },
+    ],
+    # state present & key trusted
+    [
+        {
+            'state': 'present',
+            'ensure_trusted': True,
+            'id': TESTING_KEYID,
+            'data': 'FAKEDATA',
+            '_ansible_check_mode': True,
+        },
+        {
+            'id': 'state_present_and_key_trusted',
+            'run_command.calls': [
+                (
+                    RUN_CMD_LISTKEYS,
+                    {
+                        'check_rc': False,
+                    },
+                    (
+                        0,
+                        GPG_SHOWKEY_OUTPUT_TRUSTED,
+                        '',
+                    ),
+                ),
+                (
+                    RUN_CMD_CHECK_SIGNATURES,
+                    {},
+                    (
+                        0,
+                        GPG_CHECK_SIGNATURES_OUTPUT,
+                        '',
+                    ),
+                ),
+                (
+                    RUN_CMD_LIST_SECRET_KEY,
+                    {},
+                    (
+                        0,
+                        GPG_LIST_SECRET_KEY_OUTPUT,
                         '',
                     ),
                 ),
@@ -270,7 +420,7 @@ TESTCASES = [
                     {'check_rc': False},
                     (
                         0,
-                        GPG_SHOWKEY_OUTPUT,
+                        GPG_SHOWKEY_OUTPUT_EXPIRED,
                         '',
                     ),
                 ),
@@ -339,7 +489,7 @@ TESTCASES = [
                     {'check_rc': True},
                     (
                         0,
-                        GPG_SHOWKEY_OUTPUT,
+                        GPG_SHOWKEY_OUTPUT_EXPIRED,
                         '',
                     ),
                 ),
@@ -397,7 +547,7 @@ TESTCASES = [
                     {'check_rc': True},
                     (
                         0,
-                        GPG_SHOWKEY_OUTPUT.replace('61B7B526D98F0353', '61B7B526D98F0354'),
+                        GPG_SHOWKEY_OUTPUT_EXPIRED.replace('61B7B526D98F0353', '61B7B526D98F0354'),
                         '',
                     ),
                 ),
@@ -485,7 +635,7 @@ gpg:               imported: 1
                     {'check_rc': True},
                     (
                         0,
-                        GPG_SHOWKEY_OUTPUT,
+                        GPG_SHOWKEY_OUTPUT_EXPIRED,
                         '',
                     ),
                 ),
