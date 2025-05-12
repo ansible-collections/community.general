@@ -125,8 +125,6 @@ files:
     maintainers: $team_ansible_core
   $doc_fragments/:
     labels: docs_fragments
-  $doc_fragments/clc.py:
-    maintainers: clc-runner russoz
   $doc_fragments/django.py:
     maintainers: russoz
   $doc_fragments/hpe3par.py:
@@ -252,8 +250,6 @@ files:
   $inventories/scaleway.py:
     labels: cloud scaleway
     maintainers: $team_scaleway
-  $inventories/stackpath_compute.py:
-    maintainers: shayrybak
   $inventories/virtualbox.py: {}
   $inventories/xen_orchestra.py:
     maintainers: ddelnano shinuza
@@ -297,9 +293,6 @@ files:
   $lookups/lastpass.py: {}
   $lookups/lmdb_kv.py:
     maintainers: jpmens
-  $lookups/manifold.py:
-    labels: manifold
-    maintainers: galanoff
   $lookups/merge_variables.py:
     maintainers: rlenferink m-a-r-k-e alpex8
   $lookups/onepass:
@@ -506,8 +499,6 @@ files:
     maintainers: NickatEpic
   $modules/cisco_webex.py:
     maintainers: drew-russell
-  $modules/clc_:
-    maintainers: clc-runner
   $modules/cloud_init_data_facts.py:
     maintainers: resmo
   $modules/cloudflare_dns.py:
@@ -666,8 +657,6 @@ files:
     maintainers: marns93
   $modules/hg.py:
     maintainers: yeukhon
-  $modules/hipchat.py:
-    maintainers: pb8226 shirou
   $modules/homebrew.py:
     ignore: ryansb
     keywords: brew cask darwin homebrew macosx macports osx
@@ -1141,8 +1130,6 @@ files:
     maintainers: $team_bsd berenddeboer
   $modules/pritunl_:
     maintainers: Lowess
-  $modules/profitbricks:
-    maintainers: baldwinSPC
   $modules/proxmox:
     keywords: kvm libvirt proxmox qemu
     labels: proxmox virt
