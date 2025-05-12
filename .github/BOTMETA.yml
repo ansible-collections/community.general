@@ -986,6 +986,8 @@ files:
     ignore: mcodd
   $modules/nexmo.py:
     maintainers: sivel
+  $modules/nfs_exports_info.py:
+    maintainers: yousefenzhad
   $modules/nginx_status_info.py:
     maintainers: resmo
   $modules/nictagadm.py:
