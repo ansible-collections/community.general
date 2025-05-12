@@ -59,44 +59,53 @@ def get_exports(module, output_format, file_path="/etc/exports"):
     try:
         exports_file_digest = module.digest_from_file(file_path, 'sha1')
         if exports_file_digest is None:
-            module.fail_json(msg=f"{file_path} file not found")
+            module.fail_json(msg="{} file not found".format(file_path))
 
-        with open(file_path, 'r') as f:
+        try:
+            f = open(file_path, 'r')
             output_lines = f.readlines()
+            f.close()
+        except IOError:
+            module.fail_json(msg="Could not read {}".format(file_path))
 
         exports = {}
         pattern = r'\s*(\S+)\s+(.+)'
 
         for line in output_lines:
-            if line.strip() and not line.strip().startswith('#'):
-                match = re.match(pattern, line)
-                if not match:
-                    continue
+            line = line.strip()
+            if not line or line.startswith('#'):
+                continue
 
-                folder = match.group(1)
-                rest = match.group(2)
+            match = re.match(pattern, line)
+            if not match:
+                continue
 
-                entries = re.findall(r'(\d+\.\d+\.\d+\.\d+)\(([^)]+)\)', rest)
-                for ip, options_str in entries:
-                    options = options_str.split(',')
+            folder = match.group(1)
+            rest = match.group(2)
 
-                    if output_format == "ips_per_share":
-                        entry = {"ip": ip, "options": options}
-                        exports.setdefault(folder, []).append(entry)
+            entries = re.findall(r'(\d+\.\d+\.\d+\.\d+)\(([^)]+)\)', rest)
+            for ip, options_str in entries:
+                options = options_str.split(',')
 
-                    elif output_format == "shares_per_ip":
-                        entry = {"folder": folder, "options": options}
-                        exports.setdefault(ip, []).append(entry)
+                if output_format == "ips_per_share":
+                    entry = {"ip": ip, "options": options}
+                    if folder not in exports:
+                        exports[folder] = []
+                    exports[folder].append(entry)
+
+                elif output_format == "shares_per_ip":
+                    entry = {"folder": folder, "options": options}
+                    if ip not in exports:
+                        exports[ip] = []
+                    exports[ip].append(entry)
 
         return {
             'exports_info': exports,
             'file_digest': exports_file_digest
         }
 
-    except FileNotFoundError:
-        module.fail_json(msg=f"{file_path} file not found")
     except Exception as e:
-        module.fail_json(msg=str(e))
+        module.fail_json(msg="Error while processing exports: {}".format(str(e)))
 
 
 def main():
@@ -108,12 +117,12 @@ def main():
     )
 
     output_format = module.params['output_format']
-    exports_info = get_exports(module, output_format)
+    result = get_exports(module, output_format)
 
     module.exit_json(
         changed=False,
-        exports_info=exports_info['exports_info'],
-        file_digest=exports_info['file_digest']
+        exports_info=result['exports_info'],
+        file_digest=result['file_digest']
     )
 
 
