@@ -130,7 +130,7 @@ class Sysrc(object):
         Use this dictionary to preform the tests.
         """
         (rc, out, err) = self.run_sysrc('-e', '-a')
-        conf = dict([i.split('=') for i in out.splitlines()])
+        conf = dict([i.split('=', 1) for i in out.splitlines()])
         if self.value is None:
             return self.name in conf
         else:
