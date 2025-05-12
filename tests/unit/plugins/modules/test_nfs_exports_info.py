@@ -1,8 +1,9 @@
 from __future__ import absolute_import, division, print_function
+__metaclass__ = type
+
 import pytest
 from unittest.mock import mock_open, patch, MagicMock
 from nfs_exports_info import get_exports
-
 
 @pytest.fixture
 def fake_exports_content():
