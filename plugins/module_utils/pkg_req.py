@@ -19,9 +19,9 @@ with deps.declare("packaging"):
 class PackageRequirement:
     def __init__(self, module, name):
         self.module = module
-        self.parsed_name, self.requirement = self.parse_spec(name)
+        self.parsed_name, self.requirement = self._parse_spec(name)
 
-    def parse_spec(self, name):
+    def _parse_spec(self, name):
         """
         Parse a package name that may include version specifiers using PEP 508.
         Returns a tuple of (name, requirement) where requirement is of type packaging.requirements.Requirement and it may be None.
