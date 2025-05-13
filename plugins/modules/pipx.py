@@ -207,7 +207,7 @@ version:
 
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
-from ansible_collections.community.general.plugins.module_utils.pipx import pipx_runner, pipx_common_argspec, make_process_list
+from ansible_collections.community.general.plugins.module_utils.pipx import pipx_runner, pipx_common_argspec, make_process_dict
 from ansible_collections.community.general.plugins.module_utils.pkg_req import PackageRequirement
 
 from ansible.module_utils.facts.compat import ansible_facts
@@ -265,7 +265,7 @@ class PipX(StateModuleHelper):
     use_old_vardict = False
 
     def _retrieve_installed(self):
-        output_process = make_process_list(self, include_injected=True)
+        output_process = make_process_dict(self, include_injected=True)
         installed = self.runner('_list global', output_process=output_process).run()
 
         if self.app_name is None:

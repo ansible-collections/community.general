@@ -126,7 +126,7 @@ version:
 """
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
-from ansible_collections.community.general.plugins.module_utils.pipx import pipx_runner, pipx_common_argspec, make_process_list
+from ansible_collections.community.general.plugins.module_utils.pipx import pipx_runner, pipx_common_argspec, make_process_dict
 
 from ansible.module_utils.facts.compat import ansible_facts
 
@@ -158,7 +158,7 @@ class PipXInfo(ModuleHelper):
             self.vars.version = out.strip()
 
     def __run__(self):
-        output_process = make_process_list(self, **self.vars.as_dict())
+        output_process = make_process_dict(self, **self.vars.as_dict())
         with self.runner('_list global', output_process=output_process) as ctx:
             applications = ctx.run()
             if self.vars.name:
