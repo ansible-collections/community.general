@@ -40,7 +40,7 @@ options:
     default: false
   name:
     description:
-      - The name of the setting. If no value is supplied, the value will be read from the config if it has been set.
+      - The name of the setting.
     type: str
   repo:
     description:
@@ -70,7 +70,7 @@ options:
   value:
     description:
       - When specifying the name of a single setting, supply a value to set that setting to the given value.
-      - From community.general 11.0.0 on, O(value) will be required if O(state=present). To read values, use the M(community.general.git_config_info)
+      - From community.general 11.0.0 on, O(value) is required if O(state=present). To read values, use the M(community.general.git_config_info)
         module instead.
     type: str
   add_mode:
@@ -144,12 +144,6 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
-config_value:
-  description: When O(list_all=false) and value is not set, a string containing the value of the setting in name.
-  returned: success
-  type: str
-  sample: "vim"
-
 config_values:
   description: When O(list_all=true), a dict containing key/value pairs of multiple configuration settings.
   returned: success
@@ -179,7 +173,8 @@ def main():
         mutually_exclusive=[['list_all', 'name'], ['list_all', 'value'], ['list_all', 'state']],
         required_if=[
             ('scope', 'local', ['repo']),
-            ('scope', 'file', ['file'])
+            ('scope', 'file', ['file']),
+            ('state', 'present', ['value']),
         ],
         required_one_of=[['list_all', 'name']],
         supports_check_mode=True,
@@ -197,12 +192,7 @@ def main():
     add_mode = params['add_mode']
 
     if not unset and not new_value and not params['list_all']:
-        module.deprecate(
-            'If state=present, a value must be specified from community.general 11.0.0 on.'
-            ' To read a config value, use the community.general.git_config_info module instead.',
-            version='11.0.0',
-            collection_name='community.general',
-        )
+        module.fail_json(msg="If state=present, a value must be specified. Use the community.general.git_config_info module to read a config value.")
 
     scope = determine_scope(params)
     cwd = determine_cwd(scope, params)
@@ -241,8 +231,6 @@ def main():
             k, v = value.split('=', 1)
             config_values[k] = v
         module.exit_json(changed=False, msg='', config_values=config_values)
-    elif not new_value and not unset:
-        module.exit_json(changed=False, msg='', config_value=old_values[0] if old_values else '')
     elif unset and not out:
         module.exit_json(changed=False, msg='no setting to unset')
     elif new_value in old_values and (len(old_values) == 1 or add_mode == "add") and not unset:
