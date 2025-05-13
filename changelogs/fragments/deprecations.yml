@@ -5,3 +5,4 @@ removed_features:
   - "hipchat - the module was removed since the hipchat service has been discontinued and the self-hosted variant has been End of Life since 2020 (https://github.com/ansible-collections/community.general/pull/10126)."
   - "profitbrick* modules - the modules were removed since the supporting library is unsupported since 2021 (https://github.com/ansible-collections/community.general/pull/10126)."
   - "redfish_utils module utils - the ``_init_session`` method has been removed (https://github.com/ansible-collections/community.general/pull/10126)."
+  - "django_manage - the ``ack_venv_creation_deprecation`` option has been removed. It had no effect anymore anyway (https://github.com/ansible-collections/community.general/pull/10126)."

@@ -122,12 +122,6 @@ options:
     type: str
     required: false
     aliases: [test_runner]
-  ack_venv_creation_deprecation:
-    description:
-      - This option no longer has any effect since community.general 9.0.0.
-      - It will be removed from community.general 11.0.0.
-    type: bool
-    version_added: 5.8.0
 
 notes:
   - 'B(ATTENTION): Support for Django releases older than 4.1 has been removed in community.general version 9.0.0. While the
@@ -291,7 +285,6 @@ def main():
             skip=dict(type='bool'),
             merge=dict(type='bool'),
             link=dict(type='bool'),
-            ack_venv_creation_deprecation=dict(type='bool', removed_in_version='11.0.0', removed_from_collection='community.general'),
         ),
     )
 
