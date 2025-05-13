@@ -61,7 +61,7 @@
       - "'tox' in install_tox_extras.application"
       - "install_tox_extras.application.tox.version is version('3.22.0', '>=')"
       - "install_tox_extras.application.tox.version is version('3.27.0', '<')"
-      - install_tox_higher_version is not changed
+      - install_tox_higher_version is changed
       - install_tox_higher_version_force is changed
       - uninstall_tox_final is changed
       - "'tox' not in uninstall_tox_final.application"

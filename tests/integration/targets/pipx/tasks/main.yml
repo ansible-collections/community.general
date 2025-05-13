@@ -247,7 +247,7 @@
 ##############################################################################
 # Test version specifiers in name parameter
 - name: Run version specifier tests
-  ansible.builtin.include_tasks: testcase-version-specs.yml
+  ansible.builtin.include_tasks: testcase-10031-version-specs.yml
 
 ##############################################################################
 
