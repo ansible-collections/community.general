@@ -63,4 +63,4 @@ def test_get_exports_shares_per_ip(fake_exports_content):
 
     assert result['exports_info'] == expected
     assert result['file_digest'] == "fake_sha1_digest"
-    
+
