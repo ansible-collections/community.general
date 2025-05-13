@@ -2,7 +2,13 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 import pytest
-from unittest.mock import mock_open, patch, MagicMock
+
+
+try:
+    from unittest.mock import mock_open, patch, MagicMock
+except ImportError:
+    from mock import mock_open, patch, MagicMock
+
 from plugins.modules.nfs_exports_info import get_exports
 
 
@@ -57,3 +63,4 @@ def test_get_exports_shares_per_ip(fake_exports_content):
 
     assert result['exports_info'] == expected
     assert result['file_digest'] == "fake_sha1_digest"
+    
