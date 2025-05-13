@@ -85,9 +85,9 @@ options:
   ensure_trusted:
     description:
       - Ensure that the key is trusted (signed by the Pacman machine key and not expired).
-      - This option has been added in community.general 10.6.0.
     type: bool
     default: false
+    version_added: 11.0.0
 """
 
 EXAMPLES = r"""
