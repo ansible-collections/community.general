@@ -11,7 +11,9 @@ import sys
 import os
 
 # Add plugins/modules to path for direct import
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../plugins/modules')))
+sys.path.insert(0, os.path.abspath(
+    os.path.join(os.path.dirname(__file__), '../../../../plugins/modules')
+))
 
 from nfs_exports_info import get_exports
 
@@ -29,7 +31,8 @@ def test_get_exports_ips_per_share(fake_exports_content):
     mock_module = MagicMock()
     mock_module.digest_from_file.return_value = "fake_sha1_digest"
 
-    with patch("builtins.open", mock_open(read_data=fake_exports_content)) if sys.version_info[0] == 3 else patch("__builtin__.open", mock_open(read_data=fake_exports_content)):
+    patch_target = "builtins.open" if sys.version_info[0] == 3 else "__builtin__.open"
+    with patch(patch_target, mock_open(read_data=fake_exports_content)):
         result = get_exports(mock_module, "ips_per_share")
 
     expected = {
@@ -50,7 +53,8 @@ def test_get_exports_shares_per_ip(fake_exports_content):
     mock_module = MagicMock()
     mock_module.digest_from_file.return_value = "fake_sha1_digest"
 
-    with patch("builtins.open", mock_open(read_data=fake_exports_content)) if sys.version_info[0] == 3 else patch("__builtin__.open", mock_open(read_data=fake_exports_content)):
+    patch_target = "builtins.open" if sys.version_info[0] == 3 else "__builtin__.open"
+    with patch(patch_target, mock_open(read_data=fake_exports_content)):
         result = get_exports(mock_module, "shares_per_ip")
 
     expected = {
