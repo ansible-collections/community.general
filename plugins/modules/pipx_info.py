@@ -158,13 +158,16 @@ class PipXInfo(ModuleHelper):
             self.vars.version = out.strip()
 
     def __run__(self):
-        output_process = make_process_dict(self, **self.vars.as_dict())
+        output_process = make_process_dict(self.vars.include_injected, self.vars.include_deps)
         with self.runner('_list global', output_process=output_process) as ctx:
-            applications = ctx.run()
+            applications, raw_data = ctx.run()
+            if self.vars.include_raw:
+                self.vars.raw_output = raw_data
+
             if self.vars.name:
                 self.vars.application = [
                     v
-                    for k, v in ctx.run().items()
+                    for k, v in applications.items()
                     if k == self.vars.name
                 ]
             else:

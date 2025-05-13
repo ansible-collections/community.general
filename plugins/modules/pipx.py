@@ -265,8 +265,8 @@ class PipX(StateModuleHelper):
     use_old_vardict = False
 
     def _retrieve_installed(self):
-        output_process = make_process_dict(self, include_injected=True)
-        installed = self.runner('_list global', output_process=output_process).run()
+        output_process = make_process_dict(include_injected=True)
+        installed, dummy = self.runner('_list global', output_process=output_process).run()
 
         if self.app_name is None:
             return installed

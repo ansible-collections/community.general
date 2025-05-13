@@ -84,20 +84,17 @@ def _make_entry(venv_name, venv, include_injected, include_deps):
     return entry
 
 
-def make_process_dict(mod_helper, **kwargs):
+def make_process_dict(include_injected, include_deps=False):
     def process_dict(rc, out, err):
         if not out:
             return {}
 
         results = {}
         raw_data = json.loads(out)
-        if kwargs.get("include_raw"):
-            mod_helper.vars.raw_output = raw_data
-
         for venv_name, venv in raw_data['venvs'].items():
-            results[venv_name] = _make_entry(venv_name, venv, kwargs.get("include_injected"), kwargs.get("include_deps"))
+            results[venv_name] = _make_entry(venv_name, venv, include_injected, include_deps)
 
-        return results
+        return results, raw_data
 
     return process_dict
 
@@ -111,7 +108,10 @@ def make_process_list(mod_helper, **kwargs):
     process_dict = make_process_dict(mod_helper, **kwargs)
 
     def process_list(rc, out, err):
-        res_dict = process_dict(rc, out, err)
+        res_dict, raw_data = process_dict(rc, out, err)
+
+        if kwargs.get("include_raw"):
+            mod_helper.vars.raw_output = raw_data
 
         return [
             entry
