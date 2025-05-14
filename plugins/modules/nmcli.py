@@ -46,6 +46,16 @@ options:
       - Whether the connection profile can be automatically activated.
     type: bool
     default: true
+  autoconnect_priority:
+    description: 
+      - The priority of the connection profile for autoconnect. If set, connection profiles with higher priority will be preferred.
+    type: int
+    default: 0
+  autconnect_retries:
+    description:
+      - The number of times to retry autoconnecting.
+    type: int
+    default: -1
   conn_name:
     description:
       - The name used to call the connection. Pattern is V(<type>[-<ifname>][-<num>]).
@@ -1688,6 +1698,8 @@ class Nmcli(object):
         self.state = module.params['state']
         self.ignore_unsupported_suboptions = module.params['ignore_unsupported_suboptions']
         self.autoconnect = module.params['autoconnect']
+        self.autoconnect_priority = module.params['autoconnect_priority']
+        self.autoconnect_retries = module.params['autoconnect_retries']
         self.conn_name = module.params['conn_name']
         self.conn_reload = module.params['conn_reload']
         self.slave_type = module.params['slave_type']
@@ -1819,6 +1831,8 @@ class Nmcli(object):
         # Options common to multiple connection types.
         options = {
             'connection.autoconnect': self.autoconnect,
+            'connection.autoconnect-priority': self.autoconnect_priority,
+            'connection.autoconnect-retries': self.autoconnect_retries,
             'connection.zone': self.zone,
         }
 
@@ -2262,6 +2276,9 @@ class Nmcli(object):
                          '802-11-wireless-security.wep-key-flags',
                          '802-11-wireless.mac-address-blacklist'):
             return list
+        elif setting in ('connection.autoconnect-priority',
+                         'connection.autoconnect-retries'):
+            return int
         return str
 
     def get_route_params(self, raw_values):
@@ -2571,6 +2588,8 @@ def main():
         argument_spec=dict(
             ignore_unsupported_suboptions=dict(type='bool', default=False),
             autoconnect=dict(type='bool', default=True),
+            autoconnect_priority=dict(type='int', default=0),
+            autoconnect_retries=dict(type='int', default=-1),
             state=dict(type='str', required=True, choices=['absent', 'present', 'up', 'down']),
             conn_name=dict(type='str', required=True),
             conn_reload=dict(type='bool', default=False),
