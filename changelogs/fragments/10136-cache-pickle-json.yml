@@ -1,2 +1,2 @@
 bugfixes:
-  - pickle cache plugin now avoids extra JSON serialization in core >= 2.19.
+  - pickle cache plugin - avoid extra JSON serialization with ansible-core >= 2.19 (https://github.com/ansible-collections/community.general/pull/10136).
