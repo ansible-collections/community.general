@@ -1,2 +1,2 @@
 minor_changes:
-  - nmcli - adds `autoconnect-priority` and `autoconnect-retries` options to support autoconnect logic
+  - nmcli - adds ``autoconnect_priority`` and ``autoconnect_retries`` options to support autoconnect logic (https://github.com/ansible-collections/community.general/pull/10134).

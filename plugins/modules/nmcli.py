@@ -51,6 +51,7 @@ options:
       - The priority of the connection profile for autoconnect. If set, connection profiles with higher priority will be preferred.
     type: int
     default: 0
+    version_added: 10.6.0
   autoconnect_retries:
     description:
       - The number of times to retry autoconnecting.
