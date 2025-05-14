@@ -47,11 +47,11 @@ options:
     type: bool
     default: true
   autoconnect_priority:
-    description: 
+    description:
       - The priority of the connection profile for autoconnect. If set, connection profiles with higher priority will be preferred.
     type: int
     default: 0
-  autconnect_retries:
+  autoconnect_retries:
     description:
       - The number of times to retry autoconnecting.
     type: int
