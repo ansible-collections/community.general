@@ -278,7 +278,7 @@ def main():
 
         if system:
             # Update existing entry
-            system_id = conn.get_system_handle(name, token)
+            system_id = conn.get_system_handle(name)
 
             for key, value in iteritems(module.params['properties']):
                 if key not in system:
