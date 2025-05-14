@@ -8,7 +8,7 @@ redis_packages:
   Alpine:
   - redis
   Archlinux:
-  - redis
+  - valkey
   Debian:
   - redis-server
   Ubuntu:
@@ -24,7 +24,7 @@ redis_packages:
 
 redis_user:
   Alpine: redis
-  Archlinux: redis
+  Archlinux: valkey
   Debian: redis
   Ubuntu: redis
   openSUSE Leap: redis
