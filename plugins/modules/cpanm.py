@@ -204,7 +204,6 @@ class CPANMinus(ModuleHelper):
         pkg_spec=cmd_runner_fmt.as_list(),
         cpanm_version=cmd_runner_fmt.as_fixed("--version"),
     )
-    use_old_vardict = False
 
     def __init_module__(self):
         v = self.vars

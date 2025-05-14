@@ -49,7 +49,6 @@ class MState(StateModuleHelper):
             state=dict(type='str', choices=['join', 'b_x_a', 'c_x_a', 'both_x_a', 'nop'], default='join'),
         ),
     )
-    use_old_vardict = False
 
     def __init_module__(self):
         self.vars.set('result', "abc", diff=True)

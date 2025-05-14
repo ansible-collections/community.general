@@ -111,7 +111,6 @@ class LocaleGen(StateModuleHelper):
         ),
         supports_check_mode=True,
     )
-    use_old_vardict = False
 
     def __init_module__(self):
         self.MECHANISMS = dict(
