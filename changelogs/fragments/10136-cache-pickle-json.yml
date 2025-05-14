@@ -1,0 +1,2 @@
+bugfixes:
+  - pickle cache plugin now avoids extra JSON serialization in core >= 2.19.
