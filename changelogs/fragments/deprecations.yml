@@ -15,3 +15,5 @@ removed_features:
   - "mh.module_helper module utils - ``AnsibleModule`` and ``VarsMixin`` are no longer provided (https://github.com/ansible-collections/community.general/pull/10126)."
   - "mh.module_helper module utils - the attributes ``use_old_vardict`` and ``mute_vardict_deprecation`` from ``ModuleHelper`` have been removed. We suggest to remove them from your modules if you no longer support community.general < 11.0.0 (https://github.com/ansible-collections/community.general/pull/10126)."
   - "module_helper module utils - ``StateMixin``, ``DependencyCtxMgr``, ``VarMeta``, ``VarDict``, and ``VarsMixin`` are no longer provided (https://github.com/ansible-collections/community.general/pull/10126)."
+breaking_changes:
+  - "proxmox - the default of ``update`` changed from ``false`` to ``true`` (https://github.com/ansible-collections/community.general/pull/10126)."
