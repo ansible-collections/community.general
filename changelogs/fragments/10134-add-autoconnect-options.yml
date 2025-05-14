@@ -1,0 +1,2 @@
+minor_changes:
+  - nmcli - adds `autoconnect-priority` and `autoconnect-retries` options to support autoconnect logic
