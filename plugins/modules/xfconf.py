@@ -190,7 +190,6 @@ class XFConfProperty(StateModuleHelper):
         required_together=[('value', 'value_type')],
         supports_check_mode=True,
     )
-    use_old_vardict = False
 
     default_state = 'present'
 

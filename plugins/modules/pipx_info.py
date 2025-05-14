@@ -144,7 +144,6 @@ class PipXInfo(ModuleHelper):
         argument_spec=argument_spec,
         supports_check_mode=True,
     )
-    use_old_vardict = False
 
     def __init_module__(self):
         if self.vars.executable:

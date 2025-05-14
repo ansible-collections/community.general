@@ -255,7 +255,6 @@ class PipX(StateModuleHelper):
         ),
         supports_check_mode=True,
     )
-    use_old_vardict = False
 
     def _retrieve_installed(self):
         name = _make_name(self.vars.name, self.vars.suffix)

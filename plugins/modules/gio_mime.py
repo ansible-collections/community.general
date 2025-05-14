@@ -94,7 +94,6 @@ class GioMime(ModuleHelper):
         ),
         supports_check_mode=True,
     )
-    use_old_vardict = False
 
     def __init_module__(self):
         self.runner = gio_mime_runner(self.module, check_rc=True)

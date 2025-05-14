@@ -103,7 +103,6 @@ class XdgMime(ModuleHelper):
         ),
         supports_check_mode=True,
     )
-    use_old_vardict = False
 
     def __init_module__(self):
         self.runner = xdg_mime_runner(self.module, check_rc=True)
