@@ -50,13 +50,11 @@ options:
     description:
       - The priority of the connection profile for autoconnect. If set, connection profiles with higher priority will be preferred.
     type: int
-    default: 0
     version_added: 10.6.0
   autoconnect_retries:
     description:
       - The number of times to retry autoconnecting.
     type: int
-    default: -1
   conn_name:
     description:
       - The name used to call the connection. Pattern is V(<type>[-<ifname>][-<num>]).
@@ -2589,8 +2587,8 @@ def main():
         argument_spec=dict(
             ignore_unsupported_suboptions=dict(type='bool', default=False),
             autoconnect=dict(type='bool', default=True),
-            autoconnect_priority=dict(type='int', default=0),
-            autoconnect_retries=dict(type='int', default=-1),
+            autoconnect_priority=dict(type='int'),
+            autoconnect_retries=dict(type='int'),
             state=dict(type='str', required=True, choices=['absent', 'present', 'up', 'down']),
             conn_name=dict(type='str', required=True),
             conn_reload=dict(type='bool', default=False),
