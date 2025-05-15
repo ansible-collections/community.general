@@ -3,21 +3,13 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: Determine pipx level
-  block:
-    - name: Install pipx>=1.7.0
-      ansible.builtin.pip:
-        name: pipx>=1.7.0
-    - name: Set has_pipx170 fact true
-      ansible.builtin.set_fact:
-        has_pipx170: true
-  rescue:
-    - name: Set has_pipx170 fact false
-      ansible.builtin.set_fact:
-        has_pipx170: false
-    - name: Install pipx (no version spec)
-      ansible.builtin.pip:
-        name: pipx
+- name: Bail out if Python < 3.8
+  when: ansible_python_version is version('3.8', '<')
+  ansible.builtin.meta: end_play
+- name: Install pipx>=1.7.0
+  ansible.builtin.pip:
+    name: pipx>=1.7.0
+    extra_args: --user
 
 - name: Determine packaging level
   block:
@@ -266,27 +258,23 @@
 - name: Include testcase for issue 8656
   ansible.builtin.include_tasks: testcase-8656.yml
 
-- name: Recent features
-  when:
-    - has_pipx170
-  block:
-    - name: Include testcase for PR 8793 --global
-      ansible.builtin.include_tasks: testcase-8793-global.yml
+- name: Include testcase for PR 8793 --global
+  ansible.builtin.include_tasks: testcase-8793-global.yml
 
-    - name: Include testcase for PR 8809 install-all
-      ansible.builtin.include_tasks: testcase-8809-installall.yml
+- name: Include testcase for PR 8809 install-all
+  ansible.builtin.include_tasks: testcase-8809-installall.yml
 
-    - name: Include testcase for PR 8809 pin
-      ansible.builtin.include_tasks: testcase-8809-pin.yml
+- name: Include testcase for PR 8809 pin
+  ansible.builtin.include_tasks: testcase-8809-pin.yml
 
-    - name: Include testcase for PR 8809 injectpkg
-      ansible.builtin.include_tasks: testcase-8809-uninjectpkg.yml
+- name: Include testcase for PR 8809 injectpkg
+  ansible.builtin.include_tasks: testcase-8809-uninjectpkg.yml
 
-    - name: Include testcase for PR 9009 injectpkg --global
-      ansible.builtin.include_tasks: testcase-9009-fixglobal.yml
+- name: Include testcase for PR 9009 injectpkg --global
+  ansible.builtin.include_tasks: testcase-9009-fixglobal.yml
 
-    - name: Include testcase for PR 9103 upgrade --global
-      ansible.builtin.include_tasks: testcase-9103-upgrade-global.yml
+- name: Include testcase for PR 9103 upgrade --global
+  ansible.builtin.include_tasks: testcase-9103-upgrade-global.yml
 
-    - name: Include testcase for issue 9619 latest --global
-      ansible.builtin.include_tasks: testcase-9619-latest-global.yml
+- name: Include testcase for issue 9619 latest --global
+  ansible.builtin.include_tasks: testcase-9619-latest-global.yml
