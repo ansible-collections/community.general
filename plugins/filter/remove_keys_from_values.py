@@ -36,16 +36,16 @@ options:
     default: true
     required: false
   matching_parameter:
-    description: Specify the matching option of target keys.
+    description: Specify the matching option of values.
     type: str
     default: equal
     choices:
-      equal: Matches keys of equally one of the O(target[].before) items.
-      regex: Matches keys that match one of the regular expressions provided in O(target[].before).:
+      equal: Matches values of equally one of the O(values[]) items.
+      regex: Matches values that match one of the regular expressions provided in O(values[]).
 """
 
 EXAMPLES = r"""
-- name: Remove empty keys from a list of dictionaries
+- name: Remove empty values from a list of dictionaries
   set_fact:
     my_list:
       - a: foo
@@ -57,16 +57,16 @@ EXAMPLES = r"""
       - a: ok
         b: {}
         c: None
-  - debug:
-      msg: "{{ my_list | remove_empty_keys }}"
-  - debug:
-      msg: "{{ my_list | remove_empty_keys(values='') }}"
-  - debug:
-      msg: "{{ my_list | remove_empty_keys(values=['', [], {}, None]) }}"
-  - debug:
-      msg: "{{ my_list | remove_empty_keys(values=['', [], {}, None], recursive=False) }}"
-  - debug:
-      msg: "{{ my_list | remove_empty_keys(values=['foo', 'bar']) }}"
+- debug:
+    msg: "{{ my_list | remove_empty_keys }}"
+- debug:
+    msg: "{{ my_list | remove_empty_keys(values='') }}"
+- debug:
+    msg: "{{ my_list | remove_empty_keys(values=['', [], {}, None]) }}"
+- debug:
+    msg: "{{ my_list | remove_empty_keys(values=['', [], {}, None], recursive=False) }}"
+- debug:
+    msg: "{{ my_list | remove_empty_keys(values=['foo', 'bar']) }}"
 
 - name: Remove keys from a dictionary
   set_fact:
@@ -81,42 +81,42 @@ EXAMPLES = r"""
         - a: bar
           b: {}
           c: None
-  - debug:
-      msg: "{{ my_dict | remove_empty_keys }}"
-  # returns
-  # a: foo
-  # d:
-  #   - a: foo
-  #   - a: bar
-  - debug:
-      msg: "{{ my_dict | remove_empty_keys(values='') }}"
-  # returns
-  # a: foo
-  # d:
-  #   - a: foo
-  #     c: []
-  #   - a: bar
-  #     b: {}
-  #     c: None
+- debug:
+    msg: "{{ my_dict | remove_empty_keys }}"
+# returns
+# a: foo
+# d:
+#   - a: foo
+#   - a: bar
+- debug:
+    msg: "{{ my_dict | remove_empty_keys(values='') }}"
+# returns
+# a: foo
+# d:
+#   - a: foo
+#     c: []
+#   - a: bar
+#     b: {}
+#     c: None
 
-  - debug:
-      msg: "{{ my_dict | remove_empty_keys(values=['', [], {}, None], recursive=False) }}"
-  # return
-  # a: foo
-  # d:
-  #   - a: foo
-  #   - a: bar
+- debug:
+    msg: "{{ my_dict | remove_empty_keys(values=['', [], {}, None], recursive=False) }}"
+# return
+# a: foo
+# d:
+#   - a: foo
+#   - a: bar
 
-  - debug:
-      msg: "{{ my_dict | remove_empty_keys(values=['foo', 'bar']) }}"
-  # returns
-  # b: ''
-  # c: []
-  # d:
-  #   - b: ''
-  #     c: []
-  #   - b: {}
-  #     c: None
+- debug:
+    msg: "{{ my_dict | remove_empty_keys(values=['foo', 'bar']) }}"
+# returns
+# b: ''
+# c: []
+# d:
+#   - b: ''
+#     c: []
+#   - b: {}
+#     c: None
 """
 
 RETURN = r"""
@@ -169,7 +169,7 @@ def remove_keys_from_values(data, values=None, recursive=True, matching_paramete
     Removes keys from dictionaries or lists of dictionaries
     if their values match the specified values or regex patterns.
     """
-    
+
     if not isinstance(data, (dict, list)):
         raise AnsibleFilterError("Input must be a dictionary or a list.")
 
@@ -204,6 +204,7 @@ def remove_keys_from_values(data, values=None, recursive=True, matching_paramete
         return obj
 
     return clean(data)
+
 
 class FilterModule(object):
     def filters(self):
