@@ -126,6 +126,7 @@ _value:
   type: raw
 """
 
+import re
 from ansible.errors import AnsibleFilterError
 
 
@@ -168,18 +169,17 @@ def remove_keys_from_values(data, values=None, recursive=True, matching_paramete
     Removes keys from dictionaries or lists of dictionaries
     if their values match the specified values or regex patterns.
     """
-    default_values = ['', [], {}, None]
-    if values is None:
-        values = default_values
-    elif not isinstance(values, list):
-        values = [values]
+    
+    if not isinstance(data, (dict, list)):
+        raise AnsibleFilterError("Input must be a dictionary or a list.")
 
-    if matching_parameter not in ["equal", "regex"]:
-        raise AnsibleFilterError(f"Invalid matching_parameter '{matching_parameter}'. Use 'equal' or 'regex'.")
+    if matching_parameter not in ("equal", "regex"):
+        raise AnsibleFilterError("matching_parameter must be 'equal' or 'regex'")
+
+    values = values if isinstance(values, list) else [values or '', [], {}, None]
 
     regex_patterns = []
     if matching_parameter == "regex":
-        # Convert string patterns to compiled regex
         try:
             regex_patterns = [re.compile(v) for v in values]
         except re.error as e:
@@ -188,7 +188,7 @@ def remove_keys_from_values(data, values=None, recursive=True, matching_paramete
     def should_remove(val):
         if matching_parameter == "equal":
             return val in values
-        elif matching_parameter == "regex" and isinstance(val, str):
+        if matching_parameter == "regex" and isinstance(val, str):
             return any(p.match(val) for p in regex_patterns)
         return False
 
@@ -200,15 +200,10 @@ def remove_keys_from_values(data, values=None, recursive=True, matching_paramete
                 if not should_remove(clean(v) if recursive else v)
             }
         elif isinstance(obj, list):
-            return [clean(item) if recursive else item for item in obj]
-        else:
-            return obj
+            return [clean(i) if recursive else i for i in obj]
+        return obj
 
-    if isinstance(data, (dict, list)):
-        return clean(data)
-    else:
-        raise AnsibleFilterError("Input must be a dictionary or a list of dictionaries.")
-
+    return clean(data)
 
 class FilterModule(object):
     def filters(self):
