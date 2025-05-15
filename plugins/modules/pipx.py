@@ -61,8 +61,9 @@ options:
       - Starting in community.general 10.7.0, you can use package specifiers when O(state=present) or O(state=install). For
         example, O(name=tox<4.0.0) or O(name=tox>3.0.27).
       - Please note that when you use O(state=present) and O(name) with version specifiers, contrary to the behavior of C(pipx),
-        this module honors the version specifier and installs a version of the application that satisfies it. If that is not
-        the case and you want to ensure the reinstallation of the application, then you must use O(force=true).
+        this module honors the version specifier and installs a version of the application that satisfies it. If you want
+        to ensure the reinstallation of the application even when the version specifier is met, then you must use O(force=true),
+        or perhaps use O(state=upgrade) instead.
       - Use O(source) for installing from URLs or directories.
   source:
     type: str
