@@ -24,9 +24,9 @@ class ModuleHelper(DeprecateAttrsMixin, ModuleHelperBase):
     facts_params = ()
 
     def __init__(self, module=None):
-        self.vars = VarDict()
         super(ModuleHelper, self).__init__(module)
 
+        self.vars = VarDict()
         for name, value in self.module.params.items():
             self.vars.set(
                 name, value,
