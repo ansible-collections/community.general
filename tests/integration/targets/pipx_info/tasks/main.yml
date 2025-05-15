@@ -3,13 +3,16 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: install pipx
-  pip:
-    name: pipx
+- name: Bail out if Python < 3.8
+  when: ansible_python_version is version('3.8', '<')
+  ansible.builtin.meta: end_play
+- name: Install pipx>=1.7.0
+  ansible.builtin.pip:
+    name: pipx>=1.7.0
     extra_args: --user
 
 ##############################################################################
-- name: ensure applications are uninstalled
+- name: Ensure applications are uninstalled
   community.general.pipx:
     name: "{{ item }}"
     state: absent
@@ -17,36 +20,36 @@
     - tox
     - pylint
 
-- name: retrieve applications (empty)
+- name: Retrieve applications (empty)
   community.general.pipx_info: {}
   register: info_empty
 
-- name: install application tox
+- name: Install application tox
   community.general.pipx:
     name: tox
 
-- name: retrieve applications
+- name: Retrieve applications
   community.general.pipx_info: {}
   register: info_all
 
-- name: retrieve applications (include_deps=true)
+- name: Retrieve applications (include_deps=true)
   community.general.pipx_info:
     include_deps: true
   register: info_all_deps
 
-- name: retrieve application tox
+- name: Retrieve application tox
   community.general.pipx_info:
     name: tox
     include_deps: true
   register: info_tox
 
-- name: uninstall application tox
+- name: Uninstall application tox
   community.general.pipx:
     state: absent
     name: tox
 
-- name: check assertions tox
-  assert:
+- name: Check assertions tox
+  ansible.builtin.assert:
     that:
       - info_empty.application|length == 0
 
@@ -66,8 +69,8 @@
       - info_tox.application == info_all_deps.application
 
 ##############################################################################
-- name: set test applications
-  set_fact:
+- name: Set test applications
+  ansible.builtin.set_fact:
     apps:
       - name: tox
         source: tox==3.24.0
@@ -75,19 +78,19 @@
         inject_packages:
           - licenses
 
-- name: ensure applications are uninstalled
+- name: Ensure applications are uninstalled
   community.general.pipx:
     name: "{{ item.name }}"
     state: absent
   loop: "{{ apps }}"
 
-- name: install applications
+- name: Install applications
   community.general.pipx:
     name: "{{ item.name }}"
     source: "{{ item.source | default(omit) }}"
   loop: "{{ apps }}"
 
-- name: inject packages
+- name: Inject packages
   community.general.pipx:
     state: inject
     name: "{{ item.name }}"
@@ -95,31 +98,31 @@
   when: "'inject_packages' in item"
   loop: "{{ apps }}"
 
-- name: retrieve applications
+- name: Retrieve applications
   community.general.pipx_info: {}
   register: info2_all
 
-- name: retrieve applications (include_deps=true)
+- name: Retrieve applications (include_deps=true)
   community.general.pipx_info:
     include_deps: true
     include_injected: true
   register: info2_all_deps
 
-- name: retrieve application pylint
+- name: Retrieve application pylint
   community.general.pipx_info:
     name: pylint
     include_deps: true
     include_injected: true
   register: info2_lint
 
-- name: ensure applications are uninstalled
+- name: Ensure applications are uninstalled
   community.general.pipx:
     name: "{{ item.name }}"
     state: absent
   loop: "{{ apps }}"
 
-- name: check assertions multiple apps
-  assert:
+- name: Check assertions multiple apps
+  ansible.builtin.assert:
     that:
       - all_apps|length == 2
       - all_apps[1].name == "tox"
@@ -138,6 +141,6 @@
       - all_apps_deps|length == 2
       - lint[0] == all_apps_deps[0]
   vars:
-    all_apps: "{{ info2_all.application|sort(attribute='name') }}"
+    all_apps: "{{ info2_all.application | sort(attribute='name') }}"
     all_apps_deps: "{{ info2_all_deps.application | sort(attribute='name') }}"
     lint: "{{ info2_lint.application | sort(attribute='name') }}"
