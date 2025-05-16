@@ -176,10 +176,10 @@ class Zpool(object):
             cmd.append('-n')
 
         for prop, value in self.pool_properties.items():
-            cmd.extend(['-o', f"{prop}={value}"])
+            cmd.extend(['-o', "{}={}".format(prop, value)])
 
         for prop, value in self.filesystem_properties.items():
-            cmd.extend(['-O', f"{prop}={value}"])
+            cmd.extend(['-O', "{}={}".format(prop, value)])
 
         if self.mountpoint:
             cmd.extend(['-m', self.mountpoint])
@@ -236,7 +236,7 @@ class Zpool(object):
             if current.get(prop) != str(value):
                 before[prop] = current.get(prop)
                 if not self.module.check_mode:
-                    self.module.run_command([self.zpool_cmd, 'set', f"{prop}={str(value)}", self.name], check_rc=True)
+                    self.module.run_command([self.zpool_cmd, 'set', "{}={}".format(prop, value), self.name], check_rc=True)
                 after[prop] = str(value)
                 self.changed = True
         return {'before': {'pool_properties': before}, 'after': {'pool_properties': after}}
@@ -258,7 +258,7 @@ class Zpool(object):
             if current.get(prop) != str(value):
                 before[prop] = current.get(prop)
                 if not self.module.check_mode:
-                    self.module.run_command([self.zfs_cmd, 'set', f"{prop}={str(value)}", self.name], check_rc=True)
+                    self.module.run_command([self.zfs_cmd, 'set', "{}={}".format(prop, value), self.name], check_rc=True)
                 after[prop] = str(value)
                 self.changed = True
         return {'before': {'filesystem_properties': before}, 'after': {'filesystem_properties': after}}
@@ -375,7 +375,7 @@ class Zpool(object):
             cmd.append('-n')
 
         for prop, value in self.pool_properties.items():
-            cmd.extend(['-o', f"{prop}={value}"])
+            cmd.extend(['-o', "{}={}".format(prop, value)])
 
         cmd.append(self.name)
 
@@ -488,7 +488,7 @@ def main():
     for idx, vdev in enumerate(vdevs, start=1):
         disks = vdev.get('disks')
         if not isinstance(disks, list) or len(disks) == 0:
-            module.fail_json(msg=f"vdev #{idx}: at least one disk is required (got: {disks!r})")
+            module.fail_json(msg="vdev #{idx}: at least one disk is required (got: {disks!r})".format(idx=idx, disks=disks))
 
     allowed_types = {'stripe', 'mirror', 'raidz', 'raidz1', 'raidz2', 'raidz3'}
     allowed_roles = {'log', 'cache', 'spare', 'special', 'dedup'}
@@ -498,8 +498,12 @@ def main():
         if not isinstance(vdev_type, str) or vdev_type not in allowed_types:
             module.fail_json(
                 msg=(
-                    f"vdev #{idx}: invalid type {vdev_type!r}; "
-                    f"must be one of {sorted(allowed_types)}"
+                    "vdev #{idx}: invalid type {vdev!r}; "
+                    "must be one of {types}"
+                ).format(
+                    idx=idx,
+                    vdev=vdev_type,
+                    types=sorted(allowed_types)
                 )
             )
 
@@ -508,8 +512,12 @@ def main():
             if not isinstance(role, str) or role not in allowed_roles:
                 module.fail_json(
                     msg=(
-                        f"vdev #{idx}: invalid role {role!r}; "
-                        f"must be one of {sorted(allowed_roles)}"
+                        "vdev #{idx}: invalid role {role!r}; "
+                        "must be one of {roles}"
+                    ).format(
+                        idx=idx,
+                        role=role,
+                        roles=sorted(allowed_roles)
                     )
                 )
 
