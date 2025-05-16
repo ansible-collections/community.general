@@ -357,6 +357,10 @@ class Zpool(object):
         return {'before': before, 'after': after}
 
     def add_vdevs(self):
+        invalid_properties = [k for k in self.pool_properties if k != 'ashift']
+        if invalid_properties:
+            self.module.warn("zpool add only supports 'ashift', ignoring: {}".format(invalid_properties))
+
         diff = self.diff_layout()
         before_vdevs = diff['before']['vdevs']
         after_vdevs = diff['after']['vdevs']
@@ -373,8 +377,8 @@ class Zpool(object):
         if self.module.check_mode:
             cmd.append('-n')
 
-        for prop, value in self.pool_properties.items():
-            cmd.extend(['-o', "{}={}".format(prop, value)])
+        if 'ashift' in self.pool_properties:
+            cmd.extend(['-o', "ashift={}".format(self.pool_properties['ashift'])])
 
         cmd.append(self.name)
 
