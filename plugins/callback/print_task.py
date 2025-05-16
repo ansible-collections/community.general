@@ -27,9 +27,10 @@ ansible.cfg: >
 from yaml import load, dump
 
 try:
+    from yaml import CSafeDumper as SafeDumper
     from yaml import CSafeLoader as SafeLoader
 except ImportError:
-    from yaml import SafeLoader
+    from yaml import SafeDumper, SafeLoader
 
 from ansible.plugins.callback import CallbackBase
 
@@ -51,7 +52,7 @@ class CallbackModule(CallbackBase):
     def _print_task(self, task):
         if hasattr(task, '_ds'):
             task_snippet = load(str([task._ds.copy()]), Loader=SafeLoader)
-            task_yaml = dump(task_snippet, sort_keys=False)
+            task_yaml = dump(task_snippet, sort_keys=False, Dumper=SafeDumper)
             self._display.display(f"\n{task_yaml}\n")
             self._printed_message = True
 
