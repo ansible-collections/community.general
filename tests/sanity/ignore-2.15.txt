@@ -5,7 +5,6 @@ plugins/inventory/iocage.py yamllint:unparsable-with-libyaml
 plugins/inventory/linode.py yamllint:unparsable-with-libyaml
 plugins/inventory/lxd.py yamllint:unparsable-with-libyaml
 plugins/inventory/nmap.py yamllint:unparsable-with-libyaml
-plugins/inventory/proxmox.py yamllint:unparsable-with-libyaml
 plugins/inventory/scaleway.py yamllint:unparsable-with-libyaml
 plugins/inventory/virtualbox.py yamllint:unparsable-with-libyaml
 plugins/lookup/dependent.py validate-modules:unidiomatic-typecheck
