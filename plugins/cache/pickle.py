@@ -57,6 +57,7 @@ class CacheModule(BaseFileCacheModule):
     """
     A caching module backed by pickle files.
     """
+    _persistent = False  # prevent unnecessary JSON serialization and key munging
 
     def _load(self, filepath):
         # Pickle is a binary format
