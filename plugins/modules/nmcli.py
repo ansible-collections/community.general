@@ -2121,6 +2121,8 @@ class Nmcli(object):
             'infiniband',
             'team-slave',
             'vlan',
+            'ipip',
+            'gre',
         )
 
     @property
