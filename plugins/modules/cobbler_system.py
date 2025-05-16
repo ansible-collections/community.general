@@ -161,9 +161,8 @@ from ansible.module_utils.common.text.converters import to_text
 from ansible_collections.community.general.plugins.module_utils.datetime import (
     now,
 )
-from ansible_collections.community.general.plugins.module_utils import deps
-with deps.declare("packaging"):
-    from packaging.version import Version
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+
 
 IFPROPS_MAPPING = dict(
     bondingopts='bonding_opts',
@@ -282,7 +281,7 @@ def main():
         if system:
             # Update existing entry
             system_id = None
-            if Version(str(conn.version())) >= Version('3.4.0'):
+            if LooseVersion(str(conn.version())) >= LooseVersion('3.4.0'):
                 system_id = conn.get_system_handle(name)
             else:
                 system_id = conn.get_system_handle(name, token)
