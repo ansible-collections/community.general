@@ -284,13 +284,12 @@ class Zpool(object):
         current = None
         in_config = False
 
-        def flush_current():
-            nonlocal current
+        def flush_current(current):
             if current:
                 if current.get('role') is None:
                     current.pop('role', None)
                 vdevs.append(current)
-                current = None
+            return None
 
         for line in stdout.splitlines():
             if not in_config:
@@ -308,7 +307,7 @@ class Zpool(object):
                 continue
 
             if device in ('logs', 'cache', 'spares'):
-                flush_current()
+                current = flush_current(current)
                 role = 'spare' if device == 'spares' else device.rstrip('s')
                 current = {'role': role, 'type': None, 'disks': []}
                 continue
@@ -316,7 +315,7 @@ class Zpool(object):
             match_group = re.match(r'^(mirror|raidz\d?)-\d+$', device)
             if match_group:
                 if current and current.get('type') is not None:
-                    flush_current()
+                    current = flush_current(current)
                 kind = match_group.group(1)
                 role = current.get('role') if current and current.get('type') is None else None
                 current = {'role': role, 'type': kind, 'disks': []}
@@ -341,7 +340,7 @@ class Zpool(object):
                 continue
 
         if current and current.get('type') is not None:
-            flush_current()
+            current = flush_current(current)
 
         return vdevs
 
