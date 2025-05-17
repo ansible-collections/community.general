@@ -14,7 +14,7 @@
   register: unset_result
 
 - name: getting value
-  git_config:
+  git_config_info:
     name: "{{ option_name }}"
     scope: "{{ option_scope }}"
   register: get_result

@@ -57,7 +57,7 @@ class MSimple(ModuleHelper):
             raise Exception("a >= 100")
         if self.vars.c == "abc change":
             self.vars['abc'] = "changed abc"
-        if self.vars.get('a', 0) == 2:
+        if self.vars.a == 2:
             self.vars['b'] = str(self.vars.b) * 2
             self.vars['c'] = str(self.vars.c) * 2
 

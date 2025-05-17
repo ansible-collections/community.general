@@ -38,7 +38,6 @@ But bear in mind that it does not showcase all of MH's features:
             ),
             supports_check_mode=True,
         )
-        use_old_vardict = False
 
         def __run__(self):
             self.vars.original_message = ''
@@ -83,10 +82,6 @@ section above, but there are more elements that will take part in it.
         facts_params = ()
 
         facts_name = None   # used if generating facts, from parameters or otherwise
-
-        # transitional variables for the new VarDict implementation, see information below
-        use_old_vardict = True
-        mute_vardict_deprecation = False
 
         module = dict(
             argument_spec=dict(...),
@@ -207,28 +202,14 @@ By using ``self.vars``, you get a central mechanism to access the parameters but
 As described in :ref:`ansible_collections.community.general.docsite.guide_vardict`, variables in ``VarDict`` have metadata associated to them.
 One of the attributes in that metadata marks the variable for output, and MH makes use of that to generate the module's return values.
 
-.. important::
+.. note::
 
-    The ``VarDict`` feature described was introduced in community.general 7.1.0, but there was a first
-    implementation of it embedded within ``ModuleHelper``.
-    That older implementation is now deprecated and will be removed in community.general 11.0.0.
-    After community.general 7.1.0, MH modules generate a deprecation message about *using the old VarDict*.
-    There are two ways to prevent that from happening:
+    The ``VarDict`` class was introduced in community.general 7.1.0, as part of ``ModuleHelper`` itself.
+    However, it has been factored out to become an utility on its own, described in :ref:`ansible_collections.community.general.docsite.guide_vardict`,
+    and the older implementation was removed in community.general 11.0.0.
 
-        #.  Set ``mute_vardict_deprecation = True`` and the deprecation will be silenced. If the module still uses the old ``VarDict``,
-            it will not be able to update to community.general 11.0.0 (Spring 2025) upon its release.
-        #.  Set ``use_old_vardict = False`` to make the MH module use the new ``VarDict`` immediately.
-            We strongly recommend you use the new ``VarDict``, for that you make sure to consult its documentation at
-            :ref:`ansible_collections.community.general.docsite.guide_vardict`.
-
-    .. code-block:: python
-
-        class MyTest(ModuleHelper):
-            use_old_vardict = False
-            mute_vardict_deprecation = True
-            ...
-
-    These two settings are mutually exclusive, but that is not enforced and the behavior when setting both is not specified.
+    Some code might still refer to the class variables ``use_old_vardict`` and ``mute_vardict_deprecation``, used for the transtition to the new
+    implementation but from community.general 11.0.0 onwards they are no longer used and can be safely removed from the code.
 
 Contrary to new variables created in ``VarDict``, module parameters are not set for output by default.
 If you want to include some module parameters in the output, list them in the ``output_params`` class variable.
@@ -410,7 +391,6 @@ By using ``StateModuleHelper`` you can make your code like the excerpt from the 
         module = dict(
             ...
         )
-        use_old_vardict = False
 
         def __init_module__(self):
             self.runner = gconftool2_runner(self.module, check_rc=True)

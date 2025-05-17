@@ -35,9 +35,9 @@ options:
   state:
     description:
       - Indicates the desired package state.
-      - Please note that V(present) and V(installed) are equivalent to V(latest) right now. This will change in the future.
-        To simply ensure that a package is installed, without upgrading it, use the V(present_not_latest) state.
       - The states V(latest) and V(present_not_latest) have been added in community.general 8.6.0.
+      - Please note before community.general 11.0.0, V(present) and V(installed) were equivalent to V(latest).
+        This changed in community.general 11.0.0. Now they are equivalent to V(present_not_latest).
     choices:
       - absent
       - present
@@ -307,17 +307,6 @@ def main():
         module.fail_json(msg="cannot find /usr/bin/apt-get and/or /usr/bin/rpm")
 
     p = module.params
-    if p['state'] in ['installed', 'present']:
-        module.deprecate(
-            'state=%s currently behaves unexpectedly by always upgrading to the latest version if'
-            ' the package is already installed. This behavior is deprecated and will change in'
-            ' community.general 11.0.0. You can use state=latest to explicitly request this behavior'
-            ' or state=present_not_latest to explicitly request the behavior that state=%s will have'
-            ' in community.general 11.0.0, namely that the package will not be upgraded if it is'
-            ' already installed.' % (p['state'], p['state']),
-            version='11.0.0',
-            collection_name='community.general',
-        )
 
     modified = False
     output = ""
@@ -341,7 +330,7 @@ def main():
 
     packages = p['package']
     if p['state'] in ['installed', 'present', 'present_not_latest', 'latest']:
-        (m, out) = install_packages(module, packages, allow_upgrade=p['state'] != 'present_not_latest')
+        (m, out) = install_packages(module, packages, allow_upgrade=p['state'] == 'latest')
         modified = modified or m
         output += out
 

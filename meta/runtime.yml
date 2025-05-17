@@ -100,7 +100,7 @@ plugin_routing:
     hashi_vault:
       redirect: community.hashi_vault.hashi_vault
     manifold:
-      deprecation:
+      tombstone:
         removal_version: 11.0.0
         warning_text: Company was acquired in 2021 and service was ceased afterwards.
     nios:
@@ -129,39 +129,39 @@ plugin_routing:
     cisco_spark:
       redirect: community.general.cisco_webex
     clc_alert_policy:
-      deprecation:
+      tombstone:
         removal_version: 11.0.0
         warning_text: CenturyLink Cloud services went EOL in September 2023.
     clc_blueprint_package:
-      deprecation:
+      tombstone:
         removal_version: 11.0.0
         warning_text: CenturyLink Cloud services went EOL in September 2023.
     clc_firewall_policy:
-      deprecation:
+      tombstone:
         removal_version: 11.0.0
         warning_text: CenturyLink Cloud services went EOL in September 2023.
     clc_group:
-      deprecation:
+      tombstone:
         removal_version: 11.0.0
         warning_text: CenturyLink Cloud services went EOL in September 2023.
     clc_loadbalancer:
-      deprecation:
+      tombstone:
         removal_version: 11.0.0
         warning_text: CenturyLink Cloud services went EOL in September 2023.
     clc_modify_server:
-      deprecation:
+      tombstone:
         removal_version: 11.0.0
         warning_text: CenturyLink Cloud services went EOL in September 2023.
     clc_publicip:
-      deprecation:
+      tombstone:
         removal_version: 11.0.0
         warning_text: CenturyLink Cloud services went EOL in September 2023.
     clc_server:
-      deprecation:
+      tombstone:
         removal_version: 11.0.0
         warning_text: CenturyLink Cloud services went EOL in September 2023.
     clc_server_snapshot:
-      deprecation:
+      tombstone:
         removal_version: 11.0.0
         warning_text: CenturyLink Cloud services went EOL in September 2023.
     consul_acl:
@@ -320,7 +320,7 @@ plugin_routing:
     hetzner_firewall_info:
       redirect: community.hrobot.firewall_info
     hipchat:
-      deprecation:
+      tombstone:
         removal_version: 11.0.0
         warning_text: The hipchat service has been discontinued and the self-hosted variant has been End of Life since 2020.
     hpilo_facts:
@@ -645,23 +645,23 @@ plugin_routing:
     postgresql_user_obj_stat_info:
       redirect: community.postgresql.postgresql_user_obj_stat_info
     profitbricks:
-      deprecation:
+      tombstone:
         removal_version: 11.0.0
         warning_text: Supporting library is unsupported since 2021.
     profitbricks_datacenter:
-      deprecation:
+      tombstone:
         removal_version: 11.0.0
         warning_text: Supporting library is unsupported since 2021.
     profitbricks_nic:
-      deprecation:
+      tombstone:
         removal_version: 11.0.0
         warning_text: Supporting library is unsupported since 2021.
     profitbricks_volume:
-      deprecation:
+      tombstone:
         removal_version: 11.0.0
         warning_text: Supporting library is unsupported since 2021.
     profitbricks_volume_attachments:
-      deprecation:
+      tombstone:
         removal_version: 11.0.0
         warning_text: Supporting library is unsupported since 2021.
     purefa_facts:
@@ -970,7 +970,7 @@ plugin_routing:
     kubevirt:
       redirect: community.kubevirt.kubevirt
     stackpath_compute:
-      deprecation:
+      tombstone:
         removal_version: 11.0.0
         warning_text: The company and the service were sunset in June 2024.
   filter:
