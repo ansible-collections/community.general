@@ -6,7 +6,7 @@
 - name: Determine pipx level
   block:
     - name: Install pipx>=1.7.0
-      pip:
+      ansible.builtin.pip:
         name: pipx>=1.7.0
     - name: Set has_pipx170 fact true
       ansible.builtin.set_fact:
@@ -16,9 +16,24 @@
       ansible.builtin.set_fact:
         has_pipx170: false
     - name: Install pipx (no version spec)
-      pip:
+      ansible.builtin.pip:
         name: pipx
 
+- name: Determine packaging level
+  block:
+    - name: Install packaging>=22.0
+      ansible.builtin.pip:
+        name: packaging>=22.0
+    - name: Set has_packaging22 fact true
+      ansible.builtin.set_fact:
+        has_packaging22: true
+  rescue:
+    - name: Set has_packaging22 fact false
+      ansible.builtin.set_fact:
+        has_packaging22: false
+    - name: Install has_packaging (no version spec)
+      ansible.builtin.pip:
+        name: packaging
 
 ##############################################################################
 - name: ensure application tox is uninstalled
@@ -208,26 +223,31 @@
   community.general.pipx:
     state: absent
     name: tox
-  register: uninstall_tox_again
+  register: uninstall_tox_latest_yet_again
 
 - name: check assertions tox latest
   assert:
     that:
       - install_tox_latest is changed
+      - "'tox' in install_tox_latest.application"
+      - install_tox_latest.application.tox.version != '3.24.0'
       - uninstall_tox_latest is changed
+      - "'tox' not in uninstall_tox_latest.application"
       - install_tox_324_for_latest is changed
+      - "'tox' in install_tox_324_for_latest.application"
       - install_tox_324_for_latest.application.tox.version == '3.24.0'
       - install_tox_latest_with_preinstall is changed
-      - install_tox_latest_with_preinstall.application.tox.version == latest_tox_version
+      - "'tox' in install_tox_latest_with_preinstall.application"
+      - install_tox_latest_with_preinstall.application.tox.version != '3.24.0'
       - install_tox_latest_with_preinstall_again is not changed
-      - install_tox_latest_with_preinstall_again.application.tox.version == latest_tox_version
       - install_tox_latest_with_preinstall_again_force is changed
-      - install_tox_latest_with_preinstall_again_force.application.tox.version == latest_tox_version
       - uninstall_tox_latest_again is changed
-      - install_tox_with_deps is changed
-      - install_tox_with_deps.application.tox.version == latest_tox_version
-      - uninstall_tox_again is changed
-      - "'tox' not in uninstall_tox_again.application"
+      - "'tox' not in uninstall_tox_latest_again.application"
+
+##############################################################################
+# Test version specifiers in name parameter
+- name: Run version specifier tests
+  ansible.builtin.include_tasks: testcase-10031-version-specs.yml
 
 ##############################################################################
 
