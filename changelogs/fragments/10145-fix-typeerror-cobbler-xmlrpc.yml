@@ -1,0 +1,2 @@
+bugfixes:
+  - cobbler_system - fix bug with Cobbler >= 3.4.0 caused by giving more than 2 positional arguments to ``CobblerXMLRPCInterface.get_system_handle()`` (https://github.com/ansible-collections/community.general/issues/8506, https://github.com/ansible-collections/community.general/pull/10145).
