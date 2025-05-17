@@ -67,11 +67,9 @@ class _DjangoRunner(PythonRunner):
 
 class DjangoModuleHelper(ModuleHelper):
     module = {}
-    use_old_vardict = False
     django_admin_cmd = None
     arg_formats = {}
     django_admin_arg_order = ()
-    use_old_vardict = False
     _django_args = []
     _check_mode_arg = ""
 

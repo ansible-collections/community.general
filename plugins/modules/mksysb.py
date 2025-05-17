@@ -141,7 +141,6 @@ class MkSysB(ModuleHelper):
         backup_dmapi_fs=cmd_runner_fmt.as_bool("-A"),
         combined_path=cmd_runner_fmt.as_func(cmd_runner_fmt.unpack_args(lambda p, n: ["%s/%s" % (p, n)])),
     )
-    use_old_vardict = False
 
     def __init_module__(self):
         if not os.path.isdir(self.vars.storage_path):

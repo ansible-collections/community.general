@@ -31,17 +31,11 @@
     - 'merge_request.target=foobar'
   register: set_result2
 
-- name: getting the multi-value
-  git_config:
-    name: push.pushoption
-    scope: global
-  register: get_single_result
-
 - name: getting all values for the single option
   git_config_info:
     name: push.pushoption
     scope: global
-  register: get_all_result
+  register: get_result
 
 - name: replace-all values
   git_config:
@@ -62,8 +56,8 @@
       - set_result2.results[1] is not changed
       - set_result2.results[2] is not changed
       - set_result3 is changed
-      - get_single_result.config_value == 'merge_request.create'
-      - 'get_all_result.config_values == {"push.pushoption": ["merge_request.create", "merge_request.draft", "merge_request.target=foobar"]}'
+      - get_result.config_value == 'merge_request.create'
+      - 'get_result.config_values == {"push.pushoption": ["merge_request.create", "merge_request.draft", "merge_request.target=foobar"]}'
 
 - name: assert the diffs are also right
   assert:

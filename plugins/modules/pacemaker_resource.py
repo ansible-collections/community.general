@@ -164,7 +164,6 @@ class PacemakerResource(StateModuleHelper):
         required_if=[('state', 'present', ['resource_type', 'resource_option'])],
         supports_check_mode=True,
     )
-    use_old_vardict = False
     default_state = "present"
 
     def __init_module__(self):

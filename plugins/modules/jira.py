@@ -560,7 +560,6 @@ class JIRA(StateModuleHelper):
         ),
         supports_check_mode=False
     )
-    use_old_vardict = False
     state_param = 'operation'
 
     def __init_module__(self):
