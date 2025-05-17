@@ -71,36 +71,51 @@ def pipx_runner(module, command, **kwargs):
     return runner
 
 
-def make_process_list(mod_helper, **kwargs):
-    def process_list(rc, out, err):
-        if not out:
-            return []
+def _make_entry(venv_name, venv, include_injected, include_deps):
+    entry = {
+        'name': venv_name,
+        'version': venv['metadata']['main_package']['package_version'],
+        'pinned': venv['metadata']['main_package'].get('pinned'),
+    }
+    if include_injected:
+        entry['injected'] = {k: v['package_version'] for k, v in venv['metadata']['injected_packages'].items()}
+    if include_deps:
+        entry['dependencies'] = list(venv['metadata']['main_package']['app_paths_of_dependencies'])
+    return entry
 
-        results = []
+
+def make_process_dict(include_injected, include_deps=False):
+    def process_dict(rc, out, err):
+        if not out:
+            return {}
+
+        results = {}
         raw_data = json.loads(out)
+        for venv_name, venv in raw_data['venvs'].items():
+            results[venv_name] = _make_entry(venv_name, venv, include_injected, include_deps)
+
+        return results, raw_data
+
+    return process_dict
+
+
+def make_process_list(mod_helper, **kwargs):
+    #
+    # ATTENTION!
+    #
+    # The function `make_process_list()` is deprecated and will be removed in community.general 13.0.0
+    #
+    process_dict = make_process_dict(mod_helper, **kwargs)
+
+    def process_list(rc, out, err):
+        res_dict, raw_data = process_dict(rc, out, err)
+
         if kwargs.get("include_raw"):
             mod_helper.vars.raw_output = raw_data
 
-        if kwargs["name"]:
-            if kwargs["name"] in raw_data['venvs']:
-                data = {kwargs["name"]: raw_data['venvs'][kwargs["name"]]}
-            else:
-                data = {}
-        else:
-            data = raw_data['venvs']
-
-        for venv_name, venv in data.items():
-            entry = {
-                'name': venv_name,
-                'version': venv['metadata']['main_package']['package_version'],
-                'pinned': venv['metadata']['main_package'].get('pinned'),
-            }
-            if kwargs.get("include_injected"):
-                entry['injected'] = {k: v['package_version'] for k, v in venv['metadata']['injected_packages'].items()}
-            if kwargs.get("include_deps"):
-                entry['dependencies'] = list(venv['metadata']['main_package']['app_paths_of_dependencies'])
-            results.append(entry)
-
-        return results
-
+        return [
+            entry
+            for name, entry in res_dict.items()
+            if name == kwargs.get("name")
+        ]
     return process_list
