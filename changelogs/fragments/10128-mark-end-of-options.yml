@@ -1,0 +1,2 @@
+bugfixes:
+  - "kdeconfig - allow option values beginning with a dash (https://github.com/ansible-collections/community.general/issues/10127, https://github.com/ansible-collections/community.general/pull/10128)."
