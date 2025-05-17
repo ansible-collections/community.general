@@ -15,6 +15,9 @@
     RD_USER: admin
     RD_PASSWORD: admin
   register: rundeck_api_token
+  retries: 3
+  until: rundeck_api_token.rc == 0
+  changed_when: true
 
 - name: Create a Rundeck project
   community.general.rundeck_project:
@@ -23,6 +26,71 @@
     url: "{{ rundeck_url }}"
     token: "{{ rundeck_api_token.stdout_lines[-1] }}"
     state: present
+
+- name: Create a system ACL
+  community.general.rundeck_acl_policy:
+    name: test_acl
+    api_version: "{{ rundeck_api_version }}"
+    url: "{{ rundeck_url }}"
+    token: "{{ rundeck_api_token.stdout_lines[-1] }}"
+    state: present
+    policy: "{{ system_acl_policy }}"
+
+- name: Create a project ACL
+  community.general.rundeck_acl_policy:
+    name: test_acl
+    api_version: "{{ rundeck_api_version }}"
+    url: "{{ rundeck_url }}"
+    token: "{{ rundeck_api_token.stdout_lines[-1] }}"
+    state: present
+    policy: "{{ project_acl_policy }}"
+    project: test_project
+
+- name: Retrieve ACLs
+  ansible.builtin.uri:
+    url: "{{ rundeck_url }}/api/{{ rundeck_api_version }}/{{ item }}"
+    headers:
+      accept: application/json
+      x-rundeck-auth-token: "{{ rundeck_api_token.stdout_lines[-1] }}"
+  register: acl_policy_check
+  loop:
+    - system/acl/test_acl.aclpolicy
+    - project/test_project/acl/test_acl.aclpolicy
+
+- name: Assert ACL content is correct
+  ansible.builtin.assert:
+    that:
+      - acl_policy_check['results'][0]['json']['contents'] == system_acl_policy
+      - acl_policy_check['results'][1]['json']['contents'] == project_acl_policy
+
+- name: Remove system ACL
+  community.general.rundeck_acl_policy:
+    name: test_acl
+    api_version: "{{ rundeck_api_version }}"
+    url: "{{ rundeck_url }}"
+    token: "{{ rundeck_api_token.stdout_lines[-1] }}"
+    state: absent
+
+- name: Remove project ACL
+  community.general.rundeck_acl_policy:
+    name: test_acl
+    api_version: "{{ rundeck_api_version }}"
+    url: "{{ rundeck_url }}"
+    token: "{{ rundeck_api_token.stdout_lines[-1] }}"
+    state: absent
+    project: test_project
+
+- name: Check that ACLs have been removed
+  ansible.builtin.uri:
+    url: "{{ rundeck_url }}/api/{{ rundeck_api_version }}/{{ item }}"
+    headers:
+      accept: application/json
+      x-rundeck-auth-token: "{{ rundeck_api_token.stdout_lines[-1] }}"
+    status_code:
+      - 404
+  loop:
+    - system/acl/test_acl.aclpolicy
+    - project/test_project/acl/test_acl.aclpolicy
 
 - name: Copy test_job definition to /tmp
   copy:
