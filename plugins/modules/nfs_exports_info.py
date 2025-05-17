@@ -15,7 +15,7 @@ module: nfs_exports_info
 
 short_description: Extract folders, IPs, and options from (/etc/exports)
 
-description: 
+description:
   - This module retrieves and processes the contents of the /etc/exports file from a remote server,
     mapping folders to their corresponding IP addresses and access options.
 
@@ -46,7 +46,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 exports_info:
-  description: 
+  description:
     - A mapping of shared folders to IPs and their options, or the reverse.
     - What it is depends on O(output_format).
   type: dict
