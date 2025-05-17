@@ -130,11 +130,18 @@ from ansible_collections.community.general.plugins.module_utils.rundeck import (
 class RundeckACLManager:
     def __init__(self, module):
         self.module = module
+        if module.params.get("project"):
+            self.endpoint = "project/%s/acl/%s.aclpolicy" % (
+                self.module.params["project"],
+                self.module.params["name"],
+            )
+        else:
+            self.endpoint = "system/acl/%s.aclpolicy" % self.module.params["name"]
 
     def get_acl(self):
         resp, info = api_request(
             module=self.module,
-            endpoint="system/acl/%s.aclpolicy" % self.module.params["name"],
+            endpoint=self.endpoint,
         )
 
         return resp
@@ -148,7 +155,7 @@ class RundeckACLManager:
 
             resp, info = api_request(
                 module=self.module,
-                endpoint="system/acl/%s.aclpolicy" % self.module.params["name"],
+                endpoint=self.endpoint,
                 method="POST",
                 data={"contents": self.module.params["policy"]},
             )
@@ -172,7 +179,7 @@ class RundeckACLManager:
 
             resp, info = api_request(
                 module=self.module,
-                endpoint="system/acl/%s.aclpolicy" % self.module.params["name"],
+                endpoint=self.endpoint,
                 method="PUT",
                 data={"contents": self.module.params["policy"]},
             )
@@ -195,7 +202,7 @@ class RundeckACLManager:
             if not self.module.check_mode:
                 api_request(
                     module=self.module,
-                    endpoint="system/acl/%s.aclpolicy" % self.module.params["name"],
+                    endpoint=self.endpoint,
                     method="DELETE",
                 )
 
