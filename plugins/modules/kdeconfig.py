@@ -141,7 +141,7 @@ def run_kwriteconfig(module, cmd, path, groups, key, value):
         else:
             args.append('false')
     else:
-        args.append(value)
+        args.extend(['--', value])
     module.run_command(args, check_rc=True)
 
 
