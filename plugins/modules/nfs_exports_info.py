@@ -1,7 +1,10 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
+#!/usr/bin/python
+
 # Copyright: (c) 2025, Samaneh Yousefnezhad <s-yousefenzhad@um.ac.ir>
-# GNU General Public License v3.0+
-# (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -10,11 +13,11 @@ DOCUMENTATION = r"""
 ---
 module: nfs_exports_info
 
-short_description: Extract folders, IPs, and options from /etc/exports
+short_description: Extract folders, IPs, and options from (/etc/exports)
 
-description: >
-  This module retrieves and processes the contents of the /etc/exports file from a remote server,
-  mapping folders to their corresponding IP addresses and access options.
+description: 
+  - This module retrieves and processes the contents of the /etc/exports file from a remote server,
+    mapping folders to their corresponding IP addresses and access options.
 
 author:
   - Samaneh Yousefnezhad (@yousefenzhad)
@@ -34,6 +37,7 @@ EXAMPLES = r"""
 - name: Get IPs and options per shared folder
   fava.infra.nfs_exports_info:
     output_format: 'ips_per_share'
+  register: result
 
 - name: Get shared folders and options per IP
   fava.infra.nfs_exports_info:
@@ -42,7 +46,9 @@ EXAMPLES = r"""
 
 RETURN = r"""
 exports_info:
-  description: A mapping of shared folders to IPs and their options, or the reverse.
+  description: 
+    - A mapping of shared folders to IPs and their options, or the reverse.
+    - What it is depends on O(output_format).
   type: dict
   returned: always
 
