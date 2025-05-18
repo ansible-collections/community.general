@@ -39,6 +39,7 @@ run_action_groups = true
 name = "consul"
 pattern = "^consul_.*$"
 exclusions = [
+    "consul_acl",
     "consul_acl_bootstrap",
     "consul_kv",
 ]
