@@ -167,10 +167,11 @@ options:
     version_added: '3.8.0'
   no_color:
     description:
-      - If true, suppress color codes in output from Terraform commands.
-      - If false, allows Terraform to use color codes in its output.
+      - If V(true), suppress color codes in output from Terraform commands.
+	  - If V(false), allows Terraform to use color codes in its output.
     type: bool
     default: true
+    version_added: 11.0.0
 notes:
   - To just run a C(terraform plan), use check mode.
 requirements: ["terraform"]
@@ -310,15 +311,12 @@ def preflight_validation(bin_path, project_path, version, variables_args=None, p
         module.fail_json(msg="Path for Terraform binary '{0}' doesn't exist on this host - check the path and try again please.".format(bin_path))
     if not os.path.isdir(project_path):
         module.fail_json(msg="Path for Terraform project '{0}' doesn't exist on this host - check the path and try again please.".format(project_path))
+    cmd = [bin_path, 'validate']
+    if no_color:
+        cmd.append('-no-color')
     if LooseVersion(version) < LooseVersion('0.15.0'):
-        cmd = [bin_path, 'validate']
-        if no_color:
-            cmd.append('-no-color')
         module.run_command(cmd + variables_args, check_rc=True, cwd=project_path)
     else:
-        cmd = [bin_path, 'validate']
-        if no_color:
-            cmd.append('-no-color')
         module.run_command(cmd, check_rc=True, cwd=project_path)
 
 
