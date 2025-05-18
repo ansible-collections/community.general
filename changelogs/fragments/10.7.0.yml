@@ -1,0 +1,5 @@
+release_summary: |
+  Bugfix and feature release.
+  Note that this is the final minor 10.x.0 release.
+  The next release with new features will be 11.0.0.
+  From now on, there will only be bugfix 10.7.x releases for the community.general 10 release train.
