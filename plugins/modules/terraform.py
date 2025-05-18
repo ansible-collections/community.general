@@ -168,7 +168,7 @@ options:
   no_color:
     description:
       - If V(true), suppress color codes in output from Terraform commands.
-	  - If V(false), allows Terraform to use color codes in its output.
+      - If V(false), allows Terraform to use color codes in its output.
     type: bool
     default: true
     version_added: 11.0.0
