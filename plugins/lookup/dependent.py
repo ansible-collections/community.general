@@ -127,18 +127,11 @@ from ansible.plugins.lookup import LookupBase
 from ansible.release import __version__ as ansible_version
 from ansible.template import Templar
 
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
-
 try:
     from ansible.template import trust_as_template as _trust_as_template
     HAS_DATATAGGING = True
 except ImportError:
     HAS_DATATAGGING = False
-
-
-# Whether Templar has a cache, which can be controlled by Templar.template()'s cache option.
-# The cache was removed for ansible-core 2.14 (https://github.com/ansible/ansible/pull/78419)
-_TEMPLAR_HAS_TEMPLATE_CACHE = LooseVersion(ansible_version) < LooseVersion('2.14.0')
 
 
 def _make_safe(value):
@@ -156,8 +149,6 @@ class LookupModule(LookupBase):
         """
         templar.available_variables = variables or {}
         quoted_expression = "{0}{1}{2}".format("{{", expression, "}}")
-        if _TEMPLAR_HAS_TEMPLATE_CACHE:
-            return templar.template(quoted_expression, cache=False)
         if hasattr(templar, 'evaluate_expression'):
             # This is available since the Data Tagging PR has been merged
             return templar.evaluate_expression(_make_safe(expression))

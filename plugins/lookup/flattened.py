@@ -67,12 +67,7 @@ class LookupModule(LookupBase):
 
             if isinstance(term, string_types):
                 # convert a variable to a list
-                try:
-                    term2 = listify_lookup_plugin_terms(term, templar=self._templar)
-                except TypeError:
-                    # The loader argument is deprecated in ansible-core 2.14+. Fall back to
-                    # pre-2.14 behavior for older ansible-core versions.
-                    term2 = listify_lookup_plugin_terms(term, templar=self._templar, loader=self._loader)
+                term2 = listify_lookup_plugin_terms(term, templar=self._templar)
                 # but avoid converting a plain string to a list of one string
                 if term2 != [term]:
                     term = term2
