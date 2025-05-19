@@ -96,19 +96,6 @@ stages:
             - test: 2
             - test: 3
             - test: 4
-  - stage: Sanity_2_16
-    displayName: Sanity 2.16
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          nameFormat: Test {0}
-          testFormat: 2.16/sanity/{0}
-          targets:
-            - test: 1
-            - test: 2
-            - test: 3
-            - test: 4
 ### Units
   - stage: Units_devel
     displayName: Units devel
@@ -147,18 +134,6 @@ stages:
           targets:
             - test: 3.7
             - test: "3.12"
-  - stage: Units_2_16
-    displayName: Units 2.16
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          nameFormat: Python {0}
-          testFormat: 2.16/units/{0}/1
-          targets:
-            - test: 2.7
-            - test: 3.6
-            - test: "3.11"
 
 ## Remote
   - stage: Remote_devel_extra_vms
@@ -233,28 +208,6 @@ stages:
             - 1
             - 2
             - 3
-  - stage: Remote_2_16
-    displayName: Remote 2.16
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          testFormat: 2.16/{0}
-          targets:
-            - name: macOS 13.2
-              test: macos/13.2
-            - name: RHEL 9.2
-              test: rhel/9.2
-            - name: RHEL 8.8
-              test: rhel/8.8
-            - name: RHEL 7.9
-              test: rhel/7.9
-            # - name: FreeBSD 13.2
-            #   test: freebsd/13.2
-          groups:
-            - 1
-            - 2
-            - 3
 
 ### Docker
   - stage: Docker_devel
@@ -309,26 +262,6 @@ stages:
               test: alpine319
             - name: Ubuntu 20.04
               test: ubuntu2004
-          groups:
-            - 1
-            - 2
-            - 3
-  - stage: Docker_2_16
-    displayName: Docker 2.16
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          testFormat: 2.16/linux/{0}
-          targets:
-            - name: Fedora 38
-              test: fedora38
-            - name: openSUSE 15
-              test: opensuse15
-            - name: Alpine 3
-              test: alpine3
-            - name: CentOS 7
-              test: centos7
           groups:
             - 1
             - 2
@@ -390,18 +323,6 @@ stages:
 #          targets:
 #            - test: '3.7'
 #            - test: '3.12'
-#  - stage: Generic_2_16
-#    displayName: Generic 2.16
-#    dependsOn: []
-#    jobs:
-#      - template: templates/matrix.yml
-#        parameters:
-#          nameFormat: Python {0}
-#          testFormat: 2.16/generic/{0}/1
-#          targets:
-#            - test: '2.7'
-#            - test: '3.6'
-#            - test: '3.11'
 
   - stage: Summary
     condition: succeededOrFailed()
@@ -409,25 +330,20 @@ stages:
       - Sanity_devel
       - Sanity_2_18
       - Sanity_2_17
-      - Sanity_2_16
       - Units_devel
       - Units_2_18
       - Units_2_17
-      - Units_2_16
       - Remote_devel_extra_vms
       - Remote_devel
       - Remote_2_18
       - Remote_2_17
-      - Remote_2_16
       - Docker_devel
       - Docker_2_18
       - Docker_2_17
-      - Docker_2_16
       - Docker_community_devel
 # Right now all generic tests are disabled. Uncomment when at least one of them is re-enabled.
 #      - Generic_devel
 #      - Generic_2_18
 #      - Generic_2_17
-#      - Generic_2_16
     jobs:
       - template: templates/coverage.yml

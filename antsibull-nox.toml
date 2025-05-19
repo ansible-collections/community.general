@@ -8,10 +8,6 @@
 "community.docker" = "git+https://github.com/ansible-collections/community.docker.git,main"
 "community.internal_test_tools" = "git+https://github.com/ansible-collections/community.internal_test_tools.git,main"
 
-[collection_sources_per_ansible.'2.15']
-# community.crypto's main branch needs ansible-core >= 2.17
-"community.crypto" = "git+https://github.com/ansible-collections/community.crypto.git,stable-2"
-
 [collection_sources_per_ansible.'2.16']
 # community.crypto's main branch needs ansible-core >= 2.17
 "community.crypto" = "git+https://github.com/ansible-collections/community.crypto.git,stable-2"
