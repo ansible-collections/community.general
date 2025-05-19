@@ -1699,3 +1699,29 @@ releases:
       - 9987-keycloak-auth-flow-fix-config.yaml
       - 9992-filtertypeerror.yml
     release_date: '2025-04-21'
+  9.5.8:
+    changes:
+      bugfixes:
+        - cobbler_system - fix bug with Cobbler >= 3.4.0 caused by giving more than
+          2 positional arguments to ``CobblerXMLRPCInterface.get_system_handle()``
+          (https://github.com/ansible-collections/community.general/issues/8506, https://github.com/ansible-collections/community.general/pull/10145).
+        - kdeconfig - allow option values beginning with a dash (https://github.com/ansible-collections/community.general/issues/10127,
+          https://github.com/ansible-collections/community.general/pull/10128).
+        - keycloak_user_rolemapping - fix ``--diff`` mode (https://github.com/ansible-collections/community.general/issues/10067,
+          https://github.com/ansible-collections/community.general/pull/10075).
+        - pickle cache plugin - avoid extra JSON serialization with ansible-core >=
+          2.19 (https://github.com/ansible-collections/community.general/pull/10136).
+        - rundeck_acl_policy - ensure that project ACLs are sent to the correct endpoint
+          (https://github.com/ansible-collections/community.general/pull/10097).
+        - sysrc - split the output of ``sysrc -e -a`` on the first ``=`` only (https://github.com/ansible-collections/community.general/issues/10120,
+          https://github.com/ansible-collections/community.general/pull/10121).
+      release_summary: Regular bugfix release.
+    fragments:
+      - 10075-keycloak_user_rolemapping-diff.yml
+      - 10097-fix-rundeck_acl_policy-project-endpoint.yml
+      - 10121-sysrc-fix-split-first-separator.yml
+      - 10128-mark-end-of-options.yml
+      - 10136-cache-pickle-json.yml
+      - 10145-fix-typeerror-cobbler-xmlrpc.yml
+      - 9.5.8.yml
+    release_date: '2025-05-19'
