@@ -15,11 +15,10 @@
   register: result
 
 - name: getting value with state=present
-  git_config:
+  git_config_info:
     name: "{{ option_name }}"
     scope: "file"
-    file: "{{ remote_tmp_dir }}/gitconfig_file"
-    state: present
+    path: "{{ remote_tmp_dir }}/gitconfig_file"
   register: get_result
 
 - name: assert set changed and value is correct with state=present
@@ -28,6 +27,5 @@
       - set_result is changed
       - set_result.diff.before == "\n"
       - set_result.diff.after == option_value + "\n"
-      - get_result is not changed
       - get_result.config_value == option_value
 ...

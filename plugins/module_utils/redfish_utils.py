@@ -451,9 +451,6 @@ class RedfishUtils(object):
                 pass
         return msg, data
 
-    def _init_session(self):
-        self.module.deprecate("Method _init_session is deprecated and will be removed.", version="11.0.0", collection_name="community.general")
-
     def _get_vendor(self):
         # If we got the vendor info once, don't get it again
         if self._vendor is not None:
