@@ -6,6 +6,62 @@ Community General Release Notes
 
 This changelog describes changes after version 9.0.0.
 
+v10.7.0
+=======
+
+Release Summary
+---------------
+
+Bugfix and feature release.
+Note that this is the final minor 10.x.0 release.
+The next release with new features will be 11.0.0.
+From now on, there will only be bugfix 10.7.x releases for the community.general 10 release train.
+
+Minor Changes
+-------------
+
+- cobbler inventory plugin - add ``connection_timeout`` option to specify the connection timeout to the cobbler server (https://github.com/ansible-collections/community.general/pull/11063).
+- cobbler inventory plugin - add ``facts_level`` option to allow requesting fully rendered variables for Cobbler systems (https://github.com/ansible-collections/community.general/issues/9419, https://github.com/ansible-collections/community.general/pull/9975).
+- ini_file - modify an inactive option also when there are spaces in front of the comment symbol (https://github.com/ansible-collections/community.general/pull/10102, https://github.com/ansible-collections/community.general/issues/8539).
+- pipx - parameter ``name`` now accepts Python package specifiers (https://github.com/ansible-collections/community.general/issues/7815, https://github.com/ansible-collections/community.general/pull/10031).
+- pipx module_utils - filtering application list by name now happens in the modules (https://github.com/ansible-collections/community.general/pull/10031).
+- pipx_info - filtering application list by name now happens in the module  (https://github.com/ansible-collections/community.general/pull/10031).
+
+Deprecated Features
+-------------------
+
+- The proxmox content (modules and plugins) is being moved to the `new collection community.proxmox <https://github.com/ansible-collections/community.proxmox>`__. In community.general 11.0.0, these modules and plugins will be replaced by deprecated redirections to community.proxmox. You need to explicitly install community.proxmox, for example with ``ansible-galaxy collection install community.proxmox``. We suggest to update your roles and playbooks to use the new FQCNs as soon as possible to avoid getting deprecation messages (https://github.com/ansible-collections/community.general/pull/10109).
+- pipx module_utils - function ``make_process_list()`` is deprecated and will be removed in community.general 13.0.0 (https://github.com/ansible-collections/community.general/pull/10031).
+
+Bugfixes
+--------
+
+- cobbler_system - fix bug with Cobbler >= 3.4.0 caused by giving more than 2 positional arguments to ``CobblerXMLRPCInterface.get_system_handle()`` (https://github.com/ansible-collections/community.general/issues/8506, https://github.com/ansible-collections/community.general/pull/10145).
+- kdeconfig - allow option values beginning with a dash (https://github.com/ansible-collections/community.general/issues/10127, https://github.com/ansible-collections/community.general/pull/10128).
+- keycloak_user_rolemapping - fix ``--diff`` mode (https://github.com/ansible-collections/community.general/issues/10067, https://github.com/ansible-collections/community.general/pull/10075).
+- pickle cache plugin - avoid extra JSON serialization with ansible-core >= 2.19 (https://github.com/ansible-collections/community.general/pull/10136).
+- proxmox - fix crash in module when the used on an existing LXC container with ``state=present`` and ``force=true`` (https://github.com/ansible-collections/community.proxmox/pull/91, https://github.com/ansible-collections/community.general/pull/10155).
+- rundeck_acl_policy - ensure that project ACLs are sent to the correct endpoint (https://github.com/ansible-collections/community.general/pull/10097).
+- sysrc - split the output of ``sysrc -e -a`` on the first ``=`` only (https://github.com/ansible-collections/community.general/issues/10120, https://github.com/ansible-collections/community.general/pull/10121).
+
+New Plugins
+-----------
+
+Callback
+~~~~~~~~
+
+- community.general.print_task - Prints playbook task snippet to job output.
+
+Filter
+~~~~~~
+
+- community.general.to_prettytable - Format a list of dictionaries as an ASCII table.
+
+New Modules
+-----------
+
+- community.general.xdg_mime - Set default handler for MIME types, for applications using XDG tools.
+
 v10.6.0
 =======
 

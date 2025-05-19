@@ -1801,3 +1801,88 @@ releases:
           name: wsl
           namespace: null
     release_date: '2025-04-21'
+  10.7.0:
+    changes:
+      bugfixes:
+        - cobbler_system - fix bug with Cobbler >= 3.4.0 caused by giving more than
+          2 positional arguments to ``CobblerXMLRPCInterface.get_system_handle()``
+          (https://github.com/ansible-collections/community.general/issues/8506, https://github.com/ansible-collections/community.general/pull/10145).
+        - kdeconfig - allow option values beginning with a dash (https://github.com/ansible-collections/community.general/issues/10127,
+          https://github.com/ansible-collections/community.general/pull/10128).
+        - keycloak_user_rolemapping - fix ``--diff`` mode (https://github.com/ansible-collections/community.general/issues/10067,
+          https://github.com/ansible-collections/community.general/pull/10075).
+        - pickle cache plugin - avoid extra JSON serialization with ansible-core >=
+          2.19 (https://github.com/ansible-collections/community.general/pull/10136).
+        - proxmox - fix crash in module when the used on an existing LXC container
+          with ``state=present`` and ``force=true`` (https://github.com/ansible-collections/community.proxmox/pull/91,
+          https://github.com/ansible-collections/community.general/pull/10155).
+        - rundeck_acl_policy - ensure that project ACLs are sent to the correct endpoint
+          (https://github.com/ansible-collections/community.general/pull/10097).
+        - sysrc - split the output of ``sysrc -e -a`` on the first ``=`` only (https://github.com/ansible-collections/community.general/issues/10120,
+          https://github.com/ansible-collections/community.general/pull/10121).
+      deprecated_features:
+        - The proxmox content (modules and plugins) is being moved to the `new collection
+          community.proxmox <https://github.com/ansible-collections/community.proxmox>`__.
+          In community.general 11.0.0, these modules and plugins will be replaced
+          by deprecated redirections to community.proxmox. You need to explicitly
+          install community.proxmox, for example with ``ansible-galaxy collection
+          install community.proxmox``. We suggest to update your roles and playbooks
+          to use the new FQCNs as soon as possible to avoid getting deprecation messages
+          (https://github.com/ansible-collections/community.general/pull/10109).
+        - pipx module_utils - function ``make_process_list()`` is deprecated and will
+          be removed in community.general 13.0.0 (https://github.com/ansible-collections/community.general/pull/10031).
+      minor_changes:
+        - cobbler inventory plugin - add ``connection_timeout`` option to specify
+          the connection timeout to the cobbler server (https://github.com/ansible-collections/community.general/pull/11063).
+        - cobbler inventory plugin - add ``facts_level`` option to allow requesting
+          fully rendered variables for Cobbler systems (https://github.com/ansible-collections/community.general/issues/9419,
+          https://github.com/ansible-collections/community.general/pull/9975).
+        - ini_file - modify an inactive option also when there are spaces in front
+          of the comment symbol (https://github.com/ansible-collections/community.general/pull/10102,
+          https://github.com/ansible-collections/community.general/issues/8539).
+        - 'pipx - parameter ``name`` now accepts Python package specifiers (https://github.com/ansible-collections/community.general/issues/7815,
+          https://github.com/ansible-collections/community.general/pull/10031).
+
+          '
+        - pipx module_utils - filtering application list by name now happens in the
+          modules (https://github.com/ansible-collections/community.general/pull/10031).
+        - pipx_info - filtering application list by name now happens in the module  (https://github.com/ansible-collections/community.general/pull/10031).
+      release_summary: 'Bugfix and feature release.
+
+        Note that this is the final minor 10.x.0 release.
+
+        The next release with new features will be 11.0.0.
+
+        From now on, there will only be bugfix 10.7.x releases for the community.general
+        10 release train.
+
+        '
+    fragments:
+      - 10.7.0.yml
+      - 10031-pipx-python-version.yml
+      - 10063-cobbler-add-connection-timeout.yml
+      - 10075-keycloak_user_rolemapping-diff.yml
+      - 10097-fix-rundeck_acl_policy-project-endpoint.yml
+      - 10102-ini_file-fix-unmatched-whitespace-before-comment.yml
+      - 10121-sysrc-fix-split-first-separator.yml
+      - 10128-mark-end-of-options.yml
+      - 10136-cache-pickle-json.yml
+      - 10145-fix-typeerror-cobbler-xmlrpc.yml
+      - 10155-proxmox-bugfix.yml
+      - 9975-inventory-cobbler-as-rendered.yml
+      - proxmox-deprecation.yml
+    modules:
+      - description: Set default handler for MIME types, for applications using XDG
+          tools.
+        name: xdg_mime
+        namespace: ''
+    plugins:
+      callback:
+        - description: Prints playbook task snippet to job output.
+          name: print_task
+          namespace: null
+      filter:
+        - description: Format a list of dictionaries as an ASCII table.
+          name: to_prettytable
+          namespace: null
+    release_date: '2025-05-19'
