@@ -35,12 +35,12 @@ options:
 
 EXAMPLES = r"""
 - name: Get IPs and options per shared folder
-  fava.infra.nfs_exports_info:
+  community.general.nfs_exports_info:
     output_format: 'ips_per_share'
   register: result
 
 - name: Get shared folders and options per IP
-  fava.infra.nfs_exports_info:
+  community.general.nfs_exports_info:
     output_format: 'shares_per_ip'
 """
 
