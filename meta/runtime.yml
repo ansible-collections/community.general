@@ -15,24 +15,9 @@ action_groups:
     - consul_session
     - consul_token
   proxmox:
-    - proxmox
-    - proxmox_backup
-    - proxmox_backup_info
-    - proxmox_disk
-    - proxmox_domain_info
-    - proxmox_group_info
-    - proxmox_kvm
-    - proxmox_nic
-    - proxmox_node_info
-    - proxmox_pool
-    - proxmox_pool_member
-    - proxmox_snap
-    - proxmox_storage_contents_info
-    - proxmox_storage_info
-    - proxmox_tasks_info
-    - proxmox_template
-    - proxmox_user_info
-    - proxmox_vm_info
+    - metadata:
+        extend_group:
+          - community.proxmox.proxmox
   keycloak:
     - keycloak_authentication
     - keycloak_authentication_required_actions
@@ -94,6 +79,11 @@ plugin_routing:
       redirect: community.docker.docker
     oc:
       redirect: community.okd.oc
+    proxmox_pct_remote:
+      redirect: community.proxmox.proxmox_pct_remote
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
   lookup:
     gcp_storage_file:
       redirect: community.google.gcp_storage_file
@@ -664,6 +654,96 @@ plugin_routing:
       tombstone:
         removal_version: 11.0.0
         warning_text: Supporting library is unsupported since 2021.
+    proxmox:
+      redirect: community.proxmox.proxmox
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
+    proxmox_backup:
+      redirect: community.proxmox.proxmox_backup
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
+    proxmox_backup_info:
+      redirect: community.proxmox.proxmox_backup_info
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
+    proxmox_disk:
+      redirect: community.proxmox.proxmox_disk
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
+    proxmox_domain_info:
+      redirect: community.proxmox.proxmox_domain_info
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
+    proxmox_group_info:
+      redirect: community.proxmox.proxmox_group_info
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
+    proxmox_kvm:
+      redirect: community.proxmox.proxmox_kvm
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
+    proxmox_nic:
+      redirect: community.proxmox.proxmox_nic
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
+    proxmox_node_info:
+      redirect: community.proxmox.proxmox_node_info
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
+    proxmox_pool:
+      redirect: community.proxmox.proxmox_pool
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
+    proxmox_pool_member:
+      redirect: community.proxmox.proxmox_pool_member
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
+    proxmox_snap:
+      redirect: community.proxmox.proxmox_snap
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
+    proxmox_storage_contents_info:
+      redirect: community.proxmox.proxmox_storage_contents_info
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
+    proxmox_storage_info:
+      redirect: community.proxmox.proxmox_storage_info
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
+    proxmox_tasks_info:
+      redirect: community.proxmox.proxmox_tasks_info
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
+    proxmox_template:
+      redirect: community.proxmox.proxmox_template
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
+    proxmox_user_info:
+      redirect: community.proxmox.proxmox_user_info
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
+    proxmox_vm_info:
+      redirect: community.proxmox.proxmox_vm_info
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
     purefa_facts:
       tombstone:
         removal_version: 3.0.0
@@ -922,6 +1002,11 @@ plugin_routing:
       redirect: infoblox.nios_modules.nios
     postgresql:
       redirect: community.postgresql.postgresql
+    proxmox:
+      redirect: community.proxmox.proxmox
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
     purestorage:
       deprecation:
         removal_version: 12.0.0
@@ -950,6 +1035,11 @@ plugin_routing:
       redirect: infoblox.nios_modules.api
     postgresql:
       redirect: community.postgresql.postgresql
+    proxmox:
+      redirect: community.proxmox.proxmox
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
     pure:
       deprecation:
         removal_version: 12.0.0
@@ -967,6 +1057,11 @@ plugin_routing:
       redirect: community.docker.docker_machine
     docker_swarm:
       redirect: community.docker.docker_swarm
+    proxmox:
+      redirect: community.proxmox.proxmox
+      deprecation:
+        removal_version: 15.0.0
+        warning_text: The proxmox content has been moved to community.proxmox.
     kubevirt:
       redirect: community.kubevirt.kubevirt
     stackpath_compute:
