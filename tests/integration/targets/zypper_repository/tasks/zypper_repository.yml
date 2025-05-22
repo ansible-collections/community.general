@@ -246,6 +246,44 @@
       that:
         - added_again_by_repo_file is not changed
 
+  - name: change the repository config by name with flag - disable
+    community.general.zypper_repository:
+      name: systemsmanagement_Uyuni_Stable
+      state: present
+      enabled: false
+    register: modified_repo_file_result
+
+  - name: modified_repo_file_result is changed
+    assert:
+      that:
+        - modified_repo_file_result is changed
+
+  - name: get repository details again from zypper after disabling the repository
+    command: zypper --xmlout lr systemsmanagement_Uyuni_Stable
+    register: get_repository_details_from_zypper
+
+  - name: verify modifying via .repo file was successful - the module is now disabled
+    assert:
+      that:
+        - "'enabled=\"0\"' in get_repository_details_from_zypper.stdout"
+
+  - name: change flag autorefresh in the same zypper-module
+    community.general.zypper_repository:
+      name: systemsmanagement_Uyuni_Stable
+      state: present
+      autorefresh: false
+    register: modified_repo_file_result
+
+  - name: get repository details again from zypper after disabling the repository
+    command: zypper --xmlout lr systemsmanagement_Uyuni_Stable
+    register: get_repository_details_from_zypper
+
+  - name: verify modifying via .repo file was successful - the autorefesh is disabled, but the enabled-flag was not modified (it is still disabled)
+    assert:
+      that:
+        - "'enabled=\"0\"' in get_repository_details_from_zypper.stdout"
+        - "'autorefresh=\"0\"' in get_repository_details_from_zypper.stdout"
+
   - name: remove repository via url to .repo file
     community.general.zypper_repository:
       repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/openSUSE_Leap_{{ ansible_distribution_version }}/systemsmanagement:Uyuni:Stable.repo
