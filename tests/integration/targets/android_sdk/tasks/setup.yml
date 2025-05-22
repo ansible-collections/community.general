@@ -9,7 +9,15 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Include OS-specific variables
-  include_vars: '{{ ansible_os_family }}.yml'
+  include_vars: '{{ lookup("first_found", params) }}'
+  vars:
+    params:
+      files:
+        - '{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml'
+        - '{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml'
+        - '{{ ansible_os_family }}.yml'
+      paths:
+        - '{{ role_path }}/vars'
 
 - name: Install dependencies
   become: true

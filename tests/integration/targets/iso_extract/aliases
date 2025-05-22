@@ -13,6 +13,7 @@ skip/rhel9.2  # FIXME
 skip/rhel9.3  # FIXME
 skip/rhel9.4  # FIXME
 skip/rhel9.5  # FIXME
+skip/rhel10.0  # FIXME
 skip/freebsd12.4  # FIXME
 skip/freebsd13.2  # FIXME
 skip/freebsd13.3  # FIXME
