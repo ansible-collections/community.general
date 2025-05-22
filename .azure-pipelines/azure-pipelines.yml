@@ -57,14 +57,14 @@ pool: Standard
 
 stages:
 ### Sanity
-  - stage: Sanity_devel
-    displayName: Sanity devel
+  - stage: Sanity_2_19
+    displayName: Sanity 2.19
     dependsOn: []
     jobs:
       - template: templates/matrix.yml
         parameters:
           nameFormat: Test {0}
-          testFormat: devel/sanity/{0}
+          testFormat: 2.19/sanity/{0}
           targets:
             - test: 1
             - test: 2
@@ -110,14 +110,14 @@ stages:
             - test: 3
             - test: 4
 ### Units
-  - stage: Units_devel
-    displayName: Units devel
+  - stage: Units_2_19
+    displayName: Units 2.19
     dependsOn: []
     jobs:
       - template: templates/matrix.yml
         parameters:
           nameFormat: Python {0}
-          testFormat: devel/units/{0}/1
+          testFormat: 2.19/units/{0}/1
           targets:
             - test: 3.8
             - test: 3.9
@@ -161,13 +161,13 @@ stages:
             - test: "3.11"
 
 ## Remote
-  - stage: Remote_devel_extra_vms
-    displayName: Remote devel extra VMs
+  - stage: Remote_2_19_extra_vms
+    displayName: Remote 2.19 extra VMs
     dependsOn: []
     jobs:
       - template: templates/matrix.yml
         parameters:
-          testFormat: devel/{0}
+          testFormat: 2.19/{0}
           targets:
             - name: Alpine 3.21
               test: alpine/3.21
@@ -179,13 +179,13 @@ stages:
               test: ubuntu/24.04
           groups:
             - vm
-  - stage: Remote_devel
-    displayName: Remote devel
+  - stage: Remote_2_19
+    displayName: Remote 2.19
     dependsOn: []
     jobs:
       - template: templates/matrix.yml
         parameters:
-          testFormat: devel/{0}
+          testFormat: 2.19/{0}
           targets:
             - name: macOS 15.3
               test: macos/15.3
@@ -257,13 +257,13 @@ stages:
             - 3
 
 ### Docker
-  - stage: Docker_devel
-    displayName: Docker devel
+  - stage: Docker_2_19
+    displayName: Docker 2.19
     dependsOn: []
     jobs:
       - template: templates/matrix.yml
         parameters:
-          testFormat: devel/linux/{0}
+          testFormat: 2.19/linux/{0}
           targets:
             - name: Fedora 41
               test: fedora41
@@ -335,13 +335,13 @@ stages:
             - 3
 
 ### Community Docker
-  - stage: Docker_community_devel
-    displayName: Docker (community images) devel
+  - stage: Docker_community_2_19
+    displayName: Docker (community images) 2.19
     dependsOn: []
     jobs:
       - template: templates/matrix.yml
         parameters:
-          testFormat: devel/linux-community/{0}
+          testFormat: 2.19/linux-community/{0}
           targets:
             - name: Debian Bullseye
               test: debian-bullseye/3.9
@@ -356,14 +356,14 @@ stages:
 
 ### Generic
 # Right now all generic tests are disabled. Uncomment when at least one of them is re-enabled.
-#  - stage: Generic_devel
-#    displayName: Generic devel
+#  - stage: Generic_2_19
+#    displayName: Generic 2.19
 #    dependsOn: []
 #    jobs:
 #      - template: templates/matrix.yml
 #        parameters:
 #          nameFormat: Python {0}
-#          testFormat: devel/generic/{0}/1
+#          testFormat: 2.19/generic/{0}/1
 #          targets:
 #            - test: '3.8'
 #            - test: '3.11'
@@ -406,26 +406,26 @@ stages:
   - stage: Summary
     condition: succeededOrFailed()
     dependsOn:
-      - Sanity_devel
+      - Sanity_2_19
       - Sanity_2_18
       - Sanity_2_17
       - Sanity_2_16
-      - Units_devel
+      - Units_2_19
       - Units_2_18
       - Units_2_17
       - Units_2_16
-      - Remote_devel_extra_vms
-      - Remote_devel
+      - Remote_2_19_extra_vms
+      - Remote_2_19
       - Remote_2_18
       - Remote_2_17
       - Remote_2_16
-      - Docker_devel
+      - Docker_2_19
       - Docker_2_18
       - Docker_2_17
       - Docker_2_16
-      - Docker_community_devel
+      - Docker_community_2_19
 # Right now all generic tests are disabled. Uncomment when at least one of them is re-enabled.
-#      - Generic_devel
+#      - Generic_2_19
 #      - Generic_2_18
 #      - Generic_2_17
 #      - Generic_2_16
