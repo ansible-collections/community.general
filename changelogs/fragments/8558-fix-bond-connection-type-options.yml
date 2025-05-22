@@ -1,0 +1,2 @@
+minor_changes:
+  - "nmcli - corrects underlying command formation by no longer including ``ipv4.*`` and ``ipv6.*`` settings when working with ``bond`` connection types (https://github.com/ansible-collections/community.general/issues/8558)."
