@@ -55,7 +55,9 @@ doc_fragment = "community.general.proxmox.actiongroup_proxmox"
 run_galaxy_importer = true
 
 [sessions.ansible_test_sanity]
-include_devel = true
+include_devel = false
+max_version = "2.19"
 
 [sessions.ansible_test_units]
-include_devel = true
+include_devel = false
+max_version = "2.19"
