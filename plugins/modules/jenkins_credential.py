@@ -271,25 +271,13 @@ changed:
     type: bool
     returned: always
 message:
-    description: Message from Jenkins or the result of the operation.
+    description: Message of the result of the operation.
     type: str
     returned: always
-debug_curl:
-    description: The full curl command used (for debugging).
+details:
+    description: Incase of errors return more details
     type: str
-    returned: on success
-stderr:
-    description: Standard error if the curl command fails.
-    type: str
-    returned: on failure
-stdout:
-    description: Standard output if the curl command fails.
-    type: str
-    returned: on failure
-curl_command:
-    description: The full curl command that failed.
-    type: str
-    returned: on failure
+    returned: Error
 '''
 
 from ansible.module_utils.basic import AnsibleModule
