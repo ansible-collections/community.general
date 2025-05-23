@@ -70,10 +70,6 @@ EXAMPLES = r'''
 '''
 
 RETURN = r'''
-msg:
-  description: Execution status message
-  returned: always
-  type: str
 '''
 
 
