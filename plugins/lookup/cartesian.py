@@ -66,13 +66,7 @@ class LookupModule(LookupBase):
         """
         results = []
         for x in terms:
-            try:
-                intermediate = listify_lookup_plugin_terms(x, templar=self._templar)
-            except TypeError:
-                # The loader argument is deprecated in ansible-core 2.14+. Fall back to
-                # pre-2.14 behavior for older ansible-core versions.
-                intermediate = listify_lookup_plugin_terms(x, templar=self._templar, loader=self._loader)
-            results.append(intermediate)
+            results.append(listify_lookup_plugin_terms(x, templar=self._templar))
         return results
 
     def run(self, terms, variables=None, **kwargs):
