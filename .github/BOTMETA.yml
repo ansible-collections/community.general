@@ -786,6 +786,8 @@ files:
     maintainers: brettmilford unnecessary-username juanmcasanova
   $modules/jenkins_build_info.py:
     maintainers: juanmcasanova
+  $modules/jenkins_credential.py:
+    maintainers: YoussefKhalidAli
   $modules/jenkins_job.py:
     maintainers: sermilrod
   $modules/jenkins_job_info.py:
@@ -1503,7 +1505,7 @@ files:
     maintainers: vbotka
   $tests/fqdn_valid.py:
     maintainers: vbotka
-#########################
+  #########################
   docs/docsite/rst/filter_guide.rst: {}
   docs/docsite/rst/filter_guide_abstract_informations.rst: {}
   docs/docsite/rst/filter_guide_abstract_informations_counting_elements_in_sequence.rst:
@@ -1556,7 +1558,7 @@ files:
     maintainers: russoz
   docs/docsite/rst/test_guide.rst:
     maintainers: felixfontein
-#########################
+  #########################
   tests/:
     labels: tests
   tests/integration:

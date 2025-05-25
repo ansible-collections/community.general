@@ -20,7 +20,6 @@ description:
   - For scoped credentials, it supports hostname, hostname:port, path, and scheme-based restrictions.
 requirements:
   - requests
-  - python >= 3.6
 author:
   - Youssef Ali (@YoussefKhalidAli)
 extends_documentation_fragment:
@@ -263,7 +262,7 @@ EXAMPLES = r"""
         id: "scope-id"
         command: "delete"
         type: "scope"
-        jenkinsUser: "ruff"
+        jenkinsUser: "admin"
         token: "{{ token }}"
 
 """
@@ -307,7 +306,7 @@ except ImportError:
 # Gets the Jenkins crumb for CSRF protection which is required for API calls
 def get_jenkins_crumb(url, user, token):
     # Fetch Jenkins crumb from the crumb issuer API using requests.
-    crumb_url = f"{url}/crumbIssuer/api/json"
+    crumb_url = "{}/crumbIssuer/api/json".format(url)
 
     try:
         response = requests.get(crumb_url, auth=HTTPBasicAuth(user, token))
@@ -321,8 +320,8 @@ def get_jenkins_crumb(url, user, token):
 # Function to check if credential exists
 def credential_exists(url, scope, name, user, token):
     # Check if a Jenkins credential exists using requests.
-    check_url = (
-        f"{url}/credentials/store/system/domain/{scope}/credential/{name}/api/json"
+    check_url = "{}/credentials/store/system/domain/{}/credential/{}/api/json".format(
+        url, scope, name
     )
 
     try:
@@ -340,7 +339,7 @@ def credential_exists(url, scope, name, user, token):
 # Function to check if domain (scope) exists
 def domain_exists(url, name, user, token):
     # Check if a Jenkins domain (scope) exists using requests.
-    check_url = f"{url}/credentials/store/system/domain/{name}/api/json"
+    check_url = "{}/credentials/store/system/domain/{}/api/json".format(url, name)
 
     try:
         response = requests.get(check_url, auth=HTTPBasicAuth(user, token))
@@ -377,8 +376,8 @@ def clean_data(data):
     return cleaned_data
 
 
+# Function to validate required fields based on credential type and check file existence.
 def validate_required_fields(module, cred_type):
-    # Validate required fields based on credential type and check file existence.
     required_fields_map = {
         "userAndPass": ["username", "password"],
         "file": ["filePath"],
@@ -409,38 +408,61 @@ def validate_required_fields(module, cred_type):
     for field in file_check_fields:
         path = params.get(field)
         if path and not os.path.exists(path):
-            module.fail_json(msg=f"File not found: {path}")
+            module.fail_json(msg="File not found: {}".format(path))
 
     if missing:
         module.fail_json(
-            msg=f"Missing required fields for type '{cred_type}': {', '.join(missing)}"
+            msg="Missing required fields for type '{}': {}".format(
+                cred_type, ", ".join(missing)
+            )
         )
 
 
-def delete_scope_or_credential(module, url, headers, auth, id, scope, command):
+# Function to delete the scope or credential provided
+def delete_scope_or_credential(module, url, headers, auth, id, scope):
     try:
-        if module.params["type"] == "scope":
-            delete_url = f"{url}/credentials/store/system/domain/{id}/doDelete"
-            headers.pop("Content-Type", None)
-            # For deleting a domain (scope), Jenkins expects a POST to doDelete
-            response = requests.post(delete_url, headers=headers, auth=auth)
+        type = module.params["type"]
+        headers.pop("Content-Type", None)
 
-        else:
-            delete_url = f"{url}/credentials/store/system/domain/{scope}/credential/{id}/config.xml"
-            # For deleting a credential, Jenkins expects a DELETE request
-            response = requests.delete(
-                delete_url,
-                headers=headers,
-                auth=auth,
+        if type == "scope":
+
+            delete_url = "{}/credentials/store/system/domain/{}/doDelete".format(
+                url, id
             )
 
+        else:
+            delete_url = (
+                "{}/credentials/store/system/domain/{}/credential/{}/doDelete".format(
+                    url, scope, id
+                )
+            )
+
+        response = requests.post(delete_url, headers=headers, auth=auth)
         response.raise_for_status()
+
+        headers["Content-Type"] = (
+            "application/x-www-form-urlencoded"  # Return header for future create request
+        )
 
     except requests.exceptions.RequestException as e:
         module.fail_json(
-            msg=f"Failed to delete {id} {'before updating' if command == 'update' else ''}",
+            msg="Failed to delete {} {}".format(
+                id, "before updating" if module.params["command"] == "update" else ""
+            ),
             details=response.text,
         )
+    except Exception as e:
+        module.fail_json(msg="Unexpected error during deletion: {}".format(str(e)))
+
+
+# Function to read the private key for types texts and sshKey
+def read_privateKey(module):
+    try:
+        with open(module.params["filePath"], "r") as f:
+            private_key = f.read().strip()
+            return private_key
+    except Exception as e:
+        module.fail_json(msg="Failed to read private key file: {}".format(str(e)))
 
 
 # Main function to run the Ansible module
@@ -562,7 +584,7 @@ def run_module():
         message="",
     )
 
-    files = None # To avoid undefined variable error when not type == "files"
+    files = None  # To avoid undefined variable error when not type == "files"
     auth = HTTPBasicAuth(jenkinsUser, token)
     headers = {
         crumb_field: crumb_value,
@@ -575,12 +597,12 @@ def run_module():
         does_credential_exist = credential_exists(url, scope, id, jenkinsUser, token)
         # Check if the credential already exists and user want to add
         if does_credential_exist and command == "add":
-            result["message"] = f"Credential {id} already exists."
+            result["message"] = "Credential {} already exists.".format(id)
             module.exit_json(**result)
 
         # Check if the credential doesn't exist and the user wants to delete
         elif not does_credential_exist and command == "delete":
-            result["message"] = f"Credential {id} doesn't exist."
+            result["message"] = "Credential {} doesn't exist.".format(id)
             module.exit_json(**result)
 
     else:
@@ -588,13 +610,13 @@ def run_module():
         # Check if the domain already exists and user wants to add
         if does_domain_exist and command == "add":
             result["changed"] = False
-            result["message"] = f"Domain {id} already exists."
+            result["message"] = "Domain {} already exists.".format(id)
             module.exit_json(**result)
 
         # Check if the domain doesn't exist and user wants to delete
         elif not does_domain_exist and command == "delete":
             result["changed"] = False
-            result["message"] = f"Domain {id} doesn't exist."
+            result["message"] = "Domain {} doesn't exist.".format(id)
             module.exit_json(**result)
 
     if command in ["add", "update"]:
@@ -609,9 +631,7 @@ def run_module():
             ) or domain_exists(
                 url, id, jenkinsUser, token
             ):  # Check if domain exists
-                delete_scope_or_credential(
-                    module, url, headers, auth, id, scope, command
-                )
+                delete_scope_or_credential(module, url, headers, auth, id, scope)
 
         if type == "scope":
 
@@ -702,11 +722,7 @@ def run_module():
 
             elif type == "githubApp":
 
-                try:
-                    with open(filePath, "r") as f:
-                        private_key = f.read().strip()
-                except Exception as e:
-                    module.fail_json(msg=f"Failed to read private key file: {str(e)}")
+                private_key = read_privateKey(module)
 
                 credentials.update(
                     {
@@ -718,11 +734,7 @@ def run_module():
 
             elif type == "sshKey":
 
-                try:
-                    with open(filePath, "r") as f:
-                        private_key = f.read().strip()
-                except Exception as e:
-                    module.fail_json(msg=f"Failed to read private key file: {str(e)}")
+                private_key = read_privateKey(module)
 
                 credentials.update(
                     {
@@ -747,7 +759,9 @@ def run_module():
                         )
                     except Exception as e:
                         module.fail_json(
-                            msg=f"Failed to read or encode keystore file: {str(e)}"
+                            msg="Failed to read or encode keystore file: {}".format(
+                                str(e)
+                            )
                         )
 
                     credentials.update(
@@ -767,7 +781,9 @@ def run_module():
                         with open(privateKeyPath, "r") as f:
                             private_key = f.read()
                     except Exception as e:
-                        module.fail_json(msg=f"Failed to read PEM files: {str(e)}")
+                        module.fail_json(
+                            msg="Failed to read PEM files: {}".format(str(e))
+                        )
 
                     credentials.update(
                         {
@@ -792,22 +808,24 @@ def run_module():
         if not id:
             module.fail_json(msg="id is required to delete a credential")
 
-        delete_scope_or_credential(module, url, headers, auth, id, scope, command)
+        delete_scope_or_credential(module, url, headers, auth, id, scope)
 
-        module.exit_json(changed=True, message=f"{id} deleted successfully.")
+        module.exit_json(changed=True, message="{} deleted successfully.".format(id))
 
     if not type == "file":
         data = urllib.parse.urlencode({"json": json.dumps(payload)})
 
     if not type == "scope" and not scope == "_":  # Check if custom scope exists
         if not domain_exists(url, scope, jenkinsUser, token):
-            module.fail_json(msg=f"Domain {scope} doesn't exists")
+            module.fail_json(msg="Domain {} doesn't exists".format(scope))
     try:
         response = requests.post(
             (
-                f"{url}/credentials/store/system/domain/{scope}/createCredentials"
+                "{}/credentials/store/system/domain/{}/createCredentials".format(
+                    url, scope
+                )
                 if not type == "scope"
-                else f"{url}/credentials/store/system/createDomain"
+                else "{}/credentials/store/system/createDomain".format(url)
             ),  # Create scope or domain
             headers=headers,
             auth=auth,
@@ -821,7 +839,7 @@ def run_module():
 
     except requests.exceptions.RequestException as e:
         module.fail_json(
-            msg="Failed to create/update credential", details=response.text
+            msg="Failed to {} credential".format(command), details=response.text
         )
 
     module.exit_json(**result)
