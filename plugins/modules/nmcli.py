@@ -50,11 +50,12 @@ options:
     description:
       - The priority of the connection profile for autoconnect. If set, connection profiles with higher priority will be preferred.
     type: int
-    version_added: 10.6.0
+    version_added: 11.0.0
   autoconnect_retries:
     description:
       - The number of times to retry autoconnecting.
     type: int
+    version_added: 11.0.0
   conn_name:
     description:
       - The name used to call the connection. Pattern is V(<type>[-<ifname>][-<num>]).
