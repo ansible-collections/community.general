@@ -202,7 +202,6 @@ class AnsibleGalaxyInstall(ModuleHelper):
     _RE_INSTALL_OUTPUT = re.compile(
         r'^(?:(?P<collection>\w+\.\w+):(?P<cversion>[\d\.]+)|- (?P<role>\w+\.\w+) \((?P<rversion>[\d\.]+)\)) was installed successfully$'
     )
-    ansible_version = None
 
     output_params = ('type', 'name', 'dest', 'requirements_file', 'force', 'no_deps')
     module = dict(
@@ -262,9 +261,6 @@ class AnsibleGalaxyInstall(ModuleHelper):
 
     def __init_module__(self):
         self.runner, self.vars.version = self._get_ansible_galaxy_version()
-        self.ansible_version = tuple(int(x) for x in self.vars.version.split('.')[:3])
-        if self.ansible_version < (2, 11):
-            self.module.fail_json(msg="Support for Ansible 2.9 and ansible-base 2.10 has been removed.")
         self.vars.set("new_collections", {}, change=True)
         self.vars.set("new_roles", {}, change=True)
         if self.vars.type != "collection":
