@@ -27,8 +27,6 @@ extends_documentation_fragment:
 attributes:
   check_mode:
     support: full
-    details:
-      - Module fully supports check mode and will report changes without making them
   diff_mode:
     support: none
 options:
