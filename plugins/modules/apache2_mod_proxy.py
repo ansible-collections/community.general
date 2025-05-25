@@ -41,8 +41,8 @@ options:
     description:
       - (IPv4|IPv6|FQDN) of the balancer member to get or to set attributes to. Port number is autodetected and should not
         be specified here.
-      - If undefined, the M(community.general.apache2_mod_proxy) module will return a members list of dictionaries of all the current
-        balancer pool members' attributes.
+      - If undefined, the M(community.general.apache2_mod_proxy) module returns a members list of dictionaries of all the
+        current balancer pool members' attributes.
   state:
     type: list
     elements: str
@@ -116,19 +116,20 @@ member:
   description: Specific balancer member information dictionary, returned when the module is invoked with O(member_host) parameter.
   type: dict
   returned: success
-  sample:
-    {"attributes":
-          {"Busy": "0",
-          "Elected": "42",
-          "Factor": "1",
-          "From": "136K",
-          "Load": "0",
-          "Route": null,
-          "RouteRedir": null,
-          "Set": "0",
-          "Status": "Init Ok ",
-          "To": " 47K",
-          "Worker URL": null
+  sample: |
+    {
+      "attributes": {
+        "Busy": "0",
+        "Elected": "42",
+        "Factor": "1",
+        "From": "136K",
+        "Load": "0",
+        "Route": null,
+        "RouteRedir": null,
+        "Set": "0",
+        "Status": "Init Ok ",
+        "To": " 47K",
+        "Worker URL": null
       },
       "balancer_url": "http://10.10.0.2/balancer-manager/",
       "host": "10.10.0.20",
@@ -137,10 +138,10 @@ member:
       "port": 8080,
       "protocol": "http",
       "status": {
-          "disabled": false,
-          "drained": false,
-          "hot_standby": false,
-          "ignore_errors": false
+        "disabled": false,
+        "drained": false,
+        "hot_standby": false,
+        "ignore_errors": false
       }
     }
 members:
@@ -148,8 +149,10 @@ members:
     O(state) args.
   returned: success
   type: list
-  sample:
-    [{"attributes": {
+  sample: |-
+    [
+      {
+        "attributes": {
           "Busy": "0",
           "Elected": "42",
           "Factor": "1",
@@ -161,21 +164,22 @@ members:
           "Status": "Init Ok ",
           "To": " 47K",
           "Worker URL": null
-      },
-      "balancer_url": "http://10.10.0.2/balancer-manager/",
-      "host": "10.10.0.20",
-      "management_url": "http://10.10.0.2/lb/?b=mywsbalancer&w=http://10.10.0.20:8080/ws&nonce=8925436c-79c6-4841-8936-e7d13b79239b",
-      "path": "/ws",
-      "port": 8080,
-      "protocol": "http",
-      "status": {
+        },
+        "balancer_url": "http://10.10.0.2/balancer-manager/",
+        "host": "10.10.0.20",
+        "management_url": "http://10.10.0.2/lb/?b=mywsbalancer&w=http://10.10.0.20:8080/ws&nonce=8925436c-79c6-4841-8936-e7d13b79239b",
+        "path": "/ws",
+        "port": 8080,
+        "protocol": "http",
+        "status": {
           "disabled": false,
           "drained": false,
           "hot_standby": false,
           "ignore_errors": false
-      }
+        }
       },
-      {"attributes": {
+      {
+        "attributes": {
           "Busy": "0",
           "Elected": "42",
           "Factor": "1",
@@ -187,18 +191,19 @@ members:
           "Status": "Init Ok ",
           "To": " 47K",
           "Worker URL": null
-      },
-      "balancer_url": "http://10.10.0.2/balancer-manager/",
-      "host": "10.10.0.21",
-      "management_url": "http://10.10.0.2/lb/?b=mywsbalancer&w=http://10.10.0.21:8080/ws&nonce=8925436c-79c6-4841-8936-e7d13b79239b",
-      "path": "/ws",
-      "port": 8080,
-      "protocol": "http",
-      "status": {
+        },
+        "balancer_url": "http://10.10.0.2/balancer-manager/",
+        "host": "10.10.0.21",
+        "management_url": "http://10.10.0.2/lb/?b=mywsbalancer&w=http://10.10.0.21:8080/ws&nonce=8925436c-79c6-4841-8936-e7d13b79239b",
+        "path": "/ws",
+        "port": 8080,
+        "protocol": "http",
+        "status": {
           "disabled": false,
           "drained": false,
           "hot_standby": false,
-          "ignore_errors": false}
+          "ignore_errors": false
+        }
       }
     ]
 """
