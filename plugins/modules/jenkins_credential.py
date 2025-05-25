@@ -27,6 +27,8 @@ extends_documentation_fragment:
 attributes:
   check_mode:
     support: full
+    details:
+      - Module fully supports check mode and will report changes without making them
   diff_mode:
     support: none
 options:
@@ -477,7 +479,7 @@ def embed_file_into_body(module, file_path, credentials):
         with open(file_path, "rb") as f:
             file_bytes = f.read()
     except Exception as e:
-        module.fail_json(msg=f"Failed to read file: {str(e)}")
+        module.fail_json(msg="Failed to read file: {}".format(str(e)))
 
     credentials.update(
         {
@@ -836,23 +838,25 @@ def run_module():
             module.fail_json(msg="Domain {} doesn't exists".format(scope))
 
     if type == "scope":
-        post_url = f"{url}/credentials/store/system/createDomain"
+        post_url = "{}/credentials/store/system/createDomain".format(url)
     else:
-        post_url = f"{url}/credentials/store/system/domain/{scope}/createCredentials"
+        post_url = "{}/credentials/store/system/domain/{}/createCredentials".format(
+            url, scope
+        )
 
     try:
         response, info = fetch_url(
             module, post_url, headers=headers, data=body, method="POST"
         )
     except Exception as e:
-        module.fail_json(msg=f"Request to {post_url} failed: {str(e)}")
+        module.fail_json(msg="Request to {} failed: {}".format(post_url, str(e)))
 
     status = info.get("status", 0)
 
     if status >= 400:
         body = response.read() if response else b""
         module.fail_json(
-            msg=f"Failed to {command} credential",
+            msg="Failed to {} credential".format(command),
             details=body.decode("utf-8", errors="ignore"),
         )
 
