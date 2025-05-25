@@ -116,7 +116,7 @@ member:
   description: Specific balancer member information dictionary, returned when the module is invoked with O(member_host) parameter.
   type: dict
   returned: success
-  sample: |
+  sample:
     {
       "attributes": {
         "Busy": "0",
@@ -149,7 +149,7 @@ members:
     O(state) args.
   returned: success
   type: list
-  sample: |-
+  sample:
     [
       {
         "attributes": {
