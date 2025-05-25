@@ -13,7 +13,7 @@ DOCUMENTATION = r'''
 ---
 module: lvm_pv
 short_description: Manage LVM Physical Volumes
-version_added: "10.7.0"
+version_added: "11.0.0"
 description:
 - Creates, resizes or removes LVM Physical Volumes.
 author:
@@ -138,7 +138,7 @@ def main():
         if not is_pv:
             if module.check_mode:
                 changed = True
-                actions.append('created')
+                actions.append('would be created')
             else:
                 cmd = ['pvcreate']
                 if force:
@@ -150,7 +150,7 @@ def main():
             is_pv = True
 
         # Handle resizing
-        if resize and is_pv:
+        elif resize and is_pv:
             if not module.check_mode:
                 # Perform device rescan if each time
                 if rescan_device(module, device):
@@ -170,10 +170,11 @@ def main():
         if is_pv:
             if module.check_mode:
                 changed = True
+            else:
                 cmd = ['pvremove', '-y']
                 if force:
                     cmd.append('-ff')
-
+                changed = True
                 cmd.append(device)
                 rc, out, err = module.run_command(cmd, check_rc=True)
                 actions.append('removed')
