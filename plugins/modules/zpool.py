@@ -11,6 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 module: zpool
 short_description: Manage ZFS zpools
+version_added: 11.0.0
 description:
   - Create, destroy, and modify ZFS zpools and their vdev layouts, pool properties, and filesystem properties.
 extends_documentation_fragment:
@@ -19,8 +20,8 @@ attributes:
   check_mode:
     support: partial
     details:
-      - In check_mode, any zpool subcommand that supports the dry-run flag (`-n`) will be run with `-n` and its
-        simulated output included in the module's diff results.
+      - In check mode, any C(zpool) subcommand that supports the dry-run flag (C(-n)) will be run with C(-n) and its
+        simulated output is included in the module's diff results.
   diff_mode:
     support: full
 author:
@@ -39,22 +40,22 @@ options:
     type: str
   disable_new_features:
     description:
-      - If true, disable new ZFS feature flags when creating.
+      - If V(true), disable new ZFS feature flags when creating.
     type: bool
     default: false
   force:
     description:
-      - If true, force operations (e.g. overwrite existing devices).
+      - If V(true), force operations (for example overwrite existing devices).
     type: bool
     default: false
   pool_properties:
     description:
-      - Dictionary of ZFS pool properties to set (e.g. autoexpand, cachefile).
+      - Dictionary of ZFS pool properties to set (for example V(autoexpand), V(cachefile)).
     type: dict
     default: {}
   filesystem_properties:
     description:
-      - Dictionary of ZFS filesystem properties to set on the root dataset (e.g. compression, dedup).
+      - Dictionary of ZFS filesystem properties to set on the root dataset (for example V(compression), V(dedup)).
     type: dict
     default: {}
   mountpoint:
@@ -78,12 +79,12 @@ options:
     suboptions:
       role:
         description:
-          - Special vdev role (e.g. log, cache, spare).
+          - Special vdev role (for example V(log), V(cache), V(spare)).
         type: str
         choices: [ log, cache, spare, dedup, special ]
       type:
         description:
-          - Vdev topology (stripe, mirror, raidz).
+          - Vdev topology (for example V(stripe), V(mirror), V(raidz)).
         type: str
         choices: [ stripe, mirror, raidz, raidz1, raidz2, raidz3 ]
         default: stripe
