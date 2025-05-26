@@ -467,7 +467,28 @@ def main():
             mountpoint=dict(type='str', required=False),
             altroot=dict(type='str', required=False),
             temp_name=dict(type='str', required=False),
-            vdevs=dict(type='list', required=True, elements='dict'),
+            vdevs=dict(
+                type='list',
+                elements='dict',
+                required=True,
+                options=dict(
+                    role=dict(
+                        type='str',
+                        choices=['log', 'cache', 'spare', 'dedup', 'special'],
+                        required=False,
+                    ),
+                    type=dict(
+                        type='str',
+                        choices=['stripe', 'mirror', 'raidz', 'raidz1', 'raidz2', 'raidz3'],
+                        default='stripe',
+                    ),
+                    disks=dict(
+                        type='list',
+                        elements='str',
+                        required=True,
+                    ),
+                ),
+            ),
         ),
         supports_check_mode=True
     )
@@ -492,37 +513,6 @@ def main():
         disks = vdev.get('disks')
         if not isinstance(disks, list) or len(disks) == 0:
             module.fail_json(msg="vdev #{idx}: at least one disk is required (got: {disks!r})".format(idx=idx, disks=disks))
-
-    allowed_types = {'stripe', 'mirror', 'raidz', 'raidz1', 'raidz2', 'raidz3'}
-    allowed_roles = {'log', 'cache', 'spare', 'special', 'dedup'}
-
-    for idx, vdev in enumerate(vdevs, start=1):
-        vdev_type = vdev.get('type', 'stripe')
-        if not isinstance(vdev_type, str) or vdev_type not in allowed_types:
-            module.fail_json(
-                msg=(
-                    "vdev #{idx}: invalid type {vdev!r}; "
-                    "must be one of {types}"
-                ).format(
-                    idx=idx,
-                    vdev=vdev_type,
-                    types=sorted(allowed_types)
-                )
-            )
-
-        role = vdev.get('role')
-        if role is not None:
-            if not isinstance(role, str) or role not in allowed_roles:
-                module.fail_json(
-                    msg=(
-                        "vdev #{idx}: invalid role {role!r}; "
-                        "must be one of {roles}"
-                    ).format(
-                        idx=idx,
-                        role=role,
-                        roles=sorted(allowed_roles)
-                    )
-                )
 
     result = dict(
         name=name,
