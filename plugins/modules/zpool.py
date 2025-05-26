@@ -100,27 +100,27 @@ EXAMPLES = r'''
   community.general.zpool:
     name: tank
     vdevs:
-    - disks:
-        - /dev/sda
+      - disks:
+          - /dev/sda
 
 - name: Create mirrored pool "tank"
   community.general.zpool:
     name: tank
     vdevs:
-    - type: mirror
-      disks:
-        - /dev/sda
-        - /dev/sdb
+      - type: mirror
+        disks:
+          - /dev/sda
+          - /dev/sdb
 
 - name: Add a cache device to tank
   community.general.zpool:
     name: tank
     vdevs:
-    - disks:
-        - /dev/sda
-    - role: cache
-      disks:
-        - /dev/nvme0n1
+      - disks:
+          - /dev/sda
+      - role: cache
+        disks:
+          - /dev/nvme0n1
 
 - name: Set pool and filesystem properties
   community.general.zpool:
@@ -130,8 +130,8 @@ EXAMPLES = r'''
     filesystem_properties:
     compression: lz4
     vdevs:
-    - disks:
-        - /dev/sda
+      - disks:
+          - /dev/sda
 
 - name: Destroy pool "tank"
   community.general.zpool:
