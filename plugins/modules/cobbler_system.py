@@ -280,7 +280,7 @@ def main():
 
         if system:
             # Update existing entry
-            system_id = None
+            system_id = ''
             if StrictVersion(str(conn.version())) >= StrictVersion('3.4.0'):
                 system_id = conn.get_system_handle(name)
             else:
