@@ -157,11 +157,11 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six import iteritems
 from ansible.module_utils.six.moves import xmlrpc_client
 from ansible.module_utils.common.text.converters import to_text
+from ansible.module_utils.compat.version import StrictVersion
 
 from ansible_collections.community.general.plugins.module_utils.datetime import (
     now,
 )
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 
 IFPROPS_MAPPING = dict(
@@ -281,7 +281,7 @@ def main():
         if system:
             # Update existing entry
             system_id = None
-            if LooseVersion(str(conn.version())) >= LooseVersion('3.4.0'):
+            if StrictVersion(str(conn.version())) >= StrictVersion('3.4.0'):
                 system_id = conn.get_system_handle(name)
             else:
                 system_id = conn.get_system_handle(name, token)
