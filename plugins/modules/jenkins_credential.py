@@ -49,11 +49,11 @@ options:
       - certificate
       - scope
     type: str
-  command:
+  state:
     description:
-      - The operation to perform.
-    choices: [add, delete, update]
-    default: add
+      - The state of the credential.
+    choices: [present, absent]
+    default: present
     type: str
   scope:
     description:
@@ -253,21 +253,20 @@ EXAMPLES = r"""
     - name: Delete credential
       jenkins_credential:
         id: "credential-id"
-        command: "delete"
+        state: "delete"
         jenkins_user: "admin"
         token: "{{ token }}"
 
     - name: Delete scope
       jenkins_credential:
         id: "scope-id"
-        command: "delete"
+        state: "delete"
         type: "scope"
         jenkins_user: "admin"
         token: "{{ token }}"
 
 """
-# Edit is done the same way as the add command except that the "command" parameter is set to "update".
-# The rest of the parameters are the same as for the add command.(id must be the same as the one used to add the credential)
+# Edit is done the same way as add. (id must be the same as the one used to add the credential)
 
 RETURN = r"""
 changed:
@@ -301,79 +300,6 @@ except ImportError:
 else:
     HAS_URLLIB3 = True
     URLLIB3_IMPORT_ERROR = None
-
-
-# Gets the Jenkins crumb for CSRF protection which is required for API calls
-def get_jenkins_crumb(module, url, user, token):
-    crumb_url = "{}/crumbIssuer/api/json".format(url)
-
-    headers = {"Authorization": basic_auth_header(user, token)}
-
-    response, info = fetch_url(module, crumb_url, headers=headers)
-
-    if info["status"] != 200:
-        return None, None
-
-    try:
-        data = response.read()
-        json_data = json.loads(data)
-        return json_data["crumbRequestField"], json_data["crumb"]
-    except Exception:
-        return None, None
-
-
-# Function to check if credentials/domain exists
-def target_exists(module, url, scope, name, user, token, check_custom=False):
-
-    if module.params["type"] == "scope" or check_custom:
-        target_url = "{}/credentials/store/system/domain/{}/api/json".format(
-            url, scope if check_custom else name
-        )
-    else:
-        target_url = (
-            "{}/credentials/store/system/domain/{}/credential/{}/api/json".format(
-                url, scope, name
-            )
-        )
-
-    headers = {"Authorization": basic_auth_header(user, token)}
-
-    response, info = fetch_url(module, target_url, headers=headers)
-    status = info.get("status", 0)
-
-    if status == 200:
-        return True
-    elif status == 404:
-        return False
-    else:
-        module.fail_json(
-            msg="Unexpected status code {} when checking {} existence.".format(
-                status, name
-            )
-        )
-
-
-# Function to clean the data sent via API by removing unwanted keys and None values
-def clean_data(data):
-    # Keys to remove (including those with None values)
-    keys_to_remove = {
-        "url",
-        "token",
-        "jenkins_user",
-        "file_path",
-        "type",
-        "command",
-        "scope",
-    }
-
-    # Filter out None values and unwanted keys
-    cleaned_data = {
-        key: value
-        for key, value in data.items()
-        if value is not None and key not in keys_to_remove
-    }
-
-    return cleaned_data
 
 
 # Function to validate required fields based on credential type and check file existence.
@@ -413,6 +339,79 @@ def validate_required_fields(module, cred_type):
         module.fail_json(
             msg="Missing required fields for type '{}': {}".format(
                 cred_type, ", ".join(missing)
+            )
+        )
+
+
+# Gets the Jenkins crumb for CSRF protection which is required for API calls
+def get_jenkins_crumb(module, url, user, token):
+    crumb_url = "{}/crumbIssuer/api/json".format(url)
+
+    headers = {"Authorization": basic_auth_header(user, token)}
+
+    response, info = fetch_url(module, crumb_url, headers=headers)
+
+    if info["status"] != 200:
+        return None, None
+
+    try:
+        data = response.read()
+        json_data = json.loads(data)
+        return json_data["crumbRequestField"], json_data["crumb"]
+    except Exception:
+        return None, None
+
+
+# Function to clean the data sent via API by removing unwanted keys and None values
+def clean_data(data):
+    # Keys to remove (including those with None values)
+    keys_to_remove = {
+        "url",
+        "token",
+        "jenkins_user",
+        "file_path",
+        "type",
+        "state",
+        "scope",
+    }
+
+    # Filter out None values and unwanted keys
+    cleaned_data = {
+        key: value
+        for key, value in data.items()
+        if value is not None and key not in keys_to_remove
+    }
+
+    return cleaned_data
+
+
+# Function to check if credentials/domain exists
+def target_exists(module, url, scope, name, user, token, check_domain=False):
+
+    if module.params["type"] == "scope" or check_domain:
+        target_url = "{}/credentials/store/system/domain/{}/api/json".format(
+            url, scope if check_domain else name
+        )
+    else:
+        target_url = (
+            "{}/credentials/store/system/domain/{}/credential/{}/api/json".format(
+                url, scope, name
+            )
+        )
+
+    headers = {"Authorization": basic_auth_header(user, token)}
+
+    response, info = fetch_url(module, target_url, headers=headers)
+    status = info.get("status", 0)
+
+    if status == 200:
+        return True
+    elif status == 404:
+        return False
+    else:
+        module.fail_json(
+            msg="Unexpected status code {} when checking {} existence.".format(
+                status, name
             )
         )
 
@@ -515,12 +514,12 @@ def run_module():
                     "scope",
                 ],
             ),  # Credential type
-            command=dict(
+            state=dict(
                 type="str",
                 required=False,
-                default="add",
-                choices=["add", "delete", "update"],
-            ),  # Command to execute
+                default="present",
+                choices=["present", "absent"],
+            ),  # State of the credential
             scope=dict(
                 type="str", required=False, default="_"
             ),  # Scope of the credential
@@ -579,7 +578,7 @@ def run_module():
     # Parameters
     id = module.params["id"]
     type = module.params["type"]
-    command = module.params["command"]
+    state = module.params["state"]
     scope = module.params["scope"]
     url = module.params["url"]
     jenkins_user = module.params["jenkins_user"]
@@ -597,11 +596,11 @@ def run_module():
 
     if not HAS_URLLIB3:
         module.fail_json(
-            msg=missing_required_lib("another_library"), exception=URLLIB3_IMPORT_ERROR
+            msg=missing_required_lib("urllib3"), exception=URLLIB3_IMPORT_ERROR
         )
 
-    if command not in ["add", "delete", "update"]:
-        module.fail_json(msg="Invalid command. Use 'add', 'delete', or 'update'.")
+    if state not in ["present", "absent"]:
+        module.fail_json(msg="Invalid state. Use 'present' or 'absent'.")
 
     # Get the crumb for CSRF protection
     crumb_field, crumb_value = get_jenkins_crumb(module, url, jenkins_user, token)
@@ -625,39 +624,20 @@ def run_module():
 
     does_exist = target_exists(module, url, scope, id, jenkins_user, token)
 
-    if not type == "scope":
-        # Check if the credential already exists and user want to add
-        if does_exist and command == "add":
-            result["message"] = "Credential {} already exists.".format(id)
-            module.exit_json(**result)
+    # Check if the credential/domain doesn't exist and the user wants to delete
+    if not does_exist and state == "absent":
+        result["changed"] = False
+        result["message"] = "{} does not exist.".format(id)
+        module.exit_json(**result)
 
-        # Check if the credential doesn't exist and the user wants to delete
-        elif not does_exist and command == "delete":
-            result["message"] = "Credential {} doesn't exist.".format(id)
-            module.exit_json(**result)
-
-    else:
-        # Check if the domain already exists and user wants to add
-        if does_exist and command == "add":
-            result["changed"] = False
-            result["message"] = "Domain {} already exists.".format(id)
-            module.exit_json(**result)
-
-        # Check if the domain doesn't exist and user wants to delete
-        elif not does_exist and command == "delete":
-            result["changed"] = False
-            result["message"] = "Domain {} doesn't exist.".format(id)
-            module.exit_json(**result)
-
-    if command in ["add", "update"]:
+    if state == "present":
         # Check if credential type is provided
         if type is None:
             module.fail_json(msg="Credential type is required for add or update")
 
-        # If updating, we need to delete the existing credential first
-        if command == "update":
-            if target_exists(module, url, scope, id, jenkins_user, token):
-                delete_scope_or_credential(module, url, headers, id, scope)
+        # If updating, we need to delete the existing credential/domain first
+        if target_exists(module, url, scope, id, jenkins_user, token):
+            delete_scope_or_credential(module, url, headers, id, scope)
 
         if type == "scope":
 
@@ -823,7 +803,7 @@ def run_module():
 
     else:  # Delete
 
-        # Delete command requires id
+        # Absent state requires id
         if not id:
             module.fail_json(msg="id is required to delete a credential")
 
@@ -856,7 +836,9 @@ def run_module():
     if status >= 400:
         body = response.read() if response else b""
         module.fail_json(
-            msg="Failed to {} credential".format(command),
+            msg="Failed to {} credential".format(
+                "add/update" if state == "present" else "delete"
+            ),
             details=body.decode("utf-8", errors="ignore"),
         )
 
