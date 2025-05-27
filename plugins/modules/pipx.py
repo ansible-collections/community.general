@@ -211,6 +211,7 @@ version:
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
 from ansible_collections.community.general.plugins.module_utils.pipx import pipx_runner, pipx_common_argspec, make_process_dict
 from ansible_collections.community.general.plugins.module_utils.pkg_req import PackageRequirement
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 from ansible.module_utils.facts.compat import ansible_facts
 
@@ -292,6 +293,9 @@ class PipX(StateModuleHelper):
         with self.runner("version") as ctx:
             rc, out, err = ctx.run()
             self.vars.version = out.strip()
+
+        if LooseVersion(self.vars.version) < LooseVersion("1.7.0"):
+            self.do_raise("The pipx tool must be at least at version 1.7.0")
 
     def __quit_module__(self):
         self.vars.application = self._retrieve_installed()
