@@ -345,9 +345,22 @@ class Zpool(object):
 
         return vdevs
 
+    def normalize_vdevs(self, vdevs):
+        normalized = []
+        for vdev in vdevs:
+            entry = {
+                'type': vdev.get('type', 'stripe'),
+                'disks': sorted(vdev['disks']),
+            }
+            role = vdev.get('role')
+            if role is not None:
+                entry['role'] = role
+            normalized.append(entry)
+        return sorted(normalized, key=lambda x: (x.get('role', ''), x['type'], x['disks']))
+
     def diff_layout(self):
-        current = self.get_current_layout()
-        desired = self.vdevs
+        current = self.normalize_vdevs(self.get_current_layout())
+        desired = self.normalize_vdevs(self.vdevs)
 
         before = {'vdevs': current}
         after = {'vdevs': desired}
@@ -550,7 +563,7 @@ def main():
                 result['diff'] = zpool.create()
             else:
                 before_vdevs = []
-                desired_vdevs = zpool.vdevs
+                desired_vdevs = zpool.normalize_vdevs(zpool.vdevs)
                 zpool.create()
                 result['diff'] = {
                     'before': {'state': 'absent', 'vdevs': before_vdevs},
