@@ -91,6 +91,7 @@ options:
       disks:
         description:
           - List of device paths to include in this vdev.
+        required: true
         type: list
         elements: str
 '''
@@ -220,7 +221,10 @@ class Zpool(object):
         return rc == 0
 
     def create(self):
-        with self.zpool_runner('subcommand disable_new_features force dry_run pool_properties filesystem_properties mountpoint altroot temp_name name vdevs', check_rc=True) as ctx:
+        with self.zpool_runner(
+            'subcommand disable_new_features force dry_run pool_properties filesystem_properties mountpoint altroot temp_name name vdevs',
+            check_rc=True
+        ) as ctx:
             rc, stdout, stderr = ctx.run(
                 subcommand='create',
                 disable_new_features=self.disable_new_features,
