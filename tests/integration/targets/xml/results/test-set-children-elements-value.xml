@@ -2,9 +2,7 @@
 <business type="bar">
   <name>Tasty Beverage Co.</name>
   <beers>
-    <beer alcohol="0.5" name="90 Minute IPA">2</beer>
-    <beer alcohol="0.3" name="Harvest Pumpkin Ale">5</beer>
-  </beers>
+    <beer alcohol="0.5" name="90 Minute IPA">2</beer><beer alcohol="0.3" name="Harvest Pumpkin Ale">5</beer></beers>
   <rating subjective="true">10</rating>
   <website>
     <mobilefriendly/>
