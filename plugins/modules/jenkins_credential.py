@@ -13,11 +13,11 @@ DOCUMENTATION = r"""
 ---
 module: jenkins_credential
 short_description: Manage Jenkins credentials and domains via API
-version_added: 1.0.0
+version_added: 11.0.0
 description:
-  - This module allows managing Jenkins credentials and domain scopes via Jenkins HTTP API.
-  - You can create, update, and delete different credential types such as username/password, secret text, SSH key, certificates, GitHub App, and scoped domains.
-  - For Domains, it supports hostname, hostname:port, path, and scheme-based restrictions.
+  - This module allows managing Jenkins credentials and domain scopes via the Jenkins HTTP API.
+  - Create, update, and delete different credential types such as C(username/password), C(secret text), C(SSH key), C(certificates), C(GitHub App), and domains.
+  - For scoped domains (type I(scope)), it supports restrictions based on V(hostname), V(hostname:port), V(path), and V(scheme).
 requirements:
   - urllib3
 author:
@@ -27,8 +27,6 @@ extends_documentation_fragment:
 attributes:
   check_mode:
     support: full
-    details:
-      - Module fully supports check mode and will report changes without making them
   diff_mode:
     support: none
 options:
@@ -77,8 +75,17 @@ options:
     type: str
   description:
     description:
-      - Optional description of the credential or domain.
+      - Description of the credential or domain.
     default: ''
+    type: str
+  location:
+    description:
+      - Location of the credential. Either system or folder.
+      - If location is a folder then url must be set to <jenkins-server>/job/<folder_name>.
+    choices:
+      - system
+      - folder
+    default: 'system'
     type: str
   username:
     description:
@@ -278,7 +285,7 @@ message:
     type: str
     returned: always
 details:
-    description: Incase of errors return more details
+    description: Incase of errors return more details.
     type: str
     returned: Error
 """
@@ -345,6 +352,10 @@ def validate_required_fields(module, cred_type):
 
 # Gets the Jenkins crumb for CSRF protection which is required for API calls
 def get_jenkins_crumb(module, url, user, token):
+
+    if "/job" in url:
+        url = url.split("/job")[0]
+
     crumb_url = "{}/crumbIssuer/api/json".format(url)
 
     headers = {"Authorization": basic_auth_header(user, token)}
@@ -386,17 +397,15 @@ def clean_data(data):
 
 
 # Function to check if credentials/domain exists
-def target_exists(module, url, scope, name, user, token, check_domain=False):
+def target_exists(module, url, location, scope, name, user, token, check_domain=False):
 
     if module.params["type"] == "scope" or check_domain:
-        target_url = "{}/credentials/store/system/domain/{}/api/json".format(
-            url, scope if check_domain else name
+        target_url = "{}/credentials/store/{}/domain/{}/api/json".format(
+            url, location, scope if check_domain else name
         )
     else:
-        target_url = (
-            "{}/credentials/store/system/domain/{}/credential/{}/api/json".format(
-                url, scope, name
-            )
+        target_url = "{}/credentials/store/{}/domain/{}/credential/{}/api/json".format(
+            url, location, scope, name
         )
 
     headers = {"Authorization": basic_auth_header(user, token)}
@@ -417,20 +426,20 @@ def target_exists(module, url, scope, name, user, token, check_domain=False):
 
 
 # Function to delete the scope or credential provided
-def delete_scope_or_credential(module, url, headers, id, scope):
+def delete_scope_or_credential(module, url, location, headers, id, scope):
     try:
         type = module.params["type"]
         # Remove Content-Type header if present (like your original)
         headers.pop("Content-Type", None)
 
         if type == "scope":
-            delete_url = "{}/credentials/store/system/domain/{}/doDelete".format(
-                url, id
+            delete_url = "{}/credentials/store/{}/domain/{}/doDelete".format(
+                url, location, id
             )
         else:
             delete_url = (
-                "{}/credentials/store/system/domain/{}/credential/{}/doDelete".format(
-                    url, scope, id
+                "{}/credentials/store/{}/domain/{}/credential/{}/doDelete".format(
+                    url, location, scope, id
                 )
             )
 
@@ -531,6 +540,12 @@ def run_module():
             description=dict(
                 type="str", required=False, default=""
             ),  # Description of the credential
+            location=dict(
+                type="str",
+                required=False,
+                default="system",
+                choices=["system", "folder"],
+            ),  # Location of the credential (not used in this module)
             username=dict(
                 type="str", required=False
             ),  # Username for userAndPass and sshKey types
@@ -584,6 +599,7 @@ def run_module():
     jenkins_user = module.params["jenkins_user"]
     token = module.params["token"]
     description = module.params["description"]
+    location = module.params["location"]
     filePath = module.params["file_path"]
     private_key_path = module.params["private_key_path"]
     inc_hostname = module.params["inc_hostname"]
@@ -622,7 +638,7 @@ def run_module():
 
     credentials = clean_data(module.params)
 
-    does_exist = target_exists(module, url, scope, id, jenkins_user, token)
+    does_exist = target_exists(module, url, location, scope, id, jenkins_user, token)
 
     # Check if the credential/domain doesn't exist and the user wants to delete
     if not does_exist and state == "absent":
@@ -636,8 +652,8 @@ def run_module():
             module.fail_json(msg="Credential type is required for add or update")
 
         # If updating, we need to delete the existing credential/domain first
-        if target_exists(module, url, scope, id, jenkins_user, token):
-            delete_scope_or_credential(module, url, headers, id, scope)
+        if target_exists(module, url, location, scope, id, jenkins_user, token):
+            delete_scope_or_credential(module, url, location, headers, id, scope)
 
         if type == "scope":
 
@@ -807,21 +823,21 @@ def run_module():
         if not id:
             module.fail_json(msg="id is required to delete a credential")
 
-        delete_scope_or_credential(module, url, headers, id, scope)
+        delete_scope_or_credential(module, url, location, headers, id, scope)
 
         module.exit_json(changed=True, message="{} deleted successfully.".format(id))
 
     if not type == "scope" and not scope == "_":  # Check if custom scope exists
         if not target_exists(
-            module, url, scope, id, jenkins_user, token, True
+            module, url, location, scope, id, jenkins_user, token, True
         ):  # Trigger check scope
             module.fail_json(msg="Domain {} doesn't exists".format(scope))
 
     if type == "scope":
-        post_url = "{}/credentials/store/system/createDomain".format(url)
+        post_url = "{}/credentials/store/{}/createDomain".format(url, location)
     else:
-        post_url = "{}/credentials/store/system/domain/{}/createCredentials".format(
-            url, scope
+        post_url = "{}/credentials/store/{}/domain/{}/createCredentials".format(
+            url, location, scope
         )
 
     try:
