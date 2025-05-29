@@ -73,7 +73,6 @@ options:
   vdevs:
     description:
       - List of vdev definitions for the pool.
-    required: true
     type: list
     elements: dict
     suboptions:
@@ -535,7 +534,7 @@ def main():
             vdevs=dict(
                 type='list',
                 elements='dict',
-                required=True,
+                required=False,
                 options=dict(
                     role=dict(
                         type='str',
@@ -555,7 +554,8 @@ def main():
                 ),
             ),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
+        required_if=[('state', 'present', ['vdevs'])]
     )
 
     name = module.params.get('name')
@@ -574,10 +574,11 @@ def main():
             if isinstance(value, bool):
                 module.params[property_key][key] = 'on' if value else 'off'
 
-    for idx, vdev in enumerate(vdevs, start=1):
-        disks = vdev.get('disks')
-        if not isinstance(disks, list) or len(disks) == 0:
-            module.fail_json(msg="vdev #{idx}: at least one disk is required (got: {disks!r})".format(idx=idx, disks=disks))
+    if state != 'absent':
+        for idx, vdev in enumerate(vdevs, start=1):
+            disks = vdev.get('disks')
+            if not isinstance(disks, list) or len(disks) == 0:
+                module.fail_json(msg="vdev #{idx}: at least one disk is required (got: {disks!r})".format(idx=idx, disks=disks))
 
     result = dict(
         name=name,
