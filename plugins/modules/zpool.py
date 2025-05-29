@@ -141,6 +141,7 @@ EXAMPLES = r'''
 
 import re
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
 
 
 class Zpool(object):
@@ -160,54 +161,79 @@ class Zpool(object):
         self.zfs_cmd = module.get_bin_path('zfs', required=True)
         self.changed = False
 
+        self.zpool_runner = CmdRunner(
+            module,
+            command=self.zpool_cmd,
+            arg_formats=dict(
+                subcommand=cmd_runner_fmt.as_list(),
+                disable_new_features=cmd_runner_fmt.as_bool('-d'),
+                force=cmd_runner_fmt.as_bool('-f'),
+                dry_run=cmd_runner_fmt.as_bool('-n'),
+                pool_properties=cmd_runner_fmt.as_func(
+                    lambda props: sum([['-o', f'{prop}={value}'] for prop, value in (props or {}).items()], [])
+                ),
+                filesystem_properties=cmd_runner_fmt.as_func(
+                    lambda props: sum([['-O', f'{prop}={value}'] for prop, value in (props or {}).items()], [])
+                ),
+                mountpoint=cmd_runner_fmt.as_opt_val('-m'),
+                altroot=cmd_runner_fmt.as_opt_val('-R'),
+                temp_name=cmd_runner_fmt.as_opt_val('-t'),
+                name=cmd_runner_fmt.as_list(),
+                vdevs=cmd_runner_fmt.as_func(
+                    lambda vdevs: sum(
+                        [
+                            ([vdev['role']] if vdev.get('role') else [])
+                            + ([] if vdev.get('type', 'stripe') == 'stripe' else [vdev['type']])
+                            + vdev.get('disks', [])
+                            for vdev in (vdevs or [])
+                        ],
+                        [],
+                    )
+                ),
+                vdev_name=cmd_runner_fmt.as_list(),
+                scripted=cmd_runner_fmt.as_bool('-H'),
+                parsable=cmd_runner_fmt.as_bool('-p'),
+                columns=cmd_runner_fmt.as_opt_val('-o'),
+                properties=cmd_runner_fmt.as_list(),
+                assignment=cmd_runner_fmt.as_list(),
+                full_paths=cmd_runner_fmt.as_bool('-P'),
+                real_paths=cmd_runner_fmt.as_bool('-L'),
+            )
+        )
+
+        self.zfs_runner = CmdRunner(
+            module,
+            command=self.zfs_cmd,
+            arg_formats=dict(
+                subcommand=cmd_runner_fmt.as_list(),
+                scripted=cmd_runner_fmt.as_bool('-H'),
+                columns=cmd_runner_fmt.as_opt_val('-o'),
+                properties=cmd_runner_fmt.as_list(),
+                assignment=cmd_runner_fmt.as_list(),
+                name=cmd_runner_fmt.as_list()
+            )
+        )
+
     def exists(self):
-        rc, stdout, stderr = self.module.run_command([self.zpool_cmd, 'list', self.name])
+        with self.zpool_runner('subcommand name') as ctx:
+            rc, stdout, stderr = ctx.run(subcommand='list', name=self.name)
         return rc == 0
 
-    def build_create_cmd(self, dry_run=False):
-        cmd = [self.zpool_cmd, 'create']
-
-        if self.disable_new_features:
-            cmd.append('-d')
-
-        if self.force:
-            cmd.append('-f')
-
-        if dry_run:
-            cmd.append('-n')
-
-        for prop, value in self.pool_properties.items():
-            cmd.extend(['-o', "{}={}".format(prop, value)])
-
-        for prop, value in self.filesystem_properties.items():
-            cmd.extend(['-O', "{}={}".format(prop, value)])
-
-        if self.mountpoint:
-            cmd.extend(['-m', self.mountpoint])
-
-        if self.altroot:
-            cmd.extend(['-R', self.altroot])
-
-        if self.temp_name:
-            cmd.extend(['-t', self.temp_name])
-
-        cmd.append(self.name)
-
-        for vdev in self.vdevs:
-            role = vdev.get('role')
-            vdev_type = vdev.get('type', 'stripe')
-            disks = vdev.get('disks', [])
-            if role:
-                cmd.append(role)
-            if vdev_type != 'stripe':
-                cmd.append(vdev_type)
-            cmd.extend(disks)
-
-        return cmd
-
     def create(self):
-        cmd = self.build_create_cmd(dry_run=self.module.check_mode)
-        rc, stdout, stderr = self.module.run_command(cmd, check_rc=True)
+        with self.zpool_runner('subcommand disable_new_features force dry_run pool_properties filesystem_properties mountpoint altroot temp_name name vdevs', check_rc=True) as ctx:
+            rc, stdout, stderr = ctx.run(
+                subcommand='create',
+                disable_new_features=self.disable_new_features,
+                force=self.force,
+                dry_run=self.module.check_mode,
+                pool_properties=self.pool_properties,
+                filesystem_properties=self.filesystem_properties,
+                mountpoint=self.mountpoint,
+                altroot=self.altroot,
+                temp_name=self.temp_name,
+                name=self.name,
+                vdevs=self.vdevs,
+            )
         self.changed = True
         if self.module.check_mode:
             return {'prepared': stdout}
@@ -216,13 +242,20 @@ class Zpool(object):
         if self.module.check_mode:
             self.changed = True
             return
-        cmd = [self.zpool_cmd, 'destroy', self.name]
-        self.module.run_command(cmd, check_rc=True)
+        with self.zpool_runner('subcommand name', check_rc=True) as ctx:
+            rc, stdout, stderr = ctx.run(subcommand='destroy', name=self.name)
         self.changed = True
 
     def list_pool_properties(self):
-        cmd = [self.zpool_cmd, 'get', '-H', '-o', 'property,value', 'all', self.name]
-        rc, stdout, stderr = self.module.run_command(cmd, check_rc=True)
+        with self.zpool_runner('subcommand scripted columns properties name', check_rc=True) as ctx:
+            rc, stdout, stderr = ctx.run(
+                subcommand='get',
+                scripted=True,
+                columns='property,value',
+                properties='all',
+                name=self.name,
+            )
+
         props = {}
         for line in stdout.splitlines():
             prop, value = line.split('\t', 1)
@@ -237,14 +270,26 @@ class Zpool(object):
             if current.get(prop) != str(value):
                 before[prop] = current.get(prop)
                 if not self.module.check_mode:
-                    self.module.run_command([self.zpool_cmd, 'set', "{}={}".format(prop, value), self.name], check_rc=True)
+                    with self.zpool_runner('subcommand assignment name', check_rc=True) as ctx:
+                        rc, stdout, stderr = ctx.run(
+                            subcommand='set',
+                            assignment='{}={}'.format(prop, value),
+                            name=self.name,
+                        )
                 after[prop] = str(value)
                 self.changed = True
         return {'before': {'pool_properties': before}, 'after': {'pool_properties': after}}
 
     def list_filesystem_properties(self):
-        cmd = [self.zfs_cmd, 'get', '-H', '-o', 'property,value', 'all', self.name]
-        rc, stdout, stderr = self.module.run_command(cmd, check_rc=True)
+        with self.zfs_runner('subcommand scripted columns properties name', check_rc=True) as ctx:
+            rc, stdout, stderr = ctx.run(
+                subcommand='get',
+                scripted=True,
+                columns='property,value',
+                properties='all',
+                name=self.name,
+            )
+
         props = {}
         for line in stdout.splitlines():
             prop, value = line.split('\t', 1)
@@ -259,7 +304,12 @@ class Zpool(object):
             if current.get(prop) != str(value):
                 before[prop] = current.get(prop)
                 if not self.module.check_mode:
-                    self.module.run_command([self.zfs_cmd, 'set', "{}={}".format(prop, value), self.name], check_rc=True)
+                    with self.zfs_runner('subcommand assignment name', check_rc=True) as ctx:
+                        rc, stdout, stderr = ctx.run(
+                            subcommand='set',
+                            assignment='{}={}'.format(prop, value),
+                            name=self.name,
+                        )
                 after[prop] = str(value)
                 self.changed = True
         return {'before': {'filesystem_properties': before}, 'after': {'filesystem_properties': after}}
@@ -278,8 +328,13 @@ class Zpool(object):
         return device
 
     def get_current_layout(self):
-        cmd = [self.zpool_cmd, 'status', '-P', '-L', self.name]
-        rc, stdout, stderr = self.module.run_command(cmd, check_rc=True)
+        with self.zpool_runner('subcommand full_paths real_paths name', check_rc=True) as ctx:
+            rc, stdout, stderr = ctx.run(
+                subcommand='status',
+                full_paths=True,
+                real_paths=True,
+                name=self.name,
+            )
 
         vdevs = []
         current = None
@@ -383,37 +438,28 @@ class Zpool(object):
         if not to_add:
             return {}
 
-        cmd = [self.zpool_cmd, 'add']
+        with self.zpool_runner('subcommand force dry_run pool_properties name vdevs', check_rc=True) as ctx:
+            rc, stdout, stderr = ctx.run(
+                subcommand='add',
+                force=self.force,
+                dry_run=self.module.check_mode,
+                pool_properties={'ashift': self.pool_properties['ashift']} if 'ashift' in self.pool_properties else {},
+                name=self.name,
+                vdevs=to_add,
+            )
 
-        if self.force:
-            cmd.append('-f')
-
-        if self.module.check_mode:
-            cmd.append('-n')
-
-        if 'ashift' in self.pool_properties:
-            cmd.extend(['-o', "ashift={}".format(self.pool_properties['ashift'])])
-
-        cmd.append(self.name)
-
-        for vdev in to_add:
-            role = vdev.get('role')
-            vdev_type = vdev.get('type', 'stripe')
-            disks = vdev.get('disks', [])
-            if role:
-                cmd.append(role)
-            if vdev_type != 'stripe':
-                cmd.append(vdev_type)
-            cmd.extend(disks)
-
-        rc, stdout, stderr = self.module.run_command(cmd, check_rc=True)
         self.changed = True
         if self.module.check_mode:
             return {'prepared': stdout}
 
     def list_vdevs_with_names(self):
-        cmd = [self.zpool_cmd, 'status', '-P', '-L', self.name]
-        rc, stdout, stderr = self.module.run_command(cmd, check_rc=True)
+        with self.zpool_runner('subcommand full_paths real_paths name', check_rc=True) as ctx:
+            rc, stdout, stderr = ctx.run(
+                subcommand='status',
+                full_paths=True,
+                real_paths=True,
+                name=self.name,
+            )
         in_cfg = False
         saw_pool = False
         vdevs = []
@@ -455,12 +501,13 @@ class Zpool(object):
         to_remove = [vdev['name'] for vdev in current if any(disk in gone for disk in vdev['disks'])]
         if not to_remove:
             return {}
-        cmd = [self.zpool_cmd, 'remove']
-        if self.module.check_mode:
-            cmd.append('-n')
-        cmd.append(self.name)
-        cmd.extend(to_remove)
-        rc, stdout, stderr = self.module.run_command(cmd, check_rc=True)
+        with self.zpool_runner('subcommand dry_run name vdev_name', check_rc=True) as ctx:
+            rc, stdout, stderr = ctx.run(
+                subcommand='remove',
+                dry_run=self.module.check_mode,
+                name=self.name,
+                vdev_name=to_remove,
+            )
         self.changed = True
         if self.module.check_mode:
             return {'prepared': stdout}
