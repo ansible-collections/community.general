@@ -171,10 +171,10 @@ class Zpool(object):
                 force=cmd_runner_fmt.as_bool('-f'),
                 dry_run=cmd_runner_fmt.as_bool('-n'),
                 pool_properties=cmd_runner_fmt.as_func(
-                    lambda props: sum([['-o', f'{prop}={value}'] for prop, value in (props or {}).items()], [])
+                    lambda props: sum([['-o', '{}={}'.format(prop, value)] for prop, value in (props or {}).items()], [])
                 ),
                 filesystem_properties=cmd_runner_fmt.as_func(
-                    lambda props: sum([['-O', f'{prop}={value}'] for prop, value in (props or {}).items()], [])
+                    lambda props: sum([['-O', '{}={}'.format(prop, value)] for prop, value in (props or {}).items()], [])
                 ),
                 mountpoint=cmd_runner_fmt.as_opt_val('-m'),
                 altroot=cmd_runner_fmt.as_opt_val('-R'),
