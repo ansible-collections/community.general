@@ -64,7 +64,7 @@ nox -Re ansible-test-sanity-devel -- plugins/modules/system/pids.py tests/integr
 nox -R
 ```
 
-If you replace `-Re` with `-e`, respectively. leave `-R` away, then the virtual environments will be re-created. The `-R` re-uses them (if they already exist).
+If you replace `-Re` with `-e`, respectively. If you leave `-R` away, then the virtual environments will be re-created. The `-R` re-uses them (if they already exist).
 
 ### Unit tests
 
