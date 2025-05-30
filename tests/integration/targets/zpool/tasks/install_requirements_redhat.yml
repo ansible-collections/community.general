@@ -5,12 +5,12 @@
   changed_when: false
 
 - name: Install zfs repostiory
-  ansible.builtin.dnf:
+  ansible.builtin.package:
     name: "https://zfsonlinux.org/epel/zfs-release-2-3{{ zfs_dist_tag.stdout }}.noarch.rpm"
     state: present
 
 - name: Install required packages
-  ansible.builtin.dnf:
+  ansible.builtin.package:
     name:
       - epel-release
       - kernel-devel
