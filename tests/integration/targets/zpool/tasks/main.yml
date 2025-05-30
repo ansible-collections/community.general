@@ -1,0 +1,15 @@
+---
+- name: Execute integration tests
+  become: true
+  block:
+    - name: Include setup.yml
+      ansible.builtin.include_tasks: setup.yml
+
+    - name: Include create_destroy.yml
+      ansible.builtin.include_tasks: create_destroy.yml
+
+    - name: Include add_remove_vdevs.yml
+      ansible.builtin.include_tasks: add_remove_vdevs.yml
+
+    - name: Include properties.yml
+      ansible.builtin.include_tasks: properties.yml

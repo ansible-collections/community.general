@@ -1,0 +1,18 @@
+---
+- name: Install required packages
+  ansible.builtin.package:
+    name:
+      - zfsutils-linux
+      - util-linux
+
+- name: Ensure disk files exists
+  ansible.builtin.command:
+    cmd: "dd if=/dev/zero of={{ item.file }} bs=1M count=256 conv=fsync"
+    creates: "{{ item.file }}"
+  loop: "{{ zpool_disk_configs }}"
+
+- name: Setup loop devices
+  ansible.builtin.command:
+    cmd: "losetup {{ item.loop }} {{ item.file }}"
+    creates: "{{ item.loop }}"
+  loop: "{{ zpool_disk_configs }}"
