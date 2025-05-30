@@ -318,6 +318,11 @@ class Zpool(object):
         return {'before': {'filesystem_properties': before}, 'after': {'filesystem_properties': after}}
 
     def base_device(self, device):
+        # loop devices
+        match = re.match(r'^(/dev/loop\d+)$', device)
+        if match:
+            return match.group(1)
+
         # nvme drives
         match = re.match(r'^(.*?)(p\d+)$', device)
         if match:
@@ -404,10 +409,12 @@ class Zpool(object):
         return vdevs
 
     def normalize_vdevs(self, vdevs):
+        alias = {'raidz': 'raidz1'}
         normalized = []
         for vdev in vdevs:
+            normalized_type = alias.get(vdev.get('type', 'stripe'), vdev.get('type', 'stripe'))
             entry = {
-                'type': vdev.get('type', 'stripe'),
+                'type': normalized_type,
                 'disks': sorted(vdev['disks']),
             }
             role = vdev.get('role')
