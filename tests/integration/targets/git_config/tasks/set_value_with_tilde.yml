@@ -22,7 +22,7 @@
   register: set_result2
 
 - name: getting value
-  git_config:
+  git_config_info:
     name: core.hooksPath
     scope: global
   register: get_result
@@ -32,6 +32,5 @@
     that:
       - set_result1 is changed
       - set_result2 is not changed
-      - get_result is not changed
       - get_result.config_value == '~/foo/bar'
 ...

@@ -20,7 +20,7 @@
   register: set_result2
 
 - name: getting value
-  git_config:
+  git_config_info:
     name: core.name
     scope: global
   register: get_result
@@ -30,7 +30,6 @@
     that:
       - set_result1 is changed
       - set_result2 is changed
-      - get_result is not changed
       - get_result.config_value == 'bar'
       - set_result1.diff.before == "\n"
       - set_result1.diff.after == "foo\n"

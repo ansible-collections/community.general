@@ -203,7 +203,6 @@ class Snap(StateModuleHelper):
         },
         supports_check_mode=True,
     )
-    use_old_vardict = False
 
     @staticmethod
     def _first_non_zero(a):

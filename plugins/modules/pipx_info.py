@@ -126,7 +126,8 @@ version:
 """
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
-from ansible_collections.community.general.plugins.module_utils.pipx import pipx_runner, pipx_common_argspec, make_process_list
+from ansible_collections.community.general.plugins.module_utils.pipx import pipx_runner, pipx_common_argspec, make_process_dict
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 from ansible.module_utils.facts.compat import ansible_facts
 
@@ -144,7 +145,6 @@ class PipXInfo(ModuleHelper):
         argument_spec=argument_spec,
         supports_check_mode=True,
     )
-    use_old_vardict = False
 
     def __init_module__(self):
         if self.vars.executable:
@@ -157,10 +157,24 @@ class PipXInfo(ModuleHelper):
             rc, out, err = ctx.run()
             self.vars.version = out.strip()
 
+        if LooseVersion(self.vars.version) < LooseVersion("1.7.0"):
+            self.do_raise("The pipx tool must be at least at version 1.7.0")
+
     def __run__(self):
-        output_process = make_process_list(self, **self.vars.as_dict())
+        output_process = make_process_dict(self.vars.include_injected, self.vars.include_deps)
         with self.runner('_list global', output_process=output_process) as ctx:
-            self.vars.application = ctx.run()
+            applications, raw_data = ctx.run()
+            if self.vars.include_raw:
+                self.vars.raw_output = raw_data
+
+            if self.vars.name:
+                self.vars.application = [
+                    v
+                    for k, v in applications.items()
+                    if k == self.vars.name
+                ]
+            else:
+                self.vars.application = list(applications.values())
             self._capture_results(ctx)
 
     def _capture_results(self, ctx):

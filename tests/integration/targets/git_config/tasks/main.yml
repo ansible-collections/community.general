@@ -14,8 +14,6 @@
 
 - block:
     - import_tasks: set_value.yml
-    # testing parameters exclusion: state and list_all
-    - import_tasks: exclusion_state_list-all.yml
     # testing get/set option without state
     - import_tasks: get_set_no_state.yml
     # testing get/set option with state=present

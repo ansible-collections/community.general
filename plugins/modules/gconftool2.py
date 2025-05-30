@@ -128,7 +128,6 @@ class GConftool(StateModuleHelper):
         ],
         supports_check_mode=True,
     )
-    use_old_vardict = False
 
     def __init_module__(self):
         self.runner = gconftool2_runner(self.module, check_rc=True)
