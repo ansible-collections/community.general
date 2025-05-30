@@ -9,12 +9,12 @@ from __future__ import annotations
 DOCUMENTATION = r"""
 name: remove_keys_from_values
 short_description: Remove keys from a list of dictionaries or a dictionary in base of value content
-version_added: "10.6.0"
+version_added: "11.0.0"
 author:
   - Lorenzo Tanganelli (@tanganellilore)
 description:
   - This filter removes keys from a list of dictionaries or a dictionary,
-  - recursively or not depending on the parameters.
+    recursively or not depending on the parameters.
   - The type of values to be removed is defined by the O(values) parameter.
   - The default is to remove keys with values like C(''), C([]), C({}), C(None), usefull for removing empty keys.
 options:
