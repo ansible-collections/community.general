@@ -1,0 +1,6 @@
+---
+- name: Install required packages
+  ansible.builtin.apt:
+    name:
+      - zfsutils-linux
+      - util-linux

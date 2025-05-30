@@ -1,0 +1,17 @@
+---
+- name: Query the rpm dist tag
+  command: rpm --eval '%{dist}'
+  register: zfs_dist_tag
+  changed_when: false
+
+- name: Install zfs repostiory
+  ansible.builtin.dnf:
+    name: "https://zfsonlinux.org/epel/zfs-release-2-3{{ zfs_dist_tag.stdout }}.noarch.rpm"
+    state: present
+
+- name: Install required packages
+  ansible.builtin.dnf:
+    name:
+      - epel-release
+      - kernel-devel
+      - zfs
