@@ -1,0 +1,41 @@
+---
+zpool_single_disk_config:
+  - file: /tmp/disk0.img
+    loop: /dev/loop89
+
+zpool_mirror_disk_config:
+  - file: /tmp/disk1.img
+    loop: /dev/loop90
+  - file: /tmp/disk2.img
+    loop: /dev/loop91
+
+zpool_raidz_disk_config:
+  - file: /tmp/disk3.img
+    loop: /dev/loop92
+  - file: /tmp/disk4.img
+    loop: /dev/loop93
+
+zpool_vdevs_disk_config:
+  vdev1:
+    - file: /tmp/disk5.img
+      loop: /dev/loop94
+  vdev2:
+    - file: /tmp/disk6.img
+      loop: /dev/loop95
+  vdev3:
+    - file: /tmp/disk7.img
+      loop: /dev/loop96
+    - file: /tmp/disk8.img
+      loop: /dev/loop97
+  vdev4:
+    - file: /tmp/disk9.img
+      loop: /dev/loop98
+    - file: /tmp/disk10.img
+      loop: /dev/loop99
+
+zpool_disk_configs: "{{ zpool_single_disk_config + zpool_mirror_disk_config + zpool_raidz_disk_config + (zpool_vdevs_disk_config.values() | flatten) }}"
+
+zpool_single_disk_pool_name: spool
+zpool_mirror_disk_pool_name: mpool
+zpool_raidz_disk_pool_name: rpool
+zpool_generic_pool_name: tank
