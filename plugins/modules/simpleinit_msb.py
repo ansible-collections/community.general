@@ -17,8 +17,6 @@ short_description: Manage services on Source Mage GNU/Linux
 version_added: 7.5.0
 description:
   - Controls services on remote hosts using C(simpleinit-msb).
-notes:
-  - This module needs ansible-core 2.15.5 or newer. Older versions have a broken and insufficient daemonize functionality.
 author: "Vlad Glagolev (@vaygr)"
 extends_documentation_fragment:
   - community.general.attributes
