@@ -62,6 +62,7 @@
   - include_tasks: test-set-attribute-value.yml
   - include_tasks: test-set-children-elements.yml
   - include_tasks: test-set-children-elements-level.yml
+  - include_tasks: test-set-children-elements-value.yml
   - include_tasks: test-set-element-value.yml
   - include_tasks: test-set-element-value-empty.yml
   - include_tasks: test-pretty-print.yml
