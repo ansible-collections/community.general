@@ -1,7 +1,8 @@
 removed_features:
-  - "Dropped support for ansible-core 2.15. The collection now requires ansible-core 2.16 or newer. This means that on the controller, Python 3.10+ is required. On the target side, Python 2.7 and Python 3.6+ are supported (https://github.com/ansible-collections/community.general/pull/10160)."
+  - "Dropped support for ansible-core 2.15. The collection now requires ansible-core 2.16 or newer. This means that on the controller, Python 3.10+ is required. On the target side, Python 2.7 and Python 3.6+ are supported (https://github.com/ansible-collections/community.general/pull/10160, https://github.com/ansible-collections/community.general/pull/10192)."
 minor_changes:
   - "cartesian lookup plugin - removed compatibility code for ansible-core < 2.14 (https://github.com/ansible-collections/community.general/pull/10160)."
   - "dependent lookup plugin - removed compatibility code for ansible-core < 2.14 (https://github.com/ansible-collections/community.general/pull/10160)."
   - "flattened lookup plugin - removed compatibility code for ansible-core < 2.14 (https://github.com/ansible-collections/community.general/pull/10160)."
   - "redfish module utils - removed compatibility code for ansible-core < 2.14 (https://github.com/ansible-collections/community.general/pull/10160)."
+  - "maven_artifact - removed compatibility code for ansible-core < 2.12 (https://github.com/ansible-collections/community.general/pull/10192)."
