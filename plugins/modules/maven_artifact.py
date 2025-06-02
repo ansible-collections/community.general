@@ -245,7 +245,6 @@ import tempfile
 import traceback
 import re
 
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 from ansible.module_utils.ansible_release import __version__ as ansible_version
 from re import match
 
@@ -648,10 +647,7 @@ def main():
         mutually_exclusive=([('version', 'version_by_spec')])
     )
 
-    if LooseVersion(ansible_version) < LooseVersion("2.12") and module.params['unredirected_headers']:
-        module.fail_json(msg="Unredirected Headers parameter provided, but your ansible-core version does not support it. Minimum version is 2.12")
-
-    if LooseVersion(ansible_version) >= LooseVersion("2.12") and module.params['unredirected_headers'] is None:
+    if module.params['unredirected_headers'] is None:
         # if the user did not supply unredirected params, we use the default, ONLY on ansible core 2.12 and above
         module.params['unredirected_headers'] = ['Authorization', 'Cookie']
 

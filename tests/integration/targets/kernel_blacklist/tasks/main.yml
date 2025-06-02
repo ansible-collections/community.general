@@ -65,7 +65,7 @@
 - name: test deprecation
   assert:
     that:
-      - "'deprecations' not in bl_test_1 or (ansible_version.major == 2 and ansible_version.minor == 12)"
+      - "'deprecations' not in bl_test_1"
 
 - name: add new item to list
   community.general.kernel_blacklist:
