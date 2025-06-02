@@ -143,6 +143,7 @@ from collections import OrderedDict
 from os.path import basename
 
 from ansible.errors import AnsibleError
+from ansible.module_utils.ansible_release import __version__ as ansible_version
 from ansible.module_utils.six import raise_from
 from ansible.module_utils.six.moves.urllib.parse import urlparse
 from ansible.plugins.callback import CallbackBase
@@ -212,7 +213,6 @@ class HostData:
 class OpenTelemetrySource(object):
     def __init__(self, display):
         self.ansible_playbook = ""
-        self.ansible_version = None
         self.session = str(uuid.uuid4())
         self.host = socket.gethostname()
         try:
@@ -259,9 +259,6 @@ class OpenTelemetrySource(object):
             host_name = 'include'
 
         task = tasks_data[task_uuid]
-
-        if self.ansible_version is None and hasattr(result, '_task_fields') and result._task_fields['args'].get('_ansible_version'):
-            self.ansible_version = result._task_fields['args'].get('_ansible_version')
 
         task.dump = dump
         task.add_host(HostData(host_uuid, host_name, status, result))
@@ -310,8 +307,7 @@ class OpenTelemetrySource(object):
                                           start_time=parent_start_time, kind=SpanKind.SERVER) as parent:
             parent.set_status(status)
             # Populate trace metadata attributes
-            if self.ansible_version is not None:
-                parent.set_attribute("ansible.version", self.ansible_version)
+            parent.set_attribute("ansible.version", ansible_version)
             parent.set_attribute("ansible.session", self.session)
             parent.set_attribute("ansible.host.name", self.host)
             if self.ip_address is not None:
