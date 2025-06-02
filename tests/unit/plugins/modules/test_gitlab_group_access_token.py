@@ -68,9 +68,33 @@ class TestGitlabGroupAccessToken(GitlabModuleTestCase):
         group = self.gitlab_instance.groups.get(1)
         self.assertIsNotNone(group)
 
-        rvalue = self.moduleUtil.find_access_token(group, "token1")
+        rvalue = self.moduleUtil.find_access_token(group, "test-token")
         self.assertEqual(rvalue, False)
         self.assertIsNotNone(self.moduleUtil.access_token_object)
+        self.assertEqual(self.moduleUtil.access_token_object.id, 691)
+        self.assertFalse(self.moduleUtil.access_token_object.revoked)
+
+    @with_httmock(resp_get_group)
+    @with_httmock(resp_list_group_access_tokens)
+    def test_find_access_token_old_format(self):
+        group = self.gitlab_instance.groups.get(1)
+        self.assertIsNotNone(group)
+
+        rvalue = self.moduleUtil.find_access_token(group, "test-token-no-revoked")
+        self.assertEqual(rvalue, False)
+        self.assertIsNotNone(self.moduleUtil.access_token_object)
+        self.assertEqual(self.moduleUtil.access_token_object.id, 695)
+        self.assertFalse(hasattr(self.moduleUtil.access_token_object, "revoked"))
+
+    @with_httmock(resp_get_group)
+    @with_httmock(resp_list_group_access_tokens)
+    def test_find_revoked_access_token(self):
+        group = self.gitlab_instance.groups.get(1)
+        self.assertIsNotNone(group)
+
+        rvalue = self.moduleUtil.find_access_token(group, "test-token-three")
+        self.assertEqual(rvalue, False)
+        self.assertIsNone(self.moduleUtil.access_token_object)
 
     @with_httmock(resp_get_group)
     @with_httmock(resp_list_group_access_tokens)
@@ -99,7 +123,7 @@ class TestGitlabGroupAccessToken(GitlabModuleTestCase):
         groups = self.gitlab_instance.groups.get(1)
         self.assertIsNotNone(groups)
 
-        rvalue = self.moduleUtil.find_access_token(groups, "token1")
+        rvalue = self.moduleUtil.find_access_token(groups, "test-token")
         self.assertEqual(rvalue, False)
         self.assertIsNotNone(self.moduleUtil.access_token_object)
 
