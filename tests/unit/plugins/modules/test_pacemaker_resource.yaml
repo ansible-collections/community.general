@@ -30,6 +30,16 @@ test_cases:
           environ: *env-def
           rc: 1
           out: ""
+          err: "Error: resource or tag id 'virtual-ip' not found"
+        - command: [/testbin/pcs, property, config]
+          environ: *env-def
+          rc: 1
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure=corosync
+            cluster-name=hacluster
+            dc-version=2.1.9-1.fc41-7188dbf
+            have-watchdog=false
           err: ""
         - command: [/testbin/pcs, resource, create, virtual-ip, IPaddr2, "ip=[192.168.2.1]", --wait=300]
           environ: *env-def
@@ -60,6 +70,16 @@ test_cases:
           rc: 0
           out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
           err: ""
+        - command: [/testbin/pcs, property, config]
+          environ: *env-def
+          rc: 1
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure=corosync
+            cluster-name=hacluster
+            dc-version=2.1.9-1.fc41-7188dbf
+            have-watchdog=false
+          err: ""
         - command: [/testbin/pcs, resource, create, virtual-ip, IPaddr2, "ip=[192.168.2.1]", --wait=300]
           environ: *env-def
           rc: 1
@@ -69,6 +89,46 @@ test_cases:
           environ: *env-def
           rc: 0
           out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+          err: ""
+  - id: test_present_minimal_input_resource_maintenance_mode
+    input:
+      state: present
+      name: virtual-ip
+      resource_type:
+        resource_name: IPaddr2
+      resource_option:
+        - "ip=[192.168.2.1]"
+    output:
+      changed: true
+      previous_value: null
+      value: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Stopped"
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: ""
+        - command: [/testbin/pcs, property, config]
+          environ: *env-def
+          rc: 0
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure=corosync
+            cluster-name=hacluster
+            dc-version=2.1.9-1.fc41-7188dbf
+            have-watchdog=false
+            maintenance-mode=true
+          err: ""
+        - command: [/testbin/pcs, resource, create, virtual-ip, IPaddr2, "ip=[192.168.2.1]", --wait=300]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: ""
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Stopped"
           err: ""
   - id: test_absent_minimal_input_resource_not_exist
     input:
@@ -84,7 +144,7 @@ test_cases:
           environ: *env-def
           rc: 1
           out: ""
-          err: ""
+          err: "Error: resource or tag id 'virtual-ip' not found"
         - command: [/testbin/pcs, resource, remove, virtual-ip]
           environ: *env-def
           rc: 1
@@ -94,7 +154,7 @@ test_cases:
           environ: *env-def
           rc: 1
           out: ""
-          err: ""
+          err: "Error: resource or tag id 'virtual-ip' not found"
   - id: test_absent_minimal_input_resource_exists
     input:
       state: absent
@@ -119,7 +179,7 @@ test_cases:
           environ: *env-def
           rc: 1
           out: ""
-          err: ""
+          err: "Error: resource or tag id 'virtual-ip' not found"
   - id: test_enabled_minimal_input_resource_not_exists
     input:
       state: enabled
@@ -133,7 +193,7 @@ test_cases:
           environ: *env-def
           rc: 1
           out: ""
-          err: ""
+          err: "Error: resource or tag id 'virtual-ip' not found"
         - command: [/testbin/pcs, resource, enable, virtual-ip]
           environ: *env-def
           rc: 1
@@ -177,7 +237,7 @@ test_cases:
           environ: *env-def
           rc: 1
           out: ""
-          err: ""
+          err: "Error: resource or tag id 'virtual-ip' not found"
         - command: [/testbin/pcs, resource, disable, virtual-ip]
           environ: *env-def
           rc: 1
