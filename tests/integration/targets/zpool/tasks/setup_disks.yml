@@ -9,6 +9,12 @@
     creates: "{{ item.file }}"
   loop: "{{ zpool_disk_configs }}"
 
+- name: Ensure loop devices exists
+  ansible.builtin.command:
+    cmd: "mknod -m660 {{ item.loop }} b 7 {{ item.loop | regex_search('([0-9]+)$') }}"
+    creates: "{{ item.loop }}"
+  loop: "{{ zpool_disk_configs }}"
+
 - name: Setup loop devices
   ansible.builtin.command:
     cmd: "losetup {{ item.loop }} {{ item.file }}"
