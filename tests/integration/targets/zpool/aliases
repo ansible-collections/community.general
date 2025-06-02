@@ -10,5 +10,5 @@ skip/aix
 skip/freebsd
 skip/osx
 skip/macos
+skip/rhel
 skip/docker
-skip/rhel10.0 
