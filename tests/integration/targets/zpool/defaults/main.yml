@@ -4,38 +4,27 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 zpool_single_disk_config:
-  - file: /tmp/disk0.img
-    loop: /dev/loop89
+  - /tmp/disk0.img
 
 zpool_mirror_disk_config:
-  - file: /tmp/disk1.img
-    loop: /dev/loop90
-  - file: /tmp/disk2.img
-    loop: /dev/loop91
+  - /tmp/disk1.img
+  - /tmp/disk2.img
 
 zpool_raidz_disk_config:
-  - file: /tmp/disk3.img
-    loop: /dev/loop92
-  - file: /tmp/disk4.img
-    loop: /dev/loop93
+  - /tmp/disk3.img
+  - /tmp/disk4.img
 
 zpool_vdevs_disk_config:
   vdev1:
-    - file: /tmp/disk5.img
-      loop: /dev/loop94
+    - /tmp/disk5.img
   vdev2:
-    - file: /tmp/disk6.img
-      loop: /dev/loop95
+    - /tmp/disk6.img
   vdev3:
-    - file: /tmp/disk7.img
-      loop: /dev/loop96
-    - file: /tmp/disk8.img
-      loop: /dev/loop97
+    - /tmp/disk7.img
+    - /tmp/disk8.img
   vdev4:
-    - file: /tmp/disk9.img
-      loop: /dev/loop98
-    - file: /tmp/disk10.img
-      loop: /dev/loop99
+    - /tmp/disk9.img
+    - /tmp/disk10.img
 
 zpool_disk_configs: "{{ zpool_single_disk_config + zpool_mirror_disk_config + zpool_raidz_disk_config + (zpool_vdevs_disk_config.values() | flatten) }}"
 

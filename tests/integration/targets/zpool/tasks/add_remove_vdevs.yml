@@ -9,15 +9,15 @@
       community.general.zpool:
         name: "{{ zpool_generic_pool_name }}"
         vdevs:
-          - disks: "{{ zpool_vdevs_disk_config.vdev1 | map(attribute='loop') | list }}"
+          - disks: "{{ zpool_vdevs_disk_config.vdev1 }}"
         state: present
 
     - name: Add a single disk vdev
       community.general.zpool:
         name: "{{ zpool_generic_pool_name }}"
         vdevs:
-          - disks: "{{ zpool_vdevs_disk_config.vdev1 | map(attribute='loop') | list }}"
-          - disks: "{{ zpool_vdevs_disk_config.vdev2 | map(attribute='loop') | list }}"
+          - disks: "{{ zpool_vdevs_disk_config.vdev1 }}"
+          - disks: "{{ zpool_vdevs_disk_config.vdev2 }}"
         state: present
 
     - name: Check if vdev was added
@@ -29,7 +29,7 @@
     - name: Assert that added disk is present
       ansible.builtin.assert:
         that:
-          - "zpool_vdevs_disk_config.vdev2[0].loop in single_disk_pool_check.stdout"
+          - "zpool_vdevs_disk_config.vdev2[0] in single_disk_pool_check.stdout"
 
     - name: Ensure the single disk pool is absent
       community.general.zpool:
@@ -42,7 +42,7 @@
       community.general.zpool:
         name: "{{ zpool_generic_pool_name }}"
         vdevs:
-          - disks: "{{ zpool_vdevs_disk_config.vdev1 | map(attribute='loop') | list }}"
+          - disks: "{{ zpool_vdevs_disk_config.vdev1 }}"
         state: present
 
     - name: Add a mirror vdev
@@ -50,9 +50,9 @@
         name: "{{ zpool_generic_pool_name }}"
         force: true # This is necessary because of the mismatched replication level
         vdevs:
-          - disks: "{{ zpool_vdevs_disk_config.vdev1 | map(attribute='loop') | list }}"
+          - disks: "{{ zpool_vdevs_disk_config.vdev1 }}"
           - type: mirror
-            disks: "{{ zpool_vdevs_disk_config.vdev3 | map(attribute='loop') | list }}"
+            disks: "{{ zpool_vdevs_disk_config.vdev3 }}"
         state: present
 
     - name: Check if vdev was added
@@ -64,8 +64,8 @@
     - name: Assert that added vdev is present
       ansible.builtin.assert:
         that:
-          - "zpool_vdevs_disk_config.vdev3[0].loop in mirror_pool_check.stdout"
-          - "zpool_vdevs_disk_config.vdev3[1].loop in mirror_pool_check.stdout"
+          - "zpool_vdevs_disk_config.vdev3[0] in mirror_pool_check.stdout"
+          - "zpool_vdevs_disk_config.vdev3[1] in mirror_pool_check.stdout"
 
     - name: Ensure the single disk pool is absent
       community.general.zpool:
@@ -78,7 +78,7 @@
       community.general.zpool:
         name: "{{ zpool_generic_pool_name }}"
         vdevs:
-          - disks: "{{ zpool_vdevs_disk_config.vdev1 | map(attribute='loop') | list }}"
+          - disks: "{{ zpool_vdevs_disk_config.vdev1 }}"
         state: present
 
     - name: Add a raidz vdev
@@ -86,9 +86,9 @@
         name: "{{ zpool_generic_pool_name }}"
         force: true # This is necessary because of the mismatched replication level
         vdevs:
-          - disks: "{{ zpool_vdevs_disk_config.vdev1 | map(attribute='loop') | list }}"
+          - disks: "{{ zpool_vdevs_disk_config.vdev1 }}"
           - type: raidz
-            disks: "{{ zpool_vdevs_disk_config.vdev3 | map(attribute='loop') | list }}"
+            disks: "{{ zpool_vdevs_disk_config.vdev3 }}"
         state: present
 
     - name: Check if vdev was added
@@ -100,8 +100,8 @@
     - name: Assert that added vdev is present
       ansible.builtin.assert:
         that:
-          - "zpool_vdevs_disk_config.vdev3[0].loop in raidz_pool_check.stdout"
-          - "zpool_vdevs_disk_config.vdev3[1].loop in raidz_pool_check.stdout"
+          - "zpool_vdevs_disk_config.vdev3[0] in raidz_pool_check.stdout"
+          - "zpool_vdevs_disk_config.vdev3[1] in raidz_pool_check.stdout"
 
     - name: Ensure the single disk pool is absent
       community.general.zpool:
@@ -115,9 +115,9 @@
         name: "{{ zpool_generic_pool_name }}"
         vdevs:
           - type: mirror
-            disks: "{{ zpool_vdevs_disk_config.vdev3 | map(attribute='loop') | list }}"
+            disks: "{{ zpool_vdevs_disk_config.vdev3 }}"
           - type: mirror
-            disks: "{{ zpool_vdevs_disk_config.vdev4 | map(attribute='loop') | list }}"
+            disks: "{{ zpool_vdevs_disk_config.vdev4 }}"
         state: present
 
     - name: Remove a vdev
@@ -125,7 +125,7 @@
         name: "{{ zpool_generic_pool_name }}"
         vdevs:
           - type: mirror
-            disks: "{{ zpool_vdevs_disk_config.vdev4 | map(attribute='loop') | list }}"
+            disks: "{{ zpool_vdevs_disk_config.vdev4 }}"
         state: present
 
     - name: Check if vdev was removed
@@ -137,8 +137,8 @@
     - name: Assert that removed vdev is absent
       ansible.builtin.assert:
         that:
-          - "zpool_vdevs_disk_config.vdev3[0].loop not in remove_vdev_check.stdout"
-          - "zpool_vdevs_disk_config.vdev3[1].loop not in remove_vdev_check.stdout"
+          - "zpool_vdevs_disk_config.vdev3[0] not in remove_vdev_check.stdout"
+          - "zpool_vdevs_disk_config.vdev3[1] not in remove_vdev_check.stdout"
           - "'Removal of vdev' in remove_vdev_check.stdout"
 
     - name: Ensure the pool is absent

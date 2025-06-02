@@ -12,9 +12,9 @@
       compression: off
     vdevs:
       - type: mirror
-        disks: "{{ zpool_vdevs_disk_config.vdev3 | map(attribute='loop') | list }}"
+        disks: "{{ zpool_vdevs_disk_config.vdev3 }}"
       - type: mirror
-        disks: "{{ zpool_vdevs_disk_config.vdev4 | map(attribute='loop') | list }}"
+        disks: "{{ zpool_vdevs_disk_config.vdev4 }}"
     state: present
 
 - name: Test changing of a pool property
@@ -26,9 +26,9 @@
           ashift: 13
         vdevs:
           - type: mirror
-            disks: "{{ zpool_vdevs_disk_config.vdev3 | map(attribute='loop') | list }}"
+            disks: "{{ zpool_vdevs_disk_config.vdev3 }}"
           - type: mirror
-            disks: "{{ zpool_vdevs_disk_config.vdev4 | map(attribute='loop') | list }}"
+            disks: "{{ zpool_vdevs_disk_config.vdev4 }}"
         state: present
 
     - name: Check ashift
@@ -51,9 +51,9 @@
           compression: lz4
         vdevs:
           - type: mirror
-            disks: "{{ zpool_vdevs_disk_config.vdev3 | map(attribute='loop') | list }}"
+            disks: "{{ zpool_vdevs_disk_config.vdev3 }}"
           - type: mirror
-            disks: "{{ zpool_vdevs_disk_config.vdev4 | map(attribute='loop') | list }}"
+            disks: "{{ zpool_vdevs_disk_config.vdev4 }}"
         state: present
 
     - name: Check compression
