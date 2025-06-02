@@ -1,0 +1,2 @@
+minor_changes:
+  - github_key - add ``api_url`` parameter to support GitHub Enterprise Server installations (https://github.com/ansible-collections/community.general/pull/10191).
