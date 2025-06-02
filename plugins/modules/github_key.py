@@ -14,6 +14,7 @@ module: github_key
 short_description: Manage GitHub access keys
 description:
   - Creates, removes, or updates GitHub access keys.
+  - Works with both GitHub.com and GitHub Enterprise Server installations.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -48,6 +49,12 @@ options:
         the key will only be set if no key with the given O(name) exists.
     type: bool
     default: true
+  api_url:
+    description:
+      - URL to the GitHub API if not using github.com but your own GitHub Enterprise instance.
+    type: str
+    default: 'https://api.github.com'
+    version_added: "11.1.0"
 
 author: Robert Estelle (@erydo)
 """
@@ -91,6 +98,14 @@ EXAMPLES = r"""
     name: Access Key for Some Machine
     token: '{{ github_access_token }}'
     pubkey: "{{ lookup('ansible.builtin.file', '/home/foo/.ssh/id_rsa.pub') }}"
+
+# GitHub Enterprise Server usage
+- name: Authorize key with GitHub Enterprise
+  community.general.github_key:
+    name: Access Key for Some Machine
+    token: '{{ github_enterprise_token }}'
+    pubkey: "{{ lookup('ansible.builtin.file', '/home/foo/.ssh/id_rsa.pub') }}"
+    api_url: 'https://github.company.com/api/v3'
 """
 
 import datetime
@@ -103,9 +118,6 @@ from ansible.module_utils.urls import fetch_url
 from ansible_collections.community.general.plugins.module_utils.datetime import (
     now,
 )
-
-
-API_BASE = 'https://api.github.com'
 
 
 class GitHubResponse(object):
@@ -127,9 +139,10 @@ class GitHubResponse(object):
 
 
 class GitHubSession(object):
-    def __init__(self, module, token):
+    def __init__(self, module, token, api_url):
         self.module = module
         self.token = token
+        self.api_url = api_url.rstrip('/')
 
     def request(self, method, url, data=None):
         headers = {
@@ -147,7 +160,7 @@ class GitHubSession(object):
 
 
 def get_all_keys(session):
-    url = API_BASE + '/user/keys'
+    url = session.api_url + '/user/keys'
     result = []
     while url:
         r = session.request('GET', url)
@@ -171,7 +184,7 @@ def create_key(session, name, pubkey, check_mode):
     else:
         return session.request(
             'POST',
-            API_BASE + '/user/keys',
+            session.api_url + '/user/keys',
             data=json.dumps({'title': name, 'key': pubkey})).json()
 
 
@@ -180,7 +193,7 @@ def delete_keys(session, to_delete, check_mode):
         return
 
     for key in to_delete:
-        session.request('DELETE', API_BASE + '/user/keys/%s' % key["id"])
+        session.request('DELETE', session.api_url + '/user/keys/%s' % key["id"])
 
 
 def ensure_key_absent(session, name, check_mode):
@@ -228,6 +241,7 @@ def main():
         'pubkey': {},
         'state': {'choices': ['present', 'absent'], 'default': 'present'},
         'force': {'default': True, 'type': 'bool'},
+        'api_url': {'default': 'https://api.github.com', 'type': 'str'},
     }
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -239,6 +253,7 @@ def main():
     state = module.params['state']
     force = module.params['force']
     pubkey = module.params.get('pubkey')
+    api_url = module.params.get('api_url')
 
     if pubkey:
         pubkey_parts = pubkey.split(' ')
@@ -248,7 +263,7 @@ def main():
     elif state == 'present':
         module.fail_json(msg='"pubkey" is required when state=present')
 
-    session = GitHubSession(module, token)
+    session = GitHubSession(module, token, api_url)
     if state == 'present':
         result = ensure_key_present(module, session, name, pubkey, force=force,
                                     check_mode=module.check_mode)
