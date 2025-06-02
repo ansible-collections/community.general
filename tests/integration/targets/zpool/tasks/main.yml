@@ -6,9 +6,6 @@
 - name: Execute integration tests
   become: true
   block:
-    - name: Include setup_disks.yml
-      ansible.builtin.include_tasks: setup_disks.yml
-
     - name: Include distribution specific install_requirements.yml
       ansible.builtin.include_tasks: install_requirements_{{ ansible_distribution | lower }}.yml
 
