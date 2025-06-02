@@ -318,6 +318,9 @@ class Zpool(object):
         return {'before': {'filesystem_properties': before}, 'after': {'filesystem_properties': after}}
 
     def base_device(self, device):
+        if not device.startswith('/dev/'):
+            return device
+
         # loop devices
         match = re.match(r'^(/dev/loop\d+)$', device)
         if match:
@@ -385,7 +388,7 @@ class Zpool(object):
                 current = {'role': role, 'type': kind, 'disks': []}
                 continue
 
-            if device.startswith('/dev/'):
+            if device.startswith('/'):
                 base_device = self.base_device(device)
                 if current:
                     if current.get('type') is None:
@@ -493,10 +496,10 @@ class Zpool(object):
                 vdev_type = ('stripe' if device in ('cache', 'logs', 'spares') else ('mirror' if device.startswith('mirror') else 'raidz'))
                 current = {'name': device, 'type': vdev_type, 'disks': []}
                 continue
-            if device.startswith('/dev/') and current:
+            if device.startswith('/') and current:
                 current['disks'].append(self.base_device(device))
                 continue
-            if device.startswith('/dev/'):
+            if device.startswith('/'):
                 base_device = self.base_device(device)
                 vdevs.append({'name': base_device, 'type': 'stripe', 'disks': [base_device]})
         if current:
