@@ -48,6 +48,7 @@ import getpass
 
 from os.path import basename
 
+from ansible.module_utils.ansible_release import __version__ as ansible_version
 from ansible.module_utils.urls import open_url
 from ansible.parsing.ajson import AnsibleJSONEncoder
 from ansible.plugins.callback import CallbackBase
@@ -61,7 +62,6 @@ class SumologicHTTPCollectorSource(object):
     def __init__(self):
         self.ansible_check_mode = False
         self.ansible_playbook = ""
-        self.ansible_version = ""
         self.session = str(uuid.uuid4())
         self.host = socket.gethostname()
         self.ip_address = socket.gethostbyname(socket.gethostname())
@@ -70,10 +70,6 @@ class SumologicHTTPCollectorSource(object):
     def send_event(self, url, state, result, runtime):
         if result._task_fields['args'].get('_ansible_check_mode') is True:
             self.ansible_check_mode = True
-
-        if result._task_fields['args'].get('_ansible_version'):
-            self.ansible_version = \
-                result._task_fields['args'].get('_ansible_version')
 
         if result._task._role:
             ansible_role = str(result._task._role)
@@ -92,7 +88,7 @@ class SumologicHTTPCollectorSource(object):
         data['ip_address'] = self.ip_address
         data['user'] = self.user
         data['runtime'] = runtime
-        data['ansible_version'] = self.ansible_version
+        data['ansible_version'] = ansible_version
         data['ansible_check_mode'] = self.ansible_check_mode
         data['ansible_host'] = result._host.name
         data['ansible_playbook'] = self.ansible_playbook

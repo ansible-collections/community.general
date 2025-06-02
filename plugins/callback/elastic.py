@@ -87,6 +87,7 @@ from contextlib import closing
 from os.path import basename
 
 from ansible.errors import AnsibleError, AnsibleRuntimeError
+from ansible.module_utils.ansible_release import __version__ as ansible_version
 from ansible.module_utils.six import raise_from
 from ansible.plugins.callback import CallbackBase
 
@@ -140,7 +141,6 @@ class HostData:
 class ElasticSource(object):
     def __init__(self, display):
         self.ansible_playbook = ""
-        self.ansible_version = None
         self.session = str(uuid.uuid4())
         self.host = socket.gethostname()
         try:
@@ -183,9 +183,6 @@ class ElasticSource(object):
 
         task = tasks_data[task_uuid]
 
-        if self.ansible_version is None and result._task_fields['args'].get('_ansible_version'):
-            self.ansible_version = result._task_fields['args'].get('_ansible_version')
-
         task.add_host(HostData(host_uuid, host_name, status, result))
 
     def generate_distributed_traces(self, tasks_data, status, end_time, traceparent, apm_service_name,
@@ -209,8 +206,7 @@ class ElasticSource(object):
                 else:
                     apm_cli.begin_transaction("Session", start=parent_start_time)
                 # Populate trace metadata attributes
-                if self.ansible_version is not None:
-                    label(ansible_version=self.ansible_version)
+                label(ansible_version=ansible_version)
                 label(ansible_session=self.session, ansible_host_name=self.host, ansible_host_user=self.user)
                 if self.ip_address is not None:
                     label(ansible_host_ip=self.ip_address)
