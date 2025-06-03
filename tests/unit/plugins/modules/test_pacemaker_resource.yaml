@@ -124,7 +124,7 @@ test_cases:
           environ: *env-def
           rc: 1
           out: ""
-          err: ""
+          err: "Error: resource 'virtual-ip' is not running on any node"
         - command: [/testbin/pcs, resource, status, virtual-ip]
           environ: *env-def
           rc: 0

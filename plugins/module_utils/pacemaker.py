@@ -40,7 +40,7 @@ def fmt_resource_argument(value):
 def get_pacemaker_maintenance_mode(runner):
     with runner("config") as ctx:
         rc, out, err = ctx.run()
-        maintenance_mode_output = list(filter(lambda string: "maintenace-mode=true" in string.lower(), out.splitlines()))
+        maintenance_mode_output = list(filter(lambda string: "maintenance-mode=true" in string.lower(), out.splitlines()))
         return True if maintenance_mode_output else False
 
 
