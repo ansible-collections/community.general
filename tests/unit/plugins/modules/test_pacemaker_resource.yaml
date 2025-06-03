@@ -145,6 +145,16 @@ test_cases:
           rc: 1
           out: ""
           err: "Error: resource or tag id 'virtual-ip' not found"
+        - command: [/testbin/pcs, property, config]
+          environ: *env-def
+          rc: 1
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure=corosync
+            cluster-name=hacluster
+            dc-version=2.1.9-1.fc41-7188dbf
+            have-watchdog=false
+          err: ""
         - command: [/testbin/pcs, resource, remove, virtual-ip]
           environ: *env-def
           rc: 1
@@ -170,11 +180,57 @@ test_cases:
           rc: 0
           out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
           err: ""
+        - command: [/testbin/pcs, property, config]
+          environ: *env-def
+          rc: 1
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure=corosync
+            cluster-name=hacluster
+            dc-version=2.1.9-1.fc41-7188dbf
+            have-watchdog=false
+          err: ""
         - command: [/testbin/pcs, resource, remove, virtual-ip]
           environ: *env-def
           rc: 0
           out: ""
           err: "Attempting to stop: virtual-ip... Stopped\n"
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: "Error: resource or tag id 'virtual-ip' not found"
+  - id: test_absent_minimal_input_maintenance_mode
+    input:
+      state: absent
+      name: virtual-ip
+    output:
+      changed: true
+      previous_value: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+      value: null
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+          err: ""
+        - command: [/testbin/pcs, property, config]
+          environ: *env-def
+          rc: 0
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure=corosync
+            cluster-name=hacluster
+            dc-version=2.1.9-1.fc41-7188dbf
+            have-watchdog=false
+            maintenance-mode=true
+          err: ""
+        - command: [/testbin/pcs, resource, remove, virtual-ip, --force]
+          environ: *env-def
+          rc: 0
+          out: ""
+          err: "Deleting Resource (and group) - virtual-ip"
         - command: [/testbin/pcs, resource, status, virtual-ip]
           environ: *env-def
           rc: 1

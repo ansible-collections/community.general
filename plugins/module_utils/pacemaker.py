@@ -61,6 +61,7 @@ def pacemaker_runner(module, cli_action="", **kwargs):
             resource_argument=cmd_runner_fmt.as_func(fmt_resource_argument),
             wait=cmd_runner_fmt.as_opt_eq_val("--wait"),
             config=cmd_runner_fmt.as_fixed("config"),
+            force=cmd_runner_fmt.as_fixed("--force"),
         ),
         **kwargs
     )
