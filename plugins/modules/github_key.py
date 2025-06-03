@@ -54,7 +54,7 @@ options:
       - URL to the GitHub API if not using github.com but your own GitHub Enterprise instance.
     type: str
     default: 'https://api.github.com'
-    version_added: "11.1.0"
+    version_added: "11.0.0"
 
 author: Robert Estelle (@erydo)
 """
