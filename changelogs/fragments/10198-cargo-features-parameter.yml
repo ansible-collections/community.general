@@ -1,0 +1,2 @@
+minor_changes:
+  - cargo - add ``features`` parameter to allow activating specific features when installing Rust packages (https://github.com/ansible-collections/community.general/pull/10195).
