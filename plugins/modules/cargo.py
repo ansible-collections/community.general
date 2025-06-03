@@ -75,6 +75,7 @@ options:
     type: list
     elements: str
     required: false
+    default: []
     version_added: 10.8.0
 requirements:
   - cargo installed
