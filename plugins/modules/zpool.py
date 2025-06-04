@@ -518,7 +518,7 @@ def main():
                     ),
                     disks=dict(
                         type='list',
-                        elements='str',
+                        elements='path',
                         required=True,
                     ),
                 ),
