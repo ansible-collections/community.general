@@ -24,6 +24,18 @@ run_no_unwanted_files = true
 no_unwanted_files_module_extensions = [".py"]
 no_unwanted_files_yaml_extensions = [".yml"]
 run_action_groups = true
+run_no_trailing_whitespace = true
+no_trailing_whitespace_skip_paths = [
+    "tests/integration/targets/iso_extract/files/test.iso",
+    "tests/integration/targets/java_cert/files/testpkcs.p12",
+    "tests/integration/targets/one_host/files/testhost/tmp/opennebula-fixtures.json.gz",
+    "tests/integration/targets/one_template/files/testhost/tmp/opennebula-fixtures.json.gz",
+    "tests/integration/targets/setup_flatpak_remote/files/repo.tar.xz",
+]
+no_trailing_whitespace_skip_directories = [
+    "tests/unit/plugins/modules/interfaces_file/interfaces_file_fixtures/golden_output/",
+    "tests/unit/plugins/modules/interfaces_file/interfaces_file_fixtures/input/",
+]
 
 [[sessions.extra_checks.action_groups_config]]
 name = "consul"
