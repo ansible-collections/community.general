@@ -8,21 +8,12 @@
   args:
     creates: /tmp/test_lvm_pv.img
 
-- name: Setting up loop device for the file (Alpine Linux)
-  block:
-  - name: Creating loop device
-    ansible.builtin.command: mknod /dev/loop9 b 7 9
-
-  - name: Associating loop device with file
-    ansible.builtin.command: 'losetup /dev/loop9 /tmp/test_lvm_pv.img'
-    register: loop_device
-  when: ansible_distribution == "Alpine"
-
-- name: Associating loop device with file (non-Alpine Linux)
-  ansible.builtin.command:
-    cmd: losetup --find --show /tmp/test_lvm_pv.img
+- name: Creating loop device
+  ansible.builtin.command: losetup -f
   register: loop_device
-  when: ansible_distribution != "Alpine"
+
+- name: Associating loop device with file
+  ansible.builtin.command: 'losetup {{ loop_device.stdout }} /tmp/test_lvm_pv.img'
 
 - name: Creating physical volume
   community.general.lvm_pv:
