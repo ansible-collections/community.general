@@ -186,11 +186,10 @@ class PacemakerResource(StateModuleHelper):
             return ctx.run(state='status')
 
     def state_absent(self):
-        runner_args = ['state', 'name']
-        if get_pacemaker_maintenance_mode(self._maintenance_mode_runner):
-            runner_args.append('force')
-        with self.runner(" ".join(runner_args), output_process=self._process_command_output(True, "does not exist"), check_mode_skip=True) as ctx:
-            ctx.run()
+        runner_args = ['state', 'name', 'force']
+        force = get_pacemaker_maintenance_mode(self._maintenance_mode_runner)
+        with self.runner(runner_args, output_process=self._process_command_output(True, "does not exist"), check_mode_skip=True) as ctx:
+            ctx.run(force=force)
             self.vars.set('value', self._get())
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err

@@ -41,10 +41,10 @@ def get_pacemaker_maintenance_mode(runner):
     with runner("config") as ctx:
         rc, out, err = ctx.run()
         maintenance_mode_output = list(filter(lambda string: "maintenance-mode=true" in string.lower(), out.splitlines()))
-        return True if maintenance_mode_output else False
+        return bool(maintenance_mode_output)
 
 
-def pacemaker_runner(module, cli_action="", **kwargs):
+def pacemaker_runner(module, cli_action=None, **kwargs):
     runner_command = ['pcs']
     if cli_action:
         runner_command.append(cli_action)
@@ -61,7 +61,7 @@ def pacemaker_runner(module, cli_action="", **kwargs):
             resource_argument=cmd_runner_fmt.as_func(fmt_resource_argument),
             wait=cmd_runner_fmt.as_opt_eq_val("--wait"),
             config=cmd_runner_fmt.as_fixed("config"),
-            force=cmd_runner_fmt.as_fixed("--force"),
+            force=cmd_runner_fmt.as_bool("--force"),
         ),
         **kwargs
     )
