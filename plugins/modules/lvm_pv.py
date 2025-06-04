@@ -151,7 +151,11 @@ def main():
 
         # Handle resizing
         elif resize and is_pv:
-            if not module.check_mode:
+            if module.check_mode:
+                # In check mode, assume resize would change
+                changed = True
+                actions.append('would be resized')
+            else:
                 # Perform device rescan if each time
                 if rescan_device(module, device):
                     actions.append('rescanned')
@@ -161,15 +165,12 @@ def main():
                 if new_size != original_size:
                     changed = True
                     actions.append('resized')
-            else:
-                # In check mode, assume resize would change
-                changed = True
-                actions.append('would be resized')
 
     elif state == 'absent':
         if is_pv:
             if module.check_mode:
                 changed = True
+                actions.append('would be removed')
             else:
                 cmd = ['pvremove', '-y']
                 if force:
