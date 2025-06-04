@@ -14,7 +14,7 @@ module: pacemaker_stonith
 short_description: Manage pacemaker stonith
 author:
   - Dexter Le (@munchtoast)
-version_added: 10.6.0
+version_added: 10.8.0
 description:
   - This module can manage stonith in a Pacemaker cluster using the pacemaker CLI.
 extends_documentation_fragment:
@@ -156,11 +156,11 @@ class PacemakerStonith(StateModuleHelper):
         self.runner = pacemaker_runner(self.module, cli_action='stonith')
         self.vars.set('previous_value', self._get())
         self.vars.set('value', self.vars.previous_value, change=True, diff=True)
-        self.vars.set('resource_type', self.vars.stonith_type)
-        self.vars.set('resource_option', self.vars.stonith_option)
-        self.vars.set('resource_operation', self.vars.stonith_operation)
-        self.vars.set('resource_meta', self.vars.stonith_meta)
-        self.vars.set('resource_argument', self.vars.stonith_argument)
+        self.module.params['resource_type'] = dict(resource_name=self.vars.stonith_type)
+        self.module.params['resource_option'] = self.vars.stonith_option
+        self.module.params['resource_operation'] = self.vars.stonith_operation
+        self.module.params['resource_meta'] = self.vars.stonith_meta
+        self.module.params['resource_argument'] = self.vars.stonith_argument
 
     def _process_command_output(self, fail_on_err, ignore_err_msg=""):
         def process(rc, out, err):
