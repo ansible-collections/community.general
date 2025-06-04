@@ -9,6 +9,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - include_tasks: ubuntu.yml
-  when: 
+  when:
     - ansible_distribution == 'Ubuntu'
     - ansible_distribution_release not in ['focal', 'jammy', 'noble']

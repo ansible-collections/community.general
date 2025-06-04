@@ -73,7 +73,7 @@
       that:
       - result is changed
 
-  # Check 
+  # Check
   - name: check that nothing changed after the previous step
     <<: *task_parameters
     file:
@@ -96,7 +96,7 @@
       that:
       - result is changed
 
-  # Check 
+  # Check
   - name: check that the file is deployed after the previous step
     <<: *task_parameters
     file:
@@ -131,7 +131,7 @@
       that:
       - result is not changed
 
-  # Check 
+  # Check
   - name: check that nothing changed after the previous step
     <<: *task_parameters
     file:

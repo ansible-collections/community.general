@@ -237,7 +237,7 @@
           - failure_result is failed
           - >
             "Expected a list of header names, got a string" in failure_result.msg
-          
+
 - name: Test empty data with non-dictionary column_alignments (expect failure)
   block:
     - set_fact:
@@ -263,7 +263,7 @@
           - failure_result is failed
           - >
             "Expected a string for column_alignments value, got a int" in failure_result.msg
-          
+
 - name: Test empty data with invalid alignment value in column_alignments (expect failure)
   block:
     - set_fact:

@@ -4,7 +4,7 @@
   SPDX-License-Identifier: GPL-3.0-or-later
 
 .. _ansible_collections.community.general.docsite.filter_guide.filter_guide_abstract_informations.lists_of_dicts:
-  
+
 Lists of dictionaries
 ^^^^^^^^^^^^^^^^^^^^^
 

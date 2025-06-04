@@ -512,7 +512,7 @@
     path: "{{ output_file }}"
     section: drinks
     state: absent
-  register: result20_remove_again  
+  register: result20_remove_again
 
 - name: test-values 20 - read content from output file
   slurp:
@@ -571,7 +571,7 @@
 - name: test-values 22 - Create starting ini file
   copy:
     content: |
-      
+
       # Some comment to test
       [mysqld]
       connect_timeout = 300
@@ -604,7 +604,7 @@
 - name: test-values 22 - set expected content and get current ini file content
   set_fact:
     expected22: |
-      
+
       # Some comment to test
       [mysqld]
       connect_timeout = 300
@@ -634,7 +634,7 @@
     path: "{{ output_file }}"
     section: section1
     option: var2
-    values: 
+    values:
       - foo
     state: present
   register: result23
@@ -647,7 +647,7 @@
 - name: test-values 23 - set expected content and get current ini file content
   set_fact:
     expected23: |
-      
+
       # Some comment to test
       [mysqld]
       connect_timeout = 300
@@ -691,7 +691,7 @@
 - name: test-values 24 - set expected content and get current ini file content
   set_fact:
     expected24: |
-      
+
       # Some comment to test
       [mysqld]
       connect_timeout = 300
@@ -777,7 +777,7 @@
     expected26: |+
       beverage = water
       beverage = orange juice
-      
+
     content26: "{{ output_content.content | b64decode }}"
 
 - name: test-values 26 - assert 'changed' is true and content is OK (no section)
@@ -820,7 +820,7 @@
         path: "{{ output_file }}"
         section: drinks
         option: beverage
-        values: 
+        values:
           - water
           - orange juice
         state: present

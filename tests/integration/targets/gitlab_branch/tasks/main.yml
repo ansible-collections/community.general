@@ -22,7 +22,7 @@
     initialize_with_readme: true
     state: present
 
-- name: Create branch {{ gitlab_branch }} 
+- name: Create branch {{ gitlab_branch }}
   community.general.gitlab_branch:
     api_url: https://gitlab.com
     api_token: secret_access_token
@@ -54,12 +54,12 @@
     branch: "{{ gitlab_branch }}"
     state: absent
   register: delete_branch
-  
+
 - name: Test module is idempotent
   assert:
     that:
       - delete_branch is changed
-      
+
 - name: Clean up {{ gitlab_project_name }}
   gitlab_project:
     server_url: "{{ gitlab_host }}"

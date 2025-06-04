@@ -240,7 +240,7 @@
     that:
       - gitlab_project_variable_state is changed
 
-- name: apply again the environment scope change 
+- name: apply again the environment scope change
   gitlab_project_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
@@ -255,7 +255,7 @@
   assert:
     that:
       - gitlab_project_variable_state is not changed
-            
+
 - name: purge all variables at the beginning
   gitlab_project_variable:
     api_url: "{{ gitlab_host }}"

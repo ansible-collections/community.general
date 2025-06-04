@@ -27,7 +27,7 @@
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
-    ids: 
+    ids:
       - 2
       - 2
       - 8

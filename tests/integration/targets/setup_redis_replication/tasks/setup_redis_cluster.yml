@@ -21,9 +21,9 @@
   notify: cleanup redis
 
 - name: Create redis directories
-  file:                                                                                                                                                                                                 
+  file:
     path: "{{ item }}"
-    state: directory                                                                                                                                                                                    
+    state: directory
     owner: "{{ redis_user[ansible_distribution] }}"
     group: "{{ redis_user[ansible_distribution] }}"
   loop:
