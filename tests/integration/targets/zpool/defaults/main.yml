@@ -4,27 +4,27 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 zpool_single_disk_config:
-  - /tmp/disk0.img
+  - "{{ remote_tmp_dir }}/disk0.img"
 
 zpool_mirror_disk_config:
-  - /tmp/disk1.img
-  - /tmp/disk2.img
+  - "{{ remote_tmp_dir }}/disk1.img"
+  - "{{ remote_tmp_dir }}/disk2.img"
 
 zpool_raidz_disk_config:
-  - /tmp/disk3.img
-  - /tmp/disk4.img
+  - "{{ remote_tmp_dir }}/disk3.img"
+  - "{{ remote_tmp_dir }}/disk4.img"
 
 zpool_vdevs_disk_config:
   vdev1:
-    - /tmp/disk5.img
+    - "{{ remote_tmp_dir }}/disk5.img"
   vdev2:
-    - /tmp/disk6.img
+    - "{{ remote_tmp_dir }}/disk6.img"
   vdev3:
-    - /tmp/disk7.img
-    - /tmp/disk8.img
+    - "{{ remote_tmp_dir }}/disk7.img"
+    - "{{ remote_tmp_dir }}/disk8.img"
   vdev4:
-    - /tmp/disk9.img
-    - /tmp/disk10.img
+    - "{{ remote_tmp_dir }}/disk9.img"
+    - "{{ remote_tmp_dir }}/disk10.img"
 
 zpool_disk_configs: "{{ zpool_single_disk_config + zpool_mirror_disk_config + zpool_raidz_disk_config + (zpool_vdevs_disk_config.values() | flatten) }}"
 

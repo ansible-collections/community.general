@@ -92,7 +92,7 @@ options:
           - List of device paths to include in this vdev.
         required: true
         type: list
-        elements: str
+        elements: path
 '''
 
 EXAMPLES = r'''
@@ -224,19 +224,7 @@ class Zpool(object):
             'subcommand disable_new_features force dry_run pool_properties filesystem_properties mountpoint altroot temp_name name vdevs',
             check_rc=True
         ) as ctx:
-            rc, stdout, stderr = ctx.run(
-                subcommand='create',
-                disable_new_features=self.disable_new_features,
-                force=self.force,
-                dry_run=self.module.check_mode,
-                pool_properties=self.pool_properties,
-                filesystem_properties=self.filesystem_properties,
-                mountpoint=self.mountpoint,
-                altroot=self.altroot,
-                temp_name=self.temp_name,
-                name=self.name,
-                vdevs=self.vdevs,
-            )
+            rc, stdout, stderr = ctx.run(subcommand='create', dry_run=self.module.check_mode)
         self.changed = True
         if self.module.check_mode:
             return {'prepared': stdout}
@@ -246,7 +234,7 @@ class Zpool(object):
             self.changed = True
             return
         with self.zpool_runner('subcommand name', check_rc=True) as ctx:
-            rc, stdout, stderr = ctx.run(subcommand='destroy', name=self.name)
+            rc, stdout, stderr = ctx.run(subcommand='destroy')
         self.changed = True
 
     def list_pool_properties(self):
@@ -256,7 +244,6 @@ class Zpool(object):
                 scripted=True,
                 columns='property,value',
                 properties='all',
-                name=self.name,
             )
 
         props = {}
@@ -274,11 +261,7 @@ class Zpool(object):
                 before[prop] = current.get(prop)
                 if not self.module.check_mode:
                     with self.zpool_runner('subcommand assignment name', check_rc=True) as ctx:
-                        rc, stdout, stderr = ctx.run(
-                            subcommand='set',
-                            assignment='{}={}'.format(prop, value),
-                            name=self.name,
-                        )
+                        rc, stdout, stderr = ctx.run(subcommand='set', assignment='{}={}'.format(prop, value))
                 after[prop] = str(value)
                 self.changed = True
         return {'before': {'pool_properties': before}, 'after': {'pool_properties': after}}
@@ -290,7 +273,6 @@ class Zpool(object):
                 scripted=True,
                 columns='property,value',
                 properties='all',
-                name=self.name,
             )
 
         props = {}
@@ -308,11 +290,7 @@ class Zpool(object):
                 before[prop] = current.get(prop)
                 if not self.module.check_mode:
                     with self.zfs_runner('subcommand assignment name', check_rc=True) as ctx:
-                        rc, stdout, stderr = ctx.run(
-                            subcommand='set',
-                            assignment='{}={}'.format(prop, value),
-                            name=self.name,
-                        )
+                        rc, stdout, stderr = ctx.run(subcommand='set', assignment='{}={}'.format(prop, value))
                 after[prop] = str(value)
                 self.changed = True
         return {'before': {'filesystem_properties': before}, 'after': {'filesystem_properties': after}}
@@ -340,12 +318,7 @@ class Zpool(object):
 
     def get_current_layout(self):
         with self.zpool_runner('subcommand full_paths real_paths name', check_rc=True) as ctx:
-            rc, stdout, stderr = ctx.run(
-                subcommand='status',
-                full_paths=True,
-                real_paths=True,
-                name=self.name,
-            )
+            rc, stdout, stderr = ctx.run(subcommand='status', full_paths=True, real_paths=True)
 
         vdevs = []
         current = None
@@ -454,10 +427,8 @@ class Zpool(object):
         with self.zpool_runner('subcommand force dry_run pool_properties name vdevs', check_rc=True) as ctx:
             rc, stdout, stderr = ctx.run(
                 subcommand='add',
-                force=self.force,
                 dry_run=self.module.check_mode,
                 pool_properties={'ashift': self.pool_properties['ashift']} if 'ashift' in self.pool_properties else {},
-                name=self.name,
                 vdevs=to_add,
             )
 
@@ -467,12 +438,7 @@ class Zpool(object):
 
     def list_vdevs_with_names(self):
         with self.zpool_runner('subcommand full_paths real_paths name', check_rc=True) as ctx:
-            rc, stdout, stderr = ctx.run(
-                subcommand='status',
-                full_paths=True,
-                real_paths=True,
-                name=self.name,
-            )
+            rc, stdout, stderr = ctx.run(subcommand='status', full_paths=True, real_paths=True)
         in_cfg = False
         saw_pool = False
         vdevs = []
@@ -516,11 +482,7 @@ class Zpool(object):
             return {}
         with self.zpool_runner('subcommand dry_run name vdev_name', check_rc=True) as ctx:
             rc, stdout, stderr = ctx.run(
-                subcommand='remove',
-                dry_run=self.module.check_mode,
-                name=self.name,
-                vdev_name=to_remove,
-            )
+                subcommand='remove', dry_run=self.module.check_mode, vdev_name=to_remove)
         self.changed = True
         if self.module.check_mode:
             return {'prepared': stdout}
@@ -538,18 +500,16 @@ def main():
             force=dict(type='bool', default=False),
             pool_properties=dict(type='dict', default={}),
             filesystem_properties=dict(type='dict', default={}),
-            mountpoint=dict(type='str', required=False),
-            altroot=dict(type='str', required=False),
-            temp_name=dict(type='str', required=False),
+            mountpoint=dict(type='str'),
+            altroot=dict(type='str'),
+            temp_name=dict(type='str'),
             vdevs=dict(
                 type='list',
                 elements='dict',
-                required=False,
                 options=dict(
                     role=dict(
                         type='str',
                         choices=['log', 'cache', 'spare', 'dedup', 'special'],
-                        required=False,
                     ),
                     type=dict(
                         type='str',
