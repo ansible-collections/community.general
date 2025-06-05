@@ -8,6 +8,10 @@
 ### dotenv ###
 .env
 
+### nix specific stuff ###
+/.direnv
+.envrc
+
 ### Emacs ###
 # -*- mode: gitignore; -*-
 *~
