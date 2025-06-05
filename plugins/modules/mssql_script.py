@@ -349,7 +349,7 @@ def run_module():
     # Try primary credentials first, then alternate if primary fails
     conn = None
     authenticated_user = None
-    
+
     # Try primary credentials
     if login_user is not None:
         try:
@@ -368,8 +368,8 @@ def run_module():
                         errno, errstr = e2.args
                         module.fail_json(msg="ERROR: %s %s" % (errno, errstr))
                     else:
-                        module.fail_json(msg="unable to connect with primary or alternate credentials, check login credentials are correct, or alternatively check your "
-                                             "@sysconfdir@/freetds.conf / ${HOME}/.freetds.conf")
+                        module.fail_json(msg="unable to connect with primary or alternate credentials, check login credentials are correct, "
+                                             "or alternatively check your @sysconfdir@/freetds.conf / ${HOME}/.freetds.conf")
             else:
                 if "Unknown database" in str(e):
                     errno, errstr = e.args
