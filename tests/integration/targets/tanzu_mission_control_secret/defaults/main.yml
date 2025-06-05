@@ -1,0 +1,20 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) 2025, Massimo Gengarelli <massimo.gengarelli@proton.me>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+api_host:
+api_token:
+management_cluster_name:
+provisioner_name:
+cluster_name:
+cluster_namespace:
+cluster_group:
+secret_name:
+secret_type:
+state:

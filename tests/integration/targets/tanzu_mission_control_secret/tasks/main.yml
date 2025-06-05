@@ -1,0 +1,276 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) 2025, Massimo Gengarelli <massimo.gengarelli@proton.me>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Cluster Secret | Create a new secret
+  community.general.tanzu_mission_control_secret:
+    api_host: "{{ api_host }}"
+    api_token: "{{ api_token }}"
+    cluster_name: "{{ cluster_name }}"
+    cluster_namespace: "{{ cluster_namespace }}"
+    management_cluster_name: "{{ management_cluster_name }}"
+    provisioner_name: "{{ provisioner_name }}"
+    secret_name: "{{ secret_name }}"
+    data:
+      key1: value1
+      key2: value2
+    state: present
+
+- name: Cluster Secret | Create and export a new secret
+  community.general.tanzu_mission_control_secret:
+    api_host: "{{ api_host }}"
+    api_token: "{{ api_token }}"
+    cluster_name: "{{ cluster_name }}"
+    cluster_namespace: "{{ cluster_namespace }}"
+    management_cluster_name: "{{ management_cluster_name }}"
+    provisioner_name: "{{ provisioner_name }}"
+    secret_name: exported-secret
+    data:
+      key1: value1
+      key2: value2
+    export: true
+    state: present
+
+- name: Cluster Secret | Update and un-export a secret
+  community.general.tanzu_mission_control_secret:
+    api_host: "{{ api_host }}"
+    api_token: "{{ api_token }}"
+    cluster_name: "{{ cluster_name }}"
+    cluster_namespace: "{{ cluster_namespace }}"
+    management_cluster_name: "{{ management_cluster_name }}"
+    provisioner_name: "{{ provisioner_name }}"
+    secret_name: exported-secret
+    data:
+      key1: value1
+      key2: value2
+    export: false
+    state: update
+
+- name: Cluster Secret | Do not update an already existing secret (state=present)
+  community.general.tanzu_mission_control_secret:
+    api_host: "{{ api_host }}"
+    api_token: "{{ api_token }}"
+    cluster_name: "{{ cluster_name }}"
+    cluster_namespace: "{{ cluster_namespace }}"
+    management_cluster_name: "{{ management_cluster_name }}"
+    provisioner_name: "{{ provisioner_name }}"
+    secret_name: "{{ secret_name }}"
+    data: {}
+    state: present
+
+- name: Cluster Secret | Update a secret (state=update)
+  community.general.tanzu_mission_control_secret:
+    api_host: "{{ api_host }}"
+    api_token: "{{ api_token }}"
+    cluster_name: "{{ cluster_name }}"
+    cluster_namespace: "{{ cluster_namespace }}"
+    management_cluster_name: "{{ management_cluster_name }}"
+    provisioner_name: "{{ provisioner_name }}"
+    secret_name: "{{ secret_name }}"
+    data:
+      key3: value3
+      key4: value4
+    state: update
+    export: true
+
+- name: Cluster Secret | Create a new secret (using state=update)
+  community.general.tanzu_mission_control_secret:
+    api_host: "{{ api_host }}"
+    api_token: "{{ api_token }}"
+    cluster_name: "{{ cluster_name }}"
+    cluster_namespace: "{{ cluster_namespace }}"
+    management_cluster_name: "{{ management_cluster_name }}"
+    provisioner_name: "{{ provisioner_name }}"
+    secret_name: very-new-secret
+    export: true
+    data:
+      key1: hello world
+      key2: |
+        multiline string with
+        newlines respected.
+    state: update
+
+- name: Cluster Secret | Delete the exported secret
+  community.general.tanzu_mission_control_secret:
+    api_host: "{{ api_host }}"
+    api_token: "{{ api_token }}"
+    cluster_name: "{{ cluster_name }}"
+    cluster_namespace: "{{ cluster_namespace }}"
+    management_cluster_name: "{{ management_cluster_name }}"
+    provisioner_name: "{{ provisioner_name }}"
+    secret_name: exported-secret
+    data: {}
+    state: absent
+
+- name: Cluster Secret | Delete the created secret
+  community.general.tanzu_mission_control_secret:
+    api_host: "{{ api_host }}"
+    api_token: "{{ api_token }}"
+    cluster_name: "{{ cluster_name }}"
+    cluster_namespace: "{{ cluster_namespace }}"
+    management_cluster_name: "{{ management_cluster_name }}"
+    provisioner_name: "{{ provisioner_name }}"
+    secret_name: very-new-secret
+    data: {}
+    state: absent
+
+- name: Cluster Secret | Delete the first secret
+  community.general.tanzu_mission_control_secret:
+    api_host: "{{ api_host }}"
+    api_token: "{{ api_token }}"
+    cluster_name: "{{ cluster_name }}"
+    cluster_namespace: "{{ cluster_namespace }}"
+    management_cluster_name: "{{ management_cluster_name }}"
+    provisioner_name: "{{ provisioner_name }}"
+    secret_name: "{{ secret_name }}"
+    data: {}
+    state: absent
+
+- name: Cluster Secret | Deleting a non existing secret should yield no result
+  community.general.tanzu_mission_control_secret:
+    api_host: "{{ api_host }}"
+    api_token: "{{ api_token }}"
+    cluster_name: "{{ cluster_name }}"
+    cluster_namespace: "{{ cluster_namespace }}"
+    management_cluster_name: "{{ management_cluster_name }}"
+    provisioner_name: "{{ provisioner_name }}"
+    secret_name: "{{ secret_name }}"
+    data: {}
+    state: absent
+
+- name: ClusterGroup Secret | Create a new secret (state=present)
+  community.general.tanzu_mission_control_secret:
+    api_host: "{{ api_host }}"
+    api_token: "{{ api_token }}"
+    cluster_group: "{{ cluster_group }}"
+    cluster_namespace: "{{ cluster_namespace }}"
+    secret_name: "{{ secret_name }}"
+    data:
+      key1: value1
+      key2: value2
+    state: present
+
+- name: ClusterGroup Secret | Avoid updating the secret (state=present)
+  community.general.tanzu_mission_control_secret:
+    api_host: "{{ api_host }}"
+    api_token: "{{ api_token }}"
+    cluster_group: "{{ cluster_group }}"
+    cluster_namespace: "{{ cluster_namespace }}"
+    secret_name: "{{ secret_name }}"
+    data: {}
+    state: present
+
+- name: ClusterGroup Secret | Create new secret (state=update)
+  community.general.tanzu_mission_control_secret:
+    api_host: "{{ api_host }}"
+    api_token: "{{ api_token }}"
+    cluster_group: "{{ cluster_group }}"
+    cluster_namespace: "{{ cluster_namespace }}"
+    secret_name: very-new-secret
+    data:
+      key1: hello world
+      key2: |
+        multiline string with
+        newlines respected.
+    state: update
+
+- name: ClusterGroup Secret | Create and export a new secret (export=true)
+  community.general.tanzu_mission_control_secret:
+    api_host: "{{ api_host }}"
+    api_token: "{{ api_token }}"
+    cluster_group: "{{ cluster_group }}"
+    cluster_namespace: "{{ cluster_namespace }}"
+    secret_name: exported-secret
+    data:
+      key1: hello world
+      key2: |
+        multiline string with
+        newlines respected.
+    export: true
+    state: present
+
+- name: ClusterGroup Secret | Update an existing secret (state=update, export=true)
+  community.general.tanzu_mission_control_secret:
+    api_host: "{{ api_host }}"
+    api_token: "{{ api_token }}"
+    cluster_group: "{{ cluster_group }}"
+    cluster_namespace: "{{ cluster_namespace }}"
+    secret_name: "{{ secret_name }}"
+    data:
+      key3: value3
+      key4: value4
+    export: true
+    state: update
+
+- name: ClusterGroup Secret | Delete a secret
+  community.general.tanzu_mission_control_secret:
+    api_host: "{{ api_host }}"
+    api_token: "{{ api_token }}"
+    cluster_group: "{{ cluster_group }}"
+    cluster_namespace: "{{ cluster_namespace }}"
+    secret_name: "{{ item }}"
+    data: {}
+    secret_type: opaque
+    state: absent
+  loop:
+    - "{{ secret_name }}"
+    - very-new-secret
+    - non-existant
+    - exported-secret
+
+- name: Cluster Secret | Create a Docker secret
+  community.general.tanzu_mission_control_secret:
+    api_host: "{{ api_host }}"
+    api_token: "{{ api_token }}"
+    cluster_name: "{{ cluster_name }}"
+    cluster_namespace: "{{ cluster_namespace }}"
+    management_cluster_name: "{{ management_cluster_name }}"
+    provisioner_name: "{{ provisioner_name }}"
+    secret_name: "{{ secret_name }}"
+    secret_type: docker_config
+    registry_host: docker.io
+    registry_username: some_username
+    registry_password: some_password
+    export: true
+    state: present
+
+- name: Cluster Group Secret | Create a Docker secret
+  community.general.tanzu_mission_control_secret:
+    api_host: "{{ api_host }}"
+    api_token: "{{ api_token }}"
+    cluster_group: "{{ cluster_group }}"
+    cluster_namespace: "{{ cluster_namespace }}"
+    secret_name: "{{ secret_name }}"
+    secret_type: docker_config
+    registry_host: docker.io
+    registry_username: some_username
+    registry_password: some_password
+    export: true
+    state: present
+
+- name: Cluster Group Secret | Delete the Docker secret
+  community.general.tanzu_mission_control_secret:
+    api_host: "{{ api_host }}"
+    api_token: "{{ api_token }}"
+    cluster_group: "{{ cluster_group }}"
+    cluster_namespace: "{{ cluster_namespace }}"
+    secret_name: "{{ secret_name }}"
+    data: {}
+    state: absent
+
+- name: Cluster Secret | Delete the Docker secret
+  community.general.tanzu_mission_control_secret:
+    api_host: "{{ api_host }}"
+    api_token: "{{ api_token }}"
+    cluster_name: "{{ cluster_name }}"
+    cluster_namespace: "{{ cluster_namespace }}"
+    management_cluster_name: "{{ management_cluster_name }}"
+    provisioner_name: "{{ provisioner_name }}"
+    secret_name: "{{ secret_name }}"
+    data: {}
+    state: absent
