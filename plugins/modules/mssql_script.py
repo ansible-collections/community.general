@@ -39,6 +39,14 @@ options:
   login_password:
     description: The password used to authenticate with.
     type: str
+  login_user_alt:
+    description: The alternate username used to authenticate with if primary login fails.
+    type: str
+    version_added: 10.8.0
+  login_password_alt:
+    description: The alternate password used to authenticate with if primary login fails.
+    type: str
+    version_added: 10.8.0
   login_host:
     description: Host running the database.
     type: str
@@ -52,8 +60,16 @@ options:
       - The SQL script to be executed.
       - Script can contain multiple SQL statements. Multiple Batches can be separated by V(GO) command.
       - Each batch must return at least one result set.
-    required: true
+      - Mutually exclusive with O(script_path).
     type: str
+  script_path:
+    description:
+      - Path to file containing the SQL script to be executed.
+      - Script can contain multiple SQL statements. Multiple Batches can be separated by V(GO) command.
+      - Each batch must return at least one result set.
+      - Mutually exclusive with O(script).
+    type: path
+    version_added: 10.8.0
   transaction:
     description:
       - If transactional mode is requested, start a transaction and commit the change only if the script succeed. Otherwise,
@@ -93,6 +109,26 @@ EXAMPLES = r"""
     login_port: "{{ mssql_port }}"
     db: master
     script: "SELECT 1"
+
+- name: Check DB connection with alternate credentials
+  community.general.mssql_script:
+    login_user: "{{ mssql_login_user }}"
+    login_password: "{{ mssql_login_password }}"
+    login_user_alt: "{{ mssql_login_user_alt }}"
+    login_password_alt: "{{ mssql_login_password_alt }}"
+    login_host: "{{ mssql_host }}"
+    login_port: "{{ mssql_port }}"
+    db: master
+    script: "SELECT 1"
+
+- name: Execute script from file
+  community.general.mssql_script:
+    login_user: "{{ mssql_login_user }}"
+    login_password: "{{ mssql_login_password }}"
+    login_host: "{{ mssql_host }}"
+    login_port: "{{ mssql_port }}"
+    db: master
+    script_path: /path/to/script.sql
 
 - name: Query with parameter
   community.general.mssql_script:
@@ -165,6 +201,11 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
+authenticated_user:
+  description: The username that was successfully used to authenticate with the database.
+  type: str
+  returned: always
+  sample: "sa"
 query_results:
   description: List of batches (queries separated by V(GO) keyword).
   type: list
@@ -243,9 +284,12 @@ def run_module():
         name=dict(required=False, aliases=['db'], default=''),
         login_user=dict(),
         login_password=dict(no_log=True),
+        login_user_alt=dict(),
+        login_password_alt=dict(no_log=True),
         login_host=dict(required=True),
         login_port=dict(type='int', default=1433),
-        script=dict(required=True),
+        script=dict(),
+        script_path=dict(type='path'),
         output=dict(default='default', choices=['dict', 'default']),
         params=dict(type='dict'),
         transaction=dict(type='bool', default=False),
@@ -257,7 +301,9 @@ def run_module():
 
     module = AnsibleModule(
         argument_spec=module_args,
-        supports_check_mode=True
+        supports_check_mode=True,
+        mutually_exclusive=[('script', 'script_path')],
+        required_one_of=[('script', 'script_path')]
     )
     if not MSSQL_FOUND:
         module.fail_json(msg=missing_required_lib(
@@ -266,13 +312,27 @@ def run_module():
     db = module.params['name']
     login_user = module.params['login_user']
     login_password = module.params['login_password']
+    login_user_alt = module.params['login_user_alt']
+    login_password_alt = module.params['login_password_alt']
     login_host = module.params['login_host']
     login_port = module.params['login_port']
     script = module.params['script']
+    script_path = module.params['script_path']
     output = module.params['output']
     sql_params = module.params['params']
     # Added param to set the transactional mode (true/false)
     transaction = module.params['transaction']
+
+    # Load script from file if script_path is provided
+    if script_path:
+        try:
+            with open(script_path, 'r', encoding='utf-8-sig') as f:
+                script = f.read()
+            # Additional check to ensure no BOM remains after utf-8-sig handling
+            if script.startswith('\uFEFF'):
+                script = script[1:]
+        except IOError as e:
+            module.fail_json(msg="Failed to read script file: %s" % str(e))
 
     login_querystring = login_host
     if login_port != 1433:
@@ -282,17 +342,55 @@ def run_module():
         module.fail_json(
             msg="when supplying login_user argument, login_password must also be provided")
 
-    try:
-        conn = pymssql.connect(
-            user=login_user, password=login_password, host=login_querystring, database=db)
-        cursor = conn.cursor()
-    except Exception as e:
-        if "Unknown database" in str(e):
-            errno, errstr = e.args
-            module.fail_json(msg="ERROR: %s %s" % (errno, errstr))
-        else:
-            module.fail_json(msg="unable to connect, check login_user and login_password are correct, or alternatively check your "
-                                 "@sysconfdir@/freetds.conf / ${HOME}/.freetds.conf")
+    if login_user_alt is not None and login_password_alt is None:
+        module.fail_json(
+            msg="when supplying login_user_alt argument, login_password_alt must also be provided")
+
+    # Try primary credentials first, then alternate if primary fails
+    conn = None
+    authenticated_user = None
+    
+    # Try primary credentials
+    if login_user is not None:
+        try:
+            conn = pymssql.connect(
+                user=login_user, password=login_password, host=login_querystring, database=db)
+            authenticated_user = login_user
+        except Exception as e:
+            if login_user_alt is not None:
+                # Try alternate credentials
+                try:
+                    conn = pymssql.connect(
+                        user=login_user_alt, password=login_password_alt, host=login_querystring, database=db)
+                    authenticated_user = login_user_alt
+                except Exception as e2:
+                    if "Unknown database" in str(e2):
+                        errno, errstr = e2.args
+                        module.fail_json(msg="ERROR: %s %s" % (errno, errstr))
+                    else:
+                        module.fail_json(msg="unable to connect with primary or alternate credentials, check login credentials are correct, or alternatively check your "
+                                             "@sysconfdir@/freetds.conf / ${HOME}/.freetds.conf")
+            else:
+                if "Unknown database" in str(e):
+                    errno, errstr = e.args
+                    module.fail_json(msg="ERROR: %s %s" % (errno, errstr))
+                else:
+                    module.fail_json(msg="unable to connect, check login_user and login_password are correct, or alternatively check your "
+                                         "@sysconfdir@/freetds.conf / ${HOME}/.freetds.conf")
+    else:
+        # No credentials provided, try to connect without authentication
+        try:
+            conn = pymssql.connect(host=login_querystring, database=db)
+            authenticated_user = "Windows Authentication"
+        except Exception as e:
+            if "Unknown database" in str(e):
+                errno, errstr = e.args
+                module.fail_json(msg="ERROR: %s %s" % (errno, errstr))
+            else:
+                module.fail_json(msg="unable to connect, check login_user and login_password are correct, or alternatively check your "
+                                     "@sysconfdir@/freetds.conf / ${HOME}/.freetds.conf")
+
+    cursor = conn.cursor()
 
     # If transactional mode is requested, start a transaction
     conn.autocommit(not transaction)
@@ -358,6 +456,7 @@ def run_module():
     qry_results = json.loads(json.dumps(query_results, default=clean_output))
 
     result[query_results_key] = qry_results
+    result['authenticated_user'] = authenticated_user
     module.exit_json(**result)
 
 
