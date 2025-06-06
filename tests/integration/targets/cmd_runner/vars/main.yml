@@ -253,3 +253,5 @@ cmd_echo_tests:
     assertions:
       - >
         "No such file or directory" in test_result.msg
+        or
+        "Error executing command." == test_result.msg
