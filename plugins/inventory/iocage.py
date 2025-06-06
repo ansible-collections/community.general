@@ -87,13 +87,13 @@ options:
       - This option requires the notes format C("t1=v1 t2=v2 ...")
       - The option O(get_properties) must be enabled.
     type: str
-    version_added: 10.7.1
+    version_added: 10.8.0
   inventory_hostname_required:
     description:
       - If enabled, the tag declared in O(inventory_hostname_tag) is required.
     type: bool
     default: false
-    version_added: 10.7.1
+    version_added: 10.8.0
 notes:
   - You might want to test the command C(ssh user@host iocage list -l) on
     the controller before using this inventory plugin with O(user) specified
