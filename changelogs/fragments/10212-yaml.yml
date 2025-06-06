@@ -1,0 +1,2 @@
+bugfixes:
+  - "yaml callback plugin - adjust to latest changes in ansible-core devel (https://github.com/ansible-collections/community.general/pull/10212)."
