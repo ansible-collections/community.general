@@ -83,47 +83,123 @@ except:  # noqa: E722, pylint: disable=bare-except
     from ansible._internal._yaml import _dumper
     import typing as t
 
-    class MyDumper(_dumper._BaseDumper):
+    if hasattr(_dumper, "SafeRepresenter"):
+        # This was the current state until https://github.com/ansible/ansible/commit/1c06c46cc14324df35ac4f39a45fb3ccd602195d
+        class MyDumper(_dumper._BaseDumper):
+            # This code is mostly taken from ansible._internal._yaml._dumper
+            @classmethod
+            def _register_representers(cls) -> None:
+                cls.add_multi_representer(_dumper.AnsibleTaggedObject, cls.represent_ansible_tagged_object)
+                cls.add_multi_representer(_dumper.Tripwire, cls.represent_tripwire)
+                cls.add_multi_representer(_dumper.c.Mapping, _dumper.SafeRepresenter.represent_dict)
+                cls.add_multi_representer(_dumper.c.Sequence, _dumper.SafeRepresenter.represent_list)
+
+            def represent_ansible_tagged_object(self, data):
+                if ciphertext := _dumper.VaultHelper.get_ciphertext(data, with_tags=False):
+                    return self.represent_scalar('!vault', ciphertext, style='|')
+
+                return self.represent_data(_dumper.AnsibleTagHelper.as_native_type(data))  # automatically decrypts encrypted strings
+
+            def represent_tripwire(self, data: _dumper.Tripwire) -> t.NoReturn:
+                data.trip()
+
+            # The following function is the same as in the try/except
+            def represent_scalar(self, tag, value, style=None):
+                """Uses block style for multi-line strings"""
+                if style is None:
+                    if should_use_block(value):
+                        style = '|'
+                        # we care more about readable than accuracy, so...
+                        # ...no trailing space
+                        value = value.rstrip()
+                        # ...and non-printable characters
+                        value = ''.join(x for x in value if x in string.printable or ord(x) >= 0xA0)
+                        # ...tabs prevent blocks from expanding
+                        value = value.expandtabs()
+                        # ...and odd bits of whitespace
+                        value = re.sub(r'[\x0b\x0c\r]', '', value)
+                        # ...as does trailing space
+                        value = re.sub(r' +\n', '\n', value)
+                    else:
+                        style = self.default_style
+                node = yaml.representer.ScalarNode(tag, value, style=style)
+                if self.alias_key is not None:
+                    self.represented_objects[self.alias_key] = node
+                return node
+
+    else:
+        # Adjusting to https://github.com/ansible/ansible/commit/1c06c46cc14324df35ac4f39a45fb3ccd602195d
+        # and https://github.com/ansible/ansible/commit/2b7204527b0906172e5ba719f1a0fb64070c7b5e
+
         # This code is mostly taken from ansible._internal._yaml._dumper
-        @classmethod
-        def _register_representers(cls) -> None:
-            cls.add_multi_representer(_dumper.AnsibleTaggedObject, cls.represent_ansible_tagged_object)
-            cls.add_multi_representer(_dumper.Tripwire, cls.represent_tripwire)
-            cls.add_multi_representer(_dumper.c.Mapping, _dumper.SafeRepresenter.represent_dict)
-            cls.add_multi_representer(_dumper.c.Sequence, _dumper.SafeRepresenter.represent_list)
+        import collections.abc as c
 
-        def represent_ansible_tagged_object(self, data):
-            if ciphertext := _dumper.VaultHelper.get_ciphertext(data, with_tags=False):
-                return self.represent_scalar('!vault', ciphertext, style='|')
+        from yaml.nodes import ScalarNode, Node
 
-            return self.represent_data(_dumper.AnsibleTagHelper.as_native_type(data))  # automatically decrypts encrypted strings
+        from ansible._internal._templating import _jinja_common
+        from ansible.module_utils import _internal
+        from ansible.module_utils._internal._datatag import AnsibleTaggedObject, Tripwire, AnsibleTagHelper
+        from ansible.parsing.vault import VaultHelper
 
-        def represent_tripwire(self, data: _dumper.Tripwire) -> t.NoReturn:
-            data.trip()
+        class MyDumper(_dumper._BaseDumper):
+            @classmethod
+            def _register_representers(cls) -> None:
+                cls.add_multi_representer(AnsibleTaggedObject, cls.represent_ansible_tagged_object)
+                cls.add_multi_representer(Tripwire, cls.represent_tripwire)
+                cls.add_multi_representer(c.Mapping, cls.represent_dict)
+                cls.add_multi_representer(c.Collection, cls.represent_list)
+                cls.add_multi_representer(_jinja_common.VaultExceptionMarker, cls.represent_vault_exception_marker)
 
-        # The following function is the same as in the try/except
-        def represent_scalar(self, tag, value, style=None):
-            """Uses block style for multi-line strings"""
-            if style is None:
-                if should_use_block(value):
-                    style = '|'
-                    # we care more about readable than accuracy, so...
-                    # ...no trailing space
-                    value = value.rstrip()
-                    # ...and non-printable characters
-                    value = ''.join(x for x in value if x in string.printable or ord(x) >= 0xA0)
-                    # ...tabs prevent blocks from expanding
-                    value = value.expandtabs()
-                    # ...and odd bits of whitespace
-                    value = re.sub(r'[\x0b\x0c\r]', '', value)
-                    # ...as does trailing space
-                    value = re.sub(r' +\n', '\n', value)
-                else:
-                    style = self.default_style
-            node = yaml.representer.ScalarNode(tag, value, style=style)
-            if self.alias_key is not None:
-                self.represented_objects[self.alias_key] = node
-            return node
+            def get_node_from_ciphertext(self, data: object) -> ScalarNode | None:
+                if ciphertext := VaultHelper.get_ciphertext(data, with_tags=False):
+                    return self.represent_scalar('!vault', ciphertext, style='|')
+
+                return None
+
+            def represent_vault_exception_marker(self, data: _jinja_common.VaultExceptionMarker) -> ScalarNode:
+                if node := self.get_node_from_ciphertext(data):
+                    return node
+
+                data.trip()
+
+            def represent_ansible_tagged_object(self, data: AnsibleTaggedObject) -> Node:
+                if _internal.is_intermediate_mapping(data):
+                    return self.represent_dict(data)
+
+                if _internal.is_intermediate_iterable(data):
+                    return self.represent_list(data)
+
+                if node := self.get_node_from_ciphertext(data):
+                    return node
+
+                return self.represent_data(AnsibleTagHelper.as_native_type(data))  # automatically decrypts encrypted strings
+
+            def represent_tripwire(self, data: Tripwire) -> t.NoReturn:
+                data.trip()
+
+            # The following function is the same as in the try/except
+            def represent_scalar(self, tag, value, style=None):
+                """Uses block style for multi-line strings"""
+                if style is None:
+                    if should_use_block(value):
+                        style = '|'
+                        # we care more about readable than accuracy, so...
+                        # ...no trailing space
+                        value = value.rstrip()
+                        # ...and non-printable characters
+                        value = ''.join(x for x in value if x in string.printable or ord(x) >= 0xA0)
+                        # ...tabs prevent blocks from expanding
+                        value = value.expandtabs()
+                        # ...and odd bits of whitespace
+                        value = re.sub(r'[\x0b\x0c\r]', '', value)
+                        # ...as does trailing space
+                        value = re.sub(r' +\n', '\n', value)
+                    else:
+                        style = self.default_style
+                node = yaml.representer.ScalarNode(tag, value, style=style)
+                if self.alias_key is not None:
+                    self.represented_objects[self.alias_key] = node
+                return node
 
 
 class CallbackModule(Default):
