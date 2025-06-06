@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2024 Vladimir Botka <vbotka@gmail.com>
+# Copyright (c) 2024-2025 Vladimir Botka <vbotka@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -80,6 +80,20 @@ options:
     type: list
     elements: path
     version_added: 10.4.0
+  inventory_hostname_tag:
+    description:
+      - The name of the tag in the C(iocage properties notes) that contains the jails name.
+      - By default, the C(iocage list -l) column C(NAME) is used to name the jail.
+      - This option requires the notes format C("t1=v1 t2=v2 ...")
+      - The option O(get_properties) must be enabled.
+    type: str
+    version_added: 10.7.1
+  inventory_hostname_required:
+    description:
+      - If enabled, the tag declared in O(inventory_hostname_tag) is required.
+    type: bool
+    default: false
+    version_added: 10.7.1
 notes:
   - You might want to test the command C(ssh user@host iocage list -l) on
     the controller before using this inventory plugin with O(user) specified
@@ -253,6 +267,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         env = self.get_option('env')
         get_properties = self.get_option('get_properties')
         hooks_results = self.get_option('hooks_results')
+        inventory_hostname_tag = self.get_option('inventory_hostname_tag')
+        inventory_hostname_required = self.get_option('inventory_hostname_required')
 
         cmd = []
         my_env = os.environ.copy()
@@ -356,6 +372,21 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                         iocage_hooks.append(iocage_hook)
 
                 results['_meta']['hostvars'][hostname]['iocage_hooks'] = iocage_hooks
+
+        # Optionally, get the jails names from the properties notes.
+        # Requires the notes format "t1=v1 t2=v2 ..."
+        if inventory_hostname_tag:
+            if not get_properties:
+                raise AnsibleError('Jail properties are needed. Enable get_properties')
+            update = {}
+            for hostname, host_vars in results['_meta']['hostvars'].items():
+                tags = dict([tag.split('=') for tag in host_vars['iocage_properties']['notes'].split()])
+                if inventory_hostname_tag in tags:
+                    update[hostname] = tags[inventory_hostname_tag]
+                elif inventory_hostname_required:
+                    raise AnsibleError(f'Mandatory tag {inventory_hostname_tag} is missing in the properties notes.')
+            for hostname, alias in update.items():
+                results['_meta']['hostvars'][alias] = results['_meta']['hostvars'].pop(hostname)
 
         return results
 
