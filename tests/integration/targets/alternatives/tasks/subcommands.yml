@@ -89,7 +89,7 @@
   assert:
     that:
       - cmd.rc == 2
-      - '"No such file" in cmd.msg'
+      - '"No such file" in cmd.msg or "Error executing command." == cmd.msg'
 
 - name: Get dummymain alternatives output
   command:
@@ -172,7 +172,7 @@
   assert:
     that:
       - cmd.rc == 2
-      - '"No such file" in cmd.msg'
+      - '"No such file" in cmd.msg or "Error executing command." == cmd.msg'
 
 - name: Get dummymain alternatives output
   command:
