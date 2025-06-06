@@ -82,7 +82,7 @@ options:
     version_added: 10.4.0
   inventory_hostname_tag:
     description:
-      - The name of the tag in the C(iocage properties notes) that contains the jails name.
+      - The name of the tag in the C(iocage properties notes) that contains the jails alias.
       - By default, the C(iocage list -l) column C(NAME) is used to name the jail.
       - This option requires the notes format C("t1=v1 t2=v2 ...")
       - The option O(get_properties) must be enabled.
