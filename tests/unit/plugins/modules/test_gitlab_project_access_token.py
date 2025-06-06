@@ -68,9 +68,33 @@ class TestGitlabProjectAccessToken(GitlabModuleTestCase):
         project = self.gitlab_instance.projects.get(1)
         self.assertIsNotNone(project)
 
-        rvalue = self.moduleUtil.find_access_token(project, "token1")
+        rvalue = self.moduleUtil.find_access_token(project, "test-token")
         self.assertEqual(rvalue, False)
         self.assertIsNotNone(self.moduleUtil.access_token_object)
+        self.assertEqual(self.moduleUtil.access_token_object.id, 691)
+        self.assertFalse(self.moduleUtil.access_token_object.revoked)
+
+    @with_httmock(resp_get_project)
+    @with_httmock(resp_list_project_access_tokens)
+    def test_find_access_token_old_format(self):
+        project = self.gitlab_instance.projects.get(1)
+        self.assertIsNotNone(project)
+
+        rvalue = self.moduleUtil.find_access_token(project, "test-token-no-revoked")
+        self.assertEqual(rvalue, False)
+        self.assertIsNotNone(self.moduleUtil.access_token_object)
+        self.assertEqual(self.moduleUtil.access_token_object.id, 695)
+        self.assertFalse(hasattr(self.moduleUtil.access_token_object, "revoked"))
+
+    @with_httmock(resp_get_project)
+    @with_httmock(resp_list_project_access_tokens)
+    def test_find_revoked_access_token(self):
+        project = self.gitlab_instance.projects.get(1)
+        self.assertIsNotNone(project)
+
+        rvalue = self.moduleUtil.find_access_token(project, "test-token-three")
+        self.assertEqual(rvalue, False)
+        self.assertIsNone(self.moduleUtil.access_token_object)
 
     @with_httmock(resp_get_project)
     @with_httmock(resp_list_project_access_tokens)
@@ -99,7 +123,7 @@ class TestGitlabProjectAccessToken(GitlabModuleTestCase):
         project = self.gitlab_instance.projects.get(1)
         self.assertIsNotNone(project)
 
-        rvalue = self.moduleUtil.find_access_token(project, "token1")
+        rvalue = self.moduleUtil.find_access_token(project, "test-token")
         self.assertEqual(rvalue, False)
         self.assertIsNotNone(self.moduleUtil.access_token_object)
 

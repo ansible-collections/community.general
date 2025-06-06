@@ -287,11 +287,36 @@ def resp_delete_group(url, request):
 @urlmatch(scheme="http", netloc="localhost", path="/api/v4/groups/1/access_tokens", method="get")
 def resp_list_group_access_tokens(url, request):
     headers = {'content-type': 'application/json'}
-    content = ('[{"user_id" : 1, "scopes" : ["api"], "name" : "token1", "expires_at" : "2021-01-31",'
-               '"id" : 1, "active" : false, "created_at" : "2021-01-20T22:11:48.151Z", "revoked" : true,'
-               '"access_level": 40},{"user_id" : 2, "scopes" : ["api"], "name" : "token2", "expires_at" : "2021-02-31",'
-               '"id" : 2, "active" : true, "created_at" : "2021-02-20T22:11:48.151Z", "revoked" : false,'
-               '"access_level": 40}]')
+    content = (
+        '[{"id":689,"name":"test-token","revoked":true,"created_at":"2025-06-02T09:18:01.484Z",'
+        '"description":null,"scopes":["read_repository","write_repository"],"user_id":1779,'
+        '"last_used_at":null,"active":false,"expires_at":"2025-07-02","access_level":40,'
+        '"resource_type":"group","resource_id":1730},'
+        '{"id":690,"name":"test-token","revoked":true,"created_at":"2025-06-02T09:36:30.650Z",'
+        '"description":null,"scopes":["read_repository","write_repository"],"user_id":1780,'
+        '"last_used_at":null,"active":false,"expires_at":"2025-07-02","access_level":40,'
+        '"resource_type":"group","resource_id":1730},'
+        '{"id":691,"name":"test-token","revoked":false,"created_at":"2025-06-02T09:39:18.252Z",'
+        '"description":null,"scopes":["read_repository","write_repository"],"user_id":1781,'
+        '"last_used_at":null,"active":false,"expires_at":"2025-07-02","access_level":40,'
+        '"resource_type":"group","resource_id":1730},'
+        '{"id":695,"name":"test-token-no-revoked","created_at":"2025-06-02T09:39:18.252Z",'
+        '"description":null,"scopes":["read_repository","write_repository"],"user_id":1781,'
+        '"last_used_at":null,"active":false,"expires_at":"2025-07-02","access_level":40,'
+        '"resource_type":"group","resource_id":1730},'
+        '{"id":692,"name":"test-token-two","revoked":true,"created_at":"2025-06-02T09:41:18.442Z",'
+        '"description":null,"scopes":["read_repository","write_repository"],"user_id":1782,'
+        '"last_used_at":null,"active":false,"expires_at":"2025-07-02","access_level":40,'
+        '"resource_type":"group","resource_id":1730},'
+        '{"id":693,"name":"test-token-three","revoked":true,"created_at":"2025-06-02T09:50:00.976Z"'
+        ',"description":null,"scopes":["read_repository","write_repository"],"user_id":1783,'
+        '"last_used_at":null,"active":false,"expires_at":"2025-06-04","access_level":40,'
+        '"resource_type":"group","resource_id":1730},'
+        '{"id":694,"name":"test-token-three","revoked":true,"created_at":"2025-06-02T09:56:45.779Z"'
+        ',"description":null,"scopes":["read_repository","write_repository"],"user_id":1784,'
+        '"last_used_at":null,"active":false,"expires_at":"2025-06-04","access_level":40,'
+        '"resource_type":"group","resource_id":1730}]'
+    )
     content = content.encode("utf-8")
     return response(200, content, headers, None, 5, request)
 
@@ -306,7 +331,7 @@ def resp_create_group_access_tokens(url, request):
     return response(201, content, headers, None, 5, request)
 
 
-@urlmatch(scheme="http", netloc="localhost", path="/api/v4/groups/1/access_tokens/1", method="delete")
+@urlmatch(scheme="http", netloc="localhost", path="/api/v4/groups/1/access_tokens/[0-9]+", method="delete")
 def resp_revoke_group_access_tokens(url, request):
     headers = {'content-type': 'application/json'}
     content = ('')
@@ -567,11 +592,36 @@ def resp_delete_protected_branch(url, request):
 @urlmatch(scheme="http", netloc="localhost", path="/api/v4/projects/1/access_tokens", method="get")
 def resp_list_project_access_tokens(url, request):
     headers = {'content-type': 'application/json'}
-    content = ('[{"user_id" : 1, "scopes" : ["api"], "name" : "token1", "expires_at" : "2021-01-31",'
-               '"id" : 1, "active" : false, "created_at" : "2021-01-20T22:11:48.151Z", "revoked" : true,'
-               '"access_level": 40},{"user_id" : 2, "scopes" : ["api"], "name" : "token2", "expires_at" : "2021-02-31",'
-               '"id" : 2, "active" : true, "created_at" : "2021-02-20T22:11:48.151Z", "revoked" : false,'
-               '"access_level": 40}]')
+    content = (
+        '[{"id":689,"name":"test-token","revoked":true,"created_at":"2025-06-02T09:18:01.484Z",'
+        '"description":null,"scopes":["read_repository","write_repository"],"user_id":1779,'
+        '"last_used_at":null,"active":false,"expires_at":"2025-07-02","access_level":40,'
+        '"resource_type":"project","resource_id":1730},'
+        '{"id":690,"name":"test-token","revoked":true,"created_at":"2025-06-02T09:36:30.650Z",'
+        '"description":null,"scopes":["read_repository","write_repository"],"user_id":1780,'
+        '"last_used_at":null,"active":false,"expires_at":"2025-07-02","access_level":40,'
+        '"resource_type":"project","resource_id":1730},'
+        '{"id":691,"name":"test-token","revoked":false,"created_at":"2025-06-02T09:39:18.252Z",'
+        '"description":null,"scopes":["read_repository","write_repository"],"user_id":1781,'
+        '"last_used_at":null,"active":false,"expires_at":"2025-07-02","access_level":40,'
+        '"resource_type":"project","resource_id":1730},'
+        '{"id":695,"name":"test-token-no-revoked","created_at":"2025-06-02T09:39:18.252Z",'
+        '"description":null,"scopes":["read_repository","write_repository"],"user_id":1781,'
+        '"last_used_at":null,"active":false,"expires_at":"2025-07-02","access_level":40,'
+        '"resource_type":"group","resource_id":1730},'
+        '{"id":692,"name":"test-token-two","revoked":true,"created_at":"2025-06-02T09:41:18.442Z",'
+        '"description":null,"scopes":["read_repository","write_repository"],"user_id":1782,'
+        '"last_used_at":null,"active":false,"expires_at":"2025-07-02","access_level":40,'
+        '"resource_type":"project","resource_id":1730},'
+        '{"id":693,"name":"test-token-three","revoked":true,"created_at":"2025-06-02T09:50:00.976Z"'
+        ',"description":null,"scopes":["read_repository","write_repository"],"user_id":1783,'
+        '"last_used_at":null,"active":false,"expires_at":"2025-06-04","access_level":40,'
+        '"resource_type":"project","resource_id":1730},'
+        '{"id":694,"name":"test-token-three","revoked":true,"created_at":"2025-06-02T09:56:45.779Z"'
+        ',"description":null,"scopes":["read_repository","write_repository"],"user_id":1784,'
+        '"last_used_at":null,"active":false,"expires_at":"2025-06-04","access_level":40,'
+        '"resource_type":"project","resource_id":1730}]'
+    )
     content = content.encode("utf-8")
     return response(200, content, headers, None, 5, request)
 
@@ -586,7 +636,7 @@ def resp_create_project_access_tokens(url, request):
     return response(201, content, headers, None, 5, request)
 
 
-@urlmatch(scheme="http", netloc="localhost", path="/api/v4/projects/1/access_tokens/1", method="delete")
+@urlmatch(scheme="http", netloc="localhost", path="/api/v4/projects/1/access_tokens/[0-9]+", method="delete")
 def resp_revoke_project_access_tokens(url, request):
     headers = {'content-type': 'application/json'}
     content = ('')
