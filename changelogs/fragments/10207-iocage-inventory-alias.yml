@@ -1,0 +1,2 @@
+minor_changes:
+  - iocage inventory plugin - the new parameter ``inventory_hostname_tag`` of the plugin provides the name of the tag in the C(iocage properties notes) that contains the jails alias. The new parameter ``inventory_hostname_required`` , if enabled, makes the tag mandatory (https://github.com/ansible-collections/community.general/issues/10206, https://github.com/ansible-collections/community.general/pull/10207).
