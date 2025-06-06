@@ -15,6 +15,14 @@
       deprecator:
         resolved_name: community.general
         type: collection
+    # Latest version:
+    attr2_depr_dict_dt2:
+      msg: Attribute attr2 is deprecated
+      version: 9.9.9
+      collection_name: community.general
+      deprecator:
+        resolved_name: community.general
+        type: ~
 
 - name: test msimpleda 1
   msimpleda:
@@ -26,7 +34,12 @@
     that:
       - simple1.a == 1
       - simple1.attr1 == "abc"
-      - ("deprecations" not in simple1) or (attr2_depr_dict not in simple1.deprecations and attr2_depr_dict_dt not in simple1.deprecations)
+      - >-
+        ("deprecations" not in simple1) or (
+          attr2_depr_dict not in simple1.deprecations and
+          attr2_depr_dict_dt not in simple1.deprecations and
+          attr2_depr_dict_dt2 not in simple1.deprecations
+        )
 
 - name: test msimpleda 2
   msimpleda:
@@ -43,4 +56,7 @@
       - simple2.a == 2
       - simple2.attr2 == "def"
       - '"deprecations" in simple2'
-      - attr2_depr_dict in simple2.deprecations or attr2_depr_dict_dt in simple2.deprecations
+      - >-
+        attr2_depr_dict in simple2.deprecations or
+        attr2_depr_dict_dt in simple2.deprecations or
+        attr2_depr_dict_dt2 in simple2.deprecations
