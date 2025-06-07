@@ -15,7 +15,7 @@
     name: lvm2
     state: present
 
-- name: Testing lvg_pv module
+- name: Testing lvm_pv module
   block:
     - import_tasks: creation.yml
 
