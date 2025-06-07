@@ -1,0 +1,5 @@
+deprecated_features:
+  - "yaml callback plugin - the YAML callback plugin was deprecated for removal in community.general 13.0.0.
+     Since it needs to use ansible-core internals since ansible-core 2.19 that are changing a lot,
+     we will remove this plugin already from community.general 12.0.0 to ease the maintenance burden
+     (https://github.com/ansible-collections/community.general/pull/10213)."
