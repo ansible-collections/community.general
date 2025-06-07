@@ -12,7 +12,7 @@ name: yaml
 type: stdout
 short_description: YAML-ized Ansible screen output
 deprecated:
-  removed_in: 13.0.0
+  removed_in: 12.0.0
   why: Starting in ansible-core 2.13, the P(ansible.builtin.default#callback) callback has support for printing output in
     YAML format.
   alternative: Use O(ansible.builtin.default#callback:result_format=yaml).

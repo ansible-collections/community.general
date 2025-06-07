@@ -86,7 +86,7 @@ plugin_routing:
           = yes' option.
     yaml:
       deprecation:
-        removal_version: 13.0.0
+        removal_version: 12.0.0
         warning_text: >-
           The plugin has been superseded by the the option `result_format=yaml` in callback plugin ansible.builtin.default from ansible-core 2.13 onwards.
   connection:
