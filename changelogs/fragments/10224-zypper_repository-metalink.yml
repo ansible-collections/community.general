@@ -1,0 +1,2 @@
+bugfixes:
+  - zypper_repository - use metalink attribute to identify repositories without <url/> element
