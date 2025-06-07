@@ -76,7 +76,7 @@ options:
     elements: str
     required: false
     default: []
-    version_added: 10.8.0
+    version_added: 11.0.0
 requirements:
   - cargo installed
 """
