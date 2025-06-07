@@ -1,0 +1,34 @@
+---
+# Copyright (c) 2025, Tom Hesse <contact@tomhesse.xyz>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+zpool_single_disk_config:
+  - "{{ remote_tmp_dir }}/disk0.img"
+
+zpool_mirror_disk_config:
+  - "{{ remote_tmp_dir }}/disk1.img"
+  - "{{ remote_tmp_dir }}/disk2.img"
+
+zpool_raidz_disk_config:
+  - "{{ remote_tmp_dir }}/disk3.img"
+  - "{{ remote_tmp_dir }}/disk4.img"
+
+zpool_vdevs_disk_config:
+  vdev1:
+    - "{{ remote_tmp_dir }}/disk5.img"
+  vdev2:
+    - "{{ remote_tmp_dir }}/disk6.img"
+  vdev3:
+    - "{{ remote_tmp_dir }}/disk7.img"
+    - "{{ remote_tmp_dir }}/disk8.img"
+  vdev4:
+    - "{{ remote_tmp_dir }}/disk9.img"
+    - "{{ remote_tmp_dir }}/disk10.img"
+
+zpool_disk_configs: "{{ zpool_single_disk_config + zpool_mirror_disk_config + zpool_raidz_disk_config + (zpool_vdevs_disk_config.values() | flatten) }}"
+
+zpool_single_disk_pool_name: spool
+zpool_mirror_disk_pool_name: mpool
+zpool_raidz_disk_pool_name: rpool
+zpool_generic_pool_name: tank

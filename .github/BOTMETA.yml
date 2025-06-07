@@ -1476,6 +1476,8 @@ files:
     maintainers: natefoo
   $modules/znode.py:
     maintainers: treyperry
+  $modules/zpool.py:
+    maintainers: tomhesse
   $modules/zpool_facts:
     keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
     labels: solaris
