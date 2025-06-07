@@ -37,10 +37,20 @@ def fmt_resource_argument(value):
     return ['--group' if value['argument_action'] == 'group' else value['argument_action']] + value['argument_option']
 
 
-def pacemaker_runner(module, cli_action, **kwargs):
+def get_pacemaker_maintenance_mode(runner):
+    with runner("config") as ctx:
+        rc, out, err = ctx.run()
+        maintenance_mode_output = list(filter(lambda string: "maintenance-mode=true" in string.lower(), out.splitlines()))
+        return bool(maintenance_mode_output)
+
+
+def pacemaker_runner(module, cli_action=None, **kwargs):
+    runner_command = ['pcs']
+    if cli_action:
+        runner_command.append(cli_action)
     runner = CmdRunner(
         module,
-        command=['pcs', cli_action],
+        command=runner_command,
         arg_formats=dict(
             state=cmd_runner_fmt.as_map(_state_map),
             name=cmd_runner_fmt.as_list(),
@@ -50,6 +60,8 @@ def pacemaker_runner(module, cli_action, **kwargs):
             resource_meta=cmd_runner_fmt.stack(cmd_runner_fmt.as_opt_val)("meta"),
             resource_argument=cmd_runner_fmt.as_func(fmt_resource_argument),
             wait=cmd_runner_fmt.as_opt_eq_val("--wait"),
+            config=cmd_runner_fmt.as_fixed("config"),
+            force=cmd_runner_fmt.as_bool("--force"),
         ),
         **kwargs
     )
