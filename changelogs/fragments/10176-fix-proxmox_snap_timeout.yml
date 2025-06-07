@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - proxmox_snap - correctly handle proxmox_snap timeout parameter (https://github.com/ansible-collections/community.proxmox/issues/73, https://github.com/ansible-collections/community.proxmox/issues/95, https://github.com/ansible-collections/community.general/pull/10176).
