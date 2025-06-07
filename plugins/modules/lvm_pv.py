@@ -15,36 +15,36 @@ module: lvm_pv
 short_description: Manage LVM Physical Volumes
 version_added: "11.0.0"
 description:
-- Creates, resizes or removes LVM Physical Volumes.
+  - Creates, resizes or removes LVM Physical Volumes.
 author:
-- Klention Mali (@klention)
+  - Klention Mali (@klention)
 options:
   device:
     description:
-    - Path to the block device to manage.
+      - Path to the block device to manage.
     type: path
     required: true
   state:
     description:
-    - Control if the physical volume exists.
+      - Control if the physical volume exists.
     type: str
     choices: [ present, absent ]
     default: present
   force:
     description:
-    - Force the operation.
-    - When O(state=present) (creating a PV), this uses C(pvcreate -f) to force creation.
-    - When O(state=absent) (removing a PV), this uses C(pvremove -ff) to force removal even if part of a volume group.
+      - Force the operation.
+      - When O(state=present) (creating a PV), this uses C(pvcreate -f) to force creation.
+      - When O(state=absent) (removing a PV), this uses C(pvremove -ff) to force removal even if part of a volume group.
     type: bool
     default: false
   resize:
     description:
-    - Resize PV to device size when O(state=present).
+      - Resize PV to device size when O(state=present).
     type: bool
     default: false
 notes:
-- Requires LVM2 utilities installed on the target system.
-- Device path must exist when creating a PV.
+  - Requires LVM2 utilities installed on the target system.
+  - Device path must exist when creating a PV.
 '''
 
 EXAMPLES = r'''
