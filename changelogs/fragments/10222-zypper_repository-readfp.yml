@@ -1,0 +1,2 @@
+bugfixes:
+  - zypper_repository - fix usage of removed method ConfigParser.readfp()
