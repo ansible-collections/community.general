@@ -39,7 +39,7 @@
     auth_password: "{{ admin_password }}"
     name: "{{ item }}"
     realm: "{{ realm }}"
-  with_items: 
+  with_items:
   - "{{ realm_role_admin }}"
   - "{{ realm_role_user }}"
 
@@ -67,7 +67,7 @@
     name: "{{ item }}"
     realm: "{{ realm }}"
     client_id: "{{ client_name_private }}"
-  with_items: 
+  with_items:
   - "{{ client_role_admin }}"
   - "{{ client_role_user }}"
 
@@ -124,7 +124,7 @@
     that:
     - result is not changed
     - result.end_state | length == 2
-  
+
 - name: Remove Map role admin to public client
   community.general.keycloak_client_rolescope:
     auth_keycloak_url: "{{ url }}"
@@ -298,7 +298,7 @@
     that:
     - result is changed
     - result.end_state | length == 2
-    
+
 - name: Check-mode step two, check if change where applied
   community.general.keycloak_client_rolescope:
     auth_keycloak_url: "{{ url }}"

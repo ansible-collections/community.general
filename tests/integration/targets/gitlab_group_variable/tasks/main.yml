@@ -242,7 +242,7 @@
       - gitlab_group_variable_state is changed
   when: gitlab_premium_tests is defined
 
-- name: apply again the environment scope change 
+- name: apply again the environment scope change
   gitlab_group_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"

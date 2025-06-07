@@ -25,7 +25,7 @@
     dest_iso: "{{ test_dir }}/test.iso"
     interchange_level: 3
 
-- include_tasks: iso_customize.yml  
+- include_tasks: iso_customize.yml
   vars:
     dest_iso_name: "iso_customize.iso"
 
@@ -51,7 +51,7 @@
     joliet: 3
     vol_ident: AUTOINSTALL
 
-- include_tasks: iso_customize.yml 
+- include_tasks: iso_customize.yml
   vars:
     dest_iso_name: "iso_customize_joliet.iso"
 

@@ -53,7 +53,7 @@ gives
        k2_x2: [C1]
        k3_x3: bar
 
- 
+
 .. versionadded:: 9.1.0
 
 * The results of the below examples 1-3 are all the same:

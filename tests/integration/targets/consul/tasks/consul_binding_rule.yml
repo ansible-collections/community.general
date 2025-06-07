@@ -18,7 +18,7 @@
           0iT9wCS0DRTXu269V264Vf/3jvredZiKRkgwlL9xNAwxXFg0x/XFw005UWVRIkdg
           cKWTjpBP2dPwVZ4WWC+9aGVd+Gyn1o0CLelf4rEjGoXbAAEgAqeGUxrcIlbjXfbc
           mwIDAQAB
-          -----END PUBLIC KEY-----      
+          -----END PUBLIC KEY-----
 
 - name: Create a binding rule
   community.general.consul_binding_rule:

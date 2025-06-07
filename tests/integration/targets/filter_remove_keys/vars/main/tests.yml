@@ -37,4 +37,4 @@ tests:
       - {k0_x0: A1, k1_x1: B1, k2_x2: [C1], k3_x3: bar}
     result:
       - {k1_x1: B0, k2_x2: [C0], k3_x3: foo}
-      - {k1_x1: B1, k2_x2: [C1], k3_x3: bar} 
+      - {k1_x1: B1, k2_x2: [C1], k3_x3: bar}

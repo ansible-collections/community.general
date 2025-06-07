@@ -180,7 +180,7 @@
 #     parent_id: "{{ realm }}"
 #     config: "{{ config_updated }}"
 #   register: result
-# 
+#
 # - name: Assert that forced update ran correctly
 #   assert:
 #     that:
@@ -292,7 +292,7 @@
 
 - name: Remove Keycloak test realm
   community.general.keycloak_realm:
-    auth_keycloak_url: "{{ url }}" 
+    auth_keycloak_url: "{{ url }}"
     auth_realm: "{{ admin_realm }}"
     auth_username: "{{ admin_user }}"
     auth_password: "{{ admin_password }}"

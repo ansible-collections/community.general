@@ -44,7 +44,7 @@ gives
      - {k0_x0: A0, k1_x1: B0}
      - {k0_x0: A1, k1_x1: B1}
 
- 
+
 .. versionadded:: 9.1.0
 
 * The results of the below examples 1-5 are all the same:

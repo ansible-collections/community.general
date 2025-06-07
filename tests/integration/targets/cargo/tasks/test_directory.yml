@@ -24,7 +24,7 @@
         path: "{{ manifest_path }}"
         regexp: '^version = ".*"$'
         line: 'version = "1.0.0"'
-    
+
     - name: Ensure package is uninstalled
       community.general.cargo:
         name: "{{ package_name }}"

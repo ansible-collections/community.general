@@ -10,7 +10,7 @@
 
 # TODO: Our current implementation does not handle SMTP authentication
 
-- when: 
+- when:
     # TODO: https://github.com/ansible-collections/community.general/issues/4656
     - ansible_python.version.major != 3 or ansible_python.version.minor < 12
   block:

@@ -111,7 +111,7 @@
   set_fact:
     myLdapId: "{{ result.components[0].id }}"
 
-- name: Retrive ldap subcomponents info 
+- name: Retrive ldap subcomponents info
   community.general.keycloak_component_info:
     auth_keycloak_url: "{{ url }}"
     auth_realm: "{{ admin_realm }}"
@@ -127,7 +127,7 @@
     - result is not changed
     - result.components | length > 0
 
-- name: Retrive ldap subcomponents filter by name 
+- name: Retrive ldap subcomponents filter by name
   community.general.keycloak_component_info:
     auth_keycloak_url: "{{ url }}"
     auth_realm: "{{ admin_realm }}"
@@ -145,7 +145,7 @@
     - result.components | length == 1
     - result.components[0].name == "email"
 
-- name: Retrive ldap subcomponents filter by type 
+- name: Retrive ldap subcomponents filter by type
   community.general.keycloak_component_info:
     auth_keycloak_url: "{{ url }}"
     auth_realm: "{{ admin_realm }}"

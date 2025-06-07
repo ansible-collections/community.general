@@ -71,5 +71,5 @@
 - name: Delete line of file test02.cfg
   ansible.builtin.lineinfile:
     path: "{{ test_dir }}/test02.cfg"
-    regexp: "test" 
+    regexp: "test"
     state: absent

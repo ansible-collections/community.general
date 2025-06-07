@@ -66,9 +66,9 @@
     authenticationExecutions:
       - providerId: "idp-review-profile"
         requirement: "REQUIRED"
-        authenticationConfig: 
+        authenticationConfig:
           alias: "Test review profile config"
-          config: 
+          config:
             update.profile.on.first.login: "missing"
 
 - name: Create auth flow
@@ -103,7 +103,7 @@
       providerId: "auth-conditional-otp-form"
       authenticationConfig:
         alias: my-conditional-otp-config
-        config: 
+        config:
           defaultOtpOutcome: "force"
           noOtpRequiredForHeaderPattern: "{{ keycloak_no_otp_required_pattern_orinale }}"
     state: present
@@ -140,7 +140,7 @@
       providerId: "auth-conditional-otp-form"
       authenticationConfig:
         alias: my-conditional-otp-config
-        config: 
+        config:
           defaultOtpOutcome: "force"
           noOtpRequiredForHeaderPattern: "{{ keycloak_no_otp_required_pattern_modifed }}"
     state: present

@@ -108,7 +108,7 @@
 - name: test-modify_inactive_option 3 - set expected content and get current ini file content
   set_fact:
     expected3: |
-  
+
       [section1]
       # Uncomment the line below to enable foo
       # foo = bar
