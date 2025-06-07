@@ -113,9 +113,6 @@ files:
   $connections/lxd.py:
     labels: lxd
     maintainers: mattclay
-  $connections/proxmox_pct_remote.py:
-    labels: proxmox
-    maintainers: mietzen
   $connections/qubes.py:
     maintainers: kushaldas
   $connections/saltstack.py:
@@ -247,8 +244,6 @@ files:
     keywords: opennebula dynamic inventory script
     labels: cloud opennebula
     maintainers: feldsam
-  $inventories/proxmox.py:
-    maintainers: $team_virt ilijamt krauthosting
   $inventories/scaleway.py:
     labels: cloud scaleway
     maintainers: $team_scaleway
@@ -1136,34 +1131,6 @@ files:
     maintainers: $team_bsd berenddeboer
   $modules/pritunl_:
     maintainers: Lowess
-  $modules/proxmox:
-    keywords: kvm libvirt proxmox qemu
-    labels: proxmox virt
-    maintainers: $team_virt UnderGreen krauthosting
-    ignore: tleguern
-  $modules/proxmox.py:
-    ignore: skvidal
-    maintainers: UnderGreen krauthosting
-  $modules/proxmox_disk.py:
-    maintainers: castorsky krauthosting
-  $modules/proxmox_kvm.py:
-    ignore: skvidal
-    maintainers: helldorado krauthosting
-  $modules/proxmox_backup.py:
-    maintainers: IamLunchbox
-  $modules/proxmox_backup_info.py:
-    maintainers: raoufnezhad mmayabi
-  $modules/proxmox_nic.py:
-    maintainers: Kogelvis krauthosting
-  $modules/proxmox_node_info.py:
-    maintainers: jwbernin krauthosting
-  $modules/proxmox_storage_contents_info.py:
-    maintainers: l00ptr krauthosting
-  $modules/proxmox_tasks_info:
-    maintainers: paginabianca krauthosting
-  $modules/proxmox_template.py:
-    ignore: skvidal
-    maintainers: UnderGreen krauthosting
   $modules/pubnub_blocks.py:
     maintainers: parfeon pubnub
   $modules/pulp_repo.py:

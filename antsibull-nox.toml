@@ -54,12 +54,6 @@ exclusions = [
 ]
 doc_fragment = "community.general.keycloak.actiongroup_keycloak"
 
-[[sessions.extra_checks.action_groups_config]]
-name = "proxmox"
-pattern = "^proxmox(_.*)?$"
-exclusions = []
-doc_fragment = "community.general.proxmox.actiongroup_proxmox"
-
 [sessions.build_import_check]
 run_galaxy_importer = true
 
