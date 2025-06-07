@@ -4,16 +4,16 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Creating a 50MB file for loop device
-  ansible.builtin.command: dd if=/dev/zero of=/tmp/test_lvm_pv.img bs=1M count=50
+  ansible.builtin.command: dd if=/dev/zero of={{ remote_tmp_dir }}/test_lvm_pv.img bs=1M count=50
   args:
-    creates: /tmp/test_lvm_pv.img
+    creates: "{{ remote_tmp_dir }}/test_lvm_pv.img"
 
 - name: Creating loop device
   ansible.builtin.command: losetup -f
   register: loop_device
 
 - name: Associating loop device with file
-  ansible.builtin.command: 'losetup {{ loop_device.stdout }} /tmp/test_lvm_pv.img'
+  ansible.builtin.command: 'losetup {{ loop_device.stdout }} {{ remote_tmp_dir }}/test_lvm_pv.img'
 
 - name: Creating physical volume
   community.general.lvm_pv:

@@ -22,7 +22,7 @@ options:
   device:
     description:
     - Path to the block device to manage.
-    type: str
+    type: path
     required: true
   state:
     description:
@@ -112,7 +112,7 @@ def rescan_device(module, device):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            device=dict(type='str', required=True),
+            device=dict(type='path', required=True),
             state=dict(type='str', default='present', choices=['present', 'absent']),
             force=dict(type='bool', default=False),
             resize=dict(type='bool', default=False),

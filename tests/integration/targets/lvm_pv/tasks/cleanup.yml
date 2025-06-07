@@ -8,5 +8,5 @@
 
 - name: Removing loop device file
   ansible.builtin.file:
-    path: /tmp/test_lvm_pv.img
+    path: "{{ remote_tmp_dir }}/test_lvm_pv.img"
     state: absent

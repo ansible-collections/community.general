@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Growing the loop device file to 100MB
-  ansible.builtin.shell: truncate -s 100M /tmp/test_lvm_pv.img
+  ansible.builtin.shell: truncate -s 100M {{ remote_tmp_dir }}/test_lvm_pv.img
 
 - name: Refreshing the loop device
   ansible.builtin.shell: losetup -c {{ loop_device.stdout }}
