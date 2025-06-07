@@ -1551,7 +1551,7 @@ class KeycloakAPI(object):
             if parent['subGroupCount'] == 0:
                 group_children = []
             else:
-                group_children_url = URL_GROUP_CHILDREN.format(url=self.baseurl, realm=realm, groupid=parent['id'])
+                group_children_url = URL_GROUP_CHILDREN.format(url=self.baseurl, realm=realm, groupid=parent['id']) + "?max=" + str(parent['subGroupCount'])
                 group_children = self._request_and_deserialize(group_children_url, method="GET")
             subgroups = group_children
         else:
