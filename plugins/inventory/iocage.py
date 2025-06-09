@@ -93,7 +93,7 @@ options:
       - If enabled, the tag declared in O(inventory_hostname_tag) is required.
     type: bool
     default: false
-    version_added: 10.8.0
+    version_added: 11.0.0
 notes:
   - You might want to test the command C(ssh user@host iocage list -l) on
     the controller before using this inventory plugin with O(user) specified
