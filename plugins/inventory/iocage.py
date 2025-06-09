@@ -87,7 +87,7 @@ options:
       - This option requires the notes format C("t1=v1 t2=v2 ...")
       - The option O(get_properties) must be enabled.
     type: str
-    version_added: 10.8.0
+    version_added: 11.0.0
   inventory_hostname_required:
     description:
       - If enabled, the tag declared in O(inventory_hostname_tag) is required.
