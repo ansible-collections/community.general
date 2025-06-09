@@ -3,20 +3,24 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 try:
     from unittest.mock import MagicMock, patch, mock_open  # Python 3.x
     import builtins
+
     open_path = "builtins.open"
 except ImportError:
     from mock import MagicMock, patch, mock_open  # Python 2.x
     import __builtin__ as builtins
+
     open_path = "__builtin__.open"
 
 import json
 
 from ansible_collections.community.general.plugins.modules import jenkins_credential
+
 
 def test_validate_file_exist_passes_when_file_exists():
     module = MagicMock()
@@ -24,30 +28,37 @@ def test_validate_file_exist_passes_when_file_exists():
         jenkins_credential.validate_file_exist(module, "/some/file/path")
         module.fail_json.assert_not_called()
 
+
 def test_validate_file_exist_fails_when_file_missing():
     module = MagicMock()
     with patch("os.path.exists", return_value=False):
         jenkins_credential.validate_file_exist(module, "/missing/file/path")
-        module.fail_json.assert_called_once_with(msg="File not found: /missing/file/path")
+        module.fail_json.assert_called_once_with(
+            msg="File not found: /missing/file/path"
+        )
 
-@patch("ansible_collections.community.general.plugins.modules.jenkins_credential.fetch_url")
+
+@patch(
+    "ansible_collections.community.general.plugins.modules.jenkins_credential.fetch_url"
+)
 def test_get_jenkins_crumb_sets_crumb_header(fetch_mock):
     module = MagicMock()
     module.params = {"type": "file", "url": "http://localhost:8080"}
     headers = {}
 
     fake_response = MagicMock()
-    fake_response.read.return_value = json.dumps({
-        "crumbRequestField": "crumb_field",
-        "crumb": "abc123"
-    }).encode("utf-8")
+    fake_response.read.return_value = json.dumps(
+        {"crumbRequestField": "crumb_field", "crumb": "abc123"}
+    ).encode("utf-8")
 
-    fetch_mock.return_value = (fake_response, {
-        "status": 200,
-        "set-cookie": "JSESSIONID=something; Path=/"
-    })
+    fetch_mock.return_value = (
+        fake_response,
+        {"status": 200, "set-cookie": "JSESSIONID=something; Path=/"},
+    )
 
-    crumb_request_field, crumb, session_coockie = jenkins_credential.get_jenkins_crumb(module, headers)
+    crumb_request_field, crumb, session_coockie = jenkins_credential.get_jenkins_crumb(
+        module, headers
+    )
 
     assert "Cookie" not in headers
     assert "crumb_field" in headers
@@ -55,25 +66,27 @@ def test_get_jenkins_crumb_sets_crumb_header(fetch_mock):
     assert headers[crumb_request_field] == crumb
 
 
-
-@patch("ansible_collections.community.general.plugins.modules.jenkins_credential.fetch_url")
+@patch(
+    "ansible_collections.community.general.plugins.modules.jenkins_credential.fetch_url"
+)
 def test_get_jenkins_crumb_sets_cookie_if_type_token(fetch_mock):
     module = MagicMock()
     module.params = {"type": "token", "url": "http://localhost:8080"}
     headers = {}
 
     fake_response = MagicMock()
-    fake_response.read.return_value = json.dumps({
-        "crumbRequestField": "crumb_field",
-        "crumb": "secure"
-    }).encode("utf-8")
+    fake_response.read.return_value = json.dumps(
+        {"crumbRequestField": "crumb_field", "crumb": "secure"}
+    ).encode("utf-8")
 
-    fetch_mock.return_value = (fake_response, {
-        "status": 200,
-        "set-cookie": "JSESSIONID=token-cookie; Path=/"
-    })
+    fetch_mock.return_value = (
+        fake_response,
+        {"status": 200, "set-cookie": "JSESSIONID=token-cookie; Path=/"},
+    )
 
-    crumb_request_field, crumb, session_cookie = jenkins_credential.get_jenkins_crumb(module, headers)
+    crumb_request_field, crumb, session_cookie = jenkins_credential.get_jenkins_crumb(
+        module, headers
+    )
 
     assert "crumb_field" in headers
     assert crumb == "secure"
@@ -81,7 +94,9 @@ def test_get_jenkins_crumb_sets_cookie_if_type_token(fetch_mock):
     assert headers["Cookie"] == session_cookie
 
 
-@patch("ansible_collections.community.general.plugins.modules.jenkins_credential.fetch_url")
+@patch(
+    "ansible_collections.community.general.plugins.modules.jenkins_credential.fetch_url"
+)
 def test_get_jenkins_crumb_fails_on_non_200_status(fetch_mock):
     module = MagicMock()
     module.params = {"type": "file", "url": "http://localhost:8080"}
@@ -95,17 +110,18 @@ def test_get_jenkins_crumb_fails_on_non_200_status(fetch_mock):
     assert "Failed to fetch Jenkins crumb" in module.fail_json.call_args[1]["msg"]
 
 
-@patch("ansible_collections.community.general.plugins.modules.jenkins_credential.fetch_url")
+@patch(
+    "ansible_collections.community.general.plugins.modules.jenkins_credential.fetch_url"
+)
 def test_get_jenkins_crumb_removes_job_from_url(fetch_mock):
     module = MagicMock()
     module.params = {"type": "file", "url": "http://localhost:8080/job/test"}
     headers = {}
 
     fake_response = MagicMock()
-    fake_response.read.return_value = json.dumps({
-        "crumbRequestField": "Jenkins-Crumb",
-        "crumb": "xyz"
-    }).encode("utf-8")
+    fake_response.read.return_value = json.dumps(
+        {"crumbRequestField": "Jenkins-Crumb", "crumb": "xyz"}
+    ).encode("utf-8")
 
     fetch_mock.return_value = (fake_response, {"status": 200, "set-cookie": ""})
 
@@ -114,6 +130,7 @@ def test_get_jenkins_crumb_removes_job_from_url(fetch_mock):
     url_called = fetch_mock.call_args[0][1]
     assert url_called == "http://localhost:8080/crumbIssuer/api/json"
 
+
 def test_clean_data_removes_extraneous_fields():
     data = {
         "id": "cred1",
@@ -121,13 +138,16 @@ def test_clean_data_removes_extraneous_fields():
         "jenkins_user": "admin",
         "token": "secret",
         "url": "http://localhost:8080",
-        "file_path": None
+        "file_path": None,
     }
     expected = {"id": "cred1", "description": "test"}
     result = jenkins_credential.clean_data(data)
     assert result == expected, "Expected {}, got {}".format(expected, result)
 
-@patch("ansible_collections.community.general.plugins.modules.jenkins_credential.fetch_url")
+
+@patch(
+    "ansible_collections.community.general.plugins.modules.jenkins_credential.fetch_url"
+)
 def test_target_exists_returns_true_on_200(fetch_url_mock):
     module = MagicMock()
     module.params = {
@@ -144,7 +164,9 @@ def test_target_exists_returns_true_on_200(fetch_url_mock):
     assert jenkins_credential.target_exists(module) is True
 
 
-@patch("ansible_collections.community.general.plugins.modules.jenkins_credential.fetch_url")
+@patch(
+    "ansible_collections.community.general.plugins.modules.jenkins_credential.fetch_url"
+)
 def test_target_exists_returns_false_on_404(fetch_url_mock):
     module = MagicMock()
     module.params = {
@@ -161,7 +183,9 @@ def test_target_exists_returns_false_on_404(fetch_url_mock):
     assert jenkins_credential.target_exists(module) is False
 
 
-@patch("ansible_collections.community.general.plugins.modules.jenkins_credential.fetch_url")
+@patch(
+    "ansible_collections.community.general.plugins.modules.jenkins_credential.fetch_url"
+)
 def test_target_exists_calls_fail_json_on_unexpected_status(fetch_url_mock):
     module = MagicMock()
     module.params = {
@@ -180,7 +204,9 @@ def test_target_exists_calls_fail_json_on_unexpected_status(fetch_url_mock):
     assert "Unexpected status code" in module.fail_json.call_args[1]["msg"]
 
 
-@patch("ansible_collections.community.general.plugins.modules.jenkins_credential.fetch_url")
+@patch(
+    "ansible_collections.community.general.plugins.modules.jenkins_credential.fetch_url"
+)
 def test_target_exists_skips_check_for_token_type(fetch_url_mock):
     module = MagicMock()
     module.params = {
@@ -196,7 +222,10 @@ def test_target_exists_skips_check_for_token_type(fetch_url_mock):
     assert jenkins_credential.target_exists(module) is False
     fetch_url_mock.assert_not_called()
 
-@patch("ansible_collections.community.general.plugins.modules.jenkins_credential.fetch_url")
+
+@patch(
+    "ansible_collections.community.general.plugins.modules.jenkins_credential.fetch_url"
+)
 def test_delete_target_fails_deleting(fetch_mock):
     module = MagicMock()
     module.params = {
@@ -205,7 +234,7 @@ def test_delete_target_fails_deleting(fetch_mock):
         "url": "http://localhost:8080",
         "id": "token-id",
         "location": "system",
-        "scope": "_"
+        "scope": "_",
     }
     headers = {"Authorization": "Basic abc", "Content-Type": "whatever"}
 
@@ -216,7 +245,11 @@ def test_delete_target_fails_deleting(fetch_mock):
     module.fail_json.assert_called_once()
     assert "Failed to delete" in module.fail_json.call_args[1]["msg"]
 
-@patch("ansible_collections.community.general.plugins.modules.jenkins_credential.fetch_url", side_effect=Exception("network error"))
+
+@patch(
+    "ansible_collections.community.general.plugins.modules.jenkins_credential.fetch_url",
+    side_effect=Exception("network error"),
+)
 def test_delete_target_raises_exception(fetch_mock):
     module = MagicMock()
     module.params = {
@@ -225,7 +258,7 @@ def test_delete_target_raises_exception(fetch_mock):
         "location": "system",
         "url": "http://localhost:8080",
         "id": "domain-id",
-        "scope": "_"
+        "scope": "_",
     }
     headers = {"Authorization": "Basic auth"}
 
@@ -235,11 +268,14 @@ def test_delete_target_raises_exception(fetch_mock):
     assert "Exception during delete" in module.fail_json.call_args[1]["msg"]
     assert "network error" in module.fail_json.call_args[1]["msg"]
 
+
 def test_read_privateKey_returns_trimmed_contents():
     module = MagicMock()
     module.params = {"private_key_path": "/fake/path/key.pem"}
 
-    mocked_file = mock_open(read_data="\n   \t  -----BEGIN PRIVATE KEY-----\nKEYDATA\n-----END PRIVATE KEY-----   \n\n")
+    mocked_file = mock_open(
+        read_data="\n   \t  -----BEGIN PRIVATE KEY-----\nKEYDATA\n-----END PRIVATE KEY-----   \n\n"
+    )
     with patch(open_path, mocked_file):
         result = jenkins_credential.read_privateKey(module)
 
@@ -247,6 +283,7 @@ def test_read_privateKey_returns_trimmed_contents():
 
     assert result == expected
     mocked_file.assert_called_once_with("/fake/path/key.pem", "r")
+
 
 def test_read_privateKey_handles_file_read_error():
     module = MagicMock()
@@ -258,6 +295,7 @@ def test_read_privateKey_handles_file_read_error():
     module.fail_json.assert_called_once()
     assert "Failed to read private key file" in module.fail_json.call_args[1]["msg"]
 
+
 def test_embed_file_into_body_returns_multipart_fields():
     module = MagicMock()
     file_path = "/fake/path/secret.pem"
@@ -267,8 +305,9 @@ def test_embed_file_into_body_returns_multipart_fields():
     mock = mock_open()
     mock.return_value.read.return_value = fake_file_content
 
-    with patch("os.path.basename", return_value="secret.pem"), \
-         patch.object(builtins, "open", mock):
+    with patch("os.path.basename", return_value="secret.pem"), patch.object(
+        builtins, "open", mock
+    ):
         body, content_type = jenkins_credential.embed_file_into_body(
             module, file_path, credentials.copy()
         )
@@ -277,7 +316,8 @@ def test_embed_file_into_body_returns_multipart_fields():
 
     # Check if file content is embedded in body
     assert b"MY SECRET DATA" in body
-    assert b"filename=\"secret.pem\"" in body
+    assert b'filename="secret.pem"' in body
+
 
 def test_embed_file_into_body_fails_when_file_unreadable():
     module = MagicMock()
@@ -290,13 +330,15 @@ def test_embed_file_into_body_fails_when_file_unreadable():
     module.fail_json.assert_called_once()
     assert "Failed to read file" in module.fail_json.call_args[1]["msg"]
 
+
 def test_embed_file_into_body_injects_file_keys_into_credentials():
     module = MagicMock()
     file_path = "/fake/path/file.txt"
     credentials = {"id": "test"}
 
-    with patch(open_path, mock_open(read_data=b"1234")), \
-         patch("os.path.basename", return_value="file.txt"):
+    with patch(open_path, mock_open(read_data=b"1234")), patch(
+        "os.path.basename", return_value="file.txt"
+    ):
 
         jenkins_credential.embed_file_into_body(module, file_path, credentials)
 
