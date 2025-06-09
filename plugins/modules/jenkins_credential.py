@@ -19,7 +19,7 @@ description:
   - Create, update, and delete different credential types such as C(username/password), C(secret text), C(SSH key), C(certificates), C(GitHub App), and domains.
   - For scoped domains (type I(scope)), it supports restrictions based on V(hostname), V(hostname:port), V(path), and V(scheme).
 requirements:
-  - urllib3
+  - urllib3 >= 1.26.0
 author:
   - Youssef Ali (@YoussefKhalidAli)
 extends_documentation_fragment:
@@ -32,32 +32,42 @@ attributes:
 options:
   id:
     description:
-      - The ID the Jenkins credential or domain.
-    required: true
+      - The ID of the Jenkins credential or domain.
     type: str
   type:
     description:
       - Type of the credential or action.
     choices:
-      - userAndPass
+      - user_and_pass
       - file
       - text
-      - githubApp
-      - sshKey
+      - github_app
+      - ssh_key
       - certificate
       - scope
+      - token
     type: str
   state:
     description:
       - The state of the credential.
-    choices: [present, absent]
+    choices:
+      - present
+      - absent
     default: present
     type: str
   scope:
     description:
       - Jenkins credential domain scope.
+      - Deleting a domain scope will delete all credentials within it.
     type: str
     default: '_'
+  force:
+    description:
+      - Force update if the credential already exists, used with O(state=present).
+      - If set to true, it will delete the existing credential before creating a new one.
+      - Always returns changed=True.
+    type: bool
+    default: false
   url:
     description:
       - Jenkins server URL.
@@ -68,10 +78,13 @@ options:
       - Jenkins user for authentication.
     required: true
     type: str
+  jenkins_password:
+    description:
+      - Jenkins password for token creation. required if O(type=token).
+    type: str
   token:
     description:
-      - Jenkins API token.
-    required: true
+      - Jenkins API token. Required if the C(type) is not set to I(token).
     type: str
   description:
     description:
@@ -80,28 +93,40 @@ options:
     type: str
   location:
     description:
-      - Location of the credential. Either system or folder.
-      - If location is a folder then url must be set to <jenkins-server>/job/<folder_name>.
+      - Location of the credential. Either V(system) or V(folder).
+      - If location is a folder then url must be set to V(<jenkins-server>/job/<folder_name>).
     choices:
       - system
       - folder
     default: 'system'
     type: str
+  name:
+    description:
+      - Name of the token to generate. Required if O(type=token).
+      - When generating a new token, don't pass C(id). It will be generated autCmatically.
+      - Creating two tokens with the same name will generate two distinct tokens with different V(tokenUuid) values.
+      - Replacing a token with another one of the same name requires deleting the original first using O(force=True).
+    type: str
   username:
     description:
-      - Username for credentials that require it (e.g., sshKey, userAndPass).
+      - Username for credentials that require it (for example O(type=ssh_key) or O(type=user_and_pass)).
     type: str
   password:
     description:
-      - Password or secret text.
+      - Password for credentials that required it (for example O(type=user_and_passs) or O(type=certificate)).
     type: str
   secret:
     description:
-      - Secret text (used in "text" type).
+      - Secret text (used when O(type=text)).
     type: str
   appID:
     description:
       - GitHub App ID.
+    type: str
+  api_uri:
+    description:
+      - Link to Github api
+    default: 'https://api.github.com'
     type: str
   owner:
     description:
@@ -109,12 +134,13 @@ options:
     type: str
   file_path:
     description:
-      - File path to secret (e.g., private key, certificate).
-    type: str
+      - File path to secret file (for example O(type=file) or O(type=certificate)).
+      - For O(type=certificate), this can be a V(.p12) or V(.pem) file.
+    type: path
   private_key_path:
     description:
-      - Path to private key file for PEM certificates.
-    type: str
+      - Path to private key file for PEM certificates or github apps.
+    type: path
   passphrase:
     description:
       - SSH passphrase if exists.
@@ -127,250 +153,228 @@ options:
   exc_hostname:
     description:
       - List of hostnames to exclude from scope.
+      - If a hostname appears in both this list and C(inc_hostname), the hostname is excluded.
     type: list
     elements: str
   inc_hostname_port:
     description:
-      - List of host:port to include in scope.
+      - List of V(host:port) to include in scope.
     type: list
     elements: str
   exc_hostname_port:
     description:
       - List of host:port to exclude from scope.
+      - If a hostname and port appears in both this list and C(inc_hostname_port), it is excluded.
     type: list
     elements: str
   inc_path:
     description:
-      - List of URL paths to include.
+      - List of URL paths to include when matching credentials to domains.
+      - "B(Matching is hierarchical): subpaths of excluded paths are also excluded, even if explicitly included."
     type: list
     elements: str
   exc_path:
     description:
       - List of URL paths to exclude.
+      - If a path is also matched by C(exc_path), it will be excluded.
+      - Excluded Subpaths of included paths will be excluded.
     type: list
     elements: str
   schemes:
     description:
-      - List of schemes (e.g., http, https) to match.
+      - List of schemes (for example V(http) or V(https)) to match.
     type: list
     elements: str
 """
 
 EXAMPLES = r"""
-    - name: Add CUSTOM scope credential
-      jenkins_credential:
-        id: "CUSTOM"
-        type: "scope"
-        jenkins_user: "admin"
-        token: "token"
-        description: "Custom scope credential"
-        inc_path:
-          - "include/path"
-          - "include/path2"
-        exc_path:
-          - "exclude/path"
-          - "exclude/path2"
-        inc_hostname:
-          - "included-hostname"
-          - "included-hostname2"
-        exc_hostname:
-          - "excluded-hostname"
-          - "excluded-hostname2"
-        schemes:
-          - "http"
-          - "https"
-        inc_hostname_port:
-          - "included-hostname:7000"
-          - "included-hostname2:7000"
-        exc_hostname_port:
-          - "excluded-hostname:7000"
-          - "excluded-hostname2:7000"
+- name: Generate token
+  community.general.jenkins_credential:
+    id: "test-token"
+    jenkins_user: "admin"
+    jenkins_password: "password"
+    type: "token"
+  register: token_result
 
-    - name: Add userAndPass credential
-      jenkins_credential:
-        scope: "CUSTOM"
-        id: "userpass-id"
-        type: "userAndPass"
-        jenkins_user: "admin"
-        token: "token"
-        description: "User and password credential"
-        username: "user1"
-        password: "pass1"
+- name: Add CUSTOM scope credential
+  community.general.jenkins_credential:
+    id: "CUSTOM"
+    type: "scope"
+    jenkins_user: "admin"
+    token: "{{ token }}"
+    description: "Custom scope credential"
+    inc_path:
+      - "include/path"
+      - "include/path2"
+    exc_path:
+      - "exclude/path"
+      - "exclude/path2"
+    inc_hostname:
+      - "included-hostname"
+      - "included-hostname2"
+    exc_hostname:
+      - "excluded-hostname"
+      - "excluded-hostname2"
+    schemes:
+      - "http"
+      - "https"
+    inc_hostname_port:
+      - "included-hostname:7000"
+      - "included-hostname2:7000"
+    exc_hostname_port:
+      - "excluded-hostname:7000"
+      - "excluded-hostname2:7000"
 
-    - name: Add file credential
-      jenkins_credential:
-        id: "file-id"
-        type: "file"
-        jenkins_user: "admin"
-        token: "token"
-        description: "File credential"
-        file_path: "my-secret.pem"
+- name: Add user_and_pass credential
+  community.general.jenkins_credential:
+    id: "userpass-id"
+    type: "user_and_pass"
+    jenkins_user: "admin"
+    token: "{{ token }}"
+    description: "User and password credential"
+    username: "user1"
+    password: "pass1"
 
-    - name: Add text credential
-      jenkins_credential:
-        id: "text-id"
-        type: "text"
-        jenkins_user: "admin"
-        token: "token"
-        description: "Text credential"
-        secret: "mysecrettext"
+- name: Add file credential to custom scope
+  community.general.jenkins_credential:
+    id: "file-id"
+    type: "file"
+    jenkins_user: "admin"
+    token: "{{ token }}"
+    scope: "CUSTOM"
+    description: "File credential"
+    file_path: "../vars/my-secret.pem"
 
-    - name: Add githubApp credential
-      jenkins_credential:
-        id: "githubapp-id"
-        type: "githubApp"
-        jenkins_user: "admin"
-        token: "token"
-        description: "GitHub App credential"
-        appID: "12345"
-        file_path: "my-secret.pem"
-        owner: "github_owner"
+- name: Add text credential to folder
+  community.general.jenkins_credential:
+    id: "text-id"
+    type: "text"
+    jenkins_user: "admin"
+    token: "{{ token }}"
+    description: "Text credential"
+    secret: "mysecrettext"
+    location: "folder"
+    url: "http://localhost:8080/job/test"
 
-    - name: Add sshKey credential
-      jenkins_credential:
-        id: "sshkey-id"
-        type: "sshKey"
-        jenkins_user: "admin"
-        token: "token"
-        description: "SSH key credential"
-        username: "sshuser"
-        file_path: "my-secret.pem"
-        passphrase: "passphrase"
+- name: Add githubApp credential
+  community.general.jenkins_credential:
+    id: "githubapp-id"
+    type: "github_app"
+    jenkins_user: "admin"
+    token: "{{ token }}"
+    description: "GitHub app credential"
+    appID: "12345"
+    file_path: "../vars/github.pem"
+    owner: "github_owner"
 
-    - name: Add certificate credential (p12)
-      jenkins_credential:
-        id: "certificate-id"
-        type: "certificate"
-        jenkins_user: "admin"
-        token: "token"
-        description: "Certificate credential"
-        password: "12345678901234"
-        file_path: "certificate.p12"
+- name: Add sshKey credential
+  community.general.jenkins_credential:
+    id: "sshkey-id"
+    type: "ssh_key"
+    jenkins_user: "admin"
+    token: "{{ token }}"
+    description: "SSH key credential"
+    username: "sshuser"
+    file_path: "../vars/ssh_key"
+    passphrase: 1234
 
-    - name: Add certificate credential (pem)
-      jenkins_credential:
-        id: "certificate-id-pem"
-        type: "certificate"
-        jenkins_user: "admin"
-        token: "token"
-        description: "Certificate credential (pem)"
-        file_path: "cert.pem"
-        private_key_path: "private.key"
+- name: Add certificate credential (p12)
+  community.general.jenkins_credential:
+    id: "certificate-id"
+    type: "certificate"
+    jenkins_user: "admin"
+    token: "{{ token }}"
+    description: "Certificate credential"
+    password: "12345678901234"
+    file_path: "../vars/certificate.p12"
 
-    - name: Delete credential
-      jenkins_credential:
-        id: "credential-id"
-        state: "delete"
-        jenkins_user: "admin"
-        token: "{{ token }}"
-
-    - name: Delete scope
-      jenkins_credential:
-        id: "scope-id"
-        state: "delete"
-        type: "scope"
-        jenkins_user: "admin"
-        token: "{{ token }}"
-
+- name: Add certificate credential (pem)
+  community.general.jenkins_credential:
+    id: "certificate-id-pem"
+    type: "certificate"
+    jenkins_user: "admin"
+    token: "{{ token }}"
+    description: "Certificate credential (pem)"
+    file_path: "../vars/cert.pem"
+    private_key_path: "../vars/private.key"
 """
-# Edit is done the same way as add. (id must be the same as the one used to add the credential)
-
 RETURN = r"""
-changed:
-    description: Whether a change was made.
-    type: bool
-    returned: always
-message:
-    description: Message of the result of the operation.
-    type: str
-    returned: always
 details:
-    description: Incase of errors return more details.
+    description: In case of errors return more details.
     type: str
     returned: Error
+token:
+    description:
+      - The generated API token if type is O(type=token).
+      - This is needed to authenticate API calls later.
+      - This should be stored securely, as it is the only time it is returned.
+    type: str
+    returned: success
+tokenUuid:
+    description:
+      - The generated id of the token.
+      - This is passed as C(id) to edit or revoke the token later.
+      - This should be stored securely, as it is the only time it is returned.
+    type: str
+    returned: success
 """
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url, basic_auth_header
+from ansible.module_utils.six.moves.urllib.parse import urlencode
+from ansible_collections.community.general.plugins.module_utils import deps
 
 import json
 import os
 import base64
-import traceback
-import urllib
 
-try:
+with deps.declare("urllib3", reason="urllib3 is required to embed files into requests"):
     import urllib3
-except ImportError:
-    HAS_URLLIB3 = False
-    URLLIB3_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_URLLIB3 = True
-    URLLIB3_IMPORT_ERROR = None
 
 
-# Function to validate required fields based on credential type and check file existence.
-def validate_required_fields(module, cred_type):
-    required_fields_map = {
-        "userAndPass": ["username", "password"],
-        "file": ["file_path"],
-        "text": ["secret"],
-        "githubApp": ["appID", "file_path"],
-        "sshKey": ["username", "file_path"],
-        "certificate": ["file_path"],  # special case handled below
-    }
+# Function to validate file paths exist on disk
+def validate_file_exist(module, path):
 
-    missing = []
-    file_check_fields = ["file_path", "private_key_path"]
-
-    # Basic param presence validation
-    for field in required_fields_map.get(cred_type, []):
-        if not module.params.get(field):
-            missing.append(field)
-
-    # Extra logic for certificate type
-    if cred_type == "certificate" and module.params["file_path"]:
-        ext = os.path.splitext(module.params["file_path"])[1].lower()
-        if ext in [".p12", ".pfx"] and not module.params["password"]:
-            missing.append("password")
-        elif ext in [".pem", ".crt"] and not module.params["private_key_path"]:
-            missing.append("private_key_path")
-
-    # Validate file paths exist on disk
-    for field in file_check_fields:
-        path = module.params.get(field)
-        if path and not os.path.exists(path):
-            module.fail_json(msg="File not found: {}".format(path))
-
-    if missing:
-        module.fail_json(
-            msg="Missing required fields for type '{}': {}".format(
-                cred_type, ", ".join(missing)
-            )
-        )
+    if path and not os.path.exists(path):
+        module.fail_json(msg="File not found: {}".format(path))
 
 
 # Gets the Jenkins crumb for CSRF protection which is required for API calls
-def get_jenkins_crumb(module, url, user, token):
+def get_jenkins_crumb(module, headers):
+    type = module.params["type"]
+    url = module.params["url"]
 
     if "/job" in url:
         url = url.split("/job")[0]
 
     crumb_url = "{}/crumbIssuer/api/json".format(url)
 
-    headers = {"Authorization": basic_auth_header(user, token)}
-
     response, info = fetch_url(module, crumb_url, headers=headers)
 
     if info["status"] != 200:
-        return None, None
+        module.fail_json(msg="Failed to fetch Jenkins crumb. Confirm token is real.")
+
+    # Cookie is needed to generate API token
+    cookie = info.get("set-cookie", "")
+    session_cookie = cookie.split(";")[0] if cookie else None
 
     try:
         data = response.read()
         json_data = json.loads(data)
-        return json_data["crumbRequestField"], json_data["crumb"]
+        crumb_request_field = json_data["crumbRequestField"]
+        crumb = json_data["crumb"]
+        headers[crumb_request_field] = crumb  # Set the crumb in headers
+        headers["Content-Type"] = (
+            "application/x-www-form-urlencoded"  # Set Content-Type for form data
+        )
+        if type == "token":
+            headers["Cookie"] = (
+                session_cookie  # Set session cookie for token operations
+            )
+        return crumb_request_field, crumb, session_cookie  # Return for test purposes
+
     except Exception:
-        return None, None
+        return None
 
 
 # Function to clean the data sent via API by removing unwanted keys and None values
@@ -380,10 +384,16 @@ def clean_data(data):
         "url",
         "token",
         "jenkins_user",
+        "jenkins_password",
         "file_path",
+        "private_key_path",
         "type",
         "state",
+        "force",
+        "name",
         "scope",
+        "location",
+        "api_uri",
     }
 
     # Filter out None values and unwanted keys
@@ -397,18 +407,26 @@ def clean_data(data):
 
 
 # Function to check if credentials/domain exists
-def target_exists(module, url, location, scope, name, user, token, check_domain=False):
+def target_exists(module, check_domain=False):
+    url = module.params["url"]
+    location = module.params["location"]
+    scope = module.params["scope"]
+    name = module.params["id"]
+    user = module.params["jenkins_user"]
+    token = module.params["token"]
+
+    headers = {"Authorization": basic_auth_header(user, token)}
 
     if module.params["type"] == "scope" or check_domain:
         target_url = "{}/credentials/store/{}/domain/{}/api/json".format(
             url, location, scope if check_domain else name
         )
+    elif module.params["type"] == "token":
+        return False  # Can't check token
     else:
         target_url = "{}/credentials/store/{}/domain/{}/credential/{}/api/json".format(
             url, location, scope, name
         )
-
-    headers = {"Authorization": basic_auth_header(user, token)}
 
     response, info = fetch_url(module, target_url, headers=headers)
     status = info.get("status", 0)
@@ -426,16 +444,29 @@ def target_exists(module, url, location, scope, name, user, token, check_domain=
 
 
 # Function to delete the scope or credential provided
-def delete_scope_or_credential(module, url, location, headers, id, scope):
-    try:
-        type = module.params["type"]
-        # Remove Content-Type header if present (like your original)
-        headers.pop("Content-Type", None)
+def delete_target(module, headers):
+    user = module.params["jenkins_user"]
+    type = module.params["type"]
+    url = module.params["url"]
+    location = module.params["location"]
+    id = module.params["id"]
+    scope = module.params["scope"]
 
-        if type == "scope":
+    body = False
+
+    try:
+
+        if type == "token":
+            delete_url = "{}/user/{}/descriptorByName/jenkins.security.ApiTokenProperty/revoke".format(
+                url, user
+            )
+            body = urlencode({"tokenUuid": id})
+
+        elif type == "scope":
             delete_url = "{}/credentials/store/{}/domain/{}/doDelete".format(
                 url, location, id
             )
+
         else:
             delete_url = (
                 "{}/credentials/store/{}/domain/{}/credential/{}/doDelete".format(
@@ -443,32 +474,30 @@ def delete_scope_or_credential(module, url, location, headers, id, scope):
                 )
             )
 
-        # Add Basic Auth header
-        user = module.params["jenkins_user"]
-        token = module.params["token"]
-        headers["Authorization"] = basic_auth_header(user, token)
-
-        response, info = fetch_url(module, delete_url, headers=headers, method="POST")
+        response, info = fetch_url(
+            module,
+            delete_url,
+            headers=headers,
+            data=body if body else None,
+            method="POST",
+        )
 
         status = info.get("status", 0)
-        if status >= 400:
+        if not status == 200:
             module.fail_json(
                 msg="Failed to delete: HTTP {}, {}, {}".format(
                     status, response, headers
                 )
             )
 
-        # Restore Content-Type header for future use
-        headers["Content-Type"] = "application/x-www-form-urlencoded"
-
     except Exception as e:
         module.fail_json(msg="Exception during delete: {}".format(str(e)))
 
 
-# Function to read the private key for types texts and sshKey
+# Function to read the private key for types texts and ssh_key
 def read_privateKey(module):
     try:
-        with open(module.params["file_path"], "r") as f:
+        with open(module.params["private_key_path"], "r") as f:
             private_key = f.read().strip()
             return private_key
     except Exception as e:
@@ -488,6 +517,7 @@ def embed_file_into_body(module, file_path, credentials):
             file_bytes = f.read()
     except Exception as e:
         module.fail_json(msg="Failed to read file: {}".format(str(e)))
+        return "", ""  # Return for test purposes
 
     credentials.update(
         {
@@ -509,99 +539,91 @@ def run_module():
 
     module = AnsibleModule(
         argument_spec=dict(
-            id=dict(type="str", required=True),  # Id
+            id=dict(type="str"),
             type=dict(
                 type="str",
-                required=False,
                 choices=[
-                    "userAndPass",
+                    "user_and_pass",
                     "file",
                     "text",
-                    "githubApp",
-                    "sshKey",
+                    "github_app",
+                    "ssh_key",
                     "certificate",
                     "scope",
+                    "token",
                 ],
-            ),  # Credential type
+            ),  # Credential type to add
             state=dict(
                 type="str",
-                required=False,
                 default="present",
                 choices=["present", "absent"],
-            ),  # State of the credential
-            scope=dict(
-                type="str", required=False, default="_"
-            ),  # Scope of the credential
-            url=dict(
-                type="str", required=False, default="http://localhost:8080"
-            ),  # Jenkins URL
-            jenkins_user=dict(type="str", required=True),  # Jenkins username
-            token=dict(type="str", required=True, no_log=True),  # Jenkins API token
-            description=dict(
-                type="str", required=False, default=""
-            ),  # Description of the credential
+            ),
+            force=dict(
+                type="bool", default=False
+            ),  # Force update if credential already exists
+            scope=dict(type="str", default="_"),  # Scope of the credential
+            url=dict(type="str", default="http://localhost:8080"),
+            jenkins_user=dict(type="str", required=True),
+            jenkins_password=dict(type="str", no_log=True),
+            token=dict(type="str", no_log=True),
+            description=dict(type="str", default=""),
             location=dict(
                 type="str",
-                required=False,
                 default="system",
                 choices=["system", "folder"],
-            ),  # Location of the credential (not used in this module)
-            username=dict(
-                type="str", required=False
-            ),  # Username for userAndPass and sshKey types
-            password=dict(
-                type="str", required=False, no_log=True
-            ),  # Password for userAndPass type
-            file_path=dict(
-                type="str", required=False, default=None
-            ),  # File path for file and sshKey types
-            secret=dict(type="str", required=False, no_log=True),  # Text for text type
-            appID=dict(type="str", required=False),  # App ID for githubApp type
-            owner=dict(type="str", required=False),  # Owner for githubApp type
-            passphrase=dict(
-                type="str", required=False, no_log=True
-            ),  # Passphrase for sshKey type
-            private_key_path=dict(
-                type="str", required=False, no_log=True
-            ),  # Private key path for certificate type
+            ),  # Location of the credential
+            name=dict(
+                type="str"
+            ),  # Name of the token to generate, required if type is token
+            username=dict(type="str"),
+            password=dict(type="str", no_log=True),
+            file_path=dict(type="path", default=None),
+            secret=dict(type="str", no_log=True),
+            appID=dict(type="str"),
+            api_uri=dict(type="str", default="https://api.github.com"),
+            owner=dict(type="str"),
+            passphrase=dict(type="str", no_log=True),
+            private_key_path=dict(type="path", no_log=True),
             # Scope specifications parameters
-            inc_hostname=dict(
-                type="list", required=False, elements="str"
-            ),  # Include hostname for scope type
-            exc_hostname=dict(
-                type="list", required=False, elements="str"
-            ),  # Exclude hostname for scope type
-            inc_hostname_port=dict(
-                type="list", required=False, elements="str"
-            ),  # Include hostname and port for scope type
-            exc_hostname_port=dict(
-                type="list", required=False, elements="str"
-            ),  # Exclude hostname and port for scope type
-            inc_path=dict(
-                type="list", required=False, elements="str"
-            ),  # Include path for scope type
-            exc_path=dict(
-                type="list", required=False, elements="str"
-            ),  # Exclude path for scope type
-            schemes=dict(
-                type="list", required=False, elements="str"
-            ),  # Schemes for scope type
+            inc_hostname=dict(type="list", elements="str"),
+            exc_hostname=dict(type="list", elements="str"),
+            inc_hostname_port=dict(type="list", elements="str"),
+            exc_hostname_port=dict(type="list", elements="str"),
+            inc_path=dict(type="list", elements="str"),
+            exc_path=dict(type="list", elements="str"),
+            schemes=dict(type="list", elements="str"),
         ),
         supports_check_mode=True,
+        required_if=[
+            ("state", "present", ["type"]),
+            ("state", "absent", ["id"]),
+            ("type", not "token", ["id", "token"]),
+            ("type", "token", ["name", "jenkins_password"]),
+            ("type", "user_and_pass", ["username", "password"]),
+            ("type", "file", ["file_path"]),
+            ("type", "text", ["secret"]),
+            ("type", "github_app", ["appID", "private_key_path"]),
+            ("type", "ssh_key", ["username", "private_key_path"]),
+            ("type", "certificate", ["file_path"]),
+        ],
     )
 
     # Parameters
     id = module.params["id"]
     type = module.params["type"]
     state = module.params["state"]
+    force = module.params["force"]
     scope = module.params["scope"]
     url = module.params["url"]
     jenkins_user = module.params["jenkins_user"]
+    jenkins_password = module.params["jenkins_password"]
+    name = module.params["name"]
     token = module.params["token"]
     description = module.params["description"]
     location = module.params["location"]
     filePath = module.params["file_path"]
     private_key_path = module.params["private_key_path"]
+    api_uri = module.params["api_uri"]
     inc_hostname = module.params["inc_hostname"]
     exc_hostname = module.params["exc_hostname"]
     inc_hostname_port = module.params["inc_hostname_port"]
@@ -610,52 +632,51 @@ def run_module():
     exc_path = module.params["exc_path"]
     schemes = module.params["schemes"]
 
-    if not HAS_URLLIB3:
-        module.fail_json(
-            msg=missing_required_lib("urllib3"), exception=URLLIB3_IMPORT_ERROR
-        )
+    deps.validate(module)
 
-    if state not in ["present", "absent"]:
-        module.fail_json(msg="Invalid state. Use 'present' or 'absent'.")
+    headers = {
+        "Authorization": basic_auth_header(jenkins_user, token or jenkins_password),
+    }
 
     # Get the crumb for CSRF protection
-    crumb_field, crumb_value = get_jenkins_crumb(module, url, jenkins_user, token)
-    if not crumb_field or not crumb_value:
-        module.fail_json(
-            msg="Failed to fetch Jenkins crumb. Check Jenkins URL and credentials."
-        )
+    get_jenkins_crumb(module, headers)
 
     result = dict(
         changed=False,
-        message="",
+        msg="",
     )
-
-    headers = {
-        "Authorization": basic_auth_header(jenkins_user, token),
-        crumb_field: crumb_value,
-        "Content-Type": "application/x-www-form-urlencoded",
-    }
 
     credentials = clean_data(module.params)
 
-    does_exist = target_exists(module, url, location, scope, id, jenkins_user, token)
+    does_exist = target_exists(module)
 
     # Check if the credential/domain doesn't exist and the user wants to delete
-    if not does_exist and state == "absent":
+    if not does_exist and state == "absent" and not type == "token":
         result["changed"] = False
-        result["message"] = "{} does not exist.".format(id)
+        result["msg"] = "{} does not exist.".format(id)
         module.exit_json(**result)
 
     if state == "present":
-        # Check if credential type is provided
-        if type is None:
-            module.fail_json(msg="Credential type is required for add or update")
 
-        # If updating, we need to delete the existing credential/domain first
-        if target_exists(module, url, location, scope, id, jenkins_user, token):
-            delete_scope_or_credential(module, url, location, headers, id, scope)
+        # If updating, we need to delete the existing credential/domain first based on force parameter
+        if force and (does_exist or type == "token"):
+            delete_target(module, headers)
+        elif does_exist and not force:
+            result["changed"] = False
+            result["msg"] = "{} already exists. Use force=True to update.".format(id)
+            module.exit_json(**result)
 
-        if type == "scope":
+        if type == "token":
+
+            post_url = "{}/user/{}/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken".format(
+                url, jenkins_user
+            )
+
+            body = "newTokenName={}".format(name)
+
+        elif type == "scope":
+
+            post_url = "{}/credentials/store/{}/createDomain".format(url, location)
 
             specifications = []
 
@@ -702,55 +723,48 @@ def run_module():
             }
 
         else:
-            validate_required_fields(module, type)
+            if filePath:
+                validate_file_exist(module, filePath)
+            elif private_key_path:
+                validate_file_exist(module, private_key_path)
 
-            if type == "userAndPass":
+            post_url = "{}/credentials/store/{}/domain/{}/createCredentials".format(
+                url, location, scope
+            )
 
-                credentials.update(
-                    {
-                        "$class": "com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl",
-                    }
-                )
+            cred_class = {
+                "user_and_pass": "com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl",
+                "file": "org.jenkinsci.plugins.plaincredentials.impl.FileCredentialsImpl",
+                "text": "org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl",
+                "github_app": "org.jenkinsci.plugins.github_branch_source.GitHubAppCredentials",
+                "ssh_key": "com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey",
+                "certificate": "com.cloudbees.plugins.credentials.impl.CertificateCredentialsImpl",
+            }
+            credentials.update({"$class": cred_class[type]})
 
-            elif type == "file":
-
-                credentials.update(
-                    {
-                        "$class": "org.jenkinsci.plugins.plaincredentials.impl.FileCredentialsImpl",
-                    }
-                )
+            if type == "file":
 
                 # Build multipart body and content-type
                 body, content_type = embed_file_into_body(module, filePath, credentials)
                 headers["Content-Type"] = content_type
 
-            elif type == "text":
-
-                credentials.update(
-                    {
-                        "$class": "org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl",
-                    }
-                )
-
-            elif type == "githubApp":
+            elif type == "github_app":
 
                 private_key = read_privateKey(module)
 
                 credentials.update(
                     {
-                        "$class": "org.jenkinsci.plugins.github_branch_source.GitHubAppCredentials",
                         "privateKey": private_key,
-                        "apiUri": "https://api.github.com",
+                        "apiUri": api_uri,
                     }
                 )
 
-            elif type == "sshKey":
+            elif type == "ssh_key":
 
                 private_key = read_privateKey(module)
 
                 credentials.update(
                     {
-                        "$class": "com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey",
                         "privateKeySource": {
                             "stapler-class": "com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey$DirectEntryPrivateKeySource",
                             "privateKey": private_key,
@@ -778,7 +792,6 @@ def run_module():
 
                     credentials.update(
                         {
-                            "$class": "com.cloudbees.plugins.credentials.impl.CertificateCredentialsImpl",
                             "keyStoreSource": {
                                 "$class": "com.cloudbees.plugins.credentials.impl.CertificateCredentialsImpl$UploadedKeyStoreSource",
                                 "uploadedKeystore": uploaded_keystore,
@@ -799,7 +812,6 @@ def run_module():
 
                     credentials.update(
                         {
-                            "$class": "com.cloudbees.plugins.credentials.impl.CertificateCredentialsImpl",
                             "keyStoreSource": {
                                 "$class": "com.cloudbees.plugins.credentials.impl.CertificateCredentialsImpl$PEMEntryKeyStoreSource",
                                 "certChain": cert_chain,
@@ -812,33 +824,23 @@ def run_module():
                     module.fail_json(
                         msg="Unsupported certificate file type. Only .p12, .pfx, .pem or .crt are supported."
                     )
+
             payload = {"credentials": credentials}
 
-        if not type == "file":
-            body = urllib.parse.urlencode({"json": json.dumps(payload)})
+        if not type == "file" and not type == "token":
+            body = urlencode({"json": json.dumps(payload)})
 
     else:  # Delete
 
-        # Absent state requires id
-        if not id:
-            module.fail_json(msg="id is required to delete a credential")
+        delete_target(module, headers)
 
-        delete_scope_or_credential(module, url, location, headers, id, scope)
+        module.exit_json(changed=True, msg="{} deleted successfully.".format(id))
 
-        module.exit_json(changed=True, message="{} deleted successfully.".format(id))
-
-    if not type == "scope" and not scope == "_":  # Check if custom scope exists
-        if not target_exists(
-            module, url, location, scope, id, jenkins_user, token, True
-        ):  # Trigger check scope
+    if (
+        not type == "scope" and not scope == "_"
+    ):  # Check if custom scope exists if adding to a custom scope
+        if not target_exists(module, True):
             module.fail_json(msg="Domain {} doesn't exists".format(scope))
-
-    if type == "scope":
-        post_url = "{}/credentials/store/{}/createDomain".format(url, location)
-    else:
-        post_url = "{}/credentials/store/{}/domain/{}/createCredentials".format(
-            url, location, scope
-        )
 
     try:
         response, info = fetch_url(
@@ -849,7 +851,7 @@ def run_module():
 
     status = info.get("status", 0)
 
-    if status >= 400:
+    if not status == 200:
         body = response.read() if response else b""
         module.fail_json(
             msg="Failed to {} credential".format(
@@ -858,8 +860,13 @@ def run_module():
             details=body.decode("utf-8", errors="ignore"),
         )
 
+    if type == "token":
+        response_data = json.loads(response.read())
+        result["token"] = response_data["data"]["tokenValue"]
+        result["tokenUuid"] = response_data["data"]["tokenUuid"]
+
     result["changed"] = True
-    result["message"] = response.read().decode("utf-8")
+    result["msg"] = response.read().decode("utf-8")
 
     module.exit_json(**result)
 
