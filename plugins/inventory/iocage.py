@@ -384,7 +384,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 if inventory_hostname_tag in tags:
                     update[hostname] = tags[inventory_hostname_tag]
                 elif inventory_hostname_required:
-                    raise AnsibleError(f'Mandatory tag {inventory_hostname_tag} is missing in the properties notes.')
+                    raise AnsibleError(f'Mandatory tag {inventory_hostname_tag!r} is missing in the properties notes.')
             for hostname, alias in update.items():
                 results['_meta']['hostvars'][alias] = results['_meta']['hostvars'].pop(hostname)
 
