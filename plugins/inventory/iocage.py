@@ -380,7 +380,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 raise AnsibleError('Jail properties are needed. Enable get_properties')
             update = {}
             for hostname, host_vars in results['_meta']['hostvars'].items():
-                tags = dict([tag.split('=') for tag in host_vars['iocage_properties']['notes'].split()])
+                tags = dict(tag.split('=', 1) for tag in host_vars['iocage_properties']['notes'].split() if '=' in tag)
                 if inventory_hostname_tag in tags:
                     update[hostname] = tags[inventory_hostname_tag]
                 elif inventory_hostname_required:
