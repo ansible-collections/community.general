@@ -377,7 +377,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         # Requires the notes format "t1=v1 t2=v2 ..."
         if inventory_hostname_tag:
             if not get_properties:
-                raise AnsibleError('Jail properties are needed. Enable get_properties')
+                raise AnsibleError('Jail properties are needed to use inventory_hostname_tag. Enable get_properties')
             update = {}
             for hostname, host_vars in results['_meta']['hostvars'].items():
                 tags = dict(tag.split('=', 1) for tag in host_vars['iocage_properties']['notes'].split() if '=' in tag)
