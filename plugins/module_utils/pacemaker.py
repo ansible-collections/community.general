@@ -14,7 +14,9 @@ _state_map = {
     "absent": "remove",
     "status": "status",
     "enabled": "enable",
-    "disabled": "disable"
+    "disabled": "disable",
+    "online": "start",
+    "offline": "stop",
 }
 
 
