@@ -1,0 +1,44 @@
+# -*- coding: utf-8 -*-
+# Copyright (c) Dexter Le (dextersydney2001@gmail.com)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+anchors:
+  environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+test_cases:
+  - id: test_missing_input
+    input: {}
+    output:
+      failed: true
+      msg: "missing required arguments: name"
+  - id: test_online_minimal_input_initial_online
+    input:
+      state: online
+    output:
+      changed: true
+      previous_value: "Started"
+      value: "Started"
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, pcsd, status]
+          environ: *env-def
+          rc: 0
+          out: |
+            pc3: Online
+            pc2: Online
+            pc1: Online
+          err: ""
+        - command: [/testbin/pcs, cluster, start, --wait=300]
+          environ: *env-def
+          rc: 0
+          out: "Started"
+          err: ""
+        - command: [/testbin/pcs, pcsd, status]
+          environ: *env-def
+          rc: 0
+          out: |
+            pc3: Online
+            pc2: Online
+            pc1: Online
+          err: ""
