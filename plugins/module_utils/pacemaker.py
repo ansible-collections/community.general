@@ -17,6 +17,7 @@ _state_map = {
     "disabled": "disable",
     "online": "start",
     "offline": "stop",
+    "maintenance": "set",
 }
 
 
