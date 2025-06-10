@@ -65,7 +65,7 @@
     token: "{{ token }}"
     scope: "CUSTOM"
     description: "File credential"
-    file_path: "{{ role_path }}/files/my-secret.pem"
+    file_path: "{{ output_dir }}/my-secret.pem"
   register: file_cred
 
 - name: Assert file credential changed value
@@ -102,7 +102,7 @@
     token: "{{ token }}"
     description: "GitHub app credential"
     appID: "12345"
-    private_key_path: "{{ role_path }}/files/github.pem"
+    private_key_path: "{{ output_dir }}/github.pem"
     owner: "github_owner"
   register: githubapp_cred
 
@@ -121,7 +121,7 @@
     token: "{{ token }}"
     description: "SSH key credential"
     username: "sshuser"
-    private_key_path: "{{ role_path }}/files/ssh_key"
+    private_key_path: "{{ output_dir }}/ssh_key"
     passphrase: 1234
   register: sshkey_cred
 
@@ -140,7 +140,7 @@
     token: "{{ token }}"
     description: "Certificate credential"
     password: "12345678901234"
-    file_path: "{{ role_path }}/files/certificate.p12"
+    file_path: "{{ output_dir }}/certificate.p12"
   register: cert_p12_cred
 
 - name: Assert certificate (p12) credential changed value
@@ -157,8 +157,8 @@
     jenkins_user: "ruffnut"
     token: "{{ token }}"
     description: "Certificate credential (pem)"
-    file_path: "{{ role_path }}/files/cert.pem"
-    private_key_path: "{{ role_path }}/files/private.key"
+    file_path: "{{ output_dir }}/cert.pem"
+    private_key_path: "{{ output_dir }}/private.key"
   register: cert_pem_cred
 
 - name: Assert certificate (pem) credential changed value

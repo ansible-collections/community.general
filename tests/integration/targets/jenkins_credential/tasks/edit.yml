@@ -55,7 +55,7 @@
     fail_msg: "CUSTOM scope changed status when it shouldn't"
     success_msg: "CUSTOM scope behaved correctly"
 
-- name: Add user_and_pass credential
+- name: Edit user_and_pass credential
   community.general.jenkins_credential:
     id: "userpass-id"
     type: "user_and_pass"
@@ -74,7 +74,7 @@
     fail_msg: "user_and_pass credential changed status incorrect"
     success_msg: "user_and_pass credential behaved correctly"
 
-- name: Add file credential to custom scope
+- name: Edit file credential to custom scope
   community.general.jenkins_credential:
     id: "file-id"
     type: "file"
@@ -82,7 +82,7 @@
     token: "{{ token }}"
     scope: "CUSTOM"
     description: "New file credential"
-    file_path: "{{ role_path }}/files/my-secret.pem"
+    file_path: "{{ output_dir }}/my-secret.pem"
     force: yes
   register: file_cred
 
@@ -93,7 +93,7 @@
     fail_msg: "file credential changed status incorrect"
     success_msg: "file credential behaved correctly"
 
-- name: Add text credential to folder
+- name: Edit text credential to folder
   community.general.jenkins_credential:
     id: "text-id"
     type: "text"
@@ -113,7 +113,7 @@
     fail_msg: "text credential changed status incorrect"
     success_msg: "text credential behaved correctly"
 
-- name: Add githubApp credential
+- name: Edit githubApp credential
   community.general.jenkins_credential:
     id: "githubapp-id"
     type: "github_app"
@@ -121,7 +121,7 @@
     token: "{{ token }}"
     description: "New GitHub app credential"
     appID: "12345678"
-    private_key_path: "{{ role_path }}/files/github.pem"
+    private_key_path: "{{ output_dir }}/github.pem"
     owner: "new_github_owner"
     force: yes
   register: githubapp_cred
@@ -133,7 +133,7 @@
     fail_msg: "githubApp credential changed status incorrect"
     success_msg: "githubApp credential behaved correctly"
 
-- name: Add sshKey credential
+- name: Edit sshKey credential
   community.general.jenkins_credential:
     id: "sshkey-id"
     type: "ssh_key"
@@ -141,7 +141,7 @@
     token: "{{ token }}"
     description: "New SSH key credential"
     username: "new_sshuser"
-    private_key_path: "{{ role_path }}/files/ssh_key"
+    private_key_path: "{{ output_dir }}/ssh_key"
     passphrase: 1234
     force: yes
   register: sshkey_cred
@@ -153,7 +153,7 @@
     fail_msg: "sshKey credential changed status incorrect"
     success_msg: "sshKey credential behaved correctly"
 
-- name: Add certificate credential (p12)
+- name: Edit certificate credential (p12)
   community.general.jenkins_credential:
     id: "certificate-id"
     type: "certificate"
@@ -161,7 +161,7 @@
     token: "{{ token }}"
     description: "New certificate credential"
     password: "12345678901234"
-    file_path: "{{ role_path }}/files/certificate.p12"
+    file_path: "{{ output_dir }}/certificate.p12"
     force: yes
   register: cert_p12_cred
 
@@ -172,15 +172,15 @@
     fail_msg: "certificate (p12) credential changed status incorrect"
     success_msg: "certificate (p12) credential behaved correctly"
 
-- name: Add certificate credential (pem)
+- name: Edit certificate credential (pem)
   community.general.jenkins_credential:
     id: "certificate-id-pem"
     type: "certificate"
     jenkins_user: "ruffnut"
     token: "{{ token }}"
     description: "New certificate credential (pem)"
-    file_path: "{{ role_path }}/files/cert.pem"
-    private_key_path: "{{ role_path }}/files/private.key"
+    file_path: "{{ output_dir }}/cert.pem"
+    private_key_path: "{{ output_dir }}/private.key"
     force: yes
   register: cert_pem_cred
 

@@ -17,7 +17,7 @@ version_added: 11.0.0
 description:
   - This module allows managing Jenkins credentials and domain scopes via the Jenkins HTTP API.
   - Create, update, and delete different credential types such as C(username/password), C(secret text), C(SSH key), C(certificates), C(GitHub App), and domains.
-  - For scoped domains (type I(scope)), it supports restrictions based on V(hostname), V(hostname:port), V(path), and V(scheme).
+  - For scoped domains (O(type=scope)), it supports restrictions based on V(hostname), V(hostname:port), V(path), and V(scheme).
 requirements:
   - urllib3 >= 1.26.0
 author:
@@ -597,7 +597,6 @@ def run_module():
         required_if=[
             ("state", "present", ["type"]),
             ("state", "absent", ["id"]),
-            ("type", not "token", ["id", "token"]),
             ("type", "token", ["name", "jenkins_password"]),
             ("type", "user_and_pass", ["username", "password"]),
             ("type", "file", ["file_path"]),
@@ -633,6 +632,10 @@ def run_module():
     schemes = module.params["schemes"]
 
     deps.validate(module)
+
+    if not type == "token":
+        if not id or not token:
+            module.fail_json(msg="id and token are required for types other than token")
 
     headers = {
         "Authorization": basic_auth_header(jenkins_user, token or jenkins_password),
