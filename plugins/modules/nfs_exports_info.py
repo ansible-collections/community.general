@@ -59,11 +59,8 @@ from ansible.module_utils.basic import AnsibleModule
 import re
 
 
-def get_exports(module, output_format, file_path="/etc/exports"):
-    
+def get_exports(module, output_format, file_path="/etc/exports"): 
     IP_ENTRY_PATTERN = re.compile(r'(\d+\.\d+\.\d+\.\d+)\(([^)]+)\)')
-    
-
     try:
         exports_file_digest = module.digest_from_file(file_path, 'sha1')
         if exports_file_digest is None:
@@ -83,18 +80,14 @@ def get_exports(module, output_format, file_path="/etc/exports"):
             line = line.strip()
             if not line or line.startswith('#'):
                 continue
-
+            
             match = pattern.match(line)
             if not match:
                 continue
-
             folder = match.group(1)
             rest = match.group(2)
 
-            
             entries = IP_ENTRY_PATTERN.findall(rest)
-            
-
             for ip, options_str in entries:
                 options = options_str.split(',')
 
