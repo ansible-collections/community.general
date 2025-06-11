@@ -80,14 +80,14 @@ def get_exports(module, output_format, file_path="/etc/exports"):
             module.fail_json(msg="Could not read {}".format(file_path))
 
         exports = {}
-        pattern = r'\s*(\S+)\s+(.+)'
+        pattern = re.compile(r'\s*(\S+)\s+(.+)')
 
         for line in output_lines:
             line = line.strip()
             if not line or line.startswith('#'):
                 continue
 
-            match = re.match(pattern, line)
+            match = pattern.match(line)
             if not match:
                 continue
 
