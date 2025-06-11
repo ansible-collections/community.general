@@ -119,7 +119,8 @@ EXAMPLES = r"""
 - name: Install "serpl" Rust package with ast_grep feature
   community.general.cargo:
     name: serpl
-    features: [ast_grep]
+    features:
+      - ast_grep
 """
 
 import json
