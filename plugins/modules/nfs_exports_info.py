@@ -63,6 +63,10 @@ import re
 
 
 def get_exports(module, output_format, file_path="/etc/exports"):
+    
+    IP_ENTRY_PATTERN = re.compile(r'(\d+\.\d+\.\d+\.\d+)\(([^)]+)\)')
+    
+
     try:
         exports_file_digest = module.digest_from_file(file_path, 'sha1')
         if exports_file_digest is None:
@@ -90,7 +94,10 @@ def get_exports(module, output_format, file_path="/etc/exports"):
             folder = match.group(1)
             rest = match.group(2)
 
-            entries = re.findall(r'(\d+\.\d+\.\d+\.\d+)\(([^)]+)\)', rest)
+            
+            entries = IP_ENTRY_PATTERN.findall(rest)
+            
+
             for ip, options_str in entries:
                 options = options_str.split(',')
 
@@ -112,6 +119,7 @@ def get_exports(module, output_format, file_path="/etc/exports"):
         }
 
     except Exception as e:
+
         module.fail_json(msg="Error while processing exports: {}".format(e))
 
 
