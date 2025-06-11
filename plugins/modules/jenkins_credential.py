@@ -598,12 +598,13 @@ def run_module():
             ("state", "present", ["type"]),
             ("state", "absent", ["id"]),
             ("type", "token", ["name", "jenkins_password"]),
-            ("type", "user_and_pass", ["username", "password"]),
-            ("type", "file", ["file_path"]),
-            ("type", "text", ["secret"]),
-            ("type", "github_app", ["appID", "private_key_path"]),
-            ("type", "ssh_key", ["username", "private_key_path"]),
-            ("type", "certificate", ["file_path"]),
+            ("type", "user_and_pass", ["username", "password", "id", "token"]),
+            ("type", "file", ["file_path", "id", "token"]),
+            ("type", "text", ["secret", "id", "token"]),
+            ("type", "github_app", ["appID", "private_key_path", "id", "token"]),
+            ("type", "ssh_key", ["username", "private_key_path", "id", "token"]),
+            ("type", "certificate", ["file_path", "id", "token"]),
+            ("type", "scope", ["id", "token"]),
         ],
     )
 
@@ -632,10 +633,6 @@ def run_module():
     schemes = module.params["schemes"]
 
     deps.validate(module)
-
-    if not type == "token":
-        if not id or not token:
-            module.fail_json(msg="id and token are required for types other than token")
 
     headers = {
         "Authorization": basic_auth_header(jenkins_user, token or jenkins_password),
