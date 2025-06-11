@@ -13,7 +13,7 @@ DOCUMENTATION = r"""
 ---
 module: nfs_exports_info
 
-short_description: Extract folders, IPs, and options from (/etc/exports)
+short_description: Extract folders, IPs, and options from C(/etc/exports)
 
 description:
   - This module retrieves and processes the contents of the /etc/exports file from a remote server,
