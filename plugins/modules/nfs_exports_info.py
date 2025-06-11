@@ -57,8 +57,6 @@ file_digest:
 
 from ansible.module_utils.basic import AnsibleModule
 import re
-
-
 def get_exports(module, output_format, file_path="/etc/exports"): 
     IP_ENTRY_PATTERN = re.compile(r'(\d+\.\d+\.\d+\.\d+)\(([^)]+)\)')
     try:
@@ -80,7 +78,6 @@ def get_exports(module, output_format, file_path="/etc/exports"):
             line = line.strip()
             if not line or line.startswith('#'):
                 continue
-            
             match = pattern.match(line)
             if not match:
                 continue
@@ -129,9 +126,6 @@ def main():
         exports_info=result['exports_info'],
         file_digest=result['file_digest']
     )
-
-
 if __name__ == '__main__':
     main()
-
 __all__ = ['get_exports']
