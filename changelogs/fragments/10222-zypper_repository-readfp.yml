@@ -1,2 +1,2 @@
 bugfixes:
-  - zypper_repository - fix usage of removed method ConfigParser.readfp()
+  - zypper_repository - make compatible with Python 3.12+ (https://github.com/ansible-collections/community.general/issues/10222, https://github.com/ansible-collections/community.general/pull/10223).
