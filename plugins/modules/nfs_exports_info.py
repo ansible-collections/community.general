@@ -112,7 +112,7 @@ def get_exports(module, output_format, file_path="/etc/exports"):
         }
 
     except Exception as e:
-        module.fail_json(msg="Error while processing exports: {}".format(str(e)))
+        module.fail_json(msg="Error while processing exports: {}".format(e))
 
 
 def main():
