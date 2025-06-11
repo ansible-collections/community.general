@@ -7,7 +7,7 @@
   file:
     path: "{{ terraform_project_dir }}/{{ item['name'] }}"
     state: directory
-    mode: 0755
+    mode: "0755"
   loop: "{{ terraform_provider_versions }}"
   loop_control:
     index_var: provider_index

@@ -6,32 +6,32 @@
 gandi_livedns_domain_name: "ansible-tests.org"
 gandi_livedns_record_items:
 
-# Single A record
-- record: test-www
-  type: A
-  values:
+  # Single A record
+  - record: test-www
+    type: A
+    values:
       - 10.10.10.10
-  ttl: 400
-  update_values:
+    ttl: 400
+    update_values:
       - 10.10.10.11
-  update_ttl: 800
+    update_ttl: 800
 
-# Multiple A records
-- record: test-www-multiple
-  type: A
-  ttl: 3600
-  values:
+  # Multiple A records
+  - record: test-www-multiple
+    type: A
+    ttl: 3600
+    values:
       - 10.10.11.10
       - 10.10.11.10
-  update_values:
+    update_values:
       - 10.10.11.11
       - 10.10.11.13
 
-# CNAME
-- record: test-cname
-  type: CNAME
-  ttl: 10800
-  values:
+  # CNAME
+  - record: test-cname
+    type: CNAME
+    ttl: 10800
+    values:
       - test-www2
-  update_values:
+    update_values:
       - test-www

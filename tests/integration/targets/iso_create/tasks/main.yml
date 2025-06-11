@@ -44,8 +44,8 @@
 - debug: var=iso_file
 - assert:
     that:
-    - iso_result is changed
-    - iso_file.stat.exists == False
+      - iso_result is changed
+      - iso_file.stat.exists == False
 
 - name: Create iso file with a specified file
   iso_create:
@@ -63,8 +63,8 @@
 
 - assert:
     that:
-    - iso_result is changed
-    - iso_file.stat.exists == True
+      - iso_result is changed
+      - iso_file.stat.exists == True
 
 - name: Create iso file with a specified file and folder
   iso_create:
@@ -83,8 +83,8 @@
 
 - assert:
     that:
-    - iso_result is changed
-    - iso_file.stat.exists == True
+      - iso_result is changed
+      - iso_file.stat.exists == True
 
 - name: Create iso file with volume identification string
   iso_create:
@@ -102,8 +102,8 @@
 
 - assert:
     that:
-    - iso_result is changed
-    - iso_file.stat.exists == True
+      - iso_result is changed
+      - iso_file.stat.exists == True
 
 - name: Create iso file with Rock Ridge extension
   iso_create:
@@ -121,8 +121,8 @@
 
 - assert:
     that:
-    - iso_result is changed
-    - iso_file.stat.exists == True
+      - iso_result is changed
+      - iso_file.stat.exists == True
 
 - name: Create iso file with Joliet extension
   iso_create:
@@ -140,8 +140,8 @@
 
 - assert:
     that:
-    - iso_result is changed
-    - iso_file.stat.exists == True
+      - iso_result is changed
+      - iso_file.stat.exists == True
 
 - name: Create iso file with UDF enabled
   iso_create:
@@ -159,5 +159,5 @@
 
 - assert:
     that:
-    - iso_result is changed
-    - iso_file.stat.exists == True
+      - iso_result is changed
+      - iso_file.stat.exists == True

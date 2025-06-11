@@ -12,7 +12,7 @@
 - name: Install JWT
   ansible.builtin.pip:
     name:
-    - jwt
+      - jwt
 
 - name: Read file
   ansible.builtin.set_fact:
@@ -26,5 +26,5 @@
 
 - assert:
     that:
-    - github_app_access_token is failed
-    - '"Github return error" in github_app_access_token.msg'
+      - github_app_access_token is failed
+      - '"Github return error" in github_app_access_token.msg'

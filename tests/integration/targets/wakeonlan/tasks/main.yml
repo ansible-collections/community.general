@@ -28,8 +28,8 @@
 - name: Check error message
   assert:
     that:
-    - incorrect_mac_length is failed
-    - incorrect_mac_length.msg is search('Incorrect MAC address length')
+      - incorrect_mac_length is failed
+      - incorrect_mac_length.msg is search('Incorrect MAC address length')
 
 - name: Provide an incorrect MAC format
   wakeonlan:
@@ -41,8 +41,8 @@
 - name: Check error message
   assert:
     that:
-    - incorrect_mac_format is failed
-    - incorrect_mac_format.msg is search('Incorrect MAC address format')
+      - incorrect_mac_format is failed
+      - incorrect_mac_format.msg is search('Incorrect MAC address format')
 
 - name: Cause a socket error
   wakeonlan:
@@ -54,5 +54,5 @@
 - name: Check error message
   assert:
     that:
-    - incorrect_broadcast_address is failed
-    - incorrect_broadcast_address.msg is search('not known|Name does not resolve')
+      - incorrect_broadcast_address is failed
+      - incorrect_broadcast_address.msg is search('not known|Name does not resolve')

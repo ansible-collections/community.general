@@ -20,5 +20,5 @@
 - name: assert that the right number of results are returned
   assert:
     that:
-       - output is not failed
-       - output.results | length == 2
+      - output is not failed
+      - output.results | length == 2

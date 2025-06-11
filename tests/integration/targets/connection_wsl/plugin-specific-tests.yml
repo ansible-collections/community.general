@@ -10,7 +10,7 @@
       copy:
         content: ""
         dest: "{{ remote_tmp }}/test_empty.txt"
-        force: no
+        force: false
         mode: '0644'
 
     - name: assert file without content exists
