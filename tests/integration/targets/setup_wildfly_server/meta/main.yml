@@ -4,5 +4,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 dependencies:
-- setup_pkg_mgr
-- setup_remote_tmp_dir
+  - setup_pkg_mgr
+  - setup_remote_tmp_dir

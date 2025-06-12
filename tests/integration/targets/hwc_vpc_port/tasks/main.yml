@@ -29,7 +29,7 @@
     subnet_id: "{{ subnet.id }}"
     ip_address: "192.168.100.33"
     state: absent
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: create a port (check mode)
   hwc_vpc_port:
     subnet_id: "{{ subnet.id }}"
@@ -41,7 +41,7 @@
   assert:
     that:
       - result is changed
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: create a port
   hwc_vpc_port:
     subnet_id: "{{ subnet.id }}"
@@ -52,7 +52,7 @@
   assert:
     that:
       - result is changed
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: create a port (idemponent)
   hwc_vpc_port:
     subnet_id: "{{ subnet.id }}"
@@ -75,7 +75,7 @@
     that:
       - result is not failed
       - result is not changed
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: delete a port (check mode)
   hwc_vpc_port:
     subnet_id: "{{ subnet.id }}"
@@ -87,7 +87,7 @@
   assert:
     that:
       - result is changed
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: delete a port
   hwc_vpc_port:
     subnet_id: "{{ subnet.id }}"
@@ -98,7 +98,7 @@
   assert:
     that:
       - result is changed
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: delete a port (idemponent)
   hwc_vpc_port:
     subnet_id: "{{ subnet.id }}"
@@ -122,7 +122,7 @@
     that:
       - result is not failed
       - result is not changed
-#---------------------------------------------------------
+# ---------------------------------------------------------
 # Post-test teardown
 - name: delete a subnet
   hwc_vpc_subnet:

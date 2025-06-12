@@ -21,7 +21,7 @@
 - name: Test if state and value are required together
   assert:
     that:
-    - "'following are missing: value' in missing_value['msg']"
+      - "'following are missing: value' in missing_value['msg']"
 
 - name: Change value of AppleMeasurementUnits to centimeter in check_mode
   osx_defaults:
@@ -36,7 +36,7 @@
 - name: Test if AppleMeasurementUnits value is changed to Centimeters in check_mode
   assert:
     that:
-    - measure_task_check_mode.changed
+      - measure_task_check_mode.changed
 
 - name: Find the current value of AppleMeasurementUnits
   osx_defaults:
@@ -68,7 +68,7 @@
 - name: Test if AppleMeasurementUnits value is changed to {{ new_value }}
   assert:
     that:
-    - change_value.changed
+      - change_value.changed
 
 - name: Again change value of AppleMeasurementUnits to {{ new_value }}
   osx_defaults:
@@ -82,7 +82,7 @@
 - name: Again test if AppleMeasurementUnits value is not changed to {{ new_value }}
   assert:
     that:
-    - not change_value.changed
+      - not change_value.changed
 
 - name: Check a fake setting for delete operation
   osx_defaults:

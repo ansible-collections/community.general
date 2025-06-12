@@ -47,7 +47,7 @@
   become: true
   ansible.builtin.file:
     path: /var/run/docker.sock
-    mode: 0666
+    mode: "0666"
 
 - name: Install python "requests"
   ansible.builtin.pip:

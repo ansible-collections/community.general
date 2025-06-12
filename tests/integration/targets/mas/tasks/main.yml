@@ -24,7 +24,7 @@
 - name: Ensure the app is uninstalled
   assert:
     that:
-    - install_status.stat.exists == false
+      - install_status.stat.exists == false
 
 - name: Wait until the OS-internal cache was updated
   pause:
@@ -41,8 +41,8 @@
 - name: Ensure that the status would have changed
   assert:
     that:
-    - install_check is changed
-    - install_check.msg == "Installed 1 app(s)"
+      - install_check is changed
+      - install_check.msg == "Installed 1 app(s)"
 
 - name: Determine whether the app is installed
   stat:
@@ -52,7 +52,7 @@
 - name: Ensure the app is not yet installed
   assert:
     that:
-    - install_status.stat.exists == false
+      - install_status.stat.exists == false
 
 - name: Install Rested
   mas:
@@ -63,8 +63,8 @@
 - name: Ensure that the status changed
   assert:
     that:
-    - install is changed
-    - install.msg == "Installed 1 app(s)"
+      - install is changed
+      - install.msg == "Installed 1 app(s)"
 
 - name: Determine whether the app is installed
   stat:
@@ -74,7 +74,7 @@
 - name: Ensure the app is installed
   assert:
     that:
-    - install_status.stat.exists == true
+      - install_status.stat.exists == true
 
 - name: Wait until the OS-internal cache was updated
   pause:
@@ -89,8 +89,8 @@
 - name: Ensure that the status is unchanged (already installed)
   assert:
     that:
-    - install_again is not changed
-    - "'msg' not in install_again"
+      - install_again is not changed
+      - "'msg' not in install_again"
 
 # Uninstallation
 - name: Check if Rested needs to be uninstalled
@@ -104,8 +104,8 @@
 - name: Ensure that the status would have changed
   assert:
     that:
-    - uninstall_check is changed
-    - uninstall_check.msg == "Uninstalled 1 app(s)"
+      - uninstall_check is changed
+      - uninstall_check.msg == "Uninstalled 1 app(s)"
 
 - name: Determine whether the app is installed
   stat:
@@ -115,7 +115,7 @@
 - name: Ensure the app is not yet uninstalled
   assert:
     that:
-    - install_status.stat.exists == true
+      - install_status.stat.exists == true
 
 - name: Uninstall Rested
   mas:
@@ -127,8 +127,8 @@
 - name: Ensure that the status changed
   assert:
     that:
-    - uninstall is changed
-    - uninstall.msg == "Uninstalled 1 app(s)"
+      - uninstall is changed
+      - uninstall.msg == "Uninstalled 1 app(s)"
 
 - name: Determine whether the app is installed
   stat:
@@ -138,7 +138,7 @@
 - name: Ensure the app is uninstalled
   assert:
     that:
-    - uninstall_status.stat.exists == false
+      - uninstall_status.stat.exists == false
 
 - name: Wait until the OS-internal cache was updated
   pause:
@@ -154,5 +154,5 @@
 - name: Ensure that the status is unchanged (already uninstalled)
   assert:
     that:
-    - uninstall_again is not changed
-    - "'msg' not in uninstall_again"
+      - uninstall_again is not changed
+      - "'msg' not in uninstall_again"

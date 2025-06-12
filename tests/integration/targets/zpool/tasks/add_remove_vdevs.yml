@@ -23,7 +23,7 @@
     - name: Check if vdev was added
       ansible.builtin.command:
         cmd: "zpool status -P -L {{ zpool_generic_pool_name }}"
-      register:  single_disk_pool_check
+      register: single_disk_pool_check
       changed_when: false
 
     - name: Assert that added disk is present
@@ -58,7 +58,7 @@
     - name: Check if vdev was added
       ansible.builtin.command:
         cmd: "zpool status -P -L {{ zpool_generic_pool_name }}"
-      register:  mirror_pool_check
+      register: mirror_pool_check
       changed_when: false
 
     - name: Assert that added vdev is present
@@ -94,7 +94,7 @@
     - name: Check if vdev was added
       ansible.builtin.command:
         cmd: "zpool status -P -L {{ zpool_generic_pool_name }}"
-      register:  raidz_pool_check
+      register: raidz_pool_check
       changed_when: false
 
     - name: Assert that added vdev is present
@@ -131,7 +131,7 @@
     - name: Check if vdev was removed
       ansible.builtin.command:
         cmd: "zpool status -P -L {{ zpool_generic_pool_name }}"
-      register:  remove_vdev_check
+      register: remove_vdev_check
       changed_when: false
 
     - name: Assert that removed vdev is absent

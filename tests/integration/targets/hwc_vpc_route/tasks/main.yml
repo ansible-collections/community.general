@@ -37,7 +37,7 @@
     destination: "192.168.0.0/16"
     next_hop: "{{ connect.id }}"
     state: absent
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: create a route (check mode)
   hwc_vpc_route:
     vpc_id: "{{ vpc1.id }}"
@@ -49,7 +49,7 @@
     that:
       - not result.id
       - result.changed
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: create a route
   hwc_vpc_route:
     vpc_id: "{{ vpc1.id }}"
@@ -87,7 +87,7 @@
     that:
       - result is not failed
       - result is not changed
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: delete a route (check mode)
   hwc_vpc_route:
     vpc_id: "{{ vpc1.id }}"
@@ -95,7 +95,7 @@
     next_hop: "{{ connect.id }}"
     state: absent
   check_mode: true
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: delete a route
   hwc_vpc_route:
     vpc_id: "{{ vpc1.id }}"
@@ -107,7 +107,7 @@
   assert:
     that:
       result is changed
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: delete a (idemponent)
   hwc_vpc_route:
     vpc_id: "{{ vpc1.id }}"
@@ -133,7 +133,7 @@
     that:
       - result is not failed
       - result is not changed
-#---------------------------------------------------------
+# ---------------------------------------------------------
 # Post-test teardown
 - name: delete a peering connect
   hwc_vpc_peering_connect:

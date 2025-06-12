@@ -20,7 +20,7 @@
     identities_only: true
     controlmaster: "auto"
     controlpath: "~/.ssh/sockets/%r@%h-%p"
-    controlpersist: yes
+    controlpersist: "yes"
     dynamicforward: '10080'
     other_options:
       serveraliveinterval: '30'
@@ -57,7 +57,7 @@
     identities_only: true
     controlmaster: "auto"
     controlpath: "~/.ssh/sockets/%r@%h-%p"
-    controlpersist: yes
+    controlpersist: "yes"
     dynamicforward: '10080'
     other_options:
       serveraliveinterval: '30'
@@ -83,7 +83,7 @@
     identities_only: true
     controlmaster: "auto"
     controlpath: "~/.ssh/sockets/%r@%h-%p"
-    controlpersist: yes
+    controlpersist: "yes"
     dynamicforward: '10080'
     other_options:
       serveraliveinterval: '30'
@@ -126,7 +126,7 @@
     add_keys_to_agent: false
     host_key_algorithms: "+ssh-ed25519"
     identities_only: false
-    controlmaster: no
+    controlmaster: "no"
     controlpath: "~/.ssh/new-sockets/%r@%h-%p"
     controlpersist: "600"
     dynamicforward: '11080'
@@ -154,7 +154,7 @@
     add_keys_to_agent: false
     host_key_algorithms: "+ssh-ed25519"
     identities_only: false
-    controlmaster: no
+    controlmaster: "no"
     controlpath: "~/.ssh/new-sockets/%r@%h-%p"
     controlpersist: "600"
     dynamicforward: '11080'
@@ -298,7 +298,7 @@
     identities_only: true
     controlmaster: "auto"
     controlpath: "~/.ssh/sockets/%r@%h-%p"
-    controlpersist: yes
+    controlpersist: "yes"
     dynamicforward: '10080'
     other_options:
       serveraliveinterval: '30'
@@ -335,7 +335,7 @@
     identities_only: true
     controlmaster: "auto"
     controlpath: "~/.ssh/sockets/%r@%h-%p"
-    controlpersist: yes
+    controlpersist: "yes"
     dynamicforward: '10080'
     other_options:
       serveraliveinterval: '30'
@@ -361,7 +361,7 @@
     identities_only: true
     controlmaster: "auto"
     controlpath: "~/.ssh/sockets/%r@%h-%p"
-    controlpersist: yes
+    controlpersist: "yes"
     dynamicforward: '10080'
     other_options:
       serveraliveinterval: '30'
@@ -404,7 +404,7 @@
     add_keys_to_agent: false
     host_key_algorithms: "+ssh-ed25519"
     identities_only: false
-    controlmaster: no
+    controlmaster: "no"
     controlpath: "~/.ssh/new-sockets/%r@%h-%p"
     controlpersist: "600"
     dynamicforward: '11080'
@@ -432,7 +432,7 @@
     add_keys_to_agent: false
     host_key_algorithms: "+ssh-ed25519"
     identities_only: false
-    controlmaster: no
+    controlmaster: "no"
     controlpath: "~/.ssh/new-sockets/%r@%h-%p"
     controlpersist: "600"
     dynamicforward: '11080'

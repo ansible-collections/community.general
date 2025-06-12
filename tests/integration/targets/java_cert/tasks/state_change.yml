@@ -147,7 +147,7 @@
     that:
       - result_x509_changed is failed
 
-- name:  import initial test certificate from file path
+- name: Import initial test certificate from file path
   community.general.java_cert:
     cert_alias: test_cert
     cert_path: "{{ test_cert_path }}"

@@ -28,10 +28,10 @@
 # It requires a host (nfshost) exporting the NFS
 - name: Creating NFS filesystem from nfshost (Linux NFS server)
   aix_filesystem:
-   device: /home/ftp
-   nfs_server: nfshost
-   filesystem: /nfs/ftp
-   state: present
+    device: /home/ftp
+    nfs_server: nfshost
+    filesystem: /nfs/ftp
+    state: present
 
 # It requires a volume group named datavg (next three actions)
 - name: Creating a logical volume testlv (aix_lvol module)

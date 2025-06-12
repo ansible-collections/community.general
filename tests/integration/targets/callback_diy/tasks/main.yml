@@ -25,18 +25,17 @@
               - name: Sample task name
                 debug:
                   msg: sample debug msg
-        expected_output: [
-          "",
-          "PLAY [testhost] ****************************************************************",
-          "",
-          "TASK [Sample task name] ********************************************************",
-          "ok: [testhost] => {",
-          "    \"msg\": \"sample debug msg\"",
-          "}",
-          "",
-          "PLAY RECAP *********************************************************************",
-          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
-        ]
+        expected_output:
+          - ""
+          - "PLAY [testhost] ****************************************************************"
+          - ""
+          - "TASK [Sample task name] ********************************************************"
+          - "ok: [testhost] => {"
+          - "    \"msg\": \"sample debug msg\""
+          - "}"
+          - ""
+          - "PLAY RECAP *********************************************************************"
+          - "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
 
       - name: Set playbook_on_start_msg callback using environment variable
         environment:
@@ -51,19 +50,18 @@
               - name: Sample task name
                 debug:
                   msg: sample debug msg
-        expected_output: [
-          "Sample output Sample playbook message",
-          "",
-          "PLAY [testhost] ****************************************************************",
-          "",
-          "TASK [Sample task name] ********************************************************",
-          "ok: [testhost] => {",
-          "    \"msg\": \"sample debug msg\"",
-          "}",
-          "",
-          "PLAY RECAP *********************************************************************",
-          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
-        ]
+        expected_output:
+          - "Sample output Sample playbook message"
+          - ""
+          - "PLAY [testhost] ****************************************************************"
+          - ""
+          - "TASK [Sample task name] ********************************************************"
+          - "ok: [testhost] => {"
+          - "    \"msg\": \"sample debug msg\""
+          - "}"
+          - ""
+          - "PLAY RECAP *********************************************************************"
+          - "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
 
       - name: Set playbook_on_play_start_msg callback using play variable
         environment:
@@ -80,17 +78,16 @@
               - name: Sample task name
                 debug:
                   msg: sample debug msg
-        expected_output: [
-          "Sample output Sample play name",
-          "",
-          "TASK [Sample task name] ********************************************************",
-          "ok: [testhost] => {",
-          "    \"msg\": \"sample debug msg\"",
-          "}",
-          "",
-          "PLAY RECAP *********************************************************************",
-          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
-        ]
+        expected_output:
+          - "Sample output Sample play name"
+          - ""
+          - "TASK [Sample task name] ********************************************************"
+          - "ok: [testhost] => {"
+          - "    \"msg\": \"sample debug msg\""
+          - "}"
+          - ""
+          - "PLAY RECAP *********************************************************************"
+          - "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
 
       - name: Set playbook_on_task_start_msg callback using play variable
         environment:
@@ -106,17 +103,16 @@
               - name: Sample task name
                 debug:
                   msg: sample debug msg
-        expected_output: [
-          "",
-          "PLAY [testhost] ****************************************************************",
-          "Sample output Sample task name",
-          "ok: [testhost] => {",
-          "    \"msg\": \"sample debug msg\"",
-          "}",
-          "",
-          "PLAY RECAP *********************************************************************",
-          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
-        ]
+        expected_output:
+          - ""
+          - "PLAY [testhost] ****************************************************************"
+          - "Sample output Sample task name"
+          - "ok: [testhost] => {"
+          - "    \"msg\": \"sample debug msg\""
+          - "}"
+          - ""
+          - "PLAY RECAP *********************************************************************"
+          - "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
 
       - name: Set playbook_on_task_start_msg callback using task variable
         environment:
@@ -132,17 +128,16 @@
                   msg: sample debug msg
                 vars:
                   ansible_callback_diy_playbook_on_task_start_msg: Sample output {{ ansible_callback_diy.task.name }}
-        expected_output: [
-          "",
-          "PLAY [testhost] ****************************************************************",
-          "Sample output Sample task name",
-          "ok: [testhost] => {",
-          "    \"msg\": \"sample debug msg\"",
-          "}",
-          "",
-          "PLAY RECAP *********************************************************************",
-          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
-        ]
+        expected_output:
+          - ""
+          - "PLAY [testhost] ****************************************************************"
+          - "Sample output Sample task name"
+          - "ok: [testhost] => {"
+          - "    \"msg\": \"sample debug msg\""
+          - "}"
+          - ""
+          - "PLAY RECAP *********************************************************************"
+          - "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
 
       - name: Set runner_on_ok_msg callback using task variable
         environment:
@@ -158,16 +153,15 @@
                   msg: sample debug msg
                 vars:
                   ansible_callback_diy_runner_on_ok_msg: Sample output {{ ansible_callback_diy.result.output.msg }}
-        expected_output: [
-          "",
-          "PLAY [testhost] ****************************************************************",
-          "",
-          "TASK [Sample task name] ********************************************************",
-          "Sample output sample debug msg",
-          "",
-          "PLAY RECAP *********************************************************************",
-          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
-        ]
+        expected_output:
+          - ""
+          - "PLAY [testhost] ****************************************************************"
+          - ""
+          - "TASK [Sample task name] ********************************************************"
+          - "Sample output sample debug msg"
+          - ""
+          - "PLAY RECAP *********************************************************************"
+          - "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
 
       - name: Set runner_on_failed_msg callback using task variable
         environment:
@@ -185,16 +179,15 @@
                 ignore_errors: true
                 vars:
                   ansible_callback_diy_runner_on_failed_msg: Sample output Sample failure message
-        expected_output: [
-          "",
-          "PLAY [testhost] ****************************************************************",
-          "",
-          "TASK [Sample task name] ********************************************************",
-          "Sample output Sample failure message",
-          "",
-          "PLAY RECAP *********************************************************************",
-          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=1   "
-        ]
+        expected_output:
+          - ""
+          - "PLAY [testhost] ****************************************************************"
+          - ""
+          - "TASK [Sample task name] ********************************************************"
+          - "Sample output Sample failure message"
+          - ""
+          - "PLAY RECAP *********************************************************************"
+          - "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=1   "
 
       - name: Set runner_on_skipped_msg callback using task variable
         environment:
@@ -211,16 +204,15 @@
                 when: false
                 vars:
                   ansible_callback_diy_runner_on_skipped_msg: Sample output Skipped {{ ansible_callback_diy.task.name }}
-        expected_output: [
-          "",
-          "PLAY [testhost] ****************************************************************",
-          "",
-          "TASK [Sample task name] ********************************************************",
-          "Sample output Skipped Sample task name",
-          "",
-          "PLAY RECAP *********************************************************************",
-          "testhost                   : ok=0    changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   "
-        ]
+        expected_output:
+          - ""
+          - "PLAY [testhost] ****************************************************************"
+          - ""
+          - "TASK [Sample task name] ********************************************************"
+          - "Sample output Skipped Sample task name"
+          - ""
+          - "PLAY RECAP *********************************************************************"
+          - "testhost                   : ok=0    changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   "
 
       - name: Set runner_item_on_ok_msg callback using task variable
         environment:
@@ -240,18 +232,17 @@
                   - sample item 3
                 vars:
                   ansible_callback_diy_runner_item_on_ok_msg: Sample output Looping {{ ansible_callback_diy.result.output.msg }}
-        expected_output: [
-          "",
-          "PLAY [testhost] ****************************************************************",
-          "",
-          "TASK [Sample task name] ********************************************************",
-          "Sample output Looping sample debug msg sample item 1",
-          "Sample output Looping sample debug msg sample item 2",
-          "Sample output Looping sample debug msg sample item 3",
-          "",
-          "PLAY RECAP *********************************************************************",
-          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
-        ]
+        expected_output:
+          - ""
+          - "PLAY [testhost] ****************************************************************"
+          - ""
+          - "TASK [Sample task name] ********************************************************"
+          - "Sample output Looping sample debug msg sample item 1"
+          - "Sample output Looping sample debug msg sample item 2"
+          - "Sample output Looping sample debug msg sample item 3"
+          - ""
+          - "PLAY RECAP *********************************************************************"
+          - "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
 
       - name: Set runner_item_on_failed_msg callback using task variable
         environment:
@@ -273,28 +264,25 @@
                 ignore_errors: true
                 vars:
                   ansible_callback_diy_runner_item_on_failed_msg: Sample output Looping sample failure message
-        expected_output: [
-          "",
-          "PLAY [testhost] ****************************************************************",
-          "",
-          "TASK [Sample task name] ********************************************************",
-          "ok: [testhost] => (item=sample item 1) => {",
-          "    \"msg\": \"sample debug msg sample item 1\"",
-          "}",
-          "Sample output Looping sample failure message",
-          "ok: [testhost] => (item=sample item 3) => {",
-          "    \"msg\": \"sample debug msg sample item 3\"",
-          "}",
-          [
-            # Apparently a bug was fixed in Ansible, as before it ran through with "All items completed"
-            "fatal: [testhost]: FAILED! => {\"msg\": \"All items completed\"}",
-            "fatal: [testhost]: FAILED! => {\"msg\": \"One or more items failed\"}",
-          ],
-          "...ignoring",
-          "",
-          "PLAY RECAP *********************************************************************",
-          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=1   "
-        ]
+        expected_output:
+          - ""
+          - "PLAY [testhost] ****************************************************************"
+          - ""
+          - "TASK [Sample task name] ********************************************************"
+          - "ok: [testhost] => (item=sample item 1) => {"
+          - "    \"msg\": \"sample debug msg sample item 1\""
+          - "}"
+          - "Sample output Looping sample failure message"
+          - "ok: [testhost] => (item=sample item 3) => {"
+          - "    \"msg\": \"sample debug msg sample item 3\""
+          - "}"
+          - # Apparently a bug was fixed in Ansible, as before it ran through with "All items completed"
+            - "fatal: [testhost]: FAILED! => {\"msg\": \"All items completed\"}"
+            - "fatal: [testhost]: FAILED! => {\"msg\": \"One or more items failed\"}"
+          - "...ignoring"
+          - ""
+          - "PLAY RECAP *********************************************************************"
+          - "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=1   "
 
       - name: Set runner_item_on_skipped_msg callback using task variable
         environment:
@@ -315,22 +303,21 @@
                 when: item != 'sample item 2'
                 vars:
                   ansible_callback_diy_runner_item_on_skipped_msg: Sample output Looping Skipped {{ ansible_callback_diy.result.output.item }}
-        expected_output: [
-          "",
-          "PLAY [testhost] ****************************************************************",
-          "",
-          "TASK [Sample task name] ********************************************************",
-          "ok: [testhost] => (item=sample item 1) => {",
-          "    \"msg\": \"sample debug msg sample item 1\"",
-          "}",
-          "Sample output Looping Skipped sample item 2",
-          "ok: [testhost] => (item=sample item 3) => {",
-          "    \"msg\": \"sample debug msg sample item 3\"",
-          "}",
-          "",
-          "PLAY RECAP *********************************************************************",
-          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
-        ]
+        expected_output:
+          - ""
+          - "PLAY [testhost] ****************************************************************"
+          - ""
+          - "TASK [Sample task name] ********************************************************"
+          - "ok: [testhost] => (item=sample item 1) => {"
+          - "    \"msg\": \"sample debug msg sample item 1\""
+          - "}"
+          - "Sample output Looping Skipped sample item 2"
+          - "ok: [testhost] => (item=sample item 3) => {"
+          - "    \"msg\": \"sample debug msg sample item 3\""
+          - "}"
+          - ""
+          - "PLAY RECAP *********************************************************************"
+          - "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
 
       - name: Set playbook_on_stats_msg callback using play variable
         environment:
@@ -371,20 +358,19 @@
               - name: Sample task name
                 debug:
                   msg: sample debug msg
-        expected_output: [
-          "",
-          "PLAY [testhost] ****************************************************************",
-          "",
-          "TASK [Sample task name] ********************************************************",
-          "ok: [testhost] => {",
-          "    \"msg\": \"sample debug msg\"",
-          "}",
-          "      Sample output stats",
-          "===============================",
-          "      ok     : testhost: 1",
-          "",
-          "  processed  : testhost: 1"
-        ]
+        expected_output:
+          - ""
+          - "PLAY [testhost] ****************************************************************"
+          - ""
+          - "TASK [Sample task name] ********************************************************"
+          - "ok: [testhost] => {"
+          - "    \"msg\": \"sample debug msg\""
+          - "}"
+          - "      Sample output stats"
+          - "==============================="
+          - "      ok     : testhost: 1"
+          - ""
+          - "  processed  : testhost: 1"
 
       - name: Suppress output on playbook_on_task_start_msg callback using task variable
         environment:
@@ -400,16 +386,15 @@
                   msg: sample debug msg
                 vars:
                   ansible_callback_diy_playbook_on_task_start_msg: ''
-        expected_output: [
-          "",
-          "PLAY [testhost] ****************************************************************",
-          "ok: [testhost] => {",
-          "    \"msg\": \"sample debug msg\"",
-          "}",
-          "",
-          "PLAY RECAP *********************************************************************",
-          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
-        ]
+        expected_output:
+          - ""
+          - "PLAY [testhost] ****************************************************************"
+          - "ok: [testhost] => {"
+          - "    \"msg\": \"sample debug msg\""
+          - "}"
+          - ""
+          - "PLAY RECAP *********************************************************************"
+          - "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
 
       - name: Suppress output on runner_on_ok_msg callback using task variable
         environment:
@@ -425,15 +410,14 @@
                   msg: sample debug msg
                 vars:
                   ansible_callback_diy_runner_on_ok_msg: ''
-        expected_output: [
-          "",
-          "PLAY [testhost] ****************************************************************",
-          "",
-          "TASK [Sample task name] ********************************************************",
-          "",
-          "PLAY RECAP *********************************************************************",
-          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
-        ]
+        expected_output:
+          - ""
+          - "PLAY [testhost] ****************************************************************"
+          - ""
+          - "TASK [Sample task name] ********************************************************"
+          - ""
+          - "PLAY RECAP *********************************************************************"
+          - "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
 
       - name: Set runner_on_ok_msg_color using task variable
         environment:
@@ -450,13 +434,12 @@
                 vars:
                   ansible_callback_diy_runner_on_ok_msg: Sample output {{ ansible_callback_diy.result.output.msg }}
                   ansible_callback_diy_runner_on_ok_msg_color: blue
-        expected_output: [
-          "",
-          "PLAY [testhost] ****************************************************************",
-          "",
-          "TASK [Sample task name] ********************************************************",
-          "Sample output sample debug msg",
-          "",
-          "PLAY RECAP *********************************************************************",
-          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
-        ]
+        expected_output:
+          - ""
+          - "PLAY [testhost] ****************************************************************"
+          - ""
+          - "TASK [Sample task name] ********************************************************"
+          - "Sample output sample debug msg"
+          - ""
+          - "PLAY RECAP *********************************************************************"
+          - "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "

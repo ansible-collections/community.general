@@ -14,96 +14,96 @@
     consul_uri: https://releases.hashicorp.com/consul/{{ consul_version }}/consul_{{ consul_version }}_{{ ansible_system | lower }}_{{ consul_arch }}.zip
     consul_cmd: '{{ remote_tmp_dir }}/consul'
   block:
-  - name: Install requests<2.20 (CentOS/RHEL 6)
-    pip:
-      name: requests<2.20
-      extra_args: "-c {{ remote_constraints }}"
-    register: result
-    until: result is success
-    when: ansible_distribution_file_variety|default() == 'RedHat' and ansible_distribution_major_version is version('6', '<=')
-  - name: Install python-consul
-    pip:
-      name: python-consul
-      extra_args: "-c {{ remote_constraints }}"
-    register: result
-    until: result is success
-  - name: Generate privatekey
-    community.crypto.openssl_privatekey:
-      path: '{{ remote_tmp_dir }}/privatekey.pem'
-  - name: Generate CSR
-    community.crypto.openssl_csr:
-      path: '{{ remote_tmp_dir }}/csr.csr'
-      privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
-      subject:
-        commonName: localhost
-  - name: Generate selfsigned certificate
-    register: selfsigned_certificate
-    community.crypto.x509_certificate:
-      path: '{{ remote_tmp_dir }}/cert.pem'
-      csr_path: '{{ remote_tmp_dir }}/csr.csr'
-      privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
-      provider: selfsigned
-      selfsigned_digest: sha256
-  - name: Install unzip
-    package:
-      name: unzip
-    register: result
-    until: result is success
-    when: ansible_distribution != "MacOSX"
-  - assert:
-      that: ansible_architecture in ['i386', 'x86_64', 'amd64']
-  - set_fact:
-      consul_arch: '386'
-    when: ansible_architecture == 'i386'
-  - set_fact:
-      consul_arch: amd64
-    when: ansible_architecture in ['x86_64', 'amd64']
-  - name: Download consul binary
-    unarchive:
-      src: '{{ consul_uri }}'
-      dest: '{{ remote_tmp_dir }}'
-      remote_src: true
-    register: result
-    until: result is success
-  - vars:
-      remote_dir: '{{ echo_remote_tmp_dir.stdout }}'
-    block:
-    - command: echo {{ remote_tmp_dir }}
-      register: echo_remote_tmp_dir
-    - name: Create configuration file
-      template:
-        src: consul_config.hcl.j2
-        dest: '{{ remote_tmp_dir }}/consul_config.hcl'
-    - name: Start Consul (dev mode enabled)
-      shell: nohup {{ consul_cmd }} agent -dev -config-file {{ remote_tmp_dir }}/consul_config.hcl </dev/null >/dev/null 2>&1 &
-    - name: Bootstrap ACL
-      consul_acl_bootstrap:
-      register: consul_bootstrap_result
+    - name: Install requests<2.20 (CentOS/RHEL 6)
+      pip:
+        name: requests<2.20
+        extra_args: "-c {{ remote_constraints }}"
+      register: result
+      until: result is success
+      when: ansible_distribution_file_variety|default() == 'RedHat' and ansible_distribution_major_version is version('6', '<=')
+    - name: Install python-consul
+      pip:
+        name: python-consul
+        extra_args: "-c {{ remote_constraints }}"
+      register: result
+      until: result is success
+    - name: Generate privatekey
+      community.crypto.openssl_privatekey:
+        path: '{{ remote_tmp_dir }}/privatekey.pem'
+    - name: Generate CSR
+      community.crypto.openssl_csr:
+        path: '{{ remote_tmp_dir }}/csr.csr'
+        privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
+        subject:
+          commonName: localhost
+    - name: Generate selfsigned certificate
+      register: selfsigned_certificate
+      community.crypto.x509_certificate:
+        path: '{{ remote_tmp_dir }}/cert.pem'
+        csr_path: '{{ remote_tmp_dir }}/csr.csr'
+        privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
+        provider: selfsigned
+        selfsigned_digest: sha256
+    - name: Install unzip
+      package:
+        name: unzip
+      register: result
+      until: result is success
+      when: ansible_distribution != "MacOSX"
+    - assert:
+        that: ansible_architecture in ['i386', 'x86_64', 'amd64']
     - set_fact:
-        consul_management_token: '{{ consul_bootstrap_result.result.SecretID }}'
-    - name: Create some data
-      command: '{{ consul_cmd }} kv put -token={{consul_management_token}} data/value{{ item }} foo{{ item }}'
-      loop:
-      - 1
-      - 2
-      - 3
-    - import_tasks: consul_general.yml
-    - import_tasks: consul_kv.yml
+        consul_arch: '386'
+      when: ansible_architecture == 'i386'
+    - set_fact:
+        consul_arch: amd64
+      when: ansible_architecture in ['x86_64', 'amd64']
+    - name: Download consul binary
+      unarchive:
+        src: '{{ consul_uri }}'
+        dest: '{{ remote_tmp_dir }}'
+        remote_src: true
+      register: result
+      until: result is success
+    - vars:
+        remote_dir: '{{ echo_remote_tmp_dir.stdout }}'
+      block:
+        - command: echo {{ remote_tmp_dir }}
+          register: echo_remote_tmp_dir
+        - name: Create configuration file
+          template:
+            src: consul_config.hcl.j2
+            dest: '{{ remote_tmp_dir }}/consul_config.hcl'
+        - name: Start Consul (dev mode enabled)
+          shell: nohup {{ consul_cmd }} agent -dev -config-file {{ remote_tmp_dir }}/consul_config.hcl </dev/null >/dev/null 2>&1 &
+        - name: Bootstrap ACL
+          consul_acl_bootstrap:
+          register: consul_bootstrap_result
+        - set_fact:
+            consul_management_token: '{{ consul_bootstrap_result.result.SecretID }}'
+        - name: Create some data
+          command: '{{ consul_cmd }} kv put -token={{consul_management_token}} data/value{{ item }} foo{{ item }}'
+          loop:
+            - 1
+            - 2
+            - 3
+        - import_tasks: consul_general.yml
+        - import_tasks: consul_kv.yml
 
-    - block:
-        - import_tasks: consul_session.yml
-        - import_tasks: consul_policy.yml
-        - import_tasks: consul_role.yml
-        - import_tasks: consul_token.yml
-        - import_tasks: consul_auth_method.yml
-        - import_tasks: consul_binding_rule.yml
-        - import_tasks: consul_agent_service.yml
-        - import_tasks: consul_agent_check.yml
-      module_defaults:
-        group/community.general.consul:
-          token: "{{ consul_management_token }}"
+        - block:
+            - import_tasks: consul_session.yml
+            - import_tasks: consul_policy.yml
+            - import_tasks: consul_role.yml
+            - import_tasks: consul_token.yml
+            - import_tasks: consul_auth_method.yml
+            - import_tasks: consul_binding_rule.yml
+            - import_tasks: consul_agent_service.yml
+            - import_tasks: consul_agent_check.yml
+          module_defaults:
+            group/community.general.consul:
+              token: "{{ consul_management_token }}"
 
-    always:
+  always:
     - name: Kill consul process
       shell: kill $(cat {{ remote_tmp_dir }}/consul.pid)
       ignore_errors: true

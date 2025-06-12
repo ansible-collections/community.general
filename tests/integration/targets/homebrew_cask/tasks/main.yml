@@ -9,65 +9,65 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-  - name: Find brew binary
-    command: which brew
-    register: brew_which
-    when: ansible_distribution in ['MacOSX']
+- name: Find brew binary
+  command: which brew
+  register: brew_which
+  when: ansible_distribution in ['MacOSX']
 
-  - name: Get owner of brew binary
-    stat:
-      path: "{{ brew_which.stdout }}"
-    register: brew_stat
-    when: ansible_distribution in ['MacOSX']
+- name: Get owner of brew binary
+  stat:
+    path: "{{ brew_which.stdout }}"
+  register: brew_stat
+  when: ansible_distribution in ['MacOSX']
 
-  - block:
-      - name: Install cask
-        homebrew_cask:
-          name: "{{ cask }}"
-          state: present
-        become: true
-        become_user: "{{ brew_stat.stat.pw_name }}"
-        register: cask_install_result
+- block:
+    - name: Install cask
+      homebrew_cask:
+        name: "{{ cask }}"
+        state: present
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+      register: cask_install_result
 
-      - assert:
-          that:
-            - cask_install_result is changed
-            - "'Cask installed' in cask_install_result.msg"
+    - assert:
+        that:
+          - cask_install_result is changed
+          - "'Cask installed' in cask_install_result.msg"
 
-      - name: Install cask (idempotence)
-        homebrew_cask:
-          name: "{{ cask }}"
-          state: present
-        become: true
-        become_user: "{{ brew_stat.stat.pw_name }}"
-        register: cask_install_result
+    - name: Install cask (idempotence)
+      homebrew_cask:
+        name: "{{ cask }}"
+        state: present
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+      register: cask_install_result
 
-      - assert:
-          that:
-            - cask_install_result is not changed
-            - "'Cask installed' not in cask_install_result.msg"
-            - "'Cask already installed' in cask_install_result.msg"
+    - assert:
+        that:
+          - cask_install_result is not changed
+          - "'Cask installed' not in cask_install_result.msg"
+          - "'Cask already installed' in cask_install_result.msg"
 
-      - name: Install cask with force install option
-        homebrew_cask:
-          name: "{{ cask }}"
-          state: present
-          install_options: force
-        become: true
-        become_user: "{{ brew_stat.stat.pw_name }}"
-        register: cask_install_result
+    - name: Install cask with force install option
+      homebrew_cask:
+        name: "{{ cask }}"
+        state: present
+        install_options: force
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+      register: cask_install_result
 
-      - assert:
-          that:
-            - cask_install_result is changed
-            - "'Cask installed' in cask_install_result.msg"
+    - assert:
+        that:
+          - cask_install_result is changed
+          - "'Cask installed' in cask_install_result.msg"
 
-    always:
-      - name: Delete cask
-        homebrew_cask:
-          name: "{{ cask }}"
-          state: absent
-          install_options: force
-        become: true
-        become_user: "{{ brew_stat.stat.pw_name }}"
-        ignore_errors: true
+  always:
+    - name: Delete cask
+      homebrew_cask:
+        name: "{{ cask }}"
+        state: absent
+        install_options: force
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+      ignore_errors: true

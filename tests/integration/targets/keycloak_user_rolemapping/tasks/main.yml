@@ -37,7 +37,8 @@
 
 - name: Map a realm role to client service account
   vars:
-    - roles: [ {'name': '{{ role }}'} ]
+    - roles:
+        - name: '{{ role }}'
   community.general.keycloak_user_rolemapping:
     auth_keycloak_url: "{{ url }}"
     auth_realm: "{{ admin_realm }}"
@@ -57,7 +58,8 @@
 
 - name: Unmap a realm role from client service account
   vars:
-    - roles: [ {'name': '{{ role }}'} ]
+    - roles:
+        - name: '{{ role }}'
   community.general.keycloak_user_rolemapping:
     auth_keycloak_url: "{{ url }}"
     auth_realm: "{{ admin_realm }}"
@@ -101,7 +103,8 @@
 
 - name: Map a client role to client service account
   vars:
-    - roles: [ {'name': '{{ role }}'} ]
+    - roles:
+        - name: '{{ role }}'
   community.general.keycloak_user_rolemapping:
     auth_keycloak_url: "{{ url }}"
     auth_realm: "{{ admin_realm }}"
@@ -122,7 +125,8 @@
 
 - name: Unmap a client role from client service account
   vars:
-    - roles: [ {'name': '{{ role }}'} ]
+    - roles:
+        - name: '{{ role }}'
   community.general.keycloak_user_rolemapping:
     auth_keycloak_url: "{{ url }}"
     auth_realm: "{{ admin_realm }}"

@@ -6,7 +6,7 @@
   uri:
     url: "{{ url }}/admin/"
     status_code: 200
-    validate_certs: no
+    validate_certs: false
   register: result
   until: result.status == 200
   retries: 10
@@ -72,7 +72,7 @@
     redirect_uris: '{{redirect_uris1}}'
     attributes: '{{client_attributes1}}'
     protocol_mappers: '{{protocol_mappers1}}'
-    authorization_services_enabled: False
+    authorization_services_enabled: false
   check_mode: true
   register: check_client_when_present_and_same
 
@@ -94,8 +94,8 @@
     redirect_uris: '{{redirect_uris1}}'
     attributes: '{{client_attributes1}}'
     protocol_mappers: '{{protocol_mappers1}}'
-    authorization_services_enabled: False
-    service_accounts_enabled: True
+    authorization_services_enabled: false
+    service_accounts_enabled: true
   check_mode: true
   register: check_client_when_present_and_changed
 

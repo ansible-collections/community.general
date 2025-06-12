@@ -32,7 +32,6 @@
     quiet: true
 
 
-
 - name: "trigger error about missing param 'state'"
   iptables_state:
     path: foobar
@@ -47,7 +46,6 @@
     quiet: true
 
 
-
 - name: "trigger error about missing param 'path'"
   iptables_state:
     state: saved
@@ -60,7 +58,6 @@
       - iptables_state is failed
       - iptables_state.msg is match("missing required arguments")
     quiet: true
-
 
 
 - name: "trigger error about invalid value for param 'state'"
@@ -99,7 +96,6 @@
     quiet: true
 
 
-
 - name: "save state (must report a change)"
   iptables_state:
     path: "{{ iptables_saved }}"
@@ -112,7 +108,6 @@
       - iptables_state is changed
       - iptables_state.initial_state == iptables_state.saved
     quiet: true
-
 
 
 - name: "save state (idempotency, must NOT report a change)"
@@ -129,7 +124,6 @@
     quiet: true
 
 
-
 - name: "save state (check_mode, must NOT report a change)"
   iptables_state:
     path: "{{ iptables_saved }}"
@@ -143,7 +137,6 @@
       - iptables_state is not changed
       - iptables_state.initial_state == iptables_state.saved
     quiet: true
-
 
 
 # We begin with 'state=restored' by restoring the current state on itself.
@@ -176,7 +169,6 @@
       register: xtables_lock
 
 
-
 - name: "state=restored changed=false"
   block:
     - name: "restore state (must NOT report a change, warning about rollback & async)"
@@ -202,12 +194,10 @@
       register: xtables_lock
 
 
-
 - name: "change iptables state (iptables)"
   iptables:
     chain: OUTPUT
     jump: ACCEPT
-
 
 
 - name: "state=restored changed=true"
@@ -234,7 +224,6 @@
           - iptables_state.stderr is search('xtables lock')
         quiet: true
       register: xtables_lock
-
 
 
 - name: "state=restored changed=true"
@@ -265,7 +254,6 @@
       register: xtables_lock
 
 
-
 - name: "state=restored changed=false"
   block:
     - name: "restore state (must NOT report a change, async, no warning)"
@@ -291,7 +279,6 @@
           - iptables_state.stderr is search('xtables lock')
         quiet: true
       register: xtables_lock
-
 
 
 - name: "state=restored changed=false"

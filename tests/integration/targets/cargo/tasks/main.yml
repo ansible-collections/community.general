@@ -14,9 +14,9 @@
       CARGO_NET_GIT_FETCH_WITH_CLI: "true"
   when: has_cargo | default(false) and ansible_distribution == 'Alpine'
 - block:
-  - import_tasks: test_general.yml
-  - import_tasks: test_version.yml
-  - import_tasks: test_directory.yml
+    - import_tasks: test_general.yml
+    - import_tasks: test_version.yml
+    - import_tasks: test_directory.yml
   environment: "{{ cargo_environment }}"
   when: has_cargo | default(false)
 - import_tasks: test_rustup_cargo.yml

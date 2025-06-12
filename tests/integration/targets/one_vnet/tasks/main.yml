@@ -112,7 +112,7 @@
 - name: Assert that network was deleted
   assert:
     that:
-    - result is changed
+      - result is changed
 
 # Trying to run with wrong arguments
 - name: Try to create use network with state=present and without the template parameter

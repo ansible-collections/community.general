@@ -31,8 +31,8 @@
 - name: verify uninstallation of hello
   assert:
     that:
-        - "zypper_result.rc == 0"
-        - "rpm_result.rc == 1"
+      - "zypper_result.rc == 0"
+      - "rpm_result.rc == 1"
 
 # UNINSTALL AGAIN
 - name: uninstall hello again
@@ -44,7 +44,7 @@
 - name: verify no change on re-uninstall
   assert:
     that:
-        - "not zypper_result.changed"
+      - "not zypper_result.changed"
 
 # INSTALL
 - name: install hello
@@ -64,9 +64,9 @@
 - name: verify installation of hello
   assert:
     that:
-        - "zypper_result.rc == 0"
-        - "zypper_result.changed"
-        - "rpm_result.rc == 0"
+      - "zypper_result.rc == 0"
+      - "zypper_result.changed"
+      - "rpm_result.rc == 0"
 
 # INSTALL AGAIN
 - name: install hello again
@@ -78,7 +78,7 @@
 - name: verify no change on second install
   assert:
     that:
-        - "not zypper_result.changed"
+      - "not zypper_result.changed"
 
 # Multiple packages
 - name: uninstall hello and metamail
@@ -102,8 +102,8 @@
 - name: verify packages uninstalled
   assert:
     that:
-        - "rpm_hello_result.rc != 0"
-        - "rpm_metamail_result.rc != 0"
+      - "rpm_hello_result.rc != 0"
+      - "rpm_metamail_result.rc != 0"
 
 - name: install hello and metamail
   zypper:
@@ -126,10 +126,10 @@
 - name: verify packages installed
   assert:
     that:
-        - "zypper_result.rc == 0"
-        - "zypper_result.changed"
-        - "rpm_hello_result.rc == 0"
-        - "rpm_metamail_result.rc == 0"
+      - "zypper_result.rc == 0"
+      - "zypper_result.changed"
+      - "rpm_hello_result.rc == 0"
+      - "rpm_metamail_result.rc == 0"
 
 - name: uninstall hello and metamail
   zypper:
@@ -230,9 +230,9 @@
 - name: verify installation of empty
   assert:
     that:
-        - "zypper_result.rc == 0"
-        - "zypper_result.changed"
-        - "rpm_result.rc == 0"
+      - "zypper_result.rc == 0"
+      - "zypper_result.changed"
+      - "rpm_result.rc == 0"
 
 - name: uninstall empty
   zypper:
@@ -253,7 +253,7 @@
 - name: check that we extract rpm package in testdir folder and folder var is exist
   assert:
     that:
-     - "stat_result.stat.exists == true"
+      - "stat_result.stat.exists == true"
 
 # Build and install an empty rpm with error in post script
 - name: uninstall post_error
@@ -308,9 +308,9 @@
 - name: verify installation of post_error
   assert:
     that:
-        - "zypper_result.rc == 0"
-        - "zypper_result.changed"
-        - "rpm_result.rc == 0"
+      - "zypper_result.rc == 0"
+      - "zypper_result.changed"
+      - "rpm_result.rc == 0"
 
 - name: uninstall post_error
   zypper:
@@ -332,9 +332,9 @@
 - name: verify installation of post_error
   assert:
     that:
-        - "zypper_result.rc == 107"
-        - "not zypper_result.changed"
-        - "rpm_result.rc == 0"
+      - "zypper_result.rc == 107"
+      - "not zypper_result.changed"
+      - "rpm_result.rc == 0"
 
 - name: uninstall post_error
   zypper:

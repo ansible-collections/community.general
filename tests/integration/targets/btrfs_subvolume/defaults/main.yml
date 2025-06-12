@@ -4,15 +4,15 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 btrfs_subvolume_single_configs:
-- file: "/tmp/disks0.img"
-  loop: "/dev/loop95"
+  - file: "/tmp/disks0.img"
+    loop: "/dev/loop95"
 btrfs_subvolume_multiple_configs:
-- file: "/tmp/diskm0.img"
-  loop: "/dev/loop97"
-- file: "/tmp/diskm1.img"
-  loop: "/dev/loop98"
-- file: "/tmp/diskm2.img"
-  loop: "/dev/loop99"
+  - file: "/tmp/diskm0.img"
+    loop: "/dev/loop97"
+  - file: "/tmp/diskm1.img"
+    loop: "/dev/loop98"
+  - file: "/tmp/diskm2.img"
+    loop: "/dev/loop99"
 btrfs_subvolume_configs: "{{ btrfs_subvolume_single_configs + btrfs_subvolume_multiple_configs }}"
 btrfs_subvolume_single_devices: "{{ btrfs_subvolume_single_configs | map(attribute='loop') }}"
 btrfs_subvolume_single_label: "single"

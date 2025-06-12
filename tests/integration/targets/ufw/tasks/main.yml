@@ -27,19 +27,19 @@
 
 # Run the tests
 - block:
-  - include_tasks: run-test.yml
-    with_fileglob:
-    - "tests/*.yml"
+    - include_tasks: run-test.yml
+      with_fileglob:
+        - "tests/*.yml"
   become: true
 
   # Cleanup
   always:
-  - pause:
-      # ufw creates backups of the rule files with a timestamp; if reset is called
-      # twice in a row fast enough (so that both timestamps are taken in the same second),
-      # the second call will notice that the backup files are already there and fail.
-      # Waiting one second fixes this problem.
-      seconds: 1
-  - name: Reset ufw to factory defaults and disable
-    ufw:
-      state: reset
+    - pause:
+        # ufw creates backups of the rule files with a timestamp; if reset is called
+        # twice in a row fast enough (so that both timestamps are taken in the same second),
+        # the second call will notice that the backup files are already there and fail.
+        # Waiting one second fixes this problem.
+        seconds: 1
+    - name: Reset ufw to factory defaults and disable
+      ufw:
+        state: reset

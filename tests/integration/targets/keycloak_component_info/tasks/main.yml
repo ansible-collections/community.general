@@ -6,7 +6,7 @@
   uri:
     url: "{{ url }}/admin/"
     status_code: 200
-    validate_certs: no
+    validate_certs: false
   register: result
   until: result.status == 200
   retries: 10
@@ -45,8 +45,8 @@
 - name: Assert ldap is missing
   assert:
     that:
-    - result is not changed
-    - result.components | length == 0
+      - result is not changed
+      - result.components | length == 0
 
 - name: Create new user federation
   community.general.keycloak_user_federation:
@@ -103,9 +103,9 @@
 - name: Assert ldap exists
   assert:
     that:
-    - result is not changed
-    - result.components | length == 1
-    - result.components[0].name == federation
+      - result is not changed
+      - result.components | length == 1
+      - result.components[0].name == federation
 
 - name: Save ldap id
   set_fact:
@@ -124,8 +124,8 @@
 - name: Assert components exists
   assert:
     that:
-    - result is not changed
-    - result.components | length > 0
+      - result is not changed
+      - result.components | length > 0
 
 - name: Retrive ldap subcomponents filter by name
   community.general.keycloak_component_info:
@@ -141,9 +141,9 @@
 - name: Assert sub component with name "email" exists
   assert:
     that:
-    - result is not changed
-    - result.components | length == 1
-    - result.components[0].name == "email"
+      - result is not changed
+      - result.components | length == 1
+      - result.components[0].name == "email"
 
 - name: Retrive ldap subcomponents filter by type
   community.general.keycloak_component_info:
@@ -159,9 +159,9 @@
 - name: Assert ldap sub components filter by type
   assert:
     that:
-    - result is not changed
-    - result.components | length > 0
-    - result.components[0].providerType == "org.keycloak.storage.ldap.mappers.LDAPStorageMapper"
+      - result is not changed
+      - result.components | length > 0
+      - result.components[0].providerType == "org.keycloak.storage.ldap.mappers.LDAPStorageMapper"
 
 - name: Retrive key info when absent
   community.general.keycloak_component_info:
@@ -177,8 +177,8 @@
 - name: Assert key is missing
   assert:
     that:
-    - result is not changed
-    - result.components | length == 0
+      - result is not changed
+      - result.components | length == 0
 
 - name: Create custom realm key
   community.general.keycloak_realm_key:
@@ -211,8 +211,8 @@
 - name: Assert key exists
   assert:
     that:
-    - result is not changed
-    - result.components | length == 1
+      - result is not changed
+      - result.components | length == 1
 
 - name: Retrive all realm components
   community.general.keycloak_component_info:
@@ -226,8 +226,8 @@
 - name: Assert key exists
   assert:
     that:
-    - result is not changed
-    - result.components | length > 0
+      - result is not changed
+      - result.components | length > 0
 
 - name: Retrive all ldap in realm
   community.general.keycloak_component_info:
@@ -242,10 +242,10 @@
 - name: Assert key exists
   assert:
     that:
-    - result is not changed
-    - result.components | length == 1
-    - result.components[0].providerType == "org.keycloak.storage.UserStorageProvider"
-    - result.components[0].name == "myldap"
+      - result is not changed
+      - result.components | length == 1
+      - result.components[0].providerType == "org.keycloak.storage.UserStorageProvider"
+      - result.components[0].name == "myldap"
 
 - name: Retrive component by name only
   community.general.keycloak_component_info:
@@ -260,7 +260,7 @@
 - name: Assert key exists
   assert:
     that:
-    - result is not changed
-    - result.components | length == 1
-    - result.components[0].providerType == "org.keycloak.keys.KeyProvider"
-    - result.components[0].name == realm_key_name
+      - result is not changed
+      - result.components | length == 1
+      - result.components[0].providerType == "org.keycloak.keys.KeyProvider"
+      - result.components[0].name == realm_key_name

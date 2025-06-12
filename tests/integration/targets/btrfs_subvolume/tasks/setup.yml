@@ -18,12 +18,12 @@
 - name: Create single device btrfs filesystem
   ansible.builtin.command:
     cmd: "mkfs.btrfs --label {{ btrfs_subvolume_single_label }} -f {{ btrfs_subvolume_single_devices | first }}"
-  changed_when: True
+  changed_when: true
 
 - name: Create multiple device btrfs filesystem
   ansible.builtin.command:
     cmd: "mkfs.btrfs --label {{ btrfs_subvolume_multiple_label }} -f -d raid0 {{ btrfs_subvolume_multiple_devices | join(' ') }}"
-  changed_when: True
+  changed_when: true
 
 # Typically created by udev, but apparently missing on Alpine
 - name: Create btrfs control device node
@@ -34,4 +34,4 @@
 - name: Force rescan to ensure all device are detected
   ansible.builtin.command:
     cmd: "btrfs device scan"
-  changed_when: True
+  changed_when: true

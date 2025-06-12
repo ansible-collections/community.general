@@ -64,8 +64,8 @@
       assert:
         that: "inactive_by_option_vg_autoact_status_result.stdout | length == 0"
   always:
-  - name: Cleanup vg_autoact_test
-    lvg:
-      state: absent
-      vg: vg_autoact_test
-      force: true
+    - name: Cleanup vg_autoact_test
+      lvg:
+        state: absent
+        vg: vg_autoact_test
+        force: true

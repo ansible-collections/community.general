@@ -23,17 +23,17 @@
 
 - block:
   # OpenSUSE Leap>=15.0 don't include password-store in main repo
-  - name: SUSE | Add security:privacy repo
-    template:
-      src: security-privacy.repo.j2
-      dest: /etc/zypp/repos.d/security:privacy.repo
+    - name: SUSE | Add security:privacy repo
+      template:
+        src: security-privacy.repo.j2
+        dest: /etc/zypp/repos.d/security:privacy.repo
 
-  - name: SUSE | Install package
-    package:
-      name: password-store
-      state: present
-      update_cache: true
-      disable_gpg_check: true
+    - name: SUSE | Install package
+      package:
+        name: password-store
+        state: present
+        update_cache: true
+        disable_gpg_check: true
   when: ansible_facts.pkg_mgr in ['zypper', 'community.general.zypper']
 
 # See https://github.com/gopasspw/gopass/issues/1849#issuecomment-802789285
@@ -41,20 +41,20 @@
   when: ansible_facts.os_family == 'Debian'
   become: true
   block:
-  - name: Fetch gopass repo keyring
-    ansible.builtin.get_url:
-      url: https://packages.gopass.pw/repos/gopass/gopass-archive-keyring.gpg
-      dest: /usr/share/keyrings/gopass-archive-keyring.gpg
-  - name: Add gopass repo
-    ansible.builtin.apt_repository:
-      repo: "deb [arch=amd64,arm64,armhf \
-        signed-by=/usr/share/keyrings/gopass-archive-keyring.gpg] \
-        https://packages.gopass.pw/repos/gopass stable main"
-      state: present
-  - name: Update apt-cache and install gopass package
-    ansible.builtin.apt:
-      name: gopass
-      update_cache: true
+    - name: Fetch gopass repo keyring
+      ansible.builtin.get_url:
+        url: https://packages.gopass.pw/repos/gopass/gopass-archive-keyring.gpg
+        dest: /usr/share/keyrings/gopass-archive-keyring.gpg
+    - name: Add gopass repo
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64,arm64,armhf \
+          signed-by=/usr/share/keyrings/gopass-archive-keyring.gpg] \
+          https://packages.gopass.pw/repos/gopass stable main"
+        state: present
+    - name: Update apt-cache and install gopass package
+      ansible.builtin.apt:
+        name: gopass
+        update_cache: true
 
 - name: Install on macOS
   when: ansible_facts.distribution == 'MacOSX'

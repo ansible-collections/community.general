@@ -9,25 +9,25 @@
     - fstype != "xfs"
   block:
 
-  - name: "Generate random UUIDs"
-    ansible.builtin.set_fact:
-      random_uuid: '{{ "first_random_uuid" | ansible.builtin.to_uuid }}'
-      random_uuid2: '{{ "second_random_uuid" | ansible.builtin.to_uuid }}'
+    - name: "Generate random UUIDs"
+      ansible.builtin.set_fact:
+        random_uuid: '{{ "first_random_uuid" | ansible.builtin.to_uuid }}'
+        random_uuid2: '{{ "second_random_uuid" | ansible.builtin.to_uuid }}'
 
-  - name: "Create filesystem ({{ fstype }}) with fix UUID as opt"
-    community.general.filesystem:
-      dev: '{{ dev }}'
-      fstype: '{{ fstype }}'
-      opts: "{{ ((fstype == 'lvm') | ansible.builtin.ternary('--norestorefile --uuid ', '-U ')) + random_uuid2 }}"
-      uuid: '{{ random_uuid }}'
-    register: fs_result2
+    - name: "Create filesystem ({{ fstype }}) with fix UUID as opt"
+      community.general.filesystem:
+        dev: '{{ dev }}'
+        fstype: '{{ fstype }}'
+        opts: "{{ ((fstype == 'lvm') | ansible.builtin.ternary('--norestorefile --uuid ', '-U ')) + random_uuid2 }}"
+        uuid: '{{ random_uuid }}'
+      register: fs_result2
 
-  - name: "Get UUID of the created filesystem"
-    ansible.builtin.shell:
-      cmd: "{{ get_uuid_cmd }}"
-    changed_when: false
-    register: uuid2
+    - name: "Get UUID of the created filesystem"
+      ansible.builtin.shell:
+        cmd: "{{ get_uuid_cmd }}"
+      changed_when: false
+      register: uuid2
 
-  - name: "Assert that filesystem UUID is the one set on creation with opt"
-    ansible.builtin.assert:
-      that: (random_uuid2 | replace('-','')) == ( uuid2.stdout | replace('-',''))
+    - name: "Assert that filesystem UUID is the one set on creation with opt"
+      ansible.builtin.assert:
+        that: (random_uuid2 | replace('-','')) == ( uuid2.stdout | replace('-',''))

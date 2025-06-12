@@ -39,7 +39,7 @@
       size: 1
     port_id: "{{ port.id }}"
     state: absent
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: create a eip (check mode)
   hwc_vpc_eip:
     type: "5_bgp"
@@ -55,7 +55,7 @@
   assert:
     that:
       - result is changed
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: create a eip
   hwc_vpc_eip:
     type: "5_bgp"
@@ -70,7 +70,7 @@
   assert:
     that:
       result is changed
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: create a eip (idemponent)
   hwc_vpc_eip:
     type: "5_bgp"
@@ -102,7 +102,7 @@
     that:
       - result is not failed
       - result is not changed
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: delete a eip (check mode)
   hwc_vpc_eip:
     type: "5_bgp"
@@ -118,7 +118,7 @@
   assert:
     that:
       - result is changed
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: delete a eip
   hwc_vpc_eip:
     type: "5_bgp"
@@ -133,7 +133,7 @@
   assert:
     that:
       - result is changed
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: delete a eip (idemponent)
   hwc_vpc_eip:
     type: "5_bgp"
@@ -165,7 +165,7 @@
     that:
       - result is not failed
       - result is not changed
-#---------------------------------------------------------
+# ---------------------------------------------------------
 # Post-test teardown
 - name: delete a port
   hwc_vpc_port:

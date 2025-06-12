@@ -7,7 +7,7 @@
 # https://github.com/marketplace/actions/ansible-test
 
 name: EOL CI
-on:
+"on":
   # Run EOL CI against all pushes (direct commits, also merged PRs), Pull Requests
   push:
     branches:

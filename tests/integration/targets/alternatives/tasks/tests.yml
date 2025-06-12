@@ -4,13 +4,13 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - block:
-  - include_tasks: remove_links.yml
-  - include_tasks: setup_test.yml
-  # at least two iterations:
-  # - first will use 'link currently absent',
-  # - second will receive 'link currently points to'
-  - include_tasks: test.yml
-    with_sequence: start=1 end=2
+    - include_tasks: remove_links.yml
+    - include_tasks: setup_test.yml
+    # at least two iterations:
+    # - first will use 'link currently absent',
+    # - second will receive 'link currently points to'
+    - include_tasks: test.yml
+      with_sequence: start=1 end=2
   vars:
     with_link: '{{ test_conf[0] }}'
     with_alternatives: '{{ test_conf[1] }}'

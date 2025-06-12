@@ -24,7 +24,7 @@
 - name: Verify cm_add_package
   assert:
     that:
-    - cm_add_package is changed
+      - cm_add_package is changed
 
 - name: Add package (normal mode)
   pkgutil:
@@ -35,7 +35,7 @@
 - name: Verify nm_add_package
   assert:
     that:
-    - nm_add_package is changed
+      - nm_add_package is changed
 
 - name: Add package again (check_mode)
   pkgutil:
@@ -47,7 +47,7 @@
 - name: Verify cm_add_package_again
   assert:
     that:
-    - cm_add_package_again is not changed
+      - cm_add_package_again is not changed
 
 - name: Add package again (normal mode)
   pkgutil:
@@ -58,7 +58,7 @@
 - name: Verify nm_add_package_again
   assert:
     that:
-    - nm_add_package_again is not changed
+      - nm_add_package_again is not changed
 
 
 # REMOVE PACKAGE
@@ -72,7 +72,7 @@
 - name: Verify cm_remove_package
   assert:
     that:
-    - cm_remove_package is changed
+      - cm_remove_package is changed
 
 - name: Remove package (normal mode)
   pkgutil:
@@ -83,7 +83,7 @@
 - name: Verify nm_remove_package
   assert:
     that:
-    - nm_remove_package is changed
+      - nm_remove_package is changed
 
 - name: Remove package again (check_mode)
   pkgutil:
@@ -95,7 +95,7 @@
 - name: Verify cm_remove_package_again
   assert:
     that:
-    - cm_remove_package_again is not changed
+      - cm_remove_package_again is not changed
 
 - name: Remove package again (normal mode)
   pkgutil:
@@ -106,7 +106,7 @@
 - name: Verify nm_remove_package_again
   assert:
     that:
-    - nm_remove_package_again is not changed
+      - nm_remove_package_again is not changed
 
 
 # RESTORE ENVIRONMENT

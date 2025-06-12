@@ -164,25 +164,25 @@
 - when: url_removal_result is not failed
   block:
 
-  - name: Verify removal test result - {{ method }}
-    assert:
-      that:
-        - url_removal_result is changed
-      msg: "state=absent with url as name shall remove flatpak when present"
+    - name: Verify removal test result - {{ method }}
+      assert:
+        that:
+          - url_removal_result is changed
+        msg: "state=absent with url as name shall remove flatpak when present"
 
-  - name: Test idempotency of removal with url - {{ method }}
-    flatpak:
-      name: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
-      state: absent
-      method: "{{ method }}"
-      no_dependencies: true
-    register: double_url_removal_result
+    - name: Test idempotency of removal with url - {{ method }}
+      flatpak:
+        name: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
+        state: absent
+        method: "{{ method }}"
+        no_dependencies: true
+      register: double_url_removal_result
 
-  - name: Verify idempotency of removal with url test result - {{ method }}
-    assert:
-      that:
-        - double_url_removal_result is not changed
-      msg: "state=absent with url as name shall not do anything when flatpak is not present"
+    - name: Verify idempotency of removal with url test result - {{ method }}
+      assert:
+        that:
+          - double_url_removal_result is not changed
+        msg: "state=absent with url as name shall not do anything when flatpak is not present"
 
 - name: Make sure flatpak is really gone - {{ method }}
   flatpak:

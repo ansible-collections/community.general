@@ -82,7 +82,7 @@
       unarchive:
         src: "{{ commandline_tools_link }}"
         dest: "{{ android_cmdline_temp_dir }}"
-        remote_src: yes
+        remote_src: true
         creates: "{{ android_cmdline_temp_dir }}/cmdline-tools"
       when: not sdkmanager_installed.stat.exists
 
@@ -91,4 +91,4 @@
       copy:
         src: "{{ android_cmdline_temp_dir }}/cmdline-tools/"
         dest: "{{ android_sdk_location }}/cmdline-tools/latest"
-        remote_src: yes
+        remote_src: true

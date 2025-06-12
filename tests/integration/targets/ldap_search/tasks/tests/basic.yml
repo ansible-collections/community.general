@@ -20,9 +20,9 @@
 - name: assert that test LDAP user can be found
   assert:
     that:
-       - output is not failed
-       - output.results | length == 1
-       - output.results.0.displayName == "LDAP Test"
+      - output is not failed
+      - output.results | length == 1
+      - output.results.0.displayName == "LDAP Test"
 
 - name: Test simple search for a user with no results
   ldap_search:
@@ -35,5 +35,5 @@
 - name: assert that the output is empty
   assert:
     that:
-       - output is not failed
-       - output.results | length == 0
+      - output is not failed
+      - output.results | length == 0

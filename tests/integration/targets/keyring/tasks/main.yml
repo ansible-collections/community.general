@@ -5,7 +5,7 @@
 
 - name: Ensure required packages for headless keyring access are installed (RPM)
   ansible.builtin.package:
-      name: gnome-keyring
+    name: gnome-keyring
   become: true
   when: "'localhost' not in inventory_hostname"
 

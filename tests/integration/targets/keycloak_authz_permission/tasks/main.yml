@@ -93,8 +93,8 @@
     name: "ScopePermission"
     description: "Scope permission"
     resources:
-    - "Default Resource"
-    - "Other Resource"
+      - "Default Resource"
+      - "Other Resource"
     permission_type: scope
     scopes:
       - "file:delete"

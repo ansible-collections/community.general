@@ -69,8 +69,8 @@
 - name: "assert test_{{test_number}} failed"
   assert:
     that:
-    - result is failed
-    - result.results[0].msg == 'invalid host state ERROR'
+      - result is failed
+      - result.results[0].msg == 'invalid host state ERROR'
 
 # ---
 
@@ -94,7 +94,7 @@
 - name: "assert test_{{test_number}} worked"
   assert:
     that:
-    - result.changed
+      - result.changed
 
 # HOST ENABLEMENT
 
@@ -120,7 +120,7 @@
 - name: "assert test_{{test_number}} worked"
   assert:
     that:
-    - result.changed
+      - result.changed
 
 # TEMPLATE MANAGEMENT
 
@@ -150,7 +150,7 @@
 - name: "assert test_{{test_number}} worked"
   assert:
     that:
-    - result.changed
+      - result.changed
 
 # ---
 
@@ -180,7 +180,7 @@
 - name: "assert test_{{test_number}} worked"
   assert:
     that:
-    - result is not changed
+      - result is not changed
 
 # HOST DISABLEMENT
 
@@ -205,7 +205,7 @@
 - name: "assert test_{{test_number}} worked"
   assert:
     that:
-    - result.changed
+      - result.changed
 
 # HOST OFFLINE
 
@@ -230,7 +230,7 @@
 - name: "assert test_{{test_number}} worked"
   assert:
     that:
-    - result.changed
+      - result.changed
 
 # TEARDOWN
 

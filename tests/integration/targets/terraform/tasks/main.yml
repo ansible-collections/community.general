@@ -8,20 +8,20 @@
 
 - name: Check for existing Terraform in path
   block:
-  - name: Check if terraform is present in path
-    ansible.builtin.command: "command -v terraform"
-    register: terraform_binary_path
-    ignore_errors: true
+    - name: Check if terraform is present in path
+      ansible.builtin.command: "command -v terraform"
+      register: terraform_binary_path
+      ignore_errors: true
 
-  - name: Check Terraform version
-    ansible.builtin.command: terraform version
-    register: terraform_version_output
-    when: terraform_binary_path.rc == 0
+    - name: Check Terraform version
+      ansible.builtin.command: terraform version
+      register: terraform_version_output
+      when: terraform_binary_path.rc == 0
 
-  - name: Set terraform version
-    ansible.builtin.set_fact:
-      terraform_version_installed: "{{ terraform_version_output.stdout | regex_search('(?!Terraform.*v)([0-9]+\\.[0-9]+\\.[0-9]+)') }}"
-    when: terraform_version_output.changed
+    - name: Set terraform version
+      ansible.builtin.set_fact:
+        terraform_version_installed: "{{ terraform_version_output.stdout | regex_search('(?!Terraform.*v)([0-9]+\\.[0-9]+\\.[0-9]+)') }}"
+      when: terraform_version_output.changed
 
 # This block handles the tasks of installing the Terraform binary. This happens if there is no existing
 # terraform in $PATH OR version does not match `terraform_version`.
@@ -29,22 +29,22 @@
 - name: Execute Terraform install tasks
   block:
 
-  - name: Install Terraform
-    ansible.builtin.debug:
-      msg: "Installing terraform {{ terraform_version }}, found: {{ terraform_version_installed | default('no terraform binary found') }}."
+    - name: Install Terraform
+      ansible.builtin.debug:
+        msg: "Installing terraform {{ terraform_version }}, found: {{ terraform_version_installed | default('no terraform binary found') }}."
 
-  - name: Ensure unzip is present
-    ansible.builtin.package:
-      name: unzip
-      state: present
+    - name: Ensure unzip is present
+      ansible.builtin.package:
+        name: unzip
+        state: present
 
-  - name: Install Terraform binary
-    ansible.builtin.unarchive:
-      src: "{{ terraform_url }}"
-      dest: "{{ remote_tmp_dir }}"
-      mode: 0755
-      remote_src: true
-      validate_certs: "{{ validate_certs }}"
+    - name: Install Terraform binary
+      ansible.builtin.unarchive:
+        src: "{{ terraform_url }}"
+        dest: "{{ remote_tmp_dir }}"
+        mode: "0755"
+        remote_src: true
+        validate_certs: "{{ validate_certs }}"
 
   when: terraform_version_installed is not defined or terraform_version_installed != terraform_version
 

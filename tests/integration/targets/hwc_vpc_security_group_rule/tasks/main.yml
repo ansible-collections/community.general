@@ -24,7 +24,7 @@
     port_range_min: 22
     remote_ip_prefix: "0.0.0.0/0"
     state: absent
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: create a security group rule (check mode)
   hwc_vpc_security_group_rule:
     direction: "ingress"
@@ -42,7 +42,7 @@
     that:
       - not result.id
       - result.changed
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: create a security group rule
   hwc_vpc_security_group_rule:
     direction: "ingress"
@@ -58,7 +58,7 @@
   assert:
     that:
       - result is changed
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: create a security group rule (idemponent)
   hwc_vpc_security_group_rule:
     direction: "ingress"
@@ -91,7 +91,7 @@
     that:
       - result is not failed
       - result is not changed
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: delete a security group rule (check mode)
   hwc_vpc_security_group_rule:
     direction: "ingress"
@@ -108,7 +108,7 @@
   assert:
     that:
       - result is changed
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: delete a security group rule
   hwc_vpc_security_group_rule:
     direction: "ingress"
@@ -124,7 +124,7 @@
   assert:
     that:
       - result is changed
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: delete a security group rule (idemponent)
   hwc_vpc_security_group_rule:
     direction: "ingress"
@@ -157,7 +157,7 @@
     that:
       - result is not failed
       - result is not changed
-#---------------------------------------------------------
+# ---------------------------------------------------------
 # Post-test teardown
 - name: delete a security group
   hwc_vpc_security_group:

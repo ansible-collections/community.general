@@ -52,14 +52,14 @@
     LC_ALL: C
 - assert:
     that:
-    - logging_check is changed
-    - logging is changed
-    - "ufw_logging.stdout == 'Logging: on (low)'"
-    - logging_idem is not changed
-    - logging_idem_check is not changed
-    - "ufw_logging_change.stdout == 'Logging: on (full)'"
-    - logging_change is changed
-    - logging_change_check is changed
+      - logging_check is changed
+      - logging is changed
+      - "ufw_logging.stdout == 'Logging: on (low)'"
+      - logging_idem is not changed
+      - logging_idem_check is not changed
+      - "ufw_logging_change.stdout == 'Logging: on (full)'"
+      - logging_change is changed
+      - logging_change_check is changed
 
 # ############################################
 - name: Default (check mode)
@@ -138,17 +138,17 @@
   register: default_change_implicit_idem
 - assert:
     that:
-    - default_check is changed
-    - default is changed
-    - "'reject (incoming)' in ufw_defaults.stdout"
-    - default_idem is not changed
-    - default_idem_check is not changed
-    - default_change_check is changed
-    - default_change is changed
-    - "'allow (incoming)' in ufw_defaults_change.stdout"
-    - default_change_2 is changed
-    - default_change_implicit_check is changed
-    - default_change_implicit is changed
-    - default_change_implicit_idem_check is not changed
-    - default_change_implicit_idem is not changed
-    - "'allow (incoming)' in ufw_defaults_change_implicit.stdout"
+      - default_check is changed
+      - default is changed
+      - "'reject (incoming)' in ufw_defaults.stdout"
+      - default_idem is not changed
+      - default_idem_check is not changed
+      - default_change_check is changed
+      - default_change is changed
+      - "'allow (incoming)' in ufw_defaults_change.stdout"
+      - default_change_2 is changed
+      - default_change_implicit_check is changed
+      - default_change_implicit is changed
+      - default_change_implicit_idem_check is not changed
+      - default_change_implicit_idem is not changed
+      - "'allow (incoming)' in ufw_defaults_change_implicit.stdout"

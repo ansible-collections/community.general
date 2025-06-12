@@ -30,7 +30,7 @@
     - name: verify success
       ansible.builtin.assert:
         that:
-        - result_success is successful
+          - result_success is successful
 
     - name: import pkcs12 without alias params
       community.general.java_cert:
@@ -45,7 +45,7 @@
     - name: verify success
       ansible.builtin.assert:
         that:
-        - result_success_excl_aliases is successful
+          - result_success_excl_aliases is successful
 
     - name: import pkcs12 with wrong password
       community.general.java_cert:
@@ -63,7 +63,7 @@
     - name: verify fail with wrong import password
       ansible.builtin.assert:
         that:
-        - result_wrong_pass is failed
+          - result_wrong_pass is failed
 
     - name: test fail on mutually exclusive params
       community.general.java_cert:
@@ -80,7 +80,7 @@
     - name: verify failed exclusive params
       ansible.builtin.assert:
         that:
-        - result_excl_params is failed
+          - result_excl_params is failed
 
     - name: test fail on missing required params
       community.general.java_cert:
@@ -93,7 +93,7 @@
     - name: verify failed missing required params
       ansible.builtin.assert:
         that:
-        - result_missing_required_param is failed
+          - result_missing_required_param is failed
 
     - name: delete object based on cert_alias parameter
       community.general.java_cert:
@@ -107,7 +107,7 @@
     - name: verify object successfully deleted
       ansible.builtin.assert:
         that:
-        - result_alias_deleted is successful
+          - result_alias_deleted is successful
 
     - name: include extended test suite
       import_tasks: state_change.yml

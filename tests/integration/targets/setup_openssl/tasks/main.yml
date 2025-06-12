@@ -13,13 +13,13 @@
   vars:
     search:
       files:
-      - '{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml'
-      - '{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml'
-      - '{{ ansible_distribution }}.yml'
-      - '{{ ansible_os_family }}.yml'
-      - default.yml
+        - '{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml'
+        - '{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml'
+        - '{{ ansible_distribution }}.yml'
+        - '{{ ansible_os_family }}.yml'
+        - default.yml
       paths:
-      - vars
+        - vars
 
 - name: Install OpenSSL
   become: true
@@ -29,24 +29,24 @@
 
 - when: ansible_facts.distribution ~ ansible_facts.distribution_major_version not in  ['CentOS6', 'RedHat6']
   block:
-  - name: Install cryptography (Python 3)
-    become: true
-    package:
-      name: '{{ cryptography_package_name_python3 }}'
-    when: not cryptography_from_pip and ansible_python_version is version('3.0', '>=')
+    - name: Install cryptography (Python 3)
+      become: true
+      package:
+        name: '{{ cryptography_package_name_python3 }}'
+      when: not cryptography_from_pip and ansible_python_version is version('3.0', '>=')
 
-  - name: Install cryptography (Python 2)
-    become: true
-    package:
-      name: '{{ cryptography_package_name }}'
-    when: not cryptography_from_pip and ansible_python_version is version('3.0', '<')
+    - name: Install cryptography (Python 2)
+      become: true
+      package:
+        name: '{{ cryptography_package_name }}'
+      when: not cryptography_from_pip and ansible_python_version is version('3.0', '<')
 
-  - name: Install cryptography (pip)
-    become: true
-    pip:
-      name: cryptography>=3.3
-      extra_args: "-c {{ remote_constraints }}"
-    when: cryptography_from_pip
+    - name: Install cryptography (pip)
+      become: true
+      pip:
+        name: cryptography>=3.3
+        extra_args: "-c {{ remote_constraints }}"
+      when: cryptography_from_pip
 
 - name: Install pyOpenSSL (Python 3)
   become: true

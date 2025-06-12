@@ -22,9 +22,9 @@
 - name: assert that test LDAP user can read its password
   assert:
     that:
-       - output is not failed
-       - output.results | length == 1
-       - output.results.0.userPassword is defined
+      - output is not failed
+      - output.results | length == 1
+      - output.results.0.userPassword is defined
 
 - name: Test simple search for cert authenticated user
   ldap_search:
@@ -42,6 +42,6 @@
 - name: assert that test LDAP user can read its password
   assert:
     that:
-       - output is not failed
-       - output.results | length == 1
-       - output.results.0.userPassword is defined
+      - output is not failed
+      - output.results | length == 1
+      - output.results.0.userPassword is defined

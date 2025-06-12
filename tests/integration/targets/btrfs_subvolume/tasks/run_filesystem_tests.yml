@@ -10,23 +10,23 @@
 
 - name: "Execute test scenarios where non-root subvolume is mounted"
   block:
-  - name: Create subvolume '/nonroot'
-    community.general.btrfs_subvolume:
-      automount: Yes
-      name: "/nonroot"
-      filesystem_label: "{{ btrfs_subvolume_target_label }}"
-      state: "present"
-    register: nonroot
-  - name: "Mount subvolume '/nonroot'"
-    ansible.posix.mount:
-      src: "{{ nonroot.filesystem.devices | first }}"
-      path: /mnt
-      opts: "subvolid={{ nonroot.target_subvolume_id }}"
-      fstype: btrfs
-      state: mounted
-  - name: "Run tests for explicit, mounted single device configuration"
-    ansible.builtin.include_tasks: 'run_common_tests.yml'
-  - name: "Unmount subvolume /nonroot"
-    ansible.posix.mount:
-      path: /mnt
-      state: absent
+    - name: Create subvolume '/nonroot'
+      community.general.btrfs_subvolume:
+        automount: true
+        name: "/nonroot"
+        filesystem_label: "{{ btrfs_subvolume_target_label }}"
+        state: "present"
+      register: nonroot
+    - name: "Mount subvolume '/nonroot'"
+      ansible.posix.mount:
+        src: "{{ nonroot.filesystem.devices | first }}"
+        path: /mnt
+        opts: "subvolid={{ nonroot.target_subvolume_id }}"
+        fstype: btrfs
+        state: mounted
+    - name: "Run tests for explicit, mounted single device configuration"
+      ansible.builtin.include_tasks: 'run_common_tests.yml'
+    - name: "Unmount subvolume /nonroot"
+      ansible.posix.mount:
+        path: /mnt
+        state: absent

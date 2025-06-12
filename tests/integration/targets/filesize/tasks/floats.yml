@@ -89,7 +89,6 @@
       - filesize_stat_float_04.stat.size == 512512
 
 
-
 - name: Create a file with a size of 512.513kB (check mode)
   community.general.filesize:
     path: "{{ filesize_testfile }}"
@@ -164,7 +163,6 @@
       - filesize_stat_float_11.stat.size == 512512
       - filesize_stat_float_12.stat.size == 512513
       - filesize_stat_float_14.stat.size == 512513
-
 
 
 - name: Create a file with a size of 4.004MB (check mode)

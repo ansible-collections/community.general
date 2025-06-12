@@ -15,9 +15,9 @@
     value: "bar{{ item }}"
     state: present
   loop:
-  - 1
-  - 2
-  - 3
+    - 1
+    - 2
+    - 3
 
 - name: put a single key/values in etcd
   etcd3:

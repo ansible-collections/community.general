@@ -24,27 +24,27 @@
 # Pre-test setup
 - name: delete a vpc
   hwc_network_vpc:
-      identity_endpoint: "{{ identity_endpoint }}"
-      user: "{{ user }}"
-      password: "{{ password }}"
-      domain: "{{ domain }}"
-      project: "{{ project }}"
-      region: "{{ region }}"
-      name: "vpc_1"
-      cidr: "192.168.100.0/24"
-      state: absent
-#----------------------------------------------------------
+    identity_endpoint: "{{ identity_endpoint }}"
+    user: "{{ user }}"
+    password: "{{ password }}"
+    domain: "{{ domain }}"
+    project: "{{ project }}"
+    region: "{{ region }}"
+    name: "vpc_1"
+    cidr: "192.168.100.0/24"
+    state: absent
+# ----------------------------------------------------------
 - name: create a vpc
   hwc_network_vpc:
-      identity_endpoint: "{{ identity_endpoint }}"
-      user: "{{ user }}"
-      password: "{{ password }}"
-      domain: "{{ domain }}"
-      project: "{{ project }}"
-      region: "{{ region }}"
-      name: "vpc_1"
-      cidr: "192.168.100.0/24"
-      state: present
+    identity_endpoint: "{{ identity_endpoint }}"
+    user: "{{ user }}"
+    password: "{{ password }}"
+    domain: "{{ domain }}"
+    project: "{{ project }}"
+    region: "{{ region }}"
+    name: "vpc_1"
+    cidr: "192.168.100.0/24"
+    state: present
   register: result
 - name: assert changed is true
   assert:
@@ -53,33 +53,33 @@
 # ----------------------------------------------------------------------------
 - name: create a vpc that already exists
   hwc_network_vpc:
-      identity_endpoint: "{{ identity_endpoint }}"
-      user: "{{ user }}"
-      password: "{{ password }}"
-      domain: "{{ domain }}"
-      project: "{{ project }}"
-      region: "{{ region }}"
-      name: "vpc_1"
-      cidr: "192.168.100.0/24"
-      state: present
+    identity_endpoint: "{{ identity_endpoint }}"
+    user: "{{ user }}"
+    password: "{{ password }}"
+    domain: "{{ domain }}"
+    project: "{{ project }}"
+    region: "{{ region }}"
+    name: "vpc_1"
+    cidr: "192.168.100.0/24"
+    state: present
   register: result
 - name: assert changed is false
   assert:
     that:
       - result is not failed
       - result is not changed
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: delete a vpc
   hwc_network_vpc:
-      identity_endpoint: "{{ identity_endpoint }}"
-      user: "{{ user }}"
-      password: "{{ password }}"
-      domain: "{{ domain }}"
-      project: "{{ project }}"
-      region: "{{ region }}"
-      name: "vpc_1"
-      cidr: "192.168.100.0/24"
-      state: absent
+    identity_endpoint: "{{ identity_endpoint }}"
+    user: "{{ user }}"
+    password: "{{ password }}"
+    domain: "{{ domain }}"
+    project: "{{ project }}"
+    region: "{{ region }}"
+    name: "vpc_1"
+    cidr: "192.168.100.0/24"
+    state: absent
   register: result
 - name: assert changed is true
   assert:
@@ -88,15 +88,15 @@
 # ----------------------------------------------------------------------------
 - name: delete a vpc that does not exist
   hwc_network_vpc:
-      identity_endpoint: "{{ identity_endpoint }}"
-      user: "{{ user }}"
-      password: "{{ password }}"
-      domain: "{{ domain }}"
-      project: "{{ project }}"
-      region: "{{ region }}"
-      name: "vpc_1"
-      cidr: "192.168.100.0/24"
-      state: absent
+    identity_endpoint: "{{ identity_endpoint }}"
+    user: "{{ user }}"
+    password: "{{ password }}"
+    domain: "{{ domain }}"
+    project: "{{ project }}"
+    region: "{{ region }}"
+    name: "vpc_1"
+    cidr: "192.168.100.0/24"
+    state: absent
   register: result
 - name: assert changed is false
   assert:

@@ -24,7 +24,7 @@
 
 - assert:
     that:
-    - ifile_1 is changed
+      - ifile_1 is changed
 
 - name: Change IP address to 1.2.3.5 again
   community.general.interfaces_file:
@@ -36,7 +36,7 @@
 
 - assert:
     that:
-    - ifile_2 is not changed
+      - ifile_2 is not changed
 
 - name: 3841 - copy interfaces file
   copy:

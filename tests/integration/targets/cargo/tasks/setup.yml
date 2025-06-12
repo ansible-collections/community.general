@@ -4,12 +4,12 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - block:
-  - name: Install cargo
-    package:
-      name: cargo
-      state: present
-  - set_fact:
-      has_cargo: true
+    - name: Install cargo
+      package:
+        name: cargo
+        state: present
+    - set_fact:
+        has_cargo: true
   when:
     - ansible_system != 'FreeBSD'
     - ansible_distribution != 'MacOSX'
@@ -18,25 +18,25 @@
     - ansible_distribution != 'Ubuntu' or ansible_distribution_version is version('18', '>=')
 
 - block:
-  - name: Install rust (containing cargo)
-    package:
-      name: rust
-      state: present
-  - set_fact:
-      has_cargo: true
+    - name: Install rust (containing cargo)
+      package:
+        name: rust
+        state: present
+    - set_fact:
+        has_cargo: true
   when:
     - ansible_system == 'FreeBSD' and ansible_distribution_version is version('13.0', '>')
 
 - block:
-  - name: Download rustup
-    get_url:
-      url: https://sh.rustup.rs
-      dest: /tmp/sh.rustup.rs
-      mode: "0750"
-      force: true
-  - name: Install rustup cargo
-    command: /tmp/sh.rustup.rs -y
-  - set_fact:
-      rustup_cargo_bin: "{{ lookup('env', 'HOME') }}/.cargo/bin/cargo"
+    - name: Download rustup
+      get_url:
+        url: https://sh.rustup.rs
+        dest: /tmp/sh.rustup.rs
+        mode: "0750"
+        force: true
+    - name: Install rustup cargo
+      command: /tmp/sh.rustup.rs -y
+    - set_fact:
+        rustup_cargo_bin: "{{ lookup('env', 'HOME') }}/.cargo/bin/cargo"
   when:
     - ansible_distribution != 'CentOS' or ansible_distribution_version is version('7.0', '>=')

@@ -15,11 +15,11 @@
 
 - assert:
     that:
-    - "'warnings' in disable_mpm_modules"
-    - disable_mpm_modules["warnings"] == [
-      "No MPM module loaded! apache2 reload AND other module actions will fail if no MPM module is loaded immediately.",
-      "No MPM module loaded! apache2 reload AND other module actions will fail if no MPM module is loaded immediately."
-      ]
+      - "'warnings' in disable_mpm_modules"
+      - disable_mpm_modules["warnings"] == [
+        "No MPM module loaded! apache2 reload AND other module actions will fail if no MPM module is loaded immediately.",
+        "No MPM module loaded! apache2 reload AND other module actions will fail if no MPM module is loaded immediately."
+        ]
 
 - name: Enable MPM event module - Revert previous change
   apache2_module:
@@ -44,4 +44,4 @@
 
 - assert:
     that:
-    - "'warnings' not in disable_mpm_modules"
+      - "'warnings' not in disable_mpm_modules"

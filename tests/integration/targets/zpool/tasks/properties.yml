@@ -9,7 +9,7 @@
     pool_properties:
       ashift: 12
     filesystem_properties:
-      compression: off
+      compression: false
     vdevs:
       - type: mirror
         disks: "{{ zpool_vdevs_disk_config.vdev3 }}"
