@@ -1,0 +1,2 @@
+bugfixes:
+  - zypper_repository - use ``metalink`` attribute to identify repositories without ``<url/>`` element (https://github.com/ansible-collections/community.general/issues/10224, https://github.com/ansible-collections/community.general/pull/10225).

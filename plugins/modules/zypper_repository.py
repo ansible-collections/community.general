@@ -174,7 +174,10 @@ def _parse_repos(module):
             opts = {}
             for o in REPO_OPTS:
                 opts[o] = repo.getAttribute(o)
-            opts['url'] = repo.getElementsByTagName('url')[0].firstChild.data
+            try:
+                opts['url'] = repo.getElementsByTagName('url')[0].firstChild.data
+            except IndexError:
+                opts['url'] = repo.getAttribute('metalink')
             # A repo can be uniquely identified by an alias + url
             repos.append(opts)
         return repos
