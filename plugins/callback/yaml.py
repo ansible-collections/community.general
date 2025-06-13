@@ -79,7 +79,9 @@ def create_string_node(tag, value, style, default_style):
 
 try:
     from ansible.module_utils.common.yaml import HAS_LIBYAML
-    from ansible.utils.vars import transform_to_native_types  # import added in https://github.com/ansible/ansible/pull/85039, first part of ansible-core 2.19.0b2
+    # import below was added in https://github.com/ansible/ansible/pull/85039,
+    # first contained in ansible-core 2.19.0b2:
+    from ansible.utils.vars import transform_to_native_types
 
     if HAS_LIBYAML:
         from yaml.cyaml import CSafeDumper as SafeDumper
