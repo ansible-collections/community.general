@@ -10,8 +10,6 @@ Aliases
 
 Quoting :ref:`inventory_aliases`
 
-.. code-block:: text
-
    The inventory_hostname is the unique identifier for a host in Ansible, this can be an IP or a hostname, but also just an 'alias' or short name for the host.
 
 As root at the iocage host, stop and destroy all jails
