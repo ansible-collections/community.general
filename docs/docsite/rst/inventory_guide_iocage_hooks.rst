@@ -54,6 +54,7 @@ Create the inventory configuration. Use the option *hooks_results* instead of *s
    shell> cat hosts/02_iocage.yml
 
 .. code-block:: yaml
+   :force:
 
    plugin: community.general.iocage
    host: 10.1.0.73
@@ -168,6 +169,7 @@ Run the playbook ::
    shell> ansible-playbook -i hosts/02_iocage.yml pb-test-uname.yml
 
 .. code-block:: yaml
+   :force:
 
    PLAY [all] **********************************************************************************************************
 

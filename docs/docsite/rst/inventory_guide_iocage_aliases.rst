@@ -123,6 +123,7 @@ keeps the value of the alias. The properties are required ::
    shell> cat hosts/02_iocage.yml
 
 .. code-block:: yaml
+   :force:
 
    plugin: community.general.iocage
    host: 10.1.0.73
@@ -170,6 +171,7 @@ Run the playbook ::
    shell> ansible-playbook -i hosts/02_iocage.yml pb-test-groups.yml
 
 .. code-block:: yaml
+   :force:
 
    PLAY [all] **********************************************************************************************************
 

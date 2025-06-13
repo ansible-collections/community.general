@@ -83,6 +83,7 @@ Run the playbook ::
    shell> ansible-playbook -i hosts/02_iocage.yml pb-test-groups.yml
 
 .. code-block:: yaml
+   :force:
 
    PLAY [all] **********************************************************************************************************
 
