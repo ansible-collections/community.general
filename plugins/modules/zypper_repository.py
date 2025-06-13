@@ -355,19 +355,6 @@ def main():
         'name': module.params['description'],
         'priority': module.params['priority'],
     }
-    # rewrite bools in the language that zypper lr -x provides for easier comparison
-    if module.params['enabled']:
-        repodata['enabled'] = '1'
-    else:
-        repodata['enabled'] = '0'
-    if module.params['disable_gpg_check']:
-        repodata['gpgcheck'] = '0'
-    else:
-        repodata['gpgcheck'] = '1'
-    if module.params['autorefresh']:
-        repodata['autorefresh'] = '1'
-    else:
-        repodata['autorefresh'] = '0'
 
     def exit_unchanged():
         module.exit_json(changed=False, repodata=repodata, state=state)
@@ -391,6 +378,14 @@ def main():
     else:
         if not alias and state == "present":
             module.fail_json(msg='Name required when adding non-repo files.')
+
+    # fill boolean attributes with defaults
+    if 'enabled' not in repodata:
+        repodata['enabled'] = '0'
+    if 'autorefresh' not in repodata:
+        repodata['autorefresh'] = '0'
+    if 'gpgcheck' not in repodata:
+        repodata['gpgcheck'] = '0'
 
     # Download / Open and parse .repo file to ensure idempotency
     if repo and repo.endswith('.repo'):
@@ -444,6 +439,12 @@ def main():
             repodata['autorefresh'] = repofile_items['autorefresh']
         if 'gpgcheck' in repofile_items:
             repodata['gpgcheck'] = repofile_items['gpgcheck']
+
+    # override boolean parameters in repodata with provided entries in module.params
+    # in the language that zypper lr -x provides for easier comparison
+    repodata['enabled'] = '1' if module.params['enabled'] else '0'
+    repodata['gpgcheck'] = '0' if module.params['disable_gpg_check'] else '1'
+    repodata['autorefresh'] = '1' if module.params['autorefresh'] else '0'
 
     exists, mod, old_repos = repo_exists(module, repodata, overwrite_multiple)
 
