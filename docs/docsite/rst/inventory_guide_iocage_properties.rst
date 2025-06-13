@@ -8,7 +8,9 @@
 Properties
 ^^^^^^^^^^
 
-Optionally, get the iocage properties ::
+Optionally, get the iocage properties. Enable :ansopt:`community.general.iocage#inventory:get_properties`:
+
+.. code-block:: console
 
    shell> cat hosts/02_iocage.yml
 
@@ -23,7 +25,9 @@ Optionally, get the iocage properties ::
    compose:
      ansible_host: (iocage_hooks.0 == '-') | ternary(iocage_ip4, iocage_hooks.0)
 
-Display the properties. Create a playbook ::
+Display the properties. Create a playbook:
+
+.. code-block:: console
 
    shell> cat pb-test-properties.yml
 
@@ -41,11 +45,13 @@ Display the properties. Create a playbook ::
        - debug:
            var: iocage_properties
 
-Run the playbook. Limit the inventory to *srv_3* ::
+Run the playbook. Limit the inventory to *srv_3*
+
+.. code-block:: console
 
    shell> ansible-playbook -i hosts/02_iocage.yml -l srv_3 pb-test-properties.yml
 
-.. code-block::
+.. code-block:: console
 
    PLAY [all] **********************************************************************************************************
 
