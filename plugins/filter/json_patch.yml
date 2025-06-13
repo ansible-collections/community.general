@@ -64,7 +64,7 @@ EXAMPLES: |
     ansible.builtin.debug:
       msg: "{{ input | community.general.json_patch('add', '/1', {'baz': 'qux'}) }}"
     vars:
-        input: ["foo": { "one": 1 }, "bar": { "two": 2 }]
+      input: ["foo": { "one": 1 }, "bar": { "two": 2 }]
     # => [{"foo": {"one": 1}}, {"baz": "qux"}, {"bar": {"two": 2}}]
 
   - name: Insert a new key into a dictionary

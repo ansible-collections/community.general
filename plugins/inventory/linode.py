@@ -6,75 +6,75 @@
 from __future__ import annotations
 
 DOCUMENTATION = r'''
-    name: linode
-    author:
-      - Luke Murphy (@decentral1se)
-    short_description: Ansible dynamic inventory plugin for Linode.
-    requirements:
-        - linode_api4 >= 2.0.0
-    description:
-        - Reads inventories from the Linode API v4.
-        - Uses a YAML configuration file that ends with linode.(yml|yaml).
-        - Linode labels are used by default as the hostnames.
-        - The default inventory groups are built from groups (deprecated by
-          Linode) and not tags.
-    extends_documentation_fragment:
-        - constructed
-        - inventory_cache
-    options:
-        cache:
-            version_added: 4.5.0
-        cache_plugin:
-            version_added: 4.5.0
-        cache_timeout:
-            version_added: 4.5.0
-        cache_connection:
-            version_added: 4.5.0
-        cache_prefix:
-            version_added: 4.5.0
-        plugin:
-            description: Marks this as an instance of the 'linode' plugin.
-            type: string
-            required: true
-            choices: ['linode', 'community.general.linode']
-        ip_style:
-            description: Populate hostvars with all information available from the Linode APIv4.
-            type: string
-            default: plain
-            choices:
-                - plain
-                - api
-            version_added: 3.6.0
-        access_token:
-            description: The Linode account personal access token.
-            type: string
-            required: true
-            env:
-                - name: LINODE_ACCESS_TOKEN
-        regions:
-          description: Populate inventory with instances in this region.
-          default: []
-          type: list
-          elements: string
-        tags:
-          description: Populate inventory only with instances which have at least one of the tags listed here.
-          default: []
-          type: list
-          elements: string
-          version_added: 2.0.0
-        types:
-          description: Populate inventory with instances with this type.
-          default: []
-          type: list
-          elements: string
-        strict:
-          version_added: 2.0.0
-        compose:
-          version_added: 2.0.0
-        groups:
-          version_added: 2.0.0
-        keyed_groups:
-          version_added: 2.0.0
+name: linode
+author:
+  - Luke Murphy (@decentral1se)
+short_description: Ansible dynamic inventory plugin for Linode.
+requirements:
+  - linode_api4 >= 2.0.0
+description:
+  - Reads inventories from the Linode API v4.
+  - Uses a YAML configuration file that ends with linode.(yml|yaml).
+  - Linode labels are used by default as the hostnames.
+  - The default inventory groups are built from groups (deprecated by
+    Linode) and not tags.
+extends_documentation_fragment:
+  - constructed
+  - inventory_cache
+options:
+  cache:
+    version_added: 4.5.0
+  cache_plugin:
+    version_added: 4.5.0
+  cache_timeout:
+    version_added: 4.5.0
+  cache_connection:
+    version_added: 4.5.0
+  cache_prefix:
+    version_added: 4.5.0
+  plugin:
+    description: Marks this as an instance of the 'linode' plugin.
+    type: string
+    required: true
+    choices: ['linode', 'community.general.linode']
+  ip_style:
+    description: Populate hostvars with all information available from the Linode APIv4.
+    type: string
+    default: plain
+    choices:
+      - plain
+      - api
+    version_added: 3.6.0
+  access_token:
+    description: The Linode account personal access token.
+    type: string
+    required: true
+    env:
+      - name: LINODE_ACCESS_TOKEN
+  regions:
+    description: Populate inventory with instances in this region.
+    default: []
+    type: list
+    elements: string
+  tags:
+    description: Populate inventory only with instances which have at least one of the tags listed here.
+    default: []
+    type: list
+    elements: string
+    version_added: 2.0.0
+  types:
+    description: Populate inventory with instances with this type.
+    default: []
+    type: list
+    elements: string
+  strict:
+    version_added: 2.0.0
+  compose:
+    version_added: 2.0.0
+  groups:
+    version_added: 2.0.0
+  keyed_groups:
+    version_added: 2.0.0
 '''
 
 EXAMPLES = r'''

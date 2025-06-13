@@ -6,18 +6,18 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-  name: a_module
-  short_description: Test whether a given string refers to an existing module or action plugin
-  version_added: 4.0.0
-  author: Felix Fontein (@felixfontein)
-  description:
-    - Test whether a given string refers to an existing module or action plugin.
-    - This can be useful in roles, which can use this to ensure that required modules are present ahead of time.
-  options:
-    _input:
-      description: A string denoting a fully qualified collection name (FQCN) of a module or action plugin.
-      type: string
-      required: true
+name: a_module
+short_description: Test whether a given string refers to an existing module or action plugin
+version_added: 4.0.0
+author: Felix Fontein (@felixfontein)
+description:
+  - Test whether a given string refers to an existing module or action plugin.
+  - This can be useful in roles, which can use this to ensure that required modules are present ahead of time.
+options:
+  _input:
+    description: A string denoting a fully qualified collection name (FQCN) of a module or action plugin.
+    type: string
+    required: true
 '''
 
 EXAMPLES = '''
@@ -34,9 +34,9 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-  _value:
-    description: Whether the module or action plugin denoted by the input exists.
-    type: boolean
+_value:
+  description: Whether the module or action plugin denoted by the input exists.
+  type: boolean
 '''
 
 from ansible.plugins.loader import action_loader, module_loader
