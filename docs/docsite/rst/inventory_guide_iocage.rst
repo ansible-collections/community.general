@@ -18,7 +18,7 @@ See:
 
 Notes:
 
-* The output of the examples is YAML formatted. See the option `result_format <https://docs.ansible.com/ansible/latest/collections/ansible/builtin/default_callback.html#parameter-result_format>`_.
+* The output of the examples is YAML formatted. See the option :ansopt:`ansible.bulitin.default#callback:result_format`.
 * Run Ansible in Python virtual environment. See `venv — Creation of virtual environments <https://docs.python.org/3/library/venv.html#module-venv>`_.
 
 .. toctree::
