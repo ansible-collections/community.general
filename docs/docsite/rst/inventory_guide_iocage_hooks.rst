@@ -22,7 +22,7 @@ requires root. If you run the command `iocage list -l` as unprivileged user, you
        ;;
    esac
 
-where */zroot/iocage* is the activated pool
+where */zroot/iocage* is the activated pool.
 
 .. code-block:: console
 
@@ -49,11 +49,13 @@ where */zroot/iocage* is the activated pool
 
 See: `man dhclient-script <https://man.freebsd.org/cgi/man.cgi?dhclient-script>`_
 
-Create the inventory configuration. Use the option *hooks_results* instead of *sudo* ::
+Create the inventory configuration. Use the option :ansopt:`community.general.iocage#inventory:hooks_results` instead of :ansopt:`community.general.iocage#inventory:sudo`:
+
+.. code-block:: console
 
    shell> cat hosts/02_iocage.yml
 
-.. code-block::
+.. code-block:: yaml
 
    plugin: community.general.iocage
    host: 10.1.0.73
@@ -63,14 +65,14 @@ Create the inventory configuration. Use the option *hooks_results* instead of *s
 
 Note:
 
-.. code-block:: text
-
    The option hooks_results expects the poolname is mounted to /poolname. For example, if you
    activate the pool iocage, this plugin expects to find the hooks_results items in the path
    /iocage/iocage/jails/<name>/root. If you mount the poolname to a different path, the easiest
    remedy is to create a symlink.
 
-As admin at the controller, display the inventory ::
+As admin at the controller, display the inventory:
+
+.. code-block:: console
 
    shell> ansible-inventory -i hosts/02_iocage.yml --list --yaml
 
@@ -126,7 +128,9 @@ As admin at the controller, display the inventory ::
              iocage_template: ansible_client
              iocage_type: jail
 
-Compose the variable ansible_host ::
+Compose the variable ansible_host
+
+.. code-block:: console
 
    shell> cat hosts/02_iocage.yml
 
@@ -140,7 +144,9 @@ Compose the variable ansible_host ::
    compose:
      ansible_host: (iocage_hooks.0 == '-') | ternary(iocage_ip4, iocage_hooks.0)
 
-Test the jails. Create a playbook ::
+Test the jails. Create a playbook:
+
+.. code-block:: console
 
    shell> cat pb-test-uname.yml
 
@@ -161,13 +167,15 @@ Test the jails. Create a playbook ::
        - debug:
            var: out.stdout
 
-See: `Managing BSD hosts with Ansible <https://docs.ansible.com/ansible/latest/os_guide/intro_bsd.html#managing-bsd-hosts-with-ansible>`_
+See: :ref:`working_with_bsd`
 
-Run the playbook ::
+Run the playbook:
+
+.. code-block:: console
 
    shell> ansible-playbook -i hosts/02_iocage.yml pb-test-uname.yml
 
-.. code-block::
+.. code-block:: console
 
    PLAY [all] **********************************************************************************************************
 

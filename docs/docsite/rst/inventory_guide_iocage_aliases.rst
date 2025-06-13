@@ -12,7 +12,7 @@ Quoting :ref:`inventory_aliases`
 
    The inventory_hostname is the unique identifier for a host in Ansible, this can be an IP or a hostname, but also just an 'alias' or short name for the host.
 
-As root at the iocage host, stop and destroy all jails
+As root at the iocage host, stop and destroy all jails:
 
 .. code-block:: console
 
@@ -45,8 +45,7 @@ As root at the iocage host, stop and destroy all jails
    Destroying srv_2
    Destroying srv_3
 
-Create three VNET jails with a DHCP interface from the template *ansible_client*. Use the option
-``--count``:
+Create three VNET jails with a DHCP interface from the template *ansible_client*. Use the option ``--count``:
 
 .. code-block:: console
 
@@ -55,7 +54,7 @@ Create three VNET jails with a DHCP interface from the template *ansible_client*
    9d94cc9e successfully created!
    052b9557 successfully created!
 
-The names are random. Start the jails
+The names are random. Start the jails:
 
 .. code-block:: console
 
@@ -89,7 +88,7 @@ The names are random. Start the jails
      + DHCP Address: 10.1.0.115/24
    Please convert back to a jail before trying to start ansible_client
 
-List the jails
+List the jails:
 
 .. code-block:: console
 
@@ -104,7 +103,7 @@ List the jails
    | 209 | 9d94cc9e | off  | up    | jail | 14.2-RELEASE-p3 | epair0b|10.1.0.115 | -   | ansible_client | no       |
    +-----+----------+------+-------+------+-----------------+--------------------+-----+----------------+----------+
 
-Set notes. The tag *alias* will be used to create inventory aliases
+Set notes. The tag *alias* will be used to create inventory aliases:
 
 .. code-block:: console
 
@@ -115,12 +114,16 @@ Set notes. The tag *alias* will be used to create inventory aliases
    shell> iocage set notes="vmm=iocage_02 project=bar alias=srv_3" 9d94cc9e
    notes: none -> vmm=iocage_02 project=bar alias=srv_3
 
-Update the inventory configuration. Set the option *inventory_hostname_tag* to *alias*. This tag
-keeps the value of the alias. The properties are required ::
+Update the inventory configuration. Set the option
+:ansopt:`community.general.iocage#inventory:inventory_hostname_tag` to *alias*. This tag keeps the
+value of the alias. The option :ansopt:`community.general.iocage#inventory:get_properties` must be
+enabled:
+
+.. code-block:: console
 
    shell> cat hosts/02_iocage.yml
 
-.. code-block::
+.. code-block:: yaml
 
    plugin: community.general.iocage
    host: 10.1.0.73
@@ -165,11 +168,13 @@ Display tags and groups. Create a playbook:
 	   {% endfor %}
 	 run_once: true
 
-Run the playbook ::
+Run the playbook:
+
+.. code-block:: console
 
    shell> ansible-playbook -i hosts/02_iocage.yml pb-test-groups.yml
 
-.. code-block::
+.. code-block:: console
 
    PLAY [all] **********************************************************************************************************
 

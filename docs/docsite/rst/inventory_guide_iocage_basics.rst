@@ -22,12 +22,11 @@ As root at the iocage host, create three VNET jails with a DHCP interface from t
 
 See: `Configuring a VNET Jail <https://iocage.readthedocs.io/en/latest/networking.html#configuring-a-vnet-jail>`_
 
-As admin at the controller, list the jails ::
-
-   shell> ssh admin@10.1.0.73 iocage list -l
+As admin at the controller, list the jails:
 
 .. code-block:: console
 
+   shell> ssh admin@10.1.0.73 iocage list -l
    +------+-------+------+-------+------+-----------------+--------------------+-----+----------------+----------+
    | JID  | NAME  | BOOT | STATE | TYPE |     RELEASE     |        IP4         | IP6 |    TEMPLATE    | BASEJAIL |
    +======+=======+======+=======+======+=================+====================+=====+================+==========+
@@ -38,7 +37,9 @@ As admin at the controller, list the jails ::
    | None | srv_3 | off  | down  | jail | 14.2-RELEASE-p3 | DHCP (not running) | -   | ansible_client | no       |
    +------+-------+------+-------+------+-----------------+--------------------+-----+----------------+----------+
 
-Create the inventory configuration ::
+Create the inventory configuration:
+
+.. code-block:: console
 
    shell> cat hosts/02_iocage.yml
 
@@ -48,7 +49,9 @@ Create the inventory configuration ::
    host: 10.1.0.73
    user: admin
 
-Display the inventory ::
+Display the inventory:
+
+.. code-block:: console
 
    shell> ansible-inventory -i hosts/02_iocage.yml --list --yaml
 
@@ -126,7 +129,7 @@ Notes:
 
 See: `Configuring a Shared IP Jail <https://iocage.readthedocs.io/en/latest/networking.html#configuring-a-shared-ip-jail>`_
 
-* If iocage needs environment variable(s), use the option *env*. For example,
+* If iocage needs environment variable(s), use the option :ansopt:`community.general.iocage#inventory:env`. For example,
 
 .. code-block:: yaml
 

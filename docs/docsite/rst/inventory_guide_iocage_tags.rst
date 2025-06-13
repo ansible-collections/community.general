@@ -8,21 +8,22 @@
 Tags
 ^^^^
 
-Quoting `man iocage <https://man.freebsd.org/cgi/man.cgi?query=iocage>`_: ::
+Quoting `man iocage <https://man.freebsd.org/cgi/man.cgi?query=iocage>`_:
 
    PROPERTIES
    ...
    notes="any string"
-         Custom notes for miscellaneous tagging.
-         Default: none
-         Source: local
+   Custom notes for miscellaneous tagging.
+   Default: none
+   Source: local
 
 We will use the format `notes="tag1=value1 tag2=value2 ..."`.
 
-Note: The iocage tags has nothing to do with the `Ansible tags <https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_tags.html>`_.
+Note: The iocage tags has nothing to do with the :ref:`tags`
 
+As root at the iocage host, set notes. For example,
 
-As root at the iocage host, set notes. For example, ::
+.. code-block:: console
 
    shell> iocage set notes="vmm=iocage_02 project=foo" srv_1
    notes: none -> vmm=iocage_02 project=foo
@@ -31,8 +32,10 @@ As root at the iocage host, set notes. For example, ::
    shell> iocage set notes="vmm=iocage_02 project=bar" srv_3
    notes: none -> vmm=iocage_02 project=bar
 
-Update the inventory configuration. Compose a dictionary *iocage_tags* and create groups. The
-properties are required ::
+Update the inventory configuration. Compose a dictionary *iocage_tags* and create groups. The option
+:ansopt:`community.general.iocage#inventory:get_properties` must be enabled:
+
+.. code-block:: console
 
    shell> cat hosts/02_iocage.yml
 
@@ -53,7 +56,9 @@ properties are required ::
      - prefix: project
        key: iocage_tags.project
 
-Display tags and groups. Create a playbook ::
+Display tags and groups. Create a playbook:
+
+.. code-block:: console
 
    shell> cat pb-test-groups.yml
 
@@ -78,11 +83,13 @@ Display tags and groups. Create a playbook ::
 	   {% endfor %}
 	 run_once: true
 
-Run the playbook ::
+Run the playbook:
+
+.. code-block:: console
 
    shell> ansible-playbook -i hosts/02_iocage.yml pb-test-groups.yml
 
-.. code-block::
+.. code-block:: console
 
    PLAY [all] **********************************************************************************************************
 

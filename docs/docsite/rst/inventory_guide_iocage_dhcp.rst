@@ -8,7 +8,7 @@
 DHCP
 ^^^^
 
-As root at the iocage host, start the jails
+As root at the iocage host, start the jails:
 
 .. code-block:: console
 
@@ -42,7 +42,7 @@ As root at the iocage host, start the jails
      + DHCP Address: 10.1.0.169/24
    Please convert back to a jail before trying to start ansible_client
 
-List the jails
+List the jails:
 
 .. code-block:: console
 
@@ -72,7 +72,7 @@ As admin at the controller, list the jails. The IP4 tab says "... address requir
    | 206 | srv_3 | off  | up    | jail | 14.2-RELEASE-p3 | DHCP (running -- address requires root) | -   | ansible_client | no       |
    +-----+-------+------+-------+------+-----------------+-----------------------------------------+-----+----------------+----------+
 
-Use sudo if enabled
+Use sudo if enabled:
 
 .. code-block:: console
 
@@ -87,7 +87,9 @@ Use sudo if enabled
    | 206 | srv_3 | off  | up    | jail | 14.2-RELEASE-p3 | epair0b|10.1.0.169 | -   | ansible_client | no       |
    +-----+-------+------+-------+------+-----------------+--------------------+-----+----------------+----------+
 
-Create the inventory configuration ::
+Create the inventory configuration. Use the option :ansopt:`community.general.iocage#inventory:sudo`
+
+.. code-block:: console
 
    shell> cat hosts/02_iocage.yml
 
@@ -98,7 +100,9 @@ Create the inventory configuration ::
    user: admin
    sudo: true
 
-Display the inventory ::
+Display the inventory:
+
+.. code-block:: console
 
    shell> ansible-inventory -i hosts/02_iocage.yml --list --yaml
 
@@ -157,7 +161,7 @@ Display the inventory ::
              iocage_template: ansible_client
              iocage_type: jail
 
-Note: If the option *env* is used and *sudo* is enabled, enable also *sudo_preserve_env*. For example,
+Note: If the option :ansopt:`community.general.iocage#inventory:env` is used and :ansopt:`community.general.iocage#inventory:sudo` is enabled, enable also :ansopt:`community.general.iocage#inventory:sudo_preserve_env`. For example,
 
 .. code-block:: yaml
 
@@ -169,7 +173,9 @@ Note: If the option *env* is used and *sudo* is enabled, enable also *sudo_prese
    sudo: true
    sudo_preserve_env: true
 
-In this case, make sure the sudo tag *SETENV* is used ::
+In this case, make sure the sudo tag *SETENV* is used:
+
+.. code-block:: console
 
    shell> ssh admin@10.1.0.73 sudo cat /usr/local/etc/sudoers | grep admin
    admin ALL=(ALL) NOPASSWD:SETENV: ALL
