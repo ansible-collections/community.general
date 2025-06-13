@@ -1529,6 +1529,21 @@ files:
     maintainers: russoz
   docs/docsite/rst/guide_vardict.rst:
     maintainers: russoz
+  docs/docsite/rst/inventory_guide.rst: {}
+  docs/docsite/rst/inventory_guide_iocage.rst:
+    maintainers: vbotka
+  docs/docsite/rst/inventory_guide_iocage_aliases.rst:
+    maintainers: vbotka
+  docs/docsite/rst/inventory_guide_iocage_basics.rst:
+    maintainers: vbotka
+  docs/docsite/rst/inventory_guide_iocage_dhcp.rst:
+    maintainers: vbotka
+  docs/docsite/rst/inventory_guide_iocage_hooks.rst:
+    maintainers: vbotka
+  docs/docsite/rst/inventory_guide_iocage_properties.rst:
+    maintainers: vbotka
+  docs/docsite/rst/inventory_guide_iocage_tags.rst:
+    maintainers: vbotka
   docs/docsite/rst/test_guide.rst:
     maintainers: felixfontein
 #########################
