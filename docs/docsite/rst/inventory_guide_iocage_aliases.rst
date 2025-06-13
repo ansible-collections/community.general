@@ -116,14 +116,13 @@ Set notes. The tag *alias* will be used to create inventory aliases
    notes: none -> vmm=iocage_02 project=foo alias=srv_2
    shell> iocage set notes="vmm=iocage_02 project=bar alias=srv_3" 9d94cc9e
    notes: none -> vmm=iocage_02 project=bar alias=srv_3
-   
+
 Update the inventory configuration. Set the option *inventory_hostname_tag* to *alias*. This tag
 keeps the value of the alias. The properties are required ::
 
    shell> cat hosts/02_iocage.yml
 
 .. code-block:: yaml
-   :emphasize-lines: 5
 
    plugin: community.general.iocage
    host: 10.1.0.73
@@ -175,24 +174,24 @@ Run the playbook ::
    PLAY [all] **********************************************************************************************************
 
    TASK [debug] ********************************************************************************************************
-   ok: [srv_1] => 
+   ok: [srv_1] =>
        iocage_tags:
            alias: srv_1
            project: foo
            vmm: iocage_02
-   ok: [srv_2] => 
+   ok: [srv_2] =>
        iocage_tags:
            alias: srv_2
            project: foo
            vmm: iocage_02
-   ok: [srv_3] => 
+   ok: [srv_3] =>
        iocage_tags:
            alias: srv_3
            project: bar
            vmm: iocage_02
 
    TASK [debug] ********************************************************************************************************
-   ok: [srv_1] => 
+   ok: [srv_1] =>
        msg: |-
            all: ['srv_1', 'srv_2', 'srv_3']
            ungrouped: []
@@ -201,6 +200,6 @@ Run the playbook ::
            project_bar: ['srv_3']
 
    PLAY RECAP **********************************************************************************************************
-   srv_1                      : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-   srv_2                      : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+   srv_1                      : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+   srv_2                      : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
    srv_3                      : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0

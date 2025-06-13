@@ -56,7 +56,7 @@ List the jails
    +-----+-------+------+-------+------+-----------------+--------------------+-----+----------------+----------+
    | 206 | srv_3 | off  | up    | jail | 14.2-RELEASE-p3 | epair0b|10.1.0.169 | -   | ansible_client | no       |
    +-----+-------+------+-------+------+-----------------+--------------------+-----+----------------+----------+
-   
+
 As admin at the controller, list the jails. The IP4 tab says "... address requires root"
 
 .. code-block:: console
@@ -92,7 +92,6 @@ Create the inventory configuration ::
    shell> cat hosts/02_iocage.yml
 
 .. code-block:: yaml
-   :emphasize-lines: 4
 
    plugin: community.general.iocage
    host: 10.1.0.73
@@ -161,7 +160,6 @@ Display the inventory ::
 Note: If the option *env* is used and *sudo* is enabled, enable also *sudo_preserve_env*. For example,
 
 .. code-block:: yaml
-   :emphasize-lines: 6-7
 
    plugin: community.general.iocage
    host: 10.1.0.73

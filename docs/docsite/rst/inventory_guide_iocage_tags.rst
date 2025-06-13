@@ -37,7 +37,6 @@ properties are required ::
    shell> cat hosts/02_iocage.yml
 
 .. code-block:: yaml
-   :emphasize-lines: 4,9,12,14
 
    plugin: community.general.iocage
    host: 10.1.0.73
@@ -88,15 +87,15 @@ Run the playbook ::
    PLAY [all] **********************************************************************************************************
 
    TASK [debug] ********************************************************************************************************
-   ok: [srv_1] => 
+   ok: [srv_1] =>
        iocage_tags:
            project: foo
            vmm: iocage_02
-   ok: [srv_2] => 
+   ok: [srv_2] =>
        iocage_tags:
            project: foo
            vmm: iocage_02
-   ok: [srv_3] => 
+   ok: [srv_3] =>
        iocage_tags:
            project: bar
            vmm: iocage_02
@@ -111,6 +110,6 @@ Run the playbook ::
            project_bar: ['srv_3']
 
    PLAY RECAP **********************************************************************************************************
-   srv_1                      : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-   srv_2                      : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+   srv_1                      : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+   srv_2                      : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
    srv_3                      : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0

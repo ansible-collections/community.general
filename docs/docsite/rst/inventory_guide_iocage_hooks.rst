@@ -15,7 +15,7 @@ requires root. If you run the command `iocage list -l` as unprivileged user, you
 
 .. code-block:: bash
 
-   shell> cat /zroot/iocage/jails/srv_1/root/etc/dhclient-exit-hooks 
+   shell> cat /zroot/iocage/jails/srv_1/root/etc/dhclient-exit-hooks
    case "$reason" in
        "BOUND"|"REBIND"|"REBOOT"|"RENEW")
        echo $new_ip_address > /var/db/dhclient-hook.address.$interface
@@ -46,15 +46,14 @@ where */zroot/iocage* is the activated pool
    zroot/iocage/templates                       682M   446G   416K  /zroot/iocage/templates
    zroot/iocage/templates/ansible_client        681M   446G   432K  /zroot/iocage/templates/ansible_client
    zroot/iocage/templates/ansible_client/root   681M   446G  3.53G  /zroot/iocage/templates/ansible_client/root
-   
+
 See: `man dhclient-script <https://man.freebsd.org/cgi/man.cgi?dhclient-script>`_
-  
+
 Create the inventory configuration. Use the option *hooks_results* instead of *sudo* ::
 
    shell> cat hosts/02_iocage.yml
 
 .. code-block:: yaml
-   :emphasize-lines: 4
 
    plugin: community.general.iocage
    host: 10.1.0.73
@@ -126,13 +125,12 @@ As admin at the controller, display the inventory ::
              iocage_state: up
              iocage_template: ansible_client
              iocage_type: jail
-  
+
 Compose the variable ansible_host ::
 
    shell> cat hosts/02_iocage.yml
 
 .. code-block:: yaml
-   :emphasize-lines: 6
 
    plugin: community.general.iocage
    host: 10.1.0.73
@@ -179,16 +177,16 @@ Run the playbook ::
    changed: [srv_2]
 
    TASK [debug] ********************************************************************************************************
-   ok: [srv_1] => 
+   ok: [srv_1] =>
        out.stdout: FreeBSD srv-1 14.2-RELEASE-p1 FreeBSD 14.2-RELEASE-p1 GENERIC amd64
-   ok: [srv_3] => 
+   ok: [srv_3] =>
        out.stdout: FreeBSD srv-3 14.2-RELEASE-p1 FreeBSD 14.2-RELEASE-p1 GENERIC amd64
-   ok: [srv_2] => 
+   ok: [srv_2] =>
        out.stdout: FreeBSD srv-2 14.2-RELEASE-p1 FreeBSD 14.2-RELEASE-p1 GENERIC amd64
 
    PLAY RECAP **********************************************************************************************************
-   srv_1                      : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-   srv_2                      : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+   srv_1                      : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+   srv_2                      : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
    srv_3                      : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
 Note: This playbook and the inventory configuration works also for the *Shared IP Jails*.
