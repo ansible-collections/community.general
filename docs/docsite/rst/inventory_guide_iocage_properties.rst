@@ -13,7 +13,6 @@ Optionally, get the iocage properties ::
    shell> cat hosts/02_iocage.yml
 
 .. code-block:: yaml
-   :emphasize-lines: 4
 
    plugin: community.general.iocage
    host: 10.1.0.73
