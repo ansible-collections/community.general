@@ -119,7 +119,7 @@ EXAMPLES = r"""
     state: absent
 """
 
-RETURN = """# """
+RETURN = """#"""
 import traceback
 
 from os import getenv

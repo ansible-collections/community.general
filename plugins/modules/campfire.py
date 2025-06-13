@@ -48,10 +48,51 @@ options:
     description:
       - Send a notification sound before the message.
     required: false
-    choices: ["56k", "bell", "bezos", "bueller", "clowntown", "cottoneyejoe", "crickets", "dadgummit", "dangerzone", "danielsan",
-      "deeper", "drama", "greatjob", "greyjoy", "guarantee", "heygirl", "horn", "horror", "inconceivable", "live", "loggins",
-      "makeitso", "noooo", "nyan", "ohmy", "ohyeah", "pushit", "rimshot", "rollout", "rumble", "sax", "secret", "sexyback",
-      "story", "tada", "tmyk", "trololo", "trombone", "unix", "vuvuzela", "what", "whoomp", "yeah", "yodel"]
+    choices:
+      - 56k
+      - bell
+      - bezos
+      - bueller
+      - clowntown
+      - cottoneyejoe
+      - crickets
+      - dadgummit
+      - dangerzone
+      - danielsan
+      - deeper
+      - drama
+      - greatjob
+      - greyjoy
+      - guarantee
+      - heygirl
+      - horn
+      - horror
+      - inconceivable
+      - live
+      - loggins
+      - makeitso
+      - noooo
+      - nyan
+      - ohmy
+      - ohyeah
+      - pushit
+      - rimshot
+      - rollout
+      - rumble
+      - sax
+      - secret
+      - sexyback
+      - story
+      - tada
+      - tmyk
+      - trololo
+      - trombone
+      - unix
+      - vuvuzela
+      - what
+      - whoomp
+      - yeah
+      - yodel
 
 # informational: requirements for nodes
 requirements: []

@@ -9,8 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: lvm_pv
 short_description: Manage LVM Physical Volumes
 version_added: "11.0.0"
@@ -28,7 +27,7 @@ options:
     description:
       - Control if the physical volume exists.
     type: str
-    choices: [ present, absent ]
+    choices: [present, absent]
     default: present
   force:
     description:
@@ -45,9 +44,9 @@ options:
 notes:
   - Requires LVM2 utilities installed on the target system.
   - Device path must exist when creating a PV.
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Creating physical volume on /dev/sdb
   community.general.lvm_pv:
     device: /dev/sdb
@@ -67,10 +66,10 @@ EXAMPLES = r'''
     device: /dev/sdb
     force: true
     state: absent
-'''
+"""
 
-RETURN = r'''
-'''
+RETURN = r"""
+"""
 
 
 import os

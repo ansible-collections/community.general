@@ -51,8 +51,23 @@ options:
   type:
     description:
       - The type of DNS record to create.
-    choices: ['A', 'ALIAS', 'CNAME', 'MX', 'SPF', 'URL', 'TXT', 'NS', 'SRV', 'NAPTR', 'PTR', 'AAAA', 'SSHFP', 'HINFO', 'POOL',
-      'CAA']
+    choices:
+      - A
+      - ALIAS
+      - CNAME
+      - MX
+      - SPF
+      - URL
+      - TXT
+      - NS
+      - SRV
+      - NAPTR
+      - PTR
+      - AAAA
+      - SSHFP
+      - HINFO
+      - POOL
+      - CAA
     type: str
   ttl:
     description:
@@ -151,7 +166,7 @@ EXAMPLES = r"""
   delegate_to: localhost
 """
 
-RETURN = r"""# """
+RETURN = r"""#"""
 
 import traceback
 import re
