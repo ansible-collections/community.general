@@ -8,7 +8,7 @@
 Aliases
 ^^^^^^^
 
-Quoting `Inventory aliases <https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html#inventory-aliases>`_
+Quoting :ref:`inventory_aliases`
 
 .. code-block:: text
 
