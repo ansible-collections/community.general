@@ -195,10 +195,10 @@ result: '{{ data is community.general.ansible_type(dtype) }}'
 ---
 # int alias number
 alias:
-    int: number
-    float: number
-    _AnsibleTaggedInt: number
-    _AnsibleTaggedFloat: float
+  int: number
+  float: number
+  _AnsibleTaggedInt: number
+  _AnsibleTaggedFloat: float
 dtype: number
 data: 123
 result: '{{ data is community.general.ansible_type(dtype, alias) }}'
@@ -207,10 +207,10 @@ result: '{{ data is community.general.ansible_type(dtype, alias) }}'
 ---
 # float alias number
 alias:
-    int: number
-    float: number
-    _AnsibleTaggedInt: number
-    _AnsibleTaggedFloat: float
+  int: number
+  float: number
+  _AnsibleTaggedInt: number
+  _AnsibleTaggedFloat: float
 dtype: number
 data: 123.45
 result: '{{ data is community.general.ansible_type(dtype, alias) }}'
