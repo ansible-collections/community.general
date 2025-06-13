@@ -30,7 +30,7 @@
       label: "{{ test.name }}"
 
   - name: Collect outputs
-    command: "ansible-playbook -i {{ inventory }} {{ playbook }}"
+    command: "ansible-playbook -i {{ inventory }} {{ playbook }} {{ test.extra_cli_arguments | default('') }}"
     environment: "{{ test.environment }}"
     loop: "{{ tests }}"
     loop_control:
