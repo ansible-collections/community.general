@@ -138,7 +138,9 @@ keeps the value of the alias. The properties are required ::
      - prefix: project
        key: iocage_tags.project
 
-Display tags and groups. Create a playbook ::
+Display tags and groups. Create a playbook:
+
+.. code-block:: console
 
    shell> cat pb-test-groups.yml
 
