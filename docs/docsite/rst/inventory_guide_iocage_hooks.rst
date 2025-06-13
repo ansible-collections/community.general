@@ -49,7 +49,7 @@ where */zroot/iocage* is the activated pool
    
 See: `man dhclient-script <https://man.freebsd.org/cgi/man.cgi?dhclient-script>`_
   
-Create the inventory configuration. Use the option *hooks_results* instead of sudo ::
+Create the inventory configuration. Use the option *hooks_results* instead of *sudo* ::
 
    shell> cat hosts/02_iocage.yml
 
@@ -71,7 +71,7 @@ Note:
    /iocage/iocage/jails/<name>/root. If you mount the poolname to a different path, the easiest
    remedy is to create a symlink.
 
-As admin on the console, display the inventory ::
+As admin at the controller, display the inventory ::
 
    shell> ansible-inventory -i hosts/02_iocage.yml --list --yaml
 
