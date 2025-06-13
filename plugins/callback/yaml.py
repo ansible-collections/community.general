@@ -37,6 +37,7 @@ import yaml
 import json
 import re
 import string
+from collections.abc import Mapping, Sequence
 
 from ansible.module_utils.common.text.converters import to_text
 from ansible.plugins.callback import strip_internal_keys, module_response_deepcopy
@@ -117,6 +118,14 @@ except ImportError:
             return node
 
 
+def transform_recursively(value, transform):
+    if isinstance(value, Mapping):
+        return {transform(k): transform(v) for k, v in value.items()}
+    if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
+        return [transform(e) for e in value]
+    return transform(value)
+
+
 class CallbackModule(Default):
 
     """
@@ -172,7 +181,7 @@ class CallbackModule(Default):
         if abridged_result:
             dumped += '\n'
             if transform_to_native_types is not None:
-                abridged_result = transform_to_native_types(abridged_result, redact=False)
+                abridged_result = transform_recursively(abridged_result, lambda v: transform_to_native_types(v, redact=False))
             dumped += to_text(yaml.dump(abridged_result, allow_unicode=True, width=1000, Dumper=MyDumper, default_flow_style=False))
 
         # indent by a couple of spaces
