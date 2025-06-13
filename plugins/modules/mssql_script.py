@@ -378,6 +378,7 @@ def read_script_file(script_path):
         raise IOError(f"Error reading script file \
                       {script_path}: {str(e)}") from e
 
+
 def run_module():
     module_args = dict(
         name=dict(required=False, aliases=['db'], default=''),
