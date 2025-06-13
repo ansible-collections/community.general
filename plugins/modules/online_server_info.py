@@ -42,91 +42,91 @@ online_server_info:
   elements: dict
   sample:
     "online_server_info": [
-        {
-            "abuse": "abuse@example.com",
-            "anti_ddos": false,
-            "bmc": {
-                "session_key": null
-            },
-            "boot_mode": "normal",
-            "contacts": {
-                "owner": "foobar",
-                "tech": "foobar"
-            },
+      {
+        "abuse": "abuse@example.com",
+        "anti_ddos": false,
+        "bmc": {
+          "session_key": null
+        },
+        "boot_mode": "normal",
+        "contacts": {
+          "owner": "foobar",
+          "tech": "foobar"
+        },
+        "disks": [
+          {
+            "$ref": "/api/v1/server/hardware/disk/68452"
+          },
+          {
+            "$ref": "/api/v1/server/hardware/disk/68453"
+          }
+        ],
+        "drive_arrays": [
+          {
             "disks": [
-                {
-                    "$ref": "/api/v1/server/hardware/disk/68452"
-                },
-                {
-                    "$ref": "/api/v1/server/hardware/disk/68453"
-                }
+              {
+                "$ref": "/api/v1/server/hardware/disk/68452"
+              },
+              {
+                "$ref": "/api/v1/server/hardware/disk/68453"
+              }
             ],
-            "drive_arrays": [
-                {
-                    "disks": [
-                        {
-                            "$ref": "/api/v1/server/hardware/disk/68452"
-                        },
-                        {
-                            "$ref": "/api/v1/server/hardware/disk/68453"
-                        }
-                    ],
-                    "raid_controller": {
-                        "$ref": "/api/v1/server/hardware/raidController/9910"
-                    },
-                    "raid_level": "RAID1"
-                }
-            ],
-            "hardware_watch": true,
-            "hostname": "sd-42",
-            "id": 42,
-            "ip": [
-                {
-                    "address": "195.154.172.149",
-                    "mac": "28:92:4a:33:5e:c6",
-                    "reverse": "195-154-172-149.rev.poneytelecom.eu.",
-                    "switch_port_state": "up",
-                    "type": "public"
-                },
-                {
-                    "address": "10.90.53.212",
-                    "mac": "28:92:4a:33:5e:c7",
-                    "reverse": null,
-                    "switch_port_state": "up",
-                    "type": "private"
-                }
-            ],
-            "last_reboot": "2018-08-23T08:32:03.000Z",
-            "location": {
-                "block": "A",
-                "datacenter": "DC3",
-                "position": 19,
-                "rack": "A23",
-                "room": "4 4-4"
+            "raid_controller": {
+              "$ref": "/api/v1/server/hardware/raidController/9910"
             },
-            "network": {
-                "ip": [
-                    "195.154.172.149"
-                ],
-                "ipfo": [],
-                "private": [
-                    "10.90.53.212"
-                ]
-            },
-            "offer": "Pro-1-S-SATA",
-            "os": {
-                "name": "FreeBSD",
-                "version": "11.1-RELEASE"
-            },
-            "power": "ON",
-            "proactive_monitoring": false,
-            "raid_controllers": [
-                {
-                    "$ref": "/api/v1/server/hardware/raidController/9910"
-                }
-            ],
-            "support": "Basic service level"
-        }
+            "raid_level": "RAID1"
+          }
+        ],
+        "hardware_watch": true,
+        "hostname": "sd-42",
+        "id": 42,
+        "ip": [
+          {
+            "address": "195.154.172.149",
+            "mac": "28:92:4a:33:5e:c6",
+            "reverse": "195-154-172-149.rev.poneytelecom.eu.",
+            "switch_port_state": "up",
+            "type": "public"
+          },
+          {
+            "address": "10.90.53.212",
+            "mac": "28:92:4a:33:5e:c7",
+            "reverse": null,
+            "switch_port_state": "up",
+            "type": "private"
+          }
+        ],
+        "last_reboot": "2018-08-23T08:32:03.000Z",
+        "location": {
+          "block": "A",
+          "datacenter": "DC3",
+          "position": 19,
+          "rack": "A23",
+          "room": "4 4-4"
+        },
+        "network": {
+          "ip": [
+            "195.154.172.149"
+          ],
+          "ipfo": [],
+          "private": [
+            "10.90.53.212"
+          ]
+        },
+        "offer": "Pro-1-S-SATA",
+        "os": {
+          "name": "FreeBSD",
+          "version": "11.1-RELEASE"
+        },
+        "power": "ON",
+        "proactive_monitoring": false,
+        "raid_controllers": [
+          {
+            "$ref": "/api/v1/server/hardware/raidController/9910"
+          }
+        ],
+        "support": "Basic service level"
+      }
     ]
 """
 

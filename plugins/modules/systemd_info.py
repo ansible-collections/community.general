@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: systemd_info
 short_description: Gather C(systemd) unit info
 description:
@@ -48,9 +47,9 @@ author:
 extends_documentation_fragment:
   - community.general.attributes
   - community.general.attributes.info_module
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 ---
 # Gather info for all systemd services, targets, sockets, mount and timer
 - name: Gather all systemd unit info
@@ -84,9 +83,9 @@ EXAMPLES = r'''
     extra_properties:
       - AccuracyUSec
   register: results
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 units:
   description:
     - Dictionary of systemd unit info keyed by unit name.
@@ -170,8 +169,9 @@ units:
       returned: only for C(.mount) units.
       type: str
       sample: /
-  sample: {
-    "-.mount": {
+  sample:
+    {
+      "-.mount": {
         "activestate": "active",
         "description": "Root Mount",
         "loadstate": "loaded",
@@ -181,8 +181,8 @@ units:
         "type": "xfs",
         "what": "/dev/mapper/cs-root",
         "where": "/"
-    },
-    "sshd-keygen.target": {
+      },
+      "sshd-keygen.target": {
         "activestate": "active",
         "description": "sshd-keygen.target",
         "fragmentpath": "/usr/lib/systemd/system/sshd-keygen.target",
@@ -191,8 +191,8 @@ units:
         "substate": "active",
         "unitfilepreset": "disabled",
         "unitfilestate": "static"
-    },
-    "systemd-journald.service": {
+      },
+      "systemd-journald.service": {
         "activestate": "active",
         "description": "Journal Service",
         "execmainpid": "613",
@@ -203,8 +203,8 @@ units:
         "substate": "running",
         "unitfilepreset": "disabled",
         "unitfilestate": "static"
-    },
-    "systemd-journald.socket": {
+      },
+      "systemd-journald.socket": {
         "activestate": "active",
         "description": "Journal Socket",
         "fragmentpath": "/usr/lib/systemd/system/systemd-journald.socket",
@@ -213,9 +213,9 @@ units:
         "substate": "running",
         "unitfilepreset": "disabled",
         "unitfilestate": "static"
+      }
     }
-  }
-'''
+"""
 
 import fnmatch
 from ansible.module_utils.basic import AnsibleModule

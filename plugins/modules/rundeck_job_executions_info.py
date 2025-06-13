@@ -80,46 +80,53 @@ paging:
       description: Maximum number of results per page.
       type: int
       returned: success
-  sample: {"count": 20, "total": 100, "offset": 0, "max": 20}
+  sample:
+    {
+      "count": 20,
+      "total": 100,
+      "offset": 0,
+      "max": 20
+    }
 executions:
-    description: Job executions list.
-    returned: always
-    type: list
-    elements: dict
-    sample: [
-        {
-            "id": 1,
-            "href": "https://rundeck.example.org/api/39/execution/1",
-            "permalink": "https://rundeck.example.org/project/myproject/execution/show/1",
-            "status": "succeeded",
-            "project": "myproject",
-            "executionType": "user",
-            "user": "admin",
-            "date-started": {
-                "unixtime": 1633525515026,
-                "date": "2021-10-06T13:05:15Z"
-            },
-            "date-ended": {
-                "unixtime": 1633525518386,
-                "date": "2021-10-06T13:05:18Z"
-            },
-            "job": {
-                "id": "697af0c4-72d3-4c15-86a3-b5bfe3c6cb6a",
-                "averageDuration": 6381,
-                "name": "Test",
-                "group": "",
-                "project": "myproject",
-                "description": "",
-                "options": {
-                    "exit_code": "0"
-                },
-                "href": "https://rundeck.example.org/api/39/job/697af0c4-72d3-4c15-86a3-b5bfe3c6cb6a",
-                "permalink": "https://rundeck.example.org/project/myproject/job/show/697af0c4-72d3-4c15-86a3-b5bfe3c6cb6a"
-            },
-            "description": "Plugin[com.batix.rundeck.plugins.AnsiblePlaybookInlineWorkflowStep, nodeStep: false]",
-            "argstring": "-exit_code 0",
-            "serverUUID": "5b9a1438-fa3a-457e-b254-8f3d70338068"
-        }
+  description: Job executions list.
+  returned: always
+  type: list
+  elements: dict
+  sample:
+    [
+      {
+        "id": 1,
+        "href": "https://rundeck.example.org/api/39/execution/1",
+        "permalink": "https://rundeck.example.org/project/myproject/execution/show/1",
+        "status": "succeeded",
+        "project": "myproject",
+        "executionType": "user",
+        "user": "admin",
+        "date-started": {
+          "unixtime": 1633525515026,
+          "date": "2021-10-06T13:05:15Z"
+        },
+        "date-ended": {
+          "unixtime": 1633525518386,
+          "date": "2021-10-06T13:05:18Z"
+        },
+        "job": {
+          "id": "697af0c4-72d3-4c15-86a3-b5bfe3c6cb6a",
+          "averageDuration": 6381,
+          "name": "Test",
+          "group": "",
+          "project": "myproject",
+          "description": "",
+          "options": {
+            "exit_code": "0"
+          },
+          "href": "https://rundeck.example.org/api/39/job/697af0c4-72d3-4c15-86a3-b5bfe3c6cb6a",
+          "permalink": "https://rundeck.example.org/project/myproject/job/show/697af0c4-72d3-4c15-86a3-b5bfe3c6cb6a"
+        },
+        "description": "Plugin[com.batix.rundeck.plugins.AnsiblePlaybookInlineWorkflowStep, nodeStep: false]",
+        "argstring": "-exit_code 0",
+        "serverUUID": "5b9a1438-fa3a-457e-b254-8f3d70338068"
+      }
     ]
 """
 

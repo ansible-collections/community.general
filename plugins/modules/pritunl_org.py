@@ -63,18 +63,18 @@ EXAMPLES = r"""
 
 RETURN = r"""
 response:
-    description: JSON representation of a Pritunl Organization.
-    returned: success
-    type: dict
-    sample:
-        {
-            "auth_api": false,
-            "name": "Foo",
-            "auth_token": null,
-            "user_count": 0,
-            "auth_secret": null,
-            "id": "csftwlu6uhralzi2dpmhekz3",
-        }
+  description: JSON representation of a Pritunl Organization.
+  returned: success
+  type: dict
+  sample:
+    {
+      "auth_api": false,
+      "name": "Foo",
+      "auth_token": null,
+      "user_count": 0,
+      "auth_secret": null,
+      "id": "csftwlu6uhralzi2dpmhekz3"
+    }
 """
 
 

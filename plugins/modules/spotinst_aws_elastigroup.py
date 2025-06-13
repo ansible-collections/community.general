@@ -697,8 +697,15 @@ instances:
   description: List of active elastigroup instances and their details.
   returned: success
   type: dict
-  sample: [{"spotInstanceRequestId": "sir-regs25zp", "instanceId": "i-09640ad8678234c", "instanceType": "m4.large", "product": "Linux/UNIX",
-        "availabilityZone": "us-west-2b", "privateIp": "180.0.2.244", "createdAt": "2017-07-17T12:46:18.000Z", "status": "fulfilled"}]
+  sample:
+    - "spotInstanceRequestId": "sir-regs25zp"
+      "instanceId": "i-09640ad8678234c"
+      "instanceType": "m4.large"
+      "product": "Linux/UNIX"
+      "availabilityZone": "us-west-2b"
+      "privateIp": "180.0.2.244"
+      "createdAt": "2017-07-17T12:46:18.000Z"
+      "status": "fulfilled"
 group_id:
   description: Created / Updated group's ID.
   returned: success

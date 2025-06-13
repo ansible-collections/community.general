@@ -58,16 +58,16 @@ scaleway_ip_info:
   elements: dict
   sample:
     "scaleway_ip_info": [
-        {
-            "address": "163.172.170.243",
-            "id": "ea081794-a581-8899-8451-386ddaf0a451",
-            "organization": "3f709602-5e6c-4619-b80c-e324324324af",
-            "reverse": null,
-            "server": {
-                "id": "12f19bc7-109c-4517-954c-e6b3d0311363",
-                "name": "scw-e0d158"
-            }
+      {
+        "address": "163.172.170.243",
+        "id": "ea081794-a581-8899-8451-386ddaf0a451",
+        "organization": "3f709602-5e6c-4619-b80c-e324324324af",
+        "reverse": null,
+        "server": {
+          "id": "12f19bc7-109c-4517-954c-e6b3d0311363",
+          "name": "scw-e0d158"
         }
+      }
     ]
 """
 

@@ -101,9 +101,7 @@ EXAMPLES = r"""
     state: absent
 """
 
-RETURN = r"""
-#only defaults
-"""
+RETURN = r"""#"""
 
 import json
 

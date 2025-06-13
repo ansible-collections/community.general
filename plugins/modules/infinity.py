@@ -126,7 +126,7 @@ network_info:
     "network_size": null,
     "description": null,
     "network_location": "3085",
-    "ranges": { "id": 0, "name": null,"first_ip": null,"type": null,"last_ip": null},
+    "ranges": {"id": 0, "name": null, "first_ip": null, "type": null, "last_ip": null},
     "network_type": "lan",
     "network_name": "'reserve_new_ansible_network'"
   }

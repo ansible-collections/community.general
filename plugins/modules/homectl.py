@@ -218,53 +218,54 @@ EXAMPLES = r"""
 
 RETURN = r"""
 data:
-    description: Dictionary returned from C(homectl inspect -j).
-    returned: success
-    type: dict
-    sample: {
-        "data": {
-            "binding": {
-                "e9ed2a5b0033427286b228e97c1e8343": {
-                    "fileSystemType": "btrfs",
-                    "fileSystemUuid": "7bd59491-2812-4642-a492-220c3f0c6c0b",
-                    "gid": 60268,
-                    "imagePath": "/home/james.home",
-                    "luksCipher": "aes",
-                    "luksCipherMode": "xts-plain64",
-                    "luksUuid": "7f05825a-2c38-47b4-90e1-f21540a35a81",
-                    "luksVolumeKeySize": 32,
-                    "partitionUuid": "5a906126-d3c8-4234-b230-8f6e9b427b2f",
-                    "storage": "luks",
-                    "uid": 60268
-                }
-            },
+  description: Dictionary returned from C(homectl inspect -j).
+  returned: success
+  type: dict
+  sample:
+    {
+      "data": {
+        "binding": {
+          "e9ed2a5b0033427286b228e97c1e8343": {
+            "fileSystemType": "btrfs",
+            "fileSystemUuid": "7bd59491-2812-4642-a492-220c3f0c6c0b",
+            "gid": 60268,
+            "imagePath": "/home/james.home",
+            "luksCipher": "aes",
+            "luksCipherMode": "xts-plain64",
+            "luksUuid": "7f05825a-2c38-47b4-90e1-f21540a35a81",
+            "luksVolumeKeySize": 32,
+            "partitionUuid": "5a906126-d3c8-4234-b230-8f6e9b427b2f",
+            "storage": "luks",
+            "uid": 60268
+          }
+        },
+        "diskSize": 3221225472,
+        "disposition": "regular",
+        "lastChangeUSec": 1641941238208691,
+        "lastPasswordChangeUSec": 1641941238208691,
+        "privileged": {
+          "hashedPassword": [
+            "$6$ov9AKni.trf76inT$tTtfSyHgbPTdUsG0CvSSQZXGqFGdHKQ9Pb6e0BTZhDmlgrL/vA5BxrXduBi8u/PCBiYUffGLIkGhApjKMK3bV."
+          ]
+        },
+        "signature": [
+          {
+            "data": "o6zVFbymcmk4YTVaY6KPQK23YCp+VkXdGEeniZeV1pzIbFzoaZBvVLPkNKMoPAQbodY5BYfBtuy41prNL78qAg==",
+            "key": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAbs7ELeiEYBxkUQhxZ+5NGyu6J7gTtZtZ5vmIw3jowcY=\n-----END PUBLIC KEY-----\n"
+          }
+        ],
+        "status": {
+          "e9ed2a5b0033427286b228e97c1e8343": {
+            "diskCeiling": 21845405696,
+            "diskFloor": 268435456,
             "diskSize": 3221225472,
-            "disposition": "regular",
-            "lastChangeUSec": 1641941238208691,
-            "lastPasswordChangeUSec": 1641941238208691,
-            "privileged": {
-                "hashedPassword": [
-                    "$6$ov9AKni.trf76inT$tTtfSyHgbPTdUsG0CvSSQZXGqFGdHKQ9Pb6e0BTZhDmlgrL/vA5BxrXduBi8u/PCBiYUffGLIkGhApjKMK3bV."
-                ]
-            },
-            "signature": [
-                {
-                    "data": "o6zVFbymcmk4YTVaY6KPQK23YCp+VkXdGEeniZeV1pzIbFzoaZBvVLPkNKMoPAQbodY5BYfBtuy41prNL78qAg==",
-                    "key": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAbs7ELeiEYBxkUQhxZ+5NGyu6J7gTtZtZ5vmIw3jowcY=\n-----END PUBLIC KEY-----\n"
-                }
-            ],
-            "status": {
-                "e9ed2a5b0033427286b228e97c1e8343": {
-                    "diskCeiling": 21845405696,
-                    "diskFloor": 268435456,
-                    "diskSize": 3221225472,
-                    "service": "io.systemd.Home",
-                    "signedLocally": true,
-                    "state": "inactive"
-                }
-             },
-            "userName": "james",
-        }
+            "service": "io.systemd.Home",
+            "signedLocally": true,
+            "state": "inactive"
+          }
+        },
+        "userName": "james"
+      }
     }
 """
 

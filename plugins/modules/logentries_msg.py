@@ -45,7 +45,7 @@ options:
 author: "Jimmy Tang (@jcftang) <jimmy_tang@rapid7.com>"
 """
 
-RETURN = """# """
+RETURN = """#"""
 
 EXAMPLES = r"""
 - name: Send a message to logentries
