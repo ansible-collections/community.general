@@ -46,7 +46,7 @@ As root at the iocage host, stop and destroy all jails
    Destroying srv_3
 
 Create three VNET jails with a DHCP interface from the template *ansible_client*. Use the option
-*--count*
+``--count``:
 
 .. code-block:: console
 
