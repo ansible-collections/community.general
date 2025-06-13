@@ -53,27 +53,36 @@ def should_use_block(value):
     return False
 
 
+def adjust_str_value_for_block(value):
+    # we care more about readable than accuracy, so...
+    # ...no trailing space
+    value = value.rstrip()
+    # ...and non-printable characters
+    value = ''.join(x for x in value if x in string.printable or ord(x) >= 0xA0)
+    # ...tabs prevent blocks from expanding
+    value = value.expandtabs()
+    # ...and odd bits of whitespace
+    value = re.sub(r'[\x0b\x0c\r]', '', value)
+    # ...as does trailing space
+    value = re.sub(r' +\n', '\n', value)
+    return value
+
+
+def create_string_node(tag, value, style, default_style):
+    if style is None:
+        if should_use_block(value):
+            style = '|'
+            value = adjust_str_value_for_block(value)
+        else:
+            style = default_style
+    return yaml.representer.ScalarNode(tag, value, style=style)
+
+
 try:
     class MyDumper(AnsibleDumper):  # pylint: disable=inherit-non-class
         def represent_scalar(self, tag, value, style=None):
             """Uses block style for multi-line strings"""
-            if style is None:
-                if should_use_block(value):
-                    style = '|'
-                    # we care more about readable than accuracy, so...
-                    # ...no trailing space
-                    value = value.rstrip()
-                    # ...and non-printable characters
-                    value = ''.join(x for x in value if x in string.printable or ord(x) >= 0xA0)
-                    # ...tabs prevent blocks from expanding
-                    value = value.expandtabs()
-                    # ...and odd bits of whitespace
-                    value = re.sub(r'[\x0b\x0c\r]', '', value)
-                    # ...as does trailing space
-                    value = re.sub(r' +\n', '\n', value)
-                else:
-                    style = self.default_style
-            node = yaml.representer.ScalarNode(tag, value, style=style)
+            node = create_string_node(tag, value, style, self.default_style)
             if self.alias_key is not None:
                 self.represented_objects[self.alias_key] = node
             return node
@@ -106,23 +115,7 @@ except:  # noqa: E722, pylint: disable=bare-except
             # The following function is the same as in the try/except
             def represent_scalar(self, tag, value, style=None):
                 """Uses block style for multi-line strings"""
-                if style is None:
-                    if should_use_block(value):
-                        style = '|'
-                        # we care more about readable than accuracy, so...
-                        # ...no trailing space
-                        value = value.rstrip()
-                        # ...and non-printable characters
-                        value = ''.join(x for x in value if x in string.printable or ord(x) >= 0xA0)
-                        # ...tabs prevent blocks from expanding
-                        value = value.expandtabs()
-                        # ...and odd bits of whitespace
-                        value = re.sub(r'[\x0b\x0c\r]', '', value)
-                        # ...as does trailing space
-                        value = re.sub(r' +\n', '\n', value)
-                    else:
-                        style = self.default_style
-                node = yaml.representer.ScalarNode(tag, value, style=style)
+                node = create_string_node(tag, value, style, self.default_style)
                 if self.alias_key is not None:
                     self.represented_objects[self.alias_key] = node
                 return node
@@ -180,23 +173,7 @@ except:  # noqa: E722, pylint: disable=bare-except
             # The following function is the same as in the try/except
             def represent_scalar(self, tag, value, style=None):
                 """Uses block style for multi-line strings"""
-                if style is None:
-                    if should_use_block(value):
-                        style = '|'
-                        # we care more about readable than accuracy, so...
-                        # ...no trailing space
-                        value = value.rstrip()
-                        # ...and non-printable characters
-                        value = ''.join(x for x in value if x in string.printable or ord(x) >= 0xA0)
-                        # ...tabs prevent blocks from expanding
-                        value = value.expandtabs()
-                        # ...and odd bits of whitespace
-                        value = re.sub(r'[\x0b\x0c\r]', '', value)
-                        # ...as does trailing space
-                        value = re.sub(r' +\n', '\n', value)
-                    else:
-                        style = self.default_style
-                node = yaml.representer.ScalarNode(tag, value, style=style)
+                node = create_string_node(tag, value, style, self.default_style)
                 if self.alias_key is not None:
                     self.represented_objects[self.alias_key] = node
                 return node
