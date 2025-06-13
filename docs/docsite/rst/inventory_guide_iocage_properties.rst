@@ -46,6 +46,7 @@ Run the playbook. Limit the inventory to *srv_3* ::
    shell> ansible-playbook -i hosts/02_iocage.yml -l srv_3 pb-test-properties.yml
 
 .. code-block:: yaml
+   :force:
 
    PLAY [all] **********************************************************************************************************
 
