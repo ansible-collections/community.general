@@ -530,3 +530,9 @@ tests/integration/cloud-config-*.ini
 
 # VSCode specific extensions
 .vscode/settings.json
+
+
+### nix specific stuff ###
+/.direnv
+.envrc
+
