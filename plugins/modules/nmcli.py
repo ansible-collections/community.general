@@ -2095,7 +2095,6 @@ class Nmcli(object):
     @property
     def ip_conn_type(self):
         return self.type in (
-            'bond',
             'bridge',
             'dummy',
             'ethernet',
