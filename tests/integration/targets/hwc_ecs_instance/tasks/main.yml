@@ -62,7 +62,7 @@
     root_volume:
       volume_type: "SAS"
     state: absent
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: create a instance (check mode)
   hwc_ecs_instance:
     data_volumes:
@@ -90,7 +90,7 @@
   assert:
     that:
       - result is changed
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: create a instance
   hwc_ecs_instance:
     data_volumes:
@@ -117,7 +117,7 @@
   assert:
     that:
       result is changed
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: create a instance (idemponent)
   hwc_ecs_instance:
     data_volumes:
@@ -173,7 +173,7 @@
     that:
       - result is not failed
       - result is not changed
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: delete a instance (check mode)
   hwc_ecs_instance:
     data_volumes:
@@ -201,7 +201,7 @@
   assert:
     that:
       - result is changed
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: delete a instance
   hwc_ecs_instance:
     data_volumes:
@@ -228,7 +228,7 @@
   assert:
     that:
       result is changed
-#----------------------------------------------------------
+# ----------------------------------------------------------
 - name: delete a instance (idemponent)
   hwc_ecs_instance:
     data_volumes:
@@ -283,7 +283,7 @@
     that:
       - result is not failed
       - result is not changed
-#---------------------------------------------------------
+# ---------------------------------------------------------
 # Post-test teardown
 - name: delete a disk
   hwc_evs_disk:

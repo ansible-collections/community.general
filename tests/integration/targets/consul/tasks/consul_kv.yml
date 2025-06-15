@@ -15,10 +15,10 @@
       - result is changed
       - result.data.Value == 'somevalue'
 
-#- name: Test the lookup
-#  assert:
-#    that:
-#      - lookup('community.general.consul_kv', 'somekey', token=consul_management_token) == 'somevalue'
+# - name: Test the lookup
+#   assert:
+#     that:
+#       - lookup('community.general.consul_kv', 'somekey', token=consul_management_token) == 'somevalue'
 
 - name: Update a key with the same data
   consul_kv:

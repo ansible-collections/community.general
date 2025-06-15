@@ -438,7 +438,7 @@
       - gitlab_instance_variable_state.instance_variable.removed|length == 0
       - gitlab_instance_variable_state.instance_variable.updated|length == 0
       # VALUE_SPECIFIED_IN_NO_LOG_PARAMETER
-      #- gitlab_instance_variable_state.instance_variable.added[0] == "my_test_var"
+      # - gitlab_instance_variable_state.instance_variable.added[0] == "my_test_var"
 
 - name: change variable_type attribute
   gitlab_instance_variable:

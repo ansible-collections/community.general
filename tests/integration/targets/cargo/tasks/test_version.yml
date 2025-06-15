@@ -42,9 +42,9 @@
 - name: Check assertions helloworld-yliu
   assert:
     that:
-        - install_helloworld_010 is changed
-        - install_helloworld_010_idem is not changed
-        - upgrade_helloworld_010 is changed
-        - upgrade_helloworld_010_idem is not changed
-        - downgrade_helloworld_010 is changed
-        - downgrade_helloworld_010_idem is not changed
+      - install_helloworld_010 is changed
+      - install_helloworld_010_idem is not changed
+      - upgrade_helloworld_010 is changed
+      - upgrade_helloworld_010_idem is not changed
+      - downgrade_helloworld_010 is changed
+      - downgrade_helloworld_010_idem is not changed

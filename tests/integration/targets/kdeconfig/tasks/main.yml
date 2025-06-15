@@ -17,7 +17,7 @@
   copy:
     dest: "{{ kwriteconf_fake }}"
     src: kwriteconf_fake
-    mode: 0755
+    mode: "0755"
 
 - name: Simple test
   kdeconfig:
@@ -182,7 +182,7 @@
     values:
       - group: test
         key: test1
-        bool_value: on
+        bool_value: true
     kwriteconfig_path: "{{ kwriteconf_fake }}"
   register: result_bool_idem
   ignore_errors: true
@@ -207,7 +207,7 @@
         value: test2
       - groups: [testx, testy]
         key: testz
-        bool_value: on
+        bool_value: true
     kwriteconfig_path: "{{ kwriteconf_fake }}"
   register: result_checkmode
   ignore_errors: true
@@ -236,7 +236,7 @@
         value: test2
       - groups: [testx, testy]
         key: testz
-        bool_value: on
+        bool_value: true
     kwriteconfig_path: "{{ kwriteconf_fake }}"
   register: result_checkmode_apply
   ignore_errors: true
@@ -260,7 +260,7 @@
         value: test2
       - groups: [testx, testy]
         key: testz
-        bool_value: on
+        bool_value: true
     kwriteconfig_path: "{{ kwriteconf_fake }}"
   register: result_checkmode2
   ignore_errors: true

@@ -4,21 +4,21 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - block: &prepare
-  - name: Create the final file
-    ansible.builtin.copy:
-      content: |
-        [main]
-        foo=BAR
-      dest: "{{ remote_tmp_dir }}/my_original_file.ini"
-  - name: Clean up symlink.ini
-    ansible.builtin.file:
-      path: "{{ remote_tmp_dir }}/symlink.ini"
-      state: absent
-  - name: Create a symbolic link
-    ansible.builtin.file:
-      src: my_original_file.ini
-      dest: "{{ remote_tmp_dir }}/symlink.ini"
-      state: link
+    - name: Create the final file
+      ansible.builtin.copy:
+        content: |
+          [main]
+          foo=BAR
+        dest: "{{ remote_tmp_dir }}/my_original_file.ini"
+    - name: Clean up symlink.ini
+      ansible.builtin.file:
+        path: "{{ remote_tmp_dir }}/symlink.ini"
+        state: absent
+    - name: Create a symbolic link
+      ansible.builtin.file:
+        src: my_original_file.ini
+        dest: "{{ remote_tmp_dir }}/symlink.ini"
+        state: link
 
 - name: Set the proxy key on the symlink which will be converted as a file
   community.general.ini_file:

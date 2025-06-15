@@ -145,11 +145,11 @@
     realm: "{{ realm }}"
     name: my-new_group
     attributes:
-        attrib1: value1
-        attrib2: value2
-        attrib3:
-            - item1
-            - item2
+      attrib1: value1
+      attrib2: value2
+      attrib3:
+        - item1
+        - item2
   register: result
 
 - name: Assert that group was correctly created

@@ -30,7 +30,7 @@
 
 - name: Store path of pass executable
   set_fact:
-     passpath: "{{ result.stdout }}"
+    passpath: "{{ result.stdout }}"
 
 - name: Move original pass into place if there was a leftover
   command:
@@ -49,7 +49,7 @@
 
 - name: Store path of gopass executable
   set_fact:
-     gopasspath: "{{ result.stdout }}"
+    gopasspath: "{{ result.stdout }}"
 
 - name: Move original gopass into place if there was a leftover
   command:
@@ -64,9 +64,9 @@
   command: "{{ item }} --version"
   register: versions
   loop:
-  - "{{ gpg2_bin }}"
-  - pass
-  - gopass
+    - "{{ gpg2_bin }}"
+    - pass
+    - gopass
 
 - name: Output versions of tools
   debug:
@@ -131,52 +131,52 @@
 
 - name: Test pass compatibility shim detection
   block:
-  - name: Move original pass out of the way
-    command:
-      argv:
-        - mv
-        - "{{ passpath }}"
-        - "{{ passpath }}.testorig"
-    args:
-      creates: "{{ passpath }}.testorig"
+    - name: Move original pass out of the way
+      command:
+        argv:
+          - mv
+          - "{{ passpath }}"
+          - "{{ passpath }}.testorig"
+      args:
+        creates: "{{ passpath }}.testorig"
 
-  - name: Create dummy pass script
-    ansible.builtin.copy:
-      content: |
-        #!/bin/sh
-        echo "shim_ok"
-      dest: "{{ passpath }}"
-      mode: '0755'
+    - name: Create dummy pass script
+      ansible.builtin.copy:
+        content: |
+          #!/bin/sh
+          echo "shim_ok"
+        dest: "{{ passpath }}"
+        mode: '0755'
 
-  - name: Try reading from non-existent passwordstore location with different pass utility
-    set_fact:
-      newpass: "{{ lookup('community.general.passwordstore', 'test-pass') }}"
-    environment:
-      PATH: "/tmp"
+    - name: Try reading from non-existent passwordstore location with different pass utility
+      set_fact:
+        newpass: "{{ lookup('community.general.passwordstore', 'test-pass') }}"
+      environment:
+        PATH: "/tmp"
 
-  - name: Verify password received from shim
-    assert:
-      that:
-        - newpass == "shim_ok"
+    - name: Verify password received from shim
+      assert:
+        that:
+          - newpass == "shim_ok"
 
-  - name: Try to read folder as passname with a different pass utility
-    set_fact:
-      newpass: "{{ lookup('community.general.passwordstore', 'folder') }}"
+    - name: Try to read folder as passname with a different pass utility
+      set_fact:
+        newpass: "{{ lookup('community.general.passwordstore', 'folder') }}"
 
-  - name: Verify password received from shim
-    assert:
-      that:
-        - newpass == "shim_ok"
+    - name: Verify password received from shim
+      assert:
+        that:
+          - newpass == "shim_ok"
 
   always:
-  - name: Move original pass back into place
-    command:
-      argv:
-        - mv
-        - "{{ passpath }}.testorig"
-        - "{{ passpath }}"
-    args:
-      removes: "{{ passpath }}.testorig"
+    - name: Move original pass back into place
+      command:
+        argv:
+          - mv
+          - "{{ passpath }}.testorig"
+          - "{{ passpath }}"
+      args:
+        removes: "{{ passpath }}.testorig"
 
 # This are in addition to the real gopass tests above
 # and verify plugin logic
@@ -184,56 +184,56 @@
   vars:
     passwordstore_backend: "gopass"
   block:
-  - name: Check if gopass executable exists
-    stat:
-      path: "{{ gopasspath }}"
-    register: gopass_check
+    - name: Check if gopass executable exists
+      stat:
+        path: "{{ gopasspath }}"
+      register: gopass_check
 
-  - name: Move original gopass out of the way
-    command:
-      argv:
-        - mv
-        - "{{ gopasspath }}"
-        - "{{ gopasspath }}.testorig"
-    args:
-      creates: "{{ gopasspath }}.testorig"
-    when: gopass_check.stat.exists == true
+    - name: Move original gopass out of the way
+      command:
+        argv:
+          - mv
+          - "{{ gopasspath }}"
+          - "{{ gopasspath }}.testorig"
+      args:
+        creates: "{{ gopasspath }}.testorig"
+      when: gopass_check.stat.exists == true
 
-  - name: Create mocked gopass script
-    ansible.builtin.copy:
-      content: |
-        #!/bin/sh
-        if [ "$GOPASS_NO_REMINDER" != "YES" ]; then
-          exit 1
-        fi
-        if [ "$1" = "--version" ]; then
-          exit 2
-        fi
-        echo "gopass_ok"
-      dest: "{{ gopasspath }}"
-      mode: '0755'
+    - name: Create mocked gopass script
+      ansible.builtin.copy:
+        content: |
+          #!/bin/sh
+          if [ "$GOPASS_NO_REMINDER" != "YES" ]; then
+            exit 1
+          fi
+          if [ "$1" = "--version" ]; then
+            exit 2
+          fi
+          echo "gopass_ok"
+        dest: "{{ gopasspath }}"
+        mode: '0755'
 
-  - name: Try to read folder as passname using gopass mock
-    set_fact:
-      newpass: "{{ lookup('community.general.passwordstore', 'folder') }}"
+    - name: Try to read folder as passname using gopass mock
+      set_fact:
+        newpass: "{{ lookup('community.general.passwordstore', 'folder') }}"
 
-  - name: Verify password received from gopass mock
-    assert:
-      that:
-        - newpass == "gopass_ok"
+    - name: Verify password received from gopass mock
+      assert:
+        that:
+          - newpass == "gopass_ok"
 
   always:
-  - name: Remove mocked gopass
-    ansible.builtin.file:
-      path: "{{ gopasspath }}"
-      state: absent
+    - name: Remove mocked gopass
+      ansible.builtin.file:
+        path: "{{ gopasspath }}"
+        state: absent
 
-  - name: Move original gopass back into place
-    command:
-      argv:
-        - mv
-        - "{{ gopasspath }}.testorig"
-        - "{{ gopasspath }}"
-    args:
-      removes: "{{ gopasspath }}.testorig"
-    when: gopass_check.stat.exists == true
+    - name: Move original gopass back into place
+      command:
+        argv:
+          - mv
+          - "{{ gopasspath }}.testorig"
+          - "{{ gopasspath }}"
+      args:
+        removes: "{{ gopasspath }}.testorig"
+      when: gopass_check.stat.exists == true

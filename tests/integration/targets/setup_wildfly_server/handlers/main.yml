@@ -14,5 +14,5 @@
     path: '{{ item }}'
     state: absent
   loop:
-  - '{{ wf_service_file_path }}'
-  - '{{ default_deploy_root }}'
+    - '{{ wf_service_file_path }}'
+    - '{{ default_deploy_root }}'

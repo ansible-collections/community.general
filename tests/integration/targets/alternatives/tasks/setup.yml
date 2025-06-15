@@ -5,11 +5,11 @@
 
 - include_vars: '{{ item }}'
   with_first_found:
-  - files:
-    - '{{ ansible_os_family }}-{{ ansible_distribution_version }}.yml'
-    - '{{ ansible_os_family }}.yml'
-    - default.yml
-    paths: ../vars
+    - files:
+        - '{{ ansible_os_family }}-{{ ansible_distribution_version }}.yml'
+        - '{{ ansible_os_family }}.yml'
+        - default.yml
+      paths: ../vars
 - template:
     src: dummy_command
     dest: /usr/bin/dummy{{ item }}

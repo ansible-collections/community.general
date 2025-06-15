@@ -14,8 +14,8 @@ tests:
       - {k0_x0: A0, k1_x1: B0, k2_x2: [C0], k3_x3: foo}
       - {k0_x0: A1, k1_x1: B1, k2_x2: [C1], k3_x3: bar}
     result:
-       - {a0: A0, a1: B0, k2_x2: [C0], k3_x3: foo}
-       - {a0: A1, a1: B1, k2_x2: [C1], k3_x3: bar}
+      - {a0: A0, a1: B0, k2_x2: [C0], k3_x3: foo}
+      - {a0: A1, a1: B1, k2_x2: [C1], k3_x3: bar}
   - template: mp.j2
     group:
       - d: Replace keys that starts with any of the attributes before.
@@ -37,8 +37,8 @@ tests:
       - {k0_x0: A0, k1_x1: B0, k2_x2: [C0], k3_x3: foo}
       - {k0_x0: A1, k1_x1: B1, k2_x2: [C1], k3_x3: bar}
     result:
-       - {a0: A0, a1: B0, k2_x2: [C0], k3_x3: foo}
-       - {a0: A1, a1: B1, k2_x2: [C1], k3_x3: bar}
+      - {a0: A0, a1: B0, k2_x2: [C0], k3_x3: foo}
+      - {a0: A1, a1: B1, k2_x2: [C1], k3_x3: bar}
   - template: mp.j2
     group:
       - d: If more keys match the same attribute before the last one will be used.
@@ -54,8 +54,8 @@ tests:
       - {k0_x0: A0, k1_x1: B0, k2_x2: [C0], k3_x3: foo}
       - {k0_x0: A1, k1_x1: B1, k2_x2: [C1], k3_x3: bar}
     result:
-       - X: foo
-       - X: bar
+      - X: foo
+      - X: bar
   - template: mp.j2
     group:
       - d: If there are more matches for a key the first one will be used.

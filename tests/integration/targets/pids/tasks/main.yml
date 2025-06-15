@@ -27,8 +27,8 @@
 - name: "Verify that the list of Process IDs (PIDs) returned is empty"
   assert:
     that:
-    - emptypids is not changed
-    - emptypids.pids == []
+      - emptypids is not changed
+      - emptypids.pids == []
 
 - name: "Picking a random process name"
   set_fact:
@@ -38,7 +38,7 @@
   copy:
     src: sleeper.c
     dest: "{{ remote_tmp_dir }}/sleeper.c"
-    mode: 0644
+    mode: "0644"
 
 - name: Compile fake 'sleep' binary
   command: cc {{ remote_tmp_dir }}/sleeper.c -o {{ remote_tmp_dir }}/{{ random_name }}
@@ -47,7 +47,7 @@
   template:
     src: obtainpid.sh.j2
     dest: "{{ remote_tmp_dir }}/obtainpid.sh"
-    mode: 0755
+    mode: "0755"
 
 - name: "Run the fake 'sleep' binary"
   command: sh {{ remote_tmp_dir }}/obtainpid.sh
@@ -86,7 +86,7 @@
 
 - name: "Reading pid from the file"
   slurp:
-    src:  "{{ remote_tmp_dir }}/obtainpid.txt"
+    src: "{{ remote_tmp_dir }}/obtainpid.txt"
   register: newpid
 
 - name: Gather all processes to make debugging easier
@@ -101,12 +101,12 @@
 - name: "Verify that the Process IDs (PIDs) returned is not empty and also equal to the PIDs obtained in console"
   assert:
     that:
-    - "pids.pids | join(' ')  == newpid.content | b64decode | trim"
-    - "pids.pids | length > 0"
-    - "exactpidmatch.pids == []"
-    - "pattern_pid_match.pids | join(' ')  == newpid.content | b64decode | trim"
-    - "caseinsensitive_pattern_pid_match.pids | join(' ')  == newpid.content | b64decode | trim"
-    - newpid.content | b64decode | trim | int in match_all.pids
+      - "pids.pids | join(' ')  == newpid.content | b64decode | trim"
+      - "pids.pids | length > 0"
+      - "exactpidmatch.pids == []"
+      - "pattern_pid_match.pids | join(' ')  == newpid.content | b64decode | trim"
+      - "caseinsensitive_pattern_pid_match.pids | join(' ')  == newpid.content | b64decode | trim"
+      - newpid.content | b64decode | trim | int in match_all.pids
 
 - name: "Register output of bad input pattern"
   pids:
