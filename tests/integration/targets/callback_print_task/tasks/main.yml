@@ -24,18 +24,17 @@
               - name: Sample task
                 debug:
                   msg: This is a test
-        expected_output: [
-            "",
-            "PLAY [testhost] ****************************************************************",
-            "",
-            "TASK [Sample task] *************************************************************",
-            "ok: [testhost] => {",
-            "    \"msg\": \"This is a test\"",
-            "}",
-            "",
-            "PLAY RECAP *********************************************************************",
-            "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
-        ]
+        expected_output:
+          - ""
+          - "PLAY [testhost] ****************************************************************"
+          - ""
+          - "TASK [Sample task] *************************************************************"
+          - "ok: [testhost] => {"
+          - "    \"msg\": \"This is a test\""
+          - "}"
+          - ""
+          - "PLAY RECAP *********************************************************************"
+          - "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
 
       - name: community.general.print_task is enabled
         environment:
@@ -49,23 +48,22 @@
               - name: Sample task
                 debug:
                   msg: This is a test
-        expected_output: [
-            "",
-            "PLAY [testhost] ****************************************************************",
-            "",
-            "TASK [Sample task] *************************************************************",
-            "",
-            "- name: Sample task",
-            "  debug:",
-            "    msg: This is a test",
-            "",
-            "ok: [testhost] => {",
-            "    \"msg\": \"This is a test\"",
-            "}",
-            "",
-            "PLAY RECAP *********************************************************************",
-            "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
-        ]
+        expected_output:
+          - ""
+          - "PLAY [testhost] ****************************************************************"
+          - ""
+          - "TASK [Sample task] *************************************************************"
+          - ""
+          - "- name: Sample task"
+          - "  debug:"
+          - "    msg: This is a test"
+          - ""
+          - "ok: [testhost] => {"
+          - "    \"msg\": \"This is a test\""
+          - "}"
+          - ""
+          - "PLAY RECAP *********************************************************************"
+          - "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
 
       - name: Print with msg parameter on the same line
         environment:
@@ -78,22 +76,21 @@
             tasks:
               - name: Sample task
                 debug: msg="This is a test"
-        expected_output: [
-            "",
-            "PLAY [testhost] ****************************************************************",
-            "",
-            "TASK [Sample task] *************************************************************",
-            "",
-            "- name: Sample task",
-            "  debug: msg=\"This is a test\"",
-            "",
-            "ok: [testhost] => {",
-            "    \"msg\": \"This is a test\"",
-            "}",
-            "",
-            "PLAY RECAP *********************************************************************",
-            "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
-        ]
+        expected_output:
+          - ""
+          - "PLAY [testhost] ****************************************************************"
+          - ""
+          - "TASK [Sample task] *************************************************************"
+          - ""
+          - "- name: Sample task"
+          - "  debug: msg=\"This is a test\""
+          - ""
+          - "ok: [testhost] => {"
+          - "    \"msg\": \"This is a test\""
+          - "}"
+          - ""
+          - "PLAY RECAP *********************************************************************"
+          - "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
 
       - name: Task with additional parameters
         environment:
@@ -110,23 +107,22 @@
                   test_var: "Hello World"
                 debug:
                   var: test_var
-        expected_output: [
-            "",
-            "PLAY [testhost] ****************************************************************",
-            "",
-            "TASK [Sample task] *************************************************************",
-            "",
-            "- name: Sample task",
-            "  when: true",
-            "  vars:",
-            "    test_var: Hello World",
-            "  debug:",
-            "    var: test_var",
-            "",
-            "ok: [testhost] => {",
-            "    \"test_var\": \"Hello World\"",
-            "}",
-            "",
-            "PLAY RECAP *********************************************************************",
-            "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
-        ]
+        expected_output:
+          - ""
+          - "PLAY [testhost] ****************************************************************"
+          - ""
+          - "TASK [Sample task] *************************************************************"
+          - ""
+          - "- name: Sample task"
+          - "  when: true"
+          - "  vars:"
+          - "    test_var: Hello World"
+          - "  debug:"
+          - "    var: test_var"
+          - ""
+          - "ok: [testhost] => {"
+          - "    \"test_var\": \"Hello World\""
+          - "}"
+          - ""
+          - "PLAY RECAP *********************************************************************"
+          - "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "

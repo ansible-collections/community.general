@@ -25,17 +25,17 @@
               - name: Sample task name
                 debug:
                   msg: sample debug msg
-        expected_output: [
-          "",
-          "PLAY [testhost] ****************************************************************",
-          "",
-          "TASK [Sample task name] ********************************************************",
-          "ok: [testhost] => ",
-          "  msg: sample debug msg",
-          "",
-          "PLAY RECAP *********************************************************************",
-          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
-        ]
+        expected_output:
+          - ""
+          - "PLAY [testhost] ****************************************************************"
+          - ""
+          - "TASK [Sample task name] ********************************************************"
+          - "ok: [testhost] => "
+          - "  msg: sample debug msg"
+          - ""
+          - "PLAY RECAP *********************************************************************"
+          - "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
+
       - name: Test umlauts in multiline
         environment:
           ANSIBLE_NOCOLOR: 'true'
@@ -48,20 +48,20 @@
               - name: Umlaut output
                 debug:
                   msg: "äöü\néêè\nßï☺"
-        expected_output: [
-          "",
-          "PLAY [testhost] ****************************************************************",
-          "",
-          "TASK [Umlaut output] ***********************************************************",
-          "ok: [testhost] => ",
-          "  msg: |-",
-          "    äöü",
-          "    éêè",
-          "    ßï☺",
-          "",
-          "PLAY RECAP *********************************************************************",
-          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
-        ]
+        expected_output:
+          - ""
+          - "PLAY [testhost] ****************************************************************"
+          - ""
+          - "TASK [Umlaut output] ***********************************************************"
+          - "ok: [testhost] => "
+          - "  msg: |-"
+          - "    äöü"
+          - "    éêè"
+          - "    ßï☺"
+          - ""
+          - "PLAY RECAP *********************************************************************"
+          - "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
+
       - name: Test to_yaml
         environment:
           ANSIBLE_NOCOLOR: 'true'
@@ -79,21 +79,20 @@
               - name: Test to_yaml
                 debug:
                   msg: "{{ data | to_yaml }}"
-        expected_output: [
-          "",
-          "PLAY [testhost] ****************************************************************",
-          "",
-          "TASK [Test to_yaml] ************************************************************",
-          "ok: [testhost] => ",
-          "  msg: |-",
-          "    'line 1",
-          "  ",
-          "      line 2",
-          "  ",
-          "      line 3",
-          "  ",
-          "      '",
-          "",
-          "PLAY RECAP *********************************************************************",
-          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
-        ]
+        expected_output:
+          - ""
+          - "PLAY [testhost] ****************************************************************"
+          - ""
+          - "TASK [Test to_yaml] ************************************************************"
+          - "ok: [testhost] => "
+          - "  msg: |-"
+          - "    'line 1"
+          - "  "
+          - "      line 2"
+          - "  "
+          - "      line 3"
+          - "  "
+          - "      '"
+          - ""
+          - "PLAY RECAP *********************************************************************"
+          - "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "

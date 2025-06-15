@@ -166,7 +166,7 @@
 - name: Assert that image was deleted
   assert:
     that:
-    - result is changed
+      - result is changed
 
 # Trying to run with wrong arguments
 - name: Try to use name and ID at the same time
@@ -182,7 +182,7 @@
 - name: Assert that task failed
   assert:
     that:
-    - result is failed
+      - result is failed
 
 - name: Try to rename image without specifying new name
   one_image:
@@ -197,7 +197,7 @@
 - name: Assert that task failed
   assert:
     that:
-    - result is failed
+      - result is failed
 
 - name: Try to rename image without specifying new name
   one_image:

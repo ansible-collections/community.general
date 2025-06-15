@@ -17,5 +17,5 @@
 
 - name: copy the iso to the test dir
   copy:
-      src: test.iso
-      dest: '{{ output_test_dir }}'
+    src: test.iso
+    dest: '{{ output_test_dir }}'

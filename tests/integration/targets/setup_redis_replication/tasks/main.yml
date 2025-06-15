@@ -9,4 +9,4 @@
 
 - import_tasks: setup_redis_cluster.yml
   when:
-  - ansible_distribution in ['CentOS', 'Fedora', 'FreeBSD', 'openSUSE Leap', 'Ubuntu', 'Debian', 'Archlinux', 'Alpine']
+    - ansible_distribution in ['CentOS', 'Fedora', 'FreeBSD', 'openSUSE Leap', 'Ubuntu', 'Debian', 'Archlinux', 'Alpine']

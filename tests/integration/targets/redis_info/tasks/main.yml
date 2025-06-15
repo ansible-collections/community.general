@@ -14,10 +14,10 @@
 
 - assert:
     that:
-    - result is not changed
-    - result.info is defined
-    - result.info.tcp_port == master_port
-    - result.info.role == 'master'
+      - result is not changed
+      - result.info is defined
+      - result.info.tcp_port == master_port
+      - result.info.role == 'master'
 
 - name: redis_info - connect to master (check)
   community.general.redis_info:
@@ -29,10 +29,10 @@
 
 - assert:
     that:
-    - result is not changed
-    - result.info is defined
-    - result.info.tcp_port == master_port
-    - result.info.role == 'master'
+      - result is not changed
+      - result.info is defined
+      - result.info.tcp_port == master_port
+      - result.info.role == 'master'
 
 - name: redis_info - connect to replica
   community.general.redis_info:
@@ -42,7 +42,7 @@
 
 - assert:
     that:
-    - result is not changed
-    - result.info is defined
-    - result.info.tcp_port == replica_port
-    - result.info.role == 'slave'
+      - result is not changed
+      - result.info is defined
+      - result.info.tcp_port == replica_port
+      - result.info.role == 'slave'

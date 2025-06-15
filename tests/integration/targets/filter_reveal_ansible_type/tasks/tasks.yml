@@ -64,7 +64,7 @@
   assert:
     that: result == dtype
     success_msg: '"abc" is {{ dtype }}'
-    fail_msg:  '"abc" is {{ result }}, not {{ dtype }}'
+    fail_msg: '"abc" is {{ result }}, not {{ dtype }}'
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
     result: '{{ "abc" | community.general.reveal_ansible_type }}'
@@ -74,7 +74,7 @@
   assert:
     that: result == dtype
     success_msg: '123 is {{ dtype }}'
-    fail_msg:  '123 is {{ result }}, not {{ dtype }}'
+    fail_msg: '123 is {{ result }}, not {{ dtype }}'
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
     result: '{{ 123 | community.general.reveal_ansible_type }}'
@@ -84,7 +84,7 @@
   assert:
     that: result == dtype
     success_msg: '123.45 is {{ dtype }}'
-    fail_msg:  '123.45 is {{ result }}, not {{ dtype }}'
+    fail_msg: '123.45 is {{ result }}, not {{ dtype }}'
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
     result: '{{ 123.45 | community.general.reveal_ansible_type }}'
@@ -94,7 +94,7 @@
   assert:
     that: result == dtype
     success_msg: 'true is {{ dtype }}'
-    fail_msg:  'true is {{ result }}, not {{ dtype }}'
+    fail_msg: 'true is {{ result }}, not {{ dtype }}'
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
     result: '{{ true | community.general.reveal_ansible_type }}'
@@ -104,7 +104,7 @@
   assert:
     that: result == dtype
     success_msg: '["a", "b", "c"] is {{ dtype }}'
-    fail_msg:  '["a", "b", "c"] is {{ result }}, not {{ dtype }}'
+    fail_msg: '["a", "b", "c"] is {{ result }}, not {{ dtype }}'
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
     result: '{{ ["a", "b", "c"] | community.general.reveal_ansible_type }}'
@@ -114,7 +114,7 @@
   assert:
     that: result == dtype
     success_msg: '[{"a": 1}, {"b": 2}] is {{ dtype }}'
-    fail_msg:  '[{"a": 1}, {"b": 2}] is {{ result }}, not {{ dtype }}'
+    fail_msg: '[{"a": 1}, {"b": 2}] is {{ result }}, not {{ dtype }}'
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
     result: '{{ [{"a": 1}, {"b": 2}] | community.general.reveal_ansible_type }}'
@@ -124,7 +124,7 @@
   assert:
     that: result == dtype
     success_msg: '{"a": 1} is {{ dtype }}'
-    fail_msg:  '{"a": 1} is {{ result }}, not {{ dtype }}'
+    fail_msg: '{"a": 1} is {{ result }}, not {{ dtype }}'
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
     result: '{{ {"a": 1} | community.general.reveal_ansible_type }}'
@@ -134,7 +134,7 @@
   assert:
     that: result == dtype
     success_msg: '{"a": 1, "b": 2} is {{ dtype }}'
-    fail_msg:  '{"a": 1, "b": 2} is {{ result }}, not {{ dtype }}'
+    fail_msg: '{"a": 1, "b": 2} is {{ result }}, not {{ dtype }}'
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
     result: '{{ {"a": 1, "b": 2} | community.general.reveal_ansible_type }}'
@@ -175,7 +175,7 @@
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
     alias: {"AnsibleUnicode": "str", "_AnsibleTaggedStr": "str", "_AnsibleTaggedInt": "int", "_AnsibleTaggedFloat": "float"}
-    data: {'a': 1, 'b': 1.1, 'c': 'abc', 'd': True, 'e': ['x', 'y', 'z'], 'f': {'x': 1, 'y': 2}}
+    data: {'a': 1, 'b': 1.1, 'c': 'abc', 'd': true, 'e': ['x', 'y', 'z'], 'f': {'x': 1, 'y': 2}}
     result: '{{ data | community.general.reveal_ansible_type(alias) }}'
     dtype: dict[str, bool|dict|float|int|list|str]
 
@@ -187,6 +187,6 @@
     quiet: '{{ quiet_test | default(true) | bool }}'
   vars:
     alias: {"AnsibleUnicode": "str", "_AnsibleTaggedStr": "str", "_AnsibleTaggedInt": "int", "_AnsibleTaggedFloat": "float"}
-    data: [1, 2, 1.1, 'abc', True, ['x', 'y', 'z'], {'x': 1, 'y': 2}]
+    data: [1, 2, 1.1, 'abc', true, ['x', 'y', 'z'], {'x': 1, 'y': 2}]
     result: '{{ data | community.general.reveal_ansible_type(alias) }}'
     dtype: list[bool|dict|float|int|list|str]

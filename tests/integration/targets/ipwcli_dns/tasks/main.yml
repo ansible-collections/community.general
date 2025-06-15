@@ -28,9 +28,9 @@
 - name: assert the new A record is added
   assert:
     that:
-    - result is not failed
-    - result is changed
-    - result.record == 'arecord example.{{ tld }} 127.0.0.1 -set ttl=100;container={{ container }}'
+      - result is not failed
+      - result is changed
+      - result.record == 'arecord example.{{ tld }} 127.0.0.1 -set ttl=100;container={{ container }}'
 
 - name: delete the A record
   ipwcli_dns:
@@ -47,9 +47,9 @@
 - name: assert the new A record is deleted
   assert:
     that:
-    - result is not failed
-    - result is changed
-    - result.record == 'arecord example.{{ tld }} 127.0.0.1 -set ttl=100;container={{ container }}'
+      - result is not failed
+      - result is changed
+      - result.record == 'arecord example.{{ tld }} 127.0.0.1 -set ttl=100;container={{ container }}'
 
 - name: delete not existing SRV record
   ipwcli_dns:
@@ -66,10 +66,10 @@
 - name: assert the new a record
   assert:
     that:
-    - result is not failed
-    - result is not changed
-    - result.record ==
-      'srvrecord _sip._tcp.test.example.{{ tld }} -set ttl=3600;container={{ container }};priority=10;weight=10;port=5060;target=example.{{ tld }}'
+      - result is not failed
+      - result is not changed
+      - result.record ==
+        'srvrecord _sip._tcp.test.example.{{ tld }} -set ttl=3600;container={{ container }};priority=10;weight=10;port=5060;target=example.{{ tld }}'
 
 - name: add a SRV record with weight > 65535 against RFC 2782
   ipwcli_dns:
@@ -88,9 +88,9 @@
 - name: assert the failure of the new SRV record
   assert:
     that:
-    - result is failed
-    - result is not changed
-    - "'Out of UINT16 range' in result.stderr"
+      - result is failed
+      - result is not changed
+      - "'Out of UINT16 range' in result.stderr"
 
 - name: add NAPTR record (check_mode)
   ipwcli_dns:
@@ -111,5 +111,5 @@
 - name: assert the NAPTR check_mode
   assert:
     that:
-    - result is not failed
-    - result is changed
+      - result is not failed
+      - result is changed

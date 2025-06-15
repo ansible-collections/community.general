@@ -13,12 +13,11 @@
 
 - name: Create a broken symlink in the same directory
   ansible.builtin.file:
-    src:  "{{ filesize_testfile | basename }}"
+    src: "{{ filesize_testfile | basename }}"
     dest: "{{ filesize_testlink }}"
     state: link
     force: true
     follow: false
-
 
 
 - name: Create a file with a size of 512 kB (512000 bytes) (check mode)
@@ -83,7 +82,6 @@
 
       - filesize_test_symlink_04.path == filesize_test_symlink_02.path
       - filesize_test_symlink_04.path != filesize_testlink
-
 
 
 - name: Remove test file

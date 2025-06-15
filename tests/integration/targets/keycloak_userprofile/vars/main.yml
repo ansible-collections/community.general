@@ -9,69 +9,69 @@ admin_user: admin
 admin_password: password
 realm: realm_userprofile_test
 attributes_default:
- - name: username
-   displayName: ${username}
-   validations:
-     length:
-       min: 3
-       max: 255
-     usernameProhibitedCharacters: {}
-     up_username_not_idn_homograph: {}
-   annotations: {}
-   permissions:
-     view:
-       - admin
-       - user
-     edit: []
-   multivalued: false
- - name: email
-   displayName: ${email}
-   validations:
-     email: {}
-     length:
-       max: 255
-   annotations: {}
-   required:
-     roles:
-       - user
-   permissions:
-     view:
-       - admin
-       - user
-     edit: []
-   multivalued: false
- - name: firstName
-   displayName: ${firstName}
-   validations:
-     length:
-       max: 255
-     personNameProhibitedCharacters: {}
-   annotations: {}
-   required:
-     roles:
-       - user
-   permissions:
-     view:
-       - admin
-       - user
-     edit: []
-   multivalued: false
- - name: lastName
-   displayName: ${lastName}
-   validations:
-     length:
-       max: 255
-     person_name_prohibited_characters: {}
-   annotations: {}
-   required:
-     roles:
-       - user
-   permissions:
-     view:
-       - admin
-       - user
-     edit: []
-   multivalued: false
+  - name: username
+    displayName: ${username}
+    validations:
+      length:
+        min: 3
+        max: 255
+      usernameProhibitedCharacters: {}
+      up_username_not_idn_homograph: {}
+    annotations: {}
+    permissions:
+      view:
+        - admin
+        - user
+      edit: []
+    multivalued: false
+  - name: email
+    displayName: ${email}
+    validations:
+      email: {}
+      length:
+        max: 255
+    annotations: {}
+    required:
+      roles:
+        - user
+    permissions:
+      view:
+        - admin
+        - user
+      edit: []
+    multivalued: false
+  - name: firstName
+    displayName: ${firstName}
+    validations:
+      length:
+        max: 255
+      personNameProhibitedCharacters: {}
+    annotations: {}
+    required:
+      roles:
+        - user
+    permissions:
+      view:
+        - admin
+        - user
+      edit: []
+    multivalued: false
+  - name: lastName
+    displayName: ${lastName}
+    validations:
+      length:
+        max: 255
+      person_name_prohibited_characters: {}
+    annotations: {}
+    required:
+      roles:
+        - user
+    permissions:
+      view:
+        - admin
+        - user
+      edit: []
+    multivalued: false
 attributes_additional:
   - name: additionalAttribute
     displayName: additionalAttribute

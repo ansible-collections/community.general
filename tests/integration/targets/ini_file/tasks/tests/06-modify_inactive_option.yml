@@ -68,7 +68,7 @@
 
 - name: test-modify_inactive_option 2 - read content from output file
   slurp:
-      src: "{{ output_file }}"
+    src: "{{ output_file }}"
   register: output_content
 
 - name: test-modify_inactive_option 2 - set expected content and get current ini file content
@@ -144,7 +144,7 @@
 
 - name: test-modify_inactive_option 4 - read content from output file
   slurp:
-      src: "{{ output_file }}"
+    src: "{{ output_file }}"
   register: output_content
 
 - name: test-modify_inactive_option 4 - set expected content and get current ini file content
