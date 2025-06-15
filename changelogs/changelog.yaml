@@ -1695,3 +1695,18 @@ releases:
       - 8.6.10.yml
       - 9621-keycloak_client-sanitize-saml-encryption-key.yml
     release_date: '2025-01-27'
+  8.6.11:
+    changes:
+      release_summary: 'Maintenance release.
+
+
+        This is the last 8.x.y release. The 8.x.y release train is now effectively
+        End of Life.
+
+
+        Thanks to everyone who contributed to the community.general 8.x.y releases!
+
+        '
+    fragments:
+      - 8.6.11.yml
+    release_date: '2025-06-15'

@@ -6,6 +6,18 @@ Community General Release Notes
 
 This changelog describes changes after version 7.0.0.
 
+v8.6.11
+=======
+
+Release Summary
+---------------
+
+Maintenance release.
+
+This is the last 8.x.y release. The 8.x.y release train is now effectively End of Life.
+
+Thanks to everyone who contributed to the community.general 8.x.y releases!
+
 v8.6.10
 =======
 
