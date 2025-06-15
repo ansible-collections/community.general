@@ -1725,3 +1725,17 @@ releases:
       - 10145-fix-typeerror-cobbler-xmlrpc.yml
       - 9.5.8.yml
     release_date: '2025-05-19'
+  9.5.9:
+    changes:
+      bugfixes:
+        - yaml callback plugin - adjust to latest changes in ansible-core devel (https://github.com/ansible-collections/community.general/pull/10212).
+        - yaml callback plugin - when using ansible-core 2.19.0b2 or newer, uses a
+          new utility provided by ansible-core. This allows us to remove all hacks
+          and vendored code that was part of the plugin for ansible-core versions
+          with Data Tagging so far (https://github.com/ansible-collections/community.general/pull/10242).
+      release_summary: Bugfix release.
+    fragments:
+      - 10212-yaml.yml
+      - 10242-yaml.yml
+      - 9.5.9.yml
+    release_date: '2025-06-15'

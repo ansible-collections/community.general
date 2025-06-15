@@ -6,6 +6,20 @@ Community General Release Notes
 
 This changelog describes changes after version 8.0.0.
 
+v9.5.9
+======
+
+Release Summary
+---------------
+
+Bugfix release.
+
+Bugfixes
+--------
+
+- yaml callback plugin - adjust to latest changes in ansible-core devel (https://github.com/ansible-collections/community.general/pull/10212).
+- yaml callback plugin - when using ansible-core 2.19.0b2 or newer, uses a new utility provided by ansible-core. This allows us to remove all hacks and vendored code that was part of the plugin for ansible-core versions with Data Tagging so far (https://github.com/ansible-collections/community.general/pull/10242).
+
 v9.5.8
 ======
 
