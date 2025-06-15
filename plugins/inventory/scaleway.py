@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 name: scaleway
 author:
   - Remy Leone (@remyleone)
@@ -70,9 +70,9 @@ options:
                   L(Scaleway API, https://developer.scaleway.com/#servers-server-get)
                   can be used.'
     type: dict
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 # scaleway_inventory.yml file in YAML format
 # Example command line: ansible-inventory --list -i scaleway_inventory.yml
 
@@ -110,7 +110,7 @@ variables:
   ansible_host: public_ip.address
   ansible_connection: "'ssh'"
   ansible_user: "'admin'"
-'''
+"""
 
 import os
 import json

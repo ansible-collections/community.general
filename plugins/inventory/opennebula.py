@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 name: opennebula
 author:
   - Kristian Feldsam (@feldsam)
@@ -74,9 +74,9 @@ options:
     description: Create host groups by vm labels
     type: bool
     default: true
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 # inventory_opennebula.yml file in YAML format
 # Example command line: ansible-inventory --list -i inventory_opennebula.yml
 
@@ -84,7 +84,7 @@ EXAMPLES = r'''
 plugin: community.general.opennebula
 api_url: https://opennebula:2633/RPC2
 filter_by_label: Cache
-'''
+"""
 
 try:
     import pyone

@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 author: Unknown (!UNKNOWN)
 name: virtualbox
 short_description: virtualbox inventory source
@@ -52,9 +52,9 @@ options:
     default: false
     type: bool
     version_added: 9.2.0
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 ---
 # file must be named vbox.yaml or vbox.yml
 plugin: community.general.virtualbox
@@ -69,7 +69,7 @@ compose:
 plugin: community.general.virtualbox
 groups:
   container: "'minis' in (inventory_hostname)"
-'''
+"""
 
 import os
 

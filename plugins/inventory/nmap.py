@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 author: Unknown (!UNKNOWN)
 name: nmap
 short_description: Uses nmap to find hosts to target
@@ -99,8 +99,8 @@ options:
 notes:
   - At least one of O(ipv4) or O(ipv6) is required to be V(true); both can be V(true), but they cannot both be V(false).
   - 'TODO: add OS fingerprinting'
-'''
-EXAMPLES = '''
+"""
+EXAMPLES = r"""
 ---
 # inventory.config file in YAML format
 plugin: community.general.nmap
@@ -122,7 +122,7 @@ exclude: 192.168.0.1, web.example.com
 port: 22, 443
 groups:
   web_servers: "ports | selectattr('port', 'equalto', '443')"
-'''
+"""
 
 import os
 import re

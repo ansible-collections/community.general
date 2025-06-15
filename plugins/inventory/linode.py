@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 name: linode
 author:
   - Luke Murphy (@decentral1se)
@@ -75,9 +75,9 @@ options:
     version_added: 2.0.0
   keyed_groups:
     version_added: 2.0.0
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 ---
 # Minimal example. `LINODE_ACCESS_TOKEN` is exposed in environment.
 plugin: community.general.linode
@@ -124,7 +124,7 @@ access_token: foobar
 ip_style: api
 compose:
   ansible_host: "ipv4 | community.general.json_query('[?public==`false`].address') | first"
-'''
+"""
 
 from ansible.errors import AnsibleError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable

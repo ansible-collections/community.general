@@ -7,7 +7,7 @@
 from __future__ import annotations
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 name: gitlab_runners
 author:
   - Stefan Heitmüller (@morph027) <stefan.heitmueller@gmx.com>
@@ -54,9 +54,9 @@ options:
     description: Toggle to (not) include all available nodes metadata
     type: bool
     default: true
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 ---
 # gitlab_runners.yml
 plugin: community.general.gitlab_runners
@@ -79,7 +79,7 @@ keyed_groups:
   # hint: labels containing special characters will be converted to safe names
   - key: 'tag_list'
     prefix: tag
-'''
+"""
 
 from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable

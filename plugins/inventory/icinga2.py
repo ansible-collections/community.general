@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 name: icinga2
 short_description: Icinga2 inventory source
 version_added: 3.7.0
@@ -68,9 +68,9 @@ options:
     type: boolean
     default: true
     version_added: 8.4.0
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 # my.icinga2.yml
 plugin: community.general.icinga2
 url: http://localhost:5665
@@ -93,7 +93,7 @@ compose:
   # set 'ansible_user' and 'ansible_port' from icinga2 host vars
   ansible_user: icinga2_attributes.vars.ansible_user
   ansible_port: icinga2_attributes.vars.ansible_port | default(22)
-'''
+"""
 
 import json
 

@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 name: lxd
 short_description: Returns Ansible inventory from lxd host
 description:
@@ -104,9 +104,9 @@ options:
       - Create groups by the following keywords C(location), C(network_range), C(os), C(pattern), C(profile), C(release), C(type), C(vlanid).
       - See example for syntax.
     type: dict
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 ---
 # simple lxd.yml
 plugin: community.general.lxd
@@ -165,7 +165,7 @@ groupby:
   projectInternals:
     type: project
     attribute: internals
-'''
+"""
 
 import json
 import re

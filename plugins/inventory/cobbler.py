@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 author: Orion Poplawski (@opoplawski)
 name: cobbler
 short_description: Cobbler inventory source
@@ -117,15 +117,15 @@ options:
     choices: ['normal', 'as_rendered']
     default: normal
     version_added: 10.7.0
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # my.cobbler.yml
 plugin: community.general.cobbler
 url: http://cobbler/cobbler_api
 user: ansible-tester
 password: secure
-'''
+"""
 
 import socket
 
