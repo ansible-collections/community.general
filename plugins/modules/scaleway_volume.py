@@ -95,10 +95,11 @@ EXAMPLES = r"""
 
 RETURN = r"""
 data:
-    description: This is only present when O(state=present).
-    returned: when O(state=present)
-    type: dict
-    sample: {
+  description: This is only present when O(state=present).
+  returned: when O(state=present)
+  type: dict
+  sample:
+    {
       "volume": {
         "export_uri": null,
         "id": "c675f420-cfeb-48ff-ba2a-9d2a4dbe3fcd",
@@ -107,8 +108,8 @@ data:
         "server": null,
         "size": 10000000000,
         "volume_type": "l_ssd"
-  }
-}
+      }
+    }
 """
 
 from ansible_collections.community.general.plugins.module_utils.scaleway import SCALEWAY_LOCATION, scaleway_argument_spec, Scaleway

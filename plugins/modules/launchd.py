@@ -111,16 +111,16 @@ EXAMPLES = r"""
 
 RETURN = r"""
 status:
-    description: Metadata about service status.
-    returned: always
-    type: dict
-    sample:
-        {
-            "current_pid": "-",
-            "current_state": "stopped",
-            "previous_pid": "82636",
-            "previous_state": "running"
-        }
+  description: Metadata about service status.
+  returned: always
+  type: dict
+  sample:
+    {
+      "current_pid": "-",
+      "current_state": "stopped",
+      "previous_pid": "82636",
+      "previous_state": "running"
+    }
 """
 
 import os

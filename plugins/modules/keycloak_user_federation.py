@@ -598,122 +598,125 @@ msg:
   sample: "No changes required to user federation 164bb483-c613-482e-80fe-7f1431308799."
 
 proposed:
-    description: Representation of proposed user federation.
-    returned: always
-    type: dict
-    sample: {
-        "config": {
-            "allowKerberosAuthentication": "false",
-            "authType": "simple",
-            "batchSizeForSync": "1000",
-            "bindCredential": "**********",
-            "bindDn": "cn=directory reader",
-            "cachePolicy": "DEFAULT",
-            "connectionPooling": "true",
-            "connectionUrl": "ldaps://ldap.example.com:636",
-            "debug": "false",
-            "editMode": "READ_ONLY",
-            "enabled": "true",
-            "importEnabled": "true",
-            "pagination": "true",
-            "priority": "0",
-            "rdnLDAPAttribute": "uid",
-            "searchScope": "1",
-            "syncRegistrations": "false",
-            "trustEmail": "false",
-            "useKerberosForPasswordAuthentication": "false",
-            "useTruststoreSpi": "ldapsOnly",
-            "userObjectClasses": "inetOrgPerson, organizationalPerson",
-            "usernameLDAPAttribute": "uid",
-            "usersDn": "ou=Users,dc=example,dc=com",
-            "uuidLDAPAttribute": "entryUUID",
-            "validatePasswordPolicy": "false",
-            "vendor": "other"
-        },
-        "name": "ldap",
-        "providerId": "ldap",
-        "providerType": "org.keycloak.storage.UserStorageProvider"
+  description: Representation of proposed user federation.
+  returned: always
+  type: dict
+  sample:
+    {
+      "config": {
+        "allowKerberosAuthentication": "false",
+        "authType": "simple",
+        "batchSizeForSync": "1000",
+        "bindCredential": "**********",
+        "bindDn": "cn=directory reader",
+        "cachePolicy": "DEFAULT",
+        "connectionPooling": "true",
+        "connectionUrl": "ldaps://ldap.example.com:636",
+        "debug": "false",
+        "editMode": "READ_ONLY",
+        "enabled": "true",
+        "importEnabled": "true",
+        "pagination": "true",
+        "priority": "0",
+        "rdnLDAPAttribute": "uid",
+        "searchScope": "1",
+        "syncRegistrations": "false",
+        "trustEmail": "false",
+        "useKerberosForPasswordAuthentication": "false",
+        "useTruststoreSpi": "ldapsOnly",
+        "userObjectClasses": "inetOrgPerson, organizationalPerson",
+        "usernameLDAPAttribute": "uid",
+        "usersDn": "ou=Users,dc=example,dc=com",
+        "uuidLDAPAttribute": "entryUUID",
+        "validatePasswordPolicy": "false",
+        "vendor": "other"
+      },
+      "name": "ldap",
+      "providerId": "ldap",
+      "providerType": "org.keycloak.storage.UserStorageProvider"
     }
 
 existing:
-    description: Representation of existing user federation.
-    returned: always
-    type: dict
-    sample: {
-        "config": {
-            "allowKerberosAuthentication": "false",
-            "authType": "simple",
-            "batchSizeForSync": "1000",
-            "bindCredential": "**********",
-            "bindDn": "cn=directory reader",
-            "cachePolicy": "DEFAULT",
-            "changedSyncPeriod": "-1",
-            "connectionPooling": "true",
-            "connectionUrl": "ldaps://ldap.example.com:636",
-            "debug": "false",
-            "editMode": "READ_ONLY",
-            "enabled": "true",
-            "fullSyncPeriod": "-1",
-            "importEnabled": "true",
-            "pagination": "true",
-            "priority": "0",
-            "rdnLDAPAttribute": "uid",
-            "searchScope": "1",
-            "syncRegistrations": "false",
-            "trustEmail": "false",
-            "useKerberosForPasswordAuthentication": "false",
-            "useTruststoreSpi": "ldapsOnly",
-            "userObjectClasses": "inetOrgPerson, organizationalPerson",
-            "usernameLDAPAttribute": "uid",
-            "usersDn": "ou=Users,dc=example,dc=com",
-            "uuidLDAPAttribute": "entryUUID",
-            "validatePasswordPolicy": "false",
-            "vendor": "other"
-        },
-        "id": "01122837-9047-4ae4-8ca0-6e2e891a765f",
-        "mappers": [
-            {
-                "config": {
-                    "always.read.value.from.ldap": "false",
-                    "is.mandatory.in.ldap": "false",
-                    "ldap.attribute": "mail",
-                    "read.only": "true",
-                    "user.model.attribute": "email"
-                },
-                "id": "17d60ce2-2d44-4c2c-8b1f-1fba601b9a9f",
-                "name": "email",
-                "parentId": "01122837-9047-4ae4-8ca0-6e2e891a765f",
-                "providerId": "user-attribute-ldap-mapper",
-                "providerType": "org.keycloak.storage.ldap.mappers.LDAPStorageMapper"
-            }
-        ],
-        "name": "myfed",
-        "parentId": "myrealm",
-        "providerId": "ldap",
-        "providerType": "org.keycloak.storage.UserStorageProvider"
+  description: Representation of existing user federation.
+  returned: always
+  type: dict
+  sample:
+    {
+      "config": {
+        "allowKerberosAuthentication": "false",
+        "authType": "simple",
+        "batchSizeForSync": "1000",
+        "bindCredential": "**********",
+        "bindDn": "cn=directory reader",
+        "cachePolicy": "DEFAULT",
+        "changedSyncPeriod": "-1",
+        "connectionPooling": "true",
+        "connectionUrl": "ldaps://ldap.example.com:636",
+        "debug": "false",
+        "editMode": "READ_ONLY",
+        "enabled": "true",
+        "fullSyncPeriod": "-1",
+        "importEnabled": "true",
+        "pagination": "true",
+        "priority": "0",
+        "rdnLDAPAttribute": "uid",
+        "searchScope": "1",
+        "syncRegistrations": "false",
+        "trustEmail": "false",
+        "useKerberosForPasswordAuthentication": "false",
+        "useTruststoreSpi": "ldapsOnly",
+        "userObjectClasses": "inetOrgPerson, organizationalPerson",
+        "usernameLDAPAttribute": "uid",
+        "usersDn": "ou=Users,dc=example,dc=com",
+        "uuidLDAPAttribute": "entryUUID",
+        "validatePasswordPolicy": "false",
+        "vendor": "other"
+      },
+      "id": "01122837-9047-4ae4-8ca0-6e2e891a765f",
+      "mappers": [
+        {
+          "config": {
+            "always.read.value.from.ldap": "false",
+            "is.mandatory.in.ldap": "false",
+            "ldap.attribute": "mail",
+            "read.only": "true",
+            "user.model.attribute": "email"
+          },
+          "id": "17d60ce2-2d44-4c2c-8b1f-1fba601b9a9f",
+          "name": "email",
+          "parentId": "01122837-9047-4ae4-8ca0-6e2e891a765f",
+          "providerId": "user-attribute-ldap-mapper",
+          "providerType": "org.keycloak.storage.ldap.mappers.LDAPStorageMapper"
+        }
+      ],
+      "name": "myfed",
+      "parentId": "myrealm",
+      "providerId": "ldap",
+      "providerType": "org.keycloak.storage.UserStorageProvider"
     }
 
 end_state:
-    description: Representation of user federation after module execution.
-    returned: on success
-    type: dict
-    sample: {
-        "config": {
-            "allowPasswordAuthentication": "false",
-            "cachePolicy": "DEFAULT",
-            "enabled": "true",
-            "kerberosRealm": "EXAMPLE.COM",
-            "keyTab": "/etc/krb5.keytab",
-            "priority": "0",
-            "serverPrincipal": "HTTP/host.example.com@EXAMPLE.COM",
-            "updateProfileFirstLogin": "false"
-        },
-        "id": "cf52ae4f-4471-4435-a0cf-bb620cadc122",
-        "mappers": [],
-        "name": "kerberos",
-        "parentId": "myrealm",
-        "providerId": "kerberos",
-        "providerType": "org.keycloak.storage.UserStorageProvider"
+  description: Representation of user federation after module execution.
+  returned: on success
+  type: dict
+  sample:
+    {
+      "config": {
+        "allowPasswordAuthentication": "false",
+        "cachePolicy": "DEFAULT",
+        "enabled": "true",
+        "kerberosRealm": "EXAMPLE.COM",
+        "keyTab": "/etc/krb5.keytab",
+        "priority": "0",
+        "serverPrincipal": "HTTP/host.example.com@EXAMPLE.COM",
+        "updateProfileFirstLogin": "false"
+      },
+      "id": "cf52ae4f-4471-4435-a0cf-bb620cadc122",
+      "mappers": [],
+      "name": "kerberos",
+      "parentId": "myrealm",
+      "providerId": "kerberos",
+      "providerType": "org.keycloak.storage.UserStorageProvider"
     }
 """
 

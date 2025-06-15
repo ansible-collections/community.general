@@ -144,7 +144,7 @@ EXAMPLES = r"""
     firewall_policy: ansible-firewall-policy-updated
     add_server_ips:
       - server_identifier (id or name)
-      - server_identifier #2 (id or name)
+      - "server_identifier #2 (id or name)"
     wait: true
     wait_timeout: 500
     state: update
@@ -182,8 +182,8 @@ EXAMPLES = r"""
     auth_token: oneandone_private_api_key
     firewall_policy: ansible-firewall-policy-updated
     remove_rules:
-      - rule_id #1
-      - rule_id #2
+      - "rule_id #1"
+      - "rule_id #2"
       - '...'
     wait: true
     wait_timeout: 500

@@ -58,38 +58,39 @@ EXAMPLES = r"""
 
 RETURN = r"""
 users:
-    description: List of Pritunl users.
-    returned: success
-    type: list
-    elements: dict
-    sample:
-        [
-            {
-                "audit": false,
-                "auth_type": "google",
-                "bypass_secondary": false,
-                "client_to_client": false,
-                "disabled": false,
-                "dns_mapping": null,
-                "dns_servers": null,
-                "dns_suffix": null,
-                "email": "foo@bar.com",
-                "gravatar": true,
-                "groups": [
-                    "foo", "bar"
-                ],
-                "id": "5d070dafe63q3b2e6s472c3b",
-                "name": "foo@acme.com",
-                "network_links": [],
-                "organization": "58070daee6sf342e6e4s2c36",
-                "organization_name": "Acme",
-                "otp_auth": true,
-                "otp_secret": "35H5EJA3XB2$4CWG",
-                "pin": false,
-                "port_forwarding": [],
-                "servers": [],
-            }
-        ]
+  description: List of Pritunl users.
+  returned: success
+  type: list
+  elements: dict
+  sample:
+    [
+      {
+        "audit": false,
+        "auth_type": "google",
+        "bypass_secondary": false,
+        "client_to_client": false,
+        "disabled": false,
+        "dns_mapping": null,
+        "dns_servers": null,
+        "dns_suffix": null,
+        "email": "foo@bar.com",
+        "gravatar": true,
+        "groups": [
+          "foo",
+          "bar"
+        ],
+        "id": "5d070dafe63q3b2e6s472c3b",
+        "name": "foo@acme.com",
+        "network_links": [],
+        "organization": "58070daee6sf342e6e4s2c36",
+        "organization_name": "Acme",
+        "otp_auth": true,
+        "otp_secret": "35H5EJA3XB2$4CWG",
+        "pin": false,
+        "port_forwarding": [],
+        "servers": []
+      }
+    ]
 """
 
 from ansible.module_utils.basic import AnsibleModule

@@ -51,8 +51,24 @@ options:
     description:
       - Text color for the message.
     default: "none"
-    choices: ["none", "white", "black", "blue", "green", "red", "brown", "purple", "orange", "yellow", "light_green", "teal",
-      "light_cyan", "light_blue", "pink", "gray", "light_gray"]
+    choices:
+      - none
+      - white
+      - black
+      - blue
+      - green
+      - red
+      - brown
+      - purple
+      - orange
+      - yellow
+      - light_green
+      - teal
+      - light_cyan
+      - light_blue
+      - pink
+      - gray
+      - light_gray
     aliases: [colour]
   channel:
     type: str

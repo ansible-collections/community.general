@@ -71,13 +71,16 @@ EXAMPLES = r"""
 
 RETURN = r"""
 data:
-    description: This is only present when O(state=present).
-    returned: when O(state=present)
-    type: dict
-    sample: {
-        "ssh_public_keys": [
-            {"key": "ssh-rsa AAAA...."}
-        ]
+  description: This is only present when O(state=present).
+  returned: when O(state=present)
+  type: dict
+  sample:
+    {
+      "ssh_public_keys": [
+        {
+          "key": "ssh-rsa AAAA...."
+        }
+      ]
     }
 """
 

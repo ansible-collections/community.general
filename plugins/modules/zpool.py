@@ -8,7 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 module: zpool
 short_description: Manage ZFS zpools
 version_added: 11.0.0
@@ -35,7 +35,7 @@ options:
   state:
     description:
       - Whether the pool should exist.
-    choices: [ present, absent ]
+    choices: [present, absent]
     default: present
     type: str
   disable_new_features:
@@ -80,12 +80,12 @@ options:
         description:
           - Special vdev role (for example V(log), V(cache), V(spare)).
         type: str
-        choices: [ log, cache, spare, dedup, special ]
+        choices: [log, cache, spare, dedup, special]
       type:
         description:
           - Vdev topology (for example V(stripe), V(mirror), V(raidz)).
         type: str
-        choices: [ stripe, mirror, raidz, raidz1, raidz2, raidz3 ]
+        choices: [stripe, mirror, raidz, raidz1, raidz2, raidz3]
         default: stripe
       disks:
         description:
@@ -93,9 +93,9 @@ options:
         required: true
         type: list
         elements: path
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Create pool "tank" on /dev/sda
   community.general.zpool:
     name: tank
@@ -137,7 +137,7 @@ EXAMPLES = r'''
   community.general.zpool:
     name: tank
     state: absent
-'''
+"""
 
 import re
 from ansible.module_utils.basic import AnsibleModule

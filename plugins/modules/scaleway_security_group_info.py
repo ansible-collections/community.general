@@ -57,20 +57,20 @@ scaleway_security_group_info:
   elements: dict
   sample:
     "scaleway_security_group_info": [
-        {
-            "description": "test-ams",
-            "enable_default_security": true,
-            "id": "7fcde327-8bed-43a6-95c4-6dfbc56d8b51",
-            "name": "test-ams",
-            "organization": "3f709602-5e6c-4619-b80c-e841c89734af",
-            "organization_default": false,
-            "servers": [
-                {
-                    "id": "12f19bc7-108c-4517-954c-e6b3d0311363",
-                    "name": "scw-e0d158"
-                }
-            ]
-        }
+      {
+        "description": "test-ams",
+        "enable_default_security": true,
+        "id": "7fcde327-8bed-43a6-95c4-6dfbc56d8b51",
+        "name": "test-ams",
+        "organization": "3f709602-5e6c-4619-b80c-e841c89734af",
+        "organization_default": false,
+        "servers": [
+          {
+            "id": "12f19bc7-108c-4517-954c-e6b3d0311363",
+            "name": "scw-e0d158"
+          }
+        ]
+      }
     ]
 """
 

@@ -35,8 +35,25 @@ options:
     type: str
     description:
       - Set the log facility.
-    choices: ["kern", "user", "mail", "daemon", "auth", "lpr", "news", "uucp", "cron", "syslog", "local0", "local1", "local2",
-      "local3", "local4", "local5", "local6", "local7"]
+    choices:
+      - kern
+      - user
+      - mail
+      - daemon
+      - auth
+      - lpr
+      - news
+      - uucp
+      - cron
+      - syslog
+      - local0
+      - local1
+      - local2
+      - local3
+      - local4
+      - local5
+      - local6
+      - local7
     default: "daemon"
   log_pid:
     description:

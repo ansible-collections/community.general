@@ -40,8 +40,20 @@ options:
       - Action to take.
       - The V(acknowledge) and V(forced_check) actions were added in community.general 1.2.0.
     required: true
-    choices: ["downtime", "delete_downtime", "enable_alerts", "disable_alerts", "silence", "unsilence", "silence_nagios",
-      "unsilence_nagios", "command", "servicegroup_service_downtime", "servicegroup_host_downtime", "acknowledge", "forced_check"]
+    choices:
+      - downtime
+      - delete_downtime
+      - enable_alerts
+      - disable_alerts
+      - silence
+      - unsilence
+      - silence_nagios
+      - unsilence_nagios
+      - command
+      - servicegroup_service_downtime
+      - servicegroup_host_downtime
+      - acknowledge
+      - forced_check
     type: str
   host:
     description:

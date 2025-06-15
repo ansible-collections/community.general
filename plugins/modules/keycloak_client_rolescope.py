@@ -126,11 +126,12 @@ msg:
   sample: "Client role scope for frontend-client-public has been updated"
 
 end_state:
-    description: Representation of role role scope after module execution.
-    returned: on success
-    type: list
-    elements: dict
-    sample: [
+  description: Representation of role role scope after module execution.
+  returned: on success
+  type: list
+  elements: dict
+  sample:
+    [
       {
         "clientRole": false,
         "composite": false,

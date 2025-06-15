@@ -220,7 +220,7 @@ EXAMPLES = r"""
     state: absent
 """
 
-RETURN = r"""#  """
+RETURN = r"""#"""
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 import re

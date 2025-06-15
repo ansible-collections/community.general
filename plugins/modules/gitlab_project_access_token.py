@@ -55,8 +55,16 @@ options:
     type: list
     elements: str
     aliases: ["scope"]
-    choices: ["api", "read_api", "read_registry", "write_registry", "read_repository", "write_repository", "create_runner",
-      "ai_features", "k8s_proxy"]
+    choices:
+      - api
+      - read_api
+      - read_registry
+      - write_registry
+      - read_repository
+      - write_repository
+      - create_runner
+      - ai_features
+      - k8s_proxy
   access_level:
     description:
       - Access level of the access token.

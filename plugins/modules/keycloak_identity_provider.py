@@ -354,76 +354,79 @@ msg:
   sample: "Identity provider my-idp has been created"
 
 proposed:
-    description: Representation of proposed identity provider.
-    returned: always
-    type: dict
-    sample: {
-        "config": {
-            "authorizationUrl": "https://idp.example.com/auth",
-            "clientAuthMethod": "client_secret_post",
-            "clientId": "my-client",
-            "clientSecret": "secret",
-            "issuer": "https://idp.example.com",
-            "tokenUrl": "https://idp.example.com/token",
-            "userInfoUrl": "https://idp.example.com/userinfo"
-        },
-        "displayName": "OpenID Connect IdP",
-        "providerId": "oidc"
+  description: Representation of proposed identity provider.
+  returned: always
+  type: dict
+  sample:
+    {
+      "config": {
+        "authorizationUrl": "https://idp.example.com/auth",
+        "clientAuthMethod": "client_secret_post",
+        "clientId": "my-client",
+        "clientSecret": "secret",
+        "issuer": "https://idp.example.com",
+        "tokenUrl": "https://idp.example.com/token",
+        "userInfoUrl": "https://idp.example.com/userinfo"
+      },
+      "displayName": "OpenID Connect IdP",
+      "providerId": "oidc"
     }
 
 existing:
-    description: Representation of existing identity provider.
-    returned: always
-    type: dict
-    sample: {
-        "addReadTokenRoleOnCreate": false,
-        "alias": "my-idp",
-        "authenticateByDefault": false,
-        "config": {
-            "authorizationUrl": "https://old.example.com/auth",
-            "clientAuthMethod": "client_secret_post",
-            "clientId": "my-client",
-            "clientSecret": "**********",
-            "issuer": "https://old.example.com",
-            "syncMode": "FORCE",
-            "tokenUrl": "https://old.example.com/token",
-            "userInfoUrl": "https://old.example.com/userinfo"
-        },
-        "displayName": "OpenID Connect IdP",
-        "enabled": true,
-        "firstBrokerLoginFlowAlias": "first broker login",
-        "internalId": "4d28d7e3-1b80-45bb-8a30-5822bf55aa1c",
-        "linkOnly": false,
-        "providerId": "oidc",
-        "storeToken": false,
-        "trustEmail": false,
+  description: Representation of existing identity provider.
+  returned: always
+  type: dict
+  sample:
+    {
+      "addReadTokenRoleOnCreate": false,
+      "alias": "my-idp",
+      "authenticateByDefault": false,
+      "config": {
+        "authorizationUrl": "https://old.example.com/auth",
+        "clientAuthMethod": "client_secret_post",
+        "clientId": "my-client",
+        "clientSecret": "**********",
+        "issuer": "https://old.example.com",
+        "syncMode": "FORCE",
+        "tokenUrl": "https://old.example.com/token",
+        "userInfoUrl": "https://old.example.com/userinfo"
+      },
+      "displayName": "OpenID Connect IdP",
+      "enabled": true,
+      "firstBrokerLoginFlowAlias": "first broker login",
+      "internalId": "4d28d7e3-1b80-45bb-8a30-5822bf55aa1c",
+      "linkOnly": false,
+      "providerId": "oidc",
+      "storeToken": false,
+      "trustEmail": false
     }
 
 end_state:
-    description: Representation of identity provider after module execution.
-    returned: on success
-    type: dict
-    sample: {
-        "addReadTokenRoleOnCreate": false,
-        "alias": "my-idp",
-        "authenticateByDefault": false,
-        "config": {
-            "authorizationUrl": "https://idp.example.com/auth",
-            "clientAuthMethod": "client_secret_post",
-            "clientId": "my-client",
-            "clientSecret": "**********",
-            "issuer": "https://idp.example.com",
-            "tokenUrl": "https://idp.example.com/token",
-            "userInfoUrl": "https://idp.example.com/userinfo"
-        },
-        "displayName": "OpenID Connect IdP",
-        "enabled": true,
-        "firstBrokerLoginFlowAlias": "first broker login",
-        "internalId": "4d28d7e3-1b80-45bb-8a30-5822bf55aa1c",
-        "linkOnly": false,
-        "providerId": "oidc",
-        "storeToken": false,
-        "trustEmail": false,
+  description: Representation of identity provider after module execution.
+  returned: on success
+  type: dict
+  sample:
+    {
+      "addReadTokenRoleOnCreate": false,
+      "alias": "my-idp",
+      "authenticateByDefault": false,
+      "config": {
+        "authorizationUrl": "https://idp.example.com/auth",
+        "clientAuthMethod": "client_secret_post",
+        "clientId": "my-client",
+        "clientSecret": "**********",
+        "issuer": "https://idp.example.com",
+        "tokenUrl": "https://idp.example.com/token",
+        "userInfoUrl": "https://idp.example.com/userinfo"
+      },
+      "displayName": "OpenID Connect IdP",
+      "enabled": true,
+      "firstBrokerLoginFlowAlias": "first broker login",
+      "internalId": "4d28d7e3-1b80-45bb-8a30-5822bf55aa1c",
+      "linkOnly": false,
+      "providerId": "oidc",
+      "storeToken": false,
+      "trustEmail": false
     }
 """
 

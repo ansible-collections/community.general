@@ -76,16 +76,17 @@ hooks:
   type: list
   elements: dict
   sample:
-    - {
-        "has_shared_secret": true,
-        "url": "https://jenkins.example.com/ghprbhook/",
-        "events": ["issue_comment", "pull_request"],
-        "insecure_ssl": "1",
-        "content_type": "json",
-        "active": true,
-        "id": 6206,
-        "last_response": {"status": "active", "message": "OK", "code": 200}
-      }
+    - has_shared_secret: true
+      url: https://jenkins.example.com/ghprbhook/
+      events: [issue_comment, pull_request]
+      insecure_ssl: "1"
+      content_type: json
+      active: true
+      id: 6206
+      last_response:
+        status: active
+        message: OK
+        code: 200
 """
 
 import traceback

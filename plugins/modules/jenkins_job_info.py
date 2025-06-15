@@ -135,7 +135,7 @@ jobs:
         "fullname": "test-folder/test-job",
         "url": "http://localhost:8080/job/test-job/",
         "color": "blue"
-      },
+      }
     ]
 """
 

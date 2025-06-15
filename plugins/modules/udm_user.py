@@ -317,7 +317,7 @@ EXAMPLES = r"""
 """
 
 
-RETURN = """# """
+RETURN = """#"""
 
 from datetime import date, timedelta
 import traceback

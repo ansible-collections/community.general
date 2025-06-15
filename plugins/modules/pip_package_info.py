@@ -60,36 +60,36 @@ packages:
       type: dict
       sample:
         "packages": {
-            "pip": {
-                "Babel": [
-                    {
-                        "name": "Babel",
-                        "source": "pip",
-                        "version": "2.6.0"
-                    }
-                ],
-                "Flask": [
-                    {
-                        "name": "Flask",
-                        "source": "pip",
-                        "version": "1.0.2"
-                    }
-                ],
-                "Flask-SQLAlchemy": [
-                    {
-                        "name": "Flask-SQLAlchemy",
-                        "source": "pip",
-                        "version": "2.3.2"
-                    }
-                ],
-                "Jinja2": [
-                    {
-                        "name": "Jinja2",
-                        "source": "pip",
-                        "version": "2.10"
-                    }
-                ],
-            },
+          "pip": {
+            "Babel": [
+              {
+                "name": "Babel",
+                "source": "pip",
+                "version": "2.6.0"
+              }
+            ],
+            "Flask": [
+              {
+                "name": "Flask",
+                "source": "pip",
+                "version": "1.0.2"
+              }
+            ],
+            "Flask-SQLAlchemy": [
+              {
+                "name": "Flask-SQLAlchemy",
+                "source": "pip",
+                "version": "2.3.2"
+              }
+            ],
+            "Jinja2": [
+              {
+                "name": "Jinja2",
+                "source": "pip",
+                "version": "2.10"
+              }
+            ],
+          },
         }
 """
 

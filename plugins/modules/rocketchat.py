@@ -124,7 +124,7 @@ EXAMPLES = r"""
     domain: chat.example.com
     token: thetoken/generatedby/rocketchat
     msg: '{{ inventory_hostname }} completed'
-    channel: #ansible
+    channel: "#ansible"
     username: 'Ansible on {{ inventory_hostname }}'
     icon_url: http://www.example.com/some-image-file.png
     link_names: 0
@@ -147,7 +147,7 @@ EXAMPLES = r"""
     domain: chat.example.com
     attachments:
       - text: Display my system load on host A and B
-        color: #ff00dd
+        color: "#ff00dd"
         title: System load
         fields:
           - title: System A

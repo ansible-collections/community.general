@@ -111,7 +111,17 @@ status:
     targetAddress:
       description: The remote target address.
       type: int
-  sample: [{"powerstate": "on", "targetAddress": 48}, {"powerstate": "on", "targetAddress": 50}]
+  sample:
+    [
+      {
+        "powerstate": "on",
+        "targetAddress": 48
+      },
+      {
+        "powerstate": "on",
+        "targetAddress": 50
+      }
+    ]
 """
 
 EXAMPLES = r"""

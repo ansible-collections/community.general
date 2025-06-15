@@ -132,7 +132,13 @@ diversion:
     state:
       description: The state of the diversion.
       type: str
-  sample: {"divert": "/etc/foobarrc.distrib", "holder": "LOCAL", "path": "/etc/foobarrc", "state": "present"}
+  sample:
+    {
+      "divert": "/etc/foobarrc.distrib",
+      "holder": "LOCAL",
+      "path": "/etc/foobarrc",
+      "state": "present"
+    }
 """
 
 

@@ -63,7 +63,8 @@ info:
   description: The default set of server information sections U(https://redis.io/commands/info).
   returned: success
   type: dict
-  sample: {
+  sample:
+    {
       "active_defrag_hits": 0,
       "active_defrag_key_hits": 0,
       "active_defrag_key_misses": 0,
@@ -196,20 +197,21 @@ cluster:
   returned: success if O(cluster=true)
   version_added: 9.1.0
   type: dict
-  sample: {
-     "cluster_state": ok,
-     "cluster_slots_assigned": 16384,
-     "cluster_slots_ok": 16384,
-     "cluster_slots_pfail": 0,
-     "cluster_slots_fail": 0,
-     "cluster_known_nodes": 6,
-     "cluster_size": 3,
-     "cluster_current_epoch": 6,
-     "cluster_my_epoch": 2,
-     "cluster_stats_messages_sent": 1483972,
-     "cluster_stats_messages_received": 1483968,
-     "total_cluster_links_buffer_limit_exceeded": 0
-  }
+  sample:
+    {
+      "cluster_state": "ok",
+      "cluster_slots_assigned": 16384,
+      "cluster_slots_ok": 16384,
+      "cluster_slots_pfail": 0,
+      "cluster_slots_fail": 0,
+      "cluster_known_nodes": 6,
+      "cluster_size": 3,
+      "cluster_current_epoch": 6,
+      "cluster_my_epoch": 2,
+      "cluster_stats_messages_sent": 1483972,
+      "cluster_stats_messages_received": 1483968,
+      "total_cluster_links_buffer_limit_exceeded": 0
+    }
 """
 
 import traceback
