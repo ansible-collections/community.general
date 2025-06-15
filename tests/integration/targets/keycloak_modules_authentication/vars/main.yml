@@ -9,6 +9,7 @@ admin_user: admin
 admin_password: password
 realm: myrealm
 client_id: myclient
+client_secret: myclientsecret
 role: myrole
 
 keycloak_role_name: test

@@ -3,6 +3,19 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+- name: Reset public login in master admin-cli (if potentially previous test failed)
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_client_id: "admin-cli"
+    auth_client_secret: "{{ client_secret }}"
+    client_id: "admin-cli"
+    secret: "{{ client_secret }}"
+    public_client: true
+    state: present
+
 - name: Create realm
   community.general.keycloak_realm:
     auth_keycloak_url: "{{ url }}"
@@ -201,6 +214,89 @@
   debug:
     var: result
 
+- name: PREPARE - Temporarily disable public login in master admin-cli
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_client_id: "admin-cli"
+    auth_client_secret: "{{ client_secret }}"
+    client_id: "admin-cli"
+    secret: "{{ client_secret }}"
+    public_client: false
+    service_accounts_enabled: true
+    client_authenticator_type: "client-secret"
+    state: present
+
+- name: PREPARE - Get admin role id
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_client_id: "admin-cli"
+    auth_client_secret: "{{ client_secret }}"
+    name: "admin"
+  register: admin_role
+
+- name: PREPARE - Assign admin role to admin-cli in master
+  community.general.keycloak_user_rolemapping:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_client_id: "admin-cli"
+    auth_client_secret: "{{ client_secret }}"
+    realm: "master"
+    roles:
+      - name: "admin"
+    service_account_user_client_id: "admin-cli"
+
+- name: Create new realm role with valid client_id and client_secret
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_client_id: "admin-cli"
+    auth_client_secret: "{{ client_secret }}"
+    realm: "{{ realm }}"
+    name: "{{ role }}"
+    description: "{{ keycloak_role_description }}"
+    state: present
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Reset temporarily disabled public login in master admin-cli
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_client_id: "admin-cli"
+    auth_client_secret: "{{ client_secret }}"
+    client_id: "admin-cli"
+    secret: "{{ client_secret }}"
+    public_client: true
+    state: present
+
+- name: Remove created realm role
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: "{{ role }}"
+    state: absent
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
 ### Unhappy path tests
 
 - name: Fail to create new realm role with invalid username/password
@@ -215,7 +311,6 @@
     state: present
   register: result
   failed_when: >
-    (result.exception is not defined) or
     ("HTTP Error 401: Unauthorized" not in result.msg)
 
 - name: Fail to create new realm role with invalid auth token
@@ -228,7 +323,6 @@
     state: present
   register: result
   failed_when: >
-    (result.exception is not defined) or
     ("HTTP Error 401: Unauthorized" not in result.msg)
 
 - name: Fail to create new realm role with invalid auth and refresh tokens, and invalid username/password
@@ -245,5 +339,4 @@
     state: present
   register: result
   failed_when: >
-    (result.exception is not defined) or
     ("HTTP Error 401: Unauthorized" not in result.msg)
