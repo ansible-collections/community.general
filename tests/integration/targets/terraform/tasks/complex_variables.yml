@@ -7,7 +7,7 @@
   ansible.builtin.file:
     path: "{{ terraform_project_dir }}/complex_vars"
     state: directory
-    mode: 0755
+    mode: "0755"
 
 - name: copy terraform files to work space
   ansible.builtin.copy:
@@ -49,10 +49,10 @@
         one
         two
       list_of_lists:
-        - [ 1 ]
-        - [ 11, 12, 13 ]
-        - [ 2 ]
-        - [ 3 ]
+        - [1]
+        - [11, 12, 13]
+        - [2]
+        - [3]
     state: present
   register: terraform_init_result
 

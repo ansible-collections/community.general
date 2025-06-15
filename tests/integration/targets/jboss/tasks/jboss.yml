@@ -52,187 +52,187 @@
       register: result
 
   block:
-  - name: Create test files
-    <<: *task_parameters
-    get_url:
-      url: 'https://ansible-ci-files.s3.amazonaws.com/test/integration/targets/jboss/{{ war_file_1 }}'
-      dest: '{{ wf_homedir }}'
+    - name: Create test files
+      <<: *task_parameters
+      get_url:
+        url: 'https://ansible-ci-files.s3.amazonaws.com/test/integration/targets/jboss/{{ war_file_1 }}'
+        dest: '{{ wf_homedir }}'
 
-  ##################
-  # Start the tests:
+    ##################
+    # Start the tests:
 
-  # Test if state=present and not deployed, check_mode:
-  - name: jboss - deploy war in check_mode, the default deploy_path
-    <<: *task_parameters
-    jboss:
-      deployment: '{{ war_file_1 }}'
-      src: '{{ war_file_1_path }}'
-    check_mode: true
+    # Test if state=present and not deployed, check_mode:
+    - name: jboss - deploy war in check_mode, the default deploy_path
+      <<: *task_parameters
+      jboss:
+        deployment: '{{ war_file_1 }}'
+        src: '{{ war_file_1_path }}'
+      check_mode: true
 
-  - assert:
-      that:
-      - result is changed
+    - assert:
+        that:
+          - result is changed
 
-  # Check 
-  - name: check that nothing changed after the previous step
-    <<: *task_parameters
-    file:
-      path: '{{ deploy_dir }}/{{ war_file_1 }}.deployed'
-    ignore_errors: true
+    # Check
+    - name: check that nothing changed after the previous step
+      <<: *task_parameters
+      file:
+        path: '{{ deploy_dir }}/{{ war_file_1 }}.deployed'
+      ignore_errors: true
 
-  - assert:
-      that:
-      - "'is absent' in result.msg"
+    - assert:
+        that:
+          - "'is absent' in result.msg"
 
-  # Test if state=present and not deployed, actual mode:
-  - name: jboss - deploy war
-    <<: *task_parameters
-    jboss:
-      deployment: helloworld-1.war
-      deploy_path: '{{ deploy_dir }}'
-      src: '{{ war_file_1_path }}'
+    # Test if state=present and not deployed, actual mode:
+    - name: jboss - deploy war
+      <<: *task_parameters
+      jboss:
+        deployment: helloworld-1.war
+        deploy_path: '{{ deploy_dir }}'
+        src: '{{ war_file_1_path }}'
 
-  - assert:
-      that:
-      - result is changed
+    - assert:
+        that:
+          - result is changed
 
-  # Check 
-  - name: check that the file is deployed after the previous step
-    <<: *task_parameters
-    file:
-      path: '{{ deploy_dir }}/{{ war_file_1 }}.deployed'
+    # Check
+    - name: check that the file is deployed after the previous step
+      <<: *task_parameters
+      file:
+        path: '{{ deploy_dir }}/{{ war_file_1 }}.deployed'
 
-  - assert:
-      that:
-      - result.state == 'file'
+    - assert:
+        that:
+          - result.state == 'file'
 
-  # Test if state=present and deployed in check mode, try again:
-  - name: jboss - try again to deploy war in check_mode, war is deployed now
-    <<: *task_parameters
-    jboss:
-      deployment: '{{ war_file_1 }}'
-      src: '{{ war_file_1_path }}'
-      deploy_path: '{{ deploy_dir }}'
-    check_mode: true
+    # Test if state=present and deployed in check mode, try again:
+    - name: jboss - try again to deploy war in check_mode, war is deployed now
+      <<: *task_parameters
+      jboss:
+        deployment: '{{ war_file_1 }}'
+        src: '{{ war_file_1_path }}'
+        deploy_path: '{{ deploy_dir }}'
+      check_mode: true
 
-  - assert:
-      that:
-      - result is not changed
+    - assert:
+        that:
+          - result is not changed
 
-  # Test if state=present and deployed, try again:
-  - name: jboss - try again to deploy war in actual mode, war is deployed now
-    <<: *task_parameters
-    jboss:
-      deployment: '{{ war_file_1 }}'
-      src: '{{ war_file_1_path }}'
-      deploy_path: '{{ deploy_dir }}'
+    # Test if state=present and deployed, try again:
+    - name: jboss - try again to deploy war in actual mode, war is deployed now
+      <<: *task_parameters
+      jboss:
+        deployment: '{{ war_file_1 }}'
+        src: '{{ war_file_1_path }}'
+        deploy_path: '{{ deploy_dir }}'
 
-  - assert:
-      that:
-      - result is not changed
+    - assert:
+        that:
+          - result is not changed
 
-  # Check 
-  - name: check that nothing changed after the previous step
-    <<: *task_parameters
-    file:
-      path: '{{ deploy_dir }}/{{ war_file_1 }}.deployed'
+    # Check
+    - name: check that nothing changed after the previous step
+      <<: *task_parameters
+      file:
+        path: '{{ deploy_dir }}/{{ war_file_1 }}.deployed'
 
-  - assert:
-      that:
-      - result.state == 'file'
+    - assert:
+        that:
+          - result.state == 'file'
 
-  # Test if state=absent and deployed:
-  - name: jboss - undeploy war in check_mode, war is deployed
-    <<: *task_parameters
-    jboss:
-      deployment: '{{ war_file_1 }}'
-      deploy_path: '{{ deploy_dir }}'
-      state: absent
-    check_mode: true
+    # Test if state=absent and deployed:
+    - name: jboss - undeploy war in check_mode, war is deployed
+      <<: *task_parameters
+      jboss:
+        deployment: '{{ war_file_1 }}'
+        deploy_path: '{{ deploy_dir }}'
+        state: absent
+      check_mode: true
 
-  - assert:
-      that:
-      - result is changed
+    - assert:
+        that:
+          - result is changed
 
-  - name: check that nothing actually changed after the previous step
-    <<: *task_parameters
-    file:
-      path: '{{ deploy_dir }}/{{ war_file_1 }}.deployed'
+    - name: check that nothing actually changed after the previous step
+      <<: *task_parameters
+      file:
+        path: '{{ deploy_dir }}/{{ war_file_1 }}.deployed'
 
-  - assert:
-      that:
-      - result.state == 'file'
+    - assert:
+        that:
+          - result.state == 'file'
 
-  # Test if state=absent and deployed:
-  - name: jboss - undeploy war in actual mode, war is deployed
-    <<: *task_parameters
-    jboss:
-      deployment: '{{ war_file_1 }}'
-      deploy_path: '{{ deploy_dir }}'
-      state: absent
+    # Test if state=absent and deployed:
+    - name: jboss - undeploy war in actual mode, war is deployed
+      <<: *task_parameters
+      jboss:
+        deployment: '{{ war_file_1 }}'
+        deploy_path: '{{ deploy_dir }}'
+        state: absent
 
-  - assert:
-      that:
-      - result is changed
+    - assert:
+        that:
+          - result is changed
 
-  - name: check that file is undeployed after the previous step
-    <<: *task_parameters
-    file:
-      path: '{{ deploy_dir }}/{{ war_file_1 }}.undeployed'
+    - name: check that file is undeployed after the previous step
+      <<: *task_parameters
+      file:
+        path: '{{ deploy_dir }}/{{ war_file_1 }}.undeployed'
 
-  - assert:
-      that:
-      - result.state == 'file'
+    - assert:
+        that:
+          - result.state == 'file'
 
-  # Test if state=absent and undeployed:
-  - name: jboss - undeploy war in check_mode, war is undeployed
-    <<: *task_parameters
-    jboss:
-      deployment: '{{ war_file_1 }}'
-      deploy_path: '{{ deploy_dir }}'
-      state: absent
-    check_mode: true
+    # Test if state=absent and undeployed:
+    - name: jboss - undeploy war in check_mode, war is undeployed
+      <<: *task_parameters
+      jboss:
+        deployment: '{{ war_file_1 }}'
+        deploy_path: '{{ deploy_dir }}'
+        state: absent
+      check_mode: true
 
-  - assert:
-      that:
-      - result is not changed
+    - assert:
+        that:
+          - result is not changed
 
-  # Test if state=absent and undeployed:
-  - name: jboss - undeploy war in actual_mode, war is undeployed
-    <<: *task_parameters
-    jboss:
-      deployment: '{{ war_file_1 }}'
-      deploy_path: '{{ deploy_dir }}'
-      state: absent
+    # Test if state=absent and undeployed:
+    - name: jboss - undeploy war in actual_mode, war is undeployed
+      <<: *task_parameters
+      jboss:
+        deployment: '{{ war_file_1 }}'
+        deploy_path: '{{ deploy_dir }}'
+        state: absent
 
-  - assert:
-      that:
-      - result is not changed
+    - assert:
+        that:
+          - result is not changed
 
-  # Test fake src:
-  - name: jboss - test fake src
-    <<: *task_parameters
-    jboss:
-      deployment: '{{ war_file_1 }}'
-      deploy_path: '{{ deploy_dir }}'
-      src: '{{ fake_src_path }}'
-      state: present
-    ignore_errors: true
+    # Test fake src:
+    - name: jboss - test fake src
+      <<: *task_parameters
+      jboss:
+        deployment: '{{ war_file_1 }}'
+        deploy_path: '{{ deploy_dir }}'
+        src: '{{ fake_src_path }}'
+        state: present
+      ignore_errors: true
 
-  - assert:
-      that:
-      - result is failed
-      - "'Source file {{ fake_src_path }} does not exist.' in result.msg"
+    - assert:
+        that:
+          - result is failed
+          - "'Source file {{ fake_src_path }} does not exist.' in result.msg"
 
-  # Test errors where state=present and src is not passed:
-  - name: jboss - must fail when state=present and src is not passed
-    <<: *task_parameters
-    jboss:
-      deployment: '{{ war_file_1 }}'
-      state: present
-    ignore_errors: true
+    # Test errors where state=present and src is not passed:
+    - name: jboss - must fail when state=present and src is not passed
+      <<: *task_parameters
+      jboss:
+        deployment: '{{ war_file_1 }}'
+        state: present
+      ignore_errors: true
 
-  - assert:
-      that:
-      - result is failed
-      - "'state is present but all of the following are missing: src' in result.msg"
+    - assert:
+        that:
+          - result is failed
+          - "'state is present but all of the following are missing: src' in result.msg"

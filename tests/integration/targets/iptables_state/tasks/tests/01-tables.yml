@@ -28,7 +28,6 @@
     quiet: true
 
 
-
 - name: "get state (table nat)"
   iptables_state:
     table: nat
@@ -48,7 +47,6 @@
     quiet: true
 
 
-
 - name: "save state (table filter)"
   iptables_state:
     path: "{{ iptables_saved }}"
@@ -66,7 +64,6 @@
       - iptables_state.tables.filter is defined
       - iptables_state.tables.nat is undefined
     quiet: true
-
 
 
 - name: "save state (table nat)"
@@ -89,7 +86,6 @@
     quiet: true
 
 
-
 - name: "save state (any table)"
   iptables_state:
     path: "{{ iptables_saved }}"
@@ -107,7 +103,6 @@
       - iptables_state.tables.filter is defined
       - iptables_state.tables.nat is defined
     quiet: true
-
 
 
 - name: "restore state (table nat, must NOT report a change, no warning)"
@@ -132,14 +127,12 @@
     quiet: true
 
 
-
 - name: "change NAT table (iptables)"
   iptables:
     table: nat
     chain: INPUT
     jump: ACCEPT
     state: present
-
 
 
 - name: "restore state (table nat, must report a change, no warning)"
@@ -166,7 +159,6 @@
     quiet: true
 
 
-
 - name: "get raw and mangle tables states"
   iptables_state:
     path: "{{ iptables_saved }}"
@@ -177,7 +169,6 @@
     - mangle
   changed_when: false
   check_mode: true
-
 
 
 - name: "save state (any table)"
@@ -200,7 +191,6 @@
     quiet: true
 
 
-
 - name: "save filter table into a test file"
   iptables_state:
     path: "{{ iptables_tests }}"
@@ -211,7 +201,6 @@
   lineinfile:
     path: "{{ iptables_tests }}"
     line: "# *mangle"
-
 
 
 - name: "restore state (table filter, must NOT report a change, no warning)"
@@ -242,7 +231,6 @@
     quiet: true
 
 
-
 - name: "restore state (any table, must NOT report a change, no warning)"
   iptables_state:
     path: "{{ iptables_tests }}"
@@ -268,7 +256,6 @@
       - "'*raw' in iptables_state.restored"
       - iptables_state is not changed
     quiet: true
-
 
 
 - name: "restore state (table mangle, must fail, no warning)"

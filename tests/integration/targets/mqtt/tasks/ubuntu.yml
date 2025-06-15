@@ -66,9 +66,9 @@
 #    port: 8885
 #  register: result
 
-#- assert:
-#    that:
-#      - result is success
+# - assert:
+#     that:
+#       - result is success
 
 - name: Send a message, client TLS1.1, server (required) TLS1.2 - Expected failure
   mqtt:

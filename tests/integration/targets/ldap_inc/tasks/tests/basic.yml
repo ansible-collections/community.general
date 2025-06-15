@@ -21,10 +21,10 @@
 - name: assert that test increment by default
   assert:
     that:
-       - output is not failed
-       - output.incremented
-       - output.value == "1001"
-       - output.rfc4525
+      - output is not failed
+      - output.incremented
+      - output.value == "1001"
+      - output.rfc4525
 
 - name: Test defined increment
   ldap_inc:
@@ -39,10 +39,10 @@
 - name: assert that test increment by default
   assert:
     that:
-       - output is not failed
-       - output.incremented
-       - output.value == "1003"
-       - output.rfc4525
+      - output is not failed
+      - output.incremented
+      - output.value == "1003"
+      - output.rfc4525
 
 - name: Test defined increment by 0
   ldap_inc:
@@ -57,9 +57,9 @@
 - name: assert that test defined increment by 0
   assert:
     that:
-       - output is not failed
-       - output.incremented == false
-       - output.value == "1003"
+      - output is not failed
+      - output.incremented == false
+      - output.value == "1003"
 
 - name: Test defined negative increment
   ldap_inc:
@@ -74,10 +74,10 @@
 - name: assert that test defined negative increment
   assert:
     that:
-       - output is not failed
-       - output.incremented
-       - output.value == "1002"
-       - output.rfc4525
+      - output is not failed
+      - output.incremented
+      - output.value == "1002"
+      - output.rfc4525
 
 - name: Test forcing classic method instead of automatic detection
   ldap_inc:
@@ -93,7 +93,7 @@
 - name: assert that test defined negative increment
   assert:
     that:
-       - output is not failed
-       - output.incremented
-       - output.value == "1001"
-       - output.rfc4525 == False
+      - output is not failed
+      - output.incremented
+      - output.value == "1001"
+      - output.rfc4525 == False

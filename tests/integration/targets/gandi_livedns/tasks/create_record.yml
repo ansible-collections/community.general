@@ -15,7 +15,7 @@
 - name: verify test absent dns record
   assert:
     that:
-    - result is successful
+      - result is successful
 
 - name: test create a dns record in check mode
   community.general.gandi_livedns:
@@ -30,7 +30,7 @@
 - name: verify test create a dns record in check mode
   assert:
     that:
-    - result is changed
+      - result is changed
 
 - name: test create a dns record
   community.general.gandi_livedns:
@@ -44,11 +44,11 @@
 - name: verify test create a dns record
   assert:
     that:
-    - result is changed
-    - result.record['values'] == item['values']
-    - result.record.record == item.record
-    - result.record.type == item.type
-    - result.record.ttl == item.ttl
+      - result is changed
+      - result.record['values'] == item['values']
+      - result.record.record == item.record
+      - result.record.type == item.type
+      - result.record.ttl == item.ttl
 
 - name: test create a dns record idempotence
   community.general.gandi_livedns:
@@ -62,11 +62,11 @@
 - name: verify test create a dns record idempotence
   assert:
     that:
-    - result is not changed
-    - result.record['values'] == item['values']
-    - result.record.record == item.record
-    - result.record.type == item.type
-    - result.record.ttl == item.ttl
+      - result is not changed
+      - result.record['values'] == item['values']
+      - result.record.record == item.record
+      - result.record.type == item.type
+      - result.record.ttl == item.ttl
 
 - name: test create a DNS record with personal access token
   community.general.gandi_livedns:

@@ -177,7 +177,6 @@
       - filesize_stat_basic_14.stat.checksum == filesize_test_checksum
 
 
-
 - name: Expand the file with 1 byte (57001B) (check mode)
   community.general.filesize:
     path: "{{ filesize_testfile }}"
@@ -253,7 +252,6 @@
       - filesize_stat_basic_24.stat.checksum != filesize_test_checksum
 
 
-
 - name: Expand the file up to 2 MiB (2*1024*1024 bytes) (check mode)
   community.general.filesize:
     path: "{{ filesize_testfile }}"
@@ -325,7 +323,6 @@
       - filesize_stat_basic_31.stat.size == 57001
       - filesize_stat_basic_32.stat.size == 2*1024**2
       - filesize_stat_basic_34.stat.size == 2*1024**2
-
 
 
 - name: Truncate the file to 57kB (57000B) (check mode)
@@ -402,7 +399,6 @@
       - filesize_stat_basic_41.stat.checksum != filesize_test_checksum
       - filesize_stat_basic_42.stat.checksum == filesize_test_checksum
       - filesize_stat_basic_44.stat.checksum == filesize_test_checksum
-
 
 
 - name: Remove test file

@@ -4,6 +4,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 collections:
-- ansible.posix
-- community.crypto
-- community.docker
+  - ansible.posix
+  - community.crypto
+  - community.docker

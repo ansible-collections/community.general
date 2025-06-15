@@ -6,7 +6,7 @@
   uri:
     url: "{{ url }}/admin/"
     status_code: 200
-    validate_certs: no
+    validate_certs: false
   register: result
   until: result.status == 200
   retries: 10
@@ -39,9 +39,9 @@
     auth_password: "{{ admin_password }}"
     name: "{{ item }}"
     realm: "{{ realm }}"
-  with_items: 
-  - "{{ realm_role_admin }}"
-  - "{{ realm_role_user }}"
+  with_items:
+    - "{{ realm_role_admin }}"
+    - "{{ realm_role_user }}"
 
 - name: Client private
   community.general.keycloak_client:
@@ -53,10 +53,10 @@
     client_id: "{{ client_name_private }}"
     state: present
     redirect_uris:
-    - "https://my-backend-api.c.org/"
-    fullScopeAllowed: True
+      - "https://my-backend-api.c.org/"
+    fullScopeAllowed: true
     attributes: '{{client_attributes1}}'
-    public_client: False
+    public_client: false
 
 - name: Create a Keycloak client role
   community.general.keycloak_role:
@@ -67,9 +67,9 @@
     name: "{{ item }}"
     realm: "{{ realm }}"
     client_id: "{{ client_name_private }}"
-  with_items: 
-  - "{{ client_role_admin }}"
-  - "{{ client_role_user }}"
+  with_items:
+    - "{{ client_role_admin }}"
+    - "{{ client_role_user }}"
 
 - name: Client public
   community.general.keycloak_client:
@@ -80,10 +80,10 @@
     realm: "{{ realm }}"
     client_id: "{{ client_name_public }}"
     redirect_uris:
-    - "https://my-onepage-app-frontend.c.org/"
+      - "https://my-onepage-app-frontend.c.org/"
     attributes: '{{client_attributes1}}'
-    full_scope_allowed: False
-    public_client: True
+    full_scope_allowed: false
+    public_client: true
 
 
 - name: Map roles to public client
@@ -96,15 +96,15 @@
     client_id: "{{ client_name_public }}"
     client_scope_id: "{{ client_name_private }}"
     role_names:
-    - "{{ client_role_admin }}"
-    - "{{ client_role_user }}"
+      - "{{ client_role_admin }}"
+      - "{{ client_role_user }}"
   register: result
 
 - name: Assert mapping created
   assert:
     that:
-    - result is changed
-    - result.end_state | length == 2
+      - result is changed
+      - result.end_state | length == 2
 
 - name: remap role user to public client
   community.general.keycloak_client_rolescope:
@@ -116,15 +116,15 @@
     client_id: "{{ client_name_public }}"
     client_scope_id: "{{ client_name_private }}"
     role_names:
-    - "{{ client_role_user }}"
+      - "{{ client_role_user }}"
   register: result
 
 - name: Assert mapping created
   assert:
     that:
-    - result is not changed
-    - result.end_state | length == 2
-  
+      - result is not changed
+      - result.end_state | length == 2
+
 - name: Remove Map role admin to public client
   community.general.keycloak_client_rolescope:
     auth_keycloak_url: "{{ url }}"
@@ -135,16 +135,16 @@
     client_id: "{{ client_name_public }}"
     client_scope_id: "{{ client_name_private }}"
     role_names:
-    - "{{ client_role_admin }}"
+      - "{{ client_role_admin }}"
     state: absent
   register: result
 
 - name: Assert mapping deleted
   assert:
     that:
-    - result is changed
-    - result.end_state | length == 1
-    - result.end_state[0].name == client_role_user
+      - result is changed
+      - result.end_state | length == 1
+      - result.end_state[0].name == client_role_user
 
 - name: Map missing roles to public client
   community.general.keycloak_client_rolescope:
@@ -156,15 +156,15 @@
     client_id: "{{ client_name_public }}"
     client_scope_id: "{{ client_name_private }}"
     role_names:
-    - "{{ client_role_admin }}"
-    - "{{ client_role_not_exists }}"
+      - "{{ client_role_admin }}"
+      - "{{ client_role_not_exists }}"
   ignore_errors: true
   register: result
 
 - name: Assert failed mapping missing role
   assert:
     that:
-    - result is failed
+      - result is failed
 
 - name: Map roles duplicate
   community.general.keycloak_client_rolescope:
@@ -176,15 +176,15 @@
     client_id: "{{ client_name_public }}"
     client_scope_id: "{{ client_name_private }}"
     role_names:
-    - "{{ client_role_admin }}"
-    - "{{ client_role_admin }}"
+      - "{{ client_role_admin }}"
+      - "{{ client_role_admin }}"
   register: result
 
 - name: Assert result
   assert:
     that:
-    - result is changed
-    - result.end_state | length == 2
+      - result is changed
+      - result.end_state | length == 2
 
 - name: Map roles to private client
   community.general.keycloak_client_rolescope:
@@ -195,14 +195,14 @@
     realm: "{{ realm }}"
     client_id: "{{ client_name_private }}"
     role_names:
-    - "{{ realm_role_admin }}"
+      - "{{ realm_role_admin }}"
   ignore_errors: true
   register: result
 
 - name: Assert failed mapping role to full scope client
   assert:
     that:
-    - result is failed
+      - result is failed
 
 - name: Map realm role to public client
   community.general.keycloak_client_rolescope:
@@ -213,14 +213,14 @@
     realm: "{{ realm }}"
     client_id: "{{ client_name_public }}"
     role_names:
-    - "{{ realm_role_admin }}"
+      - "{{ realm_role_admin }}"
   register: result
 
 - name: Assert result
   assert:
     that:
-    - result is changed
-    - result.end_state | length == 1
+      - result is changed
+      - result.end_state | length == 1
 
 - name: Map two realm roles to public client
   community.general.keycloak_client_rolescope:
@@ -231,15 +231,15 @@
     realm: "{{ realm }}"
     client_id: "{{ client_name_public }}"
     role_names:
-    - "{{ realm_role_admin }}"
-    - "{{ realm_role_user }}"
+      - "{{ realm_role_admin }}"
+      - "{{ realm_role_user }}"
   register: result
 
 - name: Assert result
   assert:
     that:
-    - result is changed
-    - result.end_state | length == 2
+      - result is changed
+      - result.end_state | length == 2
 
 - name: Unmap all realm roles to public client
   community.general.keycloak_client_rolescope:
@@ -250,16 +250,16 @@
     realm: "{{ realm }}"
     client_id: "{{ client_name_public }}"
     role_names:
-    - "{{ realm_role_admin }}"
-    - "{{ realm_role_user }}"
+      - "{{ realm_role_admin }}"
+      - "{{ realm_role_user }}"
     state: absent
   register: result
 
 - name: Assert result
   assert:
     that:
-    - result is changed
-    - result.end_state | length == 0
+      - result is changed
+      - result.end_state | length == 0
 
 - name: Map missing realm role to public client
   community.general.keycloak_client_rolescope:
@@ -270,14 +270,14 @@
     realm: "{{ realm }}"
     client_id: "{{ client_name_public }}"
     role_names:
-    - "{{ realm_role_not_exists }}"
+      - "{{ realm_role_not_exists }}"
   ignore_errors: true
   register: result
 
 - name: Assert failed mapping missing realm role
   assert:
     that:
-    - result is failed
+      - result is failed
 
 - name: Check-mode try to Map realm roles to public client
   community.general.keycloak_client_rolescope:
@@ -288,17 +288,17 @@
     realm: "{{ realm }}"
     client_id: "{{ client_name_public }}"
     role_names:
-    - "{{ realm_role_admin }}"
-    - "{{ realm_role_user }}"
+      - "{{ realm_role_admin }}"
+      - "{{ realm_role_user }}"
   check_mode: true
   register: result
 
 - name: Assert result
   assert:
     that:
-    - result is changed
-    - result.end_state | length == 2
-    
+      - result is changed
+      - result.end_state | length == 2
+
 - name: Check-mode step two, check if change where applied
   community.general.keycloak_client_rolescope:
     auth_keycloak_url: "{{ url }}"
@@ -313,5 +313,5 @@
 - name: Assert result
   assert:
     that:
-    - result is not changed
-    - result.end_state | length == 0
+      - result is not changed
+      - result.end_state | length == 0

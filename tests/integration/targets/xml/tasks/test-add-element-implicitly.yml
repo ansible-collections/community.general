@@ -44,8 +44,8 @@
 
 - name: Add an attribute with a value
   xml:
-     file: /tmp/ansible-xml-beers-implicit.xml
-     xpath: /business/owner/@dob='1976-04-12'
+    file: /tmp/ansible-xml-beers-implicit.xml
+    xpath: /business/owner/@dob='1976-04-12'
 
 - name: Add an element with a value, alternate syntax
   xml:
@@ -112,8 +112,8 @@
 - name: Test expected result
   assert:
     that:
-    - comparison is not changed  # identical
-  #command: diff -u {{ role_path }}/results/test-add-element-implicitly.xml /tmp/ansible-xml-beers-implicit.xml
+      - comparison is not changed  # identical
+  # command: diff -u {{ role_path }}/results/test-add-element-implicitly.xml /tmp/ansible-xml-beers-implicit.xml
 
 
 # Now we repeat the same, just to ensure proper use of namespaces
@@ -205,7 +205,7 @@
     value: xml tag with no special characters
     pretty_print: true
     namespaces:
-      a:  http://example.com/some/namespace
+      a: http://example.com/some/namespace
 
 
 - name: Add an element with dash
@@ -215,7 +215,7 @@
     value: xml tag with dashes
     pretty_print: true
     namespaces:
-      a:  http://example.com/some/namespace
+      a: http://example.com/some/namespace
 
 - name: Add an element with dot
   xml:
@@ -224,7 +224,7 @@
     value: xml tag with dashes and dots
     pretty_print: true
     namespaces:
-      a:  http://example.com/some/namespace
+      a: http://example.com/some/namespace
 
 - name: Add an element with underscore
   xml:
@@ -233,7 +233,7 @@
     value: xml tag with dashes, dots and underscores
     pretty_print: true
     namespaces:
-      a:  http://example.com/some/namespace
+      a: http://example.com/some/namespace
 
 - name: Pretty Print this!
   xml:

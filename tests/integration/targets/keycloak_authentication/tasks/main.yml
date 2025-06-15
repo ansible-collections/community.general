@@ -29,7 +29,7 @@
   uri:
     url: "{{ url }}/admin/"
     status_code: 200
-    validate_certs: no
+    validate_certs: false
   register: result
   until: result.status == 200
   retries: 10
@@ -66,9 +66,9 @@
     authenticationExecutions:
       - providerId: "idp-review-profile"
         requirement: "REQUIRED"
-        authenticationConfig: 
+        authenticationConfig:
           alias: "Test review profile config"
-          config: 
+          config:
             update.profile.on.first.login: "missing"
 
 - name: Create auth flow
@@ -82,30 +82,30 @@
     description: "browser based authentication with otp"
     providerId: "basic-flow"
     authenticationExecutions:
-    - displayName: Cookie
-      providerId: auth-cookie
-      requirement: ALTERNATIVE
-    - displayName: Kerberos
-      providerId: auth-spnego
-      requirement: DISABLED
-    - displayName: Identity Provider Redirector
-      providerId: identity-provider-redirector
-      requirement: ALTERNATIVE
-    - displayName: My browser otp forms
-      requirement: ALTERNATIVE
-    - displayName: Username Password Form
-      flowAlias: My browser otp forms
-      providerId: auth-username-password-form
-      requirement: REQUIRED
-    - displayName: My browser otp Browser - Conditional OTP
-      flowAlias: My browser otp forms
-      requirement: REQUIRED
-      providerId: "auth-conditional-otp-form"
-      authenticationConfig:
-        alias: my-conditional-otp-config
-        config: 
-          defaultOtpOutcome: "force"
-          noOtpRequiredForHeaderPattern: "{{ keycloak_no_otp_required_pattern_orinale }}"
+      - displayName: Cookie
+        providerId: auth-cookie
+        requirement: ALTERNATIVE
+      - displayName: Kerberos
+        providerId: auth-spnego
+        requirement: DISABLED
+      - displayName: Identity Provider Redirector
+        providerId: identity-provider-redirector
+        requirement: ALTERNATIVE
+      - displayName: My browser otp forms
+        requirement: ALTERNATIVE
+      - displayName: Username Password Form
+        flowAlias: My browser otp forms
+        providerId: auth-username-password-form
+        requirement: REQUIRED
+      - displayName: My browser otp Browser - Conditional OTP
+        flowAlias: My browser otp forms
+        requirement: REQUIRED
+        providerId: "auth-conditional-otp-form"
+        authenticationConfig:
+          alias: my-conditional-otp-config
+          config:
+            defaultOtpOutcome: "force"
+            noOtpRequiredForHeaderPattern: "{{ keycloak_no_otp_required_pattern_orinale }}"
     state: present
 
 - name: Modified auth flow with new config
@@ -119,30 +119,30 @@
     description: "browser based authentication with otp"
     providerId: "basic-flow"
     authenticationExecutions:
-    - displayName: Cookie
-      providerId: auth-cookie
-      requirement: ALTERNATIVE
-    - displayName: Kerberos
-      providerId: auth-spnego
-      requirement: DISABLED
-    - displayName: Identity Provider Redirector
-      providerId: identity-provider-redirector
-      requirement: ALTERNATIVE
-    - displayName: My browser otp forms
-      requirement: ALTERNATIVE
-    - displayName: Username Password Form
-      flowAlias: My browser otp forms
-      providerId: auth-username-password-form
-      requirement: REQUIRED
-    - displayName: My browser otp Browser - Conditional OTP
-      flowAlias: My browser otp forms
-      requirement: REQUIRED
-      providerId: "auth-conditional-otp-form"
-      authenticationConfig:
-        alias: my-conditional-otp-config
-        config: 
-          defaultOtpOutcome: "force"
-          noOtpRequiredForHeaderPattern: "{{ keycloak_no_otp_required_pattern_modifed }}"
+      - displayName: Cookie
+        providerId: auth-cookie
+        requirement: ALTERNATIVE
+      - displayName: Kerberos
+        providerId: auth-spnego
+        requirement: DISABLED
+      - displayName: Identity Provider Redirector
+        providerId: identity-provider-redirector
+        requirement: ALTERNATIVE
+      - displayName: My browser otp forms
+        requirement: ALTERNATIVE
+      - displayName: Username Password Form
+        flowAlias: My browser otp forms
+        providerId: auth-username-password-form
+        requirement: REQUIRED
+      - displayName: My browser otp Browser - Conditional OTP
+        flowAlias: My browser otp forms
+        requirement: REQUIRED
+        providerId: "auth-conditional-otp-form"
+        authenticationConfig:
+          alias: my-conditional-otp-config
+          config:
+            defaultOtpOutcome: "force"
+            noOtpRequiredForHeaderPattern: "{{ keycloak_no_otp_required_pattern_modifed }}"
     state: present
   register: result
 
@@ -166,7 +166,7 @@
 - name: Assert `my-conditional-otp-config` exists only once
   ansible.builtin.assert:
     that:
-    - exported_realm.json | community.general.json_query('authenticatorConfig[?alias==`my-conditional-otp-config`]') | length == 1
+      - exported_realm.json | community.general.json_query('authenticatorConfig[?alias==`my-conditional-otp-config`]') | length == 1
 
 - name: Delete auth flow
   community.general.keycloak_authentication:
