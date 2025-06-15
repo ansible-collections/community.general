@@ -5,108 +5,108 @@
 
 from __future__ import annotations
 
-DOCUMENTATION = r'''
-    name: lxd
-    short_description: Returns Ansible inventory from lxd host
+DOCUMENTATION = r"""
+name: lxd
+short_description: Returns Ansible inventory from lxd host
+description:
+  - Get inventory from the lxd.
+  - Uses a YAML configuration file that ends with 'lxd.(yml|yaml)'.
+version_added: "3.0.0"
+author: "Frank Dornheim (@conloos)"
+requirements:
+  - ipaddress
+  - lxd >= 4.0
+options:
+  plugin:
+    description: Token that ensures this is a source file for the 'lxd' plugin.
+    type: string
+    required: true
+    choices: ['community.general.lxd']
+  url:
     description:
-        - Get inventory from the lxd.
-        - Uses a YAML configuration file that ends with 'lxd.(yml|yaml)'.
-    version_added: "3.0.0"
-    author: "Frank Dornheim (@conloos)"
-    requirements:
-        - ipaddress
-        - lxd >= 4.0
-    options:
-        plugin:
-            description: Token that ensures this is a source file for the 'lxd' plugin.
-            type: string
-            required: true
-            choices: [ 'community.general.lxd' ]
-        url:
-            description:
-            - The unix domain socket path or the https URL for the lxd server.
-            - Sockets in filesystem have to start with C(unix:).
-            - Mostly C(unix:/var/lib/lxd/unix.socket) or C(unix:/var/snap/lxd/common/lxd/unix.socket).
-            type: string
-            default: unix:/var/snap/lxd/common/lxd/unix.socket
-        client_key:
-            description:
-            - The client certificate key file path.
-            aliases: [ key_file ]
-            default: $HOME/.config/lxc/client.key
-            type: path
-        client_cert:
-            description:
-            - The client certificate file path.
-            aliases: [ cert_file ]
-            default: $HOME/.config/lxc/client.crt
-            type: path
-        server_cert:
-            description:
-            - The server certificate file path.
-            type: path
-            version_added: 8.0.0
-        server_check_hostname:
-            description:
-            - This option controls if the server's hostname is checked as part of the HTTPS connection verification.
-              This can be useful to disable, if for example, the server certificate provided (see O(server_cert) option)
-              does not cover a name matching the one used to communicate with the server. Such mismatch is common as LXD
-              generates self-signed server certificates by default.
-            type: bool
-            default: true
-            version_added: 8.0.0
-        trust_password:
-            description:
-            - The client trusted password.
-            - You need to set this password on the lxd server before
-                running this module using the following command
-                C(lxc config set core.trust_password <some random password>)
-                See U(https://documentation.ubuntu.com/lxd/en/latest/authentication/#adding-client-certificates-using-a-trust-password).
-            - If O(trust_password) is set, this module send a request for authentication before sending any requests.
-            type: str
-        state:
-            description: Filter the instance according to the current status.
-            type: str
-            default: none
-            choices: [ 'STOPPED', 'STARTING', 'RUNNING', 'none' ]
-        project:
-            description: Filter the instance according to the given project.
-            type: str
-            default: default
-            version_added: 6.2.0
-        type_filter:
-            description:
-            - Filter the instances by type V(virtual-machine), V(container) or V(both).
-            - The first version of the inventory only supported containers.
-            type: str
-            default: container
-            choices: [ 'virtual-machine', 'container', 'both' ]
-            version_added: 4.2.0
-        prefered_instance_network_interface:
-            description:
-            - If an instance has multiple network interfaces, select which one is the preferred as pattern.
-            - Combined with the first number that can be found e.g. 'eth' + 0.
-            - The option has been renamed from O(prefered_container_network_interface) to O(prefered_instance_network_interface)
-              in community.general 3.8.0. The old name still works as an alias.
-            type: str
-            default: eth
-            aliases:
-              - prefered_container_network_interface
-        prefered_instance_network_family:
-            description:
-            - If an instance has multiple network interfaces, which one is the preferred by family.
-            - Specify V(inet) for IPv4 and V(inet6) for IPv6.
-            type: str
-            default: inet
-            choices: [ 'inet', 'inet6' ]
-        groupby:
-            description:
-            - Create groups by the following keywords C(location), C(network_range), C(os), C(pattern), C(profile), C(release), C(type), C(vlanid).
-            - See example for syntax.
-            type: dict
-'''
+      - The unix domain socket path or the https URL for the lxd server.
+      - Sockets in filesystem have to start with C(unix:).
+      - Mostly C(unix:/var/lib/lxd/unix.socket) or C(unix:/var/snap/lxd/common/lxd/unix.socket).
+    type: string
+    default: unix:/var/snap/lxd/common/lxd/unix.socket
+  client_key:
+    description:
+      - The client certificate key file path.
+    aliases: [key_file]
+    default: $HOME/.config/lxc/client.key
+    type: path
+  client_cert:
+    description:
+      - The client certificate file path.
+    aliases: [cert_file]
+    default: $HOME/.config/lxc/client.crt
+    type: path
+  server_cert:
+    description:
+      - The server certificate file path.
+    type: path
+    version_added: 8.0.0
+  server_check_hostname:
+    description:
+      - This option controls if the server's hostname is checked as part of the HTTPS connection verification.
+        This can be useful to disable, if for example, the server certificate provided (see O(server_cert) option)
+        does not cover a name matching the one used to communicate with the server. Such mismatch is common as LXD
+        generates self-signed server certificates by default.
+    type: bool
+    default: true
+    version_added: 8.0.0
+  trust_password:
+    description:
+      - The client trusted password.
+      - You need to set this password on the lxd server before
+          running this module using the following command
+          C(lxc config set core.trust_password <some random password>)
+          See U(https://documentation.ubuntu.com/lxd/en/latest/authentication/#adding-client-certificates-using-a-trust-password).
+      - If O(trust_password) is set, this module send a request for authentication before sending any requests.
+    type: str
+  state:
+    description: Filter the instance according to the current status.
+    type: str
+    default: none
+    choices: ['STOPPED', 'STARTING', 'RUNNING', 'none']
+  project:
+    description: Filter the instance according to the given project.
+    type: str
+    default: default
+    version_added: 6.2.0
+  type_filter:
+    description:
+      - Filter the instances by type V(virtual-machine), V(container) or V(both).
+      - The first version of the inventory only supported containers.
+    type: str
+    default: container
+    choices: ['virtual-machine', 'container', 'both']
+    version_added: 4.2.0
+  prefered_instance_network_interface:
+    description:
+      - If an instance has multiple network interfaces, select which one is the preferred as pattern.
+      - Combined with the first number that can be found e.g. 'eth' + 0.
+      - The option has been renamed from O(prefered_container_network_interface) to O(prefered_instance_network_interface)
+        in community.general 3.8.0. The old name still works as an alias.
+    type: str
+    default: eth
+    aliases:
+      - prefered_container_network_interface
+  prefered_instance_network_family:
+    description:
+      - If an instance has multiple network interfaces, which one is the preferred by family.
+      - Specify V(inet) for IPv4 and V(inet6) for IPv6.
+    type: str
+    default: inet
+    choices: ['inet', 'inet6']
+  groupby:
+    description:
+      - Create groups by the following keywords C(location), C(network_range), C(os), C(pattern), C(profile), C(release), C(type), C(vlanid).
+      - See example for syntax.
+    type: dict
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 ---
 # simple lxd.yml
 plugin: community.general.lxd
@@ -165,7 +165,7 @@ groupby:
   projectInternals:
     type: project
     attribute: internals
-'''
+"""
 
 import json
 import re

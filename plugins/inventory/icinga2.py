@@ -6,71 +6,71 @@
 from __future__ import annotations
 
 
-DOCUMENTATION = '''
-    name: icinga2
-    short_description: Icinga2 inventory source
-    version_added: 3.7.0
-    author:
-        - Cliff Hults (@BongoEADGC6) <cliff.hults@gmail.com>
+DOCUMENTATION = r"""
+name: icinga2
+short_description: Icinga2 inventory source
+version_added: 3.7.0
+author:
+  - Cliff Hults (@BongoEADGC6) <cliff.hults@gmail.com>
+description:
+  - Get inventory hosts from the Icinga2 API.
+  - "Uses a configuration file as an inventory source, it must end in
+    C(.icinga2.yml) or C(.icinga2.yaml)."
+extends_documentation_fragment:
+  - constructed
+options:
+  strict:
+    version_added: 4.4.0
+  compose:
+    version_added: 4.4.0
+  groups:
+    version_added: 4.4.0
+  keyed_groups:
+    version_added: 4.4.0
+  plugin:
+    description: Name of the plugin.
+    required: true
+    type: string
+    choices: ['community.general.icinga2']
+  url:
+    description: Root URL of Icinga2 API.
+    type: string
+    required: true
+  user:
+    description: Username to query the API.
+    type: string
+    required: true
+  password:
+    description: Password to query the API.
+    type: string
+    required: true
+  host_filter:
     description:
-        - Get inventory hosts from the Icinga2 API.
-        - "Uses a configuration file as an inventory source, it must end in
-          C(.icinga2.yml) or C(.icinga2.yaml)."
-    extends_documentation_fragment:
-        - constructed
-    options:
-      strict:
-        version_added: 4.4.0
-      compose:
-        version_added: 4.4.0
-      groups:
-        version_added: 4.4.0
-      keyed_groups:
-        version_added: 4.4.0
-      plugin:
-        description: Name of the plugin.
-        required: true
-        type: string
-        choices: ['community.general.icinga2']
-      url:
-        description: Root URL of Icinga2 API.
-        type: string
-        required: true
-      user:
-        description: Username to query the API.
-        type: string
-        required: true
-      password:
-        description: Password to query the API.
-        type: string
-        required: true
-      host_filter:
-        description:
-          - An Icinga2 API valid host filter. Leave blank for no filtering
-        type: string
-        required: false
-      validate_certs:
-        description: Enables or disables SSL certificate verification.
-        type: boolean
-        default: true
-      inventory_attr:
-        description:
-          - Allows the override of the inventory name based on different attributes.
-          - This allows for changing the way limits are used.
-          - The current default, V(address), is sometimes not unique or present. We recommend to use V(name) instead.
-        type: string
-        default: address
-        choices: ['name', 'display_name', 'address']
-        version_added: 4.2.0
-      group_by_hostgroups:
-        description:
-          - Uses Icinga2 hostgroups as groups.
-        type: boolean
-        default: true
-        version_added: 8.4.0
-'''
+      - An Icinga2 API valid host filter. Leave blank for no filtering
+    type: string
+    required: false
+  validate_certs:
+    description: Enables or disables SSL certificate verification.
+    type: boolean
+    default: true
+  inventory_attr:
+    description:
+      - Allows the override of the inventory name based on different attributes.
+      - This allows for changing the way limits are used.
+      - The current default, V(address), is sometimes not unique or present. We recommend to use V(name) instead.
+    type: string
+    default: address
+    choices: ['name', 'display_name', 'address']
+    version_added: 4.2.0
+  group_by_hostgroups:
+    description:
+      - Uses Icinga2 hostgroups as groups.
+    type: boolean
+    default: true
+    version_added: 8.4.0
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 # my.icinga2.yml
 plugin: community.general.icinga2
 url: http://localhost:5665
@@ -93,7 +93,7 @@ compose:
   # set 'ansible_user' and 'ansible_port' from icinga2 host vars
   ansible_user: icinga2_attributes.vars.ansible_user
   ansible_port: icinga2_attributes.vars.ansible_port | default(22)
-'''
+"""
 
 import json
 

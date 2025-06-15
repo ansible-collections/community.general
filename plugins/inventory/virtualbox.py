@@ -5,56 +5,56 @@
 
 from __future__ import annotations
 
-DOCUMENTATION = '''
-    author: Unknown (!UNKNOWN)
-    name: virtualbox
-    short_description: virtualbox inventory source
+DOCUMENTATION = r"""
+author: Unknown (!UNKNOWN)
+name: virtualbox
+short_description: virtualbox inventory source
+description:
+  - Get inventory hosts from the local virtualbox installation.
+  - Uses a YAML configuration file that ends with virtualbox.(yml|yaml) or vbox.(yml|yaml).
+  - The inventory_hostname is always the 'Name' of the virtualbox instance.
+  - Groups can be assigned to the VMs using C(VBoxManage). Multiple groups can be assigned by using V(/) as a delimeter.
+  - A separate parameter, O(enable_advanced_group_parsing) is exposed to change grouping behaviour. See the parameter documentation for details.
+extends_documentation_fragment:
+  - constructed
+  - inventory_cache
+options:
+  plugin:
+    description: token that ensures this is a source file for the 'virtualbox' plugin
+    type: string
+    required: true
+    choices: ['virtualbox', 'community.general.virtualbox']
+  running_only:
+    description: toggles showing all vms vs only those currently running
+    type: boolean
+    default: false
+  settings_password_file:
+    description: provide a file containing the settings password (equivalent to --settingspwfile)
+    type: string
+  network_info_path:
+    description: property path to query for network information (ansible_host)
+    type: string
+    default: "/VirtualBox/GuestInfo/Net/0/V4/IP"
+  query:
+    description: create vars from virtualbox properties
+    type: dictionary
+    default: {}
+  enable_advanced_group_parsing:
     description:
-        - Get inventory hosts from the local virtualbox installation.
-        - Uses a YAML configuration file that ends with virtualbox.(yml|yaml) or vbox.(yml|yaml).
-        - The inventory_hostname is always the 'Name' of the virtualbox instance.
-        - Groups can be assigned to the VMs using C(VBoxManage). Multiple groups can be assigned by using V(/) as a delimeter.
-        - A separate parameter, O(enable_advanced_group_parsing) is exposed to change grouping behaviour. See the parameter documentation for details.
-    extends_documentation_fragment:
-      - constructed
-      - inventory_cache
-    options:
-        plugin:
-            description: token that ensures this is a source file for the 'virtualbox' plugin
-            type: string
-            required: true
-            choices: ['virtualbox', 'community.general.virtualbox']
-        running_only:
-            description: toggles showing all vms vs only those currently running
-            type: boolean
-            default: false
-        settings_password_file:
-            description: provide a file containing the settings password (equivalent to --settingspwfile)
-            type: string
-        network_info_path:
-            description: property path to query for network information (ansible_host)
-            type: string
-            default: "/VirtualBox/GuestInfo/Net/0/V4/IP"
-        query:
-            description: create vars from virtualbox properties
-            type: dictionary
-            default: {}
-        enable_advanced_group_parsing:
-            description:
-              - The default group parsing rule (when this setting is set to V(false)) is to split the VirtualBox VM's group based on the V(/) character and
-                assign the resulting list elements as an Ansible Group.
-              - Setting O(enable_advanced_group_parsing=true) changes this behaviour to match VirtualBox's interpretation of groups according to
-                U(https://www.virtualbox.org/manual/UserManual.html#gui-vmgroups).
-                Groups are now split using the V(,) character, and the V(/) character indicates nested groups.
-              - When enabled, a VM that's been configured using V(VBoxManage modifyvm "vm01" --groups "/TestGroup/TestGroup2,/TestGroup3") will result in
-                the group C(TestGroup2) being a child group of C(TestGroup); and
-                the VM being a part of C(TestGroup2) and C(TestGroup3).
-            default: false
-            type: bool
-            version_added: 9.2.0
-'''
+      - The default group parsing rule (when this setting is set to V(false)) is to split the VirtualBox VM's group based on the V(/) character and
+        assign the resulting list elements as an Ansible Group.
+      - Setting O(enable_advanced_group_parsing=true) changes this behaviour to match VirtualBox's interpretation of groups according to
+        U(https://www.virtualbox.org/manual/UserManual.html#gui-vmgroups).
+        Groups are now split using the V(,) character, and the V(/) character indicates nested groups.
+      - When enabled, a VM that's been configured using V(VBoxManage modifyvm "vm01" --groups "/TestGroup/TestGroup2,/TestGroup3") will result in
+        the group C(TestGroup2) being a child group of C(TestGroup); and
+        the VM being a part of C(TestGroup2) and C(TestGroup3).
+    default: false
+    type: bool
+    version_added: 9.2.0
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 ---
 # file must be named vbox.yaml or vbox.yml
 plugin: community.general.virtualbox
@@ -69,7 +69,7 @@ compose:
 plugin: community.general.virtualbox
 groups:
   container: "'minis' in (inventory_hostname)"
-'''
+"""
 
 import os
 

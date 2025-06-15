@@ -99,7 +99,7 @@ options:
         section: paramiko_connection
     type: boolean
   look_for_keys:
-    default: True
+    default: true
     description: "Set to V(false) to disable searching for private key files in C(~/.ssh/)."
     env:
       - name: ANSIBLE_PARAMIKO_LOOK_FOR_KEYS
@@ -119,7 +119,7 @@ options:
     vars:
       - name: ansible_paramiko_proxy_command
   record_host_keys:
-    default: True
+    default: true
     description: "Save the host keys to a file."
     env:
       - name: ANSIBLE_PARAMIKO_RECORD_HOST_KEYS
@@ -147,7 +147,7 @@ options:
   use_persistent_connections:
     description: "Toggles the use of persistence for connections."
     type: boolean
-    default: False
+    default: false
     env:
       - name: ANSIBLE_USE_PERSISTENT_CONNECTIONS
     ini:

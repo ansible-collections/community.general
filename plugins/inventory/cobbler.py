@@ -5,127 +5,127 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
 
-DOCUMENTATION = '''
-    author: Orion Poplawski (@opoplawski)
-    name: cobbler
-    short_description: Cobbler inventory source
-    version_added: 1.0.0
+DOCUMENTATION = r"""
+author: Orion Poplawski (@opoplawski)
+name: cobbler
+short_description: Cobbler inventory source
+version_added: 1.0.0
+description:
+  - Get inventory hosts from the cobbler service.
+  - "Uses a configuration file as an inventory source, it must end in C(.cobbler.yml) or C(.cobbler.yaml) and have a C(plugin: cobbler) entry."
+  - Adds the primary IP addresses to C(cobbler_ipv4_address) and C(cobbler_ipv6_address) host variables if defined in Cobbler.  The primary IP address is
+    defined as the management interface if defined, or the interface who's DNS name matches the hostname of the system, or else the first interface found.
+extends_documentation_fragment:
+  - inventory_cache
+options:
+  plugin:
+    description: The name of this plugin, it should always be set to V(community.general.cobbler) for this plugin to recognize it as its own.
+    type: string
+    required: true
+    choices: ['cobbler', 'community.general.cobbler']
+  url:
+    description: URL to cobbler.
+    type: string
+    default: 'http://cobbler/cobbler_api'
+    env:
+      - name: COBBLER_SERVER
+  user:
+    description: Cobbler authentication user.
+    type: string
+    required: false
+    env:
+      - name: COBBLER_USER
+  password:
+    description: Cobbler authentication password.
+    type: string
+    required: false
+    env:
+      - name: COBBLER_PASSWORD
+  cache_fallback:
+    description: Fallback to cached results if connection to cobbler fails.
+    type: boolean
+    default: false
+  connection_timeout:
+    description: Timeout to connect to cobbler server.
+    type: int
+    required: false
+    version_added: 10.7.0
+  exclude_mgmt_classes:
+    description: Management classes to exclude from inventory.
+    type: list
+    default: []
+    elements: str
+    version_added: 7.4.0
+  exclude_profiles:
     description:
-        - Get inventory hosts from the cobbler service.
-        - "Uses a configuration file as an inventory source, it must end in C(.cobbler.yml) or C(.cobbler.yaml) and have a C(plugin: cobbler) entry."
-        - Adds the primary IP addresses to C(cobbler_ipv4_address) and C(cobbler_ipv6_address) host variables if defined in Cobbler.  The primary IP address is
-          defined as the management interface if defined, or the interface who's DNS name matches the hostname of the system, or else the first interface found.
-    extends_documentation_fragment:
-        - inventory_cache
-    options:
-      plugin:
-        description: The name of this plugin, it should always be set to V(community.general.cobbler) for this plugin to recognize it as its own.
-        type: string
-        required: true
-        choices: [ 'cobbler', 'community.general.cobbler' ]
-      url:
-        description: URL to cobbler.
-        type: string
-        default: 'http://cobbler/cobbler_api'
-        env:
-            - name: COBBLER_SERVER
-      user:
-        description: Cobbler authentication user.
-        type: string
-        required: false
-        env:
-            - name: COBBLER_USER
-      password:
-        description: Cobbler authentication password.
-        type: string
-        required: false
-        env:
-            - name: COBBLER_PASSWORD
-      cache_fallback:
-        description: Fallback to cached results if connection to cobbler fails.
-        type: boolean
-        default: false
-      connection_timeout:
-        description: Timeout to connect to cobbler server.
-        type: int
-        required: false
-        version_added: 10.7.0
-      exclude_mgmt_classes:
-        description: Management classes to exclude from inventory.
-        type: list
-        default: []
-        elements: str
-        version_added: 7.4.0
-      exclude_profiles:
-        description:
-          - Profiles to exclude from inventory.
-          - Ignored if O(include_profiles) is specified.
-        type: list
-        default: []
-        elements: str
-      include_mgmt_classes:
-        description: Management classes to include from inventory.
-        type: list
-        default: []
-        elements: str
-        version_added: 7.4.0
-      include_profiles:
-        description:
-          - Profiles to include from inventory.
-          - If specified, all other profiles will be excluded.
-          - O(exclude_profiles) is ignored if O(include_profiles) is specified.
-        type: list
-        default: []
-        elements: str
-        version_added: 4.4.0
-      inventory_hostname:
-        description:
-          - What to use for the ansible inventory hostname.
-          - By default the networking hostname is used if defined, otherwise the DNS name of the management or first non-static interface.
-          - If set to V(system), the cobbler system name is used.
-        type: str
-        choices: [ 'hostname', 'system' ]
-        default: hostname
-        version_added: 7.1.0
-      group_by:
-        description: Keys to group hosts by.
-        type: list
-        elements: string
-        default: [ 'mgmt_classes', 'owners', 'status' ]
-      group:
-        description: Group to place all hosts into.
-        default: cobbler
-      group_prefix:
-        description: Prefix to apply to cobbler groups.
-        default: cobbler_
-      want_facts:
-        description: Toggle, if V(true) the plugin will retrieve all host facts from the server.
-        type: boolean
-        default: true
-      want_ip_addresses:
-        description:
-          - Toggle, if V(true) the plugin will add a C(cobbler_ipv4_addresses) and C(cobbler_ipv6_addresses) dictionary to the defined O(group) mapping
-            interface DNS names to IP addresses.
-        type: boolean
-        default: true
-        version_added: 7.1.0
-      facts_level:
-        description:
-          - "Set to V(normal) to gather only system-level variables."
-          - "Set to V(as_rendered) to gather all variables as rolled up by Cobbler."
-        type: string
-        choices: [ 'normal', 'as_rendered' ]
-        default: normal
-        version_added: 10.7.0
-'''
+      - Profiles to exclude from inventory.
+      - Ignored if O(include_profiles) is specified.
+    type: list
+    default: []
+    elements: str
+  include_mgmt_classes:
+    description: Management classes to include from inventory.
+    type: list
+    default: []
+    elements: str
+    version_added: 7.4.0
+  include_profiles:
+    description:
+      - Profiles to include from inventory.
+      - If specified, all other profiles will be excluded.
+      - O(exclude_profiles) is ignored if O(include_profiles) is specified.
+    type: list
+    default: []
+    elements: str
+    version_added: 4.4.0
+  inventory_hostname:
+    description:
+      - What to use for the ansible inventory hostname.
+      - By default the networking hostname is used if defined, otherwise the DNS name of the management or first non-static interface.
+      - If set to V(system), the cobbler system name is used.
+    type: str
+    choices: ['hostname', 'system']
+    default: hostname
+    version_added: 7.1.0
+  group_by:
+    description: Keys to group hosts by.
+    type: list
+    elements: string
+    default: ['mgmt_classes', 'owners', 'status']
+  group:
+    description: Group to place all hosts into.
+    default: cobbler
+  group_prefix:
+    description: Prefix to apply to cobbler groups.
+    default: cobbler_
+  want_facts:
+    description: Toggle, if V(true) the plugin will retrieve all host facts from the server.
+    type: boolean
+    default: true
+  want_ip_addresses:
+    description:
+      - Toggle, if V(true) the plugin will add a C(cobbler_ipv4_addresses) and C(cobbler_ipv6_addresses) dictionary to the defined O(group) mapping
+        interface DNS names to IP addresses.
+    type: boolean
+    default: true
+    version_added: 7.1.0
+  facts_level:
+    description:
+      - "Set to V(normal) to gather only system-level variables."
+      - "Set to V(as_rendered) to gather all variables as rolled up by Cobbler."
+    type: string
+    choices: ['normal', 'as_rendered']
+    default: normal
+    version_added: 10.7.0
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # my.cobbler.yml
 plugin: community.general.cobbler
 url: http://cobbler/cobbler_api
 user: ansible-tester
 password: secure
-'''
+"""
 
 import socket
 
