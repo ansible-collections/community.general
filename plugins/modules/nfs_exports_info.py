@@ -70,12 +70,12 @@ import hashlib
 
 
 def get_exports(module, output_format, file_path="/etc/exports"):
-  
+
     IP_ENTRY_PATTERN = re.compile(r'(\d+\.\d+\.\d+\.\d+)\(([^)]+)\)')
-    MAIN_LINE_PATTERN = re.compile(r'\s*(\S+)\s+(.+)') 
-    
+    MAIN_LINE_PATTERN = re.compile(r'\s*(\S+)\s+(.+)')
+
     file_digests = {}
-    hash_algorithms = ['sha256', 'sha1', 'md5'] 
+    hash_algorithms = ['sha256', 'sha1', 'md5']
 
     try:
 
@@ -84,7 +84,7 @@ def get_exports(module, output_format, file_path="/etc/exports"):
 
         file_content_bytes = None
         try:
-            with open(file_path, 'rb') as f: # Open in binary mode for hashing
+            with open(file_path, 'rb') as f:
                 file_content_bytes = f.read()
         except IOError:
             module.fail_json(msg="Could not read {}".format(file_path))
@@ -99,21 +99,15 @@ def get_exports(module, output_format, file_path="/etc/exports"):
                     module.warn("Hash algorithm '{}' not available on this system. Skipping.".format(algo))
                 except Exception as ex:
                     module.warn("Error calculating '{}' hash: {}".format(algo, ex))
-
-
-        exports = {}       
+        exports = {}
         
         output_lines = []
         if file_content_bytes:
             output_lines = file_content_bytes.decode('utf-8', errors='ignore').splitlines()
-
-
         for line in output_lines:
             line = line.strip()
             if not line or line.startswith('#'):
                 continue
-            
-            
             match = MAIN_LINE_PATTERN.match(line)
             if not match:
                 continue
