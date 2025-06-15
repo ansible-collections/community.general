@@ -19,7 +19,7 @@ description:
 
 author:
   - Samaneh Yousefnezhad (@yousefenzhad)
-version_added: "11.1.0" 
+version_added: "11.1.0"
 
 options:
   output_format:
@@ -56,7 +56,7 @@ file_digest:
     - A dictionary containing various hash values of the /etc/exports file for integrity verification.
     - Keys are the hash algorithm names (e.g., 'sha256', 'sha1', 'md5'), and values are their corresponding hexadecimal digests.
     - At least one hash value is guaranteed to be present if the file exists and is readable.
-  type: dict  
+  type: dict
   returned: always
   sample:
     sha256: "a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890"
@@ -66,21 +66,19 @@ file_digest:
 
 from ansible.module_utils.basic import AnsibleModule
 import re
-import hashlib  
+import hashlib
 
 
 def get_exports(module, output_format, file_path="/etc/exports"):
-    
-    
+  
     IP_ENTRY_PATTERN = re.compile(r'(\d+\.\d+\.\d+\.\d+)\(([^)]+)\)')
     MAIN_LINE_PATTERN = re.compile(r'\s*(\S+)\s+(.+)') 
-
     
     file_digests = {}
     hash_algorithms = ['sha256', 'sha1', 'md5'] 
 
     try:
-        
+
         if not module.file_exists(file_path):
             module.fail_json(msg="{} file not found".format(file_path))
 
@@ -101,10 +99,9 @@ def get_exports(module, output_format, file_path="/etc/exports"):
                     module.warn("Hash algorithm '{}' not available on this system. Skipping.".format(algo))
                 except Exception as ex:
                     module.warn("Error calculating '{}' hash: {}".format(algo, ex))
-        
 
-        exports = {}
-        
+
+        exports = {}       
         
         output_lines = []
         if file_content_bytes:
@@ -147,9 +144,6 @@ def get_exports(module, output_format, file_path="/etc/exports"):
 
     except Exception as e:
         module.fail_json(msg="Error while processing exports: {}".format(e))
-
-
-
 def main():
     module = AnsibleModule(
         argument_spec=dict(
