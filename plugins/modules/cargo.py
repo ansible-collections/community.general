@@ -68,6 +68,15 @@ options:
     type: path
     required: false
     version_added: 9.1.0
+  features:
+    description:
+      - List of features to activate.
+      - This is only used when installing packages.
+    type: list
+    elements: str
+    required: false
+    default: []
+    version_added: 11.0.0
 requirements:
   - cargo installed
 """
@@ -106,6 +115,12 @@ EXAMPLES = r"""
   community.general.cargo:
     name: ludusavi
     directory: /path/to/ludusavi/source
+
+- name: Install "serpl" Rust package with ast_grep feature
+  community.general.cargo:
+    name: serpl
+    features:
+      - ast_grep
 """
 
 import json
@@ -125,6 +140,7 @@ class Cargo(object):
         self.version = kwargs["version"]
         self.locked = kwargs["locked"]
         self.directory = kwargs["directory"]
+        self.features = kwargs["features"]
 
     @property
     def path(self):
@@ -176,6 +192,8 @@ class Cargo(object):
         if self.directory:
             cmd.append("--path")
             cmd.append(self.directory)
+        if self.features:
+            cmd += ["--features", ",".join(self.features)]
         return self._exec(cmd)
 
     def is_outdated(self, name):
@@ -236,6 +254,7 @@ def main():
         version=dict(default=None, type="str"),
         locked=dict(default=False, type="bool"),
         directory=dict(default=None, type="path"),
+        features=dict(default=[], required=False, type="list", elements="str"),
     )
     module = AnsibleModule(argument_spec=arg_spec, supports_check_mode=True)
 
