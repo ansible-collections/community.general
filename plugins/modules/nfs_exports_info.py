@@ -18,7 +18,7 @@ description:
 
 author:
   - Samaneh Yousefnezhad (@yousefenzhad)
-
+version_added: "11.1.0"
 options:
   output_format:
     description:
