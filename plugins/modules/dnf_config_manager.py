@@ -39,6 +39,8 @@ options:
     required: false
     type: str
     choices: [enabled, disabled]
+notes:
+  - Does not work with C(dnf5).
 seealso:
   - module: ansible.builtin.dnf
   - module: ansible.builtin.yum_repository
