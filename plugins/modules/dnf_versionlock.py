@@ -74,6 +74,7 @@ notes:
     guess as close as possible to the behaviour inferred from its code.
   - For most of cases where you want to lock and unlock specific versions of a
     package, this works fairly well.
+  - Does not work with C(dnf5).
 requirements:
   - dnf
   - dnf-plugin-versionlock
