@@ -70,10 +70,9 @@ import hashlib
 
 
 def get_exports(module, output_format, file_path="/etc/exports"):
-
     IP_ENTRY_PATTERN = re.compile(r'(\d+\.\d+\.\d+\.\d+)\(([^)]+)\)')
     MAIN_LINE_PATTERN = re.compile(r'\s*(\S+)\s+(.+)')
-
+    
     file_digests = {}
     hash_algorithms = ['sha256', 'sha1', 'md5']
 
