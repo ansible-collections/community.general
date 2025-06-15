@@ -78,17 +78,17 @@ If you do not specify a ``count_tag``, the task creates the number of instances 
       tasks:
         - name: Create a set of instances
           community.general.ali_instance:
-             instance_type: ecs.n4.small
-             image_id: "{{ ami_id }}"
-             instance_name: "My-new-instance"
-             instance_tags:
-                 Name: NewECS
-                 Version: 0.0.1
-             count: 5
-             count_tag:
-                 Name: NewECS
-             allocate_public_ip: true
-             max_bandwidth_out: 50
+            instance_type: ecs.n4.small
+            image_id: "{{ ami_id }}"
+            instance_name: "My-new-instance"
+            instance_tags:
+              Name: NewECS
+              Version: 0.0.1
+            count: 5
+            count_tag:
+              Name: NewECS
+            allocate_public_ip: true
+            max_bandwidth_out: 50
           register: create_instance
 
 In the example playbook above, data about the instances created by this playbook is saved in the variable defined by the ``register`` keyword in the task.

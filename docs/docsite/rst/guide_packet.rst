@@ -67,16 +67,16 @@ The following code block is a simple playbook that creates one `Type 0 <https://
       hosts: localhost
       tasks:
 
-      - community.general.packet_sshkey:
-          key_file: ./id_rsa.pub
-          label: tutorial key
+        - community.general.packet_sshkey:
+            key_file: ./id_rsa.pub
+            label: tutorial key
 
-      - community.general.packet_device:
-          project_id: <your_project_id>
-          hostnames: myserver
-          operating_system: ubuntu_16_04
-          plan: baremetal_0
-          facility: sjc1
+        - community.general.packet_device:
+            project_id: <your_project_id>
+            hostnames: myserver
+            operating_system: ubuntu_16_04
+            plan: baremetal_0
+            facility: sjc1
 
 After running ``ansible-playbook playbook_create.yml``, you should have a server provisioned on Packet. You can verify through a CLI or in the `Packet portal <https://app.packet.net/portal#/projects/list/table>`__.
 
@@ -110,10 +110,10 @@ If your playbook acts on existing Packet devices, you can only pass the ``hostna
       hosts: localhost
       tasks:
 
-      - community.general.packet_device:
-          project_id: <your_project_id>
-          hostnames: myserver
-          state: rebooted
+        - community.general.packet_device:
+            project_id: <your_project_id>
+            hostnames: myserver
+            state: rebooted
 
 You can also identify specific Packet devices with the ``device_ids`` parameter. The device's UUID can be found in the `Packet Portal <https://app.packet.net/portal>`_ or by using a `CLI <https://www.packet.net/developers/integrations/>`_. The following playbook removes a Packet device using the ``device_ids`` field:
 
@@ -125,10 +125,10 @@ You can also identify specific Packet devices with the ``device_ids`` parameter.
       hosts: localhost
       tasks:
 
-      - community.general.packet_device:
-          project_id: <your_project_id>
-          device_ids: <myserver_device_id>
-          state: absent
+        - community.general.packet_device:
+            project_id: <your_project_id>
+            device_ids: <myserver_device_id>
+            state: absent
 
 
 More Complex Playbooks
@@ -153,43 +153,43 @@ The following playbook will create an SSH key, 3 Packet servers, and then wait u
       hosts: localhost
       tasks:
 
-      - community.general.packet_sshkey:
-          key_file: ./id_rsa.pub
-          label: new
+        - community.general.packet_sshkey:
+            key_file: ./id_rsa.pub
+            label: new
 
-      - community.general.packet_device:
-          hostnames: [coreos-one, coreos-two, coreos-three]
-          operating_system: coreos_beta
-          plan: baremetal_0
-          facility: ewr1
-          project_id: <your_project_id>
-          wait_for_public_IPv: 4
-          user_data: |
-            #cloud-config
-            coreos:
-              etcd2:
-                discovery: https://discovery.etcd.io/<token>
-                advertise-client-urls: http://$private_ipv4:2379,http://$private_ipv4:4001
-                initial-advertise-peer-urls: http://$private_ipv4:2380
-                listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
-                listen-peer-urls: http://$private_ipv4:2380
-              fleet:
-                public-ip: $private_ipv4
-              units:
-                - name: etcd2.service
-                  command: start
-                - name: fleet.service
-                  command: start
-        register: newhosts
+        - community.general.packet_device:
+            hostnames: [coreos-one, coreos-two, coreos-three]
+            operating_system: coreos_beta
+            plan: baremetal_0
+            facility: ewr1
+            project_id: <your_project_id>
+            wait_for_public_IPv: 4
+            user_data: |
+              # cloud-config
+              coreos:
+                etcd2:
+                  discovery: https://discovery.etcd.io/<token>
+                  advertise-client-urls: http://$private_ipv4:2379,http://$private_ipv4:4001
+                  initial-advertise-peer-urls: http://$private_ipv4:2380
+                  listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
+                  listen-peer-urls: http://$private_ipv4:2380
+                fleet:
+                  public-ip: $private_ipv4
+                units:
+                  - name: etcd2.service
+                    command: start
+                  - name: fleet.service
+                    command: start
+          register: newhosts
 
-      - name: wait for ssh
-        ansible.builtin.wait_for:
-          delay: 1
-          host: "{{ item.public_ipv4 }}"
-          port: 22
-          state: started
-          timeout: 500
-        loop: "{{ newhosts.results[0].devices }}"
+        - name: wait for ssh
+          ansible.builtin.wait_for:
+            delay: 1
+            host: "{{ item.public_ipv4 }}"
+            port: 22
+            state: started
+            timeout: 500
+          loop: "{{ newhosts.results[0].devices }}"
 
 
 As with most Ansible modules, the default states of the Packet modules are idempotent, meaning the resources in your project will remain the same after re-runs of a playbook. Thus, we can keep the ``packet_sshkey`` module call in our playbook. If the public key is already in your Packet account, the call will have no effect.
