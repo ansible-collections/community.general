@@ -1,5 +1,6 @@
 #!/usr/bin/python
-# Copyright (c) 2025, Samaneh Yousefnezhad <s-yousefenzhad@um.ac.ir>
+
+# SPDX-FileCopyrightText: (c) 2025, Samaneh Yousefnezhad <s-yousefenzhad@um.ac.ir>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -13,12 +14,13 @@ module: nfs_exports_info
 short_description: Extract folders, IPs, and options from C(/etc/exports)
 
 description:
-  - This module retrieves and processes the contents of the C(/etc/exports) file from a remote server,
+  - This module retrieves and processes the contents of the /etc/exports file from a remote server,
     mapping folders to their corresponding IP addresses and access options.
 
 author:
   - Samaneh Yousefnezhad (@yousefenzhad)
-version_added: "11.1.0"
+version_added: "11.1.0" 
+
 options:
   output_format:
     description:
@@ -50,39 +52,75 @@ exports_info:
   returned: always
 
 file_digest:
-  description: SHA1 hash of /etc/exports file for integrity verification.
-  type: str
+  description:
+    - A dictionary containing various hash values of the /etc/exports file for integrity verification.
+    - Keys are the hash algorithm names (e.g., 'sha256', 'sha1', 'md5'), and values are their corresponding hexadecimal digests.
+    - At least one hash value is guaranteed to be present if the file exists and is readable.
+  type: dict  
   returned: always
+  sample:
+    sha256: "a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890"
+    sha1: "f7e8d9c0b1a23c4d5e6f7a8b9c0d1e2f3a4b5c6d"
+    md5: "1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d"
 """
 
 from ansible.module_utils.basic import AnsibleModule
 import re
+import hashlib  
 
 
 def get_exports(module, output_format, file_path="/etc/exports"):
+    
+    
     IP_ENTRY_PATTERN = re.compile(r'(\d+\.\d+\.\d+\.\d+)\(([^)]+)\)')
+    MAIN_LINE_PATTERN = re.compile(r'\s*(\S+)\s+(.+)') 
+
+    
+    file_digests = {}
+    hash_algorithms = ['sha256', 'sha1', 'md5'] 
+
     try:
-        exports_file_digest = module.digest_from_file(file_path, 'sha1')
-        if exports_file_digest is None:
+        
+        if not module.file_exists(file_path):
             module.fail_json(msg="{} file not found".format(file_path))
 
+        file_content_bytes = None
         try:
-            f = open(file_path, 'r')
-            output_lines = f.readlines()
-            f.close()
+            with open(file_path, 'rb') as f: # Open in binary mode for hashing
+                file_content_bytes = f.read()
         except IOError:
             module.fail_json(msg="Could not read {}".format(file_path))
 
+        if file_content_bytes:
+            for algo in hash_algorithms:
+                try:
+                    hasher = hashlib.new(algo)
+                    hasher.update(file_content_bytes)
+                    file_digests[algo] = hasher.hexdigest()
+                except ValueError:
+                    module.warn("Hash algorithm '{}' not available on this system. Skipping.".format(algo))
+                except Exception as ex:
+                    module.warn("Error calculating '{}' hash: {}".format(algo, ex))
+        
+
         exports = {}
-        pattern = re.compile(r'\s*(\S+)\s+(.+)')
+        
+        
+        output_lines = []
+        if file_content_bytes:
+            output_lines = file_content_bytes.decode('utf-8', errors='ignore').splitlines()
+
 
         for line in output_lines:
             line = line.strip()
             if not line or line.startswith('#'):
                 continue
-            match = pattern.match(line)
+            
+            
+            match = MAIN_LINE_PATTERN.match(line)
             if not match:
                 continue
+            
             folder = match.group(1)
             rest = match.group(2)
 
@@ -104,12 +142,12 @@ def get_exports(module, output_format, file_path="/etc/exports"):
 
         return {
             'exports_info': exports,
-            'file_digest': exports_file_digest
+            'file_digest': file_digests # <--- Returning the dictionary of hashes
         }
 
     except Exception as e:
-
         module.fail_json(msg="Error while processing exports: {}".format(e))
+
 
 
 def main():
@@ -131,6 +169,6 @@ def main():
 
 
 if __name__ == '__main__':
-
     main()
+
 __all__ = ['get_exports']
