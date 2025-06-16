@@ -17,50 +17,50 @@ Consider this data structure:
 .. code-block:: yaml+jinja
 
     {
-        "domain_definition": {
-            "domain": {
-                "cluster": [
-                    {
-                        "name": "cluster1"
-                    },
-                    {
-                        "name": "cluster2"
-                    }
-                ],
-                "server": [
-                    {
-                        "name": "server11",
-                        "cluster": "cluster1",
-                        "port": "8080"
-                    },
-                    {
-                        "name": "server12",
-                        "cluster": "cluster1",
-                        "port": "8090"
-                    },
-                    {
-                        "name": "server21",
-                        "cluster": "cluster2",
-                        "port": "9080"
-                    },
-                    {
-                        "name": "server22",
-                        "cluster": "cluster2",
-                        "port": "9090"
-                    }
-                ],
-                "library": [
-                    {
-                        "name": "lib1",
-                        "target": "cluster1"
-                    },
-                    {
-                        "name": "lib2",
-                        "target": "cluster2"
-                    }
-                ]
+      "domain_definition": {
+        "domain": {
+          "cluster": [
+            {
+              "name": "cluster1"
+            },
+            {
+              "name": "cluster2"
             }
+          ],
+          "server": [
+            {
+              "name": "server11",
+              "cluster": "cluster1",
+              "port": "8080"
+            },
+            {
+              "name": "server12",
+              "cluster": "cluster1",
+              "port": "8090"
+            },
+            {
+              "name": "server21",
+              "cluster": "cluster2",
+              "port": "9080"
+            },
+            {
+              "name": "server22",
+              "cluster": "cluster2",
+              "port": "9090"
+            }
+          ],
+          "library": [
+            {
+              "name": "lib1",
+              "target": "cluster1"
+            },
+            {
+              "name": "lib2",
+              "target": "cluster2"
+            }
+          ]
         }
+      }
     }
 
 To extract all clusters from this structure, you can use the following query:
