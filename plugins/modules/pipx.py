@@ -175,6 +175,12 @@ EXAMPLES = r"""
     name: tox
     state: upgrade
 
+- name: Install or upgrade tox with dependency group 'docs'
+  community.general.pipx:
+    name: tox
+    source: tox[docs]
+    state: latest
+
 - name: Reinstall black with specific Python version
   community.general.pipx:
     name: black
