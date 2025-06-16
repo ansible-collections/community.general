@@ -45,27 +45,27 @@ scaleway_organization_info:
   elements: dict
   sample:
     "scaleway_organization_info": [
-        {
-            "address_city_name": "Paris",
-            "address_country_code": "FR",
-            "address_line1": "42 Rue de l'univers",
-            "address_line2": null,
-            "address_postal_code": "75042",
-            "address_subdivision_code": "FR-75",
-            "creation_date": "2018-08-06T13:43:28.508575+00:00",
-            "currency": "EUR",
-            "customer_class": "individual",
-            "id": "3f709602-5e6c-4619-b80c-e8432ferewtr",
-            "locale": "fr_FR",
-            "modification_date": "2018-08-06T14:56:41.401685+00:00",
-            "name": "James Bond",
-            "support_id": "694324",
-            "support_level": "basic",
-            "support_pin": "9324",
-            "users": [],
-            "vat_number": null,
-            "warnings": []
-        }
+      {
+        "address_city_name": "Paris",
+        "address_country_code": "FR",
+        "address_line1": "42 Rue de l'univers",
+        "address_line2": null,
+        "address_postal_code": "75042",
+        "address_subdivision_code": "FR-75",
+        "creation_date": "2018-08-06T13:43:28.508575+00:00",
+        "currency": "EUR",
+        "customer_class": "individual",
+        "id": "3f709602-5e6c-4619-b80c-e8432ferewtr",
+        "locale": "fr_FR",
+        "modification_date": "2018-08-06T14:56:41.401685+00:00",
+        "name": "James Bond",
+        "support_id": "694324",
+        "support_level": "basic",
+        "support_pin": "9324",
+        "users": [],
+        "vat_number": null,
+        "warnings": []
+      }
     ]
 """
 

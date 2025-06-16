@@ -45,8 +45,21 @@ options:
     description:
       - The relevant resource type in manageiq.
     required: true
-    choices: ['provider', 'host', 'vm', 'blueprint', 'category', 'cluster', 'data store', 'group', 'resource pool', 'service',
-      'service template', 'template', 'tenant', 'user']
+    choices:
+      - provider
+      - host
+      - vm
+      - blueprint
+      - category
+      - cluster
+      - data store
+      - group
+      - resource pool
+      - service
+      - service template
+      - template
+      - tenant
+      - user
   resource_name:
     type: str
     description:

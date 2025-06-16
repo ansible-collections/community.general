@@ -45,8 +45,21 @@ options:
     description:
       - The type of the resource to which the profile should be [un]assigned.
     required: true
-    choices: ['provider', 'host', 'vm', 'blueprint', 'category', 'cluster', 'data store', 'group', 'resource pool', 'service',
-      'service template', 'template', 'tenant', 'user']
+    choices:
+      - provider
+      - host
+      - vm
+      - blueprint
+      - category
+      - cluster
+      - data store
+      - group
+      - resource pool
+      - service
+      - service template
+      - template
+      - tenant
+      - user
   resource_name:
     type: str
     description:
@@ -89,35 +102,36 @@ EXAMPLES = r"""
 
 RETURN = r"""
 manageiq_policies:
-    description:
-      - List current policy_profile and policies for a provider in ManageIQ.
-    returned: always
-    type: dict
-    sample: {
-        "changed": false,
-        "profiles": [
+  description:
+    - List current policy_profile and policies for a provider in ManageIQ.
+  returned: always
+  type: dict
+  sample:
+    {
+      "changed": false,
+      "profiles": [
+        {
+          "policies": [
             {
-                "policies": [
-                    {
-                        "active": true,
-                        "description": "OpenSCAP",
-                        "name": "openscap policy"
-                    },
-                    {
-                        "active": true,
-                        "description": "Analyse incoming container images",
-                        "name": "analyse incoming container images"
-                    },
-                    {
-                        "active": true,
-                        "description": "Schedule compliance after smart state analysis",
-                        "name": "schedule compliance after smart state analysis"
-                    }
-                ],
-                "profile_description": "OpenSCAP profile",
-                "profile_name": "openscap profile"
+              "active": true,
+              "description": "OpenSCAP",
+              "name": "openscap policy"
+            },
+            {
+              "active": true,
+              "description": "Analyse incoming container images",
+              "name": "analyse incoming container images"
+            },
+            {
+              "active": true,
+              "description": "Schedule compliance after smart state analysis",
+              "name": "schedule compliance after smart state analysis"
             }
-        ]
+          ],
+          "profile_description": "OpenSCAP profile",
+          "profile_name": "openscap profile"
+        }
+      ]
     }
 """
 

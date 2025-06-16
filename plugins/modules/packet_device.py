@@ -268,16 +268,14 @@ devices:
   description: Information about each device that was processed.
   type: list
   sample:
-    - {
-        "hostname": "my-server.com",
-        "id": "2a5122b9-c323-4d5c-b53c-9ad3f54273e7",
-        "public_ipv4": "147.229.15.12",
-        "private-ipv4": "10.0.15.12",
-        "tags": [],
-        "locked": false,
-        "state": "provisioning",
-        "public_ipv6": "2604:1380:2:5200::3"
-      }
+    - "hostname": "my-server.com"
+      "id": "2a5122b9-c323-4d5c-b53c-9ad3f54273e7"
+      "public_ipv4": "147.229.15.12"
+      "private-ipv4": "10.0.15.12"
+      "tags": []
+      "locked": false
+      "state": "provisioning"
+      "public_ipv6": "2604:1380:2:5200::3"
   returned: success
 """
 

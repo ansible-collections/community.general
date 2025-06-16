@@ -55,7 +55,7 @@ EXAMPLES = r"""
   community.general.telegram:
     token: '9999999:XXXXXXXXXXXXXXXXXXXXXXX'
     api_args:
-      chat_id: 000000
+      chat_id: "000000"
       parse_mode: "markdown"
       text: "Your precious application has been deployed: https://example.com"
       disable_web_page_preview: true
@@ -66,7 +66,7 @@ EXAMPLES = r"""
     token: '9999999:XXXXXXXXXXXXXXXXXXXXXXX'
     api_method: forwardMessage
     api_args:
-      chat_id: 000000
+      chat_id: "000000"
       from_chat_id: 111111
       disable_notification: true
       message_id: '{{ saved_msg_id }}'

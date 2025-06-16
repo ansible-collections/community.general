@@ -57,20 +57,42 @@ deleted_keys:
   description: An array of key objects that were deleted. Only present on state=absent.
   type: list
   returned: When state=absent
-  sample: [{'id': 0, 'key': 'BASE64 encoded key', 'url': 'http://example.com/github key', 'created_at': 'YYYY-MM-DDTHH:MM:SZ',
-        'read_only': false}]
+  sample:
+    [
+      {
+        "id": 0,
+        "key": "BASE64 encoded key",
+        "url": "http://example.com/github key",
+        "created_at": "YYYY-MM-DDTHH:MM:SZ",
+        "read_only": false
+      }
+    ]
 matching_keys:
   description: An array of keys matching the specified name. Only present on state=present.
   type: list
   returned: When state=present
-  sample: [{'id': 0, 'key': 'BASE64 encoded key', 'url': 'http://example.com/github key', 'created_at': 'YYYY-MM-DDTHH:MM:SZ',
-        'read_only': false}]
+  sample:
+    [
+      {
+        "id": 0,
+        "key": "BASE64 encoded key",
+        "url": "http://example.com/github key",
+        "created_at": "YYYY-MM-DDTHH:MM:SZ",
+        "read_only": false
+      }
+    ]
 key:
   description: Metadata about the key just created. Only present on state=present.
   type: dict
   returned: success
-  sample: {'id': 0, 'key': 'BASE64 encoded key', 'url': 'http://example.com/github key', 'created_at': 'YYYY-MM-DDTHH:MM:SZ',
-    'read_only': false}
+  sample:
+    {
+      "id": 0,
+      "key": "BASE64 encoded key",
+      "url": "http://example.com/github key",
+      "created_at": "YYYY-MM-DDTHH:MM:SZ",
+      "read_only": false
+    }
 """
 
 EXAMPLES = r"""

@@ -81,7 +81,7 @@ EXAMPLES = r"""
   community.general.pushbullet:
     api_key: ABC123abc123ABC123abc123ABC123ab
     channel: my-awesome-channel
-    title: Broadcasting a message to the #my-awesome-channel folks
+    title: "Broadcasting a message to the #my-awesome-channel folks"
 
 - name: Sends a push notification with title and body to a channel
   community.general.pushbullet:

@@ -238,21 +238,36 @@ proposed:
   description: Representation of proposed client template.
   returned: always
   type: dict
-  sample: {name: "test01"}
+  sample:
+    {
+      "name": "test01"
+    }
 
 existing:
   description: Representation of existing client template (sample is truncated).
   returned: always
   type: dict
-  sample: {"description": "test01", "fullScopeAllowed": false, "id": "9c3712ab-decd-481e-954f-76da7b006e5f", "name": "test01",
-    "protocol": "saml"}
+  sample:
+    {
+      "description": "test01",
+      "fullScopeAllowed": false,
+      "id": "9c3712ab-decd-481e-954f-76da7b006e5f",
+      "name": "test01",
+      "protocol": "saml"
+    }
 
 end_state:
   description: Representation of client template after module execution (sample is truncated).
   returned: on success
   type: dict
-  sample: {"description": "test01", "fullScopeAllowed": false, "id": "9c3712ab-decd-481e-954f-76da7b006e5f", "name": "test01",
-    "protocol": "saml"}
+  sample:
+    {
+      "description": "test01",
+      "fullScopeAllowed": false,
+      "id": "9c3712ab-decd-481e-954f-76da7b006e5f",
+      "name": "test01",
+      "protocol": "saml"
+    }
 """
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \

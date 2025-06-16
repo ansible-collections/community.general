@@ -190,17 +190,20 @@ msg:
   type: str
 
 end_state:
-    description: Representation of the authentication after module execution.
-    returned: on success
-    type: dict
-    sample: {
+  description: Representation of the authentication after module execution.
+  returned: on success
+  type: dict
+  sample:
+    {
       "alias": "Copy of first broker login",
       "authenticationExecutions": [
         {
           "alias": "review profile config",
           "authenticationConfig": {
             "alias": "review profile config",
-            "config": { "update.profile.on.first.login": "missing" },
+            "config": {
+              "update.profile.on.first.login": "missing"
+            },
             "id": "6f09e4fb-aad4-496a-b873-7fa9779df6d7"
           },
           "configurable": true,
@@ -210,7 +213,11 @@ end_state:
           "level": 0,
           "providerId": "idp-review-profile",
           "requirement": "REQUIRED",
-          "requirementChoices": [ "REQUIRED", "ALTERNATIVE", "DISABLED" ]
+          "requirementChoices": [
+            "REQUIRED",
+            "ALTERNATIVE",
+            "DISABLED"
+          ]
         }
       ],
       "builtIn": false,

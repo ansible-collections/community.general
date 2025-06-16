@@ -78,22 +78,23 @@ EXAMPLES = r"""
 
 RETURN = r"""
 vcn:
-    description: Information about the VCN
-    returned: On successful create and update operation
-    type: dict
-    sample: {
-            "cidr_block": "10.0.0.0/16",
-            compartment_id": "ocid1.compartment.oc1..xxxxxEXAMPLExxxxx",
-            "default_dhcp_options_id": "ocid1.dhcpoptions.oc1.phx.xxxxxEXAMPLExxxxx",
-            "default_route_table_id": "ocid1.routetable.oc1.phx.xxxxxEXAMPLExxxxx",
-            "default_security_list_id": "ocid1.securitylist.oc1.phx.xxxxxEXAMPLExxxxx",
-            "display_name": "ansible_vcn",
-            "dns_label": "ansiblevcn",
-            "id": "ocid1.vcn.oc1.phx.xxxxxEXAMPLExxxxx",
-            "lifecycle_state": "AVAILABLE",
-            "time_created": "2017-11-13T20:22:40.626000+00:00",
-            "vcn_domain_name": "ansiblevcn.oraclevcn.com"
-        }
+  description: Information about the VCN.
+  returned: On successful create and update operation
+  type: dict
+  sample:
+    {
+      "cidr_block": "10.0.0.0/16",
+      "compartment_id\"": "ocid1.compartment.oc1..xxxxxEXAMPLExxxxx",
+      "default_dhcp_options_id": "ocid1.dhcpoptions.oc1.phx.xxxxxEXAMPLExxxxx",
+      "default_route_table_id": "ocid1.routetable.oc1.phx.xxxxxEXAMPLExxxxx",
+      "default_security_list_id": "ocid1.securitylist.oc1.phx.xxxxxEXAMPLExxxxx",
+      "display_name": "ansible_vcn",
+      "dns_label": "ansiblevcn",
+      "id": "ocid1.vcn.oc1.phx.xxxxxEXAMPLExxxxx",
+      "lifecycle_state": "AVAILABLE",
+      "time_created": "2017-11-13T20:22:40.626000+00:00",
+      "vcn_domain_name": "ansiblevcn.oraclevcn.com"
+    }
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
