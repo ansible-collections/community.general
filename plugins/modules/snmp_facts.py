@@ -113,7 +113,7 @@ ansible_sysdescr:
   description: A textual description of the entity.
   returned: success
   type: str
-  sample: Linux ubuntu-user 4.4.0-93-generic #116-Ubuntu SMP Fri Aug 11 21:17:51 UTC 2017 x86_64
+  sample: "Linux ubuntu-user 4.4.0-93-generic #116-Ubuntu SMP Fri Aug 11 21:17:51 UTC 2017 x86_64"
 ansible_sysobjectid:
   description: The vendor's authoritative identification of the network management subsystem contained in the entity.
   returned: success
@@ -149,40 +149,41 @@ ansible_interfaces:
   description: Dictionary of each network interface and its metadata.
   returned: success
   type: dict
-  sample: {
-    "1": {
-      "adminstatus": "up",
-      "description": "",
-      "ifindex": "1",
-      "ipv4": [
-        {
-          "address": "127.0.0.1",
-          "netmask": "255.0.0.0"
-        }
-      ],
-      "mac": "",
-      "mtu": "65536",
-      "name": "lo",
-      "operstatus": "up",
-      "speed": "65536"
-    },
-    "2": {
-      "adminstatus": "up",
-      "description": "",
-      "ifindex": "2",
-      "ipv4": [
-        {
-          "address": "192.168.213.128",
-          "netmask": "255.255.255.0"
-        }
-      ],
-      "mac": "000a305a52a1",
-      "mtu": "1500",
-      "name": "Intel Corporation 82545EM Gigabit Ethernet Controller (Copper)",
-      "operstatus": "up",
-      "speed": "1500"
+  sample:
+    {
+      "1": {
+        "adminstatus": "up",
+        "description": "",
+        "ifindex": "1",
+        "ipv4": [
+          {
+            "address": "127.0.0.1",
+            "netmask": "255.0.0.0"
+          }
+        ],
+        "mac": "",
+        "mtu": "65536",
+        "name": "lo",
+        "operstatus": "up",
+        "speed": "65536"
+      },
+      "2": {
+        "adminstatus": "up",
+        "description": "",
+        "ifindex": "2",
+        "ipv4": [
+          {
+            "address": "192.168.213.128",
+            "netmask": "255.255.255.0"
+          }
+        ],
+        "mac": "000a305a52a1",
+        "mtu": "1500",
+        "name": "Intel Corporation 82545EM Gigabit Ethernet Controller (Copper)",
+        "operstatus": "up",
+        "speed": "1500"
+      }
     }
-  }
 """
 
 import binascii

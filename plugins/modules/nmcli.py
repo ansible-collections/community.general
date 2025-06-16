@@ -85,8 +85,32 @@ options:
       - If you want to control non-ethernet connection attached to V(bond), V(bridge), or V(team) consider using O(slave_type)
         option.
     type: str
-    choices: [bond, bond-slave, bridge, bridge-slave, dummy, ethernet, generic, gre, infiniband, ipip, macvlan, sit, team,
-      team-slave, vlan, vxlan, wifi, gsm, wireguard, ovs-bridge, ovs-port, ovs-interface, vpn, vrf, loopback]
+    choices:
+      - bond
+      - bond-slave
+      - bridge
+      - bridge-slave
+      - dummy
+      - ethernet
+      - generic
+      - gre
+      - infiniband
+      - ipip
+      - macvlan
+      - sit
+      - team
+      - team-slave
+      - vlan
+      - vxlan
+      - wifi
+      - gsm
+      - wireguard
+      - ovs-bridge
+      - ovs-port
+      - ovs-interface
+      - vpn
+      - vrf
+      - loopback
   mode:
     description:
       - This is the type of device or network connection that you wish to create for a bond or bridge.

@@ -67,7 +67,7 @@ EXAMPLES = r"""
     repo: 'git@github.com:user/repo.git'
 """
 
-RETURN = """# """
+RETURN = """#"""
 
 import traceback
 

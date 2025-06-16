@@ -91,9 +91,10 @@ changed:
   sample: true
   returned: always
 sshkeys:
-    description: Information about sshkeys that were created/removed.
-    type: list
-    sample: [
+  description: Information about sshkeys that were created/removed.
+  type: list
+  sample:
+    [
       {
         "fingerprint": "5c:93:74:7c:ed:07:17:62:28:75:79:23:d6:08:93:46",
         "id": "41d61bd8-3342-428b-a09c-e67bdd18a9b7",
@@ -101,7 +102,7 @@ sshkeys:
         "label": "mynewkey33"
       }
     ]
-    returned: always
+  returned: always
 """
 
 import os

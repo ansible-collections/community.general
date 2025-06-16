@@ -126,30 +126,31 @@ RETURN = r"""
 # Returns the downtime JSON dictionary from the API response under the C(downtime) key.
 # See https://docs.datadoghq.com/api/v1/downtimes/#schedule-a-downtime for more details.
 downtime:
-    description: The downtime returned by the API.
-    type: dict
-    returned: always
-    sample: {
-        "active": true,
-        "canceled": null,
-        "creator_id": 1445416,
-        "disabled": false,
-        "downtime_type": 2,
-        "end": null,
-        "id": 1055751000,
-        "message": "Downtime for foo:bar",
-        "monitor_id": null,
-        "monitor_tags": [
-            "foo:bar"
-        ],
-        "parent_id": null,
-        "recurrence": null,
-        "scope": [
-            "test"
-        ],
-        "start": 1607015009,
-        "timezone": "UTC",
-        "updater_id": null
+  description: The downtime returned by the API.
+  type: dict
+  returned: always
+  sample:
+    {
+      "active": true,
+      "canceled": null,
+      "creator_id": 1445416,
+      "disabled": false,
+      "downtime_type": 2,
+      "end": null,
+      "id": 1055751000,
+      "message": "Downtime for foo:bar",
+      "monitor_id": null,
+      "monitor_tags": [
+        "foo:bar"
+      ],
+      "parent_id": null,
+      "recurrence": null,
+      "scope": [
+        "test"
+      ],
+      "start": 1607015009,
+      "timezone": "UTC",
+      "updater_id": null
     }
 """
 

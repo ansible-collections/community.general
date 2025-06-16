@@ -267,7 +267,7 @@ EXAMPLES = r"""
 """
 
 # TODO: Disabled RETURN as it is breaking the build for docs. Needs to be fixed.
-RETURN = """# """
+RETURN = """#"""
 
 import json
 import time

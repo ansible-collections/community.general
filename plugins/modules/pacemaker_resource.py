@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: pacemaker_resource
 short_description: Manage pacemaker resources
 author:
@@ -28,7 +27,7 @@ options:
   state:
     description:
       - Indicate desired state for cluster resource.
-    choices: [ present, absent, enabled, disabled ]
+    choices: [present, absent, enabled, disabled]
     default: present
     type: str
   name:
@@ -89,7 +88,7 @@ options:
         description:
           - Action to apply to resource.
         type: str
-        choices: [ clone, master, group, promotable ]
+        choices: [clone, master, group, promotable]
       argument_option:
         description:
           - Options to associate with resource action.
@@ -100,9 +99,9 @@ options:
       - Timeout period for polling the resource creation.
     type: int
     default: 300
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 ---
 - name: Create pacemaker resource
   hosts: localhost
@@ -124,15 +123,15 @@ EXAMPLES = '''
           - operation_action: monitor
             operation_option:
               - interval=20
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 cluster_resources:
-    description: The cluster resource output message.
-    type: str
-    sample: "Assumed agent name ocf:heartbeat:IPaddr2 (deduced from IPaddr2)"
-    returned: always
-'''
+  description: The cluster resource output message.
+  type: str
+  sample: "Assumed agent name ocf:heartbeat:IPaddr2 (deduced from IPaddr2)"
+  returned: always
+"""
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
 from ansible_collections.community.general.plugins.module_utils.pacemaker import pacemaker_runner

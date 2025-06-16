@@ -143,25 +143,26 @@ EXAMPLES = r"""
 
 RETURN = r"""
 metadata:
-    description: Backup metadata.
-    returned: when O(state=present), O(state=exported), or O(state=restored)
-    type: dict
-    sample: {
-        "metadata": {
-            "created_at": "2020-08-06T12:42:05.631049Z",
-            "database_name": "my-database",
-            "download_url": null,
-            "download_url_expires_at": null,
-            "expires_at": null,
-            "id": "a15297bd-0c4a-4b4f-8fbb-b36a35b7eb07",
-            "instance_id": "617be32e-6497-4ed7-b4c7-0ee5a81edf49",
-            "instance_name": "my-instance",
-            "name": "backup_name",
-            "region": "fr-par",
-            "size": 600000,
-            "status": "ready",
-            "updated_at": "2020-08-06T12:42:10.581649Z"
-        }
+  description: Backup metadata.
+  returned: when O(state=present), O(state=exported), or O(state=restored)
+  type: dict
+  sample:
+    {
+      "metadata": {
+        "created_at": "2020-08-06T12:42:05.631049Z",
+        "database_name": "my-database",
+        "download_url": null,
+        "download_url_expires_at": null,
+        "expires_at": null,
+        "id": "a15297bd-0c4a-4b4f-8fbb-b36a35b7eb07",
+        "instance_id": "617be32e-6497-4ed7-b4c7-0ee5a81edf49",
+        "instance_name": "my-instance",
+        "name": "backup_name",
+        "region": "fr-par",
+        "size": 600000,
+        "status": "ready",
+        "updated_at": "2020-08-06T12:42:10.581649Z"
+      }
     }
 """
 

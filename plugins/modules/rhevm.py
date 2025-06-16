@@ -153,67 +153,68 @@ options:
 
 RETURN = r"""
 vm:
-    description: Returns all of the VMs variables and execution.
-    returned: always
-    type: dict
-    sample: {
-        "boot_order": [
-            "hd",
-            "network"
-        ],
-        "changed": true,
-        "changes": [
-            "Delete Protection"
-        ],
-        "cluster": "C1",
-        "cpu_share": "0",
-        "created": false,
-        "datacenter": "Default",
-        "del_prot": true,
-        "disks": [
-            {
-                "domain": "ssd-san",
-                "name": "OS",
-                "size": 40
-            }
-        ],
-        "eth0": "00:00:5E:00:53:00",
-        "eth1": "00:00:5E:00:53:01",
-        "eth2": "00:00:5E:00:53:02",
-        "exists": true,
-        "failed": false,
-        "ifaces": [
-            {
-                "name": "eth0",
-                "vlan": "Management"
-            },
-            {
-                "name": "eth1",
-                "vlan": "Internal"
-            },
-            {
-                "name": "eth2",
-                "vlan": "External"
-            }
-        ],
-        "image": false,
-        "mempol": "0",
-        "msg": [
-            "VM exists",
-            "cpu_share was already set to 0",
-            "VM high availability was already set to True",
-            "The boot order has already been set",
-            "VM delete protection has been set to True",
-            "Disk web2_Disk0_OS already exists",
-            "The VM starting host was already set to host416"
-        ],
-        "name": "web2",
-        "type": "server",
-        "uuid": "4ba5a1be-e60b-4368-9533-920f156c817b",
-        "vm_ha": true,
-        "vmcpu": "4",
-        "vmhost": "host416",
-        "vmmem": "16"
+  description: Returns all of the VMs variables and execution.
+  returned: always
+  type: dict
+  sample:
+    {
+      "boot_order": [
+        "hd",
+        "network"
+      ],
+      "changed": true,
+      "changes": [
+        "Delete Protection"
+      ],
+      "cluster": "C1",
+      "cpu_share": "0",
+      "created": false,
+      "datacenter": "Default",
+      "del_prot": true,
+      "disks": [
+        {
+          "domain": "ssd-san",
+          "name": "OS",
+          "size": 40
+        }
+      ],
+      "eth0": "00:00:5E:00:53:00",
+      "eth1": "00:00:5E:00:53:01",
+      "eth2": "00:00:5E:00:53:02",
+      "exists": true,
+      "failed": false,
+      "ifaces": [
+        {
+          "name": "eth0",
+          "vlan": "Management"
+        },
+        {
+          "name": "eth1",
+          "vlan": "Internal"
+        },
+        {
+          "name": "eth2",
+          "vlan": "External"
+        }
+      ],
+      "image": false,
+      "mempol": "0",
+      "msg": [
+        "VM exists",
+        "cpu_share was already set to 0",
+        "VM high availability was already set to True",
+        "The boot order has already been set",
+        "VM delete protection has been set to True",
+        "Disk web2_Disk0_OS already exists",
+        "The VM starting host was already set to host416"
+      ],
+      "name": "web2",
+      "type": "server",
+      "uuid": "4ba5a1be-e60b-4368-9533-920f156c817b",
+      "vm_ha": true,
+      "vmcpu": "4",
+      "vmhost": "host416",
+      "vmmem": "16"
     }
 """
 
