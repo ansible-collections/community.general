@@ -345,8 +345,16 @@ record:
       description: Additional record data.
       returned: success, if type is SRV, DS, SSHFP TLSA or CAA
       type: dict
-      sample: {name: "jabber", port: 8080, priority: 10, proto: "_tcp", service: "_xmpp", target: "jabberhost.sample.com",
-        weight: 5}
+      sample:
+        {
+          "name": "jabber",
+          "port": 8080,
+          "priority": 10,
+          "proto": "_tcp",
+          "service": "_xmpp",
+          "target": "jabberhost.sample.com",
+          "weight": 5
+        }
     id:
       description: The record ID.
       returned: success
@@ -361,7 +369,10 @@ record:
       description: Extra Cloudflare-specific information about the record.
       returned: success
       type: dict
-      sample: {auto_added: false}
+      sample:
+        {
+          "auto_added": false
+        }
     modified_on:
       description: Record modification date.
       returned: success

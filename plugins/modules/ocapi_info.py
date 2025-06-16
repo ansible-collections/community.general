@@ -120,24 +120,25 @@ details:
   elements: str
 
 status:
-    description: Dictionary containing status information.  See OCAPI documentation for details.
-    returned: when supported
-    type: dict
-    sample: {
-        "Details": [
-            "None"
-        ],
-        "Health": [
-            {
-                "ID": 5,
-                "Name": "OK"
-            }
-        ],
-        "State": {
-            "ID": 16,
-            "Name": "In service"
-            }
-       }
+  description: Dictionary containing status information. See OCAPI documentation for details.
+  returned: when supported
+  type: dict
+  sample:
+    {
+      "Details": [
+        "None"
+      ],
+      "Health": [
+        {
+          "ID": 5,
+          "Name": "OK"
+        }
+      ],
+      "State": {
+        "ID": 16,
+        "Name": "In service"
+      }
+    }
 """
 
 from ansible.module_utils.basic import AnsibleModule

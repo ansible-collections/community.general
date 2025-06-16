@@ -195,21 +195,40 @@ proposed:
   description: Representation of proposed role.
   returned: always
   type: dict
-  sample: {"description": "My updated test description"}
+  sample:
+    {
+      "description": "My updated test description"
+    }
 
 existing:
   description: Representation of existing role.
   returned: always
   type: dict
-  sample: {"attributes": {}, "clientRole": true, "composite": false, "containerId": "9f03eb61-a826-4771-a9fd-930e06d2d36a",
-    "description": "My client test role", "id": "561703dd-0f38-45ff-9a5a-0c978f794547", "name": "myrole"}
+  sample:
+    {
+      "attributes": {},
+      "clientRole": true,
+      "composite": false,
+      "containerId": "9f03eb61-a826-4771-a9fd-930e06d2d36a",
+      "description": "My client test role",
+      "id": "561703dd-0f38-45ff-9a5a-0c978f794547",
+      "name": "myrole"
+    }
 
 end_state:
   description: Representation of role after module execution (sample is truncated).
   returned: on success
   type: dict
-  sample: {"attributes": {}, "clientRole": true, "composite": false, "containerId": "9f03eb61-a826-4771-a9fd-930e06d2d36a",
-    "description": "My updated client test role", "id": "561703dd-0f38-45ff-9a5a-0c978f794547", "name": "myrole"}
+  sample:
+    {
+      "attributes": {},
+      "clientRole": true,
+      "composite": false,
+      "containerId": "9f03eb61-a826-4771-a9fd-930e06d2d36a",
+      "description": "My updated client test role",
+      "id": "561703dd-0f38-45ff-9a5a-0c978f794547",
+      "name": "myrole"
+    }
 """
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \

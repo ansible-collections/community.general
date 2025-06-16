@@ -98,25 +98,26 @@ EXAMPLES = r"""
 
 RETURN = r"""
 result:
-    description: Result returned by nomad.
-    returned: always
-    type: dict
-    sample: {
-        "accessor_id": "0d01c55f-8d63-f832-04ff-1866d4eb594e",
-        "create_index": 14,
-        "create_time": "2023-11-12T18:48:34.248857001Z",
-        "expiration_time": null,
-        "expiration_ttl": "",
-        "global": true,
-        "hash": "eSn8H8RVqh8As8WQNnC2vlBRqXy6DECogc5umzX0P30=",
-        "modify_index": 836,
-        "name": "devs",
-        "policies": [
-            "readonly"
-        ],
-        "roles": null,
-        "secret_id": "12e878ab-e1f6-e103-b4c4-3b5173bb4cea",
-        "type": "client"
+  description: Result returned by nomad.
+  returned: always
+  type: dict
+  sample:
+    {
+      "accessor_id": "0d01c55f-8d63-f832-04ff-1866d4eb594e",
+      "create_index": 14,
+      "create_time": "2023-11-12T18:48:34.248857001Z",
+      "expiration_time": null,
+      "expiration_ttl": "",
+      "global": true,
+      "hash": "eSn8H8RVqh8As8WQNnC2vlBRqXy6DECogc5umzX0P30=",
+      "modify_index": 836,
+      "name": "devs",
+      "policies": [
+        "readonly"
+      ],
+      "roles": null,
+      "secret_id": "12e878ab-e1f6-e103-b4c4-3b5173bb4cea",
+      "type": "client"
     }
 """
 

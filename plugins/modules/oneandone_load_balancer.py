@@ -233,8 +233,8 @@ EXAMPLES = r"""
     load_balancer: ansible load balancer updated
     description: Adding rules to a load balancer with ansible
     remove_rules:
-      - rule_id #1
-      - rule_id #2
+      - "rule_id #1"
+      - "rule_id #2"
       - '...'
     wait: true
     wait_timeout: 500

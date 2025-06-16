@@ -182,17 +182,20 @@ role:
   returned: success
   type: dict
   sample:
-      {
-          "CreateIndex": 39,
-          "Description": "",
-          "Hash": "Trt0QJtxVEfvTTIcdTUbIJRr6Dsi6E4EcwSFxx9tCYM=",
-          "ID": "9a300b8d-48db-b720-8544-a37c0f5dafb5",
-          "ModifyIndex": 39,
-          "Name": "foo-role",
-          "Policies": [
-              {"ID": "b1a00172-d7a1-0e66-a12e-7a4045c4b774", "Name": "foo-access"}
-          ]
-      }
+    {
+      "CreateIndex": 39,
+      "Description": "",
+      "Hash": "Trt0QJtxVEfvTTIcdTUbIJRr6Dsi6E4EcwSFxx9tCYM=",
+      "ID": "9a300b8d-48db-b720-8544-a37c0f5dafb5",
+      "ModifyIndex": 39,
+      "Name": "foo-role",
+      "Policies": [
+        {
+          "ID": "b1a00172-d7a1-0e66-a12e-7a4045c4b774",
+          "Name": "foo-access"
+        }
+      ]
+    }
 operation:
   description: The operation performed on the role.
   returned: changed
