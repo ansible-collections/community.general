@@ -1,0 +1,2 @@
+bugfixes:
+    - keycloak - update more than 10 sub-groups (https://github.com/ansible-collections/community.general/issues/9690, https://github.com/ansible-collections/community.general/pull/9692).
