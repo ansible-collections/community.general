@@ -1,3 +1,0 @@
-minor_changes:
-  - pacemaker_cluster - using safer mechanism to run external command (https://github.com/ansible-collections/community.general/pull/9471).
-  - pacemaker_cluster - remove unused code (https://github.com/ansible-collections/community.general/pull/9471).

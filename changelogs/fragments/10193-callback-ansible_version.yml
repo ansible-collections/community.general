@@ -1,6 +1,0 @@
-minor_changes:
-  - "elastic callback plugin - instead of trying to extract the ansible-core version from task data, use ansible-core's actual version (https://github.com/ansible-collections/community.general/pull/10193)."
-  - "loganalytics callback plugin - instead of trying to extract the ansible-core version from task data, use ansible-core's actual version (https://github.com/ansible-collections/community.general/pull/10193)."
-  - "opentelemetry callback plugin - instead of trying to extract the ansible-core version from task data, use ansible-core's actual version (https://github.com/ansible-collections/community.general/pull/10193)."
-  - "splunk callback plugin - instead of trying to extract the ansible-core version from task data, use ansible-core's actual version (https://github.com/ansible-collections/community.general/pull/10193)."
-  - "sumologic callback plugin - instead of trying to extract the ansible-core version from task data, use ansible-core's actual version (https://github.com/ansible-collections/community.general/pull/10193)."

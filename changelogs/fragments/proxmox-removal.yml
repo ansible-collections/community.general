@@ -1,7 +1,0 @@
-removed_features:
-  - "The Proxmox content (modules and plugins) has been moved to the `new collection community.proxmox <https://github.com/ansible-collections/community.proxmox>`__.
-     Since community.general 11.0.0, these modules and plugins have been replaced by deprecated redirections to community.proxmox.
-     You need to explicitly install community.proxmox, for example with ``ansible-galaxy collection install community.proxmox``,
-     or by installing a new enough version of the Ansible community package.
-     We suggest to update your roles and playbooks to use the new FQCNs as soon as possible to avoid getting deprecation messages
-     (https://github.com/ansible-collections/community.general/pull/10110)."

@@ -1,2 +1,0 @@
-minor_changes:
-  - pacemaker_resource - add maintenance mode support for handling resource creation and deletion (https://github.com/ansible-collections/community.general/issues/10180, https://github.com/ansible-collections/community.general/pull/10194).
