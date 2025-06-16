@@ -1,2 +1,2 @@
 bugfixes:
-  - redhat_subscription - skip attach operation for OS versions where the attach sub-command has been removed (https://github.com/ansible-collections/community.general/issues/10253)
+  - redhat_subscription - skip attach and remove operations for OS versions where these sub-commands have been removed (https://github.com/ansible-collections/community.general/issues/10253, https://github.com/ansible-collections/community.general/issues/10260)
