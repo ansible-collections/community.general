@@ -26,8 +26,8 @@ You can use the :ansplugin:`community.general.dict_kv filter <community.general.
           type: host
           database: all
         myservers:
-        - server1
-        - server2
+          - server1
+          - server2
 
 This produces:
 
