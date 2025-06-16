@@ -470,6 +470,15 @@ class Rhsm(object):
             return False
         return True
 
+    def _has_remove_command(self):
+        """
+        Checks whether subscription-manager has a remove command.
+
+        :returns: bool -- whether subscription-manager has a remove command.
+        """
+        # subscription-manager remove command was removed in Fedora 41 and RHEL 10, same as attach
+        return self._has_attach_command()
+
     def _register_using_cli(self, username, password, token, auto_attach,
                             activationkey, org_id, consumer_type, consumer_name,
                             consumer_id, force_register, environment, release):
@@ -786,7 +795,7 @@ class Rhsm(object):
         if serials is None:
             items = ["--all"]
 
-        if items:
+        if items and self._has_remove_command():
             args = [SUBMAN_CMD, 'remove'] + items
             rc, stderr, stdout = self.module.run_command(args, check_rc=True)
         return serials
