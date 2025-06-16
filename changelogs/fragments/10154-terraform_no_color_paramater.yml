@@ -1,2 +1,0 @@
-minor_changes:
-  - terraform - adds the ``no_color`` parameter, which suppresses or allows color codes in stdout from Terraform commands (https://github.com/ansible-collections/community.general/pull/10154).

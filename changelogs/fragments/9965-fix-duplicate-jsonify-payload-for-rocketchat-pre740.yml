@@ -1,2 +1,0 @@
-minor_changes:
-  - rocketchat - fix duplicate JSON conversion for Rocket.Chat < 7.4.0 (https://github.com/ansible-collections/community.general/pull/9965).

@@ -1,5 +1,0 @@
-bugfixes:
-  - "yaml callback plugin - when using ansible-core 2.19.0b2 or newer, uses a new utility provided by ansible-core.
-     This allows us to remove all hacks and vendored code that was part of the plugin for ansible-core versions with
-     Data Tagging so far
-     (https://github.com/ansible-collections/community.general/pull/10242)."

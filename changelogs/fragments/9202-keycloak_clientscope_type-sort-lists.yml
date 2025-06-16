@@ -1,2 +1,0 @@
-bugfixes:
-    - keycloak_clientscope_type - sort the default and optional clientscope lists to improve the diff (https://github.com/ansible-collections/community.general/pull/9202).

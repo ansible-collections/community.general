@@ -1,2 +1,0 @@
-bugfixes:
-  - pipx - honor option ``global`` when ``state=latest`` (https://github.com/ansible-collections/community.general/pull/9623).

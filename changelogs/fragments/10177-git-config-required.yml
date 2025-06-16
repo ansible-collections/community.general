@@ -1,2 +1,0 @@
-minor_changes:
-  - git_config - remove redundant ``required=False`` from ``argument_spec`` (https://github.com/ansible-collections/community.general/pull/10177).
