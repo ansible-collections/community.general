@@ -99,7 +99,7 @@ def get_exports(module, output_format, file_path="/etc/exports"):
                 except Exception as ex:
                     module.warn("Error calculating '{}' hash: {}".format(algo, ex))
         exports = {}
-    
+
         output_lines = []
         if file_content_bytes:
             output_lines = file_content_bytes.decode('utf-8', errors='ignore').splitlines()
