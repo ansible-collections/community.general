@@ -179,7 +179,7 @@
   community.general.pipx:
     state: absent
     name: tox
-  register: uninstall_tox_latest
+  register: uninstall_tox_1
 
 - name: install application tox 3.24.0 for latest
   community.general.pipx:
@@ -223,7 +223,27 @@
   community.general.pipx:
     state: absent
     name: tox
-  register: uninstall_tox_latest_yet_again
+  register: uninstall_tox_2
+
+- name: install tox with dependency group 'docs'
+  community.general.pipx:
+    name: tox
+    source: tox[docs]
+    state: latest
+  register: install_tox_latest_docs
+
+- name: install tox with dependency group 'docs' again
+  community.general.pipx:
+    name: tox
+    source: tox[docs]
+    state: latest
+  register: install_tox_latest_docs_again
+
+- name: cleanup tox latest yet again
+  community.general.pipx:
+    state: absent
+    name: tox
+  register: uninstall_tox_3
 
 - name: check assertions tox latest
   assert:
@@ -231,8 +251,8 @@
       - install_tox_latest is changed
       - "'tox' in install_tox_latest.application"
       - install_tox_latest.application.tox.version != '3.24.0'
-      - uninstall_tox_latest is changed
-      - "'tox' not in uninstall_tox_latest.application"
+      - uninstall_tox_1 is changed
+      - "'tox' not in uninstall_tox_1.application"
       - install_tox_324_for_latest is changed
       - "'tox' in install_tox_324_for_latest.application"
       - install_tox_324_for_latest.application.tox.version == '3.24.0'
@@ -241,8 +261,12 @@
       - install_tox_latest_with_preinstall.application.tox.version != '3.24.0'
       - install_tox_latest_with_preinstall_again is not changed
       - install_tox_latest_with_preinstall_again_force is changed
-      - uninstall_tox_latest_again is changed
-      - "'tox' not in uninstall_tox_latest_again.application"
+      - uninstall_tox_2 is changed
+      - "'tox' not in uninstall_tox_2.application"
+      - install_tox_latest_docs is changed
+      - install_tox_latest_docs_again is not changed
+      - uninstall_tox_3 is changed
+      - "'tox' not in uninstall_tox_3.application"
 
 ##############################################################################
 # Test version specifiers in name parameter
