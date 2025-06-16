@@ -72,7 +72,7 @@ import hashlib
 def get_exports(module, output_format, file_path="/etc/exports"):
     IP_ENTRY_PATTERN = re.compile(r'(\d+\.\d+\.\d+\.\d+)\(([^)]+)\)')
     MAIN_LINE_PATTERN = re.compile(r'\s*(\S+)\s+(.+)')
-    
+
     file_digests = {}
     hash_algorithms = ['sha256', 'sha1', 'md5']
 
@@ -99,7 +99,7 @@ def get_exports(module, output_format, file_path="/etc/exports"):
                 except Exception as ex:
                     module.warn("Error calculating '{}' hash: {}".format(algo, ex))
         exports = {}
-        
+    
         output_lines = []
         if file_content_bytes:
             output_lines = file_content_bytes.decode('utf-8', errors='ignore').splitlines()
@@ -110,7 +110,7 @@ def get_exports(module, output_format, file_path="/etc/exports"):
             match = MAIN_LINE_PATTERN.match(line)
             if not match:
                 continue
-            
+
             folder = match.group(1)
             rest = match.group(2)
 
@@ -132,11 +132,13 @@ def get_exports(module, output_format, file_path="/etc/exports"):
 
         return {
             'exports_info': exports,
-            'file_digest': file_digests # <--- Returning the dictionary of hashes
+            'file_digest': file_digests
         }
 
     except Exception as e:
         module.fail_json(msg="Error while processing exports: {}".format(e))
+
+
 def main():
     module = AnsibleModule(
         argument_spec=dict(
