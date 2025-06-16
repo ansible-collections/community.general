@@ -6,7 +6,7 @@
 
 from __future__ import annotations
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 name: iocage
 short_description: iocage inventory source
 version_added: 10.2.0
@@ -96,9 +96,9 @@ notes:
     expects to find the O(hooks_results) items in the path
     C(/iocage/iocage/jails/<name>/root). If you mount the C(poolname) to a
     different path the easiest remedy is to create a symlink.
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 ---
 # file name must end with iocage.yaml or iocage.yml
 plugin: community.general.iocage
@@ -168,7 +168,7 @@ compose:
   ansible_host: iocage_hooks.0
 groups:
   test: inventory_hostname.startswith('test')
-'''
+"""
 
 import re
 import os

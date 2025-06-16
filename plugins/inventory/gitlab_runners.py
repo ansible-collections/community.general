@@ -7,56 +7,56 @@
 from __future__ import annotations
 
 
-DOCUMENTATION = '''
-    name: gitlab_runners
-    author:
-      - Stefan Heitmüller (@morph027) <stefan.heitmueller@gmx.com>
-    short_description: Ansible dynamic inventory plugin for GitLab runners.
-    requirements:
-        - python-gitlab > 1.8.0
-    extends_documentation_fragment:
-        - constructed
-    description:
-        - Reads inventories from the GitLab API.
-        - Uses a YAML configuration file gitlab_runners.[yml|yaml].
-    options:
-        plugin:
-            description: The name of this plugin, it should always be set to 'gitlab_runners' for this plugin to recognize it as its own.
-            type: str
-            required: true
-            choices:
-              - gitlab_runners
-              - community.general.gitlab_runners
-        server_url:
-            description: The URL of the GitLab server, with protocol (i.e. http or https).
-            env:
-              - name: GITLAB_SERVER_URL
-                version_added: 1.0.0
-            type: str
-            required: true
-        api_token:
-            description: GitLab token for logging in.
-            env:
-              - name: GITLAB_API_TOKEN
-                version_added: 1.0.0
-            type: str
-            aliases:
-              - private_token
-              - access_token
-        filter:
-            description: filter runners from GitLab API
-            env:
-              - name: GITLAB_FILTER
-                version_added: 1.0.0
-            type: str
-            choices: ['active', 'paused', 'online', 'specific', 'shared']
-        verbose_output:
-            description: Toggle to (not) include all available nodes metadata
-            type: bool
-            default: true
-'''
+DOCUMENTATION = r"""
+name: gitlab_runners
+author:
+  - Stefan Heitmüller (@morph027) <stefan.heitmueller@gmx.com>
+short_description: Ansible dynamic inventory plugin for GitLab runners.
+requirements:
+  - python-gitlab > 1.8.0
+extends_documentation_fragment:
+  - constructed
+description:
+  - Reads inventories from the GitLab API.
+  - Uses a YAML configuration file gitlab_runners.[yml|yaml].
+options:
+  plugin:
+    description: The name of this plugin, it should always be set to 'gitlab_runners' for this plugin to recognize it as its own.
+    type: str
+    required: true
+    choices:
+      - gitlab_runners
+      - community.general.gitlab_runners
+  server_url:
+    description: The URL of the GitLab server, with protocol (i.e. http or https).
+    env:
+      - name: GITLAB_SERVER_URL
+        version_added: 1.0.0
+    type: str
+    required: true
+  api_token:
+    description: GitLab token for logging in.
+    env:
+      - name: GITLAB_API_TOKEN
+        version_added: 1.0.0
+    type: str
+    aliases:
+      - private_token
+      - access_token
+  filter:
+    description: filter runners from GitLab API
+    env:
+      - name: GITLAB_FILTER
+        version_added: 1.0.0
+    type: str
+    choices: ['active', 'paused', 'online', 'specific', 'shared']
+  verbose_output:
+    description: Toggle to (not) include all available nodes metadata
+    type: bool
+    default: true
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 ---
 # gitlab_runners.yml
 plugin: community.general.gitlab_runners
@@ -79,7 +79,7 @@ keyed_groups:
   # hint: labels containing special characters will be converted to safe names
   - key: 'tag_list'
     prefix: tag
-'''
+"""
 
 from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable

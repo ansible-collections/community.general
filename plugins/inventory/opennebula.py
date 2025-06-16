@@ -6,77 +6,77 @@
 from __future__ import annotations
 
 
-DOCUMENTATION = r'''
-    name: opennebula
-    author:
-        - Kristian Feldsam (@feldsam)
-    short_description: OpenNebula inventory source
-    version_added: "3.8.0"
-    extends_documentation_fragment:
-        - constructed
+DOCUMENTATION = r"""
+name: opennebula
+author:
+  - Kristian Feldsam (@feldsam)
+short_description: OpenNebula inventory source
+version_added: "3.8.0"
+extends_documentation_fragment:
+  - constructed
+description:
+  - Get inventory hosts from OpenNebula cloud.
+  - Uses an YAML configuration file ending with either C(opennebula.yml) or C(opennebula.yaml)
+    to set parameter values.
+  - Uses O(api_authfile), C(~/.one/one_auth), or E(ONE_AUTH) pointing to a OpenNebula credentials file.
+options:
+  plugin:
+    description: Token that ensures this is a source file for the 'opennebula' plugin.
+    type: string
+    required: true
+    choices: [community.general.opennebula]
+  api_url:
     description:
-        - Get inventory hosts from OpenNebula cloud.
-        - Uses an YAML configuration file ending with either C(opennebula.yml) or C(opennebula.yaml)
-          to set parameter values.
-        - Uses O(api_authfile), C(~/.one/one_auth), or E(ONE_AUTH) pointing to a OpenNebula credentials file.
-    options:
-        plugin:
-            description: Token that ensures this is a source file for the 'opennebula' plugin.
-            type: string
-            required: true
-            choices: [ community.general.opennebula ]
-        api_url:
-            description:
-              - URL of the OpenNebula RPC server.
-              - It is recommended to use HTTPS so that the username/password are not
-                transferred over the network unencrypted.
-              - If not set then the value of the E(ONE_URL) environment variable is used.
-            env:
-              - name: ONE_URL
-            required: true
-            type: string
-        api_username:
-            description:
-              - Name of the user to login into the OpenNebula RPC server. If not set
-                then the value of the E(ONE_USERNAME) environment variable is used.
-            env:
-              - name: ONE_USERNAME
-            type: string
-        api_password:
-            description:
-              - Password or a token of the user to login into OpenNebula RPC server.
-              - If not set, the value of the E(ONE_PASSWORD) environment variable is used.
-            env:
-              - name: ONE_PASSWORD
-            required: false
-            type: string
-        api_authfile:
-            description:
-              - If both O(api_username) or O(api_password) are not set, then it will try
-                authenticate with ONE auth file. Default path is C(~/.one/one_auth).
-              - Set environment variable E(ONE_AUTH) to override this path.
-            env:
-              - name: ONE_AUTH
-            required: false
-            type: string
-        hostname:
-            description: Field to match the hostname. Note V(v4_first_ip) corresponds to the first IPv4 found on VM.
-            type: string
-            default: v4_first_ip
-            choices:
-                - v4_first_ip
-                - v6_first_ip
-                - name
-        filter_by_label:
-            description: Only return servers filtered by this label.
-            type: string
-        group_by_labels:
-            description: Create host groups by vm labels
-            type: bool
-            default: true
-'''
+      - URL of the OpenNebula RPC server.
+      - It is recommended to use HTTPS so that the username/password are not
+        transferred over the network unencrypted.
+      - If not set then the value of the E(ONE_URL) environment variable is used.
+    env:
+      - name: ONE_URL
+    required: true
+    type: string
+  api_username:
+    description:
+      - Name of the user to login into the OpenNebula RPC server. If not set
+        then the value of the E(ONE_USERNAME) environment variable is used.
+    env:
+      - name: ONE_USERNAME
+    type: string
+  api_password:
+    description:
+      - Password or a token of the user to login into OpenNebula RPC server.
+      - If not set, the value of the E(ONE_PASSWORD) environment variable is used.
+    env:
+      - name: ONE_PASSWORD
+    required: false
+    type: string
+  api_authfile:
+    description:
+      - If both O(api_username) or O(api_password) are not set, then it will try
+        authenticate with ONE auth file. Default path is C(~/.one/one_auth).
+      - Set environment variable E(ONE_AUTH) to override this path.
+    env:
+      - name: ONE_AUTH
+    required: false
+    type: string
+  hostname:
+    description: Field to match the hostname. Note V(v4_first_ip) corresponds to the first IPv4 found on VM.
+    type: string
+    default: v4_first_ip
+    choices:
+      - v4_first_ip
+      - v6_first_ip
+      - name
+  filter_by_label:
+    description: Only return servers filtered by this label.
+    type: string
+  group_by_labels:
+    description: Create host groups by vm labels
+    type: bool
+    default: true
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 # inventory_opennebula.yml file in YAML format
 # Example command line: ansible-inventory --list -i inventory_opennebula.yml
 
@@ -84,7 +84,7 @@ EXAMPLES = r'''
 plugin: community.general.opennebula
 api_url: https://opennebula:2633/RPC2
 filter_by_label: Cache
-'''
+"""
 
 try:
     import pyone
