@@ -443,7 +443,10 @@ class Rhsm(object):
         distro_version = tuple(str2int(p) for p in distro_version_parts)
 
         # subscription-manager attach command was removed in Fedora 41 and RHEL 10
-        if (distro_id == 'fedora' and distro_version[0] >= 41) or distro_version[0] >= 10:
+        if (
+            (distro_id == 'rhel' and distro_version[0] >= 10)
+            or (distro_id == 'fedora' and distro_version[0] >= 41)
+        ):
             auto_attach = False
 
         # There is no support for token-based registration in the D-Bus API
