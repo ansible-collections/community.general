@@ -5,11 +5,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-try:
-    from unittest.mock import mock_open, patch, MagicMock
-except ImportError:
-
-    from mock import mock_open, patch, MagicMock
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import mock_open, patch, MagicMock
 
 import pytest
 import sys
