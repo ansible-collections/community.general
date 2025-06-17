@@ -13,7 +13,7 @@ from ansible.module_utils.six import iteritems
 from ansible_collections.community.general.plugins.module_utils.net_tools.pritunl import (
     api,
 )
-from mock import MagicMock
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import MagicMock
 
 __metaclass__ = type
 
