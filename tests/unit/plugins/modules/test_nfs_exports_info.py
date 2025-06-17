@@ -9,7 +9,6 @@ from ansible_collections.community.internal_test_tools.tests.unit.compat.mock im
 
 import pytest
 import sys
-import os
 import hashlib
 
 from ansible_collections.community.general.plugins.modules.nfs_exports_info import get_exports
