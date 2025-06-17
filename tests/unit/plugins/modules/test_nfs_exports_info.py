@@ -14,6 +14,7 @@ import hashlib
 
 from ansible_collections.community.general.plugins.modules.nfs_exports_info import get_exports
 
+
 @pytest.fixture
 def fake_exports_content():
     return """
