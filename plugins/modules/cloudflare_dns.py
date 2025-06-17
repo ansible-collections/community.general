@@ -158,7 +158,7 @@ options:
       - Support for V(SPF) has been removed from community.general 9.0.0 since that record type is no longer supported by
         CloudFlare.
     type: str
-    choices: [A, AAAA, CNAME, DS, MX, NS, SRV, SSHFP, TLSA, CAA, TXT]
+    choices: [A, AAAA, CNAME, DS, MX, NS, SRV, SSHFP, TLSA, CAA, TXT, PTR]
   value:
     description:
       - The record value.
@@ -311,6 +311,14 @@ EXAMPLES = r"""
     algorithm: 8
     hash_type: 2
     value: B4EB5AC4467D2DFB3BAF9FB9961DC1B6FED54A58CDFAA3E465081EC86F89BFAB
+
+- name: Create PTR record "1.2.0.192.in-addr.arpa" with value "test.example.com"
+  community.general.cloudflare_dns:
+    zone: 2.0.192.in-addr.arpa
+    record: 1
+    type: PTR
+    value: test.example.com
+    state: present
 """
 
 RETURN = r"""
@@ -729,7 +737,7 @@ class CloudflareAPI(object):
         if (params['type'] is None) or (params['record'] is None):
             self.module.fail_json(msg="You must provide a type and a record to create a new record")
 
-        if (params['type'] in ['A', 'AAAA', 'CNAME', 'TXT', 'MX', 'NS']):
+        if (params['type'] in ['A', 'AAAA', 'CNAME', 'TXT', 'MX', 'NS', 'PTR']):
             if not params['value']:
                 self.module.fail_json(msg="You must provide a non-empty value to create this record type")
 
@@ -935,7 +943,7 @@ def main():
             state=dict(type='str', default='present', choices=['absent', 'present']),
             timeout=dict(type='int', default=30),
             ttl=dict(type='int', default=1),
-            type=dict(type='str', choices=['A', 'AAAA', 'CNAME', 'DS', 'MX', 'NS', 'SRV', 'SSHFP', 'TLSA', 'CAA', 'TXT']),
+            type=dict(type='str', choices=['A', 'AAAA', 'CNAME', 'DS', 'MX', 'NS', 'SRV', 'SSHFP', 'TLSA', 'CAA', 'TXT', 'PTR']),
             value=dict(type='str', aliases=['content']),
             weight=dict(type='int', default=1),
             zone=dict(type='str', required=True, aliases=['domain']),
