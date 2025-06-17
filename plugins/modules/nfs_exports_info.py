@@ -14,7 +14,7 @@ module: nfs_exports_info
 short_description: Extract folders, IPs, and options from C(/etc/exports)
 
 description:
-  - This module retrieves and processes the contents of the /etc/exports file from a remote server,
+  - This module retrieves and processes the contents of the C(/etc/exports) file from a remote server,
     mapping folders to their corresponding IP addresses and access options.
 
 author:
