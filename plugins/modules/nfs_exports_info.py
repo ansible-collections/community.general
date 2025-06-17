@@ -21,6 +21,10 @@ author:
   - Samaneh Yousefnezhad (@yousefenzhad)
 version_added: "11.1.0"
 
+extends_documentation_fragment:
+  - community.general.attributes
+  - community.general.attributes.info_module
+
 options:
   output_format:
     description:
