@@ -116,7 +116,8 @@ options:
     description:
       - Upon successful registration, auto-consume available subscriptions.
       - Please note that the alias O(ignore:autosubscribe) was removed in community.general 9.0.0.
-      - Since community.general X.Y.Z, this option does nothing for RHEL 10+ and Fedora 41+ where attach has been removed.
+      - Since community.general 11.1.0 resp. 10.7.2, this option does nothing for RHEL 10+ and Fedora 41+ where
+        C(attach) has been removed.
     type: bool
   activationkey:
     description:
