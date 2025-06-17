@@ -116,7 +116,7 @@ options:
     description:
       - Upon successful registration, auto-consume available subscriptions.
       - Please note that the alias O(ignore:autosubscribe) was removed in community.general 9.0.0.
-      - Also note that this option does nothing for RHEL 10+ and Fedora 41+, where the attach option has been removed.
+      - Since community.general X.Y.Z, this option does nothing for RHEL 10+ and Fedora 41+ where attach has been removed.
     type: bool
   activationkey:
     description:
@@ -431,6 +431,21 @@ class Rhsm(object):
             Raises:
               * Exception - if any error occurs during the registration
         '''
+
+        def str2int(s, default=0):
+            try:
+                return int(s)
+            except ValueError:
+                return default
+
+        distro_id = distro.id()
+        distro_version_parts = distro.version_parts()
+        distro_version = tuple(str2int(p) for p in distro_version_parts)
+
+        # subscription-manager attach command was removed in Fedora 41 and RHEL 10
+        if (distro_id == 'fedora' and distro_version[0] >= 41) or distro_version[0] >= 10:
+            auto_attach = False
+
         # There is no support for token-based registration in the D-Bus API
         # of rhsm, so always use the CLI in that case;
         # also, since the specified environments are names, and the D-Bus APIs
@@ -446,29 +461,6 @@ class Rhsm(object):
                                  activationkey, org_id, consumer_type,
                                  consumer_name, consumer_id,
                                  force_register, environment, release)
-
-    def _has_attach_command(self):
-        """
-        Checks whether subscription-manager has an attach command.
-
-        :returns: bool -- whether subscription-manager has an attach command.
-        """
-
-        def str2int(s, default=0):
-            try:
-                return int(s)
-            except ValueError:
-                return default
-
-        distro_id = distro.id()
-        distro_version = tuple(str2int(p) for p in distro.version_parts())
-
-        # subscription-manager attach command was removed in Fedora 41 and RHEL 10
-        if distro_id == 'fedora' and distro_version[0] >= 41:
-            return False
-        if distro_id == 'rhel' and distro_version[0] >= 10:
-            return False
-        return True
 
     def _register_using_cli(self, username, password, token, auto_attach,
                             activationkey, org_id, consumer_type, consumer_name,
@@ -488,7 +480,7 @@ class Rhsm(object):
         if org_id:
             args.extend(['--org', org_id])
 
-        if auto_attach and self._has_attach_command():
+        if auto_attach:
             args.append('--auto-attach')
 
         if consumer_type:
@@ -760,7 +752,7 @@ class Rhsm(object):
         self.module.run_command([SUBMAN_CMD, 'refresh'],
                                 check_rc=True, expand_user_and_vars=False)
 
-        if auto_attach and self._has_attach_command():
+        if auto_attach:
             args = [SUBMAN_CMD, 'attach', '--auto']
             self.module.run_command(args, check_rc=True, expand_user_and_vars=False)
 
