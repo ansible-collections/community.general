@@ -12,13 +12,7 @@ import sys
 import os
 import hashlib
 
-
-sys.path.insert(0, os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '../../../../plugins/modules')
-))
-
-from nfs_exports_info import get_exports
-
+from ansible_collections.community.general.plugins.modules.nfs_exports_info import get_exports
 
 @pytest.fixture
 def fake_exports_content():
