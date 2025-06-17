@@ -51,7 +51,7 @@ And by the time the module is about to exit:
 
 That makes the return value of the module:
 
-.. code-block:: javascript
+.. code-block:: json
 
     {
         "abc": 123,
