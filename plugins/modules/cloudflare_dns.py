@@ -982,13 +982,6 @@ def main():
                     and (module.params['value'] is None or module.params['value'] == ''))):
             module.fail_json(msg="For TLSA records the params cert_usage, selector, hash_type and value all need to be defined, or not at all.")
 
-    if module.params['type'] == 'CAA':
-        if not ((module.params['flag'] is not None and module.params['tag'] is not None
-                 and not (module.params['value'] is None or module.params['value'] == ''))
-                or (module.params['flag'] is None and module.params['tag'] is None
-                    and (module.params['value'] is None or module.params['value'] == ''))):
-            module.fail_json(msg="For CAA records the params flag, tag and value all need to be defined, or not at all.")
-
     if module.params['type'] == 'DS':
         if not ((module.params['key_tag'] is not None and module.params['algorithm'] is not None and module.params['hash_type'] is not None
                  and not (module.params['value'] is None or module.params['value'] == ''))
