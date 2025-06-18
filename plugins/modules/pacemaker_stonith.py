@@ -11,12 +11,12 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: pacemaker_stonith
-short_description: Manage pacemaker stonith
+short_description: Manage pacemaker STONITH
 author:
   - Dexter Le (@munchtoast)
-version_added: 10.8.0
+version_added: 11.1.0
 description:
-  - This module can manage stonith in a Pacemaker cluster using the pacemaker CLI.
+  - This module can manage STONITH in a Pacemaker cluster using the pacemaker CLI.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -27,95 +27,95 @@ attributes:
 options:
   state:
     description:
-      - Indicate desired state for cluster stonith.
+      - Indicate desired state for cluster STONITH.
     choices: [ present, absent, enabled, disabled ]
     default: present
     type: str
   name:
     description:
-      - Specify the stonith name to create.
+      - Specify the STONITH name to create.
     required: true
     type: str
   stonith_type:
     description:
-      - Specify the stonith device type
+      - Specify the STONITH device type
     type: str
-  stonith_option:
+  stonith_options:
     description:
-      - Specify the stonith option to create.
+      - Specify the STONITH option to create.
     type: list
     elements: str
     default: []
-  stonith_operation:
+  stonith_operations:
     description:
-      - List of operations to associate with stonith.
+      - List of operations to associate with STONITH.
     type: list
     elements: dict
     default: []
     suboptions:
       operation_action:
         description:
-          - Operation action to associate with stonith.
+          - Operation action to associate with STONITH.
         type: str
-      operation_option:
+      operation_options:
         description:
           - Operation option to associate with action.
         type: list
         elements: str
-  stonith_meta:
+  stonith_metas:
     description:
-      - List of meta to associate with stonith.
+      - List of meta to associate with STONITH.
     type: list
     elements: str
   stonith_argument:
     description:
-      - Action to associate with stonith.
+      - Action to associate with STONITH.
     type: dict
     suboptions:
       argument_action:
         description:
-          - Action to apply to stonith.
+          - Action to apply to STONITH.
         type: str
         choices: [ group, before, after ]
-      argument_option:
+      argument_options:
         description:
-          - Options to associate with stonith action.
+          - Options to associate with STONITH action.
         type: list
         elements: str
   agent_validation:
     description:
-      - enabled agent validation for stonith creation.
+      - enabled agent validation for STONITH creation.
     type: bool
     default: false
   wait:
     description:
-      - Timeout period for polling the stonith creation.
+      - Timeout period for polling the STONITH creation.
     type: int
     default: 300
 '''
 
 EXAMPLES = '''
 ---
-- name: Create pacemaker stonith
+- name: Create pacemaker STONITH
   hosts: localhost
   gather_facts: false
   tasks:
-  - name: Create virtual-ip stonith
+  - name: Create virtual-ip STONITH
     community.general.pacemaker_stonith:
       state: present
       name: virtual-stonith
       stonith_type: fence_virt
-      stonith_option:
+      stonith_options:
         - "pcmk_host_list=f1"
-      stonith_operation:
+      stonith_operations:
         - operation_action: monitor
-          operation_option:
+          operation_options:
             - "interval=30s"
 '''
 
 RETURN = '''
 cluster_stonith:
-    description: The cluster stonith output message.
+    description: The cluster STONITH output message.
     type: str
     sample: ""
     returned: always
@@ -132,20 +132,20 @@ class PacemakerStonith(StateModuleHelper):
                 'present', 'absent', 'enabled', 'disabled']),
             name=dict(type='str', required=True),
             stonith_type=dict(type='str'),
-            stonith_option=dict(type='list', elements='str', default=list()),
-            stonith_operation=dict(type='list', elements='dict', default=list(), options=dict(
+            stonith_options=dict(type='list', elements='str', default=list()),
+            stonith_operations=dict(type='list', elements='dict', default=list(), options=dict(
                 operation_action=dict(type='str'),
-                operation_option=dict(type='list', elements='str'),
+                operation_options=dict(type='list', elements='str'),
             )),
-            stonith_meta=dict(type='list', elements='str'),
+            stonith_metas=dict(type='list', elements='str'),
             stonith_argument=dict(type='dict', options=dict(
                 argument_action=dict(type='str', choices=['before', 'after', 'group']),
-                argument_option=dict(type='list', elements='str'),
+                argument_options=dict(type='list', elements='str'),
             )),
             agent_validation=dict(type='bool', default=False),
             wait=dict(type='int', default=300),
         ),
-        required_if=[('state', 'present', ['stonith_type', 'stonith_option'])],
+        required_if=[('state', 'present', ['stonith_type', 'stonith_options'])],
         supports_check_mode=True
     )
 
@@ -156,11 +156,6 @@ class PacemakerStonith(StateModuleHelper):
         self.runner = pacemaker_runner(self.module, cli_action='stonith')
         self.vars.set('previous_value', self._get())
         self.vars.set('value', self.vars.previous_value, change=True, diff=True)
-        self.module.params['resource_type'] = dict(resource_name=self.vars.stonith_type)
-        self.module.params['resource_option'] = self.vars.stonith_option
-        self.module.params['resource_operation'] = self.vars.stonith_operation
-        self.module.params['resource_meta'] = self.vars.stonith_meta
-        self.module.params['resource_argument'] = self.vars.stonith_argument
 
     def _process_command_output(self, fail_on_err, ignore_err_msg=""):
         def process(rc, out, err):
@@ -174,6 +169,17 @@ class PacemakerStonith(StateModuleHelper):
         with self.runner('state name', output_process=self._process_command_output(False)) as ctx:
             return ctx.run(state='status')
 
+    def _fmt_stonith_resource(self):
+        return dict([("resource_name", self.vars.stonith_type)])
+
+    # TODO: Pluralize operation_options in separate PR and remove this helper fmt function
+    def _fmt_stonith_operations(self):
+        modified_stonith_operations = []
+        for stonith_operation in self.vars.stonith_operations:
+            modified_stonith_operations.append(dict([("operation_action", stonith_operation.get('operation_action')),
+                                                    ("operation_option", stonith_operation.get('operation_options'))]))
+        return modified_stonith_operations
+
     def state_absent(self):
         with self.runner('state name', output_process=self._process_command_output(True, "does not exist"), check_mode_skip=True) as ctx:
             ctx.run()
@@ -184,10 +190,14 @@ class PacemakerStonith(StateModuleHelper):
 
     def state_present(self):
         with self.runner(
-                'state name resource_type resource_option resource_operation resource_meta resource_argument wait',
+                'state name resource_type resource_option resource_operation resource_meta resource_argument agent_validation wait',
                 output_process=self._process_command_output(True, "already exists"),
                 check_mode_skip=True) as ctx:
-            ctx.run()
+            ctx.run(resource_type=self._fmt_stonith_resource(),
+                    resource_option=self.vars.stonith_options,
+                    resource_operation=self._fmt_stonith_operations(),
+                    resource_meta=self.vars.stonith_metas,
+                    resource_argument=self.vars.stonith_argument)
             self.vars.set('value', self._get())
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err

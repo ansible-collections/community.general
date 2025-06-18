@@ -64,6 +64,7 @@ def pacemaker_runner(module, **kwargs):
             resource_meta=cmd_runner_fmt.stack(cmd_runner_fmt.as_opt_val)("meta"),
             resource_argument=cmd_runner_fmt.as_func(fmt_resource_argument),
             apply_all=cmd_runner_fmt.as_bool("--all"),
+            agent_validation=cmd_runner_fmt.as_bool("--agent-validation"),
             wait=cmd_runner_fmt.as_opt_eq_val("--wait"),
             config=cmd_runner_fmt.as_fixed("config"),
             force=cmd_runner_fmt.as_bool("--force"),

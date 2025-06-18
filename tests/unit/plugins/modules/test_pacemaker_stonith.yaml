@@ -17,11 +17,11 @@ test_cases:
       state: present
       name: virtual-stonith
       stonith_type: fence_virt
-      stonith_option:
+      stonith_options:
         - "pcmk_host_list=f1"
-      stonith_operation:
+      stonith_operations:
         - operation_action: monitor
-          operation_option:
+          operation_options:
             - "interval=30s"
     output:
       changed: true
@@ -49,11 +49,11 @@ test_cases:
       state: present
       name: virtual-stonith
       stonith_type: fence_virt
-      stonith_option:
+      stonith_options:
         - "pcmk_host_list=f1"
-      stonith_operation:
+      stonith_operations:
         - operation_action: monitor
-          operation_option:
+          operation_options:
             - "interval=30s"
     output:
       changed: false
