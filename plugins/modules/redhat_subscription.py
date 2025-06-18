@@ -432,21 +432,15 @@ class Rhsm(object):
             Raises:
               * Exception - if any error occurs during the registration
         '''
-
-        def str2int(s, default=0):
-            try:
-                return int(s)
-            except ValueError:
-                return default
-
-        distro_id = distro.id()
-        distro_version_parts = distro.version_parts()
-        distro_version = tuple(str2int(p) for p in distro_version_parts)
-
         # subscription-manager attach command was removed in Fedora 41 and RHEL 10
+        distro_id = distro.id()
+        try:
+            distro_major_version = int(distro.major_version())
+        except ValueError:
+            distro_major_version = 0
         if (
-            (distro_id == 'rhel' and distro_version[0] >= 10)
-            or (distro_id == 'fedora' and distro_version[0] >= 41)
+            (distro_id == 'rhel' and distro_major_version >= 10)
+            or (distro_id == 'fedora' and distro_major_version >= 41)
         ):
             auto_attach = False
 
