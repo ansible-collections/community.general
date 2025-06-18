@@ -156,6 +156,7 @@ options:
     description:
       - The type of DNS record to create. Required if O(state=present).
       - Support for V(SPF) has been removed from community.general 9.0.0 since that record type is no longer supported by
+      - Support for V(PTR) has been added in community.general 11.1.0.
         CloudFlare.
     type: str
     choices: [A, AAAA, CNAME, DS, MX, NS, SRV, SSHFP, TLSA, CAA, TXT, PTR]
