@@ -85,7 +85,7 @@ test_cases:
           environ: *env-def
           rc: 0
           out: ""
-          err: "" 
+          err: ""
   - id: test_online_minimal_input_initial_offline_single_nonlocal_no_maintenance
     input:
       state: online
