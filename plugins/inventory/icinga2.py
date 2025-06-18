@@ -291,11 +291,11 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         self.group_by_hostgroups = self.get_option('group_by_hostgroups')
 
         if self.templar.is_template(self.icinga2_url):
-            self.icinga2_url = self.templar.template(variable=self.icinga2_url, disable_lookups=False)
+            self.icinga2_url = self.templar.template(variable=self.icinga2_url)
         if self.templar.is_template(self.icinga2_user):
-            self.icinga2_user = self.templar.template(variable=self.icinga2_user, disable_lookups=False)
+            self.icinga2_user = self.templar.template(variable=self.icinga2_user)
         if self.templar.is_template(self.icinga2_password):
-            self.icinga2_password = self.templar.template(variable=self.icinga2_password, disable_lookups=False)
+            self.icinga2_password = self.templar.template(variable=self.icinga2_password)
 
         self.icinga2_url = f"{self.icinga2_url.rstrip('/')}/v1"
 
