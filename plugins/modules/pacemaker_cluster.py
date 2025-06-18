@@ -29,7 +29,7 @@ options:
   state:
     description:
       - Indicate desired state of the cluster.
-    choices: [cleanup, offline, online, restart, maintenance]
+    choices: [offline, online, restart, maintenance]
     type: str
     required: true
   name:
@@ -78,7 +78,7 @@ class PacemakerCluster(StateModuleHelper):
     module = dict(
         argument_spec=dict(
             state=dict(type='str', required=True, choices=[
-                'cleanup', 'offline', 'online', 'restart', 'maintenance']),
+                'offline', 'online', 'restart', 'maintenance']),
             name=dict(type='str', default='all', aliases=['node']),
             wait=dict(type='int', default=300),
             force=dict(type='bool', default=True)
