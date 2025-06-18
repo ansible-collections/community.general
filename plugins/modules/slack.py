@@ -405,6 +405,7 @@ def do_notify_slack(module, domain, token, payload):
     use_webapi = False
     if token.count('/') >= 2:
         # New style webhook token
+        domain = (domain if domain in ('slack.com', 'slack-gov.com') else 'slack.com')
         slack_uri = SLACK_INCOMING_WEBHOOK % (domain, token)
     elif re.match(r'^xox[abp]-\S+$', token):
         domain = (domain if domain in ('slack.com', 'slack-gov.com') else 'slack.com')
