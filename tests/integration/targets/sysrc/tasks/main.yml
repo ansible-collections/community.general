@@ -141,12 +141,12 @@
       #
       # NOTE: currently fails with FreeBSD 12 with minor version less than 4
       # NOTE: currently fails with FreeBSD 13 with minor version less than 4
-      # NOTE: currently fails with FreeBSD 14 with minor version less than 1
+      # NOTE: currently fails with FreeBSD 14 with minor version less than 2
       #
       when: >-
         ansible_distribution_version is version('12.4', '>=') and ansible_distribution_version is version('13', '<')
         or ansible_distribution_version is version('13.4', '>=') and ansible_distribution_version is version('14', '<')
-        or ansible_distribution_version is version('14.1', '>=')
+        or ansible_distribution_version is version('14.2', '>=')
       block:
         - name: Setup testjail
           include_tasks: setup-testjail.yml
