@@ -373,8 +373,10 @@ def build_payload_for_slack(text, channel, thread_id, username, icon_url, icon_e
 
     return payload
 
+
 def check_webapi_slack_domain(domain):
-     return (domain if domain in ('slack.com', 'slack-gov.com') else 'slack.com')
+    return (domain if domain in ('slack.com', 'slack-gov.com') else 'slack.com')
+
 
 def get_slack_message(module, domain, token, channel, ts):
     headers = {
