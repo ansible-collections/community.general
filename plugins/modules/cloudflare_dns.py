@@ -451,9 +451,11 @@ from ansible.module_utils.urls import fetch_url
 
 
 def lowercase_string(param):
-    if not isinstance(param, str):
-        return param
-    return param.lower()
+    return param.lower() if isinstance(param, str) else param
+
+
+def join_str(sep, *args):
+    return sep.join([str(arg) for arg in args])
 
 
 class CloudflareAPI(object):
@@ -501,18 +503,18 @@ class CloudflareAPI(object):
 
         if (self.type == 'SRV'):
             if (self.proto is not None) and (not self.proto.startswith('_')):
-                self.proto = '_' + self.proto
+                self.proto = '_{0}'.format(self.proto)
             if (self.service is not None) and (not self.service.startswith('_')):
-                self.service = '_' + self.service
+                self.service = '_{0}'.format(self.service)
 
         if (self.type == 'TLSA'):
             if (self.proto is not None) and (not self.proto.startswith('_')):
-                self.proto = '_' + self.proto
+                self.proto = '_{0}'.format(self.proto)
             if (self.port is not None):
-                self.port = '_' + str(self.port)
+                self.port = '_{0}'.format(self.port)
 
         if not self.record.endswith(self.zone):
-            self.record = self.record + '.' + self.zone
+            self.record = join_str('.', self.record, self.zone)
 
         if (self.type == 'DS'):
             if self.record == self.zone:
@@ -521,7 +523,7 @@ class CloudflareAPI(object):
     def _cf_simple_api_call(self, api_call, method='GET', payload=None):
         if self.api_token:
             headers = {
-                'Authorization': 'Bearer ' + self.api_token,
+                'Authorization': 'Bearer {0}'.format(self.api_token),
                 'Content-Type': 'application/json',
             }
         else:
@@ -621,7 +623,7 @@ class CloudflareAPI(object):
                 else:
                     raw_api_call = api_call
                 while next_page <= pagination['total_pages']:
-                    raw_api_call += '?' + '&'.join(parameters)
+                    raw_api_call += '?{0}'.format('&'.join(parameters))
                     result, status = self._cf_simple_api_call(raw_api_call, method, payload)
                     data += result['result']
                     next_page += 1
@@ -646,8 +648,8 @@ class CloudflareAPI(object):
             name = self.zone
         param = ''
         if name:
-            param = '?' + urlencode({'name': name})
-        zones, status = self._cf_api_call('/zones' + param)
+            param = '?{0}'.format(urlencode({'name': name}))
+        zones, status = self._cf_api_call('/zones{0}'.format(param))
         return zones
 
     def get_dns_records(self, zone_name=None, type=None, record=None, value=''):
@@ -672,48 +674,40 @@ class CloudflareAPI(object):
         if value:
             query['content'] = value
         if query:
-            api_call += '?' + urlencode(query)
+            api_call += '?{0}'.format(urlencode(query))
 
         records, status = self._cf_api_call(api_call)
         return records
 
-    def delete_dns_records(self, **kwargs):
-        params = {}
-        for param in ['port', 'proto', 'service', 'solo', 'type', 'record', 'value', 'weight', 'zone',
-                      'algorithm', 'cert_usage', 'hash_type', 'selector', 'key_tag', 'flag', 'tag']:
-            if param in kwargs:
-                params[param] = kwargs[param]
-            else:
-                params[param] = getattr(self, param)
-
+    def delete_dns_records(self, solo):
         records = []
-        content = params['value']
-        search_record = params['record']
-        if params['type'] == 'SRV':
-            if not (params['value'] is None or params['value'] == ''):
-                content = str(params['weight']) + '\t' + str(params['port']) + '\t' + params['value']
-            search_record = params['service'] + '.' + params['proto'] + '.' + params['record']
-        elif params['type'] == 'DS':
-            if not (params['value'] is None or params['value'] == ''):
-                content = str(params['key_tag']) + '\t' + str(params['algorithm']) + '\t' + str(params['hash_type']) + '\t' + params['value']
-        elif params['type'] == 'SSHFP':
-            if not (params['value'] is None or params['value'] == ''):
-                content = str(params['algorithm']) + ' ' + str(params['hash_type']) + ' ' + params['value'].upper()
-        elif params['type'] == 'TLSA':
-            if not (params['value'] is None or params['value'] == ''):
-                content = str(params['cert_usage']) + '\t' + str(params['selector']) + '\t' + str(params['hash_type']) + '\t' + params['value']
-            search_record = params['port'] + '.' + params['proto'] + '.' + params['record']
-        if params['solo']:
+        content = self.value
+        search_record = self.record
+        if self.type == 'SRV':
+            if not (self.value is None or self.value == ''):
+                content = join_str('\t', self.weight, self.port, self.value)
+            search_record = join_str('.', self.service, self.proto, self.record)
+        elif self.type == 'DS':
+            if not (self.value is None or self.value == ''):
+                content = join_str('\t', self.key_tag, self.algorithm, self.hash_type, self.value)
+        elif self.type == 'SSHFP':
+            if not (self.value is None or self.value == ''):
+                content = join_str(' ', self.algorithm, self.hash_type, self.value.upper())
+        elif self.type == 'TLSA':
+            if not (self.value is None or self.value == ''):
+                content = join_str('\t', self.cert_usage, self.selector, self.hash_type, self.value)
+            search_record = join_str('.', self.port, self.proto, self.record)
+        if solo:
             search_value = None
         else:
             search_value = content
 
-        zone_id = self._get_zone_id(params['zone'])
-        records = self.get_dns_records(params['zone'], params['type'], search_record, search_value)
+        zone_id = self._get_zone_id(self.zone)
+        records = self.get_dns_records(self.zone, self.type, search_record, search_value)
 
         for rr in records:
-            if params['solo']:
-                if not ((rr['type'] == params['type']) and (rr['name'] == search_record) and (rr['content'] == content)):
+            if solo:
+                if not ((rr['type'] == self.type) and (rr['name'] == search_record) and (rr['content'] == content)):
                     self.changed = True
                     if not self.module.check_mode:
                         result, info = self._cf_api_call('/zones/{0}/dns_records/{1}'.format(zone_id, rr['id']), 'DELETE')
@@ -723,156 +717,146 @@ class CloudflareAPI(object):
                     result, info = self._cf_api_call('/zones/{0}/dns_records/{1}'.format(zone_id, rr['id']), 'DELETE')
         return self.changed
 
-    def ensure_dns_record(self, **kwargs):
-        params = {}
-        for param in ['port', 'priority', 'proto', 'proxied', 'service', 'ttl', 'type', 'record', 'value', 'weight', 'zone',
-                      'algorithm', 'cert_usage', 'hash_type', 'selector', 'key_tag', 'flag', 'tag', 'tags', 'comment']:
-            if param in kwargs:
-                params[param] = kwargs[param]
-            else:
-                params[param] = getattr(self, param)
-
-        search_value = params['value']
-        search_record = params['record']
+    def ensure_dns_record(self):
+        search_value = self.value
+        search_record = self.record
         new_record = None
-        if (params['type'] is None) or (params['record'] is None):
-            self.module.fail_json(msg="You must provide a type and a record to create a new record")
 
-        if (params['type'] in ['A', 'AAAA', 'CNAME', 'TXT', 'MX', 'NS', 'PTR']):
-            if not params['value']:
+        if (self.type in ['A', 'AAAA', 'CNAME', 'TXT', 'MX', 'NS', 'PTR']):
+            if not self.value:
                 self.module.fail_json(msg="You must provide a non-empty value to create this record type")
 
             # there can only be one CNAME per record
             # ignoring the value when searching for existing
             # CNAME records allows us to update the value if it
             # changes
-            if params['type'] == 'CNAME':
+            if self.type == 'CNAME':
                 search_value = None
 
             new_record = {
-                "type": params['type'],
-                "name": params['record'],
-                "content": params['value'],
-                "ttl": params['ttl']
+                "type": self.type,
+                "name": self.record,
+                "content": self.value,
+                "ttl": self.ttl
             }
 
-        if (params['type'] in ['A', 'AAAA', 'CNAME']):
-            new_record["proxied"] = params["proxied"]
+        if (self.type in ['A', 'AAAA', 'CNAME']):
+            new_record["proxied"] = self.proxied
 
-        if params['type'] == 'MX':
-            for attr in [params['priority'], params['value']]:
+        if self.type == 'MX':
+            for attr in [self.priority, self.value]:
                 if (attr is None) or (attr == ''):
                     self.module.fail_json(msg="You must provide priority and a value to create this record type")
             new_record = {
-                "type": params['type'],
-                "name": params['record'],
-                "content": params['value'],
-                "priority": params['priority'],
-                "ttl": params['ttl']
+                "type": self.type,
+                "name": self.record,
+                "content": self.value,
+                "priority": self.priority,
+                "ttl": self.ttl
             }
 
-        if params['type'] == 'SRV':
-            for attr in [params['port'], params['priority'], params['proto'], params['service'], params['weight'], params['value']]:
+        if self.type == 'SRV':
+            for attr in [self.port, self.priority, self.proto, self.service, self.weight, self.value]:
                 if (attr is None) or (attr == ''):
                     self.module.fail_json(msg="You must provide port, priority, proto, service, weight and a value to create this record type")
             srv_data = {
-                "target": params['value'],
-                "port": params['port'],
-                "weight": params['weight'],
-                "priority": params['priority'],
+                "target": self.value,
+                "port": self.port,
+                "weight": self.weight,
+                "priority": self.priority,
             }
 
             new_record = {
-                "type": params['type'],
-                "name": params['service'] + '.' + params['proto'] + '.' + params['record'],
-                "ttl": params['ttl'],
+                "type": self.type,
+                "name": join_str('.', self.service, self.proto, self.record),
+                "ttl": self.ttl,
                 'data': srv_data,
             }
-            search_value = str(params['weight']) + '\t' + str(params['port']) + '\t' + params['value']
-            search_record = params['service'] + '.' + params['proto'] + '.' + params['record']
+            search_value = join_str('\t', self.weight, self.port, self.value)
+            search_record = join_str('.', self.service, self.proto, self.record)
 
-        if params['type'] == 'DS':
-            for attr in [params['key_tag'], params['algorithm'], params['hash_type'], params['value']]:
+        if self.type == 'DS':
+            for attr in [self.key_tag, self.algorithm, self.hash_type, self.value]:
                 if (attr is None) or (attr == ''):
                     self.module.fail_json(msg="You must provide key_tag, algorithm, hash_type and a value to create this record type")
             ds_data = {
-                "key_tag": params['key_tag'],
-                "algorithm": params['algorithm'],
-                "digest_type": params['hash_type'],
-                "digest": params['value'],
+                "key_tag": self.key_tag,
+                "algorithm": self.algorithm,
+                "digest_type": self.hash_type,
+                "digest": self.value,
             }
             new_record = {
-                "type": params['type'],
-                "name": params['record'],
+                "type": self.type,
+                "name": self.record,
                 'data': ds_data,
-                "ttl": params['ttl'],
+                "ttl": self.ttl,
             }
-            search_value = str(params['key_tag']) + '\t' + str(params['algorithm']) + '\t' + str(params['hash_type']) + '\t' + params['value']
+            search_value = join_str('\t', self.key_tag, self.algorithm, self.hash_type, self.value)
 
-        if params['type'] == 'SSHFP':
-            for attr in [params['algorithm'], params['hash_type'], params['value']]:
+        if self.type == 'SSHFP':
+            for attr in [self.algorithm, self.hash_type, self.value]:
                 if (attr is None) or (attr == ''):
                     self.module.fail_json(msg="You must provide algorithm, hash_type and a value to create this record type")
             sshfp_data = {
-                "fingerprint": params['value'].upper(),
-                "type": params['hash_type'],
-                "algorithm": params['algorithm'],
+                "fingerprint": self.value.upper(),
+                "type": self.hash_type,
+                "algorithm": self.algorithm,
             }
             new_record = {
-                "type": params['type'],
-                "name": params['record'],
+                "type": self.type,
+                "name": self.record,
                 'data': sshfp_data,
-                "ttl": params['ttl'],
+                "ttl": self.ttl,
             }
-            search_value = str(params['algorithm']) + ' ' + str(params['hash_type']) + ' ' + params['value']
+            search_value = join_str(' ', self.algorithm, self.hash_type, self.value)
 
-        if params['type'] == 'TLSA':
-            for attr in [params['port'], params['proto'], params['cert_usage'], params['selector'], params['hash_type'], params['value']]:
+        if self.type == 'TLSA':
+            for attr in [self.port, self.proto, self.cert_usage, self.selector, self.hash_type, self.value]:
                 if (attr is None) or (attr == ''):
                     self.module.fail_json(msg="You must provide port, proto, cert_usage, selector, hash_type and a value to create this record type")
-            search_record = params['port'] + '.' + params['proto'] + '.' + params['record']
+            search_record = join_str('.', self.port, self.proto, self.record)
             tlsa_data = {
-                "usage": params['cert_usage'],
-                "selector": params['selector'],
-                "matching_type": params['hash_type'],
-                "certificate": params['value'],
+                "usage": self.cert_usage,
+                "selector": self.selector,
+                "matching_type": self.hash_type,
+                "certificate": self.value,
             }
             new_record = {
-                "type": params['type'],
+                "type": self.type,
                 "name": search_record,
                 'data': tlsa_data,
-                "ttl": params['ttl'],
+                "ttl": self.ttl,
             }
-            search_value = str(params['cert_usage']) + '\t' + str(params['selector']) + '\t' + str(params['hash_type']) + '\t' + params['value']
+            search_value = join_str('\t', self.cert_usage, self.selector, self.hash_type, self.value)
 
-        if params['type'] == 'CAA':
-            for attr in [params['flag'], params['tag'], params['value']]:
-                if (attr is None) or (attr == ''):
+        if self.type == 'CAA':
+            for attr in [self.flag, self.tag, self.value]:
+                if attr == '':
                     self.module.fail_json(msg="You must provide flag, tag and a value to create this record type")
             caa_data = {
-                "flags": params['flag'],
-                "tag": params['tag'],
-                "value": params['value'],
+                "flags": self.flag,
+                "tag": self.tag,
+                "value": self.value,
             }
             new_record = {
-                "type": params['type'],
-                "name": params['record'],
+                "type": self.type,
+                "name": self.record,
                 'data': caa_data,
-                "ttl": params['ttl'],
+                "ttl": self.ttl,
             }
             search_value = None
 
-        new_record['comment'] = params['comment'] or None
-        new_record['tags'] = params['tags'] or []
+        new_record['comment'] = self.comment or None
+        new_record['tags'] = self.tags or []
 
-        zone_id = self._get_zone_id(params['zone'])
-        records = self.get_dns_records(params['zone'], params['type'], search_record, search_value)
+        zone_id = self._get_zone_id(self.zone)
+        records = self.get_dns_records(self.zone, self.type, search_record, search_value)
         # in theory this should be impossible as cloudflare does not allow
         # the creation of duplicate records but lets cover it anyways
         if len(records) > 1:
             # As Cloudflare API cannot filter record containing quotes
             # CAA records must be compared locally
-            if params['type'] == 'CAA':
+            if self.type == 'CAA':
                 for rr in records:
                     if rr['data']['flags'] == caa_data['flags'] and rr['data']['tag'] == caa_data['tag'] and rr['data']['value'] == caa_data['value']:
                         return rr, self.changed
@@ -882,16 +866,16 @@ class CloudflareAPI(object):
         if len(records) == 1:
             cur_record = records[0]
             do_update = False
-            if (params['ttl'] is not None) and (cur_record['ttl'] != params['ttl']):
+            if (self.ttl is not None) and (cur_record['ttl'] != self.ttl):
                 do_update = True
-            if (params['priority'] is not None) and ('priority' in cur_record) and (cur_record['priority'] != params['priority']):
+            if (self.priority is not None) and ('priority' in cur_record) and (cur_record['priority'] != self.priority):
                 do_update = True
-            if ('proxied' in new_record) and ('proxied' in cur_record) and (cur_record['proxied'] != params['proxied']):
+            if ('proxied' in new_record) and ('proxied' in cur_record) and (cur_record['proxied'] != self.proxied):
                 do_update = True
             if ('data' in new_record) and ('data' in cur_record):
                 if (cur_record['data'] != new_record['data']):
                     do_update = True
-            if (params['type'] == 'CNAME') and (cur_record['content'] != new_record['content']):
+            if (self.type == 'CNAME') and (cur_record['content'] != new_record['content']):
                 do_update = True
             if cur_record['comment'] != new_record['comment']:
                 do_update = True
@@ -917,14 +901,9 @@ class CloudflareAPI(object):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            api_token=dict(
-                type="str",
-                required=False,
-                no_log=True,
-                fallback=(env_fallback, ["CLOUDFLARE_TOKEN"]),
-            ),
-            account_api_key=dict(type='str', required=False, no_log=True, aliases=['account_api_token']),
-            account_email=dict(type='str', required=False),
+            api_token=dict(type="str", no_log=True, fallback=(env_fallback, ["CLOUDFLARE_TOKEN"])),
+            account_api_key=dict(type='str', no_log=True, aliases=['account_api_token']),
+            account_email=dict(type='str'),
             algorithm=dict(type='int'),
             cert_usage=dict(type='int', choices=[0, 1, 2, 3]),
             comment=dict(type='str'),
@@ -957,10 +936,14 @@ def main():
             ('type', 'TLSA', ['proto', 'port']),
             ('type', 'CAA', ['flag', 'tag']),
         ],
+        required_together=[
+            ('account_api_key', 'account_email'),
+        ],
+        required_one_of=[
+            ['api_token', 'account_api_key'],
+        ],
     )
 
-    if not module.params['api_token'] and not (module.params['account_api_key'] and module.params['account_email']):
-        module.fail_json(msg="Either api_token or account_api_key and account_email params are required.")
     if module.params['type'] == 'SRV':
         if not ((module.params['weight'] is not None and module.params['port'] is not None
                  and not (module.params['value'] is None or module.params['value'] == ''))
