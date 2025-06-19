@@ -932,9 +932,9 @@ def main():
         required_if=[
             ('state', 'present', ['record', 'type', 'value']),
             ('state', 'absent', ['record']),
-            ('type', 'SRV', ['proto', 'service']),
+            ('type', 'SRV', ['proto', 'service', 'value']),
             ('type', 'TLSA', ['proto', 'port']),
-            ('type', 'CAA', ['flag', 'tag']),
+            ('type', 'CAA', ['flag', 'tag', 'value']),
         ],
         required_together=[
             ('account_api_key', 'account_email'),
@@ -945,11 +945,8 @@ def main():
     )
 
     if module.params['type'] == 'SRV':
-        if not ((module.params['weight'] is not None and module.params['port'] is not None
-                 and not (module.params['value'] is None or module.params['value'] == ''))
-                or (module.params['weight'] is None and module.params['port'] is None
-                    and (module.params['value'] is None or module.params['value'] == ''))):
-            module.fail_json(msg="For SRV records the params weight, port and value all need to be defined, or not at all.")
+        if not module.params['value'] == '':
+            module.fail_json(msg="For SRV records the params weight, port and value all need to be defined.")
 
     if module.params['type'] == 'SSHFP':
         if not ((module.params['algorithm'] is not None and module.params['hash_type'] is not None
@@ -966,11 +963,8 @@ def main():
             module.fail_json(msg="For TLSA records the params cert_usage, selector, hash_type and value all need to be defined, or not at all.")
 
     if module.params['type'] == 'CAA':
-        if not ((module.params['flag'] is not None and module.params['tag'] is not None
-                 and not (module.params['value'] is None or module.params['value'] == ''))
-                or (module.params['flag'] is None and module.params['tag'] is None
-                    and (module.params['value'] is None or module.params['value'] == ''))):
-            module.fail_json(msg="For CAA records the params flag, tag and value all need to be defined, or not at all.")
+        if not module.params['value'] == '':
+            module.fail_json(msg="For CAA records the params flag, tag and value all need to be defined.")
 
     if module.params['type'] == 'DS':
         if not ((module.params['key_tag'] is not None and module.params['algorithm'] is not None and module.params['hash_type'] is not None
