@@ -174,9 +174,9 @@ options:
 requirements:
   - softlayer >= 4.1.1
 notes:
-  - If using Python 2.7, you must install `softlayer-python<=5.7.2`.
-  - If using Python 3.6, you must install `softlayer-python<=6.0.0`.
-  - The `softlayer-python` library, at version 6.2.6 (from Jan 2025), only supports Python version 3.8, 3.9 and 3.10.
+  - If using Python 2.7, you must install C(softlayer-python<=5.7.2).
+  - If using Python 3.6, you must install C(softlayer-python<=6.0.0).
+  - The C(softlayer-python) library, at version 6.2.6 (from Jan 2025), only supports Python version 3.8, 3.9 and 3.10.
 author:
   - Matt Colton (@mcltn)
 seealso:
