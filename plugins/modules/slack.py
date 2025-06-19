@@ -32,9 +32,10 @@ options:
   domain:
     type: str
     description:
-      - Slack (sub)domain for your environment without protocol. (For example V(example.slack.com).) For WebAPI tokens this can be
-        V(slack.com) or V(slack-gov.com). For Webhook tokens in Ansible 1.8 and beyond,
-        this is deprecated and may be ignored. See token documentation for information.
+      - When using new format 'Webhook token' and WebAPI tokens: this can be V(slack.com) or V(slack-gov.com) and is ignored otherwise.
+      - When using old format 'Webhook token': Slack (sub)domain for your environment without protocol. (For example V(example.slack.com).)
+        in Ansible 1.8 and beyond, this is deprecated and may be ignored.
+      - See token documentation for information.
   token:
     type: str
     description:
@@ -374,7 +375,7 @@ def build_payload_for_slack(text, channel, thread_id, username, icon_url, icon_e
     return payload
 
 
-def check_webapi_slack_domain(domain):
+def validate_slack_domain(domain):
     return (domain if domain in ('slack.com', 'slack-gov.com') else 'slack.com')
 
 
@@ -390,7 +391,7 @@ def get_slack_message(module, domain, token, channel, ts):
         'limit': 1,
         'inclusive': 'true',
     })
-    domain = check_webapi_slack_domain(domain)
+    domain = validate_slack_domain(domain)
     url = (SLACK_CONVERSATIONS_HISTORY_WEBAPI % domain) + '?' + qs
     response, info = fetch_url(module=module, url=url, headers=headers, method='GET')
     if info['status'] != 200:
@@ -409,10 +410,10 @@ def do_notify_slack(module, domain, token, payload):
     use_webapi = False
     if token.count('/') >= 2:
         # New style webhook token
-        domain = check_webapi_slack_domain(domain)
+        domain = validate_slack_domain(domain)
         slack_uri = SLACK_INCOMING_WEBHOOK % (domain, token)
     elif re.match(r'^xox[abp]-\S+$', token):
-        domain = check_webapi_slack_domain(domain)
+        domain = validate_slack_domain(domain)
         slack_uri = (SLACK_UPDATEMESSAGE_WEBAPI if 'ts' in payload else SLACK_POSTMESSAGE_WEBAPI) % domain
         use_webapi = True
     else:
