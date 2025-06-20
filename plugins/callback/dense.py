@@ -9,7 +9,7 @@ from __future__ import annotations
 DOCUMENTATION = r"""
 name: dense
 type: stdout
-short_description: minimal stdout output
+short_description: Minimal stdout output
 extends_documentation_fragment:
   - default_callback
 description:
