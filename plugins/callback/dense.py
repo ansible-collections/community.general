@@ -263,11 +263,7 @@ class CallbackModule(CallbackModule_default):
             sys.stdout.write(colors[self.hosts[name]['state']] + name + vt100.reset)
             sys.stdout.flush()
 
-#        if result._result.get('diff', False):
-#            sys.stdout.write('\n' + vt100.linewrap)
         sys.stdout.write(vt100.linewrap)
-
-#        self.keep = True
 
     def _display_task_banner(self):
         if not self.shown_title:
@@ -312,12 +308,12 @@ class CallbackModule(CallbackModule_default):
 
             delegated_vars = result._result.get('_ansible_delegated_vars', None)
             if delegated_vars:
-                sys.stdout.write(f"{vt100.reset + result._host.get_name()}>{colors[status]}{delegated_vars['ansible_host']}")
+                sys.stdout.write(f"{vt100.reset}{result._host.get_name()}>{colors[status]}{delegated_vars['ansible_host']}")
             else:
                 sys.stdout.write(result._host.get_name())
 
             sys.stdout.write(f": {dump}\n")
-            sys.stdout.write(vt100.reset + vt100.save + vt100.clearline)
+            sys.stdout.write(f"{vt100.reset}{vt100.save}{vt100.clearline}")
             sys.stdout.flush()
 
         if status == 'changed':
