@@ -1,0 +1,6 @@
+breaking_changes:
+  - pacemaker_cluster - moved "cleanup" state to pacemaker_resource. Previously, users are able to cleanup cluster resources; however, this action should be for the pacemaker_resource module instead (https://github.com/ansible-collections/community.general/pull/10227).
+
+minor_changes:
+  - pacemaker_resource - add "cleanup" state for cleaning up cluster resources (https://github.com/ansible-collections/community.general/pull/10227).
+  - pacemaker_cluster - add unit tests and "maintenance" state for managing pacemaker maintenance mode (https://github.com/ansible-collections/community.general/pull/10227).

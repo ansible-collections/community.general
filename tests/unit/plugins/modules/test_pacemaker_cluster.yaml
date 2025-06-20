@@ -26,7 +26,7 @@ test_cases:
           rc: 0
           out: '   * Online: [ pc1, pc2, pc3 ]'
           err: ""
-        - command: [/testbin/pcs, cluster, start, all, --wait=300]
+        - command: [/testbin/pcs, cluster, start, --all, --wait=300]
           environ: *env-def
           rc: 0
           out: "Starting Cluster..."
@@ -60,7 +60,7 @@ test_cases:
           rc: 1
           out: 'Error: cluster is not currently running on this node'
           err: ""
-        - command: [/testbin/pcs, cluster, start, all, --wait=300]
+        - command: [/testbin/pcs, cluster, start, --all, --wait=300]
           environ: *env-def
           rc: 0
           out: "Starting Cluster..."
@@ -170,7 +170,7 @@ test_cases:
           rc: 0
           out: '   * Online: [ pc1, pc2, pc3 ]'
           err: ""
-        - command: [/testbin/pcs, cluster, stop, all, --wait=300]
+        - command: [/testbin/pcs, cluster, stop, --all, --wait=300]
           environ: *env-def
           rc: 0
           out: "Stopping Cluster..."
@@ -194,7 +194,7 @@ test_cases:
           rc: 1
           out: 'Error: cluster is not currently running on this node'
           err: ""
-        - command: [/testbin/pcs, cluster, stop, all, --wait=300]
+        - command: [/testbin/pcs, cluster, stop, --all, --wait=300]
           environ: *env-def
           rc: 0
           out: "Stopping Cluster..."
@@ -243,12 +243,12 @@ test_cases:
           rc: 0
           out: '   * Online: [ pc1, pc2, pc3 ]'
           err: ""
-        - command: [/testbin/pcs, cluster, stop, all, --wait=300]
+        - command: [/testbin/pcs, cluster, stop, --all, --wait=300]
           environ: *env-def
           rc: 0
           out: "Stopping Cluster..."
           err: ""
-        - command: [/testbin/pcs, cluster, start, all, --wait=300]
+        - command: [/testbin/pcs, cluster, start, --all, --wait=300]
           environ: *env-def
           rc: 0
           out: "Starting Cluster..."
@@ -282,12 +282,12 @@ test_cases:
           rc: 1
           out: 'Error: cluster is not currently running on this node'
           err: ""
-        - command: [/testbin/pcs, cluster, stop, all, --wait=300]
+        - command: [/testbin/pcs, cluster, stop, --all, --wait=300]
           environ: *env-def
           rc: 0
           out: "Stopping Cluster..."
           err: ""
-        - command: [/testbin/pcs, cluster, start, all, --wait=300]
+        - command: [/testbin/pcs, cluster, start, --all, --wait=300]
           environ: *env-def
           rc: 0
           out: "Starting Cluster..."
@@ -321,12 +321,12 @@ test_cases:
           rc: 1
           out: 'Error: cluster is not currently running on this node'
           err: ""
-        - command: [/testbin/pcs, cluster, stop, all, --wait=300]
+        - command: [/testbin/pcs, cluster, stop, --all, --wait=300]
           environ: *env-def
           rc: 0
           out: "Stopping Cluster..."
           err: ""
-        - command: [/testbin/pcs, cluster, start, all, --wait=300]
+        - command: [/testbin/pcs, cluster, start, --all, --wait=300]
           environ: *env-def
           rc: 0
           out: "Starting Cluster..."
