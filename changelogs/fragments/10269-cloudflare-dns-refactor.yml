@@ -1,0 +1,2 @@
+minor_changes:
+  - cloudflare_dns - simplify validations and refactor some code, no functional changes (https://github.com/ansible-collections/community.general/pull/10269).
