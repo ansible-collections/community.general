@@ -37,7 +37,6 @@ options:
       - Specify which node of the cluster you want to manage. V(null) == the cluster status itself, V(all) == check the status
         of all nodes.
     type: str
-    default: all
     aliases: ['node']
   wait:
     description:
@@ -79,7 +78,7 @@ class PacemakerCluster(StateModuleHelper):
         argument_spec=dict(
             state=dict(type='str', required=True, choices=[
                 'offline', 'online', 'restart', 'maintenance']),
-            name=dict(type='str', default='all', aliases=['node']),
+            name=dict(type='str', aliases=['node']),
             wait=dict(type='int', default=300),
             force=dict(type='bool', default=True)
         ),
@@ -95,6 +94,7 @@ class PacemakerCluster(StateModuleHelper):
         else:
             self.vars.set('previous_value', self._get())
         self.vars.set('value', self.vars.previous_value, change=True, diff=True)
+        self.vars.set('apply_all', True if not self.module.params['name'] else False)
 
     def _process_command_output(self, fail_on_err, ignore_err_msg=""):
         def process(rc, out, err):
@@ -113,16 +113,16 @@ class PacemakerCluster(StateModuleHelper):
             return ctx.run(state='config', name='maintenance-mode')
 
     def state_offline(self):
-        with self.runner('state name wait', output_process=self._process_command_output(True, "not currently running"), check_mode_skip=True) as ctx:
-            ctx.run()
+        with self.runner('state name apply_all wait', output_process=self._process_command_output(True, "not currently running"), check_mode_skip=True) as ctx:
+            ctx.run(apply_all=self.vars.apply_all)
             self.vars.set('value', self._get())
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err
             self.vars.cmd = ctx.cmd
 
     def state_online(self):
-        with self.runner('state name wait', output_process=self._process_command_output(True, "currently running"), check_mode_skip=True) as ctx:
-            ctx.run()
+        with self.runner('state name apply_all wait', output_process=self._process_command_output(True, "currently running"), check_mode_skip=True) as ctx:
+            ctx.run(apply_all=self.vars.apply_all)
             self.vars.set('value', self._get())
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err
@@ -141,9 +141,9 @@ class PacemakerCluster(StateModuleHelper):
             self.vars.cmd = ctx.cmd
 
     def state_restart(self):
-        with self.runner('state name wait', output_process=self._process_command_output(True, "not currently running"), check_mode_skip=True) as ctx:
-            ctx.run(state='offline')
-            ctx.run(state='online')
+        with self.runner('state name apply_all wait', output_process=self._process_command_output(True, "not currently running"), check_mode_skip=True) as ctx:
+            ctx.run(state='offline', apply_all=self.vars.apply_all)
+            ctx.run(state='online', apply_all=self.vars.apply_all)
             self.vars.set('value', self._get())
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err
