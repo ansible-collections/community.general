@@ -128,7 +128,8 @@ options:
         key: record_host_keys
     type: boolean
   host_key_checking:
-    description: "Set this to V(false) if you want to avoid host key checking by the underlying tools Ansible uses to connect to the host."
+    description: "Set this to V(false) if you want to avoid host key checking by the underlying tools Ansible uses to connect
+      to the host."
     type: boolean
     default: true
     env:
@@ -157,8 +158,7 @@ options:
     type: float
     default: 30
     description:
-      - Configures, in seconds, the amount of time to wait for the SSH
-        banner to be presented.
+      - Configures, in seconds, the amount of time to wait for the SSH banner to be presented.
       - This option is supported by paramiko version 1.15.0 or newer.
     ini:
       - section: paramiko_connection
@@ -227,20 +227,20 @@ options:
       - name: ansible_paramiko_user_known_hosts_file
   wsl_distribution:
     description:
-      - WSL distribution name
+      - WSL distribution name.
     type: string
     required: true
     vars:
       - name: wsl_distribution
   wsl_user:
     description:
-      - WSL distribution user
+      - WSL distribution user.
     type: string
     vars:
       - name: wsl_user
   become_user:
     description:
-      - WSL distribution user
+      - WSL distribution user.
     type: string
     default: root
     vars:
@@ -248,7 +248,7 @@ options:
       - name: ansible_become_user
   become:
     description:
-      - whether to use the user defined by ansible_become_user.
+      - Whether to use the user defined by O(become_user).
     type: bool
     default: false
     vars:
