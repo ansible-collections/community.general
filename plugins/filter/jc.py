@@ -143,11 +143,11 @@ def jc_filter(data, parser, quiet=True, raw=False):
 
         # old API (jc v1.17.7 and lower)
         else:
-            jc_parser = importlib.import_module('jc.parsers.' + parser)
+            jc_parser = importlib.import_module(f'jc.parsers.{parser}')
             return jc_parser.parse(data, quiet=quiet, raw=raw)
 
     except Exception as e:
-        raise AnsibleFilterError('Error in jc filter plugin:  %s' % e)
+        raise AnsibleFilterError(f'Error in jc filter plugin: {e}')
 
 
 class FilterModule(object):

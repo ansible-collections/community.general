@@ -1,0 +1,7 @@
+minor_changes:
+  - dense callback plugin - use f-strings instead of concatenation (https://github.com/ansible-collections/community.general/pull/10285).
+  - mail callback plugin - use f-strings instead of concatenation (https://github.com/ansible-collections/community.general/pull/10285).
+  - wsl connection plugin - use f-strings instead of concatenation (https://github.com/ansible-collections/community.general/pull/10285).
+  - jc filter plugin - use f-strings instead of concatenation (https://github.com/ansible-collections/community.general/pull/10285).
+  - iocage inventory plugin - use f-strings instead of concatenation (https://github.com/ansible-collections/community.general/pull/10285).
+  - xen_orchestra inventory plugin - use f-strings instead of concatenation (https://github.com/ansible-collections/community.general/pull/10285).
