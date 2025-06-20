@@ -18,7 +18,7 @@ requirements:
   - nmap CLI installed
 options:
   plugin:
-    description: token that ensures this is a source file for the 'nmap' plugin.
+    description: Token that ensures this is a source file for the P(community.general.nmap#inventory) plugin.
     type: string
     required: true
     choices: ['nmap', 'community.general.nmap']
@@ -46,8 +46,8 @@ options:
   port:
     description:
       - Only scan specific port or port range (C(-p)).
-      - For example, you could pass V(22) for a single port, V(1-65535) for a range of ports,
-        or V(U:53,137,T:21-25,139,8080,S:9) to check port 53 with UDP, ports 21-25 with TCP, port 9 with SCTP, and ports 137, 139, and 8080 with all.
+      - For example, you could pass V(22) for a single port, V(1-65535) for a range of ports, or V(U:53,137,T:21-25,139,8080,S:9)
+        to check port 53 with UDP, ports 21-25 with TCP, port 9 with SCTP, and ports 137, 139, and 8080 with all.
     type: string
     version_added: 6.5.0
   ports:
@@ -55,11 +55,11 @@ options:
     type: boolean
     default: true
   ipv4:
-    description: use IPv4 type addresses
+    description: Use IPv4 type addresses.
     type: boolean
     default: true
   ipv6:
-    description: use IPv6 type addresses
+    description: Use IPv6 type addresses.
     type: boolean
     default: true
   udp_scan:
@@ -98,7 +98,7 @@ options:
     version_added: 7.4.0
 notes:
   - At least one of O(ipv4) or O(ipv6) is required to be V(true); both can be V(true), but they cannot both be V(false).
-  - 'TODO: add OS fingerprinting'
+  - 'TODO: add OS fingerprinting.'
 """
 EXAMPLES = r"""
 ---

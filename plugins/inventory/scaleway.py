@@ -37,7 +37,8 @@ options:
   scw_profile:
     description:
       - The config profile to use in config file.
-      - By default uses the one specified as C(active_profile) in the config file, or falls back to V(default) if that is not defined.
+      - By default uses the one specified as C(active_profile) in the config file, or falls back to V(default) if that is
+        not defined.
     type: string
     version_added: 4.4.0
   oauth_token:
@@ -65,10 +66,8 @@ options:
       - hostname
       - id
   variables:
-    description: 'Set individual variables: keys are variable names and
-                  values are templates. Any value returned by the
-                  L(Scaleway API, https://developer.scaleway.com/#servers-server-get)
-                  can be used.'
+    description: 'Set individual variables: keys are variable names and values are templates. Any value returned by the L(Scaleway
+      API, https://developer.scaleway.com/#servers-server-get) can be used.'
     type: dict
 """
 
