@@ -14,7 +14,7 @@ description:
   - Get inventory hosts from Scaleway (previously Online SAS or Online.net).
 options:
   plugin:
-    description: token that ensures this is a source file for the 'online' plugin.
+    description: Token that ensures this is a source file for the P(community.general.online#inventory) plugin.
     type: string
     required: true
     choices: ['online', 'community.general.online']

@@ -27,8 +27,8 @@ notes:
     to the callback.
   - Each option value is rendered as a template before being evaluated. This allows for the dynamic usage of an option. For
     example, C("{{ 'yellow' if ansible_callback_diy.result.is_changed else 'bright green' }}").
-  - 'B(Condition) for all C(msg) options: if value C(is None or omit), then the option is not being used. B(Effect): use
-    of the C(default) callback plugin for output.'
+  - 'B(Condition) for all C(msg) options: if value C(is None or omit), then the option is not being used. B(Effect): use of
+    the C(default) callback plugin for output.'
   - 'B(Condition) for all C(msg) options: if value C(is not None and not omit and length is not greater than 0), then the
     option is being used without output. B(Effect): suppress output.'
   - 'B(Condition) for all C(msg) options: if value C(is not None and not omit and length is greater than 0), then the option

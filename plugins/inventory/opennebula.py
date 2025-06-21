@@ -16,8 +16,7 @@ extends_documentation_fragment:
   - constructed
 description:
   - Get inventory hosts from OpenNebula cloud.
-  - Uses an YAML configuration file ending with either C(opennebula.yml) or C(opennebula.yaml)
-    to set parameter values.
+  - Uses an YAML configuration file ending with either C(opennebula.yml) or C(opennebula.yaml) to set parameter values.
   - Uses O(api_authfile), C(~/.one/one_auth), or E(ONE_AUTH) pointing to a OpenNebula credentials file.
 options:
   plugin:
@@ -28,8 +27,7 @@ options:
   api_url:
     description:
       - URL of the OpenNebula RPC server.
-      - It is recommended to use HTTPS so that the username/password are not
-        transferred over the network unencrypted.
+      - It is recommended to use HTTPS so that the username/password are not transferred over the network unencrypted.
       - If not set then the value of the E(ONE_URL) environment variable is used.
     env:
       - name: ONE_URL
@@ -37,8 +35,8 @@ options:
     type: string
   api_username:
     description:
-      - Name of the user to login into the OpenNebula RPC server. If not set
-        then the value of the E(ONE_USERNAME) environment variable is used.
+      - Name of the user to login into the OpenNebula RPC server. If not set then the value of the E(ONE_USERNAME) environment
+        variable is used.
     env:
       - name: ONE_USERNAME
     type: string
@@ -52,8 +50,8 @@ options:
     type: string
   api_authfile:
     description:
-      - If both O(api_username) or O(api_password) are not set, then it will try
-        authenticate with ONE auth file. Default path is C(~/.one/one_auth).
+      - If both O(api_username) or O(api_password) are not set, then it will try authenticate with ONE auth file. Default
+        path is C(~/.one/one_auth).
       - Set environment variable E(ONE_AUTH) to override this path.
     env:
       - name: ONE_AUTH
@@ -71,7 +69,7 @@ options:
     description: Only return servers filtered by this label.
     type: string
   group_by_labels:
-    description: Create host groups by vm labels
+    description: Create host groups by VM labels.
     type: bool
     default: true
 """

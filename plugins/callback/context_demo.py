@@ -10,7 +10,7 @@ DOCUMENTATION = r"""
 author: Unknown (!UNKNOWN)
 name: context_demo
 type: aggregate
-short_description: demo callback that adds play/task context
+short_description: Demo callback that adds play/task context
 description:
   - Displays some play and task context along with normal output.
   - This is mostly for demo purposes.

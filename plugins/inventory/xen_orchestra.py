@@ -79,7 +79,6 @@ options:
 
 
 EXAMPLES = r"""
----
 # file must be named xen_orchestra.yaml or xen_orchestra.yml
 plugin: community.general.xen_orchestra
 api_host: 192.168.1.255

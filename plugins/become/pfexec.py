@@ -6,7 +6,7 @@ from __future__ import annotations
 
 DOCUMENTATION = r"""
 name: pfexec
-short_description: profile based execution
+short_description: Profile based execution
 description:
   - This become plugins allows your remote/login user to execute commands as another user using the C(pfexec) utility.
 author: Ansible Core Team
