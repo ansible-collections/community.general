@@ -17,7 +17,7 @@ options:
   _uri:
     required: true
     description:
-      - Path in which the cache plugin will save the files.
+      - Path in which the cache plugin saves the files.
     env:
       - name: ANSIBLE_CACHE_PLUGIN_CONNECTION
     ini:
