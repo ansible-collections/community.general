@@ -13,7 +13,7 @@ DOCUMENTATION = r"""
 ---
 module: jenkins_credential
 short_description: Manage Jenkins credentials and domains via API
-version_added: 11.0.0
+version_added: 11.1.0
 description:
   - This module allows managing Jenkins credentials and domain scopes via the Jenkins HTTP API.
   - Create, update, and delete different credential types such as C(username/password), C(secret text), C(SSH key), C(certificates), C(GitHub App), and domains.
@@ -58,14 +58,14 @@ options:
   scope:
     description:
       - Jenkins credential domain scope.
-      - Deleting a domain scope will delete all credentials within it.
+      - Deleting a domain scope deletes all credentials within it.
     type: str
     default: '_'
   force:
     description:
       - Force update if the credential already exists, used with O(state=present).
-      - If set to true, it will delete the existing credential before creating a new one.
-      - Always returns changed=True.
+      - If set to V(true), it deletes the existing credential before creating a new one.
+      - Always returns RV(ignore:changed=true).
     type: bool
     default: false
   url:
@@ -80,11 +80,11 @@ options:
     type: str
   jenkins_password:
     description:
-      - Jenkins password for token creation. required if O(type=token).
+      - Jenkins password for token creation. Required if O(type=token).
     type: str
   token:
     description:
-      - Jenkins API token. Required if the C(type) is not set to I(token).
+      - Jenkins API token. Required unless O(type=token).
     type: str
   description:
     description:
@@ -94,7 +94,7 @@ options:
   location:
     description:
       - Location of the credential. Either V(system) or V(folder).
-      - If location is a folder then url must be set to V(<jenkins-server>/job/<folder_name>).
+      - If O(location=folder) then O(url) must be set to V(<jenkins-server>/job/<folder_name>).
     choices:
       - system
       - folder
@@ -103,17 +103,17 @@ options:
   name:
     description:
       - Name of the token to generate. Required if O(type=token).
-      - When generating a new token, don't pass C(id). It will be generated autCmatically.
-      - Creating two tokens with the same name will generate two distinct tokens with different V(tokenUuid) values.
+      - When generating a new token, don't pass O(id). It is generated automatically.
+      - Creating two tokens with the same name generates two distinct tokens with different RV(token_uuid) values.
       - Replacing a token with another one of the same name requires deleting the original first using O(force=True).
     type: str
   username:
     description:
-      - Username for credentials that require it (for example O(type=ssh_key) or O(type=user_and_pass)).
+      - Username for credentials types that require it (for example O(type=ssh_key) or O(type=user_and_pass)).
     type: str
   password:
     description:
-      - Password for credentials that required it (for example O(type=user_and_passs) or O(type=certificate)).
+      - Password for credentials types that require it (for example O(type=user_and_passs) or O(type=certificate)).
     type: str
   secret:
     description:
@@ -125,7 +125,7 @@ options:
     type: str
   api_uri:
     description:
-      - Link to Github api
+      - Link to Github API
     default: 'https://api.github.com'
     type: str
   owner:
@@ -139,11 +139,11 @@ options:
     type: path
   private_key_path:
     description:
-      - Path to private key file for PEM certificates or github apps.
+      - Path to private key file for PEM certificates or GitHub Apps.
     type: path
   passphrase:
     description:
-      - SSH passphrase if exists.
+      - SSH passphrase if needed.
     type: str
   inc_hostname:
     description:
@@ -153,7 +153,7 @@ options:
   exc_hostname:
     description:
       - List of hostnames to exclude from scope.
-      - If a hostname appears in both this list and C(inc_hostname), the hostname is excluded.
+      - If a hostname appears in both this list and O(inc_hostname), the hostname is excluded.
     type: list
     elements: str
   inc_hostname_port:
@@ -164,7 +164,7 @@ options:
   exc_hostname_port:
     description:
       - List of host:port to exclude from scope.
-      - If a hostname and port appears in both this list and C(inc_hostname_port), it is excluded.
+      - If a hostname and port appears in both this list and O(inc_hostname_port), it is excluded.
     type: list
     elements: str
   inc_path:
@@ -176,8 +176,8 @@ options:
   exc_path:
     description:
       - List of URL paths to exclude.
-      - If a path is also matched by C(exc_path), it will be excluded.
-      - Excluded Subpaths of included paths will be excluded.
+      - If a path is also matched by O(exc_path), it is excluded.
+      - If you exclude a subpath of a path previously included, that subpath alone is excluded.
     type: list
     elements: str
   schemes:
@@ -300,20 +300,20 @@ EXAMPLES = r"""
 """
 RETURN = r"""
 details:
-    description: In case of errors return more details.
+    description: Return more details in case of errors.
     type: str
-    returned: Error
+    returned: failed
 token:
     description:
-      - The generated API token if type is O(type=token).
+      - The generated API token if O(type=token).
       - This is needed to authenticate API calls later.
       - This should be stored securely, as it is the only time it is returned.
     type: str
     returned: success
-tokenUuid:
+token_uuid:
     description:
-      - The generated id of the token.
-      - This is passed as C(id) to edit or revoke the token later.
+      - The generated ID of the token.
+      - You pass this valu back to the module as O(id) to edit or revoke the token later.
       - This should be stored securely, as it is the only time it is returned.
     type: str
     returned: success
@@ -552,29 +552,17 @@ def run_module():
                     "scope",
                     "token",
                 ],
-            ),  # Credential type to add
-            state=dict(
-                type="str",
-                default="present",
-                choices=["present", "absent"],
             ),
-            force=dict(
-                type="bool", default=False
-            ),  # Force update if credential already exists
-            scope=dict(type="str", default="_"),  # Scope of the credential
+            state=dict(type="str", default="present", choices=["present", "absent"]),
+            force=dict(type="bool", default=False),
+            scope=dict(type="str", default="_"),
             url=dict(type="str", default="http://localhost:8080"),
             jenkins_user=dict(type="str", required=True),
             jenkins_password=dict(type="str", no_log=True),
             token=dict(type="str", no_log=True),
             description=dict(type="str", default=""),
-            location=dict(
-                type="str",
-                default="system",
-                choices=["system", "folder"],
-            ),  # Location of the credential
-            name=dict(
-                type="str"
-            ),  # Name of the token to generate, required if type is token
+            location=dict(type="str", default="system", choices=["system", "folder"]),
+            name=dict(type="str"),
             username=dict(type="str"),
             password=dict(type="str", no_log=True),
             file_path=dict(type="path", default=None),
@@ -863,7 +851,7 @@ def run_module():
     if type == "token":
         response_data = json.loads(response.read())
         result["token"] = response_data["data"]["tokenValue"]
-        result["tokenUuid"] = response_data["data"]["tokenUuid"]
+        result["token_uuid"] = response_data["data"]["tokenUuid"]
 
     result["changed"] = True
     result["msg"] = response.read().decode("utf-8")

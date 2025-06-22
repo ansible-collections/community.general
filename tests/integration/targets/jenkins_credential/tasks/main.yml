@@ -2,20 +2,16 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: Create output directory
-  ansible.builtin.file:
-    path: "{{ playbook_dir }}/generated"
-    state: directory
-    mode: "0755"
-
-- name: Copy files from container
-  command: docker cp jenkins-test:/var/jenkins_home/tmp/files/. "{{ playbook_dir }}/generated"
+- name: Prepare the test environment
+  include_tasks: pre.yml
+  vars:
+    output_dir: "{{ playbook_dir }}/generated"
 
 - name: Generate token
   community.general.jenkins_credential:
     name: "test-token"
-    jenkins_user: "ruffnut"
-    jenkins_password: "barf"
+    jenkins_user: "{{ jenkins_username }}"
+    jenkins_password: "{{ jenkins_password }}"
     type: "token"
   no_log: yes
   register: token_result
@@ -24,14 +20,14 @@
   assert:
     that:
       - token_result.token is defined
-      - token_result.tokenUuid is defined
+      - token_result.token_uuid is defined
     fail_msg: "Token generation failed"
     success_msg: "Token and tokenUuid successfully returned"
 
 - name: Set token facts
   set_fact:
     token: "{{ token_result.token }}"
-    tokenUuid: "{{ token_result.tokenUuid }}"
+    tokenUuid: "{{ token_result.token_uuid }}"
 
 - name: Test adding new credentials and scopes
   include_tasks: add.yml
@@ -64,8 +60,8 @@
   community.general.jenkins_credential:
     id: "{{ tokenUuid }}"
     name: "test-token-2"
-    jenkins_user: "ruffnut"
-    jenkins_password: "barf"
+    jenkins_user: "{{ jenkins_username }}"
+    jenkins_password: "{{ jenkins_password }}"
     state: "absent"
     type: "token"
   register: delete_token_result

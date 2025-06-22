@@ -6,7 +6,7 @@
   community.general.jenkins_credential:
     id: "CUSTOM"
     type: "scope"
-    jenkins_user: "ruffnut"
+    jenkins_user: "{{ jenkins_username }}"
     token: "{{ token }}"
     description: "Custom scope credential"
     inc_path:
@@ -43,7 +43,7 @@
   community.general.jenkins_credential:
     id: "userpass-id"
     type: "user_and_pass"
-    jenkins_user: "ruffnut"
+    jenkins_user: "{{ jenkins_username }}"
     token: "{{ token }}"
     description: "User and password credential"
     username: "user1"
@@ -61,7 +61,7 @@
   community.general.jenkins_credential:
     id: "file-id"
     type: "file"
-    jenkins_user: "ruffnut"
+    jenkins_user: "{{ jenkins_username }}"
     token: "{{ token }}"
     scope: "CUSTOM"
     description: "File credential"
@@ -79,7 +79,7 @@
   community.general.jenkins_credential:
     id: "text-id"
     type: "text"
-    jenkins_user: "ruffnut"
+    jenkins_user: "{{ jenkins_username }}"
     token: "{{ token }}"
     description: "Text credential"
     secret: "mysecrettext"
@@ -98,7 +98,7 @@
   community.general.jenkins_credential:
     id: "githubapp-id"
     type: "github_app"
-    jenkins_user: "ruffnut"
+    jenkins_user: "{{ jenkins_username }}"
     token: "{{ token }}"
     description: "GitHub app credential"
     appID: "12345"
@@ -117,7 +117,7 @@
   community.general.jenkins_credential:
     id: "sshkey-id"
     type: "ssh_key"
-    jenkins_user: "ruffnut"
+    jenkins_user: "{{ jenkins_username }}"
     token: "{{ token }}"
     description: "SSH key credential"
     username: "sshuser"
@@ -136,7 +136,7 @@
   community.general.jenkins_credential:
     id: "certificate-id"
     type: "certificate"
-    jenkins_user: "ruffnut"
+    jenkins_user: "{{ jenkins_username }}"
     token: "{{ token }}"
     description: "Certificate credential"
     password: "12345678901234"
@@ -154,7 +154,7 @@
   community.general.jenkins_credential:
     id: "certificate-id-pem"
     type: "certificate"
-    jenkins_user: "ruffnut"
+    jenkins_user: "{{ jenkins_username }}"
     token: "{{ token }}"
     description: "Certificate credential (pem)"
     file_path: "{{ output_dir }}/cert.pem"

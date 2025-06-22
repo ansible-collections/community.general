@@ -6,10 +6,14 @@ version: "3.8"
 
 services:
   jenkins:
-    image: youssefkali/test-jenkins-credential-module:3.0 # Pre-configured Jenkins server
+    image: bitnami/jenkins
     container_name: jenkins-test
     ports:
       - "8080:8080"
+    environment:
+      JENKINS_USERNAME: "FishLegs"
+      JENKINS_PASSWORD: "MeatLug"
+      JENKINS_PLUGINS: "credentials,cloudbees-folder,plain-credentials,github-branch-source,github-api,scm-api,workflow-step-api"
     healthcheck:
       test: curl -s http://localhost:8080/login || exit 1
       interval: 10s

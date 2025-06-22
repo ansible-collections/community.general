@@ -5,7 +5,7 @@
 - name: Delete user_and_pass credential (run {{ run_number }})
   community.general.jenkins_credential:
     id: "userpass-id"
-    jenkins_user: "ruffnut"
+    jenkins_user: "{{ jenkins_username }}"
     token: "{{ token }}"
     state: "absent"
   register: userpass_cred
@@ -20,7 +20,7 @@
 - name: Delete file credential to custom scope (run {{ run_number }})
   community.general.jenkins_credential:
     id: "file-id"
-    jenkins_user: "ruffnut"
+    jenkins_user: "{{ jenkins_username }}"
     token: "{{ token }}"
     scope: "CUSTOM"
     state: "absent"
@@ -37,7 +37,7 @@
   community.general.jenkins_credential:
     id: "CUSTOM"
     type: "scope"
-    jenkins_user: "ruffnut"
+    jenkins_user: "{{ jenkins_username }}"
     token: "{{ token }}"
     state: "absent"
   register: custom_scope
@@ -52,7 +52,7 @@
 - name: Delete text credential to folder (run {{ run_number }})
   community.general.jenkins_credential:
     id: "text-id"
-    jenkins_user: "ruffnut"
+    jenkins_user: "{{ jenkins_username }}"
     token: "{{ token }}"
     state: "absent"
     location: "folder"
@@ -69,7 +69,7 @@
 - name: Delete githubApp credential (run {{ run_number }})
   community.general.jenkins_credential:
     id: "githubapp-id"
-    jenkins_user: "ruffnut"
+    jenkins_user: "{{ jenkins_username }}"
     token: "{{ token }}"
     state: "absent"
   register: githubapp_cred
@@ -84,7 +84,7 @@
 - name: Delete sshKey credential (run {{ run_number }})
   community.general.jenkins_credential:
     id: "sshkey-id"
-    jenkins_user: "ruffnut"
+    jenkins_user: "{{ jenkins_username }}"
     token: "{{ token }}"
     description: "SSH key credential"
     state: "absent"
@@ -100,7 +100,7 @@
 - name: Delete certificate credential (p12) (run {{ run_number }})
   community.general.jenkins_credential:
     id: "certificate-id"
-    jenkins_user: "ruffnut"
+    jenkins_user: "{{ jenkins_username }}"
     token: "{{ token }}"
     state: "absent"
   register: cert_p12_cred
@@ -115,7 +115,7 @@
 - name: Delete certificate credential (pem) (run {{ run_number }})
   community.general.jenkins_credential:
     id: "certificate-id-pem"
-    jenkins_user: "ruffnut"
+    jenkins_user: "{{ jenkins_username }}"
     token: "{{ token }}"
     state: "absent"
   register: cert_pem_cred

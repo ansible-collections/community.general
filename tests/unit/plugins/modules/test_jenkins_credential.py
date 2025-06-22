@@ -6,20 +6,22 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-try:
-    from unittest.mock import MagicMock, patch, mock_open  # Python 3.x
-    import builtins
-
-    open_path = "builtins.open"
-except ImportError:
-    from mock import MagicMock, patch, mock_open  # Python 2.x
-    import __builtin__ as builtins
-
-    open_path = "__builtin__.open"
+from ansible_collections.community.general.plugins.modules import jenkins_credential
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import (
+    MagicMock,
+    patch,
+    mock_open,
+)
 
 import json
+import sys
 
-from ansible_collections.community.general.plugins.modules import jenkins_credential
+if sys.version_info[0] == 3:
+    import builtins
+    open_path = "builtins.open"
+else:
+    import __builtin__ as builtins
+    open_path = "__builtin__.open"
 
 
 def test_validate_file_exist_passes_when_file_exists():
