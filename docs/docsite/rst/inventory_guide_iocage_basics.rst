@@ -54,9 +54,6 @@ Display the inventory:
 .. code-block:: console
 
    shell> ansible-inventory -i hosts/02_iocage.yml --list --yaml
-
-.. code-block:: yaml
-
    all:
      children:
        ungrouped:
