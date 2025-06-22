@@ -13,7 +13,7 @@ requires root. If you run the command `iocage list -l` as unprivileged user, you
 `DHCP (running -- address requires root)`. If you are not granted the root privilege, use
 */etc/dhclient-exit-hooks*. For example,
 
-.. code-block:: bash
+.. code-block:: console
 
    shell> cat /zroot/iocage/jails/srv_1/root/etc/dhclient-exit-hooks
    case "$reason" in
@@ -75,9 +75,6 @@ As admin at the controller, display the inventory:
 .. code-block:: console
 
    shell> ansible-inventory -i hosts/02_iocage.yml --list --yaml
-
-.. code-block:: yaml
-
    all:
      children:
        ungrouped:
@@ -174,8 +171,6 @@ Run the playbook:
 .. code-block:: console
 
    shell> ansible-playbook -i hosts/02_iocage.yml pb-test-uname.yml
-
-.. code-block:: console
 
    PLAY [all] **********************************************************************************************************
 
