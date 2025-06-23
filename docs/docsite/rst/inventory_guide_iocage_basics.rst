@@ -99,38 +99,40 @@ Display the inventory:
              iocage_type: jail
 
 .. note::
-  Optionally, create shared IP jails
 
-  .. code-block:: console
+   Optionally, create shared IP jails
 
-     shell> iocage create --template ansible_client --name srv_1 ip4_addr="em0|10.1.0.101/24"
-     srv_1 successfully created!
-     shell> iocage create --template ansible_client --name srv_2 ip4_addr="em0|10.1.0.102/24"
-     srv_2 successfully created!
-     shell> iocage create --template ansible_client --name srv_3 ip4_addr="em0|10.1.0.103/24"
-     srv_3 successfully created!
+   .. code-block:: console
 
-  .. code-block:: console
+      shell> iocage create --template ansible_client --name srv_1 ip4_addr="em0|10.1.0.101/24"
+      srv_1 successfully created!
+      shell> iocage create --template ansible_client --name srv_2 ip4_addr="em0|10.1.0.102/24"
+      srv_2 successfully created!
+      shell> iocage create --template ansible_client --name srv_3 ip4_addr="em0|10.1.0.103/24"
+      srv_3 successfully created!
 
-     shell> iocage list -l
-     +------+-------+------+-------+------+-----------------+-------------------+-----+----------------+----------+
-     | JID  | NAME  | BOOT | STATE | TYPE |     RELEASE     |        IP4        | IP6 |    TEMPLATE    | BASEJAIL |
-     +======+=======+======+=======+======+=================+===================+=====+================+==========+
-     | None | srv_1 | off  | down  | jail | 14.2-RELEASE-p3 | em0|10.1.0.101/24 | -   | ansible_client | no       |
-     +------+-------+------+-------+------+-----------------+-------------------+-----+----------------+----------+
-     | None | srv_2 | off  | down  | jail | 14.2-RELEASE-p3 | em0|10.1.0.102/24 | -   | ansible_client | no       |
-     +------+-------+------+-------+------+-----------------+-------------------+-----+----------------+----------+
-     | None | srv_3 | off  | down  | jail | 14.2-RELEASE-p3 | em0|10.1.0.103/24 | -   | ansible_client | no       |
-     +------+-------+------+-------+------+-----------------+-------------------+-----+----------------+----------+
+   .. code-block:: console
 
-See: `Configuring a Shared IP Jail <https://iocage.readthedocs.io/en/latest/networking.html#configuring-a-shared-ip-jail>`_
+      shell> iocage list -l
+      +------+-------+------+-------+------+-----------------+-------------------+-----+----------------+----------+
+      | JID  | NAME  | BOOT | STATE | TYPE |     RELEASE     |        IP4        | IP6 |    TEMPLATE    | BASEJAIL |
+      +======+=======+======+=======+======+=================+===================+=====+================+==========+
+      | None | srv_1 | off  | down  | jail | 14.2-RELEASE-p3 | em0|10.1.0.101/24 | -   | ansible_client | no       |
+      +------+-------+------+-------+------+-----------------+-------------------+-----+----------------+----------+
+      | None | srv_2 | off  | down  | jail | 14.2-RELEASE-p3 | em0|10.1.0.102/24 | -   | ansible_client | no       |
+      +------+-------+------+-------+------+-----------------+-------------------+-----+----------------+----------+
+      | None | srv_3 | off  | down  | jail | 14.2-RELEASE-p3 | em0|10.1.0.103/24 | -   | ansible_client | no       |
+      +------+-------+------+-------+------+-----------------+-------------------+-----+----------------+----------+
 
-* If iocage needs environment variable(s), use the option :ansopt:`community.general.iocage#inventory:env`. For example,
+   See: `Configuring a Shared IP Jail <https://iocage.readthedocs.io/en/latest/networking.html#configuring-a-shared-ip-jail>`_
 
-.. code-block:: yaml
+   If iocage needs environment variable(s), use the option
+   :ansopt:`community.general.iocage#inventory:env`. For example,
 
-   plugin: community.general.iocage
-   host: 10.1.0.73
-   user: admin
-   env:
-     CRYPTOGRAPHY_OPENSSL_NO_LEGACY: 1
+   .. code-block:: yaml
+
+      plugin: community.general.iocage
+      host: 10.1.0.73
+      user: admin
+      env:
+        CRYPTOGRAPHY_OPENSSL_NO_LEGACY: 1
