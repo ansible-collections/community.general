@@ -65,7 +65,7 @@ Create the inventory configuration. Use the option :ansopt:`community.general.io
 
 Note:
 
-   The option hooks_results expects the poolname is mounted to /poolname. For example, if you
+   The option hooks_results expects the poolname to be mounted to ``/poolname``. For example, if you
    activate the pool iocage, this plugin expects to find the hooks_results items in the path
    /iocage/iocage/jails/<name>/root. If you mount the poolname to a different path, the easiest
    remedy is to create a symlink.
