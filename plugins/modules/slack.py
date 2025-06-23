@@ -35,7 +35,6 @@ options:
       - "When using new format 'Webhook token' and WebAPI tokens: this can be V(slack.com) or V(slack-gov.com) and is ignored otherwise."
       - "When using old format 'Webhook token': Slack (sub)domain for your environment without protocol. (For example V(example.slack.com).)
          in Ansible 1.8 and beyond, this is deprecated and may be ignored. See token documentation for information."
-    default: "slack.com"
   token:
     type: str
     description:
