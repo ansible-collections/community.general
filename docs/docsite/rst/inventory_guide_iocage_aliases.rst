@@ -117,11 +117,7 @@ Set notes. The tag *alias* will be used to create inventory aliases:
 Update the inventory configuration. Set the option
 :ansopt:`community.general.iocage#inventory:inventory_hostname_tag` to :ansvalue:`alias`. This tag keeps the
 value of the alias. The option :ansopt:`community.general.iocage#inventory:get_properties` must be
-enabled:
-
-.. code-block:: console
-
-   shell> cat hosts/02_iocage.yml
+enabled. For example, ``hosts/02_iocage.yml`` contains:
 
 .. code-block:: yaml
 
