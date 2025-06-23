@@ -131,7 +131,7 @@ Compose the variable ansible_host
 
    shell> cat hosts/02_iocage.yml
 
-.. code-block:: yaml
+.. code-block:: yaml+jinja
 
    plugin: community.general.iocage
    host: 10.1.0.73
