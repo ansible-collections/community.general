@@ -350,7 +350,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             for hostname, host_vars in results['_meta']['hostvars'].items():
                 iocage_hooks = []
                 for hook in hooks_results:
-                    path = "/" + iocage_pool + "/iocage/jails/" + hostname + "/root" + hook
+                    path = f"/{iocage_pool}/iocage/jails/{hostname}/root{hook}"
                     cmd_cat_hook = cmd.copy()
                     cmd_cat_hook.append('cat')
                     cmd_cat_hook.append(path)
