@@ -522,8 +522,10 @@ class Connection(ConnectionBase):
             if u'PID check failed' in msg:
                 raise AnsibleError('paramiko version issue, please upgrade paramiko on the machine running ansible')
             elif u'Private key file is encrypted' in msg:
-                msg = f'ssh {self.get_option("remote_user")}@{self.get_options("remote_addr")}:{port} : ' + \
+                msg = (
+                    f'ssh {self.get_option("remote_user")}@{self.get_options("remote_addr")}:{port} : '
                     f'{msg}\nTo connect as a different user, use -u <username>.'
+                )
                 raise AnsibleConnectionFailure(msg)
             else:
                 raise AnsibleConnectionFailure(msg)
@@ -656,7 +658,7 @@ class Connection(ConnectionBase):
                 chan.shutdown_write()
 
         except socket.timeout:
-            raise AnsibleError('ssh timed out waiting for privilege escalation.\n' + to_text(become_output))
+            raise AnsibleError(f'ssh timed out waiting for privilege escalation.\n{to_text(become_output)}')
 
         stdout = b''.join(chan.makefile('rb', bufsize))
         stderr = b''.join(chan.makefile_stderr('rb', bufsize))
