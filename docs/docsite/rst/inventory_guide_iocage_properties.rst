@@ -14,7 +14,7 @@ Optionally, get the iocage properties. Enable :ansopt:`community.general.iocage#
 
    shell> cat hosts/02_iocage.yml
 
-.. code-block:: yaml
+.. code-block:: yaml+jinja
 
    plugin: community.general.iocage
    host: 10.1.0.73
