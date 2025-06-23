@@ -300,23 +300,23 @@ EXAMPLES = r"""
 """
 RETURN = r"""
 details:
-    description: Return more details in case of errors.
-    type: str
-    returned: failed
+  description: Return more details in case of errors.
+  type: str
+  returned: failed
 token:
-    description:
-      - The generated API token if O(type=token).
-      - This is needed to authenticate API calls later.
-      - This should be stored securely, as it is the only time it is returned.
-    type: str
-    returned: success
+  description:
+    - The generated API token if O(type=token).
+    - This is needed to authenticate API calls later.
+    - This should be stored securely, as it is the only time it is returned.
+  type: str
+  returned: success
 token_uuid:
-    description:
-      - The generated ID of the token.
-      - You pass this value back to the module as O(id) to edit or revoke the token later.
-      - This should be stored securely, as it is the only time it is returned.
-    type: str
-    returned: success
+  description:
+    - The generated ID of the token.
+    - You pass this value back to the module as O(id) to edit or revoke the token later.
+    - This should be stored securely, as it is the only time it is returned.
+  type: str
+  returned: success
 """
 
 from ansible.module_utils.basic import AnsibleModule
