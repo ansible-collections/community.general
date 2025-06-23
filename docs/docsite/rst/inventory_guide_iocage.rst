@@ -5,8 +5,8 @@
 
 .. _ansible_collections.community.general.docsite.inventory_guide.inventoy_guide_iocage:
 
-community.general.iocage
-------------------------
+community.general.iocage inventory plugin
+-----------------------------------------
 
 The inventory plugin :ansplugin:`community.general.iocage#inventory` gets the inventory hosts from the iocage jail manager.
 
