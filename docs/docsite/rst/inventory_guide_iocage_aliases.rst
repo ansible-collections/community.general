@@ -115,7 +115,7 @@ Set notes. The tag *alias* will be used to create inventory aliases:
    notes: none -> vmm=iocage_02 project=bar alias=srv_3
 
 Update the inventory configuration. Set the option
-:ansopt:`community.general.iocage#inventory:inventory_hostname_tag` to :ansvalue:`alias`. This tag keeps the
+:ansopt:`community.general.iocage#inventory:inventory_hostname_tag` to :ansval:`alias`. This tag keeps the
 value of the alias. The option :ansopt:`community.general.iocage#inventory:get_properties` must be
 enabled. For example, ``hosts/02_iocage.yml`` contains:
 
