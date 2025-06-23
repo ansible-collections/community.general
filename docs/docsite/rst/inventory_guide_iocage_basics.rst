@@ -20,7 +20,7 @@ As root at the iocage host, create three VNET jails with a DHCP interface from t
    shell> iocage create --template ansible_client --name srv_3 bpf=1 dhcp=1 vnet=1
    srv_3 successfully created!
 
-See: `Configuring a VNET Jail <https://iocage.readthedocs.io/en/latest/networking.html#configuring-a-vnet-jail>`_
+See: `Configuring a VNET Jail <https://iocage.readthedocs.io/en/latest/networking.html#configuring-a-vnet-jail>`_.
 
 As admin at the controller, list the jails:
 
