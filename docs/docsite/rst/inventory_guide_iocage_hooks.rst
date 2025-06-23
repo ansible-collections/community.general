@@ -11,7 +11,7 @@ Hooks
 The iocage utility internally opens a console to a jail to get the jail's DHCP address. This
 requires root. If you run the command ``iocage list -l`` as unprivileged user, you'll see the message
 `DHCP (running -- address requires root)`. If you are not granted the root privilege, use
-*/etc/dhclient-exit-hooks*. For example,
+``/etc/dhclient-exit-hooks``. For example,
 
 .. code-block:: console
 
