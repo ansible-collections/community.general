@@ -170,7 +170,7 @@ Note: If the option :ansopt:`community.general.iocage#inventory:env` is used and
    sudo: true
    sudo_preserve_env: true
 
-In this case, make sure the sudo tag *SETENV* is used:
+In this case, make sure the sudo tag ``SETENV`` is used:
 
 .. code-block:: console
 
