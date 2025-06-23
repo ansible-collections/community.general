@@ -8,7 +8,7 @@
 Aliases
 ^^^^^^^
 
-Quoting :ref:`inventory_aliases`
+Quoting :ref:`inventory_aliases`:
 
    The inventory_hostname is the unique identifier for a host in Ansible, this can be an IP or a hostname, but also just an 'alias' or short name for the host.
 
