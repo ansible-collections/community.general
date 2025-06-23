@@ -103,7 +103,7 @@ options:
   name:
     description:
       - Name of the token to generate. Required if O(type=token).
-      - When generating a new token, don't pass O(id). It is generated automatically.
+      - When generating a new token, do not pass O(id). It is generated automatically.
       - Creating two tokens with the same name generates two distinct tokens with different RV(token_uuid) values.
       - Replacing a token with another one of the same name requires deleting the original first using O(force=True).
     type: str
@@ -125,7 +125,7 @@ options:
     type: str
   api_uri:
     description:
-      - Link to Github API
+      - Link to Github API.
     default: 'https://api.github.com'
     type: str
   owner:
@@ -313,7 +313,7 @@ token:
 token_uuid:
     description:
       - The generated ID of the token.
-      - You pass this valu back to the module as O(id) to edit or revoke the token later.
+      - You pass this value back to the module as O(id) to edit or revoke the token later.
       - This should be stored securely, as it is the only time it is returned.
     type: str
     returned: success
