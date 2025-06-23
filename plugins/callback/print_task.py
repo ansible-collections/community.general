@@ -18,7 +18,7 @@ requirements:
 """
 
 EXAMPLES = r"""
-ansible.cfg: >-
+ansible.cfg: |-
   # Enable plugin
   [defaults]
   callbacks_enabled=community.general.print_task
