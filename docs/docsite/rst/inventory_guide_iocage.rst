@@ -18,7 +18,6 @@ See:
 
 .. note::
   The output of the examples is YAML formatted. See the option :ansopt:`ansible.bulitin.default#callback:result_format`.
-* Run Ansible in Python virtual environment. See `venv — Creation of virtual environments <https://docs.python.org/3/library/venv.html#module-venv>`_.
 
 .. toctree::
    :caption: Table of Contents
