@@ -18,6 +18,7 @@ requires root. If you run the command ``iocage list -l`` as unprivileged user, y
    shell> cat /zroot/iocage/jails/srv_1/root/etc/dhclient-exit-hooks
 
 .. code-block:: sh
+
    case "$reason" in
        "BOUND"|"REBIND"|"REBOOT"|"RENEW")
        echo $new_ip_address > /var/db/dhclient-hook.address.$interface
