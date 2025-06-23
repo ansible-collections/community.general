@@ -9,7 +9,7 @@ Basics
 ^^^^^^
 
 As root at the iocage host, create three VNET jails with a DHCP interface from the template
-*ansible_client*
+*ansible_client*:
 
 .. code-block:: console
 
