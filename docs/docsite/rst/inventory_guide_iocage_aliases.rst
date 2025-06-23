@@ -151,14 +151,14 @@ Display tags and groups. Create a playbook ``pb-test-groups.yml`` with the follo
      tasks:
 
        - debug:
-	   var: iocage_tags
+           var: iocage_tags
 
        - debug:
            msg: |
-	   {% for group in groups %}
-	   {{ group }}: {{ groups[group] }}
-	   {% endfor %}
-	 run_once: true
+             {% for group in groups %}
+             {{ group }}: {{ groups[group] }}
+             {% endfor %}
+         run_once: true
 
 Run the playbook:
 
