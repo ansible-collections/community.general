@@ -1,0 +1,110 @@
+# -*- coding: utf-8 -*-
+# Copyright (c) Dexter Le (dextersydney2001@gmail.com)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+anchors:
+  environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+test_cases:
+  - id: test_info_initial_offline
+    input: {}
+    output:
+      failed: true
+      msg: "pcs resource config failed with error (rc=1): Error: unable to get cib"
+      version: "0.10.0"
+      cluster_info:
+        cluster_name: test_cluster
+        cluster_uuid: test_uuid
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, --version]
+          environ: *env-def
+          rc: 0
+          out: "0.10.0"
+          err: ""
+        - command: [/testbin/pcs, cluster, config, --output-format=json]
+          environ: *env-def
+          rc: 0
+          out: '{"cluster_name": "test_cluster", "cluster_uuid": "test_uuid"}'
+          err: ""
+        - command: [/testbin/pcs, constraint, config, --output-format=json]
+          environ: *env-def
+          rc: 0
+          out: '{"location": [{"attributes": {"constraint_id": "test-constraint-id", "node": "example.com", "score": "-INFINITY"}, "resource_id": "test-resource-id", "role": "Started"}]}'
+          err: ""
+        - command: [/testbin/pcs, property, config, --output-format=json]
+          environ: *env-def
+          rc: 0
+          out: '{"nvsets": [{"id": "test-bootstrap", "name": "test-infra", "value": "corosync"}]}'
+          err: ""
+        - command: [/testbin/pcs, resource, config, --output-format=json]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: "Error: unable to get cib"
+  - id: test_info_initial_online
+    input: {}
+    output:
+      version: "0.10.0"
+      cluster_info:
+        cluster_name: test_cluster
+        cluster_uuid: test_uuid
+      resource_info:
+        clones:
+          - description: null
+            id: test-clone
+            member_id: test-member-0
+      stonith_info:
+        primitives:
+          - agent_name:
+              provider: null
+              standard: stonith
+              type: fence_aws
+            description: null
+            id: test-stonith
+      constraint_info:
+        location:
+          - attributes:
+              constraint_id: test-constraint-id
+              node: example.com
+              score: -INFINITY
+            resource_id: test-resource-id
+            role: Started
+      property_info:
+        nvsets:
+          - id: test-bootstrap
+            name: test-infra
+            value: corosync
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, --version]
+          environ: *env-def
+          rc: 0
+          out: "0.10.0"
+          err: ""
+        - command: [/testbin/pcs, cluster, config, --output-format=json]
+          environ: *env-def
+          rc: 0
+          out: '{"cluster_name": "test_cluster", "cluster_uuid": "test_uuid"}'
+          err: ""
+        - command: [/testbin/pcs, constraint, config, --output-format=json]
+          environ: *env-def
+          rc: 0
+          out: '{"location": [{"attributes": {"constraint_id": "test-constraint-id", "node": "example.com", "score": "-INFINITY"}, "resource_id": "test-resource-id", "role": "Started"}]}'
+          err: ""
+        - command: [/testbin/pcs, property, config, --output-format=json]
+          environ: *env-def
+          rc: 0
+          out: '{"nvsets": [{"id": "test-bootstrap", "name": "test-infra", "value": "corosync"}]}'
+          err: ""
+        - command: [/testbin/pcs, resource, config, --output-format=json]
+          environ: *env-def
+          rc: 0
+          out: '{"clones": [{"description": null, "id": "test-clone", "member_id": "test-member-0"}]}'
+          err: ""
+        - command: [/testbin/pcs, stonith, config, --output-format=json]
+          environ: *env-def
+          rc: 0
+          out: '{"primitives": [{"agent_name": {"provider": null, "standard": "stonith", "type": "fence_aws"}, "description": null, "id": "test-stonith"}]}'
+          err: ""
