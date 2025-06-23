@@ -224,7 +224,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     vm_name_list.append(vm['name_label'])
                 else:
                     vm_duplicate_count = vm_name_list.count(vm['name_label'])
-                    entry_name = vm['name_label'] + "_" + str(vm_duplicate_count)
+                    entry_name = f"{vm['name_label']}_{vm_duplicate_count}"
                     vm_name_list.append(vm['name_label'])
             else:
                 entry_name = uuid
@@ -284,7 +284,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     host_name_list.append(host['name_label'])
                 else:
                     host_duplicate_count = host_name_list.count(host['name_label'])
-                    entry_name = host['name_label'] + "_" + str(host_duplicate_count)
+                    entry_name = f"{host['name_label']}_{host_duplicate_count}"
                     host_name_list.append(host['name_label'])
             else:
                 entry_name = host['uuid']
