@@ -16,9 +16,8 @@ See:
 * `man iocage <https://man.freebsd.org/cgi/man.cgi?query=iocage>`_
 * `Jails and Containers <https://docs.freebsd.org/en/books/handbook/jails>`_
 
-Notes:
-
-* The output of the examples is YAML formatted. See the option :ansopt:`ansible.bulitin.default#callback:result_format`.
+.. note::
+  The output of the examples is YAML formatted. See the option :ansopt:`ansible.bulitin.default#callback:result_format`.
 * Run Ansible in Python virtual environment. See `venv — Creation of virtual environments <https://docs.python.org/3/library/venv.html#module-venv>`_.
 
 .. toctree::
