@@ -12,7 +12,7 @@ name: 'null'
 type: stdout
 requirements:
   - set as main display callback
-short_description: do not display stuff to screen
+short_description: Do not display stuff to screen
 description:
   - This callback prevents outputting events to screen.
 """

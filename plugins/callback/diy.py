@@ -26,12 +26,12 @@ notes:
     callback. Additionally, C(ansible_callback_diy.top_level_var_names) will output the top level variable names available
     to the callback.
   - Each option value is rendered as a template before being evaluated. This allows for the dynamic usage of an option. For
-    example, C("{{ 'yellow' if ansible_callback_diy.result.is_changed else 'bright green' }}").
-  - 'B(Condition) for all C(msg) options: if value C(is None or omit), then the option is not being used. B(Effect): use
-    of the C(default) callback plugin for output.'
-  - 'B(Condition) for all C(msg) options: if value C(is not None and not omit and length is not greater than 0), then the
+    example, V("{{ 'yellow' if ansible_callback_diy.result.is_changed else 'bright green' }}").
+  - 'B(Condition) for all C(msg) options: if value V(is None or omit), then the option is not being used. B(Effect): use of
+    the C(default) callback plugin for output.'
+  - 'B(Condition) for all C(msg) options: if value V(is not None and not omit and length is not greater than 0), then the
     option is being used without output. B(Effect): suppress output.'
-  - 'B(Condition) for all C(msg) options: if value C(is not None and not omit and length is greater than 0), then the option
+  - 'B(Condition) for all C(msg) options: if value V(is not None and not omit and length is greater than 0), then the option
     is being used with output. B(Effect): render value as template and output.'
   - 'Valid color values: V(black), V(bright gray), V(blue), V(white), V(green), V(bright blue), V(cyan), V(bright green),
     V(red), V(bright cyan), V(purple), V(bright red), V(yellow), V(bright purple), V(dark gray), V(bright yellow), V(magenta),

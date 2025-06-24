@@ -10,7 +10,7 @@ DOCUMENTATION = r"""
 author: Unknown (!UNKNOWN)
 name: jabber
 type: notification
-short_description: post task events to a Jabber server
+short_description: Post task events to a Jabber server
 description:
   - The chatty part of ChatOps with a Hipchat server as a target.
   - This callback plugin sends status updates to a HipChat channel during playbook execution.

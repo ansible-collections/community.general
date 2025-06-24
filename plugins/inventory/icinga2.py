@@ -14,8 +14,7 @@ author:
   - Cliff Hults (@BongoEADGC6) <cliff.hults@gmail.com>
 description:
   - Get inventory hosts from the Icinga2 API.
-  - "Uses a configuration file as an inventory source, it must end in
-    C(.icinga2.yml) or C(.icinga2.yaml)."
+  - Uses a configuration file as an inventory source, it must end in C(.icinga2.yml) or C(.icinga2.yaml).
 extends_documentation_fragment:
   - constructed
 options:
@@ -46,7 +45,7 @@ options:
     required: true
   host_filter:
     description:
-      - An Icinga2 API valid host filter. Leave blank for no filtering
+      - An Icinga2 API valid host filter. Leave blank for no filtering.
     type: string
     required: false
   validate_certs:

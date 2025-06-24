@@ -11,7 +11,7 @@ DOCUMENTATION = r"""
 name: gitlab_runners
 author:
   - Stefan Heitmüller (@morph027) <stefan.heitmueller@gmx.com>
-short_description: Ansible dynamic inventory plugin for GitLab runners.
+short_description: Ansible dynamic inventory plugin for GitLab runners
 requirements:
   - python-gitlab > 1.8.0
 extends_documentation_fragment:
@@ -44,14 +44,14 @@ options:
       - private_token
       - access_token
   filter:
-    description: filter runners from GitLab API
+    description: Filter runners from GitLab API.
     env:
       - name: GITLAB_FILTER
         version_added: 1.0.0
     type: str
     choices: ['active', 'paused', 'online', 'specific', 'shared']
   verbose_output:
-    description: Toggle to (not) include all available nodes metadata
+    description: Toggle to (not) include all available nodes metadata.
     type: bool
     default: true
 """

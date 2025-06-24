@@ -6,7 +6,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 name: print_task
 type: aggregate
 short_description: Prints playbook task snippet to job output
@@ -15,14 +15,14 @@ description:
 version_added: 10.7.0
 requirements:
   - enable in configuration
-'''
+"""
 
-EXAMPLES = r'''
-ansible.cfg: >
-    # Enable plugin
-    [defaults]
-    callbacks_enabled=community.general.print_task
-'''
+EXAMPLES = r"""
+ansible.cfg: |-
+  # Enable plugin
+  [defaults]
+  callbacks_enabled=community.general.print_task
+"""
 
 from yaml import load, dump
 

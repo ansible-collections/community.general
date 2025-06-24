@@ -9,15 +9,14 @@ DOCUMENTATION = r"""
 name: linode
 author:
   - Luke Murphy (@decentral1se)
-short_description: Ansible dynamic inventory plugin for Linode.
+short_description: Ansible dynamic inventory plugin for Linode
 requirements:
   - linode_api4 >= 2.0.0
 description:
   - Reads inventories from the Linode API v4.
   - Uses a YAML configuration file that ends with linode.(yml|yaml).
   - Linode labels are used by default as the hostnames.
-  - The default inventory groups are built from groups (deprecated by
-    Linode) and not tags.
+  - The default inventory groups are built from groups (deprecated by Linode) and not tags.
 extends_documentation_fragment:
   - constructed
   - inventory_cache
