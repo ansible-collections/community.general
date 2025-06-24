@@ -9,7 +9,7 @@
   uri:
     url: http://localhost:8080/login
     status_code: 200
-    return_content: no
+    return_content: false
     timeout: 30
   register: result
   retries: 10
