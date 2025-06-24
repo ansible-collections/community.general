@@ -104,15 +104,15 @@ options:
     default: true
   want_ip_addresses:
     description:
-      - Toggle, if V(true) the plugin will add a C(cobbler_ipv4_addresses) and C(cobbler_ipv6_addresses) dictionary to the defined O(group) mapping
-        interface DNS names to IP addresses.
+      - Toggle, if V(true) the plugin will add a C(cobbler_ipv4_addresses) and C(cobbler_ipv6_addresses) dictionary to the
+        defined O(group) mapping interface DNS names to IP addresses.
     type: boolean
     default: true
     version_added: 7.1.0
   facts_level:
     description:
-      - "Set to V(normal) to gather only system-level variables."
-      - "Set to V(as_rendered) to gather all variables as rolled up by Cobbler."
+      - Set to V(normal) to gather only system-level variables.
+      - Set to V(as_rendered) to gather all variables as rolled up by Cobbler.
     type: string
     choices: ['normal', 'as_rendered']
     default: normal

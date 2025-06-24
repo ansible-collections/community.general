@@ -11,7 +11,7 @@ DOCUMENTATION = r"""
 name: unixy
 type: stdout
 author: Al Bowles (@akatch)
-short_description: condensed Ansible output
+short_description: Condensed Ansible output
 description:
   - Consolidated Ansible output in the style of LINUX/UNIX startup logs.
 extends_documentation_fragment:
