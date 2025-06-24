@@ -10,7 +10,7 @@ DOCUMENTATION = r"""
 author: Unknown (!UNKNOWN)
 name: log_plays
 type: notification
-short_description: write playbook output to log file
+short_description: Write playbook output to log file
 description:
   - This callback writes playbook output to a file per host in the C(/var/log/ansible/hosts) directory.
 requirements:

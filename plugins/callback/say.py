@@ -14,7 +14,7 @@ type: notification
 requirements:
   - whitelisting in configuration
   - the C(/usr/bin/say) command line program (standard on macOS) or C(espeak) command line program
-short_description: notify using software speech synthesizer
+short_description: Notify using software speech synthesizer
 description:
   - This plugin will use the C(say) or C(espeak) program to "speak" about play events.
 """
