@@ -1,0 +1,128 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Delete user_and_pass credential (run {{ run_number }})
+  community.general.jenkins_credential:
+    id: "userpass-id"
+    jenkins_user: "{{ jenkins_username }}"
+    token: "{{ token }}"
+    state: "absent"
+  register: userpass_cred
+
+- name: Assert user_and_pass changed value
+  assert:
+    that:
+      - userpass_cred.changed == (run_number == 1)
+    fail_msg: "user_and_pass credential changed status incorrect on run {{ run_number }}"
+    success_msg: "user_and_pass credential behaved correctly on run {{ run_number }}"
+
+- name: Delete file credential to custom scope (run {{ run_number }})
+  community.general.jenkins_credential:
+    id: "file-id"
+    jenkins_user: "{{ jenkins_username }}"
+    token: "{{ token }}"
+    scope: "CUSTOM"
+    state: "absent"
+  register: file_cred
+
+- name: Assert file credential changed value
+  assert:
+    that:
+      - file_cred.changed == (run_number == 1)
+    fail_msg: "file credential changed status incorrect on run {{ run_number }}"
+    success_msg: "file credential behaved correctly on run {{ run_number }}"
+
+- name: Delete CUSTOM scope credential (run {{ run_number}})
+  community.general.jenkins_credential:
+    id: "CUSTOM"
+    type: "scope"
+    jenkins_user: "{{ jenkins_username }}"
+    token: "{{ token }}"
+    state: "absent"
+  register: custom_scope
+
+- name: Assert CUSTOM scope changed value
+  assert:
+    that:
+      - custom_scope.changed == (run_number == 1)
+    fail_msg: "CUSTOM scope changed status incorrect on run {{ run_number }}"
+    success_msg: "CUSTOM scope behaved correctly on run {{ run_number }}"
+
+- name: Delete text credential to folder (run {{ run_number }})
+  community.general.jenkins_credential:
+    id: "text-id"
+    jenkins_user: "{{ jenkins_username }}"
+    token: "{{ token }}"
+    state: "absent"
+    location: "folder"
+    url: "http://localhost:8080/job/test"
+  register: text_cred
+
+- name: Assert text credential changed value
+  assert:
+    that:
+      - text_cred.changed == (run_number == 1)
+    fail_msg: "text credential changed status incorrect on run {{ run_number }}"
+    success_msg: "text credential behaved correctly on run {{ run_number }}"
+
+- name: Delete githubApp credential (run {{ run_number }})
+  community.general.jenkins_credential:
+    id: "githubapp-id"
+    jenkins_user: "{{ jenkins_username }}"
+    token: "{{ token }}"
+    state: "absent"
+  register: githubapp_cred
+
+- name: Assert githubApp credential changed value
+  assert:
+    that:
+      - githubapp_cred.changed == (run_number == 1)
+    fail_msg: "githubApp credential changed status incorrect on run {{ run_number }}"
+    success_msg: "githubApp credential behaved correctly on run {{ run_number }}"
+
+- name: Delete sshKey credential (run {{ run_number }})
+  community.general.jenkins_credential:
+    id: "sshkey-id"
+    jenkins_user: "{{ jenkins_username }}"
+    token: "{{ token }}"
+    description: "SSH key credential"
+    state: "absent"
+  register: sshkey_cred
+
+- name: Assert sshKey credential changed value
+  assert:
+    that:
+      - sshkey_cred.changed == (run_number == 1)
+    fail_msg: "sshKey credential changed status incorrect on run {{ run_number }}"
+    success_msg: "sshKey credential behaved correctly on run {{ run_number }}"
+
+- name: Delete certificate credential (p12) (run {{ run_number }})
+  community.general.jenkins_credential:
+    id: "certificate-id"
+    jenkins_user: "{{ jenkins_username }}"
+    token: "{{ token }}"
+    state: "absent"
+  register: cert_p12_cred
+
+- name: Assert certificate (p12) credential changed value
+  assert:
+    that:
+      - cert_p12_cred.changed == (run_number == 1)
+    fail_msg: "certificate (p12) credential changed status incorrect on run {{ run_number }}"
+    success_msg: "certificate (p12) credential behaved correctly on run {{ run_number }}"
+
+- name: Delete certificate credential (pem) (run {{ run_number }})
+  community.general.jenkins_credential:
+    id: "certificate-id-pem"
+    jenkins_user: "{{ jenkins_username }}"
+    token: "{{ token }}"
+    state: "absent"
+  register: cert_pem_cred
+
+- name: Assert certificate (pem) credential changed value
+  assert:
+    that:
+      - cert_pem_cred.changed == (run_number == 1)
+    fail_msg: "certificate (pem) credential changed status incorrect on run {{ run_number }}"
+    success_msg: "certificate (pem) credential behaved correctly on run {{ run_number }}"
