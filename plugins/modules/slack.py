@@ -32,8 +32,9 @@ options:
   domain:
     type: str
     description:
-      - Slack (sub)domain for your environment without protocol. (For example V(example.slack.com).) In Ansible 1.8 and beyond,
-        this is deprecated and may be ignored. See token documentation for information.
+      - "When using new format 'Webhook token' and WebAPI tokens: this can be V(slack.com) or V(slack-gov.com) and is ignored otherwise."
+      - "When using old format 'Webhook token': Slack (sub)domain for your environment without protocol. (For example V(example.slack.com).)
+         in Ansible 1.8 and beyond, this is deprecated and may be ignored. See token documentation for information."
   token:
     type: str
     description:
@@ -41,9 +42,10 @@ options:
         depending on what method you use.
       - 'Webhook token: Prior to Ansible 1.8, a token looked like V(3Ffe373sfhRE6y42Fg3rvf4GlK). In Ansible 1.8 and above,
         Ansible adapts to the new slack API where tokens look like V(G922VJP24/D921DW937/3Ffe373sfhRE6y42Fg3rvf4GlK). If tokens
-        are in the new format then slack will ignore any value of domain. If the token is in the old format the domain is
-        required. Ansible has no control of when slack will get rid of the old API. When slack does that the old format will
-        stop working. ** Please keep in mind the tokens are not the API tokens but are the webhook tokens. In slack these
+        are in the new format then slack will ignore any value of domain except V(slack.com) or V(slack-gov.com). If the token
+        is in the old format the domain is required. Ansible has no control of when slack will get rid of the old API. When slack
+        does that the old format will stop working.
+        ** Please keep in mind the tokens are not the API tokens but are the webhook tokens. In slack these
         are found in the webhook URL which are obtained under the apps and integrations. The incoming webhooks can be added
         in that area. In some cases this may be locked by your Slack admin and you must request access. It is there that the
         incoming webhooks can be added. The key is on the end of the URL given to you in that section.'
@@ -267,10 +269,10 @@ from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.urls import fetch_url
 
 OLD_SLACK_INCOMING_WEBHOOK = 'https://%s/services/hooks/incoming-webhook?token=%s'
-SLACK_INCOMING_WEBHOOK = 'https://hooks.slack.com/services/%s'
-SLACK_POSTMESSAGE_WEBAPI = 'https://slack.com/api/chat.postMessage'
-SLACK_UPDATEMESSAGE_WEBAPI = 'https://slack.com/api/chat.update'
-SLACK_CONVERSATIONS_HISTORY_WEBAPI = 'https://slack.com/api/conversations.history'
+SLACK_INCOMING_WEBHOOK = 'https://hooks.%s/services/%s'
+SLACK_POSTMESSAGE_WEBAPI = 'https://%s/api/chat.postMessage'
+SLACK_UPDATEMESSAGE_WEBAPI = 'https://%s/api/chat.update'
+SLACK_CONVERSATIONS_HISTORY_WEBAPI = 'https://%s/api/conversations.history'
 
 # Escaping quotes and apostrophes to avoid ending string prematurely in ansible call.
 # We do not escape other characters used as Slack metacharacters (e.g. &, <, >).
@@ -372,7 +374,11 @@ def build_payload_for_slack(text, channel, thread_id, username, icon_url, icon_e
     return payload
 
 
-def get_slack_message(module, token, channel, ts):
+def validate_slack_domain(domain):
+    return (domain if domain in ('slack.com', 'slack-gov.com') else 'slack.com')
+
+
+def get_slack_message(module, domain, token, channel, ts):
     headers = {
         'Content-Type': 'application/json; charset=UTF-8',
         'Accept': 'application/json',
@@ -384,7 +390,8 @@ def get_slack_message(module, token, channel, ts):
         'limit': 1,
         'inclusive': 'true',
     })
-    url = SLACK_CONVERSATIONS_HISTORY_WEBAPI + '?' + qs
+    domain = validate_slack_domain(domain)
+    url = (SLACK_CONVERSATIONS_HISTORY_WEBAPI % domain) + '?' + qs
     response, info = fetch_url(module=module, url=url, headers=headers, method='GET')
     if info['status'] != 200:
         module.fail_json(msg="failed to get slack message")
@@ -402,9 +409,11 @@ def do_notify_slack(module, domain, token, payload):
     use_webapi = False
     if token.count('/') >= 2:
         # New style webhook token
-        slack_uri = SLACK_INCOMING_WEBHOOK % token
+        domain = validate_slack_domain(domain)
+        slack_uri = SLACK_INCOMING_WEBHOOK % (domain, token)
     elif re.match(r'^xox[abp]-\S+$', token):
-        slack_uri = SLACK_UPDATEMESSAGE_WEBAPI if 'ts' in payload else SLACK_POSTMESSAGE_WEBAPI
+        domain = validate_slack_domain(domain)
+        slack_uri = (SLACK_UPDATEMESSAGE_WEBAPI if 'ts' in payload else SLACK_POSTMESSAGE_WEBAPI) % domain
         use_webapi = True
     else:
         if not domain:
@@ -426,7 +435,7 @@ def do_notify_slack(module, domain, token, payload):
         if use_webapi:
             obscured_incoming_webhook = slack_uri
         else:
-            obscured_incoming_webhook = SLACK_INCOMING_WEBHOOK % '[obscured]'
+            obscured_incoming_webhook = SLACK_INCOMING_WEBHOOK % (domain, '[obscured]')
         module.fail_json(msg=" failed to send %s to %s: %s" % (data, obscured_incoming_webhook, info['msg']))
 
     # each API requires different handling
@@ -494,7 +503,7 @@ def main():
     # if updating an existing message, we can check if there's anything to update
     if message_id is not None:
         changed = False
-        msg = get_slack_message(module, token, channel, message_id)
+        msg = get_slack_message(module, domain, token, channel, message_id)
         for key in ('icon_url', 'icon_emoji', 'link_names', 'color', 'attachments', 'blocks'):
             if msg.get(key) != module.params.get(key):
                 changed = True
