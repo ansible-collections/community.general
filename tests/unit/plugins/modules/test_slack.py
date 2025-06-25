@@ -103,6 +103,22 @@ class TestSlackModule(ModuleTestCase):
         self.assertTrue(fetch_url_mock.call_count, 1)
         self.assertEqual(fetch_url_mock.call_args[1]['url'], "https://slack.com/api/chat.postMessage")
 
+    def test_govslack_message(self):
+        with set_module_args({
+            'token': 'xoxa-123456789abcdef',
+            'domain': 'slack-gov.com',
+            'msg': 'test with ts'
+        }):
+            with patch.object(slack, "fetch_url") as fetch_url_mock:
+                mock_response = Mock()
+                mock_response.read.return_value = '{"fake":"data"}'
+                fetch_url_mock.return_value = (mock_response, {"status": 200})
+                with self.assertRaises(AnsibleExitJson):
+                    self.module.main()
+
+        self.assertTrue(fetch_url_mock.call_count, 1)
+        self.assertEqual(fetch_url_mock.call_args[1]['url'], "https://slack-gov.com/api/chat.postMessage")
+
     def test_edit_message(self):
         with set_module_args({
             'token': 'xoxa-123456789abcdef',
