@@ -2236,14 +2236,17 @@ class KeycloakAPI(object):
         """
         try:
             # Send a DELETE request to remove the specified authentication config from the Keycloak server.
-            self._request(
+            open_url(
                 URL_AUTHENTICATION_CONFIG.format(
                     url=self.baseurl,
                     realm=realm,
                     id=configId),
-                method='DELETE')
+                method='DELETE',
+                http_agent=self.http_agent, headers=self.restheaders,
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs)
         except Exception as e:
-            self.fail_request(e, msg="Unable to delete authentication config %s: %s" % (configId, str(e)))
+            self.fail_open_url(e, msg="Unable to delete authentication config %s: %s" % (configId, str(e)))
 
     def create_subflow(self, subflowName, flowAlias, realm='master', flowType='basic-flow'):
         """ Create new sublow on the flow
