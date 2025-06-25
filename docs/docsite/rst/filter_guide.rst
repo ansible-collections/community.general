@@ -8,7 +8,7 @@
 community.general Filter Guide
 ==============================
 
-The :ref:`community.general collection <plugins_in_community.general>` offers several useful filter plugins.
+The :anscollection:`community.general collection <community.general#collection>` offers several useful filter plugins.
 
 .. toctree::
    :maxdepth: 2
