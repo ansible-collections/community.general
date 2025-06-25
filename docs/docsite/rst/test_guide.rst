@@ -8,7 +8,7 @@
 community.general Test (Plugin) Guide
 =====================================
 
-The :ref:`community.general collection <plugins_in_community.general>` offers currently one test plugin.
+The :anscollection:`community.general collection <community.general#collection>` offers currently one test plugin.
 
 .. contents:: Topics
 
