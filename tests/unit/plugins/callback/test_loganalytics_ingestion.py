@@ -12,6 +12,7 @@ import urllib
 from ansible.executor.task_result import TaskResult
 from ansible_collections.community.general.plugins.callback.loganalytics_ingestion import AzureLogAnalyticsIngestionSource
 
+
 class TestAzureLogAnalyticsIngestion(unittest.TestCase):
     dce_url = "https://fake.dce_url.ansible.com"
     dcr_id = "fake-dcr-id"
