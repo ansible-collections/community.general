@@ -165,8 +165,7 @@ class PacemakerResource(StateModuleHelper):
     default_state = ""
 
     def __init_module__(self):
-        self.runner = pacemaker_runner(self.module, cli_action='resource')
-        self._maintenance_mode_runner = pacemaker_runner(self.module, cli_action='property')
+        self.runner = pacemaker_runner(self.module)
         self.vars.set('previous_value', self._get())
         self.vars.set('value', self.vars.previous_value, change=True, diff=True)
 
@@ -179,17 +178,16 @@ class PacemakerResource(StateModuleHelper):
         return process
 
     def _get(self):
-        runner_args = ['state']
+        runner_args = ['cli_action', 'state']
         if self.module.params['name']:
             runner_args.append('name')
         with self.runner(runner_args, output_process=self._process_command_output(False)) as ctx:
-            return ctx.run(state='status')
+            return ctx.run(cli_action="resource", state='status')
 
     def state_absent(self):
-        runner_args = ['state', 'name', 'force']
-        force = get_pacemaker_maintenance_mode(self._maintenance_mode_runner)
-        with self.runner(runner_args, output_process=self._process_command_output(True, "does not exist"), check_mode_skip=True) as ctx:
-            ctx.run(force=force)
+        force = get_pacemaker_maintenance_mode(self.runner)
+        with self.runner('cli_action state name force', output_process=self._process_command_output(True, "does not exist"), check_mode_skip=True) as ctx:
+            ctx.run(cli_action='resource', force=force)
             self.vars.set('value', self._get())
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err
@@ -197,37 +195,37 @@ class PacemakerResource(StateModuleHelper):
 
     def state_present(self):
         with self.runner(
-                'state name resource_type resource_option resource_operation resource_meta resource_argument wait',
-                output_process=self._process_command_output(not get_pacemaker_maintenance_mode(self._maintenance_mode_runner), "already exists"),
+                'cli_action state name resource_type resource_option resource_operation resource_meta resource_argument wait',
+                output_process=self._process_command_output(not get_pacemaker_maintenance_mode(self.runner), "already exists"),
                 check_mode_skip=True) as ctx:
-            ctx.run()
+            ctx.run(cli_action='resource')
             self.vars.set('value', self._get())
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err
             self.vars.cmd = ctx.cmd
 
     def state_enabled(self):
-        with self.runner('state name', output_process=self._process_command_output(True, "Starting"), check_mode_skip=True) as ctx:
-            ctx.run()
+        with self.runner('cli_action state name', output_process=self._process_command_output(True, "Starting"), check_mode_skip=True) as ctx:
+            ctx.run(cli_action='resource')
             self.vars.set('value', self._get())
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err
             self.vars.cmd = ctx.cmd
 
     def state_disabled(self):
-        with self.runner('state name', output_process=self._process_command_output(True, "Stopped"), check_mode_skip=True) as ctx:
-            ctx.run()
+        with self.runner('cli_action state name', output_process=self._process_command_output(True, "Stopped"), check_mode_skip=True) as ctx:
+            ctx.run(cli_action='resource')
             self.vars.set('value', self._get())
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err
             self.vars.cmd = ctx.cmd
 
     def state_cleanup(self):
-        runner_args = ['state']
+        runner_args = ['cli_action', 'state']
         if self.module.params['name']:
             runner_args.append('name')
         with self.runner(runner_args, output_process=self._process_command_output(True, "Clean"), check_mode_skip=True) as ctx:
-            ctx.run()
+            ctx.run(cli_action='resource')
             self.vars.set('value', self._get())
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err

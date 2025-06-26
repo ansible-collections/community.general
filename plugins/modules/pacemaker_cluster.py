@@ -29,9 +29,8 @@ options:
   state:
     description:
       - Indicate desired state of the cluster.
-    choices: [offline, online, restart, maintenance]
+    choices: [cleanup, offline, online, restart, maintenance]
     type: str
-    required: true
   name:
     description:
       - Specify which node of the cluster you want to manage. V(null) == the cluster status itself, V(all) == check the status
@@ -76,8 +75,8 @@ from ansible_collections.community.general.plugins.module_utils.pacemaker import
 class PacemakerCluster(StateModuleHelper):
     module = dict(
         argument_spec=dict(
-            state=dict(type='str', required=True, choices=[
-                'offline', 'online', 'restart', 'maintenance']),
+            state=dict(type='str', choices=[
+                'cleanup', 'offline', 'online', 'restart', 'maintenance']),
             name=dict(type='str', aliases=['node']),
             wait=dict(type='int', default=300),
             force=dict(type='bool', default=True)
@@ -87,14 +86,34 @@ class PacemakerCluster(StateModuleHelper):
     default_state = ""
 
     def __init_module__(self):
-        self.runner = pacemaker_runner(self.module, cli_action='cluster')
-        self._maintenance_mode_runner = pacemaker_runner(self.module, cli_action='property')
-        if self.module.params['state'] == "maintenance":
-            self.vars.set('previous_value', self._maintenance_get())
-        else:
-            self.vars.set('previous_value', self._get())
-        self.vars.set('value', self.vars.previous_value, change=True, diff=True)
+        self.runner = pacemaker_runner(self.module)
         self.vars.set('apply_all', True if not self.module.params['name'] else False)
+        get_args = dict([('cli_action', 'cluster'), ('state', 'status'), ('name', None), ('apply_all', self.vars.apply_all)])
+        if self.module.params['state'] == "maintenance":
+            get_args['cli_action'] = "property"
+            get_args['state'] = "config"
+            get_args['name'] = "maintenance-mode"
+        elif self.module.params['state'] == "cleanup":
+            get_args['cli_action'] = "resource"
+            get_args['name'] = self.module.params['name']
+
+        self.vars.set('get_args', get_args)
+        self.vars.set('previous_value', self._get())
+        self.vars.set('value', self.vars.previous_value, change=True, diff=True)
+
+        if self.module.params['state'] == "cleanup":
+            self.module.deprecate(
+                'The value `cleanup` for "state" is being deprecated',
+                version='12.0.0',
+                collection_name='community.general'
+            )
+
+        if not self.module.params['state']:
+            self.module.deprecate(
+                'Parameter "state" values not defined is being deprecated',
+                version='12.0.0',
+                collection_name='community.general'
+            )
 
     def _process_command_output(self, fail_on_err, ignore_err_msg=""):
         def process(rc, out, err):
@@ -105,53 +124,65 @@ class PacemakerCluster(StateModuleHelper):
         return process
 
     def _get(self):
-        with self.runner('state', output_process=self._process_command_output(False)) as ctx:
-            return ctx.run(state='status')
+        with self.runner('cli_action state name', output_process=self._process_command_output(False)) as ctx:
+            return ctx.run(cli_action=self.vars.get_args['cli_action'], state=self.vars.get_args['state'], name=self.vars.get_args['name'])
 
-    def _maintenance_get(self):
-        with self._maintenance_mode_runner('state name', output_process=self._process_command_output(False)) as ctx:
-            return ctx.run(state='config', name='maintenance-mode')
+    def state_cleanup(self):
+        with self.runner('cli_action state name', output_process=self._process_command_output(True, "Fail"), check_mode_skip=True) as ctx:
+            ctx.run(cli_action='resource')
+            self.vars.set('value', self._get())
+            self.vars.stdout = ctx.results_out
+            self.vars.stderr = ctx.results_err
+            self.vars.cmd = ctx.cmd
 
     def state_offline(self):
-        with self.runner('state name apply_all wait', output_process=self._process_command_output(True, "not currently running"), check_mode_skip=True) as ctx:
-            ctx.run(apply_all=self.vars.apply_all)
+        with self.runner('cli_action state name apply_all wait',
+                         output_process=self._process_command_output(True, "not currently running"),
+                         check_mode_skip=True) as ctx:
+            ctx.run(cli_action='cluster', apply_all=self.vars.apply_all)
             self.vars.set('value', self._get())
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err
             self.vars.cmd = ctx.cmd
 
     def state_online(self):
-        with self.runner('state name apply_all wait', output_process=self._process_command_output(True, "currently running"), check_mode_skip=True) as ctx:
-            ctx.run(apply_all=self.vars.apply_all)
+        with self.runner('cli_action state name apply_all wait',
+                         output_process=self._process_command_output(True, "currently running"),
+                         check_mode_skip=True) as ctx:
+            ctx.run(cli_action='cluster', apply_all=self.vars.apply_all)
             self.vars.set('value', self._get())
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err
             self.vars.cmd = ctx.cmd
 
-        if get_pacemaker_maintenance_mode(self._maintenance_mode_runner):
-            with self._maintenance_mode_runner('state name', output_process=self._process_command_output(True, "Fail"), check_mode_skip=True) as ctx:
-                ctx.run(state='maintenance', name="maintenance-mode=false")
+        if get_pacemaker_maintenance_mode(self.runner):
+            with self.runner('cli_action state name', output_process=self._process_command_output(True, "Fail"), check_mode_skip=True) as ctx:
+                ctx.run(cli_action='property', state='maintenance', name='maintenance-mode=false')
 
     def state_maintenance(self):
-        with self._maintenance_mode_runner('state name', output_process=self._process_command_output(True, "Fail"), check_mode_skip=True) as ctx:
-            ctx.run(name="maintenance-mode=true")
-            self.vars.set('value', self._maintenance_get())
+        with self.runner('cli_action state name',
+                         output_process=self._process_command_output(True, "Fail"),
+                         check_mode_skip=True) as ctx:
+            ctx.run(cli_action='property', name='maintenance-mode=true')
+            self.vars.set('value', self._get())
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err
             self.vars.cmd = ctx.cmd
 
     def state_restart(self):
-        with self.runner('state name apply_all wait', output_process=self._process_command_output(True, "not currently running"), check_mode_skip=True) as ctx:
-            ctx.run(state='offline', apply_all=self.vars.apply_all)
-            ctx.run(state='online', apply_all=self.vars.apply_all)
+        with self.runner('cli_action state name apply_all wait',
+                         output_process=self._process_command_output(True, "not currently running"),
+                         check_mode_skip=True) as ctx:
+            ctx.run(cli_action='cluster', state='offline', apply_all=self.vars.apply_all)
+            ctx.run(cli_action='cluster', state='online', apply_all=self.vars.apply_all)
             self.vars.set('value', self._get())
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err
             self.vars.cmd = ctx.cmd
 
-        if get_pacemaker_maintenance_mode(self._maintenance_mode_runner):
-            with self._maintenance_mode_runner('state name', output_process=self._process_command_output(True, "Fail"), check_mode_skip=True) as ctx:
-                ctx.run(state='maintenance', name="maintenance-mode=false")
+        if get_pacemaker_maintenance_mode(self.runner):
+            with self.runner('cli_action state name', output_process=self._process_command_output(True, "Fail"), check_mode_skip=True) as ctx:
+                ctx.run(cli_action='property', state='maintenance', name='maintenance-mode=false')
 
 
 def main():
