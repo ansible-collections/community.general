@@ -137,18 +137,12 @@ examples: |
     export LOGANALYTICS_STREAM_NAME=Custom-MyTable
 '''
 
-import base64
 import getpass
-import hashlib
-import json
 import requests
 import socket
-import time
 import uuid
 from datetime import datetime, timezone, timedelta
 from os.path import basename
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
 
 from ansible.plugins.callback import CallbackBase
 from ansible.utils.display import Display

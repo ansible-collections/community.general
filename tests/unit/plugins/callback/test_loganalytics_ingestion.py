@@ -2,14 +2,11 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from datetime import datetime
-import json
 import time
 import unittest
 import unittest.mock
 import urllib
 
-from ansible.executor.task_result import TaskResult
 from ansible_collections.community.general.plugins.callback.loganalytics_ingestion import AzureLogAnalyticsIngestionSource
 
 
