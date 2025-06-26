@@ -45,7 +45,7 @@ options:
     default: true
   ca_certs:
     description:
-      - Path to root certificates file. If not set and O(tls) is set to V(true), certifi's C(ca-certificates) is used.
+      - Path to root certificates file. If not set and O(tls) is set to V(true), certifi's CA certificates are used.
     type: str
   client_cert_file:
     description:
