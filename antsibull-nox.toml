@@ -19,11 +19,13 @@ validate_collection_refs="all"
 codeblocks_restrict_types = [
     "ansible-output",
     "console",
+    "ini",
     "json",
     "python",
     "shell",
     "yaml",
     "yaml+jinja",
+    "text",
 ]
 codeblocks_restrict_type_exact_case = true
 codeblocks_allow_without_type = false
