@@ -13,13 +13,13 @@ class ModuleDocFragment(object):
 options:
   global:
     description:
-      - The module will pass the C(--global) argument to C(pipx), to execute actions in global scope.
+      - The module passes the C(--global) argument to C(pipx), to execute actions in global scope.
     type: bool
     default: false
   executable:
     description:
       - Path to the C(pipx) installed in the system.
-      - If not specified, the module will use C(python -m pipx) to run the tool, using the same Python interpreter as ansible
+      - If not specified, the module uses C(python -m pipx) to run the tool, using the same Python interpreter as ansible
         itself.
     type: path
 requirements:
@@ -27,8 +27,8 @@ requirements:
 notes:
   - This module does not install the C(pipx) python package, however that can be easily done with the module M(ansible.builtin.pip).
   - This module does not require C(pipx) to be in the shell C(PATH), but it must be loadable by Python as a module.
-  - This module will honor C(pipx) environment variables such as but not limited to E(PIPX_HOME) and E(PIPX_BIN_DIR) passed
-    using the R(environment Ansible keyword, playbooks_environment).
+  - This module honors C(pipx) environment variables such as but not limited to E(PIPX_HOME) and E(PIPX_BIN_DIR) passed using
+    the R(environment Ansible keyword, playbooks_environment).
 seealso:
   - name: C(pipx) command manual page
     description: Manual page for the command.

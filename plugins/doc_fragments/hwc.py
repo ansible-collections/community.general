@@ -55,5 +55,5 @@ notes:
   - For authentication, you can set domain using the E(ANSIBLE_HWC_DOMAIN) environment variable.
   - For authentication, you can set project using the E(ANSIBLE_HWC_PROJECT) environment variable.
   - For authentication, you can set region using the E(ANSIBLE_HWC_REGION) environment variable.
-  - Environment variables values will only be used if the playbook values are not set.
+  - Environment variables values are only used when the playbook values are not set.
 """
