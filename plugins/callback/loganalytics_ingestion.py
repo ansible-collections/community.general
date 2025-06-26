@@ -138,7 +138,12 @@ examples: |
 '''
 
 import getpass
-import requests
+try:
+    import requests
+except ImportError as exception:
+    IMPORT_ERROR_REQUESTS = exception
+else:
+    IMPORT_ERROR_REQUESTS = None
 import socket
 import uuid
 from datetime import datetime, timezone, timedelta
@@ -273,6 +278,8 @@ class CallbackModule(CallbackBase):
     CALLBACK_NEEDS_ENABLED = True
 
     def __init__(self, display=None):
+        if IMPORT_ERROR_REQUESTS:
+            raise AnsibleError("'requests' must be installed in order to use this plugin") from IMPORT_ERROR_REQUESTS
         super(CallbackModule, self).__init__(display=display)
         self.start_datetimes = {}
         self.playbook_name = None
