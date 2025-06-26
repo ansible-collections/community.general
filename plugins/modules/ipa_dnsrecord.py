@@ -167,7 +167,7 @@ EXAMPLES = r"""
     state: absent
 
 - name: Ensure an NS record for a subdomain is present
-  community,general.ipa_dnsrecord:
+  community.general.ipa_dnsrecord:
     name: subdomain
     zone_name: example.com
     record_type: 'NS'
