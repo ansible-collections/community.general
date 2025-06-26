@@ -10,7 +10,7 @@ DOCUMENTATION = r"""
 author:
   - Juan Manuel Parrilla (@jparrill)
 name: hiera
-short_description: get info from hiera data
+short_description: Get info from hiera data
 requirements:
   - hiera (command line utility)
 description:

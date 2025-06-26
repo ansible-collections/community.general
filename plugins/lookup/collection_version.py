@@ -49,8 +49,8 @@ RETURN = r"""
 _raw:
   description:
     - The version number of the collections listed as input.
-    - If a collection can not be found, it will return the value provided in O(result_not_found). By default, this is V(none).
-    - If a collection can be found, but the version not identified, it will return the value provided in O(result_no_version).
+    - If a collection can not be found, it returns the value provided in O(result_not_found). By default, this is V(none).
+    - If a collection can be found, but the version not identified, it returns the value provided in O(result_no_version).
       By default, this is V(*). This can happen for collections installed from git which do not have a version number in V(galaxy.yml).
   type: list
   elements: str
