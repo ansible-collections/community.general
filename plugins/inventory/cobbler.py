@@ -12,14 +12,17 @@ short_description: Cobbler inventory source
 version_added: 1.0.0
 description:
   - Get inventory hosts from the cobbler service.
-  - "Uses a configuration file as an inventory source, it must end in C(.cobbler.yml) or C(.cobbler.yaml) and have a C(plugin: cobbler) entry."
-  - Adds the primary IP addresses to C(cobbler_ipv4_address) and C(cobbler_ipv6_address) host variables if defined in Cobbler.  The primary IP address is
-    defined as the management interface if defined, or the interface who's DNS name matches the hostname of the system, or else the first interface found.
+  - 'Uses a configuration file as an inventory source, it must end in C(.cobbler.yml) or C(.cobbler.yaml) and have a C(plugin:
+    cobbler) entry.'
+  - Adds the primary IP addresses to C(cobbler_ipv4_address) and C(cobbler_ipv6_address) host variables if defined in Cobbler.
+    The primary IP address is defined as the management interface if defined, or the interface who's DNS name matches the
+    hostname of the system, or else the first interface found.
 extends_documentation_fragment:
   - inventory_cache
 options:
   plugin:
-    description: The name of this plugin, it should always be set to V(community.general.cobbler) for this plugin to recognize it as its own.
+    description: The name of this plugin, it should always be set to V(community.general.cobbler) for this plugin to recognize
+      it as its own.
     type: string
     required: true
     choices: ['cobbler', 'community.general.cobbler']
@@ -72,7 +75,7 @@ options:
   include_profiles:
     description:
       - Profiles to include from inventory.
-      - If specified, all other profiles will be excluded.
+      - If specified, all other profiles are excluded.
       - O(exclude_profiles) is ignored if O(include_profiles) is specified.
     type: list
     default: []
@@ -81,7 +84,8 @@ options:
   inventory_hostname:
     description:
       - What to use for the ansible inventory hostname.
-      - By default the networking hostname is used if defined, otherwise the DNS name of the management or first non-static interface.
+      - By default the networking hostname is used if defined, otherwise the DNS name of the management or first non-static
+        interface.
       - If set to V(system), the cobbler system name is used.
     type: str
     choices: ['hostname', 'system']
@@ -99,12 +103,12 @@ options:
     description: Prefix to apply to cobbler groups.
     default: cobbler_
   want_facts:
-    description: Toggle, if V(true) the plugin will retrieve all host facts from the server.
+    description: Toggle, if V(true) the plugin retrieves all host facts from the server.
     type: boolean
     default: true
   want_ip_addresses:
     description:
-      - Toggle, if V(true) the plugin will add a C(cobbler_ipv4_addresses) and C(cobbler_ipv6_addresses) dictionary to the
+      - Toggle, if V(true) the plugin adds a C(cobbler_ipv4_addresses) and C(cobbler_ipv6_addresses) dictionary to the
         defined O(group) mapping interface DNS names to IP addresses.
     type: boolean
     default: true
