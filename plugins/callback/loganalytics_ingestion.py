@@ -150,6 +150,7 @@ from datetime import datetime, timezone, timedelta
 from os.path import basename
 
 from ansible.plugins.callback import CallbackBase
+from ansible.errors import AnsibleError
 from ansible.utils.display import Display
 
 display = Display()
