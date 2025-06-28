@@ -178,7 +178,7 @@ class XFConfProperty(StateModuleHelper):
     output_params = ('property', 'channel', 'value')
     module = dict(
         argument_spec=dict(
-            state=dict(type='str', choices=("present", "absent"), default="present"),
+            state=dict(type='str', choices=('present', 'absent'), default='present'),
             channel=dict(type='str', required=True),
             property=dict(type='str', required=True),
             value_type=dict(type='list', elements='str',
@@ -190,8 +190,6 @@ class XFConfProperty(StateModuleHelper):
         required_together=[('value', 'value_type')],
         supports_check_mode=True,
     )
-
-    default_state = 'present'
 
     def __init_module__(self):
         self.runner = xfconf_runner(self.module)
@@ -208,8 +206,8 @@ class XFConfProperty(StateModuleHelper):
             self.do_raise('xfconf-query failed with error (rc={0}): {1}'.format(rc, err))
 
         result = out.rstrip()
-        if "Value is an array with" in result:
-            result = result.split("\n")
+        if 'Value is an array with' in result:
+            result = result.split('\n')
             result.pop(0)
             result.pop(0)
 
@@ -225,7 +223,7 @@ class XFConfProperty(StateModuleHelper):
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err
             self.vars.cmd = ctx.cmd
-            self.vars.set("run_info", ctx.run_info, verbosity=4)
+            self.vars.set('run_info', ctx.run_info, verbosity=4)
         self.vars.value = None
 
     def state_present(self):
@@ -255,7 +253,7 @@ class XFConfProperty(StateModuleHelper):
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err
             self.vars.cmd = ctx.cmd
-            self.vars.set("run_info", ctx.run_info, verbosity=4)
+            self.vars.set('run_info', ctx.run_info, verbosity=4)
 
         if not self.vars.is_array:
             self.vars.value = self.vars.value[0]
