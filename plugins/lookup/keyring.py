@@ -13,7 +13,7 @@ author:
   - Samuel Boucher (!UNKNOWN) <boucher.samuel.c@gmail.com>
 requirements:
   - keyring (python library)
-short_description: grab secrets from the OS keyring
+short_description: Grab secrets from the OS keyring
 description:
   - Allows you to access data stored in the OS provided keyring/keychain.
 """

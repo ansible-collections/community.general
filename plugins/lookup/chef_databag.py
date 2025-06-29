@@ -9,7 +9,7 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 author: Unknown (!UNKNOWN)
 name: chef_databag
-short_description: fetches data from a Chef Databag
+short_description: Fetches data from a Chef Databag
 description:
   - 'This is a lookup plugin to provide access to chef data bags using the pychef package. It interfaces with the chef server
     API using the same methods to find a knife or chef-client config file to load parameters from, starting from either the

@@ -13,7 +13,7 @@ author:
 requirements:
   - lpass (command line utility)
   - must have already logged into LastPass
-short_description: fetch data from LastPass
+short_description: Fetch data from LastPass
 description:
   - Use the lpass command line utility to fetch specific fields from LastPass.
 options:

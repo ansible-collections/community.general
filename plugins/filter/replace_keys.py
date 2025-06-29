@@ -34,7 +34,7 @@ options:
         description:
           - A key or key pattern to change.
           - The interpretation of O(target[].before) depends on O(matching_parameter).
-          - For a key that matches multiple O(target[].before)s, the B(first) matching O(target[].after) will be used.
+          - For a key that matches multiple O(target[].before)s, the B(first) matching O(target[].after) is used.
         type: str
       after:
         description: A matching key change to.

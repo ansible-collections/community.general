@@ -32,8 +32,8 @@ options:
     description:
       - Dictionary where keys are column names and values are alignment settings. Valid alignment values are C(left), C(center),
         C(right), C(l), C(c), or C(r).
-      - "For example, V({'name': 'left', 'id': 'right'}) will align the C(name) column to the left and the C(id) column to
-        the right."
+      - "For example, V({'name': 'left', 'id': 'right'}) aligns the C(name) column to the left and the C(id) column to the
+        right."
     type: dictionary
 """
 

@@ -11,7 +11,7 @@ DOCUMENTATION = r"""
 name: passwordstore
 author:
   - Patrick Deelman (!UNKNOWN) <patrick@patrickdeelman.nl>
-short_description: manage passwords with passwordstore.org's pass utility
+short_description: Manage passwords with passwordstore.org's pass utility
 description:
   - Enables Ansible to retrieve, create or update passwords from the passwordstore.org pass utility. It can also retrieve,
     create or update YAML style keys stored as multilines in the passwordfile.
@@ -55,7 +55,7 @@ options:
   subkey:
     description:
       - By default return a specific subkey of the password. When set to V(password), always returns the first line.
-      - With O(overwrite=true), it will create the subkey and return it.
+      - With O(overwrite=true), it creates the subkey and returns it.
     type: str
     default: password
   userpass:
@@ -77,10 +77,10 @@ options:
     description:
       - List of preference about what to do if the password file is missing.
       - If O(create=true), the value for this option is ignored and assumed to be V(create).
-      - If set to V(error), the lookup will error out if the passname does not exist.
-      - If set to V(create), the passname will be created with the provided length O(length) if it does not exist.
-      - If set to V(empty) or V(warn), will return a V(none) in case the passname does not exist. When using C(lookup) and
-        not C(query), this will be translated to an empty string.
+      - If set to V(error), the lookup fails out if the passname does not exist.
+      - If set to V(create), the passname is created with the provided length O(length) if it does not exist.
+      - If set to V(empty) or V(warn), it returns a V(none) in case the passname does not exist. When using C(lookup) and
+        not C(query), this is translated to an empty string.
     version_added: 3.1.0
     type: str
     default: error
@@ -146,8 +146,8 @@ options:
   missing_subkey:
     description:
       - Preference about what to do if the password subkey is missing.
-      - If set to V(error), the lookup will error out if the subkey does not exist.
-      - If set to V(empty) or V(warn), will return a V(none) in case the subkey does not exist.
+      - If set to V(error), the lookup fails out if the subkey does not exist.
+      - If set to V(empty) or V(warn), it returns a V(none) in case the subkey does not exist.
     version_added: 8.6.0
     type: str
     default: empty

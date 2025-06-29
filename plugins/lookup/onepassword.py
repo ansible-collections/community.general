@@ -41,7 +41,6 @@ extends_documentation_fragment:
 """
 
 EXAMPLES = r"""
----
 # These examples only work when already signed in to 1Password
 - name: Retrieve password for KITT when already signed in to 1Password
   ansible.builtin.debug:

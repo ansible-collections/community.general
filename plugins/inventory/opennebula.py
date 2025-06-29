@@ -50,7 +50,7 @@ options:
     type: string
   api_authfile:
     description:
-      - If both O(api_username) or O(api_password) are not set, then it will try authenticate with ONE auth file. Default
+      - If both O(api_username) or O(api_password) are not set, then it tries to authenticate with ONE auth file. Default
         path is C(~/.one/one_auth).
       - Set environment variable E(ONE_AUTH) to override this path.
     env:

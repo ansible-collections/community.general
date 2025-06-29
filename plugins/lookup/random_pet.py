@@ -27,7 +27,7 @@ options:
   length:
     description:
       - The maximal length of every component of the pet name.
-      - Values below 3 will be set to 3 by petname.
+      - Values below V(3) are set to V(3) by petname.
     default: 6
     type: int
   prefix:

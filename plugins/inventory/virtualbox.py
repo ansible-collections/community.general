@@ -48,7 +48,7 @@ options:
         according to U(https://www.virtualbox.org/manual/UserManual.html#gui-vmgroups). Groups are now split using the V(,)
         character, and the V(/) character indicates nested groups.
       - When enabled, a VM that's been configured using V(VBoxManage modifyvm "vm01" --groups "/TestGroup/TestGroup2,/TestGroup3")
-        will result in the group C(TestGroup2) being a child group of C(TestGroup); and the VM being a part of C(TestGroup2)
+        results in the group C(TestGroup2) being a child group of C(TestGroup); and the VM being a part of C(TestGroup2)
         and C(TestGroup3).
     default: false
     type: bool

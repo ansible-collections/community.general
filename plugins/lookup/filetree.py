@@ -9,11 +9,11 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 name: filetree
 author: Dag Wieers (@dagwieers) <dag@wieers.com>
-short_description: recursively match all files in a directory tree
+short_description: Recursively match all files in a directory tree
 description:
   - This lookup enables you to template a complete tree of files on a target system while retaining permissions and ownership.
   - Supports directories, files and symlinks, including SELinux and other file properties.
-  - If you provide more than one path, it will implement a first_found logic, and will not process entries it already processed
+  - If you provide more than one path, it implements a first_found logic, and does not process entries it already processed
     in previous paths. This enables merging different trees in order of importance, or add role_vars to specific paths to
     influence different instances of the same role.
 options:
