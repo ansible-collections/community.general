@@ -9,7 +9,7 @@
     jenkins_user: "{{ jenkins_username }}"
     jenkins_password: "{{ jenkins_password }}"
     type: "token"
-    force: yes
+    force: true
   register: token_result
 
 - name: Set token in vars
@@ -45,7 +45,7 @@
     exc_hostname_port:
       - "new_excluded-hostname:7000"
       - "new_excluded-hostname2:7000"
-    force: yes
+    force: true
   register: custom_scope
 
 - name: Assert CUSTOM scope changed value
@@ -64,7 +64,7 @@
     description: "new user and password credential"
     username: "user2"
     password: "pass2"
-    force: yes
+    force: true
   register: userpass_cred
 
 - name: Assert user_and_pass changed value
@@ -83,7 +83,7 @@
     scope: "CUSTOM"
     description: "New file credential"
     file_path: "{{ output_dir }}/my-secret.pem"
-    force: yes
+    force: true
   register: file_cred
 
 - name: Assert file credential changed value
@@ -103,7 +103,7 @@
     secret: "mynewsecrettext"
     location: "folder"
     url: "http://localhost:8080/job/test"
-    force: yes
+    force: true
   register: text_cred
 
 - name: Assert text credential changed value
@@ -123,7 +123,7 @@
     appID: "12345678"
     private_key_path: "{{ output_dir }}/github.pem"
     owner: "new_github_owner"
-    force: yes
+    force: true
   register: githubapp_cred
 
 - name: Assert githubApp credential changed value
@@ -143,7 +143,7 @@
     username: "new_sshuser"
     private_key_path: "{{ output_dir }}/ssh_key"
     passphrase: 1234
-    force: yes
+    force: true
   register: sshkey_cred
 
 - name: Assert sshKey credential changed value
@@ -162,7 +162,7 @@
     description: "New certificate credential"
     password: "12345678901234"
     file_path: "{{ output_dir }}/certificate.p12"
-    force: yes
+    force: true
   register: cert_p12_cred
 
 - name: Assert certificate (p12) credential changed value
@@ -181,7 +181,7 @@
     description: "New certificate credential (pem)"
     file_path: "{{ output_dir }}/cert.pem"
     private_key_path: "{{ output_dir }}/private.key"
-    force: yes
+    force: true
   register: cert_pem_cred
 
 - name: Assert certificate (pem) credential changed value

@@ -13,7 +13,7 @@
     jenkins_user: "{{ jenkins_username }}"
     jenkins_password: "{{ jenkins_password }}"
     type: "token"
-  no_log: yes
+  no_log: true
   register: token_result
 
 - name: Assert token and tokenUuid are returned
