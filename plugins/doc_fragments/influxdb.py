@@ -20,13 +20,13 @@ options:
     default: localhost
   username:
     description:
-      - Username that will be used to authenticate against InfluxDB server.
+      - Username that is used to authenticate against InfluxDB server.
     type: str
     default: root
     aliases: [login_username]
   password:
     description:
-      - Password that will be used to authenticate against InfluxDB server.
+      - Password that is used to authenticate against InfluxDB server.
     type: str
     default: root
     aliases: [login_password]
@@ -44,7 +44,7 @@ options:
     version_added: '0.2.0'
   validate_certs:
     description:
-      - If set to V(false), the SSL certificates will not be validated.
+      - If set to V(false), the SSL certificates are not validated.
       - This should only set to V(false) used on personally controlled sites using self-signed certificates.
     type: bool
     default: true
@@ -55,11 +55,11 @@ options:
     default: false
   timeout:
     description:
-      - Number of seconds Requests will wait for client to establish a connection.
+      - Number of seconds Requests waits for client to establish a connection.
     type: int
   retries:
     description:
-      - Number of retries client will try before aborting.
+      - Number of retries client performs before aborting.
       - V(0) indicates try until success.
       - Only available when using C(python-influxdb) >= 4.1.0.
     type: int

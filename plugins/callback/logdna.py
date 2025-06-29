@@ -11,7 +11,7 @@ name: logdna
 type: notification
 short_description: Sends playbook logs to LogDNA
 description:
-  - This callback will report logs from playbook actions, tasks, and events to LogDNA (U(https://app.logdna.com)).
+  - This callback reports logs from playbook actions, tasks, and events to LogDNA (U(https://app.logdna.com)).
 requirements:
   - LogDNA Python Library (U(https://github.com/logdna/python))
   - whitelisting in configuration

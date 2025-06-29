@@ -11,7 +11,7 @@ name: mail
 type: notification
 short_description: Sends failure events through email
 description:
-  - This callback will report failures through email.
+  - This callback reports failures through email.
 author:
   - Dag Wieers (@dagwieers)
 requirements:

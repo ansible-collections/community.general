@@ -11,11 +11,11 @@ from __future__ import annotations
 DOCUMENTATION = r"""
 author: Rui Lopes (@rgl) <ruilopes.com>
 name: wsl
-short_description: Run tasks in WSL distribution using wsl.exe CLI via SSH
+short_description: Run tasks in WSL distribution using wsl.exe CLI using SSH
 requirements:
   - paramiko
 description:
-  - Run commands or put/fetch files to an existing WSL distribution using wsl.exe CLI via SSH.
+  - Run commands or put/fetch files to an existing WSL distribution using wsl.exe CLI using SSH.
   - Uses the Python SSH implementation (Paramiko) to connect to the WSL host.
 version_added: "10.6.0"
 options:
@@ -50,7 +50,7 @@ options:
   remote_user:
     description:
       - User to login/authenticate as.
-      - Can be set from the CLI via the C(--user) or C(-u) options.
+      - Can be set from the CLI with the C(--user) or C(-u) options.
     type: string
     vars:
       - name: ansible_user
@@ -69,7 +69,7 @@ options:
   password:
     description:
       - Secret used to either login the SSH server or as a passphrase for SSH keys that require it.
-      - Can be set from the CLI via the C(--ask-pass) option.
+      - Can be set from the CLI with the C(--ask-pass) option.
     type: string
     vars:
       - name: ansible_password
@@ -109,7 +109,7 @@ options:
   proxy_command:
     default: ""
     description:
-      - Proxy information for running the connection via a jumphost.
+      - Proxy information for running the connection through a jumphost.
       - This option is supported by paramiko version 1.9.0 or newer.
     type: string
     env:

@@ -72,7 +72,7 @@ options:
   prompt_l10n:
     description:
       - List of localized strings to match for prompt detection.
-      - If empty we will use the built in one.
+      - If empty the plugin uses the built-in one.
     type: list
     elements: string
     default: []

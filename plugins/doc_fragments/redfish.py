@@ -15,7 +15,7 @@ class ModuleDocFragment(object):
 options:
   validate_certs:
     description:
-      - If V(false), TLS/SSL certificates will not be validated.
+      - If V(false), TLS/SSL certificates are not validated.
       - Set this to V(true) to enable certificate checking. Should be used together with O(ca_path).
     type: bool
     default: false

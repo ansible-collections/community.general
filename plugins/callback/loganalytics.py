@@ -11,7 +11,7 @@ type: notification
 short_description: Posts task results to Azure Log Analytics
 author: "Cyrus Li (@zhcli) <cyrus1006@gmail.com>"
 description:
-  - This callback plugin will post task results in JSON formatted to an Azure Log Analytics workspace.
+  - This callback plugin posts task results in JSON formatted to an Azure Log Analytics workspace.
   - Credits to authors of splunk callback plugin.
 version_added: "2.4.0"
 requirements:

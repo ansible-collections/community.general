@@ -11,7 +11,7 @@ type: notification
 short_description: Sends task result events to Sumologic
 author: "Ryan Currah (@ryancurrah)"
 description:
-  - This callback plugin will send task results as JSON formatted events to a Sumologic HTTP collector source.
+  - This callback plugin sends task results as JSON formatted events to a Sumologic HTTP collector source.
 requirements:
   - Whitelisting this callback plugin
   - 'Create a HTTP collector source in Sumologic and specify a custom timestamp format of V(yyyy-MM-dd HH:mm:ss ZZZZ) and

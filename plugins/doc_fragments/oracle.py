@@ -54,9 +54,9 @@ options:
   auth_type:
     description:
       - The type of authentication to use for making API requests. By default O(auth_type=api_key) based authentication is
-        performed and the API key (see O(api_user_key_file)) in your config file will be used. If this 'auth_type' module
-        option is not specified, the value of the E(OCI_ANSIBLE_AUTH_TYPE), if any, is used. Use O(auth_type=instance_principal)
-        to use instance principal based authentication when running ansible playbooks within an OCI compute instance.
+        performed and the API key (see O(api_user_key_file)) in your config file is used. If O(auth_type) is not specified,
+        the value of the E(OCI_ANSIBLE_AUTH_TYPE), if any, is used. Use O(auth_type=instance_principal) to use instance principal
+        based authentication when running ansible playbooks within an OCI compute instance.
     choices: ['api_key', 'instance_principal']
     default: 'api_key'
     type: str

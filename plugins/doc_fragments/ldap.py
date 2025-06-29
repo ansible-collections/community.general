@@ -14,9 +14,9 @@ class ModuleDocFragment(object):
     # Standard LDAP documentation fragment
     DOCUMENTATION = r"""
 notes:
-  - The default authentication settings will attempt to use a SASL EXTERNAL bind over a UNIX domain socket. This works well
-    with the default Ubuntu install for example, which includes a C(cn=peercred,cn=external,cn=auth) ACL rule allowing root
-    to modify the server configuration. If you need to use a simple bind to access your server, pass the credentials in O(bind_dn)
+  - The default authentication settings attempts to use a SASL EXTERNAL bind over a UNIX domain socket. This works well with
+    the default Ubuntu install for example, which includes a C(cn=peercred,cn=external,cn=auth) ACL rule allowing root to
+    modify the server configuration. If you need to use a simple bind to access your server, pass the credentials in O(bind_dn)
     and O(bind_pw).
 options:
   bind_dn:
@@ -76,7 +76,7 @@ options:
     default: false
   validate_certs:
     description:
-      - If set to V(false), SSL certificates will not be validated.
+      - If set to V(false), SSL certificates are not validated.
       - This should only be used on sites using self-signed certificates.
     type: bool
     default: true
@@ -90,9 +90,9 @@ options:
   xorder_discovery:
     description:
       - Set the behavior on how to process Xordered DNs.
-      - V(enable) will perform a C(ONELEVEL) search below the superior RDN to find the matching DN.
-      - V(disable) will always use the DN unmodified (as passed by the O(dn) parameter).
-      - V(auto) will only perform a search if the first RDN does not contain an index number (C({x})).
+      - V(enable) performs a C(ONELEVEL) search below the superior RDN to find the matching DN.
+      - V(disable) always uses the DN unmodified (as passed by the O(dn) parameter).
+      - V(auto) only performs a search if the first RDN does not contain an index number (C({x})).
     type: str
     choices: ['enable', 'auto', 'disable']
     default: auto

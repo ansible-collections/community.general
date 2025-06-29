@@ -49,8 +49,8 @@ options:
   state:
     description:
       - The desired state of the object.
-      - V(present) will create or update an object.
-      - V(absent) will delete an object if it was present.
+      - V(present) creates or updates an object.
+      - V(absent) deletes an object if present.
     type: str
     choices: [absent, present]
     default: present

@@ -15,8 +15,8 @@ type: stdout
 short_description: Adds counters to the output items (tasks and hosts/task)
 description:
   - Use this callback when you need a kind of progress bar on a large environments.
-  - You will know how many tasks has the playbook to run, and which one is actually running.
-  - You will know how many hosts may run a task, and which of them is actually running.
+  - You can see how many tasks has the playbook to run, and which one is actually running.
+  - You can see how many hosts may run a task, and which of them is actually running.
 extends_documentation_fragment:
   - default_callback
 requirements:
