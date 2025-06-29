@@ -1,0 +1,7 @@
+deprecated_features:
+  - state `cleanup` in pacemaker_cluster - is deprecated and will be moved to pacemaker_resource module in community.general 12.0.0 (https://github.com/ansible-collections/community.general/pull/10227).
+  - state `None` in pacemaker_cluster - is deprecated and will be a required parameter in community.general 12.0.0
+
+minor_changes:
+  - pacemaker_resource - add `state=cleanup` value for cleaning up cluster resources (https://github.com/ansible-collections/community.general/pull/10227).
+  - pacemaker_cluster - add unit tests and "maintenance" state for managing pacemaker maintenance mode (https://github.com/ansible-collections/community.general/pull/10227).
