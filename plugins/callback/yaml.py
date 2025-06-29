@@ -119,6 +119,9 @@ except ImportError:
 
 
 def transform_recursively(value, transform):
+    # Since 2.19.0b7, this should no longer be needed:
+    # https://github.com/ansible/ansible/issues/85325
+    # https://github.com/ansible/ansible/pull/85389
     if isinstance(value, Mapping):
         return {transform(k): transform(v) for k, v in value.items()}
     if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
