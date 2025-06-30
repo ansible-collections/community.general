@@ -50,9 +50,9 @@ options:
         depend on C(passlib) version and its dependencies.
       - See U(https://passlib.readthedocs.io/en/stable/lib/passlib.apache.html#passlib.apache.HtpasswdFile) parameter C(default_scheme).
       - 'Some of the available choices might be: V(apr_md5_crypt), V(des_crypt), V(ldap_sha1), V(plaintext).'
-      - 'B(WARNING): The module has no mechanism to determine the has_scheme of an existing entry, therefore, it does not
-        detect changes in the hash_scheme. If you change the scheme, you must remove the entry and then recreate using the
-        new scheme.'
+      - 'B(WARNING): The module has no mechanism to determine the O(hash_scheme) of an existing entry, therefore, it does
+        not detect whether the O(hash_scheme) has changed. If you want to change the scheme, you must remove the existing
+        entry and then create a new one using the new scheme.'
     aliases: [crypt_scheme]
   state:
     type: str
@@ -66,8 +66,8 @@ options:
     type: bool
     default: true
     description:
-      - Used with O(state=present). If V(true), the file is created if it does not exist. Conversely, if set to V(false)
-        and the file does not exist, it fails.
+      - Used with O(state=present). If V(true), the file is created if it does not exist. Conversely, if set to V(false) and
+        the file does not exist, it fails.
 notes:
   - This module depends on the C(passlib) Python library, which needs to be installed on all target systems.
   - 'On Debian < 11, Ubuntu <= 20.04, or Fedora: install C(python-passlib).'
