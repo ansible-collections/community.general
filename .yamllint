@@ -1,0 +1,52 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+extends: default
+
+ignore: |
+  /changelogs/
+
+rules:
+  line-length:
+    max: 1000
+    level: error
+  document-start: disable
+  document-end: disable
+  truthy:
+    level: error
+    allowed-values:
+      - 'true'
+      - 'false'
+  indentation:
+    spaces: 2
+    indent-sequences: true
+  key-duplicates: enable
+  trailing-spaces: enable
+  new-line-at-end-of-file: disable
+  hyphens:
+    max-spaces-after: 1
+  empty-lines:
+    max: 2
+    max-start: 0
+    max-end: 0
+  commas:
+    max-spaces-before: 0
+    min-spaces-after: 1
+    max-spaces-after: 1
+  colons:
+    max-spaces-before: 0
+    max-spaces-after: 1
+  brackets:
+    min-spaces-inside: 0
+    max-spaces-inside: 0
+  braces:
+    min-spaces-inside: 0
+    max-spaces-inside: 1
+  octal-values:
+    forbid-implicit-octal: true
+    forbid-explicit-octal: true
+  comments:
+    min-spaces-from-content: 1
+  comments-indentation: false
