@@ -14,6 +14,17 @@
 
 [sessions]
 
+[sessions.lint]
+run_isort = false
+run_black = false
+run_flake8 = false
+run_pylint = false
+run_yamllint = true
+yamllint_config = ".yamllint"
+# yamllint_config_plugins = ".yamllint-docs"
+# yamllint_config_plugins_examples = ".yamllint-examples"
+run_mypy = false
+
 [sessions.docs_check]
 validate_collection_refs="all"
 codeblocks_restrict_types = [
