@@ -7,15 +7,10 @@ __metaclass__ = type
 
 import json
 import os
-import sys
 
 import pytest
 
 linode_apiv4 = pytest.importorskip('linode_api4')
-mandatory_py_version = pytest.mark.skipif(
-    sys.version_info < (2, 7),
-    reason='The linode_api4 dependency requires python2.7 or higher'
-)
 
 from linode_api4.errors import ApiError as LinodeApiError
 from linode_api4 import LinodeClient
