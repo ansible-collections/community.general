@@ -70,6 +70,19 @@ stages:
             - test: 2
             - test: 3
             - test: 4
+  - stage: Sanity_2_19
+    displayName: Sanity 2.19
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          nameFormat: Test {0}
+          testFormat: 2.19/sanity/{0}
+          targets:
+            - test: 1
+            - test: 2
+            - test: 3
+            - test: 4
   - stage: Sanity_2_18
     displayName: Sanity 2.18
     dependsOn: []
@@ -125,6 +138,17 @@ stages:
             - test: '3.11'
             - test: '3.12'
             - test: '3.13'
+  - stage: Units_2_19
+    displayName: Units 2.19
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          nameFormat: Python {0}
+          testFormat: 2.19/units/{0}/1
+          targets:
+            - test: 3.9
+            - test: "3.13"
   - stage: Units_2_18
     displayName: Units 2.18
     dependsOn: []
@@ -201,6 +225,20 @@ stages:
             - 1
             - 2
             - 3
+  - stage: Remote_2_19
+    displayName: Remote 2.19
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          testFormat: 2.19/{0}
+          targets:
+            - name: RHEL 10.0
+              test: rhel/10.0
+          groups:
+            - 1
+            - 2
+            - 3
   - stage: Remote_2_18
     displayName: Remote 2.18
     dependsOn: []
@@ -273,6 +311,20 @@ stages:
               test: alpine321
             - name: Ubuntu 22.04
               test: ubuntu2204
+            - name: Ubuntu 24.04
+              test: ubuntu2404
+          groups:
+            - 1
+            - 2
+            - 3
+  - stage: Docker_2_19
+    displayName: Docker 2.19
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          testFormat: 2.19/linux/{0}
+          targets:
             - name: Ubuntu 24.04
               test: ubuntu2404
           groups:
@@ -370,6 +422,17 @@ stages:
 #            - test: '3.8'
 #            - test: '3.11'
 #            - test: '3.13'
+#  - stage: Generic_2_19
+#    displayName: Generic 2.19
+#    dependsOn: []
+#    jobs:
+#      - template: templates/matrix.yml
+#        parameters:
+#          nameFormat: Python {0}
+#          testFormat: 2.19/generic/{0}/1
+#          targets:
+#            - test: '3.9'
+#            - test: '3.13'
 #  - stage: Generic_2_18
 #    displayName: Generic 2.18
 #    dependsOn: []
@@ -409,25 +472,30 @@ stages:
     condition: succeededOrFailed()
     dependsOn:
       - Sanity_devel
+      - Sanity_2_19
       - Sanity_2_18
       - Sanity_2_17
       - Sanity_2_16
       - Units_devel
+      - Units_2_19
       - Units_2_18
       - Units_2_17
       - Units_2_16
       - Remote_devel_extra_vms
       - Remote_devel
+      - Remote_2_19
       - Remote_2_18
       - Remote_2_17
       - Remote_2_16
       - Docker_devel
+      - Docker_2_19
       - Docker_2_18
       - Docker_2_17
       - Docker_2_16
       - Docker_community_devel
 # Right now all generic tests are disabled. Uncomment when at least one of them is re-enabled.
 #      - Generic_devel
+#      - Generic_2_19
 #      - Generic_2_18
 #      - Generic_2_17
 #      - Generic_2_16
