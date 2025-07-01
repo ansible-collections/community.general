@@ -23,7 +23,7 @@ notes:
     that is available using the other various execution contexts, such as playbook, play, task, and so on so forth.
   - Options being set by their respective variable input can only be set using the variable if the variable was set in a context
     that is available to the respective callback. Use the C(ansible_callback_diy) dictionary to see what is available to a
-    callback. Additionally, C(ansible_callback_diy.top_level_var_names) will output the top level variable names available
+    callback. Additionally, C(ansible_callback_diy.top_level_var_names) outputs the top level variable names available
     to the callback.
   - Each option value is rendered as a template before being evaluated. This allows for the dynamic usage of an option. For
     example, V("{{ 'yellow' if ansible_callback_diy.result.is_changed else 'bright green' }}").

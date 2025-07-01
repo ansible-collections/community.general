@@ -16,31 +16,31 @@ options:
   alicloud_access_key:
     description:
       - Alibaba Cloud access key. If not set then the value of environment variable E(ALICLOUD_ACCESS_KEY), E(ALICLOUD_ACCESS_KEY_ID)
-        will be used instead.
+        is used instead.
     aliases: ['access_key_id', 'access_key']
     type: str
   alicloud_secret_key:
     description:
       - Alibaba Cloud secret key. If not set then the value of environment variable E(ALICLOUD_SECRET_KEY), E(ALICLOUD_SECRET_ACCESS_KEY)
-        will be used instead.
+        is used instead.
     aliases: ['secret_access_key', 'secret_key']
     type: str
   alicloud_region:
     description:
       - The Alibaba Cloud region to use. If not specified then the value of environment variable E(ALICLOUD_REGION), E(ALICLOUD_REGION_ID)
-        will be used instead.
+        is used instead.
     aliases: ['region', 'region_id']
     required: true
     type: str
   alicloud_security_token:
     description:
       - The Alibaba Cloud security token. If not specified then the value of environment variable E(ALICLOUD_SECURITY_TOKEN)
-        will be used instead.
+        is used instead.
     aliases: ['security_token']
     type: str
   alicloud_assume_role:
     description:
-      - If provided with a role ARN, Ansible will attempt to assume this role using the supplied credentials.
+      - If provided with a role ARN, Ansible attempts to assume this role using the supplied credentials.
       - The nested assume_role block supports C(alicloud_assume_role_arn), C(alicloud_assume_role_session_name), C(alicloud_assume_role_session_expiration)
         and C(alicloud_assume_role_policy).
     type: dict
@@ -48,7 +48,7 @@ options:
   alicloud_assume_role_arn:
     description:
       - The Alibaba Cloud C(role_arn). The ARN of the role to assume. If ARN is set to an empty string, it does not perform
-        role switching. It supports environment variable E(ALICLOUD_ASSUME_ROLE_ARN). ansible will execute with provided credentials.
+        role switching. It supports environment variable E(ALICLOUD_ASSUME_ROLE_ARN). Ansible executes with provided credentials.
     aliases: ['assume_role_arn']
     type: str
   alicloud_assume_role_session_name:
@@ -68,7 +68,7 @@ options:
     description:
       - The RAM Role Name attached on a ECS instance for API operations. You can retrieve this from the 'Access Control' section
         of the Alibaba Cloud console.
-      - If you are running Ansible from an ECS instance with RAM Instance using RAM Role, Ansible will just access the metadata
+      - If you are running Ansible from an ECS instance with RAM Instance using RAM Role, Ansible just accesses the metadata
         U(http://100.100.100.200/latest/meta-data/ram/security-credentials/<ecs_role_name>) to obtain the STS credential.
         This is a preferred approach over any other when running in ECS as you can avoid hard coding credentials. Instead
         these are leased on-the-fly by Ansible which reduces the chance of leakage.
@@ -83,7 +83,7 @@ options:
     description:
       - This is the path to the shared credentials file. It can also be sourced from the E(ALICLOUD_SHARED_CREDENTIALS_FILE)
         environment variable.
-      - If this is not set and a profile is specified, C(~/.aliyun/config.json) will be used.
+      - If this is not set and a profile is specified, C(~/.aliyun/config.json) is used.
     type: str
 author:
   - "He Guimin (@xiaozhu36)"

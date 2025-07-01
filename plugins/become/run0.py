@@ -61,7 +61,7 @@ options:
       - name: ANSIBLE_RUN0_FLAGS
     type: string
 notes:
-  - This plugin will only work when a C(polkit) rule is in place.
+  - This plugin only works when a C(polkit) rule is in place.
 """
 
 EXAMPLES = r"""
