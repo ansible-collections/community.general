@@ -2266,7 +2266,7 @@ class Nmcli(object):
 
     @staticmethod
     def settings_type(setting):
-        if setting in ('bridge.stp',
+        if setting in {'bridge.stp',
                        'bridge-port.hairpin-mode',
                        'connection.autoconnect',
                        'ipv4.never-default',
@@ -2276,9 +2276,9 @@ class Nmcli(object):
                        'ipv6.ignore-auto-dns',
                        'ipv6.ignore-auto-routes',
                        '802-11-wireless.hidden',
-                       'team.runner-fast-rate'):
+                       'team.runner-fast-rate'}:
             return bool
-        elif setting in ('ipv4.addresses',
+        elif setting in {'ipv4.addresses',
                          'ipv6.addresses',
                          'ipv4.dns',
                          'ipv4.dns-search',
@@ -2295,10 +2295,10 @@ class Nmcli(object):
                          '802-11-wireless-security.proto',
                          '802-11-wireless-security.psk-flags',
                          '802-11-wireless-security.wep-key-flags',
-                         '802-11-wireless.mac-address-blacklist'):
+                         '802-11-wireless.mac-address-blacklist'}:
             return list
-        elif setting in ('connection.autoconnect-priority',
-                         'connection.autoconnect-retries'):
+        elif setting in {'connection.autoconnect-priority',
+                         'connection.autoconnect-retries'}:
             return int
         return str
 
@@ -2481,7 +2481,7 @@ class Nmcli(object):
 
         for line in out.splitlines():
             prefix = '%s.' % setting
-            if (line.startswith(prefix)):
+            if line.startswith(prefix):
                 pair = line.split(':', 1)
                 property = pair[0].strip().replace(prefix, '')
                 properties.append(property)
@@ -2767,8 +2767,8 @@ def main():
                             ['routes6_extended', 'routes6']],
         required_if=[
             ("type", "wifi", ["ssid"]),
-            # ("type", "team-slave", ["master", "ifname"]),
-            # ("slave_type", "team", ["master", "ifname"]),
+            ("type", "team-slave", ["master", "ifname"]),
+            ("slave_type", "team", ["master", "ifname"]),
         ],
         supports_check_mode=True,
     )
@@ -2807,7 +2807,7 @@ def main():
                 (rc, out, err) = nmcli.down_connection()
                 (rc, out, err) = nmcli.remove_connection()
                 if rc != 0:
-                    module.fail_json(name=('No Connection named %s exists' % nmcli.conn_name), msg=err, rc=rc)
+                    module.fail_json(name=('Error removing connection named %s' % nmcli.conn_name), msg=err, rc=rc)
 
         elif nmcli.state == 'present':
             if nmcli.connection_exists():
@@ -2844,7 +2844,7 @@ def main():
                     (rc, out, err) = nmcli.reload_connection()
                 (rc, out, err) = nmcli.up_connection()
                 if rc != 0:
-                    module.fail_json(name=('No Connection named %s exists' % nmcli.conn_name), msg=err, rc=rc)
+                    module.fail_json(name=('Error bringing up connection named %s' % nmcli.conn_name), msg=err, rc=rc)
 
         elif nmcli.state == 'down':
             if nmcli.connection_exists():
@@ -2854,7 +2854,7 @@ def main():
                     (rc, out, err) = nmcli.reload_connection()
                 (rc, out, err) = nmcli.down_connection()
                 if rc != 0:
-                    module.fail_json(name=('No Connection named %s exists' % nmcli.conn_name), msg=err, rc=rc)
+                    module.fail_json(name=('Error bringing down connection named %s' % nmcli.conn_name), msg=err, rc=rc)
 
     except NmcliModuleError as e:
         module.fail_json(name=nmcli.conn_name, msg=str(e))
