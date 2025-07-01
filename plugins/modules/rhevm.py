@@ -812,7 +812,7 @@ class RHEVConn(object):
                     setChanged()
                     HOST = self.get_Host(host_name)
                     state = HOST.status.state
-                    while (state != 'non_operational' and state != 'up'):
+                    while state != 'non_operational' and state != 'up':
                         HOST = self.get_Host(host_name)
                         state = HOST.status.state
                         time.sleep(1)

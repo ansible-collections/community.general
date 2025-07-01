@@ -344,7 +344,7 @@ def _add_load_balancer_rules(module, oneandone_conn, load_balancer_id, rules):
 
         if module.check_mode:
             lb_id = get_load_balancer(oneandone_conn, load_balancer_id)
-            if (load_balancer_rules and lb_id):
+            if load_balancer_rules and lb_id:
                 return True
             return False
 

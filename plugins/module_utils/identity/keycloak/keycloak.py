@@ -1961,7 +1961,7 @@ class KeycloakAPI(object):
                             and composite["name"] == existing_composite["name"]):
                         composite_found = True
                         break
-            if (not composite_found and ('state' not in composite or composite['state'] == 'present')):
+            if not composite_found and ('state' not in composite or composite['state'] == 'present'):
                 if "client_id" in composite and composite['client_id'] is not None:
                     client_roles = self.get_client_roles(clientid=composite['client_id'], realm=realm)
                     for client_role in client_roles:

@@ -261,7 +261,7 @@ def ensure(module, client):
                                   nonposix=module.params['nonposix'])
     ipa_group = client.group_find(name=name)
 
-    if (not (external or external_user is None)):
+    if not (external or external_user is None):
         module.fail_json("external_user can only be set if external = True")
 
     changed = False
