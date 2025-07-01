@@ -1839,10 +1839,7 @@ class Nmcli(object):
                 self.module.fail_json(msg="'master' option is required when 'slave_type' is specified.")
 
     def execute_command(self, cmd, use_unsafe_shell=False, data=None):
-        if isinstance(cmd, list):
-            cmd = [to_text(item) for item in cmd]
-        else:
-            cmd = to_text(cmd)
+        cmd = [to_text(item) for item in cmd]
         return self.module.run_command(cmd, use_unsafe_shell=use_unsafe_shell, data=data)
 
     def execute_edit_commands(self, commands, arguments):
