@@ -11,7 +11,7 @@ type: notification
 short_description: Sends task result events to Splunk HTTP Event Collector
 author: "Stuart Hirst (!UNKNOWN) <support@convergingdata.com>"
 description:
-  - This callback plugin will send task results as JSON formatted events to a Splunk HTTP collector.
+  - This callback plugin sends task results as JSON formatted events to a Splunk HTTP collector.
   - The companion Splunk Monitoring & Diagnostics App is available here U(https://splunkbase.splunk.com/app/4023/).
   - Credit to "Ryan Currah (@ryancurrah)" for original source upon which this is based.
 requirements:

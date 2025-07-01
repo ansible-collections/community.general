@@ -36,7 +36,7 @@ options:
     env:
       - name: JABBER_PASS
   to:
-    description: Chat identifier that will receive the message.
+    description: Chat identifier that receives the message.
     type: str
     required: true
     env:

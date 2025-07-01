@@ -16,17 +16,17 @@ options:
   client_id:
     description:
       - The OAuth consumer key.
-      - If not set the environment variable E(BITBUCKET_CLIENT_ID) will be used.
+      - If not set the environment variable E(BITBUCKET_CLIENT_ID) is used.
     type: str
   client_secret:
     description:
       - The OAuth consumer secret.
-      - If not set the environment variable E(BITBUCKET_CLIENT_SECRET) will be used.
+      - If not set the environment variable E(BITBUCKET_CLIENT_SECRET) is used.
     type: str
   user:
     description:
       - The username.
-      - If not set the environment variable E(BITBUCKET_USERNAME) will be used.
+      - If not set the environment variable E(BITBUCKET_USERNAME) is used.
       - O(ignore:username) is an alias of O(user) since community.general 6.0.0. It was an alias of O(workspace) before.
     type: str
     version_added: 4.0.0
@@ -34,7 +34,7 @@ options:
   password:
     description:
       - The App password.
-      - If not set the environment variable E(BITBUCKET_PASSWORD) will be used.
+      - If not set the environment variable E(BITBUCKET_PASSWORD) is used.
     type: str
     version_added: 4.0.0
 notes:

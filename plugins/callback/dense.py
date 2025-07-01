@@ -13,7 +13,7 @@ short_description: Minimal stdout output
 extends_documentation_fragment:
   - default_callback
 description:
-  - When in verbose mode it will act the same as the default callback.
+  - When in verbose mode it acts the same as the default callback.
 author:
   - Dag Wieers (@dagwieers)
 requirements:

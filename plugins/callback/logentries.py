@@ -11,7 +11,7 @@ name: logentries
 type: notification
 short_description: Sends events to Logentries
 description:
-  - This callback plugin will generate JSON objects and send them to Logentries using TCP for auditing/debugging purposes.
+  - This callback plugin generates JSON objects and send them to Logentries using TCP for auditing/debugging purposes.
 requirements:
   - whitelisting in configuration
   - certifi (Python library)
