@@ -9,7 +9,7 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 author: Unknown (!UNKNOWN)
 name: cyberarkpassword
-short_description: get secrets from CyberArk AIM
+short_description: Get secrets from CyberArk AIM
 requirements:
   - CyberArk AIM tool installed
 description:
@@ -39,8 +39,8 @@ options:
     description: For extra_params values please check parameters for clipasswordsdk in CyberArk's "Credential Provider and
       ASCP Implementation Guide".
 notes:
-  - For Ansible on Windows, please change the -parameters (C(-p), C(-d), and C(-o)) to /parameters (C(/p), C(/d), and C(/o)) and change the
-    location of C(CLIPasswordSDK.exe).
+  - For Ansible on Windows, please change the -parameters (C(-p), C(-d), and C(-o)) to /parameters (C(/p), C(/d), and C(/o))
+    and change the location of C(CLIPasswordSDK.exe).
 """
 
 EXAMPLES = r"""

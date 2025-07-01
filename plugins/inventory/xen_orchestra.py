@@ -31,7 +31,7 @@ options:
     description:
       - API host to XOA API.
       - If the value is not specified in the inventory configuration, the value of environment variable E(ANSIBLE_XO_HOST)
-        will be used instead.
+        is used instead.
     type: str
     env:
       - name: ANSIBLE_XO_HOST
@@ -39,7 +39,7 @@ options:
     description:
       - Xen Orchestra user.
       - If the value is not specified in the inventory configuration, the value of environment variable E(ANSIBLE_XO_USER)
-        will be used instead.
+        is used instead.
     required: true
     type: str
     env:
@@ -48,7 +48,7 @@ options:
     description:
       - Xen Orchestra password.
       - If the value is not specified in the inventory configuration, the value of environment variable E(ANSIBLE_XO_PASSWORD)
-        will be used instead.
+        is used instead.
     required: true
     type: str
     env:

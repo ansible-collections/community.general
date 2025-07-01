@@ -64,14 +64,14 @@ options:
     default: true
   udp_scan:
     description:
-      - Scan via UDP.
+      - Scan using UDP.
       - Depending on your system you might need O(sudo=true) for this to work.
     type: boolean
     default: false
     version_added: 6.1.0
   icmp_timestamp:
     description:
-      - Scan via ICMP Timestamp (C(-PP)).
+      - Scan using ICMP Timestamp (C(-PP)).
       - Depending on your system you might need O(sudo=true) for this to work.
     type: boolean
     default: false

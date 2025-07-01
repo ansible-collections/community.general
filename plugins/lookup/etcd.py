@@ -12,7 +12,7 @@ DOCUMENTATION = r"""
 author:
   - Jan-Piet Mens (@jpmens)
 name: etcd
-short_description: get info from an etcd server
+short_description: Get info from an etcd server
 description:
   - Retrieves data from an etcd server.
 options:

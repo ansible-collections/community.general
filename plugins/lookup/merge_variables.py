@@ -12,7 +12,7 @@ author:
   - Mark Ettema (@m-a-r-k-e)
   - Alexander Petrenz (@alpex8)
 name: merge_variables
-short_description: merge variables whose names match a given pattern
+short_description: Merge variables whose names match a given pattern
 description:
   - This lookup returns the merged result of all variables in scope that match the given prefixes, suffixes, or regular expressions,
     optionally.
@@ -20,8 +20,8 @@ version_added: 6.5.0
 options:
   _terms:
     description:
-      - Depending on the value of O(pattern_type), this is a list of prefixes, suffixes, or regular expressions that will
-        be used to match all variables that should be merged.
+      - Depending on the value of O(pattern_type), this is a list of prefixes, suffixes, or regular expressions that is used
+        to match all variables that should be merged.
     required: true
     type: list
     elements: str
@@ -45,11 +45,11 @@ options:
     type: raw
   override:
     description:
-      - Return an error, print a warning or ignore it when a key will be overwritten.
+      - Return an error, print a warning or ignore it when a key is overwritten.
       - The default behavior V(error) makes the plugin fail when a key would be overwritten.
       - When V(warn) and V(ignore) are used, note that it is important to know that the variables are sorted by name before
-        being merged. Keys for later variables in this order will overwrite keys of the same name for variables earlier in
-        this order. To avoid potential confusion, better use O(override=error) whenever possible.
+        being merged. Keys for later variables in this order overwrite keys of the same name for variables earlier in this
+        order. To avoid potential confusion, better use O(override=error) whenever possible.
     type: str
     default: 'error'
     choices:
@@ -111,8 +111,7 @@ example_b: "{{ lookup('community.general.merge_variables', '^.+__test_list$', in
 
 RETURN = r"""
 _raw:
-  description: In case the search matches list items, a list will be returned. In case the search matches dicts, a dict will
-    be returned.
+  description: In case the search matches list items, a list is returned. In case the search matches dicts, a dict is returned.
   type: raw
   elements: raw
 """

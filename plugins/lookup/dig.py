@@ -9,7 +9,7 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 name: dig
 author: Jan-Piet Mens (@jpmens) <jpmens(at)gmail.com>
-short_description: query DNS using the dnspython library
+short_description: Query DNS using the dnspython library
 requirements:
   - dnspython (python library, http://www.dnspython.org/)
 description:
@@ -21,10 +21,10 @@ description:
   - In addition to (default) A record, it is also possible to specify a different record type that should be queried. This
     can be done by either passing-in additional parameter of format qtype=TYPE to the dig lookup, or by appending /TYPE to
     the FQDN being queried.
-  - If multiple values are associated with the requested record, the results will be returned as a comma-separated list. In
+  - If multiple values are associated with the requested record, the results are returned as a comma-separated list. In
     such cases you may want to pass option C(wantlist=true) to the lookup call, or alternatively use C(query) instead of C(lookup),
-    which will result in the record values being returned as a list over which you can iterate later on.
-  - By default, the lookup will rely on system-wide configured DNS servers for performing the query. It is also possible to
+    which results in the record values being returned as a list over which you can iterate later on.
+  - By default, the lookup relies on system-wide configured DNS servers for performing the query. It is also possible to
     explicitly specify DNS servers to query using the @DNS_SERVER_1,DNS_SERVER_2,...,DNS_SERVER_N notation. This needs to
     be passed-in as an additional parameter to the lookup.
 options:
@@ -75,16 +75,16 @@ options:
   fail_on_error:
     description:
       - Abort execution on lookup errors.
-      - The default for this option will likely change to V(true) in the future. The current default, V(false), is used for
-        backwards compatibility, and will result in empty strings or the string V(NXDOMAIN) in the result in case of errors.
+      - The default for this option is likely to change to V(true) in the future. The current default, V(false), is used for
+        backwards compatibility, and results in empty strings or the string V(NXDOMAIN) in the result in case of errors.
     default: false
     type: bool
     version_added: 5.4.0
   real_empty:
     description:
       - Return empty result without empty strings, and return empty list instead of V(NXDOMAIN).
-      - The default for this option will likely change to V(true) in the future.
-      - This option will be forced to V(true) if multiple domains to be queried are specified.
+      - The default for this option is likely to change to V(true) in the future.
+      - This option is forced to V(true) if multiple domains to be queried are specified.
     default: false
     type: bool
     version_added: 6.0.0
@@ -104,10 +104,9 @@ options:
     type: int
     version_added: 9.5.0
 notes:
-  - V(ALL) is not a record in itself, merely the listed fields are available for any record results you retrieve in the form of
-    a dictionary.
-  - While the plugin supports anything which C(dnspython) supports out of the box, only a subset can be converted
-    into a dictionary.
+  - V(ALL) is not a record in itself, merely the listed fields are available for any record results you retrieve in the form
+    of a dictionary.
+  - While the plugin supports anything which C(dnspython) supports out of the box, only a subset can be converted into a dictionary.
   - If you need to obtain the AAAA record (IPv6 address), you must specify the record type explicitly. Syntax for specifying
     the record type is shown in the examples below.
   - The trailing dot in most of the examples listed is purely optional, but is specified for completeness/correctness sake.

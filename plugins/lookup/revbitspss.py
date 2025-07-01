@@ -19,18 +19,18 @@ requirements:
 options:
   _terms:
     description:
-      - This will be an array of keys for secrets which you want to fetch from RevBits PAM.
+      - This is an array of keys for secrets which you want to fetch from RevBits PAM.
     required: true
     type: list
     elements: string
   base_url:
     description:
-      - This will be the base URL of the server, for example V(https://server-url-here).
+      - This is the base URL of the server, for example V(https://server-url-here).
     required: true
     type: string
   api_key:
     description:
-      - This will be the API key for authentication. You can get it from the RevBits PAM secret manager module.
+      - This is the API key for authentication. You can get it from the RevBits PAM secret manager module.
     required: true
     type: string
 """
@@ -39,7 +39,7 @@ RETURN = r"""
 _list:
   description:
     - The JSON responses which you can access with defined keys.
-    - If you are fetching secrets named as UUID, PASSWORD it will gives you the dict of all secrets.
+    - If you are fetching secrets named as UUID, PASSWORD it returns the dict of all secrets.
   type: list
   elements: dict
 """

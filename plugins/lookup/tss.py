@@ -33,14 +33,14 @@ options:
   fetch_secret_ids_from_folder:
     description:
       - Boolean flag which indicates whether secret IDs are in a folder is fetched by folder ID or not.
-      - V(true) then the terms will be considered as a folder IDs. Otherwise (default), they are considered as secret IDs.
+      - V(true) then the terms are considered as a folder IDs. Otherwise (default), they are considered as secret IDs.
     required: false
     type: bool
     version_added: 7.1.0
   fetch_attachments:
     description:
-      - Boolean flag which indicates whether attached files will get downloaded or not.
-      - The download will only happen if O(file_download_path) has been provided.
+      - Boolean flag which indicates whether attached files are downloaded or not.
+      - The download only happens if O(file_download_path) has been provided.
     required: false
     type: bool
     version_added: 7.0.0
