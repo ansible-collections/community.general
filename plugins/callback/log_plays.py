@@ -19,7 +19,7 @@ requirements:
 options:
   log_folder:
     default: /var/log/ansible/hosts
-    description: The folder where log files will be created.
+    description: The folder where log files are created.
     type: str
     env:
       - name: ANSIBLE_LOG_FOLDER

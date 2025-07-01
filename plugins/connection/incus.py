@@ -52,7 +52,7 @@ options:
   remote_user:
     description:
       - User to login/authenticate as.
-      - Can be set from the CLI via the C(--user) or C(-u) options.
+      - Can be set from the CLI with the C(--user) or C(-u) options.
     type: string
     default: root
     vars:

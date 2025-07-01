@@ -18,8 +18,8 @@ options:
     aliases: ['vault_password']
     type: str
   section:
-    description: Item section containing the field to retrieve (case-insensitive). If absent will return first match from
-      any section.
+    description: Item section containing the field to retrieve (case-insensitive). If absent, returns first match from any
+      section.
   domain:
     description: Domain of 1Password.
     default: '1password.com'
@@ -42,7 +42,7 @@ options:
       - Only works with 1Password CLI version 2 or later.
     type: str
   vault:
-    description: Vault containing the item to retrieve (case-insensitive). If absent will search all vaults.
+    description: Vault containing the item to retrieve (case-insensitive). If absent, searches all vaults.
     type: str
   connect_host:
     description: The host for 1Password Connect. Must be used in combination with O(connect_token).
@@ -65,10 +65,9 @@ options:
       - name: OP_SERVICE_ACCOUNT_TOKEN
         version_added: 8.2.0
 notes:
-  - This lookup will use an existing 1Password session if one exists. If not, and you have already performed an initial sign
-    in (meaning C(~/.op/config), C(~/.config/op/config) or C(~/.config/.op/config) exists), then only the O(master_password)
-    is required. You may optionally specify O(subdomain) in this scenario, otherwise the last used subdomain will be used
-    by C(op).
+  - This lookup uses an existing 1Password session if one exists. If not, and you have already performed an initial sign in
+    (meaning C(~/.op/config), C(~/.config/op/config) or C(~/.config/.op/config) exists), then only the O(master_password)
+    is required. You may optionally specify O(subdomain) in this scenario, otherwise the last used subdomain is used by C(op).
   - This lookup can perform an initial login by providing O(subdomain), O(username), O(secret_key), and O(master_password).
   - Can target a specific account by providing the O(account_id).
   - Due to the B(very) sensitive nature of these credentials, it is B(highly) recommended that you only pass in the minimal

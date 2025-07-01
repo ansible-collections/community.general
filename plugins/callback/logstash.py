@@ -12,7 +12,7 @@ name: logstash
 type: notification
 short_description: Sends events to Logstash
 description:
-  - This callback will report facts and task events to Logstash U(https://www.elastic.co/products/logstash).
+  - This callback reports facts and task events to Logstash U(https://www.elastic.co/products/logstash).
 requirements:
   - whitelisting in configuration
   - logstash (Python library)
