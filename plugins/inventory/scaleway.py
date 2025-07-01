@@ -44,7 +44,7 @@ options:
   oauth_token:
     description:
       - Scaleway OAuth token.
-      - If not explicitly defined or in environment variables, it will try to lookup in the scaleway-cli configuration file
+      - If not explicitly defined or in environment variables, it tries to lookup in the C(scaleway-cli) configuration file
         (C($SCW_CONFIG_PATH), C($XDG_CONFIG_HOME/scw/config.yaml), or C(~/.config/scw/config.yaml)).
       - More details on L(how to generate token, https://www.scaleway.com/en/docs/generate-api-keys/).
     type: string

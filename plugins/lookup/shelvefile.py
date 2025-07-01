@@ -9,7 +9,7 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 name: shelvefile
 author: Alejandro Guirao (!UNKNOWN) <lekumberri@gmail.com>
-short_description: read keys from Python shelve file
+short_description: Read keys from Python shelve file
 description:
   - Read keys from Python shelve file.
 options:

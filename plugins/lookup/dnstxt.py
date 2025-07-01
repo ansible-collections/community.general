@@ -9,7 +9,7 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 name: dnstxt
 author: Jan-Piet Mens (@jpmens) <jpmens(at)gmail.com>
-short_description: query a domain(s)'s DNS txt fields
+short_description: Query a domain(s)'s DNS txt fields
 requirements:
   - dns/dns.resolver (python library)
 description:
@@ -23,7 +23,7 @@ options:
   real_empty:
     description:
       - Return empty result without empty strings, and return empty list instead of V(NXDOMAIN).
-      - The default for this option will likely change to V(true) in the future.
+      - The default for this option is likely to change to V(true) in the future.
     default: false
     type: bool
     version_added: 6.0.0

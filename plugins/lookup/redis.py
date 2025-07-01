@@ -11,7 +11,7 @@ name: redis
 author:
   - Jan-Piet Mens (@jpmens) <jpmens(at)gmail.com>
   - Ansible Core Team
-short_description: fetch data from Redis
+short_description: Fetch data from Redis
 description:
   - This lookup returns a list of results from a Redis DB corresponding to a list of items given to it.
 requirements:

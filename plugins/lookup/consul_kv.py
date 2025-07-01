@@ -24,7 +24,7 @@ options:
     elements: string
   recurse:
     type: boolean
-    description: If true, will retrieve all the values that have the given key as prefix.
+    description: If V(true), retrieves all the values that have the given key as prefix.
     default: false
   index:
     description:
@@ -42,14 +42,14 @@ options:
     type: str
     description:
       - The target to connect to, must be a resolvable address.
-      - Will be determined from E(ANSIBLE_CONSUL_URL) if that is set.
+      - It is determined from E(ANSIBLE_CONSUL_URL) if that is set.
     ini:
       - section: lookup_consul
         key: host
   port:
     description:
       - The port of the target host to connect to.
-      - If you use E(ANSIBLE_CONSUL_URL) this value will be used from there.
+      - If you use E(ANSIBLE_CONSUL_URL) this value is used from there.
     type: int
     default: 8500
   scheme:
@@ -57,7 +57,7 @@ options:
     type: str
     description:
       - Whether to use http or https.
-      - If you use E(ANSIBLE_CONSUL_URL) this value will be used from there.
+      - If you use E(ANSIBLE_CONSUL_URL) this value is used from there.
   validate_certs:
     default: true
     description: Whether to verify the TLS connection or not.
