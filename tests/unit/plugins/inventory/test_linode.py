@@ -7,14 +7,8 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 import pytest
-import sys
 
 linode_apiv4 = pytest.importorskip('linode_api4')
-mandatory_py_version = pytest.mark.skipif(
-    sys.version_info < (2, 7),
-    reason='The linode_api4 dependency requires python2.7 or higher'
-)
-
 
 from ansible.errors import AnsibleError
 from ansible.parsing.dataloader import DataLoader
