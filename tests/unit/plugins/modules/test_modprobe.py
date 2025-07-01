@@ -6,7 +6,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-import sys
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import ModuleTestCase, set_module_args
 from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
 from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import Mock
@@ -147,9 +146,6 @@ class TestUnloadModule(ModuleTestCase):
 
 class TestModuleIsLoadedPersistently(ModuleTestCase):
     def setUp(self):
-        if (sys.version_info[0] == 3 and sys.version_info[1] < 7) or (sys.version_info[0] == 2 and sys.version_info[1] < 7):
-            self.skipTest("open_mock doesn't support readline in earlier python versions")
-
         super(TestModuleIsLoadedPersistently, self).setUp()
 
         self.mock_get_bin_path = patch('ansible.module_utils.basic.AnsibleModule.get_bin_path')
@@ -222,8 +218,6 @@ class TestModuleIsLoadedPersistently(ModuleTestCase):
 
 class TestPermanentParams(ModuleTestCase):
     def setUp(self):
-        if (sys.version_info[0] == 3 and sys.version_info[1] < 7) or (sys.version_info[0] == 2 and sys.version_info[1] < 7):
-            self.skipTest("open_mock doesn't support readline in earlier python versions")
         super(TestPermanentParams, self).setUp()
 
         self.mock_get_bin_path = patch('ansible.module_utils.basic.AnsibleModule.get_bin_path')
