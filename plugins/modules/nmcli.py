@@ -2768,7 +2768,11 @@ def main():
         mutually_exclusive=[['never_default4', 'gw4'],
                             ['routes4_extended', 'routes4'],
                             ['routes6_extended', 'routes6']],
-        required_if=[("type", "wifi", [("ssid")])],
+        required_if=[
+            ("type", "wifi", ["ssid"]),
+            # ("type", "team-slave", ["master", "ifname"]),
+            # ("slave_type", "team", ["master", "ifname"]),
+        ],
         supports_check_mode=True,
     )
     module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')
@@ -2778,21 +2782,12 @@ def main():
     (rc, out, err) = (None, '', '')
     result = {'conn_name': nmcli.conn_name, 'state': nmcli.state}
 
-    # check for issues
-    if nmcli.conn_name is None:
-        nmcli.module.fail_json(msg="Please specify a name for the connection")
     # team checks
     if nmcli.type == "team":
         if nmcli.runner_hwaddr_policy and not nmcli.runner == "activebackup":
             nmcli.module.fail_json(msg="Runner-hwaddr-policy is only allowed for runner activebackup")
         if nmcli.runner_fast_rate is not None and nmcli.runner != "lacp":
             nmcli.module.fail_json(msg="runner-fast-rate is only allowed for runner lacp")
-    # team-slave checks
-    if nmcli.type == 'team-slave' or nmcli.slave_type == 'team':
-        if nmcli.master is None:
-            nmcli.module.fail_json(msg="Please specify a name for the master when type is %s" % nmcli.type)
-        if nmcli.ifname is None:
-            nmcli.module.fail_json(msg="Please specify an interface name for the connection when type is %s" % nmcli.type)
     if nmcli.type == 'wifi':
         unsupported_properties = {}
         if nmcli.wifi:
