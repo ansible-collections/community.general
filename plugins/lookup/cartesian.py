@@ -9,7 +9,7 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 author: Unknown (!UNKNOWN)
 name: cartesian
-short_description: returns the cartesian product of lists
+short_description: Returns the cartesian product of lists
 description:
   - Takes the input lists and returns a list that represents the product of the input lists.
   - It is clearer with an example, it turns [1, 2, 3], [a, b] into [1, a], [1, b], [2, a], [2, b], [3, a], [3, b].

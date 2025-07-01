@@ -48,20 +48,19 @@ options:
     version_added: 8.0.0
   server_check_hostname:
     description:
-      - This option controls if the server's hostname is checked as part of the HTTPS connection verification.
-        This can be useful to disable, if for example, the server certificate provided (see O(server_cert) option)
-        does not cover a name matching the one used to communicate with the server. Such mismatch is common as LXD
-        generates self-signed server certificates by default.
+      - This option controls if the server's hostname is checked as part of the HTTPS connection verification. This can be
+        useful to disable, if for example, the server certificate provided (see O(server_cert) option) does not cover a name
+        matching the one used to communicate with the server. Such mismatch is common as LXD generates self-signed server
+        certificates by default.
     type: bool
     default: true
     version_added: 8.0.0
   trust_password:
     description:
       - The client trusted password.
-      - You need to set this password on the lxd server before
-          running this module using the following command
-          C(lxc config set core.trust_password <some random password>)
-          See U(https://documentation.ubuntu.com/lxd/en/latest/authentication/#adding-client-certificates-using-a-trust-password).
+      - You need to set this password on the lxd server before running this module using the following command C(lxc config
+        set core.trust_password <some random password>) See
+        U(https://documentation.ubuntu.com/lxd/en/latest/authentication/#adding-client-certificates-using-a-trust-password).
       - If O(trust_password) is set, this module send a request for authentication before sending any requests.
     type: str
   state:
@@ -85,7 +84,7 @@ options:
   prefered_instance_network_interface:
     description:
       - If an instance has multiple network interfaces, select which one is the preferred as pattern.
-      - Combined with the first number that can be found e.g. 'eth' + 0.
+      - Combined with the first number that can be found, for example C(eth) + C(0).
       - The option has been renamed from O(prefered_container_network_interface) to O(prefered_instance_network_interface)
         in community.general 3.8.0. The old name still works as an alias.
     type: str
@@ -101,7 +100,8 @@ options:
     choices: ['inet', 'inet6']
   groupby:
     description:
-      - Create groups by the following keywords C(location), C(network_range), C(os), C(pattern), C(profile), C(release), C(type), C(vlanid).
+      - Create groups by the following keywords C(location), C(network_range), C(os), C(pattern), C(profile), C(release),
+        C(type), C(vlanid).
       - See example for syntax.
     type: dict
 """
