@@ -1,0 +1,14 @@
+plugins/modules/consul_session.py validate-modules:parameter-state-invalid-choice
+plugins/modules/homectl.py import-3.11  # Uses deprecated stdlib library 'crypt'
+plugins/modules/homectl.py import-3.12  # Uses deprecated stdlib library 'crypt'
+plugins/modules/iptables_state.py validate-modules:undocumented-parameter             # params _back and _timeout used by action plugin
+plugins/modules/lxc_container.py validate-modules:use-run-command-not-popen
+plugins/modules/osx_defaults.py validate-modules:parameter-state-invalid-choice
+plugins/modules/parted.py validate-modules:parameter-state-invalid-choice
+plugins/modules/rhevm.py validate-modules:parameter-state-invalid-choice
+plugins/modules/udm_user.py import-3.11  # Uses deprecated stdlib library 'crypt'
+plugins/modules/udm_user.py import-3.12  # Uses deprecated stdlib library 'crypt'
+plugins/modules/xfconf.py validate-modules:return-syntax-error
+plugins/module_utils/univention_umc.py pylint:use-yield-from  # suggested construct does not work with Python 2
+tests/unit/plugins/modules/uthelper.py pylint:use-yield-from  # suggested construct does not work with Python 2
+tests/unit/plugins/modules/test_gio_mime.yaml no-smart-quotes
