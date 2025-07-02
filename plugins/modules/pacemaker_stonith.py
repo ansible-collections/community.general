@@ -27,7 +27,7 @@ options:
   state:
     description:
       - Indicate desired state for cluster STONITH.
-    choices: [ present, absent, enabled, disabled ]
+    choices: [present, absent, enabled, disabled]
     default: present
     type: str
   name:
@@ -75,7 +75,7 @@ options:
         description:
           - Action to apply to STONITH.
         type: str
-        choices: [ group, before, after ]
+        choices: [group, before, after]
       argument_options:
         description:
           - Options to associate with STONITH action.
@@ -109,10 +109,10 @@ EXAMPLES = '''
 
 RETURN = '''
 cluster_stonith:
-    description: The cluster STONITH output message.
-    type: str
-    sample: ""
-    returned: always
+  description: The cluster STONITH output message.
+  type: str
+  sample: ""
+  returned: always
 '''
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
@@ -143,12 +143,13 @@ class PacemakerStonith(StateModuleHelper):
         supports_check_mode=True
     )
 
-    default_state = "present"
-
     def __init_module__(self):
         self.runner = pacemaker_runner(self.module, cli_action='stonith')
-        self.vars.set('previous_value', self._get())
+        self.vars.set('previous_value', self._get()['out'])
         self.vars.set('value', self.vars.previous_value, change=True, diff=True)
+
+    def __quit_module__(self):
+        self.vars.set('value', self._get()['out'])
 
     def _process_command_output(self, fail_on_err, ignore_err_msg=""):
         def process(rc, out, err):
@@ -159,14 +160,17 @@ class PacemakerStonith(StateModuleHelper):
         return process
 
     def _get(self):
-        with self.runner('state name', output_process=self._process_command_output(False)) as ctx:
-            return ctx.run(state='status')
+        with self.runner('state name') as ctx:
+            result = ctx.run(state='status')
+            return dict([('rc', result[0]),
+                         ('out', result[1] if result[1] != "" else None),
+                         ('err', result[2])])
 
-    def _fmt_stonith_resource(self):
+    def fmt_stonith_resource(self):
         return dict([("resource_name", self.vars.stonith_type)])
 
     # TODO: Pluralize operation_options in separate PR and remove this helper fmt function
-    def _fmt_stonith_operations(self):
+    def fmt_stonith_operations(self):
         modified_stonith_operations = []
         for stonith_operation in self.vars.stonith_operations:
             modified_stonith_operations.append(dict([("operation_action", stonith_operation.get('operation_action')),
@@ -176,41 +180,25 @@ class PacemakerStonith(StateModuleHelper):
     def state_absent(self):
         with self.runner('state name', output_process=self._process_command_output(True, "does not exist"), check_mode_skip=True) as ctx:
             ctx.run()
-            self.vars.set('value', self._get())
-            self.vars.stdout = ctx.results_out
-            self.vars.stderr = ctx.results_err
-            self.vars.cmd = ctx.cmd
 
     def state_present(self):
         with self.runner(
                 'state name resource_type resource_option resource_operation resource_meta resource_argument agent_validation wait',
                 output_process=self._process_command_output(True, "already exists"),
                 check_mode_skip=True) as ctx:
-            ctx.run(resource_type=self._fmt_stonith_resource(),
+            ctx.run(resource_type=self.fmt_stonith_resource(),
                     resource_option=self.vars.stonith_options,
-                    resource_operation=self._fmt_stonith_operations(),
+                    resource_operation=self.fmt_stonith_operations(),
                     resource_meta=self.vars.stonith_metas,
                     resource_argument=self.vars.stonith_argument)
-            self.vars.set('value', self._get())
-            self.vars.stdout = ctx.results_out
-            self.vars.stderr = ctx.results_err
-            self.vars.cmd = ctx.cmd
 
     def state_enabled(self):
         with self.runner('state name', output_process=self._process_command_output(True, "Starting"), check_mode_skip=True) as ctx:
             ctx.run()
-            self.vars.set('value', self._get())
-            self.vars.stdout = ctx.results_out
-            self.vars.stderr = ctx.results_err
-            self.vars.cmd = ctx.cmd
 
     def state_disabled(self):
         with self.runner('state name', output_process=self._process_command_output(True, "Stopped"), check_mode_skip=True) as ctx:
             ctx.run()
-            self.vars.set('value', self._get())
-            self.vars.stdout = ctx.results_out
-            self.vars.stderr = ctx.results_err
-            self.vars.cmd = ctx.cmd
 
 
 def main():
