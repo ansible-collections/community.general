@@ -9,14 +9,13 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 DOCUMENTATION = '''
----
 module: pacemaker_stonith
 short_description: Manage pacemaker STONITH
 author:
   - Dexter Le (@munchtoast)
 version_added: 11.1.0
 description:
-  - This module can manage STONITH in a Pacemaker cluster using the pacemaker CLI.
+  - This module manages STONITH in a Pacemaker cluster using the pacemaker CLI.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -38,7 +37,7 @@ options:
     type: str
   stonith_type:
     description:
-      - Specify the STONITH device type
+      - Specify the STONITH device type.
     type: str
   stonith_options:
     description:
@@ -59,12 +58,12 @@ options:
         type: str
       operation_options:
         description:
-          - Operation option to associate with action.
+          - Operation options to associate with action.
         type: list
         elements: str
   stonith_metas:
     description:
-      - List of meta to associate with STONITH.
+      - List of metadata to associate with STONITH.
     type: list
     elements: str
   stonith_argument:
@@ -84,7 +83,7 @@ options:
         elements: str
   agent_validation:
     description:
-      - enabled agent validation for STONITH creation.
+      - Enabled agent validation for STONITH creation.
     type: bool
     default: false
   wait:
@@ -95,22 +94,17 @@ options:
 '''
 
 EXAMPLES = '''
----
-- name: Create pacemaker STONITH
-  hosts: localhost
-  gather_facts: false
-  tasks:
-  - name: Create virtual-ip STONITH
-    community.general.pacemaker_stonith:
-      state: present
-      name: virtual-stonith
-      stonith_type: fence_virt
-      stonith_options:
-        - "pcmk_host_list=f1"
-      stonith_operations:
-        - operation_action: monitor
-          operation_options:
-            - "interval=30s"
+- name: Create virtual-ip STONITH
+  community.general.pacemaker_stonith:
+    state: present
+    name: virtual-stonith
+    stonith_type: fence_virt
+    stonith_options:
+      - "pcmk_host_list=f1"
+    stonith_operations:
+      - operation_action: monitor
+        operation_options:
+          - "interval=30s"
 '''
 
 RETURN = '''
@@ -132,8 +126,8 @@ class PacemakerStonith(StateModuleHelper):
                 'present', 'absent', 'enabled', 'disabled']),
             name=dict(type='str', required=True),
             stonith_type=dict(type='str'),
-            stonith_options=dict(type='list', elements='str', default=list()),
-            stonith_operations=dict(type='list', elements='dict', default=list(), options=dict(
+            stonith_options=dict(type='list', elements='str', default=[]),
+            stonith_operations=dict(type='list', elements='dict', default=[], options=dict(
                 operation_action=dict(type='str'),
                 operation_options=dict(type='list', elements='str'),
             )),
@@ -149,7 +143,6 @@ class PacemakerStonith(StateModuleHelper):
         supports_check_mode=True
     )
 
-    use_old_vardict = False
     default_state = "present"
 
     def __init_module__(self):
@@ -177,7 +170,7 @@ class PacemakerStonith(StateModuleHelper):
         modified_stonith_operations = []
         for stonith_operation in self.vars.stonith_operations:
             modified_stonith_operations.append(dict([("operation_action", stonith_operation.get('operation_action')),
-                                                    ("operation_option", stonith_operation.get('operation_options'))]))
+                                                     ("operation_option", stonith_operation.get('operation_options'))]))
         return modified_stonith_operations
 
     def state_absent(self):
