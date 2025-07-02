@@ -27,12 +27,14 @@ options:
   state:
     description:
       - Indicate desired state for cluster resource.
+      - The state V(cleanup) has been added in community.general 11.1.0.
     choices: [present, absent, enabled, disabled, cleanup]
     required: true
     type: str
   name:
     description:
       - Specify the resource name to create.
+      - This is required if O(state=present), O(state=absent), O(state=enabled), or O(state=disabled).
     type: str
   resource_type:
     description:
@@ -159,7 +161,13 @@ class PacemakerResource(StateModuleHelper):
             )),
             wait=dict(type='int', default=300),
         ),
-        required_if=[('state', 'present', ['resource_type', 'resource_option']), ('state', ['present', 'absent', 'enabled', 'disabled'], ['name'])],
+        required_if=[
+            ('state', 'present', ['resource_type', 'resource_option', 'name']),
+            ('state', 'absent', ['name']),
+            ('state', 'enabled', ['name']),
+            ('state', 'disabled', ['name']),
+            ('state', ['present', 'absent', 'enabled', 'disabled'], ['name']),
+        ],
         supports_check_mode=True,
     )
     default_state = ""

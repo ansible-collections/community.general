@@ -15,7 +15,6 @@ short_description: Manage pacemaker clusters
 author:
   - Mathieu Bultel (@matbu)
   - Dexter Le (@munchtoast)
-version_added: 1.0.0
 description:
   - This module can manage a pacemaker cluster and nodes from Ansible using the pacemaker CLI.
 extends_documentation_fragment:
@@ -29,6 +28,7 @@ options:
   state:
     description:
       - Indicate desired state of the cluster.
+      - The value V(maintenance) has been added in community.general 11.1.0.
     choices: [cleanup, offline, online, restart, maintenance]
     type: str
   name:
