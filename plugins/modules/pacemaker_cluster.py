@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: pacemaker_cluster
 short_description: Manage pacemaker clusters
 author:
@@ -37,7 +36,7 @@ options:
         of all nodes.
     type: str
     aliases: ['node']
-  wait:
+  timeout:
     description:
       - Timeout period for polling the cluster operation.
     type: int
@@ -47,10 +46,9 @@ options:
       - Force the change of the cluster state.
     type: bool
     default: true
-'''
+"""
 
-EXAMPLES = '''
----
+EXAMPLES = r"""
 - name: Set cluster Online
   hosts: localhost
   gather_facts: false
@@ -58,15 +56,15 @@ EXAMPLES = '''
     - name: Get cluster state
       community.general.pacemaker_cluster:
         state: online
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 out:
   description: The output of the current state of the cluster. It returns a list of the nodes state.
   type: str
   sample: 'out: [["  overcloud-controller-0", " Online"]]}'
   returned: always
-'''
+"""
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
 from ansible_collections.community.general.plugins.module_utils.pacemaker import pacemaker_runner, get_pacemaker_maintenance_mode
@@ -78,7 +76,7 @@ class PacemakerCluster(StateModuleHelper):
             state=dict(type='str', choices=[
                 'cleanup', 'offline', 'online', 'restart', 'maintenance']),
             name=dict(type='str', aliases=['node']),
-            wait=dict(type='int', default=300),
+            timeout=dict(type='int', default=300),
             force=dict(type='bool', default=True)
         ),
         supports_check_mode=True,
@@ -98,7 +96,7 @@ class PacemakerCluster(StateModuleHelper):
             get_args['name'] = self.module.params['name']
 
         self.vars.set('get_args', get_args)
-        self.vars.set('previous_value', self._get())
+        self.vars.set('previous_value', self._get()['out'])
         self.vars.set('value', self.vars.previous_value, change=True, diff=True)
 
         if self.module.params['state'] == "cleanup":
@@ -115,6 +113,9 @@ class PacemakerCluster(StateModuleHelper):
                 collection_name='community.general'
             )
 
+    def __quit_module__(self):
+        self.vars.set('value', self._get()['out'])
+
     def _process_command_output(self, fail_on_err, ignore_err_msg=""):
         def process(rc, out, err):
             if fail_on_err and rc != 0 and err and ignore_err_msg not in err:
@@ -124,36 +125,27 @@ class PacemakerCluster(StateModuleHelper):
         return process
 
     def _get(self):
-        with self.runner('cli_action state name', output_process=self._process_command_output(False)) as ctx:
-            return ctx.run(cli_action=self.vars.get_args['cli_action'], state=self.vars.get_args['state'], name=self.vars.get_args['name'])
+        with self.runner('cli_action state name') as ctx:
+            result = ctx.run(cli_action=self.vars.get_args['cli_action'], state=self.vars.get_args['state'], name=self.vars.get_args['name'])
+            return dict([('rc', result[0]),
+                         ('out', result[1] if result[1] != "" else None),
+                         ('err', result[2])])
 
     def state_cleanup(self):
         with self.runner('cli_action state name', output_process=self._process_command_output(True, "Fail"), check_mode_skip=True) as ctx:
             ctx.run(cli_action='resource')
-            self.vars.set('value', self._get())
-            self.vars.stdout = ctx.results_out
-            self.vars.stderr = ctx.results_err
-            self.vars.cmd = ctx.cmd
 
     def state_offline(self):
         with self.runner('cli_action state name apply_all wait',
                          output_process=self._process_command_output(True, "not currently running"),
                          check_mode_skip=True) as ctx:
-            ctx.run(cli_action='cluster', apply_all=self.vars.apply_all)
-            self.vars.set('value', self._get())
-            self.vars.stdout = ctx.results_out
-            self.vars.stderr = ctx.results_err
-            self.vars.cmd = ctx.cmd
+            ctx.run(cli_action='cluster', apply_all=self.vars.apply_all, wait=self.module.params['timeout'])
 
     def state_online(self):
         with self.runner('cli_action state name apply_all wait',
                          output_process=self._process_command_output(True, "currently running"),
                          check_mode_skip=True) as ctx:
-            ctx.run(cli_action='cluster', apply_all=self.vars.apply_all)
-            self.vars.set('value', self._get())
-            self.vars.stdout = ctx.results_out
-            self.vars.stderr = ctx.results_err
-            self.vars.cmd = ctx.cmd
+            ctx.run(cli_action='cluster', apply_all=self.vars.apply_all, wait=self.module.params['timeout'])
 
         if get_pacemaker_maintenance_mode(self.runner):
             with self.runner('cli_action state name', output_process=self._process_command_output(True, "Fail"), check_mode_skip=True) as ctx:
@@ -164,21 +156,13 @@ class PacemakerCluster(StateModuleHelper):
                          output_process=self._process_command_output(True, "Fail"),
                          check_mode_skip=True) as ctx:
             ctx.run(cli_action='property', name='maintenance-mode=true')
-            self.vars.set('value', self._get())
-            self.vars.stdout = ctx.results_out
-            self.vars.stderr = ctx.results_err
-            self.vars.cmd = ctx.cmd
 
     def state_restart(self):
         with self.runner('cli_action state name apply_all wait',
                          output_process=self._process_command_output(True, "not currently running"),
                          check_mode_skip=True) as ctx:
-            ctx.run(cli_action='cluster', state='offline', apply_all=self.vars.apply_all)
-            ctx.run(cli_action='cluster', state='online', apply_all=self.vars.apply_all)
-            self.vars.set('value', self._get())
-            self.vars.stdout = ctx.results_out
-            self.vars.stderr = ctx.results_err
-            self.vars.cmd = ctx.cmd
+            ctx.run(cli_action='cluster', state='offline', apply_all=self.vars.apply_all, wait=self.module.params['timeout'])
+            ctx.run(cli_action='cluster', state='online', apply_all=self.vars.apply_all, wait=self.module.params['timeout'])
 
         if get_pacemaker_maintenance_mode(self.runner):
             with self.runner('cli_action state name', output_process=self._process_command_output(True, "Fail"), check_mode_skip=True) as ctx:

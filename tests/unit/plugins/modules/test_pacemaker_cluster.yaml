@@ -26,11 +26,6 @@ test_cases:
           rc: 0
           out: "Starting Cluster..."
           err: ""
-        - command: [/testbin/pcs, cluster, status]
-          environ: *env-def
-          rc: 0
-          out: '   * Online: [ pc1, pc2, pc3 ]'
-          err: ""
         - command: [/testbin/pcs, property, config]
           environ: *env-def
           rc: 1
@@ -40,6 +35,11 @@ test_cases:
             cluster-name=hacluster
             dc-version=2.1.9-1.fc41-7188dbf
             have-watchdog=false
+          err: ""
+        - command: [/testbin/pcs, cluster, status]
+          environ: *env-def
+          rc: 0
+          out: '   * Online: [ pc1, pc2, pc3 ]'
           err: ""
   - id: test_online_minimal_input_initial_offline_all_maintenance
     input:
@@ -60,11 +60,6 @@ test_cases:
           rc: 0
           out: "Starting Cluster..."
           err: ""
-        - command: [/testbin/pcs, cluster, status]
-          environ: *env-def
-          rc: 0
-          out: '   * Online: [ pc1, pc2, pc3 ]'
-          err: ""
         - command: [/testbin/pcs, property, config]
           environ: *env-def
           rc: 0
@@ -80,6 +75,11 @@ test_cases:
           environ: *env-def
           rc: 0
           out: ""
+          err: ""
+        - command: [/testbin/pcs, cluster, status]
+          environ: *env-def
+          rc: 0
+          out: '   * Online: [ pc1, pc2, pc3 ]'
           err: ""
   - id: test_online_minimal_input_initial_offline_single_nonlocal_no_maintenance
     input:
@@ -101,11 +101,6 @@ test_cases:
           rc: 0
           out: "Starting Cluster..."
           err: ""
-        - command: [/testbin/pcs, cluster, status]
-          environ: *env-def
-          rc: 0
-          out: '   * Online: [ pc1, pc2, pc3 ]'
-          err: ""
         - command: [/testbin/pcs, property, config]
           environ: *env-def
           rc: 1
@@ -115,6 +110,11 @@ test_cases:
             cluster-name=hacluster
             dc-version=2.1.9-1.fc41-7188dbf
             have-watchdog=false
+          err: ""
+        - command: [/testbin/pcs, cluster, status]
+          environ: *env-def
+          rc: 0
+          out: '   * Online: [ pc1, pc2, pc3 ]'
           err: ""
   - id: test_online_minimal_input_initial_offline_single_local_no_maintenance
     input:
@@ -136,11 +136,6 @@ test_cases:
           rc: 0
           out: "Starting Cluster..."
           err: ""
-        - command: [/testbin/pcs, cluster, status]
-          environ: *env-def
-          rc: 0
-          out: '   * Online: [ pc1, pc2, pc3 ]'
-          err: ""
         - command: [/testbin/pcs, property, config]
           environ: *env-def
           rc: 1
@@ -150,6 +145,11 @@ test_cases:
             cluster-name=hacluster
             dc-version=2.1.9-1.fc41-7188dbf
             have-watchdog=false
+          err: ""
+        - command: [/testbin/pcs, cluster, status]
+          environ: *env-def
+          rc: 0
+          out: '   * Online: [ pc1, pc2, pc3 ]'
           err: ""
   - id: test_offline_minimal_input_initial_online_all
     input:
@@ -248,11 +248,6 @@ test_cases:
           rc: 0
           out: "Starting Cluster..."
           err: ""
-        - command: [/testbin/pcs, cluster, status]
-          environ: *env-def
-          rc: 0
-          out: '   * Online: [ pc1, pc2, pc3 ]'
-          err: ""
         - command: [/testbin/pcs, property, config]
           environ: *env-def
           rc: 1
@@ -262,6 +257,11 @@ test_cases:
             cluster-name=hacluster
             dc-version=2.1.9-1.fc41-7188dbf
             have-watchdog=false
+          err: ""
+        - command: [/testbin/pcs, cluster, status]
+          environ: *env-def
+          rc: 0
+          out: '   * Online: [ pc1, pc2, pc3 ]'
           err: ""
   - id: test_restart_minimal_input_initial_offline_all_no_maintenance
     input:
@@ -287,11 +287,6 @@ test_cases:
           rc: 0
           out: "Starting Cluster..."
           err: ""
-        - command: [/testbin/pcs, cluster, status]
-          environ: *env-def
-          rc: 0
-          out: '   * Online: [ pc1, pc2, pc3 ]'
-          err: ""
         - command: [/testbin/pcs, property, config]
           environ: *env-def
           rc: 1
@@ -301,6 +296,11 @@ test_cases:
             cluster-name=hacluster
             dc-version=2.1.9-1.fc41-7188dbf
             have-watchdog=false
+          err: ""
+        - command: [/testbin/pcs, cluster, status]
+          environ: *env-def
+          rc: 0
+          out: '   * Online: [ pc1, pc2, pc3 ]'
           err: ""
   - id: test_restart_minimal_input_initial_offline_all_maintenance
     input:
@@ -326,11 +326,6 @@ test_cases:
           rc: 0
           out: "Starting Cluster..."
           err: ""
-        - command: [/testbin/pcs, cluster, status]
-          environ: *env-def
-          rc: 0
-          out: '   * Online: [ pc1, pc2, pc3 ]'
-          err: ""
         - command: [/testbin/pcs, property, config]
           environ: *env-def
           rc: 0
@@ -346,6 +341,11 @@ test_cases:
           environ: *env-def
           rc: 0
           out: ""
+          err: ""
+        - command: [/testbin/pcs, cluster, status]
+          environ: *env-def
+          rc: 0
+          out: '   * Online: [ pc1, pc2, pc3 ]'
           err: ""
   - id: test_maintenance_minimal_input_initial_online
     input:
