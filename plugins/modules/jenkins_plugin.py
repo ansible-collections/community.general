@@ -315,6 +315,7 @@ import io
 import json
 import os
 import tempfile
+import time
 
 from ansible.module_utils.basic import AnsibleModule, to_bytes
 from ansible.module_utils.six.moves import http_cookiejar as cookiejar
@@ -467,6 +468,7 @@ class JenkinsPlugin(object):
         self.is_installed = False
         self.is_pinned = False
         self.is_enabled = False
+        self.installed_plugins = plugins_data['plugins']
 
         for p in plugins_data['plugins']:
             if p['shortName'] == self.params['name']:
@@ -611,6 +613,53 @@ class JenkinsPlugin(object):
             for update_segment in self.params['latest_plugins_url_segments']:
                 urls.append("{0}/{1}/{2}.hpi".format(base_url, update_segment, self.params['name']))
         return urls
+
+    def _get_latest_compatible_plugin_version(self, plugin_name=None):
+        if not hasattr(self, 'jenkins_version'):
+            resp, info = fetch_url(self.module, self.url)
+            raw_version = info.get("x-jenkins")
+            self.jenkins_version = self.parse_version(raw_version)
+        name = plugin_name or self.params['name']
+        cache_path = "{}/ansible_jenkins_plugin_cache.json".format(self.params['jenkins_home'])
+
+        try:  # Check if file is saved localy
+            with open(cache_path, "r") as f:
+                file_mtime = os.path.getmtime(cache_path)
+                now = time.time()
+                if now - file_mtime < 86400:
+                    plugin_data = json.load(f)
+                else:
+                    raise FileNotFoundError("Cache file is outdated.")
+        except Exception:
+            resp, info = fetch_url(self.module, "https://updates.jenkins.io/current/plugin-versions.json")   # Get list of plugins and their dependencies
+
+            if info.get("status") != 200:
+                self.module.fail_json(msg="Failed to fetch plugin-versions.json", details=info)
+
+            try:
+                plugin_data = json.loads(to_native(resp.read()))
+
+                # Save it to file for next time
+                with open(cache_path, "w") as f:
+                    json.dump(plugin_data, f)
+            except Exception as e:
+                self.module.fail_json(msg="Failed to parse plugin-versions.json", details=to_native(e))
+
+        plugin_versions = plugin_data.get("plugins", {}).get(name)
+        if not plugin_versions:
+            self.module.fail_json(msg="Plugin '{}' not found.".format(name))
+
+        sorted_versions = dict(reversed(list(plugin_versions.items())))
+
+        for idx, (version_title, version_info) in enumerate(sorted_versions.items()):
+            required_core = version_info.get("requiredCore", "0.0")
+            if self.parse_version(required_core) <= self.jenkins_version:
+                return 'latest' if idx == 0 else version_title
+
+        self.module.warn(
+            "No compatible version found for plugin '{}'. "
+            "Installing latest version.".format(name))
+        return 'latest'
 
     def _get_versioned_plugin_urls(self):
         urls = []
@@ -779,6 +828,10 @@ class JenkinsPlugin(object):
             msg_exception="%s has failed." % msg,
             method="POST")
 
+    @staticmethod
+    def parse_version(version_str):
+        return tuple(int(x) for x in version_str.split('.'))
+
 
 def main():
     # Module arguments
@@ -829,11 +882,17 @@ def main():
         module.fail_json(
             msg='Cannot convert %s to float.' % module.params['timeout'],
             details=to_native(e))
+    # Instantiate the JenkinsPlugin object
+    jp = JenkinsPlugin(module)
 
     # Set version to latest if state is latest
     if module.params['state'] == 'latest':
         module.params['state'] = 'present'
-        module.params['version'] = 'latest'
+        module.params['version'] = jp._get_latest_compatible_plugin_version()
+
+    # Ser version to latest compatible version if version is latest
+    if module.params['version'] == 'latest':
+        module.params['version'] = jp._get_latest_compatible_plugin_version()
 
     # Create some shortcuts
     name = module.params['name']
@@ -841,9 +900,6 @@ def main():
 
     # Initial change state of the task
     changed = False
-
-    # Instantiate the JenkinsPlugin object
-    jp = JenkinsPlugin(module)
 
     # Perform action depending on the requested state
     if state == 'present':
@@ -860,7 +916,7 @@ def main():
         changed = jp.disable()
 
     # Print status of the change
-    module.exit_json(changed=changed, plugin=name, state=state)
+    module.exit_json(changed=changed, plugin=name, state=state, dependencies=jp.dependencies_states if hasattr(jp, 'dependencies_states') else None)
 
 
 if __name__ == '__main__':
