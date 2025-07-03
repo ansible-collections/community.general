@@ -174,7 +174,7 @@ class PacemakerResource(StateModuleHelper):
         self.runner = pacemaker_runner(self.module)
         self.vars.set('previous_value', self._get()['out'])
         self.vars.set('value', self.vars.previous_value, change=True, diff=True)
-        self.module.params['name'] = self.module.params['name'] if self.module.params['name'] != "" else None
+        self.module.params['name'] = self.module.params['name'] or None
 
     def __quit_module__(self):
         self.vars.set('value', self._get()['out'])
