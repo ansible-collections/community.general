@@ -116,7 +116,7 @@ def main():
                           ('backing_device', backing_device),
                           ('password', password),
                           ('opts', opts)):
-        if (arg is not None and (' ' in arg or '\t' in arg or arg == '')):
+        if arg is not None and (' ' in arg or '\t' in arg or arg == ''):
             module.fail_json(msg="invalid '%s': contains white space or is empty" % arg_name,
                              **module.params)
 

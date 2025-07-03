@@ -244,7 +244,7 @@ def main():
                         'parameters. Error returned by OVH api was : {0}'
                         .format(apiError))
 
-            if (backendProperties['weight'] != weight):
+            if backendProperties['weight'] != weight:
                 # Change weight
                 try:
                     client.post(
@@ -263,7 +263,7 @@ def main():
                             .format(apiError))
                 moduleChanged = True
 
-            if (backendProperties['probe'] != probe):
+            if backendProperties['probe'] != probe:
                 # Change probe
                 backendProperties['probe'] = probe
                 try:

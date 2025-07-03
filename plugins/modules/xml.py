@@ -635,7 +635,7 @@ def check_or_make_target(module, tree, xpath, namespaces):
                 # module.fail_json(msg="now tree=%s" % etree.tostring(tree, pretty_print=True))
             elif eoa == "":
                 for node in tree.xpath(inner_xpath, namespaces=namespaces):
-                    if (node.text != eoa_value):
+                    if node.text != eoa_value:
                         node.text = eoa_value
                         changed = True
 

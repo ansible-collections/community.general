@@ -19,7 +19,7 @@ class PythonRunner(CmdRunner):
         self.venv = venv
         self.has_venv = venv is not None
 
-        if (os.path.isabs(python) or '/' in python):
+        if os.path.isabs(python) or '/' in python:
             self.python = python
         elif self.has_venv:
             if path_prefix is None:

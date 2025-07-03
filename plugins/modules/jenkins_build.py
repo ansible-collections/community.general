@@ -180,11 +180,11 @@ class JenkinsBuild:
 
     def get_jenkins_connection(self):
         try:
-            if (self.user and self.password):
+            if self.user and self.password:
                 return jenkins.Jenkins(self.jenkins_url, self.user, self.password)
-            elif (self.user and self.token):
+            elif self.user and self.token:
                 return jenkins.Jenkins(self.jenkins_url, self.user, self.token)
-            elif (self.user and not (self.password or self.token)):
+            elif self.user and not (self.password or self.token):
                 return jenkins.Jenkins(self.jenkins_url, self.user)
             else:
                 return jenkins.Jenkins(self.jenkins_url)

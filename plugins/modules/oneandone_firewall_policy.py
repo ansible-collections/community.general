@@ -288,7 +288,7 @@ def _add_firewall_rules(module, oneandone_conn, firewall_id, rules):
 
         if module.check_mode:
             firewall_policy_id = get_firewall_policy(oneandone_conn, firewall_id)
-            if (firewall_rules and firewall_policy_id):
+            if firewall_rules and firewall_policy_id:
                 return True
             return False
 

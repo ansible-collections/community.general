@@ -181,7 +181,7 @@ def build_payload_for_rocketchat(module, text, channel, username, icon_url, icon
     elif text is not None:
         payload = dict(attachments=[dict(text=text, color=color)])
     if channel is not None:
-        if (channel[0] == '#') or (channel[0] == '@'):
+        if channel[0] == '#' or channel[0] == '@':
             payload['channel'] = channel
         else:
             payload['channel'] = '#' + channel

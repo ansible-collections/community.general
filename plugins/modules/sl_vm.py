@@ -319,9 +319,9 @@ def create_virtual_instance(module):
         return False, None
 
     # Check if OS or Image Template is provided (Can't be both, defaults to OS)
-    if (module.params.get('os_code') is not None and module.params.get('os_code') != ''):
+    if module.params.get('os_code') is not None and module.params.get('os_code') != '':
         module.params['image_id'] = ''
-    elif (module.params.get('image_id') is not None and module.params.get('image_id') != ''):
+    elif module.params.get('image_id') is not None and module.params.get('image_id') != '':
         module.params['os_code'] = ''
         module.params['disks'] = []  # Blank out disks since it will use the template
     else:

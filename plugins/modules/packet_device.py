@@ -420,12 +420,12 @@ def get_hostname_list(module):
     # at this point, hostnames is a list
     hostnames = [h.strip() for h in hostnames]
 
-    if (len(hostnames) > 1) and (count > 1):
+    if len(hostnames) > 1 and count > 1:
         _msg = ("If you set count>1, you should only specify one hostname "
                 "with the %d formatter, not a list of hostnames.")
         raise Exception(_msg)
 
-    if (len(hostnames) == 1) and (count > 0):
+    if len(hostnames) == 1 and count > 0:
         hostname_spec = hostnames[0]
         count_range = range(count_offset, count_offset + count)
         if re.search(r"%\d{0,2}d", hostname_spec):
