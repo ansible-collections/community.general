@@ -112,7 +112,6 @@ options:
   with_dependencies:
     description:
       - Defines whether to install plugin dependencies.
-      - This option takes effect only if the O(version) is not defined.
     type: bool
     default: true
 
@@ -482,6 +481,37 @@ class JenkinsPlugin(object):
 
                 break
 
+    def _install_dependencies(self):
+        dependencies = self._get_versioned_dependencies()
+        self.dependencies_states = []
+
+        for dep_name, dep_version in dependencies.items():
+            if not any(p['shortName'] == dep_name and p['version'] == dep_version for p in self.installed_plugins):
+                dep_params = self.params.copy()
+                dep_params['name'] = dep_name
+                dep_params['version'] = dep_version
+                dep_module = self.module
+                dep_module.params = dep_params
+                dep_plugin = JenkinsPlugin(dep_module)
+                if not dep_plugin.install():
+                    self.dependencies_states.append(
+                        {
+                            'name': dep_name,
+                            'version': dep_version,
+                            'state': 'absent'})
+                else:
+                    self.dependencies_states.append(
+                        {
+                            'name': dep_name,
+                            'version': dep_version,
+                            'state': 'present'})
+            else:
+                self.dependencies_states.append(
+                    {
+                        'name': dep_name,
+                        'version': dep_version,
+                        'state': 'present'})
+
     def _install_with_plugin_manager(self):
         if not self.module.check_mode:
             # Install the plugin (with dependencies)
@@ -541,6 +571,10 @@ class JenkinsPlugin(object):
                 with open(plugin_file, 'rb') as plugin_fh:
                     plugin_content = plugin_fh.read()
                 checksum_old = hashlib.sha1(plugin_content).hexdigest()
+
+            # Install dependencies
+            if self.params['with_dependencies']:
+                self._install_dependencies()
 
             if self.params['version'] in [None, 'latest']:
                 # Take latest version
@@ -674,6 +708,18 @@ class JenkinsPlugin(object):
             for update_json in self.params['update_json_url_segment']:
                 urls.append("{0}/{1}".format(base_url, update_json))
         return urls
+
+    def _get_versioned_dependencies(self):
+        # Get dependencies for the specified plugin version
+        plugin_data = self._download_updates()['dependencies']
+
+        dependencies_info = {
+            dep["name"]: self._get_latest_compatible_plugin_version(dep["name"])
+            for dep in plugin_data
+            if not dep.get("optional", False)
+        }
+
+        return dependencies_info
 
     def _download_updates(self):
         try:
