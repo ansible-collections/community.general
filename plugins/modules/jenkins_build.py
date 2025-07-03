@@ -99,6 +99,16 @@ EXAMPLES = r"""
     state: stopped
     url: http://localhost:8080
 
+- name: Trigger Jenkins build in detached mode
+  community.general.jenkins_build:
+    name: "detached-build"
+    state: present
+    user: admin
+    token: abcdefghijklmnopqrstuvwxyz123456
+    url: http://localhost:8080
+    detach: true
+    time_between_checks: 20
+
 - name: Delete a jenkins build using token authentication
   community.general.jenkins_build:
     name: "delete-experiment"
