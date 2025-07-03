@@ -18,7 +18,9 @@ description:
   - Allows notifications to be sent using SMS / MMS using the catapult bandwidth API.
 deprecated:
   removed_in: 13.0.0
-  why: DNS fails to resolve the API endpoint used by the module since Oct 2024. See L(the associated issue, https://github.com/ansible-collections/community.general/issues/10318) for details.
+  why: >-
+    DNS fails to resolve the API endpoint used by the module since Oct 2024.
+    See L(the associated issue, https://github.com/ansible-collections/community.general/issues/10318) for details.
   alternative: There is none.
 extends_documentation_fragment:
   - community.general.attributes
