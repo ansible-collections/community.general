@@ -2484,7 +2484,7 @@ class Nmcli(object):
 
         for line in out.splitlines():
             prefix = '%s.' % setting
-            if (line.startswith(prefix)):
+            if line.startswith(prefix):
                 pair = line.split(':', 1)
                 property = pair[0].strip().replace(prefix, '')
                 properties.append(property)

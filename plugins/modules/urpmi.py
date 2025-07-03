@@ -184,7 +184,7 @@ def install_packages(module, pkgspec, root, force=True, no_recommends=True):
 
 
 def root_option(root):
-    if (root):
+    if root:
         return "--root=%s" % (root)
     else:
         return ""

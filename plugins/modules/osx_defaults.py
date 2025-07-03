@@ -191,7 +191,7 @@ class OSXDefaults(object):
     @staticmethod
     def is_int(value):
         as_str = str(value)
-        if (as_str.startswith("-")):
+        if as_str.startswith("-"):
             return as_str[1:].isdigit()
         else:
             return as_str.isdigit()

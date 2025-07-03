@@ -203,7 +203,7 @@ class PagerDutyRequest(object):
         return False, json_out, True
 
     def _create_services_payload(self, service):
-        if (isinstance(service, list)):
+        if isinstance(service, list):
             return [{'id': s, 'type': 'service_reference'} for s in service]
         else:
             return [{'id': service, 'type': 'service_reference'}]
