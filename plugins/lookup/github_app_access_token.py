@@ -139,12 +139,10 @@ def post_request(generated_jwt, installation_id):
         raise AnsibleError(f"Error while dencoding JSON respone from github: {e}")
     return json_data.get('token')
 
-
 def get_token(key_path, app_id, installation_id, private_key, expiry=600):
     jwk = read_key(key_path, private_key)
     generated_jwt = encode_jwt(app_id, jwk, exp=expiry)
     return post_request(generated_jwt, installation_id)
-
 
 class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
