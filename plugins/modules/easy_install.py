@@ -85,7 +85,7 @@ EXAMPLES = '''
     name: bottle
     virtualenv: /webapps/myapp/venv
 
-- name: Install or update pip
+- name: Install or update pip with an explicit path to easy_install
   community.general.easy_install:
     name: pip
     state: latest
