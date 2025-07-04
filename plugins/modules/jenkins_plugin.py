@@ -74,6 +74,16 @@ options:
       - A list of base URL(s) to retrieve C(update-center.json), and direct plugin files from.
       - This can be a list since community.general 3.3.0.
     default: ['https://updates.jenkins.io', 'http://mirrors.jenkins.io']
+  updates_url_username:
+    description:
+      - If using a custom O(updates_url), set this as the username of the user with access to the url.
+      - If the custom O(updates_url) does not require authentication, this can be left empty.
+    type: str
+  updates_url_password:
+    description:
+      - If using a custom O(updates_url), set this as the password of the user with access to the url.
+      - If the custom O(updates_url) does not require authentication, this can be left empty.
+    type: str
   update_json_url_segment:
     type: list
     elements: str
@@ -315,11 +325,12 @@ import json
 import os
 import tempfile
 import time
+import base64
 
 from ansible.module_utils.basic import AnsibleModule, to_bytes
 from ansible.module_utils.six.moves import http_cookiejar as cookiejar
 from ansible.module_utils.six.moves.urllib.parse import urlencode
-from ansible.module_utils.urls import fetch_url, url_argument_spec
+from ansible.module_utils.urls import fetch_url, url_argument_spec, open_url
 from ansible.module_utils.six import text_type, binary_type
 from ansible.module_utils.common.text.converters import to_native
 
@@ -340,14 +351,28 @@ class JenkinsPlugin(object):
         self.url = self.params['url']
         self.timeout = self.params['timeout']
 
+        # Authentication for non-Jenkins calls
+        self.updates_url_credentials = {}
+        if self.params['updates_url_username'] and self.params['updates_url_password']:
+            auth = f"{self.params['updates_url_username']}:{self.params['updates_url_password']}".encode("utf-8")
+            b64_auth = base64.b64encode(auth).decode("ascii")
+            self.updates_url_credentials["Authorization"] = f"Basic {b64_auth}"
+
         # Crumb
         self.crumb = {}
+
+        # Authentication for Jenkins calls
+        if self.params['url_username'] and self.params['url_password']:
+            auth = f"{self.params['url_username']}:{self.params['url_password']}".encode("utf-8")
+            b64_auth = base64.b64encode(auth).decode("ascii")
+            self.crumb["Authorization"] = f"Basic {b64_auth}"
+
         # Cookie jar for crumb session
         self.cookies = None
 
         if self._csrf_enabled():
             self.cookies = cookiejar.LWPCookieJar()
-            self.crumb = self._get_crumb()
+            self._get_crumb()
 
         # Get list of installed plugins
         self._get_installed_plugins()
@@ -390,16 +415,18 @@ class JenkinsPlugin(object):
             err_msg = None
             try:
                 self.module.debug("fetching url: %s" % url)
-                response, info = fetch_url(
-                    self.module, url, timeout=self.timeout, cookies=self.cookies,
-                    headers=self.crumb, **kwargs)
 
-                if info['status'] == 200:
+                is_jenkins_call = url.startswith(self.url)
+
+                response = open_url(
+                    url, timeout=self.timeout,
+                    cookies=self.cookies if is_jenkins_call else None,
+                    headers=self.crumb if is_jenkins_call else self.updates_url_credentials, **kwargs)
+                if response.getcode() == 200:
                     return response
                 else:
-                    err_msg = ("%s. fetching url %s failed. response code: %s" % (msg_status, url, info['status']))
-                    if info['status'] > 400:  # extend error message
-                        err_msg = "%s. response body: %s" % (err_msg, info['body'])
+                    err_msg = ("%s. fetching url %s failed. response code: %s" % (msg_status, url, response.getcode()))
+
             except Exception as e:
                 err_msg = "%s. fetching url %s failed. error msg: %s" % (msg_status, url, to_native(e))
             finally:
@@ -422,15 +449,20 @@ class JenkinsPlugin(object):
 
         # Get the URL data
         try:
-            response, info = fetch_url(
-                self.module, url, timeout=self.timeout, cookies=self.cookies,
-                headers=self.crumb, **kwargs)
+            is_jenkins_call = url.startswith(self.url)
+            response = open_url(
+                url, timeout=self.timeout,
+                cookies=self.cookies if is_jenkins_call else None,
+                headers=self.crumb if is_jenkins_call else self.updates_url_credentials, **kwargs)
 
-            if info['status'] != 200:
+            if response.getcode() != 200:
                 if dont_fail:
-                    raise FailedInstallingWithPluginManager(info['msg'])
+                    raise FailedInstallingWithPluginManager(f"HTTP {response.getcode()}")
                 else:
-                    self.module.fail_json(msg=msg_status, details=info['msg'])
+                    self.module.fail_json(
+                        msg=msg_status,
+                        details=f"Received status code {response.getcode()} from {url}"
+                    )
         except Exception as e:
             if dont_fail:
                 raise FailedInstallingWithPluginManager(e)
@@ -444,15 +476,11 @@ class JenkinsPlugin(object):
             "%s/%s" % (self.url, "crumbIssuer/api/json"), 'Crumb')
 
         if 'crumbRequestField' in crumb_data and 'crumb' in crumb_data:
-            ret = {
-                crumb_data['crumbRequestField']: crumb_data['crumb']
-            }
+            self.crumb[crumb_data['crumbRequestField']] = crumb_data['crumb']
         else:
             self.module.fail_json(
                 msg="Required fields not found in the Crum response.",
                 details=crumb_data)
-
-        return ret
 
     def _get_installed_plugins(self):
         plugins_data = self._get_json_data(
@@ -902,6 +930,8 @@ def main():
         updates_expiration=dict(default=86400, type="int"),
         updates_url=dict(type="list", elements="str", default=['https://updates.jenkins.io',
                                                                'http://mirrors.jenkins.io']),
+        updates_url_username=dict(type="str"),
+        updates_url_password=dict(type="str", no_log=True),
         update_json_url_segment=dict(type="list", elements="str", default=['update-center.json',
                                                                            'updates/update-center.json']),
         latest_plugins_url_segments=dict(type="list", elements="str", default=['latest']),
