@@ -90,6 +90,7 @@ from ansible.utils.display import Display
 
 display = Display()
 
+
 def read_key(path, private_key=None):
     try:
         if private_key:
@@ -100,6 +101,7 @@ def read_key(path, private_key=None):
         return serialization.load_pem_private_key(key_bytes, password=None)
     except Exception as e:
         raise AnsibleError(f"Error while parsing key file: {e}")
+
 
 def encode_jwt(app_id, private_key_obj, exp=600):
     now = int(time.time())
@@ -112,6 +114,7 @@ def encode_jwt(app_id, private_key_obj, exp=600):
         return jwt.encode(payload, private_key_obj, algorithm='RS256')
     except Exception as e:
         raise AnsibleError(f"Error while encoding jwt: {e}")
+
 
 def post_request(generated_jwt, installation_id):
     github_api_url = f'https://api.github.com/app/installations/{installation_id}/access_tokens'
@@ -139,10 +142,12 @@ def post_request(generated_jwt, installation_id):
         raise AnsibleError(f"Error while dencoding JSON respone from github: {e}")
     return json_data.get('token')
 
+
 def get_token(key_path, app_id, installation_id, private_key, expiry=600):
     jwk = read_key(key_path, private_key)
     generated_jwt = encode_jwt(app_id, jwk, exp=expiry)
     return post_request(generated_jwt, installation_id)
+
 
 class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
