@@ -209,7 +209,7 @@ def main():
             not (namespace == 'user' and key.startswith('user.'))):
         key = '%s.%s' % (namespace, key)
 
-    if (state == 'present' or value is not None):
+    if state == 'present' or value is not None:
         current = get_xattr(module, path, key, follow)
         if current is None or key not in current or value != current[key]:
             if not module.check_mode:

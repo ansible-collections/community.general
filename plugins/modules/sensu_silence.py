@@ -202,7 +202,7 @@ def create(
         expire_on_resolve, reason, subscription):
     (rc, out, changed) = query(module, url, check, subscription)
     for i in out:
-        if (i['subscription'] == subscription):
+        if i['subscription'] == subscription:
             if (
                     (check is None or check == i['check']) and
                     (

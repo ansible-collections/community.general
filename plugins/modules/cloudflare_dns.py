@@ -501,13 +501,13 @@ class CloudflareAPI(object):
         if (self.type == 'AAAA') and (self.value is not None):
             self.value = self.value.lower()
 
-        if (self.type == 'SRV'):
+        if self.type == 'SRV':
             if (self.proto is not None) and (not self.proto.startswith('_')):
                 self.proto = '_{0}'.format(self.proto)
             if (self.service is not None) and (not self.service.startswith('_')):
                 self.service = '_{0}'.format(self.service)
 
-        if (self.type == 'TLSA'):
+        if self.type == 'TLSA':
             if (self.proto is not None) and (not self.proto.startswith('_')):
                 self.proto = '_{0}'.format(self.proto)
             if (self.port is not None):
@@ -516,7 +516,7 @@ class CloudflareAPI(object):
         if not self.record.endswith(self.zone):
             self.record = join_str('.', self.record, self.zone)
 
-        if (self.type == 'DS'):
+        if self.type == 'DS':
             if self.record == self.zone:
                 self.module.fail_json(msg="DS records only apply to subdomains.")
 
@@ -722,7 +722,7 @@ class CloudflareAPI(object):
         search_record = self.record
         new_record = None
 
-        if (self.type in ['A', 'AAAA', 'CNAME', 'TXT', 'MX', 'NS', 'PTR']):
+        if self.type in ['A', 'AAAA', 'CNAME', 'TXT', 'MX', 'NS', 'PTR']:
             if not self.value:
                 self.module.fail_json(msg="You must provide a non-empty value to create this record type")
 
@@ -740,7 +740,7 @@ class CloudflareAPI(object):
                 "ttl": self.ttl
             }
 
-        if (self.type in ['A', 'AAAA', 'CNAME']):
+        if self.type in ['A', 'AAAA', 'CNAME']:
             new_record["proxied"] = self.proxied
 
         if self.type == 'MX':
@@ -873,7 +873,7 @@ class CloudflareAPI(object):
             if ('proxied' in new_record) and ('proxied' in cur_record) and (cur_record['proxied'] != self.proxied):
                 do_update = True
             if ('data' in new_record) and ('data' in cur_record):
-                if (cur_record['data'] != new_record['data']):
+                if cur_record['data'] != new_record['data']:
                     do_update = True
             if (self.type == 'CNAME') and (cur_record['content'] != new_record['content']):
                 do_update = True

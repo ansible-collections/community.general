@@ -537,7 +537,7 @@ def _add_processes(module, oneandone_conn, monitoring_policy_id, processes):
 
         if module.check_mode:
             mp_id = get_monitoring_policy(oneandone_conn, monitoring_policy_id)
-            if (monitoring_policy_processes and mp_id):
+            if monitoring_policy_processes and mp_id:
                 return True
             return False
 

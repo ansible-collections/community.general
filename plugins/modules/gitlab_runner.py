@@ -393,10 +393,10 @@ class GitLabRunner(object):
             # python-gitlab 2.2 through at least 2.5 returns a list of dicts for list() instead of a Runner
             # object, so we need to handle both
             if hasattr(runner, "description"):
-                if (runner.description == description):
+                if runner.description == description:
                     return self._gitlab.runners.get(runner.id)
             else:
-                if (runner['description'] == description):
+                if runner['description'] == description:
                     return self._gitlab.runners.get(runner['id'])
 
     '''

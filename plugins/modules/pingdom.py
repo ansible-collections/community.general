@@ -132,10 +132,10 @@ def main():
     passwd = module.params['passwd']
     key = module.params['key']
 
-    if (state == "paused" or state == "stopped"):
+    if state == "paused" or state == "stopped":
         (rc, name, result) = pause(checkid, uid, passwd, key)
 
-    if (state == "running" or state == "started"):
+    if state == "running" or state == "started":
         (rc, name, result) = unpause(checkid, uid, passwd, key)
 
     if rc != 0:

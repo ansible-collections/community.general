@@ -193,7 +193,7 @@ class GitLabProjectAccessToken(object):
     def find_access_token(self, project, name):
         access_tokens = [x for x in project.access_tokens.list(all=True) if not getattr(x, 'revoked', False)]
         for access_token in access_tokens:
-            if (access_token.name == name):
+            if access_token.name == name:
                 self.access_token_object = access_token
                 return False
         return False

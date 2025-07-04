@@ -271,7 +271,7 @@ class GitLabHook(object):
     '''
     def find_hook(self, project, hook_url):
         for hook in project.hooks.list(**list_all_kwargs):
-            if (hook.url == hook_url):
+            if hook.url == hook_url:
                 return hook
 
     '''
