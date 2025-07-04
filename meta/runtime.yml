@@ -116,6 +116,10 @@ plugin_routing:
       deprecation:
         removal_version: 13.0.0
         warning_text: Project Atomic was sunset by the end of 2019.
+    catapult:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: DNS fails to resolve the API endpoint used by the module since Oct 2024. See https://github.com/ansible-collections/community.general/issues/10318 for details.
     cisco_spark:
       redirect: community.general.cisco_webex
     clc_alert_policy:
