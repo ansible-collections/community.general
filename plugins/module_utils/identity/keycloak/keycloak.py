@@ -29,7 +29,7 @@ URL_CLIENT_ROLES = "{url}/admin/realms/{realm}/clients/{id}/roles"
 URL_CLIENT_ROLE = "{url}/admin/realms/{realm}/clients/{id}/roles/{name}"
 URL_CLIENT_ROLE_COMPOSITES = "{url}/admin/realms/{realm}/clients/{id}/roles/{name}/composites"
 
-URL_CLIENT_ROLE_SCOPE_CLIENTS = "{url}/admin/realms/{realm}/clients/{id}/scope-mappings/clients/{scopeid}"
+URL_CLIENT_ROLE_SCOPE_CLIENTS = "{url}/admin/realms/{realm}/client-scopes/{scopeid}/scope-mappings/clients/{id}"
 URL_CLIENT_ROLE_SCOPE_REALM = "{url}/admin/realms/{realm}/clients/{id}/scope-mappings/realm"
 
 URL_REALM_ROLES = "{url}/admin/realms/{realm}/roles"
