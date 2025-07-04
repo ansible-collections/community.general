@@ -117,6 +117,16 @@ DOCUMENTATION = '''
         ini:
           - section: callback_loganalytics
             key: tenant_id
+      timeout:
+        description: Timeout for the HTTP requests to the Azure Log Analytics API.
+        type: int
+        required: false
+        default: 2
+        env:
+          - name: LOGANALYTICS_TIMEOUT
+        ini:
+          - section: callback_loganalytics
+            key: timeout
     seealso:
       - name: Logs Ingestion API
         description: Overview of Logs Ingestion API in Azure Monitor
@@ -159,7 +169,7 @@ display = Display()
 
 class AzureLogAnalyticsIngestionSource(object):
     def __init__(self, dce_url, dcr_id, disable_attempts, disable_on_failure, client_id, client_secret, tenant_id, stream_name, include_task_args,
-                 include_content):
+                 include_content, timeout):
         self.dce_url = dce_url
         self.dcr_id = dcr_id
         self.disabled = False
@@ -174,10 +184,12 @@ class AzureLogAnalyticsIngestionSource(object):
         self.include_content = include_content
         self.token_expiration_time = None
         self.requests_session = requests.Session()
-        self.bearer_token = self.get_bearer_token()
         self.session = str(uuid.uuid4())
         self.host = socket.gethostname()
         self.user = getpass.getuser()
+        self.timeout = timeout
+
+        self.bearer_token = self.get_bearer_token()
 
     # OAuth2 authentication method to get a Bearer token
     # This replaces the shared_key authentication mechanism
@@ -191,7 +203,7 @@ class AzureLogAnalyticsIngestionSource(object):
             # and https://learn.microsoft.com/en-us/entra/identity-platform/scopes-oidc#the-default-scope
             'scope': 'https://monitor.azure.com/.default'
         }
-        response = self.requests_session.post(url, data=payload, timeout=2)
+        response = self.requests_session.post(url, data=payload, timeout=self.timeout)
         response.raise_for_status()
         self.token_expiration_time = datetime.now() + timedelta(seconds=response.json().get("expires_in"))
         return response.json().get('access_token')
@@ -209,7 +221,7 @@ class AzureLogAnalyticsIngestionSource(object):
             'Authorization': f"Bearer {self.bearer_token}",
             'Content-Type': 'application/json'
         }
-        response = self.requests_session.post(ingestion_url, headers=headers, json=event_data, timeout=2)
+        response = self.requests_session.post(ingestion_url, headers=headers, json=event_data, timeout=self.timeout)
         response.raise_for_status()
 
     def _rfc1123date(self):
@@ -303,12 +315,13 @@ class CallbackModule(CallbackBase):
         self.include_task_args = self.get_option('include_task_args')
         self.stream_name = self.get_option('stream_name')
         self.tenant_id = self.get_option('tenant_id')
+        self.timeout = self.get_option('timeout')
         self.validate_inputs()
 
         # Initialize the AzureLogAnalyticsIngestionSource with the new settings
         self.azure_loganalytics = AzureLogAnalyticsIngestionSource(
             self.dce_url, self.dcr_id, self.disable_attempts, self.disable_on_failure, self.client_id, self.client_secret, self.tenant_id, self.stream_name,
-            self.include_task_args, self.include_content
+            self.include_task_args, self.include_content, self.timeout
         )
 
     # Input checks
