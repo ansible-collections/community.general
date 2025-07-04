@@ -138,6 +138,7 @@ examples: |
 '''
 
 import getpass
+import json
 try:
     import requests
 except ImportError as exception:
@@ -265,8 +266,10 @@ class AzureLogAnalyticsIngestionSource(object):
             "Result": result._result,
             "Session": self.session
         }]
+
         # Display event data
-        display.vvv(f"Event Data :{str(event_data)}")
+        # The data displayed here can be used as a sample file in order to create the table's schema.
+        display.vvv(f"Event Data: {json.dumps(event_data)}")
 
         # Send the event data using the new Logs Ingestion API method
         self.send_event(event_data)
