@@ -190,7 +190,7 @@ class AzureLogAnalyticsIngestionSource(object):
             # and https://learn.microsoft.com/en-us/entra/identity-platform/scopes-oidc#the-default-scope
             'scope': 'https://monitor.azure.com/.default'
         }
-        response = self.requests_session.post(url, data=payload)
+        response = self.requests_session.post(url, data=payload, timeout=2)
         response.raise_for_status()
         self.token_expiration_time = datetime.now() + timedelta(seconds=response.json().get("expires_in"))
         return response.json().get('access_token')
