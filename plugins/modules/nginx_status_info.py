@@ -9,8 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: nginx_status_info
 short_description: Retrieve information on nginx status
 description:
@@ -34,9 +33,9 @@ options:
 
 notes:
   - See U(http://nginx.org/en/docs/http/ngx_http_stub_status_module.html) for more information.
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 # Gather status info from nginx on localhost
 - name: Get current http stats
   community.general.nginx_status_info:
@@ -49,10 +48,9 @@ EXAMPLES = r'''
     url: http://localhost/nginx_status
     timeout: 20
   register: result
-'''
+"""
 
-RETURN = r'''
----
+RETURN = r"""
 active_connections:
   description: Active connections.
   returned: success
@@ -64,7 +62,8 @@ accepts:
   type: int
   sample: 81769947
 handled:
-  description: The total number of handled connections. Generally, the parameter value is the same as accepts unless some resource limits have been reached.
+  description: The total number of handled connections. Generally, the parameter value is the same as accepts unless some
+    resource limits have been reached.
   returned: success
   type: int
   sample: 81769947
@@ -93,7 +92,7 @@ data:
   returned: success
   type: str
   sample: "Active connections: 2340 \nserver accepts handled requests\n 81769947 81769947 144332345 \nReading: 0 Writing: 241 Waiting: 2092 \n"
-'''
+"""
 
 import re
 from ansible.module_utils.basic import AnsibleModule

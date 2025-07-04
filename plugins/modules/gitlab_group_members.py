@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: gitlab_group_members
 short_description: Manage group members on GitLab Server
 description:
@@ -81,16 +80,16 @@ options:
     type: str
   purge_users:
     description:
-      - Adds/remove users of the given access_level to match the given O(gitlab_user)/O(gitlab_users_access) list.
-        If omitted do not purge orphaned members.
+      - Adds/remove users of the given access_level to match the given O(gitlab_user)/O(gitlab_users_access) list. If omitted
+        do not purge orphaned members.
       - Is only used when O(state=present).
     type: list
     elements: str
     choices: ['guest', 'reporter', 'developer', 'maintainer', 'owner']
     version_added: 3.6.0
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Add a user to a GitLab Group
   community.general.gitlab_group_members:
     api_url: 'https://gitlab.example.com'
@@ -152,15 +151,15 @@ EXAMPLES = r'''
       - name: user2
         access_level: maintainer
     state: absent
-'''
+"""
 
-RETURN = r''' # '''
+RETURN = r""" # """
 
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, gitlab_authentication, gitlab
+    auth_argument_spec, gitlab_authentication, gitlab, list_all_kwargs
 )
 
 
@@ -171,16 +170,20 @@ class GitLabGroup(object):
 
     # get user id if the user exists
     def get_user_id(self, gitlab_user):
-        user_exists = self._gitlab.users.list(username=gitlab_user, all=True)
-        if user_exists:
-            return user_exists[0].id
+        return next(
+            (u.id for u in self._gitlab.users.list(username=gitlab_user, **list_all_kwargs)),
+            None
+        )
 
     # get group id if group exists
     def get_group_id(self, gitlab_group):
-        groups = self._gitlab.groups.list(search=gitlab_group, all=True)
-        for group in groups:
-            if group.full_path == gitlab_group:
-                return group.id
+        return next(
+            (
+                g.id for g in self._gitlab.groups.list(search=gitlab_group, **list_all_kwargs)
+                if g.full_path == gitlab_group
+            ),
+            None
+        )
 
     # get all members in a group
     def get_members_in_a_group(self, gitlab_group_id):

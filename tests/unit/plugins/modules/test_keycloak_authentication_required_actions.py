@@ -9,9 +9,9 @@ __metaclass__ = type
 
 from contextlib import contextmanager
 
-from ansible_collections.community.general.tests.unit.compat import unittest
-from ansible_collections.community.general.tests.unit.compat.mock import patch
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, ModuleTestCase, set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleExitJson, ModuleTestCase, set_module_args
 
 from ansible_collections.community.general.plugins.modules import keycloak_authentication_required_actions
 
@@ -235,20 +235,19 @@ class TestKeycloakAuthentication(ModuleTestCase):
 
         changed = True
 
-        set_module_args(module_args)
-
         # Run the module
-        with mock_good_connection():
-            with patch_keycloak_api(
-                get_required_actions=return_value_required_actions,
-            ) as (
-                mock_get_required_actions,
-                mock_register_required_action,
-                mock_update_required_action,
-                mock_delete_required_action,
-            ):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(
+                    get_required_actions=return_value_required_actions,
+                ) as (
+                    mock_get_required_actions,
+                    mock_register_required_action,
+                    mock_update_required_action,
+                    mock_delete_required_action,
+                ):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         # Verify number of call on each mock
         self.assertEqual(len(mock_get_required_actions.mock_calls), 1)
@@ -386,20 +385,19 @@ class TestKeycloakAuthentication(ModuleTestCase):
 
         changed = False
 
-        set_module_args(module_args)
-
         # Run the module
-        with mock_good_connection():
-            with patch_keycloak_api(
-                get_required_actions=return_value_required_actions,
-            ) as (
-                mock_get_required_actions,
-                mock_register_required_action,
-                mock_update_required_action,
-                mock_delete_required_action,
-            ):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(
+                    get_required_actions=return_value_required_actions,
+                ) as (
+                    mock_get_required_actions,
+                    mock_register_required_action,
+                    mock_update_required_action,
+                    mock_delete_required_action,
+                ):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         # Verify number of call on each mock
         self.assertEqual(len(mock_get_required_actions.mock_calls), 1)
@@ -537,20 +535,19 @@ class TestKeycloakAuthentication(ModuleTestCase):
 
         changed = True
 
-        set_module_args(module_args)
-
         # Run the module
-        with mock_good_connection():
-            with patch_keycloak_api(
-                get_required_actions=return_value_required_actions,
-            ) as (
-                mock_get_required_actions,
-                mock_register_required_action,
-                mock_update_required_action,
-                mock_delete_required_action,
-            ):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(
+                    get_required_actions=return_value_required_actions,
+                ) as (
+                    mock_get_required_actions,
+                    mock_register_required_action,
+                    mock_update_required_action,
+                    mock_delete_required_action,
+                ):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         # Verify number of call on each mock
         self.assertEqual(len(mock_get_required_actions.mock_calls), 1)
@@ -676,20 +673,19 @@ class TestKeycloakAuthentication(ModuleTestCase):
 
         changed = True
 
-        set_module_args(module_args)
-
         # Run the module
-        with mock_good_connection():
-            with patch_keycloak_api(
-                get_required_actions=return_value_required_actions,
-            ) as (
-                mock_get_required_actions,
-                mock_register_required_action,
-                mock_update_required_action,
-                mock_delete_required_action,
-            ):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(
+                    get_required_actions=return_value_required_actions,
+                ) as (
+                    mock_get_required_actions,
+                    mock_register_required_action,
+                    mock_update_required_action,
+                    mock_delete_required_action,
+                ):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         # Verify number of call on each mock
         self.assertEqual(len(mock_get_required_actions.mock_calls), 1)
@@ -806,20 +802,19 @@ class TestKeycloakAuthentication(ModuleTestCase):
 
         changed = False
 
-        set_module_args(module_args)
-
         # Run the module
-        with mock_good_connection():
-            with patch_keycloak_api(
-                get_required_actions=return_value_required_actions,
-            ) as (
-                mock_get_required_actions,
-                mock_register_required_action,
-                mock_update_required_action,
-                mock_delete_required_action,
-            ):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(
+                    get_required_actions=return_value_required_actions,
+                ) as (
+                    mock_get_required_actions,
+                    mock_register_required_action,
+                    mock_update_required_action,
+                    mock_delete_required_action,
+                ):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         # Verify number of call on each mock
         self.assertEqual(len(mock_get_required_actions.mock_calls), 1)

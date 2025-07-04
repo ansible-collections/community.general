@@ -6,31 +6,31 @@ from __future__ import (absolute_import, division, print_function)
 
 __metaclass__ = type
 
-DOCUMENTATION = """
-    name: bitwarden_secrets_manager
-    author:
-      - jantari (@jantari)
-    requirements:
-      - bws (command line utility)
-    short_description: Retrieve secrets from Bitwarden Secrets Manager
-    version_added: 7.2.0
-    description:
-      - Retrieve secrets from Bitwarden Secrets Manager.
-    options:
-      _terms:
-        description: Secret ID(s) to fetch values for.
-        required: true
-        type: list
-        elements: str
-      bws_access_token:
-        description: The BWS access token to use for this lookup.
-        env:
-          - name: BWS_ACCESS_TOKEN
-        required: true
-        type: str
+DOCUMENTATION = r"""
+name: bitwarden_secrets_manager
+author:
+  - jantari (@jantari)
+requirements:
+  - bws (command line utility)
+short_description: Retrieve secrets from Bitwarden Secrets Manager
+version_added: 7.2.0
+description:
+  - Retrieve secrets from Bitwarden Secrets Manager.
+options:
+  _terms:
+    description: Secret ID(s) to fetch values for.
+    required: true
+    type: list
+    elements: str
+  bws_access_token:
+    description: The BWS access token to use for this lookup.
+    env:
+      - name: BWS_ACCESS_TOKEN
+    required: true
+    type: str
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Get a secret relying on the BWS_ACCESS_TOKEN environment variable for authentication
   ansible.builtin.debug:
     msg: >-
@@ -62,19 +62,22 @@ EXAMPLES = """
       {{ lookup("community.general.bitwarden_secrets_manager", "2bc23e48-4932-40de-a047-5524b7ddc972").value }}
 """
 
-RETURN = """
-  _raw:
-    description: List containing one or more secrets.
-    type: list
-    elements: dict
+RETURN = r"""
+_raw:
+  description: List containing one or more secrets.
+  type: list
+  elements: dict
 """
 
 from subprocess import Popen, PIPE
+from time import sleep
 
 from ansible.errors import AnsibleLookupError
 from ansible.module_utils.common.text.converters import to_text
 from ansible.parsing.ajson import AnsibleJSONDecoder
 from ansible.plugins.lookup import LookupBase
+
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 
 class BitwardenSecretsManagerException(AnsibleLookupError):
@@ -84,16 +87,43 @@ class BitwardenSecretsManagerException(AnsibleLookupError):
 class BitwardenSecretsManager(object):
     def __init__(self, path='bws'):
         self._cli_path = path
+        self._max_retries = 3
+        self._retry_delay = 1
 
     @property
     def cli_path(self):
         return self._cli_path
+
+    def _run_with_retry(self, args, stdin=None, retries=0):
+        out, err, rc = self._run(args, stdin)
+
+        if rc != 0:
+            if retries >= self._max_retries:
+                raise BitwardenSecretsManagerException("Max retries exceeded. Unable to retrieve secret.")
+
+            if "Too many requests" in err:
+                delay = self._retry_delay * (2 ** retries)
+                sleep(delay)
+                return self._run_with_retry(args, stdin, retries + 1)
+            else:
+                raise BitwardenSecretsManagerException(f"Command failed with return code {rc}: {err}")
+
+        return out, err, rc
 
     def _run(self, args, stdin=None):
         p = Popen([self.cli_path] + args, stdout=PIPE, stderr=PIPE, stdin=PIPE)
         out, err = p.communicate(stdin)
         rc = p.wait()
         return to_text(out, errors='surrogate_or_strict'), to_text(err, errors='surrogate_or_strict'), rc
+
+    def get_bws_version(self):
+        """Get the version of the Bitwarden Secrets Manager CLI.
+        """
+        out, err, rc = self._run(['--version'])
+        if rc != 0:
+            raise BitwardenSecretsManagerException(to_text(err))
+        # strip the prefix and grab the last segment, the version number
+        return out.split()[-1]
 
     def get_secret(self, secret_id, bws_access_token):
         """Get and return the secret with the given secret_id.
@@ -103,11 +133,19 @@ class BitwardenSecretsManager(object):
         # Color output was not always disabled correctly with the default 'auto' setting so explicitly disable it.
         params = [
             '--color', 'no',
-            '--access-token', bws_access_token,
-            'get', 'secret', secret_id
+            '--access-token', bws_access_token
         ]
 
-        out, err, rc = self._run(params)
+        # bws version 0.3.0 introduced a breaking change in the command line syntax:
+        # pre-0.3.0: verb noun
+        # 0.3.0 and later: noun verb
+        bws_version = self.get_bws_version()
+        if LooseVersion(bws_version) < LooseVersion('0.3.0'):
+            params.extend(['get', 'secret', secret_id])
+        else:
+            params.extend(['secret', 'get', secret_id])
+
+        out, err, rc = self._run_with_retry(params)
         if rc != 0:
             raise BitwardenSecretsManagerException(to_text(err))
 

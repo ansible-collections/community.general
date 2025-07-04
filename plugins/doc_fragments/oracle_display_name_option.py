@@ -8,10 +8,10 @@ __metaclass__ = type
 
 
 class ModuleDocFragment(object):
-    DOCUMENTATION = """
-    options:
-        display_name:
-            description: Use O(display_name) along with the other options to return only resources that match the given
-                         display name exactly.
-            type: str
-    """
+    DOCUMENTATION = r"""
+options:
+  display_name:
+    description: Use O(display_name) along with the other options to return only resources that match the given display name
+      exactly.
+    type: str
+"""

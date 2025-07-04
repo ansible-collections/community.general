@@ -8,119 +8,106 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: keycloak_group
 
-short_description: Allows administration of Keycloak groups via Keycloak API
+short_description: Allows administration of Keycloak groups using Keycloak API
 
 description:
-    - This module allows you to add, remove or modify Keycloak groups via the Keycloak REST API.
-      It requires access to the REST API via OpenID Connect; the user connecting and the client being
-      used must have the requisite access rights. In a default Keycloak installation, admin-cli
-      and an admin user would work, as would a separate client definition with the scope tailored
-      to your needs and a user having the expected roles.
-
-    - The names of module options are snake_cased versions of the camelCase ones found in the
-      Keycloak API and its documentation at U(https://www.keycloak.org/docs-api/20.0.2/rest-api/index.html).
-
-    - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and will
-      be returned that way by this module. You may pass single values for attributes when calling the module,
-      and this will be translated into a list suitable for the API.
-
-    - When updating a group, where possible provide the group ID to the module. This removes a lookup
-      to the API to translate the name into the group ID.
-
+  - This module allows you to add, remove or modify Keycloak groups using the Keycloak REST API. It requires access to the
+    REST API using OpenID Connect; the user connecting and the client being used must have the requisite access rights. In
+    a default Keycloak installation, admin-cli and an admin user would work, as would a separate client definition with the
+    scope tailored to your needs and a user having the expected roles.
+  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation
+    at U(https://www.keycloak.org/docs-api/20.0.2/rest-api/index.html).
+  - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and will be returned that
+    way by this module. You may pass single values for attributes when calling the module, and this will be translated into
+    a list suitable for the API.
+  - When updating a group, where possible provide the group ID to the module. This removes a lookup to the API to translate
+    the name into the group ID.
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: full
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
+  action_group:
+    version_added: 10.2.0
 
 options:
-    state:
-        description:
-            - State of the group.
-            - On V(present), the group will be created if it does not yet exist, or updated with the parameters you provide.
-            - >-
-              On V(absent), the group will be removed if it exists. Be aware that absenting
-              a group with subgroups will automatically delete all its subgroups too.
-        default: 'present'
+  state:
+    description:
+      - State of the group.
+      - On V(present), the group will be created if it does not yet exist, or updated with the parameters you provide.
+      - On V(absent), the group will be removed if it exists. Be aware that absenting a group with subgroups will automatically
+        delete all its subgroups too.
+    default: 'present'
+    type: str
+    choices:
+      - present
+      - absent
+
+  name:
+    type: str
+    description:
+      - Name of the group.
+      - This parameter is required only when creating or updating the group.
+  realm:
+    type: str
+    description:
+      - They Keycloak realm under which this group resides.
+    default: 'master'
+
+  id:
+    type: str
+    description:
+      - The unique identifier for this group.
+      - This parameter is not required for updating or deleting a group but providing it will reduce the number of API calls
+        required.
+  attributes:
+    type: dict
+    description:
+      - A dict of key/value pairs to set as custom attributes for the group.
+      - Values may be single values (for example a string) or a list of strings.
+  parents:
+    version_added: "6.4.0"
+    type: list
+    description:
+      - List of parent groups for the group to handle sorted top to bottom.
+      - Set this to create a group as a subgroup of another group or groups (parents) or when accessing an existing subgroup
+        by name.
+      - Not necessary to set when accessing an existing subgroup by its C(ID) because in that case the group can be directly
+        queried without necessarily knowing its parent(s).
+    elements: dict
+    suboptions:
+      id:
         type: str
-        choices:
-            - present
-            - absent
-
-    name:
+        description:
+          - Identify parent by ID.
+          - Needs less API calls than using O(parents[].name).
+          - A deep parent chain can be started at any point when first given parent is given as ID.
+          - Note that in principle both ID and name can be specified at the same time but current implementation only always
+            use just one of them, with ID being preferred.
+      name:
         type: str
         description:
-            - Name of the group.
-            - This parameter is required only when creating or updating the group.
-
-    realm:
-        type: str
-        description:
-            - They Keycloak realm under which this group resides.
-        default: 'master'
-
-    id:
-        type: str
-        description:
-            - The unique identifier for this group.
-            - This parameter is not required for updating or deleting a group but
-              providing it will reduce the number of API calls required.
-
-    attributes:
-        type: dict
-        description:
-            - A dict of key/value pairs to set as custom attributes for the group.
-            - Values may be single values (e.g. a string) or a list of strings.
-
-    parents:
-        version_added: "6.4.0"
-        type: list
-        description:
-            - List of parent groups for the group to handle sorted top to bottom.
-            - >-
-              Set this to create a group as a subgroup of another group or groups (parents) or
-              when accessing an existing subgroup by name.
-            - >-
-              Not necessary to set when accessing an existing subgroup by its C(ID) because in
-              that case the group can be directly queried without necessarily knowing its parent(s).
-        elements: dict
-        suboptions:
-          id:
-            type: str
-            description:
-              - Identify parent by ID.
-              - Needs less API calls than using O(parents[].name).
-              - A deep parent chain can be started at any point when first given parent is given as ID.
-              - Note that in principle both ID and name can be specified at the same time
-                but current implementation only always use just one of them, with ID
-                being preferred.
-          name:
-            type: str
-            description:
-              - Identify parent by name.
-              - Needs more internal API calls than using O(parents[].id) to map names to ID's under the hood.
-              - When giving a parent chain with only names it must be complete up to the top.
-              - Note that in principle both ID and name can be specified at the same time
-                but current implementation only always use just one of them, with ID
-                being preferred.
-
+          - Identify parent by name.
+          - Needs more internal API calls than using O(parents[].id) to map names to ID's under the hood.
+          - When giving a parent chain with only names it must be complete up to the top.
+          - Note that in principle both ID and name can be specified at the same time but current implementation only always
+            use just one of them, with ID being preferred.
 notes:
-    - Presently, the RV(end_state.realmRoles), RV(end_state.clientRoles), and RV(end_state.access) attributes returned by the Keycloak API
-      are read-only for groups. This limitation will be removed in a later version of this module.
-
+  - Presently, the RV(end_state.realmRoles), RV(end_state.clientRoles), and RV(end_state.access) attributes returned by the
+    Keycloak API are read-only for groups. This limitation will be removed in a later version of this module.
 extends_documentation_fragment:
-    - community.general.keycloak
-    - community.general.attributes
+  - community.general.keycloak
+  - community.general.keycloak.actiongroup_keycloak
+  - community.general.attributes
 
 author:
-    - Adam Goossens (@adamgoossens)
-'''
+  - Adam Goossens (@adamgoossens)
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a Keycloak group, authentication with credentials
   community.general.keycloak_group:
     name: my-new-kc-group
@@ -188,14 +175,14 @@ EXAMPLES = '''
     auth_password: PASSWORD
     name: my-new_group
     attributes:
-        attrib1: value1
-        attrib2: value2
-        attrib3:
-            - with
-            - numerous
-            - individual
-            - list
-            - items
+      attrib1: value1
+      attrib2: value2
+      attrib3:
+        - with
+        - numerous
+        - individual
+        - list
+        - items
   delegate_to: localhost
 
 - name: Create a Keycloak subgroup of a base group (using parent name)
@@ -255,64 +242,64 @@ EXAMPLES = '''
     parents:
       - id: "{{ result_new_kcgrp_sub.end_state.id }}"
   delegate_to: localhost
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 msg:
-    description: Message as to what action was taken.
-    returned: always
-    type: str
+  description: Message as to what action was taken.
+  returned: always
+  type: str
 
 end_state:
-    description: Representation of the group after module execution (sample is truncated).
-    returned: on success
-    type: complex
-    contains:
-        id:
-            description: GUID that identifies the group.
-            type: str
-            returned: always
-            sample: 23f38145-3195-462c-97e7-97041ccea73e
-        name:
-            description: Name of the group.
-            type: str
-            returned: always
-            sample: grp-test-123
-        attributes:
-            description: Attributes applied to this group.
-            type: dict
-            returned: always
-            sample:
-                attr1: ["val1", "val2", "val3"]
-        path:
-            description: URI path to the group.
-            type: str
-            returned: always
-            sample: /grp-test-123
-        realmRoles:
-            description: An array of the realm-level roles granted to this group.
-            type: list
-            returned: always
-            sample: []
-        subGroups:
-            description: A list of groups that are children of this group. These groups will have the same parameters as
-                         documented here.
-            type: list
-            returned: always
-        clientRoles:
-            description: A list of client-level roles granted to this group.
-            type: list
-            returned: always
-            sample: []
-        access:
-            description: A dict describing the accesses you have to this group based on the credentials used.
-            type: dict
-            returned: always
-            sample:
-                manage: true
-                manageMembership: true
-                view: true
-'''
+  description: Representation of the group after module execution (sample is truncated).
+  returned: on success
+  type: complex
+  contains:
+    id:
+      description: GUID that identifies the group.
+      type: str
+      returned: always
+      sample: 23f38145-3195-462c-97e7-97041ccea73e
+    name:
+      description: Name of the group.
+      type: str
+      returned: always
+      sample: grp-test-123
+    attributes:
+      description: Attributes applied to this group.
+      type: dict
+      returned: always
+      sample:
+        attr1: ["val1", "val2", "val3"]
+    path:
+      description: URI path to the group.
+      type: str
+      returned: always
+      sample: /grp-test-123
+    realmRoles:
+      description: An array of the realm-level roles granted to this group.
+      type: list
+      returned: always
+      sample: []
+    subGroups:
+      description: A list of groups that are children of this group. These groups will have the same parameters as documented
+        here.
+      type: list
+      returned: always
+    clientRoles:
+      description: A list of client-level roles granted to this group.
+      type: list
+      returned: always
+      sample: []
+    access:
+      description: A dict describing the accesses you have to this group based on the credentials used.
+      type: dict
+      returned: always
+      sample:
+        manage: true
+        manageMembership: true
+        view: true
+"""
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
     keycloak_argument_spec, get_token, KeycloakError
@@ -347,8 +334,10 @@ def main():
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True,
                            required_one_of=([['id', 'name'],
-                                             ['token', 'auth_realm', 'auth_username', 'auth_password']]),
-                           required_together=([['auth_realm', 'auth_username', 'auth_password']]))
+                                             ['token', 'auth_realm', 'auth_username', 'auth_password', 'auth_client_id', 'auth_client_secret']]),
+                           required_together=([['auth_username', 'auth_password']]),
+                           required_by={'refresh_token': 'auth_realm'},
+                           )
 
     result = dict(changed=False, msg='', diff={}, group='')
 
@@ -369,7 +358,7 @@ def main():
     parents = module.params.get('parents')
 
     # attributes in Keycloak have their values returned as lists
-    # via the API. attributes is a dict, so we'll transparently convert
+    # using the API. attributes is a dict, so we'll transparently convert
     # the values to lists.
     if attributes is not None:
         for key, val in module.params['attributes'].items():

@@ -8,121 +8,116 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: keycloak_role
 
-short_description: Allows administration of Keycloak roles via Keycloak API
+short_description: Allows administration of Keycloak roles using Keycloak API
 
 version_added: 3.4.0
 
 description:
-    - This module allows you to add, remove or modify Keycloak roles via the Keycloak REST API.
-      It requires access to the REST API via OpenID Connect; the user connecting and the client being
-      used must have the requisite access rights. In a default Keycloak installation, admin-cli
-      and an admin user would work, as would a separate client definition with the scope tailored
-      to your needs and a user having the expected roles.
-
-    - The names of module options are snake_cased versions of the camelCase ones found in the
-      Keycloak API and its documentation at U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html).
-
-    - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and will
-      be returned that way by this module. You may pass single values for attributes when calling the module,
-      and this will be translated into a list suitable for the API.
-
+  - This module allows you to add, remove or modify Keycloak roles using the Keycloak REST API. It requires access to the
+    REST API using OpenID Connect; the user connecting and the client being used must have the requisite access rights. In
+    a default Keycloak installation, admin-cli and an admin user would work, as would a separate client definition with the
+    scope tailored to your needs and a user having the expected roles.
+  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation
+    at U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html).
+  - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and will be returned that
+    way by this module. You may pass single values for attributes when calling the module, and this will be translated into
+    a list suitable for the API.
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: full
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
+  action_group:
+    version_added: 10.2.0
 
 options:
-    state:
-        description:
-            - State of the role.
-            - On V(present), the role will be created if it does not yet exist, or updated with the parameters you provide.
-            - On V(absent), the role will be removed if it exists.
-        default: 'present'
-        type: str
-        choices:
-            - present
-            - absent
+  state:
+    description:
+      - State of the role.
+      - On V(present), the role will be created if it does not yet exist, or updated with the parameters you provide.
+      - On V(absent), the role will be removed if it exists.
+    default: 'present'
+    type: str
+    choices:
+      - present
+      - absent
 
-    name:
+  name:
+    type: str
+    required: true
+    description:
+      - Name of the role.
+      - This parameter is required.
+  description:
+    type: str
+    description:
+      - The role description.
+  realm:
+    type: str
+    description:
+      - The Keycloak realm under which this role resides.
+    default: 'master'
+
+  client_id:
+    type: str
+    description:
+      - If the role is a client role, the client ID under which it resides.
+      - If this parameter is absent, the role is considered a realm role.
+  attributes:
+    type: dict
+    description:
+      - A dict of key/value pairs to set as custom attributes for the role.
+      - Values may be single values (for example a string) or a list of strings.
+  composite:
+    description:
+      - If V(true), the role is a composition of other realm and/or client role.
+    default: false
+    type: bool
+    version_added: 7.1.0
+  composites:
+    description:
+      - List of roles to include to the composite realm role.
+      - If the composite role is a client role, the C(clientId) (not ID of the client) must be specified.
+    default: []
+    type: list
+    elements: dict
+    version_added: 7.1.0
+    suboptions:
+      name:
+        description:
+          - Name of the role. This can be the name of a REALM role or a client role.
         type: str
         required: true
+      client_id:
         description:
-            - Name of the role.
-            - This parameter is required.
-
-    description:
+          - Client ID if the role is a client role. Do not include this option for a REALM role.
+          - Use the client ID you can see in the Keycloak console, not the technical ID of the client.
         type: str
+        required: false
+        aliases:
+          - clientId
+      state:
         description:
-            - The role description.
-
-    realm:
+          - Create the composite if present, remove it if absent.
         type: str
-        description:
-            - The Keycloak realm under which this role resides.
-        default: 'master'
-
-    client_id:
-        type: str
-        description:
-            - If the role is a client role, the client id under which it resides.
-            - If this parameter is absent, the role is considered a realm role.
-
-    attributes:
-        type: dict
-        description:
-            - A dict of key/value pairs to set as custom attributes for the role.
-            - Values may be single values (e.g. a string) or a list of strings.
-    composite:
-        description:
-            - If V(true), the role is a composition of other realm and/or client role.
-        default: false
-        type: bool
-        version_added: 7.1.0
-    composites:
-        description:
-            - List of roles to include to the composite realm role.
-            - If the composite role is a client role, the C(clientId) (not ID of the client) must be specified.
-        default: []
-        type: list
-        elements: dict
-        version_added: 7.1.0
-        suboptions:
-            name:
-                description:
-                    - Name of the role. This can be the name of a REALM role or a client role.
-                type: str
-                required: true
-            client_id:
-                description:
-                    - Client ID if the role is a client role. Do not include this option for a REALM role.
-                    - Use the client ID you can see in the Keycloak console, not the technical ID of the client.
-                type: str
-                required: false
-                aliases:
-                    - clientId
-            state:
-                description:
-                    - Create the composite if present, remove it if absent.
-                type: str
-                choices:
-                    - present
-                    - absent
-                default: present
+        choices:
+          - present
+          - absent
+        default: present
 
 extends_documentation_fragment:
-    - community.general.keycloak
-    - community.general.attributes
+  - community.general.keycloak
+  - community.general.keycloak.actiongroup_keycloak
+  - community.general.attributes
 
 author:
-    - Laurent Paumier (@laurpaum)
-'''
+  - Laurent Paumier (@laurpaum)
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a Keycloak realm role, authentication with credentials
   community.general.keycloak_role:
     name: my-new-kc-role
@@ -178,60 +173,63 @@ EXAMPLES = '''
     auth_password: PASSWORD
     name: my-new-role
     attributes:
-        attrib1: value1
-        attrib2: value2
-        attrib3:
-            - with
-            - numerous
-            - individual
-            - list
-            - items
+      attrib1: value1
+      attrib2: value2
+      attrib3:
+        - with
+        - numerous
+        - individual
+        - list
+        - items
   delegate_to: localhost
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 msg:
-    description: Message as to what action was taken.
-    returned: always
-    type: str
-    sample: "Role myrole has been updated"
+  description: Message as to what action was taken.
+  returned: always
+  type: str
+  sample: "Role myrole has been updated"
 
 proposed:
-    description: Representation of proposed role.
-    returned: always
-    type: dict
-    sample: {
-        "description": "My updated test description"
+  description: Representation of proposed role.
+  returned: always
+  type: dict
+  sample:
+    {
+      "description": "My updated test description"
     }
 
 existing:
-    description: Representation of existing role.
-    returned: always
-    type: dict
-    sample: {
-        "attributes": {},
-        "clientRole": true,
-        "composite": false,
-        "containerId": "9f03eb61-a826-4771-a9fd-930e06d2d36a",
-        "description": "My client test role",
-        "id": "561703dd-0f38-45ff-9a5a-0c978f794547",
-        "name": "myrole"
+  description: Representation of existing role.
+  returned: always
+  type: dict
+  sample:
+    {
+      "attributes": {},
+      "clientRole": true,
+      "composite": false,
+      "containerId": "9f03eb61-a826-4771-a9fd-930e06d2d36a",
+      "description": "My client test role",
+      "id": "561703dd-0f38-45ff-9a5a-0c978f794547",
+      "name": "myrole"
     }
 
 end_state:
-    description: Representation of role after module execution (sample is truncated).
-    returned: on success
-    type: dict
-    sample: {
-        "attributes": {},
-        "clientRole": true,
-        "composite": false,
-        "containerId": "9f03eb61-a826-4771-a9fd-930e06d2d36a",
-        "description": "My updated client test role",
-        "id": "561703dd-0f38-45ff-9a5a-0c978f794547",
-        "name": "myrole"
+  description: Representation of role after module execution (sample is truncated).
+  returned: on success
+  type: dict
+  sample:
+    {
+      "attributes": {},
+      "clientRole": true,
+      "composite": false,
+      "containerId": "9f03eb61-a826-4771-a9fd-930e06d2d36a",
+      "description": "My updated client test role",
+      "id": "561703dd-0f38-45ff-9a5a-0c978f794547",
+      "name": "myrole"
     }
-'''
+"""
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
     keycloak_argument_spec, get_token, KeycloakError, is_struct_included
@@ -268,8 +266,10 @@ def main():
 
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True,
-                           required_one_of=([['token', 'auth_realm', 'auth_username', 'auth_password']]),
-                           required_together=([['auth_realm', 'auth_username', 'auth_password']]))
+                           required_one_of=([['token', 'auth_realm', 'auth_username', 'auth_password', 'auth_client_id', 'auth_client_secret']]),
+                           required_together=([['auth_username', 'auth_password']]),
+                           required_by={'refresh_token': 'auth_realm'},
+                           )
 
     result = dict(changed=False, msg='', diff={}, proposed={}, existing={}, end_state={})
 
@@ -287,7 +287,7 @@ def main():
     state = module.params.get('state')
 
     # attributes in Keycloak have their values returned as lists
-    # via the API. attributes is a dict, so we'll transparently convert
+    # using the API. attributes is a dict, so we'll transparently convert
     # the values to lists.
     if module.params.get('attributes') is not None:
         for key, val in module.params['attributes'].items():

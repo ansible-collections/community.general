@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: nictagadm
 short_description: Manage nic tags on SmartOS systems
 description:
@@ -26,39 +25,39 @@ attributes:
 options:
   name:
     description:
-    - Name of the nic tag.
+      - Name of the nic tag.
     required: true
     type: str
   mac:
     description:
-    - Specifies the O(mac) address to attach the nic tag to when not creating an O(etherstub).
-    - Parameters O(mac) and O(etherstub) are mutually exclusive.
+      - Specifies the O(mac) address to attach the nic tag to when not creating an O(etherstub).
+      - Parameters O(mac) and O(etherstub) are mutually exclusive.
     type: str
   etherstub:
     description:
-    - Specifies that the nic tag will be attached to a created O(etherstub).
-    - Parameter O(etherstub) is mutually exclusive with both O(mtu), and O(mac).
+      - Specifies that the nic tag will be attached to a created O(etherstub).
+      - Parameter O(etherstub) is mutually exclusive with both O(mtu), and O(mac).
     type: bool
     default: false
   mtu:
     description:
-    - Specifies the size of the O(mtu) of the desired nic tag.
-    - Parameters O(mtu) and O(etherstub) are mutually exclusive.
+      - Specifies the size of the O(mtu) of the desired nic tag.
+      - Parameters O(mtu) and O(etherstub) are mutually exclusive.
     type: int
   force:
     description:
-    - When O(state=absent) this switch will use the C(-f) parameter and delete the nic tag regardless of existing VMs.
+      - When O(state=absent) this switch will use the C(-f) parameter and delete the nic tag regardless of existing VMs.
     type: bool
     default: false
   state:
     description:
-    - Create or delete a SmartOS nic tag.
+      - Create or delete a SmartOS nic tag.
     type: str
-    choices: [ absent, present ]
+    choices: [absent, present]
     default: present
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Create 'storage0' on '00:1b:21:a3:f5:4d'
   community.general.nictagadm:
     name: storage0
@@ -70,11 +69,11 @@ EXAMPLES = r'''
   community.general.nictagadm:
     name: storage0
     state: absent
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 name:
-  description: nic tag name
+  description: Nic tag name.
   returned: always
   type: str
   sample: storage0
@@ -84,26 +83,26 @@ mac:
   type: str
   sample: 00:1b:21:a3:f5:4d
 etherstub:
-  description: specifies if the nic tag will create and attach to an etherstub.
+  description: Specifies if the nic tag will create and attach to an etherstub.
   returned: always
   type: bool
   sample: false
 mtu:
-  description: specifies which MTU size was passed during the nictagadm add command. mtu and etherstub are mutually exclusive.
+  description: Specifies which MTU size was passed during the nictagadm add command. mtu and etherstub are mutually exclusive.
   returned: always
   type: int
   sample: 1500
 force:
-  description: Shows if -f was used during the deletion of a nic tag
+  description: Shows if -f was used during the deletion of a nic tag.
   returned: always
   type: bool
   sample: false
 state:
-  description: state of the target
+  description: State of the target.
   returned: always
   type: str
   sample: present
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.network import is_mac

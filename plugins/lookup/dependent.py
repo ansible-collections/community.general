@@ -6,31 +6,30 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = """
+DOCUMENTATION = r"""
 name: dependent
 short_description: Composes a list with nested elements of other lists or dicts which can depend on previous loop variables
 author: Felix Fontein (@felixfontein)
 version_added: 3.1.0
 description:
-  - "Takes the input lists and returns a list with elements that are lists, dictionaries,
-     or template expressions which evaluate to lists or dicts, composed of the elements of
-     the input evaluated lists and dictionaries."
+  - Takes the input lists and returns a list with elements that are lists, dictionaries, or template expressions which evaluate
+    to lists or dicts, composed of the elements of the input evaluated lists and dictionaries.
 options:
   _terms:
     description:
-      - A list where the elements are one-element dictionaries, mapping a name to a string, list, or dictionary.
-        The name is the index that is used in the result object. The value is iterated over as described below.
+      - A list where the elements are one-element dictionaries, mapping a name to a string, list, or dictionary. The name
+        is the index that is used in the result object. The value is iterated over as described below.
       - If the value is a list, it is simply iterated over.
-      - If the value is a dictionary, it is iterated over and returned as if they would be processed by the
-        P(ansible.builtin.dict2items#filter) filter.
-      - If the value is a string, it is evaluated as Jinja2 expressions which can access the previously chosen
-        elements with C(item.<index_name>). The result must be a list or a dictionary.
+      - If the value is a dictionary, it is iterated over and returned as if they would be processed by the P(ansible.builtin.dict2items#filter)
+        filter.
+      - If the value is a string, it is evaluated as Jinja2 expressions which can access the previously chosen elements with
+        C(item.<index_name>). The result must be a list or a dictionary.
     type: list
     elements: dict
     required: true
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Install/remove public keys for active admin users
   ansible.posix.authorized_key:
     user: "{{ item.admin.key }}"
@@ -76,9 +75,9 @@ EXAMPLES = """
   loop_control:
     # Makes the output readable, so that it doesn't contain the whole subdictionaries and lists
     label: |-
-        {{ [item.zone.key, item.prefix.key, item.entry.key,
-            item.entry.value.ttl | default(3600),
-            item.entry.value.absent | default(False), item.entry.value.value] }}
+      {{ [item.zone.key, item.prefix.key, item.entry.key,
+          item.entry.value.ttl | default(3600),
+          item.entry.value.absent | default(False), item.entry.value.value] }}
   with_community.general.dependent:
     - zone: dns_setup
     - prefix: item.zone.value
@@ -89,51 +88,55 @@ EXAMPLES = """
         '':
           A:
             value:
-            - 1.2.3.4
+              - 1.2.3.4
           AAAA:
             value:
-            - "2a01:1:2:3::1"
+              - "2a01:1:2:3::1"
         'test._domainkey':
           TXT:
             ttl: 300
             value:
-            - '"k=rsa; t=s; p=MIGfMA..."'
+              - '"k=rsa; t=s; p=MIGfMA..."'
       example.org:
         'www':
           A:
             value:
-            - 1.2.3.4
-            - 5.6.7.8
+              - 1.2.3.4
+              - 5.6.7.8
 """
 
-RETURN = """
-  _list:
-    description:
-      - A list composed of dictionaries whose keys are the variable names from the input list.
-    type: list
-    elements: dict
-    sample:
-      - key1: a
-        key2: test
-      - key1: a
-        key2: foo
-      - key1: b
-        key2: bar
+RETURN = r"""
+_list:
+  description:
+    - A list composed of dictionaries whose keys are the variable names from the input list.
+  type: list
+  elements: dict
+  sample:
+    - key1: a
+      key2: test
+    - key1: a
+      key2: foo
+    - key1: b
+      key2: bar
 """
 
 from ansible.errors import AnsibleLookupError
 from ansible.module_utils.common._collections_compat import Mapping, Sequence
 from ansible.module_utils.six import string_types
 from ansible.plugins.lookup import LookupBase
-from ansible.release import __version__ as ansible_version
 from ansible.template import Templar
 
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+try:
+    from ansible.template import trust_as_template as _trust_as_template
+    HAS_DATATAGGING = True
+except ImportError:
+    HAS_DATATAGGING = False
 
 
-# Whether Templar has a cache, which can be controlled by Templar.template()'s cache option.
-# The cache was removed for ansible-core 2.14 (https://github.com/ansible/ansible/pull/78419)
-_TEMPLAR_HAS_TEMPLATE_CACHE = LooseVersion(ansible_version) < LooseVersion('2.14.0')
+def _make_safe(value):
+    if HAS_DATATAGGING and isinstance(value, str):
+        return _trust_as_template(value)
+    return value
 
 
 class LookupModule(LookupBase):
@@ -144,10 +147,11 @@ class LookupModule(LookupBase):
         ``variables`` are the variables to use.
         """
         templar.available_variables = variables or {}
-        expression = "{0}{1}{2}".format("{{", expression, "}}")
-        if _TEMPLAR_HAS_TEMPLATE_CACHE:
-            return templar.template(expression, cache=False)
-        return templar.template(expression)
+        quoted_expression = "{0}{1}{2}".format("{{", expression, "}}")
+        if hasattr(templar, 'evaluate_expression'):
+            # This is available since the Data Tagging PR has been merged
+            return templar.evaluate_expression(_make_safe(expression))
+        return templar.template(quoted_expression)
 
     def __process(self, result, terms, index, current, templar, variables):
         """Fills ``result`` list with evaluated items.
@@ -173,8 +177,7 @@ class LookupModule(LookupBase):
                 values = self.__evaluate(expression, templar, variables=vars)
             except Exception as e:
                 raise AnsibleLookupError(
-                    'Caught "{error}" while evaluating {key!r} with item == {item!r}'.format(
-                        error=e, key=key, item=current))
+                    f'Caught "{e}" while evaluating {key!r} with item == {current!r}')
 
         if isinstance(values, Mapping):
             for idx, val in sorted(values.items()):
@@ -186,8 +189,7 @@ class LookupModule(LookupBase):
                 self.__process(result, terms, index + 1, current, templar, variables)
         else:
             raise AnsibleLookupError(
-                'Did not obtain dictionary or list while evaluating {key!r} with item == {item!r}, but {type}'.format(
-                    key=key, item=current, type=type(values)))
+                f'Did not obtain dictionary or list while evaluating {key!r} with item == {current!r}, but {type(values)}')
 
     def run(self, terms, variables=None, **kwargs):
         """Generate list."""
@@ -201,16 +203,14 @@ class LookupModule(LookupBase):
             for index, term in enumerate(terms):
                 if not isinstance(term, Mapping):
                     raise AnsibleLookupError(
-                        'Parameter {index} must be a dictionary, got {type}'.format(
-                            index=index, type=type(term)))
+                        f'Parameter {index} must be a dictionary, got {type(term)}')
                 if len(term) != 1:
                     raise AnsibleLookupError(
-                        'Parameter {index} must be a one-element dictionary, got {count} elements'.format(
-                            index=index, count=len(term)))
+                        f'Parameter {index} must be a one-element dictionary, got {len(term)} elements')
                 k, v = list(term.items())[0]
                 if k in vars_so_far:
                     raise AnsibleLookupError(
-                        'The variable {key!r} appears more than once'.format(key=k))
+                        f'The variable {k!r} appears more than once')
                 vars_so_far.add(k)
                 if isinstance(v, string_types):
                     data.append((k, v, None))
@@ -218,7 +218,6 @@ class LookupModule(LookupBase):
                     data.append((k, None, v))
                 else:
                     raise AnsibleLookupError(
-                        'Parameter {key!r} (index {index}) must have a value of type string, dictionary or list, got type {type}'.format(
-                            index=index, key=k, type=type(v)))
+                        f'Parameter {k!r} (index {index}) must have a value of type string, dictionary or list, got type {type(v)}')
             self.__process(result, data, 0, {}, templar, variables)
         return result

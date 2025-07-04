@@ -7,8 +7,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: keycloak_user_rolemapping
 
 short_description: Allows administration of Keycloak user_rolemapping with the Keycloak API
@@ -16,107 +15,99 @@ short_description: Allows administration of Keycloak user_rolemapping with the K
 version_added: 5.7.0
 
 description:
-    - This module allows you to add, remove or modify Keycloak user_rolemapping with the Keycloak REST API.
-      It requires access to the REST API via OpenID Connect; the user connecting and the client being
-      used must have the requisite access rights. In a default Keycloak installation, admin-cli
-      and an admin user would work, as would a separate client definition with the scope tailored
-      to your needs and a user having the expected roles.
-
-    - The names of module options are snake_cased versions of the camelCase ones found in the
-      Keycloak API and its documentation at U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html).
-
-    - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and will
-      be returned that way by this module. You may pass single values for attributes when calling the module,
-      and this will be translated into a list suitable for the API.
-
-    - When updating a user_rolemapping, where possible provide the role ID to the module. This removes a lookup
-      to the API to translate the name into the role ID.
-
+  - This module allows you to add, remove or modify Keycloak user_rolemapping with the Keycloak REST API. It requires access
+    to the REST API using OpenID Connect; the user connecting and the client being used must have the requisite access rights.
+    In a default Keycloak installation, admin-cli and an admin user would work, as would a separate client definition with
+    the scope tailored to your needs and a user having the expected roles.
+  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation
+    at U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html).
+  - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and will be returned that
+    way by this module. You may pass single values for attributes when calling the module, and this will be translated into
+    a list suitable for the API.
+  - When updating a user_rolemapping, where possible provide the role ID to the module. This removes a lookup to the API to
+    translate the name into the role ID.
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: full
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
+  action_group:
+    version_added: 10.2.0
 
 options:
-    state:
-        description:
-            - State of the user_rolemapping.
-            - On V(present), the user_rolemapping will be created if it does not yet exist, or updated with the parameters you provide.
-            - On V(absent), the user_rolemapping will be removed if it exists.
-        default: 'present'
+  state:
+    description:
+      - State of the user_rolemapping.
+      - On V(present), the user_rolemapping will be created if it does not yet exist, or updated with the parameters you provide.
+      - On V(absent), the user_rolemapping will be removed if it exists.
+    default: 'present'
+    type: str
+    choices:
+      - present
+      - absent
+
+  realm:
+    type: str
+    description:
+      - They Keycloak realm under which this role_representation resides.
+    default: 'master'
+
+  target_username:
+    type: str
+    description:
+      - Username of the user roles are mapped to.
+      - This parameter is not required (can be replaced by uid for less API call).
+  uid:
+    type: str
+    description:
+      - ID of the user to be mapped.
+      - This parameter is not required for updating or deleting the rolemapping but providing it will reduce the number of
+        API calls required.
+  service_account_user_client_id:
+    type: str
+    description:
+      - Client ID of the service-account-user to be mapped.
+      - This parameter is not required for updating or deleting the rolemapping but providing it will reduce the number of
+        API calls required.
+  client_id:
+    type: str
+    description:
+      - Name of the client to be mapped (different than O(cid)).
+      - This parameter is required if O(cid) is not provided (can be replaced by O(cid) to reduce the number of API calls
+        that must be made).
+  cid:
+    type: str
+    description:
+      - ID of the client to be mapped.
+      - This parameter is not required for updating or deleting the rolemapping but providing it will reduce the number of
+        API calls required.
+  roles:
+    description:
+      - Roles to be mapped to the user.
+    type: list
+    elements: dict
+    suboptions:
+      name:
         type: str
-        choices:
-            - present
-            - absent
-
-    realm:
+        description:
+          - Name of the role representation.
+          - This parameter is required only when creating or updating the role_representation.
+      id:
         type: str
         description:
-            - They Keycloak realm under which this role_representation resides.
-        default: 'master'
-
-    target_username:
-        type: str
-        description:
-            - Username of the user roles are mapped to.
-            - This parameter is not required (can be replaced by uid for less API call).
-
-    uid:
-        type: str
-        description:
-            - ID of the user to be mapped.
-            - This parameter is not required for updating or deleting the rolemapping but
-              providing it will reduce the number of API calls required.
-
-    service_account_user_client_id:
-        type: str
-        description:
-            - Client ID of the service-account-user to be mapped.
-            - This parameter is not required for updating or deleting the rolemapping but
-              providing it will reduce the number of API calls required.
-
-    client_id:
-        type: str
-        description:
-            - Name of the client to be mapped (different than O(cid)).
-            - This parameter is required if O(cid) is not provided (can be replaced by O(cid)
-              to reduce the number of API calls that must be made).
-
-    cid:
-        type: str
-        description:
-            - ID of the client to be mapped.
-            - This parameter is not required for updating or deleting the rolemapping but
-              providing it will reduce the number of API calls required.
-
-    roles:
-        description:
-            - Roles to be mapped to the user.
-        type: list
-        elements: dict
-        suboptions:
-            name:
-                type: str
-                description:
-                    - Name of the role representation.
-                    - This parameter is required only when creating or updating the role_representation.
-            id:
-                type: str
-                description:
-                    - The unique identifier for this role_representation.
-                    - This parameter is not required for updating or deleting a role_representation but
-                      providing it will reduce the number of API calls required.
-
+          - The unique identifier for this role_representation.
+          - This parameter is not required for updating or deleting a role_representation but providing it will reduce the
+            number of API calls required.
 extends_documentation_fragment:
-    - community.general.keycloak
-    - community.general.attributes
+  - community.general.keycloak
+  - community.general.keycloak.actiongroup_keycloak
+  - community.general.attributes
 
 author:
-    - Dušan Marković (@bratwurzt)
-'''
+  - Dušan Marković (@bratwurzt)
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Map a client role to a user, authentication with credentials
   community.general.keycloak_user_rolemapping:
     realm: MyCustomRealm
@@ -186,49 +177,37 @@ EXAMPLES = '''
       - name: role_name2
         id: role_id2
   delegate_to: localhost
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 msg:
-    description: Message as to what action was taken.
-    returned: always
-    type: str
-    sample: "Role role1 assigned to user user1."
+  description: Message as to what action was taken.
+  returned: always
+  type: str
+  sample: "Role role1 assigned to user user1."
 
 proposed:
-    description: Representation of proposed client role mapping.
-    returned: always
-    type: dict
-    sample: {
-      clientId: "test"
-    }
+  description: Representation of proposed client role mapping.
+  returned: always
+  type: dict
+  sample: {clientId: "test"}
 
 existing:
-    description:
-      - Representation of existing client role mapping.
-      - The sample is truncated.
-    returned: always
-    type: dict
-    sample: {
-        "adminUrl": "http://www.example.com/admin_url",
-        "attributes": {
-            "request.object.signature.alg": "RS256",
-        }
-    }
+  description:
+    - Representation of existing client role mapping.
+    - The sample is truncated.
+  returned: always
+  type: dict
+  sample: {"adminUrl": "http://www.example.com/admin_url", "attributes": {"request.object.signature.alg": "RS256"}}
 
 end_state:
-    description:
-      - Representation of client role mapping after module execution.
-      - The sample is truncated.
-    returned: on success
-    type: dict
-    sample: {
-        "adminUrl": "http://www.example.com/admin_url",
-        "attributes": {
-            "request.object.signature.alg": "RS256",
-        }
-    }
-'''
+  description:
+    - Representation of client role mapping after module execution.
+    - The sample is truncated.
+  returned: on success
+  type: dict
+  sample: {"adminUrl": "http://www.example.com/admin_url", "attributes": {"request.object.signature.alg": "RS256"}}
+"""
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, \
     keycloak_argument_spec, get_token, KeycloakError
@@ -263,9 +242,11 @@ def main():
 
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True,
-                           required_one_of=([['token', 'auth_realm', 'auth_username', 'auth_password'],
+                           required_one_of=([['token', 'auth_realm', 'auth_username', 'auth_password', 'auth_client_id', 'auth_client_secret'],
                                              ['uid', 'target_username', 'service_account_user_client_id']]),
-                           required_together=([['auth_realm', 'auth_username', 'auth_password']]))
+                           required_together=([['auth_username', 'auth_password']]),
+                           required_by={'refresh_token': 'auth_realm'},
+                           )
 
     result = dict(changed=False, msg='', diff={}, proposed={}, existing={}, end_state={})
 
@@ -369,7 +350,7 @@ def main():
             # Assign roles
             result['changed'] = True
             if module._diff:
-                result['diff'] = dict(before=assigned_roles_before, after=update_roles)
+                result['diff'] = dict(before={"roles": assigned_roles_before}, after={"roles": update_roles})
             if module.check_mode:
                 module.exit_json(**result)
             kc.add_user_rolemapping(uid=uid, cid=cid, role_rep=update_roles, realm=realm)
@@ -384,7 +365,7 @@ def main():
             # Remove mapping of role
             result['changed'] = True
             if module._diff:
-                result['diff'] = dict(before=assigned_roles_before, after=update_roles)
+                result['diff'] = dict(before={"roles": assigned_roles_before}, after={"roles": update_roles})
             if module.check_mode:
                 module.exit_json(**result)
             kc.delete_user_rolemapping(uid=uid, cid=cid, role_rep=update_roles, realm=realm)

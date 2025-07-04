@@ -1,0 +1,145 @@
+---
+# Copyright (c) Stanislav Meduna (@numo68)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+DOCUMENTATION:
+  name: json_patch
+  short_description: Apply a JSON-Patch (RFC 6902) operation to an object
+  description:
+    - This filter applies a single JSON patch operation and returns a modified object.
+    - If the operation is a test, the filter returns an ummodified object if the test
+      succeeded and a V(none) value otherwise.
+  requirements:
+    - jsonpatch
+  version_added: 10.3.0
+  author:
+    - Stanislav Meduna (@numo68)
+  positional: op, path, value
+  options:
+    _input:
+      description: A list or a dictionary representing a JSON object, or a string containing a JSON object.
+      type: raw
+      required: true
+    op:
+      description: Operation to perform (see L(RFC 6902, https://datatracker.ietf.org/doc/html/rfc6902)).
+      type: str
+      choices: [add, copy, move, remove, replace, test]
+      required: true
+    path:
+      description: JSON Pointer path to the target location (see L(RFC 6901, https://datatracker.ietf.org/doc/html/rfc6901)).
+      type: str
+      required: true
+    value:
+      description: Value to use in the operation. Ignored for O(op=copy), O(op=move), and O(op=remove).
+      type: raw
+    from:
+      description: The source location for the copy and move operation. Mandatory
+        for O(op=copy) and O(op=move), ignored otherwise.
+      type: str
+    fail_test:
+      description: If V(false), a failed O(op=test) will return V(none). If V(true), the filter
+        invocation will fail with an error.
+      type: bool
+      default: false
+  seealso:
+    - name: RFC 6902
+      description: JavaScript Object Notation (JSON) Patch
+      link: https://datatracker.ietf.org/doc/html/rfc6902
+    - name: RFC 6901
+      description: JavaScript Object Notation (JSON) Pointer
+      link: https://datatracker.ietf.org/doc/html/rfc6901
+    - name: jsonpatch Python Package
+      description: A Python library for applying JSON patches
+      link: https://pypi.org/project/jsonpatch/
+
+RETURN:
+  _value:
+    description: A modified object or V(none) if O(op=test), O(fail_test=false) and the test failed.
+    type: any
+    returned: always
+
+EXAMPLES: |
+  - name: Insert a new element into an array at a specified index
+    ansible.builtin.debug:
+      msg: "{{ input | community.general.json_patch('add', '/1', {'baz': 'qux'}) }}"
+    vars:
+      input: ["foo": { "one": 1 }, "bar": { "two": 2 }]
+    # => [{"foo": {"one": 1}}, {"baz": "qux"}, {"bar": {"two": 2}}]
+
+  - name: Insert a new key into a dictionary
+    ansible.builtin.debug:
+      msg: "{{ input | community.general.json_patch('add', '/bar/baz', 'qux') }}"
+    vars:
+      input: { "foo": { "one": 1 }, "bar": { "two": 2 } }
+    # => {"foo": {"one": 1}, "bar": {"baz": "qux", "two": 2}}
+
+  - name: Input is a string
+    ansible.builtin.debug:
+      msg: "{{ input | community.general.json_patch('add', '/baz', 3) }}"
+    vars:
+      input: '{ "foo": { "one": 1 }, "bar": { "two": 2 } }'
+    # => {"foo": {"one": 1}, "bar": { "two": 2 }, "baz": 3}
+
+  - name: Existing key is replaced
+    ansible.builtin.debug:
+      msg: "{{ input | community.general.json_patch('add', '/bar', 'qux') }}"
+    vars:
+      input: { "foo": { "one": 1 }, "bar": { "two": 2 } }
+    # => {"foo": {"one": 1}, "bar": "qux"}
+
+  - name: Escaping tilde as ~0 and slash as ~1 in the path
+    ansible.builtin.debug:
+      msg: "{{ input | community.general.json_patch('add', '/~0~1', 'qux') }}"
+    vars:
+      input: {}
+    # => {"~/": "qux"}
+
+  - name: Add at the end of the array
+    ansible.builtin.debug:
+      msg: "{{ input | community.general.json_patch('add', '/-', 4) }}"
+    vars:
+      input: [1, 2, 3]
+    # => [1, 2, 3, 4]
+
+  - name: Remove a key
+    ansible.builtin.debug:
+      msg: "{{ input | community.general.json_patch('remove', '/bar') }}"
+    vars:
+      input: { "foo": { "one": 1 }, "bar": { "two": 2 } }
+    # => {"foo": {"one": 1} }
+
+  - name: Replace a value
+    ansible.builtin.debug:
+      msg: "{{ input | community.general.json_patch('replace', '/bar', 2) }}"
+    vars:
+      input: { "foo": { "one": 1 }, "bar": { "two": 2 } }
+    # => {"foo": {"one": 1}, "bar": 2}
+
+  - name: Copy a value
+    ansible.builtin.debug:
+      msg: "{{ input | community.general.json_patch('copy', '/baz', from='/bar') }}"
+    vars:
+      input: { "foo": { "one": 1 }, "bar": { "two": 2 } }
+    # => {"foo": {"one": 1}, "bar": { "two": 2 }, "baz": { "two": 2 }}
+
+  - name: Move a value
+    ansible.builtin.debug:
+      msg: "{{ input | community.general.json_patch('move', '/baz', from='/bar') }}"
+    vars:
+      input: { "foo": { "one": 1 }, "bar": { "two": 2 } }
+    # => {"foo": {"one": 1}, "baz": { "two": 2 }}
+
+  - name: Successful test
+    ansible.builtin.debug:
+      msg: "{{ input | community.general.json_patch('test', '/bar/two', 2) | ternary('OK', 'Failed') }}"
+    vars:
+      input: { "foo": { "one": 1 }, "bar": { "two": 2 } }
+    # => OK
+
+  - name: Unuccessful test
+    ansible.builtin.debug:
+      msg: "{{ input | community.general.json_patch('test', '/bar/two', 9) | ternary('OK', 'Failed') }}"
+    vars:
+      input: { "foo": { "one": 1 }, "bar": { "two": 2 } }
+    # => Failed

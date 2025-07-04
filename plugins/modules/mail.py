@@ -9,27 +9,21 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 author:
-- Dag Wieers (@dagwieers)
+  - Dag Wieers (@dagwieers)
 module: mail
 short_description: Send an email
 description:
-- This module is useful for sending emails from playbooks.
-- One may wonder why automate sending emails?  In complex environments
-  there are from time to time processes that cannot be automated, either
-  because you lack the authority to make it so, or because not everyone
-  agrees to a common approach.
-- If you cannot automate a specific step, but the step is non-blocking,
-  sending out an email to the responsible party to make them perform their
-  part of the bargain is an elegant way to put the responsibility in
-  someone else's lap.
-- Of course sending out a mail can be equally useful as a way to notify
-  one or more people in a team that a specific action has been
-  (successfully) taken.
+  - This module is useful for sending emails from playbooks.
+  - One may wonder why automate sending emails? In complex environments there are from time to time processes that cannot
+    be automated, either because you lack the authority to make it so, or because not everyone agrees to a common approach.
+  - If you cannot automate a specific step, but the step is non-blocking, sending out an email to the responsible party to
+    make them perform their part of the bargain is an elegant way to put the responsibility in someone else's lap.
+  - Of course sending out a mail can be equally useful as a way to notify one or more people in a team that a specific action
+    has been (successfully) taken.
 extends_documentation_fragment:
-- community.general.attributes
+  - community.general.attributes
 attributes:
   check_mode:
     support: none
@@ -38,111 +32,118 @@ attributes:
 options:
   sender:
     description:
-    - The email-address the mail is sent from. May contain address and phrase.
+      - The email-address the mail is sent from. May contain address and phrase.
     type: str
     default: root
-    aliases: [ from ]
+    aliases: [from]
   to:
     description:
-    - The email-address(es) the mail is being sent to.
-    - This is a list, which may contain address and phrase portions.
+      - The email-address(es) the mail is being sent to.
+      - This is a list, which may contain address and phrase portions.
     type: list
     elements: str
     default: root
-    aliases: [ recipients ]
+    aliases: [recipients]
   cc:
     description:
-    - The email-address(es) the mail is being copied to.
-    - This is a list, which may contain address and phrase portions.
+      - The email-address(es) the mail is being copied to.
+      - This is a list, which may contain address and phrase portions.
     type: list
     elements: str
     default: []
   bcc:
     description:
-    - The email-address(es) the mail is being 'blind' copied to.
-    - This is a list, which may contain address and phrase portions.
+      - The email-address(es) the mail is being 'blind' copied to.
+      - This is a list, which may contain address and phrase portions.
     type: list
     elements: str
     default: []
   subject:
     description:
-    - The subject of the email being sent.
+      - The subject of the email being sent.
     required: true
     type: str
-    aliases: [ msg ]
+    aliases: [msg]
   body:
     description:
-    - The body of the email being sent.
+      - The body of the email being sent.
     type: str
   username:
     description:
-    - If SMTP requires username.
+      - If SMTP requires username.
     type: str
   password:
     description:
-    - If SMTP requires password.
+      - If SMTP requires password.
     type: str
   host:
     description:
-    - The mail server.
+      - The mail server.
     type: str
     default: localhost
   port:
     description:
-    - The mail server port.
-    - This must be a valid integer between 1 and 65534
+      - The mail server port.
+      - This must be a valid integer between V(1) and V(65534).
     type: int
     default: 25
   attach:
     description:
-    - A list of pathnames of files to attach to the message.
-    - Attached files will have their content-type set to C(application/octet-stream).
+      - A list of pathnames of files to attach to the message.
+      - Attached files will have their content-type set to C(application/octet-stream).
     type: list
     elements: path
     default: []
   headers:
     description:
-    - A list of headers which should be added to the message.
-    - Each individual header is specified as C(header=value) (see example below).
+      - A list of headers which should be added to the message.
+      - Each individual header is specified as V(header=value) (see example below).
     type: list
     elements: str
     default: []
   charset:
     description:
-    - The character set of email being sent.
+      - The character set of email being sent.
     type: str
     default: utf-8
   subtype:
     description:
-    - The minor mime type, can be either V(plain) or V(html).
-    - The major type is always V(text).
+      - The minor mime type, can be either V(plain) or V(html).
+      - The major type is always V(text).
     type: str
-    choices: [ html, plain ]
+    choices: [html, plain]
     default: plain
   secure:
     description:
-    - If V(always), the connection will only send email if the connection is Encrypted.
-      If the server doesn't accept the encrypted connection it will fail.
-    - If V(try), the connection will attempt to setup a secure SSL/TLS session, before trying to send.
-    - If V(never), the connection will not attempt to setup a secure SSL/TLS session, before sending
-    - If V(starttls), the connection will try to upgrade to a secure SSL/TLS connection, before sending.
-      If it is unable to do so it will fail.
+      - If V(always), the connection will only send email if the connection is Encrypted. If the server does not accept the
+        encrypted connection it will fail.
+      - If V(try), the connection will attempt to setup a secure SSL/TLS session, before trying to send.
+      - If V(never), the connection will not attempt to setup a secure SSL/TLS session, before sending.
+      - If V(starttls), the connection will try to upgrade to a secure SSL/TLS connection, before sending. If it is unable
+        to do so it will fail.
     type: str
-    choices: [ always, never, starttls, try ]
+    choices: [always, never, starttls, try]
     default: try
   timeout:
     description:
-    - Sets the timeout in seconds for connection attempts.
+      - Sets the timeout in seconds for connection attempts.
     type: int
     default: 20
   ehlohost:
     description:
-    - Allows for manual specification of host for EHLO.
+      - Allows for manual specification of host for EHLO.
     type: str
     version_added: 3.8.0
-'''
+  message_id_domain:
+    description:
+      - The domain name to use for the L(Message-ID header, https://en.wikipedia.org/wiki/Message-ID).
+      - Note that this is only available on Python 3+. On Python 2, this value will be ignored.
+    type: str
+    default: ansible
+    version_added: 8.2.0
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Example playbook sending mail to root
   community.general.mail:
     subject: System {{ ansible_hostname }} has been successfully provisioned.
@@ -167,15 +168,15 @@ EXAMPLES = r'''
     body: Hello, this is an e-mail. I hope you like it ;-)
     from: jane@example.net (Jane Jolie)
     to:
-    - John Doe <j.d@example.org>
-    - Suzie Something <sue@example.com>
+      - John Doe <j.d@example.org>
+      - Suzie Something <sue@example.com>
     cc: Charlie Root <root@localhost>
     attach:
-    - /etc/group
-    - /tmp/avatar2.png
+      - /etc/group
+      - /tmp/avatar2.png
     headers:
-    - Reply-To=john@example.com
-    - X-Special="Something or other"
+      - Reply-To=john@example.com
+      - X-Special="Something or other"
     charset: us-ascii
   delegate_to: localhost
 
@@ -205,23 +206,24 @@ EXAMPLES = r'''
     body: System {{ ansible_hostname }} has been successfully provisioned.
     secure: starttls
 
-- name: Sending an e-mail using StartTLS, remote server, custom EHLO
+- name: Sending an e-mail using StartTLS, remote server, custom EHLO, and timeout of 10 seconds
   community.general.mail:
     host: some.smtp.host.tld
     port: 25
+    timeout: 10
     ehlohost: my-resolvable-hostname.tld
     to: John Smith <john.smith@example.com>
     subject: Ansible-report
     body: System {{ ansible_hostname }} has been successfully provisioned.
     secure: starttls
-'''
+"""
 
 import os
 import smtplib
 import ssl
 import traceback
 from email import encoders
-from email.utils import parseaddr, formataddr, formatdate
+from email.utils import parseaddr, formataddr, formatdate, make_msgid
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -253,6 +255,7 @@ def main():
             subtype=dict(type='str', default='plain', choices=['html', 'plain']),
             secure=dict(type='str', default='try', choices=['always', 'never', 'starttls', 'try']),
             timeout=dict(type='int', default=20),
+            message_id_domain=dict(type='str', default='ansible'),
         ),
         required_together=[['password', 'username']],
     )
@@ -274,6 +277,7 @@ def main():
     subtype = module.params.get('subtype')
     secure = module.params.get('secure')
     timeout = module.params.get('timeout')
+    message_id_domain = module.params['message_id_domain']
 
     code = 0
     secure_state = False
@@ -348,6 +352,12 @@ def main():
     msg['From'] = formataddr((sender_phrase, sender_addr))
     msg['Date'] = formatdate(localtime=True)
     msg['Subject'] = Header(subject, charset)
+    try:
+        msg['Message-ID'] = make_msgid(domain=message_id_domain)
+    except TypeError:
+        # `domain` is only available in Python 3
+        msg['Message-ID'] = make_msgid()
+        module.warn("The Message-ID domain cannot be set on Python 2; the system's hostname is used")
     msg.preamble = "Multipart message"
 
     for header in headers:

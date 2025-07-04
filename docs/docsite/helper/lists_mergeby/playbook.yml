@@ -5,7 +5,7 @@
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # 1) Run all examples and create example-XXX.out
-# shell> ansible-playbook playbook.yml -e examples=true
+# shell> ansible-playbook playbook.yml -e examples_one=true
 #
 # 2) Optionally, for testing, create examples_all.rst
 # shell> ansible-playbook playbook.yml -e examples_all=true
@@ -45,18 +45,20 @@
           tags: t007
         - import_tasks: example-008.yml
           tags: t008
-      when: examples|d(false)|bool
+        - import_tasks: example-009.yml
+          tags: t009
+      when: examples_one | d(false) | bool
 
     - block:
         - include_vars: examples.yml
         - template:
             src: examples_all.rst.j2
             dest: examples_all.rst
-      when: examples_all|d(false)|bool
+      when: examples_all | d(false) | bool
 
     - block:
         - include_vars: examples.yml
         - template:
             src: filter_guide_abstract_informations_merging_lists_of_dictionaries.rst.j2
             dest: filter_guide_abstract_informations_merging_lists_of_dictionaries.rst
-      when: merging_lists_of_dictionaries|d(false)|bool
+      when: merging_lists_of_dictionaries | d(false) | bool

@@ -8,50 +8,52 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- block:
-  - tempfile:
-      state: directory
-      suffix: supervisorctl-tests
-    register: supervisord_sock_path
+- when:
+    # setuptools is too old on RHEL/CentOS 6 (https://github.com/Supervisor/meld3/issues/23)
+    - ansible_os_family != 'RedHat' or ansible_distribution_major_version|int > 6
+    # For some reason CentOS 7 and OpenSuSE 15 do not work on ansible-core 2.16
+    - ansible_version.minor != 16 or ansible_distribution not in ['CentOS', 'openSUSE Leap']
+  block:
+    - block:
+        - tempfile:
+            state: directory
+            suffix: supervisorctl-tests
+          register: supervisord_sock_path
 
-  - command: 'echo {{ remote_tmp_dir }}'
-    register: echo
-  - set_fact:
-      remote_dir: '{{ echo.stdout }}'
+        - command: 'echo {{ remote_tmp_dir }}'
+          register: echo
+        - set_fact:
+            remote_dir: '{{ echo.stdout }}'
 
-  - include_vars: '{{ item }}'
-    with_first_found:
-      - files:
-          - '{{ ansible_distribution }}.yml'
-          - '{{ ansible_os_family }}.yml'
-          - 'defaults.yml'
+        - include_vars: '{{ item }}'
+          with_first_found:
+            - files:
+                - '{{ ansible_distribution }}.yml'
+                - '{{ ansible_os_family }}.yml'
+                - 'defaults.yml'
 
-  - include_tasks: '{{ item }}'
-    with_first_found:
-      - files:
-        - 'install_{{ ansible_distribution }}.yml' # CentOS
-        - 'install_{{ ansible_os_family }}.yml'    # RedHat
-        - 'install_{{ ansible_system }}.yml'       # Linux
+        - include_tasks: '{{ item }}'
+          with_first_found:
+            - files:
+                - 'install_{{ ansible_distribution }}.yml' # CentOS
+                - 'install_{{ ansible_os_family }}.yml'    # RedHat
+                - 'install_{{ ansible_system }}.yml'       # Linux
 
-  - include_tasks: test.yml
-    with_items:
-        - { username: '', password: '' }
-        - { username: 'testétest', password: 'passéword' } # non-ASCII credentials
-    loop_control:
-      loop_var: credentials
+        - include_tasks: test.yml
+          with_items:
+            - { username: '', password: '' }
+            - { username: 'testétest', password: 'passéword' } # non-ASCII credentials
+          loop_control:
+            loop_var: credentials
 
-  # setuptools is too old on RHEL/CentOS 6 (https://github.com/Supervisor/meld3/issues/23)
-  when: ansible_os_family != 'RedHat' or ansible_distribution_major_version|int > 6
+      always:
+        - include_tasks: '{{ item }}'
+          with_first_found:
+            - files:
+                - 'uninstall_{{ ansible_distribution }}.yml' # CentOS
+                - 'uninstall_{{ ansible_os_family }}.yml'    # RedHat
+                - 'uninstall_{{ ansible_system }}.yml'       # Linux
 
-  always:
-  - include_tasks: '{{ item }}'
-    when: ansible_os_family != 'RedHat' or ansible_distribution_major_version|int > 6
-    with_first_found:
-      - files:
-        - 'uninstall_{{ ansible_distribution }}.yml' # CentOS
-        - 'uninstall_{{ ansible_os_family }}.yml'    # RedHat
-        - 'uninstall_{{ ansible_system }}.yml'       # Linux
-
-  - file:
-      path: '{{ supervisord_sock_path.path }}'
-      state: absent
+        - file:
+            path: '{{ supervisord_sock_path.path }}'
+            state: absent

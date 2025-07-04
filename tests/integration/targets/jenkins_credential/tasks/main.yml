@@ -1,0 +1,79 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Prepare the test environment
+  include_tasks: pre.yml
+  vars:
+    output_dir: "{{ playbook_dir }}/generated"
+
+- name: Generate token
+  community.general.jenkins_credential:
+    name: "test-token"
+    jenkins_user: "{{ jenkins_username }}"
+    jenkins_password: "{{ jenkins_password }}"
+    type: "token"
+  no_log: true
+  register: token_result
+
+- name: Assert token and tokenUuid are returned
+  assert:
+    that:
+      - token_result.token is defined
+      - token_result.token_uuid is defined
+    fail_msg: "Token generation failed"
+    success_msg: "Token and tokenUuid successfully returned"
+
+- name: Set token facts
+  set_fact:
+    token: "{{ token_result.token }}"
+    tokenUuid: "{{ token_result.token_uuid }}"
+
+- name: Test adding new credentials and scopes
+  include_tasks: add.yml
+  vars:
+    run_number: 1
+    output_dir: "{{ playbook_dir }}/generated"
+
+- name: Test adding credentials and scopes when they already exist
+  include_tasks: add.yml
+  vars:
+    run_number: 2
+    output_dir: "{{ playbook_dir }}/generated"
+
+- name: Test editing credentials
+  include_tasks: edit.yml
+  vars:
+    output_dir: "{{ playbook_dir }}/generated"
+
+- name: Test deleting credentials and scopes
+  include_tasks: del.yml
+  vars:
+    run_number: 1
+
+- name: Test deleting credentials and scopes when they don't exist
+  include_tasks: del.yml
+  vars:
+    run_number: 2
+
+- name: Delete token
+  community.general.jenkins_credential:
+    id: "{{ tokenUuid }}"
+    name: "test-token-2"
+    jenkins_user: "{{ jenkins_username }}"
+    jenkins_password: "{{ jenkins_password }}"
+    state: "absent"
+    type: "token"
+  register: delete_token_result
+
+- name: Assert token deletion
+  assert:
+    that:
+      - delete_token_result.changed is true
+    fail_msg: "Token deletion failed"
+    success_msg: "Token successfully deleted"
+
+- name: Remove generated test files
+  ansible.builtin.file:
+    path: "{{ playbook_dir }}/generated"
+    state: absent

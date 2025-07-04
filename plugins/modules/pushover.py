@@ -9,16 +9,13 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: pushover
-short_description: Send notifications via U(https://pushover.net)
+short_description: Send notifications through U(https://pushover.net)
 description:
-  - Send notifications via pushover, to subscriber list of devices, and email
-    addresses. Requires pushover app on devices.
+  - Send notifications through pushover to subscriber list of devices and email addresses. Requires pushover app on devices.
 notes:
-  - You will require a pushover.net account to use this module. But no account
-    is required to receive messages.
+  - You will require a pushover.net account to use this module. But no account is required to receive messages.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -53,7 +50,7 @@ options:
       - Message priority (see U(https://pushover.net) for details).
     required: false
     default: '0'
-    choices: [ '-2', '-1', '0', '1', '2' ]
+    choices: ['-2', '-1', '0', '1', '2']
   device:
     type: str
     description:
@@ -64,9 +61,9 @@ options:
 author:
   - "Jim Richardson (@weaselkeeper)"
   - "Bernd Arnold (@wopfel)"
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Send notifications via pushover.net
   community.general.pushover:
     msg: '{{ inventory_hostname }} is acting strange ...'
@@ -90,7 +87,7 @@ EXAMPLES = '''
     user_key: baa5fe97f2c5ab3ca8f0bb59
     device: admins-iPhone
   delegate_to: localhost
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves.urllib.parse import urlencode

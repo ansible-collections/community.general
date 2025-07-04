@@ -8,78 +8,75 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: utm_dns_host
 
 author:
-    - Johannes Brunswicker (@MatrixCrawler)
+  - Johannes Brunswicker (@MatrixCrawler)
 
-short_description: Create, update or destroy dns entry in Sophos UTM
+short_description: Create, update or destroy DNS entry in Sophos UTM
 
 description:
-    - Create, update or destroy a dns entry in SOPHOS UTM.
-    - This module needs to have the REST Ability of the UTM to be activated.
-
+  - Create, update or destroy a DNS entry in SOPHOS UTM.
+  - This module needs to have the REST Ability of the UTM to be activated.
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 
 options:
-    name:
-        type: str
-        description:
-          - The name of the object. Will be used to identify the entry
-        required: true
-    address:
-        type: str
-        description:
-          - The IPV4 Address of the entry. Can be left empty for automatic resolving.
-        default: 0.0.0.0
-    address6:
-        type: str
-        description:
-          - The IPV6 Address of the entry. Can be left empty for automatic resolving.
-        default: "::"
-    comment:
-        type: str
-        description:
-          - An optional comment to add to the dns host object
-        default: ''
-    hostname:
-        type: str
-        description:
-          - The hostname for the dns host object
-    interface:
-        type: str
-        description:
-          - The reference name of the interface to use. If not provided the default interface will be used
-        default: ''
-    resolved:
-        description:
-          - whether the hostname's ipv4 address is already resolved or not
-        default: false
-        type: bool
-    resolved6:
-        description:
-          - whether the hostname's ipv6 address is already resolved or not
-        default: false
-        type: bool
-    timeout:
-        type: int
-        description:
-          - the timeout for the utm to resolve the ip address for the hostname again
-        default: 0
+  name:
+    type: str
+    description:
+      - The name of the object. Will be used to identify the entry.
+    required: true
+  address:
+    type: str
+    description:
+      - The IPV4 Address of the entry. Can be left empty for automatic resolving.
+    default: 0.0.0.0
+  address6:
+    type: str
+    description:
+      - The IPV6 Address of the entry. Can be left empty for automatic resolving.
+    default: "::"
+  comment:
+    type: str
+    description:
+      - An optional comment to add to the DNS host object.
+    default: ''
+  hostname:
+    type: str
+    description:
+      - The hostname for the DNS host object.
+  interface:
+    type: str
+    description:
+      - The reference name of the interface to use. If not provided the default interface is used.
+    default: ''
+  resolved:
+    description:
+      - Whether the hostname's ipv4 address is already resolved or not.
+    default: false
+    type: bool
+  resolved6:
+    description:
+      - Whether the hostname's ipv6 address is already resolved or not.
+    default: false
+    type: bool
+  timeout:
+    type: int
+    description:
+      - The timeout for the UTM to resolve the IP address for the hostname again.
+    default: 0
 
 extends_documentation_fragment:
-- community.general.utm
-- community.general.attributes
+  - community.general.utm
+  - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Create UTM dns host entry
   community.general.utm_dns_host:
     utm_host: sophos.host.name
@@ -96,45 +93,45 @@ EXAMPLES = """
     state: absent
 """
 
-RETURN = """
+RETURN = r"""
 result:
-    description: The utm object that was created
-    returned: success
-    type: complex
-    contains:
-        _ref:
-            description: The reference name of the object
-            type: str
-        _locked:
-            description: Whether or not the object is currently locked
-            type: bool
-        name:
-            description: The name of the object
-            type: str
-        address:
-            description: The ipv4 address of the object
-            type: str
-        address6:
-            description: The ipv6 address of the object
-            type: str
-        comment:
-            description: The comment string
-            type: str
-        hostname:
-            description: The hostname of the object
-            type: str
-        interface:
-            description: The reference name of the interface the object is associated with
-            type: str
-        resolved:
-            description: Whether the ipv4 address is resolved or not
-            type: bool
-        resolved6:
-            description: Whether the ipv6 address is resolved or not
-            type: bool
-        timeout:
-            description: The timeout until a new resolving will be attempted
-            type: int
+  description: The utm object that was created.
+  returned: success
+  type: complex
+  contains:
+    _ref:
+      description: The reference name of the object.
+      type: str
+    _locked:
+      description: Whether or not the object is currently locked.
+      type: bool
+    name:
+      description: The name of the object.
+      type: str
+    address:
+      description: The ipv4 address of the object.
+      type: str
+    address6:
+      description: The ipv6 address of the object.
+      type: str
+    comment:
+      description: The comment string.
+      type: str
+    hostname:
+      description: The hostname of the object.
+      type: str
+    interface:
+      description: The reference name of the interface the object is associated with.
+      type: str
+    resolved:
+      description: Whether the ipv4 address is resolved or not.
+      type: bool
+    resolved6:
+      description: Whether the ipv6 address is resolved or not.
+      type: bool
+    timeout:
+      description: The timeout until a new resolving will be attempted.
+      type: int
 """
 
 from ansible_collections.community.general.plugins.module_utils.utm_utils import UTM, UTMModule

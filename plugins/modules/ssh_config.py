@@ -11,18 +11,17 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: ssh_config
 short_description: Manage SSH config for user
 version_added: '2.0.0'
 description:
-    - Configures SSH hosts with special C(IdentityFile)s and hostnames.
+  - Configures SSH hosts with special C(IdentityFile)s and hostnames.
 author:
-    - Björn Andersson (@gaqzi)
-    - Abhijeet Kasurde (@Akasurde)
+  - Björn Andersson (@gaqzi)
+  - Abhijeet Kasurde (@Akasurde)
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
   check_mode:
     support: full
@@ -33,7 +32,7 @@ options:
     description:
       - Whether a host entry should exist or not.
     default: present
-    choices: [ 'present', 'absent' ]
+    choices: ['present', 'absent']
     type: str
   user:
     description:
@@ -50,8 +49,7 @@ options:
   host:
     description:
       - The endpoint this configuration is valid for.
-      - Can be an actual address on the internet or an alias that will
-        connect to the value of O(hostname).
+      - Can be an actual address on the internet or an alias that will connect to the value of O(hostname).
     required: true
     type: str
   hostname:
@@ -68,10 +66,16 @@ options:
     type: str
   identity_file:
     description:
-      - The path to an identity file (SSH private key) that will be used
-        when connecting to this host.
+      - The path to an identity file (SSH private key) that will be used when connecting to this host.
       - File need to exist and have mode V(0600) to be valid.
     type: path
+  identities_only:
+    description:
+      - Specifies that SSH should only use the configured authentication identity and certificate files (either the default
+        files, or those explicitly configured in the C(ssh_config) files or passed on the ssh command-line), even if C(ssh-agent)
+        or a C(PKCS11Provider) or C(SecurityKeyProvider) offers more identities.
+    type: bool
+    version_added: 8.2.0
   user_known_hosts_file:
     description:
       - Sets the user known hosts file option.
@@ -79,7 +83,8 @@ options:
   strict_host_key_checking:
     description:
       - Whether to strictly check the host key when doing connections to the remote host.
-    choices: [ 'yes', 'no', 'ask' ]
+      - The value V(accept-new) is supported since community.general 8.6.0.
+    choices: ['yes', 'no', 'ask', 'accept-new']
     type: str
   proxycommand:
     description:
@@ -97,6 +102,11 @@ options:
       - Sets the C(ForwardAgent) option.
     type: bool
     version_added: 4.0.0
+  add_keys_to_agent:
+    description:
+      - Sets the C(AddKeysToAgent) option.
+    type: bool
+    version_added: 8.2.0
   ssh_config_file:
     description:
       - SSH config file.
@@ -111,7 +121,7 @@ options:
   controlmaster:
     description:
       - Sets the C(ControlMaster) option.
-    choices: [ 'yes', 'no', 'ask', 'auto', 'autoask' ]
+    choices: ['yes', 'no', 'ask', 'auto', 'autoask']
     type: str
     version_added: 8.1.0
   controlpath:
@@ -124,11 +134,23 @@ options:
       - Sets the C(ControlPersist) option.
     type: str
     version_added: 8.1.0
+  dynamicforward:
+    description:
+      - Sets the C(DynamicForward) option.
+    type: str
+    version_added: 10.1.0
+  other_options:
+    description:
+      - Provides the option to specify arbitrary SSH config entry options via a dictionary.
+      - The key names must be lower case. Keys with upper case values are rejected.
+      - The values must be strings. Other values are rejected.
+    type: dict
+    version_added: 10.4.0
 requirements:
-- paramiko
-'''
+  - paramiko
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Add a host in the configuration
   community.general.ssh_config:
     user: akasurde
@@ -137,15 +159,17 @@ EXAMPLES = r'''
     identity_file: "/home/akasurde/.ssh/id_rsa"
     port: '2223'
     state: present
+    other_options:
+      serveraliveinterval: '30'
 
 - name: Delete a host from the configuration
   community.general.ssh_config:
     ssh_config_file: "{{ ssh_config_test }}"
     host: "example.com"
     state: absent
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 hosts_added:
   description: A list of host added.
   returned: success
@@ -181,7 +205,7 @@ hosts_change_diff:
       }
     }
   ]
-'''
+"""
 
 import os
 
@@ -189,6 +213,7 @@ from copy import deepcopy
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.six import string_types
 from ansible_collections.community.general.plugins.module_utils._stormssh import ConfigParser, HAS_PARAMIKO, PARAMIKO_IMPORT_ERROR
 from ansible_collections.community.general.plugins.module_utils.ssh import determine_config_file
 
@@ -245,6 +270,7 @@ class SSHConfig(object):
             hostname=self.params.get('hostname'),
             port=self.params.get('port'),
             identity_file=self.params.get('identity_file'),
+            identities_only=convert_bool(self.params.get('identities_only')),
             user=self.params.get('remote_user'),
             strict_host_key_checking=self.params.get('strict_host_key_checking'),
             user_known_hosts_file=self.params.get('user_known_hosts_file'),
@@ -252,10 +278,23 @@ class SSHConfig(object):
             proxyjump=self.params.get('proxyjump'),
             host_key_algorithms=self.params.get('host_key_algorithms'),
             forward_agent=convert_bool(self.params.get('forward_agent')),
+            add_keys_to_agent=convert_bool(self.params.get('add_keys_to_agent')),
             controlmaster=self.params.get('controlmaster'),
             controlpath=self.params.get('controlpath'),
             controlpersist=fix_bool_str(self.params.get('controlpersist')),
+            dynamicforward=self.params.get('dynamicforward'),
         )
+        if self.params.get('other_options'):
+            for key, value in self.params.get('other_options').items():
+                if key.lower() != key:
+                    self.module.fail_json(msg="The other_options key {key!r} must be lower case".format(key=key))
+                if key not in args:
+                    if not isinstance(value, string_types):
+                        self.module.fail_json(msg="The other_options value provided for key {key!r} must be a string, got {type}".format(key=key,
+                                                                                                                                         type=type(value)))
+                    args[key] = value
+                else:
+                    self.module.fail_json(msg="Multiple values provided for key {key!r}".format(key=key))
 
         config_changed = False
         hosts_changed = []
@@ -342,21 +381,25 @@ def main():
             hostname=dict(type='str'),
             host_key_algorithms=dict(type='str', no_log=False),
             identity_file=dict(type='path'),
+            identities_only=dict(type='bool'),
+            other_options=dict(type='dict'),
             port=dict(type='str'),
             proxycommand=dict(type='str', default=None),
             proxyjump=dict(type='str', default=None),
             forward_agent=dict(type='bool'),
+            add_keys_to_agent=dict(type='bool'),
             remote_user=dict(type='str'),
             ssh_config_file=dict(default=None, type='path'),
             state=dict(type='str', default='present', choices=['present', 'absent']),
             strict_host_key_checking=dict(
                 type='str',
                 default=None,
-                choices=['yes', 'no', 'ask']
+                choices=['yes', 'no', 'ask', 'accept-new'],
             ),
             controlmaster=dict(type='str', default=None, choices=['yes', 'no', 'ask', 'auto', 'autoask']),
             controlpath=dict(type='str', default=None),
             controlpersist=dict(type='str', default=None),
+            dynamicforward=dict(type='str'),
             user=dict(default=None, type='str'),
             user_known_hosts_file=dict(type='str', default=None),
         ),

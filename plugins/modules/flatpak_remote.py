@@ -10,15 +10,13 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: flatpak_remote
 short_description: Manage flatpak repository remotes
 description:
   - Allows users to add or remove flatpak remotes.
-  - The flatpak remotes concept is comparable to what is called repositories in other packaging
-    formats.
-  - Currently, remote addition is only supported via C(flatpakrepo) file URLs.
+  - The flatpak remotes concept is comparable to what is called repositories in other packaging formats.
+  - Currently, remote addition is only supported using C(flatpakrepo) file URLs.
   - Existing remotes will not be updated.
   - See the M(community.general.flatpak) module for managing flatpaks.
 author:
@@ -36,49 +34,47 @@ attributes:
 options:
   executable:
     description:
-    - The path to the C(flatpak) executable to use.
-    - By default, this module looks for the C(flatpak) executable on the path.
+      - The path to the C(flatpak) executable to use.
+      - By default, this module looks for the C(flatpak) executable on the path.
     type: str
     default: flatpak
   flatpakrepo_url:
     description:
-    - The URL to the C(flatpakrepo) file representing the repository remote to add.
-    - When used with O(state=present), the flatpak remote specified under the O(flatpakrepo_url)
-      is added using the specified installation O(method).
-    - When used with O(state=absent), this is not required.
-    - Required when O(state=present).
+      - The URL to the C(flatpakrepo) file representing the repository remote to add.
+      - When used with O(state=present), the flatpak remote specified under the O(flatpakrepo_url) is added using the specified
+        installation O(method).
+      - When used with O(state=absent), this is not required.
+      - Required when O(state=present).
     type: str
   method:
     description:
-    - The installation method to use.
-    - Defines if the C(flatpak) is supposed to be installed globally for the whole V(system)
-      or only for the current V(user).
+      - The installation method to use.
+      - Defines if the C(flatpak) is supposed to be installed globally for the whole V(system) or only for the current V(user).
     type: str
-    choices: [ system, user ]
+    choices: [system, user]
     default: system
   name:
     description:
-    - The desired name for the flatpak remote to be registered under on the managed host.
-    - When used with O(state=present), the remote will be added to the managed host under
-      the specified O(name).
-    - When used with O(state=absent) the remote with that name will be removed.
+      - The desired name for the flatpak remote to be registered under on the managed host.
+      - When used with O(state=present), the remote will be added to the managed host under the specified O(name).
+      - When used with O(state=absent) the remote with that name will be removed.
     type: str
     required: true
   state:
     description:
-    - Indicates the desired package state.
+      - Indicates the desired package state.
     type: str
-    choices: [ absent, present ]
+    choices: [absent, present]
     default: present
   enabled:
     description:
-    - Indicates whether this remote is enabled.
+      - Indicates whether this remote is enabled.
     type: bool
     default: true
     version_added: 6.4.0
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Add the Gnome flatpak remote to the system installation
   community.general.flatpak_remote:
     name: gnome
@@ -108,35 +104,35 @@ EXAMPLES = r'''
     name: flathub
     state: present
     enabled: false
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 command:
-  description: The exact flatpak command that was executed
+  description: The exact flatpak command that was executed.
   returned: When a flatpak command has been executed
   type: str
   sample: "/usr/bin/flatpak remote-add --system flatpak-test https://dl.flathub.org/repo/flathub.flatpakrepo"
 msg:
-  description: Module error message
+  description: Module error message.
   returned: failure
   type: str
   sample: "Executable '/usr/local/bin/flatpak' was not found on the system."
 rc:
-  description: Return code from flatpak binary
+  description: Return code from flatpak binary.
   returned: When a flatpak command has been executed
   type: int
   sample: 0
 stderr:
-  description: Error output from flatpak binary
+  description: Error output from flatpak binary.
   returned: When a flatpak command has been executed
   type: str
   sample: "error: GPG verification enabled, but no summary found (check that the configured URL in remote config is correct)\n"
 stdout:
-  description: Output from flatpak binary
+  description: Output from flatpak binary.
   returned: When a flatpak command has been executed
   type: str
   sample: "flathub\tFlathub\thttps://dl.flathub.org/repo/\t1\t\n"
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes, to_native

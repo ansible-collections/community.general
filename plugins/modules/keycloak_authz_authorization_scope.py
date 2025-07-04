@@ -9,78 +9,76 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: keycloak_authz_authorization_scope
 
-short_description: Allows administration of Keycloak client authorization scopes via Keycloak API
+short_description: Allows administration of Keycloak client authorization scopes using Keycloak API
 
 version_added: 6.6.0
 
 description:
-    - This module allows the administration of Keycloak client Authorization Scopes via the Keycloak REST
-      API. Authorization Scopes are only available if a client has Authorization enabled.
-
-    - This module requires access to the REST API via OpenID Connect; the user connecting and the realm
-      being used must have the requisite access rights. In a default Keycloak installation, admin-cli
-      and an admin user would work, as would a separate realm definition with the scope tailored
-      to your needs and a user having the expected roles.
-
-    - The names of module options are snake_cased versions of the camelCase options used by Keycloak.
-      The Authorization Services paths and payloads have not officially been documented by the Keycloak project.
-      U(https://www.puppeteers.net/blog/keycloak-authorization-services-rest-api-paths-and-payload/)
-
+  - This module allows the administration of Keycloak client Authorization Scopes using the Keycloak REST API. Authorization
+    Scopes are only available if a client has Authorization enabled.
+  - This module requires access to the REST API using OpenID Connect; the user connecting and the realm being used must have
+    the requisite access rights. In a default Keycloak installation, admin-cli and an admin user would work, as would a separate
+    realm definition with the scope tailored to your needs and a user having the expected roles.
+  - The names of module options are snake_cased versions of the camelCase options used by Keycloak. The Authorization Services
+    paths and payloads have not officially been documented by the Keycloak project.
+    U(https://www.puppeteers.net/blog/keycloak-authorization-services-rest-api-paths-and-payload/).
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: full
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
+  action_group:
+    version_added: 10.2.0
 
 options:
-    state:
-        description:
-            - State of the authorization scope.
-            - On V(present), the authorization scope will be created (or updated if it exists already).
-            - On V(absent), the authorization scope will be removed if it exists.
-        choices: ['present', 'absent']
-        default: 'present'
-        type: str
-    name:
-        description:
-            - Name of the authorization scope to create.
-        type: str
-        required: true
-    display_name:
-        description:
-            - The display name of the authorization scope.
-        type: str
-        required: false
-    icon_uri:
-        description:
-            - The icon URI for the authorization scope.
-        type: str
-        required: false
-    client_id:
-        description:
-            - The C(clientId) of the Keycloak client that should have the authorization scope.
-            - This is usually a human-readable name of the Keycloak client.
-        type: str
-        required: true
-    realm:
-        description:
-            - The name of the Keycloak realm the Keycloak client is in.
-        type: str
-        required: true
+  state:
+    description:
+      - State of the authorization scope.
+      - On V(present), the authorization scope will be created (or updated if it exists already).
+      - On V(absent), the authorization scope will be removed if it exists.
+    choices: ['present', 'absent']
+    default: 'present'
+    type: str
+  name:
+    description:
+      - Name of the authorization scope to create.
+    type: str
+    required: true
+  display_name:
+    description:
+      - The display name of the authorization scope.
+    type: str
+    required: false
+  icon_uri:
+    description:
+      - The icon URI for the authorization scope.
+    type: str
+    required: false
+  client_id:
+    description:
+      - The C(clientId) of the Keycloak client that should have the authorization scope.
+      - This is usually a human-readable name of the Keycloak client.
+    type: str
+    required: true
+  realm:
+    description:
+      - The name of the Keycloak realm the Keycloak client is in.
+    type: str
+    required: true
 
 extends_documentation_fragment:
-    - community.general.keycloak
-    - community.general.attributes
+  - community.general.keycloak
+  - community.general.keycloak.actiongroup_keycloak
+  - community.general.attributes
 
 author:
-    - Samuli Seppänen (@mattock)
-'''
+  - Samuli Seppänen (@mattock)
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Manage Keycloak file:delete authorization scope
   keycloak_authz_authorization_scope:
     name: file:delete
@@ -92,41 +90,40 @@ EXAMPLES = '''
     auth_username: keycloak
     auth_password: keycloak
     auth_realm: master
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 msg:
-    description: Message as to what action was taken.
-    returned: always
-    type: str
+  description: Message as to what action was taken.
+  returned: always
+  type: str
 
 end_state:
-    description: Representation of the authorization scope after module execution.
-    returned: on success
-    type: complex
-    contains:
-        id:
-            description: ID of the authorization scope.
-            type: str
-            returned: when O(state=present)
-            sample: a6ab1cf2-1001-40ec-9f39-48f23b6a0a41
-        name:
-            description: Name of the authorization scope.
-            type: str
-            returned: when O(state=present)
-            sample: file:delete
-        display_name:
-            description: Display name of the authorization scope.
-            type: str
-            returned: when O(state=present)
-            sample: File delete
-        icon_uri:
-            description: Icon URI for the authorization scope.
-            type: str
-            returned: when O(state=present)
-            sample: http://localhost/icon.png
-
-'''
+  description: Representation of the authorization scope after module execution.
+  returned: on success
+  type: complex
+  contains:
+    id:
+      description: ID of the authorization scope.
+      type: str
+      returned: when O(state=present)
+      sample: a6ab1cf2-1001-40ec-9f39-48f23b6a0a41
+    name:
+      description: Name of the authorization scope.
+      type: str
+      returned: when O(state=present)
+      sample: file:delete
+    display_name:
+      description: Display name of the authorization scope.
+      type: str
+      returned: when O(state=present)
+      sample: File delete
+    icon_uri:
+      description: Icon URI for the authorization scope.
+      type: str
+      returned: when O(state=present)
+      sample: http://localhost/icon.png
+"""
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, \
     keycloak_argument_spec, get_token, KeycloakError
@@ -156,8 +153,10 @@ def main():
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True,
                            required_one_of=(
-                               [['token', 'auth_realm', 'auth_username', 'auth_password']]),
-                           required_together=([['auth_realm', 'auth_username', 'auth_password']]))
+                               [['token', 'auth_realm', 'auth_username', 'auth_password', 'auth_client_id', 'auth_client_secret']]),
+                           required_together=([['auth_username', 'auth_password']]),
+                           required_by={'refresh_token': 'auth_realm'},
+                           )
 
     result = dict(changed=False, msg='', end_state={}, diff=dict(before={}, after={}))
 

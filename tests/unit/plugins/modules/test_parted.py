@@ -5,11 +5,11 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-from ansible_collections.community.general.tests.unit.compat.mock import patch, call
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch, call
 from ansible_collections.community.general.plugins.modules import parted as parted_module
 from ansible_collections.community.general.plugins.modules.parted import parse_parted_version
 from ansible_collections.community.general.plugins.modules.parted import parse_partition_info
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
 
 # Example of output : parted -s -m /dev/sdb -- unit 'MB' print
 parted_output1 = """
@@ -187,93 +187,93 @@ class TestParted(ModuleTestCase):
         self.assertEqual(parse_partition_info(parted_output2, 'MB'), parted_dict2)
 
     def test_partition_already_exists(self):
-        set_module_args({
+        with set_module_args({
             'device': '/dev/sdb',
             'number': 1,
             'state': 'present',
-        })
-        with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
-            self.execute_module(changed=False)
+        }):
+            with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
+                self.execute_module(changed=False)
 
     def test_create_new_partition(self):
-        set_module_args({
+        with set_module_args({
             'device': '/dev/sdb',
             'number': 4,
             'state': 'present',
-        })
-        with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
-            self.execute_module(changed=True, script='unit KiB mkpart primary 0% 100%')
+        }):
+            with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
+                self.execute_module(changed=True, script='unit KiB mkpart primary 0% 100%')
 
     def test_create_new_partition_1G(self):
-        set_module_args({
+        with set_module_args({
             'device': '/dev/sdb',
             'number': 4,
             'state': 'present',
             'part_end': '1GiB',
-        })
-        with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
-            self.execute_module(changed=True, script='unit KiB mkpart primary 0% 1GiB')
+        }):
+            with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
+                self.execute_module(changed=True, script='unit KiB mkpart primary 0% 1GiB')
 
     def test_create_new_partition_minus_1G(self):
-        set_module_args({
+        with set_module_args({
             'device': '/dev/sdb',
             'number': 4,
             'state': 'present',
             'fs_type': 'ext2',
             'part_start': '-1GiB',
-        })
-        with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
-            self.execute_module(changed=True, script='unit KiB mkpart primary ext2 -1GiB 100%')
+        }):
+            with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
+                self.execute_module(changed=True, script='unit KiB mkpart primary ext2 -1GiB 100%')
 
     def test_remove_partition_number_1(self):
-        set_module_args({
+        with set_module_args({
             'device': '/dev/sdb',
             'number': 1,
             'state': 'absent',
-        })
-        with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
-            self.execute_module(changed=True, script='rm 1')
+        }):
+            with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
+                self.execute_module(changed=True, script='rm 1')
 
     def test_resize_partition(self):
-        set_module_args({
+        with set_module_args({
             'device': '/dev/sdb',
             'number': 3,
             'state': 'present',
             'part_end': '100%',
             'resize': True
-        })
-        with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
-            self.execute_module(changed=True, script='resizepart 3 100%')
+        }):
+            with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
+                self.execute_module(changed=True, script='resizepart 3 100%')
 
     def test_change_flag(self):
         # Flags are set in a second run of parted().
         # Between the two runs, the partition dict is updated.
         # use checkmode here allow us to continue even if the dictionary is
         # not updated.
-        set_module_args({
+        with set_module_args({
             'device': '/dev/sdb',
             'number': 3,
             'state': 'present',
             'flags': ['lvm', 'boot'],
             '_ansible_check_mode': True,
-        })
+        }):
 
-        with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
-            self.parted.reset_mock()
-            self.execute_module(changed=True)
-            # When using multiple flags:
-            # order of execution is non deterministic, because set() operations are used in
-            # the current implementation.
-            expected_calls_order1 = [call('unit KiB set 3 lvm on set 3 boot on ',
-                                          '/dev/sdb', 'optimal')]
-            expected_calls_order2 = [call('unit KiB set 3 boot on set 3 lvm on ',
-                                          '/dev/sdb', 'optimal')]
-            self.assertTrue(self.parted.mock_calls == expected_calls_order1 or
-                            self.parted.mock_calls == expected_calls_order2)
+            with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
+                self.parted.reset_mock()
+                self.execute_module(changed=True)
+                # When using multiple flags:
+                # order of execution is non deterministic, because set() operations are used in
+                # the current implementation.
+                expected_calls_order1 = [call('unit KiB set 3 lvm on set 3 boot on ',
+                                              '/dev/sdb', 'optimal')]
+                expected_calls_order2 = [call('unit KiB set 3 boot on set 3 lvm on ',
+                                              '/dev/sdb', 'optimal')]
+                self.assertTrue(self.parted.mock_calls == expected_calls_order1 or
+                                self.parted.mock_calls == expected_calls_order2)
 
     def test_create_new_primary_lvm_partition(self):
         # use check_mode, see previous test comment
-        set_module_args({
+        with set_module_args({
             'device': '/dev/sdb',
             'number': 4,
             'flags': ["boot"],
@@ -281,15 +281,15 @@ class TestParted(ModuleTestCase):
             'part_start': '257GiB',
             'fs_type': 'ext3',
             '_ansible_check_mode': True,
-        })
-        with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
-            self.execute_module(changed=True, script='unit KiB mkpart primary ext3 257GiB 100% unit KiB set 4 boot on')
+        }):
+            with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
+                self.execute_module(changed=True, script='unit KiB mkpart primary ext3 257GiB 100% unit KiB set 4 boot on')
 
     def test_create_label_gpt(self):
         # Like previous test, current implementation use parted to create the partition and
         # then retrieve and update the dictionary. Use check_mode to force to continue even if
         # dictionary is not updated.
-        set_module_args({
+        with set_module_args({
             'device': '/dev/sdb',
             'number': 1,
             'flags': ["lvm"],
@@ -297,48 +297,48 @@ class TestParted(ModuleTestCase):
             'name': 'lvmpartition',
             'state': 'present',
             '_ansible_check_mode': True,
-        })
-        with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict2):
-            self.execute_module(changed=True, script='unit KiB mklabel gpt mkpart primary 0% 100% unit KiB name 1 \'"lvmpartition"\' set 1 lvm on')
+        }):
+            with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict2):
+                self.execute_module(changed=True, script='unit KiB mklabel gpt mkpart primary 0% 100% unit KiB name 1 \'"lvmpartition"\' set 1 lvm on')
 
     def test_change_label_gpt(self):
         # When partitions already exists and label is changed, mkpart should be called even when partition already exists,
         # because new empty label will be created anyway
-        set_module_args({
+        with set_module_args({
             'device': '/dev/sdb',
             'number': 1,
             'state': 'present',
             'label': 'gpt',
             '_ansible_check_mode': True,
-        })
-        with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
-            self.execute_module(changed=True, script='unit KiB mklabel gpt mkpart primary 0% 100%')
+        }):
+            with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
+                self.execute_module(changed=True, script='unit KiB mklabel gpt mkpart primary 0% 100%')
 
     def test_check_mode_unchanged(self):
         # Test that get_device_info result is checked in check mode too
         # No change on partition 1
-        set_module_args({
+        with set_module_args({
             'device': '/dev/sdb',
             'number': 1,
             'state': 'present',
             'flags': ['some_flag'],
             '_ansible_check_mode': True,
-        })
-        with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict3):
-            self.execute_module(changed=False)
+        }):
+            with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict3):
+                self.execute_module(changed=False)
 
     def test_check_mode_changed(self):
         # Test that get_device_info result is checked in check mode too
         # Flag change on partition 1
-        set_module_args({
+        with set_module_args({
             'device': '/dev/sdb',
             'number': 1,
             'state': 'present',
             'flags': ['other_flag'],
             '_ansible_check_mode': True,
-        })
-        with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict3):
-            self.execute_module(changed=True)
+        }):
+            with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict3):
+                self.execute_module(changed=True)
 
     def test_version_info(self):
         """Test that the parse_parted_version returns the expected tuple"""

@@ -6,9 +6,9 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-from ansible_collections.community.general.tests.unit.compat.mock import call, patch
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import call, patch
 from ansible_collections.community.general.plugins.modules import rpm_ostree_pkg
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import (
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args)
 
 
@@ -35,12 +35,12 @@ class RpmOSTreeModuleTestCase(ModuleTestCase):
         return exc.exception.args[0]
 
     def test_present(self):
-        set_module_args({'name': 'nfs-utils', 'state': 'present'})
-        self.module_main_command.side_effect = [
-            (0, '', ''),
-        ]
+        with set_module_args({'name': 'nfs-utils', 'state': 'present'}):
+            self.module_main_command.side_effect = [
+                (0, '', ''),
+            ]
 
-        result = self.module_main(AnsibleExitJson)
+            result = self.module_main(AnsibleExitJson)
 
         self.assertTrue(result['changed'])
         self.assertEqual(['nfs-utils'], result['packages'])
@@ -49,12 +49,12 @@ class RpmOSTreeModuleTestCase(ModuleTestCase):
         ])
 
     def test_present_unchanged(self):
-        set_module_args({'name': 'nfs-utils', 'state': 'present'})
-        self.module_main_command.side_effect = [
-            (77, '', ''),
-        ]
+        with set_module_args({'name': 'nfs-utils', 'state': 'present'}):
+            self.module_main_command.side_effect = [
+                (77, '', ''),
+            ]
 
-        result = self.module_main(AnsibleExitJson)
+            result = self.module_main(AnsibleExitJson)
 
         self.assertFalse(result['changed'])
         self.assertEqual(0, result['rc'])
@@ -64,12 +64,12 @@ class RpmOSTreeModuleTestCase(ModuleTestCase):
         ])
 
     def test_present_failed(self):
-        set_module_args({'name': 'nfs-utils', 'state': 'present'})
-        self.module_main_command.side_effect = [
-            (1, '', ''),
-        ]
+        with set_module_args({'name': 'nfs-utils', 'state': 'present'}):
+            self.module_main_command.side_effect = [
+                (1, '', ''),
+            ]
 
-        result = self.module_main(AnsibleFailJson)
+            result = self.module_main(AnsibleFailJson)
 
         self.assertFalse(result['changed'])
         self.assertEqual(1, result['rc'])
@@ -79,12 +79,12 @@ class RpmOSTreeModuleTestCase(ModuleTestCase):
         ])
 
     def test_absent(self):
-        set_module_args({'name': 'nfs-utils', 'state': 'absent'})
-        self.module_main_command.side_effect = [
-            (0, '', ''),
-        ]
+        with set_module_args({'name': 'nfs-utils', 'state': 'absent'}):
+            self.module_main_command.side_effect = [
+                (0, '', ''),
+            ]
 
-        result = self.module_main(AnsibleExitJson)
+            result = self.module_main(AnsibleExitJson)
 
         self.assertTrue(result['changed'])
         self.assertEqual(['nfs-utils'], result['packages'])
@@ -93,12 +93,12 @@ class RpmOSTreeModuleTestCase(ModuleTestCase):
         ])
 
     def test_absent_failed(self):
-        set_module_args({'name': 'nfs-utils', 'state': 'absent'})
-        self.module_main_command.side_effect = [
-            (1, '', ''),
-        ]
+        with set_module_args({'name': 'nfs-utils', 'state': 'absent'}):
+            self.module_main_command.side_effect = [
+                (1, '', ''),
+            ]
 
-        result = self.module_main(AnsibleFailJson)
+            result = self.module_main(AnsibleFailJson)
 
         self.assertFalse(result['changed'])
         self.assertEqual(1, result['rc'])

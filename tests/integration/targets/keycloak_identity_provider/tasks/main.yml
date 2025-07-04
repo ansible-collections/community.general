@@ -35,14 +35,14 @@
       syncMode: FORCE
     mappers:
       - name: "first_name"
-        identityProviderAlias: "oidc-idp"
+        identityProviderAlias: "{{ idp }}"
         identityProviderMapper: "oidc-user-attribute-idp-mapper"
         config:
           claim: "first_name"
           user.attribute: "first_name"
           syncMode: "INHERIT"
       - name: "last_name"
-        identityProviderAlias: "oidc-idp"
+        identityProviderAlias: "{{ idp }}"
         identityProviderMapper: "oidc-user-attribute-idp-mapper"
         config:
           claim: "last_name"
@@ -62,6 +62,7 @@
       - result.existing == {}
       - result.end_state.alias == "{{ idp }}"
       - result.end_state.mappers != []
+      - result.end_state.config.client_secret = "**********"
 
 - name: Update existing identity provider (no change)
   community.general.keycloak_identity_provider:
@@ -84,14 +85,14 @@
       syncMode: FORCE
     mappers:
       - name: "first_name"
-        identityProviderAlias: "oidc-idp"
+        identityProviderAlias: "{{ idp }}"
         identityProviderMapper: "oidc-user-attribute-idp-mapper"
         config:
           claim: "first_name"
           user.attribute: "first_name"
           syncMode: "INHERIT"
       - name: "last_name"
-        identityProviderAlias: "oidc-idp"
+        identityProviderAlias: "{{ idp }}"
         identityProviderMapper: "oidc-user-attribute-idp-mapper"
         config:
           claim: "last_name"
@@ -109,7 +110,7 @@
     that:
       - result is not changed
 
-- name: Update existing identity provider (with change)
+- name: Update existing identity provider (with change, no mapper change)
   community.general.keycloak_identity_provider:
     auth_keycloak_url: "{{ url }}"
     auth_realm: "{{ admin_realm }}"
@@ -131,6 +132,109 @@
       - result is changed
       - result.existing.enabled == true
       - result.end_state.enabled == false
+
+- name: Update existing identity provider (delete mapper)
+  community.general.keycloak_identity_provider:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    alias: "{{ idp }}"
+    state: present
+    mappers:
+      - name: "first_name"
+        identityProviderAlias: "{{ idp }}"
+        identityProviderMapper: "oidc-user-attribute-idp-mapper"
+        config:
+          claim: "first_name"
+          user.attribute: "first_name"
+          syncMode: "INHERIT"
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Assert identity provider updated
+  assert:
+    that:
+      - result is changed
+      - result.existing.mappers | length == 2
+      - result.end_state.mappers | length == 1
+      - result.end_state.mappers[0].name == "first_name"
+
+- name: Update existing identity provider (add mapper)
+  community.general.keycloak_identity_provider:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    alias: "{{ idp }}"
+    state: present
+    mappers:
+      - name: "last_name"
+        identityProviderAlias: "{{ idp }}"
+        identityProviderMapper: "oidc-user-attribute-idp-mapper"
+        config:
+          claim: "last_name"
+          user.attribute: "last_name"
+          syncMode: "INHERIT"
+      - name: "first_name"
+        identityProviderAlias: "{{ idp }}"
+        identityProviderMapper: "oidc-user-attribute-idp-mapper"
+        config:
+          claim: "first_name"
+          user.attribute: "first_name"
+          syncMode: "INHERIT"
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Assert identity provider updated
+  assert:
+    that:
+      - result is changed
+      - result.existing.mappers | length == 1
+      - result.end_state.mappers | length == 2
+
+- name: Update existing identity provider (no change, test mapper idempotency)
+  community.general.keycloak_identity_provider:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    alias: "{{ idp }}"
+    state: present
+    mappers:
+      - name: "last_name"
+        identityProviderAlias: "{{ idp }}"
+        identityProviderMapper: "oidc-user-attribute-idp-mapper"
+        config:
+          claim: "last_name"
+          user.attribute: "last_name"
+          syncMode: "INHERIT"
+      - name: "first_name"
+        identityProviderAlias: "{{ idp }}"
+        identityProviderMapper: "oidc-user-attribute-idp-mapper"
+        config:
+          claim: "first_name"
+          user.attribute: "first_name"
+          syncMode: "INHERIT"
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Assert identity provider updated
+  assert:
+    that:
+      - result is not changed
 
 - name: Delete existing identity provider
   community.general.keycloak_identity_provider:

@@ -10,12 +10,12 @@ import sys
 from ansible_collections.community.general.plugins.modules import (
     pritunl_org_info,
 )
-from ansible_collections.community.general.tests.unit.compat.mock import patch
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
 from ansible_collections.community.general.tests.unit.plugins.module_utils.net_tools.pritunl.test_api import (
     PritunlListOrganizationMock,
     PritunlEmptyOrganizationMock,
 )
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import (
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
     AnsibleFailJson,
     ModuleTestCase,
@@ -49,9 +49,9 @@ class TestPritunlOrgInfo(ModuleTestCase):
         with self.patch_get_pritunl_organizations(
             side_effect=PritunlListOrganizationMock
         ) as org_mock:
-            set_module_args({})
-            with self.assertRaises(AnsibleFailJson):
-                self.module.main()
+            with set_module_args({}):
+                with self.assertRaises(AnsibleFailJson):
+                    self.module.main()
 
             self.assertEqual(org_mock.call_count, 0)
 
@@ -61,14 +61,14 @@ class TestPritunlOrgInfo(ModuleTestCase):
             side_effect=PritunlEmptyOrganizationMock
         ) as org_mock:
             with self.assertRaises(AnsibleExitJson) as result:
-                set_module_args(
+                with set_module_args(
                     {
                         "pritunl_api_token": "token",
                         "pritunl_api_secret": "secret",
                         "pritunl_url": "https://pritunl.domain.com",
                     }
-                )
-                self.module.main()
+                ):
+                    self.module.main()
 
                 self.assertEqual(org_mock.call_count, 1)
 
@@ -81,15 +81,15 @@ class TestPritunlOrgInfo(ModuleTestCase):
             side_effect=PritunlListOrganizationMock
         ) as org_mock:
             with self.assertRaises(AnsibleExitJson) as result:
-                set_module_args(
+                with set_module_args(
                     {
                         "pritunl_api_token": "token",
                         "pritunl_api_secret": "secret",
                         "pritunl_url": "https://pritunl.domain.com",
                         "org": "GumGum",
                     }
-                )
-                self.module.main()
+                ):
+                    self.module.main()
 
                 self.assertEqual(org_mock.call_count, 1)
 
@@ -102,15 +102,15 @@ class TestPritunlOrgInfo(ModuleTestCase):
             side_effect=PritunlListOrganizationMock
         ) as org_mock:
             with self.assertRaises(AnsibleFailJson) as result:
-                set_module_args(
+                with set_module_args(
                     {
                         "pritunl_api_token": "token",
                         "pritunl_api_secret": "secret",
                         "pritunl_url": "https://pritunl.domain.com",
                         "org": "Unknown",
                     }
-                )
-                self.module.main()
+                ):
+                    self.module.main()
 
                 self.assertEqual(org_mock.call_count, 1)
 
@@ -123,14 +123,14 @@ class TestPritunlOrgInfo(ModuleTestCase):
             side_effect=PritunlListOrganizationMock
         ) as org_mock:
             with self.assertRaises(AnsibleExitJson) as result:
-                set_module_args(
+                with set_module_args(
                     {
                         "pritunl_api_token": "token",
                         "pritunl_api_secret": "secret",
                         "pritunl_url": "https://pritunl.domain.com",
                     }
-                )
-                self.module.main()
+                ):
+                    self.module.main()
 
                 self.assertEqual(org_mock.call_count, 1)
 

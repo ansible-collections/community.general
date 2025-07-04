@@ -9,17 +9,14 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: vertica_schema
 short_description: Adds or removes Vertica database schema and roles
 description:
-  - Adds or removes Vertica database schema and, optionally, roles
-    with schema access privileges.
-  - A schema will not be removed until all the objects have been dropped.
-  - In such a situation, if the module tries to remove the schema it
-    will fail and only remove roles created for the schema if they have
-    no dependencies.
+  - Adds or removes Vertica database schema and, optionally, roles with schema access privileges.
+  - A schema is not removed until all the objects have been dropped.
+  - In such a situation, if the module tries to remove the schema it fails and only remove roles created for the schema if
+    they have no dependencies.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -78,19 +75,17 @@ options:
       - The password used to authenticate with.
     type: str
 notes:
-  - The default authentication assumes that you are either logging in as or sudo'ing
-    to the C(dbadmin) account on the host.
-  - This module uses C(pyodbc), a Python ODBC database adapter. You must ensure
-    that C(unixODBC) and C(pyodbc) is installed on the host and properly configured.
-  - Configuring C(unixODBC) for Vertica requires C(Driver = /opt/vertica/lib64/libverticaodbc.so)
-    to be added to the C(Vertica) section of either C(/etc/odbcinst.ini) or C($HOME/.odbcinst.ini)
-    and both C(ErrorMessagesPath = /opt/vertica/lib64) and C(DriverManagerEncoding = UTF-16)
-    to be added to the C(Driver) section of either C(/etc/vertica.ini) or C($HOME/.vertica.ini).
-requirements: [ 'unixODBC', 'pyodbc' ]
+  - The default authentication assumes that you are either logging in as or sudo'ing to the C(dbadmin) account on the host.
+  - This module uses C(pyodbc), a Python ODBC database adapter. You must ensure that C(unixODBC) and C(pyodbc) is installed
+    on the host and properly configured.
+  - Configuring C(unixODBC) for Vertica requires C(Driver = /opt/vertica/lib64/libverticaodbc.so) to be added to the C(Vertica)
+    section of either C(/etc/odbcinst.ini) or C($HOME/.odbcinst.ini) and both C(ErrorMessagesPath = /opt/vertica/lib64) and
+    C(DriverManagerEncoding = UTF-16) to be added to the C(Driver) section of either C(/etc/vertica.ini) or C($HOME/.vertica.ini).
+requirements: ['unixODBC', 'pyodbc']
 author: "Dariusz Owczarek (@dareko)"
-'''
+"""
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Creating a new vertica schema
   community.general.vertica_schema: name=schema_name db=db_name state=present
 
@@ -98,12 +93,8 @@ EXAMPLES = """
   community.general.vertica_schema: name=schema_name owner=dbowner db=db_name state=present
 
 - name: Creating a new schema with roles
-  community.general.vertica_schema:
-    name=schema_name
-    create_roles=schema_name_all
-    usage_roles=schema_name_ro,schema_name_rw
-    db=db_name
-    state=present
+  community.general.vertica_schema: name=schema_name create_roles=schema_name_all usage_roles=schema_name_ro,schema_name_rw
+    db=db_name state=present
 """
 import traceback
 

@@ -1,0 +1,89 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Set up environment
+  environment:
+    PATH: /usr/local/bin:{{ ansible_env.PATH }}
+  block:
+    - name: Uninstall pycowsay and black
+      community.general.pipx:
+        state: uninstall
+        name: "{{ item }}"
+      loop:
+        - black
+        - pycowsay
+
+    - name: Uninstall pycowsay and black (again)
+      community.general.pipx:
+        state: uninstall
+        name: "{{ item }}"
+      loop:
+        - black
+        - pycowsay
+      register: uninstall_all_1
+
+    - name: Install pycowsay and black
+      community.general.pipx:
+        state: install
+        name: "{{ item }}"
+      loop:
+        - black
+        - pycowsay
+      register: install_all_1
+
+    - name: Generate JSON spec
+      community.general.pipx_info:
+        include_raw: true
+      register: pipx_list
+
+    - name: Copy content
+      ansible.builtin.copy:
+        content: "{{ pipx_list.raw_output }}"
+        dest: "{{ remote_tmp_dir }}/spec.json"
+        mode: "0644"
+
+    - name: Uninstall pycowsay and black (again)
+      community.general.pipx:
+        state: uninstall
+        name: "{{ item }}"
+      loop:
+        - black
+        - pycowsay
+      register: uninstall_all_2
+
+    - name: Use install-all
+      community.general.pipx:
+        state: install_all
+        spec_metadata: "{{ remote_tmp_dir }}/spec.json"
+      register: install_all
+
+    - name: Run pycowsay (should succeed)
+      ansible.builtin.command: pycowsay Moooooooo!
+      changed_when: false
+      register: what_the_cow_said
+
+    - name: Which cow?
+      ansible.builtin.command: which pycowsay
+      changed_when: false
+      register: which_cow
+
+    - name: Uninstall pycowsay and black (again)
+      community.general.pipx:
+        state: uninstall
+        name: "{{ item }}"
+      loop:
+        - black
+        - pycowsay
+      register: uninstall_all_3
+
+    - name: Assert uninstall-all
+      ansible.builtin.assert:
+        that:
+          - uninstall_all_1 is not changed
+          - install_all_1 is changed
+          - uninstall_all_2 is changed
+          - install_all is changed
+          - "'Moooooooo!' in what_the_cow_said.stdout"
+          - uninstall_all_3 is changed

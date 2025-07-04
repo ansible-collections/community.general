@@ -8,16 +8,15 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: idrac_redfish_config
 short_description: Manages servers through iDRAC using Dell Redfish APIs
 description:
-  - For use with Dell iDRAC operations that require Redfish OEM extensions
-  - Builds Redfish URIs locally and sends them to remote iDRAC controllers to
-    set or update a configuration attribute.
+  - For use with Dell iDRAC operations that require Redfish OEM extensions.
+  - Builds Redfish URIs locally and sends them to remote iDRAC controllers to set or update a configuration attribute.
 extends_documentation_fragment:
   - community.general.attributes
+  - community.general.redfish
 attributes:
   check_mode:
     support: none
@@ -33,9 +32,8 @@ options:
     required: true
     description:
       - List of commands to execute on iDRAC.
-      - V(SetManagerAttributes), V(SetLifecycleControllerAttributes) and
-        V(SetSystemAttributes) are mutually exclusive commands when O(category)
-        is V(Manager).
+      - V(SetManagerAttributes), V(SetLifecycleControllerAttributes) and V(SetSystemAttributes) are mutually exclusive commands
+        when O(category) is V(Manager).
     type: list
     elements: str
   baseuri:
@@ -74,90 +72,96 @@ options:
       - ID of the System, Manager or Chassis to modify.
     type: str
     version_added: '0.2.0'
+  validate_certs:
+    version_added: 10.6.0
+  ca_path:
+    version_added: 10.6.0
+  ciphers:
+    version_added: 10.6.0
 
 author: "Jose Delarosa (@jose-delarosa)"
-'''
+"""
 
-EXAMPLES = '''
-  - name: Enable NTP and set NTP server and Time zone attributes in iDRAC
-    community.general.idrac_redfish_config:
-      category: Manager
-      command: SetManagerAttributes
-      resource_id: iDRAC.Embedded.1
-      manager_attributes:
-        NTPConfigGroup.1.NTPEnable: "Enabled"
-        NTPConfigGroup.1.NTP1: "{{ ntpserver1 }}"
-        Time.1.Timezone: "{{ timezone }}"
-      baseuri: "{{ baseuri }}"
-      username: "{{ username}}"
-      password: "{{ password }}"
+EXAMPLES = r"""
+- name: Enable NTP and set NTP server and Time zone attributes in iDRAC
+  community.general.idrac_redfish_config:
+    category: Manager
+    command: SetManagerAttributes
+    resource_id: iDRAC.Embedded.1
+    manager_attributes:
+      NTPConfigGroup.1.NTPEnable: "Enabled"
+      NTPConfigGroup.1.NTP1: "{{ ntpserver1 }}"
+      Time.1.Timezone: "{{ timezone }}"
+    baseuri: "{{ baseuri }}"
+    username: "{{ username}}"
+    password: "{{ password }}"
 
-  - name: Enable Syslog and set Syslog servers in iDRAC
-    community.general.idrac_redfish_config:
-      category: Manager
-      command: SetManagerAttributes
-      resource_id: iDRAC.Embedded.1
-      manager_attributes:
-        SysLog.1.SysLogEnable: "Enabled"
-        SysLog.1.Server1: "{{ syslog_server1 }}"
-        SysLog.1.Server2: "{{ syslog_server2 }}"
-      baseuri: "{{ baseuri }}"
-      username: "{{ username}}"
-      password: "{{ password }}"
+- name: Enable Syslog and set Syslog servers in iDRAC
+  community.general.idrac_redfish_config:
+    category: Manager
+    command: SetManagerAttributes
+    resource_id: iDRAC.Embedded.1
+    manager_attributes:
+      SysLog.1.SysLogEnable: "Enabled"
+      SysLog.1.Server1: "{{ syslog_server1 }}"
+      SysLog.1.Server2: "{{ syslog_server2 }}"
+    baseuri: "{{ baseuri }}"
+    username: "{{ username}}"
+    password: "{{ password }}"
 
-  - name: Configure SNMP community string, port, protocol and trap format
-    community.general.idrac_redfish_config:
-      category: Manager
-      command: SetManagerAttributes
-      resource_id: iDRAC.Embedded.1
-      manager_attributes:
-        SNMP.1.AgentEnable: "Enabled"
-        SNMP.1.AgentCommunity: "public_community_string"
-        SNMP.1.TrapFormat: "SNMPv1"
-        SNMP.1.SNMPProtocol: "All"
-        SNMP.1.DiscoveryPort: 161
-        SNMP.1.AlertPort: 162
-      baseuri: "{{ baseuri }}"
-      username: "{{ username}}"
-      password: "{{ password }}"
+- name: Configure SNMP community string, port, protocol and trap format
+  community.general.idrac_redfish_config:
+    category: Manager
+    command: SetManagerAttributes
+    resource_id: iDRAC.Embedded.1
+    manager_attributes:
+      SNMP.1.AgentEnable: "Enabled"
+      SNMP.1.AgentCommunity: "public_community_string"
+      SNMP.1.TrapFormat: "SNMPv1"
+      SNMP.1.SNMPProtocol: "All"
+      SNMP.1.DiscoveryPort: 161
+      SNMP.1.AlertPort: 162
+    baseuri: "{{ baseuri }}"
+    username: "{{ username}}"
+    password: "{{ password }}"
 
-  - name: Enable CSIOR
-    community.general.idrac_redfish_config:
-      category: Manager
-      command: SetLifecycleControllerAttributes
-      resource_id: iDRAC.Embedded.1
-      manager_attributes:
-        LCAttributes.1.CollectSystemInventoryOnRestart: "Enabled"
-      baseuri: "{{ baseuri }}"
-      username: "{{ username}}"
-      password: "{{ password }}"
+- name: Enable CSIOR
+  community.general.idrac_redfish_config:
+    category: Manager
+    command: SetLifecycleControllerAttributes
+    resource_id: iDRAC.Embedded.1
+    manager_attributes:
+      LCAttributes.1.CollectSystemInventoryOnRestart: "Enabled"
+    baseuri: "{{ baseuri }}"
+    username: "{{ username}}"
+    password: "{{ password }}"
 
-  - name: Set Power Supply Redundancy Policy to A/B Grid Redundant
-    community.general.idrac_redfish_config:
-      category: Manager
-      command: SetSystemAttributes
-      resource_id: iDRAC.Embedded.1
-      manager_attributes:
-        ServerPwr.1.PSRedPolicy: "A/B Grid Redundant"
-      baseuri: "{{ baseuri }}"
-      username: "{{ username}}"
-      password: "{{ password }}"
-'''
+- name: Set Power Supply Redundancy Policy to A/B Grid Redundant
+  community.general.idrac_redfish_config:
+    category: Manager
+    command: SetSystemAttributes
+    resource_id: iDRAC.Embedded.1
+    manager_attributes:
+      ServerPwr.1.PSRedPolicy: "A/B Grid Redundant"
+    baseuri: "{{ baseuri }}"
+    username: "{{ username}}"
+    password: "{{ password }}"
+"""
 
-RETURN = '''
+RETURN = r"""
 msg:
-    description: Message with action result or error description
-    returned: always
-    type: str
-    sample: "Action was successful"
-'''
+  description: Message with action result or error description.
+  returned: always
+  type: str
+  sample: "Action was successful"
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.validation import (
     check_mutually_exclusive,
     check_required_arguments
 )
-from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils
+from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils, REDFISH_COMMON_ARGUMENT_SPEC
 from ansible.module_utils.common.text.converters import to_native
 
 
@@ -249,18 +253,20 @@ CATEGORY_COMMANDS_MUTUALLY_EXCLUSIVE = {
 
 def main():
     result = {}
+    argument_spec = dict(
+        category=dict(required=True),
+        command=dict(required=True, type='list', elements='str'),
+        baseuri=dict(required=True),
+        username=dict(),
+        password=dict(no_log=True),
+        auth_token=dict(no_log=True),
+        manager_attributes=dict(type='dict', default={}),
+        timeout=dict(type='int', default=10),
+        resource_id=dict()
+    )
+    argument_spec.update(REDFISH_COMMON_ARGUMENT_SPEC)
     module = AnsibleModule(
-        argument_spec=dict(
-            category=dict(required=True),
-            command=dict(required=True, type='list', elements='str'),
-            baseuri=dict(required=True),
-            username=dict(),
-            password=dict(no_log=True),
-            auth_token=dict(no_log=True),
-            manager_attributes=dict(type='dict', default={}),
-            timeout=dict(type='int', default=10),
-            resource_id=dict()
-        ),
+        argument_spec,
         required_together=[
             ('username', 'password'),
         ],

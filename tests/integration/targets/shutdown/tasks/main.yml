@@ -44,7 +44,7 @@
 - name: Verify shutdown command is present in Alpine except systemd
   assert:
     that: '"poweroff" in shutdown_result["shutdown_command"]'
-  when: 
+  when:
     - "ansible_os_family == 'Alpine'"
     - '"systemctl" not in shutdown_result["shutdown_command"]'
 
@@ -52,7 +52,7 @@
 - name: Verify shutdown command is present in VMKernel except systemd
   assert:
     that: '"halt" in shutdown_result["shutdown_command"]'
-  when: 
+  when:
     - "ansible_system == 'VMKernel'"
     - '"systemctl" not in shutdown_result["shutdown_command"]'
 
@@ -111,7 +111,7 @@
   community.general.shutdown:
   register: shutdown_result
   check_mode: true
-  when: 
+  when:
     - "(ansible_distribution == 'Ubuntu' and ansible_distribution_major_version is version('18', '>=')) or (ansible_distribution == 'Debian')"
     - '"systemd-sysv" not in ansible_facts.packages'
 

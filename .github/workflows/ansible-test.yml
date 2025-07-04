@@ -7,7 +7,7 @@
 # https://github.com/marketplace/actions/ansible-test
 
 name: EOL CI
-on:
+"on":
   # Run EOL CI against all pushes (direct commits, also merged PRs), Pull Requests
   push:
     branches:
@@ -29,28 +29,21 @@ jobs:
     strategy:
       matrix:
         ansible:
-          - '2.13'
-    # Ansible-test on various stable branches does not yet work well with cgroups v2.
-    # Since ubuntu-latest now uses Ubuntu 22.04, we need to fall back to the ubuntu-20.04
-    # image for these stable branches. The list of branches where this is necessary will
-    # shrink over time, check out https://github.com/ansible-collections/news-for-maintainers/issues/28
-    # for the latest list.
+          - '2.16'
     runs-on: ubuntu-latest
     steps:
       - name: Perform sanity testing
         uses: felixfontein/ansible-test-gh-action@main
         with:
           ansible-core-version: stable-${{ matrix.ansible }}
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
           coverage: ${{ github.event_name == 'schedule' && 'always' || 'never' }}
           pull-request-change-detection: 'true'
           testing-type: sanity
+          pre-test-cmd: >-
+            git clone --depth=1 --single-branch https://github.com/ansible-collections/community.internal_test_tools.git ../../community/internal_test_tools
 
   units:
-    # Ansible-test on various stable branches does not yet work well with cgroups v2.
-    # Since ubuntu-latest now uses Ubuntu 22.04, we need to fall back to the ubuntu-20.04
-    # image for these stable branches. The list of branches where this is necessary will
-    # shrink over time, check out https://github.com/ansible-collections/news-for-maintainers/issues/28
-    # for the latest list.
     runs-on: ubuntu-latest
     name: EOL Units (Ⓐ${{ matrix.ansible }}+py${{ matrix.python }})
     strategy:
@@ -64,14 +57,12 @@ jobs:
         exclude:
           - ansible: ''
         include:
-          - ansible: '2.13'
+          - ansible: '2.16'
             python: '2.7'
-          - ansible: '2.13'
-            python: '3.8'
-          - ansible: '2.13'
-            python: '2.7'
-          - ansible: '2.13'
-            python: '3.8'
+          - ansible: '2.16'
+            python: '3.6'
+          - ansible: '2.16'
+            python: '3.11'
 
     steps:
       - name: >-
@@ -80,6 +71,7 @@ jobs:
         uses: felixfontein/ansible-test-gh-action@main
         with:
           ansible-core-version: stable-${{ matrix.ansible }}
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
           coverage: ${{ github.event_name == 'schedule' && 'always' || 'never' }}
           pre-test-cmd: >-
             mkdir -p ../../ansible
@@ -90,11 +82,6 @@ jobs:
           testing-type: units
 
   integration:
-    # Ansible-test on various stable branches does not yet work well with cgroups v2.
-    # Since ubuntu-latest now uses Ubuntu 22.04, we need to fall back to the ubuntu-20.04
-    # image for these stable branches. The list of branches where this is necessary will
-    # shrink over time, check out https://github.com/ansible-collections/news-for-maintainers/issues/28
-    # for the latest list.
     runs-on: ubuntu-latest
     name: EOL I (Ⓐ${{ matrix.ansible }}+${{ matrix.docker }}+py${{ matrix.python }}:${{ matrix.target }})
     strategy:
@@ -111,47 +98,56 @@ jobs:
         exclude:
           - ansible: ''
         include:
-          # 2.13
-          - ansible: '2.13'
-            docker: fedora35
+          # 2.16
+          # CentOS 7 does not work in GHA, that's why it's not listed here.
+          - ansible: '2.16'
+            docker: fedora38
             python: ''
             target: azp/posix/1/
-          - ansible: '2.13'
-            docker: fedora35
+          - ansible: '2.16'
+            docker: fedora38
             python: ''
             target: azp/posix/2/
-          - ansible: '2.13'
-            docker: fedora35
+          - ansible: '2.16'
+            docker: fedora38
             python: ''
             target: azp/posix/3/
-          - ansible: '2.13'
-            docker: opensuse15py2
+          - ansible: '2.16'
+            docker: opensuse15
             python: ''
             target: azp/posix/1/
-          - ansible: '2.13'
-            docker: opensuse15py2
+          - ansible: '2.16'
+            docker: opensuse15
             python: ''
             target: azp/posix/2/
-          - ansible: '2.13'
-            docker: opensuse15py2
+          - ansible: '2.16'
+            docker: opensuse15
             python: ''
             target: azp/posix/3/
-          - ansible: '2.13'
+          - ansible: '2.16'
             docker: alpine3
             python: ''
             target: azp/posix/1/
-          - ansible: '2.13'
+          - ansible: '2.16'
             docker: alpine3
             python: ''
             target: azp/posix/2/
-          - ansible: '2.13'
+          - ansible: '2.16'
             docker: alpine3
             python: ''
             target: azp/posix/3/
           # Right now all generic tests are disabled. Uncomment when at least one of them is re-enabled.
-          # - ansible: '2.13'
+          # - ansible: '2.16'
           #   docker: default
-          #   python: '3.9'
+          #   python: '2.7'
+          #   target: azp/generic/1/
+          # - ansible: '2.16'
+          #   docker: default
+          #   python: '3.6'
+          #   target: azp/generic/1/
+          # - ansible: '2.16'
+          #   docker: default
+          #   python: '3.11'
           #   target: azp/generic/1/
 
     steps:
@@ -162,17 +158,21 @@ jobs:
         uses: felixfontein/ansible-test-gh-action@main
         with:
           ansible-core-version: stable-${{ matrix.ansible }}
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
           coverage: ${{ github.event_name == 'schedule' && 'always' || 'never' }}
           docker-image: ${{ matrix.docker }}
           integration-continue-on-error: 'false'
           integration-diff: 'false'
           integration-retry-on-error: 'true'
+          # TODO: remove "--branch stable-2" from community.crypto install once we're only using ansible-core 2.17 or newer!
           pre-test-cmd: >-
             mkdir -p ../../ansible
             ;
             git clone --depth=1 --single-branch https://github.com/ansible-collections/ansible.posix.git ../../ansible/posix
             ;
-            git clone --depth=1 --single-branch https://github.com/ansible-collections/community.crypto.git ../../community/crypto
+            git clone --depth=1 --single-branch --branch stable-2 https://github.com/ansible-collections/community.crypto.git ../../community/crypto
+            ;
+            git clone --depth=1 --single-branch https://github.com/ansible-collections/community.docker.git ../../community/docker
             ;
             git clone --depth=1 --single-branch https://github.com/ansible-collections/community.internal_test_tools.git ../../community/internal_test_tools
           pull-request-change-detection: 'true'

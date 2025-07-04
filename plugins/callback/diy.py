@@ -4,605 +4,599 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
-DOCUMENTATION = r'''
-  name: diy
-  type: stdout
-  short_description: Customize the output
-  version_added: 0.2.0
-  description:
-    - Callback plugin that allows you to supply your own custom callback templates to be output.
-  author: Trevor Highfill (@theque5t)
-  extends_documentation_fragment:
-    - default_callback
-  notes:
-    - Uses the P(ansible.builtin.default#callback) callback plugin output when a custom callback V(message(msg\)) is not provided.
-    - Makes the callback event data available via the C(ansible_callback_diy) dictionary, which can be used in the templating context for the options.
-      The dictionary is only available in the templating context for the options. It is not a variable that is available via the other
-      various execution contexts, such as playbook, play, task etc.
-    - Options being set by their respective variable input can only be set using the variable if the variable was set in a context that is available to the
-      respective callback.
-      Use the C(ansible_callback_diy) dictionary to see what is available to a callback. Additionally, C(ansible_callback_diy.top_level_var_names) will output
-      the top level variable names available to the callback.
-    - Each option value is rendered as a template before being evaluated. This allows for the dynamic usage of an option. For example,
-      C("{{ 'yellow' if ansible_callback_diy.result.is_changed else 'bright green' }}")
-    - "**Condition** for all C(msg) options:
-                    if value C(is None or omit),
-                    then the option is not being used.
-       **Effect**: use of the C(default) callback plugin for output"
-    - "**Condition** for all C(msg) options:
-                    if value C(is not None and not omit and length is not greater than 0),
-                    then the option is being used without output.
-       **Effect**: suppress output"
-    - "**Condition** for all C(msg) options:
-                    if value C(is not None and not omit and length is greater than 0),
-                    then the option is being used with output.
-       **Effect**: render value as template and output"
-    - "Valid color values: V(black), V(bright gray), V(blue), V(white), V(green), V(bright blue), V(cyan), V(bright green), V(red), V(bright cyan),
-      V(purple), V(bright red), V(yellow), V(bright purple), V(dark gray), V(bright yellow), V(magenta), V(bright magenta), V(normal)"
-  seealso:
-    - name: default – default Ansible screen output
-      description: The official documentation on the B(default) callback plugin.
-      link: https://docs.ansible.com/ansible/latest/plugins/callback/default.html
-  requirements:
-    - set as stdout_callback in configuration
-  options:
-    on_any_msg:
-      description: Output to be used for callback on_any.
-      ini:
-        - section: callback_diy
-          key: on_any_msg
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_ON_ANY_MSG
-      vars:
-        - name: ansible_callback_diy_on_any_msg
-      type: str
+DOCUMENTATION = r"""
+name: diy
+type: stdout
+short_description: Customize the output
+version_added: 0.2.0
+description:
+  - Callback plugin that allows you to supply your own custom callback templates to be output.
+author: Trevor Highfill (@theque5t)
+extends_documentation_fragment:
+  - default_callback
+notes:
+  - Uses the P(ansible.builtin.default#callback) callback plugin output when a custom callback V(message(msg\)) is not provided.
+  - Makes the callback event data available using the C(ansible_callback_diy) dictionary, which can be used in the templating
+    context for the options. The dictionary is only available in the templating context for the options. It is not a variable
+    that is available using the other various execution contexts, such as playbook, play, task, and so on so forth.
+  - Options being set by their respective variable input can only be set using the variable if the variable was set in a context
+    that is available to the respective callback. Use the C(ansible_callback_diy) dictionary to see what is available to a
+    callback. Additionally, C(ansible_callback_diy.top_level_var_names) outputs the top level variable names available
+    to the callback.
+  - Each option value is rendered as a template before being evaluated. This allows for the dynamic usage of an option. For
+    example, V("{{ 'yellow' if ansible_callback_diy.result.is_changed else 'bright green' }}").
+  - 'B(Condition) for all C(msg) options: if value V(is None or omit), then the option is not being used. B(Effect): use of
+    the C(default) callback plugin for output.'
+  - 'B(Condition) for all C(msg) options: if value V(is not None and not omit and length is not greater than 0), then the
+    option is being used without output. B(Effect): suppress output.'
+  - 'B(Condition) for all C(msg) options: if value V(is not None and not omit and length is greater than 0), then the option
+    is being used with output. B(Effect): render value as template and output.'
+  - 'Valid color values: V(black), V(bright gray), V(blue), V(white), V(green), V(bright blue), V(cyan), V(bright green),
+    V(red), V(bright cyan), V(purple), V(bright red), V(yellow), V(bright purple), V(dark gray), V(bright yellow), V(magenta),
+    V(bright magenta), V(normal).'
+seealso:
+  - name: default – default Ansible screen output
+    description: The official documentation on the B(default) callback plugin.
+    link: https://docs.ansible.com/ansible/latest/plugins/callback/default.html
+requirements:
+  - set as stdout_callback in configuration
+options:
+  on_any_msg:
+    description: Output to be used for callback on_any.
+    ini:
+      - section: callback_diy
+        key: on_any_msg
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_ON_ANY_MSG
+    vars:
+      - name: ansible_callback_diy_on_any_msg
+    type: str
 
-    on_any_msg_color:
-      description:
-        - Output color to be used for O(on_any_msg).
-        - Template should render a L(valid color value,#notes).
-      ini:
-        - section: callback_diy
-          key: on_any_msg_color
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_ON_ANY_MSG_COLOR
-      vars:
-        - name: ansible_callback_diy_on_any_msg_color
-      type: str
+  on_any_msg_color:
+    description:
+      - Output color to be used for O(on_any_msg).
+      - Template should render a L(valid color value,#notes).
+    ini:
+      - section: callback_diy
+        key: on_any_msg_color
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_ON_ANY_MSG_COLOR
+    vars:
+      - name: ansible_callback_diy_on_any_msg_color
+    type: str
 
-    runner_on_failed_msg:
-      description: Output to be used for callback runner_on_failed.
-      ini:
-        - section: callback_diy
-          key: runner_on_failed_msg
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_FAILED_MSG
-      vars:
-        - name: ansible_callback_diy_runner_on_failed_msg
-      type: str
+  runner_on_failed_msg:
+    description: Output to be used for callback runner_on_failed.
+    ini:
+      - section: callback_diy
+        key: runner_on_failed_msg
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_FAILED_MSG
+    vars:
+      - name: ansible_callback_diy_runner_on_failed_msg
+    type: str
 
-    runner_on_failed_msg_color:
-      description:
-        - Output color to be used for O(runner_on_failed_msg).
-        - Template should render a L(valid color value,#notes).
-      ini:
-        - section: callback_diy
-          key: runner_on_failed_msg_color
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_FAILED_MSG_COLOR
-      vars:
-        - name: ansible_callback_diy_runner_on_failed_msg_color
-      type: str
+  runner_on_failed_msg_color:
+    description:
+      - Output color to be used for O(runner_on_failed_msg).
+      - Template should render a L(valid color value,#notes).
+    ini:
+      - section: callback_diy
+        key: runner_on_failed_msg_color
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_FAILED_MSG_COLOR
+    vars:
+      - name: ansible_callback_diy_runner_on_failed_msg_color
+    type: str
 
-    runner_on_ok_msg:
-      description: Output to be used for callback runner_on_ok.
-      ini:
-        - section: callback_diy
-          key: runner_on_ok_msg
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_OK_MSG
-      vars:
-        - name: ansible_callback_diy_runner_on_ok_msg
-      type: str
+  runner_on_ok_msg:
+    description: Output to be used for callback runner_on_ok.
+    ini:
+      - section: callback_diy
+        key: runner_on_ok_msg
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_OK_MSG
+    vars:
+      - name: ansible_callback_diy_runner_on_ok_msg
+    type: str
 
-    runner_on_ok_msg_color:
-      description:
-        - Output color to be used for O(runner_on_ok_msg).
-        - Template should render a L(valid color value,#notes).
-      ini:
-        - section: callback_diy
-          key: runner_on_ok_msg_color
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_OK_MSG_COLOR
-      vars:
-        - name: ansible_callback_diy_runner_on_ok_msg_color
-      type: str
+  runner_on_ok_msg_color:
+    description:
+      - Output color to be used for O(runner_on_ok_msg).
+      - Template should render a L(valid color value,#notes).
+    ini:
+      - section: callback_diy
+        key: runner_on_ok_msg_color
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_OK_MSG_COLOR
+    vars:
+      - name: ansible_callback_diy_runner_on_ok_msg_color
+    type: str
 
-    runner_on_skipped_msg:
-      description: Output to be used for callback runner_on_skipped.
-      ini:
-        - section: callback_diy
-          key: runner_on_skipped_msg
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_SKIPPED_MSG
-      vars:
-        - name: ansible_callback_diy_runner_on_skipped_msg
-      type: str
+  runner_on_skipped_msg:
+    description: Output to be used for callback runner_on_skipped.
+    ini:
+      - section: callback_diy
+        key: runner_on_skipped_msg
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_SKIPPED_MSG
+    vars:
+      - name: ansible_callback_diy_runner_on_skipped_msg
+    type: str
 
-    runner_on_skipped_msg_color:
-      description:
-        - Output color to be used for O(runner_on_skipped_msg).
-        - Template should render a L(valid color value,#notes).
-      ini:
-        - section: callback_diy
-          key: runner_on_skipped_msg_color
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_SKIPPED_MSG_COLOR
-      vars:
-        - name: ansible_callback_diy_runner_on_skipped_msg_color
-      type: str
+  runner_on_skipped_msg_color:
+    description:
+      - Output color to be used for O(runner_on_skipped_msg).
+      - Template should render a L(valid color value,#notes).
+    ini:
+      - section: callback_diy
+        key: runner_on_skipped_msg_color
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_SKIPPED_MSG_COLOR
+    vars:
+      - name: ansible_callback_diy_runner_on_skipped_msg_color
+    type: str
 
-    runner_on_unreachable_msg:
-      description: Output to be used for callback runner_on_unreachable.
-      ini:
-        - section: callback_diy
-          key: runner_on_unreachable_msg
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_UNREACHABLE_MSG
-      vars:
-        - name: ansible_callback_diy_runner_on_unreachable_msg
-      type: str
+  runner_on_unreachable_msg:
+    description: Output to be used for callback runner_on_unreachable.
+    ini:
+      - section: callback_diy
+        key: runner_on_unreachable_msg
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_UNREACHABLE_MSG
+    vars:
+      - name: ansible_callback_diy_runner_on_unreachable_msg
+    type: str
 
-    runner_on_unreachable_msg_color:
-      description:
-        - Output color to be used for O(runner_on_unreachable_msg).
-        - Template should render a L(valid color value,#notes).
-      ini:
-        - section: callback_diy
-          key: runner_on_unreachable_msg_color
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_UNREACHABLE_MSG_COLOR
-      vars:
-        - name: ansible_callback_diy_runner_on_unreachable_msg_color
-      type: str
+  runner_on_unreachable_msg_color:
+    description:
+      - Output color to be used for O(runner_on_unreachable_msg).
+      - Template should render a L(valid color value,#notes).
+    ini:
+      - section: callback_diy
+        key: runner_on_unreachable_msg_color
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_UNREACHABLE_MSG_COLOR
+    vars:
+      - name: ansible_callback_diy_runner_on_unreachable_msg_color
+    type: str
 
-    playbook_on_start_msg:
-      description: Output to be used for callback playbook_on_start.
-      ini:
-        - section: callback_diy
-          key: playbook_on_start_msg
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_START_MSG
-      vars:
-        - name: ansible_callback_diy_playbook_on_start_msg
-      type: str
+  playbook_on_start_msg:
+    description: Output to be used for callback playbook_on_start.
+    ini:
+      - section: callback_diy
+        key: playbook_on_start_msg
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_START_MSG
+    vars:
+      - name: ansible_callback_diy_playbook_on_start_msg
+    type: str
 
-    playbook_on_start_msg_color:
-      description:
-        - Output color to be used for O(playbook_on_start_msg).
-        - Template should render a L(valid color value,#notes).
-      ini:
-        - section: callback_diy
-          key: playbook_on_start_msg_color
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_START_MSG_COLOR
-      vars:
-        - name: ansible_callback_diy_playbook_on_start_msg_color
-      type: str
+  playbook_on_start_msg_color:
+    description:
+      - Output color to be used for O(playbook_on_start_msg).
+      - Template should render a L(valid color value,#notes).
+    ini:
+      - section: callback_diy
+        key: playbook_on_start_msg_color
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_START_MSG_COLOR
+    vars:
+      - name: ansible_callback_diy_playbook_on_start_msg_color
+    type: str
 
-    playbook_on_notify_msg:
-      description: Output to be used for callback playbook_on_notify.
-      ini:
-        - section: callback_diy
-          key: playbook_on_notify_msg
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_NOTIFY_MSG
-      vars:
-        - name: ansible_callback_diy_playbook_on_notify_msg
-      type: str
+  playbook_on_notify_msg:
+    description: Output to be used for callback playbook_on_notify.
+    ini:
+      - section: callback_diy
+        key: playbook_on_notify_msg
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_NOTIFY_MSG
+    vars:
+      - name: ansible_callback_diy_playbook_on_notify_msg
+    type: str
 
-    playbook_on_notify_msg_color:
-      description:
-        - Output color to be used for O(playbook_on_notify_msg).
-        - Template should render a L(valid color value,#notes).
-      ini:
-        - section: callback_diy
-          key: playbook_on_notify_msg_color
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_NOTIFY_MSG_COLOR
-      vars:
-        - name: ansible_callback_diy_playbook_on_notify_msg_color
-      type: str
+  playbook_on_notify_msg_color:
+    description:
+      - Output color to be used for O(playbook_on_notify_msg).
+      - Template should render a L(valid color value,#notes).
+    ini:
+      - section: callback_diy
+        key: playbook_on_notify_msg_color
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_NOTIFY_MSG_COLOR
+    vars:
+      - name: ansible_callback_diy_playbook_on_notify_msg_color
+    type: str
 
-    playbook_on_no_hosts_matched_msg:
-      description: Output to be used for callback playbook_on_no_hosts_matched.
-      ini:
-        - section: callback_diy
-          key: playbook_on_no_hosts_matched_msg
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_NO_HOSTS_MATCHED_MSG
-      vars:
-        - name: ansible_callback_diy_playbook_on_no_hosts_matched_msg
-      type: str
+  playbook_on_no_hosts_matched_msg:
+    description: Output to be used for callback playbook_on_no_hosts_matched.
+    ini:
+      - section: callback_diy
+        key: playbook_on_no_hosts_matched_msg
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_NO_HOSTS_MATCHED_MSG
+    vars:
+      - name: ansible_callback_diy_playbook_on_no_hosts_matched_msg
+    type: str
 
-    playbook_on_no_hosts_matched_msg_color:
-      description:
-        - Output color to be used for O(playbook_on_no_hosts_matched_msg).
-        - Template should render a L(valid color value,#notes).
-      ini:
-        - section: callback_diy
-          key: playbook_on_no_hosts_matched_msg_color
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_NO_HOSTS_MATCHED_MSG_COLOR
-      vars:
-        - name: ansible_callback_diy_playbook_on_no_hosts_matched_msg_color
-      type: str
+  playbook_on_no_hosts_matched_msg_color:
+    description:
+      - Output color to be used for O(playbook_on_no_hosts_matched_msg).
+      - Template should render a L(valid color value,#notes).
+    ini:
+      - section: callback_diy
+        key: playbook_on_no_hosts_matched_msg_color
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_NO_HOSTS_MATCHED_MSG_COLOR
+    vars:
+      - name: ansible_callback_diy_playbook_on_no_hosts_matched_msg_color
+    type: str
 
-    playbook_on_no_hosts_remaining_msg:
-      description: Output to be used for callback playbook_on_no_hosts_remaining.
-      ini:
-        - section: callback_diy
-          key: playbook_on_no_hosts_remaining_msg
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_NO_HOSTS_REMAINING_MSG
-      vars:
-        - name: ansible_callback_diy_playbook_on_no_hosts_remaining_msg
-      type: str
+  playbook_on_no_hosts_remaining_msg:
+    description: Output to be used for callback playbook_on_no_hosts_remaining.
+    ini:
+      - section: callback_diy
+        key: playbook_on_no_hosts_remaining_msg
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_NO_HOSTS_REMAINING_MSG
+    vars:
+      - name: ansible_callback_diy_playbook_on_no_hosts_remaining_msg
+    type: str
 
-    playbook_on_no_hosts_remaining_msg_color:
-      description:
-        - Output color to be used for O(playbook_on_no_hosts_remaining_msg).
-        - Template should render a L(valid color value,#notes).
-      ini:
-        - section: callback_diy
-          key: playbook_on_no_hosts_remaining_msg_color
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_NO_HOSTS_REMAINING_MSG_COLOR
-      vars:
-        - name: ansible_callback_diy_playbook_on_no_hosts_remaining_msg_color
-      type: str
+  playbook_on_no_hosts_remaining_msg_color:
+    description:
+      - Output color to be used for O(playbook_on_no_hosts_remaining_msg).
+      - Template should render a L(valid color value,#notes).
+    ini:
+      - section: callback_diy
+        key: playbook_on_no_hosts_remaining_msg_color
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_NO_HOSTS_REMAINING_MSG_COLOR
+    vars:
+      - name: ansible_callback_diy_playbook_on_no_hosts_remaining_msg_color
+    type: str
 
-    playbook_on_task_start_msg:
-      description: Output to be used for callback playbook_on_task_start.
-      ini:
-        - section: callback_diy
-          key: playbook_on_task_start_msg
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_TASK_START_MSG
-      vars:
-        - name: ansible_callback_diy_playbook_on_task_start_msg
-      type: str
+  playbook_on_task_start_msg:
+    description: Output to be used for callback playbook_on_task_start.
+    ini:
+      - section: callback_diy
+        key: playbook_on_task_start_msg
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_TASK_START_MSG
+    vars:
+      - name: ansible_callback_diy_playbook_on_task_start_msg
+    type: str
 
-    playbook_on_task_start_msg_color:
-      description:
-        - Output color to be used for O(playbook_on_task_start_msg).
-        - Template should render a L(valid color value,#notes).
-      ini:
-        - section: callback_diy
-          key: playbook_on_task_start_msg_color
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_TASK_START_MSG_COLOR
-      vars:
-        - name: ansible_callback_diy_playbook_on_task_start_msg_color
-      type: str
+  playbook_on_task_start_msg_color:
+    description:
+      - Output color to be used for O(playbook_on_task_start_msg).
+      - Template should render a L(valid color value,#notes).
+    ini:
+      - section: callback_diy
+        key: playbook_on_task_start_msg_color
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_TASK_START_MSG_COLOR
+    vars:
+      - name: ansible_callback_diy_playbook_on_task_start_msg_color
+    type: str
 
-    playbook_on_handler_task_start_msg:
-      description: Output to be used for callback playbook_on_handler_task_start.
-      ini:
-        - section: callback_diy
-          key: playbook_on_handler_task_start_msg
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_HANDLER_TASK_START_MSG
-      vars:
-        - name: ansible_callback_diy_playbook_on_handler_task_start_msg
-      type: str
+  playbook_on_handler_task_start_msg:
+    description: Output to be used for callback playbook_on_handler_task_start.
+    ini:
+      - section: callback_diy
+        key: playbook_on_handler_task_start_msg
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_HANDLER_TASK_START_MSG
+    vars:
+      - name: ansible_callback_diy_playbook_on_handler_task_start_msg
+    type: str
 
-    playbook_on_handler_task_start_msg_color:
-      description:
-        - Output color to be used for O(playbook_on_handler_task_start_msg).
-        - Template should render a L(valid color value,#notes).
-      ini:
-        - section: callback_diy
-          key: playbook_on_handler_task_start_msg_color
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_HANDLER_TASK_START_MSG_COLOR
-      vars:
-        - name: ansible_callback_diy_playbook_on_handler_task_start_msg_color
-      type: str
+  playbook_on_handler_task_start_msg_color:
+    description:
+      - Output color to be used for O(playbook_on_handler_task_start_msg).
+      - Template should render a L(valid color value,#notes).
+    ini:
+      - section: callback_diy
+        key: playbook_on_handler_task_start_msg_color
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_HANDLER_TASK_START_MSG_COLOR
+    vars:
+      - name: ansible_callback_diy_playbook_on_handler_task_start_msg_color
+    type: str
 
-    playbook_on_vars_prompt_msg:
-      description: Output to be used for callback playbook_on_vars_prompt.
-      ini:
-        - section: callback_diy
-          key: playbook_on_vars_prompt_msg
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_VARS_PROMPT_MSG
-      vars:
-        - name: ansible_callback_diy_playbook_on_vars_prompt_msg
-      type: str
+  playbook_on_vars_prompt_msg:
+    description: Output to be used for callback playbook_on_vars_prompt.
+    ini:
+      - section: callback_diy
+        key: playbook_on_vars_prompt_msg
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_VARS_PROMPT_MSG
+    vars:
+      - name: ansible_callback_diy_playbook_on_vars_prompt_msg
+    type: str
 
-    playbook_on_vars_prompt_msg_color:
-      description:
-        - Output color to be used for O(playbook_on_vars_prompt_msg).
-        - Template should render a L(valid color value,#notes).
-      ini:
-        - section: callback_diy
-          key: playbook_on_vars_prompt_msg_color
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_VARS_PROMPT_MSG_COLOR
-      vars:
-        - name: ansible_callback_diy_playbook_on_vars_prompt_msg_color
-      type: str
+  playbook_on_vars_prompt_msg_color:
+    description:
+      - Output color to be used for O(playbook_on_vars_prompt_msg).
+      - Template should render a L(valid color value,#notes).
+    ini:
+      - section: callback_diy
+        key: playbook_on_vars_prompt_msg_color
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_VARS_PROMPT_MSG_COLOR
+    vars:
+      - name: ansible_callback_diy_playbook_on_vars_prompt_msg_color
+    type: str
 
-    playbook_on_play_start_msg:
-      description: Output to be used for callback playbook_on_play_start.
-      ini:
-        - section: callback_diy
-          key: playbook_on_play_start_msg
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_PLAY_START_MSG
-      vars:
-        - name: ansible_callback_diy_playbook_on_play_start_msg
-      type: str
+  playbook_on_play_start_msg:
+    description: Output to be used for callback playbook_on_play_start.
+    ini:
+      - section: callback_diy
+        key: playbook_on_play_start_msg
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_PLAY_START_MSG
+    vars:
+      - name: ansible_callback_diy_playbook_on_play_start_msg
+    type: str
 
-    playbook_on_play_start_msg_color:
-      description:
-        - Output color to be used for O(playbook_on_play_start_msg).
-        - Template should render a L(valid color value,#notes).
-      ini:
-        - section: callback_diy
-          key: playbook_on_play_start_msg_color
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_PLAY_START_MSG_COLOR
-      vars:
-        - name: ansible_callback_diy_playbook_on_play_start_msg_color
-      type: str
+  playbook_on_play_start_msg_color:
+    description:
+      - Output color to be used for O(playbook_on_play_start_msg).
+      - Template should render a L(valid color value,#notes).
+    ini:
+      - section: callback_diy
+        key: playbook_on_play_start_msg_color
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_PLAY_START_MSG_COLOR
+    vars:
+      - name: ansible_callback_diy_playbook_on_play_start_msg_color
+    type: str
 
-    playbook_on_stats_msg:
-      description: Output to be used for callback playbook_on_stats.
-      ini:
-        - section: callback_diy
-          key: playbook_on_stats_msg
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_STATS_MSG
-      vars:
-        - name: ansible_callback_diy_playbook_on_stats_msg
-      type: str
+  playbook_on_stats_msg:
+    description: Output to be used for callback playbook_on_stats.
+    ini:
+      - section: callback_diy
+        key: playbook_on_stats_msg
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_STATS_MSG
+    vars:
+      - name: ansible_callback_diy_playbook_on_stats_msg
+    type: str
 
-    playbook_on_stats_msg_color:
-      description:
-        - Output color to be used for O(playbook_on_stats_msg).
-        - Template should render a L(valid color value,#notes).
-      ini:
-        - section: callback_diy
-          key: playbook_on_stats_msg_color
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_STATS_MSG_COLOR
-      vars:
-        - name: ansible_callback_diy_playbook_on_stats_msg_color
-      type: str
+  playbook_on_stats_msg_color:
+    description:
+      - Output color to be used for O(playbook_on_stats_msg).
+      - Template should render a L(valid color value,#notes).
+    ini:
+      - section: callback_diy
+        key: playbook_on_stats_msg_color
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_STATS_MSG_COLOR
+    vars:
+      - name: ansible_callback_diy_playbook_on_stats_msg_color
+    type: str
 
-    on_file_diff_msg:
-      description: Output to be used for callback on_file_diff.
-      ini:
-        - section: callback_diy
-          key: on_file_diff_msg
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_ON_FILE_DIFF_MSG
-      vars:
-        - name: ansible_callback_diy_on_file_diff_msg
-      type: str
+  on_file_diff_msg:
+    description: Output to be used for callback on_file_diff.
+    ini:
+      - section: callback_diy
+        key: on_file_diff_msg
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_ON_FILE_DIFF_MSG
+    vars:
+      - name: ansible_callback_diy_on_file_diff_msg
+    type: str
 
-    on_file_diff_msg_color:
-      description:
-        - Output color to be used for O(on_file_diff_msg).
-        - Template should render a L(valid color value,#notes).
-      ini:
-        - section: callback_diy
-          key: on_file_diff_msg_color
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_ON_FILE_DIFF_MSG_COLOR
-      vars:
-        - name: ansible_callback_diy_on_file_diff_msg_color
-      type: str
+  on_file_diff_msg_color:
+    description:
+      - Output color to be used for O(on_file_diff_msg).
+      - Template should render a L(valid color value,#notes).
+    ini:
+      - section: callback_diy
+        key: on_file_diff_msg_color
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_ON_FILE_DIFF_MSG_COLOR
+    vars:
+      - name: ansible_callback_diy_on_file_diff_msg_color
+    type: str
 
-    playbook_on_include_msg:
-      description: Output to be used for callback playbook_on_include.
-      ini:
-        - section: callback_diy
-          key: playbook_on_include_msg
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_INCLUDE_MSG
-      vars:
-        - name: ansible_callback_diy_playbook_on_include_msg
-      type: str
+  playbook_on_include_msg:
+    description: Output to be used for callback playbook_on_include.
+    ini:
+      - section: callback_diy
+        key: playbook_on_include_msg
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_INCLUDE_MSG
+    vars:
+      - name: ansible_callback_diy_playbook_on_include_msg
+    type: str
 
-    playbook_on_include_msg_color:
-      description:
-        - Output color to be used for O(playbook_on_include_msg).
-        - Template should render a L(valid color value,#notes).
-      ini:
-        - section: callback_diy
-          key: playbook_on_include_msg_color
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_INCLUDE_MSG_COLOR
-      vars:
-        - name: ansible_callback_diy_playbook_on_include_msg_color
-      type: str
+  playbook_on_include_msg_color:
+    description:
+      - Output color to be used for O(playbook_on_include_msg).
+      - Template should render a L(valid color value,#notes).
+    ini:
+      - section: callback_diy
+        key: playbook_on_include_msg_color
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_INCLUDE_MSG_COLOR
+    vars:
+      - name: ansible_callback_diy_playbook_on_include_msg_color
+    type: str
 
-    runner_item_on_ok_msg:
-      description: Output to be used for callback runner_item_on_ok.
-      ini:
-        - section: callback_diy
-          key: runner_item_on_ok_msg
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_RUNNER_ITEM_ON_OK_MSG
-      vars:
-        - name: ansible_callback_diy_runner_item_on_ok_msg
-      type: str
+  runner_item_on_ok_msg:
+    description: Output to be used for callback runner_item_on_ok.
+    ini:
+      - section: callback_diy
+        key: runner_item_on_ok_msg
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_RUNNER_ITEM_ON_OK_MSG
+    vars:
+      - name: ansible_callback_diy_runner_item_on_ok_msg
+    type: str
 
-    runner_item_on_ok_msg_color:
-      description:
-        - Output color to be used for O(runner_item_on_ok_msg).
-        - Template should render a L(valid color value,#notes).
-      ini:
-        - section: callback_diy
-          key: runner_item_on_ok_msg_color
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_RUNNER_ITEM_ON_OK_MSG_COLOR
-      vars:
-        - name: ansible_callback_diy_runner_item_on_ok_msg_color
-      type: str
+  runner_item_on_ok_msg_color:
+    description:
+      - Output color to be used for O(runner_item_on_ok_msg).
+      - Template should render a L(valid color value,#notes).
+    ini:
+      - section: callback_diy
+        key: runner_item_on_ok_msg_color
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_RUNNER_ITEM_ON_OK_MSG_COLOR
+    vars:
+      - name: ansible_callback_diy_runner_item_on_ok_msg_color
+    type: str
 
-    runner_item_on_failed_msg:
-      description: Output to be used for callback runner_item_on_failed.
-      ini:
-        - section: callback_diy
-          key: runner_item_on_failed_msg
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_RUNNER_ITEM_ON_FAILED_MSG
-      vars:
-        - name: ansible_callback_diy_runner_item_on_failed_msg
-      type: str
+  runner_item_on_failed_msg:
+    description: Output to be used for callback runner_item_on_failed.
+    ini:
+      - section: callback_diy
+        key: runner_item_on_failed_msg
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_RUNNER_ITEM_ON_FAILED_MSG
+    vars:
+      - name: ansible_callback_diy_runner_item_on_failed_msg
+    type: str
 
-    runner_item_on_failed_msg_color:
-      description:
-        - Output color to be used for O(runner_item_on_failed_msg).
-        - Template should render a L(valid color value,#notes).
-      ini:
-        - section: callback_diy
-          key: runner_item_on_failed_msg_color
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_RUNNER_ITEM_ON_FAILED_MSG_COLOR
-      vars:
-        - name: ansible_callback_diy_runner_item_on_failed_msg_color
-      type: str
+  runner_item_on_failed_msg_color:
+    description:
+      - Output color to be used for O(runner_item_on_failed_msg).
+      - Template should render a L(valid color value,#notes).
+    ini:
+      - section: callback_diy
+        key: runner_item_on_failed_msg_color
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_RUNNER_ITEM_ON_FAILED_MSG_COLOR
+    vars:
+      - name: ansible_callback_diy_runner_item_on_failed_msg_color
+    type: str
 
-    runner_item_on_skipped_msg:
-      description: Output to be used for callback runner_item_on_skipped.
-      ini:
-        - section: callback_diy
-          key: runner_item_on_skipped_msg
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_RUNNER_ITEM_ON_SKIPPED_MSG
-      vars:
-        - name: ansible_callback_diy_runner_item_on_skipped_msg
-      type: str
+  runner_item_on_skipped_msg:
+    description: Output to be used for callback runner_item_on_skipped.
+    ini:
+      - section: callback_diy
+        key: runner_item_on_skipped_msg
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_RUNNER_ITEM_ON_SKIPPED_MSG
+    vars:
+      - name: ansible_callback_diy_runner_item_on_skipped_msg
+    type: str
 
-    runner_item_on_skipped_msg_color:
-      description:
-        - Output color to be used for O(runner_item_on_skipped_msg).
-        - Template should render a L(valid color value,#notes).
-      ini:
-        - section: callback_diy
-          key: runner_item_on_skipped_msg_color
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_RUNNER_ITEM_ON_SKIPPED_MSG_COLOR
-      vars:
-        - name: ansible_callback_diy_runner_item_on_skipped_msg_color
-      type: str
+  runner_item_on_skipped_msg_color:
+    description:
+      - Output color to be used for O(runner_item_on_skipped_msg).
+      - Template should render a L(valid color value,#notes).
+    ini:
+      - section: callback_diy
+        key: runner_item_on_skipped_msg_color
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_RUNNER_ITEM_ON_SKIPPED_MSG_COLOR
+    vars:
+      - name: ansible_callback_diy_runner_item_on_skipped_msg_color
+    type: str
 
-    runner_retry_msg:
-      description: Output to be used for callback runner_retry.
-      ini:
-        - section: callback_diy
-          key: runner_retry_msg
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_RUNNER_RETRY_MSG
-      vars:
-        - name: ansible_callback_diy_runner_retry_msg
-      type: str
+  runner_retry_msg:
+    description: Output to be used for callback runner_retry.
+    ini:
+      - section: callback_diy
+        key: runner_retry_msg
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_RUNNER_RETRY_MSG
+    vars:
+      - name: ansible_callback_diy_runner_retry_msg
+    type: str
 
-    runner_retry_msg_color:
-      description:
-        - Output color to be used for O(runner_retry_msg).
-        - Template should render a L(valid color value,#notes).
-      ini:
-        - section: callback_diy
-          key: runner_retry_msg_color
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_RUNNER_RETRY_MSG_COLOR
-      vars:
-        - name: ansible_callback_diy_runner_retry_msg_color
-      type: str
+  runner_retry_msg_color:
+    description:
+      - Output color to be used for O(runner_retry_msg).
+      - Template should render a L(valid color value,#notes).
+    ini:
+      - section: callback_diy
+        key: runner_retry_msg_color
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_RUNNER_RETRY_MSG_COLOR
+    vars:
+      - name: ansible_callback_diy_runner_retry_msg_color
+    type: str
 
-    runner_on_start_msg:
-      description: Output to be used for callback runner_on_start.
-      ini:
-        - section: callback_diy
-          key: runner_on_start_msg
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_START_MSG
-      vars:
-        - name: ansible_callback_diy_runner_on_start_msg
-      type: str
+  runner_on_start_msg:
+    description: Output to be used for callback runner_on_start.
+    ini:
+      - section: callback_diy
+        key: runner_on_start_msg
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_START_MSG
+    vars:
+      - name: ansible_callback_diy_runner_on_start_msg
+    type: str
 
-    runner_on_start_msg_color:
-      description:
-        - Output color to be used for O(runner_on_start_msg).
-        - Template should render a L(valid color value,#notes).
-      ini:
-        - section: callback_diy
-          key: runner_on_start_msg_color
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_START_MSG_COLOR
-      vars:
-        - name: ansible_callback_diy_runner_on_start_msg_color
-      type: str
+  runner_on_start_msg_color:
+    description:
+      - Output color to be used for O(runner_on_start_msg).
+      - Template should render a L(valid color value,#notes).
+    ini:
+      - section: callback_diy
+        key: runner_on_start_msg_color
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_START_MSG_COLOR
+    vars:
+      - name: ansible_callback_diy_runner_on_start_msg_color
+    type: str
 
-    runner_on_no_hosts_msg:
-      description: Output to be used for callback runner_on_no_hosts.
-      ini:
-        - section: callback_diy
-          key: runner_on_no_hosts_msg
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_NO_HOSTS_MSG
-      vars:
-        - name: ansible_callback_diy_runner_on_no_hosts_msg
-      type: str
+  runner_on_no_hosts_msg:
+    description: Output to be used for callback runner_on_no_hosts.
+    ini:
+      - section: callback_diy
+        key: runner_on_no_hosts_msg
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_NO_HOSTS_MSG
+    vars:
+      - name: ansible_callback_diy_runner_on_no_hosts_msg
+    type: str
 
-    runner_on_no_hosts_msg_color:
-      description:
-        - Output color to be used for O(runner_on_no_hosts_msg).
-        - Template should render a L(valid color value,#notes).
-      ini:
-        - section: callback_diy
-          key: runner_on_no_hosts_msg_color
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_NO_HOSTS_MSG_COLOR
-      vars:
-        - name: ansible_callback_diy_runner_on_no_hosts_msg_color
-      type: str
+  runner_on_no_hosts_msg_color:
+    description:
+      - Output color to be used for O(runner_on_no_hosts_msg).
+      - Template should render a L(valid color value,#notes).
+    ini:
+      - section: callback_diy
+        key: runner_on_no_hosts_msg_color
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_NO_HOSTS_MSG_COLOR
+    vars:
+      - name: ansible_callback_diy_runner_on_no_hosts_msg_color
+    type: str
 
-    playbook_on_setup_msg:
-      description: Output to be used for callback playbook_on_setup.
-      ini:
-        - section: callback_diy
-          key: playbook_on_setup_msg
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_SETUP_MSG
-      vars:
-        - name: ansible_callback_diy_playbook_on_setup_msg
-      type: str
+  playbook_on_setup_msg:
+    description: Output to be used for callback playbook_on_setup.
+    ini:
+      - section: callback_diy
+        key: playbook_on_setup_msg
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_SETUP_MSG
+    vars:
+      - name: ansible_callback_diy_playbook_on_setup_msg
+    type: str
 
-    playbook_on_setup_msg_color:
-      description:
-        - Output color to be used for O(playbook_on_setup_msg).
-        - Template should render a L(valid color value,#notes).
-      ini:
-        - section: callback_diy
-          key: playbook_on_setup_msg_color
-      env:
-        - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_SETUP_MSG_COLOR
-      vars:
-        - name: ansible_callback_diy_playbook_on_setup_msg_color
-      type: str
-'''
+  playbook_on_setup_msg_color:
+    description:
+      - Output color to be used for O(playbook_on_setup_msg).
+      - Template should render a L(valid color value,#notes).
+    ini:
+      - section: callback_diy
+        key: playbook_on_setup_msg_color
+    env:
+      - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_SETUP_MSG_COLOR
+    vars:
+      - name: ansible_callback_diy_playbook_on_setup_msg_color
+    type: str
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 ansible.cfg: >
   # Enable plugin
   [defaults]
@@ -623,7 +617,7 @@ ansible.cfg: >
   # Newline after every callback
   # on_any_msg='{{ " " | join("\n") }}'
 
-playbook.yml: >
+playbook.yml: >-
   ---
   - name: "Default plugin output: play example"
     hosts: localhost
@@ -782,7 +776,7 @@ playbook.yml: >
               {{ white }}{{ ansible_callback_diy[key] }}
 
             {% endfor %}
-'''
+"""
 
 import sys
 from contextlib import contextmanager
@@ -790,6 +784,12 @@ from ansible.template import Templar
 from ansible.vars.manager import VariableManager
 from ansible.plugins.callback.default import CallbackModule as Default
 from ansible.module_utils.common.text.converters import to_text
+
+try:
+    from ansible.template import trust_as_template  # noqa: F401, pylint: disable=unused-import
+    SUPPORTS_DATA_TAGGING = True
+except ImportError:
+    SUPPORTS_DATA_TAGGING = False
 
 
 class DummyStdout(object):
@@ -828,9 +828,9 @@ class CallbackModule(Default):
         _callback_options = ['msg', 'msg_color']
 
         for option in _callback_options:
-            _option_name = '%s_%s' % (_callback_type, option)
+            _option_name = f'{_callback_type}_{option}'
             _option_template = variables.get(
-                self.DIY_NS + "_" + _option_name,
+                f"{self.DIY_NS}_{_option_name}",
                 self.get_option(_option_name)
             )
             _ret.update({option: self._template(
@@ -844,7 +844,10 @@ class CallbackModule(Default):
         return _ret
 
     def _using_diy(self, spec):
-        return (spec['msg'] is not None) and (spec['msg'] != spec['vars']['omit'])
+        sentinel = object()
+        omit = spec['vars'].get('omit', sentinel)
+        # With Data Tagging, omit is sentinel
+        return (spec['msg'] is not None) and (spec['msg'] != omit or omit is sentinel)
 
     def _parent_has_callback(self):
         return hasattr(super(CallbackModule, self), sys._getframe(1).f_code.co_name)
@@ -867,7 +870,7 @@ class CallbackModule(Default):
                   handler=None, result=None, stats=None, remove_attr_ref_loop=True):
         def _get_value(obj, attr=None, method=None):
             if attr:
-                return getattr(obj, attr, getattr(obj, "_" + attr, None))
+                return getattr(obj, attr, getattr(obj, f"_{attr}", None))
 
             if method:
                 _method = getattr(obj, method)
@@ -900,7 +903,7 @@ class CallbackModule(Default):
             )
         _ret.update(_all)
 
-        _ret.update(_ret.get(self.DIY_NS, {self.DIY_NS: CallbackDIYDict()}))
+        _ret.update(_ret.get(self.DIY_NS, {self.DIY_NS: {} if SUPPORTS_DATA_TAGGING else CallbackDIYDict()}))
 
         _ret[self.DIY_NS].update({'playbook': {}})
         _playbook_attributes = ['entries', 'file_name', 'basedir']

@@ -9,14 +9,13 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: vexata_volume
 short_description: Manage volumes on Vexata VX100 storage arrays
 description:
-    - Create, deletes or extend volumes on a Vexata VX100 array.
+  - Create, deletes or extend volumes on a Vexata VX100 array.
 author:
-- Sandeep Kasargod (@vexata)
+  - Sandeep Kasargod (@vexata)
 attributes:
   check_mode:
     support: full
@@ -32,19 +31,18 @@ options:
     description:
       - Creates/Modifies volume when present or removes when absent.
     default: present
-    choices: [ present, absent ]
+    choices: [present, absent]
     type: str
   size:
     description:
       - Volume size in M, G, T units. M=2^20, G=2^30, T=2^40 bytes.
     type: str
 extends_documentation_fragment:
-- community.general.vexata.vx100
-- community.general.attributes
+  - community.general.vexata.vx100
+  - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Create new 2 TiB volume named foo
   community.general.vexata_volume:
     name: foo
@@ -70,10 +68,10 @@ EXAMPLES = r'''
     array: vx100_ultra.test.com
     user: admin
     password: secret
-'''
+"""
 
-RETURN = r'''
-'''
+RETURN = r"""
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.vexata import (

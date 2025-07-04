@@ -8,13 +8,12 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: packet_sshkey
 short_description: Create/delete an SSH key in Packet host
 description:
-     - Create/delete an SSH key in Packet host.
-     - API is documented at U(https://www.packet.net/help/api/#page:ssh-keys,header:ssh-keys-ssh-keys-post).
+  - Create/delete an SSH key in Packet host.
+  - API is documented at U(https://www.packet.net/help/api/#page:ssh-keys,header:ssh-keys-ssh-keys-post).
 author: "Tomas Karasek (@t0mk) <tom.to.the.k@gmail.com>"
 extends_documentation_fragment:
   - community.general.attributes
@@ -26,42 +25,41 @@ attributes:
 options:
   state:
     description:
-    - Indicate desired state of the target.
+      - Indicate desired state of the target.
     default: present
     choices: ['present', 'absent']
     type: str
   auth_token:
     description:
-    - Packet API token. You can also supply it in environment variable E(PACKET_API_TOKEN).
+      - Packet API token. You can also supply it in environment variable E(PACKET_API_TOKEN).
     type: str
   label:
     description:
-    - Label for the key. If you keep it empty, it will be read from key string.
+      - Label for the key. If you keep it empty, it will be read from key string.
     type: str
     aliases: [name]
   id:
     description:
-    - UUID of the key which you want to remove.
+      - UUID of the key which you want to remove.
     type: str
   fingerprint:
     description:
-    - Fingerprint of the key which you want to remove.
+      - Fingerprint of the key which you want to remove.
     type: str
   key:
     description:
-    - Public Key string ({type} {base64 encoded key} {description}).
+      - Public Key string (V({type} {base64 encoded key} {description})).
     type: str
   key_file:
     description:
-    - File with the public key.
+      - File with the public key.
     type: path
 
 requirements:
   - packet-python
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 # All the examples assume that you have your Packet API token in env var PACKET_API_TOKEN.
 # You can also pass the api token in module param auth_token.
 
@@ -84,27 +82,28 @@ EXAMPLES = '''
     community.general.packet_sshkey:
       state: absent
       id: eef49903-7a09-4ca1-af67-4087c29ab5b6
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 changed:
-    description: True if a sshkey was created or removed.
-    type: bool
-    sample: true
-    returned: always
+  description: True if a sshkey was created or removed.
+  type: bool
+  sample: true
+  returned: always
 sshkeys:
-    description: Information about sshkeys that were created/removed.
-    type: list
-    sample: [
-        {
-            "fingerprint": "5c:93:74:7c:ed:07:17:62:28:75:79:23:d6:08:93:46",
-            "id": "41d61bd8-3342-428b-a09c-e67bdd18a9b7",
-            "key": "ssh-dss AAAAB3NzaC1kc3MAAACBAIfNT5S0ncP4BBJBYNhNPxFF9lqVhfPeu6SM1LoCocxqDc1AT3zFRi8hjIf6TLZ2AA4FYbcAWxLMhiBxZRVldT9GdBXile78kAK5z3bKTwq152DCqpxwwbaTIggLFhsU8wrfBsPWnDuAxZ0h7mmrCjoLIE3CNLDA/NmV3iB8xMThAAAAFQCStcesSgR1adPORzBxTr7hug92LwAAAIBOProm3Gk+HWedLyE8IfofLaOeRnbBRHAOL4z0SexKkVOnQ/LGN/uDIIPGGBDYTvXgKZT+jbHeulRJ2jKgfSpGKN4JxFQ8uzVH492jEiiUJtT72Ss1dCV4PmyERVIw+f54itihV3z/t25dWgowhb0int8iC/OY3cGodlmYb3wdcQAAAIBuLbB45djZXzUkOTzzcRDIRfhaxo5WipbtEM2B1fuBt2gyrvksPpH/LK6xTjdIIb0CxPu4OCxwJG0aOz5kJoRnOWIXQGhH7VowrJhsqhIc8gN9ErbO5ea8b1L76MNcAotmBDeTUiPw01IJ8MdDxfmcsCslJKgoRKSmQpCwXQtN2g== tomk@hp2",
-            "label": "mynewkey33"
-        }
+  description: Information about sshkeys that were created/removed.
+  type: list
+  sample:
+    [
+      {
+        "fingerprint": "5c:93:74:7c:ed:07:17:62:28:75:79:23:d6:08:93:46",
+        "id": "41d61bd8-3342-428b-a09c-e67bdd18a9b7",
+        "key": "ssh-dss AAAAB3NzaC1kc3MAAACBA ... MdDxfmcsCslJKgoRKSmQpCwXQtN2g== user@server",
+        "label": "mynewkey33"
+      }
     ]
-    returned: always
-'''  # NOQA
+  returned: always
+"""
 
 import os
 import uuid

@@ -14,7 +14,7 @@ from redis import __version__
 
 from ansible_collections.community.general.plugins.modules import (
     redis_data_info)
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args
 
 
 HAS_REDIS_USERNAME_OPTION = True
@@ -23,9 +23,9 @@ if tuple(map(int, __version__.split('.'))) < (3, 4, 0):
 
 
 def test_redis_data_info_without_arguments(capfd):
-    set_module_args({})
-    with pytest.raises(SystemExit):
-        redis_data_info.main()
+    with set_module_args({}):
+        with pytest.raises(SystemExit):
+            redis_data_info.main()
     out, err = capfd.readouterr()
     assert not err
     assert json.loads(out)['failed']
@@ -33,14 +33,16 @@ def test_redis_data_info_without_arguments(capfd):
 
 @pytest.mark.skipif(not HAS_REDIS_USERNAME_OPTION, reason="Redis version < 3.4.0")
 def test_redis_data_info_existing_key(capfd, mocker):
-    set_module_args({'login_host': 'localhost',
-                     'login_user': 'root',
-                     'login_password': 'secret',
-                     'key': 'foo',
-                     '_ansible_check_mode': False})
-    mocker.patch('redis.Redis.get', return_value='bar')
-    with pytest.raises(SystemExit):
-        redis_data_info.main()
+    with set_module_args({
+        'login_host': 'localhost',
+        'login_user': 'root',
+        'login_password': 'secret',
+        'key': 'foo',
+        '_ansible_check_mode': False
+    }):
+        mocker.patch('redis.Redis.get', return_value='bar')
+        with pytest.raises(SystemExit):
+            redis_data_info.main()
     out, err = capfd.readouterr()
     print(out)
     assert not err
@@ -50,14 +52,16 @@ def test_redis_data_info_existing_key(capfd, mocker):
 
 @pytest.mark.skipif(not HAS_REDIS_USERNAME_OPTION, reason="Redis version < 3.4.0")
 def test_redis_data_info_absent_key(capfd, mocker):
-    set_module_args({'login_host': 'localhost',
-                     'login_user': 'root',
-                     'login_password': 'secret',
-                     'key': 'foo',
-                     '_ansible_check_mode': False})
-    mocker.patch('redis.Redis.get', return_value=None)
-    with pytest.raises(SystemExit):
-        redis_data_info.main()
+    with set_module_args({
+        'login_host': 'localhost',
+        'login_user': 'root',
+        'login_password': 'secret',
+        'key': 'foo',
+        '_ansible_check_mode': False
+    }):
+        mocker.patch('redis.Redis.get', return_value=None)
+        with pytest.raises(SystemExit):
+            redis_data_info.main()
     out, err = capfd.readouterr()
     print(out)
     assert not err
@@ -67,13 +71,15 @@ def test_redis_data_info_absent_key(capfd, mocker):
 
 @pytest.mark.skipif(HAS_REDIS_USERNAME_OPTION, reason="Redis version > 3.4.0")
 def test_redis_data_fail_username(capfd, mocker):
-    set_module_args({'login_host': 'localhost',
-                     'login_user': 'root',
-                     'login_password': 'secret',
-                     'key': 'foo',
-                     '_ansible_check_mode': False})
-    with pytest.raises(SystemExit):
-        redis_data_info.main()
+    with set_module_args({
+        'login_host': 'localhost',
+        'login_user': 'root',
+        'login_password': 'secret',
+        'key': 'foo',
+        '_ansible_check_mode': False
+    }):
+        with pytest.raises(SystemExit):
+            redis_data_info.main()
     out, err = capfd.readouterr()
     print(out)
     assert not err
@@ -84,13 +90,15 @@ def test_redis_data_fail_username(capfd, mocker):
 
 @pytest.mark.skipif(HAS_REDIS_USERNAME_OPTION, reason="Redis version > 3.4.0")
 def test_redis_data_info_absent_key_no_username(capfd, mocker):
-    set_module_args({'login_host': 'localhost',
-                     'login_password': 'secret',
-                     'key': 'foo',
-                     '_ansible_check_mode': False})
-    mocker.patch('redis.Redis.get', return_value=None)
-    with pytest.raises(SystemExit):
-        redis_data_info.main()
+    with set_module_args({
+        'login_host': 'localhost',
+        'login_password': 'secret',
+        'key': 'foo',
+        '_ansible_check_mode': False
+    }):
+        mocker.patch('redis.Redis.get', return_value=None)
+        with pytest.raises(SystemExit):
+            redis_data_info.main()
     out, err = capfd.readouterr()
     print(out)
     assert not err
@@ -100,13 +108,15 @@ def test_redis_data_info_absent_key_no_username(capfd, mocker):
 
 @pytest.mark.skipif(HAS_REDIS_USERNAME_OPTION, reason="Redis version > 3.4.0")
 def test_redis_data_info_existing_key_no_username(capfd, mocker):
-    set_module_args({'login_host': 'localhost',
-                     'login_password': 'secret',
-                     'key': 'foo',
-                     '_ansible_check_mode': False})
-    mocker.patch('redis.Redis.get', return_value='bar')
-    with pytest.raises(SystemExit):
-        redis_data_info.main()
+    with set_module_args({
+        'login_host': 'localhost',
+        'login_password': 'secret',
+        'key': 'foo',
+        '_ansible_check_mode': False
+    }):
+        mocker.patch('redis.Redis.get', return_value='bar')
+        with pytest.raises(SystemExit):
+            redis_data_info.main()
     out, err = capfd.readouterr()
     print(out)
     assert not err

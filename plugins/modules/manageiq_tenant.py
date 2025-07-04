@@ -8,8 +8,7 @@ from __future__ import (absolute_import, division, print_function)
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
-
+DOCUMENTATION = r"""
 module: manageiq_tenant
 
 short_description: Management of tenants in ManageIQ
@@ -31,7 +30,8 @@ options:
   state:
     type: str
     description:
-    - absent - tenant should not exist, present - tenant should be.
+      - V(absent) - tenant should not exist,
+      - V(present) - tenant should be.
     choices: ['absent', 'present']
     default: 'present'
   name:
@@ -39,42 +39,42 @@ options:
     description:
       - The tenant name.
     required: true
-    default: null
+    default:
   description:
     type: str
     description:
-    - The tenant description.
+      - The tenant description.
     required: true
-    default: null
+    default:
   parent_id:
     type: int
     description:
-    - The id of the parent tenant. If not supplied the root tenant is used.
-    - The O(parent_id) takes president over O(parent) when supplied
+      - The ID of the parent tenant. If not supplied the root tenant is used.
+      - The O(parent_id) takes president over O(parent) when supplied.
     required: false
-    default: null
+    default:
   parent:
     type: str
     description:
-    - The name of the parent tenant. If not supplied and no O(parent_id) is supplied the root tenant is used.
+      - The name of the parent tenant. If not supplied and no O(parent_id) is supplied the root tenant is used.
     required: false
-    default: null
+    default:
   quotas:
     type: dict
     description:
-    - The tenant quotas.
-    - All parameters case sensitive.
-    - 'Valid attributes are:'
-    - ' - C(cpu_allocated) (int): use null to remove the quota.'
-    - ' - C(mem_allocated) (GB): use null to remove the quota.'
-    - ' - C(storage_allocated) (GB): use null to remove the quota.'
-    - ' - C(vms_allocated) (int): use null to remove the quota.'
-    - ' - C(templates_allocated) (int): use null to remove the quota.'
+      - The tenant quotas.
+      - All parameters case sensitive.
+      - 'Valid attributes are:'
+      - '- V(cpu_allocated) (int): use null to remove the quota.'
+      - '- V(mem_allocated) (GB): use null to remove the quota.'
+      - '- V(storage_allocated) (GB): use null to remove the quota.'
+      - '- V(vms_allocated) (int): use null to remove the quota.'
+      - '- V(templates_allocated) (int): use null to remove the quota.'
     required: false
     default: {}
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Update the root tenant in ManageIQ
   community.general.manageiq_tenant:
     name: 'My Company'
@@ -83,7 +83,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false  # only do this when you trust the network!
+      validate_certs: false # only do this when you trust the network!
 
 - name: Create a tenant in ManageIQ
   community.general.manageiq_tenant:
@@ -94,7 +94,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false  # only do this when you trust the network!
+      validate_certs: false # only do this when you trust the network!
 
 - name: Delete a tenant in ManageIQ
   community.general.manageiq_tenant:
@@ -105,7 +105,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false  # only do this when you trust the network!
+      validate_certs: false # only do this when you trust the network!
 
 - name: Set tenant quota for cpu_allocated, mem_allocated, remove quota for vms_allocated
   community.general.manageiq_tenant:
@@ -114,12 +114,12 @@ EXAMPLES = '''
     quotas:
       - cpu_allocated: 100
       - mem_allocated: 50
-      - vms_allocated: null
+      - vms_allocated:
     manageiq_connection:
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false  # only do this when you trust the network!
+      validate_certs: false # only do this when you trust the network!
 
 
 - name: Delete a tenant in ManageIQ using a token
@@ -130,39 +130,39 @@ EXAMPLES = '''
     manageiq_connection:
       url: 'http://127.0.0.1:3000'
       token: 'sometoken'
-      validate_certs: false  # only do this when you trust the network!
-'''
+      validate_certs: false # only do this when you trust the network!
+"""
 
-RETURN = '''
+RETURN = r"""
 tenant:
   description: The tenant.
   returned: success
   type: complex
   contains:
     id:
-      description: The tenant id
+      description: The tenant ID.
       returned: success
       type: int
     name:
-      description: The tenant name
+      description: The tenant name.
       returned: success
       type: str
     description:
-      description: The tenant description
+      description: The tenant description.
       returned: success
       type: str
     parent_id:
-      description: The id of the parent tenant
+      description: The ID of the parent tenant.
       returned: success
       type: int
     quotas:
-      description: List of tenant quotas
+      description: List of tenant quotas.
       returned: success
       type: list
       sample:
         cpu_allocated: 100
         mem_allocated: 50
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.manageiq import ManageIQ, manageiq_argument_spec

@@ -14,7 +14,7 @@ __metaclass__ = type
 
 
 from ansible_collections.community.general.plugins.modules import cpanm
-from .helper import Helper
+from .uthelper import UTHelper, RunCommandMock
 
 
-Helper.from_module(cpanm, __name__)
+UTHelper.from_module(cpanm, __name__, mocks=[RunCommandMock])

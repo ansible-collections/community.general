@@ -12,14 +12,14 @@ from ansible.module_utils.six import iteritems
 from ansible_collections.community.general.plugins.modules import (
     pritunl_org,
 )
-from ansible_collections.community.general.tests.unit.compat.mock import patch
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
 from ansible_collections.community.general.tests.unit.plugins.module_utils.net_tools.pritunl.test_api import (
     PritunlDeleteOrganizationMock,
     PritunlListOrganizationMock,
     PritunlListOrganizationAfterPostMock,
     PritunlPostOrganizationMock,
 )
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import (
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
     AnsibleFailJson,
     ModuleTestCase,
@@ -64,14 +64,14 @@ class TestPritunlOrg(ModuleTestCase):
 
     def test_without_parameters(self):
         """Test without parameters"""
-        set_module_args({})
-        with self.assertRaises(AnsibleFailJson):
-            self.module.main()
+        with set_module_args({}):
+            with self.assertRaises(AnsibleFailJson):
+                self.module.main()
 
     def test_present(self):
         """Test Pritunl organization creation."""
         org_params = {"name": "NewOrg"}
-        set_module_args(
+        with set_module_args(
             dict_merge(
                 {
                     "pritunl_api_token": "token",
@@ -80,32 +80,32 @@ class TestPritunlOrg(ModuleTestCase):
                 },
                 org_params,
             )
-        )
-        # Test creation
-        with self.patch_get_pritunl_organizations(
-            side_effect=PritunlListOrganizationMock
-        ) as mock_get:
-            with self.patch_add_pritunl_organization(
-                side_effect=PritunlPostOrganizationMock
-            ) as mock_add:
-                with self.assertRaises(AnsibleExitJson) as create_result:
-                    self.module.main()
+        ):
+            # Test creation
+            with self.patch_get_pritunl_organizations(
+                side_effect=PritunlListOrganizationMock
+            ) as mock_get:
+                with self.patch_add_pritunl_organization(
+                    side_effect=PritunlPostOrganizationMock
+                ) as mock_add:
+                    with self.assertRaises(AnsibleExitJson) as create_result:
+                        self.module.main()
 
-        create_exc = create_result.exception.args[0]
+            create_exc = create_result.exception.args[0]
 
-        self.assertTrue(create_exc["changed"])
-        self.assertEqual(create_exc["response"]["name"], org_params["name"])
-        self.assertEqual(create_exc["response"]["user_count"], 0)
+            self.assertTrue(create_exc["changed"])
+            self.assertEqual(create_exc["response"]["name"], org_params["name"])
+            self.assertEqual(create_exc["response"]["user_count"], 0)
 
-        # Test module idempotency
-        with self.patch_get_pritunl_organizations(
-            side_effect=PritunlListOrganizationAfterPostMock
-        ) as mock_get:
-            with self.patch_add_pritunl_organization(
-                side_effect=PritunlPostOrganizationMock
-            ) as mock_add:
-                with self.assertRaises(AnsibleExitJson) as idempotent_result:
-                    self.module.main()
+            # Test module idempotency
+            with self.patch_get_pritunl_organizations(
+                side_effect=PritunlListOrganizationAfterPostMock
+            ) as mock_get:
+                with self.patch_add_pritunl_organization(
+                    side_effect=PritunlPostOrganizationMock
+                ) as mock_add:
+                    with self.assertRaises(AnsibleExitJson) as idempotent_result:
+                        self.module.main()
 
         idempotent_exc = idempotent_result.exception.args[0]
 
@@ -120,7 +120,7 @@ class TestPritunlOrg(ModuleTestCase):
     def test_absent(self):
         """Test organization removal from Pritunl."""
         org_params = {"name": "NewOrg"}
-        set_module_args(
+        with set_module_args(
             dict_merge(
                 {
                     "state": "absent",
@@ -130,31 +130,31 @@ class TestPritunlOrg(ModuleTestCase):
                 },
                 org_params,
             )
-        )
-        # Test deletion
-        with self.patch_get_pritunl_organizations(
-            side_effect=PritunlListOrganizationAfterPostMock
-        ) as mock_get:
-            with self.patch_delete_pritunl_organization(
-                side_effect=PritunlDeleteOrganizationMock
-            ) as mock_delete:
-                with self.assertRaises(AnsibleExitJson) as delete_result:
-                    self.module.main()
+        ):
+            # Test deletion
+            with self.patch_get_pritunl_organizations(
+                side_effect=PritunlListOrganizationAfterPostMock
+            ) as mock_get:
+                with self.patch_delete_pritunl_organization(
+                    side_effect=PritunlDeleteOrganizationMock
+                ) as mock_delete:
+                    with self.assertRaises(AnsibleExitJson) as delete_result:
+                        self.module.main()
 
-        delete_exc = delete_result.exception.args[0]
+            delete_exc = delete_result.exception.args[0]
 
-        self.assertTrue(delete_exc["changed"])
-        self.assertEqual(delete_exc["response"], {})
+            self.assertTrue(delete_exc["changed"])
+            self.assertEqual(delete_exc["response"], {})
 
-        # Test module idempotency
-        with self.patch_get_pritunl_organizations(
-            side_effect=PritunlListOrganizationMock
-        ) as mock_get:
-            with self.patch_delete_pritunl_organization(
-                side_effect=PritunlDeleteOrganizationMock
-            ) as mock_add:
-                with self.assertRaises(AnsibleExitJson) as idempotent_result:
-                    self.module.main()
+            # Test module idempotency
+            with self.patch_get_pritunl_organizations(
+                side_effect=PritunlListOrganizationMock
+            ) as mock_get:
+                with self.patch_delete_pritunl_organization(
+                    side_effect=PritunlDeleteOrganizationMock
+                ) as mock_add:
+                    with self.assertRaises(AnsibleExitJson) as idempotent_result:
+                        self.module.main()
 
         idempotent_exc = idempotent_result.exception.args[0]
 
@@ -172,33 +172,31 @@ class TestPritunlOrg(ModuleTestCase):
             "pritunl_url": "https://pritunl.domain.com",
             "name": "GumGum",
         }
-        set_module_args(module_args)
+        with set_module_args(module_args):
+            # Test deletion
+            with self.patch_get_pritunl_organizations(
+                side_effect=PritunlListOrganizationMock
+            ) as mock_get:
+                with self.patch_delete_pritunl_organization(
+                    side_effect=PritunlDeleteOrganizationMock
+                ) as mock_delete:
+                    with self.assertRaises(AnsibleFailJson) as failure_result:
+                        self.module.main()
 
-        # Test deletion
-        with self.patch_get_pritunl_organizations(
-            side_effect=PritunlListOrganizationMock
-        ) as mock_get:
-            with self.patch_delete_pritunl_organization(
-                side_effect=PritunlDeleteOrganizationMock
-            ) as mock_delete:
-                with self.assertRaises(AnsibleFailJson) as failure_result:
-                    self.module.main()
+            failure_exc = failure_result.exception.args[0]
 
-        failure_exc = failure_result.exception.args[0]
+            self.assertRegex(failure_exc["msg"], "Can not remove organization")
 
-        self.assertRegex(failure_exc["msg"], "Can not remove organization")
-
-        # Switch force=True which should run successfully
-        set_module_args(dict_merge(module_args, {"force": True}))
-
-        with self.patch_get_pritunl_organizations(
-            side_effect=PritunlListOrganizationMock
-        ) as mock_get:
-            with self.patch_delete_pritunl_organization(
-                side_effect=PritunlDeleteOrganizationMock
-            ) as mock_delete:
-                with self.assertRaises(AnsibleExitJson) as delete_result:
-                    self.module.main()
+            # Switch force=True which should run successfully
+            with set_module_args(dict_merge(module_args, {"force": True})):
+                with self.patch_get_pritunl_organizations(
+                    side_effect=PritunlListOrganizationMock
+                ) as mock_get:
+                    with self.patch_delete_pritunl_organization(
+                        side_effect=PritunlDeleteOrganizationMock
+                    ) as mock_delete:
+                        with self.assertRaises(AnsibleExitJson) as delete_result:
+                            self.module.main()
 
         delete_exc = delete_result.exception.args[0]
 

@@ -8,8 +8,8 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 import json
-from ansible_collections.community.general.tests.unit.compat import unittest
-from ansible_collections.community.general.tests.unit.compat.mock import patch
+from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
 
 from ansible.errors import AnsibleLookupError
 from ansible.plugins.loader import lookup_loader
@@ -45,6 +45,10 @@ MOCK_SECRETS = [
 class MockBitwardenSecretsManager(BitwardenSecretsManager):
 
     def _run(self, args, stdin=None):
+        # mock the --version call
+        if args[0] == "--version":
+            return "bws 1.0.0", "", 0
+
         # secret_id is the last argument passed to the bws CLI
         secret_id = args[-1]
         rc = 1

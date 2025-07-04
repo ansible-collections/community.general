@@ -9,65 +9,63 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: influxdb_database
 short_description: Manage InfluxDB databases
 description:
-    - Manage InfluxDB databases.
+  - Manage InfluxDB databases.
 author: "Kamil Szczygiel (@kamsz)"
 requirements:
-    - "influxdb >= 0.9"
-    - requests
+  - "influxdb >= 0.9"
+  - requests
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    database_name:
-        description:
-            - Name of the database.
-        required: true
-        type: str
-    state:
-        description:
-            - Determines if the database should be created or destroyed.
-        choices: [ absent, present ]
-        default: present
-        type: str
+  database_name:
+    description:
+      - Name of the database.
+    required: true
+    type: str
+  state:
+    description:
+      - Determines if the database should be created or destroyed.
+    choices: [absent, present]
+    default: present
+    type: str
 extends_documentation_fragment:
   - community.general.influxdb
   - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = r'''
+EXAMPLES = r"""
 # Example influxdb_database command from Ansible Playbooks
 - name: Create database
   community.general.influxdb_database:
-      hostname: "{{influxdb_ip_address}}"
-      database_name: "{{influxdb_database_name}}"
+    hostname: "{{influxdb_ip_address}}"
+    database_name: "{{influxdb_database_name}}"
 
 - name: Destroy database
   community.general.influxdb_database:
-      hostname: "{{influxdb_ip_address}}"
-      database_name: "{{influxdb_database_name}}"
-      state: absent
+    hostname: "{{influxdb_ip_address}}"
+    database_name: "{{influxdb_database_name}}"
+    state: absent
 
 - name: Create database using custom credentials
   community.general.influxdb_database:
-      hostname: "{{influxdb_ip_address}}"
-      username: "{{influxdb_username}}"
-      password: "{{influxdb_password}}"
-      database_name: "{{influxdb_database_name}}"
-      ssl: true
-      validate_certs: true
-'''
+    hostname: "{{influxdb_ip_address}}"
+    username: "{{influxdb_username}}"
+    password: "{{influxdb_password}}"
+    database_name: "{{influxdb_database_name}}"
+    ssl: true
+    validate_certs: true
+"""
 
-RETURN = r'''
+RETURN = r"""
 # only defaults
-'''
+"""
 
 try:
     import requests.exceptions

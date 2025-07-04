@@ -7,9 +7,9 @@ __metaclass__ = type
 
 from ansible_collections.community.general.plugins.module_utils.source_control.bitbucket import BitbucketHelper
 from ansible_collections.community.general.plugins.modules import bitbucket_pipeline_key_pair
-from ansible_collections.community.general.tests.unit.compat import unittest
-from ansible_collections.community.general.tests.unit.compat.mock import patch
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleFailJson, AnsibleExitJson, ModuleTestCase, set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleFailJson, AnsibleExitJson, ModuleTestCase, set_module_args
 
 
 class TestBucketPipelineKeyPairModule(ModuleTestCase):
@@ -19,14 +19,14 @@ class TestBucketPipelineKeyPairModule(ModuleTestCase):
 
     def test_missing_keys_with_present_state(self):
         with self.assertRaises(AnsibleFailJson) as exec_info:
-            set_module_args({
+            with set_module_args({
                 'client_id': 'ABC',
                 'client_secret': 'XXX',
                 'workspace': 'name',
                 'repository': 'repo',
                 'state': 'present',
-            })
-            self.module.main()
+            }):
+                self.module.main()
 
         self.assertEqual(exec_info.exception.args[0]['msg'], self.module.error_messages['required_keys'])
 
@@ -34,7 +34,7 @@ class TestBucketPipelineKeyPairModule(ModuleTestCase):
     def test_create_keys(self, *args):
         with patch.object(self.module, 'update_ssh_key_pair') as update_ssh_key_pair_mock:
             with self.assertRaises(AnsibleExitJson) as exec_info:
-                set_module_args({
+                with set_module_args({
                     'user': 'ABC',
                     'password': 'XXX',
                     'workspace': 'name',
@@ -42,8 +42,8 @@ class TestBucketPipelineKeyPairModule(ModuleTestCase):
                     'public_key': 'public',
                     'private_key': 'PRIVATE',
                     'state': 'present',
-                })
-                self.module.main()
+                }):
+                    self.module.main()
 
             self.assertEqual(update_ssh_key_pair_mock.call_count, 1)
             self.assertEqual(exec_info.exception.args[0]['changed'], True)
@@ -53,7 +53,7 @@ class TestBucketPipelineKeyPairModule(ModuleTestCase):
     def test_create_keys_check_mode(self, *args):
         with patch.object(self.module, 'update_ssh_key_pair') as update_ssh_key_pair_mock:
             with self.assertRaises(AnsibleExitJson) as exec_info:
-                set_module_args({
+                with set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
                     'workspace': 'name',
@@ -62,8 +62,8 @@ class TestBucketPipelineKeyPairModule(ModuleTestCase):
                     'private_key': 'PRIVATE',
                     'state': 'present',
                     '_ansible_check_mode': True,
-                })
-                self.module.main()
+                }):
+                    self.module.main()
 
             self.assertEqual(update_ssh_key_pair_mock.call_count, 0)
             self.assertEqual(exec_info.exception.args[0]['changed'], True)
@@ -76,7 +76,7 @@ class TestBucketPipelineKeyPairModule(ModuleTestCase):
     def test_update_keys(self, *args):
         with patch.object(self.module, 'update_ssh_key_pair') as update_ssh_key_pair_mock:
             with self.assertRaises(AnsibleExitJson) as exec_info:
-                set_module_args({
+                with set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
                     'workspace': 'name',
@@ -84,8 +84,8 @@ class TestBucketPipelineKeyPairModule(ModuleTestCase):
                     'public_key': 'public',
                     'private_key': 'PRIVATE',
                     'state': 'present',
-                })
-                self.module.main()
+                }):
+                    self.module.main()
 
             self.assertEqual(update_ssh_key_pair_mock.call_count, 1)
             self.assertEqual(exec_info.exception.args[0]['changed'], True)
@@ -98,7 +98,7 @@ class TestBucketPipelineKeyPairModule(ModuleTestCase):
     def test_dont_update_same_key(self, *args):
         with patch.object(self.module, 'update_ssh_key_pair') as update_ssh_key_pair_mock:
             with self.assertRaises(AnsibleExitJson) as exec_info:
-                set_module_args({
+                with set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
                     'workspace': 'name',
@@ -106,8 +106,8 @@ class TestBucketPipelineKeyPairModule(ModuleTestCase):
                     'public_key': 'public',
                     'private_key': 'PRIVATE',
                     'state': 'present',
-                })
-                self.module.main()
+                }):
+                    self.module.main()
 
             self.assertEqual(update_ssh_key_pair_mock.call_count, 0)
             self.assertEqual(exec_info.exception.args[0]['changed'], False)
@@ -120,7 +120,7 @@ class TestBucketPipelineKeyPairModule(ModuleTestCase):
     def test_update_keys_check_mode(self, *args):
         with patch.object(self.module, 'update_ssh_key_pair') as update_ssh_key_pair_mock:
             with self.assertRaises(AnsibleExitJson) as exec_info:
-                set_module_args({
+                with set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
                     'workspace': 'name',
@@ -129,8 +129,8 @@ class TestBucketPipelineKeyPairModule(ModuleTestCase):
                     'private_key': 'PRIVATE',
                     'state': 'present',
                     '_ansible_check_mode': True,
-                })
-                self.module.main()
+                }):
+                    self.module.main()
 
             self.assertEqual(update_ssh_key_pair_mock.call_count, 0)
             self.assertEqual(exec_info.exception.args[0]['changed'], True)
@@ -143,14 +143,14 @@ class TestBucketPipelineKeyPairModule(ModuleTestCase):
     def test_delete_keys(self, *args):
         with patch.object(self.module, 'delete_ssh_key_pair') as delete_ssh_key_pair_mock:
             with self.assertRaises(AnsibleExitJson) as exec_info:
-                set_module_args({
+                with set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
                     'workspace': 'name',
                     'repository': 'repo',
                     'state': 'absent',
-                })
-                self.module.main()
+                }):
+                    self.module.main()
 
             self.assertEqual(delete_ssh_key_pair_mock.call_count, 1)
             self.assertEqual(exec_info.exception.args[0]['changed'], True)
@@ -160,14 +160,14 @@ class TestBucketPipelineKeyPairModule(ModuleTestCase):
     def test_delete_absent_keys(self, *args):
         with patch.object(self.module, 'delete_ssh_key_pair') as delete_ssh_key_pair_mock:
             with self.assertRaises(AnsibleExitJson) as exec_info:
-                set_module_args({
+                with set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
                     'workspace': 'name',
                     'repository': 'repo',
                     'state': 'absent',
-                })
-                self.module.main()
+                }):
+                    self.module.main()
 
             self.assertEqual(delete_ssh_key_pair_mock.call_count, 0)
             self.assertEqual(exec_info.exception.args[0]['changed'], False)
@@ -180,15 +180,15 @@ class TestBucketPipelineKeyPairModule(ModuleTestCase):
     def test_delete_keys_check_mode(self, *args):
         with patch.object(self.module, 'delete_ssh_key_pair') as delete_ssh_key_pair_mock:
             with self.assertRaises(AnsibleExitJson) as exec_info:
-                set_module_args({
+                with set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
                     'workspace': 'name',
                     'repository': 'repo',
                     'state': 'absent',
                     '_ansible_check_mode': True,
-                })
-                self.module.main()
+                }):
+                    self.module.main()
 
             self.assertEqual(delete_ssh_key_pair_mock.call_count, 0)
             self.assertEqual(exec_info.exception.args[0]['changed'], True)

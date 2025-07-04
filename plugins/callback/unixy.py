@@ -5,21 +5,20 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # Make coding more python3-ish
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
-DOCUMENTATION = '''
-    name: unixy
-    type: stdout
-    author: Al Bowles (@akatch)
-    short_description: condensed Ansible output
-    description:
-      - Consolidated Ansible output in the style of LINUX/UNIX startup logs.
-    extends_documentation_fragment:
-      - default_callback
-    requirements:
-      - set as stdout in configuration
-'''
+DOCUMENTATION = r"""
+name: unixy
+type: stdout
+author: Al Bowles (@akatch)
+short_description: Condensed Ansible output
+description:
+  - Consolidated Ansible output in the style of LINUX/UNIX startup logs.
+extends_documentation_fragment:
+  - default_callback
+requirements:
+  - set as stdout in configuration
+"""
 
 from os.path import basename
 from ansible import constants as C
@@ -67,24 +66,24 @@ class CallbackModule(CallbackModule_default):
 
     def _process_result_output(self, result, msg):
         task_host = result._host.get_name()
-        task_result = "%s %s" % (task_host, msg)
+        task_result = f"{task_host} {msg}"
 
         if self._run_is_verbose(result):
-            task_result = "%s %s: %s" % (task_host, msg, self._dump_results(result._result, indent=4))
+            task_result = f"{task_host} {msg}: {self._dump_results(result._result, indent=4)}"
             return task_result
 
         if self.delegated_vars:
             task_delegate_host = self.delegated_vars['ansible_host']
-            task_result = "%s -> %s %s" % (task_host, task_delegate_host, msg)
+            task_result = f"{task_host} -> {task_delegate_host} {msg}"
 
         if result._result.get('msg') and result._result.get('msg') != "All items completed":
-            task_result += " | msg: " + to_text(result._result.get('msg'))
+            task_result += f" | msg: {to_text(result._result.get('msg'))}"
 
         if result._result.get('stdout'):
-            task_result += " | stdout: " + result._result.get('stdout')
+            task_result += f" | stdout: {result._result.get('stdout')}"
 
         if result._result.get('stderr'):
-            task_result += " | stderr: " + result._result.get('stderr')
+            task_result += f" | stderr: {result._result.get('stderr')}"
 
         return task_result
 
@@ -92,30 +91,30 @@ class CallbackModule(CallbackModule_default):
         self._get_task_display_name(task)
         if self.task_display_name is not None:
             if task.check_mode and self.get_option('check_mode_markers'):
-                self._display.display("%s (check mode)..." % self.task_display_name)
+                self._display.display(f"{self.task_display_name} (check mode)...")
             else:
-                self._display.display("%s..." % self.task_display_name)
+                self._display.display(f"{self.task_display_name}...")
 
     def v2_playbook_on_handler_task_start(self, task):
         self._get_task_display_name(task)
         if self.task_display_name is not None:
             if task.check_mode and self.get_option('check_mode_markers'):
-                self._display.display("%s (via handler in check mode)... " % self.task_display_name)
+                self._display.display(f"{self.task_display_name} (via handler in check mode)... ")
             else:
-                self._display.display("%s (via handler)... " % self.task_display_name)
+                self._display.display(f"{self.task_display_name} (via handler)... ")
 
     def v2_playbook_on_play_start(self, play):
         name = play.get_name().strip()
         if play.check_mode and self.get_option('check_mode_markers'):
             if name and play.hosts:
-                msg = u"\n- %s (in check mode) on hosts: %s -" % (name, ",".join(play.hosts))
+                msg = f"\n- {name} (in check mode) on hosts: {','.join(play.hosts)} -"
             else:
-                msg = u"- check mode -"
+                msg = "- check mode -"
         else:
             if name and play.hosts:
-                msg = u"\n- %s on hosts: %s -" % (name, ",".join(play.hosts))
+                msg = f"\n- {name} on hosts: {','.join(play.hosts)} -"
             else:
-                msg = u"---"
+                msg = "---"
 
         self._display.display(msg)
 
@@ -126,7 +125,7 @@ class CallbackModule(CallbackModule_default):
             msg = "skipped"
 
             task_result = self._process_result_output(result, msg)
-            self._display.display("  " + task_result, display_color)
+            self._display.display(f"  {task_result}", display_color)
         else:
             return
 
@@ -136,10 +135,10 @@ class CallbackModule(CallbackModule_default):
         msg = "failed"
         item_value = self._get_item_label(result._result)
         if item_value:
-            msg += " | item: %s" % (item_value,)
+            msg += f" | item: {item_value}"
 
         task_result = self._process_result_output(result, msg)
-        self._display.display("  " + task_result, display_color, stderr=self.get_option('display_failed_stderr'))
+        self._display.display(f"  {task_result}", display_color, stderr=self.get_option('display_failed_stderr'))
 
     def v2_runner_on_ok(self, result, msg="ok", display_color=C.COLOR_OK):
         self._preprocess_result(result)
@@ -149,13 +148,13 @@ class CallbackModule(CallbackModule_default):
             msg = "done"
             item_value = self._get_item_label(result._result)
             if item_value:
-                msg += " | item: %s" % (item_value,)
+                msg += f" | item: {item_value}"
             display_color = C.COLOR_CHANGED
             task_result = self._process_result_output(result, msg)
-            self._display.display("  " + task_result, display_color)
+            self._display.display(f"  {task_result}", display_color)
         elif self.get_option('display_ok_hosts'):
             task_result = self._process_result_output(result, msg)
-            self._display.display("  " + task_result, display_color)
+            self._display.display(f"  {task_result}", display_color)
 
     def v2_runner_item_on_skipped(self, result):
         self.v2_runner_on_skipped(result)
@@ -173,7 +172,7 @@ class CallbackModule(CallbackModule_default):
         display_color = C.COLOR_UNREACHABLE
         task_result = self._process_result_output(result, msg)
 
-        self._display.display("  " + task_result, display_color, stderr=self.get_option('display_failed_stderr'))
+        self._display.display(f"  {task_result}", display_color, stderr=self.get_option('display_failed_stderr'))
 
     def v2_on_file_diff(self, result):
         if result._task.loop and 'results' in result._result:
@@ -195,25 +194,17 @@ class CallbackModule(CallbackModule_default):
             # TODO how else can we display these?
             t = stats.summarize(h)
 
-            self._display.display(u"  %s : %s %s %s %s %s %s" % (
-                hostcolor(h, t),
-                colorize(u'ok', t['ok'], C.COLOR_OK),
-                colorize(u'changed', t['changed'], C.COLOR_CHANGED),
-                colorize(u'unreachable', t['unreachable'], C.COLOR_UNREACHABLE),
-                colorize(u'failed', t['failures'], C.COLOR_ERROR),
-                colorize(u'rescued', t['rescued'], C.COLOR_OK),
-                colorize(u'ignored', t['ignored'], C.COLOR_WARN)),
+            self._display.display(
+                f"  {hostcolor(h, t)} : {colorize('ok', t['ok'], C.COLOR_OK)} {colorize('changed', t['changed'], C.COLOR_CHANGED)} "
+                f"{colorize('unreachable', t['unreachable'], C.COLOR_UNREACHABLE)} {colorize('failed', t['failures'], C.COLOR_ERROR)} "
+                f"{colorize('rescued', t['rescued'], C.COLOR_OK)} {colorize('ignored', t['ignored'], C.COLOR_WARN)}",
                 screen_only=True
             )
 
-            self._display.display(u"  %s : %s %s %s %s %s %s" % (
-                hostcolor(h, t, False),
-                colorize(u'ok', t['ok'], None),
-                colorize(u'changed', t['changed'], None),
-                colorize(u'unreachable', t['unreachable'], None),
-                colorize(u'failed', t['failures'], None),
-                colorize(u'rescued', t['rescued'], None),
-                colorize(u'ignored', t['ignored'], None)),
+            self._display.display(
+                f"  {hostcolor(h, t, False)} : {colorize('ok', t['ok'], None)} {colorize('changed', t['changed'], None)} "
+                f"{colorize('unreachable', t['unreachable'], None)} {colorize('failed', t['failures'], None)} {colorize('rescued', t['rescued'], None)} "
+                f"{colorize('ignored', t['ignored'], None)}",
                 log_only=True
             )
         if stats.custom and self.get_option('show_custom_stats'):
@@ -223,12 +214,14 @@ class CallbackModule(CallbackModule_default):
             for k in sorted(stats.custom.keys()):
                 if k == '_run':
                     continue
-                self._display.display('\t%s: %s' % (k, self._dump_results(stats.custom[k], indent=1).replace('\n', '')))
+                stat_val = self._dump_results(stats.custom[k], indent=1).replace('\n', '')
+                self._display.display(f'\t{k}: {stat_val}')
 
             # print per run custom stats
             if '_run' in stats.custom:
                 self._display.display("", screen_only=True)
-                self._display.display('\tRUN: %s' % self._dump_results(stats.custom['_run'], indent=1).replace('\n', ''))
+                stat_val_run = self._dump_results(stats.custom['_run'], indent=1).replace('\n', '')
+                self._display.display(f'\tRUN: {stat_val_run}')
             self._display.display("", screen_only=True)
 
     def v2_playbook_on_no_hosts_matched(self):
@@ -239,23 +232,23 @@ class CallbackModule(CallbackModule_default):
 
     def v2_playbook_on_start(self, playbook):
         if context.CLIARGS['check'] and self.get_option('check_mode_markers'):
-            self._display.display("Executing playbook %s in check mode" % basename(playbook._file_name))
+            self._display.display(f"Executing playbook {basename(playbook._file_name)} in check mode")
         else:
-            self._display.display("Executing playbook %s" % basename(playbook._file_name))
+            self._display.display(f"Executing playbook {basename(playbook._file_name)}")
 
         # show CLI arguments
         if self._display.verbosity > 3:
             if context.CLIARGS.get('args'):
-                self._display.display('Positional arguments: %s' % ' '.join(context.CLIARGS['args']),
+                self._display.display(f"Positional arguments: {' '.join(context.CLIARGS['args'])}",
                                       color=C.COLOR_VERBOSE, screen_only=True)
 
             for argument in (a for a in context.CLIARGS if a != 'args'):
                 val = context.CLIARGS[argument]
                 if val:
-                    self._display.vvvv('%s: %s' % (argument, val))
+                    self._display.vvvv(f'{argument}: {val}')
 
     def v2_runner_retry(self, result):
-        msg = "  Retrying... (%d of %d)" % (result._result['attempts'], result._result['retries'])
+        msg = f"  Retrying... ({result._result['attempts']} of {result._result['retries']})"
         if self._run_is_verbose(result):
-            msg += "Result was: %s" % self._dump_results(result._result)
+            msg += f"Result was: {self._dump_results(result._result)}"
         self._display.display(msg, color=C.COLOR_DEBUG)

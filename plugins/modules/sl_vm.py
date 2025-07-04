@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: sl_vm
 short_description: Create or cancel a virtual instance in SoftLayer
 description:
@@ -25,7 +24,7 @@ attributes:
 options:
   instance_id:
     description:
-      - Instance Id of the virtual instance to perform action option.
+      - Instance ID of the virtual instance to perform action option.
     type: str
   hostname:
     description:
@@ -121,7 +120,7 @@ options:
   disks:
     description:
       - List of disk sizes to be assigned to new virtual instance.
-    default: [ 25 ]
+    default: [25]
     type: list
     elements: int
   os_code:
@@ -139,15 +138,15 @@ options:
     type: int
   public_vlan:
     description:
-      - VLAN by its Id to be assigned to the public NIC.
+      - VLAN by its ID to be assigned to the public NIC.
     type: str
   private_vlan:
     description:
-      - VLAN by its Id to be assigned to the private NIC.
+      - VLAN by its ID to be assigned to the private NIC.
     type: str
   ssh_keys:
     description:
-      - List of ssh keys by their Id to be assigned to a virtual instance.
+      - List of ssh keys by their ID to be assigned to a virtual instance.
     type: list
     elements: str
     default: []
@@ -159,7 +158,7 @@ options:
     description:
       - Create, or cancel a virtual instance.
       - Specify V(present) for create, V(absent) to cancel.
-    choices: [ absent, present ]
+    choices: [absent, present]
     default: present
     type: str
   wait:
@@ -173,102 +172,110 @@ options:
     default: 600
     type: int
 requirements:
-    - softlayer >= 4.1.1
+  - softlayer >= 4.1.1
+notes:
+  - If using Python 2.7, you must install C(softlayer-python<=5.7.2).
+  - If using Python 3.6, you must install C(softlayer-python<=6.0.0).
+  - The C(softlayer-python) library, at version 6.2.6 (from Jan 2025), only supports Python version 3.8, 3.9 and 3.10.
 author:
-- Matt Colton (@mcltn)
-'''
+  - Matt Colton (@mcltn)
+seealso:
+  - name: SoftLayer API Python Client
+    description: The SoftLayer API Python Client is required for this module.
+    link: https://github.com/SoftLayer/softlayer-python
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Build instance
   hosts: localhost
   gather_facts: false
   tasks:
-  - name: Build instance request
-    community.general.sl_vm:
-      hostname: instance-1
-      domain: anydomain.com
-      datacenter: dal09
-      tags: ansible-module-test
-      hourly: true
-      private: false
-      dedicated: false
-      local_disk: true
-      cpus: 1
-      memory: 1024
-      disks: [25]
-      os_code: UBUNTU_LATEST
-      wait: false
+    - name: Build instance request
+      community.general.sl_vm:
+        hostname: instance-1
+        domain: anydomain.com
+        datacenter: dal09
+        tags: ansible-module-test
+        hourly: true
+        private: false
+        dedicated: false
+        local_disk: true
+        cpus: 1
+        memory: 1024
+        disks: [25]
+        os_code: UBUNTU_LATEST
+        wait: false
 
 - name: Build additional instances
   hosts: localhost
   gather_facts: false
   tasks:
-  - name: Build instances request
-    community.general.sl_vm:
-      hostname: "{{ item.hostname }}"
-      domain: "{{ item.domain }}"
-      datacenter: "{{ item.datacenter }}"
-      tags: "{{ item.tags }}"
-      hourly: "{{ item.hourly }}"
-      private: "{{ item.private }}"
-      dedicated: "{{ item.dedicated }}"
-      local_disk: "{{ item.local_disk }}"
-      cpus: "{{ item.cpus }}"
-      memory: "{{ item.memory }}"
-      disks: "{{ item.disks }}"
-      os_code: "{{ item.os_code }}"
-      ssh_keys: "{{ item.ssh_keys }}"
-      wait: "{{ item.wait }}"
-    with_items:
-      - hostname: instance-2
-        domain: anydomain.com
-        datacenter: dal09
-        tags:
-          - ansible-module-test
-          - ansible-module-test-replicas
-        hourly: true
-        private: false
-        dedicated: false
-        local_disk: true
-        cpus: 1
-        memory: 1024
-        disks:
-          - 25
-          - 100
-        os_code: UBUNTU_LATEST
-        ssh_keys: []
-        wait: true
-      - hostname: instance-3
-        domain: anydomain.com
-        datacenter: dal09
-        tags:
-          - ansible-module-test
-          - ansible-module-test-replicas
-        hourly: true
-        private: false
-        dedicated: false
-        local_disk: true
-        cpus: 1
-        memory: 1024
-        disks:
-          - 25
-          - 100
-        os_code: UBUNTU_LATEST
-        ssh_keys: []
-        wait: true
+    - name: Build instances request
+      community.general.sl_vm:
+        hostname: "{{ item.hostname }}"
+        domain: "{{ item.domain }}"
+        datacenter: "{{ item.datacenter }}"
+        tags: "{{ item.tags }}"
+        hourly: "{{ item.hourly }}"
+        private: "{{ item.private }}"
+        dedicated: "{{ item.dedicated }}"
+        local_disk: "{{ item.local_disk }}"
+        cpus: "{{ item.cpus }}"
+        memory: "{{ item.memory }}"
+        disks: "{{ item.disks }}"
+        os_code: "{{ item.os_code }}"
+        ssh_keys: "{{ item.ssh_keys }}"
+        wait: "{{ item.wait }}"
+      with_items:
+        - hostname: instance-2
+          domain: anydomain.com
+          datacenter: dal09
+          tags:
+            - ansible-module-test
+            - ansible-module-test-replicas
+          hourly: true
+          private: false
+          dedicated: false
+          local_disk: true
+          cpus: 1
+          memory: 1024
+          disks:
+            - 25
+            - 100
+          os_code: UBUNTU_LATEST
+          ssh_keys: []
+          wait: true
+        - hostname: instance-3
+          domain: anydomain.com
+          datacenter: dal09
+          tags:
+            - ansible-module-test
+            - ansible-module-test-replicas
+          hourly: true
+          private: false
+          dedicated: false
+          local_disk: true
+          cpus: 1
+          memory: 1024
+          disks:
+            - 25
+            - 100
+          os_code: UBUNTU_LATEST
+          ssh_keys: []
+          wait: true
 
 - name: Cancel instances
   hosts: localhost
   gather_facts: false
   tasks:
-  - name: Cancel by tag
-    community.general.sl_vm:
-      state: absent
-      tags: ansible-module-test
-'''
+    - name: Cancel by tag
+      community.general.sl_vm:
+        state: absent
+        tags: ansible-module-test
+"""
 
 # TODO: Disabled RETURN as it is breaking the build for docs. Needs to be fixed.
-RETURN = '''# '''
+RETURN = """#"""
 
 import json
 import time
@@ -312,9 +319,9 @@ def create_virtual_instance(module):
         return False, None
 
     # Check if OS or Image Template is provided (Can't be both, defaults to OS)
-    if (module.params.get('os_code') is not None and module.params.get('os_code') != ''):
+    if module.params.get('os_code') is not None and module.params.get('os_code') != '':
         module.params['image_id'] = ''
-    elif (module.params.get('image_id') is not None and module.params.get('image_id') != ''):
+    elif module.params.get('image_id') is not None and module.params.get('image_id') != '':
         module.params['os_code'] = ''
         module.params['disks'] = []  # Blank out disks since it will use the template
     else:

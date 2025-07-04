@@ -11,22 +11,24 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: ufw
 short_description: Manage firewall with UFW
 description:
-    - Manage firewall with UFW.
+  - Manage firewall with UFW.
 author:
-    - Aleksey Ovcharenko (@ovcharenko)
-    - Jarno Keskikangas (@pyykkis)
-    - Ahti Kitsik (@ahtik)
+  - Aleksey Ovcharenko (@ovcharenko)
+  - Jarno Keskikangas (@pyykkis)
+  - Ahti Kitsik (@ahtik)
 notes:
-    - See C(man ufw) for more examples.
+  - See C(man ufw) for more examples.
+  - B(Warning:) Whilst the module itself can be run using concurrent strategies, C(ufw) does not support concurrency, as firewall
+    rules are meant to be ordered and parallel executions do not guarantee order. B(Do not use concurrency:) The results are
+    unpredictable and the module may fail silently if you do.
 requirements:
-    - C(ufw) package
+  - C(ufw) package
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
   check_mode:
     support: full
@@ -40,59 +42,52 @@ options:
       - V(reloaded) reloads firewall.
       - V(reset) disables and resets firewall to installation defaults.
     type: str
-    choices: [ disabled, enabled, reloaded, reset ]
+    choices: [disabled, enabled, reloaded, reset]
   default:
     description:
       - Change the default policy for incoming or outgoing traffic.
     type: str
-    choices: [ allow, deny, reject ]
-    aliases: [ policy ]
+    choices: [allow, deny, reject]
+    aliases: [policy]
   direction:
     description:
-      - Select direction for a rule or default policy command.  Mutually
-        exclusive with O(interface_in) and O(interface_out).
+      - Select direction for a rule or default policy command. Mutually exclusive with O(interface_in) and O(interface_out).
     type: str
-    choices: [ in, incoming, out, outgoing, routed ]
+    choices: [in, incoming, out, outgoing, routed]
   logging:
     description:
       - Toggles logging. Logged packets use the LOG_KERN syslog facility.
     type: str
-    choices: [ 'on', 'off', low, medium, high, full ]
+    choices: ['on', 'off', low, medium, high, full]
   insert:
     description:
       - Insert the corresponding rule as rule number NUM.
       - Note that ufw numbers rules starting with 1.
-      - If O(delete=true) and a value is provided for O(insert),
-        then O(insert) is ignored.
+      - If O(delete=true) and a value is provided for O(insert), then O(insert) is ignored.
     type: int
   insert_relative_to:
     description:
       - Allows to interpret the index in O(insert) relative to a position.
-      - V(zero) interprets the rule number as an absolute index (i.e. 1 is
-        the first rule).
-      - V(first-ipv4) interprets the rule number relative to the index of the
-        first IPv4 rule, or relative to the position where the first IPv4 rule
-        would be if there is currently none.
-      - V(last-ipv4) interprets the rule number relative to the index of the
-        last IPv4 rule, or relative to the position where the last IPv4 rule
-        would be if there is currently none.
-      - V(first-ipv6) interprets the rule number relative to the index of the
-        first IPv6 rule, or relative to the position where the first IPv6 rule
-        would be if there is currently none.
-      - V(last-ipv6) interprets the rule number relative to the index of the
-        last IPv6 rule, or relative to the position where the last IPv6 rule
-        would be if there is currently none.
+      - V(zero) interprets the rule number as an absolute index (that is, 1 is the first rule).
+      - V(first-ipv4) interprets the rule number relative to the index of the first IPv4 rule, or relative to the position
+        where the first IPv4 rule would be if there is currently none.
+      - V(last-ipv4) interprets the rule number relative to the index of the last IPv4 rule, or relative to the position where
+        the last IPv4 rule would be if there is currently none.
+      - V(first-ipv6) interprets the rule number relative to the index of the first IPv6 rule, or relative to the position
+        where the first IPv6 rule would be if there is currently none.
+      - V(last-ipv6) interprets the rule number relative to the index of the last IPv6 rule, or relative to the position where
+        the last IPv6 rule would be if there is currently none.
     type: str
-    choices: [ first-ipv4, first-ipv6, last-ipv4, last-ipv6, zero ]
+    choices: [first-ipv4, first-ipv6, last-ipv4, last-ipv6, zero]
     default: zero
   rule:
     description:
-      - Add firewall rule
+      - Add firewall rule.
     type: str
-    choices: [ allow, deny, limit, reject ]
+    choices: [allow, deny, limit, reject]
   log:
     description:
-      - Log new connections matched to this rule
+      - Log new connections matched to this rule.
     type: bool
     default: false
   from_ip:
@@ -100,7 +95,7 @@ options:
       - Source IP address.
     type: str
     default: any
-    aliases: [ from, src ]
+    aliases: [from, src]
   from_port:
     description:
       - Source port.
@@ -110,54 +105,50 @@ options:
       - Destination IP address.
     type: str
     default: any
-    aliases: [ dest, to]
+    aliases: [dest, to]
   to_port:
     description:
       - Destination port.
     type: str
-    aliases: [ port ]
+    aliases: [port]
   proto:
     description:
       - TCP/IP protocol.
+      - The value V(vrrp) is supported since community.general 10.3.0.
     type: str
-    choices: [ any, tcp, udp, ipv6, esp, ah, gre, igmp ]
-    aliases: [ protocol ]
+    choices: [any, tcp, udp, ipv6, esp, ah, gre, igmp, vrrp]
+    aliases: [protocol]
   name:
     description:
       - Use profile located in C(/etc/ufw/applications.d).
     type: str
-    aliases: [ app ]
+    aliases: [app]
   delete:
     description:
       - Delete rule.
-      - If O(delete=true) and a value is provided for O(insert),
-        then O(insert) is ignored.
+      - If O(delete=true) and a value is provided for O(insert), then O(insert) is ignored.
     type: bool
     default: false
   interface:
     description:
-      - Specify interface for the rule.  The direction (in or out) used
-        for the interface depends on the value of O(direction).  See
-        O(interface_in) and O(interface_out) for routed rules that needs
-        to supply both an input and output interface.  Mutually
-        exclusive with O(interface_in) and O(interface_out).
+      - Specify interface for the rule. The direction (in or out) used for the interface depends on the value of O(direction).
+        See O(interface_in) and O(interface_out) for routed rules that needs to supply both an input and output interface.
+        Mutually exclusive with O(interface_in) and O(interface_out).
     type: str
-    aliases: [ if ]
+    aliases: [if]
   interface_in:
     description:
-      - Specify input interface for the rule.  This is mutually
-        exclusive with O(direction) and O(interface).  However, it is
+      - Specify input interface for the rule. This is mutually exclusive with O(direction) and O(interface). However, it is
         compatible with O(interface_out) for routed rules.
     type: str
-    aliases: [ if_in ]
+    aliases: [if_in]
     version_added: '0.2.0'
   interface_out:
     description:
-      - Specify output interface for the rule.  This is mutually
-        exclusive with O(direction) and O(interface).  However, it is
-        compatible with O(interface_in) for routed rules.
+      - Specify output interface for the rule. This is mutually exclusive with O(direction) and O(interface). However, it
+        is compatible with O(interface_in) for routed rules.
     type: str
-    aliases: [ if_out ]
+    aliases: [if_out]
     version_added: '0.2.0'
   route:
     description:
@@ -168,9 +159,9 @@ options:
     description:
       - Add a comment to the rule. Requires UFW version >=0.35.
     type: str
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Allow everything and enable UFW
   community.general.ufw:
     state: enabled
@@ -295,7 +286,7 @@ EXAMPLES = r'''
     route: true
     src: 192.0.2.0/24
     dest: 198.51.100.0/24
-'''
+"""
 
 import re
 
@@ -351,7 +342,7 @@ def main():
             from_port=dict(type='str'),
             to_ip=dict(type='str', default='any', aliases=['dest', 'to']),
             to_port=dict(type='str', aliases=['port']),
-            proto=dict(type='str', aliases=['protocol'], choices=['ah', 'any', 'esp', 'ipv6', 'tcp', 'udp', 'gre', 'igmp']),
+            proto=dict(type='str', aliases=['protocol'], choices=['ah', 'any', 'esp', 'ipv6', 'tcp', 'udp', 'gre', 'igmp', 'vrrp']),
             name=dict(type='str', aliases=['app']),
             comment=dict(type='str'),
         ),
@@ -446,7 +437,7 @@ def main():
 
     params = module.params
 
-    commands = dict((key, params[key]) for key in command_keys if params[key])
+    commands = {key: params[key] for key in command_keys if params[key]}
 
     # Ensure ufw is available
     ufw_bin = module.get_bin_path('ufw', True)

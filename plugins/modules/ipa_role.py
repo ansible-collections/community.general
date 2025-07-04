@@ -7,13 +7,12 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: ipa_role
 author: Thomas Krahn (@Nosmoht)
 short_description: Manage FreeIPA role
 description:
-- Add, modify and delete a role within FreeIPA server using FreeIPA API.
+  - Add, modify and delete a role within FreeIPA server using FreeIPA API.
 attributes:
   check_mode:
     support: full
@@ -22,53 +21,53 @@ attributes:
 options:
   cn:
     description:
-    - Role name.
-    - Can not be changed as it is the unique identifier.
+      - Role name.
+      - Can not be changed as it is the unique identifier.
     required: true
     aliases: ['name']
     type: str
   description:
     description:
-    - A description of this role-group.
+      - A description of this role-group.
     type: str
   group:
     description:
-    - List of group names assign to this role.
-    - If an empty list is passed all assigned groups will be unassigned from the role.
-    - If option is omitted groups will not be checked or changed.
-    - If option is passed all assigned groups that are not passed will be unassigned from the role.
+      - List of group names assign to this role.
+      - If an empty list is passed all assigned groups will be unassigned from the role.
+      - If option is omitted groups will not be checked or changed.
+      - If option is passed all assigned groups that are not passed will be unassigned from the role.
     type: list
     elements: str
   host:
     description:
-    - List of host names to assign.
-    - If an empty list is passed all assigned hosts will be unassigned from the role.
-    - If option is omitted hosts will not be checked or changed.
-    - If option is passed all assigned hosts that are not passed will be unassigned from the role.
+      - List of host names to assign.
+      - If an empty list is passed all assigned hosts will be unassigned from the role.
+      - If option is omitted hosts will not be checked or changed.
+      - If option is passed all assigned hosts that are not passed will be unassigned from the role.
     type: list
     elements: str
   hostgroup:
     description:
-    - List of host group names to assign.
-    - If an empty list is passed all assigned host groups will be removed from the role.
-    - If option is omitted host groups will not be checked or changed.
-    - If option is passed all assigned hostgroups that are not passed will be unassigned from the role.
+      - List of host group names to assign.
+      - If an empty list is passed all assigned host groups will be removed from the role.
+      - If option is omitted host groups will not be checked or changed.
+      - If option is passed all assigned hostgroups that are not passed will be unassigned from the role.
     type: list
     elements: str
   privilege:
     description:
-    - List of privileges granted to the role.
-    - If an empty list is passed all assigned privileges will be removed.
-    - If option is omitted privileges will not be checked or changed.
-    - If option is passed all assigned privileges that are not passed will be removed.
+      - List of privileges granted to the role.
+      - If an empty list is passed all assigned privileges will be removed.
+      - If option is omitted privileges will not be checked or changed.
+      - If option is passed all assigned privileges that are not passed will be removed.
     type: list
     elements: str
   service:
     description:
-    - List of service names to assign.
-    - If an empty list is passed all assigned services will be removed from the role.
-    - If option is omitted services will not be checked or changed.
-    - If option is passed all assigned services that are not passed will be removed from the role.
+      - List of service names to assign.
+      - If an empty list is passed all assigned services will be removed from the role.
+      - If option is omitted services will not be checked or changed.
+      - If option is passed all assigned services that are not passed will be removed from the role.
     type: list
     elements: str
   state:
@@ -78,26 +77,25 @@ options:
     type: str
   user:
     description:
-    - List of user names to assign.
-    - If an empty list is passed all assigned users will be removed from the role.
-    - If option is omitted users will not be checked or changed.
+      - List of user names to assign.
+      - If an empty list is passed all assigned users will be removed from the role.
+      - If option is omitted users will not be checked or changed.
     type: list
     elements: str
 extends_documentation_fragment:
   - community.general.ipa.documentation
   - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Ensure role is present
   community.general.ipa_role:
     name: dba
     description: Database Administrators
     state: present
     user:
-    - pinky
-    - brain
+      - pinky
+      - brain
     ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
@@ -107,16 +105,16 @@ EXAMPLES = r'''
     name: another-role
     description: Just another role
     group:
-    - editors
+      - editors
     host:
-    - host01.example.com
+      - host01.example.com
     hostgroup:
-    - hostgroup01
+      - hostgroup01
     privilege:
-    - Group Administrators
-    - User Administrators
+      - Group Administrators
+      - User Administrators
     service:
-    - service01
+      - service01
 
 - name: Ensure role is absent
   community.general.ipa_role:
@@ -125,14 +123,14 @@ EXAMPLES = r'''
     ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 role:
   description: Role as returned by IPA API.
   returned: always
   type: dict
-'''
+"""
 
 import traceback
 

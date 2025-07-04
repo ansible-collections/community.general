@@ -8,55 +8,54 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: odbc
 author: "John Westcott IV (@john-westcott-iv)"
 version_added: "1.0.0"
-short_description: Execute SQL via ODBC
+short_description: Execute SQL using ODBC
 description:
-    - Read/Write info via ODBC drivers.
+  - Read/Write info using ODBC drivers.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    dsn:
-      description:
-        - The connection string passed into ODBC.
-      required: true
-      type: str
-    query:
-      description:
-        - The SQL query to perform.
-      required: true
-      type: str
-    params:
-      description:
-        - Parameters to pass to the SQL query.
-      type: list
-      elements: str
-    commit:
-      description:
-        - Perform a commit after the execution of the SQL query.
-        - Some databases allow a commit after a select whereas others raise an exception.
-        - Default is V(true) to support legacy module behavior.
-      type: bool
-      default: true
-      version_added: 1.3.0
+  dsn:
+    description:
+      - The connection string passed into ODBC.
+    required: true
+    type: str
+  query:
+    description:
+      - The SQL query to perform.
+    required: true
+    type: str
+  params:
+    description:
+      - Parameters to pass to the SQL query.
+    type: list
+    elements: str
+  commit:
+    description:
+      - Perform a commit after the execution of the SQL query.
+      - Some databases allow a commit after a select whereas others raise an exception.
+      - Default is V(true) to support legacy module behavior.
+    type: bool
+    default: true
+    version_added: 1.3.0
 requirements:
   - "pyodbc"
 
 notes:
-  - "Like the command module, this module always returns changed = yes whether or not the query would change the database."
-  - "To alter this behavior you can use C(changed_when): [yes or no]."
-  - "For details about return values (description and row_count) see U(https://github.com/mkleehammer/pyodbc/wiki/Cursor)."
-'''
+  - Like the command module, this module always returns V(changed=true) whether or not the query would change the database.
+  - 'To alter this behavior you can use C(changed_when): [true or false].'
+  - For details about return values (RV(description) and RV(row_count)) see U(https://github.com/mkleehammer/pyodbc/wiki/Cursor).
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Set some values in the test db
   community.general.odbc:
     dsn: "DRIVER={ODBC Driver 13 for SQL Server};Server=db.ansible.com;Database=my_db;UID=admin;PWD=password;"
@@ -65,24 +64,24 @@ EXAMPLES = '''
       - "value1"
     commit: false
   changed_when: false
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 results:
-    description: List of lists of strings containing selected rows, likely empty for DDL statements.
-    returned: success
-    type: list
-    elements: list
+  description: List of lists of strings containing selected rows, likely empty for DDL statements.
+  returned: success
+  type: list
+  elements: list
 description:
-    description: "List of dicts about the columns selected from the cursors, likely empty for DDL statements. See notes."
-    returned: success
-    type: list
-    elements: dict
+  description: "List of dicts about the columns selected from the cursors, likely empty for DDL statements. See notes."
+  returned: success
+  type: list
+  elements: dict
 row_count:
-    description: "The number of rows selected or modified according to the cursor defaults to -1. See notes."
-    returned: success
-    type: str
-'''
+  description: "The number of rows selected or modified according to the cursor defaults to V(-1). See notes."
+  returned: success
+  type: str
+"""
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native

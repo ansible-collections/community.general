@@ -9,136 +9,132 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: influxdb_retention_policy
 short_description: Manage InfluxDB retention policies
 description:
-    - Manage InfluxDB retention policies.
+  - Manage InfluxDB retention policies.
 author: "Kamil Szczygiel (@kamsz)"
 requirements:
-    - "influxdb >= 0.9"
-    - requests
+  - "influxdb >= 0.9"
+  - requests
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    database_name:
-        description:
-            - Name of the database.
-        required: true
-        type: str
-    policy_name:
-        description:
-            - Name of the retention policy.
-        required: true
-        type: str
-    state:
-        description:
-            - State of the retention policy.
-        choices: [ absent, present ]
-        default: present
-        type: str
-        version_added: 3.1.0
-    duration:
-        description:
-            - Determines how long InfluxDB should keep the data. If specified, it
-              should be V(INF) or at least one hour. If not specified, V(INF) is
-              assumed. Supports complex duration expressions with multiple units.
-            - Required only if O(state) is set to V(present).
-        type: str
-    replication:
-        description:
-            - Determines how many independent copies of each point are stored in the cluster.
-            - Required only if O(state) is set to V(present).
-        type: int
-    default:
-        description:
-            - Sets the retention policy as default retention policy.
-        type: bool
-        default: false
-    shard_group_duration:
-        description:
-            - Determines the time range covered by a shard group. If specified it
-              must be at least one hour. If none, it's determined by InfluxDB by
-              the rentention policy's duration. Supports complex duration expressions
-              with multiple units.
-        type: str
-        version_added: '2.0.0'
+  database_name:
+    description:
+      - Name of the database.
+    required: true
+    type: str
+  policy_name:
+    description:
+      - Name of the retention policy.
+    required: true
+    type: str
+  state:
+    description:
+      - State of the retention policy.
+    choices: [absent, present]
+    default: present
+    type: str
+    version_added: 3.1.0
+  duration:
+    description:
+      - Determines how long InfluxDB should keep the data. If specified, it should be V(INF) or at least one hour. If not
+        specified, V(INF) is assumed. Supports complex duration expressions with multiple units.
+      - Required only if O(state) is set to V(present).
+    type: str
+  replication:
+    description:
+      - Determines how many independent copies of each point are stored in the cluster.
+      - Required only if O(state) is set to V(present).
+    type: int
+  default:
+    description:
+      - Sets the retention policy as default retention policy.
+    type: bool
+    default: false
+  shard_group_duration:
+    description:
+      - Determines the time range covered by a shard group. If specified it must be at least one hour. If not provided, it
+        is determined by InfluxDB by the rentention policy's duration. Supports complex duration expressions with multiple
+        units.
+    type: str
+    version_added: '2.0.0'
 extends_documentation_fragment:
   - community.general.influxdb
   - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = r'''
+EXAMPLES = r"""
 # Example influxdb_retention_policy command from Ansible Playbooks
 - name: Create 1 hour retention policy
   community.general.influxdb_retention_policy:
-      hostname: "{{ influxdb_ip_address }}"
-      database_name: "{{ influxdb_database_name }}"
-      policy_name: test
-      duration: 1h
-      replication: 1
-      ssl: true
-      validate_certs: true
-      state: present
+    hostname: "{{ influxdb_ip_address }}"
+    database_name: "{{ influxdb_database_name }}"
+    policy_name: test
+    duration: 1h
+    replication: 1
+    ssl: true
+    validate_certs: true
+    state: present
 
 - name: Create 1 day retention policy with 1 hour shard group duration
   community.general.influxdb_retention_policy:
-      hostname: "{{ influxdb_ip_address }}"
-      database_name: "{{ influxdb_database_name }}"
-      policy_name: test
-      duration: 1d
-      replication: 1
-      shard_group_duration: 1h
-      state: present
+    hostname: "{{ influxdb_ip_address }}"
+    database_name: "{{ influxdb_database_name }}"
+    policy_name: test
+    duration: 1d
+    replication: 1
+    shard_group_duration: 1h
+    state: present
 
 - name: Create 1 week retention policy with 1 day shard group duration
   community.general.influxdb_retention_policy:
-      hostname: "{{ influxdb_ip_address }}"
-      database_name: "{{ influxdb_database_name }}"
-      policy_name: test
-      duration: 1w
-      replication: 1
-      shard_group_duration: 1d
-      state: present
+    hostname: "{{ influxdb_ip_address }}"
+    database_name: "{{ influxdb_database_name }}"
+    policy_name: test
+    duration: 1w
+    replication: 1
+    shard_group_duration: 1d
+    state: present
 
 - name: Create infinite retention policy with 1 week of shard group duration
   community.general.influxdb_retention_policy:
-      hostname: "{{ influxdb_ip_address }}"
-      database_name: "{{ influxdb_database_name }}"
-      policy_name: test
-      duration: INF
-      replication: 1
-      ssl: false
-      shard_group_duration: 1w
-      state: present
+    hostname: "{{ influxdb_ip_address }}"
+    database_name: "{{ influxdb_database_name }}"
+    policy_name: test
+    duration: INF
+    replication: 1
+    ssl: false
+    shard_group_duration: 1w
+    state: present
 
 - name: Create retention policy with complex durations
   community.general.influxdb_retention_policy:
-      hostname: "{{ influxdb_ip_address }}"
-      database_name: "{{ influxdb_database_name }}"
-      policy_name: test
-      duration: 5d1h30m
-      replication: 1
-      ssl: false
-      shard_group_duration: 1d10h30m
-      state: present
+    hostname: "{{ influxdb_ip_address }}"
+    database_name: "{{ influxdb_database_name }}"
+    policy_name: test
+    duration: 5d1h30m
+    replication: 1
+    ssl: false
+    shard_group_duration: 1d10h30m
+    state: present
 
 - name: Drop retention policy
   community.general.influxdb_retention_policy:
-      hostname: "{{ influxdb_ip_address }}"
-      database_name: "{{ influxdb_database_name }}"
-      policy_name: test
-      state: absent
-'''
+    hostname: "{{ influxdb_ip_address }}"
+    database_name: "{{ influxdb_database_name }}"
+    policy_name: test
+    state: absent
+"""
 
-RETURN = r'''
+RETURN = r"""
 # only defaults
-'''
+"""
 
 import re
 

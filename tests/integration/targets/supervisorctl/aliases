@@ -4,5 +4,7 @@
 
 azp/posix/2
 destructive
-skip/python3
 skip/aix
+skip/rhel  # TODO executables are installed in /usr/local/bin, which isn't part of $PATH
+skip/macos  # TODO executables are installed in /Library/Frameworks/Python.framework/Versions/3.11/bin, which isn't part of $PATH
+unstable # TODO fix!

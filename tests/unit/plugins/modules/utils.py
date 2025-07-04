@@ -5,22 +5,25 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
+import contextlib as _contextlib
 import json
 
-from ansible_collections.community.general.tests.unit.compat import unittest
-from ansible_collections.community.general.tests.unit.compat.mock import patch
+from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
 from ansible.module_utils import basic
 from ansible.module_utils.common.text.converters import to_bytes
 
 
+@_contextlib.contextmanager
 def set_module_args(args):
     if '_ansible_remote_tmp' not in args:
         args['_ansible_remote_tmp'] = '/tmp'
     if '_ansible_keep_remote_files' not in args:
         args['_ansible_keep_remote_files'] = False
 
-    args = json.dumps({'ANSIBLE_MODULE_ARGS': args})
-    basic._ANSIBLE_ARGS = to_bytes(args)
+    serialized_args = to_bytes(json.dumps({'ANSIBLE_MODULE_ARGS': args}))
+    with patch.object(basic, '_ANSIBLE_ARGS', serialized_args):
+        yield
 
 
 class AnsibleExitJson(Exception):

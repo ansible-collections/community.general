@@ -3,10 +3,29 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: install pipx
-  pip:
-    name: pipx
+- name: Bail out if Python < 3.8
+  when: ansible_python_version is version('3.8', '<')
+  ansible.builtin.meta: end_play
+- name: Install pipx>=1.7.0
+  ansible.builtin.pip:
+    name: pipx>=1.7.0
     extra_args: --user
+
+- name: Determine packaging level
+  block:
+    - name: Install packaging>=22.0
+      ansible.builtin.pip:
+        name: packaging>=22.0
+    - name: Set has_packaging22 fact true
+      ansible.builtin.set_fact:
+        has_packaging22: true
+  rescue:
+    - name: Set has_packaging22 fact false
+      ansible.builtin.set_fact:
+        has_packaging22: false
+    - name: Install has_packaging (no version spec)
+      ansible.builtin.pip:
+        name: packaging
 
 ##############################################################################
 - name: ensure application tox is uninstalled
@@ -45,6 +64,7 @@
   assert:
     that:
       - install_tox is changed
+      - "'version' in install_tox"
       - "'tox' in install_tox.application"
       - install_tox_again is not changed
       - install_tox_again_force is changed
@@ -151,7 +171,7 @@
   community.general.pipx:
     state: absent
     name: tox
-  register: uninstall_tox_latest
+  register: uninstall_tox_1
 
 - name: install application tox 3.24.0 for latest
   community.general.pipx:
@@ -171,7 +191,7 @@
     state: latest
   register: install_tox_latest_with_preinstall_again
 
-- name: install application latest tox
+- name: install application latest tox (force)
   community.general.pipx:
     name: tox
     state: latest
@@ -195,147 +215,90 @@
   community.general.pipx:
     state: absent
     name: tox
-  register: uninstall_tox_again
+  register: uninstall_tox_2
+
+- name: install tox with dependency group 'docs'
+  community.general.pipx:
+    name: tox
+    source: tox[docs]
+    state: latest
+  register: install_tox_latest_docs
+
+- name: install tox with dependency group 'docs' again
+  community.general.pipx:
+    name: tox
+    source: tox[docs]
+    state: latest
+  register: install_tox_latest_docs_again
+
+- name: cleanup tox latest yet again
+  community.general.pipx:
+    state: absent
+    name: tox
+  register: uninstall_tox_3
 
 - name: check assertions tox latest
   assert:
     that:
       - install_tox_latest is changed
-      - uninstall_tox_latest is changed
+      - "'tox' in install_tox_latest.application"
+      - install_tox_latest.application.tox.version != '3.24.0'
+      - uninstall_tox_1 is changed
+      - "'tox' not in uninstall_tox_1.application"
       - install_tox_324_for_latest is changed
+      - "'tox' in install_tox_324_for_latest.application"
       - install_tox_324_for_latest.application.tox.version == '3.24.0'
       - install_tox_latest_with_preinstall is changed
-      - install_tox_latest_with_preinstall.application.tox.version == latest_tox_version
+      - "'tox' in install_tox_latest_with_preinstall.application"
+      - install_tox_latest_with_preinstall.application.tox.version != '3.24.0'
       - install_tox_latest_with_preinstall_again is not changed
-      - install_tox_latest_with_preinstall_again.application.tox.version == latest_tox_version
       - install_tox_latest_with_preinstall_again_force is changed
-      - install_tox_latest_with_preinstall_again_force.application.tox.version == latest_tox_version
-      - uninstall_tox_latest_again is changed
-      - install_tox_with_deps is changed
-      - install_tox_with_deps.application.tox.version == latest_tox_version
-      - uninstall_tox_again is changed
-      - "'tox' not in uninstall_tox_again.application"
+      - uninstall_tox_2 is changed
+      - "'tox' not in uninstall_tox_2.application"
+      - install_tox_latest_docs is changed
+      - install_tox_latest_docs_again is not changed
+      - uninstall_tox_3 is changed
+      - "'tox' not in uninstall_tox_3.application"
 
 ##############################################################################
-- name: ensure application ansible-lint is uninstalled
-  community.general.pipx:
-    name: ansible-lint
-    state: absent
-
-- name: install application ansible-lint
-  community.general.pipx:
-    name: ansible-lint
-  register: install_ansible_lint
-
-- name: inject packages
-  community.general.pipx:
-    state: inject
-    name: ansible-lint
-    inject_packages:
-      - licenses
-  register: inject_pkgs_ansible_lint
-
-- name: inject packages with apps
-  community.general.pipx:
-    state: inject
-    name: ansible-lint
-    inject_packages:
-      - black
-    install_apps: true
-  register: inject_pkgs_apps_ansible_lint
-
-- name: cleanup ansible-lint
-  community.general.pipx:
-    state: absent
-    name: ansible-lint
-  register: uninstall_ansible_lint
-
-- name: check assertions inject_packages
-  assert:
-    that:
-      - install_ansible_lint is changed
-      - inject_pkgs_ansible_lint is changed
-      - '"ansible-lint" in inject_pkgs_ansible_lint.application'
-      - '"licenses" in inject_pkgs_ansible_lint.application["ansible-lint"]["injected"]'
-      - inject_pkgs_apps_ansible_lint is changed
-      - '"ansible-lint" in inject_pkgs_apps_ansible_lint.application'
-      - '"black" in inject_pkgs_apps_ansible_lint.application["ansible-lint"]["injected"]'
-      - uninstall_ansible_lint is changed
+# Test version specifiers in name parameter
+- name: Run version specifier tests
+  ansible.builtin.include_tasks: testcase-10031-version-specs.yml
 
 ##############################################################################
-- name: install jupyter - not working smoothly in freebsd
-  when: ansible_system != 'FreeBSD'
-  block:
-    - name: ensure application jupyter is uninstalled
-      community.general.pipx:
-        name: jupyter
-        state: absent
 
-    - name: install application jupyter
-      community.general.pipx:
-        name: jupyter
-        install_deps: true
-      register: install_jupyter
+- name: Include testcase for inject packages
+  ansible.builtin.include_tasks: testcase-injectpkg.yml
 
-    - name: cleanup jupyter
-      community.general.pipx:
-        state: absent
-        name: jupyter
+- name: Include testcase for jupyter
+  ansible.builtin.include_tasks: testcase-jupyter.yml
 
-    - name: check assertions
-      assert:
-        that:
-          - install_jupyter is changed
-          - '"ipython" in install_jupyter.stdout'
+- name: Include testcase for old site-wide
+  ansible.builtin.include_tasks: testcase-oldsitewide.yml
 
-##############################################################################
-- name: ensure /opt/pipx
-  ansible.builtin.file:
-    path: /opt/pipx
-    state: directory
-    mode: 0755
+- name: Include testcase for issue 7497
+  ansible.builtin.include_tasks: testcase-7497.yml
 
-- name: install tox site-wide
-  community.general.pipx:
-    name: tox
-    state: latest
-  register: install_tox_sitewide
-  environment:
-    PIPX_HOME: /opt/pipx
-    PIPX_BIN_DIR: /usr/local/bin
+- name: Include testcase for issue 8656
+  ansible.builtin.include_tasks: testcase-8656.yml
 
-- name: stat /usr/local/bin/tox
-  ansible.builtin.stat:
-    path: /usr/local/bin/tox
-  register: usrlocaltox
+- name: Include testcase for PR 8793 --global
+  ansible.builtin.include_tasks: testcase-8793-global.yml
 
-- name: check assertions
-  ansible.builtin.assert:
-    that:
-      - install_tox_sitewide is changed
-      - usrlocaltox.stat.exists
+- name: Include testcase for PR 8809 install-all
+  ansible.builtin.include_tasks: testcase-8809-installall.yml
 
-##############################################################################
-# Test for issue 7497
-- name: ensure application pyinstaller is uninstalled
-  community.general.pipx:
-    name: pyinstaller
-    state: absent
+- name: Include testcase for PR 8809 pin
+  ansible.builtin.include_tasks: testcase-8809-pin.yml
 
-- name: Install Python Package pyinstaller
-  community.general.pipx:
-    name: pyinstaller
-    state: present
-    system_site_packages: true
-    pip_args: "--no-cache-dir"
-  register: install_pyinstaller
+- name: Include testcase for PR 8809 injectpkg
+  ansible.builtin.include_tasks: testcase-8809-uninjectpkg.yml
 
-- name: cleanup pyinstaller
-  community.general.pipx:
-    name: pyinstaller
-    state: absent
+- name: Include testcase for PR 9009 injectpkg --global
+  ansible.builtin.include_tasks: testcase-9009-fixglobal.yml
 
-- name: check assertions
-  assert:
-    that:
-      - install_pyinstaller is changed
+- name: Include testcase for PR 9103 upgrade --global
+  ansible.builtin.include_tasks: testcase-9103-upgrade-global.yml
+
+- name: Include testcase for issue 9619 latest --global
+  ansible.builtin.include_tasks: testcase-9619-latest-global.yml

@@ -9,9 +9,9 @@ __metaclass__ = type
 
 from contextlib import contextmanager
 
-from ansible_collections.community.general.tests.unit.compat import unittest
-from ansible_collections.community.general.tests.unit.compat.mock import patch
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, ModuleTestCase, set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleExitJson, ModuleTestCase, set_module_args
 
 from ansible_collections.community.general.plugins.modules import keycloak_identity_provider
 
@@ -23,7 +23,7 @@ from ansible.module_utils.six import StringIO
 @contextmanager
 def patch_keycloak_api(get_identity_provider, create_identity_provider=None, update_identity_provider=None, delete_identity_provider=None,
                        get_identity_provider_mappers=None, create_identity_provider_mapper=None, update_identity_provider_mapper=None,
-                       delete_identity_provider_mapper=None):
+                       delete_identity_provider_mapper=None, get_realm_by_id=None):
     """Mock context manager for patching the methods in PwPolicyIPAClient that contact the IPA server
 
     Patches the `login` and `_post_json` methods
@@ -55,9 +55,11 @@ def patch_keycloak_api(get_identity_provider, create_identity_provider=None, upd
                                     as mock_update_identity_provider_mapper:
                                 with patch.object(obj, 'delete_identity_provider_mapper', side_effect=delete_identity_provider_mapper) \
                                         as mock_delete_identity_provider_mapper:
-                                    yield mock_get_identity_provider, mock_create_identity_provider, mock_update_identity_provider, \
-                                        mock_delete_identity_provider, mock_get_identity_provider_mappers, mock_create_identity_provider_mapper, \
-                                        mock_update_identity_provider_mapper, mock_delete_identity_provider_mapper
+                                    with patch.object(obj, 'get_realm_by_id', side_effect=get_realm_by_id) \
+                                            as mock_get_realm_by_id:
+                                        yield mock_get_identity_provider, mock_create_identity_provider, mock_update_identity_provider, \
+                                            mock_delete_identity_provider, mock_get_identity_provider_mappers, mock_create_identity_provider_mapper, \
+                                            mock_update_identity_provider_mapper, mock_delete_identity_provider_mapper, mock_get_realm_by_id
 
 
 def get_response(object_with_future_response, method, get_id_call_count):
@@ -200,25 +202,58 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
                 "name": "last_name"
             }]
         ]
+        return_value_realm_get = [
+            {
+                'id': 'realm-name',
+                'realm': 'realm-name',
+                'enabled': True,
+                'identityProviders': [
+                    {
+                        "addReadTokenRoleOnCreate": False,
+                        "alias": "oidc-idp",
+                        "authenticateByDefault": False,
+                        "config": {
+                            "authorizationUrl": "https://idp.example.com/auth",
+                            "clientAuthMethod": "client_secret_post",
+                            "clientId": "my-client",
+                            "clientSecret": "secret",
+                            "issuer": "https://idp.example.com",
+                            "syncMode": "FORCE",
+                            "tokenUrl": "https://idp.example.com/token",
+                            "userInfoUrl": "https://idp.example.com/userinfo"
+                        },
+                        "displayName": "OpenID Connect IdP",
+                        "enabled": True,
+                        "firstBrokerLoginFlowAlias": "first broker login",
+                        "internalId": "7ab437d5-f2bb-4ecc-91a8-315349454da6",
+                        "linkOnly": False,
+                        "providerId": "oidc",
+                        "storeToken": False,
+                        "trustEmail": False,
+                    }
+                ]
+            },
+        ]
         return_value_idp_created = [None]
         return_value_mapper_created = [None, None]
         changed = True
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_identity_provider=return_value_idp_get, get_identity_provider_mappers=return_value_mappers_get,
-                                    create_identity_provider=return_value_idp_created, create_identity_provider_mapper=return_value_mapper_created) \
-                    as (mock_get_identity_provider, mock_create_identity_provider, mock_update_identity_provider, mock_delete_identity_provider,
-                        mock_get_identity_provider_mappers, mock_create_identity_provider_mapper, mock_update_identity_provider_mapper,
-                        mock_delete_identity_provider_mapper):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_identity_provider=return_value_idp_get, get_identity_provider_mappers=return_value_mappers_get,
+                                        create_identity_provider=return_value_idp_created, create_identity_provider_mapper=return_value_mapper_created,
+                                        get_realm_by_id=return_value_realm_get) \
+                        as (mock_get_identity_provider, mock_create_identity_provider, mock_update_identity_provider, mock_delete_identity_provider,
+                            mock_get_identity_provider_mappers, mock_create_identity_provider_mapper, mock_update_identity_provider_mapper,
+                            mock_delete_identity_provider_mapper, mock_get_realm_by_id):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         self.assertEqual(len(mock_get_identity_provider.mock_calls), 2)
         self.assertEqual(len(mock_get_identity_provider_mappers.mock_calls), 1)
+        self.assertEqual(len(mock_get_realm_by_id.mock_calls), 1)
         self.assertEqual(len(mock_create_identity_provider.mock_calls), 1)
         self.assertEqual(len(mock_create_identity_provider_mapper.mock_calls), 2)
 
@@ -444,30 +479,241 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
                 "name": "last_name"
             }]
         ]
+        return_value_realm_get = [
+            {
+                'id': 'realm-name',
+                'realm': 'realm-name',
+                'enabled': True,
+                'identityProviders': [
+                    {
+                        "addReadTokenRoleOnCreate": False,
+                        "alias": "oidc-idp",
+                        "authenticateByDefault": False,
+                        "config": {
+                            "authorizationUrl": "https://idp.example.com/auth",
+                            "clientAuthMethod": "client_secret_post",
+                            "clientId": "my-client",
+                            "clientSecret": "secret",
+                            "issuer": "https://idp.example.com",
+                            "syncMode": "FORCE",
+                            "tokenUrl": "https://idp.example.com/token",
+                            "userInfoUrl": "https://idp.example.com/userinfo"
+                        },
+                        "displayName": "OpenID Connect IdP",
+                        "enabled": True,
+                        "firstBrokerLoginFlowAlias": "first broker login",
+                        "internalId": "7ab437d5-f2bb-4ecc-91a8-315349454da6",
+                        "linkOnly": False,
+                        "providerId": "oidc",
+                        "storeToken": False,
+                        "trustEmail": False,
+                    }
+                ]
+            },
+            {
+                'id': 'realm-name',
+                'realm': 'realm-name',
+                'enabled': True,
+                'identityProviders': [
+                    {
+                        "addReadTokenRoleOnCreate": False,
+                        "alias": "oidc-idp",
+                        "authenticateByDefault": False,
+                        "config": {
+                            "authorizationUrl": "https://idp.example.com/auth",
+                            "clientAuthMethod": "client_secret_post",
+                            "clientId": "my-client",
+                            "clientSecret": "secret",
+                            "issuer": "https://idp.example.com",
+                            "syncMode": "FORCE",
+                            "tokenUrl": "https://idp.example.com/token",
+                            "userInfoUrl": "https://idp.example.com/userinfo"
+                        },
+                        "displayName": "OpenID Connect IdP",
+                        "enabled": True,
+                        "firstBrokerLoginFlowAlias": "first broker login",
+                        "internalId": "7ab437d5-f2bb-4ecc-91a8-315349454da6",
+                        "linkOnly": False,
+                        "providerId": "oidc",
+                        "storeToken": False,
+                        "trustEmail": False,
+                    }
+                ]
+            },
+        ]
         return_value_idp_updated = [None]
         return_value_mapper_updated = [None]
         return_value_mapper_created = [None]
         changed = True
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_identity_provider=return_value_idp_get, get_identity_provider_mappers=return_value_mappers_get,
-                                    update_identity_provider=return_value_idp_updated, update_identity_provider_mapper=return_value_mapper_updated,
-                                    create_identity_provider_mapper=return_value_mapper_created) \
-                    as (mock_get_identity_provider, mock_create_identity_provider, mock_update_identity_provider, mock_delete_identity_provider,
-                        mock_get_identity_provider_mappers, mock_create_identity_provider_mapper, mock_update_identity_provider_mapper,
-                        mock_delete_identity_provider_mapper):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_identity_provider=return_value_idp_get, get_identity_provider_mappers=return_value_mappers_get,
+                                        update_identity_provider=return_value_idp_updated, update_identity_provider_mapper=return_value_mapper_updated,
+                                        create_identity_provider_mapper=return_value_mapper_created, get_realm_by_id=return_value_realm_get) \
+                        as (mock_get_identity_provider, mock_create_identity_provider, mock_update_identity_provider, mock_delete_identity_provider,
+                            mock_get_identity_provider_mappers, mock_create_identity_provider_mapper, mock_update_identity_provider_mapper,
+                            mock_delete_identity_provider_mapper, mock_get_realm_by_id):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         self.assertEqual(len(mock_get_identity_provider.mock_calls), 2)
         self.assertEqual(len(mock_get_identity_provider_mappers.mock_calls), 5)
+        self.assertEqual(len(mock_get_realm_by_id.mock_calls), 2)
         self.assertEqual(len(mock_update_identity_provider.mock_calls), 1)
         self.assertEqual(len(mock_update_identity_provider_mapper.mock_calls), 1)
         self.assertEqual(len(mock_create_identity_provider_mapper.mock_calls), 1)
+
+        # Verify that the module's changed status matches what is expected
+        self.assertIs(exec_info.exception.args[0]['changed'], changed)
+
+    def test_no_change_when_present(self):
+        """Update existing identity provider"""
+
+        module_args = {
+            'auth_keycloak_url': 'http://keycloak.url/auth',
+            'auth_password': 'admin',
+            'auth_realm': 'master',
+            'auth_username': 'admin',
+            'auth_client_id': 'admin-cli',
+            "addReadTokenRoleOnCreate": False,
+            "alias": "oidc-idp",
+            "authenticateByDefault": False,
+            "config": {
+                "authorizationUrl": "https://idp.example.com/auth",
+                "clientAuthMethod": "client_secret_post",
+                "clientId": "my-client",
+                "clientSecret": "secret",
+                "issuer": "https://idp.example.com",
+                "syncMode": "FORCE",
+                "tokenUrl": "https://idp.example.com/token",
+                "userInfoUrl": "https://idp.example.com/userinfo"
+            },
+            "displayName": "OpenID Connect IdP changeme",
+            "enabled": True,
+            "firstBrokerLoginFlowAlias": "first broker login",
+            "linkOnly": False,
+            "providerId": "oidc",
+            "storeToken": False,
+            "trustEmail": False,
+            'mappers': [{
+                'name': "username",
+                'identityProviderAlias': "oidc-idp",
+                'identityProviderMapper': "oidc-user-attribute-idp-mapper",
+                'config': {
+                    'claim': "username",
+                    'user.attribute': "username",
+                    'syncMode': "INHERIT",
+                }
+            }]
+        }
+        return_value_idp_get = [
+            {
+                "addReadTokenRoleOnCreate": False,
+                "alias": "oidc-idp",
+                "authenticateByDefault": False,
+                "config": {
+                    "authorizationUrl": "https://idp.example.com/auth",
+                    "clientAuthMethod": "client_secret_post",
+                    "clientId": "my-client",
+                    "clientSecret": "**********",
+                    "issuer": "https://idp.example.com",
+                    "syncMode": "FORCE",
+                    "tokenUrl": "https://idp.example.com/token",
+                    "userInfoUrl": "https://idp.example.com/userinfo"
+                },
+                "displayName": "OpenID Connect IdP changeme",
+                "enabled": True,
+                "firstBrokerLoginFlowAlias": "first broker login",
+                "internalId": "7ab437d5-f2bb-4ecc-91a8-315349454da6",
+                "linkOnly": False,
+                "providerId": "oidc",
+                "storeToken": False,
+                "trustEmail": False,
+            },
+        ]
+        return_value_mappers_get = [
+            [{
+                'config': {
+                    'claim': "username",
+                    'syncMode': "INHERIT",
+                    'user.attribute': "username"
+                },
+                "id": "616f11ba-b9ae-42ae-bd1b-bc618741c10b",
+                'identityProviderAlias': "oidc-idp",
+                'identityProviderMapper': "oidc-user-attribute-idp-mapper",
+                'name': "username"
+            }],
+            [{
+                'config': {
+                    'claim': "username",
+                    'syncMode': "INHERIT",
+                    'user.attribute': "username"
+                },
+                "id": "616f11ba-b9ae-42ae-bd1b-bc618741c10b",
+                'identityProviderAlias': "oidc-idp",
+                'identityProviderMapper': "oidc-user-attribute-idp-mapper",
+                'name': "username"
+            }]
+        ]
+        return_value_realm_get = [
+            {
+                'id': 'realm-name',
+                'realm': 'realm-name',
+                'enabled': True,
+                'identityProviders': [
+                    {
+                        "addReadTokenRoleOnCreate": False,
+                        "alias": "oidc-idp",
+                        "authenticateByDefault": False,
+                        "config": {
+                            "authorizationUrl": "https://idp.example.com/auth",
+                            "clientAuthMethod": "client_secret_post",
+                            "clientId": "my-client",
+                            "clientSecret": "secret",
+                            "issuer": "https://idp.example.com",
+                            "syncMode": "FORCE",
+                            "tokenUrl": "https://idp.example.com/token",
+                            "userInfoUrl": "https://idp.example.com/userinfo"
+                        },
+                        "displayName": "OpenID Connect IdP",
+                        "enabled": True,
+                        "firstBrokerLoginFlowAlias": "first broker login",
+                        "internalId": "7ab437d5-f2bb-4ecc-91a8-315349454da6",
+                        "linkOnly": False,
+                        "providerId": "oidc",
+                        "storeToken": False,
+                        "trustEmail": False,
+                    }
+                ]
+            }
+        ]
+        return_value_idp_updated = [None]
+        return_value_mapper_updated = [None]
+        return_value_mapper_created = [None]
+        changed = False
+
+        # Run the module
+
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_identity_provider=return_value_idp_get, get_identity_provider_mappers=return_value_mappers_get,
+                                        update_identity_provider=return_value_idp_updated, update_identity_provider_mapper=return_value_mapper_updated,
+                                        create_identity_provider_mapper=return_value_mapper_created, get_realm_by_id=return_value_realm_get) \
+                        as (mock_get_identity_provider, mock_create_identity_provider, mock_update_identity_provider, mock_delete_identity_provider,
+                            mock_get_identity_provider_mappers, mock_create_identity_provider_mapper, mock_update_identity_provider_mapper,
+                            mock_delete_identity_provider_mapper, mock_get_realm_by_id):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
+
+        self.assertEqual(len(mock_get_identity_provider.mock_calls), 1)
+        self.assertEqual(len(mock_get_identity_provider_mappers.mock_calls), 2)
+        self.assertEqual(len(mock_get_realm_by_id.mock_calls), 1)
+        self.assertEqual(len(mock_update_identity_provider.mock_calls), 0)
+        self.assertEqual(len(mock_update_identity_provider_mapper.mock_calls), 0)
+        self.assertEqual(len(mock_create_identity_provider_mapper.mock_calls), 0)
 
         # Verify that the module's changed status matches what is expected
         self.assertIs(exec_info.exception.args[0]['changed'], changed)
@@ -489,17 +735,16 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
         return_value_idp_get = [None]
         changed = False
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_identity_provider=return_value_idp_get) \
-                    as (mock_get_identity_provider, mock_create_identity_provider, mock_update_identity_provider, mock_delete_identity_provider,
-                        mock_get_identity_provider_mappers, mock_create_identity_provider_mapper, mock_update_identity_provider_mapper,
-                        mock_delete_identity_provider_mapper):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_identity_provider=return_value_idp_get) \
+                        as (mock_get_identity_provider, mock_create_identity_provider, mock_update_identity_provider, mock_delete_identity_provider,
+                            mock_get_identity_provider_mappers, mock_create_identity_provider_mapper, mock_update_identity_provider_mapper,
+                            mock_delete_identity_provider_mapper, mock_get_realm_by_id):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         self.assertEqual(len(mock_get_identity_provider.mock_calls), 1)
         self.assertEqual(len(mock_delete_identity_provider.mock_calls), 0)
@@ -560,24 +805,56 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
                 "name": "email"
             }]
         ]
+        return_value_realm_get = [
+            {
+                'id': 'realm-name',
+                'realm': 'realm-name',
+                'enabled': True,
+                'identityProviders': [
+                    {
+                        "alias": "oidc",
+                        "displayName": "",
+                        "internalId": "2bca4192-e816-4beb-bcba-190164eb55b8",
+                        "providerId": "oidc",
+                        "enabled": True,
+                        "updateProfileFirstLoginMode": "on",
+                        "trustEmail": False,
+                        "storeToken": False,
+                        "addReadTokenRoleOnCreate": False,
+                        "authenticateByDefault": False,
+                        "linkOnly": False,
+                        "config": {
+                            "validateSignature": "false",
+                            "pkceEnabled": "false",
+                            "tokenUrl": "https://localhost:8000",
+                            "clientId": "asdf",
+                            "authorizationUrl": "https://localhost:8000",
+                            "clientAuthMethod": "client_secret_post",
+                            "clientSecret": "real_secret",
+                            "guiOrder": "0"
+                        }
+                    },
+                ]
+            },
+        ]
         return_value_idp_deleted = [None]
         changed = True
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_identity_provider=return_value_idp_get, get_identity_provider_mappers=return_value_mappers_get,
-                                    delete_identity_provider=return_value_idp_deleted) \
-                    as (mock_get_identity_provider, mock_create_identity_provider, mock_update_identity_provider, mock_delete_identity_provider,
-                        mock_get_identity_provider_mappers, mock_create_identity_provider_mapper, mock_update_identity_provider_mapper,
-                        mock_delete_identity_provider_mapper):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_identity_provider=return_value_idp_get, get_identity_provider_mappers=return_value_mappers_get,
+                                        delete_identity_provider=return_value_idp_deleted, get_realm_by_id=return_value_realm_get) \
+                        as (mock_get_identity_provider, mock_create_identity_provider, mock_update_identity_provider, mock_delete_identity_provider,
+                            mock_get_identity_provider_mappers, mock_create_identity_provider_mapper, mock_update_identity_provider_mapper,
+                            mock_delete_identity_provider_mapper, mock_get_realm_by_id):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         self.assertEqual(len(mock_get_identity_provider.mock_calls), 1)
         self.assertEqual(len(mock_get_identity_provider_mappers.mock_calls), 1)
+        self.assertEqual(len(mock_get_realm_by_id.mock_calls), 1)
         self.assertEqual(len(mock_delete_identity_provider.mock_calls), 1)
 
         # Verify that the module's changed status matches what is expected

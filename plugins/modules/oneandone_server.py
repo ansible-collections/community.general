@@ -7,13 +7,12 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: oneandone_server
 short_description: Create, destroy, start, stop, and reboot a 1&1 Host server
 description:
-  - Create, destroy, update, start, stop, and reboot a 1&1 Host server.
-    When the server is created it can optionally wait for it to be 'running' before returning.
+  - Create, destroy, update, start, stop, and reboot a 1&1 Host server. When the server is created it can optionally wait
+    for it to be 'running' before returning.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -27,23 +26,21 @@ options:
       - Define a server's state to create, remove, start or stop it.
     type: str
     default: present
-    choices: [ "present", "absent", "running", "stopped" ]
+    choices: ["present", "absent", "running", "stopped"]
   auth_token:
     description:
-      - Authenticating API token provided by 1&1. Overrides the
-        ONEANDONE_AUTH_TOKEN environment variable.
+      - Authenticating API token provided by 1&1. Overrides the E(ONEANDONE_AUTH_TOKEN) environment variable.
     type: str
   api_url:
     description:
-      - Custom API URL. Overrides the
-        ONEANDONE_API_URL environment variable.
+      - Custom API URL. Overrides the E(ONEANDONE_API_URL) environment variable.
     type: str
   datacenter:
     description:
       - The datacenter location.
     type: str
     default: US
-    choices: [ "US", "ES", "DE", "GB" ]
+    choices: ["US", "ES", "DE", "GB"]
   hostname:
     description:
       - The hostname or ID of the server. Only used when state is 'present'.
@@ -54,35 +51,30 @@ options:
     type: str
   appliance:
     description:
-      - The operating system name or ID for the server.
-        It is required only for 'present' state.
+      - The operating system name or ID for the server. It is required only for 'present' state.
     type: str
   fixed_instance_size:
     description:
-      - The instance size name or ID of the server.
-        It is required only for 'present' state, and it is mutually exclusive with
-        vcore, cores_per_processor, ram, and hdds parameters.
-      - 'The available choices are: V(S), V(M), V(L), V(XL), V(XXL), V(3XL), V(4XL), V(5XL)'
+      - The instance size name or ID of the server. It is required only for 'present' state, and it is mutually exclusive
+        with vcore, cores_per_processor, ram, and hdds parameters.
+      - 'The available choices are: V(S), V(M), V(L), V(XL), V(XXL), V(3XL), V(4XL), V(5XL).'
     type: str
   vcore:
     description:
-      - The total number of processors.
-        It must be provided with cores_per_processor, ram, and hdds parameters.
+      - The total number of processors. It must be provided with O(cores_per_processor), O(ram), and O(hdds) parameters.
     type: int
   cores_per_processor:
     description:
-      - The number of cores per processor.
-        It must be provided with vcore, ram, and hdds parameters.
+      - The number of cores per processor. It must be provided with O(vcore), O(ram), and O(hdds) parameters.
     type: int
   ram:
     description:
-      - The amount of RAM memory.
-        It must be provided with with vcore, cores_per_processor, and hdds parameters.
+      - The amount of RAM memory. It must be provided with with O(vcore), O(cores_per_processor), and O(hdds) parameters.
     type: float
   hdds:
     description:
-      - A list of hard disks with nested "size" and "is_main" properties.
-        It must be provided with vcore, cores_per_processor, and ram parameters.
+      - A list of hard disks with nested O(ignore:hdds[].size) and O(ignore:hdds[].is_main) properties. It must be provided with O(vcore),
+        O(cores_per_processor), and O(ram) parameters.
     type: list
     elements: dict
   private_network:
@@ -119,30 +111,27 @@ options:
       - The type of server to be built.
     type: str
     default: "cloud"
-    choices: [ "cloud", "baremetal", "k8s_node" ]
+    choices: ["cloud", "baremetal", "k8s_node"]
   wait:
     description:
-      - Wait for the server to be in state 'running' before returning.
-        Also used for delete operation (set to 'false' if you don't want to wait
-        for each individual server to be deleted before moving on with
-        other tasks.)
+      - Wait for the server to be in state 'running' before returning. Also used for delete operation (set to V(false) if
+        you do not want to wait for each individual server to be deleted before moving on with other tasks).
     type: bool
     default: true
   wait_timeout:
     description:
-      - how long before wait gives up, in seconds
+      - How long before wait gives up, in seconds.
     type: int
     default: 600
   wait_interval:
     description:
-      - Defines the number of seconds to wait when using the wait_for methods
+      - Defines the number of seconds to wait when using the wait_for methods.
     type: int
     default: 5
   auto_increment:
     description:
-      - When creating multiple servers at once, whether to differentiate
-        hostnames by appending a count after them or substituting the count
-        where there is a %02d or %03d in the hostname string.
+      - When creating multiple servers at once, whether to differentiate hostnames by appending a count after them or substituting
+        the count where there is a %02d or %03d in the hostname string.
     type: bool
     default: true
 
@@ -150,12 +139,11 @@ requirements:
   - "1and1"
 
 author:
-  -  "Amel Ajdinovic (@aajdinov)"
-  -  "Ethan Devenport (@edevenport)"
+  - "Amel Ajdinovic (@aajdinov)"
+  - "Ethan Devenport (@edevenport)"
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create three servers and enumerate their names
   community.general.oneandone_server:
     auth_token: oneandone_private_api_key
@@ -201,16 +189,16 @@ EXAMPLES = '''
     auth_token: oneandone_private_api_key
     state: stopped
     server: 'node01'
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 servers:
-    description: Information about each server that was processed
-    type: list
-    sample:
-      - {"hostname": "my-server", "id": "server-id"}
-    returned: always
-'''
+  description: Information about each server that was processed.
+  type: list
+  sample:
+    - {"hostname": "my-server", "id": "server-id"}
+  returned: always
+"""
 
 import os
 import time
@@ -530,7 +518,7 @@ def startstop_server(module, oneandone_conn):
     # Resolve server
     server = get_server(oneandone_conn, server_id, True)
     if server:
-        # Attempt to change the server state, only if it's not already there
+        # Attempt to change the server state, only if it is not already there
         # or on its way.
         try:
             if state == 'stopped' and server['status']['state'] == 'POWERED_ON':

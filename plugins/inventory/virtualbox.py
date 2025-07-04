@@ -3,65 +3,86 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
-DOCUMENTATION = '''
-    author: Unknown (!UNKNOWN)
-    name: virtualbox
-    short_description: virtualbox inventory source
+DOCUMENTATION = r"""
+author: Unknown (!UNKNOWN)
+name: virtualbox
+short_description: Virtualbox inventory source
+description:
+  - Get inventory hosts from the local virtualbox installation.
+  - Uses a YAML configuration file that ends with virtualbox.(yml|yaml) or vbox.(yml|yaml).
+  - The inventory_hostname is always the 'Name' of the virtualbox instance.
+  - Groups can be assigned to the VMs using C(VBoxManage). Multiple groups can be assigned by using V(/) as a delimeter.
+  - A separate parameter, O(enable_advanced_group_parsing) is exposed to change grouping behaviour. See the parameter documentation
+    for details.
+extends_documentation_fragment:
+  - constructed
+  - inventory_cache
+options:
+  plugin:
+    description: Token that ensures this is a source file for the P(community.general.virtualbox#inventory) plugin.
+    type: string
+    required: true
+    choices: ['virtualbox', 'community.general.virtualbox']
+  running_only:
+    description: Toggles showing all VMs instead of only those currently running.
+    type: boolean
+    default: false
+  settings_password_file:
+    description: Provide a file containing the settings password (equivalent to C(--settingspwfile)).
+    type: string
+  network_info_path:
+    description: Property path to query for network information (C(ansible_host)).
+    type: string
+    default: "/VirtualBox/GuestInfo/Net/0/V4/IP"
+  query:
+    description: Create vars from virtualbox properties.
+    type: dictionary
+    default: {}
+  enable_advanced_group_parsing:
     description:
-        - Get inventory hosts from the local virtualbox installation.
-        - Uses a YAML configuration file that ends with virtualbox.(yml|yaml) or vbox.(yml|yaml).
-        - The inventory_hostname is always the 'Name' of the virtualbox instance.
-    extends_documentation_fragment:
-      - constructed
-      - inventory_cache
-    options:
-        plugin:
-            description: token that ensures this is a source file for the 'virtualbox' plugin
-            required: true
-            choices: ['virtualbox', 'community.general.virtualbox']
-        running_only:
-            description: toggles showing all vms vs only those currently running
-            type: boolean
-            default: false
-        settings_password_file:
-            description: provide a file containing the settings password (equivalent to --settingspwfile)
-        network_info_path:
-            description: property path to query for network information (ansible_host)
-            default: "/VirtualBox/GuestInfo/Net/0/V4/IP"
-        query:
-            description: create vars from virtualbox properties
-            type: dictionary
-            default: {}
-'''
+      - The default group parsing rule (when this setting is set to V(false)) is to split the VirtualBox VM's group based
+        on the V(/) character and assign the resulting list elements as an Ansible Group.
+      - Setting O(enable_advanced_group_parsing=true) changes this behaviour to match VirtualBox's interpretation of groups
+        according to U(https://www.virtualbox.org/manual/UserManual.html#gui-vmgroups). Groups are now split using the V(,)
+        character, and the V(/) character indicates nested groups.
+      - When enabled, a VM that's been configured using V(VBoxManage modifyvm "vm01" --groups "/TestGroup/TestGroup2,/TestGroup3")
+        results in the group C(TestGroup2) being a child group of C(TestGroup); and the VM being a part of C(TestGroup2)
+        and C(TestGroup3).
+    default: false
+    type: bool
+    version_added: 9.2.0
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
+---
 # file must be named vbox.yaml or vbox.yml
-simple_config_file:
-    plugin: community.general.virtualbox
-    settings_password_file: /etc/virtulbox/secrets
-    query:
-      logged_in_users: /VirtualBox/GuestInfo/OS/LoggedInUsersList
-    compose:
-      ansible_connection: ('indows' in vbox_Guest_OS)|ternary('winrm', 'ssh')
+plugin: community.general.virtualbox
+settings_password_file: /etc/virtualbox/secrets
+query:
+  logged_in_users: /VirtualBox/GuestInfo/OS/LoggedInUsersList
+compose:
+  ansible_connection: ('indows' in vbox_Guest_OS)|ternary('winrm', 'ssh')
 
+---
 # add hosts (all match with minishift vm) to the group container if any of the vms are in ansible_inventory'
 plugin: community.general.virtualbox
 groups:
   container: "'minis' in (inventory_hostname)"
-'''
+"""
 
 import os
 
 from subprocess import Popen, PIPE
 
 from ansible.errors import AnsibleParserError
-from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
+from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible.module_utils.common._collections_compat import MutableMapping
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
 from ansible.module_utils.common.process import get_bin_path
+
+from ansible_collections.community.general.plugins.plugin_utils.unsafe import make_unsafe
 
 
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
@@ -116,6 +137,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             self._add_host_to_keyed_groups(self.get_option('keyed_groups'), hostvars[host], host, strict=strict)
 
     def _populate_from_cache(self, source_data):
+        source_data = make_unsafe(source_data)
         hostvars = source_data.pop('_meta', {}).get('hostvars', {})
         for group in source_data:
             if group == 'all':
@@ -162,7 +184,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             v = v.strip()
             # found host
             if k.startswith('Name') and ',' not in v:  # some setting strings appear in Name
-                current_host = v
+                current_host = make_unsafe(v)
                 if current_host not in hostvars:
                     hostvars[current_host] = {}
                     self.inventory.add_host(current_host)
@@ -170,32 +192,29 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 # try to get network info
                 netdata = self._query_vbox_data(current_host, netinfo)
                 if netdata:
-                    self.inventory.set_variable(current_host, 'ansible_host', netdata)
+                    self.inventory.set_variable(current_host, 'ansible_host', make_unsafe(netdata))
 
             # found groups
             elif k == 'Groups':
-                for group in v.split('/'):
-                    if group:
-                        group = self.inventory.add_group(group)
-                        self.inventory.add_child(group, current_host)
-                        if group not in cacheable_results:
-                            cacheable_results[group] = {'hosts': []}
-                        cacheable_results[group]['hosts'].append(current_host)
+                if self.get_option('enable_advanced_group_parsing'):
+                    self._handle_vboxmanage_group_string(v, current_host, cacheable_results)
+                else:
+                    self._handle_group_string(v, current_host, cacheable_results)
                 continue
 
             else:
                 # found vars, accumulate in hostvars for clean inventory set
-                pref_k = 'vbox_' + k.strip().replace(' ', '_')
+                pref_k = make_unsafe(f"vbox_{k.strip().replace(' ', '_')}")
                 leading_spaces = len(k) - len(k.lstrip(' '))
                 if 0 < leading_spaces <= 2:
                     if prevkey not in hostvars[current_host] or not isinstance(hostvars[current_host][prevkey], dict):
                         hostvars[current_host][prevkey] = {}
-                    hostvars[current_host][prevkey][pref_k] = v
+                    hostvars[current_host][prevkey][pref_k] = make_unsafe(v)
                 elif leading_spaces > 2:
                     continue
                 else:
                     if v != '':
-                        hostvars[current_host][pref_k] = v
+                        hostvars[current_host][pref_k] = make_unsafe(v)
                 if self._ungrouped_host(current_host, cacheable_results):
                     if 'ungrouped' not in cacheable_results:
                         cacheable_results['ungrouped'] = {'hosts': []}
@@ -222,6 +241,64 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             yield True
 
         return all(find_host(host, inventory))
+
+    def _handle_group_string(self, vboxmanage_group, current_host, cacheable_results):
+        '''Handles parsing the VM's Group assignment from VBoxManage according to this inventory's initial implementation.'''
+        # The original implementation of this inventory plugin treated `/` as
+        # a delimeter to split and use as Ansible Groups.
+        for group in vboxmanage_group.split('/'):
+            if group:
+                group = make_unsafe(group)
+                group = self.inventory.add_group(group)
+                self.inventory.add_child(group, current_host)
+                if group not in cacheable_results:
+                    cacheable_results[group] = {'hosts': []}
+                cacheable_results[group]['hosts'].append(current_host)
+
+    def _handle_vboxmanage_group_string(self, vboxmanage_group, current_host, cacheable_results):
+        '''Handles parsing the VM's Group assignment from VBoxManage according to VirtualBox documentation.'''
+        # Per the VirtualBox documentation, a VM can be part of many groups,
+        # and it is possible to have nested groups.
+        # Many groups are separated by commas ",", and nested groups use
+        # slash "/".
+        # https://www.virtualbox.org/manual/UserManual.html#gui-vmgroups
+        # Multi groups: VBoxManage modifyvm "vm01" --groups "/TestGroup,/TestGroup2"
+        # Nested groups: VBoxManage modifyvm "vm01" --groups "/TestGroup/TestGroup2"
+
+        for group in vboxmanage_group.split(','):
+            if not group:
+                # We could get an empty element due how to split works, and
+                # possible assignments from VirtualBox. e.g. ,/Group1
+                continue
+
+            if group == "/":
+                # This is the "root" group. We get here if the VM was not
+                # assigned to a particular group. Consider the host to be
+                # unassigned to a group.
+                continue
+
+            parent_group = None
+            for subgroup in group.split('/'):
+                if not subgroup:
+                    # Similarly to above, we could get an empty element.
+                    # e.g //Group1
+                    continue
+
+                if subgroup == '/':
+                    # "root" group.
+                    # Consider the host to be unassigned
+                    continue
+
+                subgroup = make_unsafe(subgroup)
+                subgroup = self.inventory.add_group(subgroup)
+                if parent_group is not None:
+                    self.inventory.add_child(parent_group, subgroup)
+                self.inventory.add_child(subgroup, current_host)
+                if subgroup not in cacheable_results:
+                    cacheable_results[subgroup] = {'hosts': []}
+                cacheable_results[subgroup]['hosts'].append(current_host)
+
+                parent_group = subgroup
 
     def verify_file(self, path):
 
@@ -276,7 +353,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             try:
                 p = Popen(cmd, stdout=PIPE)
             except Exception as e:
-                raise AnsibleParserError(to_native(e))
+                raise AnsibleParserError(str(e))
 
             source_data = p.stdout.read().splitlines()
 

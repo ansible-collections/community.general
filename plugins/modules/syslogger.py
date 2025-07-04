@@ -7,55 +7,70 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: syslogger
 short_description: Log messages in the syslog
 description:
-    - Uses syslog to add log entries to the host.
+  - Uses syslog to add log entries to the host.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    msg:
-        type: str
-        description:
-            - This is the message to place in syslog.
-        required: true
-    priority:
-        type: str
-        description:
-            - Set the log priority.
-        choices: [ "emerg", "alert", "crit", "err", "warning", "notice", "info", "debug" ]
-        default: "info"
-    facility:
-        type: str
-        description:
-            - Set the log facility.
-        choices: [ "kern", "user", "mail", "daemon", "auth", "lpr", "news",
-                   "uucp", "cron", "syslog", "local0", "local1", "local2",
-                   "local3", "local4", "local5", "local6", "local7" ]
-        default: "daemon"
-    log_pid:
-        description:
-            - Log the PID in brackets.
-        type: bool
-        default: false
-    ident:
-        description:
-            - Specify the name of application name which is sending the log to syslog.
-        type: str
-        default: 'ansible_syslogger'
-        version_added: '0.2.0'
+  msg:
+    type: str
+    description:
+      - This is the message to place in syslog.
+    required: true
+  priority:
+    type: str
+    description:
+      - Set the log priority.
+    choices: ["emerg", "alert", "crit", "err", "warning", "notice", "info", "debug"]
+    default: "info"
+  facility:
+    type: str
+    description:
+      - Set the log facility.
+    choices:
+      - kern
+      - user
+      - mail
+      - daemon
+      - auth
+      - lpr
+      - news
+      - uucp
+      - cron
+      - syslog
+      - local0
+      - local1
+      - local2
+      - local3
+      - local4
+      - local5
+      - local6
+      - local7
+    default: "daemon"
+  log_pid:
+    description:
+      - Log the PID in brackets.
+    type: bool
+    default: false
+  ident:
+    description:
+      - Specify the name of application name which is sending the log to syslog.
+    type: str
+    default: 'ansible_syslogger'
+    version_added: '0.2.0'
 author:
-    - Tim Rightnour (@garbled1)
-'''
+  - Tim Rightnour (@garbled1)
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Simple Usage
   community.general.syslogger:
     msg: "I will end up as daemon.info"
@@ -72,36 +87,36 @@ EXAMPLES = r'''
     ident: "MyApp"
     msg: "I want to believe"
     priority: "alert"
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 ident:
-  description: Name of application sending the message to log
+  description: Name of application sending the message to log.
   returned: always
   type: str
   sample: "ansible_syslogger"
   version_added: '0.2.0'
 priority:
-  description: Priority level
+  description: Priority level.
   returned: always
   type: str
   sample: "daemon"
 facility:
-  description: Syslog facility
+  description: Syslog facility.
   returned: always
   type: str
   sample: "info"
 log_pid:
-  description: Log PID status
+  description: Log PID status.
   returned: always
   type: bool
   sample: true
 msg:
-  description: Message sent to syslog
+  description: Message sent to syslog.
   returned: always
   type: str
   sample: "Hello from Ansible"
-'''
+"""
 
 import syslog
 import traceback

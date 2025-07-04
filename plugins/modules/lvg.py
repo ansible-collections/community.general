@@ -9,10 +9,9 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 author:
-- Alexander Bulimov (@abulimov)
+  - Alexander Bulimov (@abulimov)
 module: lvg
 short_description: Configure LVM volume groups
 description:
@@ -27,78 +26,84 @@ attributes:
 options:
   vg:
     description:
-    - The name of the volume group.
+      - The name of the volume group.
     type: str
     required: true
   pvs:
     description:
-    - List of comma-separated devices to use as physical devices in this volume group.
-    - Required when creating or resizing volume group.
-    - The module will take care of running pvcreate if needed.
+      - List of comma-separated devices to use as physical devices in this volume group.
+      - Required when creating or resizing volume group.
+      - The module will take care of running pvcreate if needed.
+      - O(remove_extra_pvs) controls whether or not unspecified physical devices are removed from the volume group.
     type: list
     elements: str
   pesize:
     description:
-    - "The size of the physical extent. O(pesize) must be a power of 2 of at least 1 sector
-       (where the sector size is the largest sector size of the PVs currently used in the VG),
-       or at least 128KiB."
-    - O(pesize) can be optionally suffixed by a UNIT (k/K/m/M/g/G), default unit is megabyte.
+      - The size of the physical extent. O(pesize) must be a power of 2 of at least 1 sector (where the sector size is the
+        largest sector size of the PVs currently used in the VG), or at least 128KiB.
+      - O(pesize) can be optionally suffixed by a UNIT (k/K/m/M/g/G), default unit is megabyte.
     type: str
     default: "4"
   pv_options:
     description:
-    - Additional options to pass to C(pvcreate) when creating the volume group.
+      - Additional options to pass to C(pvcreate) when creating the volume group.
     type: str
     default: ''
   pvresize:
     description:
-    - If V(true), resize the physical volume to the maximum available size.
+      - If V(true), resize the physical volume to the maximum available size.
     type: bool
     default: false
     version_added: '0.2.0'
   vg_options:
     description:
-    - Additional options to pass to C(vgcreate) when creating the volume group.
+      - Additional options to pass to C(vgcreate) when creating the volume group.
     type: str
     default: ''
   state:
     description:
-    - Control if the volume group exists and it's state.
-    - The states V(active) and V(inactive) implies V(present) state. Added in 7.1.0
-    - "If V(active) or V(inactive), the module manages the VG's logical volumes current state.
-       The module also handles the VG's autoactivation state if supported
-       unless when creating a volume group and the autoactivation option specified in O(vg_options)."
+      - Control if the volume group exists and its state.
+      - The states V(active) and V(inactive) implies V(present) state. Added in 7.1.0.
+      - If V(active) or V(inactive), the module manages the VG's logical volumes current state. The module also handles the
+        VG's autoactivation state if supported unless when creating a volume group and the autoactivation option specified
+        in O(vg_options).
     type: str
-    choices: [ absent, present, active, inactive ]
+    choices: [absent, present, active, inactive]
     default: present
   force:
     description:
-    - If V(true), allows to remove volume group with logical volumes.
+      - If V(true), allows to remove volume group with logical volumes.
     type: bool
     default: false
   reset_vg_uuid:
     description:
-    - Whether the volume group's UUID is regenerated.
-    - This is B(not idempotent). Specifying this parameter always results in a change.
+      - Whether the volume group's UUID is regenerated.
+      - This is B(not idempotent). Specifying this parameter always results in a change.
     type: bool
     default: false
     version_added: 7.1.0
   reset_pv_uuid:
     description:
-    - Whether the volume group's physical volumes' UUIDs are regenerated.
-    - This is B(not idempotent). Specifying this parameter always results in a change.
+      - Whether the volume group's physical volumes' UUIDs are regenerated.
+      - This is B(not idempotent). Specifying this parameter always results in a change.
     type: bool
     default: false
     version_added: 7.1.0
+  remove_extra_pvs:
+    description:
+      - Remove physical volumes from the volume group which are not in O(pvs).
+    type: bool
+    default: true
+    version_added: 10.4.0
 seealso:
-- module: community.general.filesystem
-- module: community.general.lvol
-- module: community.general.parted
+  - module: community.general.filesystem
+  - module: community.general.lvol
+  - module: community.general.parted
 notes:
   - This module does not modify PE size for already present volume group.
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Create a volume group on top of /dev/sda1 with physical extent size = 32MB
   community.general.lvg:
     vg: vg.services
@@ -154,7 +159,7 @@ EXAMPLES = r'''
     pvs: /dev/sdb1,/dev/sdc5
     reset_vg_uuid: true
     reset_pv_uuid: true
-'''
+"""
 
 import itertools
 import os
@@ -179,7 +184,7 @@ def parse_vgs(data):
 def find_mapper_device_name(module, dm_device):
     dmsetup_cmd = module.get_bin_path('dmsetup', True)
     mapper_prefix = '/dev/mapper/'
-    rc, dm_name, err = module.run_command("%s info -C --noheadings -o name %s" % (dmsetup_cmd, dm_device))
+    rc, dm_name, err = module.run_command([dmsetup_cmd, "info", "-C", "--noheadings", "-o", "name", dm_device])
     if rc != 0:
         module.fail_json(msg="Failed executing dmsetup command.", rc=rc, err=err)
     mapper_device = mapper_prefix + dm_name.rstrip()
@@ -204,7 +209,7 @@ def find_vg(module, vg):
     if not vg:
         return None
     vgs_cmd = module.get_bin_path('vgs', True)
-    dummy, current_vgs, dummy = module.run_command("%s --noheadings -o vg_name,pv_count,lv_count --separator ';'" % vgs_cmd, check_rc=True)
+    dummy, current_vgs, dummy = module.run_command([vgs_cmd, "--noheadings", "-o", "vg_name,pv_count,lv_count", "--separator", ";"], check_rc=True)
 
     vgs = parse_vgs(current_vgs)
 
@@ -385,6 +390,7 @@ def main():
             force=dict(type='bool', default=False),
             reset_vg_uuid=dict(type='bool', default=False),
             reset_pv_uuid=dict(type='bool', default=False),
+            remove_extra_pvs=dict(type="bool", default=True),
         ),
         required_if=[
             ['reset_pv_uuid', True, ['pvs']],
@@ -401,6 +407,7 @@ def main():
     vgoptions = module.params['vg_options'].split()
     reset_vg_uuid = module.boolean(module.params['reset_vg_uuid'])
     reset_pv_uuid = module.boolean(module.params['reset_pv_uuid'])
+    remove_extra_pvs = module.boolean(module.params["remove_extra_pvs"])
 
     this_vg = find_vg(module=module, vg=vg)
     present_state = state in ['present', 'active', 'inactive']
@@ -431,10 +438,10 @@ def main():
                 for x in itertools.chain(dev_list, module.params['pvs'])
             )
             pvs_filter_vg_name = 'vg_name = {0}'.format(vg)
-            pvs_filter = "--select '{0} || {1}' ".format(pvs_filter_pv_name, pvs_filter_vg_name)
+            pvs_filter = ["--select", "{0} || {1}".format(pvs_filter_pv_name, pvs_filter_vg_name)]
         else:
-            pvs_filter = ''
-        rc, current_pvs, err = module.run_command("%s --noheadings -o pv_name,vg_name --separator ';' %s" % (pvs_cmd, pvs_filter))
+            pvs_filter = []
+        rc, current_pvs, err = module.run_command([pvs_cmd, "--noheadings", "-o", "pv_name,vg_name", "--separator", ";"] + pvs_filter)
         if rc != 0:
             module.fail_json(msg="Failed executing pvs command.", rc=rc, err=err)
 
@@ -473,7 +480,7 @@ def main():
                 if this_vg['lv_count'] == 0 or force:
                     # remove VG
                     vgremove_cmd = module.get_bin_path('vgremove', True)
-                    rc, dummy, err = module.run_command("%s --force %s" % (vgremove_cmd, vg))
+                    rc, dummy, err = module.run_command([vgremove_cmd, "--force", vg])
                     if rc == 0:
                         module.exit_json(changed=True)
                     else:
@@ -496,6 +503,9 @@ def main():
             devs_to_remove = list(set(current_devs) - set(dev_list))
             devs_to_add = list(set(dev_list) - set(current_devs))
 
+            if not remove_extra_pvs:
+                devs_to_remove = []
+
             if current_devs:
                 if present_state:
                     for device in current_devs:
@@ -509,7 +519,6 @@ def main():
                     changed = True
                 else:
                     if devs_to_add:
-                        devs_to_add_string = ' '.join(devs_to_add)
                         # create PV
                         pvcreate_cmd = module.get_bin_path('pvcreate', True)
                         for current_dev in devs_to_add:
@@ -520,21 +529,20 @@ def main():
                                 module.fail_json(msg="Creating physical volume '%s' failed" % current_dev, rc=rc, err=err)
                         # add PV to our VG
                         vgextend_cmd = module.get_bin_path('vgextend', True)
-                        rc, dummy, err = module.run_command("%s %s %s" % (vgextend_cmd, vg, devs_to_add_string))
+                        rc, dummy, err = module.run_command([vgextend_cmd, vg] + devs_to_add)
                         if rc == 0:
                             changed = True
                         else:
-                            module.fail_json(msg="Unable to extend %s by %s." % (vg, devs_to_add_string), rc=rc, err=err)
+                            module.fail_json(msg="Unable to extend %s by %s." % (vg, ' '.join(devs_to_add)), rc=rc, err=err)
 
                     # remove some PV from our VG
                     if devs_to_remove:
-                        devs_to_remove_string = ' '.join(devs_to_remove)
                         vgreduce_cmd = module.get_bin_path('vgreduce', True)
-                        rc, dummy, err = module.run_command("%s --force %s %s" % (vgreduce_cmd, vg, devs_to_remove_string))
+                        rc, dummy, err = module.run_command([vgreduce_cmd, "--force", vg] + devs_to_remove)
                         if rc == 0:
                             changed = True
                         else:
-                            module.fail_json(msg="Unable to reduce %s by %s." % (vg, devs_to_remove_string), rc=rc, err=err)
+                            module.fail_json(msg="Unable to reduce %s by %s." % (vg, ' '.join(devs_to_remove)), rc=rc, err=err)
 
     module.exit_json(changed=changed)
 

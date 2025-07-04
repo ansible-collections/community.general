@@ -6,14 +6,12 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: ilo_redfish_command
 short_description: Manages Out-Of-Band controllers using Redfish APIs
 version_added: 6.6.0
 description:
-  - Builds Redfish URIs locally and sends them to remote OOB controllers to
-    perform an action.
+  - Builds Redfish URIs locally and sends them to remote OOB controllers to perform an action.
 attributes:
   check_mode:
     support: none
@@ -21,6 +19,7 @@ attributes:
     support: none
 extends_documentation_fragment:
   - community.general.attributes
+  - community.general.redfish
 options:
   category:
     required: true
@@ -60,37 +59,43 @@ options:
       - Timeout in seconds for HTTP requests to iLO.
     default: 60
     type: int
+  validate_certs:
+    version_added: 10.6.0
+  ca_path:
+    version_added: 10.6.0
+  ciphers:
+    version_added: 10.6.0
 author:
   - Varni H P (@varini-hp)
-'''
+"""
 
-EXAMPLES = '''
-  - name: Wait for iLO Reboot Completion
-    community.general.ilo_redfish_command:
-      category: Systems
-      command: WaitforiLORebootCompletion
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-'''
+EXAMPLES = r"""
+- name: Wait for iLO Reboot Completion
+  community.general.ilo_redfish_command:
+    category: Systems
+    command: WaitforiLORebootCompletion
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+"""
 
-RETURN = '''
+RETURN = r"""
 ilo_redfish_command:
-    description: Returns the status of the operation performed on the iLO.
-    type: dict
-    contains:
-        WaitforiLORebootCompletion:
-            description: Returns the output msg and whether the function executed successfully.
-            type: dict
-            contains:
-                ret:
-                    description: Return True/False based on whether the operation was performed successfully.
-                    type: bool
-                msg:
-                    description: Status of the operation performed on the iLO.
-                    type: str
-    returned: always
-'''
+  description: Returns the status of the operation performed on the iLO.
+  type: dict
+  contains:
+    WaitforiLORebootCompletion:
+      description: Returns the output msg and whether the function executed successfully.
+      type: dict
+      contains:
+        ret:
+          description: Return V(true)/V(false) based on whether the operation was performed successfully.
+          type: bool
+        msg:
+          description: Status of the operation performed on the iLO.
+          type: str
+  returned: always
+"""
 
 # More will be added as module features are expanded
 CATEGORY_COMMANDS_ALL = {
@@ -98,22 +103,25 @@ CATEGORY_COMMANDS_ALL = {
 }
 
 from ansible_collections.community.general.plugins.module_utils.ilo_redfish_utils import iLORedfishUtils
+from ansible_collections.community.general.plugins.module_utils.redfish_utils import REDFISH_COMMON_ARGUMENT_SPEC
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
 
 def main():
     result = {}
+    argument_spec = dict(
+        category=dict(required=True, choices=list(CATEGORY_COMMANDS_ALL.keys())),
+        command=dict(required=True, type='list', elements='str'),
+        baseuri=dict(required=True),
+        timeout=dict(type="int", default=60),
+        username=dict(),
+        password=dict(no_log=True),
+        auth_token=dict(no_log=True)
+    )
+    argument_spec.update(REDFISH_COMMON_ARGUMENT_SPEC)
     module = AnsibleModule(
-        argument_spec=dict(
-            category=dict(required=True, choices=list(CATEGORY_COMMANDS_ALL.keys())),
-            command=dict(required=True, type='list', elements='str'),
-            baseuri=dict(required=True),
-            timeout=dict(type="int", default=60),
-            username=dict(),
-            password=dict(no_log=True),
-            auth_token=dict(no_log=True)
-        ),
+        argument_spec,
         required_together=[
             ('username', 'password'),
         ],

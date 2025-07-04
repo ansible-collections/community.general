@@ -8,44 +8,41 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: oneview_enclosure_info
 short_description: Retrieve information about one or more Enclosures
 description:
-    - Retrieve information about one or more of the Enclosures from OneView.
+  - Retrieve information about one or more of the Enclosures from OneView.
 requirements:
-    - hpOneView >= 2.0.1
+  - hpOneView >= 2.0.1
 author:
-    - Felipe Bulsoni (@fgbulsoni)
-    - Thiago Miotto (@tmiotto)
-    - Adriane Cardozo (@adriane-cardozo)
+  - Felipe Bulsoni (@fgbulsoni)
+  - Thiago Miotto (@tmiotto)
+  - Adriane Cardozo (@adriane-cardozo)
 attributes:
-    check_mode:
-        version_added: 3.3.0
-        # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
+  check_mode:
+    version_added: 3.3.0
+    # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
 options:
-    name:
-      description:
-        - Enclosure name.
-      type: str
-    options:
-      description:
-        - "List with options to gather additional information about an Enclosure and related resources.
-          Options allowed: V(script), V(environmentalConfiguration), and V(utilization). For the option V(utilization),
-          you can provide specific parameters."
-      type: list
-      elements: raw
+  name:
+    description:
+      - Enclosure name.
+    type: str
+  options:
+    description:
+      - 'List with options to gather additional information about an Enclosure and related resources. Options allowed: V(script),
+        V(environmentalConfiguration), and V(utilization). For the option V(utilization), you can provide specific parameters.'
+    type: list
+    elements: raw
 
 extends_documentation_fragment:
   - community.general.oneview
   - community.general.oneview.factsparams
   - community.general.attributes
   - community.general.attributes.info_module
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Gather information about all Enclosures
   community.general.oneview_enclosure_info:
     hostname: 172.16.101.48
@@ -98,9 +95,9 @@ EXAMPLES = '''
   community.general.oneview_enclosure_info:
     name: Test-Enclosure
     options:
-      - script                       # optional
-      - environmentalConfiguration   # optional
-      - utilization                  # optional
+      - script                     # optional
+      - environmentalConfiguration # optional
+      - utilization                # optional
     hostname: 172.16.101.48
     username: administrator
     password: my_password
@@ -126,11 +123,11 @@ EXAMPLES = '''
     msg: "{{ result.enclosure_utilization }}"
 
 - name: "Gather information about an Enclosure with temperature data at a resolution of one sample per day, between two
-         specified dates"
+    specified dates"
   community.general.oneview_enclosure_info:
     name: Test-Enclosure
     options:
-      - utilization:                   # optional
+      - utilization:               # optional
           fields: AmbientTemperature
           filter:
             - startDate=2016-07-01T14:29:42.000Z
@@ -152,29 +149,29 @@ EXAMPLES = '''
 - name: Print fetched information about Enclosure Utilization
   ansible.builtin.debug:
     msg: "{{ result.enclosure_utilization }}"
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 enclosures:
-    description: Has all the OneView information about the Enclosures.
-    returned: Always, but can be null.
-    type: dict
+  description: Has all the OneView information about the Enclosures.
+  returned: Always, but can be null.
+  type: dict
 
 enclosure_script:
-    description: Has all the OneView information about the script of an Enclosure.
-    returned: When requested, but can be null.
-    type: str
+  description: Has all the OneView information about the script of an Enclosure.
+  returned: When requested, but can be null.
+  type: str
 
 enclosure_environmental_configuration:
-    description: Has all the OneView information about the environmental configuration of an Enclosure.
-    returned: When requested, but can be null.
-    type: dict
+  description: Has all the OneView information about the environmental configuration of an Enclosure.
+  returned: When requested, but can be null.
+  type: dict
 
 enclosure_utilization:
-    description: Has all the OneView information about the utilization of an Enclosure.
-    returned: When requested, but can be null.
-    type: dict
-'''
+  description: Has all the OneView information about the utilization of an Enclosure.
+  returned: When requested, but can be null.
+  type: dict
+"""
 
 from ansible_collections.community.general.plugins.module_utils.oneview import OneViewModuleBase
 

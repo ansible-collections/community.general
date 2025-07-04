@@ -7,101 +7,101 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    author:
-    - Eric Belhomme (@eric-belhomme) <ebelhomme@fr.scc.com>
-    version_added: '0.2.0'
-    name: etcd3
-    short_description: Get key values from etcd3 server
+DOCUMENTATION = r"""
+author:
+  - Eric Belhomme (@eric-belhomme) <ebelhomme@fr.scc.com>
+version_added: '0.2.0'
+name: etcd3
+short_description: Get key values from etcd3 server
+description:
+  - Retrieves key values and/or key prefixes from etcd3 server using its native gRPC API.
+  - Try to reuse M(community.general.etcd3) options for connection parameters, but add support for some E(ETCDCTL_*) environment
+    variables.
+  - See U(https://github.com/etcd-io/etcd/tree/master/Documentation/op-guide) for etcd overview.
+options:
+  _terms:
     description:
-    - Retrieves key values and/or key prefixes from etcd3 server using its native gRPC API.
-    - Try to reuse M(community.general.etcd3) options for connection parameters, but add support for some C(ETCDCTL_*) environment variables.
-    - See U(https://github.com/etcd-io/etcd/tree/master/Documentation/op-guide) for etcd overview.
+      - The list of keys (or key prefixes) to look up on the etcd3 server.
+    type: list
+    elements: str
+    required: true
+  prefix:
+    description:
+      - Look for key or prefix key.
+    type: bool
+    default: false
+  endpoints:
+    description:
+      - Counterpart of E(ETCDCTL_ENDPOINTS) environment variable. Specify the etcd3 connection with an URL form, for example
+        V(https://hostname:2379), or V(<host>:<port>) form.
+      - The V(host) part is overwritten by O(host) option, if defined.
+      - The V(port) part is overwritten by O(port) option, if defined.
+    env:
+      - name: ETCDCTL_ENDPOINTS
+    default: '127.0.0.1:2379'
+    type: str
+  host:
+    description:
+      - Etcd3 listening client host.
+      - Takes precedence over O(endpoints).
+    type: str
+  port:
+    description:
+      - Etcd3 listening client port.
+      - Takes precedence over O(endpoints).
+    type: int
+  ca_cert:
+    description:
+      - Etcd3 CA authority.
+    env:
+      - name: ETCDCTL_CACERT
+    type: str
+  cert_cert:
+    description:
+      - Etcd3 client certificate.
+    env:
+      - name: ETCDCTL_CERT
+    type: str
+  cert_key:
+    description:
+      - Etcd3 client private key.
+    env:
+      - name: ETCDCTL_KEY
+    type: str
+  timeout:
+    description:
+      - Client timeout.
+    default: 60
+    env:
+      - name: ETCDCTL_DIAL_TIMEOUT
+    type: int
+  user:
+    description:
+      - Authenticated user name.
+    env:
+      - name: ETCDCTL_USER
+    type: str
+  password:
+    description:
+      - Authenticated user password.
+    env:
+      - name: ETCDCTL_PASSWORD
+    type: str
 
-    options:
-        _terms:
-            description:
-            - The list of keys (or key prefixes) to look up on the etcd3 server.
-            type: list
-            elements: str
-            required: true
-        prefix:
-            description:
-            - Look for key or prefix key.
-            type: bool
-            default: false
-        endpoints:
-            description:
-            - Counterpart of E(ETCDCTL_ENDPOINTS) environment variable.
-              Specify the etcd3 connection with and URL form, for example V(https://hostname:2379), or V(<host>:<port>) form.
-            - The V(host) part is overwritten by O(host) option, if defined.
-            - The V(port) part is overwritten by O(port) option, if defined.
-            env:
-            - name: ETCDCTL_ENDPOINTS
-            default: '127.0.0.1:2379'
-            type: str
-        host:
-            description:
-            - etcd3 listening client host.
-            - Takes precedence over O(endpoints).
-            type: str
-        port:
-            description:
-            - etcd3 listening client port.
-            - Takes precedence over O(endpoints).
-            type: int
-        ca_cert:
-            description:
-            - etcd3 CA authority.
-            env:
-            - name: ETCDCTL_CACERT
-            type: str
-        cert_cert:
-            description:
-            - etcd3 client certificate.
-            env:
-            - name: ETCDCTL_CERT
-            type: str
-        cert_key:
-            description:
-            - etcd3 client private key.
-            env:
-            - name: ETCDCTL_KEY
-            type: str
-        timeout:
-            description:
-            - Client timeout.
-            default: 60
-            env:
-            - name: ETCDCTL_DIAL_TIMEOUT
-            type: int
-        user:
-            description:
-            - Authenticated user name.
-            env:
-            - name: ETCDCTL_USER
-            type: str
-        password:
-            description:
-            - Authenticated user password.
-            env:
-            - name: ETCDCTL_PASSWORD
-            type: str
+notes:
+  - O(host) and O(port) options take precedence over (endpoints) option.
+  - The recommended way to connect to etcd3 server is using E(ETCDCTL_ENDPOINT) environment variable and keep O(endpoints),
+    O(host), and O(port) unused.
+seealso:
+  - module: community.general.etcd3
+  - plugin: community.general.etcd
+    plugin_type: lookup
 
-    notes:
-    - O(host) and O(port) options take precedence over (endpoints) option.
-    - The recommended way to connect to etcd3 server is using E(ETCDCTL_ENDPOINT)
-      environment variable and keep O(endpoints), O(host), and O(port) unused.
-    seealso:
-    - module: community.general.etcd3
-    - plugin: community.general.etcd
-      plugin_type: lookup
+requirements:
+  - "etcd3 >= 0.10"
+"""
 
-    requirements:
-    - "etcd3 >= 0.10"
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: "a value from a locally running etcd"
   ansible.builtin.debug:
     msg: "{{ lookup('community.general.etcd3', 'foo/bar') }}"
@@ -117,22 +117,22 @@ EXAMPLES = '''
 - name: "connect to etcd3 with a client certificate"
   ansible.builtin.debug:
     msg: "{{ lookup('community.general.etcd3', 'foo/bar', cert_cert='/etc/ssl/etcd/client.pem', cert_key='/etc/ssl/etcd/client.key') }}"
-'''
+"""
 
-RETURN = '''
-    _raw:
-        description:
-        - List of keys and associated values.
-        type: list
-        elements: dict
-        contains:
-            key:
-                description: The element's key.
-                type: str
-            value:
-                description: The element's value.
-                type: str
-'''
+RETURN = r"""
+_raw:
+  description:
+    - List of keys and associated values.
+  type: list
+  elements: dict
+  contains:
+    key:
+      description: The element's key.
+      type: str
+    value:
+      description: The element's value.
+      type: str
+"""
 
 import re
 
@@ -168,7 +168,7 @@ def etcd3_client(client_params):
         etcd = etcd3.client(**client_params)
         etcd.status()
     except Exception as exp:
-        raise AnsibleLookupError('Cannot connect to etcd cluster: %s' % (to_native(exp)))
+        raise AnsibleLookupError(f'Cannot connect to etcd cluster: {exp}')
     return etcd
 
 
@@ -204,7 +204,7 @@ class LookupModule(LookupBase):
         cnx_log = dict(client_params)
         if 'password' in cnx_log:
             cnx_log['password'] = '<redacted>'
-        display.verbose("etcd3 connection parameters: %s" % cnx_log)
+        display.verbose(f"etcd3 connection parameters: {cnx_log}")
 
         # connect to etcd3 server
         etcd = etcd3_client(client_params)
@@ -218,12 +218,12 @@ class LookupModule(LookupBase):
                         if val and meta:
                             ret.append({'key': to_native(meta.key), 'value': to_native(val)})
                 except Exception as exp:
-                    display.warning('Caught except during etcd3.get_prefix: %s' % (to_native(exp)))
+                    display.warning(f'Caught except during etcd3.get_prefix: {exp}')
             else:
                 try:
                     val, meta = etcd.get(term)
                     if val and meta:
                         ret.append({'key': to_native(meta.key), 'value': to_native(val)})
                 except Exception as exp:
-                    display.warning('Caught except during etcd3.get: %s' % (to_native(exp)))
+                    display.warning(f'Caught except during etcd3.get: {exp}')
         return ret

@@ -8,7 +8,7 @@
     dir: example-006_vars
 - debug:
     var: list3
-  when: debug|d(false)|bool
+  when: debug | d(false) | bool
 - template:
     src: list3.out.j2
     dest: example-006.out

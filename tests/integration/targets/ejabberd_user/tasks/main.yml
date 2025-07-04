@@ -10,8 +10,11 @@
 
 - name: Bail out if not supported
   ansible.builtin.meta: end_play
-  when: ansible_distribution in ('Alpine', 'openSUSE Leap', 'CentOS', 'Fedora')
-
+  # TODO: remove Archlinux from the list
+  # TODO: remove Ubuntu 24.04 (noble) from the list
+  when: >
+    ansible_distribution in ('Alpine', 'openSUSE Leap', 'CentOS', 'Fedora', 'Archlinux')
+    or (ansible_distribution == 'Ubuntu' and ansible_distribution_release in ['noble'])
 
 - name: Remove ejabberd
   ansible.builtin.package:

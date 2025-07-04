@@ -14,7 +14,7 @@ import redis
 from redis import __version__
 
 from ansible_collections.community.general.plugins.modules import redis_data_incr
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args
 
 
 HAS_REDIS_USERNAME_OPTION = True
@@ -25,9 +25,9 @@ if HAS_REDIS_USERNAME_OPTION:
 
 
 def test_redis_data_incr_without_arguments(capfd):
-    set_module_args({})
-    with pytest.raises(SystemExit) as results:
-        redis_data_incr.main()
+    with set_module_args({}):
+        with pytest.raises(SystemExit) as results:
+            redis_data_incr.main()
     out, err = capfd.readouterr()
     assert not err
     assert json.loads(out)['failed']
@@ -35,13 +35,13 @@ def test_redis_data_incr_without_arguments(capfd):
 
 @pytest.mark.skipif(not HAS_REDIS_USERNAME_OPTION, reason="Redis version < 3.4.0")
 def test_redis_data_incr(capfd, mocker):
-    set_module_args({'login_host': 'localhost',
-                     'login_user': 'root',
-                     'login_password': 'secret',
-                     'key': 'foo', })
-    mocker.patch('redis.Redis.incr', return_value=57)
-    with pytest.raises(SystemExit):
-        redis_data_incr.main()
+    with set_module_args({'login_host': 'localhost',
+                          'login_user': 'root',
+                          'login_password': 'secret',
+                          'key': 'foo', }):
+        mocker.patch('redis.Redis.incr', return_value=57)
+        with pytest.raises(SystemExit):
+            redis_data_incr.main()
     out, err = capfd.readouterr()
     print(out)
     assert not err
@@ -53,14 +53,14 @@ def test_redis_data_incr(capfd, mocker):
 
 @pytest.mark.skipif(not HAS_REDIS_USERNAME_OPTION, reason="Redis version < 3.4.0")
 def test_redis_data_incr_int(capfd, mocker):
-    set_module_args({'login_host': 'localhost',
-                     'login_user': 'root',
-                     'login_password': 'secret',
-                     'key': 'foo',
-                     'increment_int': 10})
-    mocker.patch('redis.Redis.incrby', return_value=57)
-    with pytest.raises(SystemExit):
-        redis_data_incr.main()
+    with set_module_args({'login_host': 'localhost',
+                          'login_user': 'root',
+                          'login_password': 'secret',
+                          'key': 'foo',
+                          'increment_int': 10}):
+        mocker.patch('redis.Redis.incrby', return_value=57)
+        with pytest.raises(SystemExit):
+            redis_data_incr.main()
     out, err = capfd.readouterr()
     print(out)
     assert not err
@@ -72,14 +72,14 @@ def test_redis_data_incr_int(capfd, mocker):
 
 @pytest.mark.skipif(not HAS_REDIS_USERNAME_OPTION, reason="Redis version < 3.4.0")
 def test_redis_data_inc_float(capfd, mocker):
-    set_module_args({'login_host': 'localhost',
-                     'login_user': 'root',
-                     'login_password': 'secret',
-                     'key': 'foo',
-                     'increment_float': '5.5'})
-    mocker.patch('redis.Redis.incrbyfloat', return_value=57.45)
-    with pytest.raises(SystemExit):
-        redis_data_incr.main()
+    with set_module_args({'login_host': 'localhost',
+                          'login_user': 'root',
+                          'login_password': 'secret',
+                          'key': 'foo',
+                          'increment_float': '5.5'}):
+        mocker.patch('redis.Redis.incrbyfloat', return_value=57.45)
+        with pytest.raises(SystemExit):
+            redis_data_incr.main()
     out, err = capfd.readouterr()
     print(out)
     assert not err
@@ -91,13 +91,15 @@ def test_redis_data_inc_float(capfd, mocker):
 
 @pytest.mark.skipif(not HAS_REDIS_USERNAME_OPTION, reason="Redis version < 3.4.0")
 def test_redis_data_incr_float_wrong_value(capfd):
-    set_module_args({'login_host': 'localhost',
-                     'login_user': 'root',
-                     'login_password': 'secret',
-                     'key': 'foo',
-                     'increment_float': 'not_a_number'})
-    with pytest.raises(SystemExit):
-        redis_data_incr.main()
+    with set_module_args({
+        'login_host': 'localhost',
+        'login_user': 'root',
+        'login_password': 'secret',
+        'key': 'foo',
+        'increment_float': 'not_a_number'
+    }):
+        with pytest.raises(SystemExit):
+            redis_data_incr.main()
     out, err = capfd.readouterr()
     print(out)
     assert not err
@@ -106,13 +108,13 @@ def test_redis_data_incr_float_wrong_value(capfd):
 
 @pytest.mark.skipif(HAS_REDIS_USERNAME_OPTION, reason="Redis version > 3.4.0")
 def test_redis_data_incr_fail_username(capfd, mocker):
-    set_module_args({'login_host': 'localhost',
-                     'login_user': 'root',
-                     'login_password': 'secret',
-                     'key': 'foo',
-                     '_ansible_check_mode': False})
-    with pytest.raises(SystemExit):
-        redis_data_incr.main()
+    with set_module_args({'login_host': 'localhost',
+                          'login_user': 'root',
+                          'login_password': 'secret',
+                          'key': 'foo',
+                          '_ansible_check_mode': False}):
+        with pytest.raises(SystemExit):
+            redis_data_incr.main()
     out, err = capfd.readouterr()
     print(out)
     assert not err
@@ -122,12 +124,12 @@ def test_redis_data_incr_fail_username(capfd, mocker):
 
 
 def test_redis_data_incr_no_username(capfd, mocker):
-    set_module_args({'login_host': 'localhost',
-                     'login_password': 'secret',
-                     'key': 'foo', })
-    mocker.patch('redis.Redis.incr', return_value=57)
-    with pytest.raises(SystemExit):
-        redis_data_incr.main()
+    with set_module_args({'login_host': 'localhost',
+                          'login_password': 'secret',
+                          'key': 'foo', }):
+        mocker.patch('redis.Redis.incr', return_value=57)
+        with pytest.raises(SystemExit):
+            redis_data_incr.main()
     out, err = capfd.readouterr()
     print(out)
     assert not err
@@ -138,13 +140,13 @@ def test_redis_data_incr_no_username(capfd, mocker):
 
 
 def test_redis_data_incr_float_no_username(capfd, mocker):
-    set_module_args({'login_host': 'localhost',
-                     'login_password': 'secret',
-                     'key': 'foo',
-                     'increment_float': '5.5'})
-    mocker.patch('redis.Redis.incrbyfloat', return_value=57.45)
-    with pytest.raises(SystemExit):
-        redis_data_incr.main()
+    with set_module_args({'login_host': 'localhost',
+                          'login_password': 'secret',
+                          'key': 'foo',
+                          'increment_float': '5.5'}):
+        mocker.patch('redis.Redis.incrbyfloat', return_value=57.45)
+        with pytest.raises(SystemExit):
+            redis_data_incr.main()
     out, err = capfd.readouterr()
     print(out)
     assert not err
@@ -155,13 +157,13 @@ def test_redis_data_incr_float_no_username(capfd, mocker):
 
 
 def test_redis_data_incr_check_mode(capfd, mocker):
-    set_module_args({'login_host': 'localhost',
-                     'login_password': 'secret',
-                     'key': 'foo',
-                     '_ansible_check_mode': True})
-    mocker.patch('redis.Redis.get', return_value=10)
-    with pytest.raises(SystemExit):
-        redis_data_incr.main()
+    with set_module_args({'login_host': 'localhost',
+                          'login_password': 'secret',
+                          'key': 'foo',
+                          '_ansible_check_mode': True}):
+        mocker.patch('redis.Redis.get', return_value=10)
+        with pytest.raises(SystemExit):
+            redis_data_incr.main()
     out, err = capfd.readouterr()
     print(out)
     assert not err
@@ -171,13 +173,13 @@ def test_redis_data_incr_check_mode(capfd, mocker):
 
 
 def test_redis_data_incr_check_mode_not_incrementable(capfd, mocker):
-    set_module_args({'login_host': 'localhost',
-                     'login_password': 'secret',
-                     'key': 'foo',
-                     '_ansible_check_mode': True})
-    mocker.patch('redis.Redis.get', return_value='bar')
-    with pytest.raises(SystemExit):
-        redis_data_incr.main()
+    with set_module_args({'login_host': 'localhost',
+                          'login_password': 'secret',
+                          'key': 'foo',
+                          '_ansible_check_mode': True}):
+        mocker.patch('redis.Redis.get', return_value='bar')
+        with pytest.raises(SystemExit):
+            redis_data_incr.main()
     out, err = capfd.readouterr()
     print(out)
     assert not err
@@ -190,14 +192,14 @@ def test_redis_data_incr_check_mode_not_incrementable(capfd, mocker):
 
 @pytest.mark.skipif(not HAS_REDIS_USERNAME_OPTION, reason="Redis version < 3.4.0")
 def test_redis_data_incr_check_mode_permissions(capfd, mocker):
-    set_module_args({'login_host': 'localhost',
-                     'login_password': 'secret',
-                     'key': 'foo',
-                     '_ansible_check_mode': True})
-    redis.Redis.get = mocker.Mock(side_effect=NoPermissionError(
-        "this user has no permissions to run the 'get' command or its subcommand"))
-    with pytest.raises(SystemExit):
-        redis_data_incr.main()
+    with set_module_args({'login_host': 'localhost',
+                          'login_password': 'secret',
+                          'key': 'foo',
+                          '_ansible_check_mode': True}):
+        redis.Redis.get = mocker.Mock(side_effect=NoPermissionError(
+            "this user has no permissions to run the 'get' command or its subcommand"))
+        with pytest.raises(SystemExit):
+            redis_data_incr.main()
     out, err = capfd.readouterr()
     print(out)
     assert not err

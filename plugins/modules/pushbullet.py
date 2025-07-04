@@ -9,65 +9,60 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 author: "Willy Barro (@willybarro)"
-requirements: [ pushbullet.py ]
+requirements: [pushbullet.py]
 module: pushbullet
 short_description: Sends notifications to Pushbullet
 description:
-    - This module sends push notifications via Pushbullet to channels or devices.
+  - This module sends push notifications through Pushbullet to channels or devices.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    api_key:
-        type: str
-        description:
-            - Push bullet API token
-        required: true
-    channel:
-        type: str
-        description:
-            - The channel TAG you wish to broadcast a push notification,
-              as seen on the "My Channels" > "Edit your channel" at
-              Pushbullet page.
-    device:
-        type: str
-        description:
-            - The device NAME you wish to send a push notification,
-              as seen on the Pushbullet main page.
-    push_type:
-        type: str
-        description:
-          - Thing you wish to push.
-        default: note
-        choices: [ "note", "link" ]
-    title:
-        type: str
-        description:
-          - Title of the notification.
-        required: true
-    body:
-        type: str
-        description:
-          - Body of the notification, e.g. Details of the fault you're alerting.
-    url:
-        type: str
-        description:
-          - URL field, used when O(push_type=link).
-
+  api_key:
+    type: str
+    description:
+      - Push bullet API token.
+    required: true
+  channel:
+    type: str
+    description:
+      - The channel TAG you wish to broadcast a push notification, as seen on the "My Channels" > "Edit your channel" at Pushbullet
+        page.
+  device:
+    type: str
+    description:
+      - The device NAME you wish to send a push notification, as seen on the Pushbullet main page.
+  push_type:
+    type: str
+    description:
+      - Thing you wish to push.
+    default: note
+    choices: ["note", "link"]
+  title:
+    type: str
+    description:
+      - Title of the notification.
+    required: true
+  body:
+    type: str
+    description:
+      - Body of the notification, for example details of the fault you are alerting.
+  url:
+    type: str
+    description:
+      - URL field, used when O(push_type=link).
 notes:
-   - Requires pushbullet.py Python package on the remote host.
-     You can install it via pip with ($ pip install pushbullet.py).
-     See U(https://github.com/randomchars/pushbullet.py)
-'''
+  - Requires C(pushbullet.py) Python package on the remote host. You can install it through C(pip) with C(pip install pushbullet.py).
+  - See U(https://github.com/randomchars/pushbullet.py).
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Sends a push notification to a device
   community.general.pushbullet:
     api_key: "ABC123abc123ABC123abc123ABC123ab"
@@ -86,7 +81,7 @@ EXAMPLES = '''
   community.general.pushbullet:
     api_key: ABC123abc123ABC123abc123ABC123ab
     channel: my-awesome-channel
-    title: Broadcasting a message to the #my-awesome-channel folks
+    title: "Broadcasting a message to the #my-awesome-channel folks"
 
 - name: Sends a push notification with title and body to a channel
   community.general.pushbullet:
@@ -94,7 +89,7 @@ EXAMPLES = '''
     channel: my-awesome-channel
     title: ALERT! Signup service is down
     body: Error rate on signup service is over 90% for more than 2 minutes
-'''
+"""
 
 import traceback
 

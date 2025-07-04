@@ -5,7 +5,7 @@
 
 DOCUMENTATION:
   name: to_months
-  short_description: Converte a duration string to months
+  short_description: Convert a duration string to months
   version_added: 0.2.0
   description:
     - Parse a human readable time duration string and convert to months.

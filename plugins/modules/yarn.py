@@ -11,12 +11,12 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: yarn
-short_description: Manage node.js packages with Yarn
+short_description: Manage Node.js packages with Yarn
 description:
-  - Manage node.js packages with the Yarn package manager (https://yarnpkg.com/)
+  - Manage Node.js packages with the Yarn package manager U(https://yarnpkg.com/).
+  - Note that at the moment, this module B(only works with Yarn Classic).
 author:
   - "David Gunter (@verkaufer)"
   - "Chris Hoffman (@chrishoffman), creator of NPM Ansible module)"
@@ -31,25 +31,25 @@ options:
   name:
     type: str
     description:
-      - The name of a node.js library to install
+      - The name of a Node.js library to install.
       - If omitted all packages in package.json are installed.
-      - To globally install from local node.js library. Prepend "file:" to the path of the node.js library.
+      - To globally install from local Node.js library. Prepend C(file:) to the path of the Node.js library.
     required: false
   path:
     type: path
     description:
-      - The base path where Node.js libraries will be installed.
-      - This is where the node_modules folder lives.
+      - The base path where Node.js installs libraries.
+      - This is where the C(node_modules) folder lives.
     required: false
   version:
     type: str
     description:
       - The version of the library to be installed.
-      - Must be in semver format. If "latest" is desired, use "state" arg instead
+      - Must be in semver format. If "latest" is desired, use O(state) arg instead.
     required: false
   global:
     description:
-      - Install the node.js library globally
+      - Install the Node.js library globally.
     required: false
     default: false
     type: bool
@@ -60,14 +60,14 @@ options:
     required: false
   ignore_scripts:
     description:
-      - Use the --ignore-scripts flag when installing.
+      - Use the C(--ignore-scripts) flag when installing.
     required: false
     type: bool
     default: false
   production:
     description:
       - Install dependencies in production mode.
-      - Yarn will ignore any dependencies under devDependencies in package.json
+      - C(yarn) ignores any dependencies under devDependencies in C(package.json).
     required: false
     type: bool
     default: false
@@ -79,28 +79,28 @@ options:
   state:
     type: str
     description:
-      - Installation state of the named node.js library
-      - If absent is selected, a name option must be provided
+      - Installation state of the named Node.js library.
+      - If V(absent) is selected, a O(name) option must be provided.
     required: false
     default: present
-    choices: [ "present", "absent", "latest" ]
+    choices: ["present", "absent", "latest"]
 requirements:
-    - Yarn installed in bin path (typically /usr/local/bin)
-'''
+  - Yarn Classic installed in bin path (typically C(/usr/local/bin))
+"""
 
-EXAMPLES = '''
-- name: Install "imagemin" node.js package.
+EXAMPLES = r"""
+- name: Install "imagemin" Node.js package.
   community.general.yarn:
     name: imagemin
     path: /app/location
 
-- name: Install "imagemin" node.js package on version 5.3.1
+- name: Install "imagemin" Node.js package on version 5.3.1
   community.general.yarn:
     name: imagemin
     version: '5.3.1'
     path: /app/location
 
-- name: Install "imagemin" node.js package globally.
+- name: Install "imagemin" Node.js package globally.
   community.general.yarn:
     name: imagemin
     global: true
@@ -111,7 +111,7 @@ EXAMPLES = '''
     global: true
     state: absent
 
-- name: Install "imagemin" node.js package from custom registry.
+- name: Install "imagemin" Node.js package from custom registry.
   community.general.yarn:
     name: imagemin
     registry: 'http://registry.mysite.com'
@@ -124,43 +124,16 @@ EXAMPLES = '''
   community.general.yarn:
     path: /app/location
     state: latest
-'''
+"""
 
-RETURN = '''
-changed:
-    description: Whether Yarn changed any package data
-    returned: always
-    type: bool
-    sample: true
-msg:
-    description: Provides an error message if Yarn syntax was incorrect
-    returned: failure
-    type: str
-    sample: "Package must be explicitly named when uninstalling."
-invocation:
-    description: Parameters and values used during execution
-    returned: success
-    type: dict
-    sample: {
-            "module_args": {
-                "executable": null,
-                "globally": false,
-                "ignore_scripts": false,
-                "name": null,
-                "path": "/some/path/folder",
-                "production": false,
-                "registry": null,
-                "state": "present",
-                "version": null
-            }
-        }
+RETURN = r"""
 out:
-    description: Output generated from Yarn.
-    returned: always
-    type: str
-    sample: "yarn add v0.16.1[1/4] Resolving packages...[2/4] Fetching packages...[3/4] Linking dependencies...[4/4]
-    Building fresh packages...success Saved lockfile.success Saved 1 new dependency..left-pad@1.1.3 Done in 0.59s."
-'''
+  description: Output generated from Yarn.
+  returned: always
+  type: str
+  sample: "yarn add v0.16.1[1/4] Resolving packages...[2/4] Fetching packages...[3/4] Linking dependencies...[4/4] Building
+    fresh packages...success Saved lockfile.success Saved 1 new dependency..left-pad@1.1.3 Done in 0.59s."
+"""
 
 import os
 import json

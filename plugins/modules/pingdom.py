@@ -8,56 +8,55 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
-
+DOCUMENTATION = r"""
 module: pingdom
 short_description: Pause/unpause Pingdom alerts
 description:
-    - This module will let you pause/unpause Pingdom alerts
+  - This module will let you pause/unpause Pingdom alerts.
 author:
-    - "Dylan Silva (@thaumos)"
-    - "Justin Johns (!UNKNOWN)"
+  - "Dylan Silva (@thaumos)"
+  - "Justin Johns (!UNKNOWN)"
 requirements:
-    - "This pingdom python library: https://github.com/mbabineau/pingdom-python"
+  - "This pingdom python library: U(https://github.com/mbabineau/pingdom-python)"
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    state:
-        type: str
-        description:
-            - Define whether or not the check should be running or paused.
-        required: true
-        choices: [ "running", "paused", "started", "stopped" ]
-    checkid:
-        type: str
-        description:
-            - Pingdom ID of the check.
-        required: true
-    uid:
-        type: str
-        description:
-            - Pingdom user ID.
-        required: true
-    passwd:
-        type: str
-        description:
-            - Pingdom user password.
-        required: true
-    key:
-        type: str
-        description:
-            - Pingdom API key.
-        required: true
+  state:
+    type: str
+    description:
+      - Define whether or not the check should be running or paused.
+    required: true
+    choices: ["running", "paused", "started", "stopped"]
+  checkid:
+    type: str
+    description:
+      - Pingdom ID of the check.
+    required: true
+  uid:
+    type: str
+    description:
+      - Pingdom user ID.
+    required: true
+  passwd:
+    type: str
+    description:
+      - Pingdom user password.
+    required: true
+  key:
+    type: str
+    description:
+      - Pingdom API key.
+    required: true
 notes:
-    - This module does not yet have support to add/remove checks.
-'''
+  - This module does not yet have support to add/remove checks.
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Pause the check with the ID of 12345
   community.general.pingdom:
     uid: example@example.com
@@ -73,7 +72,7 @@ EXAMPLES = '''
     key: apipassword123
     checkid: 12345
     state: running
-'''
+"""
 
 import traceback
 
@@ -133,10 +132,10 @@ def main():
     passwd = module.params['passwd']
     key = module.params['key']
 
-    if (state == "paused" or state == "stopped"):
+    if state == "paused" or state == "stopped":
         (rc, name, result) = pause(checkid, uid, passwd, key)
 
-    if (state == "running" or state == "started"):
+    if state == "running" or state == "started":
         (rc, name, result) = unpause(checkid, uid, passwd, key)
 
     if rc != 0:

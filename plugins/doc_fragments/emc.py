@@ -10,33 +10,24 @@ __metaclass__ = type
 
 class ModuleDocFragment(object):
 
-    DOCUMENTATION = r'''
-options:
-  - See respective platform section for more details
-requirements:
-  - See respective platform section for more details
-notes:
-  - Ansible modules are available for EMC VNX.
-'''
-
     # Documentation fragment for VNX (emc_vnx)
     EMC_VNX = r'''
 options:
-    sp_address:
-        description:
-            - Address of the SP of target/secondary storage.
-        type: str
-        required: true
-    sp_user:
-        description:
-            - Username for accessing SP.
-        type: str
-        default: sysadmin
-    sp_password:
-        description:
-            - password for accessing SP.
-        type: str
-        default: sysadmin
+  sp_address:
+    description:
+      - Address of the SP of target/secondary storage.
+    type: str
+    required: true
+  sp_user:
+    description:
+      - Username for accessing SP.
+    type: str
+    default: sysadmin
+  sp_password:
+    description:
+      - password for accessing SP.
+    type: str
+    default: sysadmin
 requirements:
   - An EMC VNX Storage device.
   - storops (0.5.10 or greater). Install using C(pip install storops).

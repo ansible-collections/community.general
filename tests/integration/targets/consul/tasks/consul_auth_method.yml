@@ -1,0 +1,74 @@
+---
+# Copyright (c) 2024, Florian Apolloner (@apollo13)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create an auth method
+  community.general.consul_auth_method:
+    name: test
+    type: jwt
+    config:
+      jwt_validation_pubkeys:
+        - |
+          -----BEGIN PUBLIC KEY-----
+          MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu1SU1LfVLPHCozMxH2Mo
+          4lgOEePzNm0tRgeLezV6ffAt0gunVTLw7onLRnrq0/IzW7yWR7QkrmBL7jTKEn5u
+          +qKhbwKfBstIs+bMY2Zkp18gnTxKLxoS2tFczGkPLPgizskuemMghRniWaoLcyeh
+          kd3qqGElvW/VDL5AaWTg0nLVkjRo9z+40RQzuVaE8AkAFmxZzow3x+VJYKdjykkJ
+          0iT9wCS0DRTXu269V264Vf/3jvredZiKRkgwlL9xNAwxXFg0x/XFw005UWVRIkdg
+          cKWTjpBP2dPwVZ4WWC+9aGVd+Gyn1o0CLelf4rEjGoXbAAEgAqeGUxrcIlbjXfbc
+          mwIDAQAB
+          -----END PUBLIC KEY-----
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result.auth_method.Type == 'jwt'
+      - result.operation == 'create'
+
+- name: Update auth method
+  community.general.consul_auth_method:
+    name: test
+    max_token_ttl: 30m80s
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result.auth_method.Type == 'jwt'
+      - result.operation == 'update'
+
+- name: Update auth method (noop)
+  community.general.consul_auth_method:
+    name: test
+    max_token_ttl: 30m80s
+  register: result
+
+- assert:
+    that:
+      - result is not changed
+      - result.auth_method.Type == 'jwt'
+      - result.operation is not defined
+
+- name: Delete auth method
+  community.general.consul_auth_method:
+    name: test
+    state: absent
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result.operation == 'remove'
+
+- name: Delete auth method (noop)
+  community.general.consul_auth_method:
+    name: test
+    state: absent
+  register: result
+
+- assert:
+    that:
+      - result is not changed
+      - result.operation is not defined

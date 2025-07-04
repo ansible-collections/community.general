@@ -1,0 +1,30 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Test code for the github_app_access_token plugin.
+#
+# Copyright (c) 2017-2018, Abhijeet Kasurde <akasurde@redhat.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install JWT
+  ansible.builtin.pip:
+    name:
+      - jwt
+
+- name: Read file
+  ansible.builtin.set_fact:
+    github_app_private_key: "{{ lookup('ansible.builtin.file', 'app-private-key.pem') }}"
+
+- name: Generate Github App Token
+  register: github_app_access_token
+  ignore_errors: true
+  ansible.builtin.set_fact:
+    github_app_token: "{{ lookup('community.general.github_app_access_token', app_id=github_app_id, installation_id=github_app_installation_id, private_key=github_app_private_key) }}"
+
+- assert:
+    that:
+      - github_app_access_token is failed
+      - '"Github return error" in github_app_access_token.msg'

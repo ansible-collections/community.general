@@ -31,8 +31,8 @@
 - name: verify uninstallation of hello
   assert:
     that:
-        - "zypper_result.rc == 0"
-        - "rpm_result.rc == 1"
+      - "zypper_result.rc == 0"
+      - "rpm_result.rc == 1"
 
 # UNINSTALL AGAIN
 - name: uninstall hello again
@@ -44,7 +44,7 @@
 - name: verify no change on re-uninstall
   assert:
     that:
-        - "not zypper_result.changed"
+      - "not zypper_result.changed"
 
 # INSTALL
 - name: install hello
@@ -64,9 +64,9 @@
 - name: verify installation of hello
   assert:
     that:
-        - "zypper_result.rc == 0"
-        - "zypper_result.changed"
-        - "rpm_result.rc == 0"
+      - "zypper_result.rc == 0"
+      - "zypper_result.changed"
+      - "rpm_result.rc == 0"
 
 # INSTALL AGAIN
 - name: install hello again
@@ -78,7 +78,7 @@
 - name: verify no change on second install
   assert:
     that:
-        - "not zypper_result.changed"
+      - "not zypper_result.changed"
 
 # Multiple packages
 - name: uninstall hello and metamail
@@ -102,8 +102,8 @@
 - name: verify packages uninstalled
   assert:
     that:
-        - "rpm_hello_result.rc != 0"
-        - "rpm_metamail_result.rc != 0"
+      - "rpm_hello_result.rc != 0"
+      - "rpm_metamail_result.rc != 0"
 
 - name: install hello and metamail
   zypper:
@@ -126,10 +126,10 @@
 - name: verify packages installed
   assert:
     that:
-        - "zypper_result.rc == 0"
-        - "zypper_result.changed"
-        - "rpm_hello_result.rc == 0"
-        - "rpm_metamail_result.rc == 0"
+      - "zypper_result.rc == 0"
+      - "zypper_result.changed"
+      - "rpm_hello_result.rc == 0"
+      - "rpm_metamail_result.rc == 0"
 
 - name: uninstall hello and metamail
   zypper:
@@ -190,7 +190,7 @@
     state: present
 
 - name: clean zypper RPM cache
-  file: 
+  file:
     name: /var/cache/zypper/RPMS
     state: absent
 
@@ -230,9 +230,9 @@
 - name: verify installation of empty
   assert:
     that:
-        - "zypper_result.rc == 0"
-        - "zypper_result.changed"
-        - "rpm_result.rc == 0"
+      - "zypper_result.rc == 0"
+      - "zypper_result.changed"
+      - "rpm_result.rc == 0"
 
 - name: uninstall empty
   zypper:
@@ -253,8 +253,93 @@
 - name: check that we extract rpm package in testdir folder and folder var is exist
   assert:
     that:
-     - "stat_result.stat.exists == true"
+      - "stat_result.stat.exists == true"
 
+# Build and install an empty rpm with error in post script
+- name: uninstall post_error
+  zypper:
+    name: post_error
+    state: removed
+
+- name: install rpmbuild
+  zypper:
+    name: rpmbuild
+    state: present
+
+- name: clean zypper RPM cache
+  file:
+    name: /var/cache/zypper/RPMS
+    state: absent
+
+- name: create directory
+  file:
+    path: "{{ remote_tmp_dir | expanduser }}/zypper2"
+    state: directory
+
+- name: copy spec file
+  copy:
+    src: post_error.spec
+    dest: "{{ remote_tmp_dir | expanduser }}/zypper2/post_error.spec"
+
+- name: build rpm
+  command: |
+    rpmbuild -bb \
+    --define "_topdir {{remote_tmp_dir | expanduser }}/zypper2/rpm-build"
+    --define "_builddir %{_topdir}" \
+    --define "_rpmdir %{_topdir}" \
+    --define "_srcrpmdir %{_topdir}" \
+    --define "_specdir {{remote_tmp_dir | expanduser}}/zypper2" \
+    --define "_sourcedir %{_topdir}" \
+    {{ remote_tmp_dir }}/zypper2/post_error.spec
+  register: rpm_build_result
+
+- name: install post_error rpm with skip_post_errors
+  zypper:
+    name: "{{ remote_tmp_dir | expanduser }}/zypper2/rpm-build/noarch/post_error-1-0.noarch.rpm"
+    disable_gpg_check: true
+    skip_post_errors: true
+  register: zypper_result
+
+- name: check post_error rpm
+  shell: rpm -q post_error
+  failed_when: false
+  register: rpm_result
+
+- name: verify installation of post_error
+  assert:
+    that:
+      - "zypper_result.rc == 0"
+      - "zypper_result.changed"
+      - "rpm_result.rc == 0"
+
+- name: uninstall post_error
+  zypper:
+    name: post_error
+    state: removed
+
+- name: install post_error rpm without skip_post_errors
+  zypper:
+    name: "{{ remote_tmp_dir | expanduser }}/zypper2/rpm-build/noarch/post_error-1-0.noarch.rpm"
+    disable_gpg_check: true
+  register: zypper_result
+  ignore_errors: true
+
+- name: check post_error rpm
+  shell: rpm -q post_error
+  failed_when: false
+  register: rpm_result
+
+- name: verify installation of post_error
+  assert:
+    that:
+      - "zypper_result.rc == 107"
+      - "not zypper_result.changed"
+      - "rpm_result.rc == 0"
+
+- name: uninstall post_error
+  zypper:
+    name: post_error
+    state: removed
 
 # test simultaneous remove and install using +- prefixes
 
@@ -269,8 +354,8 @@
     state: absent
 
 - name: install and remove in the same run, with +- prefix
-  zypper: 
-    name: 
+  zypper:
+    name:
       - -hello
       - +metamail
     state: present
@@ -332,13 +417,13 @@
 
 - name: try rm patch
   zypper:
-    name: openSUSE-2016-128 
+    name: openSUSE-2016-128
     type: patch
     state: absent
   ignore_errors: true
   register: zypper_patch
 - assert:
-    that: 
+    that:
       - zypper_patch is failed
       - zypper_patch.msg.startswith('Can not remove patches.')
 
@@ -349,7 +434,7 @@
   ignore_errors: true
   register: zypper_rm
 - assert:
-    that: 
+    that:
       - zypper_rm is failed
       - zypper_rm.msg.startswith('Can not remove via URL.')
 
@@ -365,7 +450,7 @@
     type: pattern
     state: present
   register: zypper_install_pattern1
-  
+
 - name: install pattern update_test again
   zypper:
     name: update_test
@@ -394,7 +479,7 @@
     name: hello
     state: present
   register: zypperin2
-  
+
 - assert:
     that:
       - zypperin1 is succeeded

@@ -38,22 +38,12 @@ cmd_echo_tests:
       - test_result.out == "-- --answer=43 --bb-here\n"
       - test_result.err == ""
 
-  - name: implicit aa format
-    arg_formats:
-      bb:
-        func: as_bool
-        args: [--bb-here]
-    arg_order: ['aa', 'bb']
-    arg_values:
-      bb: true
-    aa: 1984
-    assertions:
-      - test_result.rc == 0
-      - test_result.out == "-- --aa 1984 --bb-here\n"
-      - test_result.err == ""
-
   - name: missing bb format
     arg_order: ['aa', 'bb']
+    arg_formats:
+      aa:
+        func: as_opt_eq_val
+        args: [--answer]
     arg_values:
       bb: true
     aa: 1984
@@ -69,6 +59,9 @@ cmd_echo_tests:
 
   - name: missing bb value
     arg_formats:
+      aa:
+        func: as_opt_eq_val
+        args: [--answer]
       bb:
         func: as_bool
         args: [--bb-here]
@@ -260,3 +253,5 @@ cmd_echo_tests:
     assertions:
       - >
         "No such file or directory" in test_result.msg
+        or
+        "Error executing command." == test_result.msg

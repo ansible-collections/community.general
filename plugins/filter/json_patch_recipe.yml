@@ -1,0 +1,102 @@
+---
+# Copyright (c) Stanislav Meduna (@numo68)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+DOCUMENTATION:
+  name: json_patch_recipe
+  short_description: Apply JSON-Patch (RFC 6902) operations to an object
+  description:
+    - This filter sequentially applies JSON patch operations and returns a modified object.
+    - If there is a test operation in the list, the filter continues if the test
+      succeeded and returns a V(none) value otherwise.
+  requirements:
+    - jsonpatch
+  version_added: 10.3.0
+  author:
+    - Stanislav Meduna (@numo68)
+  positional: operations, fail_test
+  options:
+    _input:
+      description: A list or a dictionary representing a JSON object, or a string containing a JSON object.
+      type: raw
+      required: true
+    operations:
+      description: A list of JSON patch operations to apply.
+      type: list
+      elements: dict
+      required: true
+      suboptions:
+        op:
+          description: Operation to perform (see L(RFC 6902, https://datatracker.ietf.org/doc/html/rfc6902)).
+          type: str
+          choices: [add, copy, move, remove, replace, test]
+          required: true
+        path:
+          description: JSON Pointer path to the target location (see L(RFC 6901, https://datatracker.ietf.org/doc/html/rfc6901)).
+          type: str
+          required: true
+        value:
+          description: Value to use in the operation. Ignored for O(operations[].op=copy), O(operations[].op=move), and O(operations[].op=remove).
+          type: raw
+        from:
+          description: The source location for the copy and move operation. Mandatory
+            for O(operations[].op=copy) and O(operations[].op=move), ignored otherwise.
+          type: str
+    fail_test:
+      description: If V(false), a failed O(operations[].op=test) will return V(none). If V(true), the filter
+        invocation will fail with an error.
+      type: bool
+      default: false
+  seealso:
+    - name: RFC 6902
+      description: JavaScript Object Notation (JSON) Patch
+      link: https://datatracker.ietf.org/doc/html/rfc6902
+    - name: RFC 6901
+      description: JavaScript Object Notation (JSON) Pointer
+      link: https://datatracker.ietf.org/doc/html/rfc6901
+    - name: jsonpatch Python Package
+      description: A Python library for applying JSON patches
+      link: https://pypi.org/project/jsonpatch/
+
+RETURN:
+  _value:
+    description: A modified object or V(none) if O(operations[].op=test), O(fail_test=false)
+      and the test failed.
+    type: any
+    returned: always
+
+EXAMPLES: |
+  - name: Apply a series of operations
+    ansible.builtin.debug:
+      msg: "{{ input | community.general.json_patch_recipe(operations) }}"
+    vars:
+      input: {}
+      operations:
+        - op: 'add'
+          path: '/foo'
+          value: 1
+        - op: 'add'
+          path: '/bar'
+          value: []
+        - op: 'add'
+          path: '/bar/-'
+          value: 2
+        - op: 'add'
+          path: '/bar/0'
+          value: 1
+        - op: 'remove'
+          path: '/bar/0'
+        - op: 'move'
+          from: '/foo'
+          path: '/baz'
+        - op: 'copy'
+          from: '/baz'
+          path: '/bax'
+        - op: 'copy'
+          from: '/baz'
+          path: '/bay'
+        - op: 'replace'
+          path: '/baz'
+          value: [10, 20, 30]
+    # => {"bar":[2],"bax":1,"bay":1,"baz":[10,20,30]}

@@ -7,13 +7,11 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: oneandone_firewall_policy
 short_description: Configure 1&1 firewall policy
 description:
-  - Create, remove, reconfigure, update firewall policies.
-    This module has a dependency on 1and1 >= 1.0.
+  - Create, remove, reconfigure, update firewall policies. This module has a dependency on 1and1 >= 1.0.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -28,21 +26,19 @@ options:
     required: false
     type: str
     default: 'present'
-    choices: [ "present", "absent", "update" ]
+    choices: ["present", "absent", "update"]
   auth_token:
     description:
       - Authenticating API token provided by 1&1.
     type: str
   api_url:
     description:
-      - Custom API URL. Overrides the
-        ONEANDONE_API_URL environment variable.
+      - Custom API URL. Overrides the E(ONEANDONE_API_URL) environment variable.
     type: str
     required: false
   name:
     description:
-      - Firewall policy name used with present state. Used as identifier (id or name) when used with absent state.
-        maxLength=128
+      - Firewall policy name used with present state. Used as identifier (id or name) when used with absent state. maxLength=128.
     type: str
   firewall_policy:
     description:
@@ -50,61 +46,59 @@ options:
     type: str
   rules:
     description:
-      - A list of rules that will be set for the firewall policy.
-        Each rule must contain protocol parameter, in addition to three optional parameters
-        (port_from, port_to, and source)
+      - A list of rules that will be set for the firewall policy. Each rule must contain protocol parameter, in addition to
+        three optional parameters (port_from, port_to, and source).
     type: list
     elements: dict
     default: []
   add_server_ips:
     description:
-      - A list of server identifiers (id or name) to be assigned to a firewall policy.
-        Used in combination with update state.
+      - A list of server identifiers (id or name) to be assigned to a firewall policy. Used in combination with update state.
     type: list
     elements: str
     required: false
     default: []
   remove_server_ips:
     description:
-      - A list of server IP ids to be unassigned from a firewall policy. Used in combination with update state.
+      - A list of server IP IDs to be unassigned from a firewall policy. Used in combination with update state.
     type: list
     elements: str
     required: false
     default: []
   add_rules:
     description:
-      - A list of rules that will be added to an existing firewall policy.
-        It is syntax is the same as the one used for rules parameter. Used in combination with update state.
+      - A list of rules that will be added to an existing firewall policy. It is syntax is the same as the one used for rules
+        parameter. Used in combination with update state.
     type: list
     elements: dict
     required: false
     default: []
   remove_rules:
     description:
-      - A list of rule ids that will be removed from an existing firewall policy. Used in combination with update state.
+      - A list of rule IDs that will be removed from an existing firewall policy. Used in combination with update state.
     type: list
     elements: str
     required: false
     default: []
   description:
     description:
-      - Firewall policy description. maxLength=256
+      - Firewall policy description. maxLength=256.
     type: str
     required: false
   wait:
     description:
-      - wait for the instance to be in state 'running' before returning
+      - Wait for the instance to be in state 'running' before returning.
     required: false
     default: true
     type: bool
   wait_timeout:
     description:
-      - how long before wait gives up, in seconds
+      - How long before wait gives up, in seconds.
     type: int
     default: 600
   wait_interval:
     description:
-      - Defines the number of seconds to wait when using the _wait_for methods
+      - Defines the number of seconds to wait when using the _wait_for methods.
     type: int
     default: 5
 
@@ -112,22 +106,21 @@ requirements:
   - "1and1"
 
 author:
-  -  "Amel Ajdinovic (@aajdinov)"
-  -  "Ethan Devenport (@edevenport)"
-'''
+  - "Amel Ajdinovic (@aajdinov)"
+  - "Ethan Devenport (@edevenport)"
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a firewall policy
   community.general.oneandone_firewall_policy:
     auth_token: oneandone_private_api_key
     name: ansible-firewall-policy
     description: Testing creation of firewall policies with ansible
     rules:
-     -
-       protocol: TCP
-       port_from: 80
-       port_to: 80
-       source: 0.0.0.0
+      - protocol: TCP
+        port_from: 80
+        port_to: 80
+        source: 0.0.0.0
     wait: true
     wait_timeout: 500
 
@@ -150,8 +143,8 @@ EXAMPLES = '''
     auth_token: oneandone_private_api_key
     firewall_policy: ansible-firewall-policy-updated
     add_server_ips:
-     - server_identifier (id or name)
-     - server_identifier #2 (id or name)
+      - server_identifier (id or name)
+      - "server_identifier #2 (id or name)"
     wait: true
     wait_timeout: 500
     state: update
@@ -161,7 +154,7 @@ EXAMPLES = '''
     auth_token: oneandone_private_api_key
     firewall_policy: ansible-firewall-policy-updated
     remove_server_ips:
-     - B2504878540DBC5F7634EB00A07C1EBD (server's IP id)
+      - B2504878540DBC5F7634EB00A07C1EBD (server's IP id)
     wait: true
     wait_timeout: 500
     state: update
@@ -172,16 +165,14 @@ EXAMPLES = '''
     firewall_policy: ansible-firewall-policy-updated
     description: Adding rules to an existing firewall policy
     add_rules:
-     -
-       protocol: TCP
-       port_from: 70
-       port_to: 70
-       source: 0.0.0.0
-     -
-       protocol: TCP
-       port_from: 60
-       port_to: 60
-       source: 0.0.0.0
+      - protocol: TCP
+        port_from: 70
+        port_to: 70
+        source: 0.0.0.0
+      - protocol: TCP
+        port_from: 60
+        port_to: 60
+        source: 0.0.0.0
     wait: true
     wait_timeout: 500
     state: update
@@ -191,21 +182,21 @@ EXAMPLES = '''
     auth_token: oneandone_private_api_key
     firewall_policy: ansible-firewall-policy-updated
     remove_rules:
-     - rule_id #1
-     - rule_id #2
-     - ...
+      - "rule_id #1"
+      - "rule_id #2"
+      - '...'
     wait: true
     wait_timeout: 500
     state: update
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 firewall_policy:
-    description: Information about the firewall policy that was processed
-    type: dict
-    sample: '{"id": "92B74394A397ECC3359825C1656D67A6", "name": "Default Policy"}'
-    returned: always
-'''
+  description: Information about the firewall policy that was processed.
+  type: dict
+  sample: '{"id": "92B74394A397ECC3359825C1656D67A6", "name": "Default Policy"}'
+  returned: always
+"""
 
 import os
 from ansible.module_utils.basic import AnsibleModule
@@ -297,7 +288,7 @@ def _add_firewall_rules(module, oneandone_conn, firewall_id, rules):
 
         if module.check_mode:
             firewall_policy_id = get_firewall_policy(oneandone_conn, firewall_id)
-            if (firewall_rules and firewall_policy_id):
+            if firewall_rules and firewall_policy_id:
                 return True
             return False
 

@@ -8,44 +8,43 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
-
+DOCUMENTATION = r"""
 module: uptimerobot
 short_description: Pause and start Uptime Robot monitoring
 description:
-    - This module will let you start and pause Uptime Robot Monitoring
+  - This module lets you start and pause Uptime Robot Monitoring.
 author: "Nate Kingsley (@nate-kingsley)"
 requirements:
-    - Valid Uptime Robot API Key
+  - Valid Uptime Robot API Key
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    state:
-        type: str
-        description:
-            - Define whether or not the monitor should be running or paused.
-        required: true
-        choices: [ "started", "paused" ]
-    monitorid:
-        type: str
-        description:
-            - ID of the monitor to check.
-        required: true
-    apikey:
-        type: str
-        description:
-            - Uptime Robot API key.
-        required: true
+  state:
+    type: str
+    description:
+      - Define whether or not the monitor should be running or paused.
+    required: true
+    choices: ["started", "paused"]
+  monitorid:
+    type: str
+    description:
+      - ID of the monitor to check.
+    required: true
+  apikey:
+    type: str
+    description:
+      - Uptime Robot API key.
+    required: true
 notes:
-    - Support for adding and removing monitors and alert contacts has not yet been implemented.
-'''
+  - Support for adding and removing monitors and alert contacts has not yet been implemented.
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Pause the monitor with an ID of 12345
   community.general.uptimerobot:
     monitorid: 12345
@@ -57,7 +56,7 @@ EXAMPLES = '''
     monitorid: 12345
     apikey: 12345-1234512345
     state: started
-'''
+"""
 
 import json
 

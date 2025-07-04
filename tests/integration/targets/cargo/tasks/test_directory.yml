@@ -1,0 +1,122 @@
+---
+# Copyright (c) 2024 Colin Nolan <cn580@alumni.york.ac.uk>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create temp directory
+  tempfile:
+    state: directory
+  register: temp_directory
+
+- name: Test block
+  vars:
+    manifest_path: "{{ temp_directory.path }}/Cargo.toml"
+    package_name: hello-world-directory-test
+  block:
+    - name: Initialize package
+      ansible.builtin.command:
+        cmd: "cargo init --name {{ package_name }}"
+      args:
+        chdir: "{{ temp_directory.path }}"
+
+    - name: Set package version (1.0.0)
+      ansible.builtin.lineinfile:
+        path: "{{ manifest_path }}"
+        regexp: '^version = ".*"$'
+        line: 'version = "1.0.0"'
+
+    - name: Ensure package is uninstalled
+      community.general.cargo:
+        name: "{{ package_name }}"
+        state: absent
+        directory: "{{ temp_directory.path }}"
+      register: uninstall_absent
+
+    - name: Install package
+      community.general.cargo:
+        name: "{{ package_name }}"
+        directory: "{{ temp_directory.path }}"
+      register: install_absent
+
+    - name: Change package version (1.0.1)
+      ansible.builtin.lineinfile:
+        path: "{{ manifest_path }}"
+        regexp: '^version = ".*"$'
+        line: 'version = "1.0.1"'
+
+    - name: Install package again (present)
+      community.general.cargo:
+        name: "{{ package_name }}"
+        state: present
+        directory: "{{ temp_directory.path }}"
+      register: install_present_state
+
+    - name: Install package again (latest)
+      community.general.cargo:
+        name: "{{ package_name }}"
+        state: latest
+        directory: "{{ temp_directory.path }}"
+      register: install_latest_state
+
+    - name: Change package version (2.0.0)
+      ansible.builtin.lineinfile:
+        path: "{{ manifest_path }}"
+        regexp: '^version = ".*"$'
+        line: 'version = "2.0.0"'
+
+    - name: Install package with given version (matched)
+      community.general.cargo:
+        name: "{{ package_name }}"
+        version: "2.0.0"
+        directory: "{{ temp_directory.path }}"
+      register: install_given_version_matched
+
+    - name: Install package with given version (unmatched)
+      community.general.cargo:
+        name: "{{ package_name }}"
+        version: "2.0.1"
+        directory: "{{ temp_directory.path }}"
+      register: install_given_version_unmatched
+      ignore_errors: true
+
+    - name: Uninstall package
+      community.general.cargo:
+        name: "{{ package_name }}"
+        state: absent
+        directory: "{{ temp_directory.path }}"
+      register: uninstall_present
+
+    - name: Install non-existant package
+      community.general.cargo:
+        name: "{{ package_name }}-non-existant"
+        state: present
+        directory: "{{ temp_directory.path }}"
+      register: install_non_existant
+      ignore_errors: true
+
+    - name: Install non-existant source directory
+      community.general.cargo:
+        name: "{{ package_name }}"
+        state: present
+        directory: "{{ temp_directory.path }}/non-existant"
+      register: install_non_existant_source
+      ignore_errors: true
+
+  always:
+    - name: Remove temp directory
+      file:
+        path: "{{ temp_directory.path }}"
+        state: absent
+
+- name: Check assertions
+  assert:
+    that:
+      - uninstall_absent is not changed
+      - install_absent is changed
+      - install_present_state is not changed
+      - install_latest_state is changed
+      - install_given_version_matched is changed
+      - install_given_version_unmatched is failed
+      - uninstall_present is changed
+      - install_non_existant is failed
+      - install_non_existant_source is failed

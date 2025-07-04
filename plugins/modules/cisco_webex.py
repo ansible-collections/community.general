@@ -9,17 +9,15 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: cisco_webex
 short_description: Send a message to a Cisco Webex Teams Room or Individual
 description:
-    - Send a message to a Cisco Webex Teams Room or Individual with options to control the formatting.
+  - Send a message to a Cisco Webex Teams Room or Individual with options to control the formatting.
 author: Drew Rusell (@drew-russell)
 notes:
   - The O(recipient_type) must be valid for the supplied O(recipient_id).
   - Full API documentation can be found at U(https://developer.webex.com/docs/api/basics).
-
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -32,8 +30,8 @@ options:
 
   recipient_type:
     description:
-       - The request parameter you would like to send the message to.
-       - Messages can be sent to either a room or individual (by ID or E-Mail).
+      - The request parameter you would like to send the message to.
+      - Messages can be sent to either a room or individual (by ID or E-Mail).
     required: true
     choices: ['roomId', 'toPersonEmail', 'toPersonId']
     type: str
@@ -46,7 +44,7 @@ options:
 
   msg_type:
     description:
-       - Specifies how you would like the message formatted.
+      - Specifies how you would like the message formatted.
     default: text
     choices: ['text', 'markdown']
     type: str
@@ -64,9 +62,9 @@ options:
       - The message you would like to send.
     required: true
     type: str
-'''
+"""
 
-EXAMPLES = """
+EXAMPLES = r"""
 # Note: The following examples assume a variable file has been imported
 # that contains the appropriate information.
 
@@ -101,10 +99,9 @@ EXAMPLES = """
     msg_type: text
     personal_token: "{{ token }}"
     msg: "Cisco Webex Teams Ansible Module - Text Message to Individual by E-Mail"
-
 """
 
-RETURN = """
+RETURN = r"""
 status_code:
   description:
     - The Response Code returned by the Webex Teams API.
@@ -114,12 +111,12 @@ status_code:
   sample: 200
 
 message:
-    description:
-      - The Response Message returned by the Webex Teams API.
-      - Full Response Code explanations can be found at U(https://developer.webex.com/docs/api/basics).
-    returned: always
-    type: str
-    sample: OK (585 bytes)
+  description:
+    - The Response Message returned by the Webex Teams API.
+    - Full Response Code explanations can be found at U(https://developer.webex.com/docs/api/basics).
+  returned: always
+  type: str
+  sample: OK (585 bytes)
 """
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url

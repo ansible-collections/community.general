@@ -9,17 +9,15 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 author: James Hogarth (@hogarthj)
 module: jenkins_script
 short_description: Executes a groovy script in the jenkins instance
 description:
-    - The C(jenkins_script) module takes a script plus a dict of values
-      to use within the script and returns the result of the script being run.
-
+  - The C(jenkins_script) module takes a script plus a dict of values to use within the script and returns the result of the
+    script being run.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 
 attributes:
   check_mode:
@@ -31,20 +29,18 @@ options:
   script:
     type: str
     description:
-      - The groovy script to be executed.
-        This gets passed as a string Template if args is defined.
+      - The groovy script to be executed. This gets passed as a string Template if args is defined.
     required: true
   url:
     type: str
     description:
-      - The jenkins server to execute the script against. The default is a local
-        jenkins instance that is not being proxied through a webserver.
+      - The jenkins server to execute the script against. The default is a local jenkins instance that is not being proxied
+        through a webserver.
     default: http://localhost:8080
   validate_certs:
     description:
-      - If set to V(false), the SSL certificates will not be validated.
-        This should only set to V(false) used on personally controlled sites
-        using self-signed certificates as it avoids verifying the source site.
+      - If set to V(false), the SSL certificates will not be validated. This should only set to V(false) used on personally
+        controlled sites using self-signed certificates as it avoids verifying the source site.
     type: bool
     default: true
   user:
@@ -58,21 +54,18 @@ options:
   timeout:
     type: int
     description:
-      - The request timeout in seconds
+      - The request timeout in seconds.
     default: 10
   args:
     type: dict
     description:
       - A dict of key-value pairs used in formatting the script using string.Template (see https://docs.python.org/2/library/string.html#template-strings).
-
 notes:
-    - Since the script can do anything this does not report on changes.
-      Knowing the script is being run it's important to set changed_when
-      for the ansible output to be clear on any alterations made.
+  - Since the script can do anything this does not report on changes. Knowing the script is being run it is important to set
+    C(changed_when) for the ansible output to be clear on any alterations made.
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Obtaining a list of plugins
   community.general.jenkins_script:
     script: 'println(Jenkins.instance.pluginManager.plugins)'
@@ -82,10 +75,10 @@ EXAMPLES = '''
 - name: Setting master using a variable to hold a more complicate script
   ansible.builtin.set_fact:
     setmaster_mode: |
-        import jenkins.model.*
-        instance = Jenkins.getInstance()
-        instance.setMode(${jenkins_mode})
-        instance.save()
+      import jenkins.model.*
+      instance = Jenkins.getInstance()
+      instance.setMode(${jenkins_mode})
+      instance.save()
 
 - name: Use the variable as the script
   community.general.jenkins_script:
@@ -99,16 +92,16 @@ EXAMPLES = '''
     user: admin
     password: admin
     url: https://localhost
-    validate_certs: false  # only do this when you trust the network!
-'''
+    validate_certs: false # only do this when you trust the network!
+"""
 
-RETURN = '''
+RETURN = r"""
 output:
-    description: Result of script
-    returned: success
-    type: str
-    sample: 'Result: true'
-'''
+  description: Result of script.
+  returned: success
+  type: str
+  sample: 'Result: true'
+"""
 
 import json
 

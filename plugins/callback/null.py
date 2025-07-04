@@ -4,19 +4,18 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # Make coding more python3-ish
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
-DOCUMENTATION = '''
-    author: Unknown (!UNKNOWN)
-    name: 'null'
-    type: stdout
-    requirements:
-      - set as main display callback
-    short_description: Don't display stuff to screen
-    description:
-        - This callback prevents outputting events to screen.
-'''
+DOCUMENTATION = r"""
+author: Unknown (!UNKNOWN)
+name: 'null'
+type: stdout
+requirements:
+  - set as main display callback
+short_description: Do not display stuff to screen
+description:
+  - This callback prevents outputting events to screen.
+"""
 
 from ansible.plugins.callback import CallbackBase
 

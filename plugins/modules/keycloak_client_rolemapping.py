@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: keycloak_client_rolemapping
 
 short_description: Allows administration of Keycloak client_rolemapping with the Keycloak API
@@ -17,126 +16,117 @@ short_description: Allows administration of Keycloak client_rolemapping with the
 version_added: 3.5.0
 
 description:
-    - This module allows you to add, remove or modify Keycloak client_rolemapping with the Keycloak REST API.
-      It requires access to the REST API via OpenID Connect; the user connecting and the client being
-      used must have the requisite access rights. In a default Keycloak installation, admin-cli
-      and an admin user would work, as would a separate client definition with the scope tailored
-      to your needs and a user having the expected roles.
-
-    - The names of module options are snake_cased versions of the camelCase ones found in the
-      Keycloak API and its documentation at U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html).
-
-    - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and will
-      be returned that way by this module. You may pass single values for attributes when calling the module,
-      and this will be translated into a list suitable for the API.
-
-    - When updating a client_rolemapping, where possible provide the role ID to the module. This removes a lookup
-      to the API to translate the name into the role ID.
-
+  - This module allows you to add, remove or modify Keycloak client_rolemapping with the Keycloak REST API. It requires access
+    to the REST API using OpenID Connect; the user connecting and the client being used must have the requisite access rights.
+    In a default Keycloak installation, admin-cli and an admin user would work, as would a separate client definition with
+    the scope tailored to your needs and a user having the expected roles.
+  - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation
+    at U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html).
+  - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and will be returned that
+    way by this module. You may pass single values for attributes when calling the module, and this will be translated into
+    a list suitable for the API.
+  - When updating a client_rolemapping, where possible provide the role ID to the module. This removes a lookup to the API
+    to translate the name into the role ID.
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: full
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
+  action_group:
+    version_added: 10.2.0
 
 options:
-    state:
-        description:
-            - State of the client_rolemapping.
-            - On V(present), the client_rolemapping will be created if it does not yet exist, or updated with the parameters you provide.
-            - On V(absent), the client_rolemapping will be removed if it exists.
-        default: 'present'
-        type: str
-        choices:
-            - present
-            - absent
+  state:
+    description:
+      - State of the client_rolemapping.
+      - On V(present), the client_rolemapping will be created if it does not yet exist, or updated with the parameters you
+        provide.
+      - On V(absent), the client_rolemapping will be removed if it exists.
+    default: 'present'
+    type: str
+    choices:
+      - present
+      - absent
 
-    realm:
-        type: str
-        description:
-            - They Keycloak realm under which this role_representation resides.
-        default: 'master'
+  realm:
+    type: str
+    description:
+      - They Keycloak realm under which this role_representation resides.
+    default: 'master'
 
-    group_name:
-        type: str
-        description:
-            - Name of the group to be mapped.
-            - This parameter is required (can be replaced by gid for less API call).
-
-    parents:
-        version_added: "7.1.0"
-        type: list
-        description:
-            - List of parent groups for the group to handle sorted top to bottom.
-            - >-
-              Set this if your group is a subgroup and you do not provide the GID in O(gid).
-        elements: dict
-        suboptions:
-          id:
-            type: str
-            description:
-              - Identify parent by ID.
-              - Needs less API calls than using O(parents[].name).
-              - A deep parent chain can be started at any point when first given parent is given as ID.
-              - Note that in principle both ID and name can be specified at the same time
-                but current implementation only always use just one of them, with ID
-                being preferred.
-          name:
-            type: str
-            description:
-              - Identify parent by name.
-              - Needs more internal API calls than using O(parents[].id) to map names to ID's under the hood.
-              - When giving a parent chain with only names it must be complete up to the top.
-              - Note that in principle both ID and name can be specified at the same time
-                but current implementation only always use just one of them, with ID
-                being preferred.
-    gid:
+  group_name:
+    type: str
+    description:
+      - Name of the group to be mapped.
+      - This parameter is required (can be replaced by gid for less API call).
+  parents:
+    version_added: "7.1.0"
+    type: list
+    description:
+      - List of parent groups for the group to handle sorted top to bottom.
+      - Set this if your group is a subgroup and you do not provide the GID in O(gid).
+    elements: dict
+    suboptions:
+      id:
         type: str
         description:
-            - Id of the group to be mapped.
-            - This parameter is not required for updating or deleting the rolemapping but
-              providing it will reduce the number of API calls required.
-
-    client_id:
+          - Identify parent by ID.
+          - Needs less API calls than using O(parents[].name).
+          - A deep parent chain can be started at any point when first given parent is given as ID.
+          - Note that in principle both ID and name can be specified at the same time but current implementation only always
+            use just one of them, with ID being preferred.
+      name:
         type: str
         description:
-            - Name of the client to be mapped (different than O(cid)).
-            - This parameter is required (can be replaced by cid for less API call).
-
-    cid:
+          - Identify parent by name.
+          - Needs more internal API calls than using O(parents[].id) to map names to ID's under the hood.
+          - When giving a parent chain with only names it must be complete up to the top.
+          - Note that in principle both ID and name can be specified at the same time but current implementation only always
+            use just one of them, with ID being preferred.
+  gid:
+    type: str
+    description:
+      - ID of the group to be mapped.
+      - This parameter is not required for updating or deleting the rolemapping but providing it will reduce the number of
+        API calls required.
+  client_id:
+    type: str
+    description:
+      - Name of the client to be mapped (different than O(cid)).
+      - This parameter is required (can be replaced by cid for less API call).
+  cid:
+    type: str
+    description:
+      - ID of the client to be mapped.
+      - This parameter is not required for updating or deleting the rolemapping but providing it will reduce the number of
+        API calls required.
+  roles:
+    description:
+      - Roles to be mapped to the group.
+    type: list
+    elements: dict
+    suboptions:
+      name:
         type: str
         description:
-            - Id of the client to be mapped.
-            - This parameter is not required for updating or deleting the rolemapping but
-              providing it will reduce the number of API calls required.
-
-    roles:
+          - Name of the role_representation.
+          - This parameter is required only when creating or updating the role_representation.
+      id:
+        type: str
         description:
-            - Roles to be mapped to the group.
-        type: list
-        elements: dict
-        suboptions:
-            name:
-                type: str
-                description:
-                    - Name of the role_representation.
-                    - This parameter is required only when creating or updating the role_representation.
-            id:
-                type: str
-                description:
-                    - The unique identifier for this role_representation.
-                    - This parameter is not required for updating or deleting a role_representation but
-                      providing it will reduce the number of API calls required.
-
+          - The unique identifier for this role_representation.
+          - This parameter is not required for updating or deleting a role_representation but providing it will reduce the
+            number of API calls required.
 extends_documentation_fragment:
-    - community.general.keycloak
-    - community.general.attributes
+  - community.general.keycloak
+  - community.general.keycloak.actiongroup_keycloak
+  - community.general.attributes
 
 author:
-    - Gaëtan Daubresse (@Gaetan2907)
-'''
+  - Gaëtan Daubresse (@Gaetan2907)
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Map a client role to a group, authentication with credentials
   community.general.keycloak_client_rolemapping:
     realm: MyCustomRealm
@@ -206,50 +196,37 @@ EXAMPLES = '''
       - name: role_name2
         id: role_id2
   delegate_to: localhost
+"""
 
-'''
-
-RETURN = '''
+RETURN = r"""
 msg:
-    description: Message as to what action was taken.
-    returned: always
-    type: str
-    sample: "Role role1 assigned to group group1."
+  description: Message as to what action was taken.
+  returned: always
+  type: str
+  sample: "Role role1 assigned to group group1."
 
 proposed:
-    description: Representation of proposed client role mapping.
-    returned: always
-    type: dict
-    sample: {
-      clientId: "test"
-    }
+  description: Representation of proposed client role mapping.
+  returned: always
+  type: dict
+  sample: {clientId: "test"}
 
 existing:
-    description:
-      - Representation of existing client role mapping.
-      - The sample is truncated.
-    returned: always
-    type: dict
-    sample: {
-        "adminUrl": "http://www.example.com/admin_url",
-        "attributes": {
-            "request.object.signature.alg": "RS256",
-        }
-    }
+  description:
+    - Representation of existing client role mapping.
+    - The sample is truncated.
+  returned: always
+  type: dict
+  sample: {"adminUrl": "http://www.example.com/admin_url", "attributes": {"request.object.signature.alg": "RS256"}}
 
 end_state:
-    description:
-      - Representation of client role mapping after module execution.
-      - The sample is truncated.
-    returned: on success
-    type: dict
-    sample: {
-        "adminUrl": "http://www.example.com/admin_url",
-        "attributes": {
-            "request.object.signature.alg": "RS256",
-        }
-    }
-'''
+  description:
+    - Representation of client role mapping after module execution.
+    - The sample is truncated.
+  returned: on success
+  type: dict
+  sample: {"adminUrl": "http://www.example.com/admin_url", "attributes": {"request.object.signature.alg": "RS256"}}
+"""
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
     KeycloakAPI, keycloak_argument_spec, get_token, KeycloakError,
@@ -291,8 +268,10 @@ def main():
 
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True,
-                           required_one_of=([['token', 'auth_realm', 'auth_username', 'auth_password']]),
-                           required_together=([['auth_realm', 'auth_username', 'auth_password']]))
+                           required_one_of=([['token', 'auth_realm', 'auth_username', 'auth_password', 'auth_client_id', 'auth_client_secret']]),
+                           required_together=([['auth_username', 'auth_password']]),
+                           required_by={'refresh_token': 'auth_realm'},
+                           )
 
     result = dict(changed=False, msg='', diff={}, proposed={}, existing={}, end_state={})
 

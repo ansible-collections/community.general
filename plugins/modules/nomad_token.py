@@ -9,60 +9,59 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: nomad_token
 author: Pedro Nascimento (@apecnascimento)
 version_added: "8.1.0"
 short_description: Manage Nomad ACL tokens
 description:
-    - This module allows to create Bootstrap tokens, create ACL tokens, update ACL tokens, and delete ACL tokens.
+  - This module allows to create Bootstrap tokens, create ACL tokens, update ACL tokens, and delete ACL tokens.
 requirements:
-    - python-nomad
+  - python-nomad
 extends_documentation_fragment:
-    - community.general.nomad
-    - community.general.attributes
+  - community.general.nomad
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    name:
-        description:
-            - Name of ACL token to create.
-        type: str
-    token_type:
-        description:
-            - The type of the token can be V(client), V(management), or V(bootstrap).
-        choices: ["client", "management", "bootstrap"]
-        type: str
-        default: "client"
-    policies:
-        description:
-            - A list of the policies assigned to the token.
-        type: list
-        elements: str
-        default: []
-    global_replicated:
-        description:
-            - Indicates whether or not the token was created with the C(--global).
-        type: bool
-        default: false
-    state:
-        description:
-            - Create or remove ACL token.
-        choices: ["present", "absent"]
-        required: true
-        type: str
+  name:
+    description:
+      - Name of ACL token to create.
+    type: str
+  token_type:
+    description:
+      - The type of the token can be V(client), V(management), or V(bootstrap).
+    choices: ["client", "management", "bootstrap"]
+    type: str
+    default: "client"
+  policies:
+    description:
+      - A list of the policies assigned to the token.
+    type: list
+    elements: str
+    default: []
+  global_replicated:
+    description:
+      - Indicates whether or not the token was created with the C(--global).
+    type: bool
+    default: false
+  state:
+    description:
+      - Create or remove ACL token.
+    choices: ["present", "absent"]
+    required: true
+    type: str
 
 seealso:
   - name: Nomad ACL documentation
     description: Complete documentation for Nomad API ACL.
     link: https://developer.hashicorp.com/nomad/api-docs/acl/tokens
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create boostrap token
   community.general.nomad_token:
     host: localhost
@@ -75,7 +74,7 @@ EXAMPLES = '''
     name: "Dev token"
     token_type: client
     policies:
-        - readonly
+      - readonly
     global_replicated: false
     state: absent
 
@@ -85,8 +84,8 @@ EXAMPLES = '''
     name: "Dev token"
     token_type: client
     policies:
-        - readonly
-        - devpolicy
+      - readonly
+      - devpolicy
     global_replicated: false
     state: absent
 
@@ -95,31 +94,32 @@ EXAMPLES = '''
     host: localhost
     name: "Dev token"
     state: absent
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 result:
-    description: Result returned by nomad.
-    returned: always
-    type: dict
-    sample: {
-        "accessor_id": "0d01c55f-8d63-f832-04ff-1866d4eb594e",
-        "create_index": 14,
-        "create_time": "2023-11-12T18:48:34.248857001Z",
-        "expiration_time": null,
-        "expiration_ttl": "",
-        "global": true,
-        "hash": "eSn8H8RVqh8As8WQNnC2vlBRqXy6DECogc5umzX0P30=",
-        "modify_index": 836,
-        "name": "devs",
-        "policies": [
-            "readonly"
-        ],
-        "roles": null,
-        "secret_id": "12e878ab-e1f6-e103-b4c4-3b5173bb4cea",
-        "type": "client"
+  description: Result returned by nomad.
+  returned: always
+  type: dict
+  sample:
+    {
+      "accessor_id": "0d01c55f-8d63-f832-04ff-1866d4eb594e",
+      "create_index": 14,
+      "create_time": "2023-11-12T18:48:34.248857001Z",
+      "expiration_time": null,
+      "expiration_ttl": "",
+      "global": true,
+      "hash": "eSn8H8RVqh8As8WQNnC2vlBRqXy6DECogc5umzX0P30=",
+      "modify_index": 836,
+      "name": "devs",
+      "policies": [
+        "readonly"
+      ],
+      "roles": null,
+      "secret_id": "12e878ab-e1f6-e103-b4c4-3b5173bb4cea",
+      "type": "client"
     }
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native

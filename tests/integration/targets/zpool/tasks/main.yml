@@ -1,0 +1,25 @@
+---
+# Copyright (c) 2025, Tom Hesse <contact@tomhesse.xyz>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Execute integration tests
+  become: true
+  block:
+    - name: Ensure disk files exists
+      ansible.builtin.command:
+        cmd: "dd if=/dev/zero of={{ item }} bs=1M count=256 conv=fsync"
+        creates: "{{ item }}"
+      loop: "{{ zpool_disk_configs }}"
+
+    - name: Include distribution specific install_requirements.yml
+      ansible.builtin.include_tasks: install_requirements_{{ ansible_distribution | lower }}.yml
+
+    - name: Include create_destroy.yml
+      ansible.builtin.include_tasks: create_destroy.yml
+
+    - name: Include add_remove_vdevs.yml
+      ansible.builtin.include_tasks: add_remove_vdevs.yml
+
+    - name: Include properties.yml
+      ansible.builtin.include_tasks: properties.yml

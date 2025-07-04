@@ -13,15 +13,14 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 DOCUMENTATION = r"""
----
 module: keyring_info
 version_added: 5.2.0
 author:
   - Alexander Hussey (@ahussey-redhat)
 short_description: Get a passphrase using the Operating System's native keyring
 description: >-
-  This module uses the L(keyring Python library, https://pypi.org/project/keyring/)
-  to retrieve passphrases for a given service and username from the OS' native keyring.
+  This module uses the L(keyring Python library, https://pypi.org/project/keyring/) to retrieve passphrases for a given service
+  and username from the OS' native keyring.
 requirements:
   - keyring (Python library)
   - gnome-keyring (application - required for headless Linux keyring access)
@@ -45,24 +44,24 @@ options:
 """
 
 EXAMPLES = r"""
-  - name: Retrieve password for service_name/user_name
-    community.general.keyring_info:
-      service: test
-      username: test1
-      keyring_password: "{{ keyring_password }}"
-    register: test_password
+- name: Retrieve password for service_name/user_name
+  community.general.keyring_info:
+    service: test
+    username: test1
+    keyring_password: "{{ keyring_password }}"
+  register: test_password
 
-  - name: Display password
-    ansible.builtin.debug:
-      msg: "{{ test_password.passphrase }}"
+- name: Display password
+  ansible.builtin.debug:
+    msg: "{{ test_password.passphrase }}"
 """
 
 RETURN = r"""
-  passphrase:
-    description: A string containing the password.
-    returned: success and the password exists
-    type: str
-    sample: Password123
+passphrase:
+  description: A string containing the password.
+  returned: success and the password exists
+  type: str
+  sample: Password123
 """
 
 try:

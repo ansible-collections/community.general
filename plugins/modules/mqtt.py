@@ -9,8 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: mqtt
 short_description: Publish a message on an MQTT topic for the IoT
 description:
@@ -26,12 +25,12 @@ options:
   server:
     type: str
     description:
-      - MQTT broker address/name
+      - MQTT broker address/name.
     default: localhost
   port:
     type: int
     description:
-      - MQTT broker port number
+      - MQTT broker port number.
     default: 1883
   username:
     type: str
@@ -44,76 +43,68 @@ options:
   client_id:
     type: str
     description:
-      - MQTT client identifier
+      - MQTT client identifier.
       - If not specified, a value C(hostname + pid) will be used.
   topic:
     type: str
     description:
-      - MQTT topic name
+      - MQTT topic name.
     required: true
   payload:
     type: str
     description:
-      - Payload. The special string V("None") may be used to send a NULL
-        (that is, empty) payload which is useful to simply notify with the O(topic)
-        or to clear previously retained messages.
+      - Payload. The special string V("None") may be used to send a NULL (that is, empty) payload which is useful to simply
+        notify with the O(topic) or to clear previously retained messages.
     required: true
   qos:
     type: str
     description:
-      - QoS (Quality of Service)
+      - QoS (Quality of Service).
     default: "0"
-    choices: [ "0", "1", "2" ]
+    choices: ["0", "1", "2"]
   retain:
     description:
-      - Setting this flag causes the broker to retain (i.e. keep) the message so that
-        applications that subsequently subscribe to the topic can received the last
-        retained message immediately.
+      - Setting this flag causes the broker to retain (in other words keep) the message so that applications that subsequently
+        subscribe to the topic can received the last retained message immediately.
     type: bool
     default: false
   ca_cert:
     type: path
     description:
-      - The path to the Certificate Authority certificate files that are to be
-        treated as trusted by this client. If this is the only option given
-        then the client will operate in a similar manner to a web browser. That
-        is to say it will require the broker to have a certificate signed by the
-        Certificate Authorities in ca_certs and will communicate using TLS v1,
-        but will not attempt any form of authentication. This provides basic
-        network encryption but may not be sufficient depending on how the broker
-        is configured.
-    aliases: [ ca_certs ]
+      - The path to the Certificate Authority certificate files that are to be treated as trusted by this client. If this
+        is the only option given then the client will operate in a similar manner to a web browser. That is to say it will
+        require the broker to have a certificate signed by the Certificate Authorities in ca_certs and will communicate using
+        TLS v1, but will not attempt any form of authentication. This provides basic network encryption but may not be sufficient
+        depending on how the broker is configured.
+    aliases: [ca_certs]
   client_cert:
     type: path
     description:
-      - The path pointing to the PEM encoded client certificate. If this is not
-        None it will be used as client information for TLS based
-        authentication. Support for this feature is broker dependent.
-    aliases: [ certfile ]
+      - The path pointing to the PEM encoded client certificate. If this is not None it will be used as client information
+        for TLS based authentication. Support for this feature is broker dependent.
+    aliases: [certfile]
   client_key:
     type: path
     description:
-      - The path pointing to the PEM encoded client private key. If this is not
-        None it will be used as client information for TLS based
-        authentication. Support for this feature is broker dependent.
-    aliases: [ keyfile ]
+      - The path pointing to the PEM encoded client private key. If this is not None it will be used as client information
+        for TLS based authentication. Support for this feature is broker dependent.
+    aliases: [keyfile]
   tls_version:
     description:
       - Specifies the version of the SSL/TLS protocol to be used.
-      - By default (if the python version supports it) the highest TLS version is
-        detected. If unavailable, TLS v1 is used.
+      - By default (if the python version supports it) the highest TLS version is detected. If unavailable, TLS v1 is used.
     type: str
     choices:
       - tlsv1.1
       - tlsv1.2
-requirements: [ mosquitto ]
+requirements: [mosquitto]
 notes:
- - This module requires a connection to an MQTT broker such as Mosquitto
-   U(http://mosquitto.org) and the I(Paho) C(mqtt) Python client (U(https://pypi.org/project/paho-mqtt/)).
+  - This module requires a connection to an MQTT broker such as Mosquitto U(http://mosquitto.org) and the I(Paho) C(mqtt)
+    Python client (U(https://pypi.org/project/paho-mqtt/)).
 author: "Jan-Piet Mens (@jpmens)"
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Publish a message on an MQTT topic
   community.general.mqtt:
     topic: 'service/ansible/{{ ansible_hostname }}'
@@ -122,7 +113,7 @@ EXAMPLES = '''
     retain: false
     client_id: ans001
   delegate_to: localhost
-'''
+"""
 
 # ===========================================
 # MQTT module support methods.

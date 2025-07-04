@@ -46,8 +46,8 @@ class FileLock:
         '''
         Create a lock file based on path with flock to prevent other processes
         using given path.
-        Please note that currently file locking only works when it's executed by
-        the same user, I.E single user scenarios
+        Please note that currently file locking only works when it is executed by
+        the same user, for example single user scenarios
 
         :kw path: Path (file) to lock
         :kw tmpdir: Path where to place the temporary .lock file

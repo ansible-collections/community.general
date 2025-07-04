@@ -8,7 +8,7 @@ __metaclass__ = type
 import pytest
 
 from ansible_collections.community.general.plugins.modules import linode
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args
 
 from .linode_conftest import api_key, auth  # noqa: F401, pylint: disable=unused-import
 
@@ -18,5 +18,5 @@ if not linode.HAS_LINODE:
 
 def test_name_is_a_required_parameter(api_key, auth):
     with pytest.raises(SystemExit):
-        set_module_args({})
-        linode.main()
+        with set_module_args({}):
+            linode.main()

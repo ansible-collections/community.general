@@ -7,13 +7,12 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: ipa_sudocmdgroup
 author: Thomas Krahn (@Nosmoht)
 short_description: Manage FreeIPA sudo command group
 description:
-- Add, modify or delete sudo command group within IPA server using IPA API.
+  - Add, modify or delete sudo command group within IPA server using IPA API.
 attributes:
   check_mode:
     support: full
@@ -22,13 +21,13 @@ attributes:
 options:
   cn:
     description:
-    - Sudo Command Group.
+      - Sudo Command Group.
     aliases: ['name']
     required: true
     type: str
   description:
     description:
-    - Group description.
+      - Group description.
     type: str
   state:
     description: State to ensure.
@@ -37,24 +36,23 @@ options:
     type: str
   sudocmd:
     description:
-    - List of sudo commands to assign to the group.
-    - If an empty list is passed all assigned commands will be removed from the group.
-    - If option is omitted sudo commands will not be checked or changed.
+      - List of sudo commands to assign to the group.
+      - If an empty list is passed all assigned commands will be removed from the group.
+      - If option is omitted sudo commands will not be checked or changed.
     type: list
     elements: str
 extends_documentation_fragment:
   - community.general.ipa.documentation
   - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Ensure sudo command group exists
   community.general.ipa_sudocmdgroup:
     name: group01
     description: Group of important commands
     sudocmd:
-    - su
+      - su
     ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
@@ -66,14 +64,14 @@ EXAMPLES = r'''
     ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 sudocmdgroup:
-  description: Sudo command group as returned by IPA API
+  description: Sudo command group as returned by IPA API.
   returned: always
   type: dict
-'''
+"""
 
 import traceback
 

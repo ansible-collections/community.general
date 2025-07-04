@@ -35,5 +35,5 @@
 
     - set_fact:
         mount_root_dir: "{{ test_dir }}/iso_mount"
-  when: 
+  when:
     - ansible_distribution != "MacOSX"

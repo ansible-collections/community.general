@@ -35,12 +35,12 @@
   vars:
     params:
       files:
-      - '{{ ansible_distribution }}-{{ ansible_distribution_major_version }}{{ python_suffix }}.yml'
-      - '{{ ansible_distribution }}-{{ ansible_distribution_version }}{{ python_suffix }}.yml'
-      - '{{ ansible_os_family }}{{ python_suffix }}.yml'
-      - default{{ python_suffix }}.yml
+        - '{{ ansible_distribution }}-{{ ansible_distribution_major_version }}{{ python_suffix }}.yml'
+        - '{{ ansible_distribution }}-{{ ansible_distribution_version }}{{ python_suffix }}.yml'
+        - '{{ ansible_os_family }}{{ python_suffix }}.yml'
+        - default{{ python_suffix }}.yml
       paths:
-      - '{{ role_path }}/vars'
+        - '{{ role_path }}/vars'
 
 - name: make sure the dbus service is started under systemd
   systemd:
@@ -79,8 +79,8 @@
   ignore_errors: true
   when: ansible_os_family == "Debian"
   loop:
-  - /etc/postgresql
-  - /var/lib/postgresql
+    - /etc/postgresql
+    - /var/lib/postgresql
   loop_control:
     loop_var: loop_item
 
@@ -170,38 +170,38 @@
     name: '{{ item }}'
     state: present
   with_items:
-  - pt_BR
-  - es_ES
+    - pt_BR
+    - es_ES
   when: ansible_os_family == 'Debian'
 
 - block:
-  - name: Install langpacks (RHEL8)
-    yum:
-      name:
-      - glibc-langpack-es
-      - glibc-langpack-pt
-      - glibc-all-langpacks
-      state: present
-    when: ansible_distribution_major_version is version('8', '>=')
+    - name: Install langpacks (RHEL8)
+      yum:
+        name:
+          - glibc-langpack-es
+          - glibc-langpack-pt
+          - glibc-all-langpacks
+        state: present
+      when: ansible_distribution_major_version is version('8', '>=')
 
-  - name: Check if locales need to be generated (RedHat)
-    shell: localedef --list-archive | grep -a -q '^{{ locale }}$'
-    register: locale_present
-    ignore_errors: true
-    with_items:
-    - es_ES
-    - pt_BR
-    loop_control:
-      loop_var: locale
+    - name: Check if locales need to be generated (RedHat)
+      shell: localedef --list-archive | grep -a -q '^{{ locale }}$'
+      register: locale_present
+      ignore_errors: true
+      with_items:
+        - es_ES
+        - pt_BR
+      loop_control:
+        loop_var: locale
 
-  - name: Reinstall internationalization files
-    shell: yum -y reinstall glibc-common || yum -y install glibc-common
-    when: locale_present is failed
+    - name: Reinstall internationalization files
+      shell: yum -y reinstall glibc-common || yum -y install glibc-common
+      when: locale_present is failed
 
-  - name: Generate locale (RedHat)
-    command: localedef -f ISO-8859-1 -i {{ item.locale }} {{ item.locale }}
-    when: item is failed
-    with_items: '{{ locale_present.results }}'
+    - name: Generate locale (RedHat)
+      command: localedef -f ISO-8859-1 -i {{ item.locale }} {{ item.locale }}
+      when: item is failed
+      with_items: '{{ locale_present.results }}'
   when: ansible_os_family == 'RedHat' and ansible_distribution != 'Fedora'
 
 - name: Install glibc langpacks (Fedora >= 24)
@@ -209,8 +209,8 @@
     name: '{{ item }}'
     state: latest
   with_items:
-  - glibc-langpack-es
-  - glibc-langpack-pt
+    - glibc-langpack-es
+    - glibc-langpack-pt
   when: ansible_distribution == 'Fedora' and ansible_distribution_major_version is version('24', '>=')
 
 - name: enable postgresql service (FreeBSD)
@@ -257,9 +257,9 @@
     dest: /usr/share/postgresql/{{ pg_ver }}/extension/{{ item }}
     mode: '0444'
   with_items:
-  - dummy--1.0.sql
-  - dummy--2.0.sql
-  - dummy--3.0.sql
+    - dummy--1.0.sql
+    - dummy--2.0.sql
+    - dummy--3.0.sql
   when: ansible_os_family == 'Debian'
 
 - name: add update paths
@@ -268,8 +268,8 @@
     mode: '0444'
     state: touch
   with_items:
-  - dummy--1.0--2.0.sql
-  - dummy--2.0--3.0.sql
+    - dummy--1.0--2.0.sql
+    - dummy--2.0--3.0.sql
   when: ansible_os_family == 'Debian'
 
 - name: Get PostgreSQL version

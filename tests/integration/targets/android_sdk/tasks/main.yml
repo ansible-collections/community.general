@@ -1,0 +1,31 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# java >= 17 is not available in RHEL and CentOS7 repos, which is required for sdkmanager to run
+- name: Bail out if not supported
+  when:
+    - "ansible_os_family == 'RedHat' and ansible_distribution_version is version('8.0', '<')"
+  ansible.builtin.meta: end_play
+
+- name: Run android_sdk tests
+  environment:
+    PATH: '{{ ansible_env.PATH }}:{{ android_sdk_location }}/cmdline-tools/latest/bin'
+  block:
+    - import_tasks: setup.yml
+
+    - name: Run default tests
+      import_tasks: default-tests.yml
+      when: ansible_os_family != 'FreeBSD'
+
+    # Most of the important Android SDK packages are not available on FreeBSD (like, build-tools, platform-tools and so on),
+    # but at least some of the functionality can be tested (like, downloading sources)
+    - name: Run FreeBSD tests
+      import_tasks: freebsd-tests.yml
+      when: ansible_os_family == 'FreeBSD'

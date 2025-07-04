@@ -8,54 +8,54 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: sysupgrade
 short_description: Manage OpenBSD system upgrades
 version_added: 1.1.0
 description:
-    - Manage OpenBSD system upgrades using sysupgrade.
+  - Manage OpenBSD system upgrades using C(sysupgrade).
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    snapshot:
-        description:
-        - Apply the latest snapshot.
-        - Otherwise release will be applied.
-        default: false
-        type: bool
-    force:
-        description:
-        - Force upgrade (for snapshots only).
-        default: false
-        type: bool
-    keep_files:
-        description:
-        - Keep the files under /home/_sysupgrade.
-        - By default, the files will be deleted after the upgrade.
-        default: false
-        type: bool
-    fetch_only:
-        description:
-        - Fetch and verify files and create /bsd.upgrade but do not reboot.
-        - Set to V(false) if you want sysupgrade to reboot. This will cause Ansible to error, as it expects the module to exit gracefully. See the examples.
-        default: true
-        type: bool
-    installurl:
-        description:
-        - OpenBSD mirror top-level URL for fetching an upgrade.
-        - By default, the mirror URL is pulled from /etc/installurl.
-        type: str
+  snapshot:
+    description:
+      - Apply the latest snapshot.
+      - Otherwise release will be applied.
+    default: false
+    type: bool
+  force:
+    description:
+      - Force upgrade (for snapshots only).
+    default: false
+    type: bool
+  keep_files:
+    description:
+      - Keep the files under C(/home/_sysupgrade).
+      - By default, the files will be deleted after the upgrade.
+    default: false
+    type: bool
+  fetch_only:
+    description:
+      - Fetch and verify files and create C(/bsd.upgrade) but do not reboot.
+      - Set to V(false) if you want C(sysupgrade) to reboot. This will cause Ansible to error, as it expects the module to
+        exit gracefully. See the examples.
+    default: true
+    type: bool
+  installurl:
+    description:
+      - OpenBSD mirror top-level URL for fetching an upgrade.
+      - By default, the mirror URL is pulled from C(/etc/installurl).
+    type: str
 author:
-    - Andrew Klaus (@precurse)
-'''
+  - Andrew Klaus (@precurse)
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Upgrade to latest release
   community.general.sysupgrade:
   register: sysupgrade
@@ -77,9 +77,9 @@ EXAMPLES = r'''
   community.general.sysupgrade:
     fetch_only: false
   ignore_errors: true
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 rc:
   description: The command return code (0 means success).
   returned: always
@@ -93,7 +93,7 @@ stderr:
   returned: always
   type: str
   sample: "sysupgrade: need root privileges"
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 

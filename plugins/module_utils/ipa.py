@@ -104,7 +104,7 @@ class IPAClient(object):
 
     def get_ipa_version(self):
         response = self.ping()['summary']
-        ipa_ver_regex = re.compile(r'IPA server version (\d\.\d\.\d).*')
+        ipa_ver_regex = re.compile(r'IPA server version (\d+\.\d+\.\d+).*')
         version_match = ipa_ver_regex.match(response)
         ipa_version = None
         if version_match:

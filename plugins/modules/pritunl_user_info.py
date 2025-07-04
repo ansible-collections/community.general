@@ -8,45 +8,42 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = """
----
+DOCUMENTATION = r"""
 module: pritunl_user_info
 author: "Florian Dambrine (@Lowess)"
 version_added: 2.3.0
 short_description: List Pritunl Users using the Pritunl API
 description:
-    - A module to list Pritunl users using the Pritunl API.
+  - A module to list Pritunl users using the Pritunl API.
 extends_documentation_fragment:
-    - community.general.pritunl
-    - community.general.attributes
-    - community.general.attributes.info_module
+  - community.general.pritunl
+  - community.general.attributes
+  - community.general.attributes.info_module
 options:
-    organization:
-        type: str
-        required: true
-        aliases:
-            - org
-        description:
-            - The name of the organization the user is part of.
-
-    user_name:
-        type: str
-        required: false
-        description:
-            - Name of the user to filter on Pritunl.
-
-    user_type:
-        type: str
-        required: false
-        default: client
-        choices:
-            - client
-            - server
-        description:
-            - Type of the user O(user_name).
+  organization:
+    type: str
+    required: true
+    aliases:
+      - org
+    description:
+      - The name of the organization the user is part of.
+  user_name:
+    type: str
+    required: false
+    description:
+      - Name of the user to filter on Pritunl.
+  user_type:
+    type: str
+    required: false
+    default: client
+    choices:
+      - client
+      - server
+    description:
+      - Type of the user O(user_name).
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: List all existing users part of the organization MyOrg
   community.general.pritunl_user_info:
     state: list
@@ -59,40 +56,41 @@ EXAMPLES = """
     user_name: Florian
 """
 
-RETURN = """
+RETURN = r"""
 users:
-    description: List of Pritunl users.
-    returned: success
-    type: list
-    elements: dict
-    sample:
-        [
-            {
-                "audit": false,
-                "auth_type": "google",
-                "bypass_secondary": false,
-                "client_to_client": false,
-                "disabled": false,
-                "dns_mapping": null,
-                "dns_servers": null,
-                "dns_suffix": null,
-                "email": "foo@bar.com",
-                "gravatar": true,
-                "groups": [
-                    "foo", "bar"
-                ],
-                "id": "5d070dafe63q3b2e6s472c3b",
-                "name": "foo@acme.com",
-                "network_links": [],
-                "organization": "58070daee6sf342e6e4s2c36",
-                "organization_name": "Acme",
-                "otp_auth": true,
-                "otp_secret": "35H5EJA3XB2$4CWG",
-                "pin": false,
-                "port_forwarding": [],
-                "servers": [],
-            }
-        ]
+  description: List of Pritunl users.
+  returned: success
+  type: list
+  elements: dict
+  sample:
+    [
+      {
+        "audit": false,
+        "auth_type": "google",
+        "bypass_secondary": false,
+        "client_to_client": false,
+        "disabled": false,
+        "dns_mapping": null,
+        "dns_servers": null,
+        "dns_suffix": null,
+        "email": "foo@bar.com",
+        "gravatar": true,
+        "groups": [
+          "foo",
+          "bar"
+        ],
+        "id": "5d070dafe63q3b2e6s472c3b",
+        "name": "foo@acme.com",
+        "network_links": [],
+        "organization": "58070daee6sf342e6e4s2c36",
+        "organization_name": "Acme",
+        "otp_auth": true,
+        "otp_secret": "35H5EJA3XB2$4CWG",
+        "pin": false,
+        "port_forwarding": [],
+        "servers": []
+      }
+    ]
 """
 
 from ansible.module_utils.basic import AnsibleModule

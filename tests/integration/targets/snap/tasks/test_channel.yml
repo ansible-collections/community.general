@@ -3,47 +3,46 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: Make sure package is not installed (microk8s)
+# NOTE This is currently disabled for performance reasons!
+
+- name: Make sure package is not installed (wisdom)
   community.general.snap:
-    name: microk8s
+    name: wisdom
     state: absent
 
 # Test for https://github.com/ansible-collections/community.general/issues/1606
-- name: Install package (microk8s)
+- name: Install package (wisdom)
   community.general.snap:
-    name: microk8s
-    classic: true
+    name: wisdom
     state: present
-  register: install_microk8s
+  register: install_wisdom
 
-- name: Install package with channel (microk8s)
+- name: Install package with channel (wisdom)
   community.general.snap:
-    name: microk8s
-    classic: true
-    channel: 1.20/stable
+    name: wisdom
     state: present
-  register: install_microk8s_chan
+    channel: latest/edge
+  register: install_wisdom_chan
 
-- name: Install package with channel (microk8s) again
+- name: Install package with channel (wisdom) again
   community.general.snap:
-    name: microk8s
-    classic: true
-    channel: 1.20/stable
+    name: wisdom
     state: present
-  register: install_microk8s_chan_again
+    channel: latest/edge
+  register: install_wisdom_chan_again
 
-- name: Remove package (microk8s)
+- name: Remove package (wisdom)
   community.general.snap:
-    name: microk8s
+    name: wisdom
     state: absent
-  register: remove_microk8s
+  register: remove_wisdom
 
 - assert:
     that:
-      - install_microk8s is changed
-      - install_microk8s_chan is changed
-      - install_microk8s_chan_again is not changed
-      - remove_microk8s is changed
+      - install_wisdom is changed
+      - install_wisdom_chan is changed
+      - install_wisdom_chan_again is not changed
+      - remove_wisdom is changed
 
 - name: Install package (shellcheck)
   community.general.snap:

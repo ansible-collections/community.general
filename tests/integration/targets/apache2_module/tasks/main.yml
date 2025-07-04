@@ -8,21 +8,6 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: install apache via apt
-  apt:
-    name: "{{item}}"
-    state: present
-  when: "ansible_os_family == 'Debian'"
-  with_items:
-    - apache2
-    - libapache2-mod-evasive
-
-- name: install apache via zypper
-  community.general.zypper:
-    name: apache2
-    state: present
-  when: "ansible_os_family == 'Suse'"
-
 - name: test apache2_module
   block:
     - name: get list of enabled modules

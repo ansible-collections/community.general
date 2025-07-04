@@ -1,0 +1,11 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+version = 1
+
+[[annotations]]
+path = "changelogs/fragments/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Ansible Project"
+SPDX-License-Identifier = "GPL-3.0-or-later"

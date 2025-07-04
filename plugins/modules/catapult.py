@@ -11,14 +11,19 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: catapult
-short_description: Send a sms / mms using the catapult bandwidth api
+short_description: Send a sms / mms using the catapult bandwidth API
 description:
-    - Allows notifications to be sent using sms / mms via the catapult bandwidth api.
+  - Allows notifications to be sent using SMS / MMS using the catapult bandwidth API.
+deprecated:
+  removed_in: 13.0.0
+  why: >-
+    DNS fails to resolve the API endpoint used by the module since Oct 2024.
+    See L(the associated issue, https://github.com/ansible-collections/community.general/issues/10318) for details.
+  alternative: There is none.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
   check_mode:
     support: none
@@ -44,31 +49,30 @@ options:
   media:
     type: str
     description:
-      - For MMS messages, a media url to the location of the media to be sent with the message.
+      - For MMS messages, a media URL to the location of the media to be sent with the message.
   user_id:
     type: str
     description:
-      - User Id from Api account page.
+      - User ID from API account page.
     required: true
   api_token:
     type: str
     description:
-      - Api Token from Api account page.
+      - API Token from API account page.
     required: true
   api_secret:
     type: str
     description:
-      - Api Secret from Api account page.
+      - API Secret from API account page.
     required: true
 
 author: "Jonathan Mainguy (@Jmainguy)"
 notes:
-    - Will return changed even if the media url is wrong.
-    - Will return changed if the destination number is invalid.
+  - Will return changed even if the media URL is wrong.
+  - Will return changed if the destination number is invalid.
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Send a mms to multiple users
   community.general.catapult:
     src: "+15035555555"
@@ -89,16 +93,15 @@ EXAMPLES = '''
     user_id: "{{ user_id }}"
     api_token: "{{ api_token }}"
     api_secret: "{{ api_secret }}"
+"""
 
-'''
-
-RETURN = '''
+RETURN = r"""
 changed:
-    description: Whether the api accepted the message.
-    returned: always
-    type: bool
-    sample: true
-'''
+  description: Whether the API accepted the message.
+  returned: always
+  type: bool
+  sample: true
+"""
 
 
 import json

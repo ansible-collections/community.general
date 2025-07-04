@@ -7,9 +7,9 @@ __metaclass__ = type
 
 from ansible_collections.community.general.plugins.module_utils.source_control.bitbucket import BitbucketHelper
 from ansible_collections.community.general.plugins.modules import bitbucket_access_key
-from ansible_collections.community.general.tests.unit.compat import unittest
-from ansible_collections.community.general.tests.unit.compat.mock import patch
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleFailJson, AnsibleExitJson, ModuleTestCase, set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleFailJson, AnsibleExitJson, ModuleTestCase, set_module_args
 
 
 class TestBucketAccessKeyModule(ModuleTestCase):
@@ -19,15 +19,15 @@ class TestBucketAccessKeyModule(ModuleTestCase):
 
     def test_missing_key_with_present_state(self):
         with self.assertRaises(AnsibleFailJson) as exec_info:
-            set_module_args({
+            with set_module_args({
                 'client_id': 'ABC',
                 'client_secret': 'XXX',
                 'workspace': 'name',
                 'repository': 'repo',
                 'label': 'key name',
                 'state': 'present',
-            })
-            self.module.main()
+            }):
+                self.module.main()
 
         self.assertEqual(exec_info.exception.args[0]['msg'], self.module.error_messages['required_key'])
 
@@ -35,7 +35,7 @@ class TestBucketAccessKeyModule(ModuleTestCase):
     def test_create_deploy_key(self, *args):
         with patch.object(self.module, 'create_deploy_key') as create_deploy_key_mock:
             with self.assertRaises(AnsibleExitJson) as exec_info:
-                set_module_args({
+                with set_module_args({
                     'user': 'ABC',
                     'password': 'XXX',
                     'workspace': 'name',
@@ -43,8 +43,8 @@ class TestBucketAccessKeyModule(ModuleTestCase):
                     'key': 'public_key',
                     'label': 'key name',
                     'state': 'present',
-                })
-                self.module.main()
+                }):
+                    self.module.main()
 
             self.assertEqual(create_deploy_key_mock.call_count, 1)
             self.assertEqual(exec_info.exception.args[0]['changed'], True)
@@ -54,7 +54,7 @@ class TestBucketAccessKeyModule(ModuleTestCase):
     def test_create_deploy_key_check_mode(self, *args):
         with patch.object(self.module, 'create_deploy_key') as create_deploy_key_mock:
             with self.assertRaises(AnsibleExitJson) as exec_info:
-                set_module_args({
+                with set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
                     'workspace': 'name',
@@ -63,8 +63,8 @@ class TestBucketAccessKeyModule(ModuleTestCase):
                     'label': 'key name',
                     'state': 'present',
                     '_ansible_check_mode': True,
-                })
-                self.module.main()
+                }):
+                    self.module.main()
 
             self.assertEqual(create_deploy_key_mock.call_count, 0)
             self.assertEqual(exec_info.exception.args[0]['changed'], True)
@@ -105,7 +105,7 @@ class TestBucketAccessKeyModule(ModuleTestCase):
         with patch.object(self.module, 'delete_deploy_key') as delete_deploy_key_mock:
             with patch.object(self.module, 'create_deploy_key') as create_deploy_key_mock:
                 with self.assertRaises(AnsibleExitJson) as exec_info:
-                    set_module_args({
+                    with set_module_args({
                         'client_id': 'ABC',
                         'client_secret': 'XXX',
                         'workspace': 'name',
@@ -113,8 +113,8 @@ class TestBucketAccessKeyModule(ModuleTestCase):
                         'key': 'new public key',
                         'label': 'mykey',
                         'state': 'present',
-                    })
-                    self.module.main()
+                    }):
+                        self.module.main()
 
                 self.assertEqual(delete_deploy_key_mock.call_count, 1)
                 self.assertEqual(create_deploy_key_mock.call_count, 1)
@@ -156,7 +156,7 @@ class TestBucketAccessKeyModule(ModuleTestCase):
         with patch.object(self.module, 'delete_deploy_key') as delete_deploy_key_mock:
             with patch.object(self.module, 'create_deploy_key') as create_deploy_key_mock:
                 with self.assertRaises(AnsibleExitJson) as exec_info:
-                    set_module_args({
+                    with set_module_args({
                         'client_id': 'ABC',
                         'client_secret': 'XXX',
                         'workspace': 'name',
@@ -164,8 +164,8 @@ class TestBucketAccessKeyModule(ModuleTestCase):
                         'key': 'new public key',
                         'label': 'mykey',
                         'state': 'present',
-                    })
-                    self.module.main()
+                    }):
+                        self.module.main()
 
                 self.assertEqual(delete_deploy_key_mock.call_count, 0)
                 self.assertEqual(create_deploy_key_mock.call_count, 0)
@@ -207,7 +207,7 @@ class TestBucketAccessKeyModule(ModuleTestCase):
         with patch.object(self.module, 'delete_deploy_key') as delete_deploy_key_mock:
             with patch.object(self.module, 'create_deploy_key') as create_deploy_key_mock:
                 with self.assertRaises(AnsibleExitJson) as exec_info:
-                    set_module_args({
+                    with set_module_args({
                         'client_id': 'ABC',
                         'client_secret': 'XXX',
                         'workspace': 'name',
@@ -216,8 +216,8 @@ class TestBucketAccessKeyModule(ModuleTestCase):
                         'label': 'mykey',
                         'state': 'present',
                         '_ansible_check_mode': True,
-                    })
-                    self.module.main()
+                    }):
+                        self.module.main()
 
                 self.assertEqual(delete_deploy_key_mock.call_count, 0)
                 self.assertEqual(create_deploy_key_mock.call_count, 0)
@@ -258,15 +258,15 @@ class TestBucketAccessKeyModule(ModuleTestCase):
     def test_delete_deploy_key(self, *args):
         with patch.object(self.module, 'delete_deploy_key') as delete_deploy_key_mock:
             with self.assertRaises(AnsibleExitJson) as exec_info:
-                set_module_args({
+                with set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
                     'workspace': 'name',
                     'repository': 'repo',
                     'label': 'mykey',
                     'state': 'absent',
-                })
-                self.module.main()
+                }):
+                    self.module.main()
 
             self.assertEqual(delete_deploy_key_mock.call_count, 1)
             self.assertEqual(exec_info.exception.args[0]['changed'], True)
@@ -276,15 +276,15 @@ class TestBucketAccessKeyModule(ModuleTestCase):
     def test_delete_absent_deploy_key(self, *args):
         with patch.object(self.module, 'delete_deploy_key') as delete_deploy_key_mock:
             with self.assertRaises(AnsibleExitJson) as exec_info:
-                set_module_args({
+                with set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
                     'workspace': 'name',
                     'repository': 'repo',
                     'label': 'mykey',
                     'state': 'absent',
-                })
-                self.module.main()
+                }):
+                    self.module.main()
 
             self.assertEqual(delete_deploy_key_mock.call_count, 0)
             self.assertEqual(exec_info.exception.args[0]['changed'], False)
@@ -324,7 +324,7 @@ class TestBucketAccessKeyModule(ModuleTestCase):
     def test_delete_deploy_key_check_mode(self, *args):
         with patch.object(self.module, 'delete_deploy_key') as delete_deploy_key_mock:
             with self.assertRaises(AnsibleExitJson) as exec_info:
-                set_module_args({
+                with set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
                     'workspace': 'name',
@@ -332,8 +332,8 @@ class TestBucketAccessKeyModule(ModuleTestCase):
                     'label': 'mykey',
                     'state': 'absent',
                     '_ansible_check_mode': True,
-                })
-                self.module.main()
+                }):
+                    self.module.main()
 
             self.assertEqual(delete_deploy_key_mock.call_count, 0)
             self.assertEqual(exec_info.exception.args[0]['changed'], True)

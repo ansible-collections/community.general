@@ -1,0 +1,73 @@
+---
+# Copyright (c) 2025, Tom Hesse <contact@tomhesse.xyz>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Ensure pool with two mirrored disks exists
+  community.general.zpool:
+    name: "{{ zpool_generic_pool_name }}"
+    pool_properties:
+      ashift: 12
+    filesystem_properties:
+      compression: false
+    vdevs:
+      - type: mirror
+        disks: "{{ zpool_vdevs_disk_config.vdev3 }}"
+      - type: mirror
+        disks: "{{ zpool_vdevs_disk_config.vdev4 }}"
+    state: present
+
+- name: Test changing of a pool property
+  block:
+    - name: Change ashift from 12 to 13
+      community.general.zpool:
+        name: "{{ zpool_generic_pool_name }}"
+        pool_properties:
+          ashift: 13
+        vdevs:
+          - type: mirror
+            disks: "{{ zpool_vdevs_disk_config.vdev3 }}"
+          - type: mirror
+            disks: "{{ zpool_vdevs_disk_config.vdev4 }}"
+        state: present
+
+    - name: Check ashift
+      ansible.builtin.command:
+        cmd: "zpool get -H -o value ashift {{ zpool_generic_pool_name }}"
+      changed_when: false
+      register: ashift_check
+
+    - name: Assert ashift has changed
+      ansible.builtin.assert:
+        that:
+          - "'13' in ashift_check.stdout"
+
+- name: Test changing of a dataset property
+  block:
+    - name: Change compression from off to lz4
+      community.general.zpool:
+        name: "{{ zpool_generic_pool_name }}"
+        filesystem_properties:
+          compression: lz4
+        vdevs:
+          - type: mirror
+            disks: "{{ zpool_vdevs_disk_config.vdev3 }}"
+          - type: mirror
+            disks: "{{ zpool_vdevs_disk_config.vdev4 }}"
+        state: present
+
+    - name: Check compression
+      ansible.builtin.command:
+        cmd: "zfs get -H -o value compression {{ zpool_generic_pool_name }}"
+      changed_when: false
+      register: compression_check
+
+    - name: Assert compression has changed
+      ansible.builtin.assert:
+        that:
+          - "'lz4' in compression_check.stdout"
+
+- name: Cleanup pool
+  community.general.zpool:
+    name: "{{ zpool_generic_pool_name }}"
+    state: absent

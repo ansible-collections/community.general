@@ -10,27 +10,24 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: packet_volume_attachment
 
 short_description: Attach/detach a volume to a device in the Packet host
 
 description:
-     - Attach/detach a volume to a device in the Packet host.
-     - API is documented at U(https://www.packet.com/developers/api/volumes/).
-     - "This module creates the attachment route in the Packet API. In order to discover
-       the block devices on the server, you have to run the Attach Scripts,
-       as documented at U(https://help.packet.net/technical/storage/packet-block-storage-linux)."
-
+  - Attach/detach a volume to a device in the Packet host.
+  - API is documented at U(https://www.packet.com/developers/api/volumes/).
+  - This module creates the attachment route in the Packet API. In order to discover the block devices on the server, you
+    have to run the Attach Scripts, as documented at U(https://help.packet.net/technical/storage/packet-block-storage-linux).
 version_added: '0.2.0'
 
 author:
-    - Tomas Karasek (@t0mk) <tom.to.the.k@gmail.com>
-    - Nurfet Becirevic (@nurfet-becirevic) <nurfet.becirevic@gmail.com>
+  - Tomas Karasek (@t0mk) <tom.to.the.k@gmail.com>
+  - Nurfet Becirevic (@nurfet-becirevic) <nurfet.becirevic@gmail.com>
 
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 
 attributes:
   check_mode:
@@ -61,7 +58,7 @@ options:
     description:
       - Selector for the volume.
       - It can be a UUID, an API-generated volume name, or user-defined description string.
-      - 'Example values: 4a347482-b546-4f67-8300-fb5018ef0c5, volume-4a347482, "my volume"'
+      - 'Example values: V(4a347482-b546-4f67-8300-fb5018ef0c5), V(volume-4a347482), V(my volume).'
     type: str
     required: true
 
@@ -69,15 +66,14 @@ options:
     description:
       - Selector for the device.
       - It can be a UUID of the device, or a hostname.
-      - 'Example values: 98a14f7a-3d27-4478-b7cf-35b5670523f3, "my device"'
+      - 'Example values: 98a14f7a-3d27-4478-b7cf-35b5670523f3, "my device".'
     type: str
 
 requirements:
   - "packet-python >= 1.35"
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 # All the examples assume that you have your Packet API token in env var PACKET_API_TOKEN.
 # You can also pass the api token in module param auth_token.
 
@@ -122,19 +118,19 @@ EXAMPLES = '''
         volume: "{{ volname }}"
         device: "{{ devname }}"
         state: absent
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 volume_id:
-    description: UUID of volume addressed by the module call.
-    type: str
-    returned: success
+  description: UUID of volume addressed by the module call.
+  type: str
+  returned: success
 
 device_id:
-    description: UUID of device addressed by the module call.
-    type: str
-    returned: success
-'''
+  description: UUID of device addressed by the module call.
+  type: str
+  returned: success
+"""
 
 import uuid
 

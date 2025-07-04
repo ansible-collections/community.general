@@ -14,7 +14,7 @@ from io import StringIO
 from ansible.errors import AnsibleError
 from ansible.playbook.play_context import PlayContext
 from ansible.plugins.loader import connection_loader
-from ansible_collections.community.general.tests.unit.compat import mock
+from ansible_collections.community.internal_test_tools.tests.unit.compat import mock
 
 
 @pytest.fixture(autouse=True)
@@ -117,14 +117,14 @@ class TestLXCConnectionClass():
 
         # first call initializes the connection
         conn._connect()
-        assert conn.container_name is container1_name
+        assert conn.container_name == container1_name
         assert conn.container is not None
         assert conn.container.name == container1_name
         container1 = conn.container
 
         # second call is basically a no-op
         conn._connect()
-        assert conn.container_name is container1_name
+        assert conn.container_name == container1_name
         assert conn.container is container1
         assert conn.container.name == container1_name
 

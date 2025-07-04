@@ -9,9 +9,9 @@ __metaclass__ = type
 
 from contextlib import contextmanager
 
-from ansible_collections.community.general.tests.unit.compat import unittest
-from ansible_collections.community.general.tests.unit.compat.mock import patch
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, ModuleTestCase, set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleExitJson, ModuleTestCase, set_module_args
 
 from ansible_collections.community.general.plugins.modules import keycloak_authentication
 
@@ -163,17 +163,16 @@ class TestKeycloakAuthentication(ModuleTestCase):
         ]
         changed = True
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before, copy_auth_flow=return_value_copied,
-                                    get_executions_representation=return_value_executions_after) \
-                    as (mock_get_authentication_flow_by_alias, mock_copy_auth_flow, mock_create_empty_auth_flow,
-                        mock_get_executions_representation, mock_delete_authentication_flow_by_id):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before, copy_auth_flow=return_value_copied,
+                                        get_executions_representation=return_value_executions_after) \
+                        as (mock_get_authentication_flow_by_alias, mock_copy_auth_flow, mock_create_empty_auth_flow,
+                            mock_get_executions_representation, mock_delete_authentication_flow_by_id):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         # Verify number of call on each mock
         self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 1)
@@ -256,17 +255,16 @@ class TestKeycloakAuthentication(ModuleTestCase):
         ]
         changed = False
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before,
-                                    get_executions_representation=return_value_executions_after) \
-                    as (mock_get_authentication_flow_by_alias, mock_copy_auth_flow, mock_create_empty_auth_flow,
-                        mock_get_executions_representation, mock_delete_authentication_flow_by_id):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before,
+                                        get_executions_representation=return_value_executions_after) \
+                        as (mock_get_authentication_flow_by_alias, mock_copy_auth_flow, mock_create_empty_auth_flow,
+                            mock_get_executions_representation, mock_delete_authentication_flow_by_id):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         # Verify number of call on each mock
         self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 1)
@@ -328,17 +326,16 @@ class TestKeycloakAuthentication(ModuleTestCase):
         ]
         changed = True
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before,
-                                    get_executions_representation=return_value_executions_after, create_empty_auth_flow=return_value_created_empty_flow) \
-                    as (mock_get_authentication_flow_by_alias, mock_copy_auth_flow, mock_create_empty_auth_flow,
-                        mock_get_executions_representation, mock_delete_authentication_flow_by_id):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before,
+                                        get_executions_representation=return_value_executions_after, create_empty_auth_flow=return_value_created_empty_flow) \
+                        as (mock_get_authentication_flow_by_alias, mock_copy_auth_flow, mock_create_empty_auth_flow,
+                            mock_get_executions_representation, mock_delete_authentication_flow_by_id):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         # Verify number of call on each mock
         self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 1)
@@ -419,17 +416,16 @@ class TestKeycloakAuthentication(ModuleTestCase):
         ]
         changed = True
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before,
-                                    get_executions_representation=return_value_executions_after) \
-                    as (mock_get_authentication_flow_by_alias, mock_copy_auth_flow, mock_create_empty_auth_flow,
-                        mock_get_executions_representation, mock_delete_authentication_flow_by_id):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before,
+                                        get_executions_representation=return_value_executions_after) \
+                        as (mock_get_authentication_flow_by_alias, mock_copy_auth_flow, mock_create_empty_auth_flow,
+                            mock_get_executions_representation, mock_delete_authentication_flow_by_id):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         # Verify number of call on each mock
         self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 1)
@@ -472,16 +468,15 @@ class TestKeycloakAuthentication(ModuleTestCase):
         }]
         changed = True
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before) \
-                    as (mock_get_authentication_flow_by_alias, mock_copy_auth_flow, mock_create_empty_auth_flow,
-                        mock_get_executions_representation, mock_delete_authentication_flow_by_id):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before) \
+                        as (mock_get_authentication_flow_by_alias, mock_copy_auth_flow, mock_create_empty_auth_flow,
+                            mock_get_executions_representation, mock_delete_authentication_flow_by_id):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         # Verify number of call on each mock
         self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 1)
@@ -508,16 +503,15 @@ class TestKeycloakAuthentication(ModuleTestCase):
         return_value_auth_flow_before = [{}]
         changed = False
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before) \
-                    as (mock_get_authentication_flow_by_alias, mock_copy_auth_flow, mock_create_empty_auth_flow,
-                        mock_get_executions_representation, mock_delete_authentication_flow_by_id):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before) \
+                        as (mock_get_authentication_flow_by_alias, mock_copy_auth_flow, mock_create_empty_auth_flow,
+                            mock_get_executions_representation, mock_delete_authentication_flow_by_id):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         # Verify number of call on each mock
         self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 1)
@@ -596,17 +590,16 @@ class TestKeycloakAuthentication(ModuleTestCase):
         ]
         changed = True
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before,
-                                    get_executions_representation=return_value_executions_after, create_empty_auth_flow=return_value_created_empty_flow) \
-                    as (mock_get_authentication_flow_by_alias, mock_copy_auth_flow, mock_create_empty_auth_flow,
-                        mock_get_executions_representation, mock_delete_authentication_flow_by_id):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before,
+                                        get_executions_representation=return_value_executions_after, create_empty_auth_flow=return_value_created_empty_flow) \
+                        as (mock_get_authentication_flow_by_alias, mock_copy_auth_flow, mock_create_empty_auth_flow,
+                            mock_get_executions_representation, mock_delete_authentication_flow_by_id):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         # Verify number of call on each mock
         self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 1)

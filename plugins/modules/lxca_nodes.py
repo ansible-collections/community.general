@@ -8,16 +8,14 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 author:
   - Naval Patel (@navalkp)
   - Prashant Bhosale (@prabhosa)
 module: lxca_nodes
 short_description: Custom module for lxca nodes inventory utility
 description:
-  - This module returns/displays a inventory details of nodes
-
+  - This module returns/displays a inventory details of nodes.
 attributes:
   check_mode:
     support: none
@@ -26,34 +24,30 @@ attributes:
 
 options:
   uuid:
-    description:
-      uuid of device, this is string with length greater than 16.
+    description: UUID of device, this is string with length greater than 16.
     type: str
 
   command_options:
-    description:
-      options to filter nodes information
+    description: Options to filter nodes information.
     default: nodes
     choices:
-        - nodes
-        - nodes_by_uuid
-        - nodes_by_chassis_uuid
-        - nodes_status_managed
-        - nodes_status_unmanaged
+      - nodes
+      - nodes_by_uuid
+      - nodes_by_chassis_uuid
+      - nodes_status_managed
+      - nodes_status_unmanaged
     type: str
 
   chassis:
-    description:
-      uuid of chassis, this is string with length greater than 16.
+    description: UUID of chassis, this is string with length greater than 16.
     type: str
 
 extends_documentation_fragment:
   - community.general.lxca_common
   - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 # get all nodes info
 - name: Get nodes data from LXCA
   community.general.lxca_nodes:
@@ -95,28 +89,27 @@ EXAMPLES = '''
     login_password: Password
     auth_url: "https://10.243.15.168"
     command_options: nodes_status_unmanaged
+"""
 
-'''
-
-RETURN = r'''
+RETURN = r"""
 result:
-    description: nodes detail from lxca
-    returned: always
-    type: dict
-    sample:
-      nodeList:
-        - machineType: '6241'
-          model: 'AC1'
-          type: 'Rack-TowerServer'
-          uuid: '118D2C88C8FD11E4947B6EAE8B4BDCDF'
+  description: Nodes detail from lxca.
+  returned: always
+  type: dict
+  sample:
+    nodeList:
+      - machineType: '6241'
+        model: 'AC1'
+        type: 'Rack-TowerServer'
+        uuid: '118D2C88C8FD11E4947B6EAE8B4BDCDF'
           # bunch of properties
-        - machineType: '8871'
-          model: 'AC1'
-          type: 'Rack-TowerServer'
-          uuid: '223D2C88C8FD11E4947B6EAE8B4BDCDF'
+      - machineType: '8871'
+        model: 'AC1'
+        type: 'Rack-TowerServer'
+        uuid: '223D2C88C8FD11E4947B6EAE8B4BDCDF'
           # bunch of properties
         # Multiple nodes details
-'''
+"""
 
 import traceback
 from ansible.module_utils.basic import AnsibleModule

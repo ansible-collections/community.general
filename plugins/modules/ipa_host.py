@@ -7,8 +7,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: ipa_host
 author: Thomas Krahn (@Nosmoht)
 short_description: Manage FreeIPA host
@@ -22,66 +21,73 @@ attributes:
 options:
   fqdn:
     description:
-    - Full qualified domain name.
-    - Can not be changed as it is the unique identifier.
+      - Full qualified domain name.
+      - Can not be changed as it is the unique identifier.
     required: true
     aliases: ["name"]
     type: str
   description:
     description:
-    - A description of this host.
+      - A description of this host.
     type: str
   force:
     description:
-    - Force host name even if not in DNS.
+      - Force host name even if not in DNS.
     required: false
     type: bool
   ip_address:
     description:
-    - Add the host to DNS with this IP address.
+      - Add the host to DNS with this IP address.
     type: str
   mac_address:
     description:
-    - List of Hardware MAC address(es) off this host.
-    - If option is omitted MAC addresses will not be checked or changed.
-    - If an empty list is passed all assigned MAC addresses will be removed.
-    - MAC addresses that are already assigned but not passed will be removed.
+      - List of Hardware MAC address(es) off this host.
+      - If option is omitted MAC addresses will not be checked or changed.
+      - If an empty list is passed all assigned MAC addresses will be removed.
+      - MAC addresses that are already assigned but not passed will be removed.
     aliases: ["macaddress"]
     type: list
     elements: str
   ns_host_location:
     description:
-    - Host location (e.g. "Lab 2")
+      - Host location (for example V(Lab 2)).
     aliases: ["nshostlocation"]
     type: str
   ns_hardware_platform:
     description:
-    - Host hardware platform (e.g. "Lenovo T61")
+      - Host hardware platform (for example V(Lenovo T61")).
     aliases: ["nshardwareplatform"]
     type: str
   ns_os_version:
     description:
-    - Host operating system and version (e.g. "Fedora 9")
+      - Host operating system and version (for example V(Fedora 9)).
     aliases: ["nsosversion"]
     type: str
   user_certificate:
     description:
-    - List of Base-64 encoded server certificates.
-    - If option is omitted certificates will not be checked or changed.
-    - If an empty list is passed all assigned certificates will be removed.
-    - Certificates already assigned but not passed will be removed.
+      - List of Base-64 encoded server certificates.
+      - If option is omitted certificates will not be checked or changed.
+      - If an empty list is passed all assigned certificates will be removed.
+      - Certificates already assigned but not passed will be removed.
     aliases: ["usercertificate"]
     type: list
     elements: str
   state:
-    description: State to ensure.
+    description:
+      - State to ensure.
     default: present
     choices: ["absent", "disabled", "enabled", "present"]
     type: str
+  force_creation:
+    description:
+      - Create host if O(state=disabled) or O(state=enabled) but not present.
+    default: true
+    type: bool
+    version_added: 9.5.0
   update_dns:
     description:
-    - If set V(true) with O(state=absent), then removes DNS records of the host managed by FreeIPA DNS.
-    - This option has no effect for states other than "absent".
+      - If set V(true) with O(state=absent), then removes DNS records of the host managed by FreeIPA DNS.
+      - This option has no effect for states other than V(absent).
     type: bool
   random_password:
     description: Generate a random password to be used in bulk enrollment.
@@ -89,10 +95,9 @@ options:
 extends_documentation_fragment:
   - community.general.ipa.documentation
   - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Ensure host is present
   community.general.ipa_host:
     name: host01.example.com
@@ -102,8 +107,8 @@ EXAMPLES = r'''
     ns_os_version: CentOS 7
     ns_hardware_platform: Lenovo T61
     mac_address:
-    - "08:00:27:E3:B1:2D"
-    - "52:54:00:BD:97:1E"
+      - "08:00:27:E3:B1:2D"
+      - "52:54:00:BD:97:1E"
     state: present
     ipa_host: ipa.example.com
     ipa_user: admin
@@ -152,18 +157,18 @@ EXAMPLES = r'''
     ipa_user: admin
     ipa_pass: topsecret
     update_dns: true
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 host:
   description: Host as returned by IPA API.
   returned: always
   type: dict
 host_diff:
-  description: List of options that differ and would be changed
+  description: List of options that differ and would be changed.
   returned: if check mode and a difference is found
   type: list
-'''
+"""
 
 import traceback
 
@@ -233,26 +238,31 @@ def get_host_diff(client, ipa_host, module_host):
 def ensure(module, client):
     name = module.params['fqdn']
     state = module.params['state']
+    force_creation = module.params['force_creation']
 
     ipa_host = client.host_find(name=name)
     module_host = get_host_dict(description=module.params['description'],
-                                force=module.params['force'], ip_address=module.params['ip_address'],
+                                force=module.params['force'],
+                                ip_address=module.params['ip_address'],
                                 ns_host_location=module.params['ns_host_location'],
                                 ns_hardware_platform=module.params['ns_hardware_platform'],
                                 ns_os_version=module.params['ns_os_version'],
                                 user_certificate=module.params['user_certificate'],
                                 mac_address=module.params['mac_address'],
-                                random_password=module.params.get('random_password'),
+                                random_password=module.params['random_password'],
                                 )
     changed = False
     if state in ['present', 'enabled', 'disabled']:
-        if not ipa_host:
+        if not ipa_host and (force_creation or state == 'present'):
             changed = True
             if not module.check_mode:
                 # OTP password generated by FreeIPA is visible only for host_add command
                 # so, return directly from here.
                 return changed, client.host_add(name=name, host=module_host)
         else:
+            if state in ['disabled', 'enabled']:
+                module.fail_json(msg="No host with name " + ipa_host + " found")
+
             diff = get_host_diff(client, ipa_host, module_host)
             if len(diff) > 0:
                 changed = True
@@ -260,12 +270,15 @@ def ensure(module, client):
                     data = {}
                     for key in diff:
                         data[key] = module_host.get(key)
+                    if "usercertificate" not in data:
+                        data["usercertificate"] = [
+                            cert['__base64__'] for cert in ipa_host.get("usercertificate", [])
+                        ]
                     ipa_host_show = client.host_show(name=name)
-                    if ipa_host_show.get('has_keytab', False) and module.params.get('random_password'):
+                    if ipa_host_show.get('has_keytab', True) and (state == 'disabled' or module.params.get('random_password')):
                         client.host_disable(name=name)
                     return changed, client.host_mod(name=name, host=data)
-
-    else:
+    elif state == 'absent':
         if ipa_host:
             changed = True
             update_dns = module.params.get('update_dns', False)
@@ -288,7 +301,8 @@ def main():
                          mac_address=dict(type='list', aliases=['macaddress'], elements='str'),
                          update_dns=dict(type='bool'),
                          state=dict(type='str', default='present', choices=['present', 'absent', 'enabled', 'disabled']),
-                         random_password=dict(type='bool', no_log=False),)
+                         random_password=dict(type='bool', no_log=False),
+                         force_creation=dict(type='bool', default=True),)
 
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True)

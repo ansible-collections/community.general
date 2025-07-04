@@ -9,8 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: vertica_role
 short_description: Adds or removes Vertica database roles and assigns roles to them
 description:
@@ -64,19 +63,17 @@ options:
       - The password used to authenticate with.
     type: str
 notes:
-  - The default authentication assumes that you are either logging in as or sudo'ing
-    to the C(dbadmin) account on the host.
-  - This module uses C(pyodbc), a Python ODBC database adapter. You must ensure
-    that C(unixODBC) and C(pyodbc) is installed on the host and properly configured.
-  - Configuring C(unixODBC) for Vertica requires C(Driver = /opt/vertica/lib64/libverticaodbc.so)
-    to be added to the C(Vertica) section of either C(/etc/odbcinst.ini) or C($HOME/.odbcinst.ini)
-    and both C(ErrorMessagesPath = /opt/vertica/lib64) and C(DriverManagerEncoding = UTF-16)
-    to be added to the C(Driver) section of either C(/etc/vertica.ini) or C($HOME/.vertica.ini).
-requirements: [ 'unixODBC', 'pyodbc' ]
+  - The default authentication assumes that you are either logging in as or sudo'ing to the C(dbadmin) account on the host.
+  - This module uses C(pyodbc), a Python ODBC database adapter. You must ensure that C(unixODBC) and C(pyodbc) is installed
+    on the host and properly configured.
+  - Configuring C(unixODBC) for Vertica requires C(Driver = /opt/vertica/lib64/libverticaodbc.so) to be added to the C(Vertica)
+    section of either C(/etc/odbcinst.ini) or C($HOME/.odbcinst.ini) and both C(ErrorMessagesPath = /opt/vertica/lib64) and
+    C(DriverManagerEncoding = UTF-16) to be added to the C(Driver) section of either C(/etc/vertica.ini) or C($HOME/.vertica.ini).
+requirements: ['unixODBC', 'pyodbc']
 author: "Dariusz Owczarek (@dareko)"
-'''
+"""
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Creating a new vertica role
   community.general.vertica_role: name=role_name db=db_name state=present
 

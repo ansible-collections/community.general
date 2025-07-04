@@ -8,58 +8,57 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 author: "Jan Christian Grünhage (@jcgruenhage)"
 module: matrix
 short_description: Send notifications to matrix
 description:
-    - This module sends html formatted notifications to matrix rooms.
+  - This module sends html formatted notifications to matrix rooms.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    msg_plain:
-        type: str
-        description:
-            - Plain text form of the message to send to matrix, usually markdown
-        required: true
-    msg_html:
-        type: str
-        description:
-            - HTML form of the message to send to matrix
-        required: true
-    room_id:
-        type: str
-        description:
-            - ID of the room to send the notification to
-        required: true
-    hs_url:
-        type: str
-        description:
-            - URL of the homeserver, where the CS-API is reachable
-        required: true
-    token:
-        type: str
-        description:
-            - Authentication token for the API call. If provided, user_id and password are not required
-    user_id:
-        type: str
-        description:
-            - The user id of the user
-    password:
-        type: str
-        description:
-            - The password to log in with
+  msg_plain:
+    type: str
+    description:
+      - Plain text form of the message to send to matrix, usually markdown.
+    required: true
+  msg_html:
+    type: str
+    description:
+      - HTML form of the message to send to matrix.
+    required: true
+  room_id:
+    type: str
+    description:
+      - ID of the room to send the notification to.
+    required: true
+  hs_url:
+    type: str
+    description:
+      - URL of the homeserver, where the CS-API is reachable.
+    required: true
+  token:
+    type: str
+    description:
+      - Authentication token for the API call. If provided, O(user_id) and O(password) are not required.
+  user_id:
+    type: str
+    description:
+      - The user ID of the user.
+  password:
+    type: str
+    description:
+      - The password to log in with.
 requirements:
-    -  matrix-client (Python library)
-'''
+  - matrix-client (Python library)
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Send matrix notification with token
   community.general.matrix:
     msg_plain: "**hello world**"
@@ -76,10 +75,10 @@ EXAMPLES = '''
     hs_url: "https://matrix.org"
     user_id: "ansible_notification_bot"
     password: "{{ matrix_auth_password }}"
-'''
+"""
 
-RETURN = '''
-'''
+RETURN = r"""
+"""
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib

@@ -3,74 +3,75 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
-DOCUMENTATION = '''
-    name: splunk
-    type: notification
-    short_description: Sends task result events to Splunk HTTP Event Collector
-    author: "Stuart Hirst (!UNKNOWN) <support@convergingdata.com>"
+DOCUMENTATION = r"""
+name: splunk
+type: notification
+short_description: Sends task result events to Splunk HTTP Event Collector
+author: "Stuart Hirst (!UNKNOWN) <support@convergingdata.com>"
+description:
+  - This callback plugin sends task results as JSON formatted events to a Splunk HTTP collector.
+  - The companion Splunk Monitoring & Diagnostics App is available here U(https://splunkbase.splunk.com/app/4023/).
+  - Credit to "Ryan Currah (@ryancurrah)" for original source upon which this is based.
+requirements:
+  - Whitelisting this callback plugin
+  - 'Create a HTTP Event Collector in Splunk'
+  - 'Define the URL and token in C(ansible.cfg)'
+options:
+  url:
+    description: URL to the Splunk HTTP collector source.
+    type: str
+    env:
+      - name: SPLUNK_URL
+    ini:
+      - section: callback_splunk
+        key: url
+  authtoken:
+    description: Token to authenticate the connection to the Splunk HTTP collector.
+    type: str
+    env:
+      - name: SPLUNK_AUTHTOKEN
+    ini:
+      - section: callback_splunk
+        key: authtoken
+  validate_certs:
+    description: Whether to validate certificates for connections to HEC. It is not recommended to set to V(false) except
+      when you are sure that nobody can intercept the connection between this plugin and HEC, as setting it to V(false) allows
+      man-in-the-middle attacks!
+    env:
+      - name: SPLUNK_VALIDATE_CERTS
+    ini:
+      - section: callback_splunk
+        key: validate_certs
+    type: bool
+    default: true
+    version_added: '1.0.0'
+  include_milliseconds:
+    description: Whether to include milliseconds as part of the generated timestamp field in the event sent to the Splunk
+      HTTP collector.
+    env:
+      - name: SPLUNK_INCLUDE_MILLISECONDS
+    ini:
+      - section: callback_splunk
+        key: include_milliseconds
+    type: bool
+    default: false
+    version_added: 2.0.0
+  batch:
     description:
-      - This callback plugin will send task results as JSON formatted events to a Splunk HTTP collector.
-      - The companion Splunk Monitoring & Diagnostics App is available here U(https://splunkbase.splunk.com/app/4023/).
-      - Credit to "Ryan Currah (@ryancurrah)" for original source upon which this is based.
-    requirements:
-      - Whitelisting this callback plugin
-      - 'Create a HTTP Event Collector in Splunk'
-      - 'Define the URL and token in C(ansible.cfg)'
-    options:
-      url:
-        description: URL to the Splunk HTTP collector source.
-        env:
-          - name: SPLUNK_URL
-        ini:
-          - section: callback_splunk
-            key: url
-      authtoken:
-        description: Token to authenticate the connection to the Splunk HTTP collector.
-        env:
-          - name: SPLUNK_AUTHTOKEN
-        ini:
-          - section: callback_splunk
-            key: authtoken
-      validate_certs:
-        description: Whether to validate certificates for connections to HEC. It is not recommended to set to
-                     V(false) except when you are sure that nobody can intercept the connection
-                     between this plugin and HEC, as setting it to V(false) allows man-in-the-middle attacks!
-        env:
-          - name: SPLUNK_VALIDATE_CERTS
-        ini:
-          - section: callback_splunk
-            key: validate_certs
-        type: bool
-        default: true
-        version_added: '1.0.0'
-      include_milliseconds:
-        description: Whether to include milliseconds as part of the generated timestamp field in the event
-                     sent to the Splunk HTTP collector.
-        env:
-          - name: SPLUNK_INCLUDE_MILLISECONDS
-        ini:
-          - section: callback_splunk
-            key: include_milliseconds
-        type: bool
-        default: false
-        version_added: 2.0.0
-      batch:
-        description:
-          - Correlation ID which can be set across multiple playbook executions.
-        env:
-          - name: SPLUNK_BATCH
-        ini:
-          - section: callback_splunk
-            key: batch
-        type: str
-        version_added: 3.3.0
-'''
+      - Correlation ID which can be set across multiple playbook executions.
+    env:
+      - name: SPLUNK_BATCH
+    ini:
+      - section: callback_splunk
+        key: batch
+    type: str
+    version_added: 3.3.0
+"""
 
-EXAMPLES = '''
-examples: >
+EXAMPLES = r"""
+examples: >-
   To enable, add this to your ansible.cfg file in the defaults block
     [defaults]
     callback_whitelist = community.general.splunk
@@ -81,26 +82,29 @@ examples: >
     [callback_splunk]
     url = http://mysplunkinstance.datapaas.io:8088/services/collector/event
     authtoken = f23blad6-5965-4537-bf69-5b5a545blabla88
-'''
+"""
 
 import json
 import uuid
 import socket
 import getpass
 
-from datetime import datetime
 from os.path import basename
 
+from ansible.module_utils.ansible_release import __version__ as ansible_version
 from ansible.module_utils.urls import open_url
 from ansible.parsing.ajson import AnsibleJSONEncoder
 from ansible.plugins.callback import CallbackBase
+
+from ansible_collections.community.general.plugins.module_utils.datetime import (
+    now,
+)
 
 
 class SplunkHTTPCollectorSource(object):
     def __init__(self):
         self.ansible_check_mode = False
         self.ansible_playbook = ""
-        self.ansible_version = ""
         self.session = str(uuid.uuid4())
         self.host = socket.gethostname()
         self.ip_address = socket.gethostbyname(socket.gethostname())
@@ -109,10 +113,6 @@ class SplunkHTTPCollectorSource(object):
     def send_event(self, url, authtoken, validate_certs, include_milliseconds, batch, state, result, runtime):
         if result._task_fields['args'].get('_ansible_check_mode') is True:
             self.ansible_check_mode = True
-
-        if result._task_fields['args'].get('_ansible_version'):
-            self.ansible_version = \
-                result._task_fields['args'].get('_ansible_version')
 
         if result._task._role:
             ansible_role = str(result._task._role)
@@ -134,12 +134,12 @@ class SplunkHTTPCollectorSource(object):
         else:
             time_format = '%Y-%m-%d %H:%M:%S +0000'
 
-        data['timestamp'] = datetime.utcnow().strftime(time_format)
+        data['timestamp'] = now().strftime(time_format)
         data['host'] = self.host
         data['ip_address'] = self.ip_address
         data['user'] = self.user
         data['runtime'] = runtime
-        data['ansible_version'] = self.ansible_version
+        data['ansible_version'] = ansible_version
         data['ansible_check_mode'] = self.ansible_check_mode
         data['ansible_host'] = result._host.name
         data['ansible_playbook'] = self.ansible_playbook
@@ -148,15 +148,14 @@ class SplunkHTTPCollectorSource(object):
         data['ansible_result'] = result._result
 
         # This wraps the json payload in and outer json event needed by Splunk
-        jsondata = json.dumps(data, cls=AnsibleJSONEncoder, sort_keys=True)
-        jsondata = '{"event":' + jsondata + "}"
+        jsondata = json.dumps({"event": data}, cls=AnsibleJSONEncoder, sort_keys=True)
 
         open_url(
             url,
             jsondata,
             headers={
                 'Content-type': 'application/json',
-                'Authorization': 'Splunk ' + authtoken
+                'Authorization': f"Splunk {authtoken}"
             },
             method='POST',
             validate_certs=validate_certs
@@ -181,7 +180,7 @@ class CallbackModule(CallbackBase):
 
     def _runtime(self, result):
         return (
-            datetime.utcnow() -
+            now() -
             self.start_datetimes[result._task._uuid]
         ).total_seconds()
 
@@ -220,10 +219,10 @@ class CallbackModule(CallbackBase):
         self.splunk.ansible_playbook = basename(playbook._file_name)
 
     def v2_playbook_on_task_start(self, task, is_conditional):
-        self.start_datetimes[task._uuid] = datetime.utcnow()
+        self.start_datetimes[task._uuid] = now()
 
     def v2_playbook_on_handler_task_start(self, task):
-        self.start_datetimes[task._uuid] = datetime.utcnow()
+        self.start_datetimes[task._uuid] = now()
 
     def v2_runner_on_ok(self, result, **kwargs):
         self.splunk.send_event(

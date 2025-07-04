@@ -1,0 +1,89 @@
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-FileCopyrightText: 2025 Felix Fontein <felix@fontein.de>
+
+[collection_sources]
+"ansible.posix" = "git+https://github.com/ansible-collections/ansible.posix.git,main"
+"community.crypto" = "git+https://github.com/ansible-collections/community.crypto.git,main"
+"community.docker" = "git+https://github.com/ansible-collections/community.docker.git,main"
+"community.internal_test_tools" = "git+https://github.com/ansible-collections/community.internal_test_tools.git,main"
+
+[collection_sources_per_ansible.'2.16']
+# community.crypto's main branch needs ansible-core >= 2.17
+"community.crypto" = "git+https://github.com/ansible-collections/community.crypto.git,stable-2"
+
+[sessions]
+
+[sessions.lint]
+run_isort = false
+run_black = false
+run_flake8 = false
+run_pylint = false
+run_yamllint = true
+yamllint_config = ".yamllint"
+# yamllint_config_plugins = ".yamllint-docs"
+# yamllint_config_plugins_examples = ".yamllint-examples"
+run_mypy = false
+
+[sessions.docs_check]
+validate_collection_refs="all"
+codeblocks_restrict_types = [
+    "ansible-output",
+    "console",
+    "ini",
+    "json",
+    "python",
+    "shell",
+    "yaml",
+    "yaml+jinja",
+    "text",
+]
+codeblocks_restrict_type_exact_case = true
+codeblocks_allow_without_type = false
+codeblocks_allow_literal_blocks = false
+
+[sessions.license_check]
+
+[sessions.extra_checks]
+run_no_unwanted_files = true
+no_unwanted_files_module_extensions = [".py"]
+no_unwanted_files_yaml_extensions = [".yml"]
+run_action_groups = true
+run_no_trailing_whitespace = true
+no_trailing_whitespace_skip_paths = [
+    "tests/integration/targets/iso_extract/files/test.iso",
+    "tests/integration/targets/java_cert/files/testpkcs.p12",
+    "tests/integration/targets/one_host/files/testhost/tmp/opennebula-fixtures.json.gz",
+    "tests/integration/targets/one_template/files/testhost/tmp/opennebula-fixtures.json.gz",
+    "tests/integration/targets/setup_flatpak_remote/files/repo.tar.xz",
+]
+no_trailing_whitespace_skip_directories = [
+    "tests/unit/plugins/modules/interfaces_file/interfaces_file_fixtures/golden_output/",
+    "tests/unit/plugins/modules/interfaces_file/interfaces_file_fixtures/input/",
+]
+
+[[sessions.extra_checks.action_groups_config]]
+name = "consul"
+pattern = "^consul_.*$"
+exclusions = [
+    "consul_acl_bootstrap",
+    "consul_kv",
+]
+doc_fragment = "community.general.consul.actiongroup_consul"
+
+[[sessions.extra_checks.action_groups_config]]
+name = "keycloak"
+pattern = "^keycloak_.*$"
+exclusions = [
+    "keycloak_realm_info",
+]
+doc_fragment = "community.general.keycloak.actiongroup_keycloak"
+
+[sessions.build_import_check]
+run_galaxy_importer = true
+
+[sessions.ansible_test_sanity]
+include_devel = true
+
+[sessions.ansible_test_units]
+include_devel = true

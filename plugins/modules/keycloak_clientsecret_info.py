@@ -9,28 +9,25 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: keycloak_clientsecret_info
 
-short_description: Retrieve client secret via Keycloak API
+short_description: Retrieve client secret using Keycloak API
 
 version_added: 6.1.0
 
 description:
-  - This module allows you to get a Keycloak client secret via the Keycloak
-    REST API. It requires access to the REST API via OpenID Connect; the user
-    connecting and the client being used must have the requisite access rights.
-    In a default Keycloak installation, admin-cli and an admin user would work,
-    as would a separate client definition with the scope tailored to your needs
-    and a user having the expected roles.
-
-  - When retrieving a new client secret, where possible provide the client's
-    O(id) (not O(client_id)) to the module. This removes a lookup to the API to
-    translate the O(client_id) into the client ID.
-
-  - "Note that this module returns the client secret. To avoid this showing up in the logs,
-     please add C(no_log: true) to the task."
+  - This module allows you to get a Keycloak client secret using the Keycloak REST API. It requires access to the REST API
+    using OpenID Connect; the user connecting and the client being used must have the requisite access rights. In a default
+    Keycloak installation, admin-cli and an admin user would work, as would a separate client definition with the scope tailored
+    to your needs and a user having the expected roles.
+  - When retrieving a new client secret, where possible provide the client's O(id) (not O(client_id)) to the module. This
+    removes a lookup to the API to translate the O(client_id) into the client ID.
+  - 'Note that this module returns the client secret. To avoid this showing up in the logs, please add C(no_log: true) to
+    the task.'
+attributes:
+  action_group:
+    version_added: 10.2.0
 
 options:
   realm:
@@ -42,14 +39,13 @@ options:
   id:
     description:
       - The unique identifier for this client.
-      - This parameter is not required for getting or generating a client secret but
-        providing it will reduce the number of API calls required.
+      - This parameter is not required for getting or generating a client secret but providing it will reduce the number of
+        API calls required.
     type: str
 
   client_id:
     description:
-      - The O(client_id) of the client. Passing this instead of O(id) results in an
-        extra API call.
+      - The O(client_id) of the client. Passing this instead of O(id) results in an extra API call.
     aliases:
       - clientId
     type: str
@@ -57,15 +53,16 @@ options:
 
 extends_documentation_fragment:
   - community.general.keycloak
+  - community.general.keycloak.actiongroup_keycloak
   - community.general.attributes
   - community.general.attributes.info_module
 
 author:
   - Fynn Chen (@fynncfchen)
   - John Cant (@johncant)
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Get a Keycloak client secret, authentication with credentials
   community.general.keycloak_clientsecret_info:
     id: '9d59aa76-2755-48c6-b1af-beb70a82c3cd'
@@ -97,16 +94,16 @@ EXAMPLES = '''
     token: TOKEN
   delegate_to: localhost
   no_log: true
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 msg:
-  description: Textual description of whether we succeeded or failed
+  description: Textual description of whether we succeeded or failed.
   returned: always
   type: str
 
 clientsecret_info:
-  description: Representation of the client secret
+  description: Representation of the client secret.
   returned: on success
   type: complex
   contains:
@@ -120,7 +117,7 @@ clientsecret_info:
       type: str
       returned: always
       sample: cUGnX1EIeTtPPAkcyGMv0ncyqDPu68P1
-'''
+"""
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
     KeycloakAPI, KeycloakError, get_token)

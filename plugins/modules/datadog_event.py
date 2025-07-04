@@ -14,81 +14,88 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: datadog_event
 short_description: Posts events to Datadog  service
 description:
-  - "Allows to post events to Datadog (www.datadoghq.com) service."
-  - "Uses http://docs.datadoghq.com/api/#events API."
+  - Allows to post events to Datadog (www.datadoghq.com) service.
+  - Uses http://docs.datadoghq.com/api/#events API.
 author:
   - "Artūras 'arturaz' Šlajus (@arturaz)"
   - "Naoya Nakazawa (@n0ts)"
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    api_key:
-        type: str
-        description: ["Your DataDog API key."]
-        required: true
-    app_key:
-        type: str
-        description: ["Your DataDog app key."]
-        required: true
-    title:
-        type: str
-        description: ["The event title."]
-        required: true
-    text:
-        type: str
-        description: ["The body of the event."]
-        required: true
-    date_happened:
-        type: int
-        description:
-        - POSIX timestamp of the event.
-        - Default value is now.
-    priority:
-        type: str
-        description: ["The priority of the event."]
-        default: normal
-        choices: [normal, low]
-    host:
-        type: str
-        description:
-        - Host name to associate with the event.
-        - If not specified, it defaults to the remote system's hostname.
-    api_host:
-        type: str
-        description:
-        - DataDog API endpoint URL.
-        version_added: '3.3.0'
-    tags:
-        type: list
-        elements: str
-        description: ["Comma separated list of tags to apply to the event."]
-    alert_type:
-        type: str
-        description: ["Type of alert."]
-        default: info
-        choices: ['error', 'warning', 'info', 'success']
-    aggregation_key:
-        type: str
-        description: ["An arbitrary string to use for aggregation."]
-    validate_certs:
-        description:
-            - If V(false), SSL certificates will not be validated. This should only be used
-              on personally controlled sites using self-signed certificates.
-        type: bool
-        default: true
-'''
+  api_key:
+    type: str
+    description:
+      - Your DataDog API key.
+    required: true
+  app_key:
+    type: str
+    description:
+      - Your DataDog app key.
+    required: true
+  title:
+    type: str
+    description:
+      - The event title.
+    required: true
+  text:
+    type: str
+    description:
+      - The body of the event.
+    required: true
+  date_happened:
+    type: int
+    description:
+      - POSIX timestamp of the event.
+      - Default value is now.
+  priority:
+    type: str
+    description:
+      - The priority of the event.
+    default: normal
+    choices: [normal, low]
+  host:
+    type: str
+    description:
+      - Host name to associate with the event.
+      - If not specified, it defaults to the remote system's hostname.
+  api_host:
+    type: str
+    description:
+      - DataDog API endpoint URL.
+    version_added: '3.3.0'
+  tags:
+    type: list
+    elements: str
+    description:
+      - Comma separated list of tags to apply to the event.
+  alert_type:
+    type: str
+    description:
+      - Type of alert.
+    default: info
+    choices: ['error', 'warning', 'info', 'success']
+  aggregation_key:
+    type: str
+    description:
+      - An arbitrary string to use for aggregation.
+  validate_certs:
+    description:
+      - If V(false), SSL certificates will not be validated. This should only be used on personally controlled sites using
+        self-signed certificates.
+    type: bool
+    default: true
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Post an event with low priority
   community.general.datadog_event:
     title: Testing from ansible
@@ -116,8 +123,7 @@ EXAMPLES = '''
       - aa
       - b
       - '#host:{{ inventory_hostname }}'
-
-'''
+"""
 
 import platform
 import traceback

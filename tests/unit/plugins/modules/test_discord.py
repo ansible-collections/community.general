@@ -7,9 +7,9 @@ __metaclass__ = type
 
 import json
 import pytest
-from ansible_collections.community.general.tests.unit.compat.mock import patch
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
 from ansible_collections.community.general.plugins.modules import discord
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
 
 
 class TestDiscordModule(ModuleTestCase):
@@ -28,30 +28,30 @@ class TestDiscordModule(ModuleTestCase):
     def test_without_parameters(self):
         """Failure if no parameters set"""
         with self.assertRaises(AnsibleFailJson):
-            set_module_args({})
-            self.module.main()
+            with set_module_args({}):
+                self.module.main()
 
     def test_without_content(self):
         """Failure if content and embeds both are missing"""
-        set_module_args({
+        with set_module_args({
             'webhook_id': 'xxx',
             'webhook_token': 'xxx'
-        })
-        with self.assertRaises(AnsibleFailJson):
-            self.module.main()
+        }):
+            with self.assertRaises(AnsibleFailJson):
+                self.module.main()
 
     def test_successful_message(self):
         """Test a basic message successfully."""
-        set_module_args({
+        with set_module_args({
             'webhook_id': 'xxx',
             'webhook_token': 'xxx',
             'content': 'test'
-        })
+        }):
 
-        with patch.object(discord, "fetch_url") as fetch_url_mock:
-            fetch_url_mock.return_value = (None, {"status": 204, 'msg': 'OK (0 bytes)'})
-            with self.assertRaises(AnsibleExitJson):
-                self.module.main()
+            with patch.object(discord, "fetch_url") as fetch_url_mock:
+                fetch_url_mock.return_value = (None, {"status": 204, 'msg': 'OK (0 bytes)'})
+                with self.assertRaises(AnsibleExitJson):
+                    self.module.main()
 
             self.assertTrue(fetch_url_mock.call_count, 1)
             call_data = json.loads(fetch_url_mock.call_args[1]['data'])
@@ -59,17 +59,17 @@ class TestDiscordModule(ModuleTestCase):
 
     def test_message_with_username(self):
         """Test a message with username set successfully."""
-        set_module_args({
+        with set_module_args({
             'webhook_id': 'xxx',
             'webhook_token': 'xxx',
             'content': 'test',
             'username': 'Ansible Bot'
-        })
+        }):
 
-        with patch.object(discord, "fetch_url") as fetch_url_mock:
-            fetch_url_mock.return_value = (None, {"status": 204, 'msg': 'OK (0 bytes)'})
-            with self.assertRaises(AnsibleExitJson):
-                self.module.main()
+            with patch.object(discord, "fetch_url") as fetch_url_mock:
+                fetch_url_mock.return_value = (None, {"status": 204, 'msg': 'OK (0 bytes)'})
+                with self.assertRaises(AnsibleExitJson):
+                    self.module.main()
 
             self.assertTrue(fetch_url_mock.call_count, 1)
             call_data = json.loads(fetch_url_mock.call_args[1]['data'])
@@ -79,27 +79,30 @@ class TestDiscordModule(ModuleTestCase):
     def test_failed_message(self):
         """Test failure because webhook id is wrong."""
 
-        set_module_args({
+        with set_module_args({
             'webhook_id': 'wrong',
             'webhook_token': 'xxx',
             'content': 'test'
-        })
+        }):
 
-        with patch.object(discord, "fetch_url") as fetch_url_mock:
-            fetch_url_mock.return_value = (None, {"status": 404, 'msg': 'HTTP Error 404: Not Found', 'body': '{"message": "Unknown Webhook", "code": 10015}'})
-            with self.assertRaises(AnsibleFailJson):
-                self.module.main()
+            with patch.object(discord, "fetch_url") as fetch_url_mock:
+                fetch_url_mock.return_value = (
+                    None,
+                    {"status": 404, 'msg': 'HTTP Error 404: Not Found', 'body': '{"message": "Unknown Webhook", "code": 10015}'},
+                )
+                with self.assertRaises(AnsibleFailJson):
+                    self.module.main()
 
     def test_failed_message_without_body(self):
         """Test failure with empty response body."""
 
-        set_module_args({
+        with set_module_args({
             'webhook_id': 'wrong',
             'webhook_token': 'xxx',
             'content': 'test'
-        })
+        }):
 
-        with patch.object(discord, "fetch_url") as fetch_url_mock:
-            fetch_url_mock.return_value = (None, {"status": 404, 'msg': 'HTTP Error 404: Not Found'})
-            with self.assertRaises(AnsibleFailJson):
-                self.module.main()
+            with patch.object(discord, "fetch_url") as fetch_url_mock:
+                fetch_url_mock.return_value = (None, {"status": 404, 'msg': 'HTTP Error 404: Not Found'})
+                with self.assertRaises(AnsibleFailJson):
+                    self.module.main()

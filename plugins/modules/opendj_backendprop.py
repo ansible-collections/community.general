@@ -8,94 +8,93 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: opendj_backendprop
-short_description: Will update the backend configuration of OpenDJ via the dsconfig set-backend-prop command
+short_description: Will update the backend configuration of OpenDJ using the dsconfig set-backend-prop command
 description:
-    - This module will update settings for OpenDJ with the command set-backend-prop.
-    - It will check first via de get-backend-prop if configuration needs to be applied.
+  - This module will update settings for OpenDJ with the command set-backend-prop.
+  - It will check first using de get-backend-prop if configuration needs to be applied.
 author:
-    - Werner Dijkerman (@dj-wasabi)
+  - Werner Dijkerman (@dj-wasabi)
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    opendj_bindir:
-        description:
-            - The path to the bin directory of OpenDJ.
-        required: false
-        default: /opt/opendj/bin
-        type: path
-    hostname:
-        description:
-            - The hostname of the OpenDJ server.
-        required: true
-        type: str
-    port:
-        description:
-            - The Admin port on which the OpenDJ instance is available.
-        required: true
-        type: str
-    username:
-        description:
-            - The username to connect to.
-        required: false
-        default: cn=Directory Manager
-        type: str
-    password:
-        description:
-            - The password for the cn=Directory Manager user.
-            - Either password or passwordfile is needed.
-        required: false
-        type: str
-    passwordfile:
-        description:
-            - Location to the password file which holds the password for the cn=Directory Manager user.
-            - Either password or passwordfile is needed.
-        required: false
-        type: path
-    backend:
-        description:
-            - The name of the backend on which the property needs to be updated.
-        required: true
-        type: str
-    name:
-        description:
-            - The configuration setting to update.
-        required: true
-        type: str
-    value:
-        description:
-            - The value for the configuration item.
-        required: true
-        type: str
-    state:
-        description:
-            - If configuration needs to be added/updated
-        required: false
-        default: "present"
-        type: str
-'''
+  opendj_bindir:
+    description:
+      - The path to the bin directory of OpenDJ.
+    required: false
+    default: /opt/opendj/bin
+    type: path
+  hostname:
+    description:
+      - The hostname of the OpenDJ server.
+    required: true
+    type: str
+  port:
+    description:
+      - The Admin port on which the OpenDJ instance is available.
+    required: true
+    type: str
+  username:
+    description:
+      - The username to connect to.
+    required: false
+    default: cn=Directory Manager
+    type: str
+  password:
+    description:
+      - The password for the C(cn=Directory Manager) user.
+      - Either password or passwordfile is needed.
+    required: false
+    type: str
+  passwordfile:
+    description:
+      - Location to the password file which holds the password for the C(cn=Directory Manager) user.
+      - Either password or passwordfile is needed.
+    required: false
+    type: path
+  backend:
+    description:
+      - The name of the backend on which the property needs to be updated.
+    required: true
+    type: str
+  name:
+    description:
+      - The configuration setting to update.
+    required: true
+    type: str
+  value:
+    description:
+      - The value for the configuration item.
+    required: true
+    type: str
+  state:
+    description:
+      - If configuration needs to be added/updated.
+    required: false
+    default: "present"
+    type: str
+"""
 
-EXAMPLES = '''
-  - name: Add or update OpenDJ backend properties
-    action: opendj_backendprop
-            hostname=localhost
-            port=4444
-            username="cn=Directory Manager"
-            password=password
-            backend=userRoot
-            name=index-entry-limit
-            value=5000
-'''
+EXAMPLES = r"""
+- name: Add or update OpenDJ backend properties
+  opendj_backendprop:
+    hostname: localhost
+    port: 4444
+    username: "cn=Directory Manager"
+    password: password
+    backend: userRoot
+    name: index-entry-limit
+    value: 5000
+"""
 
-RETURN = '''
-'''
+RETURN = r"""
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 

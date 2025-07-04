@@ -7,13 +7,11 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: oneandone_load_balancer
 short_description: Configure 1&1 load balancer
 description:
-  - Create, remove, update load balancers.
-    This module has a dependency on 1and1 >= 1.0.
+  - Create, remove, update load balancers. This module has a dependency on 1and1 >= 1.0.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -28,7 +26,7 @@ options:
     type: str
     required: false
     default: 'present'
-    choices: [ "present", "absent", "update" ]
+    choices: ["present", "absent", "update"]
   auth_token:
     description:
       - Authenticating API token provided by 1&1.
@@ -39,32 +37,30 @@ options:
     type: str
   api_url:
     description:
-      - Custom API URL. Overrides the
-        E(ONEANDONE_API_URL) environment variable.
+      - Custom API URL. Overrides the E(ONEANDONE_API_URL) environment variable.
     type: str
     required: false
   name:
     description:
-      - Load balancer name used with present state. Used as identifier (id or name) when used with absent state.
-        maxLength=128
+      - Load balancer name used with present state. Used as identifier (ID or name) when used with absent state. maxLength=128.
     type: str
   health_check_test:
     description:
       - Type of the health check. At the moment, HTTP is not allowed.
     type: str
-    choices: [ "NONE", "TCP", "HTTP", "ICMP" ]
+    choices: ["NONE", "TCP", "HTTP", "ICMP"]
   health_check_interval:
     description:
-      - Health check period in seconds. minimum=5, maximum=300, multipleOf=1
+      - Health check period in seconds. minimum=5, maximum=300, multipleOf=1.
     type: str
   health_check_path:
     description:
-      - Url to call for checking. Required for HTTP health check. maxLength=1000
+      - URL to call for checking. Required for HTTP health check. maxLength=1000.
     type: str
     required: false
   health_check_parse:
     description:
-      - Regular expression to check. Required for HTTP health check. maxLength=64
+      - Regular expression to check. Required for HTTP health check. maxLength=64.
     type: str
     required: false
   persistence:
@@ -73,88 +69,87 @@ options:
     type: bool
   persistence_time:
     description:
-      - Persistence time in seconds. Required if persistence is enabled. minimum=30, maximum=1200, multipleOf=1
+      - Persistence time in seconds. Required if persistence is enabled. minimum=30, maximum=1200, multipleOf=1.
     type: str
   method:
     description:
       - Balancing procedure.
     type: str
-    choices: [ "ROUND_ROBIN", "LEAST_CONNECTIONS" ]
+    choices: ["ROUND_ROBIN", "LEAST_CONNECTIONS"]
   datacenter:
     description:
       - ID or country code of the datacenter where the load balancer will be created.
       - If not specified, it defaults to V(US).
     type: str
-    choices: [ "US", "ES", "DE", "GB" ]
+    choices: ["US", "ES", "DE", "GB"]
     required: false
   rules:
     description:
-      - A list of rule objects that will be set for the load balancer. Each rule must contain protocol,
-        port_balancer, and port_server parameters, in addition to source parameter, which is optional.
+      - A list of rule objects that will be set for the load balancer. Each rule must contain protocol, port_balancer, and
+        port_server parameters, in addition to source parameter, which is optional.
     type: list
     elements: dict
     default: []
   description:
     description:
-      - Description of the load balancer. maxLength=256
+      - Description of the load balancer. maxLength=256.
     type: str
     required: false
   add_server_ips:
     description:
-      - A list of server identifiers (id or name) to be assigned to a load balancer.
-        Used in combination with update state.
+      - A list of server identifiers (id or name) to be assigned to a load balancer. Used in combination with O(state=update).
     type: list
     elements: str
     required: false
     default: []
   remove_server_ips:
     description:
-      - A list of server IP ids to be unassigned from a load balancer. Used in combination with update state.
+      - A list of server IP IDs to be unassigned from a load balancer. Used in combination with O(state=update).
     type: list
     elements: str
     required: false
     default: []
   add_rules:
     description:
-      - A list of rules that will be added to an existing load balancer.
-        It is syntax is the same as the one used for rules parameter. Used in combination with update state.
+      - A list of rules that will be added to an existing load balancer. It is syntax is the same as the one used for rules
+        parameter. Used in combination with O(state=update).
     type: list
     elements: dict
     required: false
     default: []
   remove_rules:
     description:
-      - A list of rule ids that will be removed from an existing load balancer. Used in combination with update state.
+      - A list of rule IDs that will be removed from an existing load balancer. Used in combination with O(state=update).
     type: list
     elements: str
     required: false
     default: []
   wait:
     description:
-      - wait for the instance to be in state 'running' before returning
+      - Wait for the instance to be in state 'running' before returning.
     required: false
     default: true
     type: bool
   wait_timeout:
     description:
-      - how long before wait gives up, in seconds
+      - How long before wait gives up, in seconds.
     type: int
     default: 600
   wait_interval:
     description:
-      - Defines the number of seconds to wait when using the _wait_for methods
+      - Defines the number of seconds to wait when using the _wait_for methods.
     type: int
     default: 5
 
 requirements:
-     - "1and1"
+  - "1and1"
 
 author:
   - Amel Ajdinovic (@aajdinov)
   - Ethan Devenport (@edevenport)
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a load balancer
   community.general.oneandone_load_balancer:
     auth_token: oneandone_private_api_key
@@ -167,11 +162,10 @@ EXAMPLES = '''
     method: ROUND_ROBIN
     datacenter: US
     rules:
-     -
-       protocol: TCP
-       port_balancer: 80
-       port_server: 80
-       source: 0.0.0.0
+      - protocol: TCP
+        port_balancer: 80
+        port_server: 80
+        source: 0.0.0.0
     wait: true
     wait_timeout: 500
 
@@ -199,7 +193,7 @@ EXAMPLES = '''
     load_balancer: ansible load balancer updated
     description: Adding server to a load balancer with ansible
     add_server_ips:
-     - server identifier (id or name)
+      - server identifier (id or name)
     wait: true
     wait_timeout: 500
     state: update
@@ -210,7 +204,7 @@ EXAMPLES = '''
     load_balancer: ansible load balancer updated
     description: Removing server from a load balancer with ansible
     remove_server_ips:
-     - B2504878540DBC5F7634EB00A07C1EBD (server's ip id)
+      - B2504878540DBC5F7634EB00A07C1EBD (server's ip id)
     wait: true
     wait_timeout: 500
     state: update
@@ -221,16 +215,14 @@ EXAMPLES = '''
     load_balancer: ansible load balancer updated
     description: Adding rules to a load balancer with ansible
     add_rules:
-     -
-       protocol: TCP
-       port_balancer: 70
-       port_server: 70
-       source: 0.0.0.0
-     -
-       protocol: TCP
-       port_balancer: 60
-       port_server: 60
-       source: 0.0.0.0
+      - protocol: TCP
+        port_balancer: 70
+        port_server: 70
+        source: 0.0.0.0
+      - protocol: TCP
+        port_balancer: 60
+        port_server: 60
+        source: 0.0.0.0
     wait: true
     wait_timeout: 500
     state: update
@@ -241,21 +233,21 @@ EXAMPLES = '''
     load_balancer: ansible load balancer updated
     description: Adding rules to a load balancer with ansible
     remove_rules:
-     - rule_id #1
-     - rule_id #2
-     - ...
+      - "rule_id #1"
+      - "rule_id #2"
+      - '...'
     wait: true
     wait_timeout: 500
     state: update
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 load_balancer:
-    description: Information about the load balancer that was processed
-    type: dict
-    sample: '{"id": "92B74394A397ECC3359825C1656D67A6", "name": "Default Balancer"}'
-    returned: always
-'''
+  description: Information about the load balancer that was processed.
+  type: dict
+  sample: '{"id": "92B74394A397ECC3359825C1656D67A6", "name": "Default Balancer"}'
+  returned: always
+"""
 
 import os
 from ansible.module_utils.basic import AnsibleModule
@@ -352,7 +344,7 @@ def _add_load_balancer_rules(module, oneandone_conn, load_balancer_id, rules):
 
         if module.check_mode:
             lb_id = get_load_balancer(oneandone_conn, load_balancer_id)
-            if (load_balancer_rules and lb_id):
+            if load_balancer_rules and lb_id:
                 return True
             return False
 

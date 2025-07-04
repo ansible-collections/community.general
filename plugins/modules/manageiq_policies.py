@@ -9,8 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
-
+DOCUMENTATION = r"""
 module: manageiq_policies
 
 short_description: Management of resource policy_profiles in ManageIQ
@@ -21,7 +20,6 @@ extends_documentation_fragment:
 author: Daniel Korn (@dkorn)
 description:
   - The manageiq_policies module supports adding and deleting policy_profiles in ManageIQ.
-
 attributes:
   check_mode:
     support: none
@@ -33,7 +31,7 @@ options:
     type: str
     description:
       - V(absent) - policy_profiles should not exist,
-      - V(present) - policy_profiles should exist,
+      - V(present) - policy_profiles should exist.
     choices: ['absent', 'present']
     default: 'present'
   policy_profiles:
@@ -47,9 +45,21 @@ options:
     description:
       - The type of the resource to which the profile should be [un]assigned.
     required: true
-    choices: ['provider', 'host', 'vm', 'blueprint', 'category', 'cluster',
-        'data store', 'group', 'resource pool', 'service', 'service template',
-        'template', 'tenant', 'user']
+    choices:
+      - provider
+      - host
+      - vm
+      - blueprint
+      - category
+      - cluster
+      - data store
+      - group
+      - resource pool
+      - service
+      - service template
+      - template
+      - tenant
+      - user
   resource_name:
     type: str
     description:
@@ -61,9 +71,9 @@ options:
       - The ID of the resource to which the profile should be [un]assigned.
       - Must be specified if O(resource_name) is not set. Both options are mutually exclusive.
     version_added: 2.2.0
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Assign new policy_profile for a provider in ManageIQ
   community.general.manageiq_policies:
     resource_name: 'EngLab'
@@ -74,7 +84,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false  # only do this when you trust the network!
+      validate_certs: false # only do this when you trust the network!
 
 - name: Unassign a policy_profile for a provider in ManageIQ
   community.general.manageiq_policies:
@@ -87,42 +97,43 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false  # only do this when you trust the network!
-'''
+      validate_certs: false # only do this when you trust the network!
+"""
 
-RETURN = '''
+RETURN = r"""
 manageiq_policies:
-    description:
-      - List current policy_profile and policies for a provider in ManageIQ
-    returned: always
-    type: dict
-    sample: '{
-        "changed": false,
-        "profiles": [
+  description:
+    - List current policy_profile and policies for a provider in ManageIQ.
+  returned: always
+  type: dict
+  sample:
+    {
+      "changed": false,
+      "profiles": [
+        {
+          "policies": [
             {
-                "policies": [
-                    {
-                        "active": true,
-                        "description": "OpenSCAP",
-                        "name": "openscap policy"
-                    },
-                    {
-                        "active": true,
-                        "description": "Analyse incoming container images",
-                        "name": "analyse incoming container images"
-                    },
-                    {
-                        "active": true,
-                        "description": "Schedule compliance after smart state analysis",
-                        "name": "schedule compliance after smart state analysis"
-                    }
-                ],
-                "profile_description": "OpenSCAP profile",
-                "profile_name": "openscap profile"
+              "active": true,
+              "description": "OpenSCAP",
+              "name": "openscap policy"
+            },
+            {
+              "active": true,
+              "description": "Analyse incoming container images",
+              "name": "analyse incoming container images"
+            },
+            {
+              "active": true,
+              "description": "Schedule compliance after smart state analysis",
+              "name": "schedule compliance after smart state analysis"
             }
-        ]
-    }'
-'''
+          ],
+          "profile_description": "OpenSCAP profile",
+          "profile_name": "openscap profile"
+        }
+      ]
+    }
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.manageiq import ManageIQ, manageiq_argument_spec, manageiq_entities

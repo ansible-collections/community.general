@@ -8,15 +8,15 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: one_image
 short_description: Manages OpenNebula images
 description:
-  - Manages OpenNebula images
+  - Manages OpenNebula images.
 requirements:
   - pyone
 extends_documentation_fragment:
+  - community.general.opennebula
   - community.general.attributes
 attributes:
   check_mode:
@@ -24,23 +24,6 @@ attributes:
   diff_mode:
     support: none
 options:
-  api_url:
-    description:
-      - URL of the OpenNebula RPC server.
-      - It is recommended to use HTTPS so that the username/password are not
-      - transferred over the network unencrypted.
-      - If not set then the value of the E(ONE_URL) environment variable is used.
-    type: str
-  api_username:
-    description:
-      - Name of the user to login into the OpenNebula RPC server. If not set
-      - then the value of the E(ONE_USERNAME) environment variable is used.
-    type: str
-  api_password:
-    description:
-      - Password of the user to login into OpenNebula RPC server. If not set
-      - then the value of the E(ONE_PASSWORD) environment variable is used.
-    type: str
   id:
     description:
       - A O(id) of the image you would like to manage.
@@ -48,13 +31,14 @@ options:
   name:
     description:
       - A O(name) of the image you would like to manage.
+      - Required if O(create=true).
     type: str
   state:
     description:
-      - V(present) - state that is used to manage the image
-      - V(absent) - delete the image
-      - V(cloned) - clone the image
-      - V(renamed) - rename the image to the O(new_name)
+      - V(present) - state that is used to manage the image.
+      - V(absent) - delete the image.
+      - V(cloned) - clone the image.
+      - V(renamed) - rename the image to the O(new_name).
     choices: ["present", "absent", "cloned", "renamed"]
     default: present
     type: str
@@ -67,11 +51,38 @@ options:
       - A name that will be assigned to the existing or new image.
       - In the case of cloning, by default O(new_name) will take the name of the origin image with the prefix 'Copy of'.
     type: str
+  persistent:
+    description:
+      - Whether the image should be persistent or non-persistent.
+    type: bool
+    version_added: 9.5.0
+  create:
+    description:
+      - Whether the image should be created if not present.
+      - This is ignored if O(state=absent).
+    type: bool
+    version_added: 10.0.0
+  template:
+    description:
+      - Use with O(create=true) to specify image template.
+    type: str
+    version_added: 10.0.0
+  datastore_id:
+    description:
+      - Use with O(create=true) to specify datastore for image.
+    type: int
+    version_added: 10.0.0
+  wait_timeout:
+    description:
+      - Seconds to wait until image is ready, deleted or cloned.
+    type: int
+    default: 60
+    version_added: 10.0.0
 author:
-    - "Milan Ilic (@ilicmilan)"
-'''
+  - "Milan Ilic (@ilicmilan)"
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Fetch the IMAGE by id
   community.general.one_image:
     id: 45
@@ -92,6 +103,11 @@ EXAMPLES = '''
     id: 37
     enabled: false
 
+- name: Make the IMAGE persistent
+  community.general.one_image:
+    id: 37
+    persistent: true
+
 - name: Enable the IMAGE by name
   community.general.one_image:
     name: bar-image
@@ -108,306 +124,504 @@ EXAMPLES = '''
   community.general.one_image:
     id: '{{ result.id }}'
     state: absent
-'''
 
-RETURN = '''
+- name: Make sure IMAGE is present
+  community.general.one_image:
+    name: myyy-image
+    state: present
+    create: true
+    datastore_id: 100
+    template: |
+      PATH = "/var/tmp/image"
+      TYPE = "OS"
+      SIZE = 20512
+      FORMAT = "qcow2"
+      PERSISTENT = "Yes"
+      DEV_PREFIX = "vd"
+
+- name: Make sure IMAGE is present with a longer timeout
+  community.general.one_image:
+    name: big-image
+    state: present
+    create: true
+    datastore_id: 100
+    wait_timeout: 900
+    template: |-
+      PATH = "https://192.0.2.200/repo/tipa_image.raw"
+      TYPE = "OS"
+      SIZE = 82048
+      FORMAT = "raw"
+      PERSISTENT = "Yes"
+      DEV_PREFIX = "vd"
+"""
+
+RETURN = r"""
 id:
-    description: image id
-    type: int
-    returned: success
-    sample: 153
+  description: Image ID.
+  type: int
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  sample: 153
 name:
-    description: image name
-    type: str
-    returned: success
-    sample: app1
+  description: Image name.
+  type: str
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  sample: app1
 group_id:
-    description: image's group id
-    type: int
-    returned: success
-    sample: 1
+  description: Image's group ID.
+  type: int
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  sample: 1
 group_name:
-    description: image's group name
-    type: str
-    returned: success
-    sample: one-users
+  description: Image's group name.
+  type: str
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  sample: one-users
 owner_id:
-    description: image's owner id
-    type: int
-    returned: success
-    sample: 143
+  description: Image's owner ID.
+  type: int
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  sample: 143
 owner_name:
-    description: image's owner name
-    type: str
-    returned: success
-    sample: ansible-test
+  description: Image's owner name.
+  type: str
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  sample: ansible-test
 state:
-    description: state of image instance
-    type: str
-    returned: success
-    sample: READY
+  description: State of image instance.
+  type: str
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  sample: READY
 used:
-    description: is image in use
-    type: bool
-    returned: success
-    sample: true
+  description: Is image in use.
+  type: bool
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  sample: true
 running_vms:
-    description: count of running vms that use this image
-    type: int
-    returned: success
-    sample: 7
-'''
+  description: Count of running vms that use this image.
+  type: int
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  sample: 7
+permissions:
+  description: The image's permissions.
+  type: dict
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  version_added: 9.5.0
+  contains:
+    owner_u:
+      description: The image's owner USAGE permissions.
+      type: str
+      sample: 1
+    owner_m:
+      description: The image's owner MANAGE permissions.
+      type: str
+      sample: 0
+    owner_a:
+      description: The image's owner ADMIN permissions.
+      type: str
+      sample: 0
+    group_u:
+      description: The image's group USAGE permissions.
+      type: str
+      sample: 0
+    group_m:
+      description: The image's group MANAGE permissions.
+      type: str
+      sample: 0
+    group_a:
+      description: The image's group ADMIN permissions.
+      type: str
+      sample: 0
+    other_u:
+      description: The image's other users USAGE permissions.
+      type: str
+      sample: 0
+    other_m:
+      description: The image's other users MANAGE permissions.
+      type: str
+      sample: 0
+    other_a:
+      description: The image's other users ADMIN permissions.
+      type: str
+      sample: 0
+  sample:
+    owner_u: 1
+    owner_m: 0
+    owner_a: 0
+    group_u: 0
+    group_m: 0
+    group_a: 0
+    other_u: 0
+    other_m: 0
+    other_a: 0
+type:
+  description: The image's type.
+  type: str
+  sample: 0
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  version_added: 9.5.0
+disk_type:
+  description: The image's format type.
+  type: str
+  sample: 0
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  version_added: 9.5.0
+persistent:
+  description: The image's persistence status (1 means true, 0 means false).
+  type: int
+  sample: 1
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  version_added: 9.5.0
+source:
+  description: The image's source.
+  type: str
+  sample: /var/lib/one//datastores/100/somerandomstringxd
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+path:
+  description: The image's filesystem path.
+  type: str
+  sample: /var/tmp/hello.qcow2
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  version_added: 9.5.0
+fstype:
+  description: The image's filesystem type.
+  type: str
+  sample: ext4
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  version_added: 9.5.0
+size:
+  description: The image's size in MegaBytes.
+  type: int
+  sample: 10000
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  version_added: 9.5.0
+cloning_ops:
+  description: The image's cloning operations per second.
+  type: int
+  sample: 0
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  version_added: 9.5.0
+cloning_id:
+  description: The image's cloning ID.
+  type: int
+  sample: -1
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  version_added: 9.5.0
+target_snapshot:
+  description: The image's target snapshot.
+  type: int
+  sample: 1
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  version_added: 9.5.0
+datastore_id:
+  description: The image's datastore ID.
+  type: int
+  sample: 100
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  version_added: 9.5.0
+datastore:
+  description: The image's datastore name.
+  type: int
+  sample: image_datastore
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  version_added: 9.5.0
+vms:
+  description: The image's list of vm ID's.
+  type: list
+  elements: int
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  sample:
+    - 1
+    - 2
+    - 3
+  version_added: 9.5.0
+clones:
+  description: The image's list of clones ID's.
+  type: list
+  elements: int
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  sample:
+    - 1
+    - 2
+    - 3
+  version_added: 9.5.0
+app_clones:
+  description: The image's list of app_clones ID's.
+  type: list
+  elements: int
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  sample:
+    - 1
+    - 2
+    - 3
+  version_added: 9.5.0
+snapshots:
+  description: The image's list of snapshots.
+  type: list
+  returned: when O(state=present), O(state=cloned), or O(state=renamed)
+  version_added: 9.5.0
+  sample:
+    - date: 123123
+      parent: 1
+      size: 10228
+      allow_orphans: 1
+      children: 0
+      active: 1
+      name: SampleName
+"""
 
-try:
-    import pyone
-    HAS_PYONE = True
-except ImportError:
-    HAS_PYONE = False
 
-from ansible.module_utils.basic import AnsibleModule
-import os
-
-
-def get_image(module, client, predicate):
-    # Filter -2 means fetch all images user can Use
-    pool = client.imagepool.info(-2, -1, -1, -1)
-
-    for image in pool.IMAGE:
-        if predicate(image):
-            return image
-
-    return None
-
-
-def get_image_by_name(module, client, image_name):
-    return get_image(module, client, lambda image: (image.NAME == image_name))
-
-
-def get_image_by_id(module, client, image_id):
-    return get_image(module, client, lambda image: (image.ID == image_id))
-
-
-def get_image_instance(module, client, requested_id, requested_name):
-    if requested_id:
-        return get_image_by_id(module, client, requested_id)
-    else:
-        return get_image_by_name(module, client, requested_name)
+from ansible_collections.community.general.plugins.module_utils.opennebula import OpenNebulaModule
 
 
 IMAGE_STATES = ['INIT', 'READY', 'USED', 'DISABLED', 'LOCKED', 'ERROR', 'CLONE', 'DELETE', 'USED_PERS', 'LOCKED_USED', 'LOCKED_USED_PERS']
 
 
-def get_image_info(image):
-    info = {
-        'id': image.ID,
-        'name': image.NAME,
-        'state': IMAGE_STATES[image.STATE],
-        'running_vms': image.RUNNING_VMS,
-        'used': bool(image.RUNNING_VMS),
-        'user_name': image.UNAME,
-        'user_id': image.UID,
-        'group_name': image.GNAME,
-        'group_id': image.GID,
-    }
+class ImageModule(OpenNebulaModule):
+    def __init__(self):
+        argument_spec = dict(
+            id=dict(type='int'),
+            name=dict(type='str'),
+            state=dict(type='str', choices=['present', 'absent', 'cloned', 'renamed'], default='present'),
+            enabled=dict(type='bool'),
+            new_name=dict(type='str'),
+            persistent=dict(type='bool'),
+            create=dict(type='bool'),
+            template=dict(type='str'),
+            datastore_id=dict(type='int'),
+            wait_timeout=dict(type='int', default=60),
+        )
+        required_if = [
+            ['state', 'renamed', ['id']],
+            ['create', True, ['template', 'datastore_id', 'name']],
+        ]
+        mutually_exclusive = [
+            ['id', 'name'],
+        ]
 
-    return info
+        OpenNebulaModule.__init__(self,
+                                  argument_spec,
+                                  supports_check_mode=True,
+                                  mutually_exclusive=mutually_exclusive,
+                                  required_if=required_if)
 
+    def run(self, one, module, result):
+        params = module.params
+        id = params.get('id')
+        name = params.get('name')
+        desired_state = params.get('state')
+        enabled = params.get('enabled')
+        new_name = params.get('new_name')
+        persistent = params.get('persistent')
+        create = params.get('create')
+        template = params.get('template')
+        datastore_id = params.get('datastore_id')
+        wait_timeout = params.get('wait_timeout')
 
-def wait_for_state(module, client, image_id, wait_timeout, state_predicate):
-    import time
-    start_time = time.time()
+        self.result = {}
 
-    while (time.time() - start_time) < wait_timeout:
-        image = client.image.info(image_id)
+        image = self.get_image_instance(id, name)
+        if not image and desired_state != 'absent':
+            if create:
+                self.result = self.create_image(name, template, datastore_id, wait_timeout)
+            # Using 'if id:' doesn't work properly when id=0
+            elif id is not None:
+                module.fail_json(msg="There is no image with id=" + str(id))
+            elif name is not None:
+                module.fail_json(msg="There is no image with name=" + name)
+
+        if desired_state == 'absent':
+            self.result = self.delete_image(image, wait_timeout)
+        else:
+            if persistent is not None:
+                self.result = self.change_persistence(image, persistent)
+            if enabled is not None:
+                self.result = self.enable_image(image, enabled)
+            if desired_state == "cloned":
+                self.result = self.clone_image(image, new_name, wait_timeout)
+            elif desired_state == "renamed":
+                self.result = self.rename_image(image, new_name)
+
+        self.exit()
+
+    def get_image(self, predicate):
+        # Filter -2 means fetch all images user can Use
+        pool = self.one.imagepool.info(-2, -1, -1, -1)
+
+        for image in pool.IMAGE:
+            if predicate(image):
+                return image
+
+        return None
+
+    def get_image_by_name(self, image_name):
+        return self.get_image(lambda image: (image.NAME == image_name))
+
+    def get_image_by_id(self, image_id):
+        return self.get_image(lambda image: (image.ID == image_id))
+
+    def get_image_instance(self, requested_id, requested_name):
+        # Using 'if requested_id:' doesn't work properly when requested_id=0
+        if requested_id is not None:
+            return self.get_image_by_id(requested_id)
+        else:
+            return self.get_image_by_name(requested_name)
+
+    def create_image(self, image_name, template, datastore_id, wait_timeout):
+        if not self.module.check_mode:
+            image_id = self.one.image.allocate("NAME = \"" + image_name + "\"\n" + template, datastore_id)
+            self.wait_for_ready(image_id, wait_timeout)
+            image = self.get_image_by_id(image_id)
+            result = self.get_image_info(image)
+
+        result['changed'] = True
+        return result
+
+    def wait_for_ready(self, image_id, wait_timeout=60):
+        import time
+        start_time = time.time()
+
+        while (time.time() - start_time) < wait_timeout:
+            image = self.one.image.info(image_id)
+            state = image.STATE
+
+            if state in [IMAGE_STATES.index('ERROR')]:
+                self.module.fail_json(msg="Got an ERROR state: " + image.TEMPLATE['ERROR'])
+
+            if state in [IMAGE_STATES.index('READY')]:
+                return True
+
+            time.sleep(1)
+        self.module.fail_json(msg="Wait timeout has expired!")
+
+    def wait_for_delete(self, image_id, wait_timeout=60):
+        import time
+        start_time = time.time()
+
+        while (time.time() - start_time) < wait_timeout:
+            # It might be already deleted by the time this function is called
+            try:
+                image = self.one.image.info(image_id)
+            except Exception:
+                check_image = self.get_image_instance(image_id)
+                if not check_image:
+                    return True
+
+            state = image.STATE
+
+            if state in [IMAGE_STATES.index('DELETE')]:
+                return True
+
+            time.sleep(1)
+
+        self.module.fail_json(msg="Wait timeout has expired!")
+
+    def enable_image(self, image, enable):
+        image = self.one.image.info(image.ID)
+        changed = False
+
         state = image.STATE
 
-        if state_predicate(state):
-            return image
+        if state not in [IMAGE_STATES.index('READY'), IMAGE_STATES.index('DISABLED'), IMAGE_STATES.index('ERROR')]:
+            if enable:
+                self.module.fail_json(msg="Cannot enable " + IMAGE_STATES[state] + " image!")
+            else:
+                self.module.fail_json(msg="Cannot disable " + IMAGE_STATES[state] + " image!")
 
-        time.sleep(1)
+        if ((enable and state != IMAGE_STATES.index('READY')) or
+                (not enable and state != IMAGE_STATES.index('DISABLED'))):
+            changed = True
 
-    module.fail_json(msg="Wait timeout has expired!")
+        if changed and not self.module.check_mode:
+            self.one.image.enable(image.ID, enable)
 
+        result = self.get_image_info(image)
+        result['changed'] = changed
 
-def wait_for_ready(module, client, image_id, wait_timeout=60):
-    return wait_for_state(module, client, image_id, wait_timeout, lambda state: (state in [IMAGE_STATES.index('READY')]))
-
-
-def wait_for_delete(module, client, image_id, wait_timeout=60):
-    return wait_for_state(module, client, image_id, wait_timeout, lambda state: (state in [IMAGE_STATES.index('DELETE')]))
-
-
-def enable_image(module, client, image, enable):
-    image = client.image.info(image.ID)
-    changed = False
-
-    state = image.STATE
-
-    if state not in [IMAGE_STATES.index('READY'), IMAGE_STATES.index('DISABLED'), IMAGE_STATES.index('ERROR')]:
-        if enable:
-            module.fail_json(msg="Cannot enable " + IMAGE_STATES[state] + " image!")
-        else:
-            module.fail_json(msg="Cannot disable " + IMAGE_STATES[state] + " image!")
-
-    if ((enable and state != IMAGE_STATES.index('READY')) or
-       (not enable and state != IMAGE_STATES.index('DISABLED'))):
-        changed = True
-
-    if changed and not module.check_mode:
-        client.image.enable(image.ID, enable)
-
-    result = get_image_info(image)
-    result['changed'] = changed
-
-    return result
-
-
-def clone_image(module, client, image, new_name):
-    if new_name is None:
-        new_name = "Copy of " + image.NAME
-
-    tmp_image = get_image_by_name(module, client, new_name)
-    if tmp_image:
-        result = get_image_info(tmp_image)
-        result['changed'] = False
         return result
 
-    if image.STATE == IMAGE_STATES.index('DISABLED'):
-        module.fail_json(msg="Cannot clone DISABLED image")
+    def change_persistence(self, image, enable):
+        image = self.one.image.info(image.ID)
+        changed = False
 
-    if not module.check_mode:
-        new_id = client.image.clone(image.ID, new_name)
-        wait_for_ready(module, client, new_id)
-        image = client.image.info(new_id)
+        state = image.STATE
 
-    result = get_image_info(image)
-    result['changed'] = True
+        if state not in [IMAGE_STATES.index('READY'), IMAGE_STATES.index('DISABLED'), IMAGE_STATES.index('ERROR')]:
+            if enable:
+                self.module.fail_json(msg="Cannot enable persistence for " + IMAGE_STATES[state] + " image!")
+            else:
+                self.module.fail_json(msg="Cannot disable persistence for " + IMAGE_STATES[state] + " image!")
 
-    return result
+        if ((enable and state != IMAGE_STATES.index('READY')) or
+                (not enable and state != IMAGE_STATES.index('DISABLED'))):
+            changed = True
 
+        if changed and not self.module.check_mode:
+            self.one.image.persistent(image.ID, enable)
 
-def rename_image(module, client, image, new_name):
-    if new_name is None:
-        module.fail_json(msg="'new_name' option has to be specified when the state is 'renamed'")
+        result = self.get_image_info(image)
+        result['changed'] = changed
 
-    if new_name == image.NAME:
-        result = get_image_info(image)
-        result['changed'] = False
         return result
 
-    tmp_image = get_image_by_name(module, client, new_name)
-    if tmp_image:
-        module.fail_json(msg="Name '" + new_name + "' is already taken by IMAGE with id=" + str(tmp_image.ID))
+    def clone_image(self, image, new_name, wait_timeout):
+        if new_name is None:
+            new_name = "Copy of " + image.NAME
 
-    if not module.check_mode:
-        client.image.rename(image.ID, new_name)
+        tmp_image = self.get_image_by_name(new_name)
+        if tmp_image:
+            result = self.get_image_info(image)
+            result['changed'] = False
+            return result
 
-    result = get_image_info(image)
-    result['changed'] = True
-    return result
+        if image.STATE == IMAGE_STATES.index('DISABLED'):
+            self.module.fail_json(msg="Cannot clone DISABLED image")
 
+        if not self.module.check_mode:
+            new_id = self.one.image.clone(image.ID, new_name)
+            self.wait_for_ready(new_id, wait_timeout)
+            image = self.one.image.info(new_id)
 
-def delete_image(module, client, image):
+        result = self.get_image_info(image)
+        result['changed'] = True
 
-    if not image:
-        return {'changed': False}
+        return result
 
-    if image.RUNNING_VMS > 0:
-        module.fail_json(msg="Cannot delete image. There are " + str(image.RUNNING_VMS) + " VMs using it.")
+    def rename_image(self, image, new_name):
+        if new_name is None:
+            self.module.fail_json(msg="'new_name' option has to be specified when the state is 'renamed'")
 
-    if not module.check_mode:
-        client.image.delete(image.ID)
-        wait_for_delete(module, client, image.ID)
+        if new_name == image.NAME:
+            result = self.get_image_info(image)
+            result['changed'] = False
+            return result
 
-    return {'changed': True}
+        tmp_image = self.get_image_by_name(new_name)
+        if tmp_image:
+            self.module.fail_json(msg="Name '" + new_name + "' is already taken by IMAGE with id=" + str(tmp_image.ID))
 
+        if not self.module.check_mode:
+            self.one.image.rename(image.ID, new_name)
 
-def get_connection_info(module):
+        result = self.get_image_info(image)
+        result['changed'] = True
+        return result
 
-    url = module.params.get('api_url')
-    username = module.params.get('api_username')
-    password = module.params.get('api_password')
+    def delete_image(self, image, wait_timeout):
+        if not image:
+            return {'changed': False}
 
-    if not url:
-        url = os.environ.get('ONE_URL')
+        if image.RUNNING_VMS > 0:
+            self.module.fail_json(msg="Cannot delete image. There are " + str(image.RUNNING_VMS) + " VMs using it.")
 
-    if not username:
-        username = os.environ.get('ONE_USERNAME')
+        if not self.module.check_mode:
+            self.one.image.delete(image.ID)
+            self.wait_for_delete(image.ID, wait_timeout)
 
-    if not password:
-        password = os.environ.get('ONE_PASSWORD')
-
-    if not (url and username and password):
-        module.fail_json(msg="One or more connection parameters (api_url, api_username, api_password) were not specified")
-    from collections import namedtuple
-
-    auth_params = namedtuple('auth', ('url', 'username', 'password'))
-
-    return auth_params(url=url, username=username, password=password)
+        return {'changed': True}
 
 
 def main():
-    fields = {
-        "api_url": {"required": False, "type": "str"},
-        "api_username": {"required": False, "type": "str"},
-        "api_password": {"required": False, "type": "str", "no_log": True},
-        "id": {"required": False, "type": "int"},
-        "name": {"required": False, "type": "str"},
-        "state": {
-            "default": "present",
-            "choices": ['present', 'absent', 'cloned', 'renamed'],
-            "type": "str"
-        },
-        "enabled": {"required": False, "type": "bool"},
-        "new_name": {"required": False, "type": "str"},
-    }
-
-    module = AnsibleModule(argument_spec=fields,
-                           mutually_exclusive=[['id', 'name']],
-                           supports_check_mode=True)
-
-    if not HAS_PYONE:
-        module.fail_json(msg='This module requires pyone to work!')
-
-    auth = get_connection_info(module)
-    params = module.params
-    id = params.get('id')
-    name = params.get('name')
-    state = params.get('state')
-    enabled = params.get('enabled')
-    new_name = params.get('new_name')
-    client = pyone.OneServer(auth.url, session=auth.username + ':' + auth.password)
-
-    result = {}
-
-    if not id and state == 'renamed':
-        module.fail_json(msg="Option 'id' is required when the state is 'renamed'")
-
-    image = get_image_instance(module, client, id, name)
-    if not image and state != 'absent':
-        if id:
-            module.fail_json(msg="There is no image with id=" + str(id))
-        else:
-            module.fail_json(msg="There is no image with name=" + name)
-
-    if state == 'absent':
-        result = delete_image(module, client, image)
-    else:
-        result = get_image_info(image)
-        changed = False
-        result['changed'] = False
-
-        if enabled is not None:
-            result = enable_image(module, client, image, enabled)
-        if state == "cloned":
-            result = clone_image(module, client, image, new_name)
-        elif state == "renamed":
-            result = rename_image(module, client, image, new_name)
-
-        changed = changed or result['changed']
-        result['changed'] = changed
-
-    module.exit_json(**result)
+    ImageModule().run_module()
 
 
 if __name__ == '__main__':

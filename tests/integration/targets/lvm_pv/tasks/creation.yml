@@ -1,0 +1,33 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Creating a 50MB file for loop device
+  ansible.builtin.command: dd if=/dev/zero of={{ remote_tmp_dir }}/test_lvm_pv.img bs=1M count=50
+  args:
+    creates: "{{ remote_tmp_dir }}/test_lvm_pv.img"
+
+- name: Creating loop device
+  ansible.builtin.command: losetup -f
+  register: loop_device
+
+- name: Associating loop device with file
+  ansible.builtin.command: 'losetup {{ loop_device.stdout }} {{ remote_tmp_dir }}/test_lvm_pv.img'
+
+- name: Creating physical volume
+  community.general.lvm_pv:
+    device: "{{ loop_device.stdout }}"
+  register: result
+
+- name: Checking physical volume size
+  ansible.builtin.command: pvs --noheadings -o pv_size --units M {{ loop_device.stdout }}
+  register: pv_size_output
+
+- name: Asserting physical volume was created
+  ansible.builtin.assert:
+    that:
+      - result.changed == true
+      - (pv_size_output.stdout | trim | regex_replace('M', '') | float) > 45
+      - (pv_size_output.stdout | trim | regex_replace('M', '') | float) < 55
+      - "'created' in result.msg"

@@ -10,7 +10,7 @@ __metaclass__ = type
 class ModuleDocFragment(object):
 
     # Standard files documentation fragment
-    DOCUMENTATION = r'''
+    DOCUMENTATION = r"""
 options:
   api_url:
     description:
@@ -29,4 +29,4 @@ options:
       - Whether or not to validate SSL certs when supplying a HTTPS endpoint.
     type: bool
     default: true
-'''
+"""

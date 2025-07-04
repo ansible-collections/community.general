@@ -8,14 +8,13 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: installp
 author:
   - Kairo Araujo (@kairoaraujo)
 short_description: Manage packages on AIX
 description:
-  - Manage packages using 'installp' on AIX
+  - Manage packages using 'installp' on AIX.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -26,32 +25,32 @@ attributes:
 options:
   accept_license:
     description:
-    - Whether to accept the license for the package(s).
+      - Whether to accept the license for the package(s).
     type: bool
     default: false
   name:
     description:
-    - One or more packages to install or remove.
-    - Use V(all) to install all packages available on informed O(repository_path).
+      - One or more packages to install or remove.
+      - Use V(all) to install all packages available on informed O(repository_path).
     type: list
     elements: str
     required: true
-    aliases: [ pkg ]
+    aliases: [pkg]
   repository_path:
     description:
-    - Path with AIX packages (required to install).
+      - Path with AIX packages (required to install).
     type: path
   state:
     description:
-    - Whether the package needs to be present on or absent from the system.
+      - Whether the package needs to be present on or absent from the system.
     type: str
-    choices: [ absent, present ]
+    choices: [absent, present]
     default: present
 notes:
-- If the package is already installed, even the package/fileset is new, the module will not install it.
-'''
+  - If the package is already installed, even the package/fileset is new, the module will not install it.
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Install package foo
   community.general.installp:
     name: foo
@@ -84,9 +83,9 @@ EXAMPLES = r'''
   community.general.installp:
     name: bos.sysmgt.nim.master
     state: absent
-'''
+"""
 
-RETURN = r''' # '''
+RETURN = r""" # """
 
 import os
 import re
@@ -106,7 +105,7 @@ def _check_new_pkg(module, package, repository_path):
 
     if os.path.isdir(repository_path):
         installp_cmd = module.get_bin_path('installp', True)
-        rc, package_result, err = module.run_command("%s -l -MR -d %s" % (installp_cmd, repository_path))
+        rc, package_result, err = module.run_command([installp_cmd, "-l", "-MR", "-d", repository_path])
         if rc != 0:
             module.fail_json(msg="Failed to run installp.", rc=rc, err=err)
 
@@ -142,7 +141,7 @@ def _check_installed_pkg(module, package, repository_path):
     """
 
     lslpp_cmd = module.get_bin_path('lslpp', True)
-    rc, lslpp_result, err = module.run_command("%s -lcq %s*" % (lslpp_cmd, package))
+    rc, lslpp_result, err = module.run_command([lslpp_cmd, "-lcq", "%s*" % (package, )])
 
     if rc == 1:
         package_state = ' '.join(err.split()[-2:])
@@ -173,7 +172,7 @@ def remove(module, installp_cmd, packages):
 
         if pkg_check:
             if not module.check_mode:
-                rc, remove_out, err = module.run_command("%s -u %s" % (installp_cmd, package))
+                rc, remove_out, err = module.run_command([installp_cmd, "-u", package])
                 if rc != 0:
                     module.fail_json(msg="Failed to run installp.", rc=rc, err=err)
             remove_count += 1
@@ -202,8 +201,8 @@ def install(module, installp_cmd, packages, repository_path, accept_license):
     already_installed_pkgs = {}
 
     accept_license_param = {
-        True: '-Y',
-        False: '',
+        True: ['-Y'],
+        False: [],
     }
 
     # Validate if package exists on repository path.
@@ -230,7 +229,8 @@ def install(module, installp_cmd, packages, repository_path, accept_license):
 
             else:
                 if not module.check_mode:
-                    rc, out, err = module.run_command("%s -a %s -X -d %s %s" % (installp_cmd, accept_license_param[accept_license], repository_path, package))
+                    rc, out, err = module.run_command(
+                        [installp_cmd, "-a"] + accept_license_param[accept_license] + ["-X", "-d", repository_path, package])
                     if rc != 0:
                         module.fail_json(msg="Failed to run installp", rc=rc, err=err)
                 installed_pkgs.append(package)

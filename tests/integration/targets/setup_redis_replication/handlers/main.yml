@@ -28,12 +28,12 @@
     path: "{{ item }}"
     state: absent
   loop:
-  - "{{ master_conf }}"
-  - "{{ master_datadir }}"
-  - "{{ master_logdir }}"
-  - /var/run/redis_{{ master_port }}.pid
-  - "{{ replica_conf }}"
-  - "{{ replica_datadir }}"
-  - "{{ replica_logdir }}"
-  - /var/run/redis_{{ replica_port }}.pid
+    - "{{ master_conf }}"
+    - "{{ master_datadir }}"
+    - "{{ master_logdir }}"
+    - /var/run/redis_{{ master_port }}.pid
+    - "{{ replica_conf }}"
+    - "{{ replica_datadir }}"
+    - "{{ replica_logdir }}"
+    - /var/run/redis_{{ replica_port }}.pid
   listen: cleanup redis

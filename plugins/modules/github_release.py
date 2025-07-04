@@ -9,78 +9,77 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: github_release
 short_description: Interact with GitHub Releases
 description:
-    - Fetch metadata about GitHub Releases
+  - Fetch metadata about GitHub Releases.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    token:
-        description:
-            - GitHub Personal Access Token for authenticating. Mutually exclusive with O(password).
-        type: str
-    user:
-        description:
-            - The GitHub account that owns the repository
-        type: str
-        required: true
-    password:
-        description:
-            - The GitHub account password for the user. Mutually exclusive with O(token).
-        type: str
-    repo:
-        description:
-            - Repository name
-        type: str
-        required: true
-    action:
-        description:
-            - Action to perform
-        type: str
-        required: true
-        choices: [ 'latest_release', 'create_release' ]
-    tag:
-        description:
-            - Tag name when creating a release. Required when using O(action=create_release).
-        type: str
-    target:
-        description:
-            - Target of release when creating a release
-        type: str
-    name:
-        description:
-            - Name of release when creating a release
-        type: str
-    body:
-        description:
-            - Description of the release when creating a release
-        type: str
-    draft:
-        description:
-            - Sets if the release is a draft or not. (boolean)
-        type: bool
-        default: false
-    prerelease:
-        description:
-            - Sets if the release is a prerelease or not. (boolean)
-        type: bool
-        default: false
+  token:
+    description:
+      - GitHub Personal Access Token for authenticating. Mutually exclusive with O(password).
+    type: str
+  user:
+    description:
+      - The GitHub account that owns the repository.
+    type: str
+    required: true
+  password:
+    description:
+      - The GitHub account password for the user. Mutually exclusive with O(token).
+    type: str
+  repo:
+    description:
+      - Repository name.
+    type: str
+    required: true
+  action:
+    description:
+      - Action to perform.
+    type: str
+    required: true
+    choices: ['latest_release', 'create_release']
+  tag:
+    description:
+      - Tag name when creating a release. Required when using O(action=create_release).
+    type: str
+  target:
+    description:
+      - Target of release when creating a release.
+    type: str
+  name:
+    description:
+      - Name of release when creating a release.
+    type: str
+  body:
+    description:
+      - Description of the release when creating a release.
+    type: str
+  draft:
+    description:
+      - Sets if the release is a draft or not. (boolean).
+    type: bool
+    default: false
+  prerelease:
+    description:
+      - Sets if the release is a prerelease or not. (boolean).
+    type: bool
+    default: false
 
 author:
-    - "Adrian Moisey (@adrianmoisey)"
+  - "Adrian Moisey (@adrianmoisey)"
 requirements:
-    - "github3.py >= 1.0.0a3"
-'''
+  - "github3.py >= 1.0.0a3"
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Get latest release of a public repository
   community.general.github_release:
     user: ansible
@@ -111,16 +110,15 @@ EXAMPLES = '''
     target: master
     name: My Release
     body: Some description
+"""
 
-'''
-
-RETURN = '''
+RETURN = r"""
 tag:
-    description: Version of the created/latest release.
-    type: str
-    returned: success
-    sample: 1.1.0
-'''
+  description: Version of the created/latest release.
+  type: str
+  returned: success
+  sample: 1.1.0
+"""
 
 import traceback
 

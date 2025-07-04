@@ -93,7 +93,7 @@
       - result.end_state.type == "script-policy-2.js"
       - result.msg == 'Custom policy FirstCustomPolicy already exists'
 
-# Ensure that we can create multiple instances of the custom policy 
+# Ensure that we can create multiple instances of the custom policy
 - name: Create second instance of the custom policy
   community.general.keycloak_authz_custom_policy:
     auth_keycloak_url: "{{ url }}"

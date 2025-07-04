@@ -9,91 +9,91 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - block:
-  - name: Install EPEL repository (RHEL only)
-    include_role:
-      name: setup_epel
-    when:
-      - ansible_distribution in ['RedHat', 'CentOS']
-      - ansible_distribution_major_version is version('9', '<')
+    - name: Install EPEL repository (RHEL only)
+      include_role:
+        name: setup_epel
+      when:
+        - ansible_distribution in ['RedHat', 'CentOS']
+        - ansible_distribution_major_version is version('9', '<')
 
-  - name: create required directories
-    become: true
-    file:
-      path: "{{ item }}"
-      state: directory
-    loop:
-      - /var/lib/monit
-      - /var/run/monit
-      - "{{ process_root }}"
+    - name: create required directories
+      become: true
+      file:
+        path: "{{ item }}"
+        state: directory
+      loop:
+        - /var/lib/monit
+        - /var/run/monit
+        - "{{ process_root }}"
 
-  - name: install monit
-    become: true
-    package:
-      name: monit
-      state: present
+    - name: install monit
+      become: true
+      package:
+        name: monit
+        state: present
 
-  - include_vars: '{{ item }}'
-    with_first_found:
-      - files:
-          - "{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_major_version }}.yml"
-          - '{{ ansible_os_family }}.yml'
-          - 'defaults.yml'
+    - include_vars: '{{ item }}'
+      with_first_found:
+        - files:
+            - "{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_major_version }}.yml"
+            - '{{ ansible_os_family }}.yml'
+            - 'defaults.yml'
 
-  - name: monit config
-    become: true
-    template:
-      src: "monitrc.j2"
-      dest: "{{ monitrc }}"
+    - name: monit config
+      become: true
+      template:
+        src: "monitrc.j2"
+        dest: "{{ monitrc }}"
 
-  - name: copy process file
-    become: true
-    copy:
-      src: httpd_echo.py
-      dest: "{{ process_file }}"
+    - name: copy process file
+      become: true
+      copy:
+        src: httpd_echo.py
+        dest: "{{ process_file }}"
 
-  - name: Install virtualenv on CentOS 8
-    package:
-      name: virtualenv
-      state: present
-    when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == '8'
+    - name: Install virtualenv on CentOS 8
+      package:
+        name: virtualenv
+        state: present
+      when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == '8'
 
-  - name: Install virtualenv on Arch Linux
-    pip:
-      name: virtualenv
-      state: present
-    when: ansible_os_family == 'Archlinux'
+    - name: Install virtualenv on Arch Linux
+      pip:
+        name: virtualenv
+        state: present
+      when: ansible_os_family == 'Archlinux'
 
-  - name: install dependencies
-    pip:
-      name: "{{ item }}"
-      virtualenv: "{{ process_venv }}"
-      extra_args: "-c {{ remote_constraints }}"
-    loop:
-      - setuptools==44
-      - python-daemon
+    - name: install dependencies
+      pip:
+        name: "{{ item }}"
+        virtualenv: "{{ process_venv }}"
+        extra_args: "-c {{ remote_constraints }}"
+      loop:
+        - setuptools==44
+        - python-daemon
 
-  - name: restart monit
-    become: true
-    service:
-      name: monit
-      state: restarted
+    - name: restart monit
+      become: true
+      service:
+        name: monit
+        state: restarted
 
-  - include_tasks: test.yml
+    - include_tasks: test.yml
 
   always:
-  - name: stop monit
-    become: true
-    service:
-      name: monit
-      state: stopped
+    - name: stop monit
+      become: true
+      service:
+        name: monit
+        state: stopped
 
-  - name: uninstall monit
-    become: true
-    package:
-      name: monit
-      state: absent
+    - name: uninstall monit
+      become: true
+      package:
+        name: monit
+        state: absent
 
-  - name: remove process files
-    file:
-      path: "{{ process_root }}"
-      state: absent
+    - name: remove process files
+      file:
+        path: "{{ process_root }}"
+        state: absent

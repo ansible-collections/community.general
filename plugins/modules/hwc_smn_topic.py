@@ -12,101 +12,92 @@ __metaclass__ = type
 # Documentation
 ###############################################################################
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: hwc_smn_topic
 description:
-    - Represents a SMN notification topic resource.
-short_description: Creates a resource of SMNTopic in Huaweicloud Cloud
+  - Represents a SMN notification topic resource.
+short_description: Creates a resource of SMNTopic in Huawei Cloud
 author: Huawei Inc. (@huaweicloud)
 requirements:
-    - requests >= 2.18.4
-    - keystoneauth1 >= 3.6.0
+  - requests >= 2.18.4
+  - keystoneauth1 >= 3.6.0
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    state:
-        description:
-            - Whether the given object should exist in Huaweicloud Cloud.
-        type: str
-        choices: ['present', 'absent']
-        default: 'present'
-    display_name:
-        description:
-            - Topic display name, which is presented as the name of the email
-              sender in an email message. The topic display name contains a
-              maximum of 192 bytes.
-        type: str
-        required: false
-    name:
-        description:
-            - Name of the topic to be created. The topic name is a string of 1
-              to 256 characters. It must contain upper- or lower-case letters,
-              digits, hyphens (V(-)), and underscores (V(_)), and must start with a
-              letter or digit.
-        type: str
-        required: true
+  state:
+    description:
+      - Whether the given object should exist in Huawei Cloud.
+    type: str
+    choices: ['present', 'absent']
+    default: 'present'
+  display_name:
+    description:
+      - Topic display name, which is presented as the name of the email sender in an email message. The topic display name
+        contains a maximum of 192 bytes.
+    type: str
+    required: false
+  name:
+    description:
+      - Name of the topic to be created. The topic name is a string of 1 to 256 characters. It must contain upper- or lower-case
+        letters, digits, hyphens (V(-)), and underscores (V(_)), and must start with a letter or digit.
+    type: str
+    required: true
 extends_documentation_fragment:
   - community.general.hwc
   - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a smn topic
   community.general.hwc_smn_topic:
-      identity_endpoint: "{{ identity_endpoint }}"
-      user_name: "{{ user_name }}"
-      password: "{{ password }}"
-      domain_name: "{{ domain_name }}"
-      project_name: "{{ project_name }}"
-      region: "{{ region }}"
-      name: "ansible_smn_topic_test"
-      state: present
-'''
+    identity_endpoint: "{{ identity_endpoint }}"
+    user_name: "{{ user_name }}"
+    password: "{{ password }}"
+    domain_name: "{{ domain_name }}"
+    project_name: "{{ project_name }}"
+    region: "{{ region }}"
+    name: "ansible_smn_topic_test"
+    state: present
+"""
 
-RETURN = '''
+RETURN = r"""
 create_time:
-    description:
-        - Time when the topic was created.
-    returned: success
-    type: str
+  description:
+    - Time when the topic was created.
+  returned: success
+  type: str
 display_name:
-    description:
-        - Topic display name, which is presented as the name of the email
-          sender in an email message. The topic display name contains a
-          maximum of 192 bytes.
-    returned: success
-    type: str
+  description:
+    - Topic display name, which is presented as the name of the email sender in an email message. The topic display name contains
+      a maximum of 192 bytes.
+  returned: success
+  type: str
 name:
-    description:
-        - Name of the topic to be created. The topic name is a string of 1
-          to 256 characters. It must contain upper- or lower-case letters,
-          digits, hyphens (V(-)), and underscores (V(_)), and must start with a
-          letter or digit.
-    returned: success
-    type: str
+  description:
+    - Name of the topic to be created. The topic name is a string of 1 to 256 characters. It must contain upper- or lower-case
+      letters, digits, hyphens (V(-)), and underscores (V(_)), and must start with a letter or digit.
+  returned: success
+  type: str
 push_policy:
-    description:
-        - Message pushing policy. 0 indicates that the message sending
-          fails and the message is cached in the queue. 1 indicates that
-          the failed message is discarded.
-    returned: success
-    type: int
+  description:
+    - Message pushing policy. V(0) indicates that the message sending fails and the message is cached in the queue. V(1) indicates
+      that the failed message is discarded.
+  returned: success
+  type: int
 topic_urn:
-    description:
-        - Resource identifier of a topic, which is unique.
-    returned: success
-    type: str
+  description:
+    - Resource identifier of a topic, which is unique.
+  returned: success
+  type: str
 update_time:
-    description:
-        - Time when the topic was updated.
-    returned: success
-    type: str
-'''
+  description:
+    - Time when the topic was updated.
+  returned: success
+  type: str
+"""
 
 ###############################################################################
 # Imports

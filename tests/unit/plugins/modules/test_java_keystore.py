@@ -11,9 +11,9 @@ __metaclass__ = type
 
 import os
 
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import ModuleTestCase, set_module_args
-from ansible_collections.community.general.tests.unit.compat.mock import patch
-from ansible_collections.community.general.tests.unit.compat.mock import Mock
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import ModuleTestCase, set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import Mock
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.modules.java_keystore import JavaKeystore
 
@@ -83,20 +83,20 @@ class TestCreateJavaKeystore(ModuleTestCase):
         self.mock_os_path_exists.stop()
 
     def test_create_jks_success(self):
-        set_module_args(dict(
+        with set_module_args(dict(
             certificate='cert-foo',
             private_key='private-foo',
             dest='/path/to/keystore.jks',
             name='test',
             password='changeit'
-        ))
+        )):
 
-        module = AnsibleModule(
-            argument_spec=module_argument_spec,
-            supports_check_mode=module_supports_check_mode,
-            mutually_exclusive=module_choose_between,
-            required_one_of=module_choose_between
-        )
+            module = AnsibleModule(
+                argument_spec=module_argument_spec,
+                supports_check_mode=module_supports_check_mode,
+                mutually_exclusive=module_choose_between,
+                required_one_of=module_choose_between
+            )
 
         with patch('os.remove', return_value=True):
             self.create_path.side_effect = ['/tmp/tmpgrzm2ah7']
@@ -115,21 +115,21 @@ class TestCreateJavaKeystore(ModuleTestCase):
             }
 
     def test_create_jks_keypass_fail_export_pkcs12(self):
-        set_module_args(dict(
+        with set_module_args(dict(
             certificate='cert-foo',
             private_key='private-foo',
             private_key_passphrase='passphrase-foo',
             dest='/path/to/keystore.jks',
             name='test',
             password='changeit'
-        ))
+        )):
 
-        module = AnsibleModule(
-            argument_spec=module_argument_spec,
-            supports_check_mode=module_supports_check_mode,
-            mutually_exclusive=module_choose_between,
-            required_one_of=module_choose_between
-        )
+            module = AnsibleModule(
+                argument_spec=module_argument_spec,
+                supports_check_mode=module_supports_check_mode,
+                mutually_exclusive=module_choose_between,
+                required_one_of=module_choose_between
+            )
 
         module.exit_json = Mock()
         module.fail_json = Mock()
@@ -154,20 +154,20 @@ class TestCreateJavaKeystore(ModuleTestCase):
             )
 
     def test_create_jks_fail_export_pkcs12(self):
-        set_module_args(dict(
+        with set_module_args(dict(
             certificate='cert-foo',
             private_key='private-foo',
             dest='/path/to/keystore.jks',
             name='test',
             password='changeit'
-        ))
+        )):
 
-        module = AnsibleModule(
-            argument_spec=module_argument_spec,
-            supports_check_mode=module_supports_check_mode,
-            mutually_exclusive=module_choose_between,
-            required_one_of=module_choose_between
-        )
+            module = AnsibleModule(
+                argument_spec=module_argument_spec,
+                supports_check_mode=module_supports_check_mode,
+                mutually_exclusive=module_choose_between,
+                required_one_of=module_choose_between
+            )
 
         module.exit_json = Mock()
         module.fail_json = Mock()
@@ -191,20 +191,20 @@ class TestCreateJavaKeystore(ModuleTestCase):
             )
 
     def test_create_jks_fail_import_key(self):
-        set_module_args(dict(
+        with set_module_args(dict(
             certificate='cert-foo',
             private_key='private-foo',
             dest='/path/to/keystore.jks',
             name='test',
             password='changeit'
-        ))
+        )):
 
-        module = AnsibleModule(
-            argument_spec=module_argument_spec,
-            supports_check_mode=module_supports_check_mode,
-            mutually_exclusive=module_choose_between,
-            required_one_of=module_choose_between
-        )
+            module = AnsibleModule(
+                argument_spec=module_argument_spec,
+                supports_check_mode=module_supports_check_mode,
+                mutually_exclusive=module_choose_between,
+                required_one_of=module_choose_between
+            )
 
         module.exit_json = Mock()
         module.fail_json = Mock()
@@ -257,20 +257,20 @@ class TestCertChanged(ModuleTestCase):
         self.mock_atomic_move.stop()
 
     def test_cert_unchanged_same_fingerprint(self):
-        set_module_args(dict(
+        with set_module_args(dict(
             certificate='cert-foo',
             private_key='private-foo',
             dest='/path/to/keystore.jks',
             name='foo',
             password='changeit'
-        ))
+        )):
 
-        module = AnsibleModule(
-            argument_spec=module_argument_spec,
-            supports_check_mode=module_supports_check_mode,
-            mutually_exclusive=module_choose_between,
-            required_one_of=module_choose_between
-        )
+            module = AnsibleModule(
+                argument_spec=module_argument_spec,
+                supports_check_mode=module_supports_check_mode,
+                mutually_exclusive=module_choose_between,
+                required_one_of=module_choose_between
+            )
 
         with patch('os.remove', return_value=True):
             self.create_file.side_effect = ['/tmp/placeholder', '']
@@ -282,20 +282,20 @@ class TestCertChanged(ModuleTestCase):
             self.assertFalse(result, 'Fingerprint is identical')
 
     def test_cert_changed_fingerprint_mismatch(self):
-        set_module_args(dict(
+        with set_module_args(dict(
             certificate='cert-foo',
             private_key='private-foo',
             dest='/path/to/keystore.jks',
             name='foo',
             password='changeit'
-        ))
+        )):
 
-        module = AnsibleModule(
-            argument_spec=module_argument_spec,
-            supports_check_mode=module_supports_check_mode,
-            mutually_exclusive=module_choose_between,
-            required_one_of=module_choose_between
-        )
+            module = AnsibleModule(
+                argument_spec=module_argument_spec,
+                supports_check_mode=module_supports_check_mode,
+                mutually_exclusive=module_choose_between,
+                required_one_of=module_choose_between
+            )
 
         with patch('os.remove', return_value=True):
             self.create_file.side_effect = ['/tmp/placeholder', '']
@@ -307,20 +307,20 @@ class TestCertChanged(ModuleTestCase):
             self.assertTrue(result, 'Fingerprint mismatch')
 
     def test_cert_changed_alias_does_not_exist(self):
-        set_module_args(dict(
+        with set_module_args(dict(
             certificate='cert-foo',
             private_key='private-foo',
             dest='/path/to/keystore.jks',
             name='foo',
             password='changeit'
-        ))
+        )):
 
-        module = AnsibleModule(
-            argument_spec=module_argument_spec,
-            supports_check_mode=module_supports_check_mode,
-            mutually_exclusive=module_choose_between,
-            required_one_of=module_choose_between
-        )
+            module = AnsibleModule(
+                argument_spec=module_argument_spec,
+                supports_check_mode=module_supports_check_mode,
+                mutually_exclusive=module_choose_between,
+                required_one_of=module_choose_between
+            )
 
         with patch('os.remove', return_value=True):
             self.create_file.side_effect = ['/tmp/placeholder', '']
@@ -332,20 +332,20 @@ class TestCertChanged(ModuleTestCase):
             self.assertTrue(result, 'Alias mismatch detected')
 
     def test_cert_changed_password_mismatch(self):
-        set_module_args(dict(
+        with set_module_args(dict(
             certificate='cert-foo',
             private_key='private-foo',
             dest='/path/to/keystore.jks',
             name='foo',
             password='changeit'
-        ))
+        )):
 
-        module = AnsibleModule(
-            argument_spec=module_argument_spec,
-            supports_check_mode=module_supports_check_mode,
-            mutually_exclusive=module_choose_between,
-            required_one_of=module_choose_between
-        )
+            module = AnsibleModule(
+                argument_spec=module_argument_spec,
+                supports_check_mode=module_supports_check_mode,
+                mutually_exclusive=module_choose_between,
+                required_one_of=module_choose_between
+            )
 
         with patch('os.remove', return_value=True):
             self.create_file.side_effect = ['/tmp/placeholder', '']
@@ -357,20 +357,20 @@ class TestCertChanged(ModuleTestCase):
             self.assertTrue(result, 'Password mismatch detected')
 
     def test_cert_changed_fail_read_cert(self):
-        set_module_args(dict(
+        with set_module_args(dict(
             certificate='cert-foo',
             private_key='private-foo',
             dest='/path/to/keystore.jks',
             name='foo',
             password='changeit'
-        ))
+        )):
 
-        module = AnsibleModule(
-            argument_spec=module_argument_spec,
-            supports_check_mode=module_supports_check_mode,
-            mutually_exclusive=module_choose_between,
-            required_one_of=module_choose_between
-        )
+            module = AnsibleModule(
+                argument_spec=module_argument_spec,
+                supports_check_mode=module_supports_check_mode,
+                mutually_exclusive=module_choose_between,
+                required_one_of=module_choose_between
+            )
 
         module.exit_json = Mock()
         module.fail_json = Mock()
@@ -390,20 +390,20 @@ class TestCertChanged(ModuleTestCase):
             )
 
     def test_cert_changed_fail_read_keystore(self):
-        set_module_args(dict(
+        with set_module_args(dict(
             certificate='cert-foo',
             private_key='private-foo',
             dest='/path/to/keystore.jks',
             name='foo',
             password='changeit'
-        ))
+        )):
 
-        module = AnsibleModule(
-            argument_spec=module_argument_spec,
-            supports_check_mode=module_supports_check_mode,
-            mutually_exclusive=module_choose_between,
-            required_one_of=module_choose_between
-        )
+            module = AnsibleModule(
+                argument_spec=module_argument_spec,
+                supports_check_mode=module_supports_check_mode,
+                mutually_exclusive=module_choose_between,
+                required_one_of=module_choose_between
+            )
 
         module.exit_json = Mock()
         module.fail_json = Mock(return_value=True)

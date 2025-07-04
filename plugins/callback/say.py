@@ -5,20 +5,19 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # Make coding more python3-ish
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
-DOCUMENTATION = '''
-    author: Unknown (!UNKNOWN)
-    name: say
-    type: notification
-    requirements:
-      - whitelisting in configuration
-      - the C(/usr/bin/say) command line program (standard on macOS) or C(espeak) command line program
-    short_description: notify using software speech synthesizer
-    description:
-      - This plugin will use the C(say) or C(espeak) program to "speak" about play events.
-'''
+DOCUMENTATION = r"""
+author: Unknown (!UNKNOWN)
+name: say
+type: notification
+requirements:
+  - whitelisting in configuration
+  - the C(/usr/bin/say) command line program (standard on macOS) or C(espeak) command line program
+short_description: Notify using software speech synthesizer
+description:
+  - This plugin uses C(say) or C(espeak) to "speak" about play events.
+"""
 
 import platform
 import subprocess
@@ -50,7 +49,7 @@ class CallbackModule(CallbackBase):
             self.synthesizer = get_bin_path('say')
             if platform.system() != 'Darwin':
                 # 'say' binary available, it might be GNUstep tool which doesn't support 'voice' parameter
-                self._display.warning("'say' executable found but system is '%s': ignoring voice parameter" % platform.system())
+                self._display.warning(f"'say' executable found but system is '{platform.system()}': ignoring voice parameter")
             else:
                 self.FAILED_VOICE = 'Zarvox'
                 self.REGULAR_VOICE = 'Trinoids'
@@ -69,7 +68,7 @@ class CallbackModule(CallbackBase):
         # ansible will not call any callback if disabled is set to True
         if not self.synthesizer:
             self.disabled = True
-            self._display.warning("Unable to find either 'say' or 'espeak' executable, plugin %s disabled" % os.path.basename(__file__))
+            self._display.warning(f"Unable to find either 'say' or 'espeak' executable, plugin {os.path.basename(__file__)} disabled")
 
     def say(self, msg, voice):
         cmd = [self.synthesizer, msg]
@@ -78,7 +77,7 @@ class CallbackModule(CallbackBase):
         subprocess.call(cmd)
 
     def runner_on_failed(self, host, res, ignore_errors=False):
-        self.say("Failure on host %s" % host, self.FAILED_VOICE)
+        self.say(f"Failure on host {host}", self.FAILED_VOICE)
 
     def runner_on_ok(self, host, res):
         self.say("pew", self.LASER_VOICE)
@@ -87,13 +86,13 @@ class CallbackModule(CallbackBase):
         self.say("pew", self.LASER_VOICE)
 
     def runner_on_unreachable(self, host, res):
-        self.say("Failure on host %s" % host, self.FAILED_VOICE)
+        self.say(f"Failure on host {host}", self.FAILED_VOICE)
 
     def runner_on_async_ok(self, host, res, jid):
         self.say("pew", self.LASER_VOICE)
 
     def runner_on_async_failed(self, host, res, jid):
-        self.say("Failure on host %s" % host, self.FAILED_VOICE)
+        self.say(f"Failure on host {host}", self.FAILED_VOICE)
 
     def playbook_on_start(self):
         self.say("Running Playbook", self.REGULAR_VOICE)
@@ -103,15 +102,15 @@ class CallbackModule(CallbackBase):
 
     def playbook_on_task_start(self, name, is_conditional):
         if not is_conditional:
-            self.say("Starting task: %s" % name, self.REGULAR_VOICE)
+            self.say(f"Starting task: {name}", self.REGULAR_VOICE)
         else:
-            self.say("Notifying task: %s" % name, self.REGULAR_VOICE)
+            self.say(f"Notifying task: {name}", self.REGULAR_VOICE)
 
     def playbook_on_setup(self):
         self.say("Gathering facts", self.REGULAR_VOICE)
 
     def playbook_on_play_start(self, name):
-        self.say("Starting play: %s" % name, self.HAPPY_VOICE)
+        self.say(f"Starting play: {name}", self.HAPPY_VOICE)
 
     def playbook_on_stats(self, stats):
         self.say("Play complete", self.HAPPY_VOICE)

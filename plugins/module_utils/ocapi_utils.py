@@ -56,7 +56,7 @@ class OcapiUtils(object):
                             follow_redirects='all',
                             use_proxy=True, timeout=self.timeout)
             data = json.loads(to_native(resp.read()))
-            headers = dict((k.lower(), v) for (k, v) in resp.info().items())
+            headers = {k.lower(): v for (k, v) in resp.info().items()}
         except HTTPError as e:
             return {'ret': False,
                     'msg': "HTTP Error %s on GET request to '%s'"
@@ -86,7 +86,7 @@ class OcapiUtils(object):
                 data = json.loads(to_native(resp.read()))
             else:
                 data = ""
-            headers = dict((k.lower(), v) for (k, v) in resp.info().items())
+            headers = {k.lower(): v for (k, v) in resp.info().items()}
         except HTTPError as e:
             return {'ret': False,
                     'msg': "HTTP Error %s on DELETE request to '%s'"
@@ -113,7 +113,7 @@ class OcapiUtils(object):
                             force_basic_auth=basic_auth, validate_certs=False,
                             follow_redirects='all',
                             use_proxy=True, timeout=self.timeout)
-            headers = dict((k.lower(), v) for (k, v) in resp.info().items())
+            headers = {k.lower(): v for (k, v) in resp.info().items()}
         except HTTPError as e:
             return {'ret': False,
                     'msg': "HTTP Error %s on PUT request to '%s'"
@@ -144,7 +144,7 @@ class OcapiUtils(object):
                             force_basic_auth=basic_auth, validate_certs=False,
                             follow_redirects='all',
                             use_proxy=True, timeout=self.timeout if timeout is None else timeout)
-            headers = dict((k.lower(), v) for (k, v) in resp.info().items())
+            headers = {k.lower(): v for (k, v) in resp.info().items()}
         except HTTPError as e:
             return {'ret': False,
                     'msg': "HTTP Error %s on POST request to '%s'"

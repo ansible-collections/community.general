@@ -9,66 +9,64 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: apache2_module
 author:
-    - Christian Berendt (@berendt)
-    - Ralf Hertel (@n0trax)
-    - Robin Roth (@robinro)
+  - Christian Berendt (@berendt)
+  - Ralf Hertel (@n0trax)
+  - Robin Roth (@robinro)
 short_description: Enables/disables a module of the Apache2 webserver
 description:
-   - Enables or disables a specified module of the Apache2 webserver.
+  - Enables or disables a specified module of the Apache2 webserver.
 extends_documentation_fragment:
-   - community.general.attributes
+  - community.general.attributes
 attributes:
-   check_mode:
-     support: full
-   diff_mode:
-     support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-   name:
-     type: str
-     description:
-        - Name of the module to enable/disable as given to C(a2enmod/a2dismod).
-     required: true
-   identifier:
-     type: str
-     description:
-         - Identifier of the module as listed by C(apache2ctl -M).
-           This is optional and usually determined automatically by the common convention of
-           appending V(_module) to O(name) as well as custom exception for popular modules.
-     required: false
-   force:
-     description:
-        - Force disabling of default modules and override Debian warnings.
-     required: false
-     type: bool
-     default: false
-   state:
-     type: str
-     description:
-        - Desired state of the module.
-     choices: ['present', 'absent']
-     default: present
-   ignore_configcheck:
-     description:
-        - Ignore configuration checks about inconsistent module configuration. Especially for mpm_* modules.
-     type: bool
-     default: false
-   warn_mpm_absent:
-     description:
-        - Control the behavior of the warning process for MPM modules.
-     type: bool
-     default: true
-     version_added: 6.3.0
-requirements: ["a2enmod","a2dismod"]
+  name:
+    type: str
+    description:
+      - Name of the module to enable/disable as given to C(a2enmod)/C(a2dismod).
+    required: true
+  identifier:
+    type: str
+    description:
+      - Identifier of the module as listed by C(apache2ctl -M). This is optional and usually determined automatically by the
+        common convention of appending V(_module) to O(name) as well as custom exception for popular modules.
+    required: false
+  force:
+    description:
+      - Force disabling of default modules and override Debian warnings.
+    required: false
+    type: bool
+    default: false
+  state:
+    type: str
+    description:
+      - Desired state of the module.
+    choices: ['present', 'absent']
+    default: present
+  ignore_configcheck:
+    description:
+      - Ignore configuration checks about inconsistent module configuration. Especially for mpm_* modules.
+    type: bool
+    default: false
+  warn_mpm_absent:
+    description:
+      - Control the behavior of the warning process for MPM modules.
+    type: bool
+    default: true
+    version_added: 6.3.0
+requirements: ["a2enmod", "a2dismod"]
 notes:
-  - This does not work on RedHat-based distributions. It does work on Debian- and SuSE-based distributions.
-    Whether it works on others depend on whether the C(a2enmod) and C(a2dismod) tools are available or not.
-'''
+  - This does not work on RedHat-based distributions. It does work on Debian- and SuSE-based distributions. Whether it works
+    on others depend on whether the C(a2enmod) and C(a2dismod) tools are available or not.
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Enable the Apache2 module wsgi
   community.general.apache2_module:
     state: present
@@ -98,40 +96,40 @@ EXAMPLES = '''
     warn_mpm_absent: false
     ignore_configcheck: true
   loop:
-  - module: mpm_event
-    state: absent
-  - module: mpm_prefork
-    state: present
+    - module: mpm_event
+      state: absent
+    - module: mpm_prefork
+      state: present
 
 - name: Enable dump_io module, which is identified as dumpio_module inside apache2
   community.general.apache2_module:
     state: present
     name: dump_io
     identifier: dumpio_module
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 result:
-    description: message about action taken
-    returned: always
-    type: str
+  description: Message about action taken.
+  returned: always
+  type: str
 warnings:
-    description: list of warning messages
-    returned: when needed
-    type: list
+  description: List of warning messages.
+  returned: when needed
+  type: list
 rc:
-    description: return code of underlying command
-    returned: failed
-    type: int
+  description: Return code of underlying command.
+  returned: failed
+  type: int
 stdout:
-    description: stdout of underlying command
-    returned: failed
-    type: str
+  description: The stdout of underlying command.
+  returned: failed
+  type: str
 stderr:
-    description: stderr of underlying command
-    returned: failed
-    type: str
-'''
+  description: The stderr of underlying command.
+  returned: failed
+  type: str
+"""
 
 import re
 
@@ -196,6 +194,7 @@ def create_apache_identifier(name):
 
     # re expressions to extract subparts of names
     re_workarounds = [
+        ('php8', re.compile(r'^(php)[\d\.]+')),
         ('php', re.compile(r'^(php\d)\.')),
     ]
 

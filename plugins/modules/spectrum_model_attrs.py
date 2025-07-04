@@ -9,110 +9,108 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: spectrum_model_attrs
 short_description: Enforce a model's attributes in CA Spectrum
 description:
-    - This module can be used to enforce a model's attributes in CA Spectrum.
+  - This module can be used to enforce a model's attributes in CA Spectrum.
 version_added: 2.5.0
 author:
-    - Tyler Gates (@tgates81)
+  - Tyler Gates (@tgates81)
 notes:
-    - Tested on CA Spectrum version 10.4.2.0.189.
-    - Model creation and deletion are not possible with this module. For that use M(community.general.spectrum_device) instead.
+  - Tested on CA Spectrum version 10.4.2.0.189.
+  - Model creation and deletion are not possible with this module. For that use M(community.general.spectrum_device) instead.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-      support: full
-    diff_mode:
-      support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-   url:
-     description:
-     - URL of OneClick server.
-     type: str
-     required: true
-   url_username:
-     description:
-     - OneClick username.
-     type: str
-     required: true
-     aliases: [username]
-   url_password:
-     description:
-     - OneClick password.
-     type: str
-     required: true
-     aliases: [password]
-   use_proxy:
-     description:
-     - if V(false), it will not use a proxy, even if one is defined in
-       an environment variable on the target hosts.
-     default: true
-     required: false
-     type: bool
-   name:
-     description:
-     - Model name.
-     type: str
-     required: true
-   type:
-     description:
-     - Model type.
-     type: str
-     required: true
-   validate_certs:
-     description:
-     - Validate SSL certificates. Only change this to V(false) if you can guarantee that you are talking to the correct endpoint and there is no
-       man-in-the-middle attack happening.
-     type: bool
-     default: true
-     required: false
-   attributes:
-     description:
-     - A list of attribute names and values to enforce.
-     - All values and parameters are case sensitive and must be provided as strings only.
-     required: true
-     type: list
-     elements: dict
-     suboptions:
-       name:
-         description:
-         - Attribute name OR hex ID.
-         - 'Currently defined names are:'
-         - '                 C(App_Manufacturer) (C(0x230683))'
-         - '                 C(CollectionsModelNameString) (C(0x12adb))'
-         - '                 C(Condition) (C(0x1000a))'
-         - '                 C(Criticality) (C(0x1290c))'
-         - '                 C(DeviceType) (C(0x23000e))'
-         - '                 C(isManaged) (C(0x1295d))'
-         - '                 C(Model_Class) (C(0x11ee8))'
-         - '                 C(Model_Handle) (C(0x129fa))'
-         - '                 C(Model_Name) (C(0x1006e))'
-         - '                 C(Modeltype_Handle) (C(0x10001))'
-         - '                 C(Modeltype_Name) (C(0x10000))'
-         - '                 C(Network_Address) (C(0x12d7f))'
-         - '                 C(Notes) (C(0x11564))'
-         - '                 C(ServiceDesk_Asset_ID) (C(0x12db9))'
-         - '                 C(TopologyModelNameString) (C(0x129e7))'
-         - '                 C(sysDescr) (C(0x10052))'
-         - '                 C(sysName) (C(0x10b5b))'
-         - '                 C(Vendor_Name) (C(0x11570))'
-         - '                 C(Description) (C(0x230017))'
-         - Hex IDs are the direct identifiers in Spectrum and will always work.
-         - 'To lookup hex IDs go to the UI: Locator -> Devices -> By Model Name -> <enter any model> -> Attributes tab.'
-         type: str
-         required: true
-       value:
-         description:
-         - Attribute value. Empty strings should be V("") or V(null).
-         type: str
-         required: true
-'''
+  url:
+    description:
+      - URL of OneClick server.
+    type: str
+    required: true
+  url_username:
+    description:
+      - OneClick username.
+    type: str
+    required: true
+    aliases: [username]
+  url_password:
+    description:
+      - OneClick password.
+    type: str
+    required: true
+    aliases: [password]
+  use_proxy:
+    description:
+      - If V(false), it will not use a proxy, even if one is defined in an environment variable on the target hosts.
+    default: true
+    required: false
+    type: bool
+  name:
+    description:
+      - Model name.
+    type: str
+    required: true
+  type:
+    description:
+      - Model type.
+    type: str
+    required: true
+  validate_certs:
+    description:
+      - Validate SSL certificates. Only change this to V(false) if you can guarantee that you are talking to the correct endpoint
+        and there is no man-in-the-middle attack happening.
+    type: bool
+    default: true
+    required: false
+  attributes:
+    description:
+      - A list of attribute names and values to enforce.
+      - All values and parameters are case sensitive and must be provided as strings only.
+    required: true
+    type: list
+    elements: dict
+    suboptions:
+      name:
+        description:
+          - Attribute name OR hex ID.
+          - 'Currently defined names are:'
+          - C(App_Manufacturer) (C(0x230683));
+          - C(CollectionsModelNameString) (C(0x12adb));
+          - C(Condition) (C(0x1000a));
+          - C(Criticality) (C(0x1290c));
+          - C(DeviceType) (C(0x23000e));
+          - C(isManaged) (C(0x1295d));
+          - C(Model_Class) (C(0x11ee8));
+          - C(Model_Handle) (C(0x129fa));
+          - C(Model_Name) (C(0x1006e));
+          - C(Modeltype_Handle) (C(0x10001));
+          - C(Modeltype_Name) (C(0x10000));
+          - C(Network_Address) (C(0x12d7f));
+          - C(Notes) (C(0x11564));
+          - C(ServiceDesk_Asset_ID) (C(0x12db9));
+          - C(TopologyModelNameString) (C(0x129e7));
+          - C(sysDescr) (C(0x10052));
+          - C(sysName) (C(0x10b5b));
+          - C(Vendor_Name) (C(0x11570));
+          - C(Description) (C(0x230017)).
+          - Hex IDs are the direct identifiers in Spectrum and will always work.
+          - 'To lookup hex IDs go to the UI: Locator -> Devices -> By Model Name -> <enter any model> -> Attributes tab.'
+        type: str
+        required: true
+      value:
+        description:
+          - Attribute value. Empty strings should be V("") or V(null).
+        type: str
+        required: true
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Enforce maintenance mode for modelxyz01 with a note about why
   community.general.spectrum_model_attrs:
     url: "http://oneclick.url.com"
@@ -128,23 +126,20 @@ EXAMPLES = r'''
         value: "MM set on {{ ansible_date_time.iso8601 }} via CO {{ CO }} by {{ tower_user_name | default(ansible_user_id) }}"
   delegate_to: localhost
   register: spectrum_model_attrs_status
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 msg:
-    description: Informational message on the job result.
-    type: str
-    returned: always
-    sample: 'Success'
+  description: Informational message on the job result.
+  type: str
+  returned: always
+  sample: 'Success'
 changed_attrs:
-    description: Dictionary of changed name or hex IDs (whichever was specified) to their new corresponding values.
-    type: dict
-    returned: always
-    sample: {
-            "Notes": "MM set on 2021-02-03T22:04:02Z via CO CO9999 by tgates",
-            "isManaged": "true"
-    }
-'''
+  description: Dictionary of changed name or hex IDs (whichever was specified) to their new corresponding values.
+  type: dict
+  returned: always
+  sample: {"Notes": "MM set on 2021-02-03T22:04:02Z via CO CO9999 by tgates", "isManaged": "true"}
+"""
 
 
 from ansible.module_utils.basic import AnsibleModule

@@ -8,37 +8,41 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: atomic_host
 short_description: Manage the atomic host platform
 description:
-    - Manage the atomic host platform.
-    - Rebooting of Atomic host platform should be done outside this module.
+  - Manage the atomic host platform.
+  - Rebooting of Atomic host platform should be done outside this module.
+deprecated:
+  removed_in: 13.0.0
+  why: Project Atomic was sunset by the end of 2019.
+  alternative: There is none.
 author:
-- Saravanan KR (@krsacme)
+  - Saravanan KR (@krsacme)
 notes:
-    - Host should be an atomic platform (verified by existence of '/run/ostree-booted' file).
+  - Host should be an atomic platform (verified by existence of '/run/ostree-booted' file).
+  - According to U(https://projectatomic.io/) the project has been sunset around 2019/2020, in favor of C(podman) and Fedora CoreOS.
 requirements:
   - atomic
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    revision:
-        description:
-          - The version number of the atomic host to be deployed.
-          - Providing V(latest) will upgrade to the latest available version.
-        default: 'latest'
-        aliases: [ version ]
-        type: str
-'''
+  revision:
+    description:
+      - The version number of the atomic host to be deployed.
+      - Providing V(latest) will upgrade to the latest available version.
+    default: 'latest'
+    aliases: [version]
+    type: str
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Upgrade the atomic host platform to the latest version (atomic host upgrade)
   community.general.atomic_host:
     revision: latest
@@ -46,15 +50,15 @@ EXAMPLES = r'''
 - name: Deploy a specific revision as the atomic host (atomic host deploy 23.130)
   community.general.atomic_host:
     revision: 23.130
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 msg:
-    description: The command standard output
-    returned: always
-    type: str
-    sample: 'Already on latest'
-'''
+  description: The command standard output.
+  returned: always
+  type: str
+  sample: 'Already on latest'
+"""
 import os
 import traceback
 

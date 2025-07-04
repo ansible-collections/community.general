@@ -12,162 +12,141 @@ __metaclass__ = type
 # Documentation
 ###############################################################################
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: hwc_vpc_security_group
 description:
-    - vpc security group management.
-short_description: Creates a resource of Vpc/SecurityGroup in Huawei Cloud
+  - VPC security group management.
+short_description: Creates a resource of VPC/SecurityGroup in Huawei Cloud
 notes:
-    - If O(id) option is provided, it takes precedence over O(name),
-      O(enterprise_project_id), and O(vpc_id) for security group selection.
-    - O(name), O(enterprise_project_id) and O(vpc_id) are used for security
-      group selection. If more than one security group with this options exists,
-      execution is aborted.
-    - No parameter support updating. If one of option is changed, the module
-      will create a new resource.
+  - If O(id) option is provided, it takes precedence over O(name), O(enterprise_project_id), and O(vpc_id) for security group
+    selection.
+  - O(name), O(enterprise_project_id) and O(vpc_id) are used for security group selection. If more than one security group
+    with this options exists, execution is aborted.
+  - No parameter support updating. If one of option is changed, the module will create a new resource.
 version_added: '0.2.0'
 author: Huawei Inc. (@huaweicloud)
 requirements:
-    - keystoneauth1 >= 3.6.0
+  - keystoneauth1 >= 3.6.0
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    state:
-        description:
-            - Whether the given object should exist in Huawei Cloud.
-        type: str
-        choices: ['present', 'absent']
-        default: 'present'
-    name:
-        description:
-            - Specifies the security group name. The value is a string of 1 to
-              64 characters that can contain letters, digits, underscores (V(_)),
-              hyphens (V(-)), and periods (V(.)).
-        type: str
-        required: true
-    enterprise_project_id:
-        description:
-            - Specifies the enterprise project ID. When creating a security
-              group, associate the enterprise project ID with the security
-              group.s
-        type: str
-        required: false
-    vpc_id:
-        description:
-            - Specifies the resource ID of the VPC to which the security group
-              belongs.
-        type: str
-        required: false
+  state:
+    description:
+      - Whether the given object should exist in Huawei Cloud.
+    type: str
+    choices: ['present', 'absent']
+    default: 'present'
+  name:
+    description:
+      - Specifies the security group name. The value is a string of 1 to 64 characters that can contain letters, digits, underscores
+        (V(_)), hyphens (V(-)), and periods (V(.)).
+    type: str
+    required: true
+  enterprise_project_id:
+    description:
+      - Specifies the enterprise project ID. When creating a security group, associate the enterprise project ID with the
+        security group.s.
+    type: str
+    required: false
+  vpc_id:
+    description:
+      - Specifies the resource ID of the VPC to which the security group belongs.
+    type: str
+    required: false
 extends_documentation_fragment:
   - community.general.hwc
   - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 # create a security group
 - name: Create a security group
   community.general.hwc_vpc_security_group:
     name: "ansible_network_security_group_test"
-'''
+"""
 
-RETURN = '''
-    name:
-        description:
-            - Specifies the security group name. The value is a string of 1 to
-              64 characters that can contain letters, digits, underscores (V(_)),
-              hyphens (V(-)), and periods (V(.)).
-        type: str
-        returned: success
-    enterprise_project_id:
-        description:
-            - Specifies the enterprise project ID. When creating a security
-              group, associate the enterprise project ID with the security
-              group.
-        type: str
-        returned: success
-    vpc_id:
-        description:
-            - Specifies the resource ID of the VPC to which the security group
-              belongs.
-        type: str
-        returned: success
-    rules:
-        description:
-            - Specifies the security group rule, which ensures that resources
-              in the security group can communicate with one another.
-        type: complex
-        returned: success
-        contains:
-            description:
-                description:
-                    - Provides supplementary information about the security
-                      group rule.
-                type: str
-                returned: success
-            direction:
-                description:
-                    - Specifies the direction of access control. The value can
-                      be egress or ingress.
-                type: str
-                returned: success
-            ethertype:
-                description:
-                    - Specifies the IP protocol version. The value can be IPv4
-                      or IPv6.
-                type: str
-                returned: success
-            id:
-                description:
-                    - Specifies the security group rule ID.
-                type: str
-                returned: success
-            port_range_max:
-                description:
-                    - Specifies the end port number. The value ranges from 1 to
-                      65535. If the protocol is not icmp, the value cannot be
-                      smaller than the port_range_min value. An empty value
-                      indicates all ports.
-                type: int
-                returned: success
-            port_range_min:
-                description:
-                    - Specifies the start port number. The value ranges from 1
-                      to 65535. The value cannot be greater than the
-                      port_range_max value. An empty value indicates all ports.
-                type: int
-                returned: success
-            protocol:
-                description:
-                    - Specifies the protocol type. The value can be icmp, tcp,
-                      udp, or others. If the parameter is left blank, the
-                      security group supports all protocols.
-                type: str
-                returned: success
-            remote_address_group_id:
-                description:
-                    - Specifies the ID of remote IP address group.
-                type: str
-                returned: success
-            remote_group_id:
-                description:
-                    - Specifies the ID of the peer security group.
-                type: str
-                returned: success
-            remote_ip_prefix:
-                description:
-                    - Specifies the remote IP address. If the access control
-                      direction is set to egress, the parameter specifies the
-                      source IP address. If the access control direction is set
-                      to ingress, the parameter specifies the destination IP
-                      address.
-                type: str
-                returned: success
-'''
+RETURN = r"""
+name:
+  description:
+    - Specifies the security group name. The value is a string of 1 to 64 characters that can contain letters, digits, underscores
+      (V(_)), hyphens (V(-)), and periods (V(.)).
+  type: str
+  returned: success
+enterprise_project_id:
+  description:
+    - Specifies the enterprise project ID. When creating a security group, associate the enterprise project ID with the security
+      group.
+  type: str
+  returned: success
+vpc_id:
+  description:
+    - Specifies the resource ID of the VPC to which the security group belongs.
+  type: str
+  returned: success
+rules:
+  description:
+    - Specifies the security group rule, which ensures that resources in the security group can communicate with one another.
+  type: complex
+  returned: success
+  contains:
+    description:
+      description:
+        - Provides supplementary information about the security group rule.
+      type: str
+      returned: success
+    direction:
+      description:
+        - Specifies the direction of access control. The value can be egress or ingress.
+      type: str
+      returned: success
+    ethertype:
+      description:
+        - Specifies the IP protocol version. The value can be IPv4 or IPv6.
+      type: str
+      returned: success
+    id:
+      description:
+        - Specifies the security group rule ID.
+      type: str
+      returned: success
+    port_range_max:
+      description:
+        - Specifies the end port number. The value ranges from 1 to 65535. If the protocol is not icmp, the value cannot be
+          smaller than the port_range_min value. An empty value indicates all ports.
+      type: int
+      returned: success
+    port_range_min:
+      description:
+        - Specifies the start port number. The value ranges from 1 to 65535. The value cannot be greater than the port_range_max
+          value. An empty value indicates all ports.
+      type: int
+      returned: success
+    protocol:
+      description:
+        - Specifies the protocol type. The value can be icmp, tcp, udp, or others. If the parameter is left blank, the security
+          group supports all protocols.
+      type: str
+      returned: success
+    remote_address_group_id:
+      description:
+        - Specifies the ID of remote IP address group.
+      type: str
+      returned: success
+    remote_group_id:
+      description:
+        - Specifies the ID of the peer security group.
+      type: str
+      returned: success
+    remote_ip_prefix:
+      description:
+        - Specifies the remote IP address. If the access control direction is set to egress, the parameter specifies the source
+          IP address. If the access control direction is set to ingress, the parameter specifies the destination IP address.
+      type: str
+      returned: success
+"""
 
 from ansible_collections.community.general.plugins.module_utils.hwc_utils import (
     Config, HwcClientException, HwcModule, are_different_dicts, build_path,

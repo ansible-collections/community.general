@@ -4,94 +4,96 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
-DOCUMENTATION = r'''
-    author: Yevhen Khmelenko (@ujenmr)
-    name: logstash
-    type: notification
-    short_description: Sends events to Logstash
-    description:
-      - This callback will report facts and task events to Logstash U(https://www.elastic.co/products/logstash).
-    requirements:
-      - whitelisting in configuration
-      - logstash (Python library)
-    options:
-      server:
-        description: Address of the Logstash server.
-        env:
-          - name: LOGSTASH_SERVER
-        ini:
-          - section: callback_logstash
-            key: server
-            version_added: 1.0.0
-        default: localhost
-      port:
-        description: Port on which logstash is listening.
-        env:
-            - name: LOGSTASH_PORT
-        ini:
-          - section: callback_logstash
-            key: port
-            version_added: 1.0.0
-        default: 5000
-      type:
-        description: Message type.
-        env:
-          - name: LOGSTASH_TYPE
-        ini:
-          - section: callback_logstash
-            key: type
-            version_added: 1.0.0
-        default: ansible
-      pre_command:
-        description: Executes command before run and its result is added to the C(ansible_pre_command_output) logstash field.
-        version_added: 2.0.0
-        ini:
-          - section: callback_logstash
-            key: pre_command
-        env:
-          - name: LOGSTASH_PRE_COMMAND
-      format_version:
-        description: Logging format.
-        type: str
-        version_added: 2.0.0
-        ini:
-          - section: callback_logstash
-            key: format_version
-        env:
-          - name: LOGSTASH_FORMAT_VERSION
-        default: v1
-        choices:
-          - v1
-          - v2
+DOCUMENTATION = r"""
+author: Yevhen Khmelenko (@ujenmr)
+name: logstash
+type: notification
+short_description: Sends events to Logstash
+description:
+  - This callback reports facts and task events to Logstash U(https://www.elastic.co/products/logstash).
+requirements:
+  - whitelisting in configuration
+  - logstash (Python library)
+options:
+  server:
+    description: Address of the Logstash server.
+    type: str
+    env:
+      - name: LOGSTASH_SERVER
+    ini:
+      - section: callback_logstash
+        key: server
+        version_added: 1.0.0
+    default: localhost
+  port:
+    description: Port on which logstash is listening.
+    type: int
+    env:
+      - name: LOGSTASH_PORT
+    ini:
+      - section: callback_logstash
+        key: port
+        version_added: 1.0.0
+    default: 5000
+  type:
+    description: Message type.
+    type: str
+    env:
+      - name: LOGSTASH_TYPE
+    ini:
+      - section: callback_logstash
+        key: type
+        version_added: 1.0.0
+    default: ansible
+  pre_command:
+    description: Executes command before run and its result is added to the C(ansible_pre_command_output) logstash field.
+    type: str
+    version_added: 2.0.0
+    ini:
+      - section: callback_logstash
+        key: pre_command
+    env:
+      - name: LOGSTASH_PRE_COMMAND
+  format_version:
+    description: Logging format.
+    type: str
+    version_added: 2.0.0
+    ini:
+      - section: callback_logstash
+        key: format_version
+    env:
+      - name: LOGSTASH_FORMAT_VERSION
+    default: v1
+    choices:
+      - v1
+      - v2
+"""
 
-'''
-
-EXAMPLES = r'''
+EXAMPLES = r"""
 ansible.cfg: |
-    # Enable Callback plugin
-    [defaults]
-        callback_whitelist = community.general.logstash
+  # Enable Callback plugin
+  [defaults]
+      callback_whitelist = community.general.logstash
 
-    [callback_logstash]
-        server = logstash.example.com
-        port = 5000
-        pre_command = git rev-parse HEAD
-        type = ansible
+  [callback_logstash]
+      server = logstash.example.com
+      port = 5000
+      pre_command = git rev-parse HEAD
+      type = ansible
 
-11-input-tcp.conf: |
-    # Enable Logstash TCP Input
-    input {
-            tcp {
-                port => 5000
-                codec => json
-                add_field => { "[@metadata][beat]" => "notify" }
-                add_field => { "[@metadata][type]" => "ansible" }
-            }
-        }
-'''
+11-input-tcp.conf: |-
+  # Enable Logstash TCP Input
+  input {
+          tcp {
+              port => 5000
+              codec => json
+              add_field => { "[@metadata][beat]" => "notify" }
+              add_field => { "[@metadata][type]" => "ansible" }
+          }
+      }
+"""
 
 import os
 import json
@@ -99,7 +101,6 @@ from ansible import context
 import socket
 import uuid
 import logging
-from datetime import datetime
 
 try:
     import logstash
@@ -108,6 +109,10 @@ except ImportError:
     HAS_LOGSTASH = False
 
 from ansible.plugins.callback import CallbackBase
+
+from ansible_collections.community.general.plugins.module_utils.datetime import (
+    now,
+)
 
 
 class CallbackModule(CallbackBase):
@@ -126,7 +131,7 @@ class CallbackModule(CallbackBase):
                                   "pip install python-logstash for Python 2"
                                   "pip install python3-logstash for Python 3")
 
-        self.start_time = datetime.utcnow()
+        self.start_time = now()
 
     def _init_plugin(self):
         if not self.disabled:
@@ -177,7 +182,7 @@ class CallbackModule(CallbackBase):
         data['status'] = "OK"
         data['ansible_playbook'] = playbook._file_name
 
-        if (self.ls_format_version == "v2"):
+        if self.ls_format_version == "v2":
             self.logger.info(
                 "START PLAYBOOK | %s", data['ansible_playbook'], extra=data
             )
@@ -185,7 +190,7 @@ class CallbackModule(CallbackBase):
             self.logger.info("ansible start", extra=data)
 
     def v2_playbook_on_stats(self, stats):
-        end_time = datetime.utcnow()
+        end_time = now()
         runtime = end_time - self.start_time
         summarize_stat = {}
         for host in stats.processed.keys():
@@ -202,7 +207,7 @@ class CallbackModule(CallbackBase):
         data['ansible_playbook_duration'] = runtime.total_seconds()
         data['ansible_result'] = json.dumps(summarize_stat)  # deprecated field
 
-        if (self.ls_format_version == "v2"):
+        if self.ls_format_version == "v2":
             self.logger.info(
                 "FINISH PLAYBOOK | %s", json.dumps(summarize_stat), extra=data
             )
@@ -221,7 +226,7 @@ class CallbackModule(CallbackBase):
         data['ansible_play_id'] = self.play_id
         data['ansible_play_name'] = self.play_name
 
-        if (self.ls_format_version == "v2"):
+        if self.ls_format_version == "v2":
             self.logger.info("START PLAY | %s", self.play_name, extra=data)
         else:
             self.logger.info("ansible play", extra=data)
@@ -246,7 +251,7 @@ class CallbackModule(CallbackBase):
             data['ansible_task'] = task_name
             data['ansible_facts'] = self._dump_results(result._result)
 
-            if (self.ls_format_version == "v2"):
+            if self.ls_format_version == "v2":
                 self.logger.info(
                     "SETUP FACTS | %s", self._dump_results(result._result), extra=data
                 )
@@ -267,7 +272,7 @@ class CallbackModule(CallbackBase):
             data['ansible_task_id'] = self.task_id
             data['ansible_result'] = self._dump_results(result._result)
 
-            if (self.ls_format_version == "v2"):
+            if self.ls_format_version == "v2":
                 self.logger.info(
                     "TASK OK | %s | RESULT | %s",
                     task_name, self._dump_results(result._result), extra=data
@@ -288,7 +293,7 @@ class CallbackModule(CallbackBase):
         data['ansible_task_id'] = self.task_id
         data['ansible_result'] = self._dump_results(result._result)
 
-        if (self.ls_format_version == "v2"):
+        if self.ls_format_version == "v2":
             self.logger.info("TASK SKIPPED | %s", task_name, extra=data)
         else:
             self.logger.info("ansible skipped", extra=data)
@@ -302,7 +307,7 @@ class CallbackModule(CallbackBase):
         data['ansible_play_name'] = self.play_name
         data['imported_file'] = imported_file
 
-        if (self.ls_format_version == "v2"):
+        if self.ls_format_version == "v2":
             self.logger.info("IMPORT | %s", imported_file, extra=data)
         else:
             self.logger.info("ansible import", extra=data)
@@ -316,7 +321,7 @@ class CallbackModule(CallbackBase):
         data['ansible_play_name'] = self.play_name
         data['imported_file'] = missing_file
 
-        if (self.ls_format_version == "v2"):
+        if self.ls_format_version == "v2":
             self.logger.info("NOT IMPORTED | %s", missing_file, extra=data)
         else:
             self.logger.info("ansible import", extra=data)
@@ -340,7 +345,7 @@ class CallbackModule(CallbackBase):
         data['ansible_result'] = self._dump_results(result._result)
 
         self.errors += 1
-        if (self.ls_format_version == "v2"):
+        if self.ls_format_version == "v2":
             self.logger.error(
                 "TASK FAILED | %s | HOST | %s | RESULT | %s",
                 task_name, self.hostname,
@@ -363,7 +368,7 @@ class CallbackModule(CallbackBase):
         data['ansible_result'] = self._dump_results(result._result)
 
         self.errors += 1
-        if (self.ls_format_version == "v2"):
+        if self.ls_format_version == "v2":
             self.logger.error(
                 "UNREACHABLE | %s | HOST | %s | RESULT | %s",
                 task_name, self.hostname,
@@ -386,7 +391,7 @@ class CallbackModule(CallbackBase):
         data['ansible_result'] = self._dump_results(result._result)
 
         self.errors += 1
-        if (self.ls_format_version == "v2"):
+        if self.ls_format_version == "v2":
             self.logger.error(
                 "ASYNC FAILED | %s | HOST | %s | RESULT | %s",
                 task_name, self.hostname,

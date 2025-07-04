@@ -1,0 +1,14 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: 9. Merge single list by common attribute 'name'
+  include_vars:
+    dir: example-009_vars
+- debug:
+    var: list3
+  when: debug | d(false) | bool
+- template:
+    src: list3.out.j2
+    dest: example-009.out

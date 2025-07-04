@@ -3,40 +3,39 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
-DOCUMENTATION = '''
-  name: dict_kv
-  short_description: Convert a value to a dictionary with a single key-value pair
-  version_added: 1.3.0
-  author: Stanislav German-Evtushenko (@giner)
-  description:
-    - Convert a value to a dictionary with a single key-value pair.
-  positional: key
-  options:
-    _input:
-      description: The value for the single key-value pair.
-      type: any
-      required: true
-    key:
-      description: The key for the single key-value pair.
-      type: any
-      required: true
-'''
+DOCUMENTATION = r"""
+name: dict_kv
+short_description: Convert a value to a dictionary with a single key-value pair
+version_added: 1.3.0
+author: Stanislav German-Evtushenko (@giner)
+description:
+  - Convert a value to a dictionary with a single key-value pair.
+positional: key
+options:
+  _input:
+    description: The value for the single key-value pair.
+    type: any
+    required: true
+  key:
+    description: The key for the single key-value pair.
+    type: any
+    required: true
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a one-element dictionary from a value
   ansible.builtin.debug:
     msg: "{{ 'myvalue' | dict_kv('mykey') }}"
     # Produces the dictionary {'mykey': 'myvalue'}
-'''
+"""
 
-RETURN = '''
-  _value:
-    description: A dictionary with a single key-value pair.
-    type: dictionary
-'''
+RETURN = r"""
+_value:
+  description: A dictionary with a single key-value pair.
+  type: dictionary
+"""
 
 
 def dict_kv(value, key):

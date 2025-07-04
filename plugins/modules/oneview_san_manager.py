@@ -7,47 +7,45 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: oneview_san_manager
 short_description: Manage OneView SAN Manager resources
 description:
-    - Provides an interface to manage SAN Manager resources. Can create, update, or delete.
+  - Provides an interface to manage SAN Manager resources. Can create, update, or delete.
 requirements:
-    - hpOneView >= 3.1.1
+  - hpOneView >= 3.1.1
 author:
-    - Felipe Bulsoni (@fgbulsoni)
-    - Thiago Miotto (@tmiotto)
-    - Adriane Cardozo (@adriane-cardozo)
+  - Felipe Bulsoni (@fgbulsoni)
+  - Thiago Miotto (@tmiotto)
+  - Adriane Cardozo (@adriane-cardozo)
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    state:
-        description:
-            - Indicates the desired state for the Uplink Set resource.
-                - V(present) ensures data properties are compliant with OneView.
-                - V(absent) removes the resource from OneView, if it exists.
-                - V(connection_information_set) updates the connection information for the SAN Manager. This operation is non-idempotent.
-        type: str
-        default: present
-        choices: [present, absent, connection_information_set]
-    data:
-        description:
-            - List with SAN Manager properties.
-        type: dict
-        required: true
+  state:
+    description:
+      - Indicates the desired state for the Uplink Set resource.
+      - V(present) ensures data properties are compliant with OneView.
+      - V(absent) removes the resource from OneView, if it exists.
+      - V(connection_information_set) updates the connection information for the SAN Manager. This operation is non-idempotent.
+    type: str
+    default: present
+    choices: [present, absent, connection_information_set]
+  data:
+    description:
+      - List with SAN Manager properties.
+    type: dict
+    required: true
 
 extends_documentation_fragment:
-    - community.general.oneview
-    - community.general.oneview.validateetag
-    - community.general.attributes
+  - community.general.oneview
+  - community.general.oneview.validateetag
+  - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Creates a Device Manager for the Brocade SAN provider with the given hostname and credentials
   community.general.oneview_san_manager:
     config: /etc/oneview/oneview_config.json
@@ -123,14 +121,14 @@ EXAMPLES = '''
     data:
       name: '172.18.15.1'
   delegate_to: localhost
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 san_manager:
-    description: Has the OneView facts about the SAN Manager.
-    returned: On state 'present'. Can be null.
-    type: dict
-'''
+  description: Has the OneView facts about the SAN Manager.
+  returned: On O(state=present). Can be null.
+  type: dict
+"""
 
 from ansible_collections.community.general.plugins.module_utils.oneview import OneViewModuleBase, OneViewModuleValueError
 

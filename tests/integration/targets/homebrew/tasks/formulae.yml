@@ -1,0 +1,481 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Test code for the homebrew module.
+# Copyright (c) 2020, Abhijeet Kasurde <akasurde@redhat.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Find brew binary
+  command: which brew
+  register: brew_which
+
+- name: Get owner of brew binary
+  stat:
+    path: "{{ brew_which.stdout }}"
+  register: brew_stat
+
+# - name: Use ignored-pinned option while upgrading all
+#   homebrew:
+#     upgrade_all: true
+#     upgrade_options: ignore-pinned
+#   become: true
+#   become_user: "{{ brew_stat.stat.pw_name }}"
+#   register: upgrade_option_result
+#   environment:
+#     HOMEBREW_NO_AUTO_UPDATE: True
+
+# - assert:
+#     that:
+#       - upgrade_option_result.changed
+
+- vars:
+    package_name: gnu-tar
+
+  block:
+    - name: Make sure {{ package_name }} package is not installed
+      homebrew:
+        name: "{{ package_name }}"
+        state: absent
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+
+    - name: Install {{ package_name }} package using homebrew
+      homebrew:
+        name: "{{ package_name }}"
+        state: present
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+      register: package_result
+
+    - assert:
+        that:
+          - package_result is changed
+          - "package_result.msg == 'Package installed: gnu-tar'"
+          - "package_result.changed_pkgs == ['gnu-tar']"
+          - "package_result.unchanged_pkgs == []"
+
+    - name: Again install {{ package_name }} package using homebrew
+      homebrew:
+        name: "{{ package_name }}"
+        state: present
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+      register: package_result
+
+    - assert:
+        that:
+          - package_result is not changed
+          - "package_result.msg == 'Package already installed: gnu-tar'"
+          - "package_result.changed_pkgs == []"
+          - "package_result.unchanged_pkgs == ['gnu-tar']"
+
+    - name: Unlink {{ package_name }} package using homebrew
+      homebrew:
+        name: "{{ package_name }}"
+        state: unlinked
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+      register: package_result
+
+    - assert:
+        that:
+          - package_result is changed
+          - "package_result.msg == 'Package unlinked: gnu-tar'"
+          - "package_result.changed_pkgs == ['gnu-tar']"
+          - "package_result.unchanged_pkgs == []"
+
+    - name: Link {{ package_name }} package using homebrew
+      homebrew:
+        name: "{{ package_name }}"
+        state: linked
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+      register: package_result
+
+    - assert:
+        that:
+          - package_result is changed
+          - "package_result.msg == 'Package linked: gnu-tar'"
+          - "package_result.changed_pkgs == ['gnu-tar']"
+          - "package_result.unchanged_pkgs == []"
+
+    - name: Uninstall {{ package_name }} package using homebrew
+      homebrew:
+        name: "{{ package_name }}"
+        state: absent
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+      register: package_result
+
+    - assert:
+        that:
+          - package_result is changed
+          - "package_result.msg == 'Package uninstalled: gnu-tar'"
+          - "package_result.changed_pkgs == ['gnu-tar']"
+          - "package_result.unchanged_pkgs == []"
+
+    - name: Again uninstall {{ package_name }} package using homebrew
+      homebrew:
+        name: "{{ package_name }}"
+        state: absent
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+      register: package_result
+
+    - assert:
+        that:
+          - package_result is not changed
+          - "package_result.msg == 'Package already uninstalled: gnu-tar'"
+          - "package_result.changed_pkgs == []"
+          - "package_result.unchanged_pkgs == ['gnu-tar']"
+
+    - name: Upgrade {{ package_name }} package using homebrew
+      homebrew:
+        name: "{{ package_name }}"
+        state: latest
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+      register: package_result
+
+    - assert:
+        that:
+          - package_result is changed
+          - "package_result.msg == 'Package upgraded: gnu-tar'"
+          - "package_result.changed_pkgs == ['gnu-tar']"
+          - "package_result.unchanged_pkgs == []"
+
+    - name: Again upgrade {{ package_name }} package using homebrew
+      homebrew:
+        name: "{{ package_name }}"
+        state: latest
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+      register: package_result
+
+    - assert:
+        that:
+          - package_result is not changed
+          - "package_result.msg == 'Package already upgraded: gnu-tar'"
+          - "package_result.changed_pkgs == []"
+          - "package_result.unchanged_pkgs == ['gnu-tar']"
+
+- vars:
+    package_names:
+      - gnu-tar
+      - gnu-time
+
+  block:
+    - name: Make sure {{ package_names }} packages are not installed
+      homebrew:
+        name: "{{ package_names }}"
+        state: absent
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+
+    - name: Install only {{ package_names[0] }} package using homebrew
+      homebrew:
+        name: "{{ package_names[0] }}"
+        state: present
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+
+    - name: Install {{ package_names }} packages using homebrew (one is already installed)
+      homebrew:
+        name: "{{ package_names }}"
+        state: present
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+      register: package_result
+
+    - assert:
+        that:
+          - package_result is changed
+          - "package_result.msg == 'Changed: 1, Unchanged: 1'"
+          - "package_result.changed_pkgs == ['gnu-time']"
+          - "package_result.unchanged_pkgs == ['gnu-tar']"
+
+    - name: Again install {{ package_names }} packages using homebrew
+      homebrew:
+        name: "{{ package_names }}"
+        state: present
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+      register: package_result
+
+    - assert:
+        that:
+          - package_result is not changed
+          - "package_result.msg == 'Changed: 0, Unchanged: 2'"
+          - "package_result.changed_pkgs == []"
+          - "package_result.unchanged_pkgs | sort == ['gnu-tar', 'gnu-time']"
+
+    - name: Unlink {{ package_names }} packages using homebrew
+      homebrew:
+        name: "{{ package_names }}"
+        state: unlinked
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+      register: package_result
+
+    - assert:
+        that:
+          - package_result is changed
+          - "package_result.msg == 'Changed: 2, Unchanged: 0'"
+          - "package_result.changed_pkgs | sort == ['gnu-tar', 'gnu-time']"
+          - "package_result.unchanged_pkgs == []"
+
+    - name: Link {{ package_names }} packages using homebrew
+      homebrew:
+        name: "{{ package_names }}"
+        state: linked
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+      register: package_result
+
+    - assert:
+        that:
+          - package_result is changed
+          - "package_result.msg == 'Changed: 2, Unchanged: 0'"
+          - "package_result.changed_pkgs | sort == ['gnu-tar', 'gnu-time']"
+          - "package_result.unchanged_pkgs == []"
+
+    - name: Uninstall {{ package_names }} packages using homebrew
+      homebrew:
+        name: "{{ package_names }}"
+        state: absent
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+      register: package_result
+
+    - assert:
+        that:
+          - package_result is changed
+          - "package_result.msg == 'Changed: 2, Unchanged: 0'"
+          - "package_result.changed_pkgs | sort == ['gnu-tar', 'gnu-time']"
+          - "package_result.unchanged_pkgs == []"
+
+    - name: Again uninstall {{ package_names }} packages using homebrew
+      homebrew:
+        name: "{{ package_names }}"
+        state: absent
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+      register: package_result
+
+    - assert:
+        that:
+          - package_result is not changed
+          - "package_result.msg == 'Changed: 0, Unchanged: 2'"
+          - "package_result.changed_pkgs == []"
+          - "package_result.unchanged_pkgs | sort == ['gnu-tar', 'gnu-time']"
+
+    - name: Upgrade {{ package_names }} packages using homebrew
+      homebrew:
+        name: "{{ package_names }}"
+        state: latest
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+      register: package_result
+
+    - assert:
+        that:
+          - package_result is changed
+          - "package_result.msg == 'Changed: 2, Unchanged: 0'"
+          - "package_result.changed_pkgs | sort == ['gnu-tar', 'gnu-time']"
+          - "package_result.unchanged_pkgs == []"
+
+    - name: Again upgrade {{ package_names }} packages using homebrew
+      homebrew:
+        name: "{{ package_names }}"
+        state: latest
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+      register: package_result
+
+    - assert:
+        that:
+          - package_result is not changed
+          - "package_result.msg == 'Changed: 0, Unchanged: 2'"
+          - "package_result.changed_pkgs == []"
+          - "package_result.unchanged_pkgs | sort == ['gnu-tar', 'gnu-time']"
+
+# Test alias handling with sqlite (that is aliased to sqlite3)
+- block:
+    - name: Make sure sqlite package is not installed
+      homebrew:
+        name: "sqlite"
+        state: absent
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+
+    - name: Install sqlite package using alias (sqlite3)
+      homebrew:
+        name: "sqlite3"
+        state: present
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+      register: install_result
+
+    - assert:
+        that:
+          - install_result is changed
+          - "install_result.msg == 'Package installed: sqlite3'"
+          - "install_result.changed_pkgs == ['sqlite3']"
+          - "install_result.unchanged_pkgs == []"
+
+    - name: Again install sqlite package using alias (sqlite3)
+      homebrew:
+        name: "sqlite3"
+        state: present
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+      register: reinstall_result
+
+    - assert:
+        that:
+          - reinstall_result is not changed
+          - "reinstall_result.msg == 'Package already installed: sqlite3'"
+          - "reinstall_result.changed_pkgs == []"
+          - "reinstall_result.unchanged_pkgs == ['sqlite3']"
+
+# Test install from homebrew tap
+- block:
+    - name: Tap hashicorp repository
+      community.general.homebrew_tap:
+        name: hashicorp/tap
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+
+    - name: Install terraform from tap
+      community.general.homebrew:
+        name: hashicorp/tap/terraform
+        state: latest
+      register: terraform_install_result
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+
+    - assert:
+        that:
+          - terraform_install_result is changed
+          - "terraform_install_result.msg == 'Package upgraded: hashicorp/tap/terraform'"
+          - "terraform_install_result.changed_pkgs == ['hashicorp/tap/terraform']"
+          - "terraform_install_result.unchanged_pkgs == []"
+
+    - name: Remove terraform
+      homebrew:
+        name: hashicorp/tap/terraform
+        state: absent
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+
+# Test irregular formulae name case
+- block:
+    - name: Install terraform from full tap name with irregular case
+      community.general.homebrew:
+        name: HasHicorp/TAp/tErRaForm
+        state: latest
+      register: terraform_install_result
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+
+    - assert:
+        that:
+          - terraform_install_result is changed
+          - "terraform_install_result.msg == 'Package upgraded: hashicorp/tap/terraform'"
+          - "terraform_install_result.changed_pkgs == ['hashicorp/tap/terraform']"
+          - "terraform_install_result.unchanged_pkgs == []"
+
+# Test tap with no public fallback
+- block:
+    - name: Tap ascii-image-converter homebrew repository
+      community.general.homebrew_tap:
+        name: TheZoraiz/ascii-image-converter
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+
+    - name: Install ascii from full tap name
+      community.general.homebrew:
+        name: TheZoraiz/ascii-image-converter/ascii-image-converter
+        state: latest
+      register: ascii_install_result
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+
+    - assert:
+        that:
+          - ascii_install_result is changed
+          - "ascii_install_result.msg == 'Package upgraded: thezoraiz/ascii-image-converter/ascii-image-converter'"
+          - "ascii_install_result.changed_pkgs == ['thezoraiz/ascii-image-converter/ascii-image-converter']"
+          - "ascii_install_result.unchanged_pkgs == []"
+
+    - name: Again install ascii from full tap name
+      community.general.homebrew:
+        name: TheZoraiz/ascii-image-converter/ascii-image-converter
+        state: latest
+      register: ascii_reinstall_result
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+
+    - assert:
+        that:
+          - ascii_reinstall_result is not changed
+          - "ascii_reinstall_result.msg == 'Package already upgraded: thezoraiz/ascii-image-converter/ascii-image-converter'"
+          - "ascii_reinstall_result.changed_pkgs == []"
+          - "ascii_reinstall_result.unchanged_pkgs == ['thezoraiz/ascii-image-converter/ascii-image-converter']"
+
+    - name: Remove ascii from full tap name
+      homebrew:
+        name: TheZoraiz/ascii-image-converter/ascii-image-converter
+        state: absent
+      register: ascii_uninstall_result
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+
+    - assert:
+        that:
+          - ascii_uninstall_result is changed
+          - "ascii_uninstall_result.msg == 'Package uninstalled: thezoraiz/ascii-image-converter/ascii-image-converter'"
+          - "ascii_uninstall_result.changed_pkgs == ['thezoraiz/ascii-image-converter/ascii-image-converter']"
+          - "ascii_uninstall_result.unchanged_pkgs == []"
+
+    - name: Again remove ascii from full tap name
+      homebrew:
+        name: TheZoraiz/ascii-image-converter/ascii-image-converter
+        state: absent
+      register: ascii_again_uninstall_result
+
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+
+    - assert:
+        that:
+          - ascii_again_uninstall_result is not changed
+          - "ascii_again_uninstall_result.msg == 'Package already uninstalled: thezoraiz/ascii-image-converter/ascii-image-converter'"
+          - "ascii_again_uninstall_result.changed_pkgs == []"
+          - "ascii_again_uninstall_result.unchanged_pkgs == ['thezoraiz/ascii-image-converter/ascii-image-converter']"
+
+    - name: Install ascii from regular name
+      community.general.homebrew:
+        name: ascii-image-converter
+        state: latest
+      register: ascii_install_result
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+
+    - assert:
+        that:
+          - ascii_install_result is changed
+          - "ascii_install_result.msg == 'Package upgraded: ascii-image-converter'"
+          - "ascii_install_result.changed_pkgs == ['ascii-image-converter']"
+          - "ascii_install_result.unchanged_pkgs == []"
+
+    - name: Remove ascii from regular name
+      homebrew:
+        name: ascii-image-converter
+        state: absent
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"

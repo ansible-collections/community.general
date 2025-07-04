@@ -8,20 +8,20 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: xcc_redfish_command
 short_description: Manages Lenovo Out-Of-Band controllers using Redfish APIs
 version_added: 2.4.0
 description:
-  - Builds Redfish URIs locally and sends them to remote OOB controllers to
-    perform an action or get information back or update a configuration attribute.
+  - Builds Redfish URIs locally and sends them to remote OOB controllers to perform an action or get information back or update
+    a configuration attribute.
   - Manages virtual media.
-  - Supports getting information back via GET method.
-  - Supports updating a configuration attribute via PATCH method.
-  - Supports performing an action via POST method.
+  - Supports getting information back using GET method.
+  - Supports updating a configuration attribute using PATCH method.
+  - Supports performing an action using POST method.
 extends_documentation_fragment:
   - community.general.attributes
+  - community.general.redfish
 attributes:
   check_mode:
     support: none
@@ -54,7 +54,7 @@ options:
     type: str
   auth_token:
     description:
-      - Security token for authentication with OOB controller
+      - Security token for authentication with OOB controller.
     type: str
   timeout:
     description:
@@ -111,194 +111,200 @@ options:
   resource_uri:
     required: false
     description:
-      - The resource uri to get or patch or post.
+      - The resource URI to get or patch or post.
     type: str
   request_body:
     required: false
     description:
       - The request body to patch or post.
     type: dict
+  validate_certs:
+    version_added: 10.6.0
+  ca_path:
+    version_added: 10.6.0
+  ciphers:
+    version_added: 10.6.0
 
 author: "Yuyan Pan (@panyy3)"
-'''
+"""
 
-EXAMPLES = '''
-  - name: Insert Virtual Media
-    community.general.xcc_redfish_command:
-      category: Manager
-      command: VirtualMediaInsert
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      virtual_media:
-        image_url: "http://example.com/images/SomeLinux-current.iso"
-        media_types:
-          - CD
-          - DVD
-      resource_id: "1"
+EXAMPLES = r"""
+- name: Insert Virtual Media
+  community.general.xcc_redfish_command:
+    category: Manager
+    command: VirtualMediaInsert
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    virtual_media:
+      image_url: "http://example.com/images/SomeLinux-current.iso"
+      media_types:
+        - CD
+        - DVD
+    resource_id: "1"
 
-  - name: Eject Virtual Media
-    community.general.xcc_redfish_command:
-      category: Manager
-      command: VirtualMediaEject
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      virtual_media:
-        image_url: "http://example.com/images/SomeLinux-current.iso"
-      resource_id: "1"
+- name: Eject Virtual Media
+  community.general.xcc_redfish_command:
+    category: Manager
+    command: VirtualMediaEject
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    virtual_media:
+      image_url: "http://example.com/images/SomeLinux-current.iso"
+    resource_id: "1"
 
-  - name: Eject all Virtual Media
-    community.general.xcc_redfish_command:
-      category: Manager
-      command: VirtualMediaEject
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      resource_id: "1"
+- name: Eject all Virtual Media
+  community.general.xcc_redfish_command:
+    category: Manager
+    command: VirtualMediaEject
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    resource_id: "1"
 
-  - name: Get ComputeSystem Oem property SystemStatus via GetResource command
-    community.general.xcc_redfish_command:
-      category: Raw
-      command: GetResource
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      resource_uri: "/redfish/v1/Systems/1"
-    register: result
-  - ansible.builtin.debug:
-      msg: "{{ result.redfish_facts.data.Oem.Lenovo.SystemStatus }}"
+- name: Get ComputeSystem Oem property SystemStatus via GetResource command
+  community.general.xcc_redfish_command:
+    category: Raw
+    command: GetResource
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    resource_uri: "/redfish/v1/Systems/1"
+  register: result
+- ansible.builtin.debug:
+    msg: "{{ result.redfish_facts.data.Oem.Lenovo.SystemStatus }}"
 
-  - name: Get Oem DNS setting via GetResource command
-    community.general.xcc_redfish_command:
-      category: Raw
-      command: GetResource
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      resource_uri: "/redfish/v1/Managers/1/NetworkProtocol/Oem/Lenovo/DNS"
-    register: result
+- name: Get Oem DNS setting via GetResource command
+  community.general.xcc_redfish_command:
+    category: Raw
+    command: GetResource
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    resource_uri: "/redfish/v1/Managers/1/NetworkProtocol/Oem/Lenovo/DNS"
+  register: result
 
-  - name: Print fetched information
-    ansible.builtin.debug:
-      msg: "{{ result.redfish_facts.data }}"
+- name: Print fetched information
+  ansible.builtin.debug:
+    msg: "{{ result.redfish_facts.data }}"
 
-  - name: Get Lenovo FoD key collection resource via GetCollectionResource command
-    community.general.xcc_redfish_command:
-      category: Raw
-      command: GetCollectionResource
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      resource_uri: "/redfish/v1/Managers/1/Oem/Lenovo/FoD/Keys"
-    register: result
+- name: Get Lenovo FoD key collection resource via GetCollectionResource command
+  community.general.xcc_redfish_command:
+    category: Raw
+    command: GetCollectionResource
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    resource_uri: "/redfish/v1/Managers/1/Oem/Lenovo/FoD/Keys"
+  register: result
 
-  - name: Print fetched information
-    ansible.builtin.debug:
-      msg: "{{ result.redfish_facts.data_list }}"
+- name: Print fetched information
+  ansible.builtin.debug:
+    msg: "{{ result.redfish_facts.data_list }}"
 
-  - name: Update ComputeSystem property AssetTag via PatchResource command
-    community.general.xcc_redfish_command:
-      category: Raw
-      command: PatchResource
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      resource_uri: "/redfish/v1/Systems/1"
-      request_body:
-        AssetTag: "new_asset_tag"
+- name: Update ComputeSystem property AssetTag via PatchResource command
+  community.general.xcc_redfish_command:
+    category: Raw
+    command: PatchResource
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    resource_uri: "/redfish/v1/Systems/1"
+    request_body:
+      AssetTag: "new_asset_tag"
 
-  - name: Perform BootToBIOSSetup action via PostResource command
-    community.general.xcc_redfish_command:
-      category: Raw
-      command: PostResource
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      resource_uri: "/redfish/v1/Systems/1/Actions/Oem/LenovoComputerSystem.BootToBIOSSetup"
-      request_body: {}
+- name: Perform BootToBIOSSetup action via PostResource command
+  community.general.xcc_redfish_command:
+    category: Raw
+    command: PostResource
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    resource_uri: "/redfish/v1/Systems/1/Actions/Oem/LenovoComputerSystem.BootToBIOSSetup"
+    request_body: {}
 
-  - name: Perform SecureBoot.ResetKeys action via PostResource command
-    community.general.xcc_redfish_command:
-      category: Raw
-      command: PostResource
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      resource_uri: "/redfish/v1/Systems/1/SecureBoot/Actions/SecureBoot.ResetKeys"
-      request_body:
-        ResetKeysType: DeleteAllKeys
+- name: Perform SecureBoot.ResetKeys action via PostResource command
+  community.general.xcc_redfish_command:
+    category: Raw
+    command: PostResource
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    resource_uri: "/redfish/v1/Systems/1/SecureBoot/Actions/SecureBoot.ResetKeys"
+    request_body:
+      ResetKeysType: DeleteAllKeys
 
-  - name: Create session
-    community.general.redfish_command:
-      category: Sessions
-      command: CreateSession
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-    register: result
+- name: Create session
+  community.general.redfish_command:
+    category: Sessions
+    command: CreateSession
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result
 
-  - name: Update Manager DateTimeLocalOffset property using security token for auth
-    community.general.xcc_redfish_command:
-      category: Raw
-      command: PatchResource
-      baseuri: "{{ baseuri }}"
-      auth_token: "{{ result.session.token }}"
-      resource_uri: "/redfish/v1/Managers/1"
-      request_body:
-        DateTimeLocalOffset: "+08:00"
+- name: Update Manager DateTimeLocalOffset property using security token for auth
+  community.general.xcc_redfish_command:
+    category: Raw
+    command: PatchResource
+    baseuri: "{{ baseuri }}"
+    auth_token: "{{ result.session.token }}"
+    resource_uri: "/redfish/v1/Managers/1"
+    request_body:
+      DateTimeLocalOffset: "+08:00"
 
-  - name: Delete session using security token created by CreateSesssion above
-    community.general.redfish_command:
-      category: Sessions
-      command: DeleteSession
-      baseuri: "{{ baseuri }}"
-      auth_token: "{{ result.session.token }}"
-      session_uri: "{{ result.session.uri }}"
-'''
+- name: Delete session using security token created by CreateSesssion above
+  community.general.redfish_command:
+    category: Sessions
+    command: DeleteSession
+    baseuri: "{{ baseuri }}"
+    auth_token: "{{ result.session.token }}"
+    session_uri: "{{ result.session.uri }}"
+"""
 
-RETURN = '''
+RETURN = r"""
 msg:
-    description: A message related to the performed action(s).
-    returned: when failure or action/update success
-    type: str
-    sample: "Action was successful"
+  description: A message related to the performed action(s).
+  returned: when failure or action/update success
+  type: str
+  sample: "Action was successful"
 redfish_facts:
-    description: Resource content.
-    returned: when command == GetResource or command == GetCollectionResource
-    type: dict
-    sample: '{
-        "redfish_facts": {
-            "data": {
-                "@odata.etag": "\"3179bf00d69f25a8b3c\"",
-                "@odata.id": "/redfish/v1/Managers/1/NetworkProtocol/Oem/Lenovo/DNS",
-                "@odata.type": "#LenovoDNS.v1_0_0.LenovoDNS",
-                "DDNS": [
-                    {
-                        "DDNSEnable": true,
-                        "DomainName": "",
-                        "DomainNameSource": "DHCP"
-                    }
-                ],
-                "DNSEnable": true,
-                "Description": "This resource is used to represent a DNS resource for a Redfish implementation.",
-                "IPv4Address1": "10.103.62.178",
-                "IPv4Address2": "0.0.0.0",
-                "IPv4Address3": "0.0.0.0",
-                "IPv6Address1": "::",
-                "IPv6Address2": "::",
-                "IPv6Address3": "::",
-                "Id": "LenovoDNS",
-                "PreferredAddresstype": "IPv4"
-            },
-            "ret": true
-        }
-    }'
-'''
+  description: Resource content.
+  returned: when command == GetResource or command == GetCollectionResource
+  type: dict
+  sample: '{
+    "redfish_facts": {
+      "data": {
+        "@odata.etag": "\"3179bf00d69f25a8b3c\"",
+        "@odata.id": "/redfish/v1/Managers/1/NetworkProtocol/Oem/Lenovo/DNS",
+        "@odata.type": "#LenovoDNS.v1_0_0.LenovoDNS",
+        "DDNS": [
+          {
+            "DDNSEnable": true,
+            "DomainName": "",
+            "DomainNameSource": "DHCP"
+          }
+        ],
+        "DNSEnable": true,
+        "Description": "This resource is used to represent a DNS resource for a Redfish implementation.",
+        "IPv4Address1": "10.103.62.178",
+        "IPv4Address2": "0.0.0.0",
+        "IPv4Address3": "0.0.0.0",
+        "IPv6Address1": "::",
+        "IPv6Address2": "::",
+        "IPv6Address3": "::",
+        "Id": "LenovoDNS",
+        "PreferredAddresstype": "IPv4"
+      },
+      "ret": true
+    }
+  }'
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
-from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils
+from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils, REDFISH_COMMON_ARGUMENT_SPEC
 
 
 class XCCRedfishUtils(RedfishUtils):
@@ -592,8 +598,9 @@ class XCCRedfishUtils(RedfishUtils):
     def raw_post_resource(self, resource_uri, request_body):
         if resource_uri is None:
             return {'ret': False, 'msg': "resource_uri is missing"}
+        resource_uri_has_actions = True
         if '/Actions/' not in resource_uri:
-            return {'ret': False, 'msg': "Bad uri %s. Keyword /Actions/ should be included in uri" % resource_uri}
+            resource_uri_has_actions = False
         if request_body is None:
             return {'ret': False, 'msg': "request_body is missing"}
         # get action base uri data for further checking
@@ -602,7 +609,10 @@ class XCCRedfishUtils(RedfishUtils):
         if response['ret'] is False:
             return response
         if 'Actions' not in response['data']:
-            return {'ret': False, 'msg': "Actions property not found in %s" % action_base_uri}
+            if resource_uri_has_actions:
+                return {'ret': False, 'msg': "Actions property not found in %s" % action_base_uri}
+            else:
+                response['data']['Actions'] = {}
 
         # check resouce_uri with target uri found in action base uri data
         action_found = False
@@ -634,7 +644,7 @@ class XCCRedfishUtils(RedfishUtils):
                     else:
                         action_target_uri_list.append(response['data']['Actions']['Oem'][key]['target'])
 
-        if not action_found:
+        if not action_found and resource_uri_has_actions:
             return {'ret': False,
                     'msg': 'Specified resource_uri is not a supported action target uri, please specify a supported target uri instead. Supported uri: %s'
                     % (str(action_target_uri_list))}
@@ -675,34 +685,36 @@ CATEGORY_COMMANDS_ALL = {
 
 def main():
     result = {}
-    module = AnsibleModule(
-        argument_spec=dict(
-            category=dict(required=True),
-            command=dict(required=True, type='list', elements='str'),
-            baseuri=dict(required=True),
-            username=dict(),
-            password=dict(no_log=True),
-            auth_token=dict(no_log=True),
-            timeout=dict(type='int', default=10),
-            resource_id=dict(),
-            virtual_media=dict(
-                type='dict',
-                options=dict(
-                    media_types=dict(type='list', elements='str', default=[]),
-                    image_url=dict(),
-                    inserted=dict(type='bool', default=True),
-                    write_protected=dict(type='bool', default=True),
-                    username=dict(),
-                    password=dict(no_log=True),
-                    transfer_protocol_type=dict(),
-                    transfer_method=dict(),
-                )
-            ),
-            resource_uri=dict(),
-            request_body=dict(
-                type='dict',
-            ),
+    argument_spec = dict(
+        category=dict(required=True),
+        command=dict(required=True, type='list', elements='str'),
+        baseuri=dict(required=True),
+        username=dict(),
+        password=dict(no_log=True),
+        auth_token=dict(no_log=True),
+        timeout=dict(type='int', default=10),
+        resource_id=dict(),
+        virtual_media=dict(
+            type='dict',
+            options=dict(
+                media_types=dict(type='list', elements='str', default=[]),
+                image_url=dict(),
+                inserted=dict(type='bool', default=True),
+                write_protected=dict(type='bool', default=True),
+                username=dict(),
+                password=dict(no_log=True),
+                transfer_protocol_type=dict(),
+                transfer_method=dict(),
+            )
         ),
+        resource_uri=dict(),
+        request_body=dict(
+            type='dict',
+        ),
+    )
+    argument_spec.update(REDFISH_COMMON_ARGUMENT_SPEC)
+    module = AnsibleModule(
+        argument_spec,
         required_together=[
             ('username', 'password'),
         ],

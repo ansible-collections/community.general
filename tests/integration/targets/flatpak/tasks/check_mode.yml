@@ -52,6 +52,38 @@
       - removal_result is not changed
     msg: "Removing an absent flatpak shall mark module execution as not changed"
 
+# state=latest on absent flatpak
+
+- name: Test state=latest of absent flatpak (check mode)
+  flatpak:
+    name: com.dummy.App1
+    remote: dummy-remote
+    state: latest
+  register: latest_result
+  check_mode: true
+
+- name: Verify state=latest of absent flatpak test result (check mode)
+  assert:
+    that:
+      - latest_result is changed
+    msg: "state=latest an absent flatpak shall mark module execution as changed"
+
+- name: Test non-existent idempotency of state=latest of absent flatpak (check mode)
+  flatpak:
+    name: com.dummy.App1
+    remote: dummy-remote
+    state: latest
+  register: double_latest_result
+  check_mode: true
+
+- name: Verify non-existent idempotency of state=latest of absent flatpak test result (check mode)
+  assert:
+    that:
+      - double_latest_result is changed
+    msg: |
+        state=latest an absent flatpak a second time shall still mark module execution
+        as changed in check mode
+
 # state=present with url on absent flatpak
 
 - name: Test addition of absent flatpak with url (check mode)
@@ -101,6 +133,40 @@
       - url_removal_result is not changed
     msg: "Removing an absent flatpak shall mark module execution as not changed"
 
+# state=latest with url on absent flatpak
+
+- name: Test state=latest of absent flatpak with url (check mode)
+  flatpak:
+    name: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
+    remote: dummy-remote
+    state: latest
+  register: url_latest_result
+  check_mode: true
+
+- name: Verify state=latest of absent flatpak with url test result (check mode)
+  assert:
+    that:
+      - url_latest_result is changed
+    msg: "state=latest an absent flatpak from URL shall mark module execution as changed"
+
+- name: Test non-existent idempotency of state=latest of absent flatpak with url (check mode)
+  flatpak:
+    name: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
+    remote: dummy-remote
+    state: latest
+  register: double_url_latest_result
+  check_mode: true
+
+- name: >
+      Verify non-existent idempotency of additionof state=latest flatpak with url test
+      result (check mode)
+  assert:
+    that:
+      - double_url_latest_result is changed
+    msg: |
+        state=latest an absent flatpak from URL a second time shall still mark module execution
+        as changed in check mode
+
 # - Tests with present flatpak -------------------------------------------------
 
 # state=present on present flatpak
@@ -149,6 +215,22 @@
         Removing a present flatpak a second time shall still mark module execution
         as changed in check mode
 
+# state=latest on present flatpak
+
+- name: Test state=latest of present flatpak (check mode)
+  flatpak:
+    name: com.dummy.App2
+    remote: dummy-remote
+    state: latest
+  register: latest_present_result
+  check_mode: true
+
+- name: Verify latest test result of present flatpak (check mode)
+  assert:
+    that:
+      - latest_present_result is changed
+    msg: "state=latest an present flatpak shall mark module execution as changed"
+
 # state=present with url on present flatpak
 
 - name: Test addition with url of present flatpak (check mode)
@@ -195,3 +277,19 @@
     that:
       - double_url_removal_present_result is changed
     msg: Removing an absent flatpak a second time shall still mark module execution as changed
+
+# state=latest with url on present flatpak
+
+- name: Test state=latest with url of present flatpak (check mode)
+  flatpak:
+    name: http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
+    remote: dummy-remote
+    state: latest
+  register: url_latest_present_result
+  check_mode: true
+
+- name: Verify state=latest with url of present flatpak test result (check mode)
+  assert:
+    that:
+      - url_latest_present_result is changed
+    msg: "state=latest a present flatpak from URL shall mark module execution as changed"

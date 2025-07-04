@@ -3,43 +3,50 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: Make sure package is not installed (cider)
+# NOTE This is currently disabled for performance reasons!
+
+- name: Make sure package is not installed (bpytop)
   community.general.snap:
-    name: cider
+    name: bpytop
     state: absent
 
-- name: Download cider snap
-  ansible.builtin.get_url:
-    url: https://github.com/ciderapp/cider-releases/releases/download/v1.6.0/cider_1.6.0_amd64.snap
-    dest: "{{ remote_tmp_dir }}/cider_1.6.0_amd64.snap"
-    mode: "0644"
+- name: Download bpytop snap
+  ansible.builtin.command:
+    cmd: snap download bpytop
+    chdir: "{{ remote_tmp_dir }}"
+  register: bpytop_download
 
-# Test for https://github.com/ansible-collections/community.general/issues/5715
-- name: Install package from file (check)
-  community.general.snap:
-    name: "{{ remote_tmp_dir }}/cider_1.6.0_amd64.snap"
-    dangerous: true
-    state: present
-  check_mode: true
-  register: install_dangerous_check
+- name: Test block
+  vars:
+    snap_file: "{{ (bpytop_download.stdout_lines[-1] | split(' '))[-1] }}"
+    snap_path: "{{ remote_tmp_dir }}/{{ snap_file }}"
+  block:
+    # Test for https://github.com/ansible-collections/community.general/issues/5715
+    - name: Install package from file (check)
+      community.general.snap:
+        name: "{{ snap_path }}"
+        dangerous: true
+        state: present
+      check_mode: true
+      register: install_dangerous_check
 
-- name: Install package from file
-  community.general.snap:
-    name: "{{ remote_tmp_dir }}/cider_1.6.0_amd64.snap"
-    dangerous: true
-    state: present
-  register: install_dangerous
+    - name: Install package from file
+      community.general.snap:
+        name: "{{ snap_path }}"
+        dangerous: true
+        state: present
+      register: install_dangerous
 
-- name: Install package from file
-  community.general.snap:
-    name: "{{ remote_tmp_dir }}/cider_1.6.0_amd64.snap"
-    dangerous: true
-    state: present
-  register: install_dangerous_idempot
+    - name: Install package from file (again)
+      community.general.snap:
+        name: "{{ snap_path }}"
+        dangerous: true
+        state: present
+      register: install_dangerous_idempot
 
 - name: Remove package
   community.general.snap:
-    name: cider
+    name: bpytop
     state: absent
   register: remove_dangerous
 

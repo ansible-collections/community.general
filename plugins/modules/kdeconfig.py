@@ -7,15 +7,13 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: kdeconfig
 short_description: Manage KDE configuration files
 version_added: "6.5.0"
 description:
   - Add or change individual settings in KDE configuration files.
   - It uses B(kwriteconfig) under the hood.
-
 options:
   path:
     description:
@@ -24,8 +22,7 @@ options:
     required: true
   kwriteconfig_path:
     description:
-      - Path to the kwriteconfig executable. If not specified, Ansible will try
-        to discover it.
+      - Path to the kwriteconfig executable. If not specified, Ansible will try to discover it.
     type: path
   values:
     description:
@@ -74,9 +71,9 @@ requirements:
   - kwriteconfig
 author:
   - Salvatore Mesoraca (@smeso)
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Ensure "Homepage=https://www.ansible.com/" in group "Branding"
   community.general.kdeconfig:
     path: /etc/xdg/kickoffrc
@@ -97,9 +94,9 @@ EXAMPLES = r'''
         key: KEY
         value: VALUE
     backup: true
-'''
+"""
 
-RETURN = r''' # '''
+RETURN = r""" # """
 
 import os
 import shutil
@@ -144,7 +141,7 @@ def run_kwriteconfig(module, cmd, path, groups, key, value):
         else:
             args.append('false')
     else:
-        args.append(value)
+        args.extend(['--', value])
     module.run_command(args, check_rc=True)
 
 
@@ -214,7 +211,7 @@ def run_module(module, tmpdir, kwriteconfig):
         if module.params['backup'] and os.path.exists(b_path):
             result['backup_file'] = module.backup_local(result['path'])
         try:
-            module.atomic_move(b_tmpfile, b_path)
+            module.atomic_move(b_tmpfile, os.path.abspath(b_path))
         except IOError:
             module.ansible.fail_json(msg='Unable to move temporary file %s to %s, IOError' % (tmpfile, result['path']), traceback=traceback.format_exc())
 

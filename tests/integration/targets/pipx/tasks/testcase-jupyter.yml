@@ -1,0 +1,28 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: install jupyter
+  block:
+    - name: ensure application mkdocs is uninstalled
+      community.general.pipx:
+        name: mkdocs
+        state: absent
+
+    - name: install application mkdocs
+      community.general.pipx:
+        name: mkdocs
+        install_deps: true
+      register: install_mkdocs
+
+    - name: cleanup mkdocs
+      community.general.pipx:
+        state: absent
+        name: mkdocs
+
+    - name: check assertions
+      assert:
+        that:
+          - install_mkdocs is changed
+          - '"markdown_py" in install_mkdocs.stdout'

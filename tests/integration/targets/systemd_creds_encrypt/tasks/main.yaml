@@ -1,0 +1,55 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Test systemd_creds_encrypt
+  when:
+    - ansible_systemd.version is defined
+    - ansible_systemd.version | int >= 250
+  block:
+    - name: Encrypt secret
+      become: true
+      systemd_creds_encrypt:
+        name: db
+        not_after: +48hr
+        secret: access_token
+      register: encrypted_secret
+
+    - name: Assert encrypted secret output is base64 encoded
+      ansible.builtin.assert:
+        that:
+          - (encrypted_secret.value | b64decode) is truthy
+        fail_msg: "Encrypted secret is not base64 encoded"
+        success_msg: "Encrypted secret is base64 encoded"
+
+    - name: Print the encrypted secret
+      ansible.builtin.debug:
+        msg: "{{ encrypted_secret }}"
+
+    - name: Assert that SetCredentialEncrypted message is not in the output
+      ansible.builtin.assert:
+        that:
+          - '"SetCredentialEncrypted" not in encrypted_secret.value'
+        fail_msg: "SetCredentialEncrypted is in the output"
+        success_msg: "SetCredentialEncrypted is not in the output"
+
+    - name: Encrypt secret
+      become: true
+      community.general.systemd_creds_encrypt:
+        name: web
+        not_after: +5y
+        pretty: true
+        secret: token
+      register: pretty_encrypted_secret
+
+    - name: Pretty print the encrypted secret
+      ansible.builtin.debug:
+        msg: "{{ pretty_encrypted_secret }}"
+
+    - name: Assert that SetCredentialEncrypted message is in the output
+      ansible.builtin.assert:
+        that:
+          - '"SetCredentialEncrypted=web: " in pretty_encrypted_secret.value'
+        fail_msg: "SetCredentialEncrypted is not in the output"
+        success_msg: "SetCredentialEncrypted is in the output"

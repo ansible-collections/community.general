@@ -36,7 +36,7 @@
     # Not available: btrfs, lvm, f2fs, ocfs2
     # All BSD systems use swap fs, but only Linux needs mkswap
     # Supported: ext2/3/4 (e2fsprogs), xfs (xfsprogs), reiserfs (progsreiserfs), vfat
-    - 'not (ansible_system == "FreeBSD" and item.0.key in ["btrfs", "f2fs", "swap", "lvm", "ocfs2"])'
+    - 'not (ansible_system == "FreeBSD" and item.0.key in ["bcachefs", "btrfs", "f2fs", "swap", "lvm", "ocfs2"])'
     # Available on FreeBSD but not on testbed (util-linux conflicts with e2fsprogs): wipefs, mkfs.minix
     - 'not (ansible_system == "FreeBSD" and item.1 in ["overwrite_another_fs", "remove_fs"])'
 
@@ -46,6 +46,10 @@
 
     # Other limitations and corner cases
 
+    # bcachefs only on Alpine > 3.18 and Arch Linux for now
+    # other distributions have too old versions of bcachefs-tools and/or util-linux (blkid for UUID tests)
+    - 'ansible_distribution == "Alpine" and ansible_distribution_version is version("3.18", ">") and item.0.key == "bcachefs"'
+    - 'ansible_distribution == "Archlinux" and item.0.key == "bcachefs"'
     # f2fs-tools and reiserfs-utils packages not available with RHEL/CentOS on CI
     - 'not (ansible_distribution in ["CentOS", "RedHat"] and item.0.key in ["f2fs", "reiserfs"])'
     - 'not (ansible_os_family == "RedHat" and ansible_distribution_major_version is version("8", ">=") and
@@ -55,6 +59,8 @@
             item.0.key == "reiserfs")'
     # reiserfs packages apparently not available with Alpine
     - 'not (ansible_distribution == "Alpine" and item.0.key == "reiserfs")'
+    # reiserfsprogs packages no longer available with Arch Linux
+    - 'not (ansible_distribution == "Archlinux" and item.0.key == "reiserfs")'
     # ocfs2 only available on Debian based distributions
     - 'not (item.0.key == "ocfs2" and ansible_os_family != "Debian")'
     # Tests use losetup which can not be used inside unprivileged container

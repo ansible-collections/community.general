@@ -10,91 +10,87 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: udm_dns_zone
 author:
-    - Tobias Rüetschi (@keachi)
-short_description: Manage dns zones on a univention corporate server
+  - Tobias Rüetschi (@keachi)
+short_description: Manage DNS zones on a univention corporate server
 description:
-    - "This module allows to manage dns zones on a univention corporate server (UCS).
-       It uses the python API of the UCS to create a new object or edit it."
+  - This module allows to manage DNS zones on a univention corporate server (UCS). It uses the Python API of the UCS to create
+    a new object or edit it.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: partial
+  check_mode:
+    support: full
+  diff_mode:
+    support: partial
 options:
-    state:
-        type: str
-        default: "present"
-        choices: [ present, absent ]
-        description:
-            - Whether the dns zone is present or not.
-    type:
-        type: str
-        required: true
-        description:
-            - Define if the zone is a forward or reverse DNS zone.
-            - "The available choices are: V(forward_zone), V(reverse_zone)."
-    zone:
-        type: str
-        required: true
-        description:
-            - DNS zone name, for example V(example.com).
-        aliases: [name]
-    nameserver:
-        type: list
-        elements: str
-        default: []
-        description:
-            - List of appropriate name servers. Required if O(state=present).
-    interfaces:
-        type: list
-        elements: str
-        default: []
-        description:
-            - List of interface IP addresses, on which the server should
-              response this zone. Required if O(state=present).
-
-    refresh:
-        type: int
-        default: 3600
-        description:
-            - Interval before the zone should be refreshed.
-    retry:
-        type: int
-        default: 1800
-        description:
-            - Interval that should elapse before a failed refresh should be retried.
-    expire:
-        type: int
-        default: 604800
-        description:
-            - Specifies the upper limit on the time interval that can elapse before the zone is no longer authoritative.
-    ttl:
-        type: int
-        default: 600
-        description:
-            - Minimum TTL field that should be exported with any RR from this zone.
-
-    contact:
-        type: str
-        default: ''
-        description:
-            - Contact person in the SOA record.
-    mx:
-        type: list
-        elements: str
-        default: []
-        description:
-            - List of MX servers. (Must declared as A or AAAA records).
-'''
+  state:
+    type: str
+    default: "present"
+    choices: [present, absent]
+    description:
+      - Whether the DNS zone is present or not.
+  type:
+    type: str
+    required: true
+    description:
+      - Define if the zone is a forward or reverse DNS zone.
+      - 'The available choices are: V(forward_zone), V(reverse_zone).'
+  zone:
+    type: str
+    required: true
+    description:
+      - DNS zone name, for example V(example.com).
+    aliases: [name]
+  nameserver:
+    type: list
+    elements: str
+    default: []
+    description:
+      - List of appropriate name servers. Required if O(state=present).
+  interfaces:
+    type: list
+    elements: str
+    default: []
+    description:
+      - List of interface IP addresses, on which the server should response this zone. Required if O(state=present).
+  refresh:
+    type: int
+    default: 3600
+    description:
+      - Interval before the zone should be refreshed.
+  retry:
+    type: int
+    default: 1800
+    description:
+      - Interval that should elapse before a failed refresh should be retried.
+  expire:
+    type: int
+    default: 604800
+    description:
+      - Specifies the upper limit on the time interval that can elapse before the zone is no longer authoritative.
+  ttl:
+    type: int
+    default: 600
+    description:
+      - Minimum TTL field that should be exported with any RR from this zone.
+  contact:
+    type: str
+    default: ''
+    description:
+      - Contact person in the SOA record.
+  mx:
+    type: list
+    elements: str
+    default: []
+    description:
+      - List of MX servers. (Must declared as A or AAAA records).
+"""
 
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a DNS zone on a UCS
   community.general.udm_dns_zone:
     zone: example.com
@@ -103,10 +99,10 @@ EXAMPLES = '''
       - ucs.example.com
     interfaces:
       - 192.0.2.1
-'''
+"""
 
 
-RETURN = '''# '''
+RETURN = """#"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.univention_umc import (

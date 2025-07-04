@@ -1,0 +1,66 @@
+---
+# Copyright (c) 2023, Steffen Scheib <steffen@scheib.me>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: 'Define ini_test_dict'
+  ansible.builtin.set_fact:
+    ini_test_dict:
+      section_name:
+        key_name: 'key value'
+
+      another_section:
+        connection: 'ssh'
+
+      interpolate_test:
+        interpolate_test_key: '%'
+
+- name: 'Write INI file that reflects ini_test_dict to {{ ini_test_file }}'
+  ansible.builtin.copy:
+    dest: '{{ ini_test_file }}'
+    content: |
+      [section_name]
+      key_name = key value
+
+      [another_section]
+      connection = ssh
+
+      [interpolate_test]
+      interpolate_test_key = %
+
+- name: 'Slurp the test file: {{ ini_test_file }}'
+  ansible.builtin.slurp:
+    src: '{{ ini_test_file }}'
+  register: 'ini_file_content'
+
+- name: >-
+    Ensure defined ini_test_dict is the same when retrieved
+    from {{ ini_test_file }}
+  ansible.builtin.assert:
+    that:
+      - 'ini_file_content.content | b64decode | community.general.from_ini ==
+         ini_test_dict'
+
+- name: 'Create a file that is not INI formatted: {{ ini_bad_file }}'
+  ansible.builtin.copy:
+    dest: '{{ ini_bad_file }}'
+    content: |
+      Testing a not INI formatted file.
+
+- name: 'Slurp the file that is not INI formatted: {{ ini_bad_file }}'
+  ansible.builtin.slurp:
+    src: '{{ ini_bad_file }}'
+  register: 'ini_bad_file_content'
+
+- name: 'Try parsing the bad file with from_ini: {{ ini_bad_file }}'
+  ansible.builtin.debug:
+    var: ini_bad_file_content | b64decode | community.general.from_ini
+  register: 'ini_bad_file_debug'
+  ignore_errors: true
+
+- name: 'Ensure from_ini raised the correct exception'
+  ansible.builtin.assert:
+    that:
+      - "'from_ini failed to parse given string' in ini_bad_file_debug.msg"
+      - "'File contains no section headers' in ini_bad_file_debug.msg"
+...

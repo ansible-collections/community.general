@@ -45,8 +45,8 @@
     that:
       - result is changed
       - result.existing == {}
-      - result.end_state.name == "{{ role }}"
-      - result.end_state.containerId == "{{ realm }}"
+      - result.end_state.name == role
+      - result.end_state.containerId == realm
 
 - name: Create existing realm role
   community.general.keycloak_role:
@@ -89,8 +89,8 @@
   assert:
     that:
       - result is changed
-      - result.existing.description == "{{ description_1 }}"
-      - result.end_state.description == "{{ description_2 }}"
+      - result.existing.description == description_1
+      - result.end_state.description == description_2
 
 - name: Delete existing realm role
   community.general.keycloak_role:
@@ -156,8 +156,8 @@
     that:
       - result is changed
       - result.existing == {}
-      - result.end_state.name == "{{ role }}"
-      - result.end_state.containerId == "{{ client.end_state.id }}"
+      - result.end_state.name == role
+      - result.end_state.containerId == client.end_state.id
 
 - name: Create existing client role
   community.general.keycloak_role:
@@ -202,8 +202,8 @@
   assert:
     that:
       - result is changed
-      - result.existing.description == "{{ description_1 }}"
-      - result.end_state.description == "{{ description_2 }}"
+      - result.existing.description == description_1
+      - result.end_state.description == description_2
 
 - name: Delete existing client role
   community.general.keycloak_role:

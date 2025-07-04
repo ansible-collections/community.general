@@ -8,8 +8,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: scaleway_organization_info
 short_description: Gather information about the Scaleway organizations available
 description:
@@ -27,20 +26,18 @@ extends_documentation_fragment:
   - community.general.scaleway
   - community.general.attributes
   - community.general.attributes.info_module
+"""
 
-'''
-
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Gather Scaleway organizations information
   community.general.scaleway_organization_info:
   register: result
 
 - ansible.builtin.debug:
     msg: "{{ result.scaleway_organization_info }}"
-'''
+"""
 
-RETURN = r'''
----
+RETURN = r"""
 scaleway_organization_info:
   description: Response from Scaleway API.
   returned: success
@@ -48,29 +45,29 @@ scaleway_organization_info:
   elements: dict
   sample:
     "scaleway_organization_info": [
-        {
-            "address_city_name": "Paris",
-            "address_country_code": "FR",
-            "address_line1": "42 Rue de l'univers",
-            "address_line2": null,
-            "address_postal_code": "75042",
-            "address_subdivision_code": "FR-75",
-            "creation_date": "2018-08-06T13:43:28.508575+00:00",
-            "currency": "EUR",
-            "customer_class": "individual",
-            "id": "3f709602-5e6c-4619-b80c-e8432ferewtr",
-            "locale": "fr_FR",
-            "modification_date": "2018-08-06T14:56:41.401685+00:00",
-            "name": "James Bond",
-            "support_id": "694324",
-            "support_level": "basic",
-            "support_pin": "9324",
-            "users": [],
-            "vat_number": null,
-            "warnings": []
-        }
+      {
+        "address_city_name": "Paris",
+        "address_country_code": "FR",
+        "address_line1": "42 Rue de l'univers",
+        "address_line2": null,
+        "address_postal_code": "75042",
+        "address_subdivision_code": "FR-75",
+        "creation_date": "2018-08-06T13:43:28.508575+00:00",
+        "currency": "EUR",
+        "customer_class": "individual",
+        "id": "3f709602-5e6c-4619-b80c-e8432ferewtr",
+        "locale": "fr_FR",
+        "modification_date": "2018-08-06T14:56:41.401685+00:00",
+        "name": "James Bond",
+        "support_id": "694324",
+        "support_level": "basic",
+        "support_pin": "9324",
+        "users": [],
+        "vat_number": null,
+        "warnings": []
+      }
     ]
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible_collections.community.general.plugins.module_utils.scaleway import (

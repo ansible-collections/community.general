@@ -51,7 +51,7 @@
       - orig_stat.stat.size == stat_test_1.stat.size
       - orig_stat.stat.checksum == stat_test_1.stat.checksum
       - orig_stat.stat.mtime == stat_test_1.stat.mtime
-      - stat_test_1.stat.checksum == expected_content | checksum
+      - stat_test_1.stat.checksum == (expected_content | trim + '\n') | checksum
   vars:
     expected_content: |
       # Copyright (c) Ansible Project
@@ -65,7 +65,7 @@
 - name: test deprecation
   assert:
     that:
-      - "'deprecations' not in bl_test_1 or (ansible_version.major == 2 and ansible_version.minor == 12)"
+      - "'deprecations' not in bl_test_1"
 
 - name: add new item to list
   community.general.kernel_blacklist:
@@ -83,7 +83,7 @@
   assert:
     that:
       - bl_test_2 is changed
-      - slurp_test_2.content|b64decode == content
+      - slurp_test_2.content|b64decode == (content | trim + '\n')
   vars:
     content: |
       # Copyright (c) Ansible Project
@@ -111,7 +111,7 @@
   assert:
     that:
       - bl_test_3 is changed
-      - slurp_test_3.content|b64decode == content
+      - slurp_test_3.content|b64decode == (content | trim + '\n')
   vars:
     content: |
       # Copyright (c) Ansible Project

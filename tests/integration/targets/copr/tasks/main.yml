@@ -11,133 +11,133 @@
       or (ansible_os_family == 'RedHat' and ansible_distribution != 'Fedora'
           and ansible_distribution_major_version | int >= 8)
   block:
-  - debug: var=copr_chroot
-  - name: enable copr project
-    copr:
-      host: copr.fedorainfracloud.org
-      state: enabled
-      name: '{{ copr_fullname }}'
-      chroot: "{{ copr_chroot }}"
-    register: result
+    - debug: var=copr_chroot
+    - name: enable copr project
+      copr:
+        host: copr.fedorainfracloud.org
+        state: enabled
+        name: '{{ copr_fullname }}'
+        chroot: "{{ copr_chroot }}"
+      register: result
 
-  - name: assert that the copr project was enabled
-    assert:
-      that:
-        - 'result is changed'
-        - result.msg == 'enabled'
-        - result.info == 'Please note that this repository is not part of the main distribution'
+    - name: assert that the copr project was enabled
+      assert:
+        that:
+          - 'result is changed'
+          - result.msg == 'enabled'
+          - result.info == 'Please note that this repository is not part of the main distribution'
 
-  - name: enable copr project
-    check_mode: true
-    copr:
-      state: enabled
-      name: '{{ copr_fullname }}'
-      chroot: '{{ copr_chroot }}'
-    register: result
+    - name: enable copr project
+      check_mode: true
+      copr:
+        state: enabled
+        name: '{{ copr_fullname }}'
+        chroot: '{{ copr_chroot }}'
+      register: result
 
-  - name: assert that the copr project was enabled
-    assert:
-      that:
-        - result is not changed
-        - result.msg == 'enabled'
+    - name: assert that the copr project was enabled
+      assert:
+        that:
+          - result is not changed
+          - result.msg == 'enabled'
 
-  - name: Ensure the repo is installed and enabled | slurp
-    register: result
-    ansible.builtin.slurp:
-      src: "{{ copr_repofile }}"
+    - name: Ensure the repo is installed and enabled | slurp
+      register: result
+      ansible.builtin.slurp:
+        src: "{{ copr_repofile }}"
 
-  - name: Ensure the repo is installed and enabled
-    vars:
-      content: "{{ result.content | b64decode }}"
-      _baseurl: "{{ 'https://download.copr.fedorainfracloud.org/results/gotmax23/community.general.copr_integration_tests' | regex_escape }}"
-      baseurl: "{{ content | regex_search('baseurl=' ~ _baseurl) }}"
-    block:
-      - ansible.builtin.debug:
-          var: content
-      - ansible.builtin.debug:
-          var: baseurl
-      - name: Ensure the repo is installed and enabled
-        ansible.builtin.assert:
-          that:
-            - "'enabled=1' in content"
-            - baseurl | length > 0
+    - name: Ensure the repo is installed and enabled
+      vars:
+        content: "{{ result.content | b64decode }}"
+        _baseurl: "{{ 'https://download.copr.fedorainfracloud.org/results/gotmax23/community.general.copr_integration_tests' | regex_escape }}"
+        baseurl: "{{ content | regex_search('baseurl=' ~ _baseurl) }}"
+      block:
+        - ansible.builtin.debug:
+            var: content
+        - ansible.builtin.debug:
+            var: baseurl
+        - name: Ensure the repo is installed and enabled
+          ansible.builtin.assert:
+            that:
+              - "'enabled=1' in content"
+              - baseurl | length > 0
 
-  - name: Install test package from Copr
-    when:
-      # Copr does not build new packages for EOL Fedoras.
-      - >
-        not (ansible_distribution == 'Fedora' and
-             ansible_distribution_major_version | int < 35)
-    block:
-      - name: install test package from the copr
-        ansible.builtin.package:
-          update_cache: true
-          name: copr-module-integration-dummy-package
+    - name: Install test package from Copr
+      when:
+        # Copr does not build new packages for EOL Fedoras.
+        - >
+          not (ansible_distribution == 'Fedora' and
+               ansible_distribution_major_version | int < 35)
+      block:
+        - name: install test package from the copr
+          ansible.builtin.package:
+            update_cache: true
+            name: copr-module-integration-dummy-package
 
-      - name: uninstall test package
-        register: result
-        ansible.builtin.package:
-          name: copr-module-integration-dummy-package
-          state: absent
+        - name: uninstall test package
+          register: result
+          ansible.builtin.package:
+            name: copr-module-integration-dummy-package
+            state: absent
 
-      - name: check uninstall test package
-        ansible.builtin.assert:
-          that: result.changed | bool
+        - name: check uninstall test package
+          ansible.builtin.assert:
+            that: result.changed | bool
 
-  - name: remove copr project
-    copr:
-      state: absent
-      name: '{{ copr_fullname }}'
-    register: result
+    - name: remove copr project
+      copr:
+        state: absent
+        name: '{{ copr_fullname }}'
+      register: result
 
-  - name: assert that the copr project was removed
-    assert:
-      that:
-        - 'result is changed'
-        - result.msg == 'absent'
+    - name: assert that the copr project was removed
+      assert:
+        that:
+          - 'result is changed'
+          - result.msg == 'absent'
 
-  - name: Ensure the repo file was removed | stat
-    register: result
-    ansible.builtin.stat:
-      dest: "{{ copr_repofile }}"
+    - name: Ensure the repo file was removed | stat
+      register: result
+      ansible.builtin.stat:
+        dest: "{{ copr_repofile }}"
 
-  - name: Ensure the repo file was removed
-    ansible.builtin.assert:
-      that: not result.stat.exists | bool
+    - name: Ensure the repo file was removed
+      ansible.builtin.assert:
+        that: not result.stat.exists | bool
 
-  - name: disable copr project
-    copr:
-      state: disabled
-      name: '{{ copr_fullname }}'
-      chroot: '{{ copr_chroot }}'
-    register: result
+    - name: disable copr project
+      copr:
+        state: disabled
+        name: '{{ copr_fullname }}'
+        chroot: '{{ copr_chroot }}'
+      register: result
 
-  - name: assert that the copr project was disabled
-    assert:
-      that:
-        - 'result is changed'
-        - result.msg == 'disabled'
+    - name: assert that the copr project was disabled
+      assert:
+        that:
+          - 'result is changed'
+          - result.msg == 'disabled'
 
-  - name: Ensure the repo is installed but disabled | slurp
-    register: result
-    ansible.builtin.slurp:
-      src: "{{ copr_repofile }}"
+    - name: Ensure the repo is installed but disabled | slurp
+      register: result
+      ansible.builtin.slurp:
+        src: "{{ copr_repofile }}"
 
-  - name: Ensure the repo is installed but disabled
-    vars:
-      content: "{{ result.content | b64decode }}"
-      _baseurl: "{{ 'https://download.copr.fedorainfracloud.org/results/gotmax23/community.general.copr_integration_tests' | regex_escape }}"
-      baseurl: "{{ content | regex_search('baseurl=' ~ _baseurl) }}"
-    block:
-      - ansible.builtin.debug:
-          var: content
-      - ansible.builtin.debug:
-          var: baseurl
-      - name: Ensure the repo is installed but disabled
-        ansible.builtin.assert:
-          that:
-            - "'enabled=0' in content"
-            - baseurl | length > 0
+    - name: Ensure the repo is installed but disabled
+      vars:
+        content: "{{ result.content | b64decode }}"
+        _baseurl: "{{ 'https://download.copr.fedorainfracloud.org/results/gotmax23/community.general.copr_integration_tests' | regex_escape }}"
+        baseurl: "{{ content | regex_search('baseurl=' ~ _baseurl) }}"
+      block:
+        - ansible.builtin.debug:
+            var: content
+        - ansible.builtin.debug:
+            var: baseurl
+        - name: Ensure the repo is installed but disabled
+          ansible.builtin.assert:
+            that:
+              - "'enabled=0' in content"
+              - baseurl | length > 0
 
   always:
     - name: clean up

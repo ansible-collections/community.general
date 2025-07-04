@@ -10,8 +10,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
-
+DOCUMENTATION = r"""
 module: manageiq_policies_info
 version_added: 5.8.0
 
@@ -24,16 +23,27 @@ extends_documentation_fragment:
 author: Alexei Znamensky (@russoz)
 description:
   - The manageiq_policies module supports listing policy_profiles in ManageIQ.
-
 options:
   resource_type:
     type: str
     description:
       - The type of the resource to obtain the profile for.
     required: true
-    choices: ['provider', 'host', 'vm', 'blueprint', 'category', 'cluster',
-        'data store', 'group', 'resource pool', 'service', 'service template',
-        'template', 'tenant', 'user']
+    choices:
+      - provider
+      - host
+      - vm
+      - blueprint
+      - category
+      - cluster
+      - data store
+      - group
+      - resource pool
+      - service
+      - service template
+      - template
+      - tenant
+      - user
   resource_name:
     type: str
     description:
@@ -44,9 +54,9 @@ options:
     description:
       - The ID of the resource to obtain the profile for.
       - Must be specified if O(resource_name) is not set. Both options are mutually exclusive.
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: List current policy_profile and policies for a provider in ManageIQ
   community.general.manageiq_policies_info:
     resource_name: 'EngLab'
@@ -56,9 +66,9 @@ EXAMPLES = '''
       username: 'admin'
       password: 'smartvm'
   register: result
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 profiles:
   description:
     - List current policy_profile and policies for a provider in ManageIQ.
@@ -78,7 +88,7 @@ profiles:
           name: schedule compliance after smart state analysis
       profile_description: OpenSCAP profile
       profile_name: openscap profile
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.manageiq import ManageIQ, manageiq_argument_spec, manageiq_entities

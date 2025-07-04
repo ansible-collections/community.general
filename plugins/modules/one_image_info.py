@@ -8,8 +8,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: one_image_info
 short_description: Gather information on OpenNebula images
 description:
@@ -17,46 +16,31 @@ description:
 requirements:
   - pyone
 extends_documentation_fragment:
+  - community.general.opennebula
   - community.general.attributes
   - community.general.attributes.info_module
 options:
-  api_url:
-    description:
-      - URL of the OpenNebula RPC server.
-      - It is recommended to use HTTPS so that the username/password are not
-      - transferred over the network unencrypted.
-      - If not set then the value of the E(ONE_URL) environment variable is used.
-    type: str
-  api_username:
-    description:
-      - Name of the user to login into the OpenNebula RPC server. If not set
-      - then the value of the E(ONE_USERNAME) environment variable is used.
-    type: str
-  api_password:
-    description:
-      - Password of the user to login into OpenNebula RPC server. If not set
-      - then the value of the E(ONE_PASSWORD) environment variable is used.
-    type: str
   ids:
     description:
-      - A list of images ids whose facts you want to gather.
+      - A list of images IDs whose facts you want to gather.
+      - Module can use integers too.
     aliases: ['id']
     type: list
     elements: str
   name:
     description:
       - A O(name) of the image whose facts will be gathered.
-      - If the O(name) begins with V(~) the O(name) will be used as regex pattern
-      - which restricts the list of images (whose facts will be returned) whose names match specified regex.
+      - If the O(name) begins with V(~) the O(name) will be used as regex pattern, which restricts the list of images (whose
+        facts will be returned) whose names match specified regex.
       - Also, if the O(name) begins with V(~*) case-insensitive matching will be performed.
       - See examples for more details.
     type: str
 author:
-    - "Milan Ilic (@ilicmilan)"
-    - "Jan Meerkamp (@meerkampdvv)"
-'''
+  - "Milan Ilic (@ilicmilan)"
+  - "Jan Meerkamp (@meerkampdvv)"
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Gather facts about all images
   community.general.one_image_info:
   register: result
@@ -67,8 +51,15 @@ EXAMPLES = '''
 
 - name: Gather facts about an image using ID
   community.general.one_image_info:
+    ids: 123
+
+- name: Gather facts about an image using list of ID
+  community.general.one_image_info:
     ids:
       - 123
+      - 456
+      - 789
+      - 0
 
 - name: Gather facts about an image using the name
   community.general.one_image_info:
@@ -84,191 +75,294 @@ EXAMPLES = '''
   community.general.one_image_info:
     name: '~*foo-image-.*'
   register: foo_images
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 images:
-    description: A list of images info
-    type: complex
-    returned: success
-    contains:
-        id:
-            description: image id
-            type: int
-            sample: 153
-        name:
-            description: image name
-            type: str
-            sample: app1
-        group_id:
-            description: image's group id
-            type: int
-            sample: 1
-        group_name:
-            description: image's group name
-            type: str
-            sample: one-users
-        owner_id:
-            description: image's owner id
-            type: int
-            sample: 143
-        owner_name:
-            description: image's owner name
-            type: str
-            sample: ansible-test
-        state:
-            description: state of image instance
-            type: str
-            sample: READY
-        used:
-            description: is image in use
-            type: bool
-            sample: true
-        running_vms:
-            description: count of running vms that use this image
-            type: int
-            sample: 7
-'''
+  description: A list of images info.
+  type: complex
+  returned: success
+  contains:
+    id:
+      description: The image's ID.
+      type: int
+      sample: 153
+    name:
+      description: The image's name.
+      type: str
+      sample: app1
+    group_id:
+      description: The image's group ID.
+      type: int
+      sample: 1
+    group_name:
+      description: The image's group name.
+      type: str
+      sample: one-users
+    owner_id:
+      description: The image's owner ID.
+      type: int
+      sample: 143
+    owner_name:
+      description: The image's owner name.
+      type: str
+      sample: ansible-test
+    state:
+      description: The image's state.
+      type: str
+      sample: READY
+    used:
+      description: The image's usage status.
+      type: bool
+      sample: true
+    running_vms:
+      description: The image's count of running vms that use this image.
+      type: int
+      sample: 7
+    permissions:
+      description: The image's permissions.
+      type: dict
+      version_added: 9.5.0
+      contains:
+        owner_u:
+          description: The image's owner USAGE permissions.
+          type: str
+          sample: 1
+        owner_m:
+          description: The image's owner MANAGE permissions.
+          type: str
+          sample: 0
+        owner_a:
+          description: The image's owner ADMIN permissions.
+          type: str
+          sample: 0
+        group_u:
+          description: The image's group USAGE permissions.
+          type: str
+          sample: 0
+        group_m:
+          description: The image's group MANAGE permissions.
+          type: str
+          sample: 0
+        group_a:
+          description: The image's group ADMIN permissions.
+          type: str
+          sample: 0
+        other_u:
+          description: The image's other users USAGE permissions.
+          type: str
+          sample: 0
+        other_m:
+          description: The image's other users MANAGE permissions.
+          type: str
+          sample: 0
+        other_a:
+          description: The image's other users ADMIN permissions.
+          type: str
+          sample: 0
+      sample:
+        owner_u: 1
+        owner_m: 0
+        owner_a: 0
+        group_u: 0
+        group_m: 0
+        group_a: 0
+        other_u: 0
+        other_m: 0
+        other_a: 0
+    type:
+      description: The image's type.
+      type: int
+      sample: 0
+      version_added: 9.5.0
+    disk_type:
+      description: The image's format type.
+      type: int
+      sample: 0
+      version_added: 9.5.0
+    persistent:
+      description: The image's persistence status (1 means true, 0 means false).
+      type: int
+      sample: 1
+      version_added: 9.5.0
+    source:
+      description: The image's source.
+      type: str
+      sample: /var/lib/one//datastores/100/somerandomstringxd
+      version_added: 9.5.0
+    path:
+      description: The image's filesystem path.
+      type: str
+      sample: /var/tmp/hello.qcow2
+      version_added: 9.5.0
+    fstype:
+      description: The image's filesystem type.
+      type: str
+      sample: ext4
+      version_added: 9.5.0
+    size:
+      description: The image's size in MegaBytes.
+      type: int
+      sample: 10000
+      version_added: 9.5.0
+    cloning_ops:
+      description: The image's cloning operations per second.
+      type: int
+      sample: 0
+      version_added: 9.5.0
+    cloning_id:
+      description: The image's cloning ID.
+      type: int
+      sample: -1
+      version_added: 9.5.0
+    target_snapshot:
+      description: The image's target snapshot.
+      type: int
+      sample: 1
+      version_added: 9.5.0
+    datastore_id:
+      description: The image's datastore ID.
+      type: int
+      sample: 100
+      version_added: 9.5.0
+    datastore:
+      description: The image's datastore name.
+      type: int
+      sample: image_datastore
+      version_added: 9.5.0
+    vms:
+      description: The image's list of vm ID's.
+      type: list
+      elements: int
+      version_added: 9.5.0
+      sample:
+        - 1
+        - 2
+        - 3
+    clones:
+      description: The image's list of clones ID's.
+      type: list
+      elements: int
+      version_added: 9.5.0
+      sample:
+        - 1
+        - 2
+        - 3
+    app_clones:
+      description: The image's list of app_clones ID's.
+      type: list
+      elements: int
+      version_added: 9.5.0
+      sample:
+        - 1
+        - 2
+        - 3
+    snapshots:
+      description: The image's list of snapshots.
+      type: list
+      version_added: 9.5.0
+      sample:
+        - date: 123123
+          parent: 1
+          size: 10228
+          allow_orphans: 1
+          children: 0
+          active: 1
+          name: SampleName
+"""
 
-try:
-    import pyone
-    HAS_PYONE = True
-except ImportError:
-    HAS_PYONE = False
 
-from ansible.module_utils.basic import AnsibleModule
-import os
-
-
-def get_all_images(client):
-    pool = client.imagepool.info(-2, -1, -1, -1)
-    # Filter -2 means fetch all images user can Use
-
-    return pool
+from ansible_collections.community.general.plugins.module_utils.opennebula import OpenNebulaModule
 
 
 IMAGE_STATES = ['INIT', 'READY', 'USED', 'DISABLED', 'LOCKED', 'ERROR', 'CLONE', 'DELETE', 'USED_PERS', 'LOCKED_USED', 'LOCKED_USED_PERS']
 
 
-def get_image_info(image):
-    info = {
-        'id': image.ID,
-        'name': image.NAME,
-        'state': IMAGE_STATES[image.STATE],
-        'running_vms': image.RUNNING_VMS,
-        'used': bool(image.RUNNING_VMS),
-        'user_name': image.UNAME,
-        'user_id': image.UID,
-        'group_name': image.GNAME,
-        'group_id': image.GID,
-    }
-    return info
+class ImageInfoModule(OpenNebulaModule):
+    def __init__(self):
+        argument_spec = dict(
+            ids=dict(type='list', aliases=['id'], elements='str', required=False),
+            name=dict(type='str', required=False),
+        )
+        mutually_exclusive = [
+            ['ids', 'name'],
+        ]
 
+        OpenNebulaModule.__init__(self,
+                                  argument_spec,
+                                  supports_check_mode=True,
+                                  mutually_exclusive=mutually_exclusive)
 
-def get_images_by_ids(module, client, ids):
-    images = []
-    pool = get_all_images(client)
+    def run(self, one, module, result):
+        params = module.params
+        ids = params.get('ids')
+        name = params.get('name')
 
-    for image in pool.IMAGE:
-        if str(image.ID) in ids:
-            images.append(image)
-            ids.remove(str(image.ID))
-            if len(ids) == 0:
+        if ids:
+            images = self.get_images_by_ids(ids)
+        elif name:
+            images = self.get_images_by_name(name)
+        else:
+            images = self.get_all_images().IMAGE
+
+        self.result = {
+            'images': [self.get_image_info(image) for image in images]
+        }
+
+        self.exit()
+
+    def get_all_images(self):
+        pool = self.one.imagepool.info(-2, -1, -1, -1)
+        # Filter -2 means fetch all images user can Use
+
+        return pool
+
+    def get_images_by_ids(self, ids):
+        images = []
+        pool = self.get_all_images()
+
+        for image in pool.IMAGE:
+            if str(image.ID) in ids:
+                images.append(image)
+                ids.remove(str(image.ID))
+                if len(ids) == 0:
+                    break
+
+        if len(ids) > 0:
+            self.module.fail_json(msg='There is no IMAGE(s) with id(s)=' + ', '.join('{id}'.format(id=str(image_id)) for image_id in ids))
+
+        return images
+
+    def get_images_by_name(self, name_pattern):
+        images = []
+        pattern = None
+
+        pool = self.get_all_images()
+
+        if name_pattern.startswith('~'):
+            import re
+            if name_pattern[1] == '*':
+                pattern = re.compile(name_pattern[2:], re.IGNORECASE)
+            else:
+                pattern = re.compile(name_pattern[1:])
+
+        for image in pool.IMAGE:
+            if pattern is not None:
+                if pattern.match(image.NAME):
+                    images.append(image)
+            elif name_pattern == image.NAME:
+                images.append(image)
                 break
 
-    if len(ids) > 0:
-        module.fail_json(msg='There is no IMAGE(s) with id(s)=' + ', '.join('{id}'.format(id=str(image_id)) for image_id in ids))
+        # if the specific name is indicated
+        if pattern is None and len(images) == 0:
+            self.module.fail_json(msg="There is no IMAGE with name=" + name_pattern)
 
-    return images
-
-
-def get_images_by_name(module, client, name_pattern):
-
-    images = []
-    pattern = None
-
-    pool = get_all_images(client)
-
-    if name_pattern.startswith('~'):
-        import re
-        if name_pattern[1] == '*':
-            pattern = re.compile(name_pattern[2:], re.IGNORECASE)
-        else:
-            pattern = re.compile(name_pattern[1:])
-
-    for image in pool.IMAGE:
-        if pattern is not None:
-            if pattern.match(image.NAME):
-                images.append(image)
-        elif name_pattern == image.NAME:
-            images.append(image)
-            break
-
-    # if the specific name is indicated
-    if pattern is None and len(images) == 0:
-        module.fail_json(msg="There is no IMAGE with name=" + name_pattern)
-
-    return images
-
-
-def get_connection_info(module):
-
-    url = module.params.get('api_url')
-    username = module.params.get('api_username')
-    password = module.params.get('api_password')
-
-    if not url:
-        url = os.environ.get('ONE_URL')
-
-    if not username:
-        username = os.environ.get('ONE_USERNAME')
-
-    if not password:
-        password = os.environ.get('ONE_PASSWORD')
-
-    if not (url and username and password):
-        module.fail_json(msg="One or more connection parameters (api_url, api_username, api_password) were not specified")
-    from collections import namedtuple
-
-    auth_params = namedtuple('auth', ('url', 'username', 'password'))
-
-    return auth_params(url=url, username=username, password=password)
+        return images
 
 
 def main():
-    fields = {
-        "api_url": {"required": False, "type": "str"},
-        "api_username": {"required": False, "type": "str"},
-        "api_password": {"required": False, "type": "str", "no_log": True},
-        "ids": {"required": False, "aliases": ['id'], "type": "list", "elements": "str"},
-        "name": {"required": False, "type": "str"},
-    }
-
-    module = AnsibleModule(argument_spec=fields,
-                           mutually_exclusive=[['ids', 'name']],
-                           supports_check_mode=True)
-
-    if not HAS_PYONE:
-        module.fail_json(msg='This module requires pyone to work!')
-
-    auth = get_connection_info(module)
-    params = module.params
-    ids = params.get('ids')
-    name = params.get('name')
-    client = pyone.OneServer(auth.url, session=auth.username + ':' + auth.password)
-
-    if ids:
-        images = get_images_by_ids(module, client, ids)
-    elif name:
-        images = get_images_by_name(module, client, name)
-    else:
-        images = get_all_images(client).IMAGE
-
-    result = {
-        'images': [get_image_info(image) for image in images],
-    }
-
-    module.exit_json(**result)
+    ImageInfoModule().run_module()
 
 
 if __name__ == '__main__':

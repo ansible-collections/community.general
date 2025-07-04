@@ -9,9 +9,9 @@ __metaclass__ = type
 
 from contextlib import contextmanager
 
-from ansible_collections.community.general.tests.unit.compat import unittest
-from ansible_collections.community.general.tests.unit.compat.mock import patch
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, ModuleTestCase, set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleExitJson, ModuleTestCase, set_module_args
 
 from ansible_collections.community.general.plugins.modules import keycloak_user_federation
 
@@ -144,22 +144,22 @@ class TestKeycloakUserFederation(ModuleTestCase):
                 }
             }
         ]
+        # get before_comp, get default_mapper, get after_mapper
         return_value_components_get = [
-            [], []
+            [], [], []
         ]
         changed = True
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_components=return_value_components_get, create_component=return_value_component_create) \
-                    as (mock_get_components, mock_get_component, mock_create_component, mock_update_component, mock_delete_component):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_components=return_value_components_get, create_component=return_value_component_create) \
+                        as (mock_get_components, mock_get_component, mock_create_component, mock_update_component, mock_delete_component):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
-        self.assertEqual(len(mock_get_components.mock_calls), 1)
+        self.assertEqual(len(mock_get_components.mock_calls), 3)
         self.assertEqual(len(mock_get_component.mock_calls), 0)
         self.assertEqual(len(mock_create_component.mock_calls), 1)
         self.assertEqual(len(mock_update_component.mock_calls), 0)
@@ -228,6 +228,7 @@ class TestKeycloakUserFederation(ModuleTestCase):
                     }
                 }
             ],
+            [],
             []
         ]
         return_value_component_get = [
@@ -270,18 +271,17 @@ class TestKeycloakUserFederation(ModuleTestCase):
         ]
         changed = True
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_components=return_value_components_get, get_component=return_value_component_get,
-                                    update_component=return_value_component_update) \
-                    as (mock_get_components, mock_get_component, mock_create_component, mock_update_component, mock_delete_component):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_components=return_value_components_get, get_component=return_value_component_get,
+                                        update_component=return_value_component_update) \
+                        as (mock_get_components, mock_get_component, mock_create_component, mock_update_component, mock_delete_component):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
-        self.assertEqual(len(mock_get_components.mock_calls), 2)
+        self.assertEqual(len(mock_get_components.mock_calls), 3)
         self.assertEqual(len(mock_get_component.mock_calls), 1)
         self.assertEqual(len(mock_create_component.mock_calls), 0)
         self.assertEqual(len(mock_update_component.mock_calls), 1)
@@ -344,7 +344,47 @@ class TestKeycloakUserFederation(ModuleTestCase):
             ]
         }
         return_value_components_get = [
-            [], []
+            [],
+            # exemplary default mapper created by keylocak
+            [
+                {
+                    "config": {
+                        "always.read.value.from.ldap": "false",
+                        "is.mandatory.in.ldap": "false",
+                        "ldap.attribute": "mail",
+                        "read.only": "true",
+                        "user.model.attribute": "email"
+                    },
+                    "id": "77e1763f-c51a-4286-bade-75577d64803c",
+                    "name": "email",
+                    "parentId": "e5f48aa3-b56b-4983-a8ad-2c7b8b5e77cb",
+                    "providerId": "user-attribute-ldap-mapper",
+                    "providerType": "org.keycloak.storage.ldap.mappers.LDAPStorageMapper"
+                },
+            ],
+            [
+                {
+                    "id": "2dfadafd-8b34-495f-a98b-153e71a22311",
+                    "name": "full name",
+                    "providerId": "full-name-ldap-mapper",
+                    "providerType": "org.keycloak.storage.ldap.mappers.LDAPStorageMapper",
+                    "parentId": "eb691537-b73c-4cd8-b481-6031c26499d8",
+                    "config": {
+                        "ldap.full.name.attribute": [
+                            "cn"
+                        ],
+                        "read.only": [
+                            "true"
+                        ],
+                        "write.only": [
+                            "false"
+                        ]
+                    }
+                }
+            ]
+        ]
+        return_value_component_delete = [
+            None
         ]
         return_value_component_create = [
             {
@@ -452,21 +492,20 @@ class TestKeycloakUserFederation(ModuleTestCase):
         ]
         changed = True
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_components=return_value_components_get, create_component=return_value_component_create) \
-                    as (mock_get_components, mock_get_component, mock_create_component, mock_update_component, mock_delete_component):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_components=return_value_components_get, create_component=return_value_component_create) \
+                        as (mock_get_components, mock_get_component, mock_create_component, mock_update_component, mock_delete_component):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
-        self.assertEqual(len(mock_get_components.mock_calls), 2)
+        self.assertEqual(len(mock_get_components.mock_calls), 3)
         self.assertEqual(len(mock_get_component.mock_calls), 0)
         self.assertEqual(len(mock_create_component.mock_calls), 2)
         self.assertEqual(len(mock_update_component.mock_calls), 0)
-        self.assertEqual(len(mock_delete_component.mock_calls), 0)
+        self.assertEqual(len(mock_delete_component.mock_calls), 1)
 
         # Verify that the module's changed status matches what is expected
         self.assertIs(exec_info.exception.args[0]['changed'], changed)
@@ -488,15 +527,14 @@ class TestKeycloakUserFederation(ModuleTestCase):
         ]
         changed = False
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_components=return_value_components_get) \
-                    as (mock_get_components, mock_get_component, mock_create_component, mock_update_component, mock_delete_component):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_components=return_value_components_get) \
+                        as (mock_get_components, mock_get_component, mock_create_component, mock_update_component, mock_delete_component):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         self.assertEqual(len(mock_get_components.mock_calls), 1)
         self.assertEqual(len(mock_get_component.mock_calls), 0)
@@ -562,15 +600,14 @@ class TestKeycloakUserFederation(ModuleTestCase):
         ]
         changed = True
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_components=return_value_components_get, delete_component=return_value_component_delete) \
-                    as (mock_get_components, mock_get_component, mock_create_component, mock_update_component, mock_delete_component):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_components=return_value_components_get, delete_component=return_value_component_delete) \
+                        as (mock_get_components, mock_get_component, mock_create_component, mock_update_component, mock_delete_component):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         self.assertEqual(len(mock_get_components.mock_calls), 2)
         self.assertEqual(len(mock_get_component.mock_calls), 0)

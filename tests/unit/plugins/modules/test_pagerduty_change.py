@@ -7,9 +7,9 @@ __metaclass__ = type
 
 import json
 import pytest
-from ansible_collections.community.general.tests.unit.compat.mock import patch
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
 from ansible_collections.community.general.plugins.modules import pagerduty_change
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
 
 
 class TestPagerDutyChangeModule(ModuleTestCase):
@@ -26,19 +26,19 @@ class TestPagerDutyChangeModule(ModuleTestCase):
 
     def test_module_fail_when_required_args_missing(self):
         with self.assertRaises(AnsibleFailJson):
-            set_module_args({})
-            self.module.main()
+            with set_module_args({}):
+                self.module.main()
 
     def test_ensure_change_event_created_with_minimal_data(self):
-        set_module_args({
+        with set_module_args({
             'integration_key': 'test',
             'summary': 'Testing'
-        })
+        }):
 
-        with patch.object(pagerduty_change, 'fetch_url') as fetch_url_mock:
-            fetch_url_mock.return_value = (None, {"status": 202})
-            with self.assertRaises(AnsibleExitJson):
-                self.module.main()
+            with patch.object(pagerduty_change, 'fetch_url') as fetch_url_mock:
+                fetch_url_mock.return_value = (None, {"status": 202})
+                with self.assertRaises(AnsibleExitJson):
+                    self.module.main()
 
             assert fetch_url_mock.call_count == 1
             url = fetch_url_mock.call_args[0][1]
@@ -51,7 +51,7 @@ class TestPagerDutyChangeModule(ModuleTestCase):
             assert data['payload']['source'] == 'Ansible'
 
     def test_ensure_change_event_created_with_full_data(self):
-        set_module_args({
+        with set_module_args({
             'integration_key': 'test',
             'summary': 'Testing',
             'source': 'My Ansible Script',
@@ -61,12 +61,12 @@ class TestPagerDutyChangeModule(ModuleTestCase):
             'environment': 'production',
             'link_url': 'https://pagerduty.com',
             'link_text': 'PagerDuty'
-        })
+        }):
 
-        with patch.object(pagerduty_change, 'fetch_url') as fetch_url_mock:
-            fetch_url_mock.return_value = (None, {"status": 202})
-            with self.assertRaises(AnsibleExitJson):
-                self.module.main()
+            with patch.object(pagerduty_change, 'fetch_url') as fetch_url_mock:
+                fetch_url_mock.return_value = (None, {"status": 202})
+                with self.assertRaises(AnsibleExitJson):
+                    self.module.main()
 
             assert fetch_url_mock.call_count == 1
             url = fetch_url_mock.call_args[0][1]

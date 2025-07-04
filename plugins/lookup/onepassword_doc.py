@@ -6,66 +6,53 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    name: onepassword_doc
-    author:
-      - Sam Doran (@samdoran)
-    requirements:
-      - C(op) 1Password command line utility version 2 or later.
-    short_description: Fetch documents stored in 1Password
-    version_added: "8.1.0"
-    description:
-      - P(community.general.onepassword_doc#lookup) wraps C(op) command line utility to fetch one or more documents from 1Password.
-    notes:
-      - The document contents are a string exactly as stored in 1Password.
-      - This plugin requires C(op) version 2 or later.
+DOCUMENTATION = r"""
+name: onepassword_doc
+author:
+  - Sam Doran (@samdoran)
+requirements:
+  - C(op) 1Password command line utility version 2 or later.
+short_description: Fetch documents stored in 1Password
+version_added: "8.1.0"
+description:
+  - P(community.general.onepassword_doc#lookup) wraps C(op) command line utility to fetch one or more documents from 1Password.
+notes:
+  - The document contents are a string exactly as stored in 1Password.
+  - This plugin requires C(op) version 2 or later.
+options:
+  _terms:
+    description: Identifier(s) (case-insensitive UUID or name) of item(s) to retrieve.
+    required: true
+    type: list
+    elements: string
 
-    options:
-      _terms:
-        description: Identifier(s) (case-insensitive UUID or name) of item(s) to retrieve.
-        required: true
+extends_documentation_fragment:
+  - community.general.onepassword
+  - community.general.onepassword.lookup
+"""
 
-    extends_documentation_fragment:
-      - community.general.onepassword
-      - community.general.onepassword.lookup
-'''
-
-EXAMPLES = """
+EXAMPLES = r"""
+---
 - name: Retrieve a private key from 1Password
   ansible.builtin.debug:
     var: lookup('community.general.onepassword_doc', 'Private key')
 """
 
-RETURN = """
-  _raw:
-    description: Requested document
-    type: list
-    elements: string
+RETURN = r"""
+_raw:
+  description: Requested document.
+  type: list
+  elements: string
 """
 
 from ansible_collections.community.general.plugins.lookup.onepassword import OnePass, OnePassCLIv2
-from ansible.errors import AnsibleLookupError
-from ansible.module_utils.common.text.converters import to_bytes
 from ansible.plugins.lookup import LookupBase
 
 
 class OnePassCLIv2Doc(OnePassCLIv2):
     def get_raw(self, item_id, vault=None, token=None):
         args = ["document", "get", item_id]
-        if vault is not None:
-            args = [*args, "--vault={0}".format(vault)]
-
-        if self.service_account_token:
-            if vault is None:
-                raise AnsibleLookupError("'vault' is required with 'service_account_token'")
-
-            environment_update = {"OP_SERVICE_ACCOUNT_TOKEN": self.service_account_token}
-            return self._run(args, environment_update=environment_update)
-
-        if token is not None:
-            args = [*args, to_bytes("--session=") + token]
-
-        return self._run(args)
+        return self._add_parameters_and_run(args, vault=vault, token=token)
 
 
 class LookupModule(LookupBase):

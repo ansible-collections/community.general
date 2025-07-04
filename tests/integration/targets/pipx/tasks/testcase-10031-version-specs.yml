@@ -1,0 +1,83 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+##############################################################################
+# Test version specifiers in name parameter
+
+- name: Ensure tox is uninstalled
+  community.general.pipx:
+    state: absent
+    name: tox
+  register: uninstall_tox
+
+- name: Install tox with version specifier in name
+  community.general.pipx:
+    name: tox>=3.22.0,<3.27.0
+  register: install_tox_version
+
+- name: Install tox with same version specifier (idempotency check)
+  community.general.pipx:
+    name: tox>=3.22.0,<3.27.0
+  register: install_tox_version_again
+
+- name: Ensure tox is uninstalled again
+  community.general.pipx:
+    state: absent
+    name: tox
+
+- name: Install tox with extras and version
+  community.general.pipx:
+    name: "tox[testing]>=3.22.0,<3.27.0"
+  register: install_tox_extras
+  ignore_errors: true  # Some versions might not have this extra
+
+- name: Install tox with higher version specifier
+  community.general.pipx:
+    name: "tox>=3.27.0"
+  register: install_tox_higher_version
+
+- name: Install tox with higher version specifier (force)
+  community.general.pipx:
+    name: "tox>=3.27.0"
+    force: true
+  register: install_tox_higher_version_force
+
+- name: Cleanup tox
+  community.general.pipx:
+    state: absent
+    name: tox
+  register: uninstall_tox_final
+
+- name: Check version specifier assertions
+  assert:
+    that:
+      - install_tox_version is changed
+      - "'tox' in install_tox_version.application"
+      - "install_tox_version.application.tox.version is version('3.22.0', '>=')"
+      - "install_tox_version.application.tox.version is version('3.27.0', '<')"
+      - install_tox_version_again is not changed
+      - "'tox' in install_tox_extras.application"
+      - "install_tox_extras.application.tox.version is version('3.22.0', '>=')"
+      - "install_tox_extras.application.tox.version is version('3.27.0', '<')"
+      - install_tox_higher_version is changed
+      - install_tox_higher_version_force is changed
+      - uninstall_tox_final is changed
+      - "'tox' not in uninstall_tox_final.application"
+
+- name: If packaging is recent
+  when:
+    - has_packaging22
+  block:
+    - name: Install tox with invalid version specifier
+      community.general.pipx:
+        name: "tox>>>>>3.27.0"
+      register: install_tox_invalid
+      ignore_errors: true
+
+    - name: Check version specifier assertions
+      assert:
+        that:
+          - install_tox_invalid is failed
+          - "'Invalid package specification' in install_tox_invalid.msg"

@@ -9,9 +9,9 @@ __metaclass__ = type
 
 from contextlib import contextmanager
 
-from ansible_collections.community.general.tests.unit.compat import unittest
-from ansible_collections.community.general.tests.unit.compat.mock import patch
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, ModuleTestCase, set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleExitJson, ModuleTestCase, set_module_args
 
 from ansible_collections.community.general.plugins.modules import keycloak_realm_info
 
@@ -105,15 +105,14 @@ class TestKeycloakRealmRole(ModuleTestCase):
             }
         ]
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_realm_info_by_id=return_value) \
-                    as (mock_get_realm_info_by_id):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_realm_info_by_id=return_value) \
+                        as (mock_get_realm_info_by_id):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         self.assertEqual(len(mock_get_realm_info_by_id.mock_calls), 1)
 

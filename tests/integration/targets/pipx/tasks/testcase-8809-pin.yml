@@ -1,0 +1,69 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Set up environment
+  environment:
+    PATH: /usr/local/bin:{{ ansible_env.PATH }}
+  block:
+    - name: Uninstall pycowsay and black
+      community.general.pipx:
+        state: uninstall
+        name: pycowsay
+
+    # latest is 0.0.0.2
+    - name: Install pycowsay 0.0.0.1
+      community.general.pipx:
+        state: install
+        name: pycowsay
+        source: pycowsay==0.0.0.1
+
+    - name: Pin cowsay
+      community.general.pipx:
+        state: pin
+        name: pycowsay
+      register: pin_cow
+
+    - name: Upgrade pycowsay
+      community.general.pipx:
+        state: upgrade
+        name: pycowsay
+
+    - name: Get pycowsay version
+      community.general.pipx_info:
+        name: pycowsay
+      register: cow_info_1
+
+    - name: Unpin cowsay
+      community.general.pipx:
+        state: unpin
+        name: pycowsay
+      register: unpin_cow
+
+    - name: Upgrade pycowsay
+      community.general.pipx:
+        state: upgrade
+        name: pycowsay
+
+    - name: Get pycowsay version
+      community.general.pipx_info:
+        name: pycowsay
+      register: cow_info_2
+
+    - name: Uninstall pycowsay and black (again)
+      community.general.pipx:
+        state: uninstall
+        name: "{{ item }}"
+      loop:
+        - black
+        - pycowsay
+      register: uninstall_all_2
+
+    - name: Assert pin/unpin
+      ansible.builtin.assert:
+        that:
+          - pin_cow is changed
+          - cow_info_1.application.0.version == "0.0.0.1"
+          - unpin_cow is changed
+          - cow_info_2.application.0.version != "0.0.0.1"

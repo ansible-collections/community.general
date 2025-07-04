@@ -8,7 +8,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 module: infinity
 short_description: Manage Infinity IPAM using Rest API
 description:
@@ -41,10 +41,10 @@ options:
     required: true
   action:
     description:
-      - Action to perform
+      - Action to perform.
     type: str
     required: true
-    choices: [add_network, delete_network, get_network, get_network_id, release_ip, release_network, reserve_network, reserve_next_available_ip ]
+    choices: [add_network, delete_network, get_network, get_network_id, release_ip, release_network, reserve_network, reserve_next_available_ip]
   network_id:
     description:
       - Network ID.
@@ -55,11 +55,11 @@ options:
     type: str
   network_address:
     description:
-      - Network address with CIDR format (e.g., 192.168.310.0).
+      - Network address with CIDR format (for example V(192.168.310.0)).
     type: str
   network_size:
     description:
-      - Network bitmask (e.g. 255.255.255.220) or CIDR format (e.g., /26).
+      - Network bitmask (for example V(255.255.255.220) or CIDR format V(/26)).
     type: str
   network_name:
     description:
@@ -67,25 +67,24 @@ options:
     type: str
   network_location:
     description:
-      - The parent network id for a given network.
+      - The parent network ID for a given network.
     type: int
     default: -1
   network_type:
     description:
-      - Network type defined by Infinity
+      - Network type defined by Infinity.
     type: str
-    choices: [ lan, shared_lan, supernet ]
+    choices: [lan, shared_lan, supernet]
     default: lan
   network_family:
     description:
-      - Network family defined by Infinity, e.g. IPv4, IPv6 and Dual stack
+      - Network family defined by Infinity, for example V(IPv4), V(IPv6) and V(Dual stack).
     type: str
-    choices: [ '4', '6', dual ]
+    choices: ['4', '6', dual]
     default: '4'
-'''
+"""
 
-EXAMPLES = r'''
----
+EXAMPLES = r"""
 - hosts: localhost
   connection: local
   strategy: debug
@@ -102,35 +101,36 @@ EXAMPLES = r'''
         network_id: 1201
         network_size: /28
       register: infinity
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 network_id:
-    description: id for a given network
-    returned: success
-    type: str
-    sample: '1501'
+  description: ID for a given network.
+  returned: success
+  type: str
+  sample: '1501'
 ip_info:
-    description: when reserve next available ip address from a network, the ip address info ) is returned.
-    returned: success
-    type: str
-    sample: '{"address": "192.168.10.3", "hostname": "", "FQDN": "", "domainname": "", "id": 3229}'
+  description: When reserve next available IP address from a network, the IP address info is returned.
+  returned: success
+  type: str
+  sample: '{"address": "192.168.10.3", "hostname": "", "FQDN": "", "domainname": "", "id": 3229}'
 network_info:
-    description: when reserving a LAN network from a Infinity supernet by providing network_size, the information about the reserved network is returned.
-    returned: success
-    type: str
-    sample: {
-        "network_address": "192.168.10.32/28",
-        "network_family": "4",
-        "network_id": 3102,
-        "network_size": null,
-        "description": null,
-        "network_location": "3085",
-        "ranges": { "id": 0, "name": null,"first_ip": null,"type": null,"last_ip": null},
-        "network_type": "lan",
-        "network_name": "'reserve_new_ansible_network'"
-    }
-'''
+  description: When reserving a LAN network from a Infinity supernet by providing network_size, the information about the
+    reserved network is returned.
+  returned: success
+  type: str
+  sample: {
+    "network_address": "192.168.10.32/28",
+    "network_family": "4",
+    "network_id": 3102,
+    "network_size": null,
+    "description": null,
+    "network_location": "3085",
+    "ranges": {"id": 0, "name": null, "first_ip": null, "type": null, "last_ip": null},
+    "network_type": "lan",
+    "network_name": "'reserve_new_ansible_network'"
+  }
+"""
 
 
 from ansible.module_utils.basic import AnsibleModule, json

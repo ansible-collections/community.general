@@ -9,23 +9,21 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: hpilo_info
 author: Dag Wieers (@dagwieers)
 short_description: Gather information through an HP iLO interface
 description:
-- This module gathers information on a specific system using its HP iLO interface.
-  These information includes hardware and network related information useful
-  for provisioning (e.g. macaddress, uuid).
-- This module requires the C(hpilo) python module.
+  - This module gathers information on a specific system using its HP iLO interface. These information includes hardware and
+    network related information useful for provisioning (for example macaddress, uuid).
+  - This module requires the C(hpilo) python module.
 extends_documentation_fragment:
-- community.general.attributes
-- community.general.attributes.info_module
+  - community.general.attributes
+  - community.general.attributes.info_module
 options:
   host:
     description:
-        - The HP iLO hostname/address that is linked to the physical system.
+      - The HP iLO hostname/address that is linked to the physical system.
     type: str
     required: true
   login:
@@ -43,15 +41,15 @@ options:
       - Change the ssl_version used.
     default: TLSv1
     type: str
-    choices: [ "SSLv3", "SSLv23", "TLSv1", "TLSv1_1", "TLSv1_2" ]
+    choices: ["SSLv3", "SSLv23", "TLSv1", "TLSv1_1", "TLSv1_2"]
 requirements:
-- hpilo
+  - hpilo
 notes:
-- This module ought to be run from a system that can access the HP iLO
-  interface directly, either by using C(local_action) or using C(delegate_to).
-'''
+  - This module ought to be run from a system that can access the HP iLO interface directly, either by using C(local_action)
+    or using C(delegate_to).
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Gather facts from a HP iLO interface only if the system is an HP server
   community.general.hpilo_info:
     host: YOUR_ILO_ADDRESS
@@ -64,71 +62,71 @@ EXAMPLES = r'''
 - ansible.builtin.fail:
     msg: 'CMDB serial ({{ cmdb_serialno }}) does not match hardware serial ({{ results.hw_system_serial }}) !'
   when: cmdb_serialno != results.hw_system_serial
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 # Typical output of HP iLO_info for a physical system
 hw_bios_date:
-    description: BIOS date
-    returned: always
-    type: str
-    sample: 05/05/2011
+  description: BIOS date.
+  returned: always
+  type: str
+  sample: 05/05/2011
 
 hw_bios_version:
-    description: BIOS version
-    returned: always
-    type: str
-    sample: P68
+  description: BIOS version.
+  returned: always
+  type: str
+  sample: P68
 
 hw_ethX:
-    description: Interface information (for each interface)
-    returned: always
-    type: dict
-    sample:
-      - macaddress: 00:11:22:33:44:55
-        macaddress_dash: 00-11-22-33-44-55
+  description: Interface information (for each interface).
+  returned: always
+  type: dict
+  sample:
+    - macaddress: 00:11:22:33:44:55
+      macaddress_dash: 00-11-22-33-44-55
 
 hw_eth_ilo:
-    description: Interface information (for the iLO network interface)
-    returned: always
-    type: dict
-    sample:
-      - macaddress: 00:11:22:33:44:BA
-      - macaddress_dash: 00-11-22-33-44-BA
+  description: Interface information (for the iLO network interface).
+  returned: always
+  type: dict
+  sample:
+    - macaddress: 00:11:22:33:44:BA
+    - macaddress_dash: 00-11-22-33-44-BA
 
 hw_product_name:
-    description: Product name
-    returned: always
-    type: str
-    sample: ProLiant DL360 G7
+  description: Product name.
+  returned: always
+  type: str
+  sample: ProLiant DL360 G7
 
 hw_product_uuid:
-    description: Product UUID
-    returned: always
-    type: str
-    sample: ef50bac8-2845-40ff-81d9-675315501dac
+  description: Product UUID.
+  returned: always
+  type: str
+  sample: ef50bac8-2845-40ff-81d9-675315501dac
 
 hw_system_serial:
-    description: System serial number
-    returned: always
-    type: str
-    sample: ABC12345D6
+  description: System serial number.
+  returned: always
+  type: str
+  sample: ABC12345D6
 
 hw_uuid:
-    description: Hardware UUID
-    returned: always
-    type: str
-    sample: 123456ABC78901D2
+  description: Hardware UUID.
+  returned: always
+  type: str
+  sample: 123456ABC78901D2
 
 host_power_status:
-    description:
-      - Power status of host.
-      - Will be one of V(ON), V(OFF) and V(UNKNOWN).
-    returned: always
-    type: str
-    sample: "ON"
-    version_added: 3.5.0
-'''
+  description:
+    - Power status of host.
+    - Will be one of V(ON), V(OFF) and V(UNKNOWN).
+  returned: always
+  type: str
+  sample: "ON"
+  version_added: 3.5.0
+"""
 
 import re
 import traceback

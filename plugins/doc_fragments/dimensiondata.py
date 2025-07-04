@@ -14,8 +14,7 @@ __metaclass__ = type
 class ModuleDocFragment(object):
 
     # Dimension Data doc fragment
-    DOCUMENTATION = r'''
-
+    DOCUMENTATION = r"""
 options:
   region:
     description:
@@ -29,12 +28,12 @@ options:
   mcp_user:
     description:
       - The username used to authenticate to the CloudControl API.
-      - If not specified, will fall back to E(MCP_USER) from environment variable or C(~/.dimensiondata).
+      - If not specified, falls back to E(MCP_USER) from environment variable or C(~/.dimensiondata).
     type: str
   mcp_password:
     description:
       - The password used to authenticate to the CloudControl API.
-      - If not specified, will fall back to E(MCP_PASSWORD) from environment variable or C(~/.dimensiondata).
+      - If not specified, falls back to E(MCP_PASSWORD) from environment variable or C(~/.dimensiondata).
       - Required if O(mcp_user) is specified.
     type: str
   location:
@@ -44,8 +43,8 @@ options:
     required: true
   validate_certs:
     description:
-      - If V(false), SSL certificates will not be validated.
+      - If V(false), SSL certificates are not validated.
       - This should only be used on private instances of the CloudControl API that use self-signed certificates.
     type: bool
     default: true
-'''
+"""

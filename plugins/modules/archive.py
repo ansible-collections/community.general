@@ -10,17 +10,16 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: archive
 short_description: Creates a compressed archive of one or more files or trees
 extends_documentation_fragment:
-    - files
-    - community.general.attributes
+  - files
+  - community.general.attributes
 description:
-    - Creates or extends an archive.
-    - The source and archive are on the remote host, and the archive I(is not) copied to the local host.
-    - Source files can be deleted after archival by specifying O(remove=True).
+  - Creates or extends an archive.
+  - The source and archive are on the target host, and the archive I(is not) copied to the controller host.
+  - Source files can be deleted after archival by specifying O(remove=True).
 attributes:
   check_mode:
     support: full
@@ -37,17 +36,19 @@ options:
     description:
       - The type of compression to use.
     type: str
-    choices: [ bz2, gz, tar, xz, zip ]
+    choices: [bz2, gz, tar, xz, zip]
     default: gz
   dest:
     description:
       - The file name of the destination archive. The parent directory must exists on the remote host.
-      - This is required when O(path) refers to multiple files by either specifying a glob, a directory or multiple paths in a list.
+      - This is required when O(path) refers to multiple files by either specifying a glob, a directory or multiple paths
+        in a list.
       - If the destination archive already exists, it will be truncated and overwritten.
     type: path
   exclude_path:
     description:
-      - Remote absolute path, glob, or list of paths or globs for the file or files to exclude from O(path) list and glob expansion.
+      - Remote absolute path, glob, or list of paths or globs for the file or files to exclude from O(path) list and glob
+        expansion.
       - Use O(exclusion_patterns) to instead exclude files or subdirectories below any of the paths from the O(path) list.
     type: list
     elements: path
@@ -72,18 +73,19 @@ options:
     type: bool
     default: false
 notes:
-    - Can produce C(gzip), C(bzip2), C(lzma), and C(zip) compressed files or archives.
-    - This module uses C(tarfile), C(zipfile), C(gzip), and C(bz2) packages on the target host to create archives.
-      These are part of the Python standard library for Python 2 and 3.
+  - Can produce C(gzip), C(bzip2), C(lzma), and C(zip) compressed files or archives.
+  - This module uses C(tarfile), C(zipfile), C(gzip), and C(bz2) packages on the target host to create archives. These are
+    part of the Python standard library for Python 2 and 3.
 requirements:
-    - Requires C(lzma) (standard library of Python 3) or L(backports.lzma, https://pypi.org/project/backports.lzma/) (Python 2) if using C(xz) format.
+  - Requires C(lzma) (standard library of Python 3) or L(backports.lzma, https://pypi.org/project/backports.lzma/) (Python
+    2) if using C(xz) format.
 seealso:
-    - module: ansible.builtin.unarchive
+  - module: ansible.builtin.unarchive
 author:
-    - Ben Doherty (@bendoh)
-'''
+  - Ben Doherty (@bendoh)
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Compress directory /path/to/foo/ into /path/to/foo.tgz
   community.general.archive:
     path: /path/to/foo
@@ -102,28 +104,28 @@ EXAMPLES = r'''
 - name: Create a bz2 archive of multiple files, rooted at /path
   community.general.archive:
     path:
-    - /path/to/foo
-    - /path/wong/foo
+      - /path/to/foo
+      - /path/wong/foo
     dest: /path/file.tar.bz2
     format: bz2
 
 - name: Create a bz2 archive of a globbed path, while excluding specific dirnames
   community.general.archive:
     path:
-    - /path/to/foo/*
+      - /path/to/foo/*
     dest: /path/file.tar.bz2
     exclude_path:
-    - /path/to/foo/bar
-    - /path/to/foo/baz
+      - /path/to/foo/bar
+      - /path/to/foo/baz
     format: bz2
 
 - name: Create a bz2 archive of a globbed path, while excluding a glob of dirnames
   community.general.archive:
     path:
-    - /path/to/foo/*
+      - /path/to/foo/*
     dest: /path/file.tar.bz2
     exclude_path:
-    - /path/to/foo/ba*
+      - /path/to/foo/ba*
     format: bz2
 
 - name: Use gzip to compress a single archive (i.e don't archive it first with tar)
@@ -138,45 +140,44 @@ EXAMPLES = r'''
     dest: /path/file.tar.gz
     format: gz
     force_archive: true
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 state:
-    description:
-        The state of the input O(path).
-    type: str
-    returned: always
+  description: The state of the input O(path).
+  type: str
+  returned: always
 dest_state:
-    description:
-      - The state of the O(dest) file.
-      - V(absent) when the file does not exist.
-      - V(archive) when the file is an archive.
-      - V(compress) when the file is compressed, but not an archive.
-      - V(incomplete) when the file is an archive, but some files under O(path) were not found.
-    type: str
-    returned: success
-    version_added: 3.4.0
+  description:
+    - The state of the O(dest) file.
+    - V(absent) when the file does not exist.
+    - V(archive) when the file is an archive.
+    - V(compress) when the file is compressed, but not an archive.
+    - V(incomplete) when the file is an archive, but some files under O(path) were not found.
+  type: str
+  returned: success
+  version_added: 3.4.0
 missing:
-    description: Any files that were missing from the source.
-    type: list
-    returned: success
+  description: Any files that were missing from the source.
+  type: list
+  returned: success
 archived:
-    description: Any files that were compressed or added to the archive.
-    type: list
-    returned: success
+  description: Any files that were compressed or added to the archive.
+  type: list
+  returned: success
 arcroot:
-    description: The archive root.
-    type: str
-    returned: always
+  description: The archive root.
+  type: str
+  returned: always
 expanded_paths:
-    description: The list of matching paths from paths argument.
-    type: list
-    returned: always
+  description: The list of matching paths from paths argument.
+  type: list
+  returned: always
 expanded_exclude_paths:
-    description: The list of matching exclude paths from the exclude_path argument.
-    type: list
-    returned: always
-'''
+  description: The list of matching exclude paths from the exclude_path argument.
+  type: list
+  returned: always
+"""
 
 import abc
 import bz2

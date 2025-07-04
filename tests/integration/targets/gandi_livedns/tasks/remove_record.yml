@@ -16,7 +16,7 @@
 - name: verify test remove a dns record in check mode
   assert:
     that:
-    - result is changed
+      - result is changed
 
 - name: test remove a dns record
   community.general.gandi_livedns:
@@ -30,7 +30,7 @@
 - name: verify test remove a dns record
   assert:
     that:
-    - result is changed
+      - result is changed
 
 - name: test remove a dns record idempotence
   community.general.gandi_livedns:
@@ -44,7 +44,7 @@
 - name: verify test remove a dns record idempotence
   assert:
     that:
-    - result is not changed
+      - result is not changed
 
 - name: test remove second dns record idempotence
   community.general.gandi_livedns:
@@ -58,4 +58,4 @@
 - name: verify test remove a dns record idempotence
   assert:
     that:
-    - result is not changed
+      - result is not changed

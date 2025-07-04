@@ -4,13 +4,17 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-from ansible_collections.community.general.tests.unit.compat import unittest
-from ansible_collections.community.general.tests.unit.compat.mock import patch
+from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
 from ansible.module_utils import basic
-from ansible.module_utils.common.text.converters import to_bytes
 import ansible_collections.community.general.plugins.modules.ufw as module
-
-import json
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
+    AnsibleExitJson,
+    AnsibleFailJson,
+    set_module_args,
+    exit_json,
+    fail_json,
+)
 
 
 # mock ufw messages
@@ -104,35 +108,6 @@ def do_nothing_func_port_7000(*args, **kwarg):
     return 0, dry_mode_cmd_with_port_700[args[0]], ""
 
 
-def set_module_args(args):
-    args = json.dumps({'ANSIBLE_MODULE_ARGS': args})
-    """prepare arguments so that they will be picked up during module creation"""
-    basic._ANSIBLE_ARGS = to_bytes(args)
-
-
-class AnsibleExitJson(Exception):
-    """Exception class to be raised by module.exit_json and caught by the test case"""
-    pass
-
-
-class AnsibleFailJson(Exception):
-    """Exception class to be raised by module.fail_json and caught by the test case"""
-    pass
-
-
-def exit_json(*args, **kwargs):
-    """function to patch over exit_json; package return data into an exception"""
-    if 'changed' not in kwargs:
-        kwargs['changed'] = False
-    raise AnsibleExitJson(kwargs)
-
-
-def fail_json(*args, **kwargs):
-    """function to patch over fail_json; package return data into an exception"""
-    kwargs['failed'] = True
-    raise AnsibleFailJson(kwargs)
-
-
 def get_bin_path(self, arg, required=False):
     """Mock AnsibleModule.get_bin_path"""
     return arg
@@ -171,28 +146,28 @@ class TestUFW(unittest.TestCase):
         self.assertTrue(reg.match("::") is not None)
 
     def test_check_mode_add_rules(self):
-        set_module_args({
+        with set_module_args({
             'rule': 'allow',
             'proto': 'tcp',
             'port': '7000',
             '_ansible_check_mode': True
-        })
-        result = self.__getResult(do_nothing_func_port_7000)
+        }):
+            result = self.__getResult(do_nothing_func_port_7000)
         self.assertFalse(result.exception.args[0]['changed'])
 
     def test_check_mode_add_insert_rules(self):
-        set_module_args({
+        with set_module_args({
             'insert': '1',
             'rule': 'allow',
             'proto': 'tcp',
             'port': '7000',
             '_ansible_check_mode': True
-        })
-        result = self.__getResult(do_nothing_func_port_7000)
+        }):
+            result = self.__getResult(do_nothing_func_port_7000)
         self.assertFalse(result.exception.args[0]['changed'])
 
     def test_check_mode_add_detailed_route(self):
-        set_module_args({
+        with set_module_args({
             'rule': 'allow',
             'route': 'yes',
             'interface_in': 'foo',
@@ -203,13 +178,12 @@ class TestUFW(unittest.TestCase):
             'from_port': '7000',
             'to_port': '7001',
             '_ansible_check_mode': True
-        })
-
-        result = self.__getResult(do_nothing_func_port_7000)
+        }):
+            result = self.__getResult(do_nothing_func_port_7000)
         self.assertTrue(result.exception.args[0]['changed'])
 
     def test_check_mode_add_ambiguous_route(self):
-        set_module_args({
+        with set_module_args({
             'rule': 'allow',
             'route': 'yes',
             'interface_in': 'foo',
@@ -217,68 +191,66 @@ class TestUFW(unittest.TestCase):
             'direction': 'in',
             'interface': 'baz',
             '_ansible_check_mode': True
-        })
-
-        with self.assertRaises(AnsibleFailJson) as result:
-            self.__getResult(do_nothing_func_port_7000)
+        }):
+            with self.assertRaises(AnsibleFailJson) as result:
+                self.__getResult(do_nothing_func_port_7000)
 
         exc = result.exception.args[0]
         self.assertTrue(exc['failed'])
         self.assertIn('mutually exclusive', exc['msg'])
 
     def test_check_mode_add_interface_in(self):
-        set_module_args({
+        with set_module_args({
             'rule': 'allow',
             'proto': 'tcp',
             'port': '7003',
             'interface_in': 'foo',
             '_ansible_check_mode': True
-        })
-        result = self.__getResult(do_nothing_func_port_7000)
+        }):
+            result = self.__getResult(do_nothing_func_port_7000)
         self.assertTrue(result.exception.args[0]['changed'])
 
     def test_check_mode_add_interface_out(self):
-        set_module_args({
+        with set_module_args({
             'rule': 'allow',
             'proto': 'tcp',
             'port': '7004',
             'interface_out': 'foo',
             '_ansible_check_mode': True
-        })
-        result = self.__getResult(do_nothing_func_port_7000)
+        }):
+            result = self.__getResult(do_nothing_func_port_7000)
         self.assertTrue(result.exception.args[0]['changed'])
 
     def test_check_mode_add_non_route_interface_both(self):
-        set_module_args({
+        with set_module_args({
             'rule': 'allow',
             'proto': 'tcp',
             'port': '7004',
             'interface_in': 'foo',
             'interface_out': 'bar',
             '_ansible_check_mode': True
-        })
-
-        with self.assertRaises(AnsibleFailJson) as result:
-            self.__getResult(do_nothing_func_port_7000)
+        }):
+            with self.assertRaises(AnsibleFailJson) as result:
+                self.__getResult(do_nothing_func_port_7000)
 
         exc = result.exception.args[0]
         self.assertTrue(exc['failed'])
         self.assertIn('combine', exc['msg'])
 
     def test_check_mode_add_direction_in(self):
-        set_module_args({
+        with set_module_args({
             'rule': 'allow',
             'proto': 'tcp',
             'port': '7003',
             'direction': 'in',
             'interface': 'foo',
             '_ansible_check_mode': True
-        })
-        result = self.__getResult(do_nothing_func_port_7000)
+        }):
+            result = self.__getResult(do_nothing_func_port_7000)
         self.assertTrue(result.exception.args[0]['changed'])
 
     def test_check_mode_add_direction_in_with_ip(self):
-        set_module_args({
+        with set_module_args({
             'rule': 'allow',
             'proto': 'tcp',
             'from_ip': '1.1.1.1',
@@ -288,24 +260,24 @@ class TestUFW(unittest.TestCase):
             'direction': 'in',
             'interface': 'foo',
             '_ansible_check_mode': True
-        })
-        result = self.__getResult(do_nothing_func_port_7000)
+        }):
+            result = self.__getResult(do_nothing_func_port_7000)
         self.assertTrue(result.exception.args[0]['changed'])
 
     def test_check_mode_add_direction_out(self):
-        set_module_args({
+        with set_module_args({
             'rule': 'allow',
             'proto': 'tcp',
             'port': '7004',
             'direction': 'out',
             'interface': 'foo',
             '_ansible_check_mode': True
-        })
-        result = self.__getResult(do_nothing_func_port_7000)
+        }):
+            result = self.__getResult(do_nothing_func_port_7000)
         self.assertTrue(result.exception.args[0]['changed'])
 
     def test_check_mode_add_direction_out_with_ip(self):
-        set_module_args({
+        with set_module_args({
             'rule': 'allow',
             'proto': 'tcp',
             'from_ip': '1.1.1.1',
@@ -315,157 +287,149 @@ class TestUFW(unittest.TestCase):
             'direction': 'out',
             'interface': 'foo',
             '_ansible_check_mode': True
-        })
-        result = self.__getResult(do_nothing_func_port_7000)
+        }):
+            result = self.__getResult(do_nothing_func_port_7000)
         self.assertTrue(result.exception.args[0]['changed'])
 
     def test_check_mode_delete_existing_rules(self):
 
-        set_module_args({
+        with set_module_args({
             'rule': 'allow',
             'proto': 'tcp',
             'port': '7000',
             'delete': 'yes',
             '_ansible_check_mode': True,
-        })
-
-        self.assertTrue(self.__getResult(do_nothing_func_port_7000).exception.args[0]['changed'])
+        }):
+            self.assertTrue(self.__getResult(do_nothing_func_port_7000).exception.args[0]['changed'])
 
     def test_check_mode_delete_existing_insert_rules(self):
 
-        set_module_args({
+        with set_module_args({
             'insert': '1',
             'rule': 'allow',
             'proto': 'tcp',
             'port': '7000',
             'delete': 'yes',
             '_ansible_check_mode': True,
-        })
-
-        self.assertTrue(self.__getResult(do_nothing_func_port_7000).exception.args[0]['changed'])
+        }):
+            self.assertTrue(self.__getResult(do_nothing_func_port_7000).exception.args[0]['changed'])
 
     def test_check_mode_delete_not_existing_rules(self):
 
-        set_module_args({
+        with set_module_args({
             'rule': 'allow',
             'proto': 'tcp',
             'port': '7001',
             'delete': 'yes',
             '_ansible_check_mode': True,
-        })
-
-        self.assertFalse(self.__getResult(do_nothing_func_port_7000).exception.args[0]['changed'])
+        }):
+            self.assertFalse(self.__getResult(do_nothing_func_port_7000).exception.args[0]['changed'])
 
     def test_check_mode_delete_not_existing_insert_rules(self):
 
-        set_module_args({
+        with set_module_args({
             'insert': '1',
             'rule': 'allow',
             'proto': 'tcp',
             'port': '7001',
             'delete': 'yes',
             '_ansible_check_mode': True,
-        })
-
-        self.assertFalse(self.__getResult(do_nothing_func_port_7000).exception.args[0]['changed'])
+        }):
+            self.assertFalse(self.__getResult(do_nothing_func_port_7000).exception.args[0]['changed'])
 
     def test_enable_mode(self):
-        set_module_args({
+        with set_module_args({
             'state': 'enabled',
             '_ansible_check_mode': True
-        })
-
-        self.assertFalse(self.__getResult(do_nothing_func_port_7000).exception.args[0]['changed'])
+        }):
+            self.assertFalse(self.__getResult(do_nothing_func_port_7000).exception.args[0]['changed'])
 
     def test_disable_mode(self):
-        set_module_args({
+        with set_module_args({
             'state': 'disabled',
             '_ansible_check_mode': True
-        })
-
-        self.assertTrue(self.__getResult(do_nothing_func_port_7000).exception.args[0]['changed'])
+        }):
+            self.assertTrue(self.__getResult(do_nothing_func_port_7000).exception.args[0]['changed'])
 
     def test_logging_off(self):
-        set_module_args({
+        with set_module_args({
             'logging': 'off',
             '_ansible_check_mode': True
-        })
-
-        self.assertTrue(self.__getResult(do_nothing_func_port_7000).exception.args[0]['changed'])
+        }):
+            self.assertTrue(self.__getResult(do_nothing_func_port_7000).exception.args[0]['changed'])
 
     def test_logging_on(self):
-        set_module_args({
+        with set_module_args({
             'logging': 'on',
             '_ansible_check_mode': True
-        })
-
-        self.assertFalse(self.__getResult(do_nothing_func_port_7000).exception.args[0]['changed'])
+        }):
+            self.assertFalse(self.__getResult(do_nothing_func_port_7000).exception.args[0]['changed'])
 
     def test_default_changed(self):
-        set_module_args({
+        with set_module_args({
             'default': 'allow',
             "direction": "incoming",
             '_ansible_check_mode': True
-        })
-        self.assertTrue(self.__getResult(do_nothing_func_port_7000).exception.args[0]['changed'])
+        }):
+            self.assertTrue(self.__getResult(do_nothing_func_port_7000).exception.args[0]['changed'])
 
     def test_default_not_changed(self):
-        set_module_args({
+        with set_module_args({
             'default': 'deny',
             "direction": "incoming",
             '_ansible_check_mode': True
-        })
-        self.assertFalse(self.__getResult(do_nothing_func_port_7000).exception.args[0]['changed'])
+        }):
+            self.assertFalse(self.__getResult(do_nothing_func_port_7000).exception.args[0]['changed'])
 
     def test_ipv6_remove(self):
-        set_module_args({
+        with set_module_args({
             'rule': 'allow',
             'proto': 'udp',
             'port': '5353',
             'from': 'ff02::fb',
             'delete': 'yes',
             '_ansible_check_mode': True,
-        })
-        self.assertTrue(self.__getResult(do_nothing_func_ipv6).exception.args[0]['changed'])
+        }):
+            self.assertTrue(self.__getResult(do_nothing_func_ipv6).exception.args[0]['changed'])
 
     def test_ipv6_add_existing(self):
-        set_module_args({
+        with set_module_args({
             'rule': 'allow',
             'proto': 'udp',
             'port': '5353',
             'from': 'ff02::fb',
             '_ansible_check_mode': True,
-        })
-        self.assertFalse(self.__getResult(do_nothing_func_ipv6).exception.args[0]['changed'])
+        }):
+            self.assertFalse(self.__getResult(do_nothing_func_ipv6).exception.args[0]['changed'])
 
     def test_add_not_existing_ipv4_submask(self):
-        set_module_args({
+        with set_module_args({
             'rule': 'allow',
             'proto': 'udp',
             'port': '1577',
             'from': '10.0.0.0/24',
             '_ansible_check_mode': True,
-        })
-        self.assertTrue(self.__getResult(do_nothing_func_ipv6).exception.args[0]['changed'])
+        }):
+            self.assertTrue(self.__getResult(do_nothing_func_ipv6).exception.args[0]['changed'])
 
     def test_ipv4_add_with_existing_ipv6(self):
-        set_module_args({
+        with set_module_args({
             'rule': 'allow',
             'proto': 'udp',
             'port': '5353',
             'from': '224.0.0.252',
             '_ansible_check_mode': True,
-        })
-        self.assertTrue(self.__getResult(do_nothing_func_ipv6).exception.args[0]['changed'])
+        }):
+            self.assertTrue(self.__getResult(do_nothing_func_ipv6).exception.args[0]['changed'])
 
     def test_ipv6_add_from_nothing(self):
-        set_module_args({
+        with set_module_args({
             'rule': 'allow',
             'port': '23',
             'to': '::',
             '_ansible_check_mode': True,
-        })
-        result = self.__getResult(do_nothing_func_nothing).exception.args[0]
+        }):
+            result = self.__getResult(do_nothing_func_nothing).exception.args[0]
         print(result)
         self.assertTrue(result['changed'])
 

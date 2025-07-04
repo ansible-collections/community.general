@@ -12,108 +12,111 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: onepassword_info
 author:
-    - Ryan Conway (@Rylon)
+  - Ryan Conway (@Rylon)
 requirements:
-    - C(op) 1Password command line utility. See U(https://support.1password.com/command-line/)
+  - C(op) 1Password command line utility. See U(https://support.1password.com/command-line/)
 notes:
-    - Tested with C(op) version 0.5.5
-    - "Based on the P(community.general.onepassword#lookup) lookup plugin by Scott Buchanan <sbuchanan@ri.pn>."
+  - Tested with C(op) version 0.5.5.
+  - Based on the P(community.general.onepassword#lookup) lookup plugin by Scott Buchanan <sbuchanan@ri.pn>.
 short_description: Gather items from 1Password
 description:
-    - M(community.general.onepassword_info) wraps the C(op) command line utility to fetch data about one or more 1Password items.
-    - A fatal error occurs if any of the items being searched for can not be found.
-    - Recommend using with the C(no_log) option to avoid logging the values of the secrets being retrieved.
+  - M(community.general.onepassword_info) wraps the C(op) command line utility to fetch data about one or more 1Password items.
+  - A fatal error occurs if any of the items being searched for can not be found.
+  - Recommend using with the C(no_log) option to avoid logging the values of the secrets being retrieved.
 extends_documentation_fragment:
-    - community.general.attributes
-    - community.general.attributes.info_module
+  - community.general.attributes
+  - community.general.attributes.info_module
 options:
-    search_terms:
-        type: list
-        elements: dict
+  search_terms:
+    type: list
+    elements: dict
+    description:
+      - A list of one or more search terms.
+      - Each search term can either be a simple string or it can be a dictionary for more control.
+      - When passing a simple string, O(search_terms[].field) is assumed to be V(password).
+      - When passing a dictionary, the following fields are available.
+    suboptions:
+      name:
+        type: str
         description:
-            - A list of one or more search terms.
-            - Each search term can either be a simple string or it can be a dictionary for more control.
-            - When passing a simple string, O(search_terms[].field) is assumed to be V(password).
-            - When passing a dictionary, the following fields are available.
-        suboptions:
-            name:
-                type: str
-                description:
-                    - The name of the 1Password item to search for (required).
-            field:
-                type: str
-                description:
-                    - The name of the field to search for within this item (optional, defaults to "password" (or "document" if the item has an attachment).
-            section:
-                type: str
-                description:
-                    - The name of a section within this item containing the specified field (optional, will search all sections if not specified).
-            vault:
-                type: str
-                description:
-                    - The name of the particular 1Password vault to search, useful if your 1Password user has access to multiple vaults (optional).
+          - The name of the 1Password item to search for (required).
+      field:
+        type: str
+        description:
+          - The name of the field to search for within this item (optional, defaults to V(password), or V(document) if the
+            item has an attachment).
+      section:
+        type: str
+        description:
+          - The name of a section within this item containing the specified field (optional, will search all sections if not
+            specified).
+      vault:
+        type: str
+        description:
+          - The name of the particular 1Password vault to search, useful if your 1Password user has access to multiple vaults
+            (optional).
+    required: true
+  auto_login:
+    type: dict
+    description:
+      - A dictionary containing authentication details. If this is set, M(community.general.onepassword_info) will attempt
+        to sign in to 1Password automatically.
+      - Without this option, you must have already logged in using the 1Password CLI before running Ansible.
+      - It is B(highly) recommended to store 1Password credentials in an Ansible Vault. Ensure that the key used to encrypt
+        the Ansible Vault is equal to or greater in strength than the 1Password master password.
+    suboptions:
+      subdomain:
+        type: str
+        description:
+          - 1Password subdomain name (V(subdomain).1password.com).
+          - If this is not specified, the most recent subdomain will be used.
+      username:
+        type: str
+        description:
+          - 1Password username.
+          - Only required for initial sign in.
+      master_password:
+        type: str
+        description:
+          - The master password for your subdomain.
+          - This is always required when specifying O(auto_login).
         required: true
-    auto_login:
-        type: dict
+      secret_key:
+        type: str
         description:
-            - A dictionary containing authentication details. If this is set, M(community.general.onepassword_info)
-              will attempt to sign in to 1Password automatically.
-            - Without this option, you must have already logged in via the 1Password CLI before running Ansible.
-            - It is B(highly) recommended to store 1Password credentials in an Ansible Vault. Ensure that the key used to encrypt
-              the Ansible Vault is equal to or greater in strength than the 1Password master password.
-        suboptions:
-            subdomain:
-                type: str
-                description:
-                    - 1Password subdomain name (<subdomain>.1password.com).
-                    - If this is not specified, the most recent subdomain will be used.
-            username:
-                type: str
-                description:
-                    - 1Password username.
-                    - Only required for initial sign in.
-            master_password:
-                type: str
-                description:
-                    - The master password for your subdomain.
-                    - This is always required when specifying O(auto_login).
-                required: true
-            secret_key:
-                type: str
-                description:
-                    - The secret key for your subdomain.
-                    - Only required for initial sign in.
-        required: false
-    cli_path:
-        type: path
-        description: Used to specify the exact path to the C(op) command line interface
-        required: false
-        default: 'op'
-'''
+          - The secret key for your subdomain.
+          - Only required for initial sign in.
+    required: false
+  cli_path:
+    type: path
+    description: Used to specify the exact path to the C(op) command line interface.
+    required: false
+    default: 'op'
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # Gather secrets from 1Password, assuming there is a 'password' field:
 - name: Get a password
   community.general.onepassword_info:
     search_terms: My 1Password item
   delegate_to: localhost
   register: my_1password_item
-  no_log: true         # Don't want to log the secrets to the console!
+  no_log: true       # Don't want to log the secrets to the console!
 
 # Gather secrets from 1Password, with more advanced search terms:
 - name: Get a password
   community.general.onepassword_info:
     search_terms:
-      - name:    My 1Password item
-        field:   Custom field name       # optional, defaults to 'password'
-        section: Custom section name     # optional, defaults to 'None'
-        vault:   Name of the vault       # optional, only necessary if there is more than 1 Vault available
+      - name: My 1Password item
+        field: Custom field name       # optional, defaults to 'password'
+        section: Custom section name   # optional, defaults to 'None'
+        vault: Name of the vault       # optional, only necessary if there is more than 1 Vault available
   delegate_to: localhost
   register: my_1password_item
-  no_log: true                           # Don't want to log the secrets to the console!
+  no_log: true                         # Don't want to log the secrets to the console!
 
 # Gather secrets combining simple and advanced search terms to retrieve two items, one of which we fetch two
 # fields. In the first 'password' is fetched, as a field name is not specified (default behaviour) and in the
@@ -121,39 +124,39 @@ EXAMPLES = '''
 - name: Get a password
   community.general.onepassword_info:
     search_terms:
-      - My 1Password item                # 'name' is optional when passing a simple string...
-      - name: My Other 1Password item    # ...but it can also be set for consistency
-      - name:    My 1Password item
-        field:   Custom field name       # optional, defaults to 'password'
-        section: Custom section name     # optional, defaults to 'None'
-        vault:   Name of the vault       # optional, only necessary if there is more than 1 Vault available
+      - My 1Password item              # 'name' is optional when passing a simple string...
+      - name: My Other 1Password item  # ...but it can also be set for consistency
+      - name: My 1Password item
+        field: Custom field name       # optional, defaults to 'password'
+        section: Custom section name   # optional, defaults to 'None'
+        vault: Name of the vault       # optional, only necessary if there is more than 1 Vault available
       - name: A 1Password item with document attachment
   delegate_to: localhost
   register: my_1password_item
-  no_log: true                           # Don't want to log the secrets to the console!
+  no_log: true                         # Don't want to log the secrets to the console!
 
 - name: Debug a password (for example)
   ansible.builtin.debug:
     msg: "{{ my_1password_item['onepassword']['My 1Password item'] }}"
-'''
+"""
 
-RETURN = '''
----
+RETURN = r"""
 # One or more dictionaries for each matching item from 1Password, along with the appropriate fields.
 # This shows the response you would expect to receive from the third example documented above.
 onepassword:
-    description: Dictionary of each 1password item matching the given search terms, shows what would be returned from the third example above.
-    returned: success
-    type: dict
-    sample:
-        "My 1Password item":
-            password: the value of this field
-            Custom field name: the value of this field
-        "My Other 1Password item":
-            password: the value of this field
-        "A 1Password item with document attachment":
-            document: the contents of the document attached to this item
-'''
+  description: Dictionary of each 1password item matching the given search terms, shows what would be returned from the third
+    example above.
+  returned: success
+  type: dict
+  sample:
+    "My 1Password item":
+      password: the value of this field
+      Custom field name: the value of this field
+    "My Other 1Password item":
+      password: the value of this field
+    "A 1Password item with document attachment":
+      document: the contents of the document attached to this item
+"""
 
 
 import errno
@@ -206,7 +209,7 @@ class OnePasswordInfo(object):
     def _parse_field(self, data_json, item_id, field_name, section_title=None):
         data = json.loads(data_json)
 
-        if ('documentAttributes' in data['details']):
+        if 'documentAttributes' in data['details']:
             # This is actually a document, let's fetch the document data instead!
             document = self._run(["get", "document", data['overview']['title']])
             return {'document': document[1].strip()}
@@ -216,7 +219,7 @@ class OnePasswordInfo(object):
 
             # Some types of 1Password items have a 'password' field directly alongside the 'fields' attribute,
             # not inside it, so we need to check there first.
-            if (field_name in data['details']):
+            if field_name in data['details']:
                 return {field_name: data['details'][field_name]}
 
             # Otherwise we continue looking inside the 'fields' attribute for the specified field.

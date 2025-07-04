@@ -8,16 +8,15 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: idrac_redfish_command
 short_description: Manages Out-Of-Band controllers using iDRAC OEM Redfish APIs
 description:
-  - Builds Redfish URIs locally and sends them to remote OOB controllers to
-    perform an action.
+  - Builds Redfish URIs locally and sends them to remote OOB controllers to perform an action.
   - For use with Dell iDRAC operations that require Redfish OEM extensions.
 extends_documentation_fragment:
   - community.general.attributes
+  - community.general.redfish
 attributes:
   check_mode:
     support: none
@@ -64,40 +63,44 @@ options:
       - ID of the System, Manager or Chassis to modify.
     type: str
     version_added: '0.2.0'
+  validate_certs:
+    version_added: 10.6.0
+  ca_path:
+    version_added: 10.6.0
+  ciphers:
+    version_added: 10.6.0
 
 author: "Jose Delarosa (@jose-delarosa)"
-'''
+"""
 
-EXAMPLES = '''
-  - name: Create BIOS configuration job (schedule BIOS setting update)
-    community.general.idrac_redfish_command:
-      category: Systems
-      command: CreateBiosConfigJob
-      resource_id: System.Embedded.1
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-'''
+EXAMPLES = r"""
+- name: Create BIOS configuration job (schedule BIOS setting update)
+  community.general.idrac_redfish_command:
+    category: Systems
+    command: CreateBiosConfigJob
+    resource_id: System.Embedded.1
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+"""
 
-RETURN = '''
+RETURN = r"""
 msg:
-    description: Message with action result or error description
-    returned: always
-    type: str
-    sample: "Action was successful"
+  description: Message with action result or error description.
+  returned: always
+  type: str
+  sample: "Action was successful"
 return_values:
-    description: Dictionary containing command-specific response data from the action.
-    returned: on success
-    type: dict
-    version_added: 6.6.0
-    sample: {
-        "job_id": "/redfish/v1/Managers/iDRAC.Embedded.1/Jobs/JID_471269252011"
-    }
-'''
+  description: Dictionary containing command-specific response data from the action.
+  returned: on success
+  type: dict
+  version_added: 6.6.0
+  sample: {"job_id": "/redfish/v1/Managers/iDRAC.Embedded.1/Jobs/JID_471269252011"}
+"""
 
 import re
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils
+from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils, REDFISH_COMMON_ARGUMENT_SPEC
 from ansible.module_utils.common.text.converters import to_native
 
 
@@ -151,17 +154,19 @@ CATEGORY_COMMANDS_ALL = {
 def main():
     result = {}
     return_values = {}
+    argument_spec = dict(
+        category=dict(required=True),
+        command=dict(required=True, type='list', elements='str'),
+        baseuri=dict(required=True),
+        username=dict(),
+        password=dict(no_log=True),
+        auth_token=dict(no_log=True),
+        timeout=dict(type='int', default=10),
+        resource_id=dict()
+    )
+    argument_spec.update(REDFISH_COMMON_ARGUMENT_SPEC)
     module = AnsibleModule(
-        argument_spec=dict(
-            category=dict(required=True),
-            command=dict(required=True, type='list', elements='str'),
-            baseuri=dict(required=True),
-            username=dict(),
-            password=dict(no_log=True),
-            auth_token=dict(no_log=True),
-            timeout=dict(type='int', default=10),
-            resource_id=dict()
-        ),
+        argument_spec,
         required_together=[
             ('username', 'password'),
         ],

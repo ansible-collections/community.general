@@ -1,0 +1,13 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+azp/posix/2
+needs/root
+destructive
+skip/aix
+skip/osx
+skip/macos
+skip/freebsd
+skip/rhel
+skip/ubuntu

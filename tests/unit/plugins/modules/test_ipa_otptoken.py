@@ -9,9 +9,9 @@ __metaclass__ = type
 
 from contextlib import contextmanager
 
-from ansible_collections.community.general.tests.unit.compat import unittest
-from ansible_collections.community.general.tests.unit.compat.mock import call, patch
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import call, patch
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
 
 from ansible_collections.community.general.plugins.modules import ipa_otptoken
 
@@ -61,12 +61,11 @@ class TestIPAOTPToken(ModuleTestCase):
         changed (bool):
             Whether or not the module is supposed to be marked as changed
         """
-        set_module_args(module_args)
-
-        # Run the module
-        with patch_ipa(return_value=return_value) as (mock_login, mock_post):
-            with self.assertRaises(AnsibleExitJson) as exec_info:
-                self.module.main()
+        with set_module_args(module_args):
+            # Run the module
+            with patch_ipa(return_value=return_value) as (mock_login, mock_post):
+                with self.assertRaises(AnsibleExitJson) as exec_info:
+                    self.module.main()
 
         # Verify that the calls to _post_json match what is expected
         expected_call_count = len(mock_calls)
@@ -104,7 +103,7 @@ class TestIPAOTPToken(ModuleTestCase):
             {
                 'method': 'otptoken_add',
                 'name': 'NewToken1',
-                'item': {'ipatokendisabled': 'FALSE',
+                'item': {'ipatokendisabled': False,
                          'all': True}
             }
         )
@@ -130,7 +129,7 @@ class TestIPAOTPToken(ModuleTestCase):
             {
                 'method': 'otptoken_add',
                 'name': 'NewToken1',
-                'item': {'ipatokendisabled': 'FALSE',
+                'item': {'ipatokendisabled': False,
                          'all': True}
             }
         )
@@ -176,7 +175,7 @@ class TestIPAOTPToken(ModuleTestCase):
                          'ipatokenotpkey': 'KRSXG5CTMVRXEZLUGE======',
                          'description': 'Test description',
                          'ipatokenowner': 'pinky',
-                         'ipatokendisabled': 'FALSE',
+                         'ipatokendisabled': False,
                          'ipatokennotbefore': '20200101010101Z',
                          'ipatokennotafter': '20900101010101Z',
                          'ipatokenvendor': 'Acme',
@@ -220,7 +219,7 @@ class TestIPAOTPToken(ModuleTestCase):
                         'ipatokenotpkey': [{'__base64__': 'VGVzdFNlY3JldDE='}],
                         'description': ['Test description'],
                         'ipatokenowner': ['pinky'],
-                        'ipatokendisabled': ['FALSE'],
+                        'ipatokendisabled': [False],
                         'ipatokennotbefore': ['20200101010101Z'],
                         'ipatokennotafter': ['20900101010101Z'],
                         'ipatokenvendor': ['Acme'],
@@ -271,7 +270,7 @@ class TestIPAOTPToken(ModuleTestCase):
                         'ipatokenotpkey': [{'__base64__': 'VGVzdFNlY3JldDE='}],
                         'description': ['Test description'],
                         'ipatokenowner': ['pinky'],
-                        'ipatokendisabled': ['FALSE'],
+                        'ipatokendisabled': [False],
                         'ipatokennotbefore': ['20200101010101Z'],
                         'ipatokennotafter': ['20900101010101Z'],
                         'ipatokenvendor': ['Acme'],
@@ -296,7 +295,7 @@ class TestIPAOTPToken(ModuleTestCase):
                 'name': 'NewToken1',
                 'item': {'description': 'Test description',
                          'ipatokenowner': 'brain',
-                         'ipatokendisabled': 'FALSE',
+                         'ipatokendisabled': False,
                          'ipatokennotbefore': '20200101010101Z',
                          'ipatokennotafter': '20900101010101Z',
                          'ipatokenvendor': 'Acme',
@@ -335,7 +334,7 @@ class TestIPAOTPToken(ModuleTestCase):
                         'ipatokenotpkey': [{'__base64__': 'VGVzdFNlY3JldDE='}],
                         'description': ['Test description'],
                         'ipatokenowner': ['pinky'],
-                        'ipatokendisabled': ['FALSE'],
+                        'ipatokendisabled': [False],
                         'ipatokennotbefore': ['20200101010101Z'],
                         'ipatokennotafter': ['20900101010101Z'],
                         'ipatokenvendor': ['Acme'],
@@ -360,7 +359,7 @@ class TestIPAOTPToken(ModuleTestCase):
                 'name': 'NewToken1',
                 'item': {'description': 'New Test description',
                          'ipatokenowner': 'pinky',
-                         'ipatokendisabled': 'TRUE',
+                         'ipatokendisabled': True,
                          'ipatokennotbefore': '20200101010102Z',
                          'ipatokennotafter': '20900101010102Z',
                          'ipatokenvendor': 'NewAcme',
@@ -384,7 +383,7 @@ class TestIPAOTPToken(ModuleTestCase):
                         'ipatokenotpkey': [{'__base64__': 'KRSXG5CTMVRXEZLUGE======'}],
                         'description': ['Test description'],
                         'ipatokenowner': ['pinky'],
-                        'ipatokendisabled': ['FALSE'],
+                        'ipatokendisabled': [False],
                         'ipatokennotbefore': ['20200101010101Z'],
                         'ipatokennotafter': ['20900101010101Z'],
                         'ipatokenvendor': ['Acme'],
@@ -425,7 +424,7 @@ class TestIPAOTPToken(ModuleTestCase):
                         'ipatokenotpkey': [{'__base64__': 'KRSXG5CTMVRXEZLUGE======'}],
                         'description': ['Test description'],
                         'ipatokenowner': ['pinky'],
-                        'ipatokendisabled': ['FALSE'],
+                        'ipatokendisabled': [False],
                         'ipatokennotbefore': ['20200101010101Z'],
                         'ipatokennotafter': ['20900101010101Z'],
                         'ipatokenvendor': ['Acme'],
@@ -448,7 +447,7 @@ class TestIPAOTPToken(ModuleTestCase):
             {
                 'method': 'otptoken_mod',
                 'name': 'NewToken1',
-                'item': {'ipatokendisabled': 'TRUE',
+                'item': {'ipatokendisabled': True,
                           'all': True}
             }
         )
@@ -481,13 +480,12 @@ class TestIPAOTPToken(ModuleTestCase):
 
     def test_fail_post(self):
         """Fail due to an exception raised from _post_json"""
-        set_module_args({
+        with set_module_args({
             'uniqueid': 'NewToken1'
-        })
-
-        with patch_ipa(side_effect=Exception('ERROR MESSAGE')) as (mock_login, mock_post):
-            with self.assertRaises(AnsibleFailJson) as exec_info:
-                self.module.main()
+        }):
+            with patch_ipa(side_effect=Exception('ERROR MESSAGE')) as (mock_login, mock_post):
+                with self.assertRaises(AnsibleFailJson) as exec_info:
+                    self.module.main()
 
         self.assertEqual(exec_info.exception.args[0]['msg'], 'ERROR MESSAGE')
 

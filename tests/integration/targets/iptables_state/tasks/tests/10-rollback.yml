@@ -12,7 +12,6 @@
       COMMIT
 
 
-
 - name: "restore state from the test file (check_mode, must report a change)"
   iptables_state:
     path: "{{ iptables_tests }}"
@@ -24,7 +23,6 @@
   assert:
     that:
       - iptables_state is changed
-
 
 
 - name: "fail to restore state from the test file"
@@ -59,7 +57,6 @@
       - iptables_state is failed
 
 
-
 - name: "fail to restore state from the test file (again)"
   block:
     - name: "try again, with a higher timeout (bad policies, same expected error)"
@@ -70,7 +67,7 @@
       async: "{{ ansible_timeout }}"
       poll: 0
       vars:
-        ansible_timeout: "{{ max_delay | d(300) }}"
+        ansible_timeout: "{{ max_delay | default(300) }}"
 
   rescue:
     - name: "explain expected failure"
@@ -94,7 +91,6 @@
       - iptables_state is failed
 
 
-
 - name: "restore state from backup (must NOT report a change)"
   iptables_state:
     path: "{{ iptables_saved }}"
@@ -107,7 +103,6 @@
   assert:
     that:
       - iptables_state is not changed
-
 
 
 - name: "restore state from backup (mangle, must NOT report a change)"
@@ -125,7 +120,6 @@
       - iptables_state is not changed
 
 
-
 - name: "create a blocking ruleset with a REJECT rule"
   copy:
     dest: "{{ iptables_tests }}"
@@ -133,7 +127,6 @@
       *filter
       -A INPUT -j REJECT
       COMMIT
-
 
 
 - name: "fail to restore state from the test file (again)"
@@ -168,7 +161,6 @@
       - iptables_state is failed
 
 
-
 - name: "fail to restore state from the test file (again)"
   block:
     - name: "try again, with a higher timeout (bad rules, same expected error)"
@@ -179,7 +171,7 @@
       async: "{{ ansible_timeout }}"
       poll: 0
       vars:
-        ansible_timeout: "{{ max_delay | d(300) }}"
+        ansible_timeout: "{{ max_delay | default(300) }}"
 
   rescue:
     - name: "explain expected failure"

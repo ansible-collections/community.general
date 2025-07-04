@@ -11,91 +11,89 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: zypper_repository
 author: "Matthias Vogelgesang (@matze)"
 short_description: Add and remove Zypper repositories
 description:
-    - Add or remove Zypper repositories on SUSE and openSUSE
+  - Add or remove Zypper repositories on SUSE and openSUSE.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    name:
-        description:
-            - A name for the repository. Not required when adding repofiles.
-        type: str
-    repo:
-        description:
-            - URI of the repository or .repo file. Required when state=present.
-        type: str
-    state:
-        description:
-            - A source string state.
-        choices: [ "absent", "present" ]
-        default: "present"
-        type: str
+  name:
     description:
-        description:
-            - A description of the repository
-        type: str
-    disable_gpg_check:
-        description:
-            - Whether to disable GPG signature checking of
-              all packages. Has an effect only if O(state=present).
-            - Needs zypper version >= 1.6.2.
-        type: bool
-        default: false
-    autorefresh:
-        description:
-            - Enable autorefresh of the repository.
-        type: bool
-        default: true
-        aliases: [ "refresh" ]
-    priority:
-        description:
-            - Set priority of repository. Packages will always be installed
-              from the repository with the smallest priority number.
-            - Needs zypper version >= 1.12.25.
-        type: int
-    overwrite_multiple:
-        description:
-            - Overwrite multiple repository entries, if repositories with both name and
-              URL already exist.
-        type: bool
-        default: false
-    auto_import_keys:
-        description:
-            - Automatically import the gpg signing key of the new or changed repository.
-            - Has an effect only if O(state=present). Has no effect on existing (unchanged) repositories or in combination with O(state=absent).
-            - Implies runrefresh.
-            - Only works with C(.repo) files if `name` is given explicitly.
-        type: bool
-        default: false
-    runrefresh:
-        description:
-            - Refresh the package list of the given repository.
-            - Can be used with repo=* to refresh all repositories.
-        type: bool
-        default: false
-    enabled:
-        description:
-            - Set repository to enabled (or disabled).
-        type: bool
-        default: true
+      - A name for the repository. Not required when adding repofiles.
+    type: str
+  repo:
+    description:
+      - URI of the repository or full path of a C(.repo) file. Required when O(state=present).
+    type: str
+  state:
+    description:
+      - Whether the repository should exist or not.
+      - A source string state.
+    choices: ["absent", "present"]
+    default: "present"
+    type: str
+  description:
+    description:
+      - A description of the repository.
+    type: str
+  disable_gpg_check:
+    description:
+      - Whether to disable GPG signature checking of all packages. Has an effect only if O(state=present).
+      - Needs C(zypper) version >= 1.6.2.
+    type: bool
+    default: false
+  autorefresh:
+    description:
+      - Enable autorefresh of the repository.
+    type: bool
+    default: true
+    aliases: ["refresh"]
+  priority:
+    description:
+      - Set priority of repository. Packages are always installed from the repository with the smallest priority number.
+      - Needs C(zypper) version >= 1.12.25.
+    type: int
+  overwrite_multiple:
+    description:
+      - Overwrite multiple repository entries, if repositories with both name and URL already exist.
+    type: bool
+    default: false
+  auto_import_keys:
+    description:
+      - Automatically import the gpg signing key of the new or changed repository.
+      - Has an effect only if O(state=present). Has no effect on existing (unchanged) repositories or in combination with
+        O(state=absent).
+      - Implies O(runrefresh).
+      - Only works with C(.repo) files if O(name) is given explicitly.
+    type: bool
+    default: false
+  runrefresh:
+    description:
+      - Refresh the package list of the given repository.
+      - Can be used with O(repo=*) to refresh all repositories.
+    type: bool
+    default: false
+  enabled:
+    description:
+      - Set repository to enabled (or disabled).
+    type: bool
+    default: true
 
 
 requirements:
-    - "zypper >= 1.0  # included in openSUSE >= 11.1 or SUSE Linux Enterprise Server/Desktop >= 11.0"
-    - python-xml
-'''
+  - "zypper >= 1.0  # included in openSUSE >= 11.1 or SUSE Linux Enterprise Server/Desktop >= 11.0"
+  - python-xml
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Add NVIDIA repository for graphics drivers
   community.general.zypper_repository:
     name: nvidia-repo
@@ -128,7 +126,7 @@ EXAMPLES = '''
     name: my_ci_repo
     state: present
     runrefresh: true
-'''
+"""
 
 import traceback
 
@@ -144,6 +142,7 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.common.text.converters import to_text
+from ansible.module_utils.six import PY3
 from ansible.module_utils.six.moves import configparser, StringIO
 from io import open
 
@@ -175,7 +174,10 @@ def _parse_repos(module):
             opts = {}
             for o in REPO_OPTS:
                 opts[o] = repo.getAttribute(o)
-            opts['url'] = repo.getElementsByTagName('url')[0].firstChild.data
+            try:
+                opts['url'] = repo.getElementsByTagName('url')[0].firstChild.data
+            except IndexError:
+                opts['url'] = repo.getAttribute('metalink')
             # A repo can be uniquely identified by an alias + url
             repos.append(opts)
         return repos
@@ -409,7 +411,10 @@ def main():
 
         repofile = configparser.ConfigParser()
         try:
-            repofile.readfp(StringIO(repofile_text))
+            if PY3:
+                repofile.read_file(StringIO(repofile_text))
+            else:
+                repofile.readfp(StringIO(repofile_text))
         except configparser.Error:
             module.fail_json(msg='Invalid format, .repo file could not be parsed')
 

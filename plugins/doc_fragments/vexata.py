@@ -10,15 +10,6 @@ __metaclass__ = type
 
 class ModuleDocFragment(object):
 
-    DOCUMENTATION = r'''
-options:
-    - See respective platform section for more details
-requirements:
-    - See respective platform section for more details
-notes:
-    - Ansible modules are available for Vexata VX100 arrays.
-'''
-
     # Documentation fragment for Vexata VX100 series
     VX100 = r'''
 options:

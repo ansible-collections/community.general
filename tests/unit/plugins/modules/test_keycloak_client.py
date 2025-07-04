@@ -10,9 +10,9 @@ __metaclass__ = type
 
 from contextlib import contextmanager
 
-from ansible_collections.community.general.tests.unit.compat import unittest
-from ansible_collections.community.general.tests.unit.compat.mock import patch
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, ModuleTestCase, set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleExitJson, ModuleTestCase, set_module_args
 
 from ansible_collections.community.general.plugins.modules import keycloak_client
 
@@ -126,15 +126,14 @@ class TestKeycloakRealm(ModuleTestCase):
         ]
         changed = True
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_client_by_clientid=return_value_get_client_by_clientid) \
-                    as (mock_get_client_by_clientid, mock_get_client_by_id, mock_create_client, mock_update_client, mock_delete_client):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_client_by_clientid=return_value_get_client_by_clientid) \
+                        as (mock_get_client_by_clientid, mock_get_client_by_id, mock_create_client, mock_update_client, mock_delete_client):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         self.assertEqual(mock_get_client_by_clientid.call_count, 2)
         self.assertEqual(mock_get_client_by_id.call_count, 0)

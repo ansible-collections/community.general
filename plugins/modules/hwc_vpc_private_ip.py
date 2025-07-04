@@ -12,54 +12,51 @@ __metaclass__ = type
 # Documentation
 ###############################################################################
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: hwc_vpc_private_ip
 description:
-    - vpc private ip management.
-short_description: Creates a resource of Vpc/PrivateIP in Huawei Cloud
+  - VPC private IP management.
+short_description: Creates a resource of VPC/PrivateIP in Huawei Cloud
 notes:
-    - If O(id) option is provided, it takes precedence over O(subnet_id), O(ip_address) for private ip selection.
-    - O(subnet_id), O(ip_address) are used for private ip selection. If more than one private ip with this options exists, execution is aborted.
-    - No parameter support updating. If one of option is changed, the module will create a new resource.
+  - If O(id) option is provided, it takes precedence over O(subnet_id), O(ip_address) for private IP selection.
+  - O(subnet_id), O(ip_address) are used for private IP selection. If more than one private IP with this options exists, execution
+    is aborted.
+  - No parameter support updating. If one of option is changed, the module will create a new resource.
 version_added: '0.2.0'
 author: Huawei Inc. (@huaweicloud)
 requirements:
-    - keystoneauth1 >= 3.6.0
+  - keystoneauth1 >= 3.6.0
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    state:
-        description:
-            - Whether the given object should exist in Huawei Cloud.
-        type: str
-        choices: ['present', 'absent']
-        default: 'present'
-    subnet_id:
-        description:
-            - Specifies the ID of the subnet from which IP addresses are
-              assigned. Cannot be changed after creating the private ip.
-        type: str
-        required: true
-    ip_address:
-        description:
-            - Specifies the target IP address. The value can be an available IP
-              address in the subnet. If it is not specified, the system
-              automatically assigns an IP address. Cannot be changed after
-              creating the private ip.
-        type: str
-        required: false
+  state:
+    description:
+      - Whether the given object should exist in Huawei Cloud.
+    type: str
+    choices: ['present', 'absent']
+    default: 'present'
+  subnet_id:
+    description:
+      - Specifies the ID of the subnet from which IP addresses are assigned. Cannot be changed after creating the private
+        IP.
+    type: str
+    required: true
+  ip_address:
+    description:
+      - Specifies the target IP address. The value can be an available IP address in the subnet. If it is not specified, the
+        system automatically assigns an IP address. Cannot be changed after creating the private IP.
+    type: str
+    required: false
 extends_documentation_fragment:
   - community.general.hwc
   - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = '''
-# create a private ip
+EXAMPLES = r"""
+# create a private IP
 - name: Create vpc
   hwc_network_vpc:
     cidr: "192.168.100.0/24"
@@ -73,27 +70,25 @@ EXAMPLES = '''
     vpc_id: "{{ vpc.id }}"
     cidr: "192.168.100.0/26"
   register: subnet
-- name: Create a private ip
+- name: Create a private IP
   community.general.hwc_vpc_private_ip:
     subnet_id: "{{ subnet.id }}"
     ip_address: "192.168.100.33"
-'''
+"""
 
-RETURN = '''
-    subnet_id:
-        description:
-            - Specifies the ID of the subnet from which IP addresses are
-              assigned.
-        type: str
-        returned: success
-    ip_address:
-        description:
-            - Specifies the target IP address. The value can be an available IP
-              address in the subnet. If it is not specified, the system
-              automatically assigns an IP address.
-        type: str
-        returned: success
-'''
+RETURN = r"""
+subnet_id:
+  description:
+    - Specifies the ID of the subnet from which IP addresses are assigned.
+  type: str
+  returned: success
+ip_address:
+  description:
+    - Specifies the target IP address. The value can be an available IP address in the subnet. If it is not specified, the
+      system automatically assigns an IP address.
+  type: str
+  returned: success
+"""
 
 from ansible_collections.community.general.plugins.module_utils.hwc_utils import (
     Config, HwcClientException, HwcModule, are_different_dicts, build_path,

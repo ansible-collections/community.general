@@ -26,7 +26,7 @@
 
 - name: Read certificate keys
   slurp:
-    src: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | d(item.name)) ~ '.key' }}"
+    src: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.key' }}"
   loop: "{{ java_keystore_certs }}"
   when: not remote_cert
   register: certificate_keys
@@ -34,15 +34,15 @@
 - name: Create a Java keystore for the given ({{ 'remote' if remote_cert else 'local' }}) certificates (check mode)
   community.general.java_keystore: &java_keystore_params
     name: example
-    dest: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | d(item.name)) ~ '.jks' }}"
+    dest: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.jks' }}"
     certificate: "{{ omit if remote_cert else (certificates.results[loop_index].content | b64decode) }}"
     private_key: "{{ omit if remote_cert else (certificate_keys.results[loop_index].content | b64decode) }}"
     certificate_path: "{{ omit if not remote_cert else remote_tmp_dir ~ '/' ~ item.name ~ '.pem' }}"
-    private_key_path: "{{ omit if not remote_cert else remote_tmp_dir ~ '/' ~ (item.keyname | d(item.name)) ~ '.key' }}"
-    private_key_passphrase: "{{ item.passphrase | d(omit) }}"
+    private_key_path: "{{ omit if not remote_cert else remote_tmp_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.key' }}"
+    private_key_passphrase: "{{ item.passphrase | default(omit) }}"
     password: changeit
     ssl_backend: "{{ ssl_backend }}"
-    keystore_type: "{{ item.keystore_type | d(omit) }}"
+    keystore_type: "{{ item.keystore_type | default(omit) }}"
   loop: "{{ java_keystore_certs }}"
   loop_control:
     index_var: loop_index
@@ -82,7 +82,7 @@
 
 - name: Read certificate keys (new)
   slurp:
-    src: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | d(item.name)) ~ '.key' }}"
+    src: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.key' }}"
   loop: "{{ java_keystore_new_certs }}"
   when: not remote_cert
   register: certificate_keys_new
@@ -90,15 +90,15 @@
 - name: Create a Java keystore for the given certificates (certificate changed, check mode)
   community.general.java_keystore: &java_keystore_params_new_certs
     name: example
-    dest: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | d(item.name)) ~ '.jks' }}"
+    dest: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.jks' }}"
     certificate: "{{ omit if remote_cert else (certificates_new.results[loop_index].content | b64decode) }}"
     private_key: "{{ omit if remote_cert else (certificate_keys_new.results[loop_index].content | b64decode) }}"
     certificate_path: "{{ omit if not remote_cert else remote_tmp_dir ~ '/' ~ item.name ~ '.pem' }}"
-    private_key_path: "{{ omit if not remote_cert else remote_tmp_dir ~ '/' ~ (item.keyname | d(item.name)) ~ '.key' }}"
-    private_key_passphrase: "{{ item.passphrase | d(omit) }}"
+    private_key_path: "{{ omit if not remote_cert else remote_tmp_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.key' }}"
+    private_key_passphrase: "{{ item.passphrase | default(omit) }}"
     password: changeit
     ssl_backend: "{{ ssl_backend }}"
-    keystore_type: "{{ item.keystore_type | d(omit) }}"
+    keystore_type: "{{ item.keystore_type | default(omit) }}"
   loop: "{{ java_keystore_new_certs }}"
   loop_control:
     index_var: loop_index
@@ -193,7 +193,7 @@
 
 - name: Stat keystore (before failure)
   ansible.builtin.stat:
-    path: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | d(item.name)) ~ '.jks' }}"
+    path: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.jks' }}"
   loop: "{{ java_keystore_new_certs }}"
   register: result_stat_before
 
@@ -211,7 +211,7 @@
 
 - name: Stat keystore (after failure)
   ansible.builtin.stat:
-    path: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | d(item.name)) ~ '.jks' }}"
+    path: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.jks' }}"
   loop: "{{ java_keystore_new_certs }}"
   register: result_stat_after
 

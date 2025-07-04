@@ -9,88 +9,85 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: elasticsearch_plugin
 short_description: Manage Elasticsearch plugins
 description:
-    - Manages Elasticsearch plugins.
+  - Manages Elasticsearch plugins.
 author:
-    - Mathew Davies (@ThePixelDeveloper)
-    - Sam Doran (@samdoran)
+  - Mathew Davies (@ThePixelDeveloper)
+  - Sam Doran (@samdoran)
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    name:
-        description:
-            - Name of the plugin to install.
-        required: true
-        type: str
-    state:
-        description:
-            - Desired state of a plugin.
-        choices: ["present", "absent"]
-        default: present
-        type: str
-    src:
-        description:
-            - Optionally set the source location to retrieve the plugin from. This can be a file://
-              URL to install from a local file, or a remote URL. If this is not set, the plugin
-              location is just based on the name.
-            - The name parameter must match the descriptor in the plugin ZIP specified.
-            - Is only used if the state would change, which is solely checked based on the name
-              parameter. If, for example, the plugin is already installed, changing this has no
-              effect.
-            - For ES 1.x use url.
-        required: false
-        type: str
-    url:
-        description:
-            - Set exact URL to download the plugin from (Only works for ES 1.x).
-            - For ES 2.x and higher, use src.
-        required: false
-        type: str
-    timeout:
-        description:
-            - "Timeout setting: 30s, 1m, 1h..."
-            - Only valid for Elasticsearch < 5.0. This option is ignored for Elasticsearch > 5.0.
-        default: 1m
-        type: str
-    force:
-        description:
-            - "Force batch mode when installing plugins. This is only necessary if a plugin requires additional permissions and console detection fails."
-        default: false
-        type: bool
-    plugin_bin:
-        description:
-            - Location of the plugin binary. If this file is not found, the default plugin binaries will be used.
-        type: path
-    plugin_dir:
-        description:
-            - Your configured plugin directory specified in Elasticsearch
-        default: /usr/share/elasticsearch/plugins/
-        type: path
-    proxy_host:
-        description:
-            - Proxy host to use during plugin installation
-        type: str
-    proxy_port:
-        description:
-            - Proxy port to use during plugin installation
-        type: str
-    version:
-        description:
-            - Version of the plugin to be installed.
-              If plugin exists with previous version, it will NOT be updated
-        type: str
-'''
+  name:
+    description:
+      - Name of the plugin to install.
+    required: true
+    type: str
+  state:
+    description:
+      - Desired state of a plugin.
+    choices: ["present", "absent"]
+    default: present
+    type: str
+  src:
+    description:
+      - Optionally set the source location to retrieve the plugin from. This can be a C(file://) URL to install from a local
+        file, or a remote URL. If this is not set, the plugin location is just based on the name.
+      - The name parameter must match the descriptor in the plugin ZIP specified.
+      - Is only used if the state would change, which is solely checked based on the name parameter. If, for example, the
+        plugin is already installed, changing this has no effect.
+      - For ES 1.x use O(url).
+    required: false
+    type: str
+  url:
+    description:
+      - Set exact URL to download the plugin from (Only works for ES 1.x).
+      - For ES 2.x and higher, use src.
+    required: false
+    type: str
+  timeout:
+    description:
+      - 'Timeout setting: V(30s), V(1m), V(1h)...'
+      - Only valid for Elasticsearch < 5.0. This option is ignored for Elasticsearch > 5.0.
+    default: 1m
+    type: str
+  force:
+    description:
+      - Force batch mode when installing plugins. This is only necessary if a plugin requires additional permissions and console
+        detection fails.
+    default: false
+    type: bool
+  plugin_bin:
+    description:
+      - Location of the plugin binary. If this file is not found, the default plugin binaries will be used.
+    type: path
+  plugin_dir:
+    description:
+      - Your configured plugin directory specified in Elasticsearch.
+    default: /usr/share/elasticsearch/plugins/
+    type: path
+  proxy_host:
+    description:
+      - Proxy host to use during plugin installation.
+    type: str
+  proxy_port:
+    description:
+      - Proxy port to use during plugin installation.
+    type: str
+  version:
+    description:
+      - Version of the plugin to be installed. If plugin exists with previous version, it will NOT be updated.
+    type: str
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Install Elasticsearch Head plugin in Elasticsearch 2.x
   community.general.elasticsearch_plugin:
     name: mobz/elasticsearch-head
@@ -116,7 +113,7 @@ EXAMPLES = '''
     name: ingest-geoip
     state: present
     force: true
-'''
+"""
 
 import os
 
@@ -166,33 +163,38 @@ def parse_error(string):
 
 
 def install_plugin(module, plugin_bin, plugin_name, version, src, url, proxy_host, proxy_port, timeout, force):
-    cmd_args = [plugin_bin, PACKAGE_STATE_MAP["present"]]
+    cmd = [plugin_bin, PACKAGE_STATE_MAP["present"]]
     is_old_command = (os.path.basename(plugin_bin) == 'plugin')
 
     # Timeout and version are only valid for plugin, not elasticsearch-plugin
     if is_old_command:
         if timeout:
-            cmd_args.append("--timeout %s" % timeout)
+            cmd.append("--timeout")
+            cmd.append(timeout)
 
         if version:
             plugin_name = plugin_name + '/' + version
-            cmd_args[2] = plugin_name
+            cmd[2] = plugin_name
 
     if proxy_host and proxy_port:
-        cmd_args.append("-DproxyHost=%s -DproxyPort=%s" % (proxy_host, proxy_port))
+        java_opts = ["-Dhttp.proxyHost=%s" % proxy_host,
+                     "-Dhttp.proxyPort=%s" % proxy_port,
+                     "-Dhttps.proxyHost=%s" % proxy_host,
+                     "-Dhttps.proxyPort=%s" % proxy_port]
+        module.run_command_environ_update = dict(CLI_JAVA_OPTS=" ".join(java_opts),  # Elasticsearch 8.x
+                                                 ES_JAVA_OPTS=" ".join(java_opts))  # Older Elasticsearch versions
 
     # Legacy ES 1.x
     if url:
-        cmd_args.append("--url %s" % url)
+        cmd.append("--url")
+        cmd.append(url)
 
     if force:
-        cmd_args.append("--batch")
+        cmd.append("--batch")
     if src:
-        cmd_args.append(src)
+        cmd.append(src)
     else:
-        cmd_args.append(plugin_name)
-
-    cmd = " ".join(cmd_args)
+        cmd.append(plugin_name)
 
     if module.check_mode:
         rc, out, err = 0, "check mode", ""
@@ -207,9 +209,7 @@ def install_plugin(module, plugin_bin, plugin_name, version, src, url, proxy_hos
 
 
 def remove_plugin(module, plugin_bin, plugin_name):
-    cmd_args = [plugin_bin, PACKAGE_STATE_MAP["absent"], parse_plugin_repo(plugin_name)]
-
-    cmd = " ".join(cmd_args)
+    cmd = [plugin_bin, PACKAGE_STATE_MAP["absent"], parse_plugin_repo(plugin_name)]
 
     if module.check_mode:
         rc, out, err = 0, "check mode", ""

@@ -9,24 +9,22 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: packet_volume
 
 short_description: Create/delete a volume in Packet host
 
 description:
-     - Create/delete a volume in Packet host.
-     - API is documented at U(https://www.packet.com/developers/api/#volumes).
-
+  - Create/delete a volume in Packet host.
+  - API is documented at U(https://www.packet.com/developers/api/#volumes).
 version_added: '0.2.0'
 
 author:
-    - Tomas Karasek (@t0mk) <tom.to.the.k@gmail.com>
-    - Nurfet Becirevic (@nurfet-becirevic) <nurfet.becirevic@gmail.com>
+  - Tomas Karasek (@t0mk) <tom.to.the.k@gmail.com>
+  - Nurfet Becirevic (@nurfet-becirevic) <nurfet.becirevic@gmail.com>
 
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 
 attributes:
   check_mode:
@@ -55,14 +53,13 @@ options:
 
   name:
     description:
-      - Selector for API-generated name of the volume
+      - Selector for API-generated name of the volume.
     type: str
 
   description:
     description:
       - User-defined description attribute for Packet volume.
-      - "It is used used as idempotent identifier - if volume with given
-        description exists, new one is not created."
+      - It is used used as idempotent identifier - if volume with given description exists, new one is not created.
     type: str
 
   id:
@@ -72,7 +69,7 @@ options:
 
   plan:
     description:
-      - storage_1 for standard tier, storage_2 for premium (performance) tier.
+      - V(storage_1) for standard tier, V(storage_2) for premium (performance) tier.
       - Tiers are described at U(https://www.packet.com/cloud/storage/).
     choices: ['storage_1', 'storage_2']
     default: 'storage_1'
@@ -91,7 +88,7 @@ options:
 
   locked:
     description:
-     - Create new volume locked.
+      - Create new volume locked.
     type: bool
     default: false
 
@@ -123,10 +120,9 @@ options:
 
 requirements:
   - "packet-python >= 1.35"
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 # All the examples assume that you have your Packet API token in env var PACKET_API_TOKEN.
 # You can also pass the api token in module param auth_token.
 
@@ -154,25 +150,25 @@ EXAMPLES = '''
         id: "{{ result_create.id }}"
         project_id: "{{ project_id }}"
         state: absent
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 id:
-    description: UUID of specified volume
-    type: str
-    returned: success
-    sample: 53000fb2-ee46-4673-93a8-de2c2bdba33c
+  description: UUID of specified volume.
+  type: str
+  returned: success
+  sample: 53000fb2-ee46-4673-93a8-de2c2bdba33c
 name:
-    description: The API-generated name of the volume resource.
-    type: str
-    returned: if volume is attached/detached to/from some device
-    sample: "volume-a91dc506"
+  description: The API-generated name of the volume resource.
+  type: str
+  returned: if volume is attached/detached to/from some device
+  sample: "volume-a91dc506"
 description:
-    description: The user-defined description of the volume resource.
-    type: str
-    returned: success
-    sample: "Just another volume"
-'''
+  description: The user-defined description of the volume resource.
+  type: str
+  returned: success
+  sample: "Just another volume"
+"""
 
 import uuid
 

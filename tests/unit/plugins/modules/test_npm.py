@@ -6,9 +6,9 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-from ansible_collections.community.general.tests.unit.compat.mock import call, patch
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import call, patch
 from ansible_collections.community.general.plugins.modules import npm
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, ModuleTestCase, set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleExitJson, ModuleTestCase, set_module_args
 
 
 class NPMModuleTestCase(ModuleTestCase):
@@ -34,17 +34,17 @@ class NPMModuleTestCase(ModuleTestCase):
         return exc.exception.args[0]
 
     def test_present(self):
-        set_module_args({
+        with set_module_args({
             'name': 'coffee-script',
             'global': 'true',
             'state': 'present'
-        })
-        self.module_main_command.side_effect = [
-            (0, '{}', ''),
-            (0, '{}', ''),
-        ]
+        }):
+            self.module_main_command.side_effect = [
+                (0, '{}', ''),
+                (0, '{}', ''),
+            ]
 
-        result = self.module_main(AnsibleExitJson)
+            result = self.module_main(AnsibleExitJson)
 
         self.assertTrue(result['changed'])
         self.module_main_command.assert_has_calls([
@@ -53,17 +53,17 @@ class NPMModuleTestCase(ModuleTestCase):
         ])
 
     def test_present_missing(self):
-        set_module_args({
+        with set_module_args({
             'name': 'coffee-script',
             'global': 'true',
             'state': 'present',
-        })
-        self.module_main_command.side_effect = [
-            (0, '{"dependencies": {"coffee-script": {"missing" : true}}}', ''),
-            (0, '{}', ''),
-        ]
+        }):
+            self.module_main_command.side_effect = [
+                (0, '{"dependencies": {"coffee-script": {"missing" : true}}}', ''),
+                (0, '{}', ''),
+            ]
 
-        result = self.module_main(AnsibleExitJson)
+            result = self.module_main(AnsibleExitJson)
 
         self.assertTrue(result['changed'])
         self.module_main_command.assert_has_calls([
@@ -72,18 +72,18 @@ class NPMModuleTestCase(ModuleTestCase):
         ])
 
     def test_present_version(self):
-        set_module_args({
+        with set_module_args({
             'name': 'coffee-script',
             'global': 'true',
             'state': 'present',
             'version': '2.5.1'
-        })
-        self.module_main_command.side_effect = [
-            (0, '{}', ''),
-            (0, '{}', ''),
-        ]
+        }):
+            self.module_main_command.side_effect = [
+                (0, '{}', ''),
+                (0, '{}', ''),
+            ]
 
-        result = self.module_main(AnsibleExitJson)
+            result = self.module_main(AnsibleExitJson)
 
         self.assertTrue(result['changed'])
         self.module_main_command.assert_has_calls([
@@ -92,18 +92,18 @@ class NPMModuleTestCase(ModuleTestCase):
         ])
 
     def test_present_version_update(self):
-        set_module_args({
+        with set_module_args({
             'name': 'coffee-script',
             'global': 'true',
             'state': 'present',
             'version': '2.5.1'
-        })
-        self.module_main_command.side_effect = [
-            (0, '{"dependencies": {"coffee-script": {"version" : "2.5.0"}}}', ''),
-            (0, '{}', ''),
-        ]
+        }):
+            self.module_main_command.side_effect = [
+                (0, '{"dependencies": {"coffee-script": {"version" : "2.5.0"}}}', ''),
+                (0, '{}', ''),
+            ]
 
-        result = self.module_main(AnsibleExitJson)
+            result = self.module_main(AnsibleExitJson)
 
         self.assertTrue(result['changed'])
         self.module_main_command.assert_has_calls([
@@ -112,18 +112,18 @@ class NPMModuleTestCase(ModuleTestCase):
         ])
 
     def test_present_version_exists(self):
-        set_module_args({
+        with set_module_args({
             'name': 'coffee-script',
             'global': 'true',
             'state': 'present',
             'version': '2.5.1'
-        })
-        self.module_main_command.side_effect = [
-            (0, '{"dependencies": {"coffee-script": {"version" : "2.5.1"}}}', ''),
-            (0, '{}', ''),
-        ]
+        }):
+            self.module_main_command.side_effect = [
+                (0, '{"dependencies": {"coffee-script": {"version" : "2.5.1"}}}', ''),
+                (0, '{}', ''),
+            ]
 
-        result = self.module_main(AnsibleExitJson)
+            result = self.module_main(AnsibleExitJson)
 
         self.assertFalse(result['changed'])
         self.module_main_command.assert_has_calls([
@@ -131,17 +131,17 @@ class NPMModuleTestCase(ModuleTestCase):
         ])
 
     def test_absent(self):
-        set_module_args({
+        with set_module_args({
             'name': 'coffee-script',
             'global': 'true',
             'state': 'absent'
-        })
-        self.module_main_command.side_effect = [
-            (0, '{"dependencies": {"coffee-script": {"version" : "2.5.1"}}}', ''),
-            (0, '{}', ''),
-        ]
+        }):
+            self.module_main_command.side_effect = [
+                (0, '{"dependencies": {"coffee-script": {"version" : "2.5.1"}}}', ''),
+                (0, '{}', ''),
+            ]
 
-        result = self.module_main(AnsibleExitJson)
+            result = self.module_main(AnsibleExitJson)
 
         self.assertTrue(result['changed'])
         self.module_main_command.assert_has_calls([
@@ -150,18 +150,18 @@ class NPMModuleTestCase(ModuleTestCase):
         ])
 
     def test_absent_version(self):
-        set_module_args({
+        with set_module_args({
             'name': 'coffee-script',
             'global': 'true',
             'state': 'absent',
             'version': '2.5.1'
-        })
-        self.module_main_command.side_effect = [
-            (0, '{"dependencies": {"coffee-script": {"version" : "2.5.1"}}}', ''),
-            (0, '{}', ''),
-        ]
+        }):
+            self.module_main_command.side_effect = [
+                (0, '{"dependencies": {"coffee-script": {"version" : "2.5.1"}}}', ''),
+                (0, '{}', ''),
+            ]
 
-        result = self.module_main(AnsibleExitJson)
+            result = self.module_main(AnsibleExitJson)
 
         self.assertTrue(result['changed'])
         self.module_main_command.assert_has_calls([
@@ -170,18 +170,18 @@ class NPMModuleTestCase(ModuleTestCase):
         ])
 
     def test_absent_version_different(self):
-        set_module_args({
+        with set_module_args({
             'name': 'coffee-script',
             'global': 'true',
             'state': 'absent',
             'version': '2.5.1'
-        })
-        self.module_main_command.side_effect = [
-            (0, '{"dependencies": {"coffee-script": {"version" : "2.5.0"}}}', ''),
-            (0, '{}', ''),
-        ]
+        }):
+            self.module_main_command.side_effect = [
+                (0, '{"dependencies": {"coffee-script": {"version" : "2.5.0"}}}', ''),
+                (0, '{}', ''),
+            ]
 
-        result = self.module_main(AnsibleExitJson)
+            result = self.module_main(AnsibleExitJson)
 
         self.assertTrue(result['changed'])
         self.module_main_command.assert_has_calls([
@@ -190,16 +190,16 @@ class NPMModuleTestCase(ModuleTestCase):
         ])
 
     def test_present_package_json(self):
-        set_module_args({
+        with set_module_args({
             'global': 'true',
             'state': 'present'
-        })
-        self.module_main_command.side_effect = [
-            (0, '{}', ''),
-            (0, '{}', ''),
-        ]
+        }):
+            self.module_main_command.side_effect = [
+                (0, '{}', ''),
+                (0, '{}', ''),
+            ]
 
-        result = self.module_main(AnsibleExitJson)
+            result = self.module_main(AnsibleExitJson)
 
         self.assertTrue(result['changed'])
         self.module_main_command.assert_has_calls([
@@ -207,17 +207,17 @@ class NPMModuleTestCase(ModuleTestCase):
         ])
 
     def test_present_package_json_production(self):
-        set_module_args({
+        with set_module_args({
             'production': 'true',
             'global': 'true',
             'state': 'present',
-        })
-        self.module_main_command.side_effect = [
-            (0, '{}', ''),
-            (0, '{}', ''),
-        ]
+        }):
+            self.module_main_command.side_effect = [
+                (0, '{}', ''),
+                (0, '{}', ''),
+            ]
 
-        result = self.module_main(AnsibleExitJson)
+            result = self.module_main(AnsibleExitJson)
 
         self.assertTrue(result['changed'])
         self.module_main_command.assert_has_calls([
@@ -225,17 +225,17 @@ class NPMModuleTestCase(ModuleTestCase):
         ])
 
     def test_present_package_json_ci(self):
-        set_module_args({
+        with set_module_args({
             'ci': 'true',
             'global': 'true',
             'state': 'present'
-        })
-        self.module_main_command.side_effect = [
-            (0, '{}', ''),
-            (0, '{}', ''),
-        ]
+        }):
+            self.module_main_command.side_effect = [
+                (0, '{}', ''),
+                (0, '{}', ''),
+            ]
 
-        result = self.module_main(AnsibleExitJson)
+            result = self.module_main(AnsibleExitJson)
 
         self.assertTrue(result['changed'])
         self.module_main_command.assert_has_calls([
@@ -243,18 +243,18 @@ class NPMModuleTestCase(ModuleTestCase):
         ])
 
     def test_present_package_json_ci_production(self):
-        set_module_args({
+        with set_module_args({
             'ci': 'true',
             'production': 'true',
             'global': 'true',
             'state': 'present'
-        })
-        self.module_main_command.side_effect = [
-            (0, '{}', ''),
-            (0, '{}', ''),
-        ]
+        }):
+            self.module_main_command.side_effect = [
+                (0, '{}', ''),
+                (0, '{}', ''),
+            ]
 
-        result = self.module_main(AnsibleExitJson)
+            result = self.module_main(AnsibleExitJson)
 
         self.assertTrue(result['changed'])
         self.module_main_command.assert_has_calls([

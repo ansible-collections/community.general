@@ -7,43 +7,41 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: oneview_datacenter_info
 short_description: Retrieve information about the OneView Data Centers
 description:
-    - Retrieve information about the OneView Data Centers.
+  - Retrieve information about the OneView Data Centers.
 requirements:
-    - "hpOneView >= 2.0.1"
+  - "hpOneView >= 2.0.1"
 author:
-    - Alex Monteiro (@aalexmonteiro)
-    - Madhav Bharadwaj (@madhav-bharadwaj)
-    - Priyanka Sood (@soodpr)
-    - Ricardo Galeno (@ricardogpsf)
+  - Alex Monteiro (@aalexmonteiro)
+  - Madhav Bharadwaj (@madhav-bharadwaj)
+  - Priyanka Sood (@soodpr)
+  - Ricardo Galeno (@ricardogpsf)
 attributes:
-    check_mode:
-        version_added: 3.3.0
-        # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
+  check_mode:
+    version_added: 3.3.0
+    # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
 options:
-    name:
-      description:
-        - Data Center name.
-      type: str
-    options:
-      description:
-        - "Retrieve additional information. Options available: 'visualContent'."
-      type: list
-      elements: str
+  name:
+    description:
+      - Data Center name.
+    type: str
+  options:
+    description:
+      - 'Retrieve additional information. Options available: V(visualContent).'
+    type: list
+    elements: str
 
 extends_documentation_fragment:
   - community.general.oneview
   - community.general.oneview.factsparams
   - community.general.attributes
   - community.general.attributes.info_module
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Gather information about all Data Centers
   community.general.oneview_datacenter_info:
     hostname: 172.16.101.48
@@ -107,19 +105,19 @@ EXAMPLES = '''
 - name: Print fetched information about Data Center Visual Content
   ansible.builtin.debug:
     msg: "{{ result.datacenter_visual_content }}"
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 datacenters:
-    description: Has all the OneView information about the Data Centers.
-    returned: Always, but can be null.
-    type: dict
+  description: Has all the OneView information about the Data Centers.
+  returned: Always, but can be null.
+  type: dict
 
 datacenter_visual_content:
-    description: Has information about the Data Center Visual Content.
-    returned: When requested, but can be null.
-    type: dict
-'''
+  description: Has information about the Data Center Visual Content.
+  returned: When requested, but can be null.
+  type: dict
+"""
 
 from ansible_collections.community.general.plugins.module_utils.oneview import OneViewModuleBase
 

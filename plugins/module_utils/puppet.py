@@ -95,17 +95,16 @@ def puppet_runner(module):
             skip_tags=cmd_runner_fmt.as_func(lambda v: ["--skip_tags", ",".join(v)]),
             certname=cmd_runner_fmt.as_opt_eq_val("--certname"),
             noop=cmd_runner_fmt.as_func(noop_func),
-            use_srv_records=cmd_runner_fmt.as_map({
-                True: "--usr_srv_records",
-                False: "--no-usr_srv_records",
-            }),
+            use_srv_records=cmd_runner_fmt.as_bool("--usr_srv_records", "--no-usr_srv_records", ignore_none=True),
             logdest=cmd_runner_fmt.as_map(_logdest_map, default=[]),
             modulepath=cmd_runner_fmt.as_opt_eq_val("--modulepath"),
             _execute=cmd_runner_fmt.as_func(execute_func),
             summarize=cmd_runner_fmt.as_bool("--summarize"),
+            waitforlock=cmd_runner_fmt.as_opt_val("--waitforlock"),
             debug=cmd_runner_fmt.as_bool("--debug"),
             verbose=cmd_runner_fmt.as_bool("--verbose"),
         ),
         check_rc=False,
+        force_lang=module.params["environment_lang"],
     )
     return runner

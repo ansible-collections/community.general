@@ -6,9 +6,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 # Community General Collection
 
+[![Documentation](https://img.shields.io/badge/docs-brightgreen.svg)](https://docs.ansible.com/ansible/devel/collections/community/general/)
 [![Build Status](https://dev.azure.com/ansible/community.general/_apis/build/status/CI?branchName=main)](https://dev.azure.com/ansible/community.general/_build?definitionId=31)
-[![EOL CI](https://github.com/ansible-collections/community.general/workflows/EOL%20CI/badge.svg?event=push)](https://github.com/ansible-collections/community.general/actions)
+[![EOL CI](https://github.com/ansible-collections/community.general/actions/workflows/ansible-test.yml/badge.svg?branch=main)](https://github.com/ansible-collections/community.general/actions)
+[![Nox CI](https://github.com/ansible-collections/community.general/actions/workflows/nox.yml/badge.svg?branch=main)](https://github.com/ansible-collections/community.general/actions)
 [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/community.general)](https://codecov.io/gh/ansible-collections/community.general)
+[![REUSE status](https://api.reuse.software/badge/github.com/ansible-collections/community.general)](https://api.reuse.software/info/github.com/ansible-collections/community.general)
 
 This repository contains the `community.general` Ansible Collection. The collection is a part of the Ansible package and includes many modules and plugins supported by Ansible community which are not part of more specialized community collections.
 
@@ -22,9 +25,21 @@ We follow [Ansible Code of Conduct](https://docs.ansible.com/ansible/latest/comm
 
 If you encounter abusive behavior violating the [Ansible Code of Conduct](https://docs.ansible.com/ansible/latest/community/code_of_conduct.html), please refer to the [policy violations](https://docs.ansible.com/ansible/latest/community/code_of_conduct.html#policy-violations) section of the Code of Conduct for information on how to raise a complaint.
 
+## Communication
+
+* Join the Ansible forum:
+  * [Get Help](https://forum.ansible.com/c/help/6): get help or help others. This is for questions about modules or plugins in the collection. Please add appropriate tags if you start new discussions.
+  * [Tag `community-general`](https://forum.ansible.com/tag/community-general): discuss the *collection itself*, instead of specific modules or plugins.
+  * [Social Spaces](https://forum.ansible.com/c/chat/4): gather and interact with fellow enthusiasts.
+  * [News & Announcements](https://forum.ansible.com/c/news/5): track project-wide announcements including social events.
+
+* The Ansible [Bullhorn newsletter](https://docs.ansible.com/ansible/devel/community/communication.html#the-bullhorn): used to announce releases and important changes.
+
+For more information about communication, see the [Ansible communication guide](https://docs.ansible.com/ansible/devel/community/communication.html).
+
 ## Tested with Ansible
 
-Tested with the current ansible-core 2.13, ansible-core 2.14, ansible-core 2.15, ansible-core 2.16 releases and the current development version of ansible-core. Ansible-core versions before 2.13.0 are not supported. This includes all ansible-base 2.10 and Ansible 2.9 releases.
+Tested with the current ansible-core 2.16, ansible-core 2.17, ansible-core 2.18, ansible-core 2.19 releases and the current development version of ansible-core. Ansible-core versions before 2.16.0 are not supported. This includes all ansible-base 2.10 and Ansible 2.9 releases.
 
 ## External requirements
 
@@ -97,25 +112,13 @@ It is necessary for maintainers of this collection to be subscribed to:
 
 They also should be subscribed to Ansible's [The Bullhorn newsletter](https://docs.ansible.com/ansible/devel/community/communication.html#the-bullhorn).
 
-## Communication
-
-We announce important development changes and releases through Ansible's [The Bullhorn newsletter](https://eepurl.com/gZmiEP). If you are a collection developer, be sure you are subscribed.
-
-Join us in the `#ansible` (general use questions and support), `#ansible-community` (community and collection development questions), and other [IRC channels](https://docs.ansible.com/ansible/devel/community/communication.html#irc-channels) on [Libera.chat](https://libera.chat).
-
-We take part in the global quarterly [Ansible Contributor Summit](https://github.com/ansible/community/wiki/Contributor-Summit) virtually or in-person. Track [The Bullhorn newsletter](https://eepurl.com/gZmiEP) and join us.
-
-For more information about communities, meetings and agendas see [Community Wiki](https://github.com/ansible/community/wiki/Community).
-
-For more information about communication, refer to Ansible's the [Communication guide](https://docs.ansible.com/ansible/devel/community/communication.html).
-
 ## Publishing New Version
 
 See the [Releasing guidelines](https://github.com/ansible/community-docs/blob/main/releasing_collections.rst) to learn how to release this collection.
 
 ## Release notes
 
-See the [changelog](https://github.com/ansible-collections/community.general/blob/main/CHANGELOG.rst).
+See the [changelog](https://github.com/ansible-collections/community.general/blob/main/CHANGELOG.md).
 
 ## Roadmap
 
@@ -138,4 +141,4 @@ See [LICENSES/GPL-3.0-or-later.txt](https://github.com/ansible-collections/commu
 
 Parts of the collection are licensed under the [BSD 2-Clause license](https://github.com/ansible-collections/community.general/blob/main/LICENSES/BSD-2-Clause.txt), the [MIT license](https://github.com/ansible-collections/community.general/blob/main/LICENSES/MIT.txt), and the [PSF 2.0 license](https://github.com/ansible-collections/community.general/blob/main/LICENSES/PSF-2.0.txt).
 
-All files have a machine readable `SDPX-License-Identifier:` comment denoting its respective license(s) or an equivalent entry in an accompanying `.license` file. Only changelog fragments (which will not be part of a release) are covered by a blanket statement in `.reuse/dep5`. This conforms to the [REUSE specification](https://reuse.software/spec/).
+All files have a machine readable `SDPX-License-Identifier:` comment denoting its respective license(s) or an equivalent entry in an accompanying `.license` file. Only changelog fragments (which will not be part of a release) are covered by a blanket statement in `REUSE.toml`. This conforms to the [REUSE specification](https://reuse.software/spec/).

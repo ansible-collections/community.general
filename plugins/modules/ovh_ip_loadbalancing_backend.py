@@ -9,85 +9,80 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: ovh_ip_loadbalancing_backend
 short_description: Manage OVH IP LoadBalancing backends
 description:
-    - Manage OVH (French European hosting provider) LoadBalancing IP backends
+  - Manage OVH (French European hosting provider) LoadBalancing IP backends.
 author: Pascal Heraud (@pascalheraud)
 notes:
-    - Uses the python OVH Api U(https://github.com/ovh/python-ovh).
-      You have to create an application (a key and secret) with a consumer
-      key as described into U(https://docs.ovh.com/gb/en/customer/first-steps-with-ovh-api/)
+  - Uses the Python OVH API U(https://github.com/ovh/python-ovh). You have to create an application (a key and secret) with
+    a consumer key as described into U(https://docs.ovh.com/gb/en/customer/first-steps-with-ovh-api/).
 requirements:
-    - ovh >  0.3.5
+  - ovh > 0.3.5
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    name:
-        required: true
-        description:
-            - Name of the LoadBalancing internal name (ip-X.X.X.X)
-        type: str
-    backend:
-        required: true
-        description:
-            - The IP address of the backend to update / modify / delete
-        type: str
-    state:
-        default: present
-        choices: ['present', 'absent']
-        description:
-            - Determines whether the backend is to be created/modified
-              or deleted
-        type: str
-    probe:
-        default: 'none'
-        choices: ['none', 'http', 'icmp' , 'oco']
-        description:
-            - Determines the type of probe to use for this backend
-        type: str
-    weight:
-        default: 8
-        description:
-            - Determines the weight for this backend
-        type: int
-    endpoint:
-        required: true
-        description:
-            - The endpoint to use ( for instance ovh-eu)
-        type: str
-    application_key:
-        required: true
-        description:
-            - The applicationKey to use
-        type: str
-    application_secret:
-        required: true
-        description:
-            - The application secret to use
-        type: str
-    consumer_key:
-        required: true
-        description:
-            - The consumer key to use
-        type: str
-    timeout:
-        default: 120
-        description:
-            - The timeout in seconds used to wait for a task to be
-              completed.
-        type: int
+  name:
+    required: true
+    description:
+      - Name of the LoadBalancing internal name (V(ip-X.X.X.X)).
+    type: str
+  backend:
+    required: true
+    description:
+      - The IP address of the backend to update / modify / delete.
+    type: str
+  state:
+    default: present
+    choices: ['present', 'absent']
+    description:
+      - Determines whether the backend is to be created/modified or deleted.
+    type: str
+  probe:
+    default: 'none'
+    choices: ['none', 'http', 'icmp', 'oco']
+    description:
+      - Determines the type of probe to use for this backend.
+    type: str
+  weight:
+    default: 8
+    description:
+      - Determines the weight for this backend.
+    type: int
+  endpoint:
+    required: true
+    description:
+      - The endpoint to use (for instance V(ovh-eu)).
+    type: str
+  application_key:
+    required: true
+    description:
+      - The applicationKey to use.
+    type: str
+  application_secret:
+    required: true
+    description:
+      - The application secret to use.
+    type: str
+  consumer_key:
+    required: true
+    description:
+      - The consumer key to use.
+    type: str
+  timeout:
+    default: 120
+    description:
+      - The timeout in seconds used to wait for a task to be completed.
+    type: int
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Adds or modify the backend '212.1.1.1' to a loadbalancing 'ip-1.1.1.1'
   ovh_ip_loadbalancing:
     name: ip-1.1.1.1
@@ -109,10 +104,10 @@ EXAMPLES = '''
     application_key: yourkey
     application_secret: yoursecret
     consumer_key: yourconsumerkey
-'''
+"""
 
-RETURN = '''
-'''
+RETURN = r"""
+"""
 
 import time
 
@@ -249,7 +244,7 @@ def main():
                         'parameters. Error returned by OVH api was : {0}'
                         .format(apiError))
 
-            if (backendProperties['weight'] != weight):
+            if backendProperties['weight'] != weight:
                 # Change weight
                 try:
                     client.post(
@@ -268,7 +263,7 @@ def main():
                             .format(apiError))
                 moduleChanged = True
 
-            if (backendProperties['probe'] != probe):
+            if backendProperties['probe'] != probe:
                 # Change probe
                 backendProperties['probe'] = probe
                 try:

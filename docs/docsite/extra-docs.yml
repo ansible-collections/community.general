@@ -14,3 +14,10 @@ sections:
       - guide_online
       - guide_packet
       - guide_scaleway
+  - title: Developer Guides
+    toctree:
+      - guide_deps
+      - guide_vardict
+      - guide_cmdrunner
+      - guide_modulehelper
+      - guide_uthelper

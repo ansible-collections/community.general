@@ -7,109 +7,109 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: keycloak_authentication
 
 short_description: Configure authentication in Keycloak
 
 description:
-    - This module actually can only make a copy of an existing authentication flow, add an execution to it and configure it.
-    - It can also delete the flow.
-
+  - This module actually can only make a copy of an existing authentication flow, add an execution to it and configure it.
+  - It can also delete the flow.
 version_added: "3.3.0"
 
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: full
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
+  action_group:
+    version_added: 10.2.0
 
 options:
-    realm:
-        description:
-            - The name of the realm in which is the authentication.
-        required: true
-        type: str
-    alias:
-        description:
-            - Alias for the authentication flow.
-        required: true
-        type: str
+  realm:
     description:
+      - The name of the realm in which is the authentication.
+    required: true
+    type: str
+  alias:
+    description:
+      - Alias for the authentication flow.
+    required: true
+    type: str
+  description:
+    description:
+      - Description of the flow.
+    type: str
+  providerId:
+    description:
+      - C(providerId) for the new flow when not copied from an existing flow.
+    choices: ["basic-flow", "client-flow"]
+    type: str
+  copyFrom:
+    description:
+      - C(flowAlias) of the authentication flow to use for the copy.
+    type: str
+  authenticationExecutions:
+    description:
+      - Configuration structure for the executions.
+    type: list
+    elements: dict
+    suboptions:
+      providerId:
         description:
-            - Description of the flow.
+          - C(providerID) for the new flow when not copied from an existing flow.
         type: str
-    providerId:
+      displayName:
         description:
-            - C(providerId) for the new flow when not copied from an existing flow.
-        choices: [ "basic-flow", "client-flow" ]
+          - Name of the execution or subflow to create or update.
         type: str
-    copyFrom:
+      requirement:
         description:
-            - C(flowAlias) of the authentication flow to use for the copy.
+          - Control status of the subflow or execution.
+        choices: ["REQUIRED", "ALTERNATIVE", "DISABLED", "CONDITIONAL"]
         type: str
-    authenticationExecutions:
+      flowAlias:
         description:
-            - Configuration structure for the executions.
-        type: list
-        elements: dict
-        suboptions:
-            providerId:
-                description:
-                    - C(providerID) for the new flow when not copied from an existing flow.
-                type: str
-            displayName:
-                description:
-                    - Name of the execution or subflow to create or update.
-                type: str
-            requirement:
-                description:
-                    - Control status of the subflow or execution.
-                choices: [ "REQUIRED", "ALTERNATIVE", "DISABLED", "CONDITIONAL" ]
-                type: str
-            flowAlias:
-                description:
-                    - Alias of parent flow.
-                type: str
-            authenticationConfig:
-                description:
-                    - Describe the config of the authentication.
-                type: dict
-            index:
-                description:
-                    - Priority order of the execution.
-                type: int
-            subFlowType:
-                description:
-                    - For new subflows, optionally specify the type.
-                    - Is only used at creation.
-                choices: ["basic-flow", "form-flow"]
-                default: "basic-flow"
-                type: str
-                version_added: 6.6.0
-    state:
-        description:
-            - Control if the authentication flow must exists or not.
-        choices: [ "present", "absent" ]
-        default: present
+          - Alias of parent flow.
         type: str
-    force:
-        type: bool
-        default: false
+      authenticationConfig:
         description:
-            - If V(true), allows to remove the authentication flow and recreate it.
-
+          - Describe the config of the authentication.
+        type: dict
+      index:
+        description:
+          - Priority order of the execution.
+        type: int
+      subFlowType:
+        description:
+          - For new subflows, optionally specify the type.
+          - Is only used at creation.
+        choices: ["basic-flow", "form-flow"]
+        default: "basic-flow"
+        type: str
+        version_added: 6.6.0
+  state:
+    description:
+      - Control if the authentication flow must exists or not.
+    choices: ["present", "absent"]
+    default: present
+    type: str
+  force:
+    type: bool
+    default: false
+    description:
+      - If V(true), allows to remove the authentication flow and recreate it.
 extends_documentation_fragment:
-    - community.general.keycloak
-    - community.general.attributes
+  - community.general.keycloak
+  - community.general.keycloak.actiongroup_keycloak
+  - community.general.attributes
 
 author:
-    - Philippe Gauthier (@elfelip)
-    - Gaëtan Daubresse (@Gaetan2907)
-'''
+  - Philippe Gauthier (@elfelip)
+  - Gaëtan Daubresse (@Gaetan2907)
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create an authentication flow from first broker login and add an execution to it.
   community.general.keycloak_authentication:
     auth_keycloak_url: http://localhost:8080/auth
@@ -123,15 +123,15 @@ EXAMPLES = '''
       - providerId: "test-execution1"
         requirement: "REQUIRED"
         authenticationConfig:
-            alias: "test.execution1.property"
-            config:
-            test1.property: "value"
+          alias: "test.execution1.property"
+          config:
+          test1.property: "value"
       - providerId: "test-execution2"
         requirement: "REQUIRED"
         authenticationConfig:
-            alias: "test.execution2.property"
-            config:
-            test2.property: "value"
+          alias: "test.execution2.property"
+          config:
+          test2.property: "value"
     state: present
 
 - name: Re-create the authentication flow
@@ -147,9 +147,9 @@ EXAMPLES = '''
       - providerId: "test-provisioning"
         requirement: "REQUIRED"
         authenticationConfig:
-            alias: "test.provisioning.property"
-            config:
-            test.provisioning.property: "value"
+          alias: "test.provisioning.property"
+          config:
+          test.provisioning.property: "value"
     state: present
     force: true
 
@@ -181,26 +181,29 @@ EXAMPLES = '''
     realm: master
     alias: "Copy of first broker login"
     state: absent
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 msg:
-    description: Message as to what action was taken.
-    returned: always
-    type: str
+  description: Message as to what action was taken.
+  returned: always
+  type: str
 
 end_state:
-    description: Representation of the authentication after module execution.
-    returned: on success
-    type: dict
-    sample: {
+  description: Representation of the authentication after module execution.
+  returned: on success
+  type: dict
+  sample:
+    {
       "alias": "Copy of first broker login",
       "authenticationExecutions": [
         {
           "alias": "review profile config",
           "authenticationConfig": {
             "alias": "review profile config",
-            "config": { "update.profile.on.first.login": "missing" },
+            "config": {
+              "update.profile.on.first.login": "missing"
+            },
             "id": "6f09e4fb-aad4-496a-b873-7fa9779df6d7"
           },
           "configurable": true,
@@ -210,7 +213,11 @@ end_state:
           "level": 0,
           "providerId": "idp-review-profile",
           "requirement": "REQUIRED",
-          "requirementChoices": [ "REQUIRED", "ALTERNATIVE", "DISABLED" ]
+          "requirementChoices": [
+            "REQUIRED",
+            "ALTERNATIVE",
+            "DISABLED"
+          ]
         }
       ],
       "builtIn": false,
@@ -219,7 +226,7 @@ end_state:
       "providerId": "basic-flow",
       "topLevel": true
     }
-'''
+"""
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak \
     import KeycloakAPI, keycloak_argument_spec, get_token, KeycloakError, is_struct_included
@@ -246,7 +253,7 @@ def create_or_update_executions(kc, config, realm='master'):
     """
     Create or update executions for an authentication flow.
     :param kc: Keycloak API access.
-    :param config: Representation of the authentication flow including it's executions.
+    :param config: Representation of the authentication flow including its executions.
     :param realm: Realm
     :return: tuple (changed, dict(before, after)
         WHERE
@@ -257,6 +264,7 @@ def create_or_update_executions(kc, config, realm='master'):
         changed = False
         after = ""
         before = ""
+        execution = None
         if "authenticationExecutions" in config:
             # Get existing executions on the Keycloak server for this alias
             existing_executions = kc.get_executions_representation(config, realm=realm)
@@ -283,36 +291,40 @@ def create_or_update_executions(kc, config, realm='master'):
                         if new_exec['index'] is None:
                             new_exec_index = exec_index
                         before += str(existing_executions[exec_index]) + '\n'
-                    id_to_update = existing_executions[exec_index]["id"]
+                    execution = existing_executions[exec_index].copy()
                     # Remove exec from list in case 2 exec with same name
                     existing_executions[exec_index].clear()
                 elif new_exec["providerId"] is not None:
                     kc.create_execution(new_exec, flowAlias=flow_alias_parent, realm=realm)
+                    execution = kc.get_executions_representation(config, realm=realm)[exec_index]
                     exec_found = True
                     exec_index = new_exec_index
-                    id_to_update = kc.get_executions_representation(config, realm=realm)[exec_index]["id"]
                     after += str(new_exec) + '\n'
                 elif new_exec["displayName"] is not None:
                     kc.create_subflow(new_exec["displayName"], flow_alias_parent, realm=realm, flowType=new_exec["subFlowType"])
+                    execution = kc.get_executions_representation(config, realm=realm)[exec_index]
                     exec_found = True
                     exec_index = new_exec_index
-                    id_to_update = kc.get_executions_representation(config, realm=realm)[exec_index]["id"]
                     after += str(new_exec) + '\n'
                 if exec_found:
                     changed = True
                     if exec_index != -1:
                         # Update the existing execution
                         updated_exec = {
-                            "id": id_to_update
+                            "id": execution["id"]
                         }
                         # add the execution configuration
                         if new_exec["authenticationConfig"] is not None:
+                            if "authenticationConfig" in execution and "id" in execution["authenticationConfig"]:
+                                kc.delete_authentication_config(execution["authenticationConfig"]["id"], realm=realm)
                             kc.add_authenticationConfig_to_execution(updated_exec["id"], new_exec["authenticationConfig"], realm=realm)
                         for key in new_exec:
                             # remove unwanted key for the next API call
                             if key not in ("flowAlias", "authenticationConfig", "subFlowType"):
                                 updated_exec[key] = new_exec[key]
                         if new_exec["requirement"] is not None:
+                            if "priority" in execution:
+                                updated_exec["priority"] = execution["priority"]
                             kc.update_authentication_executions(flow_alias_parent, updated_exec, realm=realm)
                         diff = exec_index - new_exec_index
                         kc.change_execution_priority(updated_exec["id"], diff, realm=realm)
@@ -355,8 +367,9 @@ def main():
 
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True,
-                           required_one_of=([['token', 'auth_realm', 'auth_username', 'auth_password']]),
-                           required_together=([['auth_realm', 'auth_username', 'auth_password']])
+                           required_one_of=([['token', 'auth_realm', 'auth_username', 'auth_password', 'auth_client_id', 'auth_client_secret']]),
+                           required_together=([['auth_username', 'auth_password']]),
+                           required_by={'refresh_token': 'auth_realm'},
                            )
 
     result = dict(changed=False, msg='', flow={})

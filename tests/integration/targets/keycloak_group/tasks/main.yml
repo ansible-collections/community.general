@@ -10,8 +10,8 @@
     command: start-dev
     env:
       KC_HTTP_RELATIVE_PATH: /auth
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: password
+      KEYCLOAK_ADMIN: "{{ admin_user }}"
+      KEYCLOAK_ADMIN_PASSWORD: "{{ admin_password }}"
     ports:
       - "8080:8080"
     detach: true
@@ -145,11 +145,11 @@
     realm: "{{ realm }}"
     name: my-new_group
     attributes:
-        attrib1: value1
-        attrib2: value2
-        attrib3:
-            - item1
-            - item2
+      attrib1: value1
+      attrib2: value2
+      attrib3:
+        - item1
+        - item2
   register: result
 
 - name: Assert that group was correctly created

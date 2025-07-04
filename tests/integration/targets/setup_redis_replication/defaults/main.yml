@@ -6,21 +6,31 @@
 # General
 redis_packages:
   Alpine:
-  - redis
+    - redis
   Archlinux:
-  - redis
+    - valkey
   Debian:
-  - redis-server
+    - redis-server
   Ubuntu:
-  - redis-server
+    - redis-server
   openSUSE Leap:
-  - redis
+    - redis
   Fedora:
-  - redis
+    - redis
   CentOS:
-  - redis
+    - redis
   FreeBSD:
-  - redis
+    - redis
+
+redis_user:
+  Alpine: redis
+  Archlinux: valkey
+  Debian: redis
+  Ubuntu: redis
+  openSUSE Leap: redis
+  Fedora: "{{ '998' if ansible_distribution_major_version is version('41', '>=') else 'redis' }}"
+  CentOS: redis
+  FreeBSD: redis
 
 redis_bin:
   Alpine: /usr/bin/redis-server
@@ -28,7 +38,7 @@ redis_bin:
   Debian: /usr/bin/redis-server
   Ubuntu: /usr/bin/redis-server
   openSUSE Leap: /usr/sbin/redis-server
-  Fedora: /usr/bin/redis-server
+  Fedora: "/usr/bin/{{ 'valkey-server' if ansible_distribution_major_version is version('41', '>=') else 'redis-server' }}"
   CentOS: /usr/bin/redis-server
   FreeBSD: /usr/local/bin/redis-server
 

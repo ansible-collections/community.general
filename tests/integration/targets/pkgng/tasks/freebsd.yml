@@ -469,8 +469,10 @@
       - '(pkgng_example8_invalid_annotation_failure.results | selectattr("changed") | list | count) == 0'
       # Invalid strings should always fail
       - '(pkgng_example8_invalid_annotation_failure.results | rejectattr("failed") | list | count) == 0'
-      # Invalid strings should not cause an exception
-      - '(pkgng_example8_invalid_annotation_failure.results | selectattr("exception", "defined") | list | count) == 0'
+      # Invalid strings should not cause a module crash
+      - '(pkgng_example8_invalid_annotation_failure.results | selectattr("module_stdout", "defined") | list | count) == 0'
+      # Invalid strings should have a proper msg field
+      - '(pkgng_example8_invalid_annotation_failure.results | selectattr("msg", "match", "failed to annotate zsh, invalid annotate string: .*") | list | count) == 4'
       # Verify annotations are unaffected
       - '(pkgng_example8_invalid_annotation_verify.stdout_lines | select("search",  "(naked_string|invalid_operation|empty_first_tag|validsecond|notag)") | list | count) == 0'
 
@@ -515,11 +517,29 @@
   # NOTE: FreeBSD 13.2 fails to update the package catalogue for unknown reasons (someone with FreeBSD
   #       knowledge has to take a look)
   #
+  # NOTE: FreeBSD 13.3 fails to update the package catalogue for unknown reasons (someone with FreeBSD
+  #       knowledge has to take a look)
+  #
+  # NOTE: FreeBSD 13.4 fails to update the package catalogue for unknown reasons (someone with FreeBSD
+  #       knowledge has to take a look)
+  #
+  # NOTE: FreeBSD 13.5 fails to update the package catalogue for unknown reasons (someone with FreeBSD
+  #       knowledge has to take a look)
+  #
+  # NOTE: FreeBSD 14.0 fails to update the package catalogue for unknown reasons (someone with FreeBSD
+  #       knowledge has to take a look)
+  #
+  # NOTE: FreeBSD 14.1 fails to update the package catalogue for unknown reasons (someone with FreeBSD
+  #       knowledge has to take a look)
+  #
+  # NOTE: FreeBSD 14.2 fails as well (someone with FreeBSD knowledge has to take a look)
+  #
   # See also
   # https://github.com/ansible-collections/community.general/issues/5795
   when: >-
     (ansible_distribution_version is version('12.01', '>=') and ansible_distribution_version is version('12.3', '<'))
-    or ansible_distribution_version is version('13.3', '>=')
+    or (ansible_distribution_version is version('13.6', '>=') and ansible_distribution_version is version('14.0', '<'))
+    or ansible_distribution_version is version('14.3', '>=')
   block:
     - name: Setup testjail
       include_tasks: setup-testjail.yml

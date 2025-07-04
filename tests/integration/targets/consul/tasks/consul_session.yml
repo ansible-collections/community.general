@@ -6,7 +6,6 @@
 - name: list sessions
   consul_session:
     state: list
-    token: "{{ consul_management_token }}"
   register: result
 
 - assert:
@@ -18,7 +17,6 @@
   consul_session:
     state: present
     name: testsession
-    token: "{{ consul_management_token }}"
   register: result
 
 - assert:
@@ -33,7 +31,6 @@
 - name: list sessions after creation
   consul_session:
     state: list
-    token: "{{ consul_management_token }}"
   register: result
 
 - set_fact:
@@ -61,7 +58,6 @@
   consul_session:
     state: info
     id: '{{ session_id }}'
-    token: "{{ consul_management_token }}"
   register: result
 
 - assert:
@@ -72,78 +68,17 @@
   consul_session:
     state: info
     name: test
-    token: "{{ consul_management_token }}"
   register: result
   ignore_errors: true
 
 - assert:
     that:
       - result is failed
-
-- name: ensure unknown scheme fails
-  consul_session:
-    state: info
-    id: '{{ session_id }}'
-    scheme: non_existent
-    token: "{{ consul_management_token }}"
-  register: result
-  ignore_errors: true
-
-- assert:
-    that:
-      - result is failed
-
-- name: ensure SSL certificate is checked
-  consul_session:
-    state: info
-    id: '{{ session_id }}'
-    port: 8501
-    scheme: https
-    token: "{{ consul_management_token }}"
-  register: result
-  ignore_errors: true
-
-- name: previous task should fail since certificate is not known
-  assert:
-    that:
-      - result is failed
-      - "'certificate verify failed' in result.msg"
-
-- name: ensure SSL certificate isn't checked when validate_certs is disabled
-  consul_session:
-    state: info
-    id: '{{ session_id }}'
-    port: 8501
-    scheme: https
-    token: "{{ consul_management_token }}"
-    validate_certs: false
-  register: result
-
-- name: previous task should succeed since certificate isn't checked
-  assert:
-    that:
-      - result is changed
-
-- name: ensure a secure connection is possible
-  consul_session:
-    state: info
-    id: '{{ session_id }}'
-    port: 8501
-    scheme: https
-    token: "{{ consul_management_token }}"
-  environment:
-    REQUESTS_CA_BUNDLE: '{{ remote_dir }}/cert.pem'
-  register: result
-
-- assert:
-    that:
-      - result is changed
 
 - name: delete a session
   consul_session:
     state: absent
     id: '{{ session_id }}'
-    token: "{{ consul_management_token }}"
   register: result
 
 - assert:
@@ -153,7 +88,6 @@
 - name: list sessions after deletion
   consul_session:
     state: list
-    token: "{{ consul_management_token }}"
   register: result
 
 - assert:
@@ -180,7 +114,6 @@
     state: present
     name: session-with-ttl
     ttl: 180  # sec
-    token: "{{ consul_management_token }}"
   register: result
 
 - assert:

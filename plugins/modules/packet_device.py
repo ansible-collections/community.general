@@ -10,26 +10,23 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: packet_device
 
 short_description: Manage a bare metal server in the Packet Host
 
 description:
-    - Manage a bare metal server in the Packet Host (a "device" in the API terms).
-    - When the machine is created it can optionally wait for public IP address, or for active state.
-    - This module has a dependency on packet >= 1.0.
-    - API is documented at U(https://www.packet.net/developers/api/devices).
-
-
+  - Manage a bare metal server in the Packet Host (a "device" in the API terms).
+  - When the machine is created it can optionally wait for public IP address, or for active state.
+  - This module has a dependency on packet >= 1.0.
+  - API is documented at U(https://www.packet.net/developers/api/devices).
 author:
-    - Tomas Karasek (@t0mk) <tom.to.the.k@gmail.com>
-    - Matt Baldwin (@baldwinSPC) <baldwin@stackpointcloud.com>
-    - Thibaud Morel l'Horset (@teebes) <teebes@gmail.com>
+  - Tomas Karasek (@t0mk) <tom.to.the.k@gmail.com>
+  - Matt Baldwin (@baldwinSPC) <baldwin@stackpointcloud.com>
+  - Thibaud Morel l'Horset (@teebes) <teebes@gmail.com>
 
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 
 attributes:
   check_mode:
@@ -45,7 +42,7 @@ options:
 
   count:
     description:
-      - The number of devices to create. Count number can be included in hostname via the %d string formatter.
+      - The number of devices to create. Count number can be included in hostname using the C(%d) string formatter.
     default: 1
     type: int
 
@@ -114,15 +111,17 @@ options:
   state:
     description:
       - Desired state of the device.
-      - If set to V(present) (the default), the module call will return immediately after the device-creating HTTP request successfully returns.
-      - If set to V(active), the module call will block until all the specified devices are in state active due to the Packet API, or until O(wait_timeout).
+      - If set to V(present) (the default), the module call will return immediately after the device-creating HTTP request
+        successfully returns.
+      - If set to V(active), the module call will block until all the specified devices are in state active due to the Packet
+        API, or until O(wait_timeout).
     choices: [present, absent, active, inactive, rebooted]
     default: present
     type: str
 
   user_data:
     description:
-      - Userdata blob made available to the machine
+      - Userdata blob made available to the machine.
     type: str
 
   wait_for_public_IPv:
@@ -130,13 +129,14 @@ options:
       - Whether to wait for the instance to be assigned a public IPv4/IPv6 address.
       - If set to 4, it will wait until IPv4 is assigned to the instance.
       - If set to 6, wait until public IPv6 is assigned to the instance.
-    choices: [4,6]
+    choices: [4, 6]
     type: int
 
   wait_timeout:
     description:
       - How long (seconds) to wait either for automatic IP address assignment, or for the device to reach the V(active) state.
-      - If O(wait_for_public_IPv) is set and O(state=active), the module will wait for both events consequently, applying the timeout twice.
+      - If O(wait_for_public_IPv) is set and O(state=active), the module will wait for both events consequently, applying
+        the timeout twice.
     default: 900
     type: int
 
@@ -156,11 +156,10 @@ options:
 
 
 requirements:
-     - "packet-python >= 1.35"
+  - "packet-python >= 1.35"
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 # All the examples assume that you have your Packet API token in environment variable PACKET_API_TOKEN.
 # You can also pass it to the auth_token parameter of the module instead.
 
@@ -169,79 +168,79 @@ EXAMPLES = '''
 - name: Create 1 device
   hosts: localhost
   tasks:
-  - community.general.packet_device:
-      project_id: 89b497ee-5afc-420a-8fb5-56984898f4df
-      hostnames: myserver
-      tags: ci-xyz
-      operating_system: ubuntu_16_04
-      plan: baremetal_0
-      facility: sjc1
+    - community.general.packet_device:
+        project_id: 89b497ee-5afc-420a-8fb5-56984898f4df
+        hostnames: myserver
+        tags: ci-xyz
+        operating_system: ubuntu_16_04
+        plan: baremetal_0
+        facility: sjc1
 
-# Create the same device and wait until it is in state "active", (when it's
+# Create the same device and wait until it is in state "active", (when it is
 # ready for other API operations). Fail if the device is not "active" in
 # 10 minutes.
 
 - name: Create device and wait up to 10 minutes for active state
   hosts: localhost
   tasks:
-  - community.general.packet_device:
-      project_id: 89b497ee-5afc-420a-8fb5-56984898f4df
-      hostnames: myserver
-      operating_system: ubuntu_16_04
-      plan: baremetal_0
-      facility: sjc1
-      state: active
-      wait_timeout: 600
+    - community.general.packet_device:
+        project_id: 89b497ee-5afc-420a-8fb5-56984898f4df
+        hostnames: myserver
+        operating_system: ubuntu_16_04
+        plan: baremetal_0
+        facility: sjc1
+        state: active
+        wait_timeout: 600
 
 - name: Create 3 ubuntu devices called server-01, server-02 and server-03
   hosts: localhost
   tasks:
-  - community.general.packet_device:
-      project_id: 89b497ee-5afc-420a-8fb5-56984898f4df
-      hostnames: server-%02d
-      count: 3
-      operating_system: ubuntu_16_04
-      plan: baremetal_0
-      facility: sjc1
+    - community.general.packet_device:
+        project_id: 89b497ee-5afc-420a-8fb5-56984898f4df
+        hostnames: server-%02d
+        count: 3
+        operating_system: ubuntu_16_04
+        plan: baremetal_0
+        facility: sjc1
 
 - name: Create 3 coreos devices with userdata, wait until they get IPs and then wait for SSH
   hosts: localhost
   tasks:
-  - name: Create 3 devices and register their facts
-    community.general.packet_device:
-      hostnames: [coreos-one, coreos-two, coreos-three]
-      operating_system: coreos_stable
-      plan: baremetal_0
-      facility: ewr1
-      locked: true
-      project_id: 89b497ee-5afc-420a-8fb5-56984898f4df
-      wait_for_public_IPv: 4
-      user_data: |
-        #cloud-config
-        ssh_authorized_keys:
-          - {{ lookup('file', 'my_packet_sshkey') }}
-        coreos:
-          etcd:
-            discovery: https://discovery.etcd.io/6a28e078895c5ec737174db2419bb2f3
-            addr: $private_ipv4:4001
-            peer-addr: $private_ipv4:7001
-          fleet:
-            public-ip: $private_ipv4
-          units:
-            - name: etcd.service
-              command: start
-            - name: fleet.service
-              command: start
-    register: newhosts
+    - name: Create 3 devices and register their facts
+      community.general.packet_device:
+        hostnames: [coreos-one, coreos-two, coreos-three]
+        operating_system: coreos_stable
+        plan: baremetal_0
+        facility: ewr1
+        locked: true
+        project_id: 89b497ee-5afc-420a-8fb5-56984898f4df
+        wait_for_public_IPv: 4
+        user_data: |
+          #cloud-config
+          ssh_authorized_keys:
+            - {{ lookup('file', 'my_packet_sshkey') }}
+          coreos:
+            etcd:
+              discovery: https://discovery.etcd.io/6a28e078895c5ec737174db2419bb2f3
+              addr: $private_ipv4:4001
+              peer-addr: $private_ipv4:7001
+            fleet:
+              public-ip: $private_ipv4
+            units:
+              - name: etcd.service
+                command: start
+              - name: fleet.service
+                command: start
+      register: newhosts
 
-  - name: Wait for ssh
-    ansible.builtin.wait_for:
-      delay: 1
-      host: "{{ item.public_ipv4 }}"
-      port: 22
-      state: started
-      timeout: 500
-    with_items: "{{ newhosts.devices }}"
+    - name: Wait for ssh
+      ansible.builtin.wait_for:
+        delay: 1
+        host: "{{ item.public_ipv4 }}"
+        port: 22
+        state: started
+        timeout: 500
+      with_items: "{{ newhosts.devices }}"
 
 
 # Other states of devices
@@ -249,38 +248,36 @@ EXAMPLES = '''
 - name: Remove 3 devices by uuid
   hosts: localhost
   tasks:
-  - community.general.packet_device:
-      project_id: 89b497ee-5afc-420a-8fb5-56984898f4df
-      state: absent
-      device_ids:
-        - 1fb4faf8-a638-4ac7-8f47-86fe514c30d8
-        - 2eb4faf8-a638-4ac7-8f47-86fe514c3043
-        - 6bb4faf8-a638-4ac7-8f47-86fe514c301f
-'''
+    - community.general.packet_device:
+        project_id: 89b497ee-5afc-420a-8fb5-56984898f4df
+        state: absent
+        device_ids:
+          - 1fb4faf8-a638-4ac7-8f47-86fe514c30d8
+          - 2eb4faf8-a638-4ac7-8f47-86fe514c3043
+          - 6bb4faf8-a638-4ac7-8f47-86fe514c301f
+"""
 
-RETURN = '''
+RETURN = r"""
 changed:
-    description: True if a device was altered in any way (created, modified or removed)
-    type: bool
-    sample: true
-    returned: success
+  description: True if a device was altered in any way (created, modified or removed).
+  type: bool
+  sample: true
+  returned: success
 
 devices:
-    description: Information about each device that was processed
-    type: list
-    sample:
-      - {
-            "hostname": "my-server.com",
-            "id": "2a5122b9-c323-4d5c-b53c-9ad3f54273e7",
-            "public_ipv4": "147.229.15.12",
-            "private-ipv4": "10.0.15.12",
-            "tags": [],
-            "locked": false,
-            "state": "provisioning",
-            "public_ipv6": "2604:1380:2:5200::3"
-        }
-    returned: success
-'''  # NOQA
+  description: Information about each device that was processed.
+  type: list
+  sample:
+    - "hostname": "my-server.com"
+      "id": "2a5122b9-c323-4d5c-b53c-9ad3f54273e7"
+      "public_ipv4": "147.229.15.12"
+      "private-ipv4": "10.0.15.12"
+      "tags": []
+      "locked": false
+      "state": "provisioning"
+      "public_ipv6": "2604:1380:2:5200::3"
+  returned: success
+"""
 
 
 import os
@@ -423,12 +420,12 @@ def get_hostname_list(module):
     # at this point, hostnames is a list
     hostnames = [h.strip() for h in hostnames]
 
-    if (len(hostnames) > 1) and (count > 1):
+    if len(hostnames) > 1 and count > 1:
         _msg = ("If you set count>1, you should only specify one hostname "
                 "with the %d formatter, not a list of hostnames.")
         raise Exception(_msg)
 
-    if (len(hostnames) == 1) and (count > 0):
+    if len(hostnames) == 1 and count > 0:
         hostname_spec = hostnames[0]
         count_range = range(count_offset, count_offset + count)
         if re.search(r"%\d{0,2}d", hostname_spec):

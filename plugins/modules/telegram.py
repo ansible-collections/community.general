@@ -9,22 +9,21 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
-
+DOCUMENTATION = r"""
 module: telegram
 author:
- - "Artem Feofanov (@tyouxa)"
- - "Nikolai Lomov (@lomserman)"
+  - "Artem Feofanov (@tyouxa)"
+  - "Nikolai Lomov (@lomserman)"
 
-short_description: Send notifications via telegram
+short_description: Send notifications using telegram
 
 description:
-    - Send notifications via telegram bot, to a verified group or user.
-    - Also, the user may try to use any other telegram bot API method, if you specify O(api_method) argument.
+  - Send notifications using telegram bot, to a verified group or user.
+  - Also, the user may try to use any other telegram bot API method, if you specify O(api_method) argument.
 notes:
-    - You will require a telegram account and create telegram bot to use this module.
+  - You will require a telegram account and create telegram bot to use this module.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
   check_mode:
     support: full
@@ -49,16 +48,14 @@ options:
       - Any parameters for the method.
       - For reference to default method, V(SendMessage), see U(https://core.telegram.org/bots/api#sendmessage).
     version_added: 2.0.0
+"""
 
-'''
-
-EXAMPLES = """
-
+EXAMPLES = r"""
 - name: Send notify to Telegram
   community.general.telegram:
     token: '9999999:XXXXXXXXXXXXXXXXXXXXXXX'
     api_args:
-      chat_id: 000000
+      chat_id: "000000"
       parse_mode: "markdown"
       text: "Your precious application has been deployed: https://example.com"
       disable_web_page_preview: true
@@ -69,21 +66,20 @@ EXAMPLES = """
     token: '9999999:XXXXXXXXXXXXXXXXXXXXXXX'
     api_method: forwardMessage
     api_args:
-      chat_id: 000000
+      chat_id: "000000"
       from_chat_id: 111111
       disable_notification: true
       message_id: '{{ saved_msg_id }}'
 """
 
-RETURN = """
-
+RETURN = r"""
 msg:
-  description: The message you attempted to send
+  description: The message you attempted to send.
   returned: success
   type: str
   sample: "Ansible task finished"
 telegram_error:
-  description: Error message gotten from Telegram API
+  description: Error message gotten from Telegram API.
   returned: failure
   type: str
   sample: "Bad Request: message text is empty"

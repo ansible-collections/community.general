@@ -23,7 +23,7 @@
     name: "ansible_network_subnet_test"
     dhcp_enable: true
     state: absent
-#----------------------------------------------------------
+# ---------------------------------------------------------
 - name: create a subnet (check mode)
   hwc_vpc_subnet:
     vpc_id: "{{ vpc.id }}"
@@ -39,7 +39,7 @@
     that:
       - not result.id
       - result.changed
-#----------------------------------------------------------
+# ---------------------------------------------------------
 - name: create a subnet
   hwc_vpc_subnet:
     vpc_id: "{{ vpc.id }}"
@@ -53,7 +53,7 @@
   assert:
     that:
       result is changed
-#----------------------------------------------------------
+# ---------------------------------------------------------
 - name: create a subnet (idemponent)
   hwc_vpc_subnet:
     vpc_id: "{{ vpc.id }}"
@@ -83,7 +83,7 @@
     that:
       - result is not failed
       - result is not changed
-#----------------------------------------------------------
+# ---------------------------------------------------------
 - name: delete a subnet (check mode)
   hwc_vpc_subnet:
     vpc_id: "{{ vpc.id }}"
@@ -98,7 +98,7 @@
   assert:
     that:
       - result is changed
-#----------------------------------------------------------
+# ---------------------------------------------------------
 - name: delete a subnet
   hwc_vpc_subnet:
     vpc_id: "{{ vpc.id }}"
@@ -112,7 +112,7 @@
   assert:
     that:
       - result is changed
-#----------------------------------------------------------
+# ---------------------------------------------------------
 - name: delete a subnet (idemponent)
   hwc_vpc_subnet:
     vpc_id: "{{ vpc.id }}"
@@ -142,7 +142,7 @@
     that:
       - result is not failed
       - result is not changed
-#---------------------------------------------------------
+# --------------------------------------------------------
 # Post-test teardown
 - name: delete a vpc
   hwc_network_vpc:

@@ -4,38 +4,37 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
-DOCUMENTATION = '''
-    author: Unknown (!UNKNOWN)
-    name: selective
-    type: stdout
-    requirements:
-      - set as main display callback
-    short_description: only print certain tasks
-    description:
-      - This callback only prints tasks that have been tagged with C(print_action) or that have failed.
-        This allows operators to focus on the tasks that provide value only.
-      - Tasks that are not printed are placed with a C(.).
-      - If you increase verbosity all tasks are printed.
-    options:
-      nocolor:
-        default: false
-        description: This setting allows suppressing colorizing output.
-        env:
-          - name: ANSIBLE_NOCOLOR
-          - name: ANSIBLE_SELECTIVE_DONT_COLORIZE
-        ini:
-          - section: defaults
-            key: nocolor
-        type: boolean
-'''
+DOCUMENTATION = r"""
+author: Unknown (!UNKNOWN)
+name: selective
+type: stdout
+requirements:
+  - set as main display callback
+short_description: Only print certain tasks
+description:
+  - This callback only prints tasks that have been tagged with C(print_action) or that have failed. This allows operators
+    to focus on the tasks that provide value only.
+  - Tasks that are not printed are placed with a C(.).
+  - If you increase verbosity all tasks are printed.
+options:
+  nocolor:
+    default: false
+    description: This setting allows suppressing colorizing output.
+    env:
+      - name: ANSIBLE_NOCOLOR
+      - name: ANSIBLE_SELECTIVE_DONT_COLORIZE
+    ini:
+      - section: defaults
+        key: nocolor
+    type: boolean
+"""
 
-EXAMPLES = """
-  - ansible.builtin.debug: msg="This will not be printed"
-  - ansible.builtin.debug: msg="But this will"
-    tags: [print_action]
+EXAMPLES = r"""
+- ansible.builtin.debug: msg="This will not be printed"
+- ansible.builtin.debug: msg="But this will"
+  tags: [print_action]
 """
 
 import difflib
@@ -48,13 +47,13 @@ from ansible.module_utils.common.text.converters import to_text
 DONT_COLORIZE = False
 COLORS = {
     'normal': '\033[0m',
-    'ok': '\033[{0}m'.format(C.COLOR_CODES[C.COLOR_OK]),
+    'ok': f'\x1b[{C.COLOR_CODES[C.COLOR_OK]}m',
     'bold': '\033[1m',
     'not_so_bold': '\033[1m\033[34m',
-    'changed': '\033[{0}m'.format(C.COLOR_CODES[C.COLOR_CHANGED]),
-    'failed': '\033[{0}m'.format(C.COLOR_CODES[C.COLOR_ERROR]),
+    'changed': f'\x1b[{C.COLOR_CODES[C.COLOR_CHANGED]}m',
+    'failed': f'\x1b[{C.COLOR_CODES[C.COLOR_ERROR]}m',
     'endc': '\033[0m',
-    'skipped': '\033[{0}m'.format(C.COLOR_CODES[C.COLOR_SKIP]),
+    'skipped': f'\x1b[{C.COLOR_CODES[C.COLOR_SKIP]}m',
 }
 
 
@@ -73,7 +72,7 @@ def colorize(msg, color):
     if DONT_COLORIZE:
         return msg
     else:
-        return '{0}{1}{2}'.format(COLORS[color], msg, COLORS['endc'])
+        return f"{COLORS[color]}{msg}{COLORS['endc']}"
 
 
 class CallbackModule(CallbackBase):
@@ -106,15 +105,15 @@ class CallbackModule(CallbackBase):
             line_length = 120
             if self.last_skipped:
                 print()
-            line = "# {0} ".format(task_name)
-            msg = colorize("{0}{1}".format(line, '*' * (line_length - len(line))), 'bold')
+            line = f"# {task_name} "
+            msg = colorize(f"{line}{'*' * (line_length - len(line))}", 'bold')
             print(msg)
 
     def _indent_text(self, text, indent_level):
         lines = text.splitlines()
         result_lines = []
         for l in lines:
-            result_lines.append("{0}{1}".format(' ' * indent_level, l))
+            result_lines.append(f"{' ' * indent_level}{l}")
         return '\n'.join(result_lines)
 
     def _print_diff(self, diff, indent_level):
@@ -147,19 +146,19 @@ class CallbackModule(CallbackBase):
             change_string = colorize('FAILED!!!', color)
         else:
             color = 'changed' if changed else 'ok'
-            change_string = colorize("changed={0}".format(changed), color)
+            change_string = colorize(f"changed={changed}", color)
 
         msg = colorize(msg, color)
 
         line_length = 120
         spaces = ' ' * (40 - len(name) - indent_level)
-        line = "{0}  * {1}{2}- {3}".format(' ' * indent_level, name, spaces, change_string)
+        line = f"{' ' * indent_level}  * {name}{spaces}- {change_string}"
 
         if len(msg) < 50:
-            line += ' -- {0}'.format(msg)
-            print("{0} {1}---------".format(line, '-' * (line_length - len(line))))
+            line += f' -- {msg}'
+            print(f"{line} {'-' * (line_length - len(line))}---------")
         else:
-            print("{0} {1}".format(line, '-' * (line_length - len(line))))
+            print(f"{line} {'-' * (line_length - len(line))}")
             print(self._indent_text(msg, indent_level + 4))
 
         if diff:
@@ -239,8 +238,10 @@ class CallbackModule(CallbackBase):
             else:
                 color = 'ok'
 
-            msg = '{0}    : ok={1}\tchanged={2}\tfailed={3}\tunreachable={4}\trescued={5}\tignored={6}'.format(
-                host, s['ok'], s['changed'], s['failures'], s['unreachable'], s['rescued'], s['ignored'])
+            msg = (
+                f"{host}    : ok={s['ok']}\tchanged={s['changed']}\tfailed={s['failures']}\tunreachable="
+                f"{s['unreachable']}\trescued={s['rescued']}\tignored={s['ignored']}"
+            )
             print(colorize(msg, color))
 
     def v2_runner_on_skipped(self, result, **kwargs):
@@ -252,17 +253,15 @@ class CallbackModule(CallbackBase):
             line_length = 120
             spaces = ' ' * (31 - len(result._host.name) - 4)
 
-            line = "  * {0}{1}- {2}".format(colorize(result._host.name, 'not_so_bold'),
-                                            spaces,
-                                            colorize("skipped", 'skipped'),)
+            line = f"  * {colorize(result._host.name, 'not_so_bold')}{spaces}- {colorize('skipped', 'skipped')}"
 
             reason = result._result.get('skipped_reason', '') or \
                 result._result.get('skip_reason', '')
             if len(reason) < 50:
-                line += ' -- {0}'.format(reason)
-                print("{0} {1}---------".format(line, '-' * (line_length - len(line))))
+                line += f' -- {reason}'
+                print(f"{line} {'-' * (line_length - len(line))}---------")
             else:
-                print("{0} {1}".format(line, '-' * (line_length - len(line))))
+                print(f"{line} {'-' * (line_length - len(line))}")
                 print(self._indent_text(reason, 8))
                 print(reason)
 

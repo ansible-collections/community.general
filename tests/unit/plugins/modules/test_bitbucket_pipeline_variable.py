@@ -7,9 +7,9 @@ __metaclass__ = type
 
 from ansible_collections.community.general.plugins.module_utils.source_control.bitbucket import BitbucketHelper
 from ansible_collections.community.general.plugins.modules import bitbucket_pipeline_variable
-from ansible_collections.community.general.tests.unit.compat import unittest
-from ansible_collections.community.general.tests.unit.compat.mock import patch
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleFailJson, AnsibleExitJson, ModuleTestCase, set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleFailJson, AnsibleExitJson, ModuleTestCase, set_module_args
 
 
 class TestBucketPipelineVariableModule(ModuleTestCase):
@@ -19,27 +19,27 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
 
     def test_without_required_parameters(self):
         with self.assertRaises(AnsibleFailJson) as exec_info:
-            set_module_args({
+            with set_module_args({
                 'workspace': 'name',
                 'repository': 'repo',
                 'name': 'PIPELINE_VAR_NAME',
                 'state': 'absent',
-            })
-            self.module.main()
+            }):
+                self.module.main()
 
         self.assertEqual(exec_info.exception.args[0]['failed'], True)
 
     def test_missing_value_with_present_state(self):
         with self.assertRaises(AnsibleFailJson) as exec_info:
-            set_module_args({
+            with set_module_args({
                 'client_id': 'ABC',
                 'client_secret': 'XXX',
                 'workspace': 'name',
                 'repository': 'repo',
                 'name': 'PIPELINE_VAR_NAME',
                 'state': 'present',
-            })
-            self.module.main()
+            }):
+                self.module.main()
 
         self.assertEqual(exec_info.exception.args[0]['msg'], self.module.error_messages['required_value'])
 
@@ -51,13 +51,13 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
     @patch.object(bitbucket_pipeline_variable, 'get_existing_pipeline_variable', return_value=None)
     def test_oauth_env_vars_params(self, *args):
         with self.assertRaises(AnsibleExitJson):
-            set_module_args({
+            with set_module_args({
                 'workspace': 'name',
                 'repository': 'repo',
                 'name': 'PIPELINE_VAR_NAME',
                 'state': 'absent',
-            })
-            self.module.main()
+            }):
+                self.module.main()
 
     @patch.dict('os.environ', {
         'BITBUCKET_USERNAME': 'ABC',
@@ -66,19 +66,19 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
     @patch.object(bitbucket_pipeline_variable, 'get_existing_pipeline_variable', return_value=None)
     def test_basic_auth_env_vars_params(self, *args):
         with self.assertRaises(AnsibleExitJson):
-            set_module_args({
+            with set_module_args({
                 'workspace': 'name',
                 'repository': 'repo',
                 'name': 'PIPELINE_VAR_NAME',
                 'state': 'absent',
-            })
-            self.module.main()
+            }):
+                self.module.main()
 
     @patch.object(bitbucket_pipeline_variable, 'get_existing_pipeline_variable', return_value=None)
     def test_create_variable(self, *args):
         with patch.object(self.module, 'create_pipeline_variable') as create_pipeline_variable_mock:
             with self.assertRaises(AnsibleExitJson) as exec_info:
-                set_module_args({
+                with set_module_args({
                     'user': 'ABC',
                     'password': 'XXX',
                     'workspace': 'name',
@@ -86,8 +86,8 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
                     'name': 'PIPELINE_VAR_NAME',
                     'value': '42',
                     'state': 'present',
-                })
-                self.module.main()
+                }):
+                    self.module.main()
 
             self.assertEqual(create_pipeline_variable_mock.call_count, 1)
             self.assertEqual(exec_info.exception.args[0]['changed'], True)
@@ -97,7 +97,7 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
     def test_create_variable_check_mode(self, *args):
         with patch.object(self.module, 'create_pipeline_variable') as create_pipeline_variable_mock:
             with self.assertRaises(AnsibleExitJson) as exec_info:
-                set_module_args({
+                with set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
                     'workspace': 'name',
@@ -106,8 +106,8 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
                     'value': '42',
                     'state': 'present',
                     '_ansible_check_mode': True,
-                })
-                self.module.main()
+                }):
+                    self.module.main()
 
             self.assertEqual(create_pipeline_variable_mock.call_count, 0)
             self.assertEqual(exec_info.exception.args[0]['changed'], True)
@@ -123,7 +123,7 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
     def test_update_variable(self, *args):
         with patch.object(self.module, 'update_pipeline_variable') as update_pipeline_variable_mock:
             with self.assertRaises(AnsibleExitJson) as exec_info:
-                set_module_args({
+                with set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
                     'workspace': 'name',
@@ -131,8 +131,8 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
                     'name': 'PIPELINE_VAR_NAME',
                     'value': '42',
                     'state': 'present',
-                })
-                self.module.main()
+                }):
+                    self.module.main()
 
             self.assertEqual(update_pipeline_variable_mock.call_count, 1)
             self.assertEqual(exec_info.exception.args[0]['changed'], True)
@@ -147,7 +147,7 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
     def test_update_secured_variable(self, *args):
         with patch.object(self.module, 'update_pipeline_variable') as update_pipeline_variable_mock:
             with self.assertRaises(AnsibleExitJson) as exec_info:
-                set_module_args({
+                with set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
                     'workspace': 'name',
@@ -156,8 +156,8 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
                     'value': '42',
                     'secured': True,
                     'state': 'present',
-                })
-                self.module.main()
+                }):
+                    self.module.main()
 
             self.assertEqual(update_pipeline_variable_mock.call_count, 1)
             self.assertEqual(exec_info.exception.args[0]['changed'], True)
@@ -173,7 +173,7 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
     def test_update_secured_state(self, *args):
         with patch.object(self.module, 'update_pipeline_variable') as update_pipeline_variable_mock:
             with self.assertRaises(AnsibleExitJson) as exec_info:
-                set_module_args({
+                with set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
                     'workspace': 'name',
@@ -182,8 +182,8 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
                     'value': '42',
                     'secured': True,
                     'state': 'present',
-                })
-                self.module.main()
+                }):
+                    self.module.main()
 
             self.assertEqual(update_pipeline_variable_mock.call_count, 1)
             self.assertEqual(exec_info.exception.args[0]['changed'], True)
@@ -199,7 +199,7 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
     def test_dont_update_same_value(self, *args):
         with patch.object(self.module, 'update_pipeline_variable') as update_pipeline_variable_mock:
             with self.assertRaises(AnsibleExitJson) as exec_info:
-                set_module_args({
+                with set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
                     'workspace': 'name',
@@ -207,8 +207,8 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
                     'name': 'PIPELINE_VAR_NAME',
                     'value': '42',
                     'state': 'present',
-                })
-                self.module.main()
+                }):
+                    self.module.main()
 
             self.assertEqual(update_pipeline_variable_mock.call_count, 0)
             self.assertEqual(exec_info.exception.args[0]['changed'], False)
@@ -224,7 +224,7 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
     def test_update_variable_check_mode(self, *args):
         with patch.object(self.module, 'update_pipeline_variable') as update_pipeline_variable_mock:
             with self.assertRaises(AnsibleExitJson) as exec_info:
-                set_module_args({
+                with set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
                     'workspace': 'name',
@@ -233,8 +233,8 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
                     'value': '42',
                     'state': 'present',
                     '_ansible_check_mode': True,
-                })
-                self.module.main()
+                }):
+                    self.module.main()
 
             self.assertEqual(update_pipeline_variable_mock.call_count, 0)
             self.assertEqual(exec_info.exception.args[0]['changed'], True)
@@ -250,15 +250,15 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
     def test_delete_variable(self, *args):
         with patch.object(self.module, 'delete_pipeline_variable') as delete_pipeline_variable_mock:
             with self.assertRaises(AnsibleExitJson) as exec_info:
-                set_module_args({
+                with set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
                     'workspace': 'name',
                     'repository': 'repo',
                     'name': 'PIPELINE_VAR_NAME',
                     'state': 'absent',
-                })
-                self.module.main()
+                }):
+                    self.module.main()
 
             self.assertEqual(delete_pipeline_variable_mock.call_count, 1)
             self.assertEqual(exec_info.exception.args[0]['changed'], True)
@@ -268,15 +268,15 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
     def test_delete_absent_variable(self, *args):
         with patch.object(self.module, 'delete_pipeline_variable') as delete_pipeline_variable_mock:
             with self.assertRaises(AnsibleExitJson) as exec_info:
-                set_module_args({
+                with set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
                     'workspace': 'name',
                     'repository': 'repo',
                     'name': 'PIPELINE_VAR_NAME',
                     'state': 'absent',
-                })
-                self.module.main()
+                }):
+                    self.module.main()
 
             self.assertEqual(delete_pipeline_variable_mock.call_count, 0)
             self.assertEqual(exec_info.exception.args[0]['changed'], False)
@@ -292,7 +292,7 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
     def test_delete_variable_check_mode(self, *args):
         with patch.object(self.module, 'delete_pipeline_variable') as delete_pipeline_variable_mock:
             with self.assertRaises(AnsibleExitJson) as exec_info:
-                set_module_args({
+                with set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
                     'workspace': 'name',
@@ -300,8 +300,8 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
                     'name': 'PIPELINE_VAR_NAME',
                     'state': 'absent',
                     '_ansible_check_mode': True,
-                })
-                self.module.main()
+                }):
+                    self.module.main()
 
             self.assertEqual(delete_pipeline_variable_mock.call_count, 0)
             self.assertEqual(exec_info.exception.args[0]['changed'], True)

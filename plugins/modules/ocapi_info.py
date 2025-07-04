@@ -10,14 +10,12 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: ocapi_info
 version_added: 6.3.0
 short_description: Manages Out-Of-Band controllers using Open Composable API (OCAPI)
 description:
-  - Builds OCAPI URIs locally and sends them to remote OOB controllers to
-    get information back.
+  - Builds OCAPI URIs locally and sends them to remote OOB controllers to get information back.
 extends_documentation_fragment:
   - community.general.attributes
   - community.general.attributes.info_module
@@ -38,7 +36,7 @@ options:
       - Base URI of OOB controller.
     type: str
   proxy_slot_number:
-    description: For proxied inband requests, the slot number of the IOM.  Only applies if O(baseuri) is a proxy server.
+    description: For proxied inband requests, the slot number of the IOM. Only applies if O(baseuri) is a proxy server.
     type: int
   username:
     required: true
@@ -62,84 +60,86 @@ options:
 
 
 author: "Mike Moerk (@mikemoerk)"
-'''
+"""
 
-EXAMPLES = '''
-  - name: Get job status
-    community.general.ocapi_info:
-      category: Status
-      command: JobStatus
-      baseuri: "http://iom1.wdc.com"
-      jobName: FirmwareUpdate
-      username: "{{ username }}"
-      password: "{{ password }}"
-'''
+EXAMPLES = r"""
+- name: Get job status
+  community.general.ocapi_info:
+    category: Status
+    command: JobStatus
+    baseuri: "http://iom1.wdc.com"
+    jobName: FirmwareUpdate
+    username: "{{ username }}"
+    password: "{{ password }}"
+"""
 
-RETURN = '''
+RETURN = r"""
 msg:
-    description: Message with action result or error description.
-    returned: always
-    type: str
-    sample: "Action was successful"
+  description: Message with action result or error description.
+  returned: always
+  type: str
+  sample: "Action was successful"
 
 percentComplete:
-    description: Percent complete of the relevant operation.  Applies to O(command=JobStatus).
-    returned: when supported
-    type: int
-    sample: 99
+  description: Percent complete of the relevant operation. Applies to O(command=JobStatus).
+  returned: when supported
+  type: int
+  sample: 99
 
 operationStatus:
-    description: Status of the relevant operation.  Applies to O(command=JobStatus).  See OCAPI documentation for details.
-    returned: when supported
-    type: str
-    sample: "Activate needed"
+  description: Status of the relevant operation. Applies to O(command=JobStatus). See OCAPI documentation for details.
+  returned: when supported
+  type: str
+  sample: "Activate needed"
 
 operationStatusId:
-    description: Integer value of status (corresponds to operationStatus).  Applies to O(command=JobStatus).  See OCAPI documentation for details.
-    returned: when supported
-    type: int
-    sample: 65540
+  description: Integer value of status (corresponds to operationStatus). Applies to O(command=JobStatus). See OCAPI documentation
+    for details.
+  returned: when supported
+  type: int
+  sample: 65540
 
 operationHealth:
-    description: Health of the operation.  Applies to O(command=JobStatus).  See OCAPI documentation for details.
-    returned: when supported
-    type: str
-    sample: "OK"
+  description: Health of the operation. Applies to O(command=JobStatus). See OCAPI documentation for details.
+  returned: when supported
+  type: str
+  sample: "OK"
 
 operationHealthId:
-    description: >
-     Integer value for health of the operation (corresponds to RV(operationHealth)). Applies to O(command=JobStatus).
-     See OCAPI documentation for details.
-    returned: when supported
-    type: str
-    sample: "OK"
+  description: >-
+    Integer value for health of the operation (corresponds to RV(operationHealth)). Applies to O(command=JobStatus). See OCAPI
+    documentation for details.
+  returned: when supported
+  type: str
+  sample: "OK"
 
 details:
-    description: Details of the relevant operation.  Applies to O(command=JobStatus).
-    returned: when supported
-    type: list
-    elements: str
+  description: Details of the relevant operation. Applies to O(command=JobStatus).
+  returned: when supported
+  type: list
+  elements: str
 
 status:
-    description: Dictionary containing status information.  See OCAPI documentation for details.
-    returned: when supported
-    type: dict
-    sample: {
-        "Details": [
-            "None"
-        ],
-        "Health": [
-            {
-                "ID": 5,
-                "Name": "OK"
-            }
-        ],
-        "State": {
-            "ID": 16,
-            "Name": "In service"
-            }
-       }
-'''
+  description: Dictionary containing status information. See OCAPI documentation for details.
+  returned: when supported
+  type: dict
+  sample:
+    {
+      "Details": [
+        "None"
+      ],
+      "Health": [
+        {
+          "ID": 5,
+          "Name": "OK"
+        }
+      ],
+      "State": {
+        "ID": 16,
+        "Name": "In service"
+      }
+    }
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.ocapi_utils import OcapiUtils

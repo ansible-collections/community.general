@@ -9,43 +9,42 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: rundeck_job_executions_info
 short_description: Query executions for a Rundeck job
 description:
-    - This module gets the list of executions for a specified Rundeck job.
+  - This module gets the list of executions for a specified Rundeck job.
 author: "Phillipe Smith (@phsmith)"
 version_added: 3.8.0
 options:
-    job_id:
-        type: str
-        description:
-            - The job unique ID.
-        required: true
-    status:
-        type: str
-        description:
-            - The job status to filter.
-        choices: [succeeded, failed, aborted, running]
-    max:
-        type: int
-        description:
-            - Max results to return.
-        default: 20
-    offset:
-        type: int
-        description:
-            - The start point to return the results.
-        default: 0
+  job_id:
+    type: str
+    description:
+      - The job unique ID.
+    required: true
+  status:
+    type: str
+    description:
+      - The job status to filter.
+    choices: [succeeded, failed, aborted, running]
+  max:
+    type: int
+    description:
+      - Max results to return.
+    default: 20
+  offset:
+    type: int
+    description:
+      - The start point to return the results.
+    default: 0
 extends_documentation_fragment:
   - community.general.rundeck
   - url
   - community.general.attributes
   - community.general.attributes.info_module
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Get Rundeck job executions info
   community.general.rundeck_job_executions_info:
     url: "https://rundeck.example.org"
@@ -57,77 +56,79 @@ EXAMPLES = '''
 - name: Show Rundeck job executions info
   ansible.builtin.debug:
     var: rundeck_job_executions_info.executions
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 paging:
-    description: Results pagination info.
-    returned: success
-    type: dict
-    contains:
-      count:
-        description: Number of results in the response.
-        type: int
-        returned: success
-      total:
-        description: Total number of results.
-        type: int
-        returned: success
-      offset:
-        description: Offset from first of all results.
-        type: int
-        returned: success
-      max:
-        description: Maximum number of results per page.
-        type: int
-        returned: success
-    sample: {
-        "count": 20,
-        "total": 100,
-        "offset": 0,
-        "max": 20
+  description: Results pagination info.
+  returned: success
+  type: dict
+  contains:
+    count:
+      description: Number of results in the response.
+      type: int
+      returned: success
+    total:
+      description: Total number of results.
+      type: int
+      returned: success
+    offset:
+      description: Offset from first of all results.
+      type: int
+      returned: success
+    max:
+      description: Maximum number of results per page.
+      type: int
+      returned: success
+  sample:
+    {
+      "count": 20,
+      "total": 100,
+      "offset": 0,
+      "max": 20
     }
 executions:
-    description: Job executions list.
-    returned: always
-    type: list
-    elements: dict
-    sample: [
-        {
-            "id": 1,
-            "href": "https://rundeck.example.org/api/39/execution/1",
-            "permalink": "https://rundeck.example.org/project/myproject/execution/show/1",
-            "status": "succeeded",
-            "project": "myproject",
-            "executionType": "user",
-            "user": "admin",
-            "date-started": {
-                "unixtime": 1633525515026,
-                "date": "2021-10-06T13:05:15Z"
-            },
-            "date-ended": {
-                "unixtime": 1633525518386,
-                "date": "2021-10-06T13:05:18Z"
-            },
-            "job": {
-                "id": "697af0c4-72d3-4c15-86a3-b5bfe3c6cb6a",
-                "averageDuration": 6381,
-                "name": "Test",
-                "group": "",
-                "project": "myproject",
-                "description": "",
-                "options": {
-                    "exit_code": "0"
-                },
-                "href": "https://rundeck.example.org/api/39/job/697af0c4-72d3-4c15-86a3-b5bfe3c6cb6a",
-                "permalink": "https://rundeck.example.org/project/myproject/job/show/697af0c4-72d3-4c15-86a3-b5bfe3c6cb6a"
-            },
-            "description": "Plugin[com.batix.rundeck.plugins.AnsiblePlaybookInlineWorkflowStep, nodeStep: false]",
-            "argstring": "-exit_code 0",
-            "serverUUID": "5b9a1438-fa3a-457e-b254-8f3d70338068"
-        }
+  description: Job executions list.
+  returned: always
+  type: list
+  elements: dict
+  sample:
+    [
+      {
+        "id": 1,
+        "href": "https://rundeck.example.org/api/39/execution/1",
+        "permalink": "https://rundeck.example.org/project/myproject/execution/show/1",
+        "status": "succeeded",
+        "project": "myproject",
+        "executionType": "user",
+        "user": "admin",
+        "date-started": {
+          "unixtime": 1633525515026,
+          "date": "2021-10-06T13:05:15Z"
+        },
+        "date-ended": {
+          "unixtime": 1633525518386,
+          "date": "2021-10-06T13:05:18Z"
+        },
+        "job": {
+          "id": "697af0c4-72d3-4c15-86a3-b5bfe3c6cb6a",
+          "averageDuration": 6381,
+          "name": "Test",
+          "group": "",
+          "project": "myproject",
+          "description": "",
+          "options": {
+            "exit_code": "0"
+          },
+          "href": "https://rundeck.example.org/api/39/job/697af0c4-72d3-4c15-86a3-b5bfe3c6cb6a",
+          "permalink": "https://rundeck.example.org/project/myproject/job/show/697af0c4-72d3-4c15-86a3-b5bfe3c6cb6a"
+        },
+        "description": "Plugin[com.batix.rundeck.plugins.AnsiblePlaybookInlineWorkflowStep, nodeStep: false]",
+        "argstring": "-exit_code 0",
+        "serverUUID": "5b9a1438-fa3a-457e-b254-8f3d70338068"
+      }
     ]
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves.urllib.parse import quote

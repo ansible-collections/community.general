@@ -7,10 +7,10 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 import sys
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import ModuleTestCase, set_module_args
-from ansible_collections.community.general.tests.unit.compat.mock import patch
-from ansible_collections.community.general.tests.unit.compat.mock import Mock
-from ansible_collections.community.general.tests.unit.compat.mock import mock_open
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import ModuleTestCase, set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import Mock
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import mock_open
 from ansible_collections.community.general.plugins.modules.modprobe import Modprobe, build_module
 
 
@@ -36,19 +36,18 @@ class TestLoadModule(ModuleTestCase):
         self.mock_get_bin_path.stop()
 
     def test_load_module_success(self):
-        set_module_args(dict(
+        with set_module_args(dict(
             name='test',
             state='present',
-        ))
+        )):
+            module = build_module()
 
-        module = build_module()
+            self.get_bin_path.side_effect = ['modprobe']
+            self.module_loaded.side_effect = [True]
+            self.run_command.side_effect = [(0, '', '')]
 
-        self.get_bin_path.side_effect = ['modprobe']
-        self.module_loaded.side_effect = [True]
-        self.run_command.side_effect = [(0, '', '')]
-
-        modprobe = Modprobe(module)
-        modprobe.load_module()
+            modprobe = Modprobe(module)
+            modprobe.load_module()
 
         assert modprobe.result == {
             'changed': True,
@@ -58,21 +57,20 @@ class TestLoadModule(ModuleTestCase):
         }
 
     def test_load_module_unchanged(self):
-        set_module_args(dict(
+        with set_module_args(dict(
             name='test',
             state='present',
-        ))
+        )):
+            module = build_module()
 
-        module = build_module()
+            module.warn = Mock()
 
-        module.warn = Mock()
+            self.get_bin_path.side_effect = ['modprobe']
+            self.module_loaded.side_effect = [False]
+            self.run_command.side_effect = [(0, '', ''), (1, '', '')]
 
-        self.get_bin_path.side_effect = ['modprobe']
-        self.module_loaded.side_effect = [False]
-        self.run_command.side_effect = [(0, '', ''), (1, '', '')]
-
-        modprobe = Modprobe(module)
-        modprobe.load_module()
+            modprobe = Modprobe(module)
+            modprobe.load_module()
 
         module.warn.assert_called_once_with('')
 
@@ -99,19 +97,18 @@ class TestUnloadModule(ModuleTestCase):
         self.mock_get_bin_path.stop()
 
     def test_unload_module_success(self):
-        set_module_args(dict(
+        with set_module_args(dict(
             name='test',
             state='absent',
-        ))
+        )):
+            module = build_module()
 
-        module = build_module()
+            self.get_bin_path.side_effect = ['modprobe']
+            self.module_loaded.side_effect = [False]
+            self.run_command.side_effect = [(0, '', '')]
 
-        self.get_bin_path.side_effect = ['modprobe']
-        self.module_loaded.side_effect = [False]
-        self.run_command.side_effect = [(0, '', '')]
-
-        modprobe = Modprobe(module)
-        modprobe.unload_module()
+            modprobe = Modprobe(module)
+            modprobe.unload_module()
 
         assert modprobe.result == {
             'changed': True,
@@ -121,21 +118,20 @@ class TestUnloadModule(ModuleTestCase):
         }
 
     def test_unload_module_failure(self):
-        set_module_args(dict(
+        with set_module_args(dict(
             name='test',
             state='absent',
-        ))
+        )):
+            module = build_module()
 
-        module = build_module()
+            module.fail_json = Mock()
 
-        module.fail_json = Mock()
+            self.get_bin_path.side_effect = ['modprobe']
+            self.module_loaded.side_effect = [True]
+            self.run_command.side_effect = [(1, '', '')]
 
-        self.get_bin_path.side_effect = ['modprobe']
-        self.module_loaded.side_effect = [True]
-        self.run_command.side_effect = [(1, '', '')]
-
-        modprobe = Modprobe(module)
-        modprobe.unload_module()
+            modprobe = Modprobe(module)
+            modprobe.unload_module()
 
         dummy_result = {
             'changed': False,
@@ -151,7 +147,7 @@ class TestUnloadModule(ModuleTestCase):
 
 class TestModuleIsLoadedPersistently(ModuleTestCase):
     def setUp(self):
-        if (sys.version_info[0] == 3 and sys.version_info[1] < 7) or (sys.version_info[0] == 2 and sys.version_info[1] < 7):
+        if sys.version_info[0] == 3 and sys.version_info[1] < 7:
             self.skipTest("open_mock doesn't support readline in earlier python versions")
 
         super(TestModuleIsLoadedPersistently, self).setUp()
@@ -168,68 +164,65 @@ class TestModuleIsLoadedPersistently(ModuleTestCase):
 
     def test_module_is_loaded(self):
 
-        set_module_args(dict(
+        with set_module_args(dict(
             name='dummy',
             state='present',
             persistent='present'
-        ))
+        )):
+            module = build_module()
 
-        module = build_module()
+            self.get_bin_path.side_effect = ['modprobe']
 
-        self.get_bin_path.side_effect = ['modprobe']
+            modprobe = Modprobe(module)
+            with patch('ansible_collections.community.general.plugins.modules.modprobe.open', mock_open(read_data='dummy')) as mocked_file:
+                with patch('ansible_collections.community.general.plugins.modules.modprobe.Modprobe.modules_files'):
+                    modprobe.modules_files = ['/etc/modules-load.d/dummy.conf']
 
-        modprobe = Modprobe(module)
-        with patch('ansible_collections.community.general.plugins.modules.modprobe.open', mock_open(read_data='dummy')) as mocked_file:
-            with patch('ansible_collections.community.general.plugins.modules.modprobe.Modprobe.modules_files'):
-                modprobe.modules_files = ['/etc/modules-load.d/dummy.conf']
-
-                assert modprobe.module_is_loaded_persistently
+                    assert modprobe.module_is_loaded_persistently
 
         mocked_file.assert_called_once_with('/etc/modules-load.d/dummy.conf')
 
     def test_module_is_not_loaded_empty_file(self):
 
-        set_module_args(dict(
+        with set_module_args(dict(
             name='dummy',
             state='present',
             persistent='present'
-        ))
+        )):
+            module = build_module()
 
-        module = build_module()
+            self.get_bin_path.side_effect = ['modprobe']
 
-        self.get_bin_path.side_effect = ['modprobe']
+            modprobe = Modprobe(module)
+            with patch('ansible_collections.community.general.plugins.modules.modprobe.open', mock_open(read_data='')) as mocked_file:
+                with patch('ansible_collections.community.general.plugins.modules.modprobe.Modprobe.modules_files'):
+                    modprobe.modules_files = ['/etc/modules-load.d/dummy.conf']
 
-        modprobe = Modprobe(module)
-        with patch('ansible_collections.community.general.plugins.modules.modprobe.open', mock_open(read_data='')) as mocked_file:
-            with patch('ansible_collections.community.general.plugins.modules.modprobe.Modprobe.modules_files'):
-                modprobe.modules_files = ['/etc/modules-load.d/dummy.conf']
-
-                assert not modprobe.module_is_loaded_persistently
+                    assert not modprobe.module_is_loaded_persistently
 
         mocked_file.assert_called_once_with('/etc/modules-load.d/dummy.conf')
 
     def test_module_is_not_loaded_no_files(self):
 
-        set_module_args(dict(
+        with set_module_args(dict(
             name='dummy',
             state='present',
             persistent='present'
-        ))
+        )):
+            module = build_module()
 
-        module = build_module()
+            self.get_bin_path.side_effect = ['modprobe']
 
-        self.get_bin_path.side_effect = ['modprobe']
+            modprobe = Modprobe(module)
+            with patch('ansible_collections.community.general.plugins.modules.modprobe.Modprobe.modules_files'):
+                modprobe.modules_files = []
 
-        modprobe = Modprobe(module)
-        with patch('ansible_collections.community.general.plugins.modules.modprobe.Modprobe.modules_files'):
-            modprobe.modules_files = []
-
-            assert not modprobe.module_is_loaded_persistently
+                assert not modprobe.module_is_loaded_persistently
 
 
 class TestPermanentParams(ModuleTestCase):
     def setUp(self):
-        if (sys.version_info[0] == 3 and sys.version_info[1] < 7) or (sys.version_info[0] == 2 and sys.version_info[1] < 7):
+        if sys.version_info[0] == 3 and sys.version_info[1] < 7:
             self.skipTest("open_mock doesn't support readline in earlier python versions")
         super(TestPermanentParams, self).setUp()
 
@@ -251,24 +244,23 @@ class TestPermanentParams(ModuleTestCase):
         ]
         mock_files_content = [mock_open(read_data=content).return_value for content in files_content]
 
-        set_module_args(dict(
+        with set_module_args(dict(
             name='dummy',
             state='present',
             persistent='present'
-        ))
+        )):
+            module = build_module()
 
-        module = build_module()
+            self.get_bin_path.side_effect = ['modprobe']
 
-        self.get_bin_path.side_effect = ['modprobe']
+            modprobe = Modprobe(module)
 
-        modprobe = Modprobe(module)
+            with patch('ansible_collections.community.general.plugins.modules.modprobe.open', mock_open()) as mocked_file:
+                mocked_file.side_effect = mock_files_content
+                with patch('ansible_collections.community.general.plugins.modules.modprobe.Modprobe.modprobe_files'):
+                    modprobe.modprobe_files = ['/etc/modprobe.d/dummy1.conf', '/etc/modprobe.d/dummy2.conf']
 
-        with patch('ansible_collections.community.general.plugins.modules.modprobe.open', mock_open()) as mocked_file:
-            mocked_file.side_effect = mock_files_content
-            with patch('ansible_collections.community.general.plugins.modules.modprobe.Modprobe.modprobe_files'):
-                modprobe.modprobe_files = ['/etc/modprobe.d/dummy1.conf', '/etc/modprobe.d/dummy2.conf']
-
-                assert modprobe.permanent_params == set(['numdummies=4', 'dummy_parameter1=6', 'dummy_parameter2=5'])
+                    assert modprobe.permanent_params == set(['numdummies=4', 'dummy_parameter1=6', 'dummy_parameter2=5'])
 
     def test_module_permanent_params_empty(self):
 
@@ -278,24 +270,23 @@ class TestPermanentParams(ModuleTestCase):
         ]
         mock_files_content = [mock_open(read_data=content).return_value for content in files_content]
 
-        set_module_args(dict(
+        with set_module_args(dict(
             name='dummy',
             state='present',
             persistent='present'
-        ))
+        )):
+            module = build_module()
 
-        module = build_module()
+            self.get_bin_path.side_effect = ['modprobe']
 
-        self.get_bin_path.side_effect = ['modprobe']
+            modprobe = Modprobe(module)
 
-        modprobe = Modprobe(module)
+            with patch('ansible_collections.community.general.plugins.modules.modprobe.open', mock_open(read_data='')) as mocked_file:
+                mocked_file.side_effect = mock_files_content
+                with patch('ansible_collections.community.general.plugins.modules.modprobe.Modprobe.modprobe_files'):
+                    modprobe.modprobe_files = ['/etc/modprobe.d/dummy1.conf', '/etc/modprobe.d/dummy2.conf']
 
-        with patch('ansible_collections.community.general.plugins.modules.modprobe.open', mock_open(read_data='')) as mocked_file:
-            mocked_file.side_effect = mock_files_content
-            with patch('ansible_collections.community.general.plugins.modules.modprobe.Modprobe.modprobe_files'):
-                modprobe.modprobe_files = ['/etc/modprobe.d/dummy1.conf', '/etc/modprobe.d/dummy2.conf']
-
-                assert modprobe.permanent_params == set()
+                    assert modprobe.permanent_params == set()
 
 
 class TestCreateModuleFIle(ModuleTestCase):
@@ -314,22 +305,21 @@ class TestCreateModuleFIle(ModuleTestCase):
 
     def test_create_file(self):
 
-        set_module_args(dict(
+        with set_module_args(dict(
             name='dummy',
             state='present',
             persistent='present'
-        ))
+        )):
+            module = build_module()
 
-        module = build_module()
+            self.get_bin_path.side_effect = ['modprobe']
 
-        self.get_bin_path.side_effect = ['modprobe']
+            modprobe = Modprobe(module)
 
-        modprobe = Modprobe(module)
-
-        with patch('ansible_collections.community.general.plugins.modules.modprobe.open', mock_open()) as mocked_file:
-            modprobe.create_module_file()
-            mocked_file.assert_called_once_with('/etc/modules-load.d/dummy.conf', 'w')
-            mocked_file().write.assert_called_once_with('dummy\n')
+            with patch('ansible_collections.community.general.plugins.modules.modprobe.open', mock_open()) as mocked_file:
+                modprobe.create_module_file()
+                mocked_file.assert_called_once_with('/etc/modules-load.d/dummy.conf', 'w')
+                mocked_file().write.assert_called_once_with('dummy\n')
 
 
 class TestCreateModuleOptionsFIle(ModuleTestCase):
@@ -348,23 +338,22 @@ class TestCreateModuleOptionsFIle(ModuleTestCase):
 
     def test_create_file(self):
 
-        set_module_args(dict(
+        with set_module_args(dict(
             name='dummy',
             state='present',
             params='numdummies=4',
             persistent='present'
-        ))
+        )):
+            module = build_module()
 
-        module = build_module()
+            self.get_bin_path.side_effect = ['modprobe']
 
-        self.get_bin_path.side_effect = ['modprobe']
+            modprobe = Modprobe(module)
 
-        modprobe = Modprobe(module)
-
-        with patch('ansible_collections.community.general.plugins.modules.modprobe.open', mock_open()) as mocked_file:
-            modprobe.create_module_options_file()
-            mocked_file.assert_called_once_with('/etc/modprobe.d/dummy.conf', 'w')
-            mocked_file().write.assert_called_once_with('options dummy numdummies=4\n')
+            with patch('ansible_collections.community.general.plugins.modules.modprobe.open', mock_open()) as mocked_file:
+                modprobe.create_module_options_file()
+                mocked_file.assert_called_once_with('/etc/modprobe.d/dummy.conf', 'w')
+                mocked_file().write.assert_called_once_with('options dummy numdummies=4\n')
 
 
 class TestDisableOldParams(ModuleTestCase):
@@ -384,47 +373,45 @@ class TestDisableOldParams(ModuleTestCase):
     def test_disable_old_params_file_changed(self):
         mock_data = 'options dummy numdummies=4'
 
-        set_module_args(dict(
+        with set_module_args(dict(
             name='dummy',
             state='present',
             params='numdummies=4',
             persistent='present'
-        ))
+        )):
+            module = build_module()
 
-        module = build_module()
+            self.get_bin_path.side_effect = ['modprobe']
 
-        self.get_bin_path.side_effect = ['modprobe']
+            modprobe = Modprobe(module)
 
-        modprobe = Modprobe(module)
-
-        with patch('ansible_collections.community.general.plugins.modules.modprobe.open', mock_open(read_data=mock_data)) as mocked_file:
-            with patch('ansible_collections.community.general.plugins.modules.modprobe.Modprobe.modprobe_files'):
-                modprobe.modprobe_files = ['/etc/modprobe.d/dummy1.conf']
-                modprobe.disable_old_params()
-                mocked_file.assert_called_with('/etc/modprobe.d/dummy1.conf', 'w')
-                mocked_file().write.assert_called_once_with('#options dummy numdummies=4')
+            with patch('ansible_collections.community.general.plugins.modules.modprobe.open', mock_open(read_data=mock_data)) as mocked_file:
+                with patch('ansible_collections.community.general.plugins.modules.modprobe.Modprobe.modprobe_files'):
+                    modprobe.modprobe_files = ['/etc/modprobe.d/dummy1.conf']
+                    modprobe.disable_old_params()
+                    mocked_file.assert_called_with('/etc/modprobe.d/dummy1.conf', 'w')
+                    mocked_file().write.assert_called_once_with('#options dummy numdummies=4')
 
     def test_disable_old_params_file_unchanged(self):
         mock_data = 'options notdummy numdummies=4'
 
-        set_module_args(dict(
+        with set_module_args(dict(
             name='dummy',
             state='present',
             params='numdummies=4',
             persistent='present'
-        ))
+        )):
+            module = build_module()
 
-        module = build_module()
+            self.get_bin_path.side_effect = ['modprobe']
 
-        self.get_bin_path.side_effect = ['modprobe']
+            modprobe = Modprobe(module)
 
-        modprobe = Modprobe(module)
-
-        with patch('ansible_collections.community.general.plugins.modules.modprobe.open', mock_open(read_data=mock_data)) as mocked_file:
-            with patch('ansible_collections.community.general.plugins.modules.modprobe.Modprobe.modprobe_files'):
-                modprobe.modprobe_files = ['/etc/modprobe.d/dummy1.conf']
-                modprobe.disable_old_params()
-                mocked_file.assert_called_once_with('/etc/modprobe.d/dummy1.conf')
+            with patch('ansible_collections.community.general.plugins.modules.modprobe.open', mock_open(read_data=mock_data)) as mocked_file:
+                with patch('ansible_collections.community.general.plugins.modules.modprobe.Modprobe.modprobe_files'):
+                    modprobe.modprobe_files = ['/etc/modprobe.d/dummy1.conf']
+                    modprobe.disable_old_params()
+                    mocked_file.assert_called_once_with('/etc/modprobe.d/dummy1.conf')
 
 
 class TestDisableModulePermanent(ModuleTestCase):
@@ -443,43 +430,41 @@ class TestDisableModulePermanent(ModuleTestCase):
 
     def test_disable_module_permanent_file_changed(self):
 
-        set_module_args(dict(
+        with set_module_args(dict(
             name='dummy',
             state='present',
             params='numdummies=4',
             persistent='present'
-        ))
+        )):
+            module = build_module()
 
-        module = build_module()
+            self.get_bin_path.side_effect = ['modprobe']
 
-        self.get_bin_path.side_effect = ['modprobe']
+            modprobe = Modprobe(module)
 
-        modprobe = Modprobe(module)
-
-        with patch('ansible_collections.community.general.plugins.modules.modprobe.open', mock_open(read_data='dummy')) as mocked_file:
-            with patch('ansible_collections.community.general.plugins.modules.modprobe.Modprobe.modules_files'):
-                modprobe.modules_files = ['/etc/modules-load.d/dummy.conf']
-                modprobe.disable_module_permanent()
-                mocked_file.assert_called_with('/etc/modules-load.d/dummy.conf', 'w')
-                mocked_file().write.assert_called_once_with('#dummy')
+            with patch('ansible_collections.community.general.plugins.modules.modprobe.open', mock_open(read_data='dummy')) as mocked_file:
+                with patch('ansible_collections.community.general.plugins.modules.modprobe.Modprobe.modules_files'):
+                    modprobe.modules_files = ['/etc/modules-load.d/dummy.conf']
+                    modprobe.disable_module_permanent()
+                    mocked_file.assert_called_with('/etc/modules-load.d/dummy.conf', 'w')
+                    mocked_file().write.assert_called_once_with('#dummy')
 
     def test_disable_module_permanent_file_unchanged(self):
 
-        set_module_args(dict(
+        with set_module_args(dict(
             name='dummy',
             state='present',
             params='numdummies=4',
             persistent='present'
-        ))
+        )):
+            module = build_module()
 
-        module = build_module()
+            self.get_bin_path.side_effect = ['modprobe']
 
-        self.get_bin_path.side_effect = ['modprobe']
+            modprobe = Modprobe(module)
 
-        modprobe = Modprobe(module)
-
-        with patch('ansible_collections.community.general.plugins.modules.modprobe.open', mock_open(read_data='notdummy')) as mocked_file:
-            with patch('ansible_collections.community.general.plugins.modules.modprobe.Modprobe.modules_files'):
-                modprobe.modules_files = ['/etc/modules-load.d/dummy.conf']
-                modprobe.disable_module_permanent()
-                mocked_file.assert_called_once_with('/etc/modules-load.d/dummy.conf')
+            with patch('ansible_collections.community.general.plugins.modules.modprobe.open', mock_open(read_data='notdummy')) as mocked_file:
+                with patch('ansible_collections.community.general.plugins.modules.modprobe.Modprobe.modules_files'):
+                    modprobe.modules_files = ['/etc/modules-load.d/dummy.conf']
+                    modprobe.disable_module_permanent()
+                    mocked_file.assert_called_once_with('/etc/modules-load.d/dummy.conf')

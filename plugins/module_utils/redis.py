@@ -57,7 +57,9 @@ def redis_auth_argument_spec(tls_default=True):
         validate_certs=dict(type='bool',
                             default=True
                             ),
-        ca_certs=dict(type='str')
+        ca_certs=dict(type='str'),
+        client_cert_file=dict(type='str'),
+        client_key_file=dict(type='str'),
     )
 
 
@@ -71,6 +73,8 @@ def redis_auth_params(module):
     ca_certs = module.params['ca_certs']
     if tls and ca_certs is None:
         ca_certs = str(certifi.where())
+    client_cert_file = module.params['client_cert_file']
+    client_key_file = module.params['client_key_file']
     if tuple(map(int, redis_version.split('.'))) < (3, 4, 0) and login_user is not None:
         module.fail_json(
             msg='The option `username` in only supported with redis >= 3.4.0.')
@@ -78,6 +82,8 @@ def redis_auth_params(module):
               'port': login_port,
               'password': login_password,
               'ssl_ca_certs': ca_certs,
+              'ssl_certfile': client_cert_file,
+              'ssl_keyfile': client_key_file,
               'ssl_cert_reqs': validate_certs,
               'ssl': tls}
     if login_user is not None:

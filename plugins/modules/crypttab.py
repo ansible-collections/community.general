@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: crypttab
 short_description: Encrypted Linux block devices
 description:
@@ -24,31 +23,27 @@ attributes:
 options:
   name:
     description:
-      - Name of the encrypted block device as it appears in the C(/etc/crypttab) file, or
-        optionally prefixed with V(/dev/mapper/), as it appears in the filesystem. V(/dev/mapper/)
-        will be stripped from O(name).
+      - Name of the encrypted block device as it appears in the C(/etc/crypttab) file, or optionally prefixed with V(/dev/mapper/),
+        as it appears in the filesystem. V(/dev/mapper/) will be stripped from O(name).
     type: str
     required: true
   state:
     description:
-      - Use V(present) to add a line to C(/etc/crypttab) or update its definition
-        if already present.
+      - Use V(present) to add a line to C(/etc/crypttab) or update its definition if already present.
       - Use V(absent) to remove a line with matching O(name).
-      - Use V(opts_present) to add options to those already present; options with
-        different values will be updated.
+      - Use V(opts_present) to add options to those already present; options with different values will be updated.
       - Use V(opts_absent) to remove options from the existing set.
     type: str
     required: true
-    choices: [ absent, opts_absent, opts_present, present ]
+    choices: [absent, opts_absent, opts_present, present]
   backing_device:
     description:
-      - Path to the underlying block device or file, or the UUID of a block-device
-        prefixed with V(UUID=).
+      - Path to the underlying block device or file, or the UUID of a block-device prefixed with V(UUID=).
     type: str
   password:
     description:
-      - Encryption password, the path to a file containing the password, or
-        V(-) or unset if the password should be entered at boot.
+      - Encryption password, the path to a file containing the password, or V(-) or unset if the password should be entered
+        at boot.
     type: path
   opts:
     description:
@@ -61,10 +56,10 @@ options:
     type: path
     default: /etc/crypttab
 author:
-- Steve (@groks)
-'''
+  - Steve (@groks)
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Set the options explicitly a device which must already exist
   community.general.crypttab:
     name: luks-home
@@ -77,8 +72,8 @@ EXAMPLES = r'''
     state: opts_present
     opts: discard
   loop: '{{ ansible_mounts }}'
-  when: "'/dev/mapper/luks-' in {{ item.device }}"
-'''
+  when: "'/dev/mapper/luks-' in item.device"
+"""
 
 import os
 import traceback
@@ -121,7 +116,7 @@ def main():
                           ('backing_device', backing_device),
                           ('password', password),
                           ('opts', opts)):
-        if (arg is not None and (' ' in arg or '\t' in arg or arg == '')):
+        if arg is not None and (' ' in arg or '\t' in arg or arg == ''):
             module.fail_json(msg="invalid '%s': contains white space or is empty" % arg_name,
                              **module.params)
 
@@ -159,11 +154,8 @@ def main():
             changed, reason = existing_line.opts.remove(opts)
 
     if changed and not module.check_mode:
-        try:
-            f = open(path, 'wb')
+        with open(path, 'wb') as f:
             f.write(to_bytes(crypttab, errors='surrogate_or_strict'))
-        finally:
-            f.close()
 
     module.exit_json(changed=changed, msg=reason, **module.params)
 
@@ -178,12 +170,9 @@ class Crypttab(object):
                 os.makedirs(os.path.dirname(path))
             open(path, 'a').close()
 
-        try:
-            f = open(path, 'r')
+        with open(path, 'r') as f:
             for line in f.readlines():
                 self._lines.append(Line(line))
-        finally:
-            f.close()
 
     def add(self, line):
         self._lines.append(line)

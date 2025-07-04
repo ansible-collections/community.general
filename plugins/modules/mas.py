@@ -10,54 +10,54 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: mas
 short_description: Manage Mac App Store applications with mas-cli
 description:
-    - Installs, uninstalls and updates macOS applications from the Mac App Store using the C(mas-cli).
+  - Installs, uninstalls and updates macOS applications from the Mac App Store using the C(mas-cli).
 version_added: '0.2.0'
 author:
-    - Michael Heap (@mheap)
-    - Lukas Bestle (@lukasbestle)
+  - Michael Heap (@mheap)
+  - Lukas Bestle (@lukasbestle)
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    id:
-        description:
-            - The Mac App Store identifier of the app(s) you want to manage.
-            - This can be found by running C(mas search APP_NAME) on your machine.
-        type: list
-        elements: int
-    state:
-        description:
-            - Desired state of the app installation.
-            - The V(absent) value requires root permissions, also see the examples.
-        type: str
-        choices:
-            - absent
-            - latest
-            - present
-        default: present
-    upgrade_all:
-        description:
-            - Upgrade all installed Mac App Store apps.
-        type: bool
-        default: false
-        aliases: ["upgrade"]
+  id:
+    description:
+      - The Mac App Store identifier of the app(s) you want to manage.
+      - This can be found by running C(mas search APP_NAME) on your machine.
+    type: list
+    elements: int
+  state:
+    description:
+      - Desired state of the app installation.
+      - The V(absent) value requires root permissions, also see the examples.
+    type: str
+    choices:
+      - absent
+      - latest
+      - present
+    default: present
+  upgrade_all:
+    description:
+      - Upgrade all installed Mac App Store apps.
+    type: bool
+    default: false
+    aliases: ["upgrade"]
 requirements:
-    - macOS 10.11+
-    - "mas-cli (U(https://github.com/mas-cli/mas)) 1.5.0+ available as C(mas) in the bin path"
-    - The Apple ID to use already needs to be signed in to the Mac App Store (check with C(mas account)).
-    - The feature of "checking if user is signed in" is disabled for anyone using macOS 12.0+.
-    - Users need to sign in via the Mac App Store GUI beforehand for anyone using macOS 12.0+ due to U(https://github.com/mas-cli/mas/issues/417).
-'''
+  - macOS 10.11 or higher.
+  - "mas-cli (U(https://github.com/mas-cli/mas)) 1.5.0+ available as C(mas) in the bin path"
+  - The Apple ID to use already needs to be signed in to the Mac App Store (check with C(mas account)).
+  - The feature of "checking if user is signed in" is disabled for anyone using macOS 12.0+.
+  - Users need to sign in to the Mac App Store GUI beforehand for anyone using macOS 12.0+ due to U(https://github.com/mas-cli/mas/issues/417).
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Install Keynote
   community.general.mas:
     id: 409183694
@@ -99,9 +99,9 @@ EXAMPLES = '''
     id: 413857545
     state: absent
   become: true # Uninstallation requires root permissions
-'''
+"""
 
-RETURN = r''' # '''
+RETURN = r""" # """
 
 from ansible.module_utils.basic import AnsibleModule
 import os

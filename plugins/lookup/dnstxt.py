@@ -6,30 +6,30 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    name: dnstxt
-    author: Jan-Piet Mens (@jpmens) <jpmens(at)gmail.com>
-    short_description: query a domain(s)'s DNS txt fields
-    requirements:
-      - dns/dns.resolver (python library)
+DOCUMENTATION = r"""
+name: dnstxt
+author: Jan-Piet Mens (@jpmens) <jpmens(at)gmail.com>
+short_description: Query a domain(s)'s DNS txt fields
+requirements:
+  - dns/dns.resolver (python library)
+description:
+  - Uses a python library to return the DNS TXT record for a domain.
+options:
+  _terms:
+    description: Domain or list of domains to query TXT records from.
+    required: true
+    type: list
+    elements: string
+  real_empty:
     description:
-      - Uses a python library to return the DNS TXT record for a domain.
-    options:
-      _terms:
-        description: domain or list of domains to query TXT records from
-        required: true
-        type: list
-        elements: string
-      real_empty:
-        description:
-          - Return empty result without empty strings, and return empty list instead of V(NXDOMAIN).
-          - The default for this option will likely change to V(true) in the future.
-        default: false
-        type: bool
-        version_added: 6.0.0
-'''
+      - Return empty result without empty strings, and return empty list instead of V(NXDOMAIN).
+      - The default for this option is likely to change to V(true) in the future.
+    default: false
+    type: bool
+    version_added: 6.0.0
+"""
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: show txt entry
   ansible.builtin.debug:
     msg: "{{lookup('community.general.dnstxt', ['test.example.com'])}}"
@@ -48,11 +48,11 @@ EXAMPLES = """
   with_community.general.dnstxt: "{{lookup('community.general.dnstxt', ['test.example.com']).split(',')}}"
 """
 
-RETURN = """
-  _list:
-    description:
-      - values returned by the DNS TXT record.
-    type: list
+RETURN = r"""
+_list:
+  description:
+    - Values returned by the DNS TXT record.
+  type: list
 """
 
 HAVE_DNS = False
@@ -64,7 +64,6 @@ except ImportError:
     pass
 
 from ansible.errors import AnsibleError
-from ansible.module_utils.common.text.converters import to_native
 from ansible.plugins.lookup import LookupBase
 
 # ==============================================================
@@ -108,7 +107,7 @@ class LookupModule(LookupBase):
                     continue
                 string = ''
             except DNSException as e:
-                raise AnsibleError("dns.resolver unhandled exception %s" % to_native(e))
+                raise AnsibleError(f"dns.resolver unhandled exception {e}")
 
             ret.append(''.join(string))
 

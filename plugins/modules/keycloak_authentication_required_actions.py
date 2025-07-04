@@ -9,81 +9,82 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: keycloak_authentication_required_actions
 
 short_description: Allows administration of Keycloak authentication required actions
 
 description:
-    - This module can register, update and delete required actions.
-    - It also filters out any duplicate required actions by their alias. The first occurrence is preserved.
-
+  - This module can register, update and delete required actions.
+  - It also filters out any duplicate required actions by their alias. The first occurrence is preserved.
 version_added: 7.1.0
 
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: full
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
+  action_group:
+    version_added: 10.2.0
 
 options:
-    realm:
+  realm:
+    description:
+      - The name of the realm in which are the authentication required actions.
+    required: true
+    type: str
+  required_actions:
+    elements: dict
+    description:
+      - Authentication required action.
+    suboptions:
+      alias:
         description:
-            - The name of the realm in which are the authentication required actions.
+          - Unique name of the required action.
         required: true
         type: str
-    required_actions:
-        elements: dict
+      config:
         description:
-            - Authentication required action.
-        suboptions:
-            alias:
-                description:
-                    - Unique name of the required action.
-                required: true
-                type: str
-            config:
-                description:
-                    - Configuration for the required action.
-                type: dict
-            defaultAction:
-                description:
-                    - Indicates, if any new user will have the required action assigned to it.
-                type: bool
-            enabled:
-                description:
-                    - Indicates, if the required action is enabled or not.
-                type: bool
-            name:
-                description:
-                    - Displayed name of the required action. Required for registration.
-                type: str
-            priority:
-                description:
-                    - Priority of the required action.
-                type: int
-            providerId:
-                description:
-                    - Provider ID of the required action. Required for registration.
-                type: str
-        type: list
-    state:
-        choices: [ "absent", "present" ]
+          - Configuration for the required action.
+        type: dict
+      defaultAction:
         description:
-            - Control if the realm authentication required actions are going to be registered/updated (V(present)) or deleted (V(absent)).
-        required: true
+          - Indicates, if any new user will have the required action assigned to it.
+        type: bool
+      enabled:
+        description:
+          - Indicates, if the required action is enabled or not.
+        type: bool
+      name:
+        description:
+          - Displayed name of the required action. Required for registration.
         type: str
+      priority:
+        description:
+          - Priority of the required action.
+        type: int
+      providerId:
+        description:
+          - Provider ID of the required action. Required for registration.
+        type: str
+    type: list
+  state:
+    choices: ["absent", "present"]
+    description:
+      - Control if the realm authentication required actions are going to be registered/updated (V(present)) or deleted (V(absent)).
+    required: true
+    type: str
 
 extends_documentation_fragment:
-    - community.general.keycloak
-    - community.general.attributes
+  - community.general.keycloak
+  - community.general.keycloak.actiongroup_keycloak
+  - community.general.attributes
 
 author:
-    - Skrekulko (@Skrekulko)
-'''
+  - Skrekulko (@Skrekulko)
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Register a new required action.
   community.general.keycloak_authentication_required_actions:
     auth_client_id: "admin-cli"
@@ -123,56 +124,55 @@ EXAMPLES = '''
     required_action:
       - alias: "TERMS_AND_CONDITIONS"
     state: "absent"
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 msg:
-    description: Message as to what action was taken.
-    returned: always
-    type: str
+  description: Message as to what action was taken.
+  returned: always
+  type: str
 
 end_state:
-    description: Representation of the authentication required actions after module execution.
-    returned: on success
-    type: complex
-    contains:
-        alias:
-            description:
-                - Unique name of the required action.
-            sample: test-provider-id
-            type: str
-        config:
-            description:
-                - Configuration for the required action.
-            sample: {}
-            type: dict
-        defaultAction:
-            description:
-                - Indicates, if any new user will have the required action assigned to it.
-            sample: false
-            type: bool
-        enabled:
-            description:
-                - Indicates, if the required action is enabled or not.
-            sample: false
-            type: bool
-        name:
-            description:
-                - Displayed name of the required action. Required for registration.
-            sample: Test provider ID
-            type: str
-        priority:
-            description:
-                - Priority of the required action.
-            sample: 90
-            type: int
-        providerId:
-            description:
-                - Provider ID of the required action. Required for registration.
-            sample: test-provider-id
-            type: str
-
-'''
+  description: Representation of the authentication required actions after module execution.
+  returned: on success
+  type: complex
+  contains:
+    alias:
+      description:
+        - Unique name of the required action.
+      sample: test-provider-id
+      type: str
+    config:
+      description:
+        - Configuration for the required action.
+      sample: {}
+      type: dict
+    defaultAction:
+      description:
+        - Indicates, if any new user will have the required action assigned to it.
+      sample: false
+      type: bool
+    enabled:
+      description:
+        - Indicates, if the required action is enabled or not.
+      sample: false
+      type: bool
+    name:
+      description:
+        - Displayed name of the required action. Required for registration.
+      sample: Test provider ID
+      type: str
+    priority:
+      description:
+        - Priority of the required action.
+      sample: 90
+      type: int
+    providerId:
+      description:
+        - Provider ID of the required action. Required for registration.
+      sample: test-provider-id
+      type: str
+"""
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, \
     keycloak_argument_spec, get_token, KeycloakError
@@ -237,8 +237,9 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
-        required_one_of=([['token', 'auth_realm', 'auth_username', 'auth_password']]),
-        required_together=([['auth_realm', 'auth_username', 'auth_password']])
+        required_one_of=([['token', 'auth_realm', 'auth_username', 'auth_password', 'auth_client_id', 'auth_client_secret']]),
+        required_together=([['auth_username', 'auth_password']]),
+        required_by={'refresh_token': 'auth_realm'},
     )
 
     result = dict(changed=False, msg='', end_state={}, diff=dict(before={}, after={}))

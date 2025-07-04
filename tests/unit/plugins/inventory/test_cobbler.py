@@ -16,11 +16,6 @@ def inventory():
     return InventoryModule()
 
 
-def test_init_cache(inventory):
-    inventory._init_cache()
-    assert inventory._cache[inventory.cache_key] == {}
-
-
 def test_verify_file(tmp_path, inventory):
     file = tmp_path / "foobar.cobbler.yml"
     file.touch()

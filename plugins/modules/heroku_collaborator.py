@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: heroku_collaborator
 short_description: Add or delete app collaborators on Heroku
 description:
@@ -32,35 +31,35 @@ options:
   api_key:
     type: str
     description:
-      - Heroku API key
+      - Heroku API key.
   apps:
     type: list
     elements: str
     description:
-      - List of Heroku App names
+      - List of Heroku App names.
     required: true
   suppress_invitation:
     description:
-      - Suppress email invitation when creating collaborator
+      - Suppress email invitation when creating collaborator.
     type: bool
     default: false
   user:
     type: str
     description:
-      - User ID or e-mail
+      - User ID or e-mail.
     required: true
   state:
     type: str
     description:
-      - Create or remove the heroku collaborator
+      - Create or remove the heroku collaborator.
     choices: ["present", "absent"]
     default: "present"
 notes:
   - E(HEROKU_API_KEY) and E(TF_VAR_HEROKU_API_KEY) environment variables can be used instead setting O(api_key).
-  - If you use C(check_mode), you can also pass the C(-v) flag to see affected apps in C(msg), e.g. ["heroku-example-app"].
-'''
+  - If you use C(check_mode), you can also pass the C(-v) flag to see affected apps in C(msg), for example C(["heroku-example-app"]).
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a heroku collaborator
   community.general.heroku_collaborator:
     api_key: YOUR_API_KEY
@@ -76,12 +75,12 @@ EXAMPLES = '''
     suppress_invitation: '{{ item.suppress_invitation | default(suppress_invitation) }}'
     state: '{{ item.state | default("present") }}'
   with_items:
-    - { user: 'a.b@example.com' }
-    - { state: 'absent', user: 'b.c@example.com', suppress_invitation: false }
-    - { user: 'x.y@example.com', apps: ["heroku-example-app"] }
-'''
+    - {user: 'a.b@example.com'}
+    - {state: 'absent', user: 'b.c@example.com', suppress_invitation: false}
+    - {user: 'x.y@example.com', apps: ["heroku-example-app"]}
+"""
 
-RETURN = ''' # '''
+RETURN = """ # """
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.heroku import HerokuHelper

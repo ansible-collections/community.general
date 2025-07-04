@@ -9,8 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: vertica_info
 short_description: Gathers Vertica database facts
 description:
@@ -25,8 +24,7 @@ options:
     default: localhost
     type: str
   port:
-    description:
-      Database port to connect to.
+    description: Database port to connect to.
     default: '5433'
     type: str
   db:
@@ -43,19 +41,17 @@ options:
       - The password used to authenticate with.
     type: str
 notes:
-  - The default authentication assumes that you are either logging in as or sudo'ing
-    to the C(dbadmin) account on the host.
-  - This module uses C(pyodbc), a Python ODBC database adapter. You must ensure
-    that C(unixODBC) and C(pyodbc) are installed on the host and properly configured.
-  - Configuring C(unixODBC) for Vertica requires C(Driver = /opt/vertica/lib64/libverticaodbc.so)
-    to be added to the C(Vertica) section of either C(/etc/odbcinst.ini) or C($HOME/.odbcinst.ini)
-    and both C(ErrorMessagesPath = /opt/vertica/lib64) and C(DriverManagerEncoding = UTF-16)
-    to be added to the C(Driver) section of either C(/etc/vertica.ini) or C($HOME/.vertica.ini).
-requirements: [ 'unixODBC', 'pyodbc' ]
+  - The default authentication assumes that you are either logging in as or sudo'ing to the C(dbadmin) account on the host.
+  - This module uses C(pyodbc), a Python ODBC database adapter. You must ensure that C(unixODBC) and C(pyodbc) are installed
+    on the host and properly configured.
+  - Configuring C(unixODBC) for Vertica requires C(Driver = /opt/vertica/lib64/libverticaodbc.so) to be added to the C(Vertica)
+    section of either C(/etc/odbcinst.ini) or C($HOME/.odbcinst.ini) and both C(ErrorMessagesPath = /opt/vertica/lib64) and
+    C(DriverManagerEncoding = UTF-16) to be added to the C(Driver) section of either C(/etc/vertica.ini) or C($HOME/.vertica.ini).
+requirements: ['unixODBC', 'pyodbc']
 author: "Dariusz Owczarek (@dareko)"
-'''
+"""
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Gathering vertica facts
   community.general.vertica_info: db=db_name
   register: result

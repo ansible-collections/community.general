@@ -8,8 +8,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: scaleway_volume_info
 short_description: Gather information about the Scaleway volumes available
 description:
@@ -37,9 +36,9 @@ options:
       - EMEA-FR-PAR2
       - waw1
       - EMEA-PL-WAW1
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Gather Scaleway volumes information
   community.general.scaleway_volume_info:
     region: par1
@@ -47,33 +46,32 @@ EXAMPLES = r'''
 
 - ansible.builtin.debug:
     msg: "{{ result.scaleway_volume_info }}"
-'''
+"""
 
-RETURN = r'''
----
+RETURN = r"""
 scaleway_volume_info:
   description:
     - Response from Scaleway API.
-    - "For more details please refer to: U(https://developers.scaleway.com/en/products/instance/api/)."
+    - 'For more details please refer to: U(https://developers.scaleway.com/en/products/instance/api/).'
   returned: success
   type: list
   elements: dict
   sample:
     "scaleway_volume_info": [
-        {
-            "creation_date": "2018-08-14T20:56:24.949660+00:00",
-            "export_uri": null,
-            "id": "b8d51a06-daeb-4fef-9539-a8aea016c1ba",
-            "modification_date": "2018-08-14T20:56:24.949660+00:00",
-            "name": "test-volume",
-            "organization": "3f709602-5e6c-4619-b80c-e841c89734af",
-            "server": null,
-            "size": 50000000000,
-            "state": "available",
-            "volume_type": "l_ssd"
-        }
+      {
+        "creation_date": "2018-08-14T20:56:24.949660+00:00",
+        "export_uri": null,
+        "id": "b8d51a06-daeb-4fef-9539-a8aea016c1ba",
+        "modification_date": "2018-08-14T20:56:24.949660+00:00",
+        "name": "test-volume",
+        "organization": "3f709602-5e6c-4619-b80c-e841c89734af",
+        "server": null,
+        "size": 50000000000,
+        "state": "available",
+        "volume_type": "l_ssd"
+      }
     ]
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.scaleway import (

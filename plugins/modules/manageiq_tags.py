@@ -9,8 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
-
+DOCUMENTATION = r"""
 module: manageiq_tags
 
 short_description: Management of resource tags in ManageIQ
@@ -21,7 +20,6 @@ extends_documentation_fragment:
 author: Daniel Korn (@dkorn)
 description:
   - The manageiq_tags module supports adding, updating and deleting tags in ManageIQ.
-
 attributes:
   check_mode:
     support: none
@@ -32,7 +30,7 @@ options:
   state:
     type: str
     description:
-      - V(absent) - tags should not exist.
+      - V(absent) - tags should not exist,
       - V(present) - tags should exist.
     choices: ['absent', 'present']
     default: 'present'
@@ -47,9 +45,21 @@ options:
     description:
       - The relevant resource type in manageiq.
     required: true
-    choices: ['provider', 'host', 'vm', 'blueprint', 'category', 'cluster',
-        'data store', 'group', 'resource pool', 'service', 'service template',
-        'template', 'tenant', 'user']
+    choices:
+      - provider
+      - host
+      - vm
+      - blueprint
+      - category
+      - cluster
+      - data store
+      - group
+      - resource pool
+      - service
+      - service template
+      - template
+      - tenant
+      - user
   resource_name:
     type: str
     description:
@@ -61,38 +71,38 @@ options:
       - Must be specified if O(resource_name) is not set. Both options are mutually exclusive.
     type: int
     version_added: 2.2.0
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create new tags for a provider in ManageIQ.
   community.general.manageiq_tags:
     resource_name: 'EngLab'
     resource_type: 'provider'
     tags:
-    - category: environment
-      name: prod
-    - category: owner
-      name: prod_ops
+      - category: environment
+        name: prod
+      - category: owner
+        name: prod_ops
     manageiq_connection:
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false  # only do this when connecting to localhost!
+      validate_certs: false # only do this when connecting to localhost!
 
 - name: Create new tags for a provider in ManageIQ.
   community.general.manageiq_tags:
     resource_id: 23000000790497
     resource_type: 'provider'
     tags:
-    - category: environment
-      name: prod
-    - category: owner
-      name: prod_ops
+      - category: environment
+        name: prod
+      - category: owner
+        name: prod_ops
     manageiq_connection:
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false  # only do this when connecting to localhost!
+      validate_certs: false # only do this when connecting to localhost!
 
 - name: Remove tags for a provider in ManageIQ.
   community.general.manageiq_tags:
@@ -100,19 +110,19 @@ EXAMPLES = '''
     resource_name: 'EngLab'
     resource_type: 'provider'
     tags:
-    - category: environment
-      name: prod
-    - category: owner
-      name: prod_ops
+      - category: environment
+        name: prod
+      - category: owner
+        name: prod_ops
     manageiq_connection:
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false  # only do this when connecting to localhost!
-'''
+      validate_certs: false # only do this when connecting to localhost!
+"""
 
-RETURN = '''
-'''
+RETURN = r"""
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.manageiq import (

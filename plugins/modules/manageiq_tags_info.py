@@ -9,8 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
-
+DOCUMENTATION = r"""
 module: manageiq_tags_info
 version_added: 5.8.0
 short_description: Retrieve resource tags in ManageIQ
@@ -22,16 +21,27 @@ extends_documentation_fragment:
 author: Alexei Znamensky (@russoz)
 description:
   - This module supports retrieving resource tags from ManageIQ.
-
 options:
   resource_type:
     type: str
     description:
       - The relevant resource type in ManageIQ.
     required: true
-    choices: ['provider', 'host', 'vm', 'blueprint', 'category', 'cluster',
-        'data store', 'group', 'resource pool', 'service', 'service template',
-        'template', 'tenant', 'user']
+    choices:
+      - provider
+      - host
+      - vm
+      - blueprint
+      - category
+      - cluster
+      - data store
+      - group
+      - resource pool
+      - service
+      - service template
+      - template
+      - tenant
+      - user
   resource_name:
     type: str
     description:
@@ -42,9 +52,9 @@ options:
       - The ID of the resource at which tags will be controlled.
       - Must be specified if O(resource_name) is not set. Both options are mutually exclusive.
     type: int
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: List current tags for a provider in ManageIQ.
   community.general.manageiq_tags_info:
     resource_name: 'EngLab'
@@ -54,15 +64,15 @@ EXAMPLES = '''
       username: 'admin'
       password: 'smartvm'
   register: result
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 tags:
   description: List of tags associated with the resource.
   returned: on success
   type: list
   elements: dict
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.manageiq import (

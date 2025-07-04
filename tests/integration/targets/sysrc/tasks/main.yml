@@ -140,11 +140,13 @@
     - name: Test within jail
       #
       # NOTE: currently fails with FreeBSD 12 with minor version less than 4
-      # NOTE: currently fails with FreeBSD 13 with minor version less than 2
+      # NOTE: currently fails with FreeBSD 13 with minor version less than 4
+      # NOTE: currently fails with FreeBSD 14 with minor version less than 2
       #
       when: >-
         ansible_distribution_version is version('12.4', '>=') and ansible_distribution_version is version('13', '<')
-        or ansible_distribution_version is version('13.2', '>=')
+        or ansible_distribution_version is version('13.4', '>=') and ansible_distribution_version is version('14', '<')
+        or ansible_distribution_version is version('14.2', '>=')
       block:
         - name: Setup testjail
           include_tasks: setup-testjail.yml
@@ -331,7 +333,44 @@
           - not sysrc_value_absent_idempotent.changed
           - "'sysrc_delim=\"t1,t2\"' in sysrc_delim_content.stdout_lines"
           - "'sysrc_delim_delete' not in sysrc_delim_content.stdout_lines"
+
+    ##
+    ## sysrc - value contains equals sign
+    ##
+    - name: Value contains equals sign
+      vars:
+        value_1: "-u spamd -x --allow-tell --max-spare=1 --listen=*"
+        value_2: "-u spamd -x --allow-tell --max-spare=1 --listen=localhost"
+      block:
+
+        - name: Add spamd_flags
+          sysrc:
+            name: spamd_flags
+            value: "{{ value_1 }}"
+          register: sysrc_equals_sign_1
+
+        - name: Change spamd_flags
+          sysrc:
+            name: spamd_flags
+            value: "{{ value_2 }}"
+          register: sysrc_equals_sign_2
+
+        - name: Get file content
+          command: sysrc -a
+          register: sysrc_content
+
+        - name: Ensure sysrc did as intended with values that contains equals sign
+          vars:
+            conf: "{{ sysrc_content.stdout | from_yaml }}"
+          assert:
+            that:
+              - "value_1 == sysrc_equals_sign_1.value"
+              - sysrc_equals_sign_2.changed
+              - "value_2 == sysrc_equals_sign_2.value"
+              - "value_2 == conf.spamd_flags"
+
   always:
+
     - name: Restore /etc/rc.conf
       copy:
         content: "{{ cached_etc_rcconf_content }}"

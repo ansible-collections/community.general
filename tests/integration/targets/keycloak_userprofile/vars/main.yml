@@ -1,0 +1,111 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+url: http://localhost:8080/auth
+admin_realm: master
+admin_user: admin
+admin_password: password
+realm: realm_userprofile_test
+attributes_default:
+  - name: username
+    displayName: ${username}
+    validations:
+      length:
+        min: 3
+        max: 255
+      usernameProhibitedCharacters: {}
+      up_username_not_idn_homograph: {}
+    annotations: {}
+    permissions:
+      view:
+        - admin
+        - user
+      edit: []
+    multivalued: false
+  - name: email
+    displayName: ${email}
+    validations:
+      email: {}
+      length:
+        max: 255
+    annotations: {}
+    required:
+      roles:
+        - user
+    permissions:
+      view:
+        - admin
+        - user
+      edit: []
+    multivalued: false
+  - name: firstName
+    displayName: ${firstName}
+    validations:
+      length:
+        max: 255
+      personNameProhibitedCharacters: {}
+    annotations: {}
+    required:
+      roles:
+        - user
+    permissions:
+      view:
+        - admin
+        - user
+      edit: []
+    multivalued: false
+  - name: lastName
+    displayName: ${lastName}
+    validations:
+      length:
+        max: 255
+      person_name_prohibited_characters: {}
+    annotations: {}
+    required:
+      roles:
+        - user
+    permissions:
+      view:
+        - admin
+        - user
+      edit: []
+    multivalued: false
+attributes_additional:
+  - name: additionalAttribute
+    displayName: additionalAttribute
+    group: user-metadata
+    required:
+      roles:
+        - user
+    permissions:
+      view:
+        - admin
+        - user
+      edit: []
+    multivalued: false
+groups_default:
+  - name: user-metadata
+    displayHeader: User metadata
+    displayDescription: Attributes, which refer to user metadata
+config_default:
+  kc_user_profile_config:
+    - attributes: "{{ attributes_default }}"
+      groups: "{{ groups_default }}"
+config_updated:
+  kc_user_profile_config:
+    - attributes: "{{ attributes_default + attributes_additional }}"
+      groups: "{{ groups_default }}"
+config_unmanaged_attributes_enabled:
+  kc_user_profile_config:
+    - unmanagedAttributePolicy: ENABLED
+      attributes: "{{ attributes_default }}"
+config_unmanaged_attributes_admin_edit:
+  kc_user_profile_config:
+    - unmanagedAttributePolicy: ADMIN_EDIT
+      attributes: "{{ attributes_default }}"
+config_unmanaged_attributes_admin_view:
+  kc_user_profile_config:
+    - unmanagedAttributePolicy: ADMIN_VIEW
+      attributes: "{{ attributes_default }}"

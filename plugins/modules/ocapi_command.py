@@ -8,14 +8,12 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: ocapi_command
 version_added: 6.3.0
 short_description: Manages Out-Of-Band controllers using Open Composable API (OCAPI)
 description:
-  - Builds OCAPI URIs locally and sends them to remote OOB controllers to
-    perform an action.
+  - Builds OCAPI URIs locally and sends them to remote OOB controllers to perform an action.
   - Manages OOB controller such as Indicator LED, Reboot, Power Mode, Firmware Update.
 extends_documentation_fragment:
   - community.general.attributes
@@ -41,7 +39,7 @@ options:
       - Base URI of OOB controller.
     type: str
   proxy_slot_number:
-    description: For proxied inband requests, the slot number of the IOM.  Only applies if O(baseuri) is a proxy server.
+    description: For proxied inband requests, the slot number of the IOM. Only applies if O(baseuri) is a proxy server.
     type: int
   update_image_path:
     required: false
@@ -70,104 +68,104 @@ options:
     type: int
 
 author: "Mike Moerk (@mikemoerk)"
-'''
+"""
 
-EXAMPLES = '''
-  - name: Set the power state to low
-    community.general.ocapi_command:
-      category: Chassis
-      command: PowerModeLow
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
+EXAMPLES = r"""
+- name: Set the power state to low
+  community.general.ocapi_command:
+    category: Chassis
+    command: PowerModeLow
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
 
-  - name: Set the power state to normal
-    community.general.ocapi_command:
-      category: Chassis
-      command: PowerModeNormal
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-  - name: Set chassis indicator LED to on
-    community.general.ocapi_command:
-      category: Chassis
-      command: IndicatorLedOn
-      baseuri: "{{ baseuri }}"
-      proxy_slot_number: 2
-      username: "{{ username }}"
-      password: "{{ password }}"
-  - name: Set chassis indicator LED to off
-    community.general.ocapi_command:
-      category: Chassis
-      command: IndicatorLedOff
-      baseuri: "{{ baseuri }}"
-      proxy_slot_number: 2
-      username: "{{ username }}"
-      password: "{{ password }}"
-  - name: Reset Enclosure
-    community.general.ocapi_command:
-      category: Systems
-      command: PowerGracefulRestart
-      baseuri: "{{ baseuri }}"
-      proxy_slot_number: 2
-      username: "{{ username }}"
-      password: "{{ password }}"
-  - name: Firmware Upload
-    community.general.ocapi_command:
-      category: Update
-      command: FWUpload
-      baseuri: "iom1.wdc.com"
-      proxy_slot_number: 2
-      username: "{{ username }}"
-      password: "{{ password }}"
-      update_image_path: "/path/to/firmware.tar.gz"
-  - name: Firmware Update
-    community.general.ocapi_command:
-      category: Update
-      command: FWUpdate
-      baseuri: "iom1.wdc.com"
-      proxy_slot_number: 2
-      username: "{{ username }}"
-      password: "{{ password }}"
-  - name: Firmware Activate
-    community.general.ocapi_command:
-      category: Update
-      command: FWActivate
-      baseuri: "iom1.wdc.com"
-      proxy_slot_number: 2
-      username: "{{ username }}"
-      password: "{{ password }}"
-  - name: Delete Job
-    community.general.ocapi_command:
-      category: Jobs
-      command: DeleteJob
-      job_name: FirmwareUpdate
-      baseuri: "{{ baseuri }}"
-      proxy_slot_number: 2
-      username: "{{ username }}"
-      password: "{{ password }}"
-'''
+- name: Set the power state to normal
+  community.general.ocapi_command:
+    category: Chassis
+    command: PowerModeNormal
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+- name: Set chassis indicator LED to on
+  community.general.ocapi_command:
+    category: Chassis
+    command: IndicatorLedOn
+    baseuri: "{{ baseuri }}"
+    proxy_slot_number: 2
+    username: "{{ username }}"
+    password: "{{ password }}"
+- name: Set chassis indicator LED to off
+  community.general.ocapi_command:
+    category: Chassis
+    command: IndicatorLedOff
+    baseuri: "{{ baseuri }}"
+    proxy_slot_number: 2
+    username: "{{ username }}"
+    password: "{{ password }}"
+- name: Reset Enclosure
+  community.general.ocapi_command:
+    category: Systems
+    command: PowerGracefulRestart
+    baseuri: "{{ baseuri }}"
+    proxy_slot_number: 2
+    username: "{{ username }}"
+    password: "{{ password }}"
+- name: Firmware Upload
+  community.general.ocapi_command:
+    category: Update
+    command: FWUpload
+    baseuri: "iom1.wdc.com"
+    proxy_slot_number: 2
+    username: "{{ username }}"
+    password: "{{ password }}"
+    update_image_path: "/path/to/firmware.tar.gz"
+- name: Firmware Update
+  community.general.ocapi_command:
+    category: Update
+    command: FWUpdate
+    baseuri: "iom1.wdc.com"
+    proxy_slot_number: 2
+    username: "{{ username }}"
+    password: "{{ password }}"
+- name: Firmware Activate
+  community.general.ocapi_command:
+    category: Update
+    command: FWActivate
+    baseuri: "iom1.wdc.com"
+    proxy_slot_number: 2
+    username: "{{ username }}"
+    password: "{{ password }}"
+- name: Delete Job
+  community.general.ocapi_command:
+    category: Jobs
+    command: DeleteJob
+    job_name: FirmwareUpdate
+    baseuri: "{{ baseuri }}"
+    proxy_slot_number: 2
+    username: "{{ username }}"
+    password: "{{ password }}"
+"""
 
-RETURN = '''
+RETURN = r"""
 msg:
-    description: Message with action result or error description.
-    returned: always
-    type: str
-    sample: "Action was successful"
+  description: Message with action result or error description.
+  returned: always
+  type: str
+  sample: "Action was successful"
 
 jobUri:
-    description: URI to use to monitor status of the operation.  Returned for async commands such as Firmware Update, Firmware Activate.
-    returned: when supported
-    type: str
-    sample: "https://ioma.wdc.com/Storage/Devices/openflex-data24-usalp03020qb0003/Jobs/FirmwareUpdate/"
+  description: URI to use to monitor status of the operation. Returned for async commands such as Firmware Update, Firmware
+    Activate.
+  returned: when supported
+  type: str
+  sample: "https://ioma.wdc.com/Storage/Devices/openflex-data24-usalp03020qb0003/Jobs/FirmwareUpdate/"
 
 operationStatusId:
-    description: OCAPI State ID (see OCAPI documentation for possible values).
-    returned: when supported
-    type: int
-    sample: 2
-
-'''
+  description: OCAPI State ID (see OCAPI documentation for possible values).
+  returned: when supported
+  type: int
+  sample: 2
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.ocapi_utils import OcapiUtils

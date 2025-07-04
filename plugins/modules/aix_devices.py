@@ -8,14 +8,13 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 author:
-- Kairo Araujo (@kairoaraujo)
+  - Kairo Araujo (@kairoaraujo)
 module: aix_devices
 short_description: Manages AIX devices
 description:
-- This module discovers, defines, removes and modifies attributes of AIX devices.
+  - This module discovers, defines, removes and modifies attributes of AIX devices.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -26,35 +25,35 @@ attributes:
 options:
   attributes:
     description:
-    - A list of device attributes.
+      - A list of device attributes.
     type: dict
   device:
     description:
-    - The name of the device.
-    - V(all) is valid to rescan C(available) all devices (AIX cfgmgr command).
+      - The name of the device.
+      - V(all) is valid to rescan C(available) all devices (AIX C(cfgmgr) command).
     type: str
   force:
     description:
-    - Forces action.
+      - Forces action.
     type: bool
     default: false
   recursive:
     description:
-    - Removes or defines a device and children devices.
+      - Removes or defines a device and children devices.
     type: bool
     default: false
   state:
     description:
-    - Controls the device state.
-    - V(available) (alias V(present)) rescan a specific device or all devices (when O(device) is not specified).
-    - V(removed) (alias V(absent) removes a device.
-    - V(defined) changes device to Defined state.
+      - Controls the device state.
+      - V(available) (alias V(present)) rescan a specific device or all devices (when O(device) is not specified).
+      - V(removed) (alias V(absent) removes a device.
+      - V(defined) changes device to Defined state.
     type: str
-    choices: [ available, defined, removed ]
+    choices: [available, defined, removed]
     default: available
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Scan new devices
   community.general.aix_devices:
     device: all
@@ -126,9 +125,9 @@ EXAMPLES = r'''
     attributes:
       alias4: 10.0.0.100,255.255.255.0
     state: available
-'''
+"""
 
-RETURN = r''' # '''
+RETURN = r""" # """
 
 from ansible.module_utils.basic import AnsibleModule
 

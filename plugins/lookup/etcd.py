@@ -8,44 +8,46 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    author:
-        - Jan-Piet Mens (@jpmens)
-    name: etcd
-    short_description: get info from an etcd server
+DOCUMENTATION = r"""
+author:
+  - Jan-Piet Mens (@jpmens)
+name: etcd
+short_description: Get info from an etcd server
+description:
+  - Retrieves data from an etcd server.
+options:
+  _terms:
     description:
-        - Retrieves data from an etcd server
-    options:
-        _terms:
-            description:
-                - the list of keys to lookup on the etcd server
-            type: list
-            elements: string
-            required: true
-        url:
-            description:
-                - Environment variable with the URL for the etcd server
-            default: 'http://127.0.0.1:4001'
-            env:
-              - name: ANSIBLE_ETCD_URL
-        version:
-            description:
-                - Environment variable with the etcd protocol version
-            default: 'v1'
-            env:
-              - name: ANSIBLE_ETCD_VERSION
-        validate_certs:
-            description:
-                - toggle checking that the ssl certificates are valid, you normally only want to turn this off with self-signed certs.
-            default: true
-            type: boolean
-    seealso:
-    - module: community.general.etcd3
-    - plugin: community.general.etcd3
-      plugin_type: lookup
-'''
+      - The list of keys to lookup on the etcd server.
+    type: list
+    elements: string
+    required: true
+  url:
+    description:
+      - Environment variable with the URL for the etcd server.
+    type: string
+    default: 'http://127.0.0.1:4001'
+    env:
+      - name: ANSIBLE_ETCD_URL
+  version:
+    description:
+      - Environment variable with the etcd protocol version.
+    type: string
+    default: 'v1'
+    env:
+      - name: ANSIBLE_ETCD_VERSION
+  validate_certs:
+    description:
+      - Toggle checking that the ssl certificates are valid, you normally only want to turn this off with self-signed certs.
+    default: true
+    type: boolean
+seealso:
+  - module: community.general.etcd3
+  - plugin: community.general.etcd3
+    plugin_type: lookup
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: "a value from a locally running etcd"
   ansible.builtin.debug:
     msg: "{{ lookup('community.general.etcd', 'foo/bar') }}"
@@ -57,15 +59,15 @@ EXAMPLES = '''
 - name: "you can set server options inline"
   ansible.builtin.debug:
     msg: "{{ lookup('community.general.etcd', 'foo', version='v2', url='http://192.168.0.27:4001') }}"
-'''
+"""
 
-RETURN = '''
-    _raw:
-        description:
-            - List of values associated with input keys.
-        type: list
-        elements: string
-'''
+RETURN = r"""
+_raw:
+  description:
+    - List of values associated with input keys.
+  type: list
+  elements: string
+"""
 
 import json
 
@@ -102,7 +104,7 @@ class Etcd:
     def __init__(self, url, version, validate_certs):
         self.url = url
         self.version = version
-        self.baseurl = '%s/%s/keys' % (self.url, self.version)
+        self.baseurl = f'{self.url}/{self.version}/keys'
         self.validate_certs = validate_certs
 
     def _parse_node(self, node):
@@ -123,7 +125,7 @@ class Etcd:
         return path
 
     def get(self, key):
-        url = "%s/%s?recursive=true" % (self.baseurl, key)
+        url = f"{self.baseurl}/{key}?recursive=true"
         data = None
         value = {}
         try:

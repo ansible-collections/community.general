@@ -8,12 +8,11 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: github_webhook_info
 short_description: Query information about GitHub webhooks
 description:
-  - "Query information about GitHub webhooks"
+  - Query information about GitHub webhooks.
 requirements:
   - "PyGithub >= 1.3.5"
 extends_documentation_fragment:
@@ -22,38 +21,38 @@ extends_documentation_fragment:
 options:
   repository:
     description:
-      - Full name of the repository to configure a hook for
+      - Full name of the repository to configure a hook for.
     type: str
     required: true
     aliases:
       - repo
   user:
     description:
-      - User to authenticate to GitHub as
+      - User to authenticate to GitHub as.
     type: str
     required: true
   password:
     description:
-      - Password to authenticate to GitHub with
+      - Password to authenticate to GitHub with.
     type: str
     required: false
   token:
     description:
-      - Token to authenticate to GitHub with
+      - Token to authenticate to GitHub with.
     type: str
     required: false
   github_url:
     description:
-      - Base URL of the github api
+      - Base URL of the GitHub API.
     type: str
     required: false
     default: https://api.github.com
 
 author:
   - "Chris St. Pierre (@stpierre)"
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: List hooks for a repository (password auth)
   community.general.github_webhook_info:
     repository: ansible/ansible
@@ -68,27 +67,27 @@ EXAMPLES = '''
     token: "{{ github_user_api_token }}"
     github_url: https://github.example.com/api/v3/
   register: myrepo_webhooks
-'''
+"""
 
-RETURN = '''
----
+RETURN = r"""
 hooks:
-  description: A list of hooks that exist for the repo
+  description: A list of hooks that exist for the repo.
   returned: always
   type: list
   elements: dict
   sample:
-    - {
-        "has_shared_secret": true,
-        "url": "https://jenkins.example.com/ghprbhook/",
-        "events": ["issue_comment", "pull_request"],
-        "insecure_ssl": "1",
-        "content_type": "json",
-        "active": true,
-        "id": 6206,
-        "last_response": {"status": "active", "message": "OK", "code": 200}
-      }
-'''
+    - has_shared_secret: true
+      url: https://jenkins.example.com/ghprbhook/
+      events: [issue_comment, pull_request]
+      insecure_ssl: "1"
+      content_type: json
+      active: true
+      id: 6206
+      last_response:
+        status: active
+        message: OK
+        code: 200
+"""
 
 import traceback
 

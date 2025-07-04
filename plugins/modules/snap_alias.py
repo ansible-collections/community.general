@@ -9,46 +9,45 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: snap_alias
 short_description: Manages snap aliases
 version_added: 4.0.0
 description:
-    - "Manages snaps aliases."
+  - Manages snaps aliases.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: full
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
 options:
-    state:
-        description:
-            - Desired state of the alias.
-        type: str
-        choices: [ absent, present ]
-        default: present
-    name:
-        description:
-            - Name of the snap.
-        type: str
-    alias:
-        description:
-            - Aliases to be created or removed.
-        type: list
-        elements: str
-        aliases: [aliases]
+  state:
+    description:
+      - Desired state of the alias.
+    type: str
+    choices: [absent, present]
+    default: present
+  name:
+    description:
+      - Name of the snap.
+    type: str
+  alias:
+    description:
+      - Aliases to be created or removed.
+    type: list
+    elements: str
+    aliases: [aliases]
 
 author:
-    - Alexei Znamensky (@russoz) <russoz@gmail.com>
+  - Alexei Znamensky (@russoz) <russoz@gmail.com>
 
 seealso:
-    - module: community.general.snap
-'''
+  - module: community.general.snap
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 # Install "foo" and "bar" snap
 - name: Create snap alias
   community.general.snap_alias:
@@ -62,7 +61,7 @@ EXAMPLES = '''
       - hw
       - hw2
       - hw3
-    state: present   # optional
+    state: present # optional
 
 - name: Remove one specific aliases
   community.general.snap_alias:
@@ -73,21 +72,26 @@ EXAMPLES = '''
   community.general.snap_alias:
     name: hello-world
     state: absent
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 snap_aliases:
-    description: The snap aliases after execution. If called in check mode, then the list represents the state before execution.
-    type: list
-    elements: str
-    returned: always
-'''
+  description: The snap aliases after execution. If called in check mode, then the list represents the state before execution.
+  type: list
+  elements: str
+  returned: always
+version:
+  description: Versions of snap components as reported by C(snap version).
+  type: dict
+  returned: always
+  version_added: 10.3.0
+"""
 
 
 import re
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
-from ansible_collections.community.general.plugins.module_utils.snap import snap_runner
+from ansible_collections.community.general.plugins.module_utils.snap import snap_runner, get_version
 
 
 class SnapAlias(StateModuleHelper):
@@ -112,6 +116,7 @@ class SnapAlias(StateModuleHelper):
 
     def __init_module__(self):
         self.runner = snap_runner(self.module)
+        self.vars.version = get_version(self.runner)
         self.vars.set("snap_aliases", self._aliases(), change=True, diff=True)
 
     def __quit_module__(self):

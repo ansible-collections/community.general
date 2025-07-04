@@ -39,4 +39,3 @@
           - "'onyx_pfc_interface' is not community.general.a_module"
           # Tombstoned module
           - "'community.general.docker_image_facts' is not community.general.a_module"
-      when: ansible_version.string is version('2.10.0', '>=')

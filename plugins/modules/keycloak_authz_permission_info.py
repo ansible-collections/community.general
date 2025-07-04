@@ -9,8 +9,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: keycloak_authz_permission_info
 
 version_added: 7.2.0
@@ -18,47 +17,47 @@ version_added: 7.2.0
 short_description: Query Keycloak client authorization permissions information
 
 description:
-    - This module allows querying information about Keycloak client authorization permissions from the
-      resources endpoint via the Keycloak REST API. Authorization permissions are only available if a
-      client has Authorization enabled.
-
-    - This module requires access to the REST API via OpenID Connect; the user connecting and the realm
-      being used must have the requisite access rights. In a default Keycloak installation, admin-cli
-      and an admin user would work, as would a separate realm definition with the scope tailored
-      to your needs and a user having the expected roles.
-
-    - The names of module options are snake_cased versions of the camelCase options used by Keycloak.
-      The Authorization Services paths and payloads have not officially been documented by the Keycloak project.
-      U(https://www.puppeteers.net/blog/keycloak-authorization-services-rest-api-paths-and-payload/)
+  - This module allows querying information about Keycloak client authorization permissions from the resources endpoint using
+    the Keycloak REST API. Authorization permissions are only available if a client has Authorization enabled.
+  - This module requires access to the REST API using OpenID Connect; the user connecting and the realm being used must have
+    the requisite access rights. In a default Keycloak installation, admin-cli and an admin user would work, as would a separate
+    realm definition with the scope tailored to your needs and a user having the expected roles.
+  - The names of module options are snake_cased versions of the camelCase options used by Keycloak. The Authorization Services
+    paths and payloads have not officially been documented by the Keycloak project.
+    U(https://www.puppeteers.net/blog/keycloak-authorization-services-rest-api-paths-and-payload/).
+attributes:
+  action_group:
+    version_added: 10.2.0
 
 options:
-    name:
-        description:
-            - Name of the authorization permission to create.
-        type: str
-        required: true
-    client_id:
-        description:
-            - The clientId of the keycloak client that should have the authorization scope.
-            - This is usually a human-readable name of the Keycloak client.
-        type: str
-        required: true
-    realm:
-        description:
-            - The name of the Keycloak realm the Keycloak client is in.
-        type: str
-        required: true
+  name:
+    description:
+      - Name of the authorization permission to create.
+    type: str
+    required: true
+  client_id:
+    description:
+      - The clientId of the keycloak client that should have the authorization scope.
+      - This is usually a human-readable name of the Keycloak client.
+    type: str
+    required: true
+  realm:
+    description:
+      - The name of the Keycloak realm the Keycloak client is in.
+    type: str
+    required: true
 
 extends_documentation_fragment:
-    - community.general.keycloak
-    - community.general.attributes
-    - community.general.attributes.info_module
+  - community.general.keycloak
+  - community.general.keycloak.actiongroup_keycloak
+  - community.general.attributes
+  - community.general.attributes.info_module
 
 author:
-    - Samuli Seppänen (@mattock)
-'''
+  - Samuli Seppänen (@mattock)
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Query Keycloak authorization permission
   community.general.keycloak_authz_permission_info:
     name: ScopePermission
@@ -68,48 +67,48 @@ EXAMPLES = '''
     auth_username: keycloak
     auth_password: keycloak
     auth_realm: master
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 msg:
-    description: Message as to what action was taken.
-    returned: always
-    type: str
+  description: Message as to what action was taken.
+  returned: always
+  type: str
 
 queried_state:
-    description: State of the resource (a policy) as seen by Keycloak.
-    returned: on success
-    type: complex
-    contains:
-        id:
-            description: ID of the authorization permission.
-            type: str
-            sample: 9da05cd2-b273-4354-bbd8-0c133918a454
-        name:
-            description: Name of the authorization permission.
-            type: str
-            sample: ResourcePermission
-        description:
-            description: Description of the authorization permission.
-            type: str
-            sample: Resource Permission
-        type:
-            description: Type of the authorization permission.
-            type: str
-            sample: resource
-        decisionStrategy:
-            description: The decision strategy.
-            type: str
-            sample: UNANIMOUS
-        logic:
-            description: The logic used for the permission (part of the payload, but has a fixed value).
-            type: str
-            sample: POSITIVE
-        config:
-            description: Configuration of the permission (empty in all observed cases).
-            type: dict
-            sample: {}
-'''
+  description: State of the resource (a policy) as seen by Keycloak.
+  returned: on success
+  type: complex
+  contains:
+    id:
+      description: ID of the authorization permission.
+      type: str
+      sample: 9da05cd2-b273-4354-bbd8-0c133918a454
+    name:
+      description: Name of the authorization permission.
+      type: str
+      sample: ResourcePermission
+    description:
+      description: Description of the authorization permission.
+      type: str
+      sample: Resource Permission
+    type:
+      description: Type of the authorization permission.
+      type: str
+      sample: resource
+    decisionStrategy:
+      description: The decision strategy.
+      type: str
+      sample: UNANIMOUS
+    logic:
+      description: The logic used for the permission (part of the payload, but has a fixed value).
+      type: str
+      sample: POSITIVE
+    config:
+      description: Configuration of the permission (empty in all observed cases).
+      type: dict
+      sample: {}
+"""
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, \
     keycloak_argument_spec, get_token, KeycloakError
@@ -135,8 +134,10 @@ def main():
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True,
                            required_one_of=(
-                               [['token', 'auth_realm', 'auth_username', 'auth_password']]),
-                           required_together=([['auth_realm', 'auth_username', 'auth_password']]))
+                               [['token', 'auth_realm', 'auth_username', 'auth_password', 'auth_client_id', 'auth_client_secret']]),
+                           required_together=([['auth_username', 'auth_password']]),
+                           required_by={'refresh_token': 'auth_realm'},
+                           )
 
     # Convenience variables
     name = module.params.get('name')

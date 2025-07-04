@@ -3,59 +3,58 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
-DOCUMENTATION = '''
-    author: Unknown (!UNKNOWN)
-    name: logdna
-    type: notification
-    short_description: Sends playbook logs to LogDNA
-    description:
-      - This callback will report logs from playbook actions, tasks, and events to LogDNA (U(https://app.logdna.com)).
-    requirements:
-      - LogDNA Python Library (U(https://github.com/logdna/python))
-      - whitelisting in configuration
-    options:
-      conf_key:
-        required: true
-        description: LogDNA Ingestion Key.
-        type: string
-        env:
-          - name: LOGDNA_INGESTION_KEY
-        ini:
-          - section: callback_logdna
-            key: conf_key
-      plugin_ignore_errors:
-        required: false
-        description: Whether to ignore errors on failing or not.
-        type: boolean
-        env:
-          - name: ANSIBLE_IGNORE_ERRORS
-        ini:
-          - section: callback_logdna
-            key: plugin_ignore_errors
-        default: false
-      conf_hostname:
-        required: false
-        description: Alternative Host Name; the current host name by default.
-        type: string
-        env:
-          - name: LOGDNA_HOSTNAME
-        ini:
-          - section: callback_logdna
-            key: conf_hostname
-      conf_tags:
-        required: false
-        description: Tags.
-        type: string
-        env:
-          - name: LOGDNA_TAGS
-        ini:
-          - section: callback_logdna
-            key: conf_tags
-        default: ansible
-'''
+DOCUMENTATION = r"""
+author: Unknown (!UNKNOWN)
+name: logdna
+type: notification
+short_description: Sends playbook logs to LogDNA
+description:
+  - This callback reports logs from playbook actions, tasks, and events to LogDNA (U(https://app.logdna.com)).
+requirements:
+  - LogDNA Python Library (U(https://github.com/logdna/python))
+  - whitelisting in configuration
+options:
+  conf_key:
+    required: true
+    description: LogDNA Ingestion Key.
+    type: string
+    env:
+      - name: LOGDNA_INGESTION_KEY
+    ini:
+      - section: callback_logdna
+        key: conf_key
+  plugin_ignore_errors:
+    required: false
+    description: Whether to ignore errors on failing or not.
+    type: boolean
+    env:
+      - name: ANSIBLE_IGNORE_ERRORS
+    ini:
+      - section: callback_logdna
+        key: plugin_ignore_errors
+    default: false
+  conf_hostname:
+    required: false
+    description: Alternative Host Name; the current host name by default.
+    type: string
+    env:
+      - name: LOGDNA_HOSTNAME
+    ini:
+      - section: callback_logdna
+        key: conf_hostname
+  conf_tags:
+    required: false
+    description: Tags.
+    type: string
+    env:
+      - name: LOGDNA_TAGS
+    ini:
+      - section: callback_logdna
+        key: conf_tags
+    default: ansible
+"""
 
 import logging
 import json
@@ -73,7 +72,7 @@ except ImportError:
 
 # Getting MAC Address of system:
 def get_mac():
-    mac = "%012x" % getnode()
+    mac = f"{getnode():012x}"
     return ":".join(map(lambda index: mac[index:index + 2], range(int(len(mac) / 2))))
 
 
@@ -161,7 +160,7 @@ class CallbackModule(CallbackBase):
         if ninvalidKeys > 0:
             for key in invalidKeys:
                 del meta[key]
-            meta['__errors'] = 'These keys have been sanitized: ' + ', '.join(invalidKeys)
+            meta['__errors'] = f"These keys have been sanitized: {', '.join(invalidKeys)}"
         return meta
 
     def sanitizeJSON(self, data):

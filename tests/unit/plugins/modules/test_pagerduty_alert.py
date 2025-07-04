@@ -5,12 +5,12 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-from ansible_collections.community.general.tests.unit.compat import unittest
+from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
 from ansible_collections.community.general.plugins.modules import pagerduty_alert
 import json
 import pytest
-from ansible_collections.community.general.tests.unit.compat.mock import patch
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
 
 
 class PagerDutyAlertsTest(unittest.TestCase):
@@ -64,22 +64,22 @@ class TestPagerDutyAlertModule(ModuleTestCase):
 
     def test_module_fail_when_required_args_missing(self):
         with self.assertRaises(AnsibleFailJson):
-            set_module_args({})
-            self.module.main()
+            with set_module_args({}):
+                self.module.main()
 
     def test_ensure_alert_created_with_minimal_data(self):
-        set_module_args({
+        with set_module_args({
             'state': 'triggered',
             'api_version': 'v2',
             'integration_key': 'test',
             'source': 'My Ansible Script',
             'desc': 'Description for alert'
-        })
+        }):
 
-        with patch.object(pagerduty_alert, 'fetch_url') as fetch_url_mock:
-            fetch_url_mock.return_value = (Response(), {"status": 202})
-            with self.assertRaises(AnsibleExitJson):
-                self.module.main()
+            with patch.object(pagerduty_alert, 'fetch_url') as fetch_url_mock:
+                fetch_url_mock.return_value = (Response(), {"status": 202})
+                with self.assertRaises(AnsibleExitJson):
+                    self.module.main()
 
             assert fetch_url_mock.call_count == 1
             url = fetch_url_mock.call_args[0][1]
@@ -95,7 +95,7 @@ class TestPagerDutyAlertModule(ModuleTestCase):
             assert data['payload']['timestamp'] is not None
 
     def test_ensure_alert_created_with_full_data(self):
-        set_module_args({
+        with set_module_args({
             'api_version': 'v2',
             'component': 'mysql',
             'custom_details': {'environment': 'production', 'notes': 'this is a test note'},
@@ -106,12 +106,12 @@ class TestPagerDutyAlertModule(ModuleTestCase):
             'link_text': 'PagerDuty',
             'state': 'triggered',
             'source': 'My Ansible Script',
-        })
+        }):
 
-        with patch.object(pagerduty_alert, 'fetch_url') as fetch_url_mock:
-            fetch_url_mock.return_value = (Response(), {"status": 202})
-            with self.assertRaises(AnsibleExitJson):
-                self.module.main()
+            with patch.object(pagerduty_alert, 'fetch_url') as fetch_url_mock:
+                fetch_url_mock.return_value = (Response(), {"status": 202})
+                with self.assertRaises(AnsibleExitJson):
+                    self.module.main()
 
             assert fetch_url_mock.call_count == 1
             url = fetch_url_mock.call_args[0][1]
@@ -130,17 +130,17 @@ class TestPagerDutyAlertModule(ModuleTestCase):
             assert data['links'][0]['text'] == 'PagerDuty'
 
     def test_ensure_alert_acknowledged(self):
-        set_module_args({
+        with set_module_args({
             'state': 'acknowledged',
             'api_version': 'v2',
             'integration_key': 'test',
             'incident_key': 'incident_test_id',
-        })
+        }):
 
-        with patch.object(pagerduty_alert, 'fetch_url') as fetch_url_mock:
-            fetch_url_mock.return_value = (Response(), {"status": 202})
-            with self.assertRaises(AnsibleExitJson):
-                self.module.main()
+            with patch.object(pagerduty_alert, 'fetch_url') as fetch_url_mock:
+                fetch_url_mock.return_value = (Response(), {"status": 202})
+                with self.assertRaises(AnsibleExitJson):
+                    self.module.main()
 
             assert fetch_url_mock.call_count == 1
             url = fetch_url_mock.call_args[0][1]

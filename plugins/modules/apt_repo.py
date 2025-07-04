@@ -9,16 +9,15 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: apt_repo
-short_description: Manage APT repositories via apt-repo
+short_description: Manage APT repositories using C(apt-repo)
 description:
-  - Manages APT repositories using apt-repo tool.
-  - See U(https://www.altlinux.org/Apt-repo) for details about apt-repo
+  - Manages APT repositories using C(apt-repo) tool.
+  - See U(https://www.altlinux.org/Apt-repo) for details about C(apt-repo).
 notes:
-    - This module works on ALT based distros.
-    - Does NOT support checkmode, due to a limitation in apt-repo tool.
+  - This module works on ALT based distros.
+  - Does NOT support checkmode, due to a limitation in C(apt-repo) tool.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -35,13 +34,13 @@ options:
   state:
     description:
       - Indicates the desired repository state.
-    choices: [ absent, present ]
+    choices: [absent, present]
     default: present
     type: str
   remove_others:
     description:
-      - Remove other then added repositories
-      - Used if O(state=present)
+      - Remove other then added repositories.
+      - Used if O(state=present).
     type: bool
     default: false
   update:
@@ -50,10 +49,10 @@ options:
     type: bool
     default: false
 author:
-- Mikhail Gordeev (@obirvalger)
-'''
+  - Mikhail Gordeev (@obirvalger)
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Remove all repositories
   community.general.apt_repo:
     repo: all
@@ -70,9 +69,9 @@ EXAMPLES = '''
     repo: copy:///space/ALT/Sisyphus
     state: present
     update: true
-'''
+"""
 
-RETURN = ''' # '''
+RETURN = """ # """
 
 import os
 

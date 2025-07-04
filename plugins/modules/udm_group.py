@@ -10,63 +10,61 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: udm_group
 author:
-    - Tobias Rüetschi (@keachi)
+  - Tobias Rüetschi (@keachi)
 short_description: Manage of the posix group
 description:
-    - "This module allows to manage user groups on a univention corporate server (UCS).
-       It uses the python API of the UCS to create a new object or edit it."
+  - This module allows to manage user groups on a univention corporate server (UCS). It uses the Python API of the UCS to
+    create a new object or edit it.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: partial
+  check_mode:
+    support: full
+  diff_mode:
+    support: partial
 options:
-    state:
-        required: false
-        default: "present"
-        choices: [ present, absent ]
-        description:
-            - Whether the group is present or not.
-        type: str
-    name:
-        required: true
-        description:
-            - Name of the posix group.
-        type: str
+  state:
+    required: false
+    default: "present"
+    choices: [present, absent]
     description:
-        required: false
-        description:
-            - Group description.
-        type: str
-    position:
-        required: false
-        description:
-            - define the whole ldap position of the group, e.g.
-              C(cn=g123m-1A,cn=classes,cn=schueler,cn=groups,ou=schule,dc=example,dc=com).
-        type: str
-        default: ''
-    ou:
-        required: false
-        description:
-            - LDAP OU, e.g. school for LDAP OU C(ou=school,dc=example,dc=com).
-        type: str
-        default: ''
-    subpath:
-        required: false
-        description:
-            - Subpath inside the OU, e.g. C(cn=classes,cn=students,cn=groups).
-        type: str
-        default: "cn=groups"
-'''
+      - Whether the group is present or not.
+    type: str
+  name:
+    required: true
+    description:
+      - Name of the POSIX group.
+    type: str
+  description:
+    required: false
+    description:
+      - Group description.
+    type: str
+  position:
+    required: false
+    description:
+      - Define the whole LDAP position of the group, for example V(cn=g123m-1A,cn=classes,cn=schueler,cn=groups,ou=schule,dc=example,dc=com).
+    type: str
+    default: ''
+  ou:
+    required: false
+    description:
+      - LDAP OU, for example V(school) for LDAP OU V(ou=school,dc=example,dc=com).
+    type: str
+    default: ''
+  subpath:
+    required: false
+    description:
+      - Subpath inside the OU, for example V(cn=classes,cn=students,cn=groups).
+    type: str
+    default: "cn=groups"
+"""
 
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a POSIX group
   community.general.udm_group:
     name: g123m-1A
@@ -84,10 +82,10 @@ EXAMPLES = '''
   community.general.udm_group:
     name: g123m-1A
     position: 'cn=classes,cn=students,cn=groups,ou=school,dc=school,dc=example,dc=com'
-'''
+"""
 
 
-RETURN = '''# '''
+RETURN = """#"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.univention_umc import (

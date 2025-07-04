@@ -34,7 +34,7 @@
 
 - assert:
     that:
-    - check_file.stat.exists == False
+      - check_file.stat.exists == False
 
 - name: Check the file /preseed/ubuntu.seed is added
   stat:
@@ -43,7 +43,7 @@
 
 - assert:
     that:
-    - check_file.stat.exists == True
+      - check_file.stat.exists == True
 
 - block:
     - name: Get the content of file test02.cfg
@@ -71,5 +71,5 @@
 - name: Delete line of file test02.cfg
   ansible.builtin.lineinfile:
     path: "{{ test_dir }}/test02.cfg"
-    regexp: "test" 
+    regexp: "test"
     state: absent

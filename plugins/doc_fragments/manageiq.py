@@ -11,7 +11,7 @@ __metaclass__ = type
 class ModuleDocFragment(object):
 
     # Standard ManageIQ documentation fragment
-    DOCUMENTATION = r'''
+    DOCUMENTATION = r"""
 options:
   manageiq_connection:
     description:
@@ -34,20 +34,21 @@ options:
         type: str
       token:
         description:
-          - ManageIQ token. E(MIQ_TOKEN) environment variable if set. Otherwise, required if no username or password is passed in.
+          - ManageIQ token. E(MIQ_TOKEN) environment variable if set. Otherwise, required if no username or password is passed
+            in.
         type: str
       validate_certs:
         description:
           - Whether SSL certificates should be verified for HTTPS requests.
         type: bool
         default: true
-        aliases: [ verify_ssl ]
+        aliases: [verify_ssl]
       ca_cert:
         description:
           - The path to a CA bundle file or directory with certificates.
         type: str
-        aliases: [ ca_bundle_path ]
+        aliases: [ca_bundle_path]
 
 requirements:
   - 'manageiq-client U(https://github.com/ManageIQ/manageiq-api-client-python/)'
-'''
+"""

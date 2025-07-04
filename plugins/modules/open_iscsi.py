@@ -8,103 +8,100 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: open_iscsi
 author:
-    - Serge van Ginderachter (@srvg)
+  - Serge van Ginderachter (@srvg)
 short_description: Manage iSCSI targets with Open-iSCSI
 description:
-    - Discover targets on given portal, (dis)connect targets, mark targets to
-      manually or auto start, return device nodes of connected targets.
+  - Discover targets on given portal, (dis)connect targets, mark targets to manually or auto start, return device nodes of
+    connected targets.
 requirements:
-    - open_iscsi library and tools (iscsiadm)
+  - open_iscsi library and tools (iscsiadm)
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    portal:
-        description:
-        - The domain name or IP address of the iSCSI target.
-        type: str
-        aliases: [ ip ]
-    port:
-        description:
-        - The port on which the iSCSI target process listens.
-        type: str
-        default: '3260'
-    target:
-        description:
-        - The iSCSI target name.
-        type: str
-        aliases: [ name, targetname ]
-    login:
-        description:
-        - Whether the target node should be connected.
-        type: bool
-        aliases: [ state ]
-    node_auth:
-        description:
-        - The value for C(node.session.auth.authmethod).
-        type: str
-        default: CHAP
-    node_user:
-        description:
-        - The value for C(node.session.auth.username).
-        type: str
-    node_pass:
-        description:
-        - The value for C(node.session.auth.password).
-        type: str
-    node_user_in:
-        description:
-        - The value for C(node.session.auth.username_in).
-        type: str
-        version_added: 3.8.0
-    node_pass_in:
-        description:
-        - The value for C(node.session.auth.password_in).
-        type: str
-        version_added: 3.8.0
-    auto_node_startup:
-        description:
-        - Whether the target node should be automatically connected at startup.
-        type: bool
-        aliases: [ automatic ]
-    auto_portal_startup:
-        description:
-        - Whether the target node portal should be automatically connected at startup.
-        type: bool
-        version_added: 3.2.0
-    discover:
-        description:
-        - Whether the list of target nodes on the portal should be
-          (re)discovered and added to the persistent iSCSI database.
-        - Keep in mind that C(iscsiadm) discovery resets configuration, like C(node.startup)
-          to manual, hence combined with O(auto_node_startup=true) will always return
-          a changed state.
-        type: bool
-        default: false
-    show_nodes:
-        description:
-        - Whether the list of nodes in the persistent iSCSI database should be returned by the module.
-        type: bool
-        default: false
-    rescan:
-        description:
-        - Rescan an established session for discovering new targets.
-        - When O(target) is omitted, will rescan all sessions.
-        type: bool
-        default: false
-        version_added: 4.1.0
+  portal:
+    description:
+      - The domain name or IP address of the iSCSI target.
+    type: str
+    aliases: [ip]
+  port:
+    description:
+      - The port on which the iSCSI target process listens.
+    type: str
+    default: '3260'
+  target:
+    description:
+      - The iSCSI target name.
+    type: str
+    aliases: [name, targetname]
+  login:
+    description:
+      - Whether the target node should be connected.
+      - When O(target) is omitted, will login to all available.
+    type: bool
+    aliases: [state]
+  node_auth:
+    description:
+      - The value for C(node.session.auth.authmethod).
+    type: str
+    default: CHAP
+  node_user:
+    description:
+      - The value for C(node.session.auth.username).
+    type: str
+  node_pass:
+    description:
+      - The value for C(node.session.auth.password).
+    type: str
+  node_user_in:
+    description:
+      - The value for C(node.session.auth.username_in).
+    type: str
+    version_added: 3.8.0
+  node_pass_in:
+    description:
+      - The value for C(node.session.auth.password_in).
+    type: str
+    version_added: 3.8.0
+  auto_node_startup:
+    description:
+      - Whether the target node should be automatically connected at startup.
+    type: bool
+    aliases: [automatic]
+  auto_portal_startup:
+    description:
+      - Whether the target node portal should be automatically connected at startup.
+    type: bool
+    version_added: 3.2.0
+  discover:
+    description:
+      - Whether the list of target nodes on the portal should be (re)discovered and added to the persistent iSCSI database.
+      - Keep in mind that C(iscsiadm) discovery resets configuration, like C(node.startup) to manual, hence combined with
+        O(auto_node_startup=true) will always return a changed state.
+    type: bool
+    default: false
+  show_nodes:
+    description:
+      - Whether the list of nodes in the persistent iSCSI database should be returned by the module.
+    type: bool
+    default: false
+  rescan:
+    description:
+      - Rescan an established session for discovering new targets.
+      - When O(target) is omitted, will rescan all sessions.
+    type: bool
+    default: false
+    version_added: 4.1.0
+"""
 
-'''
-
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Perform a discovery on sun.com and show available target nodes
   community.general.open_iscsi:
     show_nodes: true
@@ -117,8 +114,7 @@ EXAMPLES = r'''
     discover: true
     ip: 10.1.2.3
 
-# NOTE: Only works if exactly one target is exported to the initiator
-- name: Discover targets on portal and login to the one available
+- name: Discover targets on portal and login to the ones available
   community.general.open_iscsi:
     portal: '{{ iscsi_target }}'
     login: true
@@ -145,7 +141,7 @@ EXAMPLES = r'''
   community.general.open_iscsi:
     rescan: true
     target: iqn.1986-03.com.sun:02:f8c1f9e0-c3ec-ec84-c9c9-8bfb0cd5de3d
-'''
+"""
 
 import glob
 import os
@@ -227,7 +223,7 @@ def target_loggedon(module, target, portal=None, port=None):
         module.fail_json(cmd=cmd, rc=rc, msg=err)
 
 
-def target_login(module, target, portal=None, port=None):
+def target_login(module, target, check_rc, portal=None, port=None):
     node_auth = module.params['node_auth']
     node_user = module.params['node_user']
     node_pass = module.params['node_pass']
@@ -240,21 +236,22 @@ def target_login(module, target, portal=None, port=None):
                   ('node.session.auth.password', node_pass)]
         for (name, value) in params:
             cmd = [iscsiadm_cmd, '--mode', 'node', '--targetname', target, '--op=update', '--name', name, '--value', value]
-            module.run_command(cmd, check_rc=True)
+            module.run_command(cmd, check_rc=check_rc)
 
     if node_user_in:
         params = [('node.session.auth.username_in', node_user_in),
                   ('node.session.auth.password_in', node_pass_in)]
         for (name, value) in params:
             cmd = '%s --mode node --targetname %s --op=update --name %s --value %s' % (iscsiadm_cmd, target, name, value)
-            module.run_command(cmd, check_rc=True)
+            module.run_command(cmd, check_rc=check_rc)
 
     cmd = [iscsiadm_cmd, '--mode', 'node', '--targetname', target, '--login']
     if portal is not None and port is not None:
         cmd.append('--portal')
         cmd.append('%s:%s' % (portal, port))
 
-    module.run_command(cmd, check_rc=True)
+    rc, out, err = module.run_command(cmd, check_rc=check_rc)
+    return rc
 
 
 def target_logout(module, target):
@@ -339,7 +336,10 @@ def main():
         ),
 
         required_together=[['node_user', 'node_pass'], ['node_user_in', 'node_pass_in']],
-        required_if=[('discover', True, ['portal'])],
+        required_if=[
+            ('discover', True, ['portal']),
+            ('auto_node_startup', True, ['target']),
+            ('auto_portal_startup', True, ['target'])],
         supports_check_mode=True,
     )
 
@@ -369,6 +369,8 @@ def main():
 
     # return json dict
     result = {'changed': False}
+    login_to_all_nodes = False
+    check_rc = True
 
     if discover:
         if check:
@@ -385,9 +387,10 @@ def main():
     if login is not None or automatic is not None:
         if target is None:
             if len(nodes) > 1:
-                module.fail_json(msg="Need to specify a target")
-            else:
-                target = nodes[0]
+                # Disable strict return code checking if there are multiple targets
+                # That will allow to skip target where we have no rights to login
+                login_to_all_nodes = True
+                check_rc = False
         else:
             # check given target is in cache
             check_target = False
@@ -402,26 +405,54 @@ def main():
         result['nodes'] = nodes
 
     if login is not None:
-        loggedon = target_loggedon(module, target, portal, port)
-        if (login and loggedon) or (not login and not loggedon):
-            result['changed'] |= False
-            if login:
-                result['devicenodes'] = target_device_node(target)
-        elif not check:
-            if login:
-                target_login(module, target, portal, port)
-                # give udev some time
-                time.sleep(1)
-                result['devicenodes'] = target_device_node(target)
-            else:
-                target_logout(module, target)
-            result['changed'] |= True
-            result['connection_changed'] = True
+        if login_to_all_nodes:
+            result['devicenodes'] = []
+            for index_target in nodes:
+                loggedon = target_loggedon(module, index_target, portal, port)
+                if (login and loggedon) or (not login and not loggedon):
+                    result['changed'] |= False
+                    if login:
+                        result['devicenodes'] += target_device_node(index_target)
+                elif not check:
+                    if login:
+                        login_result = target_login(module, index_target, check_rc, portal, port)
+                        # give udev some time
+                        time.sleep(1)
+                        result['devicenodes'] += target_device_node(index_target)
+                    else:
+                        target_logout(module, index_target)
+                    # Check if there are multiple targets on a single portal and
+                    # do not mark the task changed if host could not login to one of them
+                    if len(nodes) > 1 and login_result == 24:
+                        result['changed'] |= False
+                        result['connection_changed'] = False
+                    else:
+                        result['changed'] |= True
+                        result['connection_changed'] = True
+                else:
+                    result['changed'] |= True
+                    result['connection_changed'] = True
         else:
-            result['changed'] |= True
-            result['connection_changed'] = True
+            loggedon = target_loggedon(module, target, portal, port)
+            if (login and loggedon) or (not login and not loggedon):
+                result['changed'] |= False
+                if login:
+                    result['devicenodes'] = target_device_node(target)
+            elif not check:
+                if login:
+                    target_login(module, target, portal, port)
+                    # give udev some time
+                    time.sleep(1)
+                    result['devicenodes'] = target_device_node(target)
+                else:
+                    target_logout(module, target)
+                result['changed'] |= True
+                result['connection_changed'] = True
+            else:
+                result['changed'] |= True
+                result['connection_changed'] = True
 
-    if automatic is not None:
+    if automatic is not None and not login_to_all_nodes:
         isauto = target_isauto(module, target)
         if (automatic and isauto) or (not automatic and not isauto):
             result['changed'] |= False
@@ -437,7 +468,7 @@ def main():
             result['changed'] |= True
             result['automatic_changed'] = True
 
-    if automatic_portal is not None:
+    if automatic_portal is not None and not login_to_all_nodes:
         isauto = target_isauto(module, target, portal, port)
         if (automatic_portal and isauto) or (not automatic_portal and not isauto):
             result['changed'] |= False

@@ -4,22 +4,21 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 name: dense
 type: stdout
-short_description: minimal stdout output
+short_description: Minimal stdout output
 extends_documentation_fragment:
-- default_callback
+  - default_callback
 description:
-- When in verbose mode it will act the same as the default callback.
+  - When in verbose mode it acts the same as the default callback.
 author:
-- Dag Wieers (@dagwieers)
+  - Dag Wieers (@dagwieers)
 requirements:
-- set as stdout in configuration
-'''
+  - set as stdout in configuration
+"""
 
 HAS_OD = False
 try:
@@ -195,7 +194,7 @@ class CallbackModule(CallbackModule_default):
             self.disabled = True
 
     def __del__(self):
-        sys.stdout.write(vt100.restore + vt100.reset + '\n' + vt100.save + vt100.clearline)
+        sys.stdout.write(f"{vt100.restore}{vt100.reset}\n{vt100.save}{vt100.clearline}")
 
     def _add_host(self, result, status):
         name = result._host.get_name()
@@ -243,7 +242,7 @@ class CallbackModule(CallbackModule_default):
 
     def _handle_exceptions(self, result):
         if 'exception' in result:
-            # Remove the exception from the result so it's not shown every time
+            # Remove the exception from the result so it is not shown every time
             del result['exception']
 
             if self._display.verbosity == 1:
@@ -252,7 +251,7 @@ class CallbackModule(CallbackModule_default):
     def _display_progress(self, result=None):
         # Always rewrite the complete line
         sys.stdout.write(vt100.restore + vt100.reset + vt100.clearline + vt100.nolinewrap + vt100.underline)
-        sys.stdout.write('%s %d:' % (self.type, self.count[self.type]))
+        sys.stdout.write(f'{self.type} {self.count[self.type]}:')
         sys.stdout.write(vt100.reset)
         sys.stdout.flush()
 
@@ -260,22 +259,18 @@ class CallbackModule(CallbackModule_default):
         for name in self.hosts:
             sys.stdout.write(' ')
             if self.hosts[name].get('delegate', None):
-                sys.stdout.write(self.hosts[name]['delegate'] + '>')
+                sys.stdout.write(f"{self.hosts[name]['delegate']}>")
             sys.stdout.write(colors[self.hosts[name]['state']] + name + vt100.reset)
             sys.stdout.flush()
 
-#        if result._result.get('diff', False):
-#            sys.stdout.write('\n' + vt100.linewrap)
         sys.stdout.write(vt100.linewrap)
-
-#        self.keep = True
 
     def _display_task_banner(self):
         if not self.shown_title:
             self.shown_title = True
             sys.stdout.write(vt100.restore + vt100.reset + vt100.clearline + vt100.underline)
-            sys.stdout.write('%s %d: %s' % (self.type, self.count[self.type], self.task.get_name().strip()))
-            sys.stdout.write(vt100.restore + vt100.reset + '\n' + vt100.save + vt100.clearline)
+            sys.stdout.write(f'{self.type} {self.count[self.type]}: {self.task.get_name().strip()}')
+            sys.stdout.write(f"{vt100.restore}{vt100.reset}\n{vt100.save}{vt100.clearline}")
             sys.stdout.flush()
         else:
             sys.stdout.write(vt100.restore + vt100.reset + vt100.clearline)
@@ -284,7 +279,7 @@ class CallbackModule(CallbackModule_default):
     def _display_results(self, result, status):
         # Leave the previous task on screen (as it has changes/errors)
         if self._display.verbosity == 0 and self.keep:
-            sys.stdout.write(vt100.restore + vt100.reset + '\n' + vt100.save + vt100.clearline)
+            sys.stdout.write(f"{vt100.restore}{vt100.reset}\n{vt100.save}{vt100.clearline}")
         else:
             sys.stdout.write(vt100.restore + vt100.reset + vt100.clearline)
         self.keep = False
@@ -309,16 +304,16 @@ class CallbackModule(CallbackModule_default):
         if result._task.loop and 'results' in result._result:
             self._process_items(result)
         else:
-            sys.stdout.write(colors[status] + status + ': ')
+            sys.stdout.write(f"{colors[status] + status}: ")
 
             delegated_vars = result._result.get('_ansible_delegated_vars', None)
             if delegated_vars:
-                sys.stdout.write(vt100.reset + result._host.get_name() + '>' + colors[status] + delegated_vars['ansible_host'])
+                sys.stdout.write(f"{vt100.reset}{result._host.get_name()}>{colors[status]}{delegated_vars['ansible_host']}")
             else:
                 sys.stdout.write(result._host.get_name())
 
-            sys.stdout.write(': ' + dump + '\n')
-            sys.stdout.write(vt100.reset + vt100.save + vt100.clearline)
+            sys.stdout.write(f": {dump}\n")
+            sys.stdout.write(f"{vt100.reset}{vt100.save}{vt100.clearline}")
             sys.stdout.flush()
 
         if status == 'changed':
@@ -327,7 +322,7 @@ class CallbackModule(CallbackModule_default):
     def v2_playbook_on_play_start(self, play):
         # Leave the previous task on screen (as it has changes/errors)
         if self._display.verbosity == 0 and self.keep:
-            sys.stdout.write(vt100.restore + vt100.reset + '\n' + vt100.save + vt100.clearline + vt100.bold)
+            sys.stdout.write(f"{vt100.restore}{vt100.reset}\n{vt100.save}{vt100.clearline}{vt100.bold}")
         else:
             sys.stdout.write(vt100.restore + vt100.reset + vt100.clearline + vt100.bold)
 
@@ -341,14 +336,14 @@ class CallbackModule(CallbackModule_default):
         name = play.get_name().strip()
         if not name:
             name = 'unnamed'
-        sys.stdout.write('PLAY %d: %s' % (self.count['play'], name.upper()))
-        sys.stdout.write(vt100.restore + vt100.reset + '\n' + vt100.save + vt100.clearline)
+        sys.stdout.write(f"PLAY {self.count['play']}: {name.upper()}")
+        sys.stdout.write(f"{vt100.restore}{vt100.reset}\n{vt100.save}{vt100.clearline}")
         sys.stdout.flush()
 
     def v2_playbook_on_task_start(self, task, is_conditional):
         # Leave the previous task on screen (as it has changes/errors)
         if self._display.verbosity == 0 and self.keep:
-            sys.stdout.write(vt100.restore + vt100.reset + '\n' + vt100.save + vt100.clearline + vt100.underline)
+            sys.stdout.write(f"{vt100.restore}{vt100.reset}\n{vt100.save}{vt100.clearline}{vt100.underline}")
         else:
             # Do not clear line, since we want to retain the previous output
             sys.stdout.write(vt100.restore + vt100.reset + vt100.underline)
@@ -365,14 +360,14 @@ class CallbackModule(CallbackModule_default):
             self.count['task'] += 1
 
         # Write the next task on screen (behind the prompt is the previous output)
-        sys.stdout.write('%s %d.' % (self.type, self.count[self.type]))
+        sys.stdout.write(f'{self.type} {self.count[self.type]}.')
         sys.stdout.write(vt100.reset)
         sys.stdout.flush()
 
     def v2_playbook_on_handler_task_start(self, task):
         # Leave the previous task on screen (as it has changes/errors)
         if self._display.verbosity == 0 and self.keep:
-            sys.stdout.write(vt100.restore + vt100.reset + '\n' + vt100.save + vt100.clearline + vt100.underline)
+            sys.stdout.write(f"{vt100.restore}{vt100.reset}\n{vt100.save}{vt100.clearline}{vt100.underline}")
         else:
             sys.stdout.write(vt100.restore + vt100.reset + vt100.clearline + vt100.underline)
 
@@ -388,7 +383,7 @@ class CallbackModule(CallbackModule_default):
             self.count[self.type] += 1
 
         # Write the next task on screen (behind the prompt is the previous output)
-        sys.stdout.write('%s %d.' % (self.type, self.count[self.type]))
+        sys.stdout.write(f'{self.type} {self.count[self.type]}.')
         sys.stdout.write(vt100.reset)
         sys.stdout.flush()
 
@@ -451,13 +446,13 @@ class CallbackModule(CallbackModule_default):
 
     def v2_playbook_on_no_hosts_remaining(self):
         if self._display.verbosity == 0 and self.keep:
-            sys.stdout.write(vt100.restore + vt100.reset + '\n' + vt100.save + vt100.clearline)
+            sys.stdout.write(f"{vt100.restore}{vt100.reset}\n{vt100.save}{vt100.clearline}")
         else:
             sys.stdout.write(vt100.restore + vt100.reset + vt100.clearline)
         self.keep = False
 
-        sys.stdout.write(vt100.white + vt100.redbg + 'NO MORE HOSTS LEFT')
-        sys.stdout.write(vt100.restore + vt100.reset + '\n' + vt100.save + vt100.clearline)
+        sys.stdout.write(f"{vt100.white + vt100.redbg}NO MORE HOSTS LEFT")
+        sys.stdout.write(f"{vt100.restore}{vt100.reset}\n{vt100.save}{vt100.clearline}")
         sys.stdout.flush()
 
     def v2_playbook_on_include(self, included_file):
@@ -465,7 +460,7 @@ class CallbackModule(CallbackModule_default):
 
     def v2_playbook_on_stats(self, stats):
         if self._display.verbosity == 0 and self.keep:
-            sys.stdout.write(vt100.restore + vt100.reset + '\n' + vt100.save + vt100.clearline)
+            sys.stdout.write(f"{vt100.restore}{vt100.reset}\n{vt100.save}{vt100.clearline}")
         else:
             sys.stdout.write(vt100.restore + vt100.reset + vt100.clearline)
 
@@ -476,22 +471,16 @@ class CallbackModule(CallbackModule_default):
         sys.stdout.write(vt100.bold + vt100.underline)
         sys.stdout.write('SUMMARY')
 
-        sys.stdout.write(vt100.restore + vt100.reset + '\n' + vt100.save + vt100.clearline)
+        sys.stdout.write(f"{vt100.restore}{vt100.reset}\n{vt100.save}{vt100.clearline}")
         sys.stdout.flush()
 
         hosts = sorted(stats.processed.keys())
         for h in hosts:
             t = stats.summarize(h)
             self._display.display(
-                u"%s : %s %s %s %s %s %s" % (
-                    hostcolor(h, t),
-                    colorize(u'ok', t['ok'], C.COLOR_OK),
-                    colorize(u'changed', t['changed'], C.COLOR_CHANGED),
-                    colorize(u'unreachable', t['unreachable'], C.COLOR_UNREACHABLE),
-                    colorize(u'failed', t['failures'], C.COLOR_ERROR),
-                    colorize(u'rescued', t['rescued'], C.COLOR_OK),
-                    colorize(u'ignored', t['ignored'], C.COLOR_WARN),
-                ),
+                f"{hostcolor(h, t)} : {colorize('ok', t['ok'], C.COLOR_OK)} {colorize('changed', t['changed'], C.COLOR_CHANGED)} "
+                f"{colorize('unreachable', t['unreachable'], C.COLOR_UNREACHABLE)} {colorize('failed', t['failures'], C.COLOR_ERROR)} "
+                f"{colorize('rescued', t['rescued'], C.COLOR_OK)} {colorize('ignored', t['ignored'], C.COLOR_WARN)}",
                 screen_only=True
             )
 

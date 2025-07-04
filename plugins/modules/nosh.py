@@ -9,67 +9,61 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: nosh
 author:
-    - "Thomas Caravia (@tacatac)"
+  - "Thomas Caravia (@tacatac)"
 short_description: Manage services with nosh
 description:
-    - Control running and enabled state for system-wide or user services.
-    - BSD and Linux systems are supported.
+  - Control running and enabled state for system-wide or user services.
+  - BSD and Linux systems are supported.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    name:
-        type: str
-        required: true
-        description:
-            - Name of the service to manage.
-    state:
-        type: str
-        required: false
-        choices: [ started, stopped, reset, restarted, reloaded ]
-        description:
-            - V(started)/V(stopped) are idempotent actions that will not run
-              commands unless necessary.
-              V(restarted) will always bounce the service.
-              V(reloaded) will send a SIGHUP or start the service.
-              V(reset) will start or stop the service according to whether it is
-              enabled or not.
-    enabled:
-        required: false
-        type: bool
-        description:
-            - Enable or disable the service, independently of C(*.preset) file
-              preference or running state. Mutually exclusive with O(preset). Will take
-              effect prior to O(state=reset).
-    preset:
-        required: false
-        type: bool
-        description:
-            - Enable or disable the service according to local preferences in C(*.preset) files.
-              Mutually exclusive with O(enabled). Only has an effect if set to true. Will take
-              effect prior to O(state=reset).
-    user:
-        required: false
-        default: false
-        type: bool
-        description:
-            - Run system-control talking to the calling user's service manager, rather than
-              the system-wide service manager.
+  name:
+    type: str
+    required: true
+    description:
+      - Name of the service to manage.
+  state:
+    type: str
+    required: false
+    choices: [started, stopped, reset, restarted, reloaded]
+    description:
+      - V(started)/V(stopped) are idempotent actions that will not run commands unless necessary.
+      - V(restarted) will always bounce the service.
+      - V(reloaded) will send a SIGHUP or start the service.
+      - V(reset) will start or stop the service according to whether it is enabled or not.
+  enabled:
+    required: false
+    type: bool
+    description:
+      - Enable or disable the service, independently of C(*.preset) file preference or running state. Mutually exclusive with
+        O(preset). Will take effect prior to O(state=reset).
+  preset:
+    required: false
+    type: bool
+    description:
+      - Enable or disable the service according to local preferences in C(*.preset) files. Mutually exclusive with O(enabled).
+        Only has an effect if set to true. Will take effect prior to O(state=reset).
+  user:
+    required: false
+    default: false
+    type: bool
+    description:
+      - Run system-control talking to the calling user's service manager, rather than the system-wide service manager.
 requirements:
-    - A system with an active nosh service manager, see Notes for further information.
+  - A system with an active nosh service manager, see Notes for further information.
 notes:
-    - Information on the nosh utilities suite may be found at U(https://jdebp.eu/Softwares/nosh/).
-'''
+  - Information on the nosh utilities suite may be found at U(https://jdebp.eu/Softwares/nosh/).
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Start dnscache if not running
   community.general.nosh:
     name: dnscache
@@ -122,215 +116,216 @@ EXAMPLES = '''
       ansible.builtin.fail:
         msg: "The {{ result.name }} service is running"
       when: result.status and result.status['DaemontoolsEncoreState'] == "running"
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 name:
-    description: name used to find the service
-    returned: success
-    type: str
-    sample: "sshd"
+  description: Name used to find the service.
+  returned: success
+  type: str
+  sample: "sshd"
 service_path:
-    description: resolved path for the service
-    returned: success
-    type: str
-    sample: "/var/sv/sshd"
+  description: Resolved path for the service.
+  returned: success
+  type: str
+  sample: "/var/sv/sshd"
 enabled:
-    description: whether the service is enabled at system bootstrap
-    returned: success
-    type: bool
-    sample: true
+  description: Whether the service is enabled at system bootstrap.
+  returned: success
+  type: bool
+  sample: true
 preset:
-    description: whether the enabled status reflects the one set in the relevant C(*.preset) file
-    returned: success
-    type: bool
-    sample: 'False'
+  description: Whether the enabled status reflects the one set in the relevant C(*.preset) file.
+  returned: success
+  type: bool
+  sample: 'False'
 state:
-    description: service process run state, V(none) if the service is not loaded and will not be started
-    returned: if state option is used
-    type: str
-    sample: "reloaded"
+  description: Service process run state, V(none) if the service is not loaded and will not be started.
+  returned: if state option is used
+  type: str
+  sample: "reloaded"
 status:
-    description: A dictionary with the key=value pairs returned by C(system-control show-json) or V(none) if the service is not loaded
-    returned: success
-    type: complex
-    contains:
-        After:
-            description: []  # FIXME
-            returned: success
-            type: list
-            sample: ["/etc/service-bundles/targets/basic","../sshdgenkeys", "log"]
-        Before:
-            description: []  # FIXME
-            returned: success
-            type: list
-            sample: ["/etc/service-bundles/targets/shutdown"]
-        Conflicts:
-            description: []  # FIXME
-            returned: success
-            type: list
-            sample: []
-        DaemontoolsEncoreState:
-            description: []  # FIXME
-            returned: success
-            type: str
-            sample: "running"
-        DaemontoolsState:
-            description: []  # FIXME
-            returned: success
-            type: str
-            sample: "up"
-        Enabled:
-            description: []  # FIXME
-            returned: success
-            type: bool
-            sample: true
-        LogService:
-            description: []  # FIXME
-            returned: success
-            type: str
-            sample: "../cyclog@sshd"
-        MainPID:
-            description: []  # FIXME
-            returned: success
-            type: int
-            sample: 661
-        Paused:
-            description: []  # FIXME
-            returned: success
-            type: bool
-            sample: 'False'
-        ReadyAfterRun:
-            description: []  # FIXME
-            returned: success
-            type: bool
-            sample: 'False'
-        RemainAfterExit:
-            description: []  # FIXME
-            returned: success
-            type: bool
-            sample: 'False'
-        Required-By:
-            description: []  # FIXME
-            returned: success
-            type: list
-            sample: []
-        RestartExitStatusCode:
-            description: []  # FIXME
-            returned: success
-            type: int
-            sample: '0'
-        RestartExitStatusNumber:
-            description: []  # FIXME
-            returned: success
-            type: int
-            sample: '0'
-        RestartTimestamp:
-            description: []  # FIXME
-            returned: success
-            type: int
-            sample: 4611686019935648081
-        RestartUTCTimestamp:
-            description: []  # FIXME
-            returned: success
-            type: int
-            sample: 1508260140
-        RunExitStatusCode:
-            description: []  # FIXME
-            returned: success
-            type: int
-            sample: '0'
-        RunExitStatusNumber:
-            description: []  # FIXME
-            returned: success
-            type: int
-            sample: '0'
-        RunTimestamp:
-            description: []  # FIXME
-            returned: success
-            type: int
-            sample: 4611686019935648081
-        RunUTCTimestamp:
-            description: []  # FIXME
-            returned: success
-            type: int
-            sample: 1508260140
-        StartExitStatusCode:
-            description: []  # FIXME
-            returned: success
-            type: int
-            sample: 1
-        StartExitStatusNumber:
-            description: []  # FIXME
-            returned: success
-            type: int
-            sample: '0'
-        StartTimestamp:
-            description: []  # FIXME
-            returned: success
-            type: int
-            sample: 4611686019935648081
-        StartUTCTimestamp:
-            description: []  # FIXME
-            returned: success
-            type: int
-            sample: 1508260140
-        StopExitStatusCode:
-            description: []  # FIXME
-            returned: success
-            type: int
-            sample: '0'
-        StopExitStatusNumber:
-            description: []  # FIXME
-            returned: success
-            type: int
-            sample: '0'
-        StopTimestamp:
-            description: []  # FIXME
-            returned: success
-            type: int
-            sample: 4611686019935648081
-        StopUTCTimestamp:
-            description: []  # FIXME
-            returned: success
-            type: int
-            sample: 1508260140
-        Stopped-By:
-            description: []  # FIXME
-            returned: success
-            type: list
-            sample: ["/etc/service-bundles/targets/shutdown"]
-        Timestamp:
-            description: []  # FIXME
-            returned: success
-            type: int
-            sample: 4611686019935648081
-        UTCTimestamp:
-            description: []  # FIXME
-            returned: success
-            type: int
-            sample: 1508260140
-        Want:
-            description: []  # FIXME
-            returned: success
-            type: str
-            sample: "nothing"
-        Wanted-By:
-            description: []  # FIXME
-            returned: success
-            type: list
-            sample: ["/etc/service-bundles/targets/server","/etc/service-bundles/targets/sockets"]
-        Wants:
-            description: []  # FIXME
-            returned: success
-            type: list
-            sample: ["/etc/service-bundles/targets/basic","../sshdgenkeys"]
+  description: A dictionary with the key=value pairs returned by C(system-control show-json) or V(none) if the service is
+    not loaded.
+  returned: success
+  type: complex
+  contains:
+    After:
+      description: []        # FIXME
+      returned: success
+      type: list
+      sample: ["/etc/service-bundles/targets/basic", "../sshdgenkeys", "log"]
+    Before:
+      description: []        # FIXME
+      returned: success
+      type: list
+      sample: ["/etc/service-bundles/targets/shutdown"]
+    Conflicts:
+      description: []        # FIXME
+      returned: success
+      type: list
+      sample: []
+    DaemontoolsEncoreState:
+      description: []        # FIXME
+      returned: success
+      type: str
+      sample: "running"
+    DaemontoolsState:
+      description: []        # FIXME
+      returned: success
+      type: str
+      sample: "up"
+    Enabled:
+      description: []        # FIXME
+      returned: success
+      type: bool
+      sample: true
+    LogService:
+      description: []        # FIXME
+      returned: success
+      type: str
+      sample: "../cyclog@sshd"
+    MainPID:
+      description: []        # FIXME
+      returned: success
+      type: int
+      sample: 661
+    Paused:
+      description: []        # FIXME
+      returned: success
+      type: bool
+      sample: 'False'
+    ReadyAfterRun:
+      description: []        # FIXME
+      returned: success
+      type: bool
+      sample: 'False'
+    RemainAfterExit:
+      description: []        # FIXME
+      returned: success
+      type: bool
+      sample: 'False'
+    Required-By:
+      description: []        # FIXME
+      returned: success
+      type: list
+      sample: []
+    RestartExitStatusCode:
+      description: []        # FIXME
+      returned: success
+      type: int
+      sample: '0'
+    RestartExitStatusNumber:
+      description: []        # FIXME
+      returned: success
+      type: int
+      sample: '0'
+    RestartTimestamp:
+      description: []        # FIXME
+      returned: success
+      type: int
+      sample: 4611686019935648081
+    RestartUTCTimestamp:
+      description: []        # FIXME
+      returned: success
+      type: int
+      sample: 1508260140
+    RunExitStatusCode:
+      description: []        # FIXME
+      returned: success
+      type: int
+      sample: '0'
+    RunExitStatusNumber:
+      description: []        # FIXME
+      returned: success
+      type: int
+      sample: '0'
+    RunTimestamp:
+      description: []        # FIXME
+      returned: success
+      type: int
+      sample: 4611686019935648081
+    RunUTCTimestamp:
+      description: []        # FIXME
+      returned: success
+      type: int
+      sample: 1508260140
+    StartExitStatusCode:
+      description: []        # FIXME
+      returned: success
+      type: int
+      sample: 1
+    StartExitStatusNumber:
+      description: []        # FIXME
+      returned: success
+      type: int
+      sample: '0'
+    StartTimestamp:
+      description: []        # FIXME
+      returned: success
+      type: int
+      sample: 4611686019935648081
+    StartUTCTimestamp:
+      description: []        # FIXME
+      returned: success
+      type: int
+      sample: 1508260140
+    StopExitStatusCode:
+      description: []        # FIXME
+      returned: success
+      type: int
+      sample: '0'
+    StopExitStatusNumber:
+      description: []        # FIXME
+      returned: success
+      type: int
+      sample: '0'
+    StopTimestamp:
+      description: []        # FIXME
+      returned: success
+      type: int
+      sample: 4611686019935648081
+    StopUTCTimestamp:
+      description: []        # FIXME
+      returned: success
+      type: int
+      sample: 1508260140
+    Stopped-By:
+      description: []        # FIXME
+      returned: success
+      type: list
+      sample: ["/etc/service-bundles/targets/shutdown"]
+    Timestamp:
+      description: []        # FIXME
+      returned: success
+      type: int
+      sample: 4611686019935648081
+    UTCTimestamp:
+      description: []        # FIXME
+      returned: success
+      type: int
+      sample: 1508260140
+    Want:
+      description: []        # FIXME
+      returned: success
+      type: str
+      sample: "nothing"
+    Wanted-By:
+      description: []        # FIXME
+      returned: success
+      type: list
+      sample: ["/etc/service-bundles/targets/server", "/etc/service-bundles/targets/sockets"]
+    Wants:
+      description: []        # FIXME
+      returned: success
+      type: list
+      sample: ["/etc/service-bundles/targets/basic", "../sshdgenkeys"]
 user:
-    description: whether the user-level service manager is called
-    returned: success
-    type: bool
-    sample: false
-'''
+  description: Whether the user-level service manager is called.
+  returned: success
+  type: bool
+  sample: false
+"""
 
 
 import json

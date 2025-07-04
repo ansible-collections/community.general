@@ -12,7 +12,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: gitlab_issue
 short_description: Create, update, or delete GitLab issues
 version_added: '8.1.0'
@@ -97,10 +97,10 @@ options:
       - A title for the issue. The title is used as a unique identifier to ensure idempotency.
     type: str
     required: true
-'''
+"""
 
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create Issue
   community.general.gitlab_issue:
     api_url: https://gitlab.com
@@ -109,10 +109,10 @@ EXAMPLES = '''
     title: "Ansible demo Issue"
     description: "Demo Issue description"
     labels:
-        - Ansible
-        - Demo
+      - Ansible
+      - Demo
     assignee_ids:
-        - testassignee
+      - testassignee
     state_filter: "opened"
     state: present
 
@@ -124,9 +124,9 @@ EXAMPLES = '''
     title: "Ansible demo Issue"
     state_filter: "opened"
     state: absent
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 msg:
   description: Success or failure message.
   returned: always
@@ -137,13 +137,12 @@ issue:
   description: API object.
   returned: success
   type: dict
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.common.text.converters import to_native, to_text
 
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
     auth_argument_spec, gitlab_authentication, gitlab, find_project, find_group
 )
@@ -183,7 +182,7 @@ class GitlabIssue(object):
     def get_issue(self, title, state_filter):
         issues = []
         try:
-            issues = self.project.issues.list(title=title, state=state_filter)
+            issues = self.project.issues.list(query_parameters={"search": title, "in": "title", "state": state_filter})
         except gitlab.exceptions.GitlabGetError as e:
             self._module.fail_json(msg="Failed to list the Issues: %s" % to_native(e))
 
@@ -265,14 +264,14 @@ class GitlabIssue(object):
 
                 if key == 'milestone_id':
                     old_milestone = getattr(issue, 'milestone')['id'] if getattr(issue, 'milestone') else ""
-                    if options[key] != old_milestone:
+                    if value != old_milestone:
                         return True
                 elif key == 'assignee_ids':
-                    if options[key] != sorted([user["id"] for user in getattr(issue, 'assignees')]):
+                    if value != sorted([user["id"] for user in getattr(issue, 'assignees')]):
                         return True
 
                 elif key == 'labels':
-                    if options[key] != sorted(getattr(issue, key)):
+                    if value != sorted(getattr(issue, key)):
                         return True
 
                 elif getattr(issue, key) != value:
@@ -330,13 +329,8 @@ def main():
     state_filter = module.params['state_filter']
     title = module.params['title']
 
-    gitlab_version = gitlab.__version__
-    if LooseVersion(gitlab_version) < LooseVersion('2.3.0'):
-        module.fail_json(msg="community.general.gitlab_issue requires python-gitlab Python module >= 2.3.0 (installed version: [%s])."
-                             " Please upgrade python-gitlab to version 2.3.0 or above." % gitlab_version)
-
     # check prerequisites and connect to gitlab server
-    gitlab_instance = gitlab_authentication(module)
+    gitlab_instance = gitlab_authentication(module, min_version='2.3.0')
 
     this_project = find_project(gitlab_instance, project)
     if this_project is None:

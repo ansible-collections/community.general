@@ -36,7 +36,7 @@ job "example" {
   #
   type = "service"
 
-  
+
   # The "constraint" stanza defines additional constraints for placing this job,
   # in addition to any resource or driver constraints. This stanza may be placed
   # at the "job", "group", or "task" level, and supports variable interpolation.

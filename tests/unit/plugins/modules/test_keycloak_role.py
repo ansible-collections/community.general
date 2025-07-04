@@ -9,9 +9,9 @@ __metaclass__ = type
 
 from contextlib import contextmanager
 
-from ansible_collections.community.general.tests.unit.compat import unittest
-from ansible_collections.community.general.tests.unit.compat.mock import patch
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, ModuleTestCase, set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleExitJson, ModuleTestCase, set_module_args
 
 from ansible_collections.community.general.plugins.modules import keycloak_role
 
@@ -129,17 +129,16 @@ class TestKeycloakRealmRole(ModuleTestCase):
         return_value_created = [None]
         changed = True
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_realm_role=return_value_absent, create_realm_role=return_value_created) \
-                    as (mock_get_realm_role, mock_create_realm_role, mock_update_realm_role, mock_delete_realm_role,
-                        mock_get_client_role, mock_create_client_role, mock_update_client_role, mock_delete_client_role,
-                        mock_get_client_by_client_id, mock_get_role_composites):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_realm_role=return_value_absent, create_realm_role=return_value_created) \
+                        as (mock_get_realm_role, mock_create_realm_role, mock_update_realm_role, mock_delete_realm_role,
+                            mock_get_client_role, mock_create_client_role, mock_update_client_role, mock_delete_client_role,
+                            mock_get_client_by_client_id, mock_get_role_composites):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         self.assertEqual(len(mock_get_realm_role.mock_calls), 2)
         self.assertEqual(len(mock_create_realm_role.mock_calls), 1)
@@ -185,17 +184,16 @@ class TestKeycloakRealmRole(ModuleTestCase):
         return_value_updated = [None]
         changed = True
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_realm_role=return_value_present, update_realm_role=return_value_updated) \
-                    as (mock_get_realm_role, mock_create_realm_role, mock_update_realm_role, mock_delete_realm_role,
-                        mock_get_client_role, mock_create_client_role, mock_update_client_role, mock_delete_client_role,
-                        mock_get_client_by_client_id, mock_get_role_composites):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_realm_role=return_value_present, update_realm_role=return_value_updated) \
+                        as (mock_get_realm_role, mock_create_realm_role, mock_update_realm_role, mock_delete_realm_role,
+                            mock_get_client_role, mock_create_client_role, mock_update_client_role, mock_delete_client_role,
+                            mock_get_client_by_client_id, mock_get_role_composites):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         self.assertEqual(len(mock_get_realm_role.mock_calls), 2)
         self.assertEqual(len(mock_create_realm_role.mock_calls), 0)
@@ -241,17 +239,16 @@ class TestKeycloakRealmRole(ModuleTestCase):
         return_value_updated = [None]
         changed = False
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_realm_role=return_value_present, update_realm_role=return_value_updated) \
-                    as (mock_get_realm_role, mock_create_realm_role, mock_update_realm_role, mock_delete_realm_role,
-                        mock_get_client_role, mock_create_client_role, mock_update_client_role, mock_delete_client_role,
-                        mock_get_client_by_client_id, mock_get_role_composites):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_realm_role=return_value_present, update_realm_role=return_value_updated) \
+                        as (mock_get_realm_role, mock_create_realm_role, mock_update_realm_role, mock_delete_realm_role,
+                            mock_get_client_role, mock_create_client_role, mock_update_client_role, mock_delete_client_role,
+                            mock_get_client_by_client_id, mock_get_role_composites):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         self.assertEqual(len(mock_get_realm_role.mock_calls), 1)
         self.assertEqual(len(mock_create_realm_role.mock_calls), 0)
@@ -371,19 +368,18 @@ class TestKeycloakRealmRole(ModuleTestCase):
 
         changed = False
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_realm_role=return_value_present, update_realm_role=return_value_updated,
-                                    get_client_by_id=return_get_client_by_client_id,
-                                    get_role_composites=return_get_role_composites) \
-                    as (mock_get_realm_role, mock_create_realm_role, mock_update_realm_role, mock_delete_realm_role,
-                        mock_get_client_role, mock_create_client_role, mock_update_client_role, mock_delete_client_role,
-                        mock_get_client_by_client_id, mock_get_role_composites):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_realm_role=return_value_present, update_realm_role=return_value_updated,
+                                        get_client_by_id=return_get_client_by_client_id,
+                                        get_role_composites=return_get_role_composites) \
+                        as (mock_get_realm_role, mock_create_realm_role, mock_update_realm_role, mock_delete_realm_role,
+                            mock_get_client_role, mock_create_client_role, mock_update_client_role, mock_delete_client_role,
+                            mock_get_client_by_client_id, mock_get_role_composites):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         self.assertEqual(len(mock_get_realm_role.mock_calls), 1)
         self.assertEqual(len(mock_create_realm_role.mock_calls), 0)
@@ -412,17 +408,16 @@ class TestKeycloakRealmRole(ModuleTestCase):
         return_value_deleted = [None]
         changed = False
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_realm_role=return_value_absent, delete_realm_role=return_value_deleted) \
-                    as (mock_get_realm_role, mock_create_realm_role, mock_update_realm_role, mock_delete_realm_role,
-                        mock_get_client_role, mock_create_client_role, mock_update_client_role, mock_delete_client_role,
-                        mock_get_client_by_client_id, mock_get_role_composites):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_realm_role=return_value_absent, delete_realm_role=return_value_deleted) \
+                        as (mock_get_realm_role, mock_create_realm_role, mock_update_realm_role, mock_delete_realm_role,
+                            mock_get_client_role, mock_create_client_role, mock_update_client_role, mock_delete_client_role,
+                            mock_get_client_by_client_id, mock_get_role_composites):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         self.assertEqual(len(mock_get_realm_role.mock_calls), 1)
         self.assertEqual(len(mock_delete_realm_role.mock_calls), 0)
@@ -458,17 +453,16 @@ class TestKeycloakRealmRole(ModuleTestCase):
         return_value_deleted = [None]
         changed = True
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_realm_role=return_value_absent, delete_realm_role=return_value_deleted) \
-                    as (mock_get_realm_role, mock_create_realm_role, mock_update_realm_role, mock_delete_realm_role,
-                        mock_get_client_role, mock_create_client_role, mock_update_client_role, mock_delete_client_role,
-                        mock_get_client_by_client_id, mock_get_role_composites):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_realm_role=return_value_absent, delete_realm_role=return_value_deleted) \
+                        as (mock_get_realm_role, mock_create_realm_role, mock_update_realm_role, mock_delete_realm_role,
+                            mock_get_client_role, mock_create_client_role, mock_update_client_role, mock_delete_client_role,
+                            mock_get_client_by_client_id, mock_get_role_composites):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         self.assertEqual(len(mock_get_realm_role.mock_calls), 1)
         self.assertEqual(len(mock_delete_realm_role.mock_calls), 1)
@@ -531,17 +525,16 @@ class TestKeycloakClientRole(ModuleTestCase):
         ]
         changed = True
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_client_role=return_get_client_role) \
-                    as (mock_get_realm_role, mock_create_realm_role, mock_update_realm_role, mock_delete_realm_role,
-                        mock_get_client_role, mock_create_client_role, mock_update_client_role, mock_delete_client_role,
-                        mock_get_client_by_client_id, mock_get_role_composites):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_client_role=return_get_client_role) \
+                        as (mock_get_realm_role, mock_create_realm_role, mock_update_realm_role, mock_delete_realm_role,
+                            mock_get_client_role, mock_create_client_role, mock_update_client_role, mock_delete_client_role,
+                            mock_get_client_by_client_id, mock_get_role_composites):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         self.assertEqual(len(mock_get_realm_role.mock_calls), 0)
         self.assertEqual(len(mock_create_realm_role.mock_calls), 0)
@@ -653,18 +646,17 @@ class TestKeycloakClientRole(ModuleTestCase):
         ]
         changed = False
 
-        set_module_args(module_args)
-
         # Run the module
 
-        with mock_good_connection():
-            with patch_keycloak_api(get_client_role=return_get_client_role, get_client_by_id=return_get_client_by_client_id,
-                                    get_role_composites=return_get_role_composites) \
-                    as (mock_get_realm_role, mock_create_realm_role, mock_update_realm_role, mock_delete_realm_role,
-                        mock_get_client_role, mock_create_client_role, mock_update_client_role, mock_delete_client_role,
-                        mock_get_client_by_client_id, mock_get_role_composites):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(get_client_role=return_get_client_role, get_client_by_id=return_get_client_by_client_id,
+                                        get_role_composites=return_get_role_composites) \
+                        as (mock_get_realm_role, mock_create_realm_role, mock_update_realm_role, mock_delete_realm_role,
+                            mock_get_client_role, mock_create_client_role, mock_update_client_role, mock_delete_client_role,
+                            mock_get_client_by_client_id, mock_get_role_composites):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
 
         self.assertEqual(len(mock_get_realm_role.mock_calls), 0)
         self.assertEqual(len(mock_create_realm_role.mock_calls), 0)

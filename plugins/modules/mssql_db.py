@@ -10,8 +10,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: mssql_db
 short_description: Add or remove MSSQL databases from a remote host
 description:
@@ -26,56 +25,55 @@ attributes:
 options:
   name:
     description:
-      - name of the database to add or remove
+      - Name of the database to add or remove.
     required: true
-    aliases: [ db ]
+    aliases: [db]
     type: str
   login_user:
     description:
-      - The username used to authenticate with
+      - The username used to authenticate with.
     type: str
     default: ''
   login_password:
     description:
-      - The password used to authenticate with
+      - The password used to authenticate with.
     type: str
     default: ''
   login_host:
     description:
-      - Host running the database
+      - Host running the database.
     type: str
     required: true
   login_port:
     description:
-      - Port of the MSSQL server. Requires login_host be defined as other than localhost if login_port is used
+      - Port of the MSSQL server. Requires login_host be defined as other than localhost if login_port is used.
     default: '1433'
     type: str
   state:
     description:
-      - The database state
+      - The database state.
     default: present
-    choices: [ "present", "absent", "import" ]
+    choices: ["present", "absent", "import"]
     type: str
   target:
     description:
-      - Location, on the remote host, of the dump file to read from or write to. Uncompressed SQL
-        files (C(.sql)) files are supported.
+      - Location, on the remote host, of the dump file to read from or write to. Uncompressed SQL files (C(.sql)) files are
+        supported.
     type: str
   autocommit:
     description:
-      - Automatically commit the change only if the import succeed. Sometimes it is necessary to use autocommit=true, since some content can't be changed
-        within a transaction.
+      - Automatically commit the change only if the import succeed. Sometimes it is necessary to use autocommit=true, since
+        some content can not be changed within a transaction.
     type: bool
     default: false
 notes:
-   - Requires the pymssql Python package on the remote host. For Ubuntu, this
-     is as easy as pip install pymssql (See M(ansible.builtin.pip).)
+  - Requires the pymssql Python package on the remote host. For Ubuntu, this is as easy as pip install pymssql (See M(ansible.builtin.pip)).
 requirements:
-   - pymssql
+  - pymssql
 author: Vedit Firat Arig (@vedit)
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a new database with name 'jackdata'
   community.general.mssql_db:
     name: jackdata
@@ -92,11 +90,11 @@ EXAMPLES = '''
     name: my_db
     state: import
     target: /tmp/dump.sql
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 #
-'''
+"""
 
 import os
 import traceback

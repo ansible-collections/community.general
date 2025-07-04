@@ -5,61 +5,67 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # Make coding more python3-ish
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
-DOCUMENTATION = '''
-    author: Unknown (!UNKNOWN)
-    name: slack
-    type: notification
-    requirements:
-      - whitelist in configuration
-      - prettytable (python library)
-    short_description: Sends play events to a Slack channel
+DOCUMENTATION = r"""
+author: Unknown (!UNKNOWN)
+name: slack
+type: notification
+requirements:
+  - whitelist in configuration
+  - prettytable (python library)
+short_description: Sends play events to a Slack channel
+description:
+  - This is an ansible callback plugin that sends status updates to a Slack channel during playbook execution.
+options:
+  http_agent:
     description:
-        - This is an ansible callback plugin that sends status updates to a Slack channel during playbook execution.
-    options:
-      webhook_url:
-        required: true
-        description: Slack Webhook URL.
-        env:
-          - name: SLACK_WEBHOOK_URL
-        ini:
-          - section: callback_slack
-            key: webhook_url
-      channel:
-        default: "#ansible"
-        description: Slack room to post in.
-        env:
-          - name: SLACK_CHANNEL
-        ini:
-          - section: callback_slack
-            key: channel
-      username:
-        description: Username to post as.
-        env:
-          - name: SLACK_USERNAME
-        default: ansible
-        ini:
-          - section: callback_slack
-            key: username
-      validate_certs:
-        description: Validate the SSL certificate of the Slack server for HTTPS URLs.
-        env:
-          - name: SLACK_VALIDATE_CERTS
-        ini:
-          - section: callback_slack
-            key: validate_certs
-        default: true
-        type: bool
-'''
+      - HTTP user agent to use for requests to Slack.
+    type: string
+    version_added: "10.5.0"
+  webhook_url:
+    required: true
+    description: Slack Webhook URL.
+    type: str
+    env:
+      - name: SLACK_WEBHOOK_URL
+    ini:
+      - section: callback_slack
+        key: webhook_url
+  channel:
+    default: "#ansible"
+    description: Slack room to post in.
+    type: str
+    env:
+      - name: SLACK_CHANNEL
+    ini:
+      - section: callback_slack
+        key: channel
+  username:
+    description: Username to post as.
+    type: str
+    env:
+      - name: SLACK_USERNAME
+    default: ansible
+    ini:
+      - section: callback_slack
+        key: username
+  validate_certs:
+    description: Validate the SSL certificate of the Slack server for HTTPS URLs.
+    env:
+      - name: SLACK_VALIDATE_CERTS
+    ini:
+      - section: callback_slack
+        key: validate_certs
+    default: true
+    type: bool
+"""
 
 import json
 import os
 import uuid
 
 from ansible import context
-from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.urls import open_url
 from ansible.plugins.callback import CallbackBase
 
@@ -105,7 +111,7 @@ class CallbackModule(CallbackBase):
         self.username = self.get_option('username')
         self.show_invocation = (self._display.verbosity > 1)
         self.validate_certs = self.get_option('validate_certs')
-
+        self.http_agent = self.get_option('http_agent')
         if self.webhook_url is None:
             self.disabled = True
             self._display.warning('Slack Webhook URL was not provided. The '
@@ -131,18 +137,22 @@ class CallbackModule(CallbackBase):
         self._display.debug(data)
         self._display.debug(self.webhook_url)
         try:
-            response = open_url(self.webhook_url, data=data, validate_certs=self.validate_certs,
-                                headers=headers)
+            response = open_url(
+                self.webhook_url,
+                data=data,
+                validate_certs=self.validate_certs,
+                headers=headers,
+                http_agent=self.http_agent,
+            )
             return response.read()
         except Exception as e:
-            self._display.warning(u'Could not submit message to Slack: %s' %
-                                  to_text(e))
+            self._display.warning(f'Could not submit message to Slack: {e}')
 
     def v2_playbook_on_start(self, playbook):
         self.playbook_name = os.path.basename(playbook._file_name)
 
         title = [
-            '*Playbook initiated* (_%s_)' % self.guid
+            f'*Playbook initiated* (_{self.guid}_)'
         ]
 
         invocation_items = []
@@ -153,23 +163,23 @@ class CallbackModule(CallbackBase):
             subset = context.CLIARGS['subset']
             inventory = [os.path.abspath(i) for i in context.CLIARGS['inventory']]
 
-            invocation_items.append('Inventory:  %s' % ', '.join(inventory))
+            invocation_items.append(f"Inventory:  {', '.join(inventory)}")
             if tags and tags != ['all']:
-                invocation_items.append('Tags:       %s' % ', '.join(tags))
+                invocation_items.append(f"Tags:       {', '.join(tags)}")
             if skip_tags:
-                invocation_items.append('Skip Tags:  %s' % ', '.join(skip_tags))
+                invocation_items.append(f"Skip Tags:  {', '.join(skip_tags)}")
             if subset:
-                invocation_items.append('Limit:      %s' % subset)
+                invocation_items.append(f'Limit:      {subset}')
             if extra_vars:
-                invocation_items.append('Extra Vars: %s' %
-                                        ' '.join(extra_vars))
+                invocation_items.append(f"Extra Vars: {' '.join(extra_vars)}")
 
-            title.append('by *%s*' % context.CLIARGS['remote_user'])
+            title.append(f"by *{context.CLIARGS['remote_user']}*")
 
-        title.append('\n\n*%s*' % self.playbook_name)
+        title.append(f'\n\n*{self.playbook_name}*')
         msg_items = [' '.join(title)]
         if invocation_items:
-            msg_items.append('```\n%s\n```' % '\n'.join(invocation_items))
+            _inv_item = '\n'.join(invocation_items)
+            msg_items.append(f'```\n{_inv_item}\n```')
 
         msg = '\n'.join(msg_items)
 
@@ -189,8 +199,8 @@ class CallbackModule(CallbackBase):
     def v2_playbook_on_play_start(self, play):
         """Display Play start messages"""
 
-        name = play.name or 'Play name not specified (%s)' % play._uuid
-        msg = '*Starting play* (_%s_)\n\n*%s*' % (self.guid, name)
+        name = play.name or f'Play name not specified ({play._uuid})'
+        msg = f'*Starting play* (_{self.guid}_)\n\n*{name}*'
         attachments = [
             {
                 'fallback': msg,
@@ -225,7 +235,7 @@ class CallbackModule(CallbackBase):
 
         attachments = []
         msg_items = [
-            '*Playbook Complete* (_%s_)' % self.guid
+            f'*Playbook Complete* (_{self.guid}_)'
         ]
         if failures or unreachable:
             color = 'danger'
@@ -234,7 +244,7 @@ class CallbackModule(CallbackBase):
             color = 'good'
             msg_items.append('\n*Success!*')
 
-        msg_items.append('```\n%s\n```' % t)
+        msg_items.append(f'```\n{t}\n```')
 
         msg = '\n'.join(msg_items)
 

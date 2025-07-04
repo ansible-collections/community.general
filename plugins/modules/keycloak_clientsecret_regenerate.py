@@ -9,34 +9,29 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: keycloak_clientsecret_regenerate
 
-short_description: Regenerate Keycloak client secret via Keycloak API
+short_description: Regenerate Keycloak client secret using Keycloak API
 
 version_added: 6.1.0
 
 description:
-  - This module allows you to regenerate a Keycloak client secret via the
-    Keycloak REST API. It requires access to the REST API via OpenID Connect;
-    the user connecting and the client being used must have the requisite access
-    rights. In a default Keycloak installation, admin-cli and an admin user
-    would work, as would a separate client definition with the scope tailored to
-    your needs and a user having the expected roles.
-
-  - When regenerating a client secret, where possible provide the client's id
-    (not client_id) to the module. This removes a lookup to the API to
-    translate the client_id into the client ID.
-
-  - "Note that this module returns the client secret. To avoid this showing up in the logs,
-     please add C(no_log: true) to the task."
-
+  - This module allows you to regenerate a Keycloak client secret using the Keycloak REST API. It requires access to the REST
+    API using OpenID Connect; the user connecting and the client being used must have the requisite access rights. In a default
+    Keycloak installation, admin-cli and an admin user would work, as would a separate client definition with the scope tailored
+    to your needs and a user having the expected roles.
+  - When regenerating a client secret, where possible provide the client's ID (not client_id) to the module. This removes
+    a lookup to the API to translate the client_id into the client ID.
+  - 'Note that this module returns the client secret. To avoid this showing up in the logs, please add C(no_log: true) to
+    the task.'
 attributes:
   check_mode:
     support: full
   diff_mode:
     support: none
+  action_group:
+    version_added: 10.2.0
 
 options:
   realm:
@@ -48,14 +43,13 @@ options:
   id:
     description:
       - The unique identifier for this client.
-      - This parameter is not required for getting or generating a client secret but
-        providing it will reduce the number of API calls required.
+      - This parameter is not required for getting or generating a client secret but providing it will reduce the number of
+        API calls required.
     type: str
 
   client_id:
     description:
-      - The client_id of the client. Passing this instead of id results in an
-        extra API call.
+      - The client_id of the client. Passing this instead of ID results in an extra API call.
     aliases:
       - clientId
     type: str
@@ -63,14 +57,15 @@ options:
 
 extends_documentation_fragment:
   - community.general.keycloak
+  - community.general.keycloak.actiongroup_keycloak
   - community.general.attributes
 
 author:
   - Fynn Chen (@fynncfchen)
   - John Cant (@johncant)
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Regenerate a Keycloak client secret, authentication with credentials
   community.general.keycloak_clientsecret_regenerate:
     id: '9d59aa76-2755-48c6-b1af-beb70a82c3cd'
@@ -102,16 +97,16 @@ EXAMPLES = '''
     token: TOKEN
   delegate_to: localhost
   no_log: true
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 msg:
   description: Message as to what action was taken.
   returned: always
   type: str
 
 end_state:
-  description: Representation of the client credential after module execution
+  description: Representation of the client credential after module execution.
   returned: on success
   type: complex
   contains:
@@ -125,8 +120,7 @@ end_state:
       type: str
       returned: always
       sample: cUGnX1EIeTtPPAkcyGMv0ncyqDPu68P1
-
-'''
+"""
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
     KeycloakAPI, KeycloakError, get_token)

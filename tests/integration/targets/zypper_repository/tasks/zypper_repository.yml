@@ -218,72 +218,72 @@
 #        (Maybe 'Uyuni' needs to be replaced with something else?)
 - when: ansible_distribution_version is version('15.4', '<')
   block:
-  - name: add new repository via url to .repo file
-    community.general.zypper_repository:
-      repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/openSUSE_Leap_{{ ansible_distribution_version }}/systemsmanagement:Uyuni:Stable.repo
-      state: present
-    register: added_by_repo_file
+    - name: add new repository via url to .repo file
+      community.general.zypper_repository:
+        repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/openSUSE_Leap_{{ ansible_distribution_version }}/systemsmanagement:Uyuni:Stable.repo
+        state: present
+      register: added_by_repo_file
 
-  - name: get repository details from zypper
-    command: zypper lr systemsmanagement_Uyuni_Stable
-    register: get_repository_details_from_zypper
+    - name: get repository details from zypper
+      command: zypper lr systemsmanagement_Uyuni_Stable
+      register: get_repository_details_from_zypper
 
-  - name: verify adding via .repo file was successful
-    assert:
-      that:
-        - "added_by_repo_file is changed"
-        - "get_repository_details_from_zypper.rc == 0"
-        - "'/systemsmanagement:/Uyuni:/Stable/' in get_repository_details_from_zypper.stdout"
+    - name: verify adding via .repo file was successful
+      assert:
+        that:
+          - "added_by_repo_file is changed"
+          - "get_repository_details_from_zypper.rc == 0"
+          - "'/systemsmanagement:/Uyuni:/Stable/' in get_repository_details_from_zypper.stdout"
 
-  - name: add same repository via url to .repo file again to verify idempotency
-    community.general.zypper_repository:
-      repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/openSUSE_Leap_{{ ansible_distribution_version }}/systemsmanagement:Uyuni:Stable.repo
-      state: present
-    register: added_again_by_repo_file
+    - name: add same repository via url to .repo file again to verify idempotency
+      community.general.zypper_repository:
+        repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/openSUSE_Leap_{{ ansible_distribution_version }}/systemsmanagement:Uyuni:Stable.repo
+        state: present
+      register: added_again_by_repo_file
 
-  - name: verify nothing was changed adding a repo with the same .repo file
-    assert:
-      that:
-        - added_again_by_repo_file is not changed
+    - name: verify nothing was changed adding a repo with the same .repo file
+      assert:
+        that:
+          - added_again_by_repo_file is not changed
 
-  - name: remove repository via url to .repo file
-    community.general.zypper_repository:
-      repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/openSUSE_Leap_{{ ansible_distribution_version }}/systemsmanagement:Uyuni:Stable.repo
-      state: absent
-    register: removed_by_repo_file
+    - name: remove repository via url to .repo file
+      community.general.zypper_repository:
+        repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/openSUSE_Leap_{{ ansible_distribution_version }}/systemsmanagement:Uyuni:Stable.repo
+        state: absent
+      register: removed_by_repo_file
 
-  - name: get list of files in /etc/zypp/repos.d/
-    command: ls /etc/zypp/repos.d/
-    changed_when: false
-    register: etc_zypp_reposd
+    - name: get list of files in /etc/zypp/repos.d/
+      command: ls /etc/zypp/repos.d/
+      changed_when: false
+      register: etc_zypp_reposd
 
-  - name: verify removal via .repo file was successful, including cleanup of local .repo file in /etc/zypp/repos.d/
-    assert:
-      that:
-        - "removed_by_repo_file"
-        - "'/systemsmanagement:/Uyuni:/Stable/' not in etc_zypp_reposd.stdout"
+    - name: verify removal via .repo file was successful, including cleanup of local .repo file in /etc/zypp/repos.d/
+      assert:
+        that:
+          - "removed_by_repo_file"
+          - "'/systemsmanagement:/Uyuni:/Stable/' not in etc_zypp_reposd.stdout"
 
 # FIXME: THIS DOESN'T SEEM TO WORK ANYMORE WITH ANY OPENSUSE VERSION IN CI!
 - when: false
   block:
-  - name: Copy test .repo file
-    copy:
-      src: 'files/systemsmanagement_Uyuni_Utils.repo'
-      dest: '{{ remote_tmp_dir }}'
+    - name: Copy test .repo file
+      copy:
+        src: 'files/systemsmanagement_Uyuni_Utils.repo'
+        dest: '{{ remote_tmp_dir }}'
 
-  - name: add new repository via local path to .repo file
-    community.general.zypper_repository:
-      repo: "{{ remote_tmp_dir }}/systemsmanagement_Uyuni_Utils.repo"
-      state: present
-    register: added_by_repo_local_file
+    - name: add new repository via local path to .repo file
+      community.general.zypper_repository:
+        repo: "{{ remote_tmp_dir }}/systemsmanagement_Uyuni_Utils.repo"
+        state: present
+      register: added_by_repo_local_file
 
-  - name: get repository details for systemsmanagement_Uyuni_Utils from zypper
-    command: zypper lr systemsmanagement_Uyuni_Utils
-    register: get_repository_details_from_zypper_for_systemsmanagement_Uyuni_Utils
+    - name: get repository details for systemsmanagement_Uyuni_Utils from zypper
+      command: zypper lr systemsmanagement_Uyuni_Utils
+      register: get_repository_details_from_zypper_for_systemsmanagement_Uyuni_Utils
 
-  - name: verify adding repository via local .repo file was successful
-    assert:
-      that:
-        - "added_by_repo_local_file is changed"
-        - "get_repository_details_from_zypper_for_systemsmanagement_Uyuni_Utils.rc == 0"
-        - "'/systemsmanagement:/Uyuni:/Utils/' in get_repository_details_from_zypper_for_systemsmanagement_Uyuni_Utils.stdout"
+    - name: verify adding repository via local .repo file was successful
+      assert:
+        that:
+          - "added_by_repo_local_file is changed"
+          - "get_repository_details_from_zypper_for_systemsmanagement_Uyuni_Utils.rc == 0"
+          - "'/systemsmanagement:/Uyuni:/Utils/' in get_repository_details_from_zypper_for_systemsmanagement_Uyuni_Utils.stdout"

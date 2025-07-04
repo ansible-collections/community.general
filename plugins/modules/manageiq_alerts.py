@@ -8,8 +8,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
-
+DOCUMENTATION = r"""
 module: manageiq_alerts
 
 short_description: Configuration of alerts in ManageIQ
@@ -20,7 +19,6 @@ extends_documentation_fragment:
 author: Elad Alfassa (@elad661) <ealfassa@redhat.com>
 description:
   - The manageiq_alerts module supports adding, updating and deleting alerts in ManageIQ.
-
 attributes:
   check_mode:
     support: none
@@ -31,8 +29,8 @@ options:
   state:
     type: str
     description:
-      - absent - alert should not exist,
-      - present - alert should exist,
+      - V(absent) - alert should not exist,
+      - V(present) - alert should exist.
     required: false
     choices: ['absent', 'present']
     default: 'present'
@@ -44,9 +42,8 @@ options:
   resource_type:
     type: str
     description:
-      - The entity type for the alert in ManageIQ. Required when state is "present".
-    choices: ['Vm', 'ContainerNode', 'MiqServer', 'Host', 'Storage', 'EmsCluster',
-              'ExtManagementSystem', 'MiddlewareServer']
+      - The entity type for the alert in ManageIQ. Required when O(state=present).
+    choices: ['Vm', 'ContainerNode', 'MiqServer', 'Host', 'Storage', 'EmsCluster', 'ExtManagementSystem', 'MiddlewareServer']
   expression_type:
     type: str
     description:
@@ -58,20 +55,18 @@ options:
     description:
       - The alert expression for ManageIQ.
       - Can either be in the "Miq Expression" format or the "Hash Expression format".
-      - Required if state is "present".
+      - Required if O(state=present).
   enabled:
     description:
-      - Enable or disable the alert. Required if state is "present".
+      - Enable or disable the alert. Required if O(state=present).
     type: bool
   options:
     type: dict
     description:
-      - Additional alert options, such as notification type and frequency
+      - Additional alert options, such as notification type and frequency.
+"""
 
-
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Add an alert with a "hash expression" to ManageIQ
   community.general.manageiq_alerts:
     state: present
@@ -83,15 +78,15 @@ EXAMPLES = '''
           from: "example@example.com"
     resource_type: ContainerNode
     expression:
-        eval_method: hostd_log_threshold
-        mode: internal
-        options: {}
+      eval_method: hostd_log_threshold
+      mode: internal
+      options: {}
     enabled: true
     manageiq_connection:
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false  # only do this when you trust the network!
+      validate_certs: false # only do this when you trust the network!
 
 - name: Add an alert with a "miq expression" to ManageIQ
   community.general.manageiq_alerts:
@@ -105,20 +100,20 @@ EXAMPLES = '''
     resource_type: Vm
     expression_type: miq
     expression:
-        and:
-          - CONTAINS:
-              tag: Vm.managed-environment
-              value: prod
-          - not:
-            CONTAINS:
-              tag: Vm.host.managed-environment
-              value: prod
+      and:
+        - CONTAINS:
+            tag: Vm.managed-environment
+            value: prod
+        - not:
+          CONTAINS:
+            tag: Vm.host.managed-environment
+            value: prod
     enabled: true
     manageiq_connection:
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false  # only do this when you trust the network!
+      validate_certs: false # only do this when you trust the network!
 
 - name: Delete an alert from ManageIQ
   community.general.manageiq_alerts:
@@ -128,11 +123,11 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false  # only do this when you trust the network!
-'''
+      validate_certs: false # only do this when you trust the network!
+"""
 
-RETURN = '''
-'''
+RETURN = r"""
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.manageiq import ManageIQ, manageiq_argument_spec
@@ -156,7 +151,7 @@ class ManageIQAlert(object):
             self.miq_expression = alert['miq_expression']
             if 'exp' in self.miq_expression:
                 # miq_expression is a field that needs a special case, because
-                # it's returned surrounded by a dict named exp even though we don't
+                # it is returned surrounded by a dict named exp even though we don't
                 # send it with that dict.
                 self.miq_expression = self.miq_expression['exp']
 

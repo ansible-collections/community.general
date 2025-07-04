@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 # Copyright (c) 2021 Radek Sprta <mail@radeksprta.eu>
+# Copyright (c) 2024 Colin Nolan <cn580@alumni.york.ac.uk>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -10,7 +11,6 @@ __metaclass__ = type
 
 
 DOCUMENTATION = r"""
----
 module: cargo
 short_description: Manage Rust packages with cargo
 version_added: 4.3.0
@@ -38,16 +38,12 @@ options:
     elements: str
     required: true
   path:
-    description:
-      ->
-      The base path where to install the Rust packages. Cargo automatically appends
-      V(/bin). In other words, V(/usr/local) will become V(/usr/local/bin).
+    description: The base path where to install the Rust packages. Cargo automatically appends V(/bin). In other words, V(/usr/local)
+      will become V(/usr/local/bin).
     type: path
   version:
-    description:
-      ->
-      The version to install. If O(name) contains multiple values, the module will
-      try to install all of them in this version.
+    description: The version to install. If O(name) contains multiple values, the module will try to install all of them in
+      this version.
     type: str
     required: false
   locked:
@@ -64,9 +60,25 @@ options:
     required: false
     type: str
     default: present
-    choices: [ "present", "absent", "latest" ]
+    choices: ["present", "absent", "latest"]
+  directory:
+    description:
+      - Path to the source directory to install the Rust package from.
+      - This is only used when installing packages.
+    type: path
+    required: false
+    version_added: 9.1.0
+  features:
+    description:
+      - List of features to activate.
+      - This is only used when installing packages.
+    type: list
+    elements: str
+    required: false
+    default: []
+    version_added: 11.0.0
 requirements:
-    - cargo installed
+  - cargo installed
 """
 
 EXAMPLES = r"""
@@ -98,8 +110,20 @@ EXAMPLES = r"""
   community.general.cargo:
     name: ludusavi
     state: latest
+
+- name: Install "ludusavi" Rust package from source directory
+  community.general.cargo:
+    name: ludusavi
+    directory: /path/to/ludusavi/source
+
+- name: Install "serpl" Rust package with ast_grep feature
+  community.general.cargo:
+    name: serpl
+    features:
+      - ast_grep
 """
 
+import json
 import os
 import re
 
@@ -115,6 +139,8 @@ class Cargo(object):
         self.state = kwargs["state"]
         self.version = kwargs["version"]
         self.locked = kwargs["locked"]
+        self.directory = kwargs["directory"]
+        self.features = kwargs["features"]
 
     @property
     def path(self):
@@ -137,9 +163,13 @@ class Cargo(object):
 
     def get_installed(self):
         cmd = ["install", "--list"]
+        if self.path:
+            cmd.append("--root")
+            cmd.append(self.path)
+
         data, dummy = self._exec(cmd, True, False, False)
 
-        package_regex = re.compile(r"^([\w\-]+) v(.+):$")
+        package_regex = re.compile(r"^([\w\-]+) v(\S+).*:$")
         installed = {}
         for line in data.splitlines():
             package_info = package_regex.match(line)
@@ -159,19 +189,55 @@ class Cargo(object):
         if self.version:
             cmd.append("--version")
             cmd.append(self.version)
+        if self.directory:
+            cmd.append("--path")
+            cmd.append(self.directory)
+        if self.features:
+            cmd += ["--features", ",".join(self.features)]
         return self._exec(cmd)
 
     def is_outdated(self, name):
         installed_version = self.get_installed().get(name)
+        latest_version = (
+            self.get_latest_published_version(name)
+            if not self.directory
+            else self.get_source_directory_version(name)
+        )
+        return installed_version != latest_version
 
+    def get_latest_published_version(self, name):
         cmd = ["search", name, "--limit", "1"]
         data, dummy = self._exec(cmd, True, False, False)
 
         match = re.search(r'"(.+)"', data)
-        if match:
-            latest_version = match.group(1)
+        if not match:
+            self.module.fail_json(
+                msg="No published version for package %s found" % name
+            )
+        return match.group(1)
 
-        return installed_version != latest_version
+    def get_source_directory_version(self, name):
+        cmd = [
+            "metadata",
+            "--format-version",
+            "1",
+            "--no-deps",
+            "--manifest-path",
+            os.path.join(self.directory, "Cargo.toml"),
+        ]
+        data, dummy = self._exec(cmd, True, False, False)
+        manifest = json.loads(data)
+
+        package = next(
+            (package for package in manifest["packages"] if package["name"] == name),
+            None,
+        )
+        if not package:
+            self.module.fail_json(
+                msg="Package %s not defined in source, found: %s"
+                % (name, [x["name"] for x in manifest["packages"]])
+            )
+        return package["version"]
 
     def uninstall(self, packages=None):
         cmd = ["uninstall"]
@@ -187,15 +253,21 @@ def main():
         state=dict(default="present", choices=["present", "absent", "latest"]),
         version=dict(default=None, type="str"),
         locked=dict(default=False, type="bool"),
+        directory=dict(default=None, type="path"),
+        features=dict(default=[], required=False, type="list", elements="str"),
     )
     module = AnsibleModule(argument_spec=arg_spec, supports_check_mode=True)
 
     name = module.params["name"]
     state = module.params["state"]
     version = module.params["version"]
+    directory = module.params["directory"]
 
     if not name:
         module.fail_json(msg="Package name must be specified")
+
+    if directory is not None and not os.path.isdir(directory):
+        module.fail_json(msg="Source directory does not exist")
 
     # Set LANG env since we parse stdout
     module.run_command_environ_update = dict(

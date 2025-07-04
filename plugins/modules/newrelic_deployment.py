@@ -9,13 +9,12 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: newrelic_deployment
 author: "Matt Coddington (@mcodd)"
 short_description: Notify New Relic about app deployments
 description:
-  - Notify New Relic about app deployments (see https://docs.newrelic.com/docs/apm/new-relic-apm/maintenance/record-monitor-deployments/)
+  - Notify New Relic about app deployments (see U(https://docs.newrelic.com/docs/apm/new-relic-apm/maintenance/record-monitor-deployments/)).
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -44,49 +43,49 @@ options:
   changelog:
     type: str
     description:
-      - A list of changes for this deployment
+      - A list of changes for this deployment.
     required: false
   description:
     type: str
     description:
-      - Text annotation for the deployment - notes for you
+      - Text annotation for the deployment - notes for you.
     required: false
   revision:
     type: str
     description:
-      - A revision number (e.g., git commit SHA)
+      - A revision number (for example, git commit SHA).
     required: true
   user:
     type: str
     description:
-      - The name of the user/process that triggered this deployment
+      - The name of the user/process that triggered this deployment.
     required: false
   validate_certs:
     description:
-      - If V(false), SSL certificates will not be validated. This should only be used
-        on personally controlled sites using self-signed certificates.
+      - If V(false), SSL certificates will not be validated. This should only be used on personally controlled sites using
+        self-signed certificates.
     required: false
     default: true
     type: bool
   app_name_exact_match:
     type: bool
     description:
-      - If this flag is set to V(true) then the application ID lookup by name would only work for an exact match.
-        If set to V(false) it returns the first result.
+      - If this flag is set to V(true) then the application ID lookup by name would only work for an exact match. If set to
+        V(false) it returns the first result.
     required: false
     default: false
     version_added: 7.5.0
 requirements: []
-'''
+"""
 
-EXAMPLES = '''
-- name:  Notify New Relic about an app deployment
+EXAMPLES = r"""
+- name: Notify New Relic about an app deployment
   community.general.newrelic_deployment:
     token: AAAAAA
     app_name: myapp
     user: ansible deployment
     revision: '1.0'
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url

@@ -1,0 +1,185 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+- name: Install required packages
+  pip:
+    name:
+      - jmespath
+      - requests
+  register: result
+  until: result is success
+
+- name: Start container
+  community.docker.docker_container:
+    name: mykeycloak
+    image: "quay.io/keycloak/keycloak:{{ keycloak_version }}"
+    command: start-dev
+    env:
+      KC_HTTP_RELATIVE_PATH: /auth
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: password
+    ports:
+      - "{{ keycloak_port }}:8080"
+    detach: true
+    auto_remove: true
+    memory: 2200M
+
+- name: Wait for Keycloak
+  uri:
+    url: "{{ url }}/admin/"
+    status_code: 200
+    validate_certs: false
+  register: result
+  until: result.status == 200
+  retries: 10
+  delay: 10
+
+- name: Delete realm if exists
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    state: absent
+
+- name: Create realm
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    id: "{{ realm }}"
+    realm: "{{ realm }}"
+    state: present
+
+- name: Create an authentication flow from first broker login and add an execution to it.
+  community.general.keycloak_authentication:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    alias: "Test first broker login"
+    copyFrom: "first broker login"
+    authenticationExecutions:
+      - providerId: "idp-review-profile"
+        requirement: "REQUIRED"
+        authenticationConfig:
+          alias: "Test review profile config"
+          config:
+            update.profile.on.first.login: "missing"
+
+- name: Create auth flow
+  community.general.keycloak_authentication:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    alias: "My conditionnal browser otp"
+    description: "browser based authentication with otp"
+    providerId: "basic-flow"
+    authenticationExecutions:
+      - displayName: Cookie
+        providerId: auth-cookie
+        requirement: ALTERNATIVE
+      - displayName: Kerberos
+        providerId: auth-spnego
+        requirement: DISABLED
+      - displayName: Identity Provider Redirector
+        providerId: identity-provider-redirector
+        requirement: ALTERNATIVE
+      - displayName: My browser otp forms
+        requirement: ALTERNATIVE
+      - displayName: Username Password Form
+        flowAlias: My browser otp forms
+        providerId: auth-username-password-form
+        requirement: REQUIRED
+      - displayName: My browser otp Browser - Conditional OTP
+        flowAlias: My browser otp forms
+        requirement: REQUIRED
+        providerId: "auth-conditional-otp-form"
+        authenticationConfig:
+          alias: my-conditional-otp-config
+          config:
+            defaultOtpOutcome: "force"
+            noOtpRequiredForHeaderPattern: "{{ keycloak_no_otp_required_pattern_orinale }}"
+    state: present
+
+- name: Modified auth flow with new config
+  community.general.keycloak_authentication:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    alias: "My conditionnal browser otp"
+    description: "browser based authentication with otp"
+    providerId: "basic-flow"
+    authenticationExecutions:
+      - displayName: Cookie
+        providerId: auth-cookie
+        requirement: ALTERNATIVE
+      - displayName: Kerberos
+        providerId: auth-spnego
+        requirement: DISABLED
+      - displayName: Identity Provider Redirector
+        providerId: identity-provider-redirector
+        requirement: ALTERNATIVE
+      - displayName: My browser otp forms
+        requirement: ALTERNATIVE
+      - displayName: Username Password Form
+        flowAlias: My browser otp forms
+        providerId: auth-username-password-form
+        requirement: REQUIRED
+      - displayName: My browser otp Browser - Conditional OTP
+        flowAlias: My browser otp forms
+        requirement: REQUIRED
+        providerId: "auth-conditional-otp-form"
+        authenticationConfig:
+          alias: my-conditional-otp-config
+          config:
+            defaultOtpOutcome: "force"
+            noOtpRequiredForHeaderPattern: "{{ keycloak_no_otp_required_pattern_modifed }}"
+    state: present
+  register: result
+
+- name: Retrive access
+  ansible.builtin.include_tasks:
+    file: access_token.yml
+
+- name: Export realm
+  ansible.builtin.uri:
+    url: "{{ url }}/admin/realms/{{ realm }}/partial-export?exportClients=false&exportGroupsAndRoles=false"
+    method: POST
+    headers:
+      Accept: application/json
+      User-agent: Ansible
+      Authorization: "Bearer {{ access_token }}"
+    body_format: form-urlencoded
+    body: {}
+  register: exported_realm
+  no_log: true
+
+- name: Assert `my-conditional-otp-config` exists only once
+  ansible.builtin.assert:
+    that:
+      - exported_realm.json | community.general.json_query('authenticatorConfig[?alias==`my-conditional-otp-config`]') | length == 1
+
+- name: Delete auth flow
+  community.general.keycloak_authentication:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    alias: "My conditionnal browser otp"
+    state: absent
+  register: result
+
+- name: Remove container
+  community.docker.docker_container:
+    name: mykeycloak
+    state: absent

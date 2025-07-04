@@ -8,13 +8,12 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: jenkins_build_info
 short_description: Get information about Jenkins builds
 version_added: 7.4.0
 description:
-    - Get information about Jenkins builds with Jenkins REST API.
+  - Get information about Jenkins builds with Jenkins REST API.
 requirements:
   - "python-jenkins >= 0.4.12"
 author:
@@ -48,11 +47,11 @@ options:
     type: str
   user:
     description:
-       - User to authenticate with the Jenkins server.
+      - User to authenticate with the Jenkins server.
     type: str
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Get information about a jenkins build using basic authentication
   community.general.jenkins_build_info:
     name: "test-check"
@@ -74,10 +73,9 @@ EXAMPLES = '''
     user: Jenkins
     token: abcdefghijklmnopqrstuvwxyz123456
     url: http://localhost:8080
-'''
+"""
 
-RETURN = '''
----
+RETURN = r"""
 name:
   description: Name of the jenkins job.
   returned: success
@@ -102,7 +100,7 @@ build_info:
   description: Build info of the jenkins job.
   returned: success
   type: dict
-'''
+"""
 
 import traceback
 
@@ -140,11 +138,11 @@ class JenkinsBuildInfo:
 
     def get_jenkins_connection(self):
         try:
-            if (self.user and self.password):
+            if self.user and self.password:
                 return jenkins.Jenkins(self.jenkins_url, self.user, self.password)
-            elif (self.user and self.token):
+            elif self.user and self.token:
                 return jenkins.Jenkins(self.jenkins_url, self.user, self.token)
-            elif (self.user and not (self.password or self.token)):
+            elif self.user and not (self.password or self.token):
                 return jenkins.Jenkins(self.jenkins_url, self.user)
             else:
                 return jenkins.Jenkins(self.jenkins_url)

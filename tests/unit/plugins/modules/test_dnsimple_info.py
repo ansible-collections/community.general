@@ -9,7 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 from ansible_collections.community.general.plugins.modules import dnsimple_info
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleFailJson, ModuleTestCase, set_module_args, AnsibleExitJson
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleFailJson, ModuleTestCase, set_module_args, AnsibleExitJson
 from httmock import response
 from httmock import with_httmock
 from httmock import urlmatch
@@ -56,19 +56,19 @@ class TestDNSimple_Info(ModuleTestCase):
     def test_with_no_parameters(self):
         """Failure must occurs when all parameters are missing"""
         with self.assertRaises(AnsibleFailJson):
-            set_module_args({})
-            self.module.main()
+            with set_module_args({}):
+                self.module.main()
 
     @with_httmock(zones_resp)
     def test_only_key_and_account(self):
         """key and account will pass, returns domains"""
         account_id = "1234"
         with self.assertRaises(AnsibleExitJson) as exc_info:
-            set_module_args({
+            with set_module_args({
                 "api_key": "abcd1324",
                 "account_id": account_id
-            })
-            self.module.main()
+            }):
+                self.module.main()
         result = exc_info.exception.args[0]
         # nothing should change
         self.assertFalse(result['changed'])
@@ -80,12 +80,12 @@ class TestDNSimple_Info(ModuleTestCase):
         """name and no record should not fail, returns the record"""
         name = "example.com"
         with self.assertRaises(AnsibleExitJson) as exc_info:
-            set_module_args({
+            with set_module_args({
                 "api_key": "abcd1324",
                 "name": "example.com",
                 "account_id": "1234"
-            })
-            self.module.main()
+            }):
+                self.module.main()
         result = exc_info.exception.args[0]
         # nothing should change
         self.assertFalse(result['changed'])
@@ -97,13 +97,13 @@ class TestDNSimple_Info(ModuleTestCase):
         """name and record should not fail, returns the record"""
         record = "example"
         with self.assertRaises(AnsibleExitJson) as exc_info:
-            set_module_args({
+            with set_module_args({
                 "api_key": "abcd1324",
                 "account_id": "1234",
                 "name": "example.com",
                 "record": "example"
-            })
-            self.module.main()
+            }):
+                self.module.main()
         result = exc_info.exception.args[0]
         # nothing should change
         self.assertFalse(result['changed'])

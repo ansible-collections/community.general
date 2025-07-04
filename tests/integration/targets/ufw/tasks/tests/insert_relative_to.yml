@@ -71,14 +71,14 @@
   register: ufw_status
 - assert:
     that:
-    - ufw_status.stdout_lines == expected_stdout
+      - ufw_status.stdout_lines == expected_stdout
   vars:
     expected_stdout:
-    - "0.0.0.0 10"
-    - "0.0.0.0 22"
-    - "0.0.0.0 11"
-    - "0.0.0.0 23"
-    - ":: 110"
-    - ":: 122"
-    - ":: 111"
-    - ":: 123"
+      - "0.0.0.0 10"
+      - "0.0.0.0 22"
+      - "0.0.0.0 11"
+      - "0.0.0.0 23"
+      - ":: 110"
+      - ":: 122"
+      - ":: 111"
+      - ":: 123"

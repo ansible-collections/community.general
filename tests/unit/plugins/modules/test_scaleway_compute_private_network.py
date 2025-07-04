@@ -11,8 +11,8 @@ import pytest
 
 from ansible_collections.community.general.plugins.modules import scaleway_compute_private_network
 from ansible_collections.community.general.plugins.module_utils.scaleway import Scaleway, Response
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
-from ansible_collections.community.general.tests.unit.compat.mock import patch
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
 
 
 def response_without_nics():
@@ -62,9 +62,9 @@ def response_remove_nics():
 
 
 def test_scaleway_private_network_without_arguments(capfd):
-    set_module_args({})
-    with pytest.raises(SystemExit) as results:
-        scaleway_compute_private_network.main()
+    with set_module_args({}):
+        with pytest.raises(SystemExit) as results:
+            scaleway_compute_private_network.main()
     out, err = capfd.readouterr()
 
     assert not err
@@ -77,21 +77,22 @@ def test_scaleway_add_nic(capfd):
     cid = 'c004b4cd-ef5g-678h-90i1-jk2345678l90'
     url = 'servers/' + cid + '/private_nics'
 
-    set_module_args({"project": "a123b4cd-ef5g-678h-90i1-jk2345678l90",
-                     "state": "present",
-                     "region": "par1",
-                     "compute_id": cid,
-                     "private_network_id": pnid
-                     })
+    with set_module_args({
+        "project": "a123b4cd-ef5g-678h-90i1-jk2345678l90",
+        "state": "present",
+        "region": "par1",
+        "compute_id": cid,
+        "private_network_id": pnid
+    }):
 
-    with patch.object(Scaleway, 'get') as mock_scw_get:
-        mock_scw_get.return_value = response_without_nics()
-        with patch.object(Scaleway, 'post') as mock_scw_post:
-            mock_scw_post.return_value = response_when_add_nics()
-            with pytest.raises(SystemExit) as results:
-                scaleway_compute_private_network.main()
-        mock_scw_post.assert_any_call(path=url, data={"private_network_id": pnid})
-    mock_scw_get.assert_any_call(url)
+        with patch.object(Scaleway, 'get') as mock_scw_get:
+            mock_scw_get.return_value = response_without_nics()
+            with patch.object(Scaleway, 'post') as mock_scw_post:
+                mock_scw_post.return_value = response_when_add_nics()
+                with pytest.raises(SystemExit) as results:
+                    scaleway_compute_private_network.main()
+            mock_scw_post.assert_any_call(path=url, data={"private_network_id": pnid})
+        mock_scw_get.assert_any_call(url)
 
     out, err = capfd.readouterr()
     del os.environ['SCW_API_TOKEN']
@@ -105,18 +106,19 @@ def test_scaleway_add_existing_nic(capfd):
     cid = 'c004b4cd-ef5g-678h-90i1-jk2345678l90'
     url = 'servers/' + cid + '/private_nics'
 
-    set_module_args({"project": "a123b4cd-ef5g-678h-90i1-jk2345678l90",
-                     "state": "present",
-                     "region": "par1",
-                     "compute_id": cid,
-                     "private_network_id": pnid
-                     })
+    with set_module_args({
+        "project": "a123b4cd-ef5g-678h-90i1-jk2345678l90",
+        "state": "present",
+        "region": "par1",
+        "compute_id": cid,
+        "private_network_id": pnid
+    }):
 
-    with patch.object(Scaleway, 'get') as mock_scw_get:
-        mock_scw_get.return_value = response_with_nics()
-        with pytest.raises(SystemExit) as results:
-            scaleway_compute_private_network.main()
-    mock_scw_get.assert_any_call(url)
+        with patch.object(Scaleway, 'get') as mock_scw_get:
+            mock_scw_get.return_value = response_with_nics()
+            with pytest.raises(SystemExit) as results:
+                scaleway_compute_private_network.main()
+        mock_scw_get.assert_any_call(url)
 
     out, err = capfd.readouterr()
     del os.environ['SCW_API_TOKEN']
@@ -132,21 +134,22 @@ def test_scaleway_remove_existing_nic(capfd):
     url = 'servers/' + cid + '/private_nics'
     urlremove = 'servers/' + cid + '/private_nics/' + nicid
 
-    set_module_args({"project": "a123b4cd-ef5g-678h-90i1-jk2345678l90",
-                     "state": "absent",
-                     "region": "par1",
-                     "compute_id": cid,
-                     "private_network_id": pnid
-                     })
+    with set_module_args({
+        "project": "a123b4cd-ef5g-678h-90i1-jk2345678l90",
+        "state": "absent",
+        "region": "par1",
+        "compute_id": cid,
+        "private_network_id": pnid
+    }):
 
-    with patch.object(Scaleway, 'get') as mock_scw_get:
-        mock_scw_get.return_value = response_with_nics()
-        with patch.object(Scaleway, 'delete') as mock_scw_delete:
-            mock_scw_delete.return_value = response_remove_nics()
-            with pytest.raises(SystemExit) as results:
-                scaleway_compute_private_network.main()
-        mock_scw_delete.assert_any_call(urlremove)
-    mock_scw_get.assert_any_call(url)
+        with patch.object(Scaleway, 'get') as mock_scw_get:
+            mock_scw_get.return_value = response_with_nics()
+            with patch.object(Scaleway, 'delete') as mock_scw_delete:
+                mock_scw_delete.return_value = response_remove_nics()
+                with pytest.raises(SystemExit) as results:
+                    scaleway_compute_private_network.main()
+            mock_scw_delete.assert_any_call(urlremove)
+        mock_scw_get.assert_any_call(url)
 
     out, err = capfd.readouterr()
 
@@ -161,18 +164,19 @@ def test_scaleway_remove_absent_nic(capfd):
     cid = 'c004b4cd-ef5g-678h-90i1-jk2345678l90'
     url = 'servers/' + cid + '/private_nics'
 
-    set_module_args({"project": "a123b4cd-ef5g-678h-90i1-jk2345678l90",
-                     "state": "absent",
-                     "region": "par1",
-                     "compute_id": cid,
-                     "private_network_id": pnid
-                     })
+    with set_module_args({
+        "project": "a123b4cd-ef5g-678h-90i1-jk2345678l90",
+        "state": "absent",
+        "region": "par1",
+        "compute_id": cid,
+        "private_network_id": pnid
+    }):
 
-    with patch.object(Scaleway, 'get') as mock_scw_get:
-        mock_scw_get.return_value = response_without_nics()
-        with pytest.raises(SystemExit) as results:
-            scaleway_compute_private_network.main()
-    mock_scw_get.assert_any_call(url)
+        with patch.object(Scaleway, 'get') as mock_scw_get:
+            mock_scw_get.return_value = response_without_nics()
+            with pytest.raises(SystemExit) as results:
+                scaleway_compute_private_network.main()
+        mock_scw_get.assert_any_call(url)
 
     out, err = capfd.readouterr()
     del os.environ['SCW_API_TOKEN']

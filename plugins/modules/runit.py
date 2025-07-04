@@ -8,54 +8,50 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: runit
 author:
-    - James Sumners (@jsumners)
+  - James Sumners (@jsumners)
 short_description: Manage runit services
 description:
-    - Controls runit services on remote hosts using the sv utility.
+  - Controls runit services on remote hosts using the sv utility.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    name:
-        description:
-            - Name of the service to manage.
-        type: str
-        required: true
-    state:
-        description:
-            - V(started)/V(stopped) are idempotent actions that will not run
-              commands unless necessary.  V(restarted) will always bounce the
-              service (sv restart) and V(killed) will always bounce the service (sv force-stop).
-              V(reloaded) will send a HUP (sv reload).
-              V(once) will run a normally downed sv once (sv once), not really
-              an idempotent operation.
-        type: str
-        choices: [ killed, once, reloaded, restarted, started, stopped ]
-    enabled:
-        description:
-            - Whether the service is enabled or not, if disabled it also implies stopped.
-        type: bool
-    service_dir:
-        description:
-            - directory runsv watches for services
-        type: str
-        default: /var/service
-    service_src:
-        description:
-            - directory where services are defined, the source of symlinks to service_dir.
-        type: str
-        default: /etc/sv
-'''
+  name:
+    description:
+      - Name of the service to manage.
+    type: str
+    required: true
+  state:
+    description:
+      - V(started)/V(stopped) are idempotent actions that will not run commands unless necessary. V(restarted) will always
+        bounce the service (sv restart) and V(killed) will always bounce the service (sv force-stop). V(reloaded) will send
+        a HUP (sv reload). V(once) will run a normally downed sv once (sv once), not really an idempotent operation.
+    type: str
+    choices: [killed, once, reloaded, restarted, started, stopped]
+  enabled:
+    description:
+      - Whether the service is enabled or not, if disabled it also implies stopped.
+    type: bool
+  service_dir:
+    description:
+      - Directory runsv watches for services.
+    type: str
+    default: /var/service
+  service_src:
+    description:
+      - Directory where services are defined, the source of symlinks to O(service_dir).
+    type: str
+    default: /etc/sv
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Start sv dnscache, if not running
   community.general.runit:
     name: dnscache
@@ -86,7 +82,7 @@ EXAMPLES = r'''
     name: dnscache
     state: reloaded
     service_dir: /run/service
-'''
+"""
 
 import os
 import re

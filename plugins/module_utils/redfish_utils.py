@@ -10,8 +10,7 @@ import json
 import os
 import random
 import string
-import gzip
-from io import BytesIO
+import time
 from ansible.module_utils.urls import open_url
 from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.common.text.converters import to_text
@@ -35,11 +34,26 @@ FAIL_MSG = 'Issuing a data modification command without specifying the '\
            'than one %(resource)s is no longer allowed. Use the `resource_id` '\
            'option to specify the target %(resource)s ID.'
 
+# Use together with the community.general.redfish docs fragment
+REDFISH_COMMON_ARGUMENT_SPEC = {
+    "validate_certs": {
+        "type": "bool",
+        "default": False,
+    },
+    "ca_path": {
+        "type": "path",
+    },
+    "ciphers": {
+        "type": "list",
+        "elements": "str",
+    },
+}
+
 
 class RedfishUtils(object):
 
     def __init__(self, creds, root_uri, timeout, module, resource_id=None,
-                 data_modification=False, strip_etag_quotes=False):
+                 data_modification=False, strip_etag_quotes=False, ciphers=None):
         self.root_uri = root_uri
         self.creds = creds
         self.timeout = timeout
@@ -50,8 +64,10 @@ class RedfishUtils(object):
         self.resource_id = resource_id
         self.data_modification = data_modification
         self.strip_etag_quotes = strip_etag_quotes
+        self.ciphers = ciphers if ciphers is not None else module.params.get("ciphers")
         self._vendor = None
-        self._init_session()
+        self.validate_certs = module.params.get("validate_certs", False)
+        self.ca_path = module.params.get("ca_path")
 
     def _auth_params(self, headers):
         """
@@ -116,7 +132,7 @@ class RedfishUtils(object):
 
                 # Note: This is also a fallthrough for properties that are
                 # arrays of objects.  Some services erroneously omit properties
-                # within arrays of objects when not configured, and it's
+                # within arrays of objects when not configured, and it is
                 # expecting the client to provide them anyway.
 
                 if req_pyld[prop] != cur_pyld[prop]:
@@ -129,35 +145,52 @@ class RedfishUtils(object):
             resp['msg'] = 'Properties in %s are already set' % uri
         return resp
 
+    def _request(self, uri, **kwargs):
+        kwargs.setdefault("validate_certs", self.validate_certs)
+        kwargs.setdefault("follow_redirects", "all")
+        kwargs.setdefault("use_proxy", True)
+        kwargs.setdefault("timeout", self.timeout)
+        kwargs.setdefault("ciphers", self.ciphers)
+        kwargs.setdefault("ca_path", self.ca_path)
+        resp = open_url(uri, **kwargs)
+        headers = {k.lower(): v for (k, v) in resp.info().items()}
+        return resp, headers
+
     # The following functions are to send GET/POST/PATCH/DELETE requests
-    def get_request(self, uri, override_headers=None):
+    def get_request(self, uri, override_headers=None, allow_no_resp=False, timeout=None):
         req_headers = dict(GET_HEADERS)
         if override_headers:
             req_headers.update(override_headers)
         username, password, basic_auth = self._auth_params(req_headers)
+        if timeout is None:
+            timeout = self.timeout
         try:
             # Service root is an unauthenticated resource; remove credentials
             # in case the caller will be using sessions later.
             if uri == (self.root_uri + self.service_root):
                 basic_auth = False
-            resp = open_url(uri, method="GET", headers=req_headers,
-                            url_username=username, url_password=password,
-                            force_basic_auth=basic_auth, validate_certs=False,
-                            follow_redirects='all',
-                            use_proxy=True, timeout=self.timeout)
-            if override_headers:
-                resp = gzip.open(BytesIO(resp.read()), 'rt', encoding='utf-8')
+            resp, headers = self._request(
+                uri,
+                method="GET",
+                headers=req_headers,
+                url_username=username,
+                url_password=password,
+                force_basic_auth=basic_auth,
+                timeout=timeout,
+            )
+            try:
                 data = json.loads(to_native(resp.read()))
-                headers = req_headers
-            else:
-                data = json.loads(to_native(resp.read()))
-                headers = dict((k.lower(), v) for (k, v) in resp.info().items())
+            except Exception as e:
+                # No response data; this is okay in certain cases
+                data = None
+                if not allow_no_resp:
+                    raise
         except HTTPError as e:
-            msg = self._get_extended_message(e)
+            msg, data = self._get_extended_message(e)
             return {'ret': False,
                     'msg': "HTTP Error %s on GET request to '%s', extended message: '%s'"
                            % (e.code, uri, msg),
-                    'status': e.code}
+                    'status': e.code, 'data': data}
         except URLError as e:
             return {'ret': False, 'msg': "URL Error on GET request to '%s': '%s'"
                                          % (uri, e.reason)}
@@ -183,24 +216,26 @@ class RedfishUtils(object):
                 req_headers['content-type'] = multipart_encoder[1]
             else:
                 data = json.dumps(pyld)
-            resp = open_url(uri, data=data,
-                            headers=req_headers, method="POST",
-                            url_username=username, url_password=password,
-                            force_basic_auth=basic_auth, validate_certs=False,
-                            follow_redirects='all',
-                            use_proxy=True, timeout=self.timeout)
+            resp, headers = self._request(
+                uri,
+                data=data,
+                headers=req_headers,
+                method="POST",
+                url_username=username,
+                url_password=password,
+                force_basic_auth=basic_auth,
+            )
             try:
                 data = json.loads(to_native(resp.read()))
             except Exception as e:
                 # No response data; this is okay in many cases
                 data = None
-            headers = dict((k.lower(), v) for (k, v) in resp.info().items())
         except HTTPError as e:
-            msg = self._get_extended_message(e)
+            msg, data = self._get_extended_message(e)
             return {'ret': False,
                     'msg': "HTTP Error %s on POST request to '%s', extended message: '%s'"
                            % (e.code, uri, msg),
-                    'status': e.code}
+                    'status': e.code, 'data': data}
         except URLError as e:
             return {'ret': False, 'msg': "URL Error on POST request to '%s': '%s'"
                                          % (uri, e.reason)}
@@ -237,18 +272,21 @@ class RedfishUtils(object):
 
         username, password, basic_auth = self._auth_params(req_headers)
         try:
-            resp = open_url(uri, data=json.dumps(pyld),
-                            headers=req_headers, method="PATCH",
-                            url_username=username, url_password=password,
-                            force_basic_auth=basic_auth, validate_certs=False,
-                            follow_redirects='all',
-                            use_proxy=True, timeout=self.timeout)
+            resp, dummy = self._request(
+                uri,
+                data=json.dumps(pyld),
+                headers=req_headers,
+                method="PATCH",
+                url_username=username,
+                url_password=password,
+                force_basic_auth=basic_auth,
+            )
         except HTTPError as e:
-            msg = self._get_extended_message(e)
+            msg, data = self._get_extended_message(e)
             return {'ret': False, 'changed': False,
                     'msg': "HTTP Error %s on PATCH request to '%s', extended message: '%s'"
                            % (e.code, uri, msg),
-                    'status': e.code}
+                    'status': e.code, 'data': data}
         except URLError as e:
             return {'ret': False, 'changed': False,
                     'msg': "URL Error on PATCH request to '%s': '%s'" % (uri, e.reason)}
@@ -272,18 +310,21 @@ class RedfishUtils(object):
                 req_headers['If-Match'] = etag
         username, password, basic_auth = self._auth_params(req_headers)
         try:
-            resp = open_url(uri, data=json.dumps(pyld),
-                            headers=req_headers, method="PUT",
-                            url_username=username, url_password=password,
-                            force_basic_auth=basic_auth, validate_certs=False,
-                            follow_redirects='all',
-                            use_proxy=True, timeout=self.timeout)
+            resp, dummy = self._request(
+                uri,
+                data=json.dumps(pyld),
+                headers=req_headers,
+                method="PUT",
+                url_username=username,
+                url_password=password,
+                force_basic_auth=basic_auth,
+            )
         except HTTPError as e:
-            msg = self._get_extended_message(e)
+            msg, data = self._get_extended_message(e)
             return {'ret': False,
                     'msg': "HTTP Error %s on PUT request to '%s', extended message: '%s'"
                            % (e.code, uri, msg),
-                    'status': e.code}
+                    'status': e.code, 'data': data}
         except URLError as e:
             return {'ret': False, 'msg': "URL Error on PUT request to '%s': '%s'"
                                          % (uri, e.reason)}
@@ -298,18 +339,21 @@ class RedfishUtils(object):
         username, password, basic_auth = self._auth_params(req_headers)
         try:
             data = json.dumps(pyld) if pyld else None
-            resp = open_url(uri, data=data,
-                            headers=req_headers, method="DELETE",
-                            url_username=username, url_password=password,
-                            force_basic_auth=basic_auth, validate_certs=False,
-                            follow_redirects='all',
-                            use_proxy=True, timeout=self.timeout)
+            resp, dummy = self._request(
+                uri,
+                data=data,
+                headers=req_headers,
+                method="DELETE",
+                url_username=username,
+                url_password=password,
+                force_basic_auth=basic_auth,
+            )
         except HTTPError as e:
-            msg = self._get_extended_message(e)
+            msg, data = self._get_extended_message(e)
             return {'ret': False,
                     'msg': "HTTP Error %s on DELETE request to '%s', extended message: '%s'"
                            % (e.code, uri, msg),
-                    'status': e.code}
+                    'status': e.code, 'data': data}
         except URLError as e:
             return {'ret': False, 'msg': "URL Error on DELETE request to '%s': '%s'"
                                          % (uri, e.reason)}
@@ -379,8 +423,10 @@ class RedfishUtils(object):
         :param error: an HTTPError exception
         :type error: HTTPError
         :return: the ExtendedInfo message if present, else standard HTTP error
+        :return: the JSON data of the response if present
         """
         msg = http_client.responses.get(error.code, '')
+        data = None
         if error.code >= 400:
             try:
                 body = error.read().decode('utf-8')
@@ -394,10 +440,7 @@ class RedfishUtils(object):
                     msg = str(data['error']['@Message.ExtendedInfo'])
             except Exception:
                 pass
-        return msg
-
-    def _init_session(self):
-        pass
+        return msg, data
 
     def _get_vendor(self):
         # If we got the vendor info once, don't get it again
@@ -598,12 +641,13 @@ class RedfishUtils(object):
                 data = response['data']
                 if 'Parameters' in data:
                     params = data['Parameters']
-                    ai = dict((p['Name'], p)
-                              for p in params if 'Name' in p)
+                    ai = {p['Name']: p for p in params if 'Name' in p}
         if not ai:
-            ai = dict((k[:-24],
-                       {'AllowableValues': v}) for k, v in action.items()
-                      if k.endswith('@Redfish.AllowableValues'))
+            ai = {
+                k[:-24]: {'AllowableValues': v}
+                for k, v in action.items()
+                if k.endswith('@Redfish.AllowableValues')
+            }
         return ai
 
     def _get_allowable_values(self, action, name, default_values=None):
@@ -615,6 +659,24 @@ class RedfishUtils(object):
         if allowable_values is None:
             allowable_values = default_values
         return allowable_values
+
+    def check_service_availability(self):
+        """
+        Checks if the service is accessible.
+
+        :return: dict containing the status of the service
+        """
+
+        # Get the service root
+        # Override the timeout since the service root is expected to be readily
+        # available.
+        service_root = self.get_request(self.root_uri + self.service_root, timeout=10)
+        if service_root['ret'] is False:
+            # Failed, either due to a timeout or HTTP error; not available
+            return {'ret': True, 'available': False}
+
+        # Successfully accessed the service root; available
+        return {'ret': True, 'available': True}
 
     def get_logs(self):
         log_svcs_uri_list = []
@@ -662,7 +724,7 @@ class RedfishUtils(object):
                         entry[prop] = logEntry.get(prop)
                 if entry:
                     list_of_log_entries.append(entry)
-            log_name = log_svcs_uri.split('/')[-1]
+            log_name = log_svcs_uri.rstrip('/').split('/')[-1]
             logs[log_name] = list_of_log_entries
             list_of_logs.append(logs)
 
@@ -833,6 +895,7 @@ class RedfishUtils(object):
                         return response
                     data = response['data']
                     controller_name = 'Controller 1'
+                    storage_id = data['Id']
                     if 'Controllers' in data:
                         controllers_uri = data['Controllers'][u'@odata.id']
 
@@ -867,6 +930,7 @@ class RedfishUtils(object):
                             data = response['data']
 
                             drive_result = {}
+                            drive_result['RedfishURI'] = data['@odata.id']
                             for property in properties:
                                 if property in data:
                                     if data[property] is not None:
@@ -878,6 +942,7 @@ class RedfishUtils(object):
                                             drive_result[property] = data[property]
                             drive_results.append(drive_result)
                     drives = {'Controller': controller_name,
+                              'StorageId': storage_id,
                               'Drives': drive_results}
                     result["entries"].append(drives)
 
@@ -1016,7 +1081,7 @@ class RedfishUtils(object):
                                     if 'Drives' in data[u'Links']:
                                         for link in data[u'Links'][u'Drives']:
                                             drive_id_link = link[u'@odata.id']
-                                            drive_id = drive_id_link.split("/")[-1]
+                                            drive_id = drive_id_link.rstrip('/').split('/')[-1]
                                             drive_id_list.append({'Id': drive_id})
                                         volume_result['Linked_drives'] = drive_id_list
                                 volume_results.append(volume_result)
@@ -1075,15 +1140,17 @@ class RedfishUtils(object):
         return self.manage_power(command, self.systems_uri,
                                  '#ComputerSystem.Reset')
 
-    def manage_manager_power(self, command):
+    def manage_manager_power(self, command, wait=False, wait_timeout=120):
         return self.manage_power(command, self.manager_uri,
-                                 '#Manager.Reset')
+                                 '#Manager.Reset', wait, wait_timeout)
 
-    def manage_power(self, command, resource_uri, action_name):
+    def manage_power(self, command, resource_uri, action_name, wait=False,
+                     wait_timeout=120):
         key = "Actions"
         reset_type_values = ['On', 'ForceOff', 'GracefulShutdown',
                              'GracefulRestart', 'ForceRestart', 'Nmi',
-                             'ForceOn', 'PushPowerButton', 'PowerCycle']
+                             'ForceOn', 'PushPowerButton', 'PowerCycle',
+                             'FullPowerCycle']
 
         # command should be PowerOn, PowerForceOff, etc.
         if not command.startswith('Power'):
@@ -1139,34 +1206,123 @@ class RedfishUtils(object):
         response = self.post_request(self.root_uri + action_uri, payload)
         if response['ret'] is False:
             return response
+
+        # If requested to wait for the service to be available again, block
+        # until it is ready
+        if wait:
+            elapsed_time = 0
+            start_time = time.time()
+            # Start with a large enough sleep.  Some services will process new
+            # requests while in the middle of shutting down, thus breaking out
+            # early.
+            time.sleep(30)
+
+            # Periodically check for the service's availability.
+            while elapsed_time <= wait_timeout:
+                status = self.check_service_availability()
+                if status['available']:
+                    # It is available; we are done
+                    break
+                time.sleep(5)
+                elapsed_time = time.time() - start_time
+
+            if elapsed_time > wait_timeout:
+                # Exhausted the wait timer; error
+                return {'ret': False, 'changed': True,
+                        'msg': 'The service did not become available after %d seconds' % wait_timeout}
         return {'ret': True, 'changed': True}
 
-    def _find_account_uri(self, username=None, acct_id=None):
-        if not any((username, acct_id)):
-            return {'ret': False, 'msg':
-                    'Must provide either account_id or account_username'}
+    def manager_reset_to_defaults(self, command):
+        return self.reset_to_defaults(command, self.manager_uri,
+                                      '#Manager.ResetToDefaults')
 
-        response = self.get_request(self.root_uri + self.accounts_uri)
+    def reset_to_defaults(self, command, resource_uri, action_name):
+        key = "Actions"
+        reset_type_values = ['ResetAll',
+                             'PreserveNetworkAndUsers',
+                             'PreserveNetwork']
+
+        if command not in reset_type_values:
+            return {'ret': False, 'msg': 'Invalid Command (%s)' % command}
+
+        # read the resource and get the current power state
+        response = self.get_request(self.root_uri + resource_uri)
         if response['ret'] is False:
             return response
         data = response['data']
 
-        uris = [a.get('@odata.id') for a in data.get('Members', []) if
-                a.get('@odata.id')]
-        for uri in uris:
-            response = self.get_request(self.root_uri + uri)
+        # get the reset Action and target URI
+        if key not in data or action_name not in data[key]:
+            return {'ret': False, 'msg': 'Action %s not found' % action_name}
+        reset_action = data[key][action_name]
+        if 'target' not in reset_action:
+            return {'ret': False,
+                    'msg': 'target URI missing from Action %s' % action_name}
+        action_uri = reset_action['target']
+
+        # get AllowableValues
+        ai = self._get_all_action_info_values(reset_action)
+        allowable_values = ai.get('ResetType', {}).get('AllowableValues', [])
+
+        # map ResetType to an allowable value if needed
+        if allowable_values and command not in allowable_values:
+            return {'ret': False,
+                    'msg': 'Specified reset type (%s) not supported '
+                           'by service. Supported types: %s' %
+                           (command, allowable_values)}
+
+        # define payload
+        payload = {'ResetType': command}
+
+        # POST to Action URI
+        response = self.post_request(self.root_uri + action_uri, payload)
+        if response['ret'] is False:
+            return response
+        return {'ret': True, 'changed': True}
+
+    def _find_account_uri(self, username=None, acct_id=None, password_change_uri=None):
+        if not any((username, acct_id)):
+            return {'ret': False, 'msg':
+                    'Must provide either account_id or account_username'}
+
+        if password_change_uri:
+            # Password change required; go directly to the specified URI
+            response = self.get_request(self.root_uri + password_change_uri)
             if response['ret'] is False:
-                continue
+                return response
             data = response['data']
             headers = response['headers']
             if username:
                 if username == data.get('UserName'):
                     return {'ret': True, 'data': data,
-                            'headers': headers, 'uri': uri}
+                            'headers': headers, 'uri': password_change_uri}
             if acct_id:
                 if acct_id == data.get('Id'):
                     return {'ret': True, 'data': data,
-                            'headers': headers, 'uri': uri}
+                            'headers': headers, 'uri': password_change_uri}
+        else:
+            # Walk the accounts collection to find the desired user
+            response = self.get_request(self.root_uri + self.accounts_uri)
+            if response['ret'] is False:
+                return response
+            data = response['data']
+
+            uris = [a.get('@odata.id') for a in data.get('Members', []) if
+                    a.get('@odata.id')]
+            for uri in uris:
+                response = self.get_request(self.root_uri + uri)
+                if response['ret'] is False:
+                    continue
+                data = response['data']
+                headers = response['headers']
+                if username:
+                    if username == data.get('UserName'):
+                        return {'ret': True, 'data': data,
+                                'headers': headers, 'uri': uri}
+                if acct_id:
+                    if acct_id == data.get('Id'):
+                        return {'ret': True, 'data': data,
+                                'headers': headers, 'uri': uri}
 
         return {'ret': False, 'no_match': True, 'msg':
                 'No account with the given account_id or account_username found'}
@@ -1387,7 +1543,8 @@ class RedfishUtils(object):
                     'Must provide account_password for UpdateUserPassword command'}
 
         response = self._find_account_uri(username=user.get('account_username'),
-                                          acct_id=user.get('account_id'))
+                                          acct_id=user.get('account_id'),
+                                          password_change_uri=user.get('account_passwordchangerequired'))
         if not response['ret']:
             return response
 
@@ -1429,6 +1586,52 @@ class RedfishUtils(object):
         if resp['ret'] and resp['changed']:
             resp['msg'] = 'Modified account service'
         return resp
+
+    def update_user_accounttypes(self, user):
+        account_types = user.get('account_accounttypes')
+        oemaccount_types = user.get('account_oemaccounttypes')
+        if account_types is None and oemaccount_types is None:
+            return {'ret': False, 'msg':
+                    'Must provide account_accounttypes or account_oemaccounttypes for UpdateUserAccountTypes command'}
+
+        response = self._find_account_uri(username=user.get('account_username'),
+                                          acct_id=user.get('account_id'))
+        if not response['ret']:
+            return response
+
+        uri = response['uri']
+        payload = {}
+        if user.get('account_accounttypes'):
+            payload['AccountTypes'] = user.get('account_accounttypes')
+        if user.get('account_oemaccounttypes'):
+            payload['OEMAccountTypes'] = user.get('account_oemaccounttypes')
+
+        return self.patch_request(self.root_uri + uri, payload, check_pyld=True)
+
+    def check_password_change_required(self, return_data):
+        """
+        Checks a response if a user needs to change their password
+
+        :param return_data: The return data for a failed request
+        :return: None or the URI of the account to update
+        """
+        uri = None
+        if 'data' in return_data:
+            # Find the extended messages in the response payload
+            extended_messages = return_data['data'].get('error', {}).get('@Message.ExtendedInfo', [])
+            if len(extended_messages) == 0:
+                extended_messages = return_data['data'].get('@Message.ExtendedInfo', [])
+            # Go through each message and look for Base.1.X.PasswordChangeRequired
+            for message in extended_messages:
+                message_id = message.get('MessageId')
+                if message_id is None:
+                    # While this is invalid, treat the lack of a MessageId as "no message"
+                    continue
+                if message_id.startswith('Base.1.') and message_id.endswith('.PasswordChangeRequired'):
+                    # Password change required; get the URI of the user account
+                    uri = message['MessageArgs'][0]
+                    break
+        return uri
 
     def get_sessions(self):
         result = {}
@@ -1541,6 +1744,8 @@ class RedfishUtils(object):
 
         data = response['data']
 
+        result['multipart_supported'] = 'MultipartHttpPushUri' in data
+
         if "Actions" in data:
             actions = data['Actions']
             if len(actions) > 0:
@@ -1639,7 +1844,7 @@ class RedfishUtils(object):
                     operation_results['status'] = data.get('TaskState', data.get('JobState'))
                     operation_results['messages'] = data.get('Messages', [])
                 else:
-                    # Error response body, which is a bit of a misnomer since it's used in successful action responses
+                    # Error response body, which is a bit of a misnomer since it is used in successful action responses
                     operation_results['status'] = 'Completed'
                     if response.status >= 400:
                         operation_results['status'] = 'Exception'
@@ -1758,6 +1963,9 @@ class RedfishUtils(object):
         targets = update_opts.get('update_targets')
         apply_time = update_opts.get('update_apply_time')
         oem_params = update_opts.get('update_oem_params')
+        custom_oem_header = update_opts.get('update_custom_oem_header')
+        custom_oem_mime_type = update_opts.get('update_custom_oem_mime_type')
+        custom_oem_params = update_opts.get('update_custom_oem_params')
 
         # Ensure the image file is provided
         if not image_file:
@@ -1783,7 +1991,7 @@ class RedfishUtils(object):
         update_uri = data['MultipartHttpPushUri']
 
         # Assemble the JSON payload portion of the request
-        payload = {"@Redfish.OperationApplyTime": "Immediate"}
+        payload = {}
         if targets:
             payload["Targets"] = targets
         if apply_time:
@@ -1794,6 +2002,11 @@ class RedfishUtils(object):
             'UpdateParameters': {'content': json.dumps(payload), 'mime_type': 'application/json'},
             'UpdateFile': {'filename': image_file, 'content': image_payload, 'mime_type': 'application/octet-stream'}
         }
+        if custom_oem_params:
+            multipart_payload[custom_oem_header] = {'content': custom_oem_params}
+            if custom_oem_mime_type:
+                multipart_payload[custom_oem_header]['mime_type'] = custom_oem_mime_type
+
         response = self.post_request(self.root_uri + update_uri, multipart_payload, multipart=True)
         if response['ret'] is False:
             return response
@@ -1813,7 +2026,7 @@ class RedfishUtils(object):
             return {'ret': False, 'msg': 'Must provide a handle tracking the update.'}
 
         # Get the task or job tracking the update
-        response = self.get_request(self.root_uri + update_handle)
+        response = self.get_request(self.root_uri + update_handle, allow_no_resp=True)
         if response['ret'] is False:
             return response
 
@@ -2137,7 +2350,7 @@ class RedfishUtils(object):
                 continue
 
             # If already set to requested value, remove it from PATCH payload
-            if data[u'Attributes'][attr_name] == attributes[attr_name]:
+            if data[u'Attributes'][attr_name] == attr_value:
                 del attrs_to_patch[attr_name]
 
         warning = ""
@@ -2157,11 +2370,19 @@ class RedfishUtils(object):
 
         # Construct payload and issue PATCH command
         payload = {"Attributes": attrs_to_patch}
+
+        # WORKAROUND
+        # Dell systems require manually setting the apply time to "OnReset"
+        # to spawn a proprietary job to apply the BIOS settings
+        vendor = self._get_vendor()['Vendor']
+        if vendor == 'Dell':
+            payload.update({"@Redfish.SettingsApplyTime": {"ApplyTime": "OnReset"}})
+
         response = self.patch_request(self.root_uri + set_bios_attr_uri, payload)
         if response['ret'] is False:
             return response
         return {'ret': True, 'changed': True,
-                'msg': "Modified BIOS attributes %s" % (attrs_to_patch),
+                'msg': "Modified BIOS attributes %s. A reboot is required" % (attrs_to_patch),
                 'warning': warning}
 
     def set_boot_order(self, boot_list):
@@ -2675,9 +2896,11 @@ class RedfishUtils(object):
 
     def virtual_media_insert_via_patch(self, options, param_map, uri, data, image_only=False):
         # get AllowableValues
-        ai = dict((k[:-24],
-                   {'AllowableValues': v}) for k, v in data.items()
-                  if k.endswith('@Redfish.AllowableValues'))
+        ai = {
+            k[:-24]: {'AllowableValues': v}
+            for k, v in data.items()
+            if k.endswith('@Redfish.AllowableValues')
+        }
         # construct payload
         payload = self._insert_virt_media_payload(options, param_map, data, ai)
         if 'Inserted' not in payload and not image_only:
@@ -2907,8 +3130,7 @@ class RedfishUtils(object):
 
         # Get a list of all Chassis and build URIs, then get all PowerSupplies
         # from each Power entry in the Chassis
-        chassis_uri_list = self.chassis_uris
-        for chassis_uri in chassis_uri_list:
+        for chassis_uri in self.chassis_uris:
             response = self.get_request(self.root_uri + chassis_uri)
             if response['ret'] is False:
                 return response
@@ -3269,7 +3491,7 @@ class RedfishUtils(object):
 
         # Capture list of URIs that match a specified HostInterface resource Id
         if hostinterface_id:
-            matching_hostinterface_uris = [uri for uri in uris if hostinterface_id in uri.split('/')[-1]]
+            matching_hostinterface_uris = [uri for uri in uris if hostinterface_id in uri.rstrip('/').split('/')[-1]]
         if hostinterface_id and matching_hostinterface_uris:
             hostinterface_uri = list.pop(matching_hostinterface_uris)
         elif hostinterface_id and not matching_hostinterface_uris:
@@ -3365,7 +3587,8 @@ class RedfishUtils(object):
         inventory = {}
         # Get these entries, but does not fail if not found
         properties = ['Id', 'FirmwareVersion', 'ManagerType', 'Manufacturer', 'Model',
-                      'PartNumber', 'PowerState', 'SerialNumber', 'Status', 'UUID']
+                      'PartNumber', 'PowerState', 'SerialNumber', 'ServiceIdentification',
+                      'Status', 'UUID']
 
         response = self.get_request(self.root_uri + manager_uri)
         if response['ret'] is False:
@@ -3383,6 +3606,35 @@ class RedfishUtils(object):
     def get_multi_manager_inventory(self):
         return self.aggregate_managers(self.get_manager_inventory)
 
+    def get_service_identification(self, manager):
+        result = {}
+        if manager is None:
+            if len(self.manager_uris) == 1:
+                manager = self.manager_uris[0].rstrip('/').split('/')[-1]
+            elif len(self.manager_uris) > 1:
+                entries = self.get_multi_manager_inventory()['entries']
+                managers = [m[0]['manager_uri'] for m in entries if m[1].get('ServiceIdentification')]
+                if len(managers) == 1:
+                    manager = managers[0].rstrip('/').split('/')[-1]
+                else:
+                    self.module.fail_json(msg=[
+                        "Multiple managers with ServiceIdentification were found: %s" % str(managers),
+                        "Please specify by using the 'manager' parameter in your playbook"])
+            elif len(self.manager_uris) == 0:
+                self.module.fail_json(msg="No manager identities were found")
+        response = self.get_request(self.root_uri + '/redfish/v1/Managers/' + manager, override_headers=None)
+        try:
+            result['service_identification'] = response['data']['ServiceIdentification']
+        except Exception as e:
+            self.module.fail_json(msg="Service ID not found for manager %s" % manager)
+        result['ret'] = True
+        return result
+
+    def set_service_identification(self, service_id):
+        data = {"ServiceIdentification": service_id}
+        resp = self.patch_request(self.root_uri + '/redfish/v1/Managers/' + self.resource_id, data, check_pyld=True)
+        return resp
+
     def set_session_service(self, sessions_config):
         if sessions_config is None:
             return {'ret': False, 'msg':
@@ -3395,7 +3647,7 @@ class RedfishUtils(object):
 
     def verify_bios_attributes(self, bios_attributes):
         # This method verifies BIOS attributes against the provided input
-        server_bios = self.get_multi_bios_attributes()
+        server_bios = self.get_bios_attributes(self.systems_uri)
         if server_bios["ret"] is False:
             return server_bios
 
@@ -3404,8 +3656,8 @@ class RedfishUtils(object):
 
         # Verify bios_attributes with BIOS settings available in the server
         for key, value in bios_attributes.items():
-            if key in server_bios["entries"][0][1]:
-                if server_bios["entries"][0][1][key] != value:
+            if key in server_bios["entries"]:
+                if server_bios["entries"][key] != value:
                     bios_dict.update({key: value})
             else:
                 wrong_param.update({key: value})
@@ -3470,33 +3722,30 @@ class RedfishUtils(object):
         result = {}
         key = "Thermal"
         # Go through list
-        for chassis_uri in self.chassis_uri_list:
+        for chassis_uri in self.chassis_uris:
             response = self.get_request(self.root_uri + chassis_uri)
             if response['ret'] is False:
                 return response
             result['ret'] = True
             data = response['data']
-            oem = data.get['Oem']
-            hpe = oem.get['Hpe']
-            thermal_config = hpe.get('ThermalConfiguration')
-        result["current_thermal_config"] = thermal_config
-        return result
+            val = data.get('Oem', {}).get('Hpe', {}).get('ThermalConfiguration')
+            if val is not None:
+                return {"ret": True, "current_thermal_config": val}
+        return {"ret": False}
 
     def get_hpe_fan_percent_min(self):
         result = {}
         key = "Thermal"
         # Go through list
-        for chassis_uri in self.chassis_uri_list:
+        for chassis_uri in self.chassis_uris:
             response = self.get_request(self.root_uri + chassis_uri)
             if response['ret'] is False:
                 return response
-            result['ret'] = True
             data = response['data']
-            oem = data.get['Oem']
-            hpe = oem.get['Hpe']
-            fan_percent_min_config = hpe.get('FanPercentMinimum')
-        result["fan_percent_min"] = fan_percent_min_config
-        return result
+            val = data.get('Oem', {}).get('Hpe', {}).get('FanPercentMinimum')
+            if val is not None:
+                return {"ret": True, "fan_percent_min": val}
+        return {"ret": False}
 
     def delete_volumes(self, storage_subsystem_id, volume_ids):
         # Find the Storage resource from the requested ComputerSystem resource
@@ -3524,7 +3773,7 @@ class RedfishUtils(object):
         # Matching Storage Subsystem ID with user input
         self.storage_subsystem_uri = ""
         for storage_subsystem_uri in self.storage_subsystems_uris:
-            if storage_subsystem_uri.split("/")[-2] == storage_subsystem_id:
+            if storage_subsystem_uri.rstrip('/').split('/')[-1] == storage_subsystem_id:
                 self.storage_subsystem_uri = storage_subsystem_uri
 
         if not self.storage_subsystem_uri:
@@ -3552,7 +3801,7 @@ class RedfishUtils(object):
 
         # Delete each volume
         for volume in self.volume_uris:
-            if volume.split("/")[-1] in volume_ids:
+            if volume.rstrip('/').split('/')[-1] in volume_ids:
                 response = self.delete_request(self.root_uri + volume)
                 if response['ret'] is False:
                     return response
@@ -3560,7 +3809,7 @@ class RedfishUtils(object):
         return {'ret': True, 'changed': True,
                 'msg': "The following volumes were deleted: %s" % str(volume_ids)}
 
-    def create_volume(self, volume_details, storage_subsystem_id):
+    def create_volume(self, volume_details, storage_subsystem_id, storage_none_volume_deletion=False):
         # Find the Storage resource from the requested ComputerSystem resource
         response = self.get_request(self.root_uri + self.systems_uri)
         if response['ret'] is False:
@@ -3586,7 +3835,7 @@ class RedfishUtils(object):
         # Matching Storage Subsystem ID with user input
         self.storage_subsystem_uri = ""
         for storage_subsystem_uri in self.storage_subsystems_uris:
-            if storage_subsystem_uri.split("/")[-2] == storage_subsystem_id:
+            if storage_subsystem_uri.rstrip('/').split('/')[-1] == storage_subsystem_id:
                 self.storage_subsystem_uri = storage_subsystem_uri
 
         if not self.storage_subsystem_uri:
@@ -3595,8 +3844,8 @@ class RedfishUtils(object):
                 'msg': "Provided Storage Subsystem ID %s does not exist on the server" % storage_subsystem_id}
 
         # Validate input parameters
-        required_parameters = ['RAIDType', 'Drives', 'CapacityBytes']
-        allowed_parameters = ['DisplayName', 'InitializeMethod', 'MediaSpanCount',
+        required_parameters = ['RAIDType', 'Drives']
+        allowed_parameters = ['CapacityBytes', 'DisplayName', 'InitializeMethod', 'MediaSpanCount',
                               'Name', 'ReadCachePolicy', 'StripSizeBytes', 'VolumeUsage', 'WriteCachePolicy']
 
         for parameter in required_parameters:
@@ -3612,22 +3861,23 @@ class RedfishUtils(object):
         data = response['data']
 
         # Deleting any volumes of RAIDType None present on the Storage Subsystem
-        response = self.get_request(self.root_uri + data['Volumes']['@odata.id'])
-        if response['ret'] is False:
-            return response
-        volume_data = response['data']
+        if storage_none_volume_deletion:
+            response = self.get_request(self.root_uri + data['Volumes']['@odata.id'])
+            if response['ret'] is False:
+                return response
+            volume_data = response['data']
 
-        if "Members" in volume_data:
-            for member in volume_data["Members"]:
-                response = self.get_request(self.root_uri + member['@odata.id'])
-                if response['ret'] is False:
-                    return response
-                member_data = response['data']
-
-                if member_data["RAIDType"] == "None":
-                    response = self.delete_request(self.root_uri + member['@odata.id'])
+            if "Members" in volume_data:
+                for member in volume_data["Members"]:
+                    response = self.get_request(self.root_uri + member['@odata.id'])
                     if response['ret'] is False:
                         return response
+                    member_data = response['data']
+
+                    if member_data["RAIDType"] == "None":
+                        response = self.delete_request(self.root_uri + member['@odata.id'])
+                        if response['ret'] is False:
+                            return response
 
         # Construct payload and issue POST command to create volume
         volume_details["Links"] = {}
@@ -3702,7 +3952,7 @@ class RedfishUtils(object):
         vendor = self._get_vendor()['Vendor']
         rsp_uri = ""
         for loc in resp_data['Location']:
-            if loc['Language'] == "en":
+            if loc['Language'].startswith("en"):
                 rsp_uri = loc['Uri']
                 if vendor == 'HPE':
                     # WORKAROUND
@@ -3732,3 +3982,38 @@ class RedfishUtils(object):
                 "rsp_uri": rsp_uri
             }
         return res
+
+    def get_accountservice_properties(self):
+        # Find the AccountService resource
+        response = self.get_request(self.root_uri + self.service_root)
+        if response['ret'] is False:
+            return response
+        data = response['data']
+        accountservice_uri = data.get("AccountService", {}).get("@odata.id")
+        if accountservice_uri is None:
+            return {'ret': False, 'msg': "AccountService resource not found"}
+
+        response = self.get_request(self.root_uri + accountservice_uri)
+        if response['ret'] is False:
+            return response
+        return {
+            'ret': True,
+            'entries': response['data']
+        }
+
+    def get_power_restore_policy(self, systems_uri):
+        # Retrieve System resource
+        response = self.get_request(self.root_uri + systems_uri)
+        if response['ret'] is False:
+            return response
+        return {
+            'ret': True,
+            'entries': response['data']['PowerRestorePolicy']
+        }
+
+    def get_multi_power_restore_policy(self):
+        return self.aggregate_systems(self.get_power_restore_policy)
+
+    def set_power_restore_policy(self, policy):
+        body = {'PowerRestorePolicy': policy}
+        return self.patch_request(self.root_uri + self.systems_uri, body, check_pyld=True)

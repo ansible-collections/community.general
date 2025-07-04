@@ -12,16 +12,15 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: scaleway_volume
 short_description: Scaleway volumes management module
 author: Henryk Konsek (@hekonsek)
 description:
-    - "This module manages volumes on Scaleway account U(https://developer.scaleway.com)."
+  - This module manages volumes on Scaleway account U(https://developer.scaleway.com).
 extends_documentation_fragment:
-- community.general.scaleway
-- community.general.attributes
+  - community.general.scaleway
+  - community.general.attributes
 
 attributes:
   check_mode:
@@ -74,9 +73,9 @@ options:
     type: str
     description:
       - Type of the volume (for example 'l_ssd').
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create 10GB volume
   community.general.scaleway_volume:
     name: my-volume
@@ -92,14 +91,15 @@ EXAMPLES = '''
     name: my-volume
     state: absent
     region: par1
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 data:
-    description: This is only present when O(state=present).
-    returned: when O(state=present)
-    type: dict
-    sample: {
+  description: This is only present when O(state=present).
+  returned: when O(state=present)
+  type: dict
+  sample:
+    {
       "volume": {
         "export_uri": null,
         "id": "c675f420-cfeb-48ff-ba2a-9d2a4dbe3fcd",
@@ -108,9 +108,9 @@ data:
         "server": null,
         "size": 10000000000,
         "volume_type": "l_ssd"
-  }
-}
-'''
+      }
+    }
+"""
 
 from ansible_collections.community.general.plugins.module_utils.scaleway import SCALEWAY_LOCATION, scaleway_argument_spec, Scaleway
 from ansible.module_utils.basic import AnsibleModule

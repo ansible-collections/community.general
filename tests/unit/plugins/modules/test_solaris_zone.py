@@ -13,7 +13,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.modules import (
     solaris_zone
 )
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import (
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     set_module_args,
 )
 
@@ -54,16 +54,16 @@ def test_zone_create(mocked_zone_create, capfd):
     """
     test zone creation
     """
-    set_module_args(
+    with set_module_args(
         {
             "name": "z1",
             "state": "installed",
             "path": "/zones/z1",
             "_ansible_check_mode": False,
         }
-    )
-    with pytest.raises(SystemExit):
-        solaris_zone.main()
+    ):
+        with pytest.raises(SystemExit):
+            solaris_zone.main()
 
     out, err = capfd.readouterr()
     results = json.loads(out)
@@ -75,16 +75,16 @@ def test_zone_delete(mocked_zone_delete, capfd):
     """
     test zone deletion
     """
-    set_module_args(
+    with set_module_args(
         {
             "name": "z1",
             "state": "absent",
             "path": "/zones/z1",
             "_ansible_check_mode": False,
         }
-    )
-    with pytest.raises(SystemExit):
-        solaris_zone.main()
+    ):
+        with pytest.raises(SystemExit):
+            solaris_zone.main()
 
     out, err = capfd.readouterr()
     results = json.loads(out)
@@ -100,16 +100,16 @@ def test_zone_create_invalid_names(mocked_zone_create, capfd):
     # 2. Zone name > 64 characters.
     # 3. Zone name beginning with non-alphanumeric character.
     for invalid_name in ('foo!bar', 'z' * 65, '_zone'):
-        set_module_args(
+        with set_module_args(
             {
                 "name": invalid_name,
                 "state": "installed",
                 "path": "/zones/" + invalid_name,
                 "_ansible_check_mode": False,
             }
-        )
-        with pytest.raises(SystemExit):
-            solaris_zone.main()
+        ):
+            with pytest.raises(SystemExit):
+                solaris_zone.main()
 
         out, err = capfd.readouterr()
         results = json.loads(out)

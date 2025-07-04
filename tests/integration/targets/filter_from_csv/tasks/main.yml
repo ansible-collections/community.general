@@ -51,4 +51,4 @@
   assert:
     that:
       - _invalid_csv_strict_true is failed
-      - _invalid_csv_strict_true.msg is match('Unable to process file:.*')
+      - _invalid_csv_strict_true.msg is search('Unable to process file:.*')

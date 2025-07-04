@@ -8,17 +8,16 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: office_365_connector_card
 short_description: Use webhooks to create Connector Card messages within an Office 365 group
 description:
-  - Creates Connector Card messages through
-    Office 365 Connectors
+  - Creates Connector Card messages through Office 365 Connectors.
+  - See
     U(https://learn.microsoft.com/en-us/microsoftteams/platform/task-modules-and-cards/cards/cards-reference#connector-card-for-microsoft-365-groups).
 author: "Marc Sensenich (@marc-sensenich)"
 notes:
-  - This module is not idempotent, therefore if the same task is run twice
-    there will be two Connector Cards created
+  - This module is not idempotent, therefore if the same task is run twice there will be two Connector Cards created.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -37,7 +36,7 @@ options:
     description:
       - A string used for summarizing card content.
       - This will be shown as the message subject.
-      - This is required if the text parameter isn't populated.
+      - This is required if the text parameter is not populated.
   color:
     type: str
     description:
@@ -51,22 +50,21 @@ options:
     description:
       - The main text of the card.
       - This will be rendered below the sender information and optional title,
-      - and above any sections or actions present.
+      - And above any sections or actions present.
   actions:
     type: list
     elements: dict
     description:
-      - This array of objects will power the action links
-      - found at the bottom of the card.
+      - This array of objects will power the action links found at the bottom of the card.
   sections:
     type: list
     elements: dict
     description:
       - Contains a list of sections to display in the card.
       - For more information see U(https://learn.microsoft.com/en-us/outlook/actionable-messages/message-card-reference#section-fields).
-'''
+"""
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Create a simple Connector Card
   community.general.office_365_connector_card:
     webhook: https://outlook.office.com/webhook/GUID/IncomingWebhook/GUID/GUID
@@ -77,71 +75,70 @@ EXAMPLES = """
     webhook: https://outlook.office.com/webhook/GUID/IncomingWebhook/GUID/GUID
     summary: This is the summary property
     title: This is the **card's title** property
-    text: This is the **card's text** property. Lorem ipsum dolor sit amet, consectetur
-      adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+    text: This is the **card's text** property. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+      tempor incididunt ut labore et dolore magna aliqua.
     color: E81123
     sections:
-    - title: This is the **section's title** property
-      activity_image: http://connectorsdemo.azurewebsites.net/images/MSC12_Oscar_002.jpg
-      activity_title: This is the section's **activityTitle** property
-      activity_subtitle: This is the section's **activitySubtitle** property
-      activity_text: This is the section's **activityText** property.
-      hero_image:
-        image: http://connectorsdemo.azurewebsites.net/images/WIN12_Scene_01.jpg
-        title: This is the image's alternate text
-      text: This is the section's text property. Lorem ipsum dolor sit amet, consectetur
-        adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-      facts:
-      - name: This is a fact name
-        value: This is a fact value
-      - name: This is a fact name
-        value: This is a fact value
-      - name: This is a fact name
-        value: This is a fact value
-      images:
-      - image: http://connectorsdemo.azurewebsites.net/images/MicrosoftSurface_024_Cafe_OH-06315_VS_R1c.jpg
-        title: This is the image's alternate text
-      - image: http://connectorsdemo.azurewebsites.net/images/WIN12_Scene_01.jpg
-        title: This is the image's alternate text
-      - image: http://connectorsdemo.azurewebsites.net/images/WIN12_Anthony_02.jpg
-        title: This is the image's alternate text
-      actions:
-      - "@type": ActionCard
-        name: Comment
-        inputs:
-        - "@type": TextInput
-          id: comment
-          is_multiline: true
-          title: Input's title property
+      - title: This is the **section's title** property
+        activity_image: http://connectorsdemo.azurewebsites.net/images/MSC12_Oscar_002.jpg
+        activity_title: This is the section's **activityTitle** property
+        activity_subtitle: This is the section's **activitySubtitle** property
+        activity_text: This is the section's **activityText** property.
+        hero_image:
+          image: http://connectorsdemo.azurewebsites.net/images/WIN12_Scene_01.jpg
+          title: This is the image's alternate text
+        text: This is the section's text property. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+          tempor incididunt ut labore et dolore magna aliqua.
+        facts:
+          - name: This is a fact name
+            value: This is a fact value
+          - name: This is a fact name
+            value: This is a fact value
+          - name: This is a fact name
+            value: This is a fact value
+        images:
+          - image: http://connectorsdemo.azurewebsites.net/images/MicrosoftSurface_024_Cafe_OH-06315_VS_R1c.jpg
+            title: This is the image's alternate text
+          - image: http://connectorsdemo.azurewebsites.net/images/WIN12_Scene_01.jpg
+            title: This is the image's alternate text
+          - image: http://connectorsdemo.azurewebsites.net/images/WIN12_Anthony_02.jpg
+            title: This is the image's alternate text
         actions:
-        - "@type": HttpPOST
-          name: Save
-          target: http://...
-      - "@type": ActionCard
-        name: Due Date
-        inputs:
-        - "@type": DateInput
-          id: dueDate
-          title: Input's title property
-        actions:
-        - "@type": HttpPOST
-          name: Save
-          target: http://...
-      - "@type": HttpPOST
-        name: Action's name prop.
-        target: http://...
-      - "@type": OpenUri
-        name: Action's name prop
-        targets:
-        - os: default
-          uri: http://...
-    - start_group: true
-      title: This is the title of a **second section**
-      text: This second section is visually separated from the first one by setting its
-        **startGroup** property to true.
+          - "@type": ActionCard
+            name: Comment
+            inputs:
+              - "@type": TextInput
+                id: comment
+                is_multiline: true
+                title: Input's title property
+            actions:
+              - "@type": HttpPOST
+                name: Save
+                target: http://...
+          - "@type": ActionCard
+            name: Due Date
+            inputs:
+              - "@type": DateInput
+                id: dueDate
+                title: Input's title property
+            actions:
+              - "@type": HttpPOST
+                name: Save
+                target: http://...
+          - "@type": HttpPOST
+            name: Action's name prop.
+            target: http://...
+          - "@type": OpenUri
+            name: Action's name prop
+            targets:
+              - os: default
+                uri: http://...
+      - start_group: true
+        title: This is the title of a **second section**
+        text: This second section is visually separated from the first one by setting its **startGroup** property to true.
 """
 
-RETURN = """
+RETURN = r"""
 """
 
 # import module snippets

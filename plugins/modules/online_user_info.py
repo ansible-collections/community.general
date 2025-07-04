@@ -7,7 +7,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 module: online_user_info
 short_description: Gather information about Online user
 description:
@@ -18,34 +18,34 @@ extends_documentation_fragment:
   - community.general.online
   - community.general.attributes
   - community.general.attributes.info_module
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Gather Online user info
   community.general.online_user_info:
   register: result
 
 - ansible.builtin.debug:
     msg: "{{ result.online_user_info }}"
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 online_user_info:
   description:
     - Response from Online API.
-    - "For more details please refer to: U(https://console.online.net/en/api/)."
+    - 'For more details please refer to: U(https://console.online.net/en/api/).'
   returned: success
   type: dict
   sample:
     "online_user_info": {
-        "company": "foobar LLC",
-        "email": "foobar@example.com",
-        "first_name": "foo",
-        "id": 42,
-        "last_name": "bar",
-        "login": "foobar"
+      "company": "foobar LLC",
+      "email": "foobar@example.com",
+      "first_name": "foo",
+      "id": 42,
+      "last_name": "bar",
+      "login": "foobar"
     }
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.online import (

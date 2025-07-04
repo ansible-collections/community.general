@@ -7,13 +7,12 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: ipa_subca
 author: Abhijeet Kasurde (@Akasurde)
 short_description: Manage FreeIPA Lightweight Sub Certificate Authorities
 description:
-- Add, modify, enable, disable and delete an IPA Lightweight Sub Certificate Authorities using IPA API.
+  - Add, modify, enable, disable and delete an IPA Lightweight Sub Certificate Authorities using IPA API.
 attributes:
   check_mode:
     support: full
@@ -22,23 +21,23 @@ attributes:
 options:
   subca_name:
     description:
-    - The Sub Certificate Authority name which needs to be managed.
+      - The Sub Certificate Authority name which needs to be managed.
     required: true
     aliases: ["name"]
     type: str
   subca_subject:
     description:
-    - The Sub Certificate Authority's Subject. e.g., 'CN=SampleSubCA1,O=testrelm.test'.
+      - The Sub Certificate Authority's Subject, for example V(CN=SampleSubCA1,O=testrelm.test).
     required: true
     type: str
   subca_desc:
     description:
-    - The Sub Certificate Authority's description.
+      - The Sub Certificate Authority's description.
     type: str
   state:
     description:
-    - State to ensure.
-    - State 'disable' and 'enable' is available for FreeIPA 4.4.2 version and onwards.
+      - State to ensure.
+      - States V(disable) and V(enable) are available for FreeIPA 4.4.2 version and onwards.
     required: false
     default: present
     choices: ["absent", "disabled", "enabled", "present"]
@@ -46,10 +45,9 @@ options:
 extends_documentation_fragment:
   - community.general.ipa.documentation
   - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Ensure IPA Sub CA is present
   community.general.ipa_subca:
     ipa_host: spider.example.com
@@ -72,14 +70,14 @@ EXAMPLES = '''
     ipa_pass: Passw0rd!
     state: disable
     subca_name: AnsibleSubCA1
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 subca:
   description: IPA Sub CA record as returned by IPA API.
   returned: always
   type: dict
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.ipa import IPAClient, ipa_argument_spec

@@ -8,17 +8,16 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: wdc_redfish_info
 short_description: Manages WDC UltraStar Data102 Out-Of-Band controllers using Redfish APIs
 version_added: 5.4.0
 description:
-  - Builds Redfish URIs locally and sends them to remote OOB controllers to
-    get information back.
+  - Builds Redfish URIs locally and sends them to remote OOB controllers to get information back.
 extends_documentation_fragment:
   - community.general.attributes
   - community.general.attributes.info_module
+  - community.general.redfish
 options:
   category:
     required: true
@@ -33,11 +32,11 @@ options:
     elements: str
   baseuri:
     description:
-      - Base URI of OOB controller.  Must include this or O(ioms).
+      - Base URI of OOB controller. Must include this or O(ioms).
     type: str
   ioms:
     description:
-      - List of IOM FQDNs for the enclosure.  Must include this or O(baseuri).
+      - List of IOM FQDNs for the enclosure. Must include this or O(baseuri).
     type: list
     elements: str
   username:
@@ -57,15 +56,20 @@ options:
       - Timeout in seconds for URL requests to OOB controller.
     default: 10
     type: int
+  validate_certs:
+    version_added: 10.6.0
+  ca_path:
+    version_added: 10.6.0
+  ciphers:
+    version_added: 10.6.0
 
 notes:
-  - In the inventory, you can specify baseuri or ioms.  See the EXAMPLES section.
-  - ioms is a list of FQDNs for the enclosure's IOMs.
-
+  - In the inventory, you can specify baseuri or ioms. See the EXAMPLES section.
+  - Ioms is a list of FQDNs for the enclosure's IOMs.
 author: Mike Moerk (@mikemoerk)
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Get Simple Update Status with individual IOMs specified
   community.general.wdc_redfish_info:
     category: Update
@@ -93,34 +97,35 @@ EXAMPLES = '''
 - name: Print fetched information
   ansible.builtin.debug:
     msg: "{{ result.redfish_facts.simple_update_status.entries | to_nice_json }}"
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 Description:
-    description: Firmware update status description.
-    returned: always
-    type: str
-    sample: Ready for FW update
+  description: Firmware update status description.
+  returned: always
+  type: str
+  sample: Ready for FW update
 ErrorCode:
-    description: Numeric error code for firmware update status.  Non-zero indicates an error condition.
-    returned: always
-    type: int
-    sample: 0
+  description: Numeric error code for firmware update status. Non-zero indicates an error condition.
+  returned: always
+  type: int
+  sample: 0
 EstimatedRemainingMinutes:
-    description: Estimated number of minutes remaining in firmware update operation.
-    returned: always
-    type: int
-    sample: 20
+  description: Estimated number of minutes remaining in firmware update operation.
+  returned: always
+  type: int
+  sample: 20
 StatusCode:
-    description: Firmware update status code.
-    returned: always
-    type: int
-    sample: 2
-'''
+  description: Firmware update status code.
+  returned: always
+  type: int
+  sample: 2
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils import WdcRedfishUtils
+from ansible_collections.community.general.plugins.module_utils.redfish_utils import REDFISH_COMMON_ARGUMENT_SPEC
 
 CATEGORY_COMMANDS_ALL = {
     "Update": ["SimpleUpdateStatus"]
@@ -129,17 +134,19 @@ CATEGORY_COMMANDS_ALL = {
 
 def main():
     result = {}
+    argument_spec = dict(
+        category=dict(required=True),
+        command=dict(required=True, type='list', elements='str'),
+        ioms=dict(type='list', elements='str'),
+        baseuri=dict(),
+        username=dict(),
+        password=dict(no_log=True),
+        auth_token=dict(no_log=True),
+        timeout=dict(type='int', default=10)
+    )
+    argument_spec.update(REDFISH_COMMON_ARGUMENT_SPEC)
     module = AnsibleModule(
-        argument_spec=dict(
-            category=dict(required=True),
-            command=dict(required=True, type='list', elements='str'),
-            ioms=dict(type='list', elements='str'),
-            baseuri=dict(),
-            username=dict(),
-            password=dict(no_log=True),
-            auth_token=dict(no_log=True),
-            timeout=dict(type='int', default=10)
-        ),
+        argument_spec,
         required_together=[
             ('username', 'password'),
         ],

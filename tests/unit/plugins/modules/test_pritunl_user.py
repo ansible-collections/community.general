@@ -12,7 +12,7 @@ from ansible.module_utils.six import iteritems
 from ansible_collections.community.general.plugins.modules import (
     pritunl_user,
 )
-from ansible_collections.community.general.tests.unit.compat.mock import patch
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
 from ansible_collections.community.general.tests.unit.plugins.module_utils.net_tools.pritunl.test_api import (
     PritunlDeleteUserMock,
     PritunlListOrganizationMock,
@@ -20,7 +20,7 @@ from ansible_collections.community.general.tests.unit.plugins.module_utils.net_t
     PritunlPostUserMock,
     PritunlPutUserMock,
 )
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import (
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
     AnsibleFailJson,
     ModuleTestCase,
@@ -94,9 +94,9 @@ class TestPritunlUser(ModuleTestCase):
 
     def test_without_parameters(self):
         """Test without parameters"""
-        set_module_args({})
-        with self.assertRaises(AnsibleFailJson):
-            self.module.main()
+        with set_module_args({}):
+            with self.assertRaises(AnsibleFailJson):
+                self.module.main()
 
     @mock_pritunl_api
     def test_present(self):
@@ -105,7 +105,7 @@ class TestPritunlUser(ModuleTestCase):
             "user_name": "alice",
             "user_email": "alice@company.com",
         }
-        set_module_args(
+        with set_module_args(
             dict_merge(
                 {
                     "pritunl_api_token": "token",
@@ -115,13 +115,12 @@ class TestPritunlUser(ModuleTestCase):
                 },
                 user_params,
             )
-        )
-
-        with self.patch_update_pritunl_users(
-            side_effect=PritunlPostUserMock
-        ) as post_mock:
-            with self.assertRaises(AnsibleExitJson) as create_result:
-                self.module.main()
+        ):
+            with self.patch_update_pritunl_users(
+                side_effect=PritunlPostUserMock
+            ) as post_mock:
+                with self.assertRaises(AnsibleExitJson) as create_result:
+                    self.module.main()
 
         create_exc = create_result.exception.args[0]
 
@@ -137,7 +136,7 @@ class TestPritunlUser(ModuleTestCase):
             "user_email": "bob@company.com",
             "user_disabled": True,
         }
-        set_module_args(
+        with set_module_args(
             dict_merge(
                 {
                     "pritunl_api_token": "token",
@@ -147,14 +146,12 @@ class TestPritunlUser(ModuleTestCase):
                 },
                 new_user_params,
             )
-        )
-
-        with self.patch_update_pritunl_users(
-            side_effect=PritunlPutUserMock
-        ) as put_mock:
-
-            with self.assertRaises(AnsibleExitJson) as update_result:
-                self.module.main()
+        ):
+            with self.patch_update_pritunl_users(
+                side_effect=PritunlPutUserMock
+            ) as put_mock:
+                with self.assertRaises(AnsibleExitJson) as update_result:
+                    self.module.main()
 
         update_exc = update_result.exception.args[0]
 
@@ -168,7 +165,7 @@ class TestPritunlUser(ModuleTestCase):
     @mock_pritunl_api
     def test_absent(self):
         """Test user removal from Pritunl."""
-        set_module_args(
+        with set_module_args(
             {
                 "state": "absent",
                 "pritunl_api_token": "token",
@@ -177,10 +174,9 @@ class TestPritunlUser(ModuleTestCase):
                 "organization": "GumGum",
                 "user_name": "florian",
             }
-        )
-
-        with self.assertRaises(AnsibleExitJson) as result:
-            self.module.main()
+        ):
+            with self.assertRaises(AnsibleExitJson) as result:
+                self.module.main()
 
         exc = result.exception.args[0]
 
@@ -190,7 +186,7 @@ class TestPritunlUser(ModuleTestCase):
     @mock_pritunl_api
     def test_absent_failure(self):
         """Test user removal from a non existing organization."""
-        set_module_args(
+        with set_module_args(
             {
                 "state": "absent",
                 "pritunl_api_token": "token",
@@ -199,10 +195,9 @@ class TestPritunlUser(ModuleTestCase):
                 "organization": "Unknown",
                 "user_name": "floria@company.com",
             }
-        )
-
-        with self.assertRaises(AnsibleFailJson) as result:
-            self.module.main()
+        ):
+            with self.assertRaises(AnsibleFailJson) as result:
+                self.module.main()
 
         exc = result.exception.args[0]
 

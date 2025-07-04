@@ -9,8 +9,7 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = """
----
+DOCUMENTATION = r"""
 module: datadog_downtime
 short_description: Manages Datadog downtimes
 version_added: 2.0.0
@@ -25,132 +24,133 @@ requirements:
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    api_key:
-        description:
-          - Your Datadog API key.
-        required: true
-        type: str
-    api_host:
-        description:
-          - The URL to the Datadog API.
-          - This value can also be set with the E(DATADOG_HOST) environment variable.
-        required: false
-        default: https://api.datadoghq.com
-        type: str
-    app_key:
-        description:
-          - Your Datadog app key.
-        required: true
-        type: str
-    state:
-        description:
-          - The designated state of the downtime.
-        required: false
-        choices: ["present", "absent"]
-        default: present
-        type: str
-    id:
-        description:
-          - The identifier of the downtime.
-          - If empty, a new downtime gets created, otherwise it is either updated or deleted depending of the O(state).
-          - To keep your playbook idempotent, you should save the identifier in a file and read it in a lookup.
-        type: int
+  api_key:
+    description:
+      - Your Datadog API key.
+    required: true
+    type: str
+  api_host:
+    description:
+      - The URL to the Datadog API.
+      - This value can also be set with the E(DATADOG_HOST) environment variable.
+    required: false
+    default: https://api.datadoghq.com
+    type: str
+  app_key:
+    description:
+      - Your Datadog app key.
+    required: true
+    type: str
+  state:
+    description:
+      - The designated state of the downtime.
+    required: false
+    choices: ["present", "absent"]
+    default: present
+    type: str
+  id:
+    description:
+      - The identifier of the downtime.
+      - If empty, a new downtime gets created, otherwise it is either updated or deleted depending of the O(state).
+      - To keep your playbook idempotent, you should save the identifier in a file and read it in a lookup.
+    type: int
+  monitor_tags:
+    description:
+      - A list of monitor tags to which the downtime applies.
+      - The resulting downtime applies to monitors that match ALL provided monitor tags.
+    type: list
+    elements: str
+  scope:
+    description:
+      - A list of scopes to which the downtime applies.
+      - The resulting downtime applies to sources that matches ALL provided scopes.
+    type: list
+    elements: str
+  monitor_id:
+    description:
+      - The ID of the monitor to mute. If not provided, the downtime applies to all monitors.
+    type: int
+  downtime_message:
+    description:
+      - A message to include with notifications for this downtime.
+      - Email notifications can be sent to specific users by using the same "@username" notation as events.
+    type: str
+  start:
+    type: int
+    description:
+      - POSIX timestamp to start the downtime. If not provided, the downtime starts the moment it is created.
+  end:
+    type: int
+    description:
+      - POSIX timestamp to end the downtime. If not provided, the downtime is in effect until you cancel it.
+  timezone:
+    description:
+      - The timezone for the downtime.
+    type: str
+  rrule:
+    description:
+      - The C(RRULE) standard for defining recurring events.
+      - For example, to have a recurring event on the first day of each month, select a type of rrule and set the C(FREQ)
+        to C(MONTHLY) and C(BYMONTHDAY) to C(1).
+      - Most common rrule options from the iCalendar Spec are supported.
+      - Attributes specifying the duration in C(RRULE) are not supported (for example C(DTSTART), C(DTEND), C(DURATION)).
+    type: str
+"""
+
+EXAMPLES = r"""
+- name: Create a downtime
+  register: downtime_var
+  community.general.datadog_downtime:
+    state: present
     monitor_tags:
-        description:
-          - A list of monitor tags to which the downtime applies.
-          - The resulting downtime applies to monitors that match ALL provided monitor tags.
-        type: list
-        elements: str
-    scope:
-        description:
-          - A list of scopes to which the downtime applies.
-          - The resulting downtime applies to sources that matches ALL provided scopes.
-        type: list
-        elements: str
-    monitor_id:
-        description:
-          - The ID of the monitor to mute. If not provided, the downtime applies to all monitors.
-        type: int
-    downtime_message:
-        description:
-          - A message to include with notifications for this downtime.
-          - Email notifications can be sent to specific users by using the same "@username" notation as events.
-        type: str
-    start:
-        type: int
-        description:
-          - POSIX timestamp to start the downtime. If not provided, the downtime starts the moment it is created.
-    end:
-        type: int
-        description:
-          - POSIX timestamp to end the downtime. If not provided, the downtime is in effect until you cancel it.
-    timezone:
-        description:
-          - The timezone for the downtime.
-        type: str
-    rrule:
-        description:
-          - The C(RRULE) standard for defining recurring events.
-          - For example, to have a recurring event on the first day of each month,
-            select a type of rrule and set the C(FREQ) to C(MONTHLY) and C(BYMONTHDAY) to C(1).
-          - Most common rrule options from the iCalendar Spec are supported.
-          - Attributes specifying the duration in C(RRULE) are not supported (for example C(DTSTART), C(DTEND), C(DURATION)).
-        type: str
+      - "foo:bar"
+    downtime_message: "Downtime for foo:bar"
+    scope: "test"
+    api_key: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    app_key: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    # Lookup the id in the file and ignore errors if the file doesn't exits, so downtime gets created
+    id: "{{ lookup('file', inventory_hostname ~ '_downtime_id.txt', errors='ignore') }}"
+- name: Save downtime id to file for later updates and idempotence
+  delegate_to: localhost
+  copy:
+    content: "{{ downtime.downtime.id }}"
+    dest: "{{ inventory_hostname ~ '_downtime_id.txt' }}"
 """
 
-EXAMPLES = """
-  - name: Create a downtime
-    register: downtime_var
-    community.general.datadog_downtime:
-      state: present
-      monitor_tags:
-        - "foo:bar"
-      downtime_message: "Downtime for foo:bar"
-      scope: "test"
-      api_key: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-      app_key: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-      # Lookup the id in the file and ignore errors if the file doesn't exits, so downtime gets created
-      id: "{{ lookup('file', inventory_hostname ~ '_downtime_id.txt', errors='ignore') }}"
-  - name: Save downtime id to file for later updates and idempotence
-    delegate_to: localhost
-    copy:
-      content: "{{ downtime.downtime.id }}"
-      dest: "{{ inventory_hostname ~ '_downtime_id.txt' }}"
-"""
-
-RETURN = """
+RETURN = r"""
 # Returns the downtime JSON dictionary from the API response under the C(downtime) key.
 # See https://docs.datadoghq.com/api/v1/downtimes/#schedule-a-downtime for more details.
 downtime:
-    description: The downtime returned by the API.
-    type: dict
-    returned: always
-    sample: {
-        "active": true,
-        "canceled": null,
-        "creator_id": 1445416,
-        "disabled": false,
-        "downtime_type": 2,
-        "end": null,
-        "id": 1055751000,
-        "message": "Downtime for foo:bar",
-        "monitor_id": null,
-        "monitor_tags": [
-            "foo:bar"
-        ],
-        "parent_id": null,
-        "recurrence": null,
-        "scope": [
-            "test"
-        ],
-        "start": 1607015009,
-        "timezone": "UTC",
-        "updater_id": null
+  description: The downtime returned by the API.
+  type: dict
+  returned: always
+  sample:
+    {
+      "active": true,
+      "canceled": null,
+      "creator_id": 1445416,
+      "disabled": false,
+      "downtime_type": 2,
+      "end": null,
+      "id": 1055751000,
+      "message": "Downtime for foo:bar",
+      "monitor_id": null,
+      "monitor_tags": [
+        "foo:bar"
+      ],
+      "parent_id": null,
+      "recurrence": null,
+      "scope": [
+        "test"
+      ],
+      "start": 1607015009,
+      "timezone": "UTC",
+      "updater_id": null
     }
 """
 

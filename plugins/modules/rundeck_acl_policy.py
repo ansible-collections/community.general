@@ -11,71 +11,70 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: rundeck_acl_policy
 
 short_description: Manage Rundeck ACL policies
 description:
-    - Create, update and remove Rundeck ACL policies through HTTP API.
+  - Create, update and remove Rundeck ACL policies through HTTP API.
 author: "Loic Blot (@nerzhul)"
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    state:
-        type: str
-        description:
-            - Create or remove Rundeck project.
-        choices: ['present', 'absent']
-        default: 'present'
-    name:
-        type: str
-        description:
-            - Sets the project name.
-        required: true
-    api_token:
-        description:
-            - Sets the token to authenticate against Rundeck API.
-        aliases: ["token"]
-    project:
-        type: str
-        description:
-            - Sets the project which receive the ACL policy.
-            - If unset, it's a system ACL policy.
-    policy:
-        type: str
-        description:
-            - Sets the ACL policy content.
-            - ACL policy content is a YAML object as described in http://rundeck.org/docs/man5/aclpolicy.html.
-            - It can be a YAML string or a pure Ansible inventory YAML object.
-    client_cert:
-        version_added: '0.2.0'
-    client_key:
-        version_added: '0.2.0'
-    force:
-        version_added: '0.2.0'
-    force_basic_auth:
-        version_added: '0.2.0'
-    http_agent:
-        version_added: '0.2.0'
-    url_password:
-        version_added: '0.2.0'
-    url_username:
-        version_added: '0.2.0'
-    use_proxy:
-        version_added: '0.2.0'
-    validate_certs:
-        version_added: '0.2.0'
+  state:
+    type: str
+    description:
+      - Create or remove Rundeck project.
+    choices: ['present', 'absent']
+    default: 'present'
+  name:
+    type: str
+    description:
+      - Sets the project name.
+    required: true
+  api_token:
+    description:
+      - Sets the token to authenticate against Rundeck API.
+    aliases: ["token"]
+  project:
+    type: str
+    description:
+      - Sets the project which receive the ACL policy.
+      - If unset, it is a system ACL policy.
+  policy:
+    type: str
+    description:
+      - Sets the ACL policy content.
+      - ACL policy content is a YAML object as described in U(http://rundeck.org/docs/man5/aclpolicy.html).
+      - It can be a YAML string or a pure Ansible inventory YAML object.
+  client_cert:
+    version_added: '0.2.0'
+  client_key:
+    version_added: '0.2.0'
+  force:
+    version_added: '0.2.0'
+  force_basic_auth:
+    version_added: '0.2.0'
+  http_agent:
+    version_added: '0.2.0'
+  url_password:
+    version_added: '0.2.0'
+  url_username:
+    version_added: '0.2.0'
+  use_proxy:
+    version_added: '0.2.0'
+  validate_certs:
+    version_added: '0.2.0'
 extends_documentation_fragment:
   - ansible.builtin.url
   - community.general.attributes
   - community.general.rundeck
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create or update a rundeck ACL policy in project Ansible
   community.general.rundeck_acl_policy:
     name: "Project_01"
@@ -100,22 +99,22 @@ EXAMPLES = '''
     url: "https://rundeck.example.org"
     token: "mytoken"
     state: absent
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 rundeck_response:
-    description: Rundeck response when a failure occurs.
-    returned: failed
-    type: str
+  description: Rundeck response when a failure occurs.
+  returned: failed
+  type: str
 before:
-    description: Dictionary containing ACL policy information before modification.
-    returned: success
-    type: dict
+  description: Dictionary containing ACL policy information before modification.
+  returned: success
+  type: dict
 after:
-    description: Dictionary containing ACL policy information after modification.
-    returned: success
-    type: dict
-'''
+  description: Dictionary containing ACL policy information after modification.
+  returned: success
+  type: dict
+"""
 
 # import module snippets
 import re
@@ -130,11 +129,18 @@ from ansible_collections.community.general.plugins.module_utils.rundeck import (
 class RundeckACLManager:
     def __init__(self, module):
         self.module = module
+        if module.params.get("project"):
+            self.endpoint = "project/%s/acl/%s.aclpolicy" % (
+                self.module.params["project"],
+                self.module.params["name"],
+            )
+        else:
+            self.endpoint = "system/acl/%s.aclpolicy" % self.module.params["name"]
 
     def get_acl(self):
         resp, info = api_request(
             module=self.module,
-            endpoint="system/acl/%s.aclpolicy" % self.module.params["name"],
+            endpoint=self.endpoint,
         )
 
         return resp
@@ -148,7 +154,7 @@ class RundeckACLManager:
 
             resp, info = api_request(
                 module=self.module,
-                endpoint="system/acl/%s.aclpolicy" % self.module.params["name"],
+                endpoint=self.endpoint,
                 method="POST",
                 data={"contents": self.module.params["policy"]},
             )
@@ -156,7 +162,7 @@ class RundeckACLManager:
             if info["status"] == 201:
                 self.module.exit_json(changed=True, before={}, after=self.get_acl())
             elif info["status"] == 400:
-                self.module.fail_json(msg="Unable to validate acl %s. Please ensure it's a valid ACL" %
+                self.module.fail_json(msg="Unable to validate acl %s. Please ensure it is a valid ACL" %
                                           self.module.params["name"])
             elif info["status"] == 409:
                 self.module.fail_json(msg="ACL %s already exists" % self.module.params["name"])
@@ -172,7 +178,7 @@ class RundeckACLManager:
 
             resp, info = api_request(
                 module=self.module,
-                endpoint="system/acl/%s.aclpolicy" % self.module.params["name"],
+                endpoint=self.endpoint,
                 method="PUT",
                 data={"contents": self.module.params["policy"]},
             )
@@ -180,7 +186,7 @@ class RundeckACLManager:
             if info["status"] == 200:
                 self.module.exit_json(changed=True, before=facts, after=self.get_acl())
             elif info["status"] == 400:
-                self.module.fail_json(msg="Unable to validate acl %s. Please ensure it's a valid ACL" %
+                self.module.fail_json(msg="Unable to validate acl %s. Please ensure it is a valid ACL" %
                                           self.module.params["name"])
             elif info["status"] == 404:
                 self.module.fail_json(msg="ACL %s doesn't exists. Cannot update." % self.module.params["name"])
@@ -195,7 +201,7 @@ class RundeckACLManager:
             if not self.module.check_mode:
                 api_request(
                     module=self.module,
-                    endpoint="system/acl/%s.aclpolicy" % self.module.params["name"],
+                    endpoint=self.endpoint,
                     method="DELETE",
                 )
 

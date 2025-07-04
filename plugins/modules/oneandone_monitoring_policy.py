@@ -7,14 +7,12 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: oneandone_monitoring_policy
 short_description: Configure 1&1 monitoring policy
 description:
-  - Create, remove, update monitoring policies
-    (and add/remove ports, processes, and servers).
-    This module has a dependency on 1and1 >= 1.0.
+  - Create, remove, update monitoring policies (and add/remove ports, processes, and servers). This module has a dependency
+    on 1and1 >= 1.0.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -29,20 +27,19 @@ options:
     type: str
     required: false
     default: present
-    choices: [ "present", "absent", "update" ]
+    choices: ["present", "absent", "update"]
   auth_token:
     description:
       - Authenticating API token provided by 1&1.
     type: str
   api_url:
     description:
-      - Custom API URL. Overrides the
-        ONEANDONE_API_URL environment variable.
+      - Custom API URL. Overrides the E(ONEANDONE_API_URL) environment variable.
     type: str
     required: false
   name:
     description:
-      - Monitoring policy name used with present state. Used as identifier (id or name) when used with absent state. maxLength=128
+      - Monitoring policy name used with present state. Used as identifier (id or name) when used with absent state. maxLength=128.
     type: str
   monitoring_policy:
     description:
@@ -54,19 +51,18 @@ options:
     type: str
   email:
     description:
-      - User's email. maxLength=128
+      - User's email. maxLength=128.
     type: str
   description:
     description:
-      - Monitoring policy description. maxLength=256
+      - Monitoring policy description. maxLength=256.
     type: str
     required: false
   thresholds:
     description:
-      - Monitoring policy thresholds. Each of the suboptions have warning and critical,
-        which both have alert and value suboptions. Warning is used to set limits for
-        warning alerts, critical is used to set critical alerts. alert enables alert,
-        and value is used to advise when the value is exceeded.
+      - Monitoring policy thresholds. Each of the suboptions have warning and critical, which both have alert and value suboptions.
+        Warning is used to set limits for warning alerts, critical is used to set critical alerts. alert enables alert, and
+        value is used to advise when the value is exceeded.
     type: list
     elements: dict
     default: []
@@ -101,16 +97,16 @@ options:
       protocol:
         description:
           - Internet protocol.
-        choices: [ "TCP", "UDP" ]
+        choices: ["TCP", "UDP"]
         required: true
       port:
         description:
-          - Port number. minimum=1, maximum=65535
+          - Port number. minimum=1, maximum=65535.
         required: true
       alert_if:
         description:
           - Case of alert.
-        choices: [ "RESPONDING", "NOT_RESPONDING" ]
+        choices: ["RESPONDING", "NOT_RESPONDING"]
         required: true
       email_notification:
         description:
@@ -125,12 +121,12 @@ options:
     suboptions:
       process:
         description:
-          - Name of the process. maxLength=50
+          - Name of the process. maxLength=50.
         required: true
       alert_if:
         description:
           - Case of alert.
-        choices: [ "RUNNING", "NOT_RUNNING" ]
+        choices: ["RUNNING", "NOT_RUNNING"]
         required: true
   add_ports:
     description:
@@ -190,18 +186,18 @@ options:
     default: []
   wait:
     description:
-      - wait for the instance to be in state 'running' before returning
+      - Wait for the instance to be in state 'running' before returning.
     required: false
     default: true
     type: bool
   wait_timeout:
     description:
-      - how long before wait gives up, in seconds
+      - How long before wait gives up, in seconds.
     type: int
     default: 600
   wait_interval:
     description:
-      - Defines the number of seconds to wait when using the _wait_for methods
+      - Defines the number of seconds to wait when using the _wait_for methods.
     type: int
     default: 5
 
@@ -209,11 +205,11 @@ requirements:
   - "1and1"
 
 author:
-  -  "Amel Ajdinovic (@aajdinov)"
-  -  "Ethan Devenport (@edevenport)"
-'''
+  - "Amel Ajdinovic (@aajdinov)"
+  - "Ethan Devenport (@edevenport)"
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create a monitoring policy
   community.general.oneandone_monitoring_policy:
     auth_token: oneandone_private_api_key
@@ -222,57 +218,50 @@ EXAMPLES = '''
     email: your@emailaddress.com
     agent: true
     thresholds:
-     -
-       cpu:
-         warning:
-           value: 80
-           alert: false
-         critical:
-           value: 92
-           alert: false
-     -
-       ram:
-         warning:
-           value: 80
-           alert: false
-         critical:
-           value: 90
-           alert: false
-     -
-       disk:
-         warning:
-           value: 80
-           alert: false
-         critical:
-           value: 90
-           alert: false
-     -
-       internal_ping:
-         warning:
-           value: 50
-           alert: false
-         critical:
-           value: 100
-           alert: false
-     -
-       transfer:
-         warning:
-           value: 1000
-           alert: false
-         critical:
-           value: 2000
-           alert: false
+      - cpu:
+          warning:
+            value: 80
+            alert: false
+          critical:
+            value: 92
+            alert: false
+      - ram:
+          warning:
+            value: 80
+            alert: false
+          critical:
+            value: 90
+            alert: false
+      - disk:
+          warning:
+            value: 80
+            alert: false
+          critical:
+            value: 90
+            alert: false
+      - internal_ping:
+          warning:
+            value: 50
+            alert: false
+          critical:
+            value: 100
+            alert: false
+      - transfer:
+          warning:
+            value: 1000
+            alert: false
+          critical:
+            value: 2000
+            alert: false
     ports:
-     -
-       protocol: TCP
-       port: 22
-       alert_if: RESPONDING
-       email_notification: false
+      - protocol: TCP
+        port: 22
+        alert_if: RESPONDING
+        email_notification: false
     processes:
-     -
-       process: test
-       alert_if: NOT_RUNNING
-       email_notification: false
+      - process: test
+        alert_if: NOT_RUNNING
+        email_notification: false
     wait: true
 
 - name: Destroy a monitoring policy
@@ -289,46 +278,41 @@ EXAMPLES = '''
     description: Testing creation of a monitoring policy with ansible updated
     email: another@emailaddress.com
     thresholds:
-     -
-       cpu:
-         warning:
-           value: 70
-           alert: false
-         critical:
-           value: 90
-           alert: false
-     -
-       ram:
-         warning:
-           value: 70
-           alert: false
-         critical:
-           value: 80
-           alert: false
-     -
-       disk:
-         warning:
-           value: 70
-           alert: false
-         critical:
-           value: 80
-           alert: false
-     -
-       internal_ping:
-         warning:
-           value: 60
-           alert: false
-         critical:
-           value: 90
-           alert: false
-     -
-       transfer:
-         warning:
-           value: 900
-           alert: false
-         critical:
-           value: 1900
-           alert: false
+      - cpu:
+          warning:
+            value: 70
+            alert: false
+          critical:
+            value: 90
+            alert: false
+      - ram:
+          warning:
+            value: 70
+            alert: false
+          critical:
+            value: 80
+            alert: false
+      - disk:
+          warning:
+            value: 70
+            alert: false
+          critical:
+            value: 80
+            alert: false
+      - internal_ping:
+          warning:
+            value: 60
+            alert: false
+          critical:
+            value: 90
+            alert: false
+      - transfer:
+          warning:
+            value: 900
+            alert: false
+          critical:
+            value: 1900
+            alert: false
     wait: true
     state: update
 
@@ -337,11 +321,10 @@ EXAMPLES = '''
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     add_ports:
-     -
-       protocol: TCP
-       port: 33
-       alert_if: RESPONDING
-       email_notification: false
+      - protocol: TCP
+        port: 33
+        alert_if: RESPONDING
+        email_notification: false
     wait: true
     state: update
 
@@ -350,18 +333,16 @@ EXAMPLES = '''
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     update_ports:
-     -
-       id: existing_port_id
-       protocol: TCP
-       port: 34
-       alert_if: RESPONDING
-       email_notification: false
-     -
-       id: existing_port_id
-       protocol: TCP
-       port: 23
-       alert_if: RESPONDING
-       email_notification: false
+      - id: existing_port_id
+        protocol: TCP
+        port: 34
+        alert_if: RESPONDING
+        email_notification: false
+      - id: existing_port_id
+        protocol: TCP
+        port: 23
+        alert_if: RESPONDING
+        email_notification: false
     wait: true
     state: update
 
@@ -370,7 +351,7 @@ EXAMPLES = '''
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     remove_ports:
-     - port_id
+      - port_id
     state: update
 
 - name: Add a process to a monitoring policy
@@ -378,10 +359,9 @@ EXAMPLES = '''
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     add_processes:
-     -
-       process: test_2
-       alert_if: NOT_RUNNING
-       email_notification: false
+      - process: test_2
+        alert_if: NOT_RUNNING
+        email_notification: false
     wait: true
     state: update
 
@@ -390,16 +370,14 @@ EXAMPLES = '''
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     update_processes:
-     -
-       id: process_id
-       process: test_1
-       alert_if: NOT_RUNNING
-       email_notification: false
-     -
-       id: process_id
-       process: test_3
-       alert_if: NOT_RUNNING
-       email_notification: false
+      - id: process_id
+        process: test_1
+        alert_if: NOT_RUNNING
+        email_notification: false
+      - id: process_id
+        process: test_3
+        alert_if: NOT_RUNNING
+        email_notification: false
     wait: true
     state: update
 
@@ -408,7 +386,7 @@ EXAMPLES = '''
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     remove_processes:
-     - process_id
+      - process_id
     wait: true
     state: update
 
@@ -417,7 +395,7 @@ EXAMPLES = '''
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     add_servers:
-     - server id or name
+      - server id or name
     wait: true
     state: update
 
@@ -426,18 +404,18 @@ EXAMPLES = '''
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     remove_servers:
-     - server01
+      - server01
     wait: true
     state: update
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 monitoring_policy:
-    description: Information about the monitoring policy that was processed
-    type: dict
-    sample: '{"id": "92B74394A397ECC3359825C1656D67A6", "name": "Default Policy"}'
-    returned: always
-'''
+  description: Information about the monitoring policy that was processed.
+  type: dict
+  sample: '{"id": "92B74394A397ECC3359825C1656D67A6", "name": "Default Policy"}'
+  returned: always
+"""
 
 import os
 from ansible.module_utils.basic import AnsibleModule
@@ -559,7 +537,7 @@ def _add_processes(module, oneandone_conn, monitoring_policy_id, processes):
 
         if module.check_mode:
             mp_id = get_monitoring_policy(oneandone_conn, monitoring_policy_id)
-            if (monitoring_policy_processes and mp_id):
+            if monitoring_policy_processes and mp_id:
                 return True
             return False
 

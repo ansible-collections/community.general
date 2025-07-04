@@ -10,12 +10,12 @@ import os
 import shutil
 import tempfile
 
-from ansible_collections.community.general.tests.unit.compat.mock import patch
-from ansible_collections.community.general.tests.unit.compat import unittest
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
+from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
 from ansible.module_utils import basic
 import ansible_collections.community.general.plugins.modules.ocapi_command as module
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args, exit_json, fail_json
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args, exit_json, fail_json
 from ansible.module_utils.six.moves.urllib.parse import urljoin
 
 
@@ -188,20 +188,20 @@ class TestOcapiCommand(unittest.TestCase):
 
     def test_module_fail_when_required_args_missing(self):
         with self.assertRaises(AnsibleFailJson) as ansible_fail_json:
-            set_module_args({})
-            module.main()
+            with set_module_args({}):
+                module.main()
         self.assertIn("missing required arguments:", get_exception_message(ansible_fail_json))
 
     def test_module_fail_when_unknown_category(self):
         with self.assertRaises(AnsibleFailJson) as ansible_fail_json:
-            set_module_args({
+            with set_module_args({
                 'category': 'unknown',
                 'command': 'IndicatorLedOn',
                 'username': 'USERID',
                 'password': 'PASSW0RD=21',
                 'baseuri': MOCK_BASE_URI
-            })
-            module.main()
+            }):
+                module.main()
         self.assertIn("Invalid Category 'unknown", get_exception_message(ansible_fail_json))
 
     def test_set_power_mode(self):
@@ -210,14 +210,14 @@ class TestOcapiCommand(unittest.TestCase):
                             get_request=mock_get_request,
                             put_request=mock_put_request):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                set_module_args({
+                with set_module_args({
                     'category': 'Chassis',
                     'command': 'PowerModeLow',
                     'baseuri': MOCK_BASE_URI,
                     'username': 'USERID',
                     'password': 'PASSWORD=21'
-                })
-                module.main()
+                }):
+                    module.main()
             self.assertEqual(ACTION_WAS_SUCCESSFUL, get_exception_message(ansible_exit_json))
             self.assertTrue(is_changed(ansible_exit_json))
 
@@ -227,14 +227,14 @@ class TestOcapiCommand(unittest.TestCase):
                             get_request=mock_get_request,
                             put_request=mock_put_request):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                set_module_args({
+                with set_module_args({
                     'category': 'Chassis',
                     'command': 'IndicatorLedOn',
                     'baseuri': MOCK_BASE_URI,
                     'username': 'USERID',
                     'password': 'PASSWORD=21'
-                })
-                module.main()
+                }):
+                    module.main()
             self.assertEqual(ACTION_WAS_SUCCESSFUL, get_exception_message(ansible_exit_json))
             self.assertTrue(is_changed(ansible_exit_json))
 
@@ -244,14 +244,14 @@ class TestOcapiCommand(unittest.TestCase):
                             get_request=mock_get_request,
                             put_request=mock_invalid_http_request):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                set_module_args({
+                with set_module_args({
                     'category': 'Chassis',
                     'command': 'PowerModeNormal',
                     'baseuri': MOCK_BASE_URI,
                     'username': 'USERID',
                     'password': 'PASSWORD=21'
-                })
-                module.main()
+                }):
+                    module.main()
             self.assertEqual(ACTION_WAS_SUCCESSFUL, get_exception_message(ansible_exit_json))
             self.assertFalse(is_changed(ansible_exit_json))
 
@@ -261,15 +261,15 @@ class TestOcapiCommand(unittest.TestCase):
                             get_request=mock_get_request,
                             put_request=mock_invalid_http_request):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                set_module_args({
+                with set_module_args({
                     'category': 'Chassis',
                     'command': 'IndicatorLedOn',
                     'baseuri': MOCK_BASE_URI,
                     'username': 'USERID',
                     'password': 'PASSWORD=21',
                     '_ansible_check_mode': True
-                })
-                module.main()
+                }):
+                    module.main()
             self.assertEqual(UPDATE_NOT_PERFORMED_IN_CHECK_MODE, get_exception_message(ansible_exit_json))
             self.assertTrue(is_changed(ansible_exit_json))
 
@@ -279,15 +279,15 @@ class TestOcapiCommand(unittest.TestCase):
                             get_request=mock_get_request,
                             put_request=mock_invalid_http_request):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                set_module_args({
+                with set_module_args({
                     'category': 'Chassis',
                     'command': 'IndicatorLedOn',
                     'baseuri': MOCK_BASE_URI,
                     'username': 'USERID',
                     'password': 'PASSWORD=21',
                     '_ansible_check_mode': True
-                })
-                module.main()
+                }):
+                    module.main()
             self.assertEqual(UPDATE_NOT_PERFORMED_IN_CHECK_MODE, get_exception_message(ansible_exit_json))
             self.assertTrue(is_changed(ansible_exit_json))
 
@@ -297,14 +297,14 @@ class TestOcapiCommand(unittest.TestCase):
                             get_request=mock_get_request,
                             put_request=mock_invalid_http_request):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                set_module_args({
+                with set_module_args({
                     'category': 'Chassis',
                     'command': 'IndicatorLedOff',
                     'baseuri': MOCK_BASE_URI,
                     'username': 'USERID',
                     'password': 'PASSWORD=21'
-                })
-                module.main()
+                }):
+                    module.main()
             self.assertEqual(ACTION_WAS_SUCCESSFUL, get_exception_message(ansible_exit_json))
             self.assertFalse(is_changed(ansible_exit_json))
 
@@ -314,15 +314,15 @@ class TestOcapiCommand(unittest.TestCase):
                             get_request=mock_get_request,
                             put_request=mock_invalid_http_request):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                set_module_args({
+                with set_module_args({
                     'category': 'Chassis',
                     'command': 'IndicatorLedOff',
                     'baseuri': MOCK_BASE_URI,
                     'username': 'USERID',
                     'password': 'PASSWORD=21',
                     "_ansible_check_mode": True
-                })
-                module.main()
+                }):
+                    module.main()
             self.assertEqual(NO_ACTION_PERFORMED_IN_CHECK_MODE, get_exception_message(ansible_exit_json))
             self.assertFalse(is_changed(ansible_exit_json))
 
@@ -331,14 +331,14 @@ class TestOcapiCommand(unittest.TestCase):
                             get_request=mock_get_request,
                             put_request=mock_put_request):
             with self.assertRaises(AnsibleFailJson) as ansible_fail_json:
-                set_module_args({
+                with set_module_args({
                     'category': 'Chassis',
                     'command': 'IndicatorLedBright',
                     'baseuri': MOCK_BASE_URI,
                     'username': 'USERID',
                     'password': 'PASSWORD=21'
-                })
-                module.main()
+                }):
+                    module.main()
             self.assertIn("Invalid Command", get_exception_message(ansible_fail_json))
 
     def test_reset_enclosure(self):
@@ -346,14 +346,14 @@ class TestOcapiCommand(unittest.TestCase):
                             get_request=mock_get_request,
                             put_request=mock_put_request):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                set_module_args({
+                with set_module_args({
                     'category': 'Systems',
                     'command': 'PowerGracefulRestart',
                     'baseuri': MOCK_BASE_URI,
                     'username': 'USERID',
                     'password': 'PASSWORD=21'
-                })
-                module.main()
+                }):
+                    module.main()
             self.assertEqual(ACTION_WAS_SUCCESSFUL, get_exception_message(ansible_exit_json))
             self.assertTrue(is_changed(ansible_exit_json))
 
@@ -362,15 +362,15 @@ class TestOcapiCommand(unittest.TestCase):
                             get_request=mock_get_request,
                             put_request=mock_invalid_http_request):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                set_module_args({
+                with set_module_args({
                     'category': 'Systems',
                     'command': 'PowerGracefulRestart',
                     'baseuri': MOCK_BASE_URI,
                     'username': 'USERID',
                     'password': 'PASSWORD=21',
                     "_ansible_check_mode": True
-                })
-                module.main()
+                }):
+                    module.main()
             self.assertEqual(UPDATE_NOT_PERFORMED_IN_CHECK_MODE, get_exception_message(ansible_exit_json))
             self.assertTrue(is_changed(ansible_exit_json))
 
@@ -379,14 +379,14 @@ class TestOcapiCommand(unittest.TestCase):
                             get_request=mock_get_request,
                             put_request=mock_put_request):
             with self.assertRaises(AnsibleFailJson) as ansible_fail_json:
-                set_module_args({
+                with set_module_args({
                     'category': 'Update',
                     'command': 'FWUpload',
                     'baseuri': MOCK_BASE_URI,
                     'username': 'USERID',
                     'password': 'PASSWORD=21'
-                })
-                module.main()
+                }):
+                    module.main()
             self.assertEqual("Missing update_image_path.", get_exception_message(ansible_fail_json))
 
     def test_firmware_upload_file_not_found(self):
@@ -394,15 +394,15 @@ class TestOcapiCommand(unittest.TestCase):
                             get_request=mock_get_request,
                             put_request=mock_invalid_http_request):
             with self.assertRaises(AnsibleFailJson) as ansible_fail_json:
-                set_module_args({
+                with set_module_args({
                     'category': 'Update',
                     'command': 'FWUpload',
                     'update_image_path': 'nonexistentfile.bin',
                     'baseuri': MOCK_BASE_URI,
                     'username': 'USERID',
                     'password': 'PASSWORD=21'
-                })
-                module.main()
+                }):
+                    module.main()
             self.assertEqual("File does not exist.", get_exception_message(ansible_fail_json))
 
     def test_firmware_upload(self):
@@ -417,15 +417,15 @@ class TestOcapiCommand(unittest.TestCase):
                             put_request=mock_put_request,
                             post_request=mock_post_request):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                set_module_args({
+                with set_module_args({
                     'category': 'Update',
                     'command': 'FWUpload',
                     'update_image_path': filepath,
                     'baseuri': MOCK_BASE_URI,
                     'username': 'USERID',
                     'password': 'PASSWORD=21'
-                })
-                module.main()
+                }):
+                    module.main()
             self.assertEqual(ACTION_WAS_SUCCESSFUL, get_exception_message(ansible_exit_json))
             self.assertTrue(is_changed(ansible_exit_json))
 
@@ -441,7 +441,7 @@ class TestOcapiCommand(unittest.TestCase):
                             put_request=mock_put_request,
                             post_request=mock_invalid_http_request):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                set_module_args({
+                with set_module_args({
                     'category': 'Update',
                     'command': 'FWUpload',
                     'update_image_path': filepath,
@@ -449,8 +449,8 @@ class TestOcapiCommand(unittest.TestCase):
                     'username': 'USERID',
                     'password': 'PASSWORD=21',
                     "_ansible_check_mode": True
-                })
-                module.main()
+                }):
+                    module.main()
             self.assertEqual(UPDATE_NOT_PERFORMED_IN_CHECK_MODE, get_exception_message(ansible_exit_json))
             self.assertTrue(is_changed(ansible_exit_json))
 
@@ -460,14 +460,14 @@ class TestOcapiCommand(unittest.TestCase):
                             put_request=mock_put_request,
                             post_request=mock_invalid_http_request):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                set_module_args({
+                with set_module_args({
                     'category': 'Update',
                     'command': 'FWUpdate',
                     'baseuri': MOCK_BASE_URI,
                     'username': 'USERID',
                     'password': 'PASSWORD=21'
-                })
-                module.main()
+                }):
+                    module.main()
             self.assertEqual(ACTION_WAS_SUCCESSFUL, get_exception_message(ansible_exit_json))
             self.assertTrue(is_changed(ansible_exit_json))
 
@@ -477,15 +477,15 @@ class TestOcapiCommand(unittest.TestCase):
                             put_request=mock_invalid_http_request,
                             post_request=mock_invalid_http_request):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                set_module_args({
+                with set_module_args({
                     'category': 'Update',
                     'command': 'FWUpdate',
                     'baseuri': MOCK_BASE_URI,
                     'username': 'USERID',
                     'password': 'PASSWORD=21',
                     "_ansible_check_mode": True
-                })
-                module.main()
+                }):
+                    module.main()
             self.assertEqual(UPDATE_NOT_PERFORMED_IN_CHECK_MODE, get_exception_message(ansible_exit_json))
             self.assertTrue(is_changed(ansible_exit_json))
 
@@ -495,14 +495,14 @@ class TestOcapiCommand(unittest.TestCase):
                             put_request=mock_put_request,
                             post_request=mock_invalid_http_request):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                set_module_args({
+                with set_module_args({
                     'category': 'Update',
                     'command': 'FWActivate',
                     'baseuri': MOCK_BASE_URI,
                     'username': 'USERID',
                     'password': 'PASSWORD=21'
-                })
-                module.main()
+                }):
+                    module.main()
             self.assertEqual(ACTION_WAS_SUCCESSFUL, get_exception_message(ansible_exit_json))
             self.assertTrue(is_changed(ansible_exit_json))
 
@@ -512,15 +512,15 @@ class TestOcapiCommand(unittest.TestCase):
                             put_request=mock_invalid_http_request,
                             post_request=mock_invalid_http_request):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                set_module_args({
+                with set_module_args({
                     'category': 'Update',
                     'command': 'FWActivate',
                     'baseuri': MOCK_BASE_URI,
                     'username': 'USERID',
                     'password': 'PASSWORD=21',
                     "_ansible_check_mode": True
-                })
-                module.main()
+                }):
+                    module.main()
             self.assertEqual(UPDATE_NOT_PERFORMED_IN_CHECK_MODE, get_exception_message(ansible_exit_json))
             self.assertTrue(is_changed(ansible_exit_json))
 
@@ -531,15 +531,15 @@ class TestOcapiCommand(unittest.TestCase):
                             put_request=mock_invalid_http_request,
                             post_request=mock_invalid_http_request):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                set_module_args({
+                with set_module_args({
                     'category': 'Jobs',
                     'command': 'DeleteJob',
                     'baseuri': MOCK_BASE_URI,
                     'job_name': MOCK_JOB_NAME,
                     'username': 'USERID',
                     'password': 'PASSWORD=21'
-                })
-                module.main()
+                }):
+                    module.main()
             self.assertEqual(ACTION_WAS_SUCCESSFUL, get_exception_message(ansible_exit_json))
             self.assertTrue(is_changed(ansible_exit_json))
 
@@ -550,15 +550,15 @@ class TestOcapiCommand(unittest.TestCase):
                             put_request=mock_invalid_http_request,
                             post_request=mock_invalid_http_request):
             with self.assertRaises(AnsibleFailJson) as ansible_fail_json:
-                set_module_args({
+                with set_module_args({
                     'category': 'Jobs',
                     'command': 'DeleteJob',
                     'baseuri': MOCK_BASE_URI,
                     'job_name': MOCK_JOB_NAME,
                     'username': 'USERID',
                     'password': 'PASSWORD=21'
-                })
-                module.main()
+                }):
+                    module.main()
             self.assertEqual("Cannot delete job because it is in progress.", get_exception_message(ansible_fail_json))
 
     def test_delete_job_in_progress_only_on_delete(self):
@@ -568,15 +568,15 @@ class TestOcapiCommand(unittest.TestCase):
                             put_request=mock_invalid_http_request,
                             post_request=mock_invalid_http_request):
             with self.assertRaises(AnsibleFailJson) as ansible_fail_json:
-                set_module_args({
+                with set_module_args({
                     'category': 'Jobs',
                     'command': 'DeleteJob',
                     'baseuri': MOCK_BASE_URI,
                     'job_name': MOCK_JOB_NAME,
                     'username': 'USERID',
                     'password': 'PASSWORD=21'
-                })
-                module.main()
+                }):
+                    module.main()
             self.assertEqual("Cannot delete job because it is in progress.", get_exception_message(ansible_fail_json))
 
     def test_delete_job_check_mode(self):
@@ -586,7 +586,7 @@ class TestOcapiCommand(unittest.TestCase):
                             put_request=mock_invalid_http_request,
                             post_request=mock_invalid_http_request):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                set_module_args({
+                with set_module_args({
                     'category': 'Jobs',
                     'command': 'DeleteJob',
                     'baseuri': MOCK_BASE_URI,
@@ -594,8 +594,8 @@ class TestOcapiCommand(unittest.TestCase):
                     'username': 'USERID',
                     'password': 'PASSWORD=21',
                     '_ansible_check_mode': True
-                })
-                module.main()
+                }):
+                    module.main()
             self.assertEqual(UPDATE_NOT_PERFORMED_IN_CHECK_MODE, get_exception_message(ansible_exit_json))
             self.assertTrue(is_changed(ansible_exit_json))
 
@@ -606,7 +606,7 @@ class TestOcapiCommand(unittest.TestCase):
                             put_request=mock_invalid_http_request,
                             post_request=mock_invalid_http_request):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                set_module_args({
+                with set_module_args({
                     'category': 'Jobs',
                     'command': 'DeleteJob',
                     'baseuri': MOCK_BASE_URI,
@@ -614,8 +614,8 @@ class TestOcapiCommand(unittest.TestCase):
                     'username': 'USERID',
                     'password': 'PASSWORD=21',
                     '_ansible_check_mode': True
-                })
-                module.main()
+                }):
+                    module.main()
             self.assertEqual("Job already deleted.", get_exception_message(ansible_exit_json))
             self.assertFalse(is_changed(ansible_exit_json))
 
@@ -626,7 +626,7 @@ class TestOcapiCommand(unittest.TestCase):
                             put_request=mock_invalid_http_request,
                             post_request=mock_invalid_http_request):
             with self.assertRaises(AnsibleFailJson) as ansible_fail_json:
-                set_module_args({
+                with set_module_args({
                     'category': 'Jobs',
                     'command': 'DeleteJob',
                     'baseuri': MOCK_BASE_URI,
@@ -634,6 +634,6 @@ class TestOcapiCommand(unittest.TestCase):
                     'username': 'USERID',
                     'password': 'PASSWORD=21',
                     '_ansible_check_mode': True
-                })
-                module.main()
+                }):
+                    module.main()
             self.assertEqual("Cannot delete job because it is in progress.", get_exception_message(ansible_fail_json))

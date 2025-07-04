@@ -9,125 +9,121 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: keycloak_authz_permission
 
 version_added: 7.2.0
 
-short_description: Allows administration of Keycloak client authorization permissions via Keycloak API
+short_description: Allows administration of Keycloak client authorization permissions using Keycloak API
 
 description:
-    - This module allows the administration of Keycloak client authorization permissions via the Keycloak REST
-      API. Authorization permissions are only available if a client has Authorization enabled.
-
-    - There are some peculiarities in JSON paths and payloads for authorization permissions. In particular
-      POST and PUT operations are targeted at permission endpoints, whereas GET requests go to policies
-      endpoint. To make matters more interesting the JSON responses from GET requests return data in a
-      different format than what is expected for POST and PUT. The end result is that it is not possible to
-      detect changes to things like policies, scopes or resources - at least not without a large number of
-      additional API calls. Therefore this module always updates authorization permissions instead of
-      attempting to determine if changes are truly needed.
-
-    - This module requires access to the REST API via OpenID Connect; the user connecting and the realm
-      being used must have the requisite access rights. In a default Keycloak installation, admin-cli
-      and an admin user would work, as would a separate realm definition with the scope tailored
-      to your needs and a user having the expected roles.
-
-    - The names of module options are snake_cased versions of the camelCase options used by Keycloak.
-      The Authorization Services paths and payloads have not officially been documented by the Keycloak project.
-      U(https://www.puppeteers.net/blog/keycloak-authorization-services-rest-api-paths-and-payload/)
-
+  - This module allows the administration of Keycloak client authorization permissions using the Keycloak REST API. Authorization
+    permissions are only available if a client has Authorization enabled.
+  - There are some peculiarities in JSON paths and payloads for authorization permissions. In particular POST and PUT operations
+    are targeted at permission endpoints, whereas GET requests go to policies endpoint. To make matters more interesting the
+    JSON responses from GET requests return data in a different format than what is expected for POST and PUT. The end result
+    is that it is not possible to detect changes to things like policies, scopes or resources - at least not without a large
+    number of additional API calls. Therefore this module always updates authorization permissions instead of attempting to
+    determine if changes are truly needed.
+  - This module requires access to the REST API using OpenID Connect; the user connecting and the realm being used must have
+    the requisite access rights. In a default Keycloak installation, admin-cli and an admin user would work, as would a separate
+    realm definition with the scope tailored to your needs and a user having the expected roles.
+  - The names of module options are snake_cased versions of the camelCase options used by Keycloak. The Authorization Services
+    paths and payloads have not officially been documented by the Keycloak project.
+    U(https://www.puppeteers.net/blog/keycloak-authorization-services-rest-api-paths-and-payload/).
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+  action_group:
+    version_added: 10.2.0
 
 options:
-    state:
-        description:
-            - State of the authorization permission.
-            - On V(present), the authorization permission will be created (or updated if it exists already).
-            - On V(absent), the authorization permission will be removed if it exists.
-        choices: ['present', 'absent']
-        default: 'present'
-        type: str
-    name:
-        description:
-            - Name of the authorization permission to create.
-        type: str
-        required: true
+  state:
     description:
-        description:
-            - The description of the authorization permission.
-        type: str
-        required: false
-    permission_type:
-        description:
-            - The type of authorization permission.
-            - On V(scope) create a scope-based permission.
-            - On V(resource) create a resource-based permission.
-        type: str
-        required: true
-        choices:
-            - resource
-            - scope
-    decision_strategy:
-        description:
-            - The decision strategy to use with this permission.
-        type: str
-        default: UNANIMOUS
-        required: false
-        choices:
-            - UNANIMOUS
-            - AFFIRMATIVE
-            - CONSENSUS
-    resources:
-        description:
-            - Resource names to attach to this permission.
-            - Scope-based permissions can only include one resource.
-            - Resource-based permissions can include multiple resources.
-        type: list
-        elements: str
-        default: []
-        required: false
-    scopes:
-        description:
-            - Scope names to attach to this permission.
-            - Resource-based permissions cannot have scopes attached to them.
-        type: list
-        elements: str
-        default: []
-        required: false
-    policies:
-        description:
-            - Policy names to attach to this permission.
-        type: list
-        elements: str
-        default: []
-        required: false
-    client_id:
-        description:
-            - The clientId of the keycloak client that should have the authorization scope.
-            - This is usually a human-readable name of the Keycloak client.
-        type: str
-        required: true
-    realm:
-        description:
-            - The name of the Keycloak realm the Keycloak client is in.
-        type: str
-        required: true
+      - State of the authorization permission.
+      - On V(present), the authorization permission will be created (or updated if it exists already).
+      - On V(absent), the authorization permission will be removed if it exists.
+    choices: ['present', 'absent']
+    default: 'present'
+    type: str
+  name:
+    description:
+      - Name of the authorization permission to create.
+    type: str
+    required: true
+  description:
+    description:
+      - The description of the authorization permission.
+    type: str
+    required: false
+  permission_type:
+    description:
+      - The type of authorization permission.
+      - On V(scope) create a scope-based permission.
+      - On V(resource) create a resource-based permission.
+    type: str
+    required: true
+    choices:
+      - resource
+      - scope
+  decision_strategy:
+    description:
+      - The decision strategy to use with this permission.
+    type: str
+    default: UNANIMOUS
+    required: false
+    choices:
+      - UNANIMOUS
+      - AFFIRMATIVE
+      - CONSENSUS
+  resources:
+    description:
+      - Resource names to attach to this permission.
+      - Scope-based permissions can only include one resource.
+      - Resource-based permissions can include multiple resources.
+    type: list
+    elements: str
+    default: []
+    required: false
+  scopes:
+    description:
+      - Scope names to attach to this permission.
+      - Resource-based permissions cannot have scopes attached to them.
+    type: list
+    elements: str
+    default: []
+    required: false
+  policies:
+    description:
+      - Policy names to attach to this permission.
+    type: list
+    elements: str
+    default: []
+    required: false
+  client_id:
+    description:
+      - The clientId of the keycloak client that should have the authorization scope.
+      - This is usually a human-readable name of the Keycloak client.
+    type: str
+    required: true
+  realm:
+    description:
+      - The name of the Keycloak realm the Keycloak client is in.
+    type: str
+    required: true
 
 extends_documentation_fragment:
-    - community.general.keycloak
-    - community.general.attributes
+  - community.general.keycloak
+  - community.general.keycloak.actiongroup_keycloak
+  - community.general.attributes
 
 author:
-    - Samuli Seppänen (@mattock)
-'''
+  - Samuli Seppänen (@mattock)
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Manage scope-based Keycloak authorization permission
   community.general.keycloak_authz_permission:
     name: ScopePermission
@@ -161,68 +157,68 @@ EXAMPLES = '''
     auth_username: keycloak
     auth_password: keycloak
     auth_realm: master
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 msg:
-    description: Message as to what action was taken.
-    returned: always
-    type: str
+  description: Message as to what action was taken.
+  returned: always
+  type: str
 
 end_state:
-    description: Representation of the authorization permission after module execution.
-    returned: on success
-    type: complex
-    contains:
-        id:
-            description: ID of the authorization permission.
-            type: str
-            returned: when O(state=present)
-            sample: 9da05cd2-b273-4354-bbd8-0c133918a454
-        name:
-            description: Name of the authorization permission.
-            type: str
-            returned: when O(state=present)
-            sample: ResourcePermission
-        description:
-            description: Description of the authorization permission.
-            type: str
-            returned: when O(state=present)
-            sample: Resource Permission
-        type:
-            description: Type of the authorization permission.
-            type: str
-            returned: when O(state=present)
-            sample: resource
-        decisionStrategy:
-            description: The decision strategy to use.
-            type: str
-            returned: when O(state=present)
-            sample: UNANIMOUS
-        logic:
-            description: The logic used for the permission (part of the payload, but has a fixed value).
-            type: str
-            returned: when O(state=present)
-            sample: POSITIVE
-        resources:
-            description: IDs of resources attached to this permission.
-            type: list
-            returned: when O(state=present)
-            sample:
-                - 49e052ff-100d-4b79-a9dd-52669ed3c11d
-        scopes:
-            description: IDs of scopes attached to this permission.
-            type: list
-            returned: when O(state=present)
-            sample:
-                - 9da05cd2-b273-4354-bbd8-0c133918a454
-        policies:
-            description: IDs of policies attached to this permission.
-            type: list
-            returned: when O(state=present)
-            sample:
-                - 9da05cd2-b273-4354-bbd8-0c133918a454
-'''
+  description: Representation of the authorization permission after module execution.
+  returned: on success
+  type: complex
+  contains:
+    id:
+      description: ID of the authorization permission.
+      type: str
+      returned: when O(state=present)
+      sample: 9da05cd2-b273-4354-bbd8-0c133918a454
+    name:
+      description: Name of the authorization permission.
+      type: str
+      returned: when O(state=present)
+      sample: ResourcePermission
+    description:
+      description: Description of the authorization permission.
+      type: str
+      returned: when O(state=present)
+      sample: Resource Permission
+    type:
+      description: Type of the authorization permission.
+      type: str
+      returned: when O(state=present)
+      sample: resource
+    decisionStrategy:
+      description: The decision strategy to use.
+      type: str
+      returned: when O(state=present)
+      sample: UNANIMOUS
+    logic:
+      description: The logic used for the permission (part of the payload, but has a fixed value).
+      type: str
+      returned: when O(state=present)
+      sample: POSITIVE
+    resources:
+      description: IDs of resources attached to this permission.
+      type: list
+      returned: when O(state=present)
+      sample:
+        - 49e052ff-100d-4b79-a9dd-52669ed3c11d
+    scopes:
+      description: IDs of scopes attached to this permission.
+      type: list
+      returned: when O(state=present)
+      sample:
+        - 9da05cd2-b273-4354-bbd8-0c133918a454
+    policies:
+      description: IDs of policies attached to this permission.
+      type: list
+      returned: when O(state=present)
+      sample:
+        - 9da05cd2-b273-4354-bbd8-0c133918a454
+"""
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, \
     keycloak_argument_spec, get_token, KeycloakError
@@ -257,8 +253,10 @@ def main():
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True,
                            required_one_of=(
-                               [['token', 'auth_realm', 'auth_username', 'auth_password']]),
-                           required_together=([['auth_realm', 'auth_username', 'auth_password']]))
+                               [['token', 'auth_realm', 'auth_username', 'auth_password', 'auth_client_id', 'auth_client_secret']]),
+                           required_together=([['auth_username', 'auth_password']]),
+                           required_by={'refresh_token': 'auth_realm'},
+                           )
 
     # Convenience variables
     state = module.params.get('state')

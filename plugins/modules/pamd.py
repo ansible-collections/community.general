@@ -9,15 +9,15 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 module: pamd
 author:
-    - Kenneth D. Evensen (@kevensen)
+  - Kenneth D. Evensen (@kevensen)
 short_description: Manage PAM Modules
 description:
   - Edit PAM service's type, control, module path and module arguments.
-  - In order for a PAM rule to be modified, the type, control and
-    module_path must match an existing rule. See man(5) pam.d for details.
+  - In order for a PAM rule to be modified, the type, control and module_path must match an existing rule. See man(5) pam.d
+    for details.
 notes:
   - This module does not handle authselect profiles.
 extends_documentation_fragment:
@@ -30,8 +30,7 @@ attributes:
 options:
   name:
     description:
-      - The name generally refers to the PAM service file to
-        change, for example system-auth.
+      - The name generally refers to the PAM service file to change, for example system-auth.
     type: str
     required: true
   type:
@@ -40,12 +39,11 @@ options:
       - The O(type), O(control), and O(module_path) options all must match a rule to be modified.
     type: str
     required: true
-    choices: [ account, -account, auth, -auth, password, -password, session, -session ]
+    choices: [account, -account, auth, -auth, password, -password, session, -session]
   control:
     description:
       - The control of the PAM rule being modified.
-      - This may be a complicated control with brackets. If this is the case, be
-        sure to put "[bracketed controls]" in quotes.
+      - This may be a complicated control with brackets. If this is the case, be sure to put "[bracketed controls]" in quotes.
       - The O(type), O(control), and O(module_path) options all must match a rule to be modified.
     type: str
     required: true
@@ -57,55 +55,51 @@ options:
     required: true
   new_type:
     description:
-    - The new type to assign to the new rule.
+      - The new type to assign to the new rule.
     type: str
-    choices: [ account, -account, auth, -auth, password, -password, session, -session ]
+    choices: [account, -account, auth, -auth, password, -password, session, -session]
   new_control:
     description:
-    - The new control to assign to the new rule.
+      - The new control to assign to the new rule.
     type: str
   new_module_path:
     description:
-    - The new module path to be assigned to the new rule.
+      - The new module path to be assigned to the new rule.
     type: str
   module_arguments:
     description:
-    - When O(state=updated), the O(module_arguments) will replace existing module_arguments.
-    - When O(state=args_absent) args matching those listed in O(module_arguments) will be removed.
-    - When O(state=args_present) any args listed in O(module_arguments) are added if
-      missing from the existing rule.
-    - Furthermore, if the module argument takes a value denoted by C(=),
-      the value will be changed to that specified in module_arguments.
+      - When O(state=updated), the O(module_arguments) will replace existing module_arguments.
+      - When O(state=args_absent) args matching those listed in O(module_arguments) will be removed.
+      - When O(state=args_present) any args listed in O(module_arguments) are added if missing from the existing rule.
+      - Furthermore, if the module argument takes a value denoted by C(=), the value will be changed to that specified in
+        module_arguments.
     type: list
     elements: str
   state:
     description:
-    - The default of V(updated) will modify an existing rule if type,
-      control and module_path all match an existing rule.
-    - With V(before), the new rule will be inserted before a rule matching type,
-      control and module_path.
-    - Similarly, with V(after), the new rule will be inserted after an existing rulematching type,
-      control and module_path.
-    - With either V(before) or V(after) O(new_type), O(new_control), and O(new_module_path) must all be specified.
-    - If state is V(args_absent) or V(args_present), O(new_type), O(new_control), and O(new_module_path) will be ignored.
-    - State V(absent) will remove the rule.
+      - The default of V(updated) will modify an existing rule if type, control and module_path all match an existing rule.
+      - With V(before), the new rule will be inserted before a rule matching type, control and module_path.
+      - Similarly, with V(after), the new rule will be inserted after an existing rulematching type, control and module_path.
+      - With either V(before) or V(after) O(new_type), O(new_control), and O(new_module_path) must all be specified.
+      - If state is V(args_absent) or V(args_present), O(new_type), O(new_control), and O(new_module_path) will be ignored.
+      - State V(absent) will remove the rule.
     type: str
-    choices: [ absent, before, after, args_absent, args_present, updated ]
+    choices: [absent, before, after, args_absent, args_present, updated]
     default: updated
   path:
     description:
-    - This is the path to the PAM service files.
+      - This is the path to the PAM service files.
     type: path
     default: /etc/pam.d
   backup:
-     description:
-       - Create a backup file including the timestamp information so you can
-         get the original file back if you somehow clobbered it incorrectly.
-     type: bool
-     default: false
-'''
+    description:
+      - Create a backup file including the timestamp information so you can get the original file back if you somehow clobbered
+        it incorrectly.
+    type: bool
+    default: false
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Update pamd rule's control in /etc/pam.d/system-auth
   community.general.pamd:
     name: system-auth
@@ -133,8 +127,7 @@ EXAMPLES = r'''
     new_module_path: pam_faillock.so
     state: before
 
-- name: Insert a new rule pam_wheel.so with argument 'use_uid' after an \
-        existing rule pam_rootok.so
+- name: Insert a new rule pam_wheel.so with argument 'use_uid' after an existing rule pam_rootok.so
   community.general.pamd:
     name: su
     type: auth
@@ -161,11 +154,7 @@ EXAMPLES = r'''
     type: auth
     control: required
     module_path: pam_faillock.so
-    module_arguments: 'preauth
-        silent
-        deny=3
-        unlock_time=604800
-        fail_interval=900'
+    module_arguments: 'preauth silent deny=3 unlock_time=604800 fail_interval=900'
     state: updated
 
 - name: Remove specific arguments from a rule
@@ -193,8 +182,8 @@ EXAMPLES = r'''
     control: '[success=1 default=ignore]'
     module_path: pam_succeed_if.so
     module_arguments:
-    - crond
-    - quiet
+      - crond
+      - quiet
     state: args_present
 
 - name: Module arguments requiring commas must be listed as a Yaml list
@@ -204,7 +193,7 @@ EXAMPLES = r'''
     control: required
     module_path: pam_access.so
     module_arguments:
-    - listsep=,
+      - listsep=,
     state: args_present
 
 - name: Update specific argument value in a rule
@@ -226,21 +215,20 @@ EXAMPLES = r'''
     type: auth
     module_path: pam_sss.so
     control: 'requisite'
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 change_count:
-    description: How many rules were changed.
-    type: int
-    sample: 1
-    returned: success
+  description: How many rules were changed.
+  type: int
+  sample: 1
+  returned: success
 backupdest:
-    description:
-    - "The file name of the backup file, if created."
-    returned: success
-    type: str
-...
-'''
+  description:
+    - The file name of the backup file, if created.
+  returned: success
+  type: str
+"""
 
 
 from ansible.module_utils.basic import AnsibleModule

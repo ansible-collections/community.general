@@ -9,12 +9,11 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: supervisorctl
-short_description: Manage the state of a program or group of programs running via supervisord
+short_description: Manage the state of a program or group of programs managed by C(supervisord)
 description:
-  - Manage the state of a program or group of programs running via supervisord
+  - Manage the state of a program or group of programs managed by C(supervisord).
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -33,29 +32,29 @@ options:
   config:
     type: path
     description:
-      - The supervisor configuration file path
+      - The supervisor configuration file path.
   server_url:
     type: str
     description:
-      - URL on which supervisord server is listening
+      - URL on which supervisord server is listening.
   username:
     type: str
     description:
-      - username to use for authentication
+      - Username to use for authentication.
   password:
     type: str
     description:
-      - password to use for authentication
+      - Password to use for authentication.
   state:
     type: str
     description:
       - The desired state of program/group.
     required: true
-    choices: [ "present", "started", "stopped", "restarted", "absent", "signalled" ]
+    choices: ["present", "started", "stopped", "restarted", "absent", "signalled"]
   stop_before_removing:
     type: bool
     description:
-      - Use O(stop_before_removing=true) to stop the program/group before removing it
+      - Use O(stop_before_removing=true) to stop the program/group before removing it.
     required: false
     default: false
     version_added: 7.5.0
@@ -66,19 +65,21 @@ options:
   supervisorctl_path:
     type: path
     description:
-      - path to supervisorctl executable
+      - Path to C(supervisorctl) executable.
 notes:
-  - When O(state=present), the module will call C(supervisorctl reread) then C(supervisorctl add) if the program/group does not exist.
+  - When O(state=present), the module will call C(supervisorctl reread) then C(supervisorctl add) if the program/group does
+    not exist.
   - When O(state=restarted), the module will call C(supervisorctl update) then call C(supervisorctl restart).
   - When O(state=absent), the module will call C(supervisorctl reread) then C(supervisorctl remove) to remove the target program/group.
-    If the program/group is still running, the action will fail. If you want to stop the program/group before removing, use O(stop_before_removing=true).
-requirements: [ "supervisorctl" ]
+    If the program/group is still running, the action will fail. If you want to stop the program/group before removing, use
+    O(stop_before_removing=true).
+requirements: ["supervisorctl"]
 author:
-    - "Matt Wright (@mattupstate)"
-    - "Aaron Wang (@inetfuture) <inetfuture@gmail.com>"
-'''
+  - "Matt Wright (@mattupstate)"
+  - "Aaron Wang (@inetfuture) <inetfuture@gmail.com>"
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Manage the state of program to be in started state
   community.general.supervisorctl:
     name: my_app
@@ -113,7 +114,7 @@ EXAMPLES = '''
   community.general.supervisorctl:
     name: all
     state: restarted
-'''
+"""
 
 import os
 from ansible.module_utils.basic import AnsibleModule, is_executable

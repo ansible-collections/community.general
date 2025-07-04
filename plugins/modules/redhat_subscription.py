@@ -10,219 +10,189 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: redhat_subscription
 short_description: Manage registration and subscriptions to RHSM using C(subscription-manager)
 description:
-    - Manage registration and subscription to the Red Hat Subscription Management entitlement platform using the C(subscription-manager) command,
-      registering using D-Bus if possible.
+  - Manage registration and subscription to the Red Hat Subscription Management entitlement platform using the C(subscription-manager)
+    command, registering using D-Bus if possible.
 author: "Barnaby Court (@barnabycourt)"
 notes:
-    - |
-      The module tries to use the D-Bus C(rhsm) service (part of C(subscription-manager))
-      to register, starting from community.general 6.5.0: this is done so credentials
-      (username, password, activation keys) can be passed to C(rhsm) in a secure way.
-      C(subscription-manager) itself gets credentials only as arguments of command line
-      parameters, which is I(not) secure, as they can be easily stolen by checking the
-      process listing on the system. Due to limitations of the D-Bus interface of C(rhsm),
-      the module will I(not) use D-Bus for registration when trying either to register
-      using O(token), or when specifying O(environment), or when the system is old
-      (typically RHEL 7 older than 7.4, RHEL 6, and older).
-    - In order to register a system, subscription-manager requires either a username and password, or an activationkey and an Organization ID.
-    - Since 2.5 values for O(server_hostname), O(server_insecure), O(rhsm_baseurl),
-      O(server_proxy_hostname), O(server_proxy_port), O(server_proxy_user) and
-      O(server_proxy_password) are no longer taken from the C(/etc/rhsm/rhsm.conf)
-      config file and default to V(null).
-    - It is possible to interact with C(subscription-manager) only as root,
-      so root permissions are required to successfully run this module.
-    - Since community.general 6.5.0, credentials (that is, O(username) and O(password),
-      O(activationkey), or O(token)) are needed only in case the the system is not registered,
-      or O(force_register) is specified; this makes it possible to use the module to tweak an
-      already registered system, for example attaching pools to it (using O(pool), or O(pool_ids)),
-      and modifying the C(syspurpose) attributes (using O(syspurpose)).
+  - 'The module tries to use the D-Bus C(rhsm) service (part of C(subscription-manager)) to register, starting from community.general
+    6.5.0: this is done so credentials (username, password, activation keys) can be passed to C(rhsm) in a secure way. C(subscription-manager)
+    itself gets credentials only as arguments of command line parameters, which is I(not) secure, as they can be easily stolen
+    by checking the process listing on the system. Due to limitations of the D-Bus interface of C(rhsm), the module will I(not)
+    use D-Bus for registration when trying either to register using O(token), or when specifying O(environment), or when the
+    system is old (typically RHEL 7 older than 7.4, RHEL 6, and older).'
+  - In order to register a system, subscription-manager requires either a username and password, or an activationkey and an
+    Organization ID.
+  - Since 2.5 values for O(server_hostname), O(server_insecure), O(rhsm_baseurl), O(server_proxy_hostname), O(server_proxy_port),
+    O(server_proxy_user) and O(server_proxy_password) are no longer taken from the C(/etc/rhsm/rhsm.conf) config file and
+    default to V(null).
+  - It is possible to interact with C(subscription-manager) only as root, so root permissions are required to successfully
+    run this module.
+  - Since community.general 6.5.0, credentials (that is, O(username) and O(password), O(activationkey), or O(token)) are needed
+    only in case the the system is not registered, or O(force_register) is specified; this makes it possible to use the module
+    to tweak an already registered system, for example attaching pools to it (using O(pool_ids)), and modifying the C(syspurpose)
+    attributes (using O(syspurpose)).
 requirements:
-    - subscription-manager
-    - Optionally the C(dbus) Python library; this is usually included in the OS
-      as it is used by C(subscription-manager).
+  - subscription-manager
+  - Optionally the C(dbus) Python library; this is usually included in the OS as it is used by C(subscription-manager).
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    state:
-        description:
-          - whether to register and subscribe (V(present)), or unregister (V(absent)) a system
-        choices: [ "present", "absent" ]
-        default: "present"
+  state:
+    description:
+      - Whether to register and subscribe (V(present)), or unregister (V(absent)) a system.
+    choices: ["present", "absent"]
+    default: "present"
+    type: str
+  username:
+    description:
+      - Access.redhat.com or Red Hat Satellite or Katello username.
+    type: str
+  password:
+    description:
+      - Access.redhat.com or Red Hat Satellite or Katello password.
+    type: str
+  token:
+    description:
+      - Sso.redhat.com API access token.
+    type: str
+    version_added: 6.3.0
+  server_hostname:
+    description:
+      - Specify an alternative Red Hat Subscription Management or Red Hat Satellite or Katello server.
+    type: str
+  server_insecure:
+    description:
+      - Enable or disable https server certificate verification when connecting to O(server_hostname).
+    type: str
+  server_prefix:
+    description:
+      - Specify the prefix when registering to the Red Hat Subscription Management or Red Hat Satellite or Katello server.
+    type: str
+    version_added: 3.3.0
+  server_port:
+    description:
+      - Specify the port when registering to the Red Hat Subscription Management or Red Hat Satellite or Katello server.
+    type: str
+    version_added: 3.3.0
+  rhsm_baseurl:
+    description:
+      - Specify CDN baseurl.
+    type: str
+  rhsm_repo_ca_cert:
+    description:
+      - Specify an alternative location for a CA certificate for CDN.
+    type: str
+  server_proxy_hostname:
+    description:
+      - Specify an HTTP proxy hostname.
+    type: str
+  server_proxy_scheme:
+    description:
+      - Specify an HTTP proxy scheme, for example V(http) or V(https).
+    type: str
+    version_added: 6.2.0
+  server_proxy_port:
+    description:
+      - Specify an HTTP proxy port.
+    type: str
+  server_proxy_user:
+    description:
+      - Specify a user for HTTP proxy with basic authentication.
+    type: str
+  server_proxy_password:
+    description:
+      - Specify a password for HTTP proxy with basic authentication.
+    type: str
+  auto_attach:
+    description:
+      - Upon successful registration, auto-consume available subscriptions.
+      - Please note that the alias O(ignore:autosubscribe) was removed in community.general 9.0.0.
+    type: bool
+  activationkey:
+    description:
+      - Supply an activation key for use with registration.
+    type: str
+  org_id:
+    description:
+      - Organization ID to use in conjunction with activationkey.
+    type: str
+  environment:
+    description:
+      - Register with a specific environment in the destination org. Used with Red Hat Satellite or Katello.
+    type: str
+  pool_ids:
+    description:
+      - Specify subscription pool IDs to consume.
+      - 'A pool ID may be specified as a C(string) - just the pool ID (for example
+        V(0123456789abcdef0123456789abcdef)), or as a C(dict) with the pool ID as the key, and a quantity as the value (for
+        example V(0123456789abcdef0123456789abcdef: 2). If the quantity is provided, it is used to consume multiple entitlements
+        from a pool (the pool must support this).'
+    default: []
+    type: list
+    elements: raw
+  consumer_type:
+    description:
+      - The type of unit to register, defaults to system.
+    type: str
+  consumer_name:
+    description:
+      - Name of the system to register, defaults to the hostname.
+    type: str
+  consumer_id:
+    description:
+      - References an existing consumer ID to resume using a previous registration for this system. If the system's identity
+        certificate is lost or corrupted, this option allows it to resume using its previous identity and subscriptions. The
+        default is to not specify a consumer ID so a new ID is created.
+    type: str
+  force_register:
+    description:
+      - Register the system even if it is already registered.
+    type: bool
+    default: false
+  release:
+    description:
+      - Set a release version.
+    type: str
+  syspurpose:
+    description:
+      - Set syspurpose attributes in file C(/etc/rhsm/syspurpose/syspurpose.json) and synchronize these attributes with RHSM
+        server. Syspurpose attributes help attach the most appropriate subscriptions to the system automatically. When C(syspurpose.json)
+        file already contains some attributes, then new attributes overwrite existing attributes. When some attribute is not
+        listed in the new list of attributes, the existing attribute will be removed from C(syspurpose.json) file. Unknown
+        attributes are ignored.
+    type: dict
+    suboptions:
+      usage:
+        description: Syspurpose attribute usage.
         type: str
-    username:
-        description:
-            - access.redhat.com or Red Hat Satellite or Katello username
+      role:
+        description: Syspurpose attribute role.
         type: str
-    password:
-        description:
-            - access.redhat.com or Red Hat Satellite or Katello password
+      service_level_agreement:
+        description: Syspurpose attribute service_level_agreement.
         type: str
-    token:
-        description:
-            - sso.redhat.com API access token.
-        type: str
-        version_added: 6.3.0
-    server_hostname:
-        description:
-            - Specify an alternative Red Hat Subscription Management or Red Hat Satellite or Katello server.
-        type: str
-    server_insecure:
-        description:
-            - Enable or disable https server certificate verification when connecting to O(server_hostname).
-        type: str
-    server_prefix:
-        description:
-            - Specify the prefix when registering to the Red Hat Subscription Management or Red Hat Satellite or Katello server.
-        type: str
-        version_added: 3.3.0
-    server_port:
-        description:
-            - Specify the port when registering to the Red Hat Subscription Management or Red Hat Satellite or Katello server.
-        type: str
-        version_added: 3.3.0
-    rhsm_baseurl:
-        description:
-            - Specify CDN baseurl
-        type: str
-    rhsm_repo_ca_cert:
-        description:
-            - Specify an alternative location for a CA certificate for CDN
-        type: str
-    server_proxy_hostname:
-        description:
-            - Specify an HTTP proxy hostname.
-        type: str
-    server_proxy_scheme:
-        description:
-            - Specify an HTTP proxy scheme, for example V(http) or V(https).
-        type: str
-        version_added: 6.2.0
-    server_proxy_port:
-        description:
-            - Specify an HTTP proxy port.
-        type: str
-    server_proxy_user:
-        description:
-            - Specify a user for HTTP proxy with basic authentication
-        type: str
-    server_proxy_password:
-        description:
-            - Specify a password for HTTP proxy with basic authentication
-        type: str
-    auto_attach:
-        description:
-            - Upon successful registration, auto-consume available subscriptions
-            - |
-              Please note that the alias O(autosubscribe) will be removed in
-              community.general 9.0.0.
-        type: bool
-        aliases: [autosubscribe]
-    activationkey:
-        description:
-            - supply an activation key for use with registration
-        type: str
-    org_id:
-        description:
-            - Organization ID to use in conjunction with activationkey
-        type: str
-    environment:
-        description:
-            - Register with a specific environment in the destination org. Used with Red Hat Satellite or Katello
-        type: str
-    pool:
-        description:
-            - |
-              Specify a subscription pool name to consume.  Regular expressions accepted.
-              Mutually exclusive with O(pool_ids).
-            - |
-              Please use O(pool_ids) instead: specifying pool IDs is much faster,
-              and it avoids to match new pools that become available for the
-              system and are not explicitly wanted.  Also, this option does not
-              support quantities.
-            - |
-              This option is deprecated for the reasons mentioned above,
-              and it will be removed in community.general 10.0.0.
-        default: '^$'
-        type: str
-    pool_ids:
-        description:
-            - |
-              Specify subscription pool IDs to consume. Prefer over O(pool) when possible as it is much faster.
-              A pool ID may be specified as a C(string) - just the pool ID (for example V(0123456789abcdef0123456789abcdef)),
-              or as a C(dict) with the pool ID as the key, and a quantity as the value (for example
-              V(0123456789abcdef0123456789abcdef: 2). If the quantity is provided, it is used to consume multiple
-              entitlements from a pool (the pool must support this). Mutually exclusive with O(pool).
-        default: []
+      addons:
+        description: Syspurpose attribute addons.
         type: list
-        elements: raw
-    consumer_type:
+        elements: str
+      sync:
         description:
-            - The type of unit to register, defaults to system
-        type: str
-    consumer_name:
-        description:
-            - Name of the system to register, defaults to the hostname
-        type: str
-    consumer_id:
-        description:
-            - |
-              References an existing consumer ID to resume using a previous registration
-              for this system. If the  system's identity certificate is lost or corrupted,
-              this option allows it to resume using its previous identity and subscriptions.
-              The default is to not specify a consumer ID so a new ID is created.
-        type: str
-    force_register:
-        description:
-            -  Register the system even if it is already registered
+          - When this option is V(true), then syspurpose attributes are synchronized with RHSM server immediately. When this
+            option is V(false), then syspurpose attributes will be synchronized with RHSM server by rhsmcertd daemon.
         type: bool
         default: false
-    release:
-        description:
-            - Set a release version
-        type: str
-    syspurpose:
-        description:
-            - Set syspurpose attributes in file C(/etc/rhsm/syspurpose/syspurpose.json)
-              and synchronize these attributes with RHSM server. Syspurpose attributes help attach
-              the most appropriate subscriptions to the system automatically. When C(syspurpose.json) file
-              already contains some attributes, then new attributes overwrite existing attributes.
-              When some attribute is not listed in the new list of attributes, the existing
-              attribute will be removed from C(syspurpose.json) file. Unknown attributes are ignored.
-        type: dict
-        suboptions:
-            usage:
-                description: Syspurpose attribute usage
-                type: str
-            role:
-                description: Syspurpose attribute role
-                type: str
-            service_level_agreement:
-                description: Syspurpose attribute service_level_agreement
-                type: str
-            addons:
-                description: Syspurpose attribute addons
-                type: list
-                elements: str
-            sync:
-                description:
-                    - When this option is V(true), then syspurpose attributes are synchronized with
-                      RHSM server immediately. When this option is V(false), then syspurpose attributes
-                      will be synchronized with RHSM server by rhsmcertd daemon.
-                type: bool
-                default: false
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Register as user (joe_user) with password (somepass) and auto-subscribe to available content.
   community.general.redhat_subscription:
     state: present
@@ -262,20 +232,6 @@ EXAMPLES = '''
     password: somepass
     consumer_id: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
-- name: Register with activationkey and consume subscriptions matching Red Hat Enterprise Server or Red Hat Virtualization
-  community.general.redhat_subscription:
-    state: present
-    activationkey: 1-222333444
-    org_id: 222333444
-    pool: '^(Red Hat Enterprise Server|Red Hat Virtualization)$'
-
-- name: Update the consumed subscriptions from the previous example (remove Red Hat Virtualization subscription)
-  community.general.redhat_subscription:
-    state: present
-    activationkey: 1-222333444
-    org_id: 222333444
-    pool: '^Red Hat Enterprise Server$'
-
 - name: Register as user credentials into given environment (against Red Hat Satellite or Katello), and auto-subscribe.
   community.general.redhat_subscription:
     state: present
@@ -305,17 +261,15 @@ EXAMPLES = '''
         - addon1
         - addon2
       sync: true
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 subscribed_pool_ids:
-    description: List of pool IDs to which system is now subscribed
-    returned: success
-    type: dict
-    sample: {
-        "8a85f9815ab905d3015ab928c7005de4": "1"
-    }
-'''
+  description: List of pool IDs to which system is now subscribed.
+  returned: success
+  type: dict
+  sample: {"8a85f9815ab905d3015ab928c7005de4": "1"}
+"""
 
 from os.path import isfile
 from os import getuid, unlink
@@ -354,9 +308,8 @@ class Rhsm(object):
             else:
                 cfg.set('main', 'enabled', '0')
 
-            fd = open(tmpfile, 'w+')
-            cfg.write(fd)
-            fd.close()
+            with open(tmpfile, 'w+') as fd:
+                cfg.write(fd)
             self.module.atomic_move(tmpfile, plugin_conf)
 
     def enable(self):
@@ -590,6 +543,45 @@ class Rhsm(object):
              (distro_version[0] == 9 and distro_version[1] >= 2) or
              distro_version[0] > 9)):
             dbus_force_option_works = True
+        # We need to use the 'enable_content' D-Bus option to ensure that
+        # content is enabled; sadly the option is available depending on the
+        # version of the distro, and also depending on which API/method is used
+        # for registration.
+        dbus_has_enable_content_option = False
+        if activationkey:
+            def supports_enable_content_for_activation_keys():
+                # subscription-manager in Fedora >= 41 has the new option.
+                if distro_id == 'fedora' and distro_version[0] >= 41:
+                    return True
+                # Assume EL distros here.
+                if distro_version[0] >= 10:
+                    return True
+                return False
+            dbus_has_enable_content_option = supports_enable_content_for_activation_keys()
+        else:
+            def supports_enable_content_for_credentials():
+                # subscription-manager in any supported Fedora version
+                # has the new option.
+                if distro_id == 'fedora':
+                    return True
+                # Check for RHEL 8 >= 8.6, or RHEL >= 9.
+                if distro_id == 'rhel' and \
+                   ((distro_version[0] == 8 and distro_version[1] >= 6) or
+                       distro_version[0] >= 9):
+                    return True
+                # CentOS: similar checks as for RHEL, with one extra bit:
+                # if the 2nd part of the version is empty, it means it is
+                # CentOS Stream, and thus we can assume it has the latest
+                # version of subscription-manager.
+                if distro_id == 'centos' and \
+                   ((distro_version[0] == 8 and
+                       (distro_version[1] >= 6 or distro_version_parts[1] == '')) or
+                       distro_version[0] >= 9):
+                    return True
+                # Unknown or old distro: assume it does not support
+                # the new option.
+                return False
+            dbus_has_enable_content_option = supports_enable_content_for_credentials()
 
         if force_register and not dbus_force_option_works and was_registered:
             self.unregister()
@@ -662,6 +654,8 @@ class Rhsm(object):
             register_opts[environment_key] = environment
         if force_register and dbus_force_option_works and was_registered:
             register_opts['force'] = True
+        if dbus_has_enable_content_option:
+            register_opts['enable_content'] = "1"
         # Wrap it as proper D-Bus dict
         register_opts = dbus.Dictionary(register_opts, signature='sv', variant_level=1)
 
@@ -784,42 +778,6 @@ class Rhsm(object):
         self.update_plugin_conf('rhnplugin', False)
         self.update_plugin_conf('subscription-manager', False)
 
-    def subscribe(self, regexp):
-        '''
-            Subscribe current system to available pools matching the specified
-            regular expression. It matches regexp against available pool ids first.
-            If any pool ids match, subscribe to those pools and return.
-
-            If no pool ids match, then match regexp against available pool product
-            names. Note this can still easily match many many pools. Then subscribe
-            to those pools.
-
-            Since a pool id is a more specific match, we only fallback to matching
-            against names if we didn't match pool ids.
-
-            Raises:
-              * Exception - if error occurs while running command
-        '''
-        # See https://github.com/ansible/ansible/issues/19466
-
-        # subscribe to pools whose pool id matches regexp (and only the pool id)
-        subscribed_pool_ids = self.subscribe_pool(regexp)
-
-        # If we found any matches, we are done
-        # Don't attempt to match pools by product name
-        if subscribed_pool_ids:
-            return subscribed_pool_ids
-
-        # We didn't match any pool ids.
-        # Now try subscribing to pools based on product name match
-        # Note: This can match lots of product names.
-        subscribed_by_product_pool_ids = self.subscribe_product(regexp)
-        if subscribed_by_product_pool_ids:
-            return subscribed_by_product_pool_ids
-
-        # no matches
-        return []
-
     def subscribe_by_pool_ids(self, pool_ids):
         """
         Try to subscribe to the list of pool IDs
@@ -837,56 +795,6 @@ class Rhsm(object):
             else:
                 self.module.fail_json(msg='Pool ID: %s not in list of available pools' % pool_id)
         return pool_ids
-
-    def subscribe_pool(self, regexp):
-        '''
-            Subscribe current system to available pools matching the specified
-            regular expression
-            Raises:
-              * Exception - if error occurs while running command
-        '''
-
-        # Available pools ready for subscription
-        available_pools = RhsmPools(self.module)
-
-        subscribed_pool_ids = []
-        for pool in available_pools.filter_pools(regexp):
-            pool.subscribe()
-            subscribed_pool_ids.append(pool.get_pool_id())
-        return subscribed_pool_ids
-
-    def subscribe_product(self, regexp):
-        '''
-            Subscribe current system to available pools matching the specified
-            regular expression
-            Raises:
-              * Exception - if error occurs while running command
-        '''
-
-        # Available pools ready for subscription
-        available_pools = RhsmPools(self.module)
-
-        subscribed_pool_ids = []
-        for pool in available_pools.filter_products(regexp):
-            pool.subscribe()
-            subscribed_pool_ids.append(pool.get_pool_id())
-        return subscribed_pool_ids
-
-    def update_subscriptions(self, regexp):
-        changed = False
-        consumed_pools = RhsmPools(self.module, consumed=True)
-        pool_ids_to_keep = [p.get_pool_id() for p in consumed_pools.filter_pools(regexp)]
-        pool_ids_to_keep.extend([p.get_pool_id() for p in consumed_pools.filter_products(regexp)])
-
-        serials_to_remove = [p.Serial for p in consumed_pools if p.get_pool_id() not in pool_ids_to_keep]
-        serials = self.unsubscribe(serials=serials_to_remove)
-
-        subscribed_pool_ids = self.subscribe(regexp)
-
-        if subscribed_pool_ids or serials:
-            changed = True
-        return {'changed': changed, 'subscribed_pool_ids': subscribed_pool_ids,
-                'unsubscribed_serials': serials}
 
     def update_subscriptions_by_pool_ids(self, pool_ids):
         changed = False
@@ -1106,25 +1014,10 @@ def main():
             'server_port': {},
             'rhsm_baseurl': {},
             'rhsm_repo_ca_cert': {},
-            'auto_attach': {
-                'type': 'bool',
-                'aliases': ['autosubscribe'],
-                'deprecated_aliases': [
-                    {
-                        'name': 'autosubscribe',
-                        'version': '9.0.0',
-                        'collection_name': 'community.general',
-                    },
-                ],
-            },
+            'auto_attach': {'type': 'bool'},
             'activationkey': {'no_log': True},
             'org_id': {},
             'environment': {},
-            'pool': {
-                'default': '^$',
-                'removed_in_version': '10.0.0',
-                'removed_from_collection': 'community.general',
-            },
             'pool_ids': {'default': [], 'type': 'list', 'elements': 'raw'},
             'consumer_type': {},
             'consumer_name': {},
@@ -1155,8 +1048,7 @@ def main():
                             ['token', 'username'],
                             ['activationkey', 'consumer_id'],
                             ['activationkey', 'environment'],
-                            ['activationkey', 'auto_attach'],
-                            ['pool', 'pool_ids']],
+                            ['activationkey', 'auto_attach']],
         required_if=[['force_register', True, ['username', 'activationkey', 'token'], True]],
     )
 
@@ -1184,7 +1076,6 @@ def main():
     if activationkey and not org_id:
         module.fail_json(msg='org_id is required when using activationkey')
     environment = module.params['environment']
-    pool = module.params['pool']
     pool_ids = {}
     for value in module.params['pool_ids']:
         if isinstance(value, dict):
@@ -1228,12 +1119,9 @@ def main():
                     rhsm.sync_syspurpose()
                 except Exception as e:
                     module.fail_json(msg="Failed to synchronize syspurpose attributes: %s" % to_native(e))
-            if pool != '^$' or pool_ids:
+            if pool_ids:
                 try:
-                    if pool_ids:
-                        result = rhsm.update_subscriptions_by_pool_ids(pool_ids)
-                    else:
-                        result = rhsm.update_subscriptions(pool)
+                    result = rhsm.update_subscriptions_by_pool_ids(pool_ids)
                 except Exception as e:
                     module.fail_json(msg="Failed to update subscriptions for '%s': %s" % (server_hostname, to_native(e)))
                 else:
@@ -1256,8 +1144,6 @@ def main():
                     rhsm.sync_syspurpose()
                 if pool_ids:
                     subscribed_pool_ids = rhsm.subscribe_by_pool_ids(pool_ids)
-                elif pool != '^$':
-                    subscribed_pool_ids = rhsm.subscribe(pool)
                 else:
                     subscribed_pool_ids = []
             except Exception as e:
@@ -1273,7 +1159,6 @@ def main():
             module.exit_json(changed=False, msg="System already unregistered.")
         else:
             try:
-                rhsm.unsubscribe()
                 rhsm.unregister()
             except Exception as e:
                 module.fail_json(msg="Failed to unregister: %s" % to_native(e))

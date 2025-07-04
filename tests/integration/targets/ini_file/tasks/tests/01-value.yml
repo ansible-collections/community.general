@@ -253,7 +253,7 @@
     path: "{{ output_file }}"
     section: mysqld
     option: "{{ item.o }}"
-    value: "{{ item.v | d(omit) }}"
+    value: "{{ item.v | default(omit) }}"
     allow_no_value: true
   loop:
     - { o: "skip-name-resolve" }
@@ -273,7 +273,7 @@
       skip-name
       skip-name-resolve
       max_connections = 500
-  
+
 - name: test-value 12 - Verify content of ini file is as expected
   assert:
     that:
@@ -395,7 +395,7 @@
   set_fact:
     expected16: |+
       beverage = coke
-      
+
     content16: "{{ output_content.content | b64decode }}"
 
 - name: test-value 16 - assert 'changed' is true and content is OK (no section)
@@ -423,7 +423,7 @@
   set_fact:
     expected17: |+
       beverage = water
-      
+
     content17: "{{ output_content.content | b64decode }}"
 
 - name: test-value 17 - assert 'changed' is true and content is OK (no section)
@@ -512,10 +512,10 @@
     - name: test-value 20 - Tests with empty strings
       ini_file:
         path: "{{ output_file }}"
-        section: "{{ item.section | d('extensions') }}"
+        section: "{{ item.section | default('extensions') }}"
         option: "{{ item.option }}"
         value: ""
-        allow_no_value: "{{ item.no_value | d(omit) }}"
+        allow_no_value: "{{ item.no_value | default(omit) }}"
       loop:
         - option: evolve
         - option: regress
@@ -532,14 +532,7 @@
 
 - name: test-value 20 - set expected content and get current ini file content
   set_fact:
-    expected20: |+
-      
-      [extensions]
-      evolve = 
-      regress = 
-      improve = 
-      [foobar]
-      foo = 
+    expected20: "\n[extensions]\nevolve = \nregress = \nimprove = \n[foobar]\nfoo = \n"
     content20: "{{ output_content.content | b64decode }}"
 
 - name: test-value 20 - Verify content of ini file is as expected

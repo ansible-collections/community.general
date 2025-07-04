@@ -9,12 +9,11 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: jabber
 short_description: Send a message to jabber user or chat room
 description:
-  - Send a message to jabber
+  - Send a message to jabber.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -26,17 +25,17 @@ options:
   user:
     type: str
     description:
-      - User as which to connect
+      - User as which to connect.
     required: true
   password:
     type: str
     description:
-      - password for user to connect
+      - Password for user to connect.
     required: true
   to:
     type: str
     description:
-      - user ID or name of the room, when using room use a slash to indicate your nick.
+      - User ID or name of the room, when using room use a slash to indicate your nick.
     required: true
   msg:
     type: str
@@ -46,24 +45,22 @@ options:
   host:
     type: str
     description:
-      - host to connect, overrides user info
+      - Host to connect, overrides user info.
   port:
     type: int
     description:
-      - port to connect to, overrides default
+      - Port to connect to, overrides default.
     default: 5222
   encoding:
     type: str
     description:
-      - message encoding
-
-# informational: requirements for nodes
+      - Message encoding.
 requirements:
-    - python xmpp (xmpppy)
+  - python xmpp (xmpppy)
 author: "Brian Coca (@bcoca)"
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Send a message to a user
   community.general.jabber:
     user: mybot@example.net
@@ -86,7 +83,7 @@ EXAMPLES = '''
     password: secret
     to: mychaps@example.net
     msg: Ansible task finished
-'''
+"""
 
 import time
 import traceback

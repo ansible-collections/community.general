@@ -3,69 +3,73 @@
 # Copyright (c) 2021 Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-from __future__ import (absolute_import, division, print_function)
+from __future__ import annotations
 
-__metaclass__ = type
 
-DOCUMENTATION = '''
-    name: icinga2
-    short_description: Icinga2 inventory source
-    version_added: 3.7.0
-    author:
-        - Cliff Hults (@BongoEADGC6) <cliff.hults@gmail.com>
+DOCUMENTATION = r"""
+name: icinga2
+short_description: Icinga2 inventory source
+version_added: 3.7.0
+author:
+  - Cliff Hults (@BongoEADGC6) <cliff.hults@gmail.com>
+description:
+  - Get inventory hosts from the Icinga2 API.
+  - Uses a configuration file as an inventory source, it must end in C(.icinga2.yml) or C(.icinga2.yaml).
+extends_documentation_fragment:
+  - constructed
+options:
+  strict:
+    version_added: 4.4.0
+  compose:
+    version_added: 4.4.0
+  groups:
+    version_added: 4.4.0
+  keyed_groups:
+    version_added: 4.4.0
+  plugin:
+    description: Name of the plugin.
+    required: true
+    type: string
+    choices: ['community.general.icinga2']
+  url:
+    description: Root URL of Icinga2 API.
+    type: string
+    required: true
+  user:
+    description: Username to query the API.
+    type: string
+    required: true
+  password:
+    description: Password to query the API.
+    type: string
+    required: true
+  host_filter:
     description:
-        - Get inventory hosts from the Icinga2 API.
-        - "Uses a configuration file as an inventory source, it must end in
-          C(.icinga2.yml) or C(.icinga2.yaml)."
-    extends_documentation_fragment:
-        - constructed
-    options:
-      strict:
-        version_added: 4.4.0
-      compose:
-        version_added: 4.4.0
-      groups:
-        version_added: 4.4.0
-      keyed_groups:
-        version_added: 4.4.0
-      plugin:
-        description: Name of the plugin.
-        required: true
-        type: string
-        choices: ['community.general.icinga2']
-      url:
-        description: Root URL of Icinga2 API.
-        type: string
-        required: true
-      user:
-        description: Username to query the API.
-        type: string
-        required: true
-      password:
-        description: Password to query the API.
-        type: string
-        required: true
-      host_filter:
-        description:
-          - An Icinga2 API valid host filter. Leave blank for no filtering
-        type: string
-        required: false
-      validate_certs:
-        description: Enables or disables SSL certificate verification.
-        type: boolean
-        default: true
-      inventory_attr:
-        description:
-          - Allows the override of the inventory name based on different attributes.
-          - This allows for changing the way limits are used.
-          - The current default, V(address), is sometimes not unique or present. We recommend to use V(name) instead.
-        type: string
-        default: address
-        choices: ['name', 'display_name', 'address']
-        version_added: 4.2.0
-'''
+      - An Icinga2 API valid host filter. Leave blank for no filtering.
+    type: string
+    required: false
+  validate_certs:
+    description: Enables or disables SSL certificate verification.
+    type: boolean
+    default: true
+  inventory_attr:
+    description:
+      - Allows the override of the inventory name based on different attributes.
+      - This allows for changing the way limits are used.
+      - The current default, V(address), is sometimes not unique or present. We recommend to use V(name) instead.
+    type: string
+    default: address
+    choices: ['name', 'display_name', 'address']
+    version_added: 4.2.0
+  group_by_hostgroups:
+    description:
+      - Uses Icinga2 hostgroups as groups.
+    type: boolean
+    default: true
+    version_added: 8.4.0
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 # my.icinga2.yml
 plugin: community.general.icinga2
 url: http://localhost:5665
@@ -88,7 +92,7 @@ compose:
   # set 'ansible_user' and 'ansible_port' from icinga2 host vars
   ansible_user: icinga2_attributes.vars.ansible_user
   ansible_port: icinga2_attributes.vars.ansible_port | default(22)
-'''
+"""
 
 import json
 
@@ -96,6 +100,8 @@ from ansible.errors import AnsibleParserError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable
 from ansible.module_utils.urls import open_url
 from ansible.module_utils.six.moves.urllib.error import HTTPError
+
+from ansible_collections.community.general.plugins.plugin_utils.unsafe import make_unsafe
 
 
 class InventoryModule(BaseInventoryPlugin, Constructable):
@@ -114,6 +120,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         self.ssl_verify = None
         self.host_filter = None
         self.inventory_attr = None
+        self.group_by_hostgroups = None
 
         self.cache_key = None
         self.use_cache = None
@@ -132,7 +139,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
             'User-Agent': "ansible-icinga2-inv",
             'Accept': "application/json",
         }
-        api_status_url = self.icinga2_url + "/status"
+        api_status_url = f"{self.icinga2_url}/status"
         request_args = {
             'headers': self.headers,
             'url_username': self.icinga2_user,
@@ -142,7 +149,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         open_url(api_status_url, **request_args)
 
     def _post_request(self, request_url, data=None):
-        self.display.vvv("Requested URL: %s" % request_url)
+        self.display.vvv(f"Requested URL: {request_url}")
         request_args = {
             'headers': self.headers,
             'url_username': self.icinga2_user,
@@ -151,42 +158,38 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         }
         if data is not None:
             request_args['data'] = json.dumps(data)
-        self.display.vvv("Request Args: %s" % request_args)
+        self.display.vvv(f"Request Args: {request_args}")
         try:
             response = open_url(request_url, **request_args)
         except HTTPError as e:
             try:
                 error_body = json.loads(e.read().decode())
-                self.display.vvv("Error returned: {0}".format(error_body))
+                self.display.vvv(f"Error returned: {error_body}")
             except Exception:
                 error_body = {"status": None}
             if e.code == 404 and error_body.get('status') == "No objects found.":
                 raise AnsibleParserError("Host filter returned no data. Please confirm your host_filter value is valid")
-            raise AnsibleParserError("Unexpected data returned: {0} -- {1}".format(e, error_body))
+            raise AnsibleParserError(f"Unexpected data returned: {e} -- {error_body}")
 
         response_body = response.read()
         json_data = json.loads(response_body.decode('utf-8'))
-        self.display.vvv("Returned Data: %s" % json.dumps(json_data, indent=4, sort_keys=True))
+        self.display.vvv(f"Returned Data: {json.dumps(json_data, indent=4, sort_keys=True)}")
         if 200 <= response.status <= 299:
             return json_data
         if response.status == 404 and json_data['status'] == "No objects found.":
             raise AnsibleParserError(
-                "API returned no data -- Response: %s - %s"
-                % (response.status, json_data['status']))
+                f"API returned no data -- Response: {response.status} - {json_data['status']}")
         if response.status == 401:
             raise AnsibleParserError(
-                "API was unable to complete query -- Response: %s - %s"
-                % (response.status, json_data['status']))
+                f"API was unable to complete query -- Response: {response.status} - {json_data['status']}")
         if response.status == 500:
             raise AnsibleParserError(
-                "API Response - %s - %s"
-                % (json_data['status'], json_data['errors']))
+                f"API Response - {json_data['status']} - {json_data['errors']}")
         raise AnsibleParserError(
-            "Unexpected data returned - %s - %s"
-            % (json_data['status'], json_data['errors']))
+            f"Unexpected data returned - {json_data['status']} - {json_data['errors']}")
 
     def _query_hosts(self, hosts=None, attrs=None, joins=None, host_filter=None):
-        query_hosts_url = "{0}/objects/hosts".format(self.icinga2_url)
+        query_hosts_url = f"{self.icinga2_url}/objects/hosts"
         self.headers['X-HTTP-Method-Override'] = 'GET'
         data_dict = dict()
         if hosts:
@@ -233,31 +236,32 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         """Convert Icinga2 API data to JSON format for Ansible"""
         groups_dict = {"_meta": {"hostvars": {}}}
         for entry in json_data:
-            host_attrs = entry['attrs']
+            host_attrs = make_unsafe(entry['attrs'])
             if self.inventory_attr == "name":
-                host_name = entry.get('name')
+                host_name = make_unsafe(entry.get('name'))
             if self.inventory_attr == "address":
                 # When looking for address for inventory, if missing fallback to object name
                 if host_attrs.get('address', '') != '':
-                    host_name = host_attrs.get('address')
+                    host_name = make_unsafe(host_attrs.get('address'))
                 else:
-                    host_name = entry.get('name')
+                    host_name = make_unsafe(entry.get('name'))
             if self.inventory_attr == "display_name":
                 host_name = host_attrs.get('display_name')
             if host_attrs['state'] == 0:
                 host_attrs['state'] = 'on'
             else:
                 host_attrs['state'] = 'off'
-            host_groups = host_attrs.get('groups')
             self.inventory.add_host(host_name)
-            for group in host_groups:
-                if group not in self.inventory.groups.keys():
-                    self.inventory.add_group(group)
-                self.inventory.add_child(group, host_name)
+            if self.group_by_hostgroups:
+                host_groups = host_attrs.get('groups')
+                for group in host_groups:
+                    if group not in self.inventory.groups.keys():
+                        self.inventory.add_group(group)
+                    self.inventory.add_child(group, host_name)
             # If the address attribute is populated, override ansible_host with the value
             if host_attrs.get('address') != '':
                 self.inventory.set_variable(host_name, 'ansible_host', host_attrs.get('address'))
-            self.inventory.set_variable(host_name, 'hostname', entry.get('name'))
+            self.inventory.set_variable(host_name, 'hostname', make_unsafe(entry.get('name')))
             self.inventory.set_variable(host_name, 'display_name', host_attrs.get('display_name'))
             self.inventory.set_variable(host_name, 'state',
                                         host_attrs['state'])
@@ -277,12 +281,23 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         self._read_config_data(path)
 
         # Store the options from the YAML file
-        self.icinga2_url = self.get_option('url').rstrip('/') + '/v1'
+        self.icinga2_url = self.get_option('url')
         self.icinga2_user = self.get_option('user')
         self.icinga2_password = self.get_option('password')
         self.ssl_verify = self.get_option('validate_certs')
         self.host_filter = self.get_option('host_filter')
         self.inventory_attr = self.get_option('inventory_attr')
+        self.group_by_hostgroups = self.get_option('group_by_hostgroups')
+
+        if self.templar.is_template(self.icinga2_url):
+            self.icinga2_url = self.templar.template(variable=self.icinga2_url)
+        if self.templar.is_template(self.icinga2_user):
+            self.icinga2_user = self.templar.template(variable=self.icinga2_user)
+        if self.templar.is_template(self.icinga2_password):
+            self.icinga2_password = self.templar.template(variable=self.icinga2_password)
+
+        self.icinga2_url = f"{self.icinga2_url.rstrip('/')}/v1"
+
         # Not currently enabled
         # self.cache_key = self.get_cache_key(path)
         # self.use_cache = cache and self.get_option('cache')

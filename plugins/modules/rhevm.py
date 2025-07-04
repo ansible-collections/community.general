@@ -8,217 +8,217 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: rhevm
 short_description: RHEV/oVirt automation
 description:
-    - This module only supports oVirt/RHEV version 3.
-    - A newer module M(ovirt.ovirt.ovirt_vm) supports oVirt/RHV version 4.
-    - Allows you to create/remove/update or powermanage virtual machines on a RHEV/oVirt platform.
+  - This module only supports oVirt/RHEV version 3.
+  - A newer module M(ovirt.ovirt.ovirt_vm) supports oVirt/RHV version 4.
+  - Allows you to create/remove/update or powermanage virtual machines on a RHEV/oVirt platform.
 requirements:
-    - ovirtsdk
+  - ovirtsdk
 author:
-    - Timothy Vandenbrande (@TimothyVandenbrande)
+  - Timothy Vandenbrande (@TimothyVandenbrande)
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    user:
-        description:
-            - The user to authenticate with.
-        type: str
-        default: admin@internal
-    password:
-        description:
-            - The password for user authentication.
-        type: str
-        required: true
-    server:
-        description:
-            - The name/IP of your RHEV-m/oVirt instance.
-        type: str
-        default: 127.0.0.1
-    port:
-        description:
-            - The port on which the API is reachable.
-        type: int
-        default: 443
-    insecure_api:
-        description:
-            - A boolean switch to make a secure or insecure connection to the server.
-        type: bool
-        default: false
-    name:
-        description:
-            - The name of the VM.
-        type: str
-    cluster:
-        description:
-            - The RHEV/oVirt cluster in which you want you VM to start.
-        type: str
-        default: ''
-    datacenter:
-        description:
-            - The RHEV/oVirt datacenter in which you want you VM to start.
-        type: str
-        default: Default
-    state:
-        description:
-            - This serves to create/remove/update or powermanage your VM.
-        type: str
-        choices: [ absent, cd, down, info, ping, present, restarted, up ]
-        default: present
-    image:
-        description:
-            - The template to use for the VM.
-        type: str
-    type:
-        description:
-            - To define if the VM is a server or desktop.
-        type: str
-        choices: [ desktop, host, server ]
-        default: server
-    vmhost:
-        description:
-            - The host you wish your VM to run on.
-        type: str
-    vmcpu:
-        description:
-            - The number of CPUs you want in your VM.
-        type: int
-        default: 2
-    cpu_share:
-        description:
-            - This parameter is used to configure the CPU share.
-        type: int
-        default: 0
-    vmmem:
-        description:
-            - The amount of memory you want your VM to use (in GB).
-        type: int
-        default: 1
-    osver:
-        description:
-            - The operating system option in RHEV/oVirt.
-        type: str
-        default: rhel_6x64
-    mempol:
-        description:
-            - The minimum amount of memory you wish to reserve for this system.
-        type: int
-        default: 1
-    vm_ha:
-        description:
-            - To make your VM High Available.
-        type: bool
-        default: true
-    disks:
-        description:
-            - This option uses complex arguments and is a list of disks with the options name, size and domain.
-        type: list
-        elements: str
-    ifaces:
-        description:
-            - This option uses complex arguments and is a list of interfaces with the options name and vlan.
-        type: list
-        elements: str
-        aliases: [ interfaces, nics ]
-    boot_order:
-        description:
-            - This option uses complex arguments and is a list of items that specify the bootorder.
-        type: list
-        elements: str
-        default: [ hd, network ]
-    del_prot:
-        description:
-            - This option sets the delete protection checkbox.
-        type: bool
-        default: true
-    cd_drive:
-        description:
-            - The CD you wish to have mounted on the VM when O(state=cd).
-        type: str
-    timeout:
-        description:
-            - The timeout you wish to define for power actions.
-            - When O(state=up).
-            - When O(state=down).
-            - When O(state=restarted).
-        type: int
-'''
+  user:
+    description:
+      - The user to authenticate with.
+    type: str
+    default: admin@internal
+  password:
+    description:
+      - The password for user authentication.
+    type: str
+    required: true
+  server:
+    description:
+      - The name/IP of your RHEV-m/oVirt instance.
+    type: str
+    default: 127.0.0.1
+  port:
+    description:
+      - The port on which the API is reachable.
+    type: int
+    default: 443
+  insecure_api:
+    description:
+      - A boolean switch to make a secure or insecure connection to the server.
+    type: bool
+    default: false
+  name:
+    description:
+      - The name of the VM.
+    type: str
+  cluster:
+    description:
+      - The RHEV/oVirt cluster in which you want you VM to start.
+    type: str
+    default: ''
+  datacenter:
+    description:
+      - The RHEV/oVirt datacenter in which you want you VM to start.
+    type: str
+    default: Default
+  state:
+    description:
+      - This serves to create/remove/update or powermanage your VM.
+    type: str
+    choices: [absent, cd, down, info, ping, present, restarted, up]
+    default: present
+  image:
+    description:
+      - The template to use for the VM.
+    type: str
+  type:
+    description:
+      - To define if the VM is a server or desktop.
+    type: str
+    choices: [desktop, host, server]
+    default: server
+  vmhost:
+    description:
+      - The host you wish your VM to run on.
+    type: str
+  vmcpu:
+    description:
+      - The number of CPUs you want in your VM.
+    type: int
+    default: 2
+  cpu_share:
+    description:
+      - This parameter is used to configure the CPU share.
+    type: int
+    default: 0
+  vmmem:
+    description:
+      - The amount of memory you want your VM to use (in GB).
+    type: int
+    default: 1
+  osver:
+    description:
+      - The operating system option in RHEV/oVirt.
+    type: str
+    default: rhel_6x64
+  mempol:
+    description:
+      - The minimum amount of memory you wish to reserve for this system.
+    type: int
+    default: 1
+  vm_ha:
+    description:
+      - To make your VM High Available.
+    type: bool
+    default: true
+  disks:
+    description:
+      - This option uses complex arguments and is a list of disks with the options V(name), V(size), and V(domain).
+    type: list
+    elements: str
+  ifaces:
+    description:
+      - This option uses complex arguments and is a list of interfaces with the options V(name) and V(vlan).
+    type: list
+    elements: str
+    aliases: [interfaces, nics]
+  boot_order:
+    description:
+      - This option uses complex arguments and is a list of items that specify the bootorder.
+    type: list
+    elements: str
+    default: [hd, network]
+  del_prot:
+    description:
+      - This option sets the delete protection checkbox.
+    type: bool
+    default: true
+  cd_drive:
+    description:
+      - The CD you wish to have mounted on the VM when O(state=cd).
+    type: str
+  timeout:
+    description:
+      - The timeout you wish to define for power actions.
+      - When O(state=up).
+      - When O(state=down).
+      - When O(state=restarted).
+    type: int
+"""
 
-RETURN = r'''
+RETURN = r"""
 vm:
-    description: Returns all of the VMs variables and execution.
-    returned: always
-    type: dict
-    sample: {
-        "boot_order": [
-            "hd",
-            "network"
-        ],
-        "changed": true,
-        "changes": [
-            "Delete Protection"
-        ],
-        "cluster": "C1",
-        "cpu_share": "0",
-        "created": false,
-        "datacenter": "Default",
-        "del_prot": true,
-        "disks": [
-            {
-                "domain": "ssd-san",
-                "name": "OS",
-                "size": 40
-            }
-        ],
-        "eth0": "00:00:5E:00:53:00",
-        "eth1": "00:00:5E:00:53:01",
-        "eth2": "00:00:5E:00:53:02",
-        "exists": true,
-        "failed": false,
-        "ifaces": [
-            {
-                "name": "eth0",
-                "vlan": "Management"
-            },
-            {
-                "name": "eth1",
-                "vlan": "Internal"
-            },
-            {
-                "name": "eth2",
-                "vlan": "External"
-            }
-        ],
-        "image": false,
-        "mempol": "0",
-        "msg": [
-            "VM exists",
-            "cpu_share was already set to 0",
-            "VM high availability was already set to True",
-            "The boot order has already been set",
-            "VM delete protection has been set to True",
-            "Disk web2_Disk0_OS already exists",
-            "The VM starting host was already set to host416"
-        ],
-        "name": "web2",
-        "type": "server",
-        "uuid": "4ba5a1be-e60b-4368-9533-920f156c817b",
-        "vm_ha": true,
-        "vmcpu": "4",
-        "vmhost": "host416",
-        "vmmem": "16"
+  description: Returns all of the VMs variables and execution.
+  returned: always
+  type: dict
+  sample:
+    {
+      "boot_order": [
+        "hd",
+        "network"
+      ],
+      "changed": true,
+      "changes": [
+        "Delete Protection"
+      ],
+      "cluster": "C1",
+      "cpu_share": "0",
+      "created": false,
+      "datacenter": "Default",
+      "del_prot": true,
+      "disks": [
+        {
+          "domain": "ssd-san",
+          "name": "OS",
+          "size": 40
+        }
+      ],
+      "eth0": "00:00:5E:00:53:00",
+      "eth1": "00:00:5E:00:53:01",
+      "eth2": "00:00:5E:00:53:02",
+      "exists": true,
+      "failed": false,
+      "ifaces": [
+        {
+          "name": "eth0",
+          "vlan": "Management"
+        },
+        {
+          "name": "eth1",
+          "vlan": "Internal"
+        },
+        {
+          "name": "eth2",
+          "vlan": "External"
+        }
+      ],
+      "image": false,
+      "mempol": "0",
+      "msg": [
+        "VM exists",
+        "cpu_share was already set to 0",
+        "VM high availability was already set to True",
+        "The boot order has already been set",
+        "VM delete protection has been set to True",
+        "Disk web2_Disk0_OS already exists",
+        "The VM starting host was already set to host416"
+      ],
+      "name": "web2",
+      "type": "server",
+      "uuid": "4ba5a1be-e60b-4368-9533-920f156c817b",
+      "vm_ha": true,
+      "vmcpu": "4",
+      "vmhost": "host416",
+      "vmmem": "16"
     }
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Basic get info from VM
   community.general.rhevm:
     server: rhevm01
@@ -258,33 +258,33 @@ EXAMPLES = r'''
     vmcpu: 4
     vmmem: 2
     ifaces:
-    - name: eth0
-      vlan: vlan2202
-    - name: eth1
-      vlan: vlan36
-    - name: eth2
-      vlan: vlan38
-    - name: eth3
-      vlan: vlan2202
+      - name: eth0
+        vlan: vlan2202
+      - name: eth1
+        vlan: vlan36
+      - name: eth2
+        vlan: vlan38
+      - name: eth3
+        vlan: vlan2202
     disks:
-    - name: root
-      size: 10
-      domain: ssd-san
-    - name: swap
-      size: 10
-      domain: 15kiscsi-san
-    - name: opt
-      size: 10
-      domain: 15kiscsi-san
-    - name: var
-      size: 10
-      domain: 10kiscsi-san
-    - name: home
-      size: 10
-      domain: sata-san
+      - name: root
+        size: 10
+        domain: ssd-san
+      - name: swap
+        size: 10
+        domain: 15kiscsi-san
+      - name: opt
+        size: 10
+        domain: 15kiscsi-san
+      - name: var
+        size: 10
+        domain: 10kiscsi-san
+      - name: home
+        size: 10
+        domain: sata-san
     boot_order:
-    - network
-    - hd
+      - network
+      - hd
     state: present
 
 - name: Add a CD to the disk cd_drive
@@ -302,33 +302,33 @@ EXAMPLES = r'''
     type: host
     cluster: rhevm01
     ifaces:
-    - name: em1
-    - name: em2
-    - name: p3p1
-      ip: 172.31.224.200
-      netmask: 255.255.254.0
-    - name: p3p2
-      ip: 172.31.225.200
-      netmask: 255.255.254.0
-    - name: bond0
-      bond:
-      - em1
-      - em2
-      network: rhevm
-      ip: 172.31.222.200
-      netmask: 255.255.255.0
-      management: true
-    - name: bond0.36
-      network: vlan36
-      ip: 10.2.36.200
-      netmask: 255.255.254.0
-      gateway: 10.2.36.254
-    - name: bond0.2202
-      network: vlan2202
-    - name: bond0.38
-      network: vlan38
+      - name: em1
+      - name: em2
+      - name: p3p1
+        ip: 172.31.224.200
+        netmask: 255.255.254.0
+      - name: p3p2
+        ip: 172.31.225.200
+        netmask: 255.255.254.0
+      - name: bond0
+        bond:
+          - em1
+          - em2
+        network: rhevm
+        ip: 172.31.222.200
+        netmask: 255.255.255.0
+        management: true
+      - name: bond0.36
+        network: vlan36
+        ip: 10.2.36.200
+        netmask: 255.255.254.0
+        gateway: 10.2.36.254
+      - name: bond0.2202
+        network: vlan2202
+      - name: bond0.38
+        network: vlan38
     state: present
-'''
+"""
 
 import time
 
@@ -812,7 +812,7 @@ class RHEVConn(object):
                     setChanged()
                     HOST = self.get_Host(host_name)
                     state = HOST.status.state
-                    while (state != 'non_operational' and state != 'up'):
+                    while state != 'non_operational' and state != 'up':
                         HOST = self.get_Host(host_name)
                         state = HOST.status.state
                         time.sleep(1)

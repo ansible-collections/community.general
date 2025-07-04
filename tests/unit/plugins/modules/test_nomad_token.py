@@ -10,10 +10,8 @@ __metaclass__ = type
 
 import nomad
 from ansible_collections.community.general.plugins.modules import nomad_token
-from ansible_collections.community.general.tests.unit.compat.mock import patch
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, \
-    ModuleTestCase, \
-    set_module_args
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
 
 
 def mock_acl_get_tokens(empty_list=False):
@@ -102,8 +100,8 @@ class TestNomadTokenModule(ModuleTestCase):
 
     def test_should_fail_without_parameters(self):
         with self.assertRaises(AnsibleFailJson):
-            set_module_args({})
-            self.module.main()
+            with set_module_args({}):
+                self.module.main()
 
     def test_should_create_token_type_client(self):
         module_args = {
@@ -113,12 +111,12 @@ class TestNomadTokenModule(ModuleTestCase):
             'state': 'present'
         }
 
-        set_module_args(module_args)
-        with patch.object(nomad.api.acl.Acl, 'get_tokens', return_value=mock_acl_get_tokens()) as mock_get_tokens:
-            with patch.object(nomad.api.acl.Acl, 'create_token', return_value=mock_acl_create_update_token()) as \
-                    mock_create_update_token:
-                with self.assertRaises(AnsibleExitJson):
-                    self.module.main()
+        with set_module_args(module_args):
+            with patch.object(nomad.api.acl.Acl, 'get_tokens', return_value=mock_acl_get_tokens()) as mock_get_tokens:
+                with patch.object(nomad.api.acl.Acl, 'create_token', return_value=mock_acl_create_update_token()) as \
+                        mock_create_update_token:
+                    with self.assertRaises(AnsibleExitJson):
+                        self.module.main()
 
                 self.assertIs(mock_get_tokens.call_count, 1)
                 self.assertIs(mock_create_update_token.call_count, 1)
@@ -130,15 +128,15 @@ class TestNomadTokenModule(ModuleTestCase):
             'state': 'present'
         }
 
-        set_module_args(module_args)
+        with set_module_args(module_args):
 
-        with patch.object(nomad.api.acl.Acl, 'get_tokens') as mock_get_tokens:
-            with patch.object(nomad.api.Acl, 'generate_bootstrap') as mock_generate_bootstrap:
-                mock_get_tokens.return_value = mock_acl_get_tokens(empty_list=True)
-                mock_generate_bootstrap.return_value = mock_acl_generate_bootstrap()
+            with patch.object(nomad.api.acl.Acl, 'get_tokens') as mock_get_tokens:
+                with patch.object(nomad.api.Acl, 'generate_bootstrap') as mock_generate_bootstrap:
+                    mock_get_tokens.return_value = mock_acl_get_tokens(empty_list=True)
+                    mock_generate_bootstrap.return_value = mock_acl_generate_bootstrap()
 
-                with self.assertRaises(AnsibleExitJson):
-                    self.module.main()
+                    with self.assertRaises(AnsibleExitJson):
+                        self.module.main()
 
                 self.assertIs(mock_get_tokens.call_count, 1)
                 self.assertIs(mock_generate_bootstrap.call_count, 1)
@@ -149,14 +147,14 @@ class TestNomadTokenModule(ModuleTestCase):
             'state': 'absent'
         }
 
-        set_module_args(module_args)
-        with patch.object(nomad.api.acl.Acl, 'get_tokens') as mock_get_tokens:
-            with patch.object(nomad.api.acl.Acl, 'delete_token') as mock_delete_token:
-                mock_get_tokens.return_value = mock_acl_get_tokens()
-                mock_delete_token.return_value = mock_acl_delete_token()
+        with set_module_args(module_args):
+            with patch.object(nomad.api.acl.Acl, 'get_tokens') as mock_get_tokens:
+                with patch.object(nomad.api.acl.Acl, 'delete_token') as mock_delete_token:
+                    mock_get_tokens.return_value = mock_acl_get_tokens()
+                    mock_delete_token.return_value = mock_acl_delete_token()
 
-                with self.assertRaises(AnsibleFailJson):
-                    self.module.main()
+                    with self.assertRaises(AnsibleFailJson):
+                        self.module.main()
 
     def test_should_fail_delete_bootstrap_token(self):
         module_args = {
@@ -165,10 +163,10 @@ class TestNomadTokenModule(ModuleTestCase):
             'state': 'absent'
         }
 
-        set_module_args(module_args)
+        with set_module_args(module_args):
 
-        with self.assertRaises(AnsibleFailJson):
-            self.module.main()
+            with self.assertRaises(AnsibleFailJson):
+                self.module.main()
 
     def test_should_fail_delete_boostrap_token_by_name(self):
         module_args = {
@@ -177,10 +175,10 @@ class TestNomadTokenModule(ModuleTestCase):
             'state': 'absent'
         }
 
-        set_module_args(module_args)
+        with set_module_args(module_args):
 
-        with self.assertRaises(AnsibleFailJson):
-            self.module.main()
+            with self.assertRaises(AnsibleFailJson):
+                self.module.main()
 
     def test_should_delete_client_token(self):
         module_args = {
@@ -189,15 +187,15 @@ class TestNomadTokenModule(ModuleTestCase):
             'state': 'absent'
         }
 
-        set_module_args(module_args)
+        with set_module_args(module_args):
 
-        with patch.object(nomad.api.acl.Acl, 'get_tokens') as mock_get_tokens:
-            with patch.object(nomad.api.acl.Acl, 'delete_token') as mock_delete_token:
-                mock_get_tokens.return_value = mock_acl_get_tokens()
-                mock_delete_token.return_value = mock_acl_delete_token()
+            with patch.object(nomad.api.acl.Acl, 'get_tokens') as mock_get_tokens:
+                with patch.object(nomad.api.acl.Acl, 'delete_token') as mock_delete_token:
+                    mock_get_tokens.return_value = mock_acl_get_tokens()
+                    mock_delete_token.return_value = mock_acl_delete_token()
 
-                with self.assertRaises(AnsibleExitJson):
-                    self.module.main()
+                    with self.assertRaises(AnsibleExitJson):
+                        self.module.main()
 
                 self.assertIs(mock_delete_token.call_count, 1)
 
@@ -209,14 +207,14 @@ class TestNomadTokenModule(ModuleTestCase):
             'state': 'present'
         }
 
-        set_module_args(module_args)
+        with set_module_args(module_args):
 
-        with patch.object(nomad.api.acl.Acl, 'get_tokens') as mock_get_tokens:
-            with patch.object(nomad.api.acl.Acl, 'update_token') as mock_create_update_token:
-                mock_get_tokens.return_value = mock_acl_get_tokens()
-                mock_create_update_token.return_value = mock_acl_create_update_token()
+            with patch.object(nomad.api.acl.Acl, 'get_tokens') as mock_get_tokens:
+                with patch.object(nomad.api.acl.Acl, 'update_token') as mock_create_update_token:
+                    mock_get_tokens.return_value = mock_acl_get_tokens()
+                    mock_create_update_token.return_value = mock_acl_create_update_token()
 
-                with self.assertRaises(AnsibleExitJson):
-                    self.module.main()
+                    with self.assertRaises(AnsibleExitJson):
+                        self.module.main()
                 self.assertIs(mock_get_tokens.call_count, 1)
                 self.assertIs(mock_create_update_token.call_count, 1)

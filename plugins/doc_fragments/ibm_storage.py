@@ -12,26 +12,25 @@ __metaclass__ = type
 class ModuleDocFragment(object):
 
     # ibm_storage documentation fragment
-    DOCUMENTATION = r'''
+    DOCUMENTATION = r"""
 options:
-    username:
-        description:
-            - Management user on the spectrum accelerate storage system.
-        type: str
-        required: true
-    password:
-        description:
-            - Password for username on the spectrum accelerate storage system.
-        type: str
-        required: true
-    endpoints:
-        description:
-            - The hostname or management IP of Spectrum Accelerate storage system.
-        type: str
-        required: true
+  username:
+    description:
+      - Management user on the Spectrum Accelerate storage system.
+    type: str
+    required: true
+  password:
+    description:
+      - Password for username on the Spectrum Accelerate storage system.
+    type: str
+    required: true
+  endpoints:
+    description:
+      - The hostname or management IP of Spectrum Accelerate storage system.
+    type: str
+    required: true
 notes:
-  - This module requires pyxcli python library.
-    Use C(pip install pyxcli) in order to get pyxcli.
+  - This module requires pyxcli python library. Use C(pip install pyxcli) in order to get pyxcli.
 requirements:
   - pyxcli
-'''
+"""

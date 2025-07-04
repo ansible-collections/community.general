@@ -60,6 +60,14 @@
     state: present
   when: ansible_distribution == 'Alpine'
 
+- name: make sure hwclock is installed in Ubuntu 24.04
+  package:
+    name: util-linux-extra
+    state: present
+  when:
+    - ansible_distribution == 'Ubuntu'
+    - ansible_facts.distribution_major_version is version('24', '>=')
+
 - name: make sure the dbus service is started under systemd
   systemd:
     name: dbus
@@ -77,6 +85,7 @@
   when:
     - ansible_facts.distribution ~ ansible_facts.distribution_major_version not in ['Fedora31', 'Fedora32']
     - not (ansible_os_family == 'Alpine')  # TODO
+    - not (ansible_distribution == 'Archlinux')  # TODO
   block:
     - name: set timezone to Etc/UTC
       timezone:

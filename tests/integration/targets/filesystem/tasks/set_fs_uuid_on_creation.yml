@@ -12,33 +12,33 @@
     - new_uuid | default(False)
     - not (ansible_system == "FreeBSD" and fstype == "xfs")
   block:
-  - name: "Create filesystem ({{ fstype }}) with UUID"
-    community.general.filesystem:
-      dev: '{{ dev }}'
-      fstype: '{{ fstype }}'
-      uuid: '{{ random_uuid }}'
-    register: fs_result
+    - name: "Create filesystem ({{ fstype }}) with UUID"
+      community.general.filesystem:
+        dev: '{{ dev }}'
+        fstype: '{{ fstype }}'
+        uuid: '{{ random_uuid }}'
+      register: fs_result
 
-  - name: "Get UUID of the created filesystem"
-    ansible.builtin.shell:
-      cmd: "{{ get_uuid_cmd }}"
-    changed_when: false
-    register: uuid
+    - name: "Get UUID of the created filesystem"
+      ansible.builtin.shell:
+        cmd: "{{ get_uuid_cmd }}"
+      changed_when: false
+      register: uuid
 
-  - name: "Assert that filesystem UUID is the random UUID set on creation"
-    ansible.builtin.assert:
-      that: (random_uuid | replace('-','')) == ( uuid.stdout | replace('-',''))
+    - name: "Assert that filesystem UUID is the random UUID set on creation"
+      ansible.builtin.assert:
+        that: (random_uuid | replace('-','')) == ( uuid.stdout | replace('-',''))
 
 - when: not (new_uuid | default(False))
   block:
-  - name: "Create filesystem ({{ fstype }}) without UUID support"
-    ignore_errors: true
-    community.general.filesystem:
-      dev: '{{ dev }}'
-      fstype: '{{ fstype }}'
-      uuid: '{{ random_uuid }}'
-    register: fs_result
+    - name: "Create filesystem ({{ fstype }}) without UUID support"
+      ignore_errors: true
+      community.general.filesystem:
+        dev: '{{ dev }}'
+        fstype: '{{ fstype }}'
+        uuid: '{{ random_uuid }}'
+      register: fs_result
 
-  - name: "Assert that filesystem creation failed"
-    ansible.builtin.assert:
-      that: fs_result is failed
+    - name: "Assert that filesystem creation failed"
+      ansible.builtin.assert:
+        that: fs_result is failed

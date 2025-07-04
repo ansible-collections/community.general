@@ -160,6 +160,6 @@ def test_json_without_token_returned(mock_json_without_token_returned):
     with pytest.raises(KeycloakError) as raised_error:
         get_token(module_params_creds)
     assert str(raised_error.value) == (
-        'Could not obtain access token from http://keycloak.url'
-        '/auth/realms/master/protocol/openid-connect/token'
+        'API did not include access_token field in response from '
+        'http://keycloak.url/auth/realms/master/protocol/openid-connect/token'
     )

@@ -12,43 +12,42 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: portinstall
 short_description: Installing packages from FreeBSD's ports system
 description:
-    - Manage packages for FreeBSD using 'portinstall'.
+  - Manage packages for FreeBSD using C(portinstall).
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
-    name:
-        description:
-            - name of package to install/remove
-        aliases: [pkg]
-        required: true
-        type: str
-    state:
-        description:
-            - state of the package
-        choices: [ 'present', 'absent' ]
-        required: false
-        default: present
-        type: str
-    use_packages:
-        description:
-            - use packages instead of ports whenever available
-        type: bool
-        required: false
-        default: true
+  name:
+    description:
+      - Name of package to install/remove.
+    aliases: [pkg]
+    required: true
+    type: str
+  state:
+    description:
+      - State of the package.
+    choices: ['present', 'absent']
+    required: false
+    default: present
+    type: str
+  use_packages:
+    description:
+      - Use packages instead of ports whenever available.
+    type: bool
+    required: false
+    default: true
 author: "berenddeboer (@berenddeboer)"
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Install package foo
   community.general.portinstall:
     name: foo
@@ -63,7 +62,7 @@ EXAMPLES = '''
   community.general.portinstall:
     name: foo,bar
     state: absent
-'''
+"""
 
 import re
 
@@ -79,12 +78,13 @@ def query_package(module, name):
     if pkg_info_path:
         pkgng = False
         pkg_glob_path = module.get_bin_path('pkg_glob', True)
+        # TODO: convert run_comand() argument to list!
         rc, out, err = module.run_command("%s -e `pkg_glob %s`" % (pkg_info_path, shlex_quote(name)), use_unsafe_shell=True)
+        pkg_info_path = [pkg_info_path]
     else:
         pkgng = True
-        pkg_info_path = module.get_bin_path('pkg', True)
-        pkg_info_path = pkg_info_path + " info"
-        rc, out, err = module.run_command("%s %s" % (pkg_info_path, name))
+        pkg_info_path = [module.get_bin_path('pkg', True), "info"]
+        rc, out, err = module.run_command(pkg_info_path + [name])
 
     found = rc == 0
 
@@ -94,10 +94,7 @@ def query_package(module, name):
         # some package is installed
         name_without_digits = re.sub('[0-9]', '', name)
         if name != name_without_digits:
-            if pkgng:
-                rc, out, err = module.run_command("%s %s" % (pkg_info_path, name_without_digits))
-            else:
-                rc, out, err = module.run_command("%s %s" % (pkg_info_path, name_without_digits))
+            rc, out, err = module.run_command(pkg_info_path + [name_without_digits])
 
         found = rc == 0
 
@@ -107,13 +104,13 @@ def query_package(module, name):
 def matching_packages(module, name):
 
     ports_glob_path = module.get_bin_path('ports_glob', True)
-    rc, out, err = module.run_command("%s %s" % (ports_glob_path, name))
+    rc, out, err = module.run_command([ports_glob_path, name])
     # counts the number of packages found
     occurrences = out.count('\n')
     if occurrences == 0:
         name_without_digits = re.sub('[0-9]', '', name)
         if name != name_without_digits:
-            rc, out, err = module.run_command("%s %s" % (ports_glob_path, name_without_digits))
+            rc, out, err = module.run_command([ports_glob_path, name_without_digits])
             occurrences = out.count('\n')
     return occurrences
 
@@ -135,10 +132,12 @@ def remove_packages(module, packages):
         if not query_package(module, package):
             continue
 
+        # TODO: convert run_comand() argument to list!
         rc, out, err = module.run_command("%s `%s %s`" % (pkg_delete_path, pkg_glob_path, shlex_quote(package)), use_unsafe_shell=True)
 
         if query_package(module, package):
             name_without_digits = re.sub('[0-9]', '', package)
+            # TODO: convert run_comand() argument to list!
             rc, out, err = module.run_command("%s `%s %s`" % (pkg_delete_path, pkg_glob_path,
                                                               shlex_quote(name_without_digits)),
                                               use_unsafe_shell=True)
@@ -163,13 +162,13 @@ def install_packages(module, packages, use_packages):
     if not portinstall_path:
         pkg_path = module.get_bin_path('pkg', False)
         if pkg_path:
-            module.run_command("pkg install -y portupgrade")
+            module.run_command([pkg_path, "install", "-y", "portupgrade"])
         portinstall_path = module.get_bin_path('portinstall', True)
 
     if use_packages:
-        portinstall_params = "--use-packages"
+        portinstall_params = ["--use-packages"]
     else:
-        portinstall_params = ""
+        portinstall_params = []
 
     for package in packages:
         if query_package(module, package):
@@ -178,7 +177,7 @@ def install_packages(module, packages, use_packages):
         # TODO: check how many match
         matches = matching_packages(module, package)
         if matches == 1:
-            rc, out, err = module.run_command("%s --batch %s %s" % (portinstall_path, portinstall_params, package))
+            rc, out, err = module.run_command([portinstall_path, "--batch"] + portinstall_params + [package])
             if not query_package(module, package):
                 module.fail_json(msg="failed to install %s: %s" % (package, out))
         elif matches == 0:

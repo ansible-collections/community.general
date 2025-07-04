@@ -16,7 +16,6 @@
 
 - name: include tasks
   block:
-
     - name: include tasks to perform basic tests
       include_tasks: tests/00-basic.yml
 
@@ -47,3 +46,9 @@
 
     - name: include tasks to test modify_inactive_option
       include_tasks: tests/06-modify_inactive_option.yml
+
+    - name: include tasks to test optional spaces in section headings
+      include_tasks: tests/07-section_name_spaces.yml
+
+    - name: include tasks to test section_has_values
+      include_tasks: tests/08-section.yml

@@ -9,11 +9,12 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: github_key
 short_description: Manage GitHub access keys
 description:
   - Creates, removes, or updates GitHub access keys.
+  - Works with both GitHub.com and GitHub Enterprise Server installations.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -29,7 +30,7 @@ options:
     type: str
   name:
     description:
-      - SSH key name
+      - SSH key name.
     required: true
     type: str
   pubkey:
@@ -44,34 +45,64 @@ options:
     type: str
   force:
     description:
-      - The default is V(true), which will replace the existing remote key
-        if it is different than O(pubkey). If V(false), the key will only be
-        set if no key with the given O(name) exists.
+      - The default is V(true), which will replace the existing remote key if it is different than O(pubkey). If V(false),
+        the key will only be set if no key with the given O(name) exists.
     type: bool
     default: true
+  api_url:
+    description:
+      - URL to the GitHub API if not using github.com but your own GitHub Enterprise instance.
+    type: str
+    default: 'https://api.github.com'
+    version_added: "11.0.0"
 
 author: Robert Estelle (@erydo)
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 deleted_keys:
-    description: An array of key objects that were deleted. Only present on state=absent
-    type: list
-    returned: When state=absent
-    sample: [{'id': 0, 'key': 'BASE64 encoded key', 'url': 'http://example.com/github key', 'created_at': 'YYYY-MM-DDTHH:MM:SZ', 'read_only': false}]
+  description: An array of key objects that were deleted. Only present on state=absent.
+  type: list
+  returned: When state=absent
+  sample:
+    [
+      {
+        "id": 0,
+        "key": "BASE64 encoded key",
+        "url": "http://example.com/github key",
+        "created_at": "YYYY-MM-DDTHH:MM:SZ",
+        "read_only": false
+      }
+    ]
 matching_keys:
-    description: An array of keys matching the specified name. Only present on state=present
-    type: list
-    returned: When state=present
-    sample: [{'id': 0, 'key': 'BASE64 encoded key', 'url': 'http://example.com/github key', 'created_at': 'YYYY-MM-DDTHH:MM:SZ', 'read_only': false}]
+  description: An array of keys matching the specified name. Only present on state=present.
+  type: list
+  returned: When state=present
+  sample:
+    [
+      {
+        "id": 0,
+        "key": "BASE64 encoded key",
+        "url": "http://example.com/github key",
+        "created_at": "YYYY-MM-DDTHH:MM:SZ",
+        "read_only": false
+      }
+    ]
 key:
-    description: Metadata about the key just created. Only present on state=present
-    type: dict
-    returned: success
-    sample: {'id': 0, 'key': 'BASE64 encoded key', 'url': 'http://example.com/github key', 'created_at': 'YYYY-MM-DDTHH:MM:SZ', 'read_only': false}
-'''
+  description: Metadata about the key just created. Only present on state=present.
+  type: dict
+  returned: success
+  sample:
+    {
+      "id": 0,
+      "key": "BASE64 encoded key",
+      "url": "http://example.com/github key",
+      "created_at": "YYYY-MM-DDTHH:MM:SZ",
+      "read_only": false
+    }
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Read SSH public key to authorize
   ansible.builtin.shell: cat /home/foo/.ssh/id_rsa.pub
   register: ssh_pub_key
@@ -89,16 +120,26 @@ EXAMPLES = '''
     name: Access Key for Some Machine
     token: '{{ github_access_token }}'
     pubkey: "{{ lookup('ansible.builtin.file', '/home/foo/.ssh/id_rsa.pub') }}"
-'''
 
+# GitHub Enterprise Server usage
+- name: Authorize key with GitHub Enterprise
+  community.general.github_key:
+    name: Access Key for Some Machine
+    token: '{{ github_enterprise_token }}'
+    pubkey: "{{ lookup('ansible.builtin.file', '/home/foo/.ssh/id_rsa.pub') }}"
+    api_url: 'https://github.company.com/api/v3'
+"""
+
+import datetime
 import json
 import re
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 
-
-API_BASE = 'https://api.github.com'
+from ansible_collections.community.general.plugins.module_utils.datetime import (
+    now,
+)
 
 
 class GitHubResponse(object):
@@ -120,9 +161,10 @@ class GitHubResponse(object):
 
 
 class GitHubSession(object):
-    def __init__(self, module, token):
+    def __init__(self, module, token, api_url):
         self.module = module
         self.token = token
+        self.api_url = api_url.rstrip('/')
 
     def request(self, method, url, data=None):
         headers = {
@@ -140,7 +182,7 @@ class GitHubSession(object):
 
 
 def get_all_keys(session):
-    url = API_BASE + '/user/keys'
+    url = session.api_url + '/user/keys'
     result = []
     while url:
         r = session.request('GET', url)
@@ -151,21 +193,20 @@ def get_all_keys(session):
 
 def create_key(session, name, pubkey, check_mode):
     if check_mode:
-        from datetime import datetime
-        now = datetime.utcnow()
+        now_t = now()
         return {
             'id': 0,
             'key': pubkey,
             'title': name,
             'url': 'http://example.com/CHECK_MODE_GITHUB_KEY',
-            'created_at': datetime.strftime(now, '%Y-%m-%dT%H:%M:%SZ'),
+            'created_at': datetime.datetime.strftime(now_t, '%Y-%m-%dT%H:%M:%SZ'),
             'read_only': False,
             'verified': False
         }
     else:
         return session.request(
             'POST',
-            API_BASE + '/user/keys',
+            session.api_url + '/user/keys',
             data=json.dumps({'title': name, 'key': pubkey})).json()
 
 
@@ -174,7 +215,7 @@ def delete_keys(session, to_delete, check_mode):
         return
 
     for key in to_delete:
-        session.request('DELETE', API_BASE + '/user/keys/%s' % key["id"])
+        session.request('DELETE', session.api_url + '/user/keys/%s' % key["id"])
 
 
 def ensure_key_absent(session, name, check_mode):
@@ -222,6 +263,7 @@ def main():
         'pubkey': {},
         'state': {'choices': ['present', 'absent'], 'default': 'present'},
         'force': {'default': True, 'type': 'bool'},
+        'api_url': {'default': 'https://api.github.com', 'type': 'str'},
     }
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -233,6 +275,7 @@ def main():
     state = module.params['state']
     force = module.params['force']
     pubkey = module.params.get('pubkey')
+    api_url = module.params.get('api_url')
 
     if pubkey:
         pubkey_parts = pubkey.split(' ')
@@ -242,7 +285,7 @@ def main():
     elif state == 'present':
         module.fail_json(msg='"pubkey" is required when state=present')
 
-    session = GitHubSession(module, token)
+    session = GitHubSession(module, token, api_url)
     if state == 'present':
         result = ensure_key_present(module, session, name, pubkey, force=force,
                                     check_mode=module.check_mode)

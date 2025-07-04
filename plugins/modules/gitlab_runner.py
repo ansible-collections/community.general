@@ -10,27 +10,31 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: gitlab_runner
 short_description: Create, modify and delete GitLab Runners
 description:
-  - Register, update and delete runners with the GitLab API.
+  - Register, update and delete runners on GitLab Server side with the GitLab API.
   - All operations are performed using the GitLab API v4.
-  - For details, consult the full API documentation at U(https://docs.gitlab.com/ee/api/runners.html).
-  - A valid private API token is required for all operations. You can create as many tokens as you like using the GitLab web interface at
-    U(https://$GITLAB_URL/profile/personal_access_tokens).
-  - A valid registration token is required for registering a new runner.
-    To create shared runners, you need to ask your administrator to give you this token.
-    It can be found at U(https://$GITLAB_URL/admin/runners/).
+  - For details, consult the full API documentation at U(https://docs.gitlab.com/ee/api/runners.html) and
+    U(https://docs.gitlab.com/ee/api/users.html#create-a-runner-linked-to-a-user).
+  - A valid private API token is required for all operations. You can create as many tokens as you like using the GitLab web
+    interface at U(https://$GITLAB_URL/profile/personal_access_tokens).
+  - A valid registration token is required for registering a new runner. To create shared runners, you need to ask your administrator
+    to give you this token. It can be found at U(https://$GITLAB_URL/admin/runners/).
+  - This module does not handle the C(gitlab-runner) process part, but only manages the runner on GitLab Server side through
+    its API. Once the module has created the runner, you may use the generated token to run C(gitlab-runner register) command.
 notes:
   - To create a new runner at least the O(api_token), O(description) and O(api_url) options are required.
-  - Runners need to have unique descriptions.
+  - Runners need to have unique descriptions, since this attribute is used as key for idempotency.
 author:
   - Samy Coenen (@SamyCoenen)
   - Guillaume Martinez (@Lunik)
 requirements:
-  - python-gitlab >= 1.5.0
+  - python-gitlab >= 1.5.0 for legacy runner registration workflow (runner registration token -
+    U(https://docs.gitlab.com/runner/register/#register-with-a-runner-registration-token-deprecated))
+  - python-gitlab >= 4.0.0 for new runner registration workflow (runner authentication token -
+    U(https://docs.gitlab.com/runner/register/#register-with-a-runner-authentication-token))
 extends_documentation_fragment:
   - community.general.auth_basic
   - community.general.gitlab
@@ -67,7 +71,8 @@ options:
       - name
   state:
     description:
-      - Make sure that the runner with the same name exists with the same configuration or delete the runner with the same name.
+      - Make sure that the runner with the same name exists with the same configuration or delete the runner with the same
+        name.
     required: false
     default: present
     choices: ["present", "absent"]
@@ -112,12 +117,12 @@ options:
   access_level:
     description:
       - Determines if a runner can pick up jobs only from protected branches.
-      - If O(access_level_on_creation) is not explicitly set to V(true), this option is ignored on registration and
-        is only applied on updates.
+      - If O(access_level_on_creation) is not explicitly set to V(true), this option is ignored on registration and is only
+        applied on updates.
       - If set to V(not_protected), runner can pick up jobs from both protected and unprotected branches.
       - If set to V(ref_protected), runner can pick up jobs only from protected branches.
-      - Before community.general 8.0.0 the default was V(ref_protected). This was changed to no default in community.general 8.0.0.
-        If this option is not specified explicitly, GitLab will use V(not_protected) on creation, and the value set
+      - Before community.general 8.0.0 the default was V(ref_protected). This was changed to no default in community.general
+        8.0.0. If this option is not specified explicitly, GitLab will use V(not_protected) on creation, and the value set
         will not be changed on any updates.
     required: false
     choices: ["not_protected", "ref_protected"]
@@ -150,10 +155,48 @@ options:
     default: []
     type: list
     elements: str
-'''
+"""
 
-EXAMPLES = '''
-- name: "Register runner"
+EXAMPLES = r"""
+- name: Create an instance-level runner
+  community.general.gitlab_runner:
+    api_url: https://gitlab.example.com/
+    api_token: "{{ access_token }}"
+    description: Docker Machine t1
+    state: present
+    active: true
+    tag_list: ['docker']
+    run_untagged: false
+    locked: false
+  register: runner # Register module output to run C(gitlab-runner register) command in another task
+
+- name: Create a group-level runner
+  community.general.gitlab_runner:
+    api_url: https://gitlab.example.com/
+    api_token: "{{ access_token }}"
+    description: Docker Machine t1
+    state: present
+    active: true
+    tag_list: ['docker']
+    run_untagged: false
+    locked: false
+    group: top-level-group/subgroup
+  register: runner # Register module output to run C(gitlab-runner register) command in another task
+
+- name: Create a project-level runner
+  community.general.gitlab_runner:
+    api_url: https://gitlab.example.com/
+    api_token: "{{ access_token }}"
+    description: Docker Machine t1
+    state: present
+    active: true
+    tag_list: ['docker']
+    run_untagged: false
+    locked: false
+    project: top-level-group/subgroup/project
+  register: runner # Register module output to run C(gitlab-runner register) command in another task
+
+- name: "Register instance-level runner with registration token (deprecated)"
   community.general.gitlab_runner:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
@@ -164,6 +207,7 @@ EXAMPLES = '''
     tag_list: ['docker']
     run_untagged: false
     locked: false
+  register: runner # Register module output to run C(gitlab-runner register) command in another task
 
 - name: "Delete runner"
   community.general.gitlab_runner:
@@ -180,7 +224,7 @@ EXAMPLES = '''
     owned: true
     state: absent
 
-- name: Register runner for a specific project
+- name: "Register a project-level runner with registration token (deprecated)"
   community.general.gitlab_runner:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
@@ -188,38 +232,39 @@ EXAMPLES = '''
     description: MyProject runner
     state: present
     project: mygroup/mysubgroup/myproject
-'''
+  register: runner # Register module output to run C(gitlab-runner register) command in another task
+"""
 
-RETURN = '''
+RETURN = r"""
 msg:
-  description: Success or failure message
+  description: Success or failure message.
   returned: always
   type: str
   sample: "Success"
 
 result:
-  description: json parsed response from the server
+  description: JSON-parsed response from the server.
   returned: always
   type: dict
 
 error:
-  description: the error message returned by the GitLab API
+  description: The error message returned by the GitLab API.
   returned: failed
   type: str
   sample: "400: path is already in use"
 
 runner:
-  description: API object
+  description: API object.
   returned: always
   type: dict
-'''
+"""
 
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, gitlab_authentication, gitlab
+    auth_argument_spec, gitlab_authentication, gitlab, list_all_kwargs
 )
 
 
@@ -322,18 +367,18 @@ class GitLabRunner(object):
         changed = False
 
         for arg_key, arg_value in arguments.items():
-            if arguments[arg_key] is not None:
-                if isinstance(arguments[arg_key], list):
+            if arg_value is not None:
+                if isinstance(arg_value, list):
                     list1 = getattr(runner, arg_key)
                     list1.sort()
-                    list2 = arguments[arg_key]
+                    list2 = arg_value
                     list2.sort()
                     if list1 != list2:
-                        setattr(runner, arg_key, arguments[arg_key])
+                        setattr(runner, arg_key, arg_value)
                         changed = True
                 else:
-                    if getattr(runner, arg_key) != arguments[arg_key]:
-                        setattr(runner, arg_key, arguments[arg_key])
+                    if getattr(runner, arg_key) != arg_value:
+                        setattr(runner, arg_key, arg_value)
                         changed = True
 
         return (changed, runner)
@@ -342,16 +387,16 @@ class GitLabRunner(object):
     @param description Description of the runner
     '''
     def find_runner(self, description):
-        runners = self._runners_endpoint(as_list=False)
+        runners = self._runners_endpoint(**list_all_kwargs)
 
         for runner in runners:
             # python-gitlab 2.2 through at least 2.5 returns a list of dicts for list() instead of a Runner
             # object, so we need to handle both
             if hasattr(runner, "description"):
-                if (runner.description == description):
+                if runner.description == description:
                     return self._gitlab.runners.get(runner.id)
             else:
-                if (runner['description'] == description):
+                if runner['description'] == description:
                     return self._gitlab.runners.get(runner['id'])
 
     '''
@@ -423,6 +468,7 @@ def main():
     state = module.params['state']
     runner_description = module.params['description']
     runner_active = module.params['active']
+    runner_paused = module.params['paused']
     tag_list = module.params['tag_list']
     run_untagged = module.params['run_untagged']
     runner_locked = module.params['locked']
@@ -457,7 +503,7 @@ def main():
             module.exit_json(changed=False, msg="Runner deleted or does not exists")
 
     if state == 'present':
-        if gitlab_runner.create_or_update_runner(runner_description, {
+        runner_values = {
             "active": runner_active,
             "tag_list": tag_list,
             "run_untagged": run_untagged,
@@ -467,7 +513,11 @@ def main():
             "registration_token": registration_token,
             "group": group,
             "project": project,
-        }):
+        }
+        if LooseVersion(gitlab_runner._gitlab.version()[0]) >= LooseVersion("14.8.0"):
+            # the paused attribute for runners is available since 14.8
+            runner_values["paused"] = runner_paused
+        if gitlab_runner.create_or_update_runner(runner_description, runner_values):
             module.exit_json(changed=True, runner=gitlab_runner.runner_object._attrs,
                              msg="Successfully created or updated the runner %s" % runner_description)
         else:

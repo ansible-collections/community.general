@@ -17,6 +17,10 @@ from ansible.module_utils.basic import env_fallback, missing_required_lib
 from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.six.moves.urllib.parse import urlencode
 
+from ansible_collections.community.general.plugins.module_utils.datetime import (
+    now,
+)
+
 SCALEWAY_SECRET_IMP_ERR = None
 try:
     from passlib.hash import argon2
@@ -47,11 +51,11 @@ def scaleway_waitable_resource_argument_spec():
 
 
 def payload_from_object(scw_object):
-    return dict(
-        (k, v)
+    return {
+        k: v
         for k, v in scw_object.items()
         if k != 'id' and v is not None
-    )
+    }
 
 
 class ScalewayException(Exception):
@@ -113,10 +117,7 @@ class SecretVariables(object):
     @staticmethod
     def list_to_dict(source_list, hashed=False):
         key_value = 'hashed_value' if hashed else 'value'
-        return dict(
-            (var['key'], var[key_value])
-            for var in source_list
-        )
+        return {var['key']: var[key_value] for var in source_list}
 
     @classmethod
     def decode(cls, secrets_list, values_list):
@@ -139,7 +140,7 @@ def resource_attributes_should_be_changed(target, wished, verifiable_mutable_att
             diff[attr] = wished[attr]
 
     if diff:
-        return dict((attr, wished[attr]) for attr in mutable_attributes)
+        return {attr: wished[attr] for attr in mutable_attributes}
     else:
         return diff
 
@@ -306,10 +307,10 @@ class Scaleway(object):
         # Prevent requesting the resource status too soon
         time.sleep(wait_sleep_time)
 
-        start = datetime.datetime.utcnow()
+        start = now()
         end = start + datetime.timedelta(seconds=wait_timeout)
 
-        while datetime.datetime.utcnow() < end:
+        while now() < end:
             self.module.debug("We are going to wait for the resource to finish its transition")
 
             state = self.fetch_state(resource)

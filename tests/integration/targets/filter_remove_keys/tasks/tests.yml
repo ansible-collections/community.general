@@ -1,0 +1,31 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Debug ansible_version
+  ansible.builtin.debug:
+    var: ansible_version
+  when: not (quiet_test | default(true) | bool)
+  tags: ansible_version
+
+- name: Tests
+  ansible.builtin.assert:
+    that:
+      - (result | difference(i.0.result) | length) == 0
+    success_msg: |
+      [OK]  result:
+      {{ result | to_yaml }}
+    fail_msg: |
+      [ERR] result:
+      {{ result | to_yaml }}
+    quiet: "{{ quiet_test | default(true) | bool }}"
+  loop: "{{ tests | subelements('group') }}"
+  loop_control:
+    loop_var: i
+    label: "{{ i.1.mp | default('default') }}: {{ i.1.tt }}"
+  vars:
+    input: "{{ i.0.input }}"
+    target: "{{ i.1.tt }}"
+    mp: "{{ i.1.mp | default('default') }}"
+    result: "{{ lookup('template', i.0.template) }}"

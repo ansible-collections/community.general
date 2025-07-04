@@ -6,5 +6,7 @@ azp/posix/3
 destructive
 needs/root
 skip/aix
+skip/fedora
 skip/freebsd
 skip/macos
+skip/rhel

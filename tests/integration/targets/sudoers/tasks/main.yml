@@ -159,6 +159,20 @@
     src: "{{ sudoers_path }}/my-sudo-rule-8"
   register: rule_8_contents
 
+- name: Create rule with noexec parameters
+  community.general.sudoers:
+    name: my-sudo-rule-9
+    state: present
+    user: alice
+    commands: /usr/local/bin/command
+    noexec: true
+  register: rule_9
+
+- name: Grab contents of my-sudo-rule-9
+  ansible.builtin.slurp:
+    src: "{{ sudoers_path }}/my-sudo-rule-9"
+  register: rule_9_contents
+
 - name: Revoke rule 1
   community.general.sudoers:
     name: my-sudo-rule-1
@@ -215,7 +229,7 @@
   ignore_errors: true
   when: ansible_os_family != 'Darwin'
   register: edge_case_3
-  
+
 - name: Revoke non-existing rule
   community.general.sudoers:
     name: non-existing-rule
@@ -257,18 +271,21 @@
       - "rule_6_contents['content'] | b64decode == 'alice ALL=(bob)NOPASSWD: /usr/local/bin/command\n'"
       - "rule_7_contents['content'] | b64decode == 'alice host-1=NOPASSWD: /usr/local/bin/command\n'"
       - "rule_8_contents['content'] | b64decode == 'alice ALL=NOPASSWD:SETENV: /usr/local/bin/command\n'"
+      - "rule_9_contents['content'] | b64decode == 'alice ALL=NOEXEC:NOPASSWD: /usr/local/bin/command\n'"
 
 - name: Check revocation stat
   ansible.builtin.assert:
     that:
       - not revoke_rule_1_stat.stat.exists
       - not revoke_non_existing_rule_stat.stat.exists
-      
+
 - name: Check edge case responses
   ansible.builtin.assert:
     that:
       - edge_case_1 is failed
       - "'Failed to validate sudoers rule' in edge_case_1.msg"
+      - edge_case_1.stdout is defined
+      - edge_case_1.stderr is defined
       - edge_case_2 is not failed
 
 - name: Check missing validation edge case

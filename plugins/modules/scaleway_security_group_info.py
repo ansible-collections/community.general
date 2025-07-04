@@ -8,8 +8,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: scaleway_security_group_info
 short_description: Gather information about the Scaleway security groups available
 description:
@@ -36,10 +35,9 @@ extends_documentation_fragment:
   - community.general.scaleway
   - community.general.attributes
   - community.general.attributes.info_module
+"""
 
-'''
-
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Gather Scaleway security groups information
   community.general.scaleway_security_group_info:
     region: par1
@@ -47,35 +45,34 @@ EXAMPLES = r'''
 
 - ansible.builtin.debug:
     msg: "{{ result.scaleway_security_group_info }}"
-'''
+"""
 
-RETURN = r'''
----
+RETURN = r"""
 scaleway_security_group_info:
   description:
     - Response from Scaleway API.
-    - "For more details please refer to: U(https://developers.scaleway.com/en/products/instance/api/)."
+    - 'For more details please refer to: U(https://developers.scaleway.com/en/products/instance/api/).'
   returned: success
   type: list
   elements: dict
   sample:
     "scaleway_security_group_info": [
-        {
-            "description": "test-ams",
-            "enable_default_security": true,
-            "id": "7fcde327-8bed-43a6-95c4-6dfbc56d8b51",
-            "name": "test-ams",
-            "organization": "3f709602-5e6c-4619-b80c-e841c89734af",
-            "organization_default": false,
-            "servers": [
-                {
-                    "id": "12f19bc7-108c-4517-954c-e6b3d0311363",
-                    "name": "scw-e0d158"
-                }
-            ]
-        }
+      {
+        "description": "test-ams",
+        "enable_default_security": true,
+        "id": "7fcde327-8bed-43a6-95c4-6dfbc56d8b51",
+        "name": "test-ams",
+        "organization": "3f709602-5e6c-4619-b80c-e841c89734af",
+        "organization_default": false,
+        "servers": [
+          {
+            "id": "12f19bc7-108c-4517-954c-e6b3d0311363",
+            "name": "scw-e0d158"
+          }
+        ]
+      }
     ]
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.scaleway import (

@@ -7,13 +7,12 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: ipa_service
 author: Cédric Parent (@cprh)
 short_description: Manage FreeIPA service
 description:
-- Add and delete an IPA service using IPA API.
+  - Add and delete an IPA service using IPA API.
 attributes:
   check_mode:
     support: full
@@ -22,26 +21,26 @@ attributes:
 options:
   krbcanonicalname:
     description:
-    - Principal of the service.
-    - Can not be changed as it is the unique identifier.
+      - Principal of the service.
+      - Can not be changed as it is the unique identifier.
     required: true
     aliases: ["name"]
     type: str
   hosts:
     description:
-    - Defines the list of 'ManagedBy' hosts.
+      - Defines the list of C(ManagedBy) hosts.
     required: false
     type: list
     elements: str
   force:
     description:
-    - Force principal name even if host is not in DNS.
+      - Force principal name even if host is not in DNS.
     required: false
     type: bool
   skip_host_check:
     description:
-    - Force service to be created even when host object does not exist to manage it.
-    - This is only used on creation, not for updating existing services.
+      - Force service to be created even when host object does not exist to manage it.
+      - This is only used on creation, not for updating existing services.
     required: false
     type: bool
     default: false
@@ -55,10 +54,9 @@ options:
 extends_documentation_fragment:
   - community.general.ipa.documentation
   - community.general.attributes
+"""
 
-'''
-
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Ensure service is present
   community.general.ipa_service:
     name: http/host01.example.com
@@ -79,19 +77,19 @@ EXAMPLES = r'''
   community.general.ipa_service:
     name: http/host01.example.com
     hosts:
-       - host01.example.com
-       - host02.example.com
+      - host01.example.com
+      - host02.example.com
     ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 service:
   description: Service as returned by IPA API.
   returned: always
   type: dict
-'''
+"""
 
 import traceback
 

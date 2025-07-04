@@ -4,64 +4,65 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
+from __future__ import annotations
 
-__metaclass__ = type
 
-DOCUMENTATION = '''
-    name: gitlab_runners
-    author:
-      - Stefan Heitmüller (@morph027) <stefan.heitmueller@gmx.com>
-    short_description: Ansible dynamic inventory plugin for GitLab runners.
-    requirements:
-        - python-gitlab > 1.8.0
-    extends_documentation_fragment:
-        - constructed
-    description:
-        - Reads inventories from the GitLab API.
-        - Uses a YAML configuration file gitlab_runners.[yml|yaml].
-    options:
-        plugin:
-            description: The name of this plugin, it should always be set to 'gitlab_runners' for this plugin to recognize it as it's own.
-            type: str
-            required: true
-            choices:
-              - gitlab_runners
-              - community.general.gitlab_runners
-        server_url:
-            description: The URL of the GitLab server, with protocol (i.e. http or https).
-            env:
-              - name: GITLAB_SERVER_URL
-                version_added: 1.0.0
-            type: str
-            required: true
-        api_token:
-            description: GitLab token for logging in.
-            env:
-              - name: GITLAB_API_TOKEN
-                version_added: 1.0.0
-            type: str
-            aliases:
-              - private_token
-              - access_token
-        filter:
-            description: filter runners from GitLab API
-            env:
-              - name: GITLAB_FILTER
-                version_added: 1.0.0
-            type: str
-            choices: ['active', 'paused', 'online', 'specific', 'shared']
-        verbose_output:
-            description: Toggle to (not) include all available nodes metadata
-            type: bool
-            default: true
-'''
+DOCUMENTATION = r"""
+name: gitlab_runners
+author:
+  - Stefan Heitmüller (@morph027) <stefan.heitmueller@gmx.com>
+short_description: Ansible dynamic inventory plugin for GitLab runners
+requirements:
+  - python-gitlab > 1.8.0
+extends_documentation_fragment:
+  - constructed
+description:
+  - Reads inventories from the GitLab API.
+  - Uses a YAML configuration file gitlab_runners.[yml|yaml].
+options:
+  plugin:
+    description: The name of this plugin, it should always be set to V(gitlab_runners) for this plugin to recognize it as its own.
+    type: str
+    required: true
+    choices:
+      - gitlab_runners
+      - community.general.gitlab_runners
+  server_url:
+    description: The URL of the GitLab server, with protocol (i.e. http or https).
+    env:
+      - name: GITLAB_SERVER_URL
+        version_added: 1.0.0
+    type: str
+    required: true
+  api_token:
+    description: GitLab token for logging in.
+    env:
+      - name: GITLAB_API_TOKEN
+        version_added: 1.0.0
+    type: str
+    aliases:
+      - private_token
+      - access_token
+  filter:
+    description: Filter runners from GitLab API.
+    env:
+      - name: GITLAB_FILTER
+        version_added: 1.0.0
+    type: str
+    choices: ['active', 'paused', 'online', 'specific', 'shared']
+  verbose_output:
+    description: Toggle to (not) include all available nodes metadata.
+    type: bool
+    default: true
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
+---
 # gitlab_runners.yml
 plugin: community.general.gitlab_runners
 host: https://gitlab.com
 
+---
 # Example using constructed features to create groups and set ansible_host
 plugin: community.general.gitlab_runners
 host: https://gitlab.com
@@ -78,11 +79,12 @@ keyed_groups:
   # hint: labels containing special characters will be converted to safe names
   - key: 'tag_list'
     prefix: tag
-'''
+"""
 
 from ansible.errors import AnsibleError, AnsibleParserError
-from ansible.module_utils.common.text.converters import to_native
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable
+
+from ansible_collections.community.general.plugins.plugin_utils.unsafe import make_unsafe
 
 try:
     import gitlab
@@ -105,11 +107,11 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
             else:
                 runners = gl.runners.all()
             for runner in runners:
-                host = str(runner['id'])
+                host = make_unsafe(str(runner['id']))
                 ip_address = runner['ip_address']
-                host_attrs = vars(gl.runners.get(runner['id']))['_attrs']
+                host_attrs = make_unsafe(vars(gl.runners.get(runner['id']))['_attrs'])
                 self.inventory.add_host(host, group='gitlab_runners')
-                self.inventory.set_variable(host, 'ansible_host', ip_address)
+                self.inventory.set_variable(host, 'ansible_host', make_unsafe(ip_address))
                 if self.get_option('verbose_output', True):
                     self.inventory.set_variable(host, 'gitlab_runner_attributes', host_attrs)
 
@@ -122,7 +124,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
                 # Create groups based on variable values and add the corresponding hosts to it
                 self._add_host_to_keyed_groups(self.get_option('keyed_groups'), host_attrs, host, strict=strict)
         except Exception as e:
-            raise AnsibleParserError('Unable to fetch hosts from GitLab API, this was the original exception: %s' % to_native(e))
+            raise AnsibleParserError(f'Unable to fetch hosts from GitLab API, this was the original exception: {e}')
 
     def verify_file(self, path):
         """Return the possibly of a file being consumable by this plugin."""

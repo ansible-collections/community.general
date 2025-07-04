@@ -1,0 +1,326 @@
+# -*- coding: utf-8 -*-
+# Copyright (c) Dexter Le (dextersydney2001@gmail.com)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+anchors:
+  environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+test_cases:
+  - id: test_missing_input
+    input: {}
+    output:
+      failed: true
+      msg: "missing required arguments: name"
+  - id: test_present_minimal_input_resource_not_exist
+    input:
+      state: present
+      name: virtual-ip
+      resource_type:
+        resource_name: IPaddr2
+      resource_option:
+        - "ip=[192.168.2.1]"
+    output:
+      changed: true
+      previous_value: null
+      value: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: "Error: resource or tag id 'virtual-ip' not found"
+        - command: [/testbin/pcs, property, config]
+          environ: *env-def
+          rc: 1
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure=corosync
+            cluster-name=hacluster
+            dc-version=2.1.9-1.fc41-7188dbf
+            have-watchdog=false
+          err: ""
+        - command: [/testbin/pcs, resource, create, virtual-ip, IPaddr2, "ip=[192.168.2.1]", --wait=300]
+          environ: *env-def
+          rc: 0
+          out: "Assumed agent name 'ocf:heartbeat:IPaddr2' (deduced from 'IPAddr2')"
+          err: ""
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+          err: ""
+  - id: test_present_minimal_input_resource_exists
+    input:
+      state: present
+      name: virtual-ip
+      resource_type:
+        resource_name: IPaddr2
+      resource_option:
+        - "ip=[192.168.2.1]"
+    output:
+      changed: false
+      previous_value: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+      value: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+          err: ""
+        - command: [/testbin/pcs, property, config]
+          environ: *env-def
+          rc: 1
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure=corosync
+            cluster-name=hacluster
+            dc-version=2.1.9-1.fc41-7188dbf
+            have-watchdog=false
+          err: ""
+        - command: [/testbin/pcs, resource, create, virtual-ip, IPaddr2, "ip=[192.168.2.1]", --wait=300]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: "Error: 'virtual-ip' already exists\n"
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+          err: ""
+  - id: test_present_minimal_input_resource_maintenance_mode
+    input:
+      state: present
+      name: virtual-ip
+      resource_type:
+        resource_name: IPaddr2
+      resource_option:
+        - "ip=[192.168.2.1]"
+    output:
+      changed: true
+      previous_value: null
+      value: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Stopped"
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: ""
+        - command: [/testbin/pcs, property, config]
+          environ: *env-def
+          rc: 0
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure=corosync
+            cluster-name=hacluster
+            dc-version=2.1.9-1.fc41-7188dbf
+            have-watchdog=false
+            maintenance-mode=true
+          err: ""
+        - command: [/testbin/pcs, resource, create, virtual-ip, IPaddr2, "ip=[192.168.2.1]", --wait=300]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: "Error: resource 'virtual-ip' is not running on any node"
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Stopped"
+          err: ""
+  - id: test_absent_minimal_input_resource_not_exist
+    input:
+      state: absent
+      name: virtual-ip
+    output:
+      changed: false
+      previous_value: null
+      value: null
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: "Error: resource or tag id 'virtual-ip' not found"
+        - command: [/testbin/pcs, property, config]
+          environ: *env-def
+          rc: 1
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure=corosync
+            cluster-name=hacluster
+            dc-version=2.1.9-1.fc41-7188dbf
+            have-watchdog=false
+          err: ""
+        - command: [/testbin/pcs, resource, remove, virtual-ip]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: "Error: Resource 'virtual-ip' does not exist.\n"
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: "Error: resource or tag id 'virtual-ip' not found"
+  - id: test_absent_minimal_input_resource_exists
+    input:
+      state: absent
+      name: virtual-ip
+    output:
+      changed: true
+      previous_value: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+      value: null
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+          err: ""
+        - command: [/testbin/pcs, property, config]
+          environ: *env-def
+          rc: 1
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure=corosync
+            cluster-name=hacluster
+            dc-version=2.1.9-1.fc41-7188dbf
+            have-watchdog=false
+          err: ""
+        - command: [/testbin/pcs, resource, remove, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: ""
+          err: "Attempting to stop: virtual-ip... Stopped\n"
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: "Error: resource or tag id 'virtual-ip' not found"
+  - id: test_absent_minimal_input_maintenance_mode
+    input:
+      state: absent
+      name: virtual-ip
+    output:
+      changed: true
+      previous_value: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+      value: null
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+          err: ""
+        - command: [/testbin/pcs, property, config]
+          environ: *env-def
+          rc: 0
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure=corosync
+            cluster-name=hacluster
+            dc-version=2.1.9-1.fc41-7188dbf
+            have-watchdog=false
+            maintenance-mode=true
+          err: ""
+        - command: [/testbin/pcs, resource, remove, virtual-ip, --force]
+          environ: *env-def
+          rc: 0
+          out: ""
+          err: "Deleting Resource (and group) - virtual-ip"
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: "Error: resource or tag id 'virtual-ip' not found"
+  - id: test_enabled_minimal_input_resource_not_exists
+    input:
+      state: enabled
+      name: virtual-ip
+    output:
+      failed: true
+      msg: "pcs failed with error (rc=1): bundle/clone/group/resource/tag 'virtual-ip' does not exist"
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: "Error: resource or tag id 'virtual-ip' not found"
+        - command: [/testbin/pcs, resource, enable, virtual-ip]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: "bundle/clone/group/resource/tag 'virtual-ip' does not exist"
+  - id: test_enabled_minimal_input_resource_exists
+    input:
+      state: enabled
+      name: virtual-ip
+    output:
+      changed: true
+      previous_value: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Stopped (disabled)"
+      value: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Starting"
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Stopped (disabled)"
+          err: ""
+        - command: [/testbin/pcs, resource, enable, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: ""
+          err: ""
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Starting"
+          err: ""
+  - id: test_disable_minimal_input_resource_not_exists
+    input:
+      state: disabled
+      name: virtual-ip
+    output:
+      failed: true
+      msg: "pcs failed with error (rc=1): bundle/clone/group/resource/tag 'virtual-ip' does not exist"
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: "Error: resource or tag id 'virtual-ip' not found"
+        - command: [/testbin/pcs, resource, disable, virtual-ip]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: "bundle/clone/group/resource/tag 'virtual-ip' does not exist"
+  - id: test_disable_minimal_input_resource_exists
+    input:
+      state: disabled
+      name: virtual-ip
+    output:
+      changed: true
+      previous_value: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+      value: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Stopped (disabled)"
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+          err: ""
+        - command: [/testbin/pcs, resource, disable, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: ""
+          err: ""
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Stopped (disabled)"
+          err: ""

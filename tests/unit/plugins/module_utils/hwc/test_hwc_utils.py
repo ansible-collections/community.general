@@ -8,7 +8,7 @@ __metaclass__ = type
 
 import sys
 
-from ansible_collections.community.general.tests.unit.compat import unittest
+from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
 from ansible_collections.community.general.plugins.module_utils.hwc_utils import (HwcModuleException, navigate_value)
 
 

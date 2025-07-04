@@ -13,16 +13,15 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: scaleway_sshkey
 short_description: Scaleway SSH keys management module
 author: Remy Leone (@remyleone)
 description:
-    - "This module manages SSH keys on Scaleway account U(https://developer.scaleway.com)."
+  - This module manages SSH keys on Scaleway account (U(https://developer.scaleway.com)).
 extends_documentation_fragment:
-- community.general.scaleway
-- community.general.attributes
+  - community.general.scaleway
+  - community.general.attributes
 
 attributes:
   check_mode:
@@ -34,7 +33,7 @@ options:
   state:
     type: str
     description:
-     - Indicate desired state of the SSH key.
+      - Indicate desired state of the SSH key.
     default: present
     choices:
       - present
@@ -42,7 +41,7 @@ options:
   ssh_pub_key:
     type: str
     description:
-     - The public SSH key as a string to add.
+      - The public SSH key as a string to add.
     required: true
   api_url:
     type: str
@@ -50,9 +49,9 @@ options:
       - Scaleway API URL.
     default: 'https://account.scaleway.com'
     aliases: ['base_url']
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: "Add SSH key"
   community.general.scaleway_sshkey:
     ssh_pub_key: "ssh-rsa AAAA..."
@@ -68,19 +67,22 @@ EXAMPLES = '''
     ssh_pub_key: "ssh-rsa AAAA..."
     state: "present"
     oauth_token: "6ecd2c9b-6f4f-44d4-a187-61a92078d08c"
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 data:
-    description: This is only present when O(state=present).
-    returned: when O(state=present)
-    type: dict
-    sample: {
-        "ssh_public_keys": [
-            {"key": "ssh-rsa AAAA...."}
-        ]
+  description: This is only present when O(state=present).
+  returned: when O(state=present)
+  type: dict
+  sample:
+    {
+      "ssh_public_keys": [
+        {
+          "key": "ssh-rsa AAAA...."
+        }
+      ]
     }
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible_collections.community.general.plugins.module_utils.scaleway import scaleway_argument_spec, Scaleway

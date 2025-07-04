@@ -8,8 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: npm
 short_description: Manage node.js packages with npm
 description:
@@ -83,7 +82,7 @@ options:
     required: false
     type: str
     default: present
-    choices: [ "present", "absent", "latest" ]
+    choices: ["present", "absent", "latest"]
   no_optional:
     description:
       - Use the C(--no-optional) flag when installing.
@@ -96,11 +95,17 @@ options:
     type: bool
     default: false
     version_added: 2.5.0
+  force:
+    description:
+      - Use the C(--force) flag when installing.
+    type: bool
+    default: false
+    version_added: 9.5.0
 requirements:
-    - npm installed in bin path (recommended /usr/local/bin)
-'''
+  - npm installed in bin path (recommended /usr/local/bin)
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Install "coffee-script" node.js package.
   community.general.npm:
     name: coffee-script
@@ -116,6 +121,11 @@ EXAMPLES = r'''
   community.general.npm:
     name: coffee-script
     global: true
+
+- name: Force Install "coffee-script" node.js package.
+  community.general.npm:
+    name: coffee-script
+    force: true
 
 - name: Remove the globally package "coffee-script".
   community.general.npm:
@@ -142,7 +152,7 @@ EXAMPLES = r'''
     path: /app/location
     executable: /opt/nvm/v0.10.1/bin/npm
     state: present
-'''
+"""
 
 import json
 import os
@@ -167,6 +177,7 @@ class Npm(object):
         self.state = kwargs['state']
         self.no_optional = kwargs['no_optional']
         self.no_bin_links = kwargs['no_bin_links']
+        self.force = kwargs['force']
 
         if kwargs['executable']:
             self.executable = kwargs['executable'].split(' ')
@@ -191,6 +202,7 @@ class Npm(object):
                 registry=cmd_runner_fmt.as_opt_val('--registry'),
                 no_optional=cmd_runner_fmt.as_bool('--no-optional'),
                 no_bin_links=cmd_runner_fmt.as_bool('--no-bin-links'),
+                force=cmd_runner_fmt.as_bool('--force'),
             )
         )
 
@@ -212,7 +224,7 @@ class Npm(object):
             params['name_version'] = self.name_version if add_package_name else None
 
             with self.runner(
-                "exec_args global_ production ignore_scripts unsafe_perm name_version registry no_optional no_bin_links",
+                "exec_args global_ production ignore_scripts unsafe_perm name_version registry no_optional no_bin_links force",
                 check_rc=check_rc, cwd=cwd
             ) as ctx:
                 rc, out, err = ctx.run(**params)
@@ -289,6 +301,7 @@ def main():
         ci=dict(default=False, type='bool'),
         no_optional=dict(default=False, type='bool'),
         no_bin_links=dict(default=False, type='bool'),
+        force=dict(default=False, type='bool'),
     )
     arg_spec['global'] = dict(default=False, type='bool')
     module = AnsibleModule(
@@ -318,7 +331,8 @@ def main():
               unsafe_perm=module.params['unsafe_perm'],
               state=state,
               no_optional=module.params['no_optional'],
-              no_bin_links=module.params['no_bin_links'])
+              no_bin_links=module.params['no_bin_links'],
+              force=module.params['force'])
 
     changed = False
     if module.params['ci']:

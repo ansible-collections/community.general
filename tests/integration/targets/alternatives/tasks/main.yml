@@ -9,54 +9,60 @@
 
 - name: 'setup: create a dummy alternative'
   block:
-  - import_tasks: setup.yml
+    - import_tasks: setup.yml
 
-  ##############
-  # Test parameters:
-  # link parameter present / absent ('with_link' variable)
-  # with / without alternatives defined in alternatives file ('with_alternatives' variable)
-  # auto / manual ('mode' variable)
+    ##############
+    # Test parameters:
+    # link parameter present / absent ('with_link' variable)
+    # with / without alternatives defined in alternatives file ('with_alternatives' variable)
+    # auto / manual ('mode' variable)
 
-  - include_tasks: tests.yml
-    with_nested:
-        - [ true, false ] # with_link
-        - [ true, false ] # with_alternatives
-        - [ 'auto', 'manual' ] # mode
-    loop_control:
-      loop_var: test_conf
+    - include_tasks: tests.yml
+      with_nested:
+        - [true, false] # with_link
+        - [true, false] # with_alternatives
+        - ['auto', 'manual'] # mode
+      loop_control:
+        loop_var: test_conf
 
-  ##########
-  # Priority
-  - block:
-    - include_tasks: remove_links.yml
-    - include_tasks: setup_test.yml
-    # at least two iterations again
-    - include_tasks: tests_set_priority.yml
-      with_sequence: start=3 end=4
-    vars:
-      with_alternatives: true
-      mode: auto
+    ##########
+    # Priority
+    - block:
+        - include_tasks: remove_links.yml
+        - include_tasks: setup_test.yml
+        # at least two iterations again
+        - include_tasks: tests_set_priority.yml
+          with_sequence: start=3 end=4
+      vars:
+        with_alternatives: true
+        mode: auto
 
-  - block:
-    - include_tasks: remove_links.yml
-    - include_tasks: setup_test.yml
-    # at least two iterations again
-    - include_tasks: tests_set_priority.yml
-      with_sequence: start=3 end=4
-    vars:
-      with_alternatives: false
-      mode: auto
+    - block:
+        - include_tasks: remove_links.yml
+        - include_tasks: setup_test.yml
+        # at least two iterations again
+        - include_tasks: tests_set_priority.yml
+          with_sequence: start=3 end=4
+      vars:
+        with_alternatives: false
+        mode: auto
 
-  # Test that path is checked: alternatives must fail when path is nonexistent
-  - import_tasks: path_is_checked.yml
+    # Test that path is checked: alternatives must fail when path is nonexistent
+    - import_tasks: path_is_checked.yml
 
-  # Test that subcommands commands work
-  - import_tasks: subcommands.yml
+    # Test that subcommands commands work
+    - import_tasks: subcommands.yml
 
-  # Test operation of the 'state' parameter
-  - block:
-    - include_tasks: remove_links.yml
-    - include_tasks: tests_state.yml
+    # Test operation of the 'state' parameter
+    - block:
+        - include_tasks: remove_links.yml
+        - include_tasks: tests_state.yml
+
+    # Test for the family parameter
+    - block:
+        - include_tasks: remove_links.yml
+        - include_tasks: tests_family.yml
+      when: ansible_os_family == 'RedHat'
 
   # Cleanup
   always:

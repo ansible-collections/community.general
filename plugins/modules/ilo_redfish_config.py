@@ -6,17 +6,16 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: ilo_redfish_config
 short_description: Sets or updates configuration attributes on HPE iLO with Redfish OEM extensions
 version_added: 4.2.0
 description:
-  - Builds Redfish URIs locally and sends them to iLO to
-    set or update a configuration attribute.
+  - Builds Redfish URIs locally and sends them to iLO to set or update a configuration attribute.
   - For use with HPE iLO operations that require Redfish OEM extensions.
 extends_documentation_fragment:
   - community.general.attributes
+  - community.general.redfish
 attributes:
   check_mode:
     support: none
@@ -67,74 +66,82 @@ options:
     description:
       - Value of the attribute to be configured.
     type: str
+  validate_certs:
+    version_added: 10.6.0
+  ca_path:
+    version_added: 10.6.0
+  ciphers:
+    version_added: 10.6.0
 author:
-    - "Bhavya B (@bhavya06)"
-'''
+  - "Bhavya B (@bhavya06)"
+"""
 
-EXAMPLES = '''
-  - name: Disable WINS Registration
-    community.general.ilo_redfish_config:
-      category: Manager
-      command: SetWINSReg
-      baseuri: 15.X.X.X
-      username: Admin
-      password: Testpass123
-      attribute_name: WINSRegistration
+EXAMPLES = r"""
+- name: Disable WINS Registration
+  community.general.ilo_redfish_config:
+    category: Manager
+    command: SetWINSReg
+    baseuri: 15.X.X.X
+    username: Admin
+    password: Testpass123
+    attribute_name: WINSRegistration
 
-  - name: Set Time Zone
-    community.general.ilo_redfish_config:
-      category: Manager
-      command: SetTimeZone
-      baseuri: 15.X.X.X
-      username: Admin
-      password: Testpass123
-      attribute_name: TimeZone
-      attribute_value: Chennai
+- name: Set Time Zone
+  community.general.ilo_redfish_config:
+    category: Manager
+    command: SetTimeZone
+    baseuri: 15.X.X.X
+    username: Admin
+    password: Testpass123
+    attribute_name: TimeZone
+    attribute_value: Chennai
 
-  - name: Set NTP Servers
-    community.general.ilo_redfish_config:
-      category: Manager
-      command: SetNTPServers
-      baseuri: 15.X.X.X
-      username: Admin
-      password: Testpass123
-      attribute_name: StaticNTPServers
-      attribute_value: X.X.X.X
+- name: Set NTP Servers
+  community.general.ilo_redfish_config:
+    category: Manager
+    command: SetNTPServers
+    baseuri: 15.X.X.X
+    username: Admin
+    password: Testpass123
+    attribute_name: StaticNTPServers
+    attribute_value: X.X.X.X
+"""
 
-'''
-
-RETURN = '''
+RETURN = r"""
 msg:
-    description: Message with action result or error description
-    returned: always
-    type: str
-    sample: "Action was successful"
-'''
+  description: Message with action result or error description.
+  returned: always
+  type: str
+  sample: "Action was successful"
+"""
 
 CATEGORY_COMMANDS_ALL = {
     "Manager": ["SetTimeZone", "SetDNSserver", "SetDomainName", "SetNTPServers", "SetWINSReg"]
 }
 
 from ansible_collections.community.general.plugins.module_utils.ilo_redfish_utils import iLORedfishUtils
+from ansible_collections.community.general.plugins.module_utils.redfish_utils import REDFISH_COMMON_ARGUMENT_SPEC
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
 
 def main():
     result = {}
+    argument_spec = dict(
+        category=dict(required=True, choices=list(
+            CATEGORY_COMMANDS_ALL.keys())),
+        command=dict(required=True, type='list', elements='str'),
+        baseuri=dict(required=True),
+        username=dict(),
+        password=dict(no_log=True),
+        auth_token=dict(no_log=True),
+        attribute_name=dict(required=True),
+        attribute_value=dict(type='str'),
+        timeout=dict(type='int', default=10)
+    )
+    argument_spec.update(REDFISH_COMMON_ARGUMENT_SPEC)
     module = AnsibleModule(
-        argument_spec=dict(
-            category=dict(required=True, choices=list(
-                CATEGORY_COMMANDS_ALL.keys())),
-            command=dict(required=True, type='list', elements='str'),
-            baseuri=dict(required=True),
-            username=dict(),
-            password=dict(no_log=True),
-            auth_token=dict(no_log=True),
-            attribute_name=dict(required=True),
-            attribute_value=dict(type='str'),
-            timeout=dict(type='int', default=10)
-        ),
+        argument_spec,
         required_together=[
             ('username', 'password'),
         ],

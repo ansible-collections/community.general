@@ -68,7 +68,7 @@
 
 - name: test-modify_inactive_option 2 - read content from output file
   slurp:
-      src: "{{ output_file }}"
+    src: "{{ output_file }}"
   register: output_content
 
 - name: test-modify_inactive_option 2 - set expected content and get current ini file content
@@ -108,7 +108,7 @@
 - name: test-modify_inactive_option 3 - set expected content and get current ini file content
   set_fact:
     expected3: |
-  
+
       [section1]
       # Uncomment the line below to enable foo
       # foo = bar
@@ -121,3 +121,45 @@
       - result3 is changed
       - result3.msg == 'option changed'
       - content3 == expected3
+
+
+- name: test-modify_inactive_option 4 - create test file with spaces before commented option
+  copy:
+    content: |
+
+      [section1]
+      # Uncomment the line below to enable foo
+        # foo = bar
+
+    dest: "{{ output_file }}"
+
+- name: test-modify_inactive_option 4 - set value for foo with modify_inactive_option set to true
+  ini_file:
+    path: "{{ output_file }}"
+    section: section1
+    option: foo
+    value: bar
+    modify_inactive_option: true
+  register: result4
+
+- name: test-modify_inactive_option 4 - read content from output file
+  slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: test-modify_inactive_option 4 - set expected content and get current ini file content
+  set_fact:
+    expected4: |
+
+      [section1]
+      # Uncomment the line below to enable foo
+      foo = bar
+
+    content4: "{{ output_content.content | b64decode }}"
+
+- name: test-modify_inactive_option 4 - assert 'changed' is true and content is OK and option changed
+  assert:
+    that:
+      - result4 is changed
+      - result4.msg == 'option changed'
+      - content4 == expected4

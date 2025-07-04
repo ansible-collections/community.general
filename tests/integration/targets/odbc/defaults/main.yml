@@ -20,14 +20,14 @@ packages:
     - postgresql-odbc
     - unixODBC
     - unixODBC-devel
-    - gcc 
+    - gcc
     - gcc-c++
   Debian:
     - odbc-postgresql
     - unixodbc
     - unixodbc-dev
-    - gcc 
-    - g++ 
+    - gcc
+    - g++
   Suse:
     - psqlODBC
     - unixODBC

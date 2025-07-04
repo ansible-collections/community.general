@@ -6,18 +6,17 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: ilo_redfish_info
 short_description: Gathers server information through iLO using Redfish APIs
 version_added: 4.2.0
 description:
-  - Builds Redfish URIs locally and sends them to iLO to
-    get information back.
+  - Builds Redfish URIs locally and sends them to iLO to get information back.
   - For use with HPE iLO operations that require Redfish OEM extensions.
 extends_documentation_fragment:
   - community.general.attributes
   - community.general.attributes.info_module
+  - community.general.redfish
 options:
   category:
     required: true
@@ -53,52 +52,58 @@ options:
       - Timeout in seconds for HTTP requests to iLO.
     default: 10
     type: int
+  validate_certs:
+    version_added: 10.6.0
+  ca_path:
+    version_added: 10.6.0
+  ciphers:
+    version_added: 10.6.0
 author:
-    - "Bhavya B (@bhavya06)"
-'''
+  - "Bhavya B (@bhavya06)"
+"""
 
-EXAMPLES = '''
-  - name: Get iLO Sessions
-    community.general.ilo_redfish_info:
-      category: Sessions
-      command: GetiLOSessions
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-    register: result_sessions
-'''
+EXAMPLES = r"""
+- name: Get iLO Sessions
+  community.general.ilo_redfish_info:
+    category: Sessions
+    command: GetiLOSessions
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result_sessions
+"""
 
-RETURN = '''
+RETURN = r"""
 ilo_redfish_info:
-    description: Returns iLO sessions.
-    type: dict
-    contains:
-        GetiLOSessions:
-            description: Returns the iLO session msg and whether the function executed successfully.
-            type: dict
-            contains:
-                ret:
-                    description: Check variable to see if the information was successfully retrieved.
-                    type: bool
-                msg:
-                    description: Information of all active iLO sessions.
-                    type: list
-                    elements: dict
-                    contains:
-                        Description:
-                            description: Provides a description of the resource.
-                            type: str
-                        Id:
-                            description: The sessionId.
-                            type: str
-                        Name:
-                            description: The name of the resource.
-                            type: str
-                        UserName:
-                            description: Name to use to log in to the management processor.
-                            type: str
-    returned: always
-'''
+  description: Returns iLO sessions.
+  type: dict
+  contains:
+    GetiLOSessions:
+      description: Returns the iLO session msg and whether the function executed successfully.
+      type: dict
+      contains:
+        ret:
+          description: Check variable to see if the information was successfully retrieved.
+          type: bool
+        msg:
+          description: Information of all active iLO sessions.
+          type: list
+          elements: dict
+          contains:
+            Description:
+              description: Provides a description of the resource.
+              type: str
+            Id:
+              description: The sessionId.
+              type: str
+            Name:
+              description: The name of the resource.
+              type: str
+            UserName:
+              description: Name to use to log in to the management processor.
+              type: str
+  returned: always
+"""
 
 CATEGORY_COMMANDS_ALL = {
     "Sessions": ["GetiLOSessions"]
@@ -110,21 +115,24 @@ CATEGORY_COMMANDS_DEFAULT = {
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.ilo_redfish_utils import iLORedfishUtils
+from ansible_collections.community.general.plugins.module_utils.redfish_utils import REDFISH_COMMON_ARGUMENT_SPEC
 
 
 def main():
     result = {}
     category_list = []
+    argument_spec = dict(
+        category=dict(required=True, type='list', elements='str'),
+        command=dict(required=True, type='list', elements='str'),
+        baseuri=dict(required=True),
+        username=dict(),
+        password=dict(no_log=True),
+        auth_token=dict(no_log=True),
+        timeout=dict(type='int', default=10)
+    )
+    argument_spec.update(REDFISH_COMMON_ARGUMENT_SPEC)
     module = AnsibleModule(
-        argument_spec=dict(
-            category=dict(required=True, type='list', elements='str'),
-            command=dict(required=True, type='list', elements='str'),
-            baseuri=dict(required=True),
-            username=dict(),
-            password=dict(no_log=True),
-            auth_token=dict(no_log=True),
-            timeout=dict(type='int', default=10)
-        ),
+        argument_spec,
         required_together=[
             ('username', 'password'),
         ],

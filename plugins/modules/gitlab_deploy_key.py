@@ -11,11 +11,11 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: gitlab_deploy_key
 short_description: Manages GitLab project deploy keys
 description:
-  - Adds, updates and removes project deploy keys
+  - Adds, updates and removes project deploy keys.
 author:
   - Marcus Watkins (@marwatk)
   - Guillaume Martinez (@Lunik)
@@ -35,7 +35,7 @@ attributes:
 options:
   project:
     description:
-      - Id or Full path of project in the form of group/name.
+      - ID or Full path of project in the form of group/name.
     required: true
     type: str
   title:
@@ -45,7 +45,7 @@ options:
     type: str
   key:
     description:
-      - Deploy key
+      - Deploy key.
     required: true
     type: str
   can_push:
@@ -55,14 +55,14 @@ options:
     default: false
   state:
     description:
-      - When V(present) the deploy key added to the project if it doesn't exist.
+      - When V(present) the deploy key added to the project if it does not exist.
       - When V(absent) it will be removed from the project if it exists.
     default: present
     type: str
-    choices: [ "present", "absent" ]
-'''
+    choices: ["present", "absent"]
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: "Adding a project deploy key"
   community.general.gitlab_deploy_key:
     api_url: https://gitlab.example.com/
@@ -88,39 +88,38 @@ EXAMPLES = '''
     project: "my_group/my_project"
     state: absent
     key: "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAIEAiPWx6WM4lhHNedGfBpPJNPpZ7yKu+dnn1SJejgt4596k6YjzGGphH2TUxwKzxcKDKKezwkpfnxPkSMkuEspGRt/aZZ9w..."
+"""
 
-'''
-
-RETURN = '''
+RETURN = r"""
 msg:
-  description: Success or failure message
+  description: Success or failure message.
   returned: always
   type: str
   sample: "Success"
 
 result:
-  description: json parsed response from the server
+  description: JSON-parsed response from the server.
   returned: always
   type: dict
 
 error:
-  description: the error message returned by the GitLab API
+  description: The error message returned by the GitLab API.
   returned: failed
   type: str
   sample: "400: key is already in use"
 
 deploy_key:
-  description: API object
+  description: API object.
   returned: always
   type: dict
-'''
+"""
 
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, find_project, gitlab_authentication, gitlab
+    auth_argument_spec, find_project, gitlab_authentication, gitlab, list_all_kwargs
 )
 
 
@@ -196,9 +195,9 @@ class GitLabDeployKey(object):
         changed = False
 
         for arg_key, arg_value in arguments.items():
-            if arguments[arg_key] is not None:
-                if getattr(deploy_key, arg_key) != arguments[arg_key]:
-                    setattr(deploy_key, arg_key, arguments[arg_key])
+            if arg_value is not None:
+                if getattr(deploy_key, arg_key) != arg_value:
+                    setattr(deploy_key, arg_key, arg_value)
                     changed = True
 
         return (changed, deploy_key)
@@ -208,9 +207,8 @@ class GitLabDeployKey(object):
     @param key_title Title of the key
     '''
     def find_deploy_key(self, project, key_title):
-        deploy_keys = project.keys.list(all=True)
-        for deploy_key in deploy_keys:
-            if (deploy_key.title == key_title):
+        for deploy_key in project.keys.list(**list_all_kwargs):
+            if deploy_key.title == key_title:
                 return deploy_key
 
     '''

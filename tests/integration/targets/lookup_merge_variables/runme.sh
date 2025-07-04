@@ -11,3 +11,9 @@ ANSIBLE_LOG_PATH=/tmp/ansible-test-merge-variables \
 ANSIBLE_LOG_PATH=/tmp/ansible-test-merge-variables \
 ANSIBLE_MERGE_VARIABLES_PATTERN_TYPE=suffix \
     ansible-playbook test_with_env.yml "$@"
+
+ANSIBLE_LOG_PATH=/tmp/ansible-test-merge-variables \
+    ansible-playbook -i test_inventory_all_hosts.yml test_all_hosts.yml "$@"
+
+ANSIBLE_LOG_PATH=/tmp/ansible-test-merge-variables \
+    ansible-playbook -i test_cross_host_merge_inventory.yml test_cross_host_merge_play.yml "$@"

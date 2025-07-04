@@ -6,39 +6,39 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-    name: lastpass
-    author:
-      - Andrew Zenk (!UNKNOWN) <azenk@umn.edu>
-    requirements:
-      - lpass (command line utility)
-      - must have already logged into LastPass
-    short_description: fetch data from LastPass
-    description:
-      - Use the lpass command line utility to fetch specific fields from LastPass.
-    options:
-      _terms:
-        description: Key from which you want to retrieve the field.
-        required: true
-        type: list
-        elements: str
-      field:
-        description: Field to return from LastPass.
-        default: 'password'
-        type: str
-'''
+DOCUMENTATION = r"""
+name: lastpass
+author:
+  - Andrew Zenk (!UNKNOWN) <azenk@umn.edu>
+requirements:
+  - lpass (command line utility)
+  - must have already logged into LastPass
+short_description: Fetch data from LastPass
+description:
+  - Use the lpass command line utility to fetch specific fields from LastPass.
+options:
+  _terms:
+    description: Key from which you want to retrieve the field.
+    required: true
+    type: list
+    elements: str
+  field:
+    description: Field to return from LastPass.
+    default: 'password'
+    type: str
+"""
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: get 'custom_field' from LastPass entry 'entry-name'
   ansible.builtin.debug:
     msg: "{{ lookup('community.general.lastpass', 'entry-name', field='custom_field') }}"
 """
 
-RETURN = """
-  _raw:
-    description: secrets stored
-    type: list
-    elements: str
+RETURN = r"""
+_raw:
+  description: Secrets stored.
+  type: list
+  elements: str
 """
 
 from subprocess import Popen, PIPE
@@ -83,9 +83,9 @@ class LPass(object):
 
     def get_field(self, key, field):
         if field in ['username', 'password', 'url', 'notes', 'id', 'name']:
-            out, err = self._run(self._build_args("show", ["--{0}".format(field), key]))
+            out, err = self._run(self._build_args("show", [f"--{field}", key]))
         else:
-            out, err = self._run(self._build_args("show", ["--field={0}".format(field), key]))
+            out, err = self._run(self._build_args("show", [f"--field={field}", key]))
         return out.strip()
 
 

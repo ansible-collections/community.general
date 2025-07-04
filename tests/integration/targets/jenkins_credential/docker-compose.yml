@@ -1,0 +1,21 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+version: "3.8"
+
+services:
+  jenkins:
+    image: bitnami/jenkins
+    container_name: jenkins-test
+    ports:
+      - "8080:8080"
+    environment:
+      JENKINS_USERNAME: "FishLegs"
+      JENKINS_PASSWORD: "MeatLug"
+      JENKINS_PLUGINS: "credentials,cloudbees-folder,plain-credentials,github-branch-source,github-api,scm-api,workflow-step-api"
+    healthcheck:
+      test: curl -s http://localhost:8080/login || exit 1
+      interval: 10s
+      timeout: 10s
+      retries: 10

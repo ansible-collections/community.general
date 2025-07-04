@@ -33,6 +33,7 @@ class GandiLiveDNSAPI(object):
     def __init__(self, module):
         self.module = module
         self.api_key = module.params['api_key']
+        self.personal_access_token = module.params['personal_access_token']
 
     def _build_error_message(self, module, info):
         s = ''
@@ -50,7 +51,12 @@ class GandiLiveDNSAPI(object):
         return s
 
     def _gandi_api_call(self, api_call, method='GET', payload=None, error_on_404=True):
-        headers = {'Authorization': 'Apikey {0}'.format(self.api_key),
+        authorization_header = (
+            'Bearer {0}'.format(self.personal_access_token)
+            if self.personal_access_token
+            else 'Apikey {0}'.format(self.api_key)
+        )
+        headers = {'Authorization': authorization_header,
                    'Content-Type': 'application/json'}
         data = None
         if payload:

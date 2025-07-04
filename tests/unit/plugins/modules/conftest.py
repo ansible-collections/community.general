@@ -5,35 +5,46 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
+import contextlib as _contextlib
 import json
 
 import pytest
 
 from ansible.module_utils.six import string_types
-from ansible.module_utils.common.text.converters import to_bytes
 from ansible.module_utils.common._collections_compat import MutableMapping
 
 from ansible_collections.community.general.plugins.module_utils import deps
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args as _set_module_args
+
+
+def _fix_ansible_args(args):
+    if isinstance(args, string_types):
+        # This should be deprecated!
+        return json.loads(args)
+
+    if isinstance(args, MutableMapping):
+        return args
+
+    raise Exception('Malformed data to the patch_ansible_module pytest fixture')
 
 
 @pytest.fixture
-def patch_ansible_module(request, mocker):
-    if isinstance(request.param, string_types):
-        args = request.param
-    elif isinstance(request.param, MutableMapping):
-        if 'ANSIBLE_MODULE_ARGS' not in request.param:
-            request.param = {'ANSIBLE_MODULE_ARGS': request.param}
-        if '_ansible_remote_tmp' not in request.param['ANSIBLE_MODULE_ARGS']:
-            request.param['ANSIBLE_MODULE_ARGS']['_ansible_remote_tmp'] = '/tmp'
-        if '_ansible_keep_remote_files' not in request.param['ANSIBLE_MODULE_ARGS']:
-            request.param['ANSIBLE_MODULE_ARGS']['_ansible_keep_remote_files'] = False
-        args = json.dumps(request.param)
-    else:
-        raise Exception('Malformed data to the patch_ansible_module pytest fixture')
+def patch_ansible_module(request):
+    args = _fix_ansible_args(request.param)
+    with _set_module_args(args):
+        yield
 
-    mocker.patch('ansible.module_utils.basic._ANSIBLE_ARGS', to_bytes(args))
+
+@pytest.fixture
+def patch_ansible_module_uthelper(request):
+    @_contextlib.contextmanager
+    def _patch(args):
+        args = _fix_ansible_args(args)
+        with _set_module_args(args):
+            yield
+    return _patch
 
 
 @pytest.fixture(autouse=True)
 def deps_cleanup():
-    deps._deps.clear()
+    deps.clear()

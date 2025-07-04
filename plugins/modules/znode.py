@@ -8,83 +8,81 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: znode
 short_description: Create, delete, retrieve, and update znodes using ZooKeeper
 description:
-    - Create, delete, retrieve, and update znodes using ZooKeeper.
+  - Create, delete, retrieve, and update znodes using ZooKeeper.
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 options:
-    hosts:
-        description:
-            - A list of ZooKeeper servers (format '[server]:[port]').
-        required: true
-        type: str
-    name:
-        description:
-            - The path of the znode.
-        required: true
-        type: str
-    value:
-        description:
-            - The value assigned to the znode.
-        type: str
-    op:
-        description:
-            - An operation to perform. Mutually exclusive with state.
-        choices: [ get, wait, list ]
-        type: str
-    state:
-        description:
-            - The state to enforce. Mutually exclusive with op.
-        choices: [ present, absent ]
-        type: str
-    timeout:
-        description:
-            - The amount of time to wait for a node to appear.
-        default: 300
-        type: int
-    recursive:
-        description:
-            - Recursively delete node and all its children.
-        type: bool
-        default: false
-    auth_scheme:
-        description:
-            - 'Authentication scheme.'
-        choices: [ digest, sasl ]
-        type: str
-        default: "digest"
-        required: false
-        version_added: 5.8.0
-    auth_credential:
-        description:
-            - The authentication credential value. Depends on O(auth_scheme).
-            - The format for O(auth_scheme=digest) is C(user:password),
-              and the format for O(auth_scheme=sasl) is C(user:password).
-        type: str
-        required: false
-        version_added: 5.8.0
-    use_tls:
-        description:
-            - Using TLS/SSL or not.
-        type: bool
-        default: false
-        required: false
-        version_added: '6.5.0'
+  hosts:
+    description:
+      - A list of ZooKeeper servers (format V([server]:[port])).
+    required: true
+    type: str
+  name:
+    description:
+      - The path of the znode.
+    required: true
+    type: str
+  value:
+    description:
+      - The value assigned to the znode.
+    type: str
+  op:
+    description:
+      - An operation to perform. Mutually exclusive with state.
+    choices: [get, wait, list]
+    type: str
+  state:
+    description:
+      - The state to enforce. Mutually exclusive with op.
+    choices: [present, absent]
+    type: str
+  timeout:
+    description:
+      - The amount of time to wait for a node to appear.
+    default: 300
+    type: int
+  recursive:
+    description:
+      - Recursively delete node and all its children.
+    type: bool
+    default: false
+  auth_scheme:
+    description:
+      - Authentication scheme.
+    choices: [digest, sasl]
+    type: str
+    default: "digest"
+    required: false
+    version_added: 5.8.0
+  auth_credential:
+    description:
+      - The authentication credential value. Depends on O(auth_scheme).
+      - The format for O(auth_scheme=digest) is C(user:password), and the format for O(auth_scheme=sasl) is C(user:password).
+    type: str
+    required: false
+    version_added: 5.8.0
+  use_tls:
+    description:
+      - Using TLS/SSL or not.
+    type: bool
+    default: false
+    required: false
+    version_added: '6.5.0'
 requirements:
-    - kazoo >= 2.1
+  - kazoo >= 2.1
 author: "Trey Perry (@treyperry)"
-'''
+"""
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Creating or updating a znode with a given value
   community.general.znode:
     hosts: 'localhost:2181'

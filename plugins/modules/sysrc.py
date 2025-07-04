@@ -9,64 +9,62 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 author:
-    - David Lundgren (@dlundgren)
+  - David Lundgren (@dlundgren)
 module: sysrc
 short_description: Manage FreeBSD using sysrc
 version_added: '2.0.0'
 description:
-    - Manages C(/etc/rc.conf) for FreeBSD.
+  - Manages C(/etc/rc.conf) for FreeBSD.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    name:
-        description:
-            - Name of variable in C(/etc/rc.conf) to manage.
-        type: str
-        required: true
-    value:
-        description:
-            - The value to set when O(state=present).
-            - The value to add when O(state=value_present).
-            - The value to remove when O(state=value_absent).
-        type: str
-    state:
-        description:
-            - Use V(present) to add the variable.
-            - Use V(absent) to remove the variable.
-            - Use V(value_present) to add the value to the existing variable.
-            - Use V(value_absent) to remove the value from the existing variable.
-        type: str
-        default: "present"
-        choices: [ absent, present, value_present, value_absent ]
-    path:
-        description:
-            - Path to file to use instead of V(/etc/rc.conf).
-        type: str
-        default: "/etc/rc.conf"
-    delim:
-        description:
-            - Delimiter to be used instead of V(" ") (space).
-            - Only used when O(state=value_present) or O(state=value_absent).
-        default: " "
-        type: str
-    jail:
-        description:
-            - Name or ID of the jail to operate on.
-        type: str
+  name:
+    description:
+      - Name of variable in C(/etc/rc.conf) to manage.
+    type: str
+    required: true
+  value:
+    description:
+      - The value to set when O(state=present).
+      - The value to add when O(state=value_present).
+      - The value to remove when O(state=value_absent).
+    type: str
+  state:
+    description:
+      - Use V(present) to add the variable.
+      - Use V(absent) to remove the variable.
+      - Use V(value_present) to add the value to the existing variable.
+      - Use V(value_absent) to remove the value from the existing variable.
+    type: str
+    default: "present"
+    choices: [absent, present, value_present, value_absent]
+  path:
+    description:
+      - Path to file to use instead of V(/etc/rc.conf).
+    type: str
+    default: "/etc/rc.conf"
+  delim:
+    description:
+      - Delimiter to be used instead of V(" ") (space).
+      - Only used when O(state=value_present) or O(state=value_absent).
+    default: " "
+    type: str
+  jail:
+    description:
+      - Name or ID of the jail to operate on.
+    type: str
 notes:
   - The O(name) cannot contain periods as sysrc does not support OID style names.
-'''
+"""
 
-EXAMPLES = r'''
----
+EXAMPLES = r"""
 # enable mysql in the /etc/rc.conf
 - name: Configure mysql pid file
   community.general.sysrc:
@@ -94,15 +92,15 @@ EXAMPLES = r'''
     name: nginx_enable
     value: "YES"
     jail: testjail
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 changed:
   description: Return changed for sysrc actions.
   returned: always
   type: bool
   sample: true
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 import re
@@ -124,14 +122,19 @@ class Sysrc(object):
         return err.find("unknown variable") > 0 or out.find("unknown variable") > 0
 
     def exists(self):
-        # sysrc doesn't really use exit codes
-        (rc, out, err) = self.run_sysrc(self.name)
+        """
+        Tests whether the name is in the file.  If parameter value is defined,
+        then tests whether name=value is in the file.  These tests are necessary
+        because sysrc doesn't use exit codes.  Instead, let sysrc read the
+        file's content and create a dictionary comprising the configuration.
+        Use this dictionary to preform the tests.
+        """
+        (rc, out, err) = self.run_sysrc('-e', '-a')
+        conf = dict([i.split('=', 1) for i in out.splitlines()])
         if self.value is None:
-            regex = "%s: " % re.escape(self.name)
+            return self.name in conf
         else:
-            regex = "%s: %s$" % (re.escape(self.name), re.escape(self.value))
-
-        return not self.has_unknown_variable(out, err) and re.match(regex, out) is not None
+            return self.name in conf and conf[self.name] == '"%s"' % self.value
 
     def contains(self):
         (rc, out, err) = self.run_sysrc('-n', self.name)
@@ -144,13 +147,10 @@ class Sysrc(object):
         if self.exists():
             return
 
-        if self.module.check_mode:
-            self.changed = True
-            return
+        if not self.module.check_mode:
+            (rc, out, err) = self.run_sysrc("%s=%s" % (self.name, self.value))
 
-        (rc, out, err) = self.run_sysrc("%s=%s" % (self.name, self.value))
-        if out.find("%s:" % self.name) == 0 and re.search("-> %s$" % re.escape(self.value), out) is not None:
-            self.changed = True
+        self.changed = True
 
     def absent(self):
         if not self.exists():

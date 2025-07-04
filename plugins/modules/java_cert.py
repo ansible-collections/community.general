@@ -8,16 +8,16 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
----
+DOCUMENTATION = r"""
 module: java_cert
 
 short_description: Uses keytool to import/remove certificate to/from java keystore (cacerts)
 description:
-  - This is a wrapper module around keytool, which can be used to import certificates
-    and optionally private keys to a given java keystore, or remove them from it.
+  - This is a wrapper module around keytool, which can be used to import certificates and optionally private keys to a given
+    java keystore, or remove them from it.
 extends_documentation_fragment:
   - community.general.attributes
+  - ansible.builtin.files
 attributes:
   check_mode:
     support: full
@@ -27,7 +27,7 @@ options:
   cert_url:
     description:
       - Basic URL to fetch SSL certificate from.
-      - Exactly one of O(cert_url), O(cert_path), or O(pkcs12_path) is required to load certificate.
+      - Exactly one of O(cert_url), O(cert_path), O(cert_content), or O(pkcs12_path) is required to load certificate.
     type: str
   cert_port:
     description:
@@ -38,8 +38,14 @@ options:
   cert_path:
     description:
       - Local path to load certificate from.
-      - Exactly one of O(cert_url), O(cert_path), or O(pkcs12_path) is required to load certificate.
+      - Exactly one of O(cert_url), O(cert_path), O(cert_content), or O(pkcs12_path) is required to load certificate.
     type: path
+  cert_content:
+    description:
+      - Content of the certificate used to create the keystore.
+      - Exactly one of O(cert_url), O(cert_path), O(cert_content), or O(pkcs12_path) is required to load certificate.
+    type: str
+    version_added: 8.6.0
   cert_alias:
     description:
       - Imported certificate alias.
@@ -54,10 +60,9 @@ options:
   pkcs12_path:
     description:
       - Local path to load PKCS12 keystore from.
-      - Unlike O(cert_url) and O(cert_path), the PKCS12 keystore embeds the private key matching
-        the certificate, and is used to import both the certificate and its private key into the
-        java keystore.
-      - Exactly one of O(cert_url), O(cert_path), or O(pkcs12_path) is required to load certificate.
+      - Unlike O(cert_url), O(cert_path) and O(cert_content), the PKCS12 keystore embeds the private key matching the certificate,
+        and is used to import both the certificate and its private key into the java keystore.
+      - Exactly one of O(cert_url), O(cert_path), O(cert_content), or O(pkcs12_path) is required to load certificate.
     type: path
   pkcs12_password:
     description:
@@ -93,17 +98,35 @@ options:
   state:
     description:
       - Defines action which can be either certificate import or removal.
-      - When state is present, the certificate will always idempotently be inserted
-        into the keystore, even if there already exists a cert alias that is different.
+      - When state is present, the certificate will always idempotently be inserted into the keystore, even if there already
+        exists a cert alias that is different.
     type: str
-    choices: [ absent, present ]
+    choices: [absent, present]
     default: present
+  mode:
+    version_added: 8.5.0
+  owner:
+    version_added: 8.5.0
+  group:
+    version_added: 8.5.0
+  seuser:
+    version_added: 8.5.0
+  serole:
+    version_added: 8.5.0
+  setype:
+    version_added: 8.5.0
+  selevel:
+    version_added: 8.5.0
+  unsafe_writes:
+    version_added: 8.5.0
+  attributes:
+    version_added: 8.5.0
 requirements: [openssl, keytool]
 author:
-- Adam Hamsik (@haad)
-'''
+  - Adam Hamsik (@haad)
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Import SSL certificate from google.com to a given cacerts keystore
   community.general.java_cert:
     cert_url: google.com
@@ -123,6 +146,19 @@ EXAMPLES = r'''
 - name: Import trusted CA from SSL certificate
   community.general.java_cert:
     cert_path: /opt/certs/rootca.crt
+    keystore_path: /tmp/cacerts
+    keystore_pass: changeit
+    keystore_create: true
+    state: present
+    cert_alias: LE_RootCA
+    trust_cacert: true
+
+- name: Import trusted CA from the SSL certificate stored in the cert_content variable
+  community.general.java_cert:
+    cert_content: |
+      -----BEGIN CERTIFICATE-----
+      ...
+      -----END CERTIFICATE-----
     keystore_path: /tmp/cacerts
     keystore_pass: changeit
     keystore_create: true
@@ -158,9 +194,9 @@ EXAMPLES = r'''
     keystore_pass: changeit
     keystore_create: true
     state: present
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 msg:
   description: Output from stdout of keytool command after execution of given command.
   returned: success
@@ -178,7 +214,7 @@ cmd:
   returned: success
   type: str
   sample: "keytool -importcert -noprompt -keystore"
-'''
+"""
 
 import os
 import tempfile
@@ -242,7 +278,7 @@ def _get_first_certificate_from_x509_file(module, pem_certificate_file, pem_cert
         (extract_rc, dummy, extract_stderr) = module.run_command(extract_cmd, check_rc=False)
 
         if extract_rc != 0:
-            # this time it's a real failure
+            # this time it is a real failure
             module.fail_json(msg="Internal module failure, cannot extract certificate, error: %s" % extract_stderr,
                              rc=extract_rc, cmd=extract_cmd)
 
@@ -279,12 +315,13 @@ def _export_public_cert_from_pkcs12(module, executable, pkcs_file, alias, passwo
         "-noprompt",
         "-keystore",
         pkcs_file,
-        "-alias",
-        alias,
         "-storetype",
         "pkcs12",
         "-rfc"
     ]
+    # Append optional alias
+    if alias:
+        export_cmd.extend(["-alias", alias])
     (export_rc, export_stdout, export_err) = module.run_command(export_cmd, data=password, check_rc=False)
 
     if export_rc != 0:
@@ -331,6 +368,12 @@ def build_proxy_options():
     return proxy_opts
 
 
+def _update_permissions(module, keystore_path):
+    """ Updates keystore file attributes as necessary """
+    file_args = module.load_file_common_arguments(module.params, path=keystore_path)
+    return module.set_fs_attributes_if_different(file_args, False)
+
+
 def _download_cert_url(module, executable, url, port):
     """ Fetches the certificate from the remote URL using `keytool -printcert...`
           The PEM formatted string is returned """
@@ -351,6 +394,10 @@ def import_pkcs12_path(module, executable, pkcs12_path, pkcs12_pass, pkcs12_alia
                        keystore_path, keystore_pass, keystore_alias, keystore_type):
     ''' Import pkcs12 from path into keystore located on
         keystore_path as alias '''
+    optional_aliases = {
+        "-destalias": keystore_alias,
+        "-srcalias": pkcs12_alias
+    }
     import_cmd = [
         executable,
         "-importkeystore",
@@ -359,13 +406,14 @@ def import_pkcs12_path(module, executable, pkcs12_path, pkcs12_pass, pkcs12_alia
         "pkcs12",
         "-srckeystore",
         pkcs12_path,
-        "-srcalias",
-        pkcs12_alias,
         "-destkeystore",
         keystore_path,
-        "-destalias",
-        keystore_alias
     ]
+    # Append optional aliases
+    for flag, value in optional_aliases.items():
+        if value:
+            import_cmd.extend([flag, value])
+
     import_cmd += _get_keystore_type_keytool_parameters(keystore_type)
 
     secret_data = "%s\n%s" % (keystore_pass, pkcs12_pass)
@@ -375,14 +423,14 @@ def import_pkcs12_path(module, executable, pkcs12_path, pkcs12_pass, pkcs12_alia
 
     # Use local certificate from local path and import it to a java keystore
     (import_rc, import_out, import_err) = module.run_command(import_cmd, data=secret_data, check_rc=False)
-
     diff = {'before': '\n', 'after': '%s\n' % keystore_alias}
-    if import_rc == 0 and os.path.exists(keystore_path):
-        module.exit_json(changed=True, msg=import_out,
-                         rc=import_rc, cmd=import_cmd, stdout=import_out,
-                         error=import_err, diff=diff)
-    else:
+
+    if import_rc != 0 or not os.path.exists(keystore_path):
         module.fail_json(msg=import_out, rc=import_rc, cmd=import_cmd, error=import_err)
+
+    return dict(changed=True, msg=import_out,
+                rc=import_rc, cmd=import_cmd, stdout=import_out,
+                error=import_err, diff=diff)
 
 
 def import_cert_path(module, executable, path, keystore_path, keystore_pass, alias, keystore_type, trust_cacert):
@@ -408,17 +456,17 @@ def import_cert_path(module, executable, path, keystore_path, keystore_pass, ali
     (import_rc, import_out, import_err) = module.run_command(import_cmd,
                                                              data="%s\n%s" % (keystore_pass, keystore_pass),
                                                              check_rc=False)
-
     diff = {'before': '\n', 'after': '%s\n' % alias}
-    if import_rc == 0:
-        module.exit_json(changed=True, msg=import_out,
-                         rc=import_rc, cmd=import_cmd, stdout=import_out,
-                         error=import_err, diff=diff)
-    else:
-        module.fail_json(msg=import_out, rc=import_rc, cmd=import_cmd)
+
+    if import_rc != 0:
+        module.fail_json(msg=import_out, rc=import_rc, cmd=import_cmd, error=import_err)
+
+    return dict(changed=True, msg=import_out,
+                rc=import_rc, cmd=import_cmd, stdout=import_out,
+                error=import_err, diff=diff)
 
 
-def delete_cert(module, executable, keystore_path, keystore_pass, alias, keystore_type, exit_after=True):
+def delete_cert(module, executable, keystore_path, keystore_pass, alias, keystore_type):
     ''' Delete certificate identified with alias from keystore on keystore_path '''
     del_cmd = [
         executable,
@@ -434,13 +482,13 @@ def delete_cert(module, executable, keystore_path, keystore_pass, alias, keystor
 
     # Delete SSL certificate from keystore
     (del_rc, del_out, del_err) = module.run_command(del_cmd, data=keystore_pass, check_rc=True)
+    diff = {'before': '%s\n' % alias, 'after': None}
 
-    if exit_after:
-        diff = {'before': '%s\n' % alias, 'after': None}
+    if del_rc != 0:
+        module.fail_json(msg=del_out, rc=del_rc, cmd=del_cmd, error=del_err)
 
-        module.exit_json(changed=True, msg=del_out,
-                         rc=del_rc, cmd=del_cmd, stdout=del_out,
-                         error=del_err, diff=diff)
+    return dict(changed=True, msg=del_out, rc=del_rc, cmd=del_cmd,
+                stdout=del_out, error=del_err, diff=diff)
 
 
 def test_keytool(module, executable):
@@ -462,6 +510,7 @@ def main():
     argument_spec = dict(
         cert_url=dict(type='str'),
         cert_path=dict(type='path'),
+        cert_content=dict(type='str'),
         pkcs12_path=dict(type='path'),
         pkcs12_password=dict(type='str', no_log=True),
         pkcs12_alias=dict(type='str'),
@@ -478,17 +527,19 @@ def main():
 
     module = AnsibleModule(
         argument_spec=argument_spec,
-        required_if=[['state', 'present', ('cert_path', 'cert_url', 'pkcs12_path'), True],
+        required_if=[['state', 'present', ('cert_path', 'cert_url', 'cert_content', 'pkcs12_path'), True],
                      ['state', 'absent', ('cert_url', 'cert_alias'), True]],
         required_together=[['keystore_path', 'keystore_pass']],
         mutually_exclusive=[
-            ['cert_url', 'cert_path', 'pkcs12_path']
+            ['cert_url', 'cert_path', 'cert_content', 'pkcs12_path']
         ],
         supports_check_mode=True,
+        add_file_common_args=True,
     )
 
     url = module.params.get('cert_url')
     path = module.params.get('cert_path')
+    content = module.params.get('cert_content')
     port = module.params.get('cert_port')
 
     pkcs12_path = module.params.get('pkcs12_path')
@@ -526,12 +577,14 @@ def main():
     module.add_cleanup_file(new_certificate)
     module.add_cleanup_file(old_certificate)
 
+    result = dict()
+
     if state == 'absent' and alias_exists:
         if module.check_mode:
             module.exit_json(changed=True)
 
-        # delete and exit
-        delete_cert(module, executable, keystore_path, keystore_pass, cert_alias, keystore_type)
+        # delete
+        result = delete_cert(module, executable, keystore_path, keystore_pass, cert_alias, keystore_type)
 
     # dump certificate to enroll in the keystore on disk and compute digest
     if state == 'present':
@@ -554,6 +607,10 @@ def main():
             # certificate to stdout so we don't need to do any transformations.
             new_certificate = path
 
+        elif content:
+            with open(new_certificate, "w") as f:
+                f.write(content)
+
         elif url:
             # Getting the X509 digest from a URL is the same as from a path, we just have
             # to download the cert first
@@ -569,16 +626,20 @@ def main():
             if alias_exists:
                 # The certificate in the keystore does not match with the one we want to be present
                 # The existing certificate must first be deleted before we insert the correct one
-                delete_cert(module, executable, keystore_path, keystore_pass, cert_alias, keystore_type, exit_after=False)
+                delete_cert(module, executable, keystore_path, keystore_pass, cert_alias, keystore_type)
 
             if pkcs12_path:
-                import_pkcs12_path(module, executable, pkcs12_path, pkcs12_pass, pkcs12_alias,
-                                   keystore_path, keystore_pass, cert_alias, keystore_type)
+                result = import_pkcs12_path(module, executable, pkcs12_path, pkcs12_pass, pkcs12_alias,
+                                            keystore_path, keystore_pass, cert_alias, keystore_type)
             else:
-                import_cert_path(module, executable, new_certificate, keystore_path,
-                                 keystore_pass, cert_alias, keystore_type, trust_cacert)
+                result = import_cert_path(module, executable, new_certificate, keystore_path,
+                                          keystore_pass, cert_alias, keystore_type, trust_cacert)
 
-    module.exit_json(changed=False)
+    if os.path.exists(keystore_path):
+        changed_permissions = _update_permissions(module, keystore_path)
+        result['changed'] = result.get('changed', False) or changed_permissions
+
+    module.exit_json(**result)
 
 
 if __name__ == "__main__":

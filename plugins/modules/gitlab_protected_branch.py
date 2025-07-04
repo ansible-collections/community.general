@@ -7,7 +7,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 module: gitlab_protected_branch
 short_description: Manage protection of existing branches
 version_added: 3.4.0
@@ -58,10 +58,10 @@ options:
     default: maintainer
     type: str
     choices: ["maintainer", "developer", "nobody"]
-'''
+"""
 
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Create protected branch on main
   community.general.gitlab_protected_branch:
     api_url: https://gitlab.com
@@ -70,11 +70,10 @@ EXAMPLES = '''
     name: main
     merge_access_levels: maintainer
     push_access_level: nobody
+"""
 
-'''
-
-RETURN = '''
-'''
+RETURN = r"""
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.api import basic_auth_argument_spec
