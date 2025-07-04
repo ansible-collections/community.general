@@ -194,7 +194,7 @@ def main():
         #   https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#githubs-token-formats
         #
         # Test if we're actually logged in, but skip this check for some token prefixes
-        SKIPPED_TOKEN_PREFIXES=['ghs_']
+        SKIPPED_TOKEN_PREFIXES = ['ghs_']
         if password or (login_token and any(login_token.startswith(prefix) for prefix in SKIPPED_TOKEN_PREFIXES)):
             gh_obj.me()
     except github3.exceptions.AuthenticationFailed as e:
