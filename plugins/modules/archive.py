@@ -43,7 +43,7 @@ options:
       - The file name of the destination archive. The parent directory must exists on the remote host.
       - This is required when O(path) refers to multiple files by either specifying a glob, a directory or multiple paths
         in a list.
-      - If the destination archive already exists, it will be truncated and overwritten.
+      - If the destination archive already exists, it is truncated and overwritten.
     type: path
   exclude_path:
     description:

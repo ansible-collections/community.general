@@ -70,7 +70,7 @@ options:
     type: bool
   min_cluster_size:
     description:
-      - Check will return bad until cluster size is met or until tries is exhausted.
+      - Check fails until cluster size is met or until tries is exhausted.
     required: false
     type: int
     default: 1
@@ -94,10 +94,10 @@ options:
     default: migrate_rx_partitions_remaining
   target_cluster_size:
     description:
-      - When all aerospike builds in the cluster are greater than version 4.3, then the C(cluster-stable) info command will
+      - When all aerospike builds in the cluster are greater than version 4.3, then the C(cluster-stable) info command is
         be used. Inside this command, you can optionally specify what the target cluster size is - but it is not necessary.
         You can still rely on O(min_cluster_size) if you do not want to use this option.
-      - If this option is specified on a cluster that has at least one host <4.3 then it will be ignored until the min version
+      - If this option is specified on a cluster that has at least one host <4.3 then it is ignored until the min version
         reaches 4.3.
     required: false
     type: int

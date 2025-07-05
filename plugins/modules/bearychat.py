@@ -33,7 +33,7 @@ options:
       - Message to send.
   markdown:
     description:
-      - If V(true), text will be parsed as markdown.
+      - If V(true), text is parsed as markdown.
     default: true
     type: bool
   channel:
