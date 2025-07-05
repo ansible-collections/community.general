@@ -1,0 +1,58 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- block:
+    - name: Create temporary file
+      tempfile:
+      register: tempfile
+
+    - name: Run tests
+      include_role:
+        name: callback
+      vars:
+        tests:
+          - name: Basic file diff
+            environment:
+              ANSIBLE_NOCOLOR: 'true'
+              ANSIBLE_FORCE_COLOR: 'false'
+              ANSIBLE_PYTHON_INTERPRETER: "{{ ansible_python_interpreter }}"
+              ANSIBLE_STDOUT_CALLBACK: community.general.tasks_only
+            playbook: |
+              - hosts: testhost
+                gather_facts: true
+                tasks:
+                  - name: Create file
+                    copy:
+                      dest: "{{ tempfile.path }}"
+                      content: |
+                        Foo bar
+
+                  - name: Modify file
+                    copy:
+                      dest: "{{ tempfile.path }}"
+                      content: |
+                        Foo bar
+                        Bar baz bam!
+            expected_output:
+              - ""
+              - "TASK [Gathering Facts] *********************************************************"
+              - "ok: [testhost]"
+              - ""
+              - "TASK [Create file] *************************************************************"
+              - "changed: [testhost]"
+              - ""
+              - "TASK [Modify file] *************************************************************"
+              - "changed: [testhost]"
+
+  always:
+    - name: Clean up temp file
+      file:
+        path: "{{ tempfile.path }}"
+        state: absent
