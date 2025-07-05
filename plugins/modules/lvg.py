@@ -146,6 +146,13 @@ EXAMPLES = r"""
     state: active
     vg: vg.services
 
+- name: Add new PVs to volume group without removing existing ones
+  community.general.lvg:
+    vg: vg.services
+    pvs: /dev/sdb1,/dev/sdc1
+    remove_extra_pvs: false
+    state: present
+
 - name: Reset a volume group UUID
   community.general.lvg:
     state: inactive
