@@ -107,6 +107,12 @@ EXAMPLES = r"""
     state: present
     remote: gnome
 
+- name: Install GIMP using custom flatpak binary path
+  community.general.flatpak:
+    name: org.gimp.GIMP
+    state: present
+    executable: /usr/local/bin/flatpak-dev
+
 - name: Install multiple packages
   community.general.flatpak:
     name:
