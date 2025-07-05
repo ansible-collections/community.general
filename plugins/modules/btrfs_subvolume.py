@@ -80,7 +80,7 @@ options:
 notes:
   - If any or all of the options O(filesystem_device), O(filesystem_label) or O(filesystem_uuid) parameters are provided,
     there is expected to be a matching btrfs filesystem. If none are provided and only a single btrfs filesystem exists or
-    only a single btrfs filesystem is mounted, that filesystem is used; otherwise, the module takes no action and return an
+    only a single btrfs filesystem is mounted, that filesystem is used; otherwise, the module takes no action and returns an
     error.
 extends_documentation_fragment:
   - community.general.attributes
