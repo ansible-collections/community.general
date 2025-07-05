@@ -162,6 +162,15 @@ EXAMPLES = r"""
     other_options:
       serveraliveinterval: '30'
 
+- name: Add SSH config with key auto-added to agent
+  community.general.ssh_config:
+    user: devops
+    host: "example.com"
+    hostname: "staging.example.com"
+    identity_file: "/home/devops/.ssh/id_rsa"
+    add_keys_to_agent: true
+    state: present
+
 - name: Delete a host from the configuration
   community.general.ssh_config:
     ssh_config_file: "{{ ssh_config_test }}"
