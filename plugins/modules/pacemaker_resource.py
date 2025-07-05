@@ -27,13 +27,13 @@ options:
   state:
     description:
       - Indicate desired state for cluster resource.
-    choices: [present, absent, enabled, disabled]
-    default: present
+      - The state V(cleanup) has been added in community.general 11.1.0.
+    choices: [present, absent, enabled, disabled, cleanup]
     type: str
   name:
     description:
       - Specify the resource name to create.
-    required: true
+      - This is required if O(state=present), O(state=absent), O(state=enabled), or O(state=disabled).
     type: str
   resource_type:
     description:
@@ -140,9 +140,9 @@ from ansible_collections.community.general.plugins.module_utils.pacemaker import
 class PacemakerResource(StateModuleHelper):
     module = dict(
         argument_spec=dict(
-            state=dict(type='str', default='present', choices=[
-                'present', 'absent', 'enabled', 'disabled']),
-            name=dict(type='str', required=True),
+            state=dict(type='str', choices=[
+                'present', 'absent', 'enabled', 'disabled', 'cleanup']),
+            name=dict(type='str'),
             resource_type=dict(type='dict', options=dict(
                 resource_name=dict(type='str'),
                 resource_standard=dict(type='str'),
@@ -160,16 +160,24 @@ class PacemakerResource(StateModuleHelper):
             )),
             wait=dict(type='int', default=300),
         ),
-        required_if=[('state', 'present', ['resource_type', 'resource_option'])],
+        required_if=[
+            ('state', 'present', ['resource_type', 'resource_option', 'name']),
+            ('state', 'absent', ['name']),
+            ('state', 'enabled', ['name']),
+            ('state', 'disabled', ['name']),
+            ('state', ['present', 'absent', 'enabled', 'disabled'], ['name']),
+        ],
         supports_check_mode=True,
     )
-    default_state = "present"
 
     def __init_module__(self):
-        self.runner = pacemaker_runner(self.module, cli_action='resource')
-        self._maintenance_mode_runner = pacemaker_runner(self.module, cli_action='property')
-        self.vars.set('previous_value', self._get())
+        self.runner = pacemaker_runner(self.module)
+        self.vars.set('previous_value', self._get()['out'])
         self.vars.set('value', self.vars.previous_value, change=True, diff=True)
+        self.module.params['name'] = self.module.params['name'] or None
+
+    def __quit_module__(self):
+        self.vars.set('value', self._get()['out'])
 
     def _process_command_output(self, fail_on_err, ignore_err_msg=""):
         def process(rc, out, err):
@@ -180,45 +188,38 @@ class PacemakerResource(StateModuleHelper):
         return process
 
     def _get(self):
-        with self.runner('state name', output_process=self._process_command_output(False)) as ctx:
-            return ctx.run(state='status')
+        with self.runner('cli_action state name') as ctx:
+            result = ctx.run(cli_action="resource", state='status')
+            return dict([('rc', result[0]),
+                         ('out', result[1] if result[1] != "" else None),
+                         ('err', result[2])])
 
     def state_absent(self):
-        runner_args = ['state', 'name', 'force']
-        force = get_pacemaker_maintenance_mode(self._maintenance_mode_runner)
-        with self.runner(runner_args, output_process=self._process_command_output(True, "does not exist"), check_mode_skip=True) as ctx:
-            ctx.run(force=force)
-            self.vars.set('value', self._get())
-            self.vars.stdout = ctx.results_out
-            self.vars.stderr = ctx.results_err
-            self.vars.cmd = ctx.cmd
+        force = get_pacemaker_maintenance_mode(self.runner)
+        with self.runner('cli_action state name force', output_process=self._process_command_output(True, "does not exist"), check_mode_skip=True) as ctx:
+            ctx.run(cli_action='resource', force=force)
 
     def state_present(self):
         with self.runner(
-                'state name resource_type resource_option resource_operation resource_meta resource_argument wait',
-                output_process=self._process_command_output(not get_pacemaker_maintenance_mode(self._maintenance_mode_runner), "already exists"),
+                'cli_action state name resource_type resource_option resource_operation resource_meta resource_argument wait',
+                output_process=self._process_command_output(not get_pacemaker_maintenance_mode(self.runner), "already exists"),
                 check_mode_skip=True) as ctx:
-            ctx.run()
-            self.vars.set('value', self._get())
-            self.vars.stdout = ctx.results_out
-            self.vars.stderr = ctx.results_err
-            self.vars.cmd = ctx.cmd
+            ctx.run(cli_action='resource')
 
     def state_enabled(self):
-        with self.runner('state name', output_process=self._process_command_output(True, "Starting"), check_mode_skip=True) as ctx:
-            ctx.run()
-            self.vars.set('value', self._get())
-            self.vars.stdout = ctx.results_out
-            self.vars.stderr = ctx.results_err
-            self.vars.cmd = ctx.cmd
+        with self.runner('cli_action state name', output_process=self._process_command_output(True, "Starting"), check_mode_skip=True) as ctx:
+            ctx.run(cli_action='resource')
 
     def state_disabled(self):
-        with self.runner('state name', output_process=self._process_command_output(True, "Stopped"), check_mode_skip=True) as ctx:
-            ctx.run()
-            self.vars.set('value', self._get())
-            self.vars.stdout = ctx.results_out
-            self.vars.stderr = ctx.results_err
-            self.vars.cmd = ctx.cmd
+        with self.runner('cli_action state name', output_process=self._process_command_output(True, "Stopped"), check_mode_skip=True) as ctx:
+            ctx.run(cli_action='resource')
+
+    def state_cleanup(self):
+        runner_args = ['cli_action', 'state']
+        if self.module.params['name']:
+            runner_args.append('name')
+        with self.runner(runner_args, output_process=self._process_command_output(True, "Clean"), check_mode_skip=True) as ctx:
+            ctx.run(cli_action='resource')
 
 
 def main():
