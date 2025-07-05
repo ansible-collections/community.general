@@ -254,6 +254,16 @@ EXAMPLES = r"""
     value: xxxxxxxxxxxxxxxxxxxx
     mode: '0600'
     state: present
+
+- name: Add or replace whole section
+  community.general.ini_file:
+    path: /etc/wireguard/wg0.conf
+    section: Peer
+    value: |
+      AllowedIps = 10.4.0.11/32
+      PublicKey = xxxxxxxxxxxxxxxxxxxx
+    mode: '0600'
+    state: present
 """
 
 import io
@@ -427,72 +437,84 @@ def do_ini(module, filename, section=None, section_has_values=None, option=None,
     # 2. edit all the remaining lines where we have a matching option
     # 3. delete remaining lines where we have a matching option
     # 4. insert missing option line(s) at the end of the section
-
-    if state == 'present' and option:
-        for index, line in enumerate(section_lines):
-            if match_function(option, line):
-                match = match_function(option, line)
-                if values and match.group(8) in values:
-                    matched_value = match.group(8)
-                    if not matched_value and allow_no_value:
+    if state == 'present':
+        if option:
+            for index, line in enumerate(section_lines):
+                if match_function(option, line):
+                    match = match_function(option, line)
+                    if values and match.group(8) in values:
+                        matched_value = match.group(8)
+                        if not matched_value and allow_no_value:
+                            # replace existing option with no value line(s)
+                            newline = u'%s\n' % option
+                            option_no_value_present = True
+                        else:
+                            # replace existing option=value line(s)
+                            newline = assignment_format % (option, matched_value)
+                        (changed, msg) = update_section_line(option, changed, section_lines, index, changed_lines, ignore_spaces, newline, msg)
+                        values.remove(matched_value)
+                    elif not values and allow_no_value:
                         # replace existing option with no value line(s)
                         newline = u'%s\n' % option
+                        (changed, msg) = update_section_line(option, changed, section_lines, index, changed_lines, ignore_spaces, newline, msg)
                         option_no_value_present = True
-                    else:
-                        # replace existing option=value line(s)
-                        newline = assignment_format % (option, matched_value)
-                    (changed, msg) = update_section_line(option, changed, section_lines, index, changed_lines, ignore_spaces, newline, msg)
-                    values.remove(matched_value)
-                elif not values and allow_no_value:
-                    # replace existing option with no value line(s)
-                    newline = u'%s\n' % option
-                    (changed, msg) = update_section_line(option, changed, section_lines, index, changed_lines, ignore_spaces, newline, msg)
-                    option_no_value_present = True
-                    break
-
-    if state == 'present' and exclusive and not allow_no_value:
-        # override option with no value to option with value if not allow_no_value
-        if len(values) > 0:
-            for index, line in enumerate(section_lines):
-                if not changed_lines[index] and match_function(option, line):
-                    newline = assignment_format % (option, values.pop(0))
-                    (changed, msg) = update_section_line(option, changed, section_lines, index, changed_lines, ignore_spaces, newline, msg)
-                    if len(values) == 0:
                         break
-        # remove all remaining option occurrences from the rest of the section
-        for index in range(len(section_lines) - 1, 0, -1):
-            if not changed_lines[index] and match_function(option, section_lines[index]):
-                del section_lines[index]
-                del changed_lines[index]
-                changed = True
-                msg = 'option changed'
 
-    if state == 'present':
-        # insert missing option line(s) at the end of the section
-        for index in range(len(section_lines), 0, -1):
-            # search backwards for previous non-blank or non-comment line
-            if not non_blank_non_comment_pattern.match(section_lines[index - 1]):
-                if option and values:
-                    # insert option line(s)
-                    for element in values[::-1]:
-                        # items are added backwards, so traverse the list backwards to not confuse the user
-                        # otherwise some of their options might appear in reverse order for whatever fancy reason ¯\_(ツ)_/¯
-                        if element is not None:
-                            # insert option=value line
-                            section_lines.insert(index, assignment_format % (option, element))
-                            msg = 'option added'
-                            changed = True
-                        elif element is None and allow_no_value:
-                            # insert option with no value line
-                            section_lines.insert(index, u'%s\n' % option)
-                            msg = 'option added'
-                            changed = True
-                elif option and not values and allow_no_value and not option_no_value_present:
-                    # insert option with no value line(s)
-                    section_lines.insert(index, u'%s\n' % option)
-                    msg = 'option added'
-                    changed = True
-                break
+            if exclusive and not allow_no_value:
+                # override option with no value to option with value if not allow_no_value
+                if len(values) > 0:
+                    for index, line in enumerate(section_lines):
+                        if not changed_lines[index] and match_function(option, line):
+                            newline = assignment_format % (option, values.pop(0))
+                            (changed, msg) = update_section_line(option, changed, section_lines, index, changed_lines, ignore_spaces, newline, msg)
+                            if len(values) == 0:
+                                break
+                # remove all remaining option occurrences from the rest of the section
+                for index in range(len(section_lines) - 1, 0, -1):
+                    if not changed_lines[index] and match_function(
+                        option, section_lines[index]
+                    ):
+                        del section_lines[index]
+                        del changed_lines[index]
+                        changed = True
+                        msg = 'option changed'
+
+            # insert missing option line(s) at the end of the section
+            for index in range(len(section_lines), 0, -1):
+                # search backwards for previous non-blank or non-comment line
+                if not non_blank_non_comment_pattern.match(section_lines[index - 1]):
+                    if values:
+                        # insert option line(s)
+                        for element in values[::-1]:
+                            # items are added backwards, so traverse the list backwards to not confuse the user
+                            # otherwise some of their options might appear in reverse order for whatever fancy reason ¯\_(ツ)_/¯
+                            if element is not None:
+                                # insert option=value line
+                                section_lines.insert(
+                                    index, assignment_format % (option, element)
+                                )
+                                msg = 'option added'
+                                changed = True
+                            elif element is None and allow_no_value:
+                                # insert option with no value line
+                                section_lines.insert(index, u'%s\n' % option)
+                                msg = 'option added'
+                                changed = True
+                    elif allow_no_value and not option_no_value_present :
+                        # insert option with no value line(s)
+                        section_lines.insert(index, u'%s\n' % option)
+                        msg = 'option added'
+                        changed = True
+                    break
+        elif within_section and len(section_lines) > 0 and len(values) > 0:
+            original = ''.join(section_lines[1:])
+            replacement = ''.join(values)
+            if not replacement.endswith('\n'):
+                replacement += '\n'
+            if original != replacement:
+                section_lines = [section_lines[0], replacement]
+                msg = 'section replaced'
+                changed = True
 
     if state == 'absent':
         if option:
@@ -539,11 +561,20 @@ def do_ini(module, filename, section=None, section_has_values=None, option=None,
                     for value in condition['values']:
                         if value not in values:
                             values.append(value)
-        if option and values:
-            for value in values:
-                ini_lines.append(assignment_format % (option, value))
-        elif option and not values and allow_no_value:
-            ini_lines.append(u'%s\n' % option)
+        if option:
+            if values:
+                for value in values:
+                    ini_lines.append(assignment_format % (option, value))
+            elif not values and allow_no_value:
+                ini_lines.append('%s\n' % option)
+            else:
+                msg = 'only section added'
+        elif len(values) > 0:
+            replacement = ''.join(values)
+            if not replacement.endswith('\n'):
+                replacement += '\n'
+            ini_lines.append(replacement)
+            msg = 'section added'
         else:
             msg = 'only section added'
         changed = True
