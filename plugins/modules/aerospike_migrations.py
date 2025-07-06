@@ -95,7 +95,7 @@ options:
   target_cluster_size:
     description:
       - When all aerospike builds in the cluster are greater than version 4.3, then the C(cluster-stable) info command is
-        be used. Inside this command, you can optionally specify what the target cluster size is - but it is not necessary.
+        used. Inside this command, you can optionally specify what the target cluster size is - but it is not necessary.
         You can still rely on O(min_cluster_size) if you do not want to use this option.
       - If this option is specified on a cluster that has at least one host <4.3 then it is ignored until the min version
         reaches 4.3.
