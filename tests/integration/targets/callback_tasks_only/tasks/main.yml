@@ -18,7 +18,7 @@
         name: callback
       vars:
         tests:
-          - name: Basic file diff
+          - name: Simple test
             environment:
               ANSIBLE_NOCOLOR: 'true'
               ANSIBLE_FORCE_COLOR: 'false'
@@ -50,6 +50,27 @@
               - ""
               - "TASK [Modify file] *************************************************************"
               - "changed: [testhost]"
+          - name: Different column width
+            environment:
+              ANSIBLE_NOCOLOR: 'true'
+              ANSIBLE_FORCE_COLOR: 'false'
+              ANSIBLE_PYTHON_INTERPRETER: "{{ ansible_python_interpreter }}"
+              ANSIBLE_STDOUT_CALLBACK: community.general.tasks_only
+              ANSIBLE_COLLECTIONS_TASKS_ONLY_COLUMN_WIDTH: 40
+            playbook: |
+              - hosts: testhost
+                gather_facts: false
+                tasks:
+                  - name: A task
+                    debug:
+                      msg: Test.
+            expected_output:
+              - ""
+              - "TASK [A task] ***************************"
+              - "ok: [testhost] => {"
+              - '    "msg": "Test."'
+              - "}"
+
 
   always:
     - name: Clean up temp file
