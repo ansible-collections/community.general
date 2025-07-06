@@ -326,6 +326,7 @@ import os
 import tempfile
 import time
 import base64
+from collections import OrderedDict
 
 from ansible.module_utils.basic import AnsibleModule, to_bytes
 from ansible.module_utils.six.moves import http_cookiejar as cookiejar
@@ -353,19 +354,19 @@ class JenkinsPlugin(object):
 
         # Authentication for non-Jenkins calls
         self.updates_url_credentials = {}
-        if self.params['updates_url_username'] and self.params['updates_url_password']:
-            auth = f"{self.params['updates_url_username']}:{self.params['updates_url_password']}".encode("utf-8")
+        if self.params.get('updates_url_username') and self.params.get('updates_url_password'):
+            auth = "{}:{}".format(self.params['updates_url_username'], self.params['updates_url_password']).encode("utf-8")
             b64_auth = base64.b64encode(auth).decode("ascii")
-            self.updates_url_credentials["Authorization"] = f"Basic {b64_auth}"
+            self.updates_url_credentials["Authorization"] = "Basic {}".format(b64_auth)
 
         # Crumb
         self.crumb = {}
 
         # Authentication for Jenkins calls
-        if self.params['url_username'] and self.params['url_password']:
-            auth = f"{self.params['url_username']}:{self.params['url_password']}".encode("utf-8")
+        if self.params.get('url_username') and self.params.get('url_password'):
+            auth = "{}:{}".format(self.params['url_username'], self.params['url_password']).encode("utf-8")
             b64_auth = base64.b64encode(auth).decode("ascii")
-            self.crumb["Authorization"] = f"Basic {b64_auth}"
+            self.crumb["Authorization"] = "Basic {}".format(b64_auth)
 
         # Cookie jar for crumb session
         self.cookies = None
@@ -457,11 +458,11 @@ class JenkinsPlugin(object):
 
             if response.getcode() != 200:
                 if dont_fail:
-                    raise FailedInstallingWithPluginManager(f"HTTP {response.getcode()}")
+                    raise FailedInstallingWithPluginManager("HTTP {}".format(response.getcode()))
                 else:
                     self.module.fail_json(
                         msg=msg_status,
-                        details=f"Received status code {response.getcode()} from {url}"
+                        details="Received status code {} from {}".format(response.getcode(), url)
                     )
         except Exception as e:
             if dont_fail:
@@ -693,13 +694,13 @@ class JenkinsPlugin(object):
                 else:
                     raise FileNotFoundError("Cache file is outdated.")
         except Exception:
-            resp, info = fetch_url(self.module, "https://updates.jenkins.io/current/plugin-versions.json")   # Get list of plugins and their dependencies
+            response = open_url("https://updates.jenkins.io/current/plugin-versions.json")   # Get list of plugins and their dependencies
 
-            if info.get("status") != 200:
+            if response.getcode() != 200:
                 self.module.fail_json(msg="Failed to fetch plugin-versions.json", details=info)
 
             try:
-                plugin_data = json.loads(to_native(resp.read()))
+                plugin_data = json.loads(to_native(response.read()), object_pairs_hook=OrderedDict)
 
                 # Save it to file for next time
                 with open(cache_path, "w") as f:
@@ -711,9 +712,9 @@ class JenkinsPlugin(object):
         if not plugin_versions:
             self.module.fail_json(msg="Plugin '{}' not found.".format(name))
 
-        sorted_versions = dict(reversed(list(plugin_versions.items())))
+        sorted_versions = list(reversed(plugin_versions.items()))
 
-        for idx, (version_title, version_info) in enumerate(sorted_versions.items()):
+        for idx, (version_title, version_info) in enumerate(sorted_versions):
             required_core = version_info.get("requiredCore", "0.0")
             if self.parse_version(required_core) <= self.jenkins_version:
                 return 'latest' if idx == 0 else version_title

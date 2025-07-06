@@ -6,9 +6,16 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 from io import BytesIO
+import json
+import socket
+from collections import OrderedDict
 
 from ansible_collections.community.general.plugins.modules.jenkins_plugin import JenkinsPlugin
 from ansible.module_utils.common._collections_compat import Mapping
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import (
+    MagicMock,
+    patch,
+)
 
 
 def pass_function(*args, **kwargs):
@@ -190,3 +197,56 @@ def isInList(l, i):
         if item == i:
             return True
     return False
+
+
+@patch("ansible_collections.community.general.plugins.modules.jenkins_plugin.open_url")
+@patch("ansible_collections.community.general.plugins.modules.jenkins_plugin.fetch_url")
+def test__get_latest_compatible_plugin_version(fetch_mock, open_mock, mocker):
+    "test the latest compatible plugin version retrieval"
+
+    params = {
+        "url": "http://fake.jenkins.server",
+        "timeout": 30,
+        "name": "git",
+        "version": "latest",
+        "updates_url": ["https://some.base.url"],
+        "latest_plugins_url_segments": ["test_latest"],
+        "jenkins_home": "/var/lib/jenkins",
+    }
+    module = mocker.Mock()
+    module.params = params
+
+    mock_response = MagicMock()
+    mock_response.read.return_value = b""
+    fetch_mock.return_value = (mock_response, {"x-jenkins": "2.263.1"})
+
+    try:
+        socket.gethostbyname("updates.jenkins.io")
+        online = True
+    except socket.gaierror:
+        online = False
+
+    # Mock the open_url to simulate the response from Jenkins update center if tests are run offline
+    if not online:
+        plugin_data = {
+            "plugins": {
+                "git": OrderedDict([
+                    ("4.8.2", {"requiredCore": "2.263.1"}),
+                    ("4.8.3", {"requiredCore": "2.263.1"}),
+                    ("4.9.0", {"requiredCore": "2.289.1"}),
+                    ("4.9.1", {"requiredCore": "2.289.1"}),
+                ])
+            }
+        }
+        mock_open_resp = MagicMock()
+        mock_open_resp.getcode.return_value = 200
+        mock_open_resp.read.return_value = json.dumps(plugin_data).encode("utf-8")
+        open_mock.return_value = mock_open_resp
+
+    JenkinsPlugin._csrf_enabled = pass_function
+    JenkinsPlugin._get_installed_plugins = pass_function
+
+    jenkins_plugin = JenkinsPlugin(module)
+
+    latest_version = jenkins_plugin._get_latest_compatible_plugin_version()
+    assert latest_version == '4.8.3'
