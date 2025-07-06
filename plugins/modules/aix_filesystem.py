@@ -82,8 +82,8 @@ options:
     description:
       - Specifies the file system size.
       - For already present it resizes the filesystem.
-      - 512-byte blocks, Megabytes or Gigabytes. If the value has M specified it is in Megabytes. If the value has G specified
-        it is in Gigabytes.
+      - 512-byte blocks, megabytes or gigabytes. If the value has M specified it is in megabytes. If the value has G specified
+        it is in gigabytes.
       - If no M or G the value is 512-byte blocks.
       - If V(+) is specified in begin of value, the value is added.
       - If V(-) is specified in begin of value, the value is removed.
