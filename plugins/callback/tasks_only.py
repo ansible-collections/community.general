@@ -24,15 +24,17 @@ options:
       - Sets the number of columns for Ansible's display.
     type: int
     env:
-      - name: ANSIBLE_COLLECTIONS_TASKS_ONLY_NUMBER_OF_COLUMN
+      - name: ANSIBLE_COLLECTIONS_TASKS_ONLY_NUMBER_OF_COLUMNS
 """
 
 EXAMPLES = r"""
+---
 # Enable callback in ansible.cfg:
 ansible_config: |-
   [defaults]
   stdout_callback = community.general.tasks_only
 
+---
 # Enable callback with environment variables:
 environment_variable: |-
   ANSIBLE_STDOUT_CALLBACK=community.general.tasks_only

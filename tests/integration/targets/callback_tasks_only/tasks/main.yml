@@ -56,7 +56,7 @@
               ANSIBLE_FORCE_COLOR: 'false'
               ANSIBLE_PYTHON_INTERPRETER: "{{ ansible_python_interpreter }}"
               ANSIBLE_STDOUT_CALLBACK: community.general.tasks_only
-              ANSIBLE_COLLECTIONS_TASKS_ONLY_NUMBER_OF_COLUMN: 40
+              ANSIBLE_COLLECTIONS_TASKS_ONLY_NUMBER_OF_COLUMNS: 40
             playbook: |
               - hosts: testhost
                 gather_facts: false
