@@ -195,7 +195,7 @@ def main():
         #
         # Test if we're actually logged in, but skip this check for some token prefixes
         SKIPPED_TOKEN_PREFIXES = ['ghs_']
-        if password or (login_token and any(login_token.startswith(prefix) for prefix in SKIPPED_TOKEN_PREFIXES)):
+        if password or (login_token and not any(login_token.startswith(prefix) for prefix in SKIPPED_TOKEN_PREFIXES)):
             gh_obj.me()
     except github3.exceptions.AuthenticationFailed as e:
         module.fail_json(msg='Failed to connect to GitHub: %s' % to_native(e),
