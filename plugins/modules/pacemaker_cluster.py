@@ -38,7 +38,7 @@ options:
     aliases: ['node']
   timeout:
     description:
-      - Timeout period for polling the cluster operation.
+      - Timeout period (in seconds) for polling the cluster operation.
     type: int
     default: 300
   force:
@@ -101,7 +101,7 @@ class PacemakerCluster(StateModuleHelper):
 
         if not self.module.params['state']:
             self.module.deprecate(
-                'Parameter "state" values not defined is being deprecated',
+                'Parameter "state" values not set is being deprecated. Make sure to provide a value for "state"',
                 version='12.0.0',
                 collection_name='community.general'
             )
