@@ -1,0 +1,2 @@
+bugfixes:
+  - github_app_access_token - support multiple types of github tokens, not failing when ghs_ token type is provided (https://github.com/ansible-collections/community.general/issues/10338)
