@@ -32,7 +32,7 @@ options:
   name:
     description:
       - Specify the resource name to create.
-      - This is required if O(state=present), O(state=absent), O(state=enabled), or O(state=disabled).
+    required: true
     type: str
   resource_type:
     description:
@@ -141,7 +141,7 @@ class PacemakerResource(StateModuleHelper):
         argument_spec=dict(
             state=dict(type='str', choices=[
                 'present', 'absent', 'enabled', 'disabled']),
-            name=dict(type='str'),
+            name=dict(type='str', required=True),
             resource_type=dict(type='dict', options=dict(
                 resource_name=dict(type='str'),
                 resource_standard=dict(type='str'),
@@ -159,13 +159,7 @@ class PacemakerResource(StateModuleHelper):
             )),
             wait=dict(type='int', default=300),
         ),
-        required_if=[
-            ('state', 'present', ['resource_type', 'resource_option', 'name']),
-            ('state', 'absent', ['name']),
-            ('state', 'enabled', ['name']),
-            ('state', 'disabled', ['name']),
-            ('state', ['present', 'absent', 'enabled', 'disabled'], ['name']),
-        ],
+        required_if=[('state', 'present', ['resource_type', 'resource_option'])],
         supports_check_mode=True,
     )
 

@@ -7,6 +7,11 @@
 anchors:
   environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
 test_cases:
+  - id: test_missing_input
+    input: {}
+    output:
+      failed: true
+      msg: "missing required arguments: name"
   - id: test_present_minimal_input_resource_not_exist
     input:
       state: present
