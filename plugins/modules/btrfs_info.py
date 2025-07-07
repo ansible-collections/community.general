@@ -64,7 +64,7 @@ filesystems:
         mountpoints:
           description: Paths where the subvolume is mounted on the targeted host.
           type: list
-          sample: ['/home']
+          sample: ["/home"]
         parent:
           description: The identifier of this subvolume's parent.
           type: int

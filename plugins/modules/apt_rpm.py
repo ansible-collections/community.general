@@ -36,8 +36,8 @@ options:
     description:
       - Indicates the desired package state.
       - The states V(latest) and V(present_not_latest) have been added in community.general 8.6.0.
-      - Please note before community.general 11.0.0, V(present) and V(installed) were equivalent to V(latest).
-        This changed in community.general 11.0.0. Now they are equivalent to V(present_not_latest).
+      - Please note before community.general 11.0.0, V(present) and V(installed) were equivalent to V(latest). This changed
+        in community.general 11.0.0. Now they are equivalent to V(present_not_latest).
     choices:
       - absent
       - present

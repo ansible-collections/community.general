@@ -32,7 +32,7 @@ options:
     aliases: ["be"]
   snapshot:
     description:
-      - If specified, the new boot environment will be cloned from the given snapshot or inactive boot environment.
+      - If specified, the new boot environment is cloned from the given snapshot or inactive boot environment.
     type: str
   description:
     description:

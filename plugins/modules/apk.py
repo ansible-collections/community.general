@@ -47,8 +47,8 @@ options:
     version_added: 1.0.0
   repository:
     description:
-      - A package repository or multiple repositories. Unlike with the underlying apk command, this list will override the
-        system repositories rather than supplement them.
+      - A package repository or multiple repositories. Unlike with the underlying apk command, this list overrides the system
+        repositories rather than supplement them.
     type: list
     elements: str
   state:
@@ -79,7 +79,7 @@ options:
     version_added: 5.4.0
 notes:
   - O(name) and O(upgrade) are mutually exclusive.
-  - When used with a C(loop:) each package will be processed individually, it is much more efficient to pass the list directly
+  - When used with a C(loop:) each package is processed individually, it is much more efficient to pass the list directly
     to the O(name) option.
 """
 
@@ -164,7 +164,7 @@ packages:
   description: A list of packages that have been changed.
   returned: when packages have changed
   type: list
-  sample: ['package', 'other-package']
+  sample: ["package", "other-package"]
 """
 
 import re

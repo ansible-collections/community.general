@@ -18,8 +18,8 @@ description:
   - This module allows the installation of Ansible collections or roles using C(ansible-galaxy).
 notes:
   - Support for B(Ansible 2.9/2.10) was removed in community.general 8.0.0.
-  - The module will try and run using the C(C.UTF-8) locale. If that fails, it will try C(en_US.UTF-8). If that one also fails,
-    the module will fail.
+  - The module tries to run using the C(C.UTF-8) locale. If that fails, it tries C(en_US.UTF-8). If that one also fails, the
+    module fails.
 seealso:
   - name: C(ansible-galaxy) command manual page
     description: Manual page for the command.
@@ -37,10 +37,10 @@ attributes:
 options:
   state:
     description:
-      - If O(state=present) then the collection or role will be installed. Note that the collections and roles are not updated
+      - If O(state=present) then the collection or role is installed. Note that the collections and roles are not updated
         with this option.
-      - Currently the O(state=latest) is ignored unless O(type=collection), and it will ensure the collection is installed
-        and updated to the latest available version.
+      - Currently the O(state=latest) is ignored unless O(type=collection), and it ensures the collection is installed and
+        updated to the latest available version.
       - Please note that O(force=true) can be used to perform upgrade regardless of O(type).
     type: str
     choices: [present, latest]
@@ -71,7 +71,7 @@ options:
   dest:
     description:
       - The path to the directory containing your collections or roles, according to the value of O(type).
-      - Please notice that C(ansible-galaxy) will not install collections with O(type=both), when O(requirements_file) contains
+      - Please notice that C(ansible-galaxy) does not install collections with O(type=both), when O(requirements_file) contains
         both roles and collections and O(dest) is specified.
     type: path
   no_deps:
@@ -83,7 +83,7 @@ options:
   force:
     description:
       - Force overwriting existing roles and/or collections.
-      - It can be used for upgrading, but the module output will always report C(changed=true).
+      - It can be used for upgrading, but the module output always reports C(changed=true).
       - Using O(force=true) is mandatory when downgrading.
     type: bool
     default: false

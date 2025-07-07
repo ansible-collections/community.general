@@ -47,7 +47,7 @@ options:
     description:
       - Logical volume (LV) device name or remote export device to create a NFS file system.
       - It is used to create a file system on an already existing logical volume or the exported NFS file system.
-      - If not mentioned a new logical volume name will be created following AIX standards (LVM).
+      - If not mentioned a new logical volume name is created following AIX standards (LVM).
     type: str
   fs_type:
     description:
@@ -81,14 +81,14 @@ options:
   size:
     description:
       - Specifies the file system size.
-      - For already V(present) it will be resized.
-      - 512-byte blocks, Megabytes or Gigabytes. If the value has M specified it will be in Megabytes. If the value has G
-        specified it will be in Gigabytes.
-      - If no M or G the value will be 512-byte blocks.
-      - If "+" is specified in begin of value, the value will be added.
-      - If "-" is specified in begin of value, the value will be removed.
-      - If "+" or "-" is not specified, the total value will be the specified.
-      - Size will respects the LVM AIX standards.
+      - For already present it resizes the filesystem.
+      - 512-byte blocks, megabytes or gigabytes. If the value has M specified it is in megabytes. If the value has G specified
+        it is in gigabytes.
+      - If no M or G the value is 512-byte blocks.
+      - If V(+) is specified in begin of value, the value is added.
+      - If V(-) is specified in begin of value, the value is removed.
+      - If neither V(+) nor V(-) is specified, then the total value is the specified.
+      - Size respects the LVM AIX standards.
     type: str
   state:
     description:

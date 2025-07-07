@@ -167,7 +167,7 @@ instances:
           type: str
           sample: 42.10.2.2
     expired_time:
-      description: The time the instance will expire.
+      description: The time the instance expires.
       returned: always
       type: str
       sample: "2099-12-31T15:59Z"
@@ -341,7 +341,7 @@ ids:
   description: List of ECS instance IDs.
   returned: always
   type: list
-  sample: [i-12345er, i-3245fs]
+  sample: ["i-12345er", "i-3245fs"]
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib

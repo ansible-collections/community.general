@@ -45,8 +45,7 @@ options:
     type: str
   availability_zone:
     description:
-      - Aliyun availability zone ID in which to launch the instance. If it is not specified, it will be allocated by system
-        automatically.
+      - Aliyun availability zone ID in which to launch the instance. If it is not specified, it is allocated by system automatically.
     aliases: ['alicloud_zone', 'zone_id']
     type: str
   image_id:
@@ -109,7 +108,7 @@ options:
     version_added: '0.2.0'
   password:
     description:
-      - The password to login instance. After rebooting instances, modified password will take effect.
+      - The password to login instance. After rebooting instances, modified password is effective.
     type: str
   system_disk_category:
     description:
@@ -140,7 +139,7 @@ options:
     description:
       - O(count) determines how many instances based on a specific tag criteria should be present. This can be expressed in
         multiple ways and is shown in the EXAMPLES section. The specified count_tag must already exist or be passed in as
-        the O(tags) option. If it is not specified, it will be replaced by O(instance_name).
+        the O(tags) option. If it is not specified, it is replaced by O(instance_name).
     type: str
   allocate_public_ip:
     description:
@@ -172,8 +171,7 @@ options:
     type: int
   instance_ids:
     description:
-      - A list of instance IDs. It is required when need to operate existing instances. If it is specified, O(count) will
-        lose efficacy.
+      - A list of instance IDs. It is required when need to operate existing instances. If it is specified, O(count) is ignored.
     type: list
     elements: str
   force:
@@ -203,7 +201,7 @@ options:
   user_data:
     description:
       - User-defined data to customize the startup behaviors of an ECS instance and to pass data into an ECS instance. It
-        only will take effect when launching the new ECS instances.
+        only takes effect when launching the new ECS instances.
     required: false
     type: str
   ram_role_name:
@@ -226,7 +224,7 @@ options:
     version_added: '0.2.0'
   period_unit:
     description:
-      - The duration unit that you will buy the resource. It is valid when O(instance_charge_type=PrePaid).
+      - The duration unit that you are buying the resource. It is valid when O(instance_charge_type=PrePaid).
     choices: ['Month', 'Week']
     default: 'Month'
     type: str
@@ -424,7 +422,7 @@ instances:
           type: str
           sample: 42.10.2.2
     expired_time:
-      description: The time the instance will expire.
+      description: The time the instance expires.
       returned: always
       type: str
       sample: "2099-12-31T15:59Z"
@@ -615,7 +613,7 @@ ids:
   description: List of ECS instance IDs.
   returned: always
   type: list
-  sample: [i-12345er, i-3245fs]
+  sample: ["i-12345er", "i-3245fs"]
 """
 
 import re
