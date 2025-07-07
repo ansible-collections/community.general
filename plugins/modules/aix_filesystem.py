@@ -66,7 +66,7 @@ options:
     type: str
   filesystem:
     description:
-      - Specifies the mount point, which is the directory where the file system is being mounted.
+      - Specifies the mount point, which is the directory where the file system will be mounted.
     type: str
     required: true
   nfs_server:
