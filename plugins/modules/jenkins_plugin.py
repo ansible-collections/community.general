@@ -76,14 +76,16 @@ options:
     default: ['https://updates.jenkins.io', 'http://mirrors.jenkins.io']
   updates_url_username:
     description:
-      - If using a custom O(updates_url), set this as the username of the user with access to the url.
+      - If using a custom O(updates_url), set this as the username of the user with access to the URL.
       - If the custom O(updates_url) does not require authentication, this can be left empty.
     type: str
+    version_added: 11.1.0
   updates_url_password:
     description:
-      - If using a custom O(updates_url), set this as the password of the user with access to the url.
+      - If using a custom O(updates_url), set this as the password of the user with access to the URL.
       - If the custom O(updates_url) does not require authentication, this can be left empty.
     type: str
+    version_added: 11.1.0
   update_json_url_segment:
     type: list
     elements: str
@@ -122,6 +124,8 @@ options:
   with_dependencies:
     description:
       - Defines whether to install plugin dependencies.
+      - In earlier versions, this option had no effect when a specific C(version) was set.
+      - Since community.general 11.1.0, dependencies are also installed for versioned plugins.
     type: bool
     default: true
 
@@ -325,13 +329,12 @@ import json
 import os
 import tempfile
 import time
-import base64
 from collections import OrderedDict
 
 from ansible.module_utils.basic import AnsibleModule, to_bytes
 from ansible.module_utils.six.moves import http_cookiejar as cookiejar
 from ansible.module_utils.six.moves.urllib.parse import urlencode
-from ansible.module_utils.urls import fetch_url, url_argument_spec, open_url
+from ansible.module_utils.urls import fetch_url, url_argument_spec, basic_auth_header
 from ansible.module_utils.six import text_type, binary_type
 from ansible.module_utils.common.text.converters import to_native
 
@@ -355,18 +358,14 @@ class JenkinsPlugin(object):
         # Authentication for non-Jenkins calls
         self.updates_url_credentials = {}
         if self.params.get('updates_url_username') and self.params.get('updates_url_password'):
-            auth = "{}:{}".format(self.params['updates_url_username'], self.params['updates_url_password']).encode("utf-8")
-            b64_auth = base64.b64encode(auth).decode("ascii")
-            self.updates_url_credentials["Authorization"] = "Basic {}".format(b64_auth)
+            self.updates_url_credentials["Authorization"] = basic_auth_header(self.params['updates_url_username'], self.params['updates_url_password'])
 
         # Crumb
         self.crumb = {}
 
         # Authentication for Jenkins calls
         if self.params.get('url_username') and self.params.get('url_password'):
-            auth = "{}:{}".format(self.params['url_username'], self.params['url_password']).encode("utf-8")
-            b64_auth = base64.b64encode(auth).decode("ascii")
-            self.crumb["Authorization"] = "Basic {}".format(b64_auth)
+            self.crumb["Authorization"] = basic_auth_header(self.params['url_username'], self.params['url_password'])
 
         # Cookie jar for crumb session
         self.cookies = None
@@ -418,16 +417,18 @@ class JenkinsPlugin(object):
                 self.module.debug("fetching url: %s" % url)
 
                 is_jenkins_call = url.startswith(self.url)
+                self.module.params['force_basic_auth'] = is_jenkins_call
 
-                response = open_url(
-                    url, timeout=self.timeout,
-                    cookies=self.cookies if is_jenkins_call else None,
-                    headers=self.crumb if is_jenkins_call else self.updates_url_credentials, **kwargs)
-                if response.getcode() == 200:
+                response, info = fetch_url(
+                    self.module, url, timeout=self.timeout, cookies=self.cookies,
+                    headers=self.crumb if is_jenkins_call else self.updates_url_credentials or self.crumb,
+                    **kwargs)
+                if info['status'] == 200:
                     return response
                 else:
-                    err_msg = ("%s. fetching url %s failed. response code: %s" % (msg_status, url, response.getcode()))
-
+                    err_msg = ("%s. fetching url %s failed. response code: %s" % (msg_status, url, info['status']))
+                    if info['status'] > 400:  # extend error message
+                        err_msg = "%s. response body: %s" % (err_msg, info['body'])
             except Exception as e:
                 err_msg = "%s. fetching url %s failed. error msg: %s" % (msg_status, url, to_native(e))
             finally:
@@ -451,19 +452,18 @@ class JenkinsPlugin(object):
         # Get the URL data
         try:
             is_jenkins_call = url.startswith(self.url)
-            response = open_url(
-                url, timeout=self.timeout,
-                cookies=self.cookies if is_jenkins_call else None,
-                headers=self.crumb if is_jenkins_call else self.updates_url_credentials, **kwargs)
+            self.module.params['force_basic_auth'] = is_jenkins_call
 
-            if response.getcode() != 200:
+            response, info = fetch_url(
+                self.module, url, timeout=self.timeout, cookies=self.cookies,
+                headers=self.crumb if is_jenkins_call else self.updates_url_credentials or self.crumb,
+                **kwargs)
+
+            if info['status'] != 200:
                 if dont_fail:
-                    raise FailedInstallingWithPluginManager("HTTP {}".format(response.getcode()))
+                    raise FailedInstallingWithPluginManager(info['msg'])
                 else:
-                    self.module.fail_json(
-                        msg=msg_status,
-                        details="Received status code {} from {}".format(response.getcode(), url)
-                    )
+                    self.module.fail_json(msg=msg_status, details=info['msg'])
         except Exception as e:
             if dont_fail:
                 raise FailedInstallingWithPluginManager(e)
@@ -679,6 +679,7 @@ class JenkinsPlugin(object):
 
     def _get_latest_compatible_plugin_version(self, plugin_name=None):
         if not hasattr(self, 'jenkins_version'):
+            self.module.params['force_basic_auth'] = True
             resp, info = fetch_url(self.module, self.url)
             raw_version = info.get("x-jenkins")
             self.jenkins_version = self.parse_version(raw_version)
@@ -694,9 +695,9 @@ class JenkinsPlugin(object):
                 else:
                     raise FileNotFoundError("Cache file is outdated.")
         except Exception:
-            response = open_url("https://updates.jenkins.io/current/plugin-versions.json")   # Get list of plugins and their dependencies
+            response, info = fetch_url(self.module, "https://updates.jenkins.io/current/plugin-versions.json")   # Get list of plugins and their dependencies
 
-            if response.getcode() != 200:
+            if info['status'] != 200:
                 self.module.fail_json(msg="Failed to fetch plugin-versions.json", details=info)
 
             try:
@@ -948,9 +949,6 @@ def main():
         add_file_common_args=True,
         supports_check_mode=True,
     )
-
-    # Force basic authentication
-    module.params['force_basic_auth'] = True
 
     # Convert timeout to float
     try:
