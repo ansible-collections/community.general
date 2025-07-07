@@ -155,11 +155,35 @@ class Connection(ConnectionBase):
         stdout = to_text(stdout)
         stderr = to_text(stderr)
 
-        if stderr == "Error: Instance is not running.\n":
-            raise AnsibleConnectionFailure(f"instance not running: {self._instance()}")
+        if stderr.startswith("Error: ") and stderr.rstrip().endswith(
+            ": Instance is not running"
+        ):
+            raise AnsibleConnectionFailure(
+                f"instance not running: {self._instance()} (remote={self.get_option('remote')}, project={self.get_option('project')})"
+            )
 
-        if stderr == "Error: Instance not found\n":
-            raise AnsibleConnectionFailure(f"instance not found: {self._instance()}")
+        if stderr.startswith("Error: ") and stderr.rstrip().endswith(
+            ": Instance not found"
+        ):
+            raise AnsibleConnectionFailure(
+                f"instance not found: {self._instance()} (remote={self.get_option('remote')}, project={self.get_option('project')})"
+            )
+
+        if (
+            stderr.startswith("Error: ")
+            and ": User does not have permission " in stderr
+        ):
+            raise AnsibleConnectionFailure(
+                f"instance access denied: {self._instance()} (remote={self.get_option('remote')}, project={self.get_option('project')})"
+            )
+
+        if (
+            stderr.startswith("Error: ")
+            and ": User does not have entitlement " in stderr
+        ):
+            raise AnsibleConnectionFailure(
+                f"instance access denied: {self._instance()} (remote={self.get_option('remote')}, project={self.get_option('project')})"
+            )
 
         return process.returncode, stdout, stderr
 
