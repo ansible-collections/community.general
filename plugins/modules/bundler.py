@@ -36,13 +36,13 @@ options:
     type: path
     description:
       - The directory to execute the bundler commands from. This directory needs to contain a valid Gemfile or .bundle/ directory.
-      - If not specified, it will default to the temporary working directory.
+      - If not specified, it defaults to the temporary working directory.
   exclude_groups:
     type: list
     elements: str
     description:
       - A list of Gemfile groups to exclude during operations. This only applies when O(state=present). Bundler considers
-        this a 'remembered' property for the Gemfile and will automatically exclude groups in future operations even if O(exclude_groups)
+        this a 'remembered' property for the Gemfile and automatically excludes groups in future operations even if O(exclude_groups)
         is not set.
   clean:
     description:
@@ -53,7 +53,7 @@ options:
     type: path
     description:
       - Only applies if O(state=present). The path to the gemfile to use to install gems.
-      - If not specified it will default to the Gemfile in current directory.
+      - If not specified it defaults to the Gemfile in current directory.
   local:
     description:
       - If set only installs gems from the cache on the target host.
@@ -61,8 +61,8 @@ options:
     default: false
   deployment_mode:
     description:
-      - Only applies if O(state=present). If set it will install gems in C(./vendor/bundle) instead of the default location.
-        Requires a C(Gemfile.lock) file to have been created prior.
+      - Only applies if O(state=present). If set it installs gems in C(./vendor/bundle) instead of the default location. Requires
+        a C(Gemfile.lock) file to have been created prior.
     type: bool
     default: false
   user_install:
@@ -75,12 +75,12 @@ options:
     description:
       - Only applies if O(state=present). Specifies the directory to install the gems into. If O(chdir) is set then this path
         is relative to O(chdir).
-      - If not specified the default RubyGems gem paths will be used.
+      - If not specified the default RubyGems gem paths are used.
   binstub_directory:
     type: path
     description:
       - Only applies if O(state=present). Specifies the directory to install any gem bins files to. When executed the bin
-        files will run within the context of the Gemfile and fail if any required gem dependencies are not installed. If O(chdir)
+        files run within the context of the Gemfile and fail if any required gem dependencies are not installed. If O(chdir)
         is set then this path is relative to O(chdir).
   extra_args:
     type: str
