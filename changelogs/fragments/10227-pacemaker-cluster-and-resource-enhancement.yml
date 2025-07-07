@@ -2,6 +2,5 @@ deprecated_features:
   - pacemaker_cluster - the parameter ``state`` will become a required parameter in community.general 12.0.0 (https://github.com/ansible-collections/community.general/pull/10227).
 
 minor_changes:
-  - pacemaker_resource - add ``state=cleanup`` for cleaning up cluster resources (https://github.com/ansible-collections/community.general/pull/10227).
   - pacemaker_cluster - add ``state=maintenance`` for managing pacemaker maintenance mode (https://github.com/ansible-collections/community.general/pull/10227).
   - pacemaker_cluster - rename ``node`` to ``name`` and add ``node`` alias (https://github.com/ansible-collections/community.general/pull/10227).

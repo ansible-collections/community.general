@@ -27,8 +27,7 @@ options:
   state:
     description:
       - Indicate desired state for cluster resource.
-      - The state V(cleanup) has been added in community.general 11.1.0.
-    choices: [present, absent, enabled, disabled, cleanup]
+    choices: [present, absent, enabled, disabled]
     type: str
   name:
     description:
@@ -141,7 +140,7 @@ class PacemakerResource(StateModuleHelper):
     module = dict(
         argument_spec=dict(
             state=dict(type='str', choices=[
-                'present', 'absent', 'enabled', 'disabled', 'cleanup']),
+                'present', 'absent', 'enabled', 'disabled']),
             name=dict(type='str'),
             resource_type=dict(type='dict', options=dict(
                 resource_name=dict(type='str'),
@@ -212,13 +211,6 @@ class PacemakerResource(StateModuleHelper):
 
     def state_disabled(self):
         with self.runner('cli_action state name', output_process=self._process_command_output(True, "Stopped"), check_mode_skip=True) as ctx:
-            ctx.run(cli_action='resource')
-
-    def state_cleanup(self):
-        runner_args = ['cli_action', 'state']
-        if self.module.params['name']:
-            runner_args.append('name')
-        with self.runner(runner_args, output_process=self._process_command_output(True, "Clean"), check_mode_skip=True) as ctx:
             ctx.run(cli_action='resource')
 
 
