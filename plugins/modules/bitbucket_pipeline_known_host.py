@@ -13,8 +13,7 @@ module: bitbucket_pipeline_known_host
 short_description: Manages Bitbucket pipeline known hosts
 description:
   - Manages Bitbucket pipeline known hosts under the "SSH Keys" menu.
-  - The host fingerprint will be retrieved automatically, but in case of an error, one can use O(key) field to specify it
-    manually.
+  - The host fingerprint is retrieved automatically, but in case of an error, one can use O(key) field to specify it manually.
 author:
   - Evgeniy Krysanov (@catcombo)
 extends_documentation_fragment:

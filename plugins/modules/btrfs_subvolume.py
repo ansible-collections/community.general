@@ -64,9 +64,9 @@ options:
         no change is required. Warning, this option does not yet verify that the target subvolume was generated from a snapshot
         of the requested source.
       - V(clobber) - If a subvolume already exists at the requested location, delete it first. This option is not idempotent
-        and will result in a new snapshot being generated on every execution.
+        and results in a new snapshot being generated on every execution.
       - V(error) - If a subvolume already exists at the requested location, return an error. This option is not idempotent
-        and will result in an error on replay of the module.
+        and results in an error on replay of the module.
     type: str
     choices: [skip, clobber, error]
     default: skip
@@ -80,8 +80,8 @@ options:
 notes:
   - If any or all of the options O(filesystem_device), O(filesystem_label) or O(filesystem_uuid) parameters are provided,
     there is expected to be a matching btrfs filesystem. If none are provided and only a single btrfs filesystem exists or
-    only a single btrfs filesystem is mounted, that filesystem will be used; otherwise, the module will take no action and
-    return an error.
+    only a single btrfs filesystem is mounted, that filesystem is used; otherwise, the module takes no action and returns an
+    error.
 extends_documentation_fragment:
   - community.general.attributes
 
@@ -180,7 +180,7 @@ filesystem:
         mountpoints:
           description: Paths where the subvolume is mounted on the targeted host.
           type: list
-          sample: ['/home']
+          sample: ["/home"]
         parent:
           description: The identifier of this subvolume's parent.
           type: int

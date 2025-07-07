@@ -40,7 +40,7 @@ options:
     description:
       - Activate the new firewall rules.
       - Can be run with other steps or on its own.
-      - Idempotency is affected if O(activate=true), as the module will always report a changed state.
+      - Idempotency is affected if O(activate=true), as the module always reports a changed state.
     type: bool
     default: false
 notes:

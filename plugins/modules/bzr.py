@@ -42,12 +42,12 @@ options:
     type: str
   force:
     description:
-      - If V(true), any modified files in the working tree will be discarded.
+      - If V(true), any modified files in the working tree is discarded.
     type: bool
     default: false
   executable:
     description:
-      - Path to bzr executable to use. If not supplied, the normal mechanism for resolving binary paths will be used.
+      - Path to C(bzr) executable to use. If not supplied, the normal mechanism for resolving binary paths is used.
     type: str
 """
 

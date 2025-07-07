@@ -36,7 +36,7 @@ options:
     description:
       - List of comma-separated devices to use as physical devices in this volume group.
       - Required when creating or extending (V(present) state) the volume group.
-      - If not informed reducing (V(absent) state) the volume group will be removed.
+      - If not informed reducing (V(absent) state) the volume group is removed.
     type: list
     elements: str
   state:
@@ -57,7 +57,7 @@ options:
     choices: [big, normal, scalable]
     default: normal
 notes:
-  - AIX will permit remove VG only if all LV/Filesystems are not busy.
+  - AIX allows removing VG only if all LV/Filesystems are not busy.
   - Module does not modify PP size for already present volume group.
 """
 
