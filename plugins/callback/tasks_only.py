@@ -15,16 +15,16 @@ short_description: Only show tasks
 description:
   - Removes play start and stats marker from P(ansible.builtin.default#callback)'s output.
   - Can be used to generate output for documentation examples.
-    For this, the O(column_width) option should be set to an explicit value.
+    For this, the O(number_of_columns) option should be set to an explicit value.
 extends_documentation_fragment:
   - default_callback
 options:
-  column_width:
+  number_of_columns:
     description:
-      - Sets the column width for Ansible's display.
+      - Sets the number of columns for Ansible's display.
     type: int
     env:
-      - name: ANSIBLE_COLLECTIONS_TASKS_ONLY_COLUMN_WIDTH
+      - name: ANSIBLE_COLLECTIONS_TASKS_ONLY_NUMBER_OF_COLUMN
 """
 
 EXAMPLES = r"""
@@ -54,7 +54,7 @@ class CallbackModule(Default):
 
     def set_options(self, *args, **kwargs):
         result = super(CallbackModule, self).set_options(*args, **kwargs)
-        self.column_width = self.get_option("column_width")
-        if self.column_width is not None:
-            self._display.columns = self.column_width
+        self.number_of_columns = self.get_option("number_of_columns")
+        if self.number_of_columns is not None:
+            self._display.columns = self.number_of_columns
         return result
