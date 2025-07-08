@@ -28,6 +28,7 @@ options:
     description:
       - Indicate desired state for cluster resource.
     choices: [present, absent, enabled, disabled]
+    default: present
     type: str
   name:
     description:
@@ -139,7 +140,7 @@ from ansible_collections.community.general.plugins.module_utils.pacemaker import
 class PacemakerResource(StateModuleHelper):
     module = dict(
         argument_spec=dict(
-            state=dict(type='str', choices=[
+            state=dict(type='str', default='present', choices=[
                 'present', 'absent', 'enabled', 'disabled']),
             name=dict(type='str', required=True),
             resource_type=dict(type='dict', options=dict(
