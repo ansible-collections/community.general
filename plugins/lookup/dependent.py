@@ -207,7 +207,10 @@ class LookupModule(LookupBase):
 
         result = []
         if len(terms) > 0:
-            templar = Templar(loader=self._templar._loader)
+            if HAS_DATATAGGING:
+                templar = self._templar.copy_with_new_env(available_variables={})
+            else:
+                templar = Templar(loader=self._templar._loader)
             data = []
             vars_so_far = set()
             for index, term in enumerate(terms):
