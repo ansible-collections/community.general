@@ -127,9 +127,7 @@ class CallbackModule(CallbackBase):
 
         if not HAS_LOGSTASH:
             self.disabled = True
-            self._display.warning("The required python-logstash/python3-logstash is not installed. "
-                                  "pip install python-logstash for Python 2"
-                                  "pip install python3-logstash for Python 3")
+            self._display.warning("The required python3-logstash is not installed.")
 
         self.start_time = now()
 
