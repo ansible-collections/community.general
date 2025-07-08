@@ -182,11 +182,27 @@ def main():
         else:
             gh_obj = github3.GitHub()
 
-        # test if we're actually logged in
-        if password or login_token:
+        # GitHub's token formats:
+        #   - ghp_          - Personal access token (classic)
+        #   - github_pat_   - Fine-grained personal access token
+        #   - gho_          - OAuth access token
+        #   - ghu_          - User access token for a GitHub App
+        #   - ghs_          - Installation access token for a GitHub App
+        #   - ghr_          - Refresh token for a GitHub App
+        #
+        # References:
+        #   https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#githubs-token-formats
+        #
+        # Test if we're actually logged in, but skip this check for some token prefixes
+        SKIPPED_TOKEN_PREFIXES = ['ghs_']
+        if password or (login_token and not any(login_token.startswith(prefix) for prefix in SKIPPED_TOKEN_PREFIXES)):
             gh_obj.me()
     except github3.exceptions.AuthenticationFailed as e:
         module.fail_json(msg='Failed to connect to GitHub: %s' % to_native(e),
+                         details="Please check username and password or token "
+                                 "for repository %s" % repo)
+    except github3.exceptions.GitHubError as e:
+        module.fail_json(msg='GitHub API error: %s' % to_native(e),
                          details="Please check username and password or token "
                                  "for repository %s" % repo)
 
