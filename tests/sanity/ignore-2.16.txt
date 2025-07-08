@@ -1,3 +1,4 @@
+plugins/callback/tasks_only.py yamllint:unparsable-with-libyaml
 plugins/connection/wsl.py yamllint:unparsable-with-libyaml
 plugins/inventory/gitlab_runners.py yamllint:unparsable-with-libyaml
 plugins/inventory/iocage.py yamllint:unparsable-with-libyaml
