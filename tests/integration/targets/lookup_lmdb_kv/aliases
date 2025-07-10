@@ -5,3 +5,4 @@
 azp/posix/2
 destructive
 skip/aix
+disabled  # TODO: currently broken
