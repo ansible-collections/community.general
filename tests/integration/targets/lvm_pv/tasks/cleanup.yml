@@ -3,10 +3,18 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: Detaching loop device
-  ansible.builtin.command: losetup -d {{ loop_device.stdout }}
+- name: Detaching first loop device
+  ansible.builtin.command: losetup -d {{ loop_device_01.stdout }}
 
-- name: Removing loop device file
+- name: Detaching second loop device
+  ansible.builtin.command: losetup -d {{ loop_device_02.stdout }}
+
+- name: Removing first loop device file
   ansible.builtin.file:
-    path: "{{ remote_tmp_dir }}/test_lvm_pv.img"
+    path: "{{ remote_tmp_dir }}/test_lvm_pv_01.img"
+    state: absent
+
+- name: Removing second loop device file
+  ansible.builtin.file:
+    path: "{{ remote_tmp_dir }}/test_lvm_pv_02.img"
     state: absent

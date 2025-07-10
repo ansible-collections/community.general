@@ -3,25 +3,25 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: Growing the loop device file to 100MB
-  ansible.builtin.shell: truncate -s 100M {{ remote_tmp_dir }}/test_lvm_pv.img
+- name: Growing the first loop device file to 1000MB
+  ansible.builtin.shell: truncate -s 1000M {{ remote_tmp_dir }}/test_lvm_pv_01.img
 
-- name: Refreshing the loop device
-  ansible.builtin.shell: losetup -c {{ loop_device.stdout }}
+- name: Refreshing the first loop device
+  ansible.builtin.shell: losetup -c {{ loop_device_01.stdout }}
 
 - name: Resizing the physical volume
   community.general.lvm_pv:
-    device: "{{ loop_device.stdout }}"
+    device: "{{ loop_device_01.stdout }}"
     resize: true
   register: resize_result
 
 - name: Checking physical volume size
-  ansible.builtin.command: pvs --noheadings -o pv_size --units M {{ loop_device.stdout }}
+  ansible.builtin.command: pvs --noheadings -o pv_size --units M {{ loop_device_01.stdout }}
   register: pv_size_output
 
 - name: Asserting physical volume was resized
   ansible.builtin.assert:
     that:
       - resize_result.changed == true
-      - (pv_size_output.stdout | trim | regex_replace('M', '') | float) > 95
+      - (pv_size_output.stdout | trim | regex_replace('M', '') | float) > 950
       - "'resized' in resize_result.msg"

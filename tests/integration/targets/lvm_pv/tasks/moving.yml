@@ -1,0 +1,52 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Creating volume group on top of first device {{ loop_device_01.stdout }}
+  community.general.lvg:
+    vg: vg_test
+    pvs: "{{ loop_device_01.stdout }}"
+
+- name: Creating LV lv_test on VG vg_test
+  community.general.lvol:
+    vg: vg_test
+    lv: lv_test
+    size: 100%FREE
+    force: true
+
+- name: Creating ext4 filesystem on LV lv_test
+  community.general.filesystem:
+    fstype: ext4
+    dev: /dev/vg_test/lv_test
+
+- name: Mounting LV lv_test to {{ remote_tmp_dir }}/tmp_mount
+  shell: mount -o rw,noauto /dev/vg_test/lv_test {{ remote_tmp_dir }}/tmp_mount
+
+- name: Creating a 100MB file on the mounted LV
+  ansible.builtin.command: dd if=/dev/zero of={{ remote_tmp_dir }}/tmp_mount/test_file bs=1M count=100
+  args:
+    creates: "{{ remote_tmp_dir }}/tmp_mount/test_file"
+
+- name: Extending VG vg_test with second device {{ loop_device_02.stdout }}
+  community.general.lvg:
+    vg: vg_test
+    pvs: "{{ loop_device_02.stdout }}"
+
+- name: Moving data from {{ loop_device_01.stdout }} to {{ loop_device_02.stdout }} (both in same VG)
+  community.general.lvm_pv:
+    device: "{{ loop_device_01.stdout }}"
+    dest_device: "{{ loop_device_02.stdout }}"
+    state: move
+  register: move_result
+
+- debug:
+    var: move_result
+
+- name: Asserting physical volume was created and data moved
+  ansible.builtin.assert:
+    that:
+      - result.changed == true
+      - (pv_size_output.stdout | trim | regex_replace('M', '') | float) > 140
+      - (pv_size_output.stdout | trim | regex_replace('M', '') | float) < 160
+      - "'created' in creation_result.msg"

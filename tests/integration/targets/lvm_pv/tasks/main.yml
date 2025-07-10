@@ -21,6 +21,8 @@
 
     - import_tasks: resizing.yml
 
+    - import_tasks: moving.yml
+
     - import_tasks: removal.yml
 
   always:
