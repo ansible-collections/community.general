@@ -76,11 +76,11 @@ EXAMPLES = r"""
 
 - name: Add entry to /etc/crypttab for luks-home with password file
   community.general.crypttab:
-        name: luks-home
-        backing_device: UUID=123e4567-e89b-12d3-a456-426614174000
-        password: /root/keys/luks-home.key
-        opts: discard,cipher=aes-cbc-essiv:sha256
-        state: present
+    name: luks-home
+    backing_device: UUID=123e4567-e89b-12d3-a456-426614174000
+    password: /root/keys/luks-home.key
+    opts: discard,cipher=aes-cbc-essiv:sha256
+    state: present
 """
 
 import os
