@@ -31,14 +31,18 @@ class TestAzureLogAnalyticsIngestion(unittest.TestCase):
         self.loganalytics = AzureLogAnalyticsIngestionSource(
             self.dce_url, self.dcr_id, 3, True,
             self.client_id, self.client_secret, self.tenant_id,
-            self.stream_name, False, False
+            self.stream_name, False, False, 2
         )
 
+    @unittest.mock.patch("json.dumps")
     @unittest.mock.patch("ansible.executor.task_result.TaskResult")
-    def test_sending_data(self, MockTaskResult):
+    def test_sending_data(self, MockTaskResult, MockJsonDumps):
         """
         Tests sending data by verifying that the expected POST requests are submitted to the expected hosts.
         """
+        # Neither the Mock objects nor its attributes are serializable but we don't care about getting accurate JSON in this case so just return fake JSON data.
+        MockJsonDumps.return_value = '{"name": "fake_json"}'
+
         self.loganalytics.send_to_loganalytics("fake_playbook", MockTaskResult(), "OK")
         self.loganalytics.send_to_loganalytics("fake_playbook", MockTaskResult(), "FAILED")
         self.loganalytics.send_to_loganalytics("fake_playbook", MockTaskResult(), "OK")
