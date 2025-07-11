@@ -3,10 +3,10 @@
   GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
   SPDX-License-Identifier: GPL-3.0-or-later
 
-.. _ansible_collections.community.general.docsite.inventory_guide.inventoy_guide_iocage.properties:
+.. _ansible_collections.community.general.docsite.guide_iocage.iocage_inventory_guide.iocage_inventory_guide_properties:
 
 Properties
-^^^^^^^^^^
+----------
 
 Optionally, get the iocage properties. Enable :ansopt:`community.general.iocage#inventory:get_properties`:
 

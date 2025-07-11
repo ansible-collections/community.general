@@ -3,10 +3,10 @@
   GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
   SPDX-License-Identifier: GPL-3.0-or-later
 
-.. _ansible_collections.community.general.docsite.inventory_guide.inventoy_guide_iocage:
+.. _ansible_collections.community.general.docsite.guide_iocage.iocage_inventory_guide:
 
 community.general.iocage inventory plugin
------------------------------------------
+=========================================
 
 The inventory plugin :ansplugin:`community.general.iocage#inventory` gets the inventory hosts from the iocage jail manager.
 

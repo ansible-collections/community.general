@@ -3,10 +3,10 @@
   GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
   SPDX-License-Identifier: GPL-3.0-or-later
 
-.. _ansible_collections.community.general.docsite.inventory_guide.inventoy_guide_iocage.hooks:
+.. _ansible_collections.community.general.docsite.guide_iocage.iocage_inventory_guide.iocage_inventory_guide_hooks:
 
 Hooks
-^^^^^
+-----
 
 The iocage utility internally opens a console to a jail to get the jail's DHCP address. This
 requires root. If you run the command ``iocage list -l`` as unprivileged user, you'll see the message
