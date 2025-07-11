@@ -87,11 +87,8 @@ Use sudo if enabled:
    | 206 | srv_3 | off  | up    | jail | 14.2-RELEASE-p3 | epair0b|10.1.0.169 | -   | ansible_client | no       |
    +-----+-------+------+-------+------+-----------------+--------------------+-----+----------------+----------+
 
-Create the inventory configuration. Use the option :ansopt:`community.general.iocage#inventory:sudo`
-
-.. code-block:: console
-
-   shell> cat hosts/02_iocage.yml
+Create the inventory file ``hosts/02_iocage.yml``. Use the option
+:ansopt:`community.general.iocage#inventory:sudo`
 
 .. code-block:: yaml
 

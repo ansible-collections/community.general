@@ -37,11 +37,7 @@ As admin at the controller, list the jails:
    | None | srv_3 | off  | down  | jail | 14.2-RELEASE-p3 | DHCP (not running) | -   | ansible_client | no       |
    +------+-------+------+-------+------+-----------------+--------------------+-----+----------------+----------+
 
-Create the inventory configuration:
-
-.. code-block:: console
-
-   shell> cat hosts/02_iocage.yml
+Create the inventory file ``hosts/02_iocage.yml``
 
 .. code-block:: yaml
 
@@ -108,9 +104,6 @@ Optionally, create shared IP jails
    srv_2 successfully created!
    shell> iocage create --template ansible_client --name srv_3 ip4_addr="em0|10.1.0.103/24"
    srv_3 successfully created!
-
-.. code-block:: console
-
    shell> iocage list -l
    +------+-------+------+-------+------+-----------------+-------------------+-----+----------------+----------+
    | JID  | NAME  | BOOT | STATE | TYPE |     RELEASE     |        IP4        | IP6 |    TEMPLATE    | BASEJAIL |

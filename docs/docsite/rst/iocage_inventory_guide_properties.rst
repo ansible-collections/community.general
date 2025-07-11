@@ -8,11 +8,8 @@
 Properties
 ----------
 
-Optionally, get the iocage properties. Enable :ansopt:`community.general.iocage#inventory:get_properties`:
-
-.. code-block:: console
-
-   shell> cat hosts/02_iocage.yml
+Optionally, in the inventory file ``hosts/02_iocage.yml``, get the iocage properties. Enable
+:ansopt:`community.general.iocage#inventory:get_properties`:
 
 .. code-block:: yaml+jinja
 
@@ -25,11 +22,7 @@ Optionally, get the iocage properties. Enable :ansopt:`community.general.iocage#
    compose:
      ansible_host: (iocage_hooks.0 == '-') | ternary(iocage_ip4, iocage_hooks.0)
 
-Display the properties. Create a playbook:
-
-.. code-block:: console
-
-   shell> cat pb-test-properties.yml
+Display the properties. Create the playbook ``pb-test-properties.yml``
 
 .. code-block:: yaml
 

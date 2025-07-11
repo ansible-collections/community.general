@@ -9,4 +9,7 @@
 Iocage Guide
 ************
 
-.. include:: iocage_inventory_guide.rst
+.. toctree::
+   :maxdepth: 1
+
+   iocage_inventory_guide
