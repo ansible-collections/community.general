@@ -74,6 +74,12 @@ EXAMPLES = r"""
   community.general.easy_install:
     name: bottle
     virtualenv: /webapps/myapp/venv
+    
+- name: Install requests using pyvenv as the virtualenv tool
+  community.general.easy_install:
+    name: requests
+    virtualenv: /opt/myenv
+    virtualenv_command: pyvenv
 """
 
 import os
