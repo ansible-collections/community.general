@@ -19,7 +19,9 @@ Quoting `man iocage <https://man.freebsd.org/cgi/man.cgi?query=iocage>`_:
 
 We will use the format `notes="tag1=value1 tag2=value2 ..."`.
 
-Note: The iocage tags has nothing to do with the :ref:`tags`
+.. note::
+
+    The iocage tags have nothing to do with the :ref:`tags`.
 
 As root at the iocage host, set notes. For example,
 
