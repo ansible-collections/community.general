@@ -94,7 +94,7 @@ Display the inventory:
              iocage_template: ansible_client
              iocage_type: jail
 
-Optionally, create shared IP jails
+Optionally, create shared IP jails:
 
 .. code-block:: console
 
