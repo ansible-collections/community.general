@@ -8,14 +8,16 @@
 Tags
 ----
 
-Quoting `man iocage <https://man.freebsd.org/cgi/man.cgi?query=iocage>`_:
+Quoting `man iocage <https://man.freebsd.org/cgi/man.cgi?query=iocage>`_
+
+.. code-block:: text
 
    PROPERTIES
    ...
    notes="any string"
-   Custom notes for miscellaneous tagging.
-   Default: none
-   Source: local
+         Custom notes for miscellaneous tagging.
+         Default: none
+         Source: local
 
 We will use the format `notes="tag1=value1 tag2=value2 ..."`.
 
