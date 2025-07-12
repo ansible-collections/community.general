@@ -22,7 +22,7 @@ Optionally, in the inventory file ``hosts/02_iocage.yml``, get the iocage proper
    compose:
      ansible_host: (iocage_hooks.0 == '-') | ternary(iocage_ip4, iocage_hooks.0)
 
-Display the properties. Create the playbook ``pb-test-properties.yml``
+Display the properties. Create the playbook ``pb-test-properties.yml``:
 
 .. code-block:: yaml
 
