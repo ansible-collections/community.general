@@ -1517,6 +1517,22 @@ files:
     maintainers: russoz
   docs/docsite/rst/guide_deps.rst:
     maintainers: russoz
+  docs/docsite/rst/guide_iocage.rst:
+    maintainers: russoz felixfontein
+  docs/docsite/rst/guide_iocage_inventory.rst:
+    maintainers: vbotka
+  docs/docsite/rst/guide_iocage_inventory_aliases.rst:
+    maintainers: vbotka
+  docs/docsite/rst/guide_iocage_inventory_basics.rst:
+    maintainers: vbotka
+  docs/docsite/rst/guide_iocage_inventory_dhcp.rst:
+    maintainers: vbotka
+  docs/docsite/rst/guide_iocage_inventory_hooks.rst:
+    maintainers: vbotka
+  docs/docsite/rst/guide_iocage_inventory_properties.rst:
+    maintainers: vbotka
+  docs/docsite/rst/guide_iocage_inventory_tags.rst:
+    maintainers: vbotka
   docs/docsite/rst/guide_modulehelper.rst:
     maintainers: russoz
   docs/docsite/rst/guide_online.rst:
@@ -1529,22 +1545,6 @@ files:
     maintainers: russoz
   docs/docsite/rst/guide_vardict.rst:
     maintainers: russoz
-  docs/docsite/rst/guide_iocage.rst:
-    maintainers: russoz felixfontein
-  docs/docsite/rst/iocage_inventory_guide.rst:
-    maintainers: vbotka
-  docs/docsite/rst/iocage_inventory_guide_aliases.rst:
-    maintainers: vbotka
-  docs/docsite/rst/iocage_inventory_guide_basics.rst:
-    maintainers: vbotka
-  docs/docsite/rst/iocage_inventory_guide_dhcp.rst:
-    maintainers: vbotka
-  docs/docsite/rst/iocage_inventory_guide_hooks.rst:
-    maintainers: vbotka
-  docs/docsite/rst/iocage_inventory_guide_properties.rst:
-    maintainers: vbotka
-  docs/docsite/rst/iocage_inventory_guide_tags.rst:
-    maintainers: vbotka
   docs/docsite/rst/test_guide.rst:
     maintainers: felixfontein
 #########################

@@ -3,7 +3,7 @@
   GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
   SPDX-License-Identifier: GPL-3.0-or-later
 
-.. _ansible_collections.community.general.docsite.guide_iocage.iocage_inventory_guide:
+.. _ansible_collections.community.general.docsite.guide_iocage.guide_iocage_inventory:
 
 community.general.iocage inventory plugin
 =========================================
@@ -17,15 +17,15 @@ See:
 * `Jails and Containers <https://docs.freebsd.org/en/books/handbook/jails>`_
 
 .. note::
-  The output of the examples is YAML formatted. See the option :ansopt:`ansible.bulitin.default#callback:result_format`.
+  The output of the examples is YAML formatted. See the option :ansopt:`ansible.builtin.default#callback:result_format`.
 
 .. toctree::
    :caption: Table of Contents
    :maxdepth: 1
 
-   inventory_guide_iocage_basics
-   inventory_guide_iocage_dhcp
-   inventory_guide_iocage_hooks
-   inventory_guide_iocage_properties
-   inventory_guide_iocage_tags
-   inventory_guide_iocage_aliases
+   guide_iocage_inventory_basics
+   guide_iocage_inventory_dhcp
+   guide_iocage_inventory_hooks
+   guide_iocage_inventory_properties
+   guide_iocage_inventory_tags
+   guide_iocage_inventory_aliases

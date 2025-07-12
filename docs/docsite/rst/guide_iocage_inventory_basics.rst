@@ -3,7 +3,7 @@
   GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
   SPDX-License-Identifier: GPL-3.0-or-later
 
-.. _ansible_collections.community.general.docsite.guide_iocage.iocage_inventory_guide.iocage_inventory_guide_basics:
+.. _ansible_collections.community.general.docsite.guide_iocage.guide_iocage_inventory.guide_iocage_inventory_basics:
 
 Basics
 ------

@@ -12,4 +12,4 @@ Iocage Guide
 .. toctree::
    :maxdepth: 1
 
-   iocage_inventory_guide
+   guide_iocage_inventory
