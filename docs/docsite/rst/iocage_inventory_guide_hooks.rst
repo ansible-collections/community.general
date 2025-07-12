@@ -63,10 +63,10 @@ Create the inventory configuration. Use the option :ansopt:`community.general.io
    hooks_results:
      - /var/db/dhclient-hook.address.epair0b
 
-Note:
+.. note::
 
-   The option hooks_results expects the poolname to be mounted to ``/poolname``. For example, if you
-   activate the pool iocage, this plugin expects to find the hooks_results items in the path
+   The option :ansopt:`community.general.iocage#inventory:hooks_results` expects the poolname to be mounted to ``/poolname``. For example, if you
+   activate the pool iocage, this plugin expects to find the :ansopt:`community.general.iocage#inventory:hooks_results` items in the path
    /iocage/iocage/jails/<name>/root. If you mount the poolname to a different path, the easiest
    remedy is to create a symlink.
 
