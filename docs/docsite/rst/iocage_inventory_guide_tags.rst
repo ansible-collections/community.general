@@ -55,11 +55,7 @@ For example, ``hosts/02_iocage.yml`` could look like:
      - prefix: project
        key: iocage_tags.project
 
-Display tags and groups. Create a playbook:
-
-.. code-block:: console
-
-   shell> cat pb-test-groups.yml
+Display tags and groups. Create a playbook ``pb-test-groups.yml``:
 
 .. code-block:: yaml+jinja
 
