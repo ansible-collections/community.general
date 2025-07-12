@@ -38,7 +38,7 @@ Display the properties. Create the playbook ``pb-test-properties.yml``
        - debug:
            var: iocage_properties
 
-Run the playbook. Limit the inventory to *srv_3*
+Run the playbook. Limit the inventory to *srv_3*:
 
 .. code-block:: console
 
