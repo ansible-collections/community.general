@@ -7,7 +7,6 @@ sections:
   - title: Guides
     toctree:
       - filter_guide
-      - inventory_guide
       - test_guide
   - title: Technology Guides
     toctree:
