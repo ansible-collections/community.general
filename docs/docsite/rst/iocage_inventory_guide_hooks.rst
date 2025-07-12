@@ -125,11 +125,7 @@ As admin at the controller, display the inventory:
              iocage_template: ansible_client
              iocage_type: jail
 
-Compose the variable ansible_host
-
-.. code-block:: console
-
-   shell> cat hosts/02_iocage.yml
+Compose the variable ``ansible_host``. For example, ``hosts/02_iocage.yml`` could look like:
 
 .. code-block:: yaml+jinja
 
