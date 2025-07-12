@@ -17,7 +17,7 @@ See:
 * `Jails and Containers <https://docs.freebsd.org/en/books/handbook/jails>`_
 
 .. note::
-  The output of the examples is YAML formatted. See the option :ansopt:`ansible.bulitin.default#callback:result_format`.
+  The output of the examples is YAML formatted. See the option :ansopt:`ansible.builtin.default#callback:result_format`.
 
 .. toctree::
    :caption: Table of Contents
