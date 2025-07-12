@@ -137,11 +137,7 @@ Compose the variable ``ansible_host``. For example, ``hosts/02_iocage.yml`` coul
    compose:
      ansible_host: (iocage_hooks.0 == '-') | ternary(iocage_ip4, iocage_hooks.0)
 
-Test the jails. Create a playbook:
-
-.. code-block:: console
-
-   shell> cat pb-test-uname.yml
+Test the jails. Create a playbook ``pb-test-uname.yml``:
 
 .. code-block:: yaml
 
