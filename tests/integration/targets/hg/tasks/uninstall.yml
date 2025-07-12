@@ -16,12 +16,6 @@
     line: "#!{{ stat_hg_interpreter.stat.path }}"
   when: stat_hg_interpreter.stat.islnk
 
-- name: uninstall packages which were not originally installed (apk)
-  package:
-    name: mercurial
-    state: absent
-  when: ansible_facts.pkg_mgr in ['apk', 'community.general.apk']
-
 # using the apt module prevents autoremove from working, so call apt-get via shell instead
 - name: uninstall packages which were not originally installed (apt)
   shell: apt-get -y remove mercurial && apt-get -y autoremove
@@ -39,11 +33,11 @@
   shell: yum -y autoremove mercurial
   when: ansible_facts.pkg_mgr == 'yum'
 
-- name: uninstall packages which were not originally installed (pacman)
+- name: uninstall packages which were not originally installed
   package:
     name: mercurial
     state: absent
-  when: ansible_facts.pkg_mgr in ['pacman', 'community.general.pacman']
+  when: ansible_facts.pkg_mgr in ['pacman', 'community.general.pacman', 'zypper', 'community.general.zypper', 'apk', 'community.general.apk']
 
 - name: uninstall packages which were not originally installed (pkgng)
   package:
@@ -51,12 +45,6 @@
     state: absent
     autoremove: true
   when: ansible_facts.pkg_mgr in ['pkgng', 'community.general.pkgng']
-
-- name: uninstall packages which were not originally installed (zypper)
-  package:
-    name: mercurial
-    state: absent
-  when: ansible_facts.pkg_mgr in ['zypper', 'community.general.zypper']
 
 - name: restore the default python
   raw: mv "{{ which_python.stdout }}.default" "{{ which_python.stdout }}"
