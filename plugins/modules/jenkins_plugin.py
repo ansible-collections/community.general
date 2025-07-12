@@ -74,6 +74,18 @@ options:
       - A list of base URL(s) to retrieve C(update-center.json), and direct plugin files from.
       - This can be a list since community.general 3.3.0.
     default: ['https://updates.jenkins.io', 'http://mirrors.jenkins.io']
+  updates_url_username:
+    description:
+      - If using a custom O(updates_url), set this as the username of the user with access to the URL.
+      - If the custom O(updates_url) does not require authentication, this can be left empty.
+    type: str
+    version_added: 11.1.0
+  updates_url_password:
+    description:
+      - If using a custom O(updates_url), set this as the password of the user with access to the URL.
+      - If the custom O(updates_url) does not require authentication, this can be left empty.
+    type: str
+    version_added: 11.1.0
   update_json_url_segment:
     type: list
     elements: str
@@ -112,7 +124,8 @@ options:
   with_dependencies:
     description:
       - Defines whether to install plugin dependencies.
-      - This option takes effect only if the O(version) is not defined.
+      - In earlier versions, this option had no effect when a specific C(version) was set.
+      - Since community.general 11.1.0, dependencies are also installed for versioned plugins.
     type: bool
     default: true
 
@@ -315,11 +328,13 @@ import io
 import json
 import os
 import tempfile
+import time
+from collections import OrderedDict
 
 from ansible.module_utils.basic import AnsibleModule, to_bytes
 from ansible.module_utils.six.moves import http_cookiejar as cookiejar
 from ansible.module_utils.six.moves.urllib.parse import urlencode
-from ansible.module_utils.urls import fetch_url, url_argument_spec
+from ansible.module_utils.urls import fetch_url, url_argument_spec, basic_auth_header
 from ansible.module_utils.six import text_type, binary_type
 from ansible.module_utils.common.text.converters import to_native
 
@@ -340,14 +355,24 @@ class JenkinsPlugin(object):
         self.url = self.params['url']
         self.timeout = self.params['timeout']
 
+        # Authentication for non-Jenkins calls
+        self.updates_url_credentials = {}
+        if self.params.get('updates_url_username') and self.params.get('updates_url_password'):
+            self.updates_url_credentials["Authorization"] = basic_auth_header(self.params['updates_url_username'], self.params['updates_url_password'])
+
         # Crumb
         self.crumb = {}
+
+        # Authentication for Jenkins calls
+        if self.params.get('url_username') and self.params.get('url_password'):
+            self.crumb["Authorization"] = basic_auth_header(self.params['url_username'], self.params['url_password'])
+
         # Cookie jar for crumb session
         self.cookies = None
 
         if self._csrf_enabled():
             self.cookies = cookiejar.LWPCookieJar()
-            self.crumb = self._get_crumb()
+            self._get_crumb()
 
         # Get list of installed plugins
         self._get_installed_plugins()
@@ -390,10 +415,14 @@ class JenkinsPlugin(object):
             err_msg = None
             try:
                 self.module.debug("fetching url: %s" % url)
+
+                is_jenkins_call = url.startswith(self.url)
+                self.module.params['force_basic_auth'] = is_jenkins_call
+
                 response, info = fetch_url(
                     self.module, url, timeout=self.timeout, cookies=self.cookies,
-                    headers=self.crumb, **kwargs)
-
+                    headers=self.crumb if is_jenkins_call else self.updates_url_credentials or self.crumb,
+                    **kwargs)
                 if info['status'] == 200:
                     return response
                 else:
@@ -422,9 +451,13 @@ class JenkinsPlugin(object):
 
         # Get the URL data
         try:
+            is_jenkins_call = url.startswith(self.url)
+            self.module.params['force_basic_auth'] = is_jenkins_call
+
             response, info = fetch_url(
                 self.module, url, timeout=self.timeout, cookies=self.cookies,
-                headers=self.crumb, **kwargs)
+                headers=self.crumb if is_jenkins_call else self.updates_url_credentials or self.crumb,
+                **kwargs)
 
             if info['status'] != 200:
                 if dont_fail:
@@ -444,15 +477,11 @@ class JenkinsPlugin(object):
             "%s/%s" % (self.url, "crumbIssuer/api/json"), 'Crumb')
 
         if 'crumbRequestField' in crumb_data and 'crumb' in crumb_data:
-            ret = {
-                crumb_data['crumbRequestField']: crumb_data['crumb']
-            }
+            self.crumb[crumb_data['crumbRequestField']] = crumb_data['crumb']
         else:
             self.module.fail_json(
                 msg="Required fields not found in the Crum response.",
                 details=crumb_data)
-
-        return ret
 
     def _get_installed_plugins(self):
         plugins_data = self._get_json_data(
@@ -467,6 +496,7 @@ class JenkinsPlugin(object):
         self.is_installed = False
         self.is_pinned = False
         self.is_enabled = False
+        self.installed_plugins = plugins_data['plugins']
 
         for p in plugins_data['plugins']:
             if p['shortName'] == self.params['name']:
@@ -479,6 +509,37 @@ class JenkinsPlugin(object):
                     self.is_enabled = True
 
                 break
+
+    def _install_dependencies(self):
+        dependencies = self._get_versioned_dependencies()
+        self.dependencies_states = []
+
+        for dep_name, dep_version in dependencies.items():
+            if not any(p['shortName'] == dep_name and p['version'] == dep_version for p in self.installed_plugins):
+                dep_params = self.params.copy()
+                dep_params['name'] = dep_name
+                dep_params['version'] = dep_version
+                dep_module = self.module
+                dep_module.params = dep_params
+                dep_plugin = JenkinsPlugin(dep_module)
+                if not dep_plugin.install():
+                    self.dependencies_states.append(
+                        {
+                            'name': dep_name,
+                            'version': dep_version,
+                            'state': 'absent'})
+                else:
+                    self.dependencies_states.append(
+                        {
+                            'name': dep_name,
+                            'version': dep_version,
+                            'state': 'present'})
+            else:
+                self.dependencies_states.append(
+                    {
+                        'name': dep_name,
+                        'version': dep_version,
+                        'state': 'present'})
 
     def _install_with_plugin_manager(self):
         if not self.module.check_mode:
@@ -539,6 +600,10 @@ class JenkinsPlugin(object):
                 with open(plugin_file, 'rb') as plugin_fh:
                     plugin_content = plugin_fh.read()
                 checksum_old = hashlib.sha1(plugin_content).hexdigest()
+
+            # Install dependencies
+            if self.params['with_dependencies']:
+                self._install_dependencies()
 
             if self.params['version'] in [None, 'latest']:
                 # Take latest version
@@ -612,6 +677,54 @@ class JenkinsPlugin(object):
                 urls.append("{0}/{1}/{2}.hpi".format(base_url, update_segment, self.params['name']))
         return urls
 
+    def _get_latest_compatible_plugin_version(self, plugin_name=None):
+        if not hasattr(self, 'jenkins_version'):
+            self.module.params['force_basic_auth'] = True
+            resp, info = fetch_url(self.module, self.url)
+            raw_version = info.get("x-jenkins")
+            self.jenkins_version = self.parse_version(raw_version)
+        name = plugin_name or self.params['name']
+        cache_path = "{}/ansible_jenkins_plugin_cache.json".format(self.params['jenkins_home'])
+
+        try:  # Check if file is saved localy
+            with open(cache_path, "r") as f:
+                file_mtime = os.path.getmtime(cache_path)
+                now = time.time()
+                if now - file_mtime < 86400:
+                    plugin_data = json.load(f)
+                else:
+                    raise FileNotFoundError("Cache file is outdated.")
+        except Exception:
+            response, info = fetch_url(self.module, "https://updates.jenkins.io/current/plugin-versions.json")   # Get list of plugins and their dependencies
+
+            if info['status'] != 200:
+                self.module.fail_json(msg="Failed to fetch plugin-versions.json", details=info)
+
+            try:
+                plugin_data = json.loads(to_native(response.read()), object_pairs_hook=OrderedDict)
+
+                # Save it to file for next time
+                with open(cache_path, "w") as f:
+                    json.dump(plugin_data, f)
+            except Exception as e:
+                self.module.fail_json(msg="Failed to parse plugin-versions.json", details=to_native(e))
+
+        plugin_versions = plugin_data.get("plugins", {}).get(name)
+        if not plugin_versions:
+            self.module.fail_json(msg="Plugin '{}' not found.".format(name))
+
+        sorted_versions = list(reversed(plugin_versions.items()))
+
+        for idx, (version_title, version_info) in enumerate(sorted_versions):
+            required_core = version_info.get("requiredCore", "0.0")
+            if self.parse_version(required_core) <= self.jenkins_version:
+                return 'latest' if idx == 0 else version_title
+
+        self.module.warn(
+            "No compatible version found for plugin '{}'. "
+            "Installing latest version.".format(name))
+        return 'latest'
+
     def _get_versioned_plugin_urls(self):
         urls = []
         for base_url in self.params['updates_url']:
@@ -625,6 +738,18 @@ class JenkinsPlugin(object):
             for update_json in self.params['update_json_url_segment']:
                 urls.append("{0}/{1}".format(base_url, update_json))
         return urls
+
+    def _get_versioned_dependencies(self):
+        # Get dependencies for the specified plugin version
+        plugin_data = self._download_updates()['dependencies']
+
+        dependencies_info = {
+            dep["name"]: self._get_latest_compatible_plugin_version(dep["name"])
+            for dep in plugin_data
+            if not dep.get("optional", False)
+        }
+
+        return dependencies_info
 
     def _download_updates(self):
         try:
@@ -779,6 +904,10 @@ class JenkinsPlugin(object):
             msg_exception="%s has failed." % msg,
             method="POST")
 
+    @staticmethod
+    def parse_version(version_str):
+        return tuple(int(x) for x in version_str.split('.'))
+
 
 def main():
     # Module arguments
@@ -803,6 +932,8 @@ def main():
         updates_expiration=dict(default=86400, type="int"),
         updates_url=dict(type="list", elements="str", default=['https://updates.jenkins.io',
                                                                'http://mirrors.jenkins.io']),
+        updates_url_username=dict(type="str"),
+        updates_url_password=dict(type="str", no_log=True),
         update_json_url_segment=dict(type="list", elements="str", default=['update-center.json',
                                                                            'updates/update-center.json']),
         latest_plugins_url_segments=dict(type="list", elements="str", default=['latest']),
@@ -819,9 +950,6 @@ def main():
         supports_check_mode=True,
     )
 
-    # Force basic authentication
-    module.params['force_basic_auth'] = True
-
     # Convert timeout to float
     try:
         module.params['timeout'] = float(module.params['timeout'])
@@ -829,11 +957,17 @@ def main():
         module.fail_json(
             msg='Cannot convert %s to float.' % module.params['timeout'],
             details=to_native(e))
+    # Instantiate the JenkinsPlugin object
+    jp = JenkinsPlugin(module)
 
     # Set version to latest if state is latest
     if module.params['state'] == 'latest':
         module.params['state'] = 'present'
-        module.params['version'] = 'latest'
+        module.params['version'] = jp._get_latest_compatible_plugin_version()
+
+    # Ser version to latest compatible version if version is latest
+    if module.params['version'] == 'latest':
+        module.params['version'] = jp._get_latest_compatible_plugin_version()
 
     # Create some shortcuts
     name = module.params['name']
@@ -841,9 +975,6 @@ def main():
 
     # Initial change state of the task
     changed = False
-
-    # Instantiate the JenkinsPlugin object
-    jp = JenkinsPlugin(module)
 
     # Perform action depending on the requested state
     if state == 'present':
@@ -860,7 +991,7 @@ def main():
         changed = jp.disable()
 
     # Print status of the change
-    module.exit_json(changed=changed, plugin=name, state=state)
+    module.exit_json(changed=changed, plugin=name, state=state, dependencies=jp.dependencies_states if hasattr(jp, 'dependencies_states') else None)
 
 
 if __name__ == '__main__':
