@@ -73,6 +73,14 @@ EXAMPLES = r"""
     opts: discard
   loop: '{{ ansible_mounts }}'
   when: "'/dev/mapper/luks-' in item.device"
+
+- name: Add entry to /etc/crypttab for luks-home with password file
+  community.general.crypttab:
+    name: luks-home
+    backing_device: UUID=123e4567-e89b-12d3-a456-426614174000
+    password: /root/keys/luks-home.key
+    opts: discard,cipher=aes-cbc-essiv:sha256
+    state: present
 """
 
 import os
