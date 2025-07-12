@@ -35,11 +35,8 @@ As root at the iocage host, set notes. For example,
    notes: none -> vmm=iocage_02 project=bar
 
 Update the inventory configuration. Compose a dictionary *iocage_tags* and create groups. The option
-:ansopt:`community.general.iocage#inventory:get_properties` must be enabled:
-
-.. code-block:: console
-
-   shell> cat hosts/02_iocage.yml
+:ansopt:`community.general.iocage#inventory:get_properties` must be enabled.
+For example, ``hosts/02_iocage.yml`` could look like:
 
 .. code-block:: yaml
 
