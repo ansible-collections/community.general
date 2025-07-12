@@ -26,11 +26,11 @@
   shell: apt-get -y update && apt-get -y install mercurial
   when: ansible_facts.pkg_mgr == 'apt'
 
-- name: install packages (apk)
+- name: install mercurial package
   package:
     name: mercurial
     state: present
-  when: ansible_facts.pkg_mgr in ['apk', 'community.general.apk']
+  when: ansible_facts.pkg_mgr in ['apk', 'community.general.apk', 'pacman', 'community.general.pacman', 'pkgng', 'community.general.pkgng', 'zypper', 'community.general.zypper']
 
 - name: install mercurial (dnf)
   dnf:
@@ -41,21 +41,6 @@
   yum:
     name: mercurial
   when: ansible_facts.pkg_mgr == 'yum'
-
-- name: install mercurial (pacman)
-  package:
-    name: mercurial
-  when: ansible_facts.pkg_mgr in ['pacman', 'community.general.pacman']
-
-- name: install mercurial (pkgng)
-  package:
-    name: mercurial
-  when: ansible_facts.pkg_mgr in ['pkgng', 'community.general.pkgng']
-
-- name: install mercurial (zypper)
-  package:
-    name: mercurial
-  when: ansible_facts.pkg_mgr in ['zypper', 'community.general.zypper']
 
 - name: preserve the updated python
   command: cp -av "{{ which_python.stdout }}" "{{ which_python.stdout }}.updated"
