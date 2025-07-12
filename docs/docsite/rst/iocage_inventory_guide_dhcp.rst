@@ -88,7 +88,7 @@ Use sudo if enabled:
    +-----+-------+------+-------+------+-----------------+--------------------+-----+----------------+----------+
 
 Create the inventory file ``hosts/02_iocage.yml``. Use the option
-:ansopt:`community.general.iocage#inventory:sudo`
+:ansopt:`community.general.iocage#inventory:sudo`:
 
 .. code-block:: yaml
 
