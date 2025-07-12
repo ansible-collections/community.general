@@ -57,7 +57,7 @@ List the jails:
    | 206 | srv_3 | off  | up    | jail | 14.2-RELEASE-p3 | epair0b|10.1.0.169 | -   | ansible_client | no       |
    +-----+-------+------+-------+------+-----------------+--------------------+-----+----------------+----------+
 
-As admin at the controller, list the jails. The IP4 tab says "... address requires root"
+As admin at the controller, list the jails. The IP4 tab says "... address requires root":
 
 .. code-block:: console
 
