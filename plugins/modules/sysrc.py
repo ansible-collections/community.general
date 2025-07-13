@@ -103,6 +103,7 @@ changed:
 """
 
 from ansible.module_utils.basic import AnsibleModule
+from configparser import ConfigParser
 import re
 
 
@@ -130,11 +131,12 @@ class Sysrc(object):
         Use this dictionary to preform the tests.
         """
         (rc, out, err) = self.run_sysrc('-e', '-a')
-        conf = dict([i.split('=', 1) for i in out.splitlines()])
+        conf = ConfigParser()
+        conf.read_string('[top]\n' + out)  # Add faked top section
         if self.value is None:
-            return self.name in conf
+            return self.name in conf['top']
         else:
-            return self.name in conf and conf[self.name] == '"%s"' % self.value
+            return conf['top'][self.name] == '"%s"' % self.value
 
     def contains(self):
         (rc, out, err) = self.run_sysrc('-n', self.name)
