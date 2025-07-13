@@ -32,7 +32,7 @@ options:
   backend:
     description:
       - Name of the HAProxy backend pool.
-      - If this parameter is unset, it will be auto-detected.
+      - If this parameter is unset, it is auto-detected.
     type: str
   drain:
     description:
@@ -62,8 +62,7 @@ options:
   state:
     description:
       - Desired state of the provided backend host.
-      - Note that V(drain) state is supported only by HAProxy version 1.5 or later. When used on versions < 1.5, it will be
-        ignored.
+      - Note that V(drain) state is supported only by HAProxy version 1.5 or later. When used on versions < 1.5, it is ignored.
     type: str
     required: true
     choices: [disabled, drain, enabled]
@@ -103,7 +102,7 @@ options:
   weight:
     description:
       - The value passed in argument.
-      - If the value ends with the V(%) sign, then the new weight will be relative to the initially configured weight.
+      - If the value ends with the V(%) sign, then the new weight is relative to the initially configured weight.
       - Relative weights are only permitted between 0 and 100% and absolute weights are permitted between 0 and 256.
     type: str
 """

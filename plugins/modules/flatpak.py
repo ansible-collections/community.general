@@ -27,7 +27,7 @@ attributes:
   check_mode:
     support: partial
     details:
-      - If O(state=latest), the module will always return C(changed=true).
+      - If O(state=latest), the module always returns RV(ignore:changed=true).
   diff_mode:
     support: none
 options:
@@ -53,7 +53,7 @@ options:
       - When supplying a reverse DNS name, you can use the O(remote) option to specify on what remote to look for the flatpak.
         An example for a reverse DNS name is C(org.gnome.gedit).
       - When used with O(state=absent) or O(state=latest), it is recommended to specify the name in the reverse DNS format.
-      - When supplying a URL with O(state=absent) or O(state=latest), the module will try to match the installed flatpak based
+      - When supplying a URL with O(state=absent) or O(state=latest), the module tries to match the installed flatpak based
         on the name of the flatpakref to remove or update it. However, there is no guarantee that the names of the flatpakref
         file and the reverse DNS name of the installed flatpak do match.
     type: list
@@ -171,26 +171,6 @@ command:
   returned: When a flatpak command has been executed
   type: str
   sample: "/usr/bin/flatpak install --user --nontinteractive flathub org.gnome.Calculator"
-msg:
-  description: Module error message.
-  returned: failure
-  type: str
-  sample: "Executable '/usr/local/bin/flatpak' was not found on the system."
-rc:
-  description: Return code from flatpak binary.
-  returned: When a flatpak command has been executed
-  type: int
-  sample: 0
-stderr:
-  description: Error output from flatpak binary.
-  returned: When a flatpak command has been executed
-  type: str
-  sample: "error: Error searching remote flathub: Can't find ref org.gnome.KDE"
-stdout:
-  description: Output from flatpak binary.
-  returned: When a flatpak command has been executed
-  type: str
-  sample: "org.gnome.Calendar/x86_64/stable\tcurrent\norg.gnome.gitg/x86_64/stable\tcurrent\n"
 """
 
 from ansible.module_utils.six.moves.urllib.parse import urlparse

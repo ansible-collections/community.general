@@ -64,10 +64,10 @@ options:
     description:
       - If V(true), if the block device and filesystem size differ, grow the filesystem into the space.
       - Supported for C(bcachefs), C(btrfs), C(ext2), C(ext3), C(ext4), C(ext4dev), C(f2fs), C(lvm), C(xfs), C(ufs) and C(vfat)
-        filesystems. Attempts to resize other filesystem types will fail.
-      - XFS Will only grow if mounted. Currently, the module is based on commands from C(util-linux) package to perform operations,
+        filesystems. Attempts to resize other filesystem types fail.
+      - XFS only grows if mounted. Currently, the module is based on commands from C(util-linux) package to perform operations,
         so resizing of XFS is not supported on FreeBSD systems.
-      - VFAT will likely fail if C(fatresize < 1.04).
+      - VFAT is likely to fail if C(fatresize < 1.04).
       - Mutually exclusive with O(uuid).
     type: bool
     default: false
@@ -82,7 +82,7 @@ options:
       - See xfs_admin(8) (C(xfs)), tune2fs(8) (C(ext2), C(ext3), C(ext4), C(ext4dev)) for possible values.
       - For O(fstype=lvm) the value is ignored, it resets the PV UUID if set.
       - Supported for O(fstype) being one of C(bcachefs), C(ext2), C(ext3), C(ext4), C(ext4dev), C(lvm), or C(xfs).
-      - This is B(not idempotent). Specifying this option will always result in a change.
+      - This is B(not idempotent). Specifying this option always results in a change.
       - Mutually exclusive with O(resizefs).
     type: str
     version_added: 7.1.0

@@ -442,7 +442,7 @@ created:
 disk_config_type:
   description:
     - Specifies the disk configuration type. MANUAL is The image space is not expanded. AUTO is the image space of the system
-      disk will be expanded to be as same as the flavor.
+      disk is expanded to be as same as the flavor.
   type: str
   returned: success
 host_name:

@@ -51,7 +51,7 @@ options:
     default: "https://api.honeybadger.io/v1/deploys"
   validate_certs:
     description:
-      - If V(false), SSL certificates for the target URL will not be validated. This should only be used on personally controlled
+      - If V(false), SSL certificates for the target URL are not validated. This should only be used on personally controlled
         sites using self-signed certificates.
     type: bool
     default: true
