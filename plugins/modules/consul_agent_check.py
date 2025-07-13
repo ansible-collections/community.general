@@ -17,9 +17,9 @@ description:
   - Allows the addition, modification and deletion of checks in a Consul cluster using the agent. For more details on using
     and configuring Checks, see U(https://developer.hashicorp.com/consul/api-docs/agent/check).
   - Currently, there is no complete way to retrieve the script, interval or TTL metadata for a registered check. Without this
-    metadata it is not possible to tell if the data supplied with ansible represents a change to a check. As a result this
-    does not attempt to determine changes and will always report a changed occurred. An API method is planned to supply this
-    metadata so at that stage change management will be added.
+    metadata it is not possible to tell if the data supplied with ansible represents a change to a check. As a result, the
+    module does not attempt to determine changes and it always reports a changed occurred. An API method is planned to supply
+    this metadata so at that stage change management is to be added.
 author:
   - Michael Ilg (@Ilgmi)
 extends_documentation_fragment:
@@ -36,8 +36,8 @@ attributes:
   diff_mode:
     support: partial
     details:
-      - In check mode the diff will show the object as it is defined in the module options and not the object structure of
-        the Consul API.
+      - In check mode the diff shows the object as it is defined in the module options and not the object structure of the
+        Consul API.
 options:
   state:
     description:
@@ -52,13 +52,13 @@ options:
   id:
     description:
       - Specifies a unique ID for this check on the node. This defaults to the O(name) parameter, but it may be necessary
-        to provide an ID for uniqueness. This value will return in the response as "CheckId".
+        to provide an ID for uniqueness. This value is returned in the response as V(CheckId).
     type: str
   interval:
     description:
-      - The interval at which the service check will be run. This is a number with a V(s) or V(m) suffix to signify the units
-        of seconds or minutes, for example V(15s) or V(1m). If no suffix is supplied V(s) will be used by default, for example
-        V(10) will be V(10s).
+      - The interval at which the service check is run. This is a number with a V(s) or V(m) suffix to signify the units of
+        seconds or minutes, for example V(15s) or V(1m). If no suffix is supplied V(s) is used by default, for example V(10)
+        is equivalent to V(10s).
       - Required if one of the parameters O(args), O(http), or O(tcp) is specified.
     type: str
   notes:
@@ -74,11 +74,11 @@ options:
     elements: str
   ttl:
     description:
-      - Checks can be registered with a TTL instead of a O(args) and O(interval) this means that the service will check in
-        with the agent before the TTL expires. If it does not the check will be considered failed. Required if registering
-        a check and the script an interval are missing Similar to the interval this is a number with a V(s) or V(m) suffix
-        to signify the units of seconds or minutes, for example V(15s) or V(1m). If no suffix is supplied V(s) will be used
-        by default, for example V(10) will be V(10s).
+      - Checks can be registered with a TTL instead of a O(args) and O(interval) this means that the service checks in with
+        the agent before the TTL expires. If it does not the check is considered failed. Required if registering a check and
+        the script an interval are missing Similar to the interval this is a number with a V(s) or V(m) suffix to signify
+        the units of seconds or minutes, for example V(15s) or V(1m). If no suffix is supplied V(s) is used by default, for
+        example V(10) is equivalent to V(10s).
       - Mutually exclusive with O(args), O(tcp) and O(http).
     type: str
   tcp:
@@ -91,8 +91,8 @@ options:
     version_added: '1.3.0'
   http:
     description:
-      - Checks can be registered with an HTTP endpoint. This means that Consul will check that the http endpoint returns a
-        successful HTTP status.
+      - Checks can be registered with an HTTP endpoint. This means that Consul checks that the HTTP endpoint returns a successful
+        HTTP status.
       - Requires O(interval) to be provided.
       - Mutually exclusive with O(args), O(ttl) and O(tcp).
     type: str
@@ -100,7 +100,7 @@ options:
     description:
       - A custom HTTP check timeout. The Consul default is 10 seconds. Similar to the interval this is a number with a V(s)
         or V(m) suffix to signify the units of seconds or minutes, for example V(15s) or V(1m). If no suffix is supplied V(s)
-        will be used by default, for example V(10) will be V(10s).
+        is used by default, for example V(10) is equivalent to V(10s).
     type: str
   service_id:
     description:

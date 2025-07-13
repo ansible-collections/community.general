@@ -29,7 +29,7 @@ attributes:
   diff_mode:
     support: partial
     details:
-      - In check mode the diff will miss operational attributes.
+      - In check mode the diff misses operational attributes.
 options:
   state:
     description:
@@ -71,7 +71,7 @@ options:
   config:
     description:
       - The raw configuration to use for the chosen auth method.
-      - Contents will vary depending upon the type chosen.
+      - Contents vary depending upon the O(type) chosen.
       - Required when the auth method is created.
     type: dict
 """

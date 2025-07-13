@@ -57,7 +57,7 @@ options:
     default: 15
   node:
     description:
-      - The name of the node that with which the session will be associated. By default this is the name of the agent.
+      - The name of the node that with which the session is associated. By default this is the name of the agent.
     type: str
   datacenter:
     description:
@@ -65,8 +65,8 @@ options:
     type: str
   checks:
     description:
-      - Checks that will be used to verify the session health. If all the checks fail, the session will be invalidated and
-        any locks associated with the session will be release and can be acquired once the associated lock delay has expired.
+      - Checks that are used to verify the session health. If all the checks fail, the session is invalidated and any locks
+        associated with the session are released and can be acquired once the associated lock delay has expired.
     type: list
     elements: str
   behavior:

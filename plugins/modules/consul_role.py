@@ -29,7 +29,7 @@ attributes:
   diff_mode:
     support: partial
     details:
-      - In check mode the diff will miss operational attributes.
+      - In check mode the diff misses operational attributes.
     version_added: 8.3.0
   action_group:
     version_added: 8.3.0
@@ -48,15 +48,15 @@ options:
   description:
     description:
       - Description of the role.
-      - If not specified, the assigned description will not be changed.
+      - If not specified, the assigned description is not changed.
     type: str
   policies:
     type: list
     elements: dict
     description:
       - List of policies to attach to the role. Each policy is a dict.
-      - If the parameter is left blank, any policies currently assigned will not be changed.
-      - Any empty array (V([])) will clear any policies previously set.
+      - If the parameter is left blank, any policies currently assigned are not changed.
+      - Any empty array (V([])) clears any policies previously set.
     suboptions:
       name:
         description:
@@ -90,8 +90,8 @@ options:
     elements: dict
     description:
       - List of service identities to attach to the role.
-      - If not specified, any service identities currently assigned will not be changed.
-      - If the parameter is an empty array (V([])), any node identities assigned will be unassigned.
+      - If not specified, any service identities currently assigned are not changed.
+      - If the parameter is an empty array (V([])), any node identities assigned are unassigned.
     suboptions:
       service_name:
         description:
@@ -106,9 +106,9 @@ options:
           - name
       datacenters:
         description:
-          - The datacenters the policies will be effective.
-          - This will result in effective policy only being valid in this datacenter.
-          - If an empty array (V([])) is specified, the policies will valid in all datacenters.
+          - The datacenters where the policies are effective.
+          - This results in effective policy only being valid in this datacenter.
+          - If an empty array (V([])) is specified, the policies are valid in all datacenters.
           - Including those which do not yet exist but may in the future.
         type: list
         elements: str
@@ -117,8 +117,8 @@ options:
     elements: dict
     description:
       - List of node identities to attach to the role.
-      - If not specified, any node identities currently assigned will not be changed.
-      - If the parameter is an empty array (V([])), any node identities assigned will be unassigned.
+      - If not specified, any node identities currently assigned are not changed.
+      - If the parameter is an empty array (V([])), any node identities assigned are unassigned.
     suboptions:
       node_name:
         description:
@@ -134,7 +134,7 @@ options:
       datacenter:
         description:
           - The nodes datacenter.
-          - This will result in effective policy only being valid in this datacenter.
+          - This results in effective policy only being valid in this datacenter.
         type: str
         required: true
 """

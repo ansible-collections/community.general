@@ -15,7 +15,7 @@ module: django_manage
 short_description: Manages a Django application
 description:
   - Manages a Django application using the C(manage.py) application frontend to C(django-admin). With the O(virtualenv) parameter,
-    all management commands will be executed by the given C(virtualenv) installation.
+    all management commands are executed by the given C(virtualenv) installation.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -34,8 +34,8 @@ options:
       - V(loaddata) - Searches for and loads the contents of the named O(fixtures) into the database.
       - V(migrate) - Synchronizes the database state with models and migrations.
       - V(test) - Runs tests for all installed apps.
-      - Other commands can be entered, but will fail if they are unknown to Django. Other commands that may prompt for user
-        input should be run with the C(--noinput) flag.
+      - Custom commands can be entered, but they fail unless they are known to Django. Custom commands that may prompt for
+        user input should be run with the C(--noinput) flag.
       - Support for the values V(cleanup), V(syncdb), V(validate) was removed in community.general 9.0.0. See note about supported
         versions of Django.
     type: str
@@ -62,7 +62,7 @@ options:
   virtualenv:
     description:
       - An optional path to a C(virtualenv) installation to use while running the manage application.
-      - The virtual environment must exist, otherwise the module will fail.
+      - The virtual environment must exist, otherwise the module fails.
     type: path
     aliases: [virtual_env]
   apps:
@@ -78,7 +78,7 @@ options:
   clear:
     description:
       - Clear the existing files before trying to copy or link the original file.
-      - Used only with the V(collectstatic) command. The C(--noinput) argument will be added automatically.
+      - Used only with the V(collectstatic) command. The C(--noinput) argument is added automatically.
     required: false
     default: false
     type: bool
@@ -101,18 +101,18 @@ options:
     required: false
   skip:
     description:
-      - Will skip over out-of-order missing migrations, you can only use this parameter with V(migrate) command.
+      - Skips over out-of-order missing migrations, you can only use this parameter with V(migrate) command.
     required: false
     type: bool
   merge:
     description:
-      - Will run out-of-order or missing migrations as they are not rollback migrations, you can only use this parameter with
+      - Runs out-of-order or missing migrations as they are not rollback migrations, you can only use this parameter with
         V(migrate) command.
     required: false
     type: bool
   link:
     description:
-      - Will create links to the files instead of copying them, you can only use this parameter with V(collectstatic) command.
+      - Creates links to the files instead of copying them, you can only use this parameter with V(collectstatic) command.
     required: false
     type: bool
   testrunner:
@@ -134,7 +134,7 @@ notes:
     module allows for free-form commands, not verifying the version of Django being used, it is B(strongly recommended) to
     use a more recent version of the framework.'
   - Please notice that Django 4.1 requires Python 3.8 or greater.
-  - This module will not create a virtualenv if the O(virtualenv) parameter is specified and a virtual environment does not
+  - This module does not create a virtualenv if the O(virtualenv) parameter is specified and a virtual environment does not
     already exist at the given location. This behavior changed in community.general version 9.0.0.
   - The recommended way to create a virtual environment in Ansible is by using M(ansible.builtin.pip).
   - This module assumes English error messages for the V(createcachetable) command to detect table existence, unfortunately.

@@ -31,7 +31,7 @@ attributes:
     support: partial
     version_added: 8.3.0
     details:
-      - In check mode the diff will miss operational attributes.
+      - In check mode the diff misses operational attributes.
   action_group:
     version_added: 8.3.0
 options:
