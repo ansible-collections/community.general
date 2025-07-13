@@ -103,13 +103,8 @@ changed:
 """
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.six.moves import configparser
 import re
-import sys
-
-if sys.version_info < (3, 0):
-    from ConfigParser import ConfigParser
-else:
-    from configparser import ConfigParser
 
 
 class Sysrc(object):
@@ -136,7 +131,7 @@ class Sysrc(object):
         Use this dictionary to preform the tests.
         """
         (rc, out, err) = self.run_sysrc('-e', '-a')
-        parser = ConfigParser()
+        parser = configparser.ConfigParser()
         parser.read_string('[top]\n' + out)  # Add faked top section
         conf = {k: parser['top'][k] for k in parser['top']}
 
