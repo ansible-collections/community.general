@@ -22,9 +22,9 @@ attributes:
     support: partial
     details:
       - The logics of the C(versionlock) plugin for corner cases could be confusing, so please take in account that this module
-        will do its best to give a C(check_mode) prediction on what is going to happen. In case of doubt, check the documentation
+        does its best to give a C(check_mode) prediction on what is going to happen. In case of doubt, check the documentation
         of the plugin.
-      - Sometimes the module could predict changes in C(check_mode) that will not be such because C(versionlock) concludes
+      - Sometimes the module could predict changes in C(check_mode) that are not fulfilled because C(versionlock) concludes
         that there is already a entry in C(locklist) that already matches.
   diff_mode:
     support: none
@@ -47,12 +47,12 @@ options:
   state:
     description:
       - Whether to add (V(present) or V(excluded)) to or remove (V(absent) or V(clean)) from the C(locklist).
-      - V(present) will add a package name spec to the C(locklist). If there is a installed package that matches, then only
-        that version will be added. Otherwise, all available package versions will be added.
-      - V(excluded) will add a package name spec as excluded to the C(locklist). It means that packages represented by the
-        package name spec will be excluded from transaction operations. All available package versions will be added.
-      - V(absent) will delete entries in the C(locklist) that match the package name spec.
-      - V(clean) will delete all entries in the C(locklist). This option is mutually exclusive with O(name).
+      - V(present) adds a package name spec to the C(locklist). If there is a installed package that matches, then only that
+        version is added. Otherwise, all available package versions are added.
+      - V(excluded) adds a package name spec as excluded to the C(locklist). It means that packages represented by the package
+        name spec are excluded from transaction operations. All available package versions are added.
+      - V(absent) deletes entries in the C(locklist) that match the package name spec.
+      - V(clean) deletes all entries in the C(locklist). This option is mutually exclusive with O(name).
     choices: ['absent', 'clean', 'excluded', 'present']
     type: str
     default: present
@@ -108,25 +108,25 @@ locklist_pre:
   returned: success
   type: list
   elements: str
-  sample: ['bash-0:4.4.20-1.el8_4.*', '!bind-32:9.11.26-4.el8_4.*']
+  sample: ["bash-0:4.4.20-1.el8_4.*", "!bind-32:9.11.26-4.el8_4.*"]
 locklist_post:
   description: Locklist after module execution.
   returned: success and (not check mode or state is clean)
   type: list
   elements: str
-  sample: ['bash-0:4.4.20-1.el8_4.*']
+  sample: ["bash-0:4.4.20-1.el8_4.*"]
 specs_toadd:
   description: Package name specs meant to be added by versionlock.
   returned: success
   type: list
   elements: str
-  sample: ['bash']
+  sample: ["bash"]
 specs_todelete:
   description: Package name specs meant to be deleted by versionlock.
   returned: success
   type: list
   elements: str
-  sample: ['bind']
+  sample: ["bind"]
 """
 
 from ansible.module_utils.basic import AnsibleModule

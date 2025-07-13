@@ -17,8 +17,8 @@ author:
   - quidame (@quidame)
 description:
   - A diversion is for C(dpkg) the knowledge that only a given package (or the local administrator) is allowed to install
-    a file at a given location. Other packages shipping their own version of this file will be forced to O(divert) it, that
-    is to install it at another location. It allows one to keep changes in a file provided by a debian package by preventing
+    a file at a given location. Other packages shipping their own version of this file are forced to O(divert) it, that is
+    to install it at another location. It allows one to keep changes in a file provided by a debian package by preventing
     it being overwritten on package upgrade.
   - This module manages diversions of debian packages files using the C(dpkg-divert) commandline tool. It can either create
     or remove a diversion for a given file, but also update an existing diversion to modify its O(holder) and/or its O(divert)
@@ -54,7 +54,7 @@ options:
     type: str
   divert:
     description:
-      - The location where the versions of file will be diverted.
+      - The location where the versions of file are diverted.
       - Default is to add suffix C(.distrib) to the file path.
       - This parameter is ignored when O(state=absent).
     type: path
@@ -70,7 +70,7 @@ options:
   force:
     description:
       - When O(rename=true) and O(force=true), renaming is performed even if the target of the renaming exists, in other words
-        the existing contents of the file at this location will be lost.
+        the existing contents of the file at this location are lost.
       - This parameter is ignored when O(rename=false).
     type: bool
     default: false
