@@ -31,7 +31,7 @@ attributes:
   diff_mode:
     support: partial
     details:
-      - In check mode the diff will miss operational attributes.
+      - In check mode the diff misses operational attributes.
 options:
   state:
     description:
@@ -50,13 +50,13 @@ options:
     type: str
   tags:
     description:
-      - Tags that will be attached to the service registration.
+      - Tags that are attached to the service registration.
     type: list
     elements: str
   address:
     description:
-      - The address to advertise that the service will be listening on. This value will be passed as the C(address) parameter
-        to Consul's C(/v1/agent/service/register) API method, so refer to the Consul API documentation for further details.
+      - The address to advertise that the service listens on. This value is passed as the C(address) parameter to Consul's
+        C(/v1/agent/service/register) API method, so refer to the Consul API documentation for further details.
     type: str
   meta:
     description:

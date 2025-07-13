@@ -36,12 +36,12 @@ options:
   state:
     description:
       - The action to take with the supplied key and value. If the state is V(present) and O(value) is set, the key contents
-        will be set to the value supplied and C(changed) will be set to V(true) only if the value was different to the current
-        contents. If the state is V(present) and O(value) is not set, the existing value associated to the key will be returned.
-        The state V(absent) will remove the key/value pair, again C(changed) will be set to V(true) only if the key actually
-        existed prior to the removal. An attempt can be made to obtain or free the lock associated with a key/value pair with
-        the states V(acquire) or V(release) respectively. A valid session must be supplied to make the attempt C(changed)
-        will be V(true) if the attempt is successful, V(false) otherwise.
+        is set to the value supplied and C(changed) is set to V(true) only if the value was different to the current contents.
+        If the state is V(present) and O(value) is not set, the existing value associated to the key is returned. The state
+        V(absent) is used to remove the key/value pair, again C(changed) is set to V(true) only if the key actually existed
+        prior to the removal. An attempt can be made to obtain or free the lock associated with a key/value pair with the
+        states V(acquire) or V(release) respectively. A valid session must be supplied to make the attempt C(changed) is V(true)
+        if the attempt is successful, V(false) otherwise.
     type: str
     choices: [absent, acquire, present, release]
     default: present
@@ -73,9 +73,8 @@ options:
     type: str
   cas:
     description:
-      - Used when acquiring a lock with a session. If the O(cas) is V(0), then Consul will only put the key if it does not
-        already exist. If the O(cas) value is non-zero, then the key is only set if the index matches the ModifyIndex of that
-        key.
+      - Used when acquiring a lock with a session. If the O(cas) is V(0), then Consul only puts the key if it does not already
+        exist. If the O(cas) value is non-zero, then the key is only set if the index matches the ModifyIndex of that key.
     type: str
   flags:
     description:
@@ -103,8 +102,7 @@ options:
     default: true
   datacenter:
     description:
-      - The name of the datacenter to query. If unspecified, the query will default to the datacenter of the Consul agent
-        on O(host).
+      - The name of the datacenter to query. If unspecified, the query defaults to the datacenter of the Consul agent on O(host).
     type: str
     version_added: 10.0.0
 """

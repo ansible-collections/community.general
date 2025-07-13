@@ -92,26 +92,26 @@ options:
     type: dict
     description:
       - Dictionary of scopes to silence, with timestamps or None.
-      - Each scope will be muted until the given POSIX timestamp or forever if the value is None.
+      - Each scope is muted until the given POSIX timestamp or forever if the value is V(None).
   notify_no_data:
     description:
-      - Whether this monitor will notify when data stops reporting.
+      - Whether this monitor notifies when data stops reporting.
     type: bool
     default: false
   no_data_timeframe:
     description:
-      - The number of minutes before a monitor will notify when data stops reporting.
+      - The number of minutes before a monitor notifies when data stops reporting.
       - Must be at least 2x the monitor timeframe for metric alerts or 2 minutes for service checks.
       - If not specified, it defaults to 2x timeframe for metric, 2 minutes for service.
     type: str
   timeout_h:
     description:
-      - The number of hours of the monitor not reporting data before it will automatically resolve from a triggered state.
+      - The number of hours of the monitor not reporting data before it automatically resolves from a triggered state.
     type: str
   renotify_interval:
     description:
-      - The number of minutes after the last notification before a monitor will re-notify on the current status.
-      - It will only re-notify if it is not resolved.
+      - The number of minutes after the last notification before a monitor re-notifies on the current status.
+      - It only re-notifies if it is not resolved.
     type: str
   escalation_message:
     description:
@@ -120,7 +120,7 @@ options:
     type: str
   notify_audit:
     description:
-      - Whether tagged users will be notified on changes to this monitor.
+      - Whether tagged users are notified on changes to this monitor.
     type: bool
     default: false
   thresholds:
@@ -138,7 +138,7 @@ options:
   require_full_window:
     description:
       - Whether this monitor needs a full window of data before it gets evaluated.
-      - We highly recommend you set this to False for sparse metrics, otherwise some evaluations will be skipped.
+      - We highly recommend you set this to V(false) for sparse metrics, otherwise some evaluations are skipped.
     type: bool
   new_host_delay:
     description:
@@ -153,7 +153,7 @@ options:
   id:
     description:
       - The ID of the alert.
-      - If set, will be used instead of the name to locate the alert.
+      - If set, it is used instead of O(name) to locate the alert.
     type: str
   include_tags:
     description:

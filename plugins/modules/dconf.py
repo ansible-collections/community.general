@@ -17,10 +17,10 @@ short_description: Modify and read dconf database
 description:
   - This module allows modifications and reading of C(dconf) database. The module is implemented as a wrapper around C(dconf)
     tool. Please see the dconf(1) man page for more details.
-  - Since C(dconf) requires a running D-Bus session to change values, the module will try to detect an existing session and
-    reuse it, or run the tool using C(dbus-run-session).
+  - Since C(dconf) requires a running D-Bus session to change values, the module tries to detect an existing session and reuse
+    it, or run the tool using C(dbus-run-session).
 requirements:
-  - Optionally the C(gi.repository) Python library (usually included in the OS on hosts which have C(dconf)); this will become
+  - Optionally the C(gi.repository) Python library (usually included in the OS on hosts which have C(dconf)); this is to become
     a non-optional requirement in a future major release of community.general.
 notes:
   - This module depends on C(psutil) Python library (version 4.0.0 and upwards), C(dconf), C(dbus-send), and C(dbus-run-session)
@@ -28,7 +28,7 @@ notes:
   - This module uses the C(gi.repository) Python library when available for accurate comparison of values in C(dconf) to values
     specified in Ansible code. C(gi.repository) is likely to be present on most systems which have C(dconf) but may not be
     present everywhere. When it is missing, a simple string comparison between values is used, and there may be false positives,
-    that is, Ansible may think that a value is being changed when it is not. This fallback will be removed in a future version
+    that is, Ansible may think that a value is being changed when it is not. This fallback is to be removed in a future version
     of this module, at which point the module will stop working on hosts without C(gi.repository).
   - Detection of existing, running D-Bus session, required to change settings using C(dconf), is not 100% reliable due to
     implementation details of D-Bus daemon itself. This might lead to running applications not picking-up changes on-the-fly
