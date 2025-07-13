@@ -18,8 +18,8 @@ short_description: Create, update, or delete GitLab issues
 version_added: '8.1.0'
 description:
   - Creates an issue if it does not exist.
-  - When an issue does exist, it will be updated if the provided parameters are different.
-  - When an issue does exist and O(state=absent), the issue will be deleted.
+  - When an issue does exist, it is updated if the provided parameters are different.
+  - When an issue does exist and O(state=absent), the issue is deleted.
   - When multiple issues are detected, the task fails.
   - Existing issues are matched based on O(title) and O(state_filter) filters.
 author:

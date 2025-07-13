@@ -86,7 +86,7 @@ options:
     required: false
   dns_address:
     description:
-      - Specifies the DNS server addresses for subnet. The address in the head will be used first.
+      - Specifies the DNS server addresses for subnet. The address in the head is used first.
     type: list
     elements: str
     required: false
@@ -148,7 +148,7 @@ dhcp_enable:
   returned: success
 dns_address:
   description:
-    - Specifies the DNS server addresses for subnet. The address in the head will be used first.
+    - Specifies the DNS server addresses for subnet. The address in the head is used first.
   type: list
   returned: success
 """

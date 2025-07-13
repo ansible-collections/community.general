@@ -14,10 +14,10 @@ DOCUMENTATION = r"""
 module: gitlab_user
 short_description: Creates/updates/deletes/blocks/unblocks GitLab Users
 description:
-  - When the user does not exist in GitLab, it will be created.
-  - When the user exists and state=absent, the user will be deleted.
-  - When the user exists and state=blocked, the user will be blocked.
-  - When changes are made to user, the user will be updated.
+  - When the user does not exist in GitLab, it is created.
+  - When the user exists and state=absent, the user is deleted.
+  - When the user exists and state=blocked, the user is blocked.
+  - When changes are made to user, the user is updated.
 notes:
   - From community.general 0.2.0 and onwards, name, email and password are optional while deleting the user.
 author:
