@@ -190,7 +190,7 @@ options:
         description: The provider's API port.
       userid:
         type: str
-        description: Provider's API endpoint authentication userid. defaults to V(null).
+        description: Provider's API endpoint authentication userid. Defaults to V(null).
       password:
         type: str
         description: Provider's API endpoint authentication password. defaults to V(null).
