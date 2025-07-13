@@ -127,7 +127,7 @@ options:
     description:
       - Whether the record should be the only one for that record type and record name.
       - Only use with O(state=present).
-      - This will delete all other records with the same record name and type.
+      - This deletes all other records with the same record name and type.
     type: bool
   state:
     description:
@@ -156,8 +156,8 @@ options:
     description:
       - The type of DNS record to create. Required if O(state=present).
       - Support for V(SPF) has been removed from community.general 9.0.0 since that record type is no longer supported by
-      - Support for V(PTR) has been added in community.general 11.1.0.
         CloudFlare.
+      - Support for V(PTR) has been added in community.general 11.1.0.
     type: str
     choices: [A, AAAA, CNAME, DS, MX, NS, SRV, SSHFP, TLSA, CAA, TXT, PTR]
   value:
@@ -378,10 +378,7 @@ record:
       description: Extra Cloudflare-specific information about the record.
       returned: success
       type: dict
-      sample:
-        {
-          "auto_added": false
-        }
+      sample: {"auto_added": false}
     modified_on:
       description: Record modification date.
       returned: success
@@ -412,7 +409,7 @@ record:
       returned: success
       type: list
       elements: str
-      sample: ['production', 'app']
+      sample: ["production", "app"]
       version_added: 10.1.0
     tags_modified_on:
       description: When the record tags were last modified. Omitted if there are no tags.

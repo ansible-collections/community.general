@@ -40,10 +40,10 @@ options:
     choices: [absent, present]
     default: present
 notes:
-  - The capabilities system will automatically transform operators and flags into the effective set, so for example, C(cap_foo=ep)
-    will probably become C(cap_foo+ep).
-  - This module does not attempt to determine the final operator and flags to compare, so you will want to ensure that your
-    capabilities argument matches the final capabilities.
+  - The capabilities system automatically transforms operators and flags into the effective set, so for example, C(cap_foo=ep)
+    probably becomes C(cap_foo+ep).
+  - This module does not attempt to determine the final operator and flags to compare, so you want to ensure that your capabilities
+    argument matches the final capabilities.
 author:
   - Nate Coraor (@natefoo)
 """

@@ -29,7 +29,7 @@ attributes:
   diff_mode:
     support: partial
     details:
-      - In check mode the diff will miss operational attributes.
+      - In check mode the diff misses operational attributes.
   action_group:
     version_added: 8.3.0
 options:
@@ -41,11 +41,11 @@ options:
     type: str
   accessor_id:
     description:
-      - Specifies a UUID to use as the token's Accessor ID. If not specified a UUID will be generated for this field.
+      - Specifies a UUID to use as the token's Accessor ID. If not specified a UUID is generated for this field.
     type: str
   secret_id:
     description:
-      - Specifies a UUID to use as the token's Secret ID. If not specified a UUID will be generated for this field.
+      - Specifies a UUID to use as the token's Secret ID. If not specified a UUID is generated for this field.
     type: str
   description:
     description:
@@ -56,8 +56,8 @@ options:
     elements: dict
     description:
       - List of policies to attach to the token. Each policy is a dict.
-      - If the parameter is left blank, any policies currently assigned will not be changed.
-      - Any empty array (V([])) will clear any policies previously set.
+      - If the parameter is left blank, any policies currently assigned are not changed.
+      - Any empty array (V([])) clears any policies previously set.
     suboptions:
       name:
         description:
@@ -74,8 +74,8 @@ options:
     elements: dict
     description:
       - List of roles to attach to the token. Each role is a dict.
-      - If the parameter is left blank, any roles currently assigned will not be changed.
-      - Any empty array (V([])) will clear any roles previously set.
+      - If the parameter is left blank, any roles currently assigned are not changed.
+      - Any empty array (V([])) clears any roles previously set.
     suboptions:
       name:
         description:
@@ -108,8 +108,8 @@ options:
     elements: dict
     description:
       - List of service identities to attach to the token.
-      - If not specified, any service identities currently assigned will not be changed.
-      - If the parameter is an empty array (V([])), any node identities assigned will be unassigned.
+      - If not specified, any service identities currently assigned are not changed.
+      - If the parameter is an empty array (V([])), any node identities assigned are unassigned.
     suboptions:
       service_name:
         description:
@@ -120,8 +120,8 @@ options:
         required: true
       datacenters:
         description:
-          - The datacenters the token will be effective.
-          - If an empty array (V([])) is specified, the token will valid in all datacenters.
+          - The datacenters where the token is effective.
+          - If an empty array (V([])) is specified, the token is valid in all datacenters.
           - Including those which do not yet exist but may in the future.
         type: list
         elements: str
@@ -130,8 +130,8 @@ options:
     elements: dict
     description:
       - List of node identities to attach to the token.
-      - If not specified, any node identities currently assigned will not be changed.
-      - If the parameter is an empty array (V([])), any node identities assigned will be unassigned.
+      - If not specified, any node identities currently assigned are not changed.
+      - If the parameter is an empty array (V([])), any node identities assigned are unassigned.
     suboptions:
       node_name:
         description:
@@ -143,7 +143,7 @@ options:
       datacenter:
         description:
           - The nodes datacenter.
-          - This will result in effective token only being valid in this datacenter.
+          - This results in effective token only being valid in this datacenter.
         type: str
         required: true
   local:
@@ -152,7 +152,7 @@ options:
     type: bool
   expiration_ttl:
     description:
-      - This is a convenience field and if set will initialize the C(expiration_time). Can be specified in the form of V(60s)
+      - This is a convenience field and if set it initializes the C(expiration_time). Can be specified in the form of V(60s)
         or V(5m) (that is, 60 seconds or 5 minutes, respectively). Ingored when the token is updated!
     type: str
 """

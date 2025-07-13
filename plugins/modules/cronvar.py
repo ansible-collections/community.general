@@ -43,12 +43,12 @@ options:
     type: str
   insertafter:
     description:
-      - If specified, the variable will be inserted after the variable specified.
+      - If specified, the variable is inserted after the variable specified.
       - Used with O(state=present).
     type: str
   insertbefore:
     description:
-      - Used with O(state=present). If specified, the variable will be inserted just before the variable specified.
+      - Used with O(state=present). If specified, the variable is inserted just before the variable specified.
     type: str
   state:
     description:
