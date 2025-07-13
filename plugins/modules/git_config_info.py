@@ -26,7 +26,7 @@ options:
   name:
     description:
       - The name of the setting to read.
-      - If not provided, all settings will be returned as RV(config_values).
+      - If not provided, all settings are returned as RV(config_values).
     type: str
   path:
     description:
@@ -94,8 +94,8 @@ config_values:
   description:
     - This is a dictionary mapping a git configuration setting to a list of its values.
     - When O(name) is not set, all configuration settings are returned here.
-    - When O(name) is set, only the setting specified in O(name) is returned here. If that setting is not set, the key will
-      still be present, and its value will be an empty list.
+    - When O(name) is set, only the setting specified in O(name) is returned here. If that setting is not set, the key is
+      still present, and its value is an empty list.
   returned: success
   type: dict
   sample:

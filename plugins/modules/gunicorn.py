@@ -50,8 +50,8 @@ options:
   pid:
     type: path
     description:
-      - A filename to use for the PID file. If not set and not found on the configuration file a tmp pid file will be created
-        to check a successful run of gunicorn.
+      - A filename to use for the PID file. If not set and not found on the configuration file a tmp pid file is created to
+        check a successful run of gunicorn.
   worker:
     type: str
     choices: ['sync', 'eventlet', 'gevent', 'tornado ', 'gthread', 'gaiohttp']
@@ -62,8 +62,8 @@ options:
     description:
       - Switch worker processes to run as this user.
 notes:
-  - If not specified on config file, a temporary error log will be created on /tmp dir. Please make sure you have write access
-    in /tmp dir. Not needed but will help you to identify any problem with configuration.
+  - If not specified on config file, a temporary error log is created on C(/tmp) directory. Please make sure you have write
+    access in C(/tmp) directory. Not needed but it is helpful to identify any problem with configuration.
 """
 
 EXAMPLES = r"""

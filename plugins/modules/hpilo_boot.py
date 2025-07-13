@@ -67,7 +67,7 @@ options:
   force:
     description:
       - Whether to force a reboot (even when the system is already booted).
-      - As a safeguard, without force, hpilo_boot will refuse to reboot a server that is already running.
+      - As a safeguard, without force, M(community.general.hpilo_boot) refuses to reboot a server that is already running.
     default: false
     type: bool
   ssl_version:
@@ -78,7 +78,7 @@ options:
     choices: ["SSLv3", "SSLv23", "TLSv1", "TLSv1_1", "TLSv1_2"]
   idempotent_boot_once:
     description:
-      - "This option makes O(state=boot_once) succeed instead of failing when the server is already powered on."
+      - This option makes O(state=boot_once) succeed instead of failing when the server is already powered on.
     type: bool
     default: false
     version_added: 10.6.0

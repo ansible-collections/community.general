@@ -72,7 +72,7 @@ options:
   organization:
     description:
       - Organization for the repository.
-      - When O(state=present), the repository will be created in the current user profile.
+      - When O(state=present), the repository is created in the current user profile.
     type: str
     required: false
   api_url:

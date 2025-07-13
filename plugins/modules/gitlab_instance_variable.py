@@ -16,10 +16,10 @@ short_description: Creates, updates, or deletes GitLab instance variables
 version_added: 7.1.0
 description:
   - Creates a instance variable if it does not exist.
-  - When a instance variable does exist, its value will be updated if the values are different.
+  - When a instance variable does exist, its value is updated if the values are different.
   - Support for instance variables requires GitLab >= 13.0.
-  - Variables which are not mentioned in the modules options, but are present on the GitLab instance, will either stay (O(purge=false))
-    or will be deleted (O(purge=true)).
+  - Variables which are not mentioned in the modules options, but are present on the GitLab instance, either stay (O(purge=false))
+    or are deleted (O(purge=true)).
 author:
   - Benedikt Braunger (@benibr)
 requirements:
@@ -124,22 +124,22 @@ instance_variable:
       description: A list of variables which were created.
       returned: always
       type: list
-      sample: ['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']
+      sample: ["ACCESS_KEY_ID", "SECRET_ACCESS_KEY"]
     untouched:
       description: A list of variables which exist.
       returned: always
       type: list
-      sample: ['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']
+      sample: ["ACCESS_KEY_ID", "SECRET_ACCESS_KEY"]
     removed:
       description: A list of variables which were deleted.
       returned: always
       type: list
-      sample: ['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']
+      sample: ["ACCESS_KEY_ID", "SECRET_ACCESS_KEY"]
     updated:
       description: A list pre-existing variables whose values have been set.
       returned: always
       type: list
-      sample: ['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']
+      sample: ["ACCESS_KEY_ID", "SECRET_ACCESS_KEY"]
 """
 
 from ansible.module_utils.basic import AnsibleModule

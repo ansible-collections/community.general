@@ -33,8 +33,8 @@ options:
       - An optional O(virtualenv) directory path to install into. If the O(virtualenv) does not exist, it is created automatically.
   virtualenv_site_packages:
     description:
-      - Whether the virtual environment will inherit packages from the global site-packages directory. Note that if this setting
-        is changed on an already existing virtual environment it will not have any effect, the environment must be deleted
+      - Whether the virtual environment inherits packages from the global site-packages directory. Note that this setting
+        has no effect on an already existing virtual environment, so if you want to change it, the environment must be deleted
         and newly created.
     type: bool
     default: false

@@ -61,15 +61,15 @@ options:
     default: true
   executable:
     description:
-      - Path to hg executable to use. If not supplied, the normal mechanism for resolving binary paths will be used.
+      - Path to C(hg) executable to use. If not supplied, the normal mechanism for resolving binary paths is used.
     type: str
 notes:
   - This module does not support push capability. See U(https://github.com/ansible/ansible/issues/31156).
-  - 'If the task seems to be hanging, first verify remote host is in C(known_hosts). SSH will prompt user to authorize the
-    first contact with a remote host. To avoid this prompt, one solution is to add the remote host public key in C(/etc/ssh/ssh_known_hosts)
+  - 'If the task seems to be hanging, first verify remote host is in C(known_hosts). SSH prompts user to authorize the first
+    contact with a remote host. To avoid this prompt, one solution is to add the remote host public key in C(/etc/ssh/ssh_known_hosts)
     before calling the hg module, with the following command: C(ssh-keyscan remote_host.com >> /etc/ssh/ssh_known_hosts).'
   - As per 01 Dec 2018, Bitbucket has dropped support for TLSv1 and TLSv1.1 connections. As such, if the underlying system
-    still uses a Python version below 2.7.9, you will have issues checking out bitbucket repositories. See
+    still uses a Python version below 2.7.9, you are bound to have issues checking out bitbucket repositories. See
     U(https://bitbucket.org/blog/deprecating-tlsv1-tlsv1-1-2018-12-01).
 """
 
