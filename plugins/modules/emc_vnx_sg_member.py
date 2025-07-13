@@ -77,7 +77,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 hluid:
-  description: LUNID that hosts attached to the storage group will see.
+  description: LUNID visible to hosts attached to the storage group.
   type: int
   returned: success
 """
