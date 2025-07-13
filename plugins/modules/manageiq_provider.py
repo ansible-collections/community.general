@@ -190,16 +190,16 @@ options:
         description: The provider's API port.
       userid:
         type: str
-        description: Provider's API endpoint authentication userid. defaults to None.
+        description: Provider's API endpoint authentication userid. defaults to V(null).
       password:
         type: str
-        description: Provider's API endpoint authentication password. defaults to None.
+        description: Provider's API endpoint authentication password. defaults to V(null).
       auth_key:
         type: str
-        description: Provider's API endpoint authentication bearer token. defaults to None.
+        description: Provider's API endpoint authentication bearer token. defaults to V(null).
       validate_certs:
         type: bool
-        description: Whether SSL certificates should be verified for HTTPS requests (deprecated). defaults to True.
+        description: Whether SSL certificates should be verified for HTTPS requests (deprecated). defaults to V(true).
         default: true
         aliases: [verify_ssl]
       security_protocol:
@@ -208,7 +208,7 @@ options:
         description: How SSL certificates should be used for HTTPS requests. defaults to None.
       certificate_authority:
         type: str
-        description: The CA bundle string with custom certificates. defaults to None.
+        description: The CA bundle string with custom certificates. defaults to V(null).
       path:
         type: str
         description:
