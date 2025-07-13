@@ -44,8 +44,8 @@ options:
     type: str
   force:
     description:
-      - The default is V(true), which will replace the existing remote key if it is different than O(pubkey). If V(false),
-        the key will only be set if no key with the given O(name) exists.
+      - The default is V(true), which replaces the existing remote key if it is different than O(pubkey). If V(false), the
+        key is only set if no key with the given O(name) exists.
     type: bool
     default: true
 

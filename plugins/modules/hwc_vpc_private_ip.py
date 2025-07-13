@@ -21,7 +21,7 @@ notes:
   - If O(id) option is provided, it takes precedence over O(subnet_id), O(ip_address) for private IP selection.
   - O(subnet_id), O(ip_address) are used for private IP selection. If more than one private IP with this options exists, execution
     is aborted.
-  - No parameter support updating. If one of option is changed, the module will create a new resource.
+  - No parameter support updating. If one of option is changed, the module creates a new resource.
 version_added: '0.2.0'
 author: Huawei Inc. (@huaweicloud)
 requirements:

@@ -48,7 +48,7 @@ options:
   repository:
     type: str
     description:
-      - The repository from which the gem will be installed.
+      - The repository from which the gem is installed.
     required: false
     aliases: [source]
   user_install:
@@ -65,7 +65,7 @@ options:
   install_dir:
     type: path
     description:
-      - Install the gems into a specific directory. These gems will be independent from the global installed ones. Specifying
+      - Install the gems into a specific directory. These gems are independent from the global installed ones. Specifying
         this requires user_install to be false.
     required: false
   bindir:

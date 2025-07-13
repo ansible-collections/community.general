@@ -81,8 +81,8 @@ options:
     description:
       - The registration token is used to register new runners before GitLab 16.0.
       - Required if O(state=present) for GitLab < 16.0.
-      - If set, the runner will be created using the old runner creation workflow.
-      - If not set, the runner will be created using the new runner creation workflow, introduced in GitLab 16.0.
+      - If set, the runner is created using the old runner creation workflow.
+      - If not set, the runner is created using the new runner creation workflow, introduced in GitLab 16.0.
       - If not set, requires python-gitlab >= 4.0.0.
     type: str
   owned:
@@ -122,8 +122,8 @@ options:
       - If set to V(not_protected), runner can pick up jobs from both protected and unprotected branches.
       - If set to V(ref_protected), runner can pick up jobs only from protected branches.
       - Before community.general 8.0.0 the default was V(ref_protected). This was changed to no default in community.general
-        8.0.0. If this option is not specified explicitly, GitLab will use V(not_protected) on creation, and the value set
-        will not be changed on any updates.
+        8.0.0. If this option is not specified explicitly, GitLab uses V(not_protected) on creation, and the value set is
+        not changed on any updates.
     required: false
     choices: ["not_protected", "ref_protected"]
     type: str
