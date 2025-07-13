@@ -63,7 +63,7 @@ options:
     description: Google Compute Engine Project ID.
   azure_tenant_id:
     type: str
-    description: Tenant ID. defaults to None.
+    description: Tenant ID. Defaults to V(null).
     aliases: [keystone_v3_domain_id]
   tenant_mapping_enabled:
     type: bool
@@ -193,22 +193,22 @@ options:
         description: Provider's API endpoint authentication userid. Defaults to V(null).
       password:
         type: str
-        description: Provider's API endpoint authentication password. defaults to V(null).
+        description: Provider's API endpoint authentication password. Defaults to V(null).
       auth_key:
         type: str
-        description: Provider's API endpoint authentication bearer token. defaults to V(null).
+        description: Provider's API endpoint authentication bearer token. Defaults to V(null).
       validate_certs:
         type: bool
-        description: Whether SSL certificates should be verified for HTTPS requests (deprecated). defaults to V(true).
+        description: Whether SSL certificates should be verified for HTTPS requests (deprecated). Defaults to V(true).
         default: true
         aliases: [verify_ssl]
       security_protocol:
         type: str
         choices: ['ssl-with-validation', 'ssl-with-validation-custom-ca', 'ssl-without-validation', 'non-ssl']
-        description: How SSL certificates should be used for HTTPS requests. defaults to V(null).
+        description: How SSL certificates should be used for HTTPS requests. Defaults to V(null).
       certificate_authority:
         type: str
-        description: The CA bundle string with custom certificates. defaults to V(null).
+        description: The CA bundle string with custom certificates. Defaults to V(null).
       path:
         type: str
         description:
