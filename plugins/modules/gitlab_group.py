@@ -13,8 +13,8 @@ DOCUMENTATION = r"""
 module: gitlab_group
 short_description: Creates/updates/deletes GitLab Groups
 description:
-  - When the group does not exist in GitLab, it will be created.
-  - When the group does exist and state=absent, the group will be deleted.
+  - When the group does not exist in GitLab, it is created.
+  - When the group does exist and O(state=absent), the group is deleted.
 author:
   - Werner Dijkerman (@dj-wasabi)
   - Guillaume Martinez (@Lunik)
@@ -101,8 +101,8 @@ options:
     type: str
   path:
     description:
-      - The path of the group you want to create, this will be api_url/group_path.
-      - If not supplied, the group_name will be used.
+      - The path of the group you want to create, this is O(api_url)/O(path).
+      - If not supplied, O(name) is used.
     type: str
   prevent_forking_outside_group:
     description:
@@ -129,7 +129,7 @@ options:
   service_access_tokens_expiration_enforced:
     description:
       - Service account token expiration.
-      - Changes will not affect existing token expiration dates.
+      - Changes do not affect existing token expiration dates.
       - Only available for top level groups.
     type: bool
     version_added: 9.5.0

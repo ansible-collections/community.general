@@ -12,8 +12,8 @@ module: gitlab_label
 short_description: Creates/updates/deletes GitLab Labels belonging to project or group
 version_added: 8.3.0
 description:
-  - When a label does not exist, it will be created.
-  - When a label does exist, its value will be updated when the values are different.
+  - When a label does not exist, it is created.
+  - When a label does exist, its value is updated when the values are different.
   - Labels can be purged.
 author:
   - "Gabriele Pongelli (@gpongelli)"
@@ -197,22 +197,22 @@ labels:
       description: A list of labels which were created.
       returned: always
       type: list
-      sample: ['abcd', 'label-one']
+      sample: ["abcd", "label-one"]
     untouched:
       description: A list of labels which exist.
       returned: always
       type: list
-      sample: ['defg', 'new-label']
+      sample: ["defg", "new-label"]
     removed:
       description: A list of labels which were deleted.
       returned: always
       type: list
-      sample: ['defg', 'new-label']
+      sample: ["defg", "new-label"]
     updated:
       description: A list pre-existing labels whose values have been set.
       returned: always
       type: list
-      sample: ['defg', 'new-label']
+      sample: ["defg", "new-label"]
 labels_obj:
   description: API object.
   returned: success

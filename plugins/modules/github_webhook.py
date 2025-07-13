@@ -32,7 +32,7 @@ options:
       - repo
   url:
     description:
-      - URL to which payloads will be delivered.
+      - URL to which payloads are delivered.
     type: str
     required: true
   content_type:
