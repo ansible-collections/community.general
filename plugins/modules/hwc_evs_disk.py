@@ -70,8 +70,8 @@ options:
       - SSD specifies the ultra-high I/O disk type.
       - SAS specifies the high I/O disk type.
       - SATA specifies the common I/O disk type.
-      - If the specified disk type is not available in the AZ, the disk will fail to create. If the EVS disk is created from
-        a snapshot, the volume_type field must be the same as that of the snapshot's source disk.
+      - If the specified disk type is not available in the AZ, the disk creation fails. If the EVS disk is created from a
+        snapshot, the volume_type field must be the same as that of the snapshot's source disk.
     type: str
     required: true
   backup_id:
@@ -92,9 +92,9 @@ options:
     required: false
   enable_scsi:
     description:
-      - If this parameter is set to True, the disk device type will be SCSI, which allows ECS OSs to directly access underlying
-        storage media. SCSI reservation command is supported. If this parameter is set to False, the disk device type will
-        be VBD, which supports only simple SCSI read/write commands.
+      - If this parameter is set to V(true), the disk device type is SCSI, which allows ECS OSs to directly access underlying
+        storage media. SCSI reservation command is supported. If this parameter is set to V(false), the disk device type is
+        VBD, which supports only simple SCSI read/write commands.
       - If parameter enable_share is set to True and this parameter is not specified, shared SCSI disks are created. SCSI
         EVS disks cannot be created from backups, which means that this parameter cannot be True if backup_id has been specified.
     type: bool
@@ -167,8 +167,8 @@ volume_type:
     - SSD specifies the ultra-high I/O disk type.
     - SAS specifies the high I/O disk type.
     - SATA specifies the common I/O disk type.
-    - If the specified disk type is not available in the AZ, the disk will fail to create. If the EVS disk is created from
-      a snapshot, the volume_type field must be the same as that of the snapshot's source disk.
+    - If the specified disk type is not available in the AZ, the disk creation fails. If the EVS disk is created from a snapshot,
+      the volume_type field must be the same as that of the snapshot's source disk.
   type: str
   returned: success
 backup_id:
@@ -189,8 +189,8 @@ enable_full_clone:
   returned: success
 enable_scsi:
   description:
-    - If this parameter is set to True, the disk device type will be SCSI, which allows ECS OSs to directly access underlying
-      storage media. SCSI reservation command is supported. If this parameter is set to False, the disk device type will be
+    - If this parameter is set to V(true), the disk device type is SCSI, which allows ECS OSs to directly access underlying
+      storage media. SCSI reservation command is supported. If this parameter is set to V(false), the disk device type is
       VBD, which supports only simple SCSI read/write commands.
     - If parameter enable_share is set to True and this parameter is not specified, shared SCSI disks are created. SCSI EVS
       disks cannot be created from backups, which means that this parameter cannot be True if backup_id has been specified.

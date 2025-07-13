@@ -92,7 +92,7 @@ options:
     required: false
   ip_version:
     description:
-      - The value can be 4 (IPv4 address) or 6 (IPv6 address). If this parameter is left blank, an IPv4 address will be assigned.
+      - The value can be 4 (IPv4 address) or 6 (IPv6 address). If this parameter is left blank, an IPv4 address is assigned.
     type: int
     required: false
   ipv4_address:
@@ -193,7 +193,7 @@ enterprise_project_id:
   returned: success
 ip_version:
   description:
-    - The value can be 4 (IPv4 address) or 6 (IPv6 address). If this parameter is left blank, an IPv4 address will be assigned.
+    - The value can be 4 (IPv4 address) or 6 (IPv6 address). If this parameter is left blank, an IPv4 address is assigned.
   type: int
   returned: success
 ipv4_address:

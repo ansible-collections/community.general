@@ -21,7 +21,7 @@ notes:
   - If O(id) option is provided, it takes precedence over O(destination), O(vpc_id), O(type), and O(next_hop) for route selection.
   - O(destination), O(vpc_id), O(type) and O(next_hop) are used for route selection. If more than one route with this options
     exists, execution is aborted.
-  - No parameter support updating. If one of option is changed, the module will create a new resource.
+  - No parameter support updating. If one of option is changed, the module creates a new resource.
 version_added: '0.2.0'
 author: Huawei Inc. (@huaweicloud)
 requirements:
