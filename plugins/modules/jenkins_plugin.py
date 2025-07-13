@@ -124,8 +124,8 @@ options:
   with_dependencies:
     description:
       - Defines whether to install plugin dependencies.
-      - In earlier versions, this option had no effect when a specific C(version) was set.
-      - Since community.general 11.1.0, dependencies are also installed for versioned plugins.
+      - In earlier versions, this option had no effect when a specific O(version) was set.
+        Since community.general 11.1.0, dependencies are also installed for versioned plugins.
     type: bool
     default: true
 
@@ -519,7 +519,10 @@ class JenkinsPlugin(object):
                 dep_params = self.params.copy()
                 dep_params['name'] = dep_name
                 dep_params['version'] = dep_version
-                dep_module = self.module
+                dep_module = AnsibleModule(
+                    argument_spec=self.module.argument_spec,
+                    supports_check_mode=self.module.check_mode
+                )
                 dep_module.params = dep_params
                 dep_plugin = JenkinsPlugin(dep_module)
                 if not dep_plugin.install():
@@ -687,27 +690,27 @@ class JenkinsPlugin(object):
         cache_path = "{}/ansible_jenkins_plugin_cache.json".format(self.params['jenkins_home'])
 
         try:  # Check if file is saved localy
-            with open(cache_path, "r") as f:
+            if os.path.exists(cache_path):
                 file_mtime = os.path.getmtime(cache_path)
-                now = time.time()
-                if now - file_mtime < 86400:
-                    plugin_data = json.load(f)
-                else:
-                    raise FileNotFoundError("Cache file is outdated.")
-        except Exception:
-            response, info = fetch_url(self.module, "https://updates.jenkins.io/current/plugin-versions.json")   # Get list of plugins and their dependencies
+            else:
+                file_mtime = 0
 
-            if info['status'] != 200:
-                self.module.fail_json(msg="Failed to fetch plugin-versions.json", details=info)
-
-            try:
+            now = time.time()
+            if now - file_mtime >= 86400:
+                response, info = fetch_url(self.module, "https://updates.jenkins.io/current/plugin-versions.json")
+                if info['status'] != 200:
+                    self.module.fail_json(msg="Failed to fetch plugin-versions.json", details=info)
                 plugin_data = json.loads(to_native(response.read()), object_pairs_hook=OrderedDict)
 
                 # Save it to file for next time
                 with open(cache_path, "w") as f:
                     json.dump(plugin_data, f)
-            except Exception as e:
-                self.module.fail_json(msg="Failed to parse plugin-versions.json", details=to_native(e))
+
+            with open(cache_path, "r") as f:
+                plugin_data = json.load(f)
+
+        except Exception as e:
+            self.module.fail_json(msg="Failed to parse plugin-versions.json", details=to_native(e))
 
         plugin_versions = plugin_data.get("plugins", {}).get(name)
         if not plugin_versions:
