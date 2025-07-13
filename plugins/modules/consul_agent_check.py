@@ -83,7 +83,7 @@ options:
     type: str
   tcp:
     description:
-      - Checks can be registered with a TCP port. This means that Consul __FIXME__(will) check if the connection attempt to that port
+      - Checks can be registered with a TCP port. This means that Consul will check if the connection attempt to that port
         is successful (that is, the port is currently accepting connections). The format is V(host:port), for example V(localhost:80).
       - Requires O(interval) to be provided.
       - Mutually exclusive with O(args), O(ttl) and O(http).
