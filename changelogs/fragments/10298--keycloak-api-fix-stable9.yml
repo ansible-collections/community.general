@@ -1,2 +1,0 @@
-bugfixes:
-  - "keycloak module_utils - fix call of method which does not exist in stable-9, which was introduced by backporting 8b1a193a (https://github.com/ansible-collections/community.general/pull/10298)."

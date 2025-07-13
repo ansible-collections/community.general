@@ -6,6 +6,22 @@ Community General Release Notes
 
 This changelog describes changes after version 8.0.0.
 
+v9.5.10
+=======
+
+Release Summary
+---------------
+
+Bugfix release with improved ansible-core 2.19 compatibility.
+
+Bugfixes
+--------
+
+- dependent lookup plugin - avoid deprecated ansible-core 2.19 functionality (https://github.com/ansible-collections/community.general/pull/10359).
+- icinga2 inventory plugin - avoid using deprecated option when templating options (https://github.com/ansible-collections/community.general/pull/10271).
+- keycloak module_utils - fix call of method which does not exist in stable-9, which was introduced by backporting 8b1a193a (https://github.com/ansible-collections/community.general/pull/10298).
+- linode inventory plugin - avoid using deprecated option when templating options (https://github.com/ansible-collections/community.general/pull/10271).
+
 v9.5.9
 ======
 
