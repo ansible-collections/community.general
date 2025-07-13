@@ -105,7 +105,10 @@ changed:
 from ansible.module_utils.basic import AnsibleModule
 import re
 import sys
-if sys.version_info > (3, 5):
+
+if sys.version_info < (3, 0):
+    from ConfigParser import ConfigParser
+else:
     from configparser import ConfigParser
 
 
@@ -133,13 +136,9 @@ class Sysrc(object):
         Use this dictionary to preform the tests.
         """
         (rc, out, err) = self.run_sysrc('-e', '-a')
-
-        if sys.version_info > (3, 5):
-            parser = ConfigParser()
-            parser.read_string('[top]\n' + out)  # Add faked top section
-            conf = {k: parser['top'][k] for k in parser['top']}
-        else:
-            conf = dict([i.split('=', 1) for i in out.splitlines()])
+        parser = ConfigParser()
+        parser.read_string('[top]\n' + out)  # Add faked top section
+        conf = {k: parser['top'][k] for k in parser['top']}
 
         if self.value is None:
             return self.name in conf
