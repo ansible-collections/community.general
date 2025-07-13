@@ -34,7 +34,7 @@ options:
   virtualenv_site_packages:
     description:
       - Whether the virtual environment inherits packages from the global site-packages directory. Note that this setting
-        has no effect on an already existing virtual environments, so if you want to change it, the environment must be deleted
+        has no effect on an already existing virtual environment, so if you want to change it, the environment must be deleted
         and newly created.
     type: bool
     default: false
