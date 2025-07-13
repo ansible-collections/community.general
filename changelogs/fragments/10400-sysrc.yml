@@ -1,0 +1,2 @@
+bugfixes:
+  - "module sysrc - use ConfigParser (https://github.com/ansible-collections/community.general/issues/10394, https://github.com/ansible-collections/community.general/pull/10400)."
