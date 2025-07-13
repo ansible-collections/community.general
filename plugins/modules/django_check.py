@@ -22,7 +22,7 @@ options:
   database:
     description:
       - Specify databases to run checks against.
-      - If not specified, Django will not run database tests.
+      - If not specified, Django does not run database tests.
     type: list
     elements: str
   deploy:
@@ -32,7 +32,7 @@ options:
     default: false
   fail_level:
     description:
-      - Message level that will trigger failure.
+      - Message level that triggers failure.
       - Default is the Django default value. Check the documentation for the version being used.
     type: str
     choices: [CRITICAL, ERROR, WARNING, INFO, DEBUG]
@@ -49,7 +49,7 @@ options:
     elements: str
 notes:
   - The outcome of the module is found in the common return values RV(ignore:stdout), RV(ignore:stderr), RV(ignore:rc).
-  - The module will fail if RV(ignore:rc) is not zero.
+  - The module fails if RV(ignore:rc) is not zero.
 attributes:
   check_mode:
     support: full

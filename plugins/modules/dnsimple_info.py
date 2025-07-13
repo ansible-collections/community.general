@@ -26,8 +26,8 @@ options:
   name:
     description:
       - The domain name to retrieve info from.
-      - Will return all associated records for this domain if specified.
-      - If not specified, will return all domains associated with the account ID.
+      - Returns all associated records for this domain if specified.
+      - If not specified, returns all domains associated with the account ID.
     type: str
 
   account_id:
@@ -43,7 +43,7 @@ options:
   record:
     description:
       - The record to find.
-      - If specified, only this record will be returned instead of all records.
+      - If specified, only this record is returned instead of all records.
     required: false
     type: str
 

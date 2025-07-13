@@ -33,13 +33,12 @@ options:
     required: true
   dest:
     description:
-      - The file name of the destination file where the compressed file will be decompressed.
-      - If the destination file exists, it will be truncated and overwritten.
-      - If not specified, the destination filename will be derived from O(src) by removing the compression format extension.
-        For example, if O(src) is V(/path/to/file.txt.gz) and O(format) is V(gz), O(dest) will be V(/path/to/file.txt). If
-        the O(src) file does not have an extension for the current O(format), the O(dest) filename will be made by appending
-        C(_decompressed) to the O(src) filename. For instance, if O(src) is V(/path/to/file.myextension), the (dest) filename
-        will be V(/path/to/file.myextension_decompressed).
+      - The file name of the destination file where the compressed file is decompressed.
+      - If the destination file exists, it is truncated and overwritten.
+      - If not specified, the destination filename is derived from O(src) by removing the compression format extension. For
+        example, when O(src) is V(/path/to/file.txt.gz) and O(format) is V(gz), O(dest) is V(/path/to/file.txt). If the O(src)
+        file does not have an extension for the current O(format), the O(dest) filename is made by appending C(_decompressed)
+        to the O(src) filename. For instance, when O(src) is V(/path/to/file.myextension), the (dest) filename is V(/path/to/file.myextension_decompressed).
     type: path
   format:
     description:
