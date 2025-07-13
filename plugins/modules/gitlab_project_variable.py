@@ -11,10 +11,10 @@ DOCUMENTATION = r"""
 module: gitlab_project_variable
 short_description: Creates/updates/deletes GitLab Projects Variables
 description:
-  - When a project variable does not exist, it will be created.
-  - When a project variable does exist, its value will be updated when the values are different.
+  - When a project variable does not exist, it is created.
+  - When a project variable does exist, its value is updated when the values are different.
   - Variables which are untouched in the playbook, but are not untouched in the GitLab project, they stay untouched (O(purge=false))
-    or will be deleted (O(purge=true)).
+    or are deleted (O(purge=true)).
 author:
   - "Markus Bergholz (@markuman)"
 requirements:
@@ -45,12 +45,12 @@ options:
     type: str
   purge:
     description:
-      - When set to true, all variables which are not untouched in the task will be deleted.
+      - When set to V(true), all variables which are not untouched in the task are deleted.
     default: false
     type: bool
   vars:
     description:
-      - When the list element is a simple key-value pair, masked, raw and protected will be set to false.
+      - When the list element is a simple key-value pair, masked, raw and protected are set to V(false).
       - When the list element is a dict with the keys C(value), C(masked), C(raw) and C(protected), the user can have full
         control about whether a value should be masked, raw, protected or both.
       - Support for protected values requires GitLab >= 9.3.
@@ -202,22 +202,22 @@ project_variable:
       description: A list of variables which were created.
       returned: always
       type: list
-      sample: ['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']
+      sample: ["ACCESS_KEY_ID", "SECRET_ACCESS_KEY"]
     untouched:
       description: A list of variables which exist.
       returned: always
       type: list
-      sample: ['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']
+      sample: ["ACCESS_KEY_ID", "SECRET_ACCESS_KEY"]
     removed:
       description: A list of variables which were deleted.
       returned: always
       type: list
-      sample: ['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']
+      sample: ["ACCESS_KEY_ID", "SECRET_ACCESS_KEY"]
     updated:
       description: A list of variables whose values were changed.
       returned: always
       type: list
-      sample: ['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']
+      sample: ["ACCESS_KEY_ID", "SECRET_ACCESS_KEY"]
 """
 
 from ansible.module_utils.basic import AnsibleModule

@@ -26,12 +26,12 @@ attributes:
 options:
   mime_type:
     description:
-      - MIME type for which a default handler will be set.
+      - MIME type for which a default handler is set.
     type: str
     required: true
   handler:
     description:
-      - Default handler will be set for the MIME type.
+      - Default handler set for the MIME type.
     type: str
     required: true
 notes:

@@ -83,7 +83,7 @@ options:
     default: false
     version_added: 9.0.0
 notes:
-  - When used with a C(loop:) each package will be processed individually, it is much more efficient to pass the list directly
+  - When used with a C(loop:) each package is processed individually, it is much more efficient to pass the list directly
     to the O(name) option.
 """
 
@@ -173,7 +173,7 @@ changed_pkgs:
     - List of package names which are changed after module run.
   returned: success
   type: list
-  sample: ['git', 'git-cola']
+  sample: ["git", "git-cola"]
   version_added: '0.2.0'
 """
 

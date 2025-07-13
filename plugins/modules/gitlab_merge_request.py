@@ -18,8 +18,8 @@ short_description: Create, update, or delete GitLab merge requests
 version_added: 7.1.0
 description:
   - Creates a merge request if it does not exist.
-  - When a single merge request does exist, it will be updated if the provided parameters are different.
-  - When a single merge request does exist and O(state=absent), the merge request will be deleted.
+  - When a single merge request does exist, it is updated if the provided parameters are different.
+  - When a single merge request does exist and O(state=absent), the merge request is deleted.
   - When multiple merge requests are detected, the task fails.
   - Existing merge requests are matched based on O(title), O(source_branch), O(target_branch), and O(state_filter) filters.
 author:

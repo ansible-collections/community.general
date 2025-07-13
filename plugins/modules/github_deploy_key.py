@@ -57,8 +57,8 @@ options:
     type: str
   read_only:
     description:
-      - If V(true), the deploy key will only be able to read repository contents. Otherwise, the deploy key will be able to
-        read and write.
+      - If V(true), the deploy key is only able to read repository contents. Otherwise, the deploy key is able to read and
+        write.
     type: bool
     default: true
   state:

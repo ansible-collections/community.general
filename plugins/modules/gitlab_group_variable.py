@@ -15,9 +15,9 @@ short_description: Creates, updates, or deletes GitLab groups variables
 version_added: 1.2.0
 description:
   - Creates a group variable if it does not exist.
-  - When a group variable does exist, its value will be updated when the values are different.
+  - When a group variable does exist, its value is updated when the values are different.
   - Variables which are untouched in the playbook, but are not untouched in the GitLab group, they stay untouched (O(purge=false))
-    or will be deleted (O(purge=true)).
+    or are deleted (O(purge=true)).
 author:
   - Florent Madiot (@scodeman)
 requirements:
@@ -52,7 +52,7 @@ options:
     type: bool
   vars:
     description:
-      - When the list element is a simple key-value pair, masked, raw and protected will be set to false.
+      - When the list element is a simple key-value pair, masked, raw and protected are set to V(false).
       - When the list element is a dict with the keys C(value), C(masked), C(raw) and C(protected), the user can have full
         control about whether a value should be masked, raw, protected or both.
       - Support for group variables requires GitLab >= 9.5.
@@ -185,22 +185,22 @@ group_variable:
       description: A list of variables which were created.
       returned: always
       type: list
-      sample: ['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']
+      sample: ["ACCESS_KEY_ID", "SECRET_ACCESS_KEY"]
     untouched:
       description: A list of variables which exist.
       returned: always
       type: list
-      sample: ['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']
+      sample: ["ACCESS_KEY_ID", "SECRET_ACCESS_KEY"]
     removed:
       description: A list of variables which were deleted.
       returned: always
       type: list
-      sample: ['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']
+      sample: ["ACCESS_KEY_ID", "SECRET_ACCESS_KEY"]
     updated:
       description: A list of variables whose values were changed.
       returned: always
       type: list
-      sample: ['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']
+      sample: ["ACCESS_KEY_ID", "SECRET_ACCESS_KEY"]
 """
 
 from ansible.module_utils.basic import AnsibleModule

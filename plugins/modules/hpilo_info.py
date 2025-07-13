@@ -121,7 +121,7 @@ hw_uuid:
 host_power_status:
   description:
     - Power status of host.
-    - Will be one of V(ON), V(OFF) and V(UNKNOWN).
+    - It is one of V(ON), V(OFF) and V(UNKNOWN).
   returned: always
   type: str
   sample: "ON"

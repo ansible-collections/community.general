@@ -17,7 +17,7 @@ description:
   - Allows users to add or remove flatpak remotes.
   - The flatpak remotes concept is comparable to what is called repositories in other packaging formats.
   - Currently, remote addition is only supported using C(flatpakrepo) file URLs.
-  - Existing remotes will not be updated.
+  - Existing remotes are not updated.
   - See the M(community.general.flatpak) module for managing flatpaks.
 author:
   - John Kwiatkoski (@JayKayy)
@@ -56,8 +56,8 @@ options:
   name:
     description:
       - The desired name for the flatpak remote to be registered under on the managed host.
-      - When used with O(state=present), the remote will be added to the managed host under the specified O(name).
-      - When used with O(state=absent) the remote with that name will be removed.
+      - When used with O(state=present), the remote is added to the managed host under the specified O(name).
+      - When used with O(state=absent) the remote with that name is removed.
     type: str
     required: true
   state:

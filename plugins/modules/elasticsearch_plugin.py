@@ -66,7 +66,7 @@ options:
     type: bool
   plugin_bin:
     description:
-      - Location of the plugin binary. If this file is not found, the default plugin binaries will be used.
+      - Location of the plugin binary. If this file is not found, the default plugin binaries are used.
     type: path
   plugin_dir:
     description:
@@ -83,7 +83,7 @@ options:
     type: str
   version:
     description:
-      - Version of the plugin to be installed. If plugin exists with previous version, it will NOT be updated.
+      - Version of the plugin to be installed. If plugin exists with previous version, it is NOT updated.
     type: str
 """
 
