@@ -14,7 +14,7 @@ module: campfire
 short_description: Send a message to Campfire
 description:
   - Send a message to Campfire.
-  - Messages with newlines will result in a "Paste" message being sent.
+  - Messages with newlines result in a "Paste" message being sent.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:

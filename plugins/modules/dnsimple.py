@@ -25,8 +25,8 @@ attributes:
 options:
   account_email:
     description:
-      - Account email. If omitted, the environment variables E(DNSIMPLE_EMAIL) and E(DNSIMPLE_API_TOKEN) will be looked for.
-      - 'If those variables are not found, a C(.dnsimple) file will be looked for, see: U(https://github.com/mikemaccana/dnsimple-python#getting-started).'
+      - Account email. If omitted, the environment variables E(DNSIMPLE_EMAIL) and E(DNSIMPLE_API_TOKEN) are looked for.
+      - 'If those variables are not found, a C(.dnsimple) file is looked for, see: U(https://github.com/mikemaccana/dnsimple-python#getting-started).'
       - C(.dnsimple) config files are only supported in dnsimple-python<2.0.0.
     type: str
   account_api_token:
@@ -36,12 +36,12 @@ options:
   domain:
     description:
       - Domain to work with. Can be the domain name (for example V(mydomain.com)) or the numeric ID of the domain in DNSimple.
-      - If omitted, a list of domains will be returned.
-      - If domain is present but the domain does not exist, it will be created.
+      - If omitted, a list of domains is returned.
+      - If domain is present but the domain does not exist, it is created.
     type: str
   record:
     description:
-      - Record to add, if blank a record for the domain will be created, supports the wildcard (*).
+      - Record to add, if blank a record for the domain is created, supports the wildcard (*).
     type: str
   record_ids:
     description:

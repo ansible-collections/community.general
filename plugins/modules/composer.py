@@ -17,7 +17,7 @@ author:
 short_description: Dependency Manager for PHP
 description:
   - Composer is a tool for dependency management in PHP. It allows you to declare the dependent libraries your project needs
-    and it will install them in your project for you.
+    and it installs them in your project for you.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -45,7 +45,7 @@ options:
     type: path
     description:
       - Directory of your project (see C(--working-dir)). This is required when the command is not run globally.
-      - Will be ignored if O(global_command=true).
+      - This is ignored if O(global_command=true).
   global_command:
     description:
       - Runs the specified command globally.

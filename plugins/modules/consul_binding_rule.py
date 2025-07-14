@@ -29,7 +29,7 @@ attributes:
   diff_mode:
     support: partial
     details:
-      - In check mode the diff will miss operational attributes.
+      - In check mode the diff misses operational attributes.
 options:
   state:
     description:

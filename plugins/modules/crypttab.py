@@ -24,14 +24,14 @@ options:
   name:
     description:
       - Name of the encrypted block device as it appears in the C(/etc/crypttab) file, or optionally prefixed with V(/dev/mapper/),
-        as it appears in the filesystem. V(/dev/mapper/) will be stripped from O(name).
+        as it appears in the filesystem. V(/dev/mapper/) is stripped from O(name).
     type: str
     required: true
   state:
     description:
       - Use V(present) to add a line to C(/etc/crypttab) or update its definition if already present.
       - Use V(absent) to remove a line with matching O(name).
-      - Use V(opts_present) to add options to those already present; options with different values will be updated.
+      - Use V(opts_present) to add options to those already present; options with different values are updated.
       - Use V(opts_absent) to remove options from the existing set.
     type: str
     required: true

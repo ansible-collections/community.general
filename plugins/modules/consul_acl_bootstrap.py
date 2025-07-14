@@ -50,7 +50,7 @@ RETURN = r"""
 result:
   description:
     - The bootstrap result as returned by the Consul HTTP API.
-    - B(Note:) If O(bootstrap_secret) has been specified the C(SecretID) and C(ID) will not contain the secret but C(VALUE_SPECIFIED_IN_NO_LOG_PARAMETER).
+    - B(Note:) If O(bootstrap_secret) has been specified the C(SecretID) and C(ID) do not contain the secret but C(VALUE_SPECIFIED_IN_NO_LOG_PARAMETER).
       If you pass O(bootstrap_secret), make sure your playbook/role does not depend on this return value!
   returned: changed
   type: dict

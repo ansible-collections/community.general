@@ -18,8 +18,8 @@ short_description: Manages some of the steps common in deploying projects
 description:
   - The Deploy Helper manages some of the steps common in deploying software. It creates a folder structure, manages a symlink
     for the current release and cleans up old releases.
-  - Running it with the O(state=query) or O(state=present) will return the C(deploy_helper) fact. C(project_path), whatever
-    you set in the O(path) parameter, C(current_path), the path to the symlink that points to the active release, C(releases_path),
+  - Running it with the O(state=query) or O(state=present) returns the C(deploy_helper) fact. C(project_path), whatever you
+    set in the O(path) parameter, C(current_path), the path to the symlink that points to the active release, C(releases_path),
     the path to the folder to keep releases in, C(shared_path), the path to the folder to keep shared resources in, C(unfinished_filename),
     the file to check for to recognize unfinished builds, C(previous_release), the release the 'current' symlink is pointing
     to, C(previous_release_path), the full path to the 'current' symlink target, C(new_release), either the O(release) parameter
@@ -41,12 +41,12 @@ options:
     type: str
     description:
       - The state of the project.
-      - V(query) will only gather facts.
-      - V(present) will create the project C(root) folder, and in it the C(releases) and C(shared) folders.
-      - V(finalize) will remove the unfinished_filename file, create a symlink to the newly deployed release and optionally
-        clean old releases.
-      - V(clean) will remove failed & old releases.
-      - V(absent) will remove the project folder (synonymous to the M(ansible.builtin.file) module with O(state=absent)).
+      - V(query) gathers facts.
+      - V(present) creates the project C(root) folder, and in it the C(releases) and C(shared) folders.
+      - V(finalize) removes the unfinished_filename file, creates a symlink to the newly deployed release and optionally cleans
+        old releases.
+      - V(clean) removes failed & old releases.
+      - V(absent) removes the project folder (synonymous to the M(ansible.builtin.file) module with O(state=absent)).
     choices: [present, finalize, absent, clean, query]
     default: present
 
@@ -59,15 +59,15 @@ options:
   releases_path:
     type: str
     description:
-      - The name of the folder that will hold the releases. This can be relative to O(path) or absolute. Returned in the C(deploy_helper.releases_path)
+      - The name of the folder that holds the releases. This can be relative to O(path) or absolute. Returned in the C(deploy_helper.releases_path)
         fact.
     default: releases
 
   shared_path:
     type: path
     description:
-      - The name of the folder that will hold the shared resources. This can be relative to O(path) or absolute. If this is
-        set to an empty string, no shared folder will be created. Returned in the C(deploy_helper.shared_path) fact.
+      - The name of the folder that holds the shared resources. This can be relative to O(path) or absolute. If this is set
+        to an empty string, no shared folder is created. Returned in the C(deploy_helper.shared_path) fact.
     default: shared
 
   current_path:
@@ -81,8 +81,8 @@ options:
     type: str
     description:
       - The name of the file that indicates a deploy has not finished. All folders in the O(releases_path) that contain this
-        file will be deleted on O(state=finalize) with O(clean=true), or O(state=clean). This file is automatically deleted
-        from the C(new_release_path) during O(state=finalize).
+        file are deleted on O(state=finalize) with O(clean=true), or O(state=clean). This file is automatically deleted from
+        the C(new_release_path) during O(state=finalize).
     default: DEPLOY_UNFINISHED
 
   clean:
@@ -95,16 +95,16 @@ options:
     type: int
     description:
       - The number of old releases to keep when cleaning. Used in O(state=finalize) and O(state=clean). Any unfinished builds
-        will be deleted first, so only correct releases will count. The current version will not count.
+        are deleted first, so only correct releases count. The current version does not count.
     default: 5
 
 notes:
   - Facts are only returned for O(state=query) and O(state=present). If you use both, you should pass any overridden parameters
-    to both calls, otherwise the second call will overwrite the facts of the first one.
+    to both calls, otherwise the second call overwrites the facts of the first one.
   - When using O(state=clean), the releases are ordered by I(creation date). You should be able to switch to a new naming
     strategy without problems.
-  - Because of the default behaviour of generating the C(new_release) fact, this module will not be idempotent unless you
-    pass your own release name with O(release). Due to the nature of deploying software, this should not be much of a problem.
+  - Because of the default behaviour of generating the C(new_release) fact, this module is not idempotent unless you pass
+    your own release name with O(release). Due to the nature of deploying software, this should not be much of a problem.
 extends_documentation_fragment:
   - ansible.builtin.files
   - community.general.attributes

@@ -16,7 +16,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 module: datadog_event
-short_description: Posts events to Datadog  service
+short_description: Posts events to Datadog service
 description:
   - Allows to post events to Datadog (www.datadoghq.com) service.
   - Uses http://docs.datadoghq.com/api/#events API.
@@ -89,8 +89,8 @@ options:
       - An arbitrary string to use for aggregation.
   validate_certs:
     description:
-      - If V(false), SSL certificates will not be validated. This should only be used on personally controlled sites using
-        self-signed certificates.
+      - If V(false), SSL certificates are not validated. This should only be used on personally controlled sites using self-signed
+        certificates.
     type: bool
     default: true
 """

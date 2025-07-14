@@ -28,7 +28,7 @@ options:
   executable:
     description:
       - Path to the C(cargo) installed in the system.
-      - If not specified, the module will look C(cargo) in E(PATH).
+      - If not specified, the module looks for C(cargo) in E(PATH).
     type: path
     version_added: 7.5.0
   name:
@@ -39,11 +39,11 @@ options:
     required: true
   path:
     description: The base path where to install the Rust packages. Cargo automatically appends V(/bin). In other words, V(/usr/local)
-      will become V(/usr/local/bin).
+      becomes V(/usr/local/bin).
     type: path
   version:
-    description: The version to install. If O(name) contains multiple values, the module will try to install all of them in
-      this version.
+    description: The version to install. If O(name) contains multiple values, the module tries to install all of them in this
+      version.
     type: str
     required: false
   locked:
