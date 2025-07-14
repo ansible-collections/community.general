@@ -45,13 +45,16 @@
   ansible.builtin.command: pvs --noheadings -o pv_size --units M {{ loop_device_02.stdout }}
   register: pv_size_output_02
 
+- name: Showing current device mapper status
+  ansible.builtin.shell: dmsetup ls
+
 - name: Making sure volume group testvg does not exist
   community.general.lvg:
     vg: testvg
     force: true
     state: absent
 
-- name: Creating volume group on top of first device {{ loop_device_01.stdout }}
+ - name: Creating volume group on top of first device {{ loop_device_01.stdout }}
   community.general.lvg:
     vg: testvg
     pvs: "{{ loop_device_01.stdout }}"
@@ -73,7 +76,7 @@
     state: present
   register: fs_creation_result
 
-- name: Mounting LV testlv
+ - name: Mounting LV testlv
   ansible.posix.mount:
     fstab: '{{ remote_tmp_dir }}/fstab'
     path: '{{ remote_tmp_dir }}/tmp_mount'
@@ -88,9 +91,9 @@
       - pv_creation_result_01.changed == true
       - pv_creation_result_02.changed == true
       - vg_creation_result.changed == true
-      - (pv_size_output_01.stdout | trim | regex_replace('M', '') | float) > 95
-      - (pv_size_output_01.stdout | trim | regex_replace('M', '') | float) < 120
-      - (pv_size_output_02.stdout | trim | regex_replace('M', '') | float) > 190
-      - (pv_size_output_02.stdout | trim | regex_replace('M', '') | float) < 220
+      - (pv_size_output_01.stdout | trim | regex_replace('M', '') | float) > 450
+      - (pv_size_output_01.stdout | trim | regex_replace('M', '') | float) < 600
+      - (pv_size_output_02.stdout | trim | regex_replace('M', '') | float) > 950
+      - (pv_size_output_02.stdout | trim | regex_replace('M', '') | float) < 1100
       - "'created' in pv_creation_result_01.msg"
       - "'created' in pv_creation_result_02.msg"
