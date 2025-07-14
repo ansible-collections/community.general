@@ -141,6 +141,13 @@ options:
     aliases:
       - bruteForceProtected
     type: bool
+  brute_force_strategy:
+    description:
+      - The realm brute force strategy.
+    aliases:
+      - bruteForceStrategy
+    choices: ['LINEAR', 'MULTIPLE']
+    type: str
   client_authentication_flow:
     description:
       - The realm client authentication flow.
@@ -638,6 +645,7 @@ def main():
         browser_flow=dict(type='str', aliases=['browserFlow']),
         browser_security_headers=dict(type='dict', aliases=['browserSecurityHeaders']),
         brute_force_protected=dict(type='bool', aliases=['bruteForceProtected']),
+        brute_force_strategy=dict(type='str', choices=['LINEAR', 'MULTIPLE'], aliases=['bruteForceStrategy']),
         client_authentication_flow=dict(type='str', aliases=['clientAuthenticationFlow']),
         client_scope_mappings=dict(type='dict', aliases=['clientScopeMappings']),
         default_default_client_scopes=dict(type='list', elements='str', aliases=['defaultDefaultClientScopes']),
