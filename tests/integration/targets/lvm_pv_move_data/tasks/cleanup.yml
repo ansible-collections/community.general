@@ -3,7 +3,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: Unmounting LV lv_tmp_test from {{ remote_tmp_dir }}/tmp_mount
+- name: Unmounting LV lv_tmp_test
   ansible.posix.mount:
     fstab: '{{ remote_tmp_dir }}/fstab'
     path: '{{ remote_tmp_dir }}/tmp_mount'
@@ -12,7 +12,7 @@
 - name: Removing xfs filesystem from LV lv_tmp_test
   community.general.filesystem:
     dev: /dev/vg_tmp_test/lv_tmp_test
-    status: absent
+    state: absent
 
 - name: Detaching first loop device
   ansible.builtin.command: losetup -d {{ loop_device_01.stdout }}

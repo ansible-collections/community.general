@@ -3,13 +3,13 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: Creating a 3000MB file for the first loop device
-  ansible.builtin.command: dd if=/dev/zero of={{ remote_tmp_dir }}/test_lvm_pv_01.img bs=1M count=3000
+- name: Creating a 500MB file for the first loop device
+  ansible.builtin.command: dd if=/dev/zero of={{ remote_tmp_dir }}/test_lvm_pv_01.img bs=1M count=500
   args:
     creates: "{{ remote_tmp_dir }}/test_lvm_pv_01.img"
 
-- name: Creating a 4000MB file for the second loop device
-  ansible.builtin.command: dd if=/dev/zero of={{ remote_tmp_dir }}/test_lvm_pv_02.img bs=1M count=4000
+- name: Creating a 1000MB file for the second loop device
+  ansible.builtin.command: dd if=/dev/zero of={{ remote_tmp_dir }}/test_lvm_pv_02.img bs=1M count=1000
   args:
     creates: "{{ remote_tmp_dir }}/test_lvm_pv_02.img"
 
@@ -63,12 +63,13 @@
   community.general.filesystem:
     dev: /dev/vg_tmp_test/lv_tmp_test
     fstype: xfs
+    state: present
   register: fs_creation_result
 
 #- name: Mounting LV lv_tmp_test to {{ remote_tmp_dir }}/tmp_mount
 #  ansible.builtin.shell: mount -o rw,noauto /dev/vg_tmp_test/lv_tmp_test {{ remote_tmp_dir }}/tmp_mount
 
-- name: Mounting LV lv_tmp_test to {{ remote_tmp_dir }}/tmp_mount
+- name: Mounting LV lv_tmp_test
   ansible.posix.mount:
     fstab: '{{ remote_tmp_dir }}/fstab'
     path: '{{ remote_tmp_dir }}/tmp_mount'
