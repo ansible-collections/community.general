@@ -136,7 +136,7 @@ class Sysrc(object):
         if self.value is None:
             return self.name in conf
         else:
-            return self.name in conf and conf[self.name] == '%s' % self.value
+            return self.name in conf and conf[self.name] == self.value
 
     def contains(self):
         (rc, out, err) = self.run_sysrc('-n', self.name)
