@@ -45,39 +45,39 @@
   ansible.builtin.command: pvs --noheadings -o pv_size --units M {{ loop_device_02.stdout }}
   register: pv_size_output_02
 
-- name: Making sure volume group vg_tmp_test does not exist
+- name: Making sure volume group testvg does not exist
   community.general.lvg:
-    vg: vg_tmp_test
+    vg: testvg
     force: true
     state: absent
 
 - name: Creating volume group on top of first device {{ loop_device_01.stdout }}
   community.general.lvg:
-    vg: vg_tmp_test
+    vg: testvg
     pvs: "{{ loop_device_01.stdout }}"
     force: true
   register: vg_creation_result
 
-- name: Creating LV lv_tmp_test on VG vg_tmp_test
+- name: Creating LV testlv on VG testvg
   community.general.lvol:
-    vg: vg_tmp_test
-    lv: lv_tmp_test
+    vg: testvg
+    lv: testlv
     size: 100%FREE
     force: true
   register: lv_creation_result
 
-- name: Creating xfs filesystem on LV lv_tmp_test
+- name: Creating xfs filesystem on LV testlv
   community.general.filesystem:
-    dev: /dev/vg_tmp_test/lv_tmp_test
+    dev: /dev/testvg/testlv
     fstype: xfs
     state: present
   register: fs_creation_result
 
-- name: Mounting LV lv_tmp_test
+- name: Mounting LV testlv
   ansible.posix.mount:
     fstab: '{{ remote_tmp_dir }}/fstab'
     path: '{{ remote_tmp_dir }}/tmp_mount'
-    src: '/dev/vg_tmp_test/lv_tmp_test'
+    src: '/dev/testvg/testlv'
     fstype: xfs
     opts: rw,noauto
     state: mounted

@@ -8,9 +8,9 @@
   args:
     creates: "{{ remote_tmp_dir }}/tmp_mount/test_file"
 
-- name: Extending VG vg_tmp_test with second device {{ loop_device_02.stdout }}
+- name: Extending VG testvg with second device {{ loop_device_02.stdout }}
   community.general.lvg:
-    vg: vg_tmp_test
+    vg: testvg
     pvs: "{{ loop_device_02.stdout }}"
 
 - name: Moving data from {{ loop_device_01.stdout }} to {{ loop_device_02.stdout }} (both in same VG)
