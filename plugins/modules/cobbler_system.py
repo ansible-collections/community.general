@@ -42,12 +42,12 @@ options:
     type: str
   use_ssl:
     description:
-      - If V(false), an HTTP connection will be used instead of the default HTTPS connection.
+      - If V(false), an HTTP connection is used instead of the default HTTPS connection.
     type: bool
     default: true
   validate_certs:
     description:
-      - If V(false), SSL certificates will not be validated.
+      - If V(false), SSL certificates are not validated.
       - This should only set to V(false) when used on personally controlled sites using self-signed certificates.
     type: bool
     default: true

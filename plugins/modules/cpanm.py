@@ -59,16 +59,18 @@ options:
   install_recommendations:
     description:
       - If V(true), installs dependencies declared as recommends per META spec.
-      - If V(false), it ensures the dependencies declared as recommends are not installed, overriding any decision made earlier in E(PERL_CPANM_OPT).
-      - If parameter is not set, C(cpanm) will use its existing defaults.
+      - If V(false), it ensures the dependencies declared as recommends are not installed, overriding any decision made earlier
+        in E(PERL_CPANM_OPT).
+      - If parameter is not set, C(cpanm) uses its existing defaults.
       - When these dependencies fail to install, cpanm continues the installation, since they are just recommendation.
     type: bool
     version_added: 10.3.0
   install_suggestions:
     description:
       - If V(true), installs dependencies declared as suggests per META spec.
-      - If V(false), it ensures the dependencies declared as suggests are not installed, overriding any decision made earlier in E(PERL_CPANM_OPT).
-      - If parameter is not set, C(cpanm) will use its existing defaults.
+      - If V(false), it ensures the dependencies declared as suggests are not installed, overriding any decision made earlier
+        in E(PERL_CPANM_OPT).
+      - If parameter is not set, C(cpanm) uses its existing defaults.
       - When these dependencies fail to install, cpanm continues the installation, since they are just suggestion.
     type: bool
     version_added: 10.3.0
@@ -97,14 +99,13 @@ options:
 notes:
   - Please note that U(http://search.cpan.org/dist/App-cpanminus/bin/cpanm, cpanm) must be installed on the remote host.
   - 'This module now comes with a choice of execution O(mode): V(compatibility) or V(new).'
-  - 'O(mode=compatibility): When using V(compatibility) mode, the module will keep backward compatibility. This was the default
+  - 'O(mode=compatibility): When using V(compatibility) mode, the module keeps backward compatibility. This was the default
     mode before community.general 9.0.0. O(name) must be either a module name or a distribution file. If the perl module given
-    by O(name) is installed (at the exact O(version) when specified), then nothing happens. Otherwise, it will be installed
-    using the C(cpanm) executable. O(name) cannot be an URL, or a git URL. C(cpanm) version specifiers do not work in this
-    mode.'
-  - 'O(mode=new): When using V(new) mode, the module will behave differently. The O(name) parameter may refer to a module
-    name, a distribution file, a HTTP URL or a git repository URL as described in C(cpanminus) documentation. C(cpanm) version
-    specifiers are recognized. This is the default mode from community.general 9.0.0 onwards.'
+    by O(name) is installed (at the exact O(version) when specified), then nothing happens. Otherwise, it is installed using
+    the C(cpanm) executable. O(name) cannot be an URL, or a git URL. C(cpanm) version specifiers do not work in this mode.'
+  - 'O(mode=new): When using V(new) mode, the module behaves differently. The O(name) parameter may refer to a module name,
+    a distribution file, a HTTP URL or a git repository URL as described in C(cpanminus) documentation. C(cpanm) version specifiers
+    are recognized. This is the default mode from community.general 9.0.0 onwards.'
 seealso:
   - name: C(cpanm) command manual page
     description: Manual page for the command.

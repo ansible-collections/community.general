@@ -120,7 +120,7 @@ changed_repos:
   returned: success
   type: list
   elements: str
-  sample: ['crb']
+  sample: ["crb"]
 """
 
 from ansible.module_utils.basic import AnsibleModule

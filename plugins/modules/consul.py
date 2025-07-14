@@ -21,8 +21,8 @@ description:
     name and ID respectively by appending V(service:) Node level checks require a O(check_name) and optionally a O(check_id).
   - Currently, there is no complete way to retrieve the script, interval or TTL metadata for a registered check. Without this
     metadata it is not possible to tell if the data supplied with ansible represents a change to a check. As a result this
-    does not attempt to determine changes and will always report a changed occurred. An API method is planned to supply this
-    metadata so at that stage change management will be added.
+    does not attempt to determine changes and it always reports a changed occurred. An API method is planned to supply this
+    metadata so at that stage change management is to be added.
   - See U(http://consul.io) for more details.
 requirements:
   - python-consul
@@ -83,25 +83,25 @@ options:
   service_address:
     type: str
     description:
-      - The address to advertise that the service will be listening on. This value will be passed as the C(address) parameter
-        to Consul's C(/v1/agent/service/register) API method, so refer to the Consul API documentation for further details.
+      - The address to advertise that the service is listening on. This value is passed as the C(address) parameter to Consul's
+        C(/v1/agent/service/register) API method, so refer to the Consul API documentation for further details.
   tags:
     type: list
     elements: str
     description:
-      - Tags that will be attached to the service registration.
+      - Tags that are attached to the service registration.
   script:
     type: str
     description:
-      - The script/command that will be run periodically to check the health of the service.
+      - The script/command that is run periodically to check the health of the service.
       - Requires O(interval) to be provided.
       - Mutually exclusive with O(ttl), O(tcp) and O(http).
   interval:
     type: str
     description:
-      - The interval at which the service check will be run. This is a number with a V(s) or V(m) suffix to signify the units
-        of seconds or minutes, for example V(15s) or V(1m). If no suffix is supplied V(s) will be used by default, for example
-        V(10) will be V(10s).
+      - The interval at which the service check is run. This is a number with a V(s) or V(m) suffix to signify the units of
+        seconds or minutes, for example V(15s) or V(1m). If no suffix is supplied V(s) is used by default, for example V(10)
+        is V(10s).
       - Required if one of the parameters O(script), O(http), or O(tcp) is specified.
   check_id:
     type: str
@@ -122,25 +122,25 @@ options:
   ttl:
     type: str
     description:
-      - Checks can be registered with a TTL instead of a O(script) and O(interval) this means that the service will check
-        in with the agent before the TTL expires. If it does not the check will be considered failed. Required if registering
-        a check and the script an interval are missing Similar to the interval this is a number with a V(s) or V(m) suffix
-        to signify the units of seconds or minutes, for example V(15s) or V(1m). If no suffix is supplied V(s) will be used
-        by default, for example V(10) will be V(10s).
+      - Checks can be registered with a TTL instead of a O(script) and O(interval) this means that the service checks in with
+        the agent before the TTL expires. If it does not the check is considered failed. Required if registering a check and
+        the script an interval are missing Similar to the interval this is a number with a V(s) or V(m) suffix to signify
+        the units of seconds or minutes, for example V(15s) or V(1m). If no suffix is supplied V(s) is used by default, for
+        example V(10) is equivalent to V(10s).
       - Mutually exclusive with O(script), O(tcp) and O(http).
   tcp:
     type: str
     description:
-      - Checks can be registered with a TCP port. This means that Consul will check if the connection attempt to that port
-        is successful (that is, the port is currently accepting connections). The format is V(host:port), for example V(localhost:80).
+      - Checks can be registered with a TCP port. This means that Consul checks if the connection attempt to that port is
+        successful (that is, the port is currently accepting connections). The format is V(host:port), for example V(localhost:80).
       - Requires O(interval) to be provided.
       - Mutually exclusive with O(script), O(ttl) and O(http).
     version_added: '1.3.0'
   http:
     type: str
     description:
-      - Checks can be registered with an HTTP endpoint. This means that Consul will check that the http endpoint returns a
-        successful HTTP status.
+      - Checks can be registered with an HTTP endpoint. This means that Consul checks that the http endpoint returns a successful
+        HTTP status.
       - Requires O(interval) to be provided.
       - Mutually exclusive with O(script), O(ttl) and O(tcp).
   timeout:
@@ -148,7 +148,7 @@ options:
     description:
       - A custom HTTP check timeout. The Consul default is 10 seconds. Similar to the interval this is a number with a V(s)
         or V(m) suffix to signify the units of seconds or minutes, for example V(15s) or V(1m). If no suffix is supplied V(s)
-        will be used by default, for example V(10) will be V(10s).
+        is used by default, for example V(10) is equivalent to V(10s).
   token:
     type: str
     description:
