@@ -57,8 +57,8 @@ options:
     description:
       - When used instead of O(path), sets the content of the API requests directly.
       - This may be convenient to template simple requests, for anything complex use the M(ansible.builtin.template) module.
-      - You can collate multiple IMC XML fragments and they will be processed sequentially in a single stream, the Cisco IMC
-        output is subsequently merged.
+      - You can collate multiple IMC XML fragments and they are processed sequentially in a single stream, the Cisco IMC output
+        is subsequently merged.
       - Parameter O(content) is mutual exclusive with parameter O(path).
     type: str
   protocol:
@@ -71,12 +71,12 @@ options:
     description:
       - The socket level timeout in seconds.
       - This is the time that every single connection (every fragment) can spend. If this O(timeout) is reached, the module
-        will fail with a C(Connection failure) indicating that C(The read operation timed out).
+        fails with a C(Connection failure) indicating that C(The read operation timed out).
     default: 60
     type: int
   validate_certs:
     description:
-      - If V(false), SSL certificates will not be validated.
+      - If V(false), SSL certificates are not validated.
       - This should only set to V(false) used on personally controlled sites using self-signed certificates.
     type: bool
     default: true
@@ -84,8 +84,8 @@ notes:
   - The XML fragments do not need an authentication cookie, this is injected by the module automatically.
   - The Cisco IMC XML output is being translated to JSON using the Cobra convention.
   - Any configConfMo change requested has a return status of C(modified), even if there was no actual change from the previous
-    configuration. As a result, this module will always report a change on subsequent runs. In case this behaviour is fixed
-    in a future update to Cisco IMC, this module will automatically adapt.
+    configuration. As a result, this module always reports a change on subsequent runs. In case this behaviour is fixed in
+    a future update to Cisco IMC, this module is meant to automatically adapt.
   - If you get a C(Connection failure) related to C(The read operation timed out) increase the O(timeout) parameter. Some
     XML fragments can take longer than the default timeout.
   - More information about the IMC REST API is available from

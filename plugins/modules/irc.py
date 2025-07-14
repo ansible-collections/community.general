@@ -73,13 +73,13 @@ options:
   channel:
     type: str
     description:
-      - Channel name. One of nick_to or channel needs to be set. When both are set, the message will be sent to both of them.
+      - Channel name. One of nick_to or channel needs to be set. When both are set, the message is sent to both of them.
   nick_to:
     type: list
     elements: str
     description:
       - A list of nicknames to send the message to. One of nick_to or channel needs to be set. When both are defined, the
-        message will be sent to both of them.
+        message is sent to both of them.
   key:
     type: str
     description:
@@ -118,7 +118,7 @@ options:
     default: none
   validate_certs:
     description:
-      - If set to V(false), the SSL certificates will not be validated.
+      - If set to V(false), the SSL certificates are not validated.
       - This should always be set to V(true). Using V(false) is unsafe and should only be done if the network between between
         Ansible and the IRC server is known to be safe.
       - B(Note:) for security reasons, you should always set O(use_tls=true) and O(validate_certs=true) whenever possible.

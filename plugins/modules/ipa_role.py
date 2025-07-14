@@ -33,41 +33,41 @@ options:
   group:
     description:
       - List of group names assign to this role.
-      - If an empty list is passed all assigned groups will be unassigned from the role.
-      - If option is omitted groups will not be checked or changed.
-      - If option is passed all assigned groups that are not passed will be unassigned from the role.
+      - If an empty list is passed all assigned groups are unassigned from the role.
+      - If option is omitted groups are not checked nor changed.
+      - If option is passed all assigned groups that are not passed are unassigned from the role.
     type: list
     elements: str
   host:
     description:
       - List of host names to assign.
-      - If an empty list is passed all assigned hosts will be unassigned from the role.
-      - If option is omitted hosts will not be checked or changed.
-      - If option is passed all assigned hosts that are not passed will be unassigned from the role.
+      - If an empty list is passed all assigned hosts are unassigned from the role.
+      - If option is omitted hosts are not checked nor changed.
+      - If option is passed all assigned hosts that are not passed are unassigned from the role.
     type: list
     elements: str
   hostgroup:
     description:
       - List of host group names to assign.
-      - If an empty list is passed all assigned host groups will be removed from the role.
-      - If option is omitted host groups will not be checked or changed.
-      - If option is passed all assigned hostgroups that are not passed will be unassigned from the role.
+      - If an empty list is passed all assigned host groups are removed from the role.
+      - If option is omitted host groups are not checked nor changed.
+      - If option is passed all assigned hostgroups that are not passed are unassigned from the role.
     type: list
     elements: str
   privilege:
     description:
       - List of privileges granted to the role.
-      - If an empty list is passed all assigned privileges will be removed.
-      - If option is omitted privileges will not be checked or changed.
-      - If option is passed all assigned privileges that are not passed will be removed.
+      - If an empty list is passed all assigned privileges are removed.
+      - If option is omitted privileges are not checked nor changed.
+      - If option is passed all assigned privileges that are not passed are removed.
     type: list
     elements: str
   service:
     description:
       - List of service names to assign.
-      - If an empty list is passed all assigned services will be removed from the role.
-      - If option is omitted services will not be checked or changed.
-      - If option is passed all assigned services that are not passed will be removed from the role.
+      - If an empty list is passed all assigned services are removed from the role.
+      - If option is omitted services are not checked nor changed.
+      - If option is passed all assigned services that are not passed are removed from the role.
     type: list
     elements: str
   state:
@@ -78,8 +78,8 @@ options:
   user:
     description:
       - List of user names to assign.
-      - If an empty list is passed all assigned users will be removed from the role.
-      - If option is omitted users will not be checked or changed.
+      - If an empty list is passed all assigned users are removed from the role.
+      - If option is omitted users are not checked nor changed.
     type: list
     elements: str
 extends_documentation_fragment:
