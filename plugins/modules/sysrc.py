@@ -117,82 +117,73 @@ class Sysrc(object):
         self.jail = jail
         self.sysrc = module.get_bin_path('sysrc', True)
 
-    def has_unknown_variable(self, out, err):
-        # newer versions of sysrc use stderr instead of stdout
-        return err.find("unknown variable") > 0 or out.find("unknown variable") > 0
+    def load_sysrc_value(self):
+        """
+        Loads the value that sysrc has for the given variable. This checks that the variable exists in the file first
+        so that a default value is not loaded and then counted as changed.
+        """
+        # if the file doesn't exist, then there is no need to load it
+        if not os.path.exists(self.path):
+            return None
 
-    def exists(self):
-        """
-        Tests whether the name is in the file.  If parameter value is defined,
-        then tests whether name=value is in the file.  These tests are necessary
-        because sysrc doesn't use exit codes.  Instead, let sysrc read the
-        file's content and create a dictionary comprising the configuration.
-        Use this dictionary to preform the tests.
-        """
-        (rc, out, err) = self.run_sysrc('-e', '-a')
-        conf = dict([i.split('=', 1) for i in out.splitlines()])
-        if self.value is None:
-            return self.name in conf
-        else:
-            return self.name in conf and conf[self.name] == '"%s"' % self.value
+        # Check if the name exists in the file 0 = true, 1 = false
+        (rc, out, err) = self.run_sysrc('-c', self.name)
+        if rc == 1:
+            return None
+
+        (rc, out, err) = self.run_sysrc('-n', self.name)
+        if err.find("unknown variable") > 0 or out.find("unknown variable") > 0:
+            return None
+
+        return out.strip()
 
     def contains(self):
-        (rc, out, err) = self.run_sysrc('-n', self.name)
-        if self.has_unknown_variable(out, err):
+        value = self.load_sysrc_value()
+        if value is None:
             return False
 
-        return self.value in out.strip().split(self.delim)
+        return self.value in value.split(self.delim)
+
+    def modify(self, op, changed):
+        (rc, out, err) = self.run_sysrc('%s%s=%s%s' % (self.name, op, self.delim, self.value))
+        if out.find("%s:" % self.name) == 0:
+            return changed(out.split(' -> ')[1].strip().split(self.delim))
 
     def present(self):
-        if self.exists():
-            return
+        if self.load_sysrc_value() == self.value:
+            return False
 
         if not self.module.check_mode:
-            (rc, out, err) = self.run_sysrc("%s=%s" % (self.name, self.value))
+            self.run_sysrc("%s=%s" % (self.name, self.value))
 
-        self.changed = True
+        return True
 
     def absent(self):
-        if not self.exists():
-            return
+        if self.load_sysrc_value() is None:
+            return False
 
-        # inversed since we still need to mark as changed
         if not self.module.check_mode:
-            (rc, out, err) = self.run_sysrc('-x', self.name)
-            if self.has_unknown_variable(out, err):
-                return
+            self.run_sysrc('-x', self.name)
 
-        self.changed = True
+        return True
 
     def value_present(self):
         if self.contains():
-            return
+            return False
 
-        if self.module.check_mode:
-            self.changed = True
-            return
+        if self.module.check_mode or self.modify('+', lambda values: self.value in values):
+            return True
 
-        setstring = '%s+=%s%s' % (self.name, self.delim, self.value)
-        (rc, out, err) = self.run_sysrc(setstring)
-        if out.find("%s:" % self.name) == 0:
-            values = out.split(' -> ')[1].strip().split(self.delim)
-            if self.value in values:
-                self.changed = True
+        return False
 
     def value_absent(self):
         if not self.contains():
-            return
+            return False
 
-        if self.module.check_mode:
-            self.changed = True
-            return
+        if self.module.check_mode or self.modify('-', lambda values: self.value not in values):
+            return True
 
-        setstring = '%s-=%s%s' % (self.name, self.delim, self.value)
-        (rc, out, err) = self.run_sysrc(setstring)
-        if out.find("%s:" % self.name) == 0:
-            values = out.split(' -> ')[1].strip().split(self.delim)
-            if self.value not in values:
-                self.changed = True
+        return False
 
     def run_sysrc(self, *args):
         cmd = [self.sysrc, '-f', self.path]
@@ -225,32 +216,17 @@ def main():
             msg="Name may only contain alphanumeric and underscore characters"
         )
 
-    value = module.params.pop('value')
-    state = module.params.pop('state')
-    path = module.params.pop('path')
-    delim = module.params.pop('delim')
-    jail = module.params.pop('jail')
     result = dict(
         name=name,
-        state=state,
-        value=value,
-        path=path,
-        delim=delim,
-        jail=jail
+        state=module.params.pop('state'),
+        value=module.params.pop('value'),
+        path=module.params.pop('path'),
+        delim=module.params.pop('delim'),
+        jail=module.params.pop('jail')
     )
 
-    rc_value = Sysrc(module, name, value, path, delim, jail)
-
-    if state == 'present':
-        rc_value.present()
-    elif state == 'absent':
-        rc_value.absent()
-    elif state == 'value_present':
-        rc_value.value_present()
-    elif state == 'value_absent':
-        rc_value.value_absent()
-
-    result['changed'] = rc_value.changed
+    sysrc = Sysrc(module, name, result['value'], result['path'], result['delim'], result['jail'])
+    result['changed'] = getattr(sysrc, result['state'])()
 
     module.exit_json(**result)
 
