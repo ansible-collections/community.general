@@ -209,6 +209,7 @@ def test__get_latest_compatible_plugin_version(fetch_mock, mocker):
         "name": "git",
         "version": "latest",
         "updates_url": ["https://some.base.url"],
+        "plugin_versions_url_segment": ["plugin-versions.json"],
         "latest_plugins_url_segments": ["test_latest"],
         "jenkins_home": "/var/lib/jenkins",
     }

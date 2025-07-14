@@ -93,6 +93,13 @@ options:
       - A list of URL segment(s) to retrieve the update center JSON file from.
     default: ['update-center.json', 'updates/update-center.json']
     version_added: 3.3.0
+  plugin_versions_url_segment:
+    type: list
+    elements: str
+    description:
+      - A list of URL segment(s) to retrieve the plugin versions JSON file from.
+    default: ['plugin-versions.json', 'current/plugin-versions.json']
+    version_added: 11.1.0
   latest_plugins_url_segments:
     type: list
     elements: str
@@ -137,6 +144,9 @@ notes:
   - Pinning works only if the plugin is installed and Jenkins service was successfully restarted after the plugin installation.
   - It is not possible to run the module remotely by changing the O(url) parameter to point to the Jenkins server. The module
     must be used on the host where Jenkins runs as it needs direct access to the plugin files.
+  - If using a custom O(updates_url), ensure that the URL provides a C(plugin-versions.json) file.
+    This file must include metadata for all available plugin versions to support version compatibility resolution.
+    The file should be in the same format as the one provided by Jenkins update center (https://updates.jenkins.io/current/plugin-versions.json).
 extends_documentation_fragment:
   - ansible.builtin.url
   - ansible.builtin.files
@@ -688,6 +698,10 @@ class JenkinsPlugin(object):
             self.jenkins_version = self.parse_version(raw_version)
         name = plugin_name or self.params['name']
         cache_path = "{}/ansible_jenkins_plugin_cache.json".format(self.params['jenkins_home'])
+        plugin_version_urls = []
+        for base_url in self.params['updates_url']:
+            for update_json in self.params['plugin_versions_url_segment']:
+                plugin_version_urls.append("{}/{}".format(base_url, update_json))
 
         try:  # Check if file is saved localy
             if os.path.exists(cache_path):
@@ -697,9 +711,7 @@ class JenkinsPlugin(object):
 
             now = time.time()
             if now - file_mtime >= 86400:
-                response, info = fetch_url(self.module, "https://updates.jenkins.io/current/plugin-versions.json")
-                if info['status'] != 200:
-                    self.module.fail_json(msg="Failed to fetch plugin-versions.json", details=info)
+                response = self._get_urls_data(plugin_version_urls, what="plugin-versions.json")
                 plugin_data = json.loads(to_native(response.read()), object_pairs_hook=OrderedDict)
 
                 # Save it to file for next time
@@ -710,6 +722,8 @@ class JenkinsPlugin(object):
                 plugin_data = json.load(f)
 
         except Exception as e:
+            if os.path.exists(cache_path):
+                os.remove(cache_path)
             self.module.fail_json(msg="Failed to parse plugin-versions.json", details=to_native(e))
 
         plugin_versions = plugin_data.get("plugins", {}).get(name)
@@ -939,6 +953,8 @@ def main():
         updates_url_password=dict(type="str", no_log=True),
         update_json_url_segment=dict(type="list", elements="str", default=['update-center.json',
                                                                            'updates/update-center.json']),
+        plugin_versions_url_segment=dict(type="list", elements="str", default=['plugin-versions.json',
+                                                                               'current/plugin-versions.json']),
         latest_plugins_url_segments=dict(type="list", elements="str", default=['latest']),
         versioned_plugins_url_segments=dict(type="list", elements="str", default=['download/plugins', 'plugins']),
         url=dict(default='http://localhost:8080'),
@@ -968,7 +984,7 @@ def main():
         module.params['state'] = 'present'
         module.params['version'] = jp._get_latest_compatible_plugin_version()
 
-    # Ser version to latest compatible version if version is latest
+    # Set version to latest compatible version if version is latest
     if module.params['version'] == 'latest':
         module.params['version'] = jp._get_latest_compatible_plugin_version()
 
