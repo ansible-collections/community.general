@@ -37,7 +37,7 @@ options:
   admin:
     description:
       - Whether the user should be in the admin role or not.
-      - Since version 2.8, the role will also be updated.
+      - Since version 2.8, the role is also updated.
     default: false
     type: bool
   state:
@@ -50,8 +50,8 @@ options:
     description:
       - Privileges to grant to this user.
       - Takes a list of dicts containing the "database" and "privilege" keys.
-      - If this argument is not provided, the current grants will be left alone.
-      - If an empty list is provided, all grants for the user will be removed.
+      - If this argument is not provided, the current grants are left alone.
+      - If an empty list is provided, all grants for the user are removed.
     type: list
     elements: dict
 extends_documentation_fragment:

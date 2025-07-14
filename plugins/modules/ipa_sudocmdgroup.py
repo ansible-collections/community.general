@@ -37,8 +37,8 @@ options:
   sudocmd:
     description:
       - List of sudo commands to assign to the group.
-      - If an empty list is passed all assigned commands will be removed from the group.
-      - If option is omitted sudo commands will not be checked or changed.
+      - If an empty list is passed all assigned commands are removed from the group.
+      - If option is omitted sudo commands are not checked nor changed.
     type: list
     elements: str
 extends_documentation_fragment:

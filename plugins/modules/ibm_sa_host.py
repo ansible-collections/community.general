@@ -41,8 +41,8 @@ options:
     type: str
   domain:
     description:
-      - The domains the cluster will be attached to. To include more than one domain, separate domain names with commas. To
-        include all existing domains, use an asterisk (V(*)).
+      - The domains the cluster is attached to. To include more than one domain, separate domain names with commas. To include
+        all existing domains, use an asterisk (V(*)).
     required: false
     type: str
   iscsi_chap_name:

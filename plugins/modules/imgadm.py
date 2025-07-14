@@ -44,7 +44,7 @@ options:
     choices: [present, absent, deleted, imported, updated, vacuumed]
     description:
       - State the object operated on should be in. V(imported) is an alias for for V(present) and V(deleted) for V(absent).
-        When set to V(vacuumed) and O(uuid=*), it will remove all unused images.
+        When set to V(vacuumed) and O(uuid=*), it removes all unused images.
     type: str
 
   type:

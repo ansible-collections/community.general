@@ -22,7 +22,7 @@ options:
   append:
     description:
       - If V(true), add the listed O(user) and O(group) to the group members.
-      - If V(false), only the listed O(user) and O(group) will be group members, removing any other members.
+      - If V(false), only the listed O(user) and O(group) are set as group members, removing any other members.
     default: false
     type: bool
     version_added: 4.0.0
@@ -49,10 +49,10 @@ options:
   group:
     description:
       - List of group names assigned to this group.
-      - If O(append=false) and an empty list is passed all groups will be removed from this group.
-      - Groups that are already assigned but not passed will be removed.
-      - If O(append=true) the listed groups will be assigned without removing other groups.
-      - If option is omitted assigned groups will not be checked or changed.
+      - If O(append=false) and an empty list is passed all groups are removed from this group.
+      - Groups that are already assigned but not passed are removed.
+      - If O(append=true) the listed groups are assigned without removing other groups.
+      - If option is omitted assigned groups are not checked or changed.
     type: list
     elements: str
   nonposix:
@@ -62,10 +62,10 @@ options:
   user:
     description:
       - List of user names assigned to this group.
-      - If O(append=false) and an empty list is passed all users will be removed from this group.
-      - Users that are already assigned but not passed will be removed.
-      - If O(append=true) the listed users will be assigned without removing other users.
-      - If option is omitted assigned users will not be checked or changed.
+      - If O(append=false) and an empty list is passed all users are removed from this group.
+      - Users that are already assigned but not passed are removed.
+      - If O(append=true) the listed users are assigned without removing other users.
+      - If option is omitted assigned users are not checked or changed.
     type: list
     elements: str
   external_user:
@@ -73,7 +73,7 @@ options:
       - List of external users assigned to this group.
       - Behaves identically to O(user) with respect to O(append) attribute.
       - List entries can be in V(DOMAIN\\\\username) or SID format.
-      - Unless SIDs are provided, the module will always attempt to make changes even if the group already has all the users.
+      - Unless SIDs are provided, the module always attempts to make changes even if the group already has all the users.
         This is because only SIDs are returned by IPA query.
       - O(external=true) is needed for this option to work.
     type: list
