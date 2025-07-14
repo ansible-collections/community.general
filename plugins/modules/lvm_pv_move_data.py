@@ -143,7 +143,7 @@ def main():
         free_pe_dest = get_pv_free_pe(module, destination)
         if free_pe_dest < allocated:
             module.fail_json(
-                msg="Destination device %s has only %d free physical extents, but source device %s has %d allocated extents. Not enough space." % 
+                msg="Destination device %s has only %d free physical extents, but source device %s has %d allocated extents. Not enough space." %
                 (destination, free_pe_dest, source, allocated)
             )
 
