@@ -1,2 +1,2 @@
 bugfixes:
-  - "sysrc - use shlex to improve parsing of `sysrc -e -a` output (https://github.com/ansible-collections/community.general/issues/10394, https://github.com/ansible-collections/community.general/pull/10400)."
+  - "sysrc - use shlex to improve parsing of ``sysrc -e -a`` output (https://github.com/ansible-collections/community.general/issues/10394, https://github.com/ansible-collections/community.general/pull/10400)."
