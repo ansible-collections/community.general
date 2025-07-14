@@ -47,7 +47,7 @@ options:
     choices: [absent, present]
     default: present
 notes:
-  - If the package is already installed, even the package/fileset is new, the module will not install it.
+  - If the package is already installed, even the package/fileset is new, the module does not install it.
 """
 
 EXAMPLES = r"""

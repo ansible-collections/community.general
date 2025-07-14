@@ -55,19 +55,19 @@ options:
     required: true
   force:
     description:
-      - If V(true), which will replace the remote file when contents are different than the source.
-      - If V(false), the file will only be extracted and copied if the destination does not already exist.
+      - If V(true), it replaces the remote file when contents are different than the source.
+      - If V(false), the file is only extracted and copied if the destination does not already exist.
     type: bool
     default: true
   executable:
     description:
       - The path to the C(7z) executable to use for extracting files from the ISO.
-      - If not provided, it will assume the value V(7z).
+      - If not provided, it assumes the value V(7z).
     type: path
   password:
     description:
       - Password used to decrypt files from the ISO.
-      - Will only be used if 7z is used.
+      - It is only used if C(7z) is used.
       - The password is used as a command line argument to 7z. This is a B(potential security risk) that allows passwords
         to be revealed if someone else can list running processes on the same machine in the right moment.
     type: str

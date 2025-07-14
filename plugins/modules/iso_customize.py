@@ -14,7 +14,7 @@ module: iso_customize
 short_description: Add/remove/change files in ISO file
 description:
   - This module is used to add/remove/change files in ISO file.
-  - The file inside ISO will be overwritten if it exists by option O(add_files).
+  - The file inside ISO is overwritten if it exists by option O(add_files).
 author:
   - Yuhua Zou (@ZouYuhua) <zouy@vmware.com>
 requirements:
@@ -51,7 +51,7 @@ options:
   add_files:
     description:
       - Allows to add and replace files in the ISO file.
-      - Will create intermediate folders inside the ISO file when they do not exist.
+      - It creates intermediate folders inside the ISO file when they do not exist.
     type: list
     required: false
     elements: dict
@@ -69,9 +69,9 @@ options:
         required: true
 notes:
   - The C(pycdlib) library states it supports Python 2.7 and 3.4+.
-  - The function C(add_file) in pycdlib will overwrite the existing file in ISO with type ISO9660 / Rock Ridge 1.12 / Joliet
-    / UDF. But it will not overwrite the existing file in ISO with Rock Ridge 1.09 / 1.10. So we take workaround "delete the
-    existing file and then add file for ISO with Rock Ridge".
+  - The function C(add_file) in pycdlib is designed to overwrite the existing file in ISO with type ISO9660 / Rock Ridge 1.12
+    / Joliet / UDF. But it does not overwrite the existing file in ISO with Rock Ridge 1.09 / 1.10. So we take workaround
+    "delete the existing file and then add file for ISO with Rock Ridge".
 """
 
 EXAMPLES = r"""
