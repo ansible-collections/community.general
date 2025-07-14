@@ -13,7 +13,7 @@ module: pacemaker_info
 short_description: Gather information about pacemaker cluster
 author:
   - Dexter Le (@munchtoast)
-version_added: 11.1.0
+version_added: 11.2.0
 description:
   - Gather information about the cluster
 extends_documentation_fragment:
