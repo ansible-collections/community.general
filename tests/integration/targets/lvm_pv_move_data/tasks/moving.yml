@@ -1,0 +1,30 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Creating a 50MB file on the mounted LV
+  ansible.builtin.command: dd if=/dev/zero of={{ remote_tmp_dir }}/tmp_mount/test_file bs=1M count=50
+  args:
+    creates: "{{ remote_tmp_dir }}/tmp_mount/test_file"
+
+- name: Extending VG vg_tmp_test with second device {{ loop_device_02.stdout }}
+  community.general.lvg:
+    vg: vg_tmp_test
+    pvs: "{{ loop_device_02.stdout }}"
+
+- name: Moving data from {{ loop_device_01.stdout }} to {{ loop_device_02.stdout }} (both in same VG)
+  community.general.lvm_pv_move_data:
+    source: "{{ loop_device_01.stdout }}"
+    destination: "{{ loop_device_02.stdout }}"
+  register: move_result
+
+- name: Debugging move result
+  ansible.builtin.debug:
+    var: move_result
+
+- name: Asserting data was moved successfully
+  ansible.builtin.assert:
+    that:
+      - move_result.changed == true
+      - "'moved data from' in creation_result.msg"
