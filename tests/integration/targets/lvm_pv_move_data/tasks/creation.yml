@@ -48,12 +48,14 @@
 - name: Making sure volume group vg_tmp_test does not exist
   community.general.lvg:
     vg: vg_tmp_test
+    force: true
     state: absent
 
 - name: Creating volume group on top of first device {{ loop_device_01.stdout }}
   community.general.lvg:
     vg: vg_tmp_test
     pvs: "{{ loop_device_01.stdout }}"
+    force: true
   register: vg_creation_result
 
 - name: Creating LV lv_tmp_test on VG vg_tmp_test
