@@ -1,0 +1,488 @@
+# -*- coding: utf-8 -*-
+# Copyright (c) Dexter Le (dextersydney2001@gmail.com)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+anchors:
+  environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+test_cases:
+  - id: test_online_minimal_input_initial_online_all_no_maintenance
+    input:
+      state: online
+    output:
+      changed: false
+      previous_value: '   * Online: [ pc1, pc2, pc3 ]'
+      value: '   * Online: [ pc1, pc2, pc3 ]'
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, cluster, status]
+          environ: *env-def
+          rc: 0
+          out: '   * Online: [ pc1, pc2, pc3 ]'
+          err: ""
+        - command: [/testbin/pcs, cluster, start, --all, --wait=300]
+          environ: *env-def
+          rc: 0
+          out: "Starting Cluster..."
+          err: ""
+        - command: [/testbin/pcs, property, config]
+          environ: *env-def
+          rc: 1
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure=corosync
+            cluster-name=hacluster
+            dc-version=2.1.9-1.fc41-7188dbf
+            have-watchdog=false
+          err: ""
+        - command: [/testbin/pcs, cluster, status]
+          environ: *env-def
+          rc: 0
+          out: '   * Online: [ pc1, pc2, pc3 ]'
+          err: ""
+  - id: test_online_minimal_input_initial_offline_all_maintenance
+    input:
+      state: online
+    output:
+      changed: true
+      previous_value: 'Error: cluster is not currently running on this node'
+      value: '   * Online: [ pc1, pc2, pc3 ]'
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, cluster, status]
+          environ: *env-def
+          rc: 1
+          out: 'Error: cluster is not currently running on this node'
+          err: ""
+        - command: [/testbin/pcs, cluster, start, --all, --wait=300]
+          environ: *env-def
+          rc: 0
+          out: "Starting Cluster..."
+          err: ""
+        - command: [/testbin/pcs, property, config]
+          environ: *env-def
+          rc: 0
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure=corosync
+            cluster-name=hacluster
+            dc-version=2.1.9-1.fc41-7188dbf
+            have-watchdog=false
+            maintenance-mode=true
+          err: ""
+        - command: [/testbin/pcs, property, set, maintenance-mode=false]
+          environ: *env-def
+          rc: 0
+          out: ""
+          err: ""
+        - command: [/testbin/pcs, cluster, status]
+          environ: *env-def
+          rc: 0
+          out: '   * Online: [ pc1, pc2, pc3 ]'
+          err: ""
+  - id: test_online_minimal_input_initial_offline_single_nonlocal_no_maintenance
+    input:
+      state: online
+      name: pc2
+    output:
+      changed: true
+      previous_value: '* Node pc2: UNCLEAN (offline)\n   * Online: [ pc1, pc3 ]'
+      value: '   * Online: [ pc1, pc2, pc3 ]'
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, cluster, status]
+          environ: *env-def
+          rc: 0
+          out: '* Node pc2: UNCLEAN (offline)\n   * Online: [ pc1, pc3 ]'
+          err: ""
+        - command: [/testbin/pcs, cluster, start, pc2, --wait=300]
+          environ: *env-def
+          rc: 0
+          out: "Starting Cluster..."
+          err: ""
+        - command: [/testbin/pcs, property, config]
+          environ: *env-def
+          rc: 1
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure=corosync
+            cluster-name=hacluster
+            dc-version=2.1.9-1.fc41-7188dbf
+            have-watchdog=false
+          err: ""
+        - command: [/testbin/pcs, cluster, status]
+          environ: *env-def
+          rc: 0
+          out: '   * Online: [ pc1, pc2, pc3 ]'
+          err: ""
+  - id: test_online_minimal_input_initial_offline_single_local_no_maintenance
+    input:
+      state: online
+      name: pc1
+    output:
+      changed: true
+      previous_value: 'Error: cluster is not currently running on this node'
+      value: '   * Online: [ pc1, pc2, pc3 ]'
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, cluster, status]
+          environ: *env-def
+          rc: 1
+          out: 'Error: cluster is not currently running on this node'
+          err: ""
+        - command: [/testbin/pcs, cluster, start, pc1, --wait=300]
+          environ: *env-def
+          rc: 0
+          out: "Starting Cluster..."
+          err: ""
+        - command: [/testbin/pcs, property, config]
+          environ: *env-def
+          rc: 1
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure=corosync
+            cluster-name=hacluster
+            dc-version=2.1.9-1.fc41-7188dbf
+            have-watchdog=false
+          err: ""
+        - command: [/testbin/pcs, cluster, status]
+          environ: *env-def
+          rc: 0
+          out: '   * Online: [ pc1, pc2, pc3 ]'
+          err: ""
+  - id: test_offline_minimal_input_initial_online_all
+    input:
+      state: offline
+    output:
+      changed: true
+      previous_value: '   * Online: [ pc1, pc2, pc3 ]'
+      value: 'Error: cluster is not currently running on this node'
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, cluster, status]
+          environ: *env-def
+          rc: 0
+          out: '   * Online: [ pc1, pc2, pc3 ]'
+          err: ""
+        - command: [/testbin/pcs, cluster, stop, --all, --wait=300]
+          environ: *env-def
+          rc: 0
+          out: "Stopping Cluster..."
+          err: ""
+        - command: [/testbin/pcs, cluster, status]
+          environ: *env-def
+          rc: 1
+          out: 'Error: cluster is not currently running on this node'
+          err: ""
+  - id: test_offline_minimal_input_initial_offline_all
+    input:
+      state: offline
+    output:
+      changed: false
+      previous_value: 'Error: cluster is not currently running on this node'
+      value: 'Error: cluster is not currently running on this node'
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, cluster, status]
+          environ: *env-def
+          rc: 1
+          out: 'Error: cluster is not currently running on this node'
+          err: ""
+        - command: [/testbin/pcs, cluster, stop, --all, --wait=300]
+          environ: *env-def
+          rc: 0
+          out: "Stopping Cluster..."
+          err: ""
+        - command: [/testbin/pcs, cluster, status]
+          environ: *env-def
+          rc: 1
+          out: 'Error: cluster is not currently running on this node'
+          err: ""
+  - id: test_offline_minimal_input_initial_offline_single_nonlocal
+    input:
+      state: offline
+      name: pc3
+    output:
+      changed: true
+      previous_value: '* Node pc2: UNCLEAN (offline)\n   * Online: [ pc1, pc3 ]'
+      value: '* Node pc2: UNCLEAN (offline)\n* Node pc3: UNCLEAN (offline)\n   * Online: [ pc1 ]'
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, cluster, status]
+          environ: *env-def
+          rc: 0
+          out: '* Node pc2: UNCLEAN (offline)\n   * Online: [ pc1, pc3 ]'
+          err: ""
+        - command: [/testbin/pcs, cluster, stop, pc3, --wait=300]
+          environ: *env-def
+          rc: 0
+          out: "Stopping Cluster..."
+          err: ""
+        - command: [/testbin/pcs, cluster, status]
+          environ: *env-def
+          rc: 0
+          out: '* Node pc2: UNCLEAN (offline)\n* Node pc3: UNCLEAN (offline)\n   * Online: [ pc1 ]'
+          err: ""
+  - id: test_restart_minimal_input_initial_online_all_no_maintenance
+    input:
+      state: restart
+    output:
+      changed: false
+      previous_value: '   * Online: [ pc1, pc2, pc3 ]'
+      value: '   * Online: [ pc1, pc2, pc3 ]'
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, cluster, status]
+          environ: *env-def
+          rc: 0
+          out: '   * Online: [ pc1, pc2, pc3 ]'
+          err: ""
+        - command: [/testbin/pcs, cluster, stop, --all, --wait=300]
+          environ: *env-def
+          rc: 0
+          out: "Stopping Cluster..."
+          err: ""
+        - command: [/testbin/pcs, cluster, start, --all, --wait=300]
+          environ: *env-def
+          rc: 0
+          out: "Starting Cluster..."
+          err: ""
+        - command: [/testbin/pcs, property, config]
+          environ: *env-def
+          rc: 1
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure=corosync
+            cluster-name=hacluster
+            dc-version=2.1.9-1.fc41-7188dbf
+            have-watchdog=false
+          err: ""
+        - command: [/testbin/pcs, cluster, status]
+          environ: *env-def
+          rc: 0
+          out: '   * Online: [ pc1, pc2, pc3 ]'
+          err: ""
+  - id: test_restart_minimal_input_initial_offline_all_no_maintenance
+    input:
+      state: restart
+    output:
+      changed: true
+      previous_value: 'Error: cluster is not currently running on this node'
+      value: '   * Online: [ pc1, pc2, pc3 ]'
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, cluster, status]
+          environ: *env-def
+          rc: 1
+          out: 'Error: cluster is not currently running on this node'
+          err: ""
+        - command: [/testbin/pcs, cluster, stop, --all, --wait=300]
+          environ: *env-def
+          rc: 0
+          out: "Stopping Cluster..."
+          err: ""
+        - command: [/testbin/pcs, cluster, start, --all, --wait=300]
+          environ: *env-def
+          rc: 0
+          out: "Starting Cluster..."
+          err: ""
+        - command: [/testbin/pcs, property, config]
+          environ: *env-def
+          rc: 1
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure=corosync
+            cluster-name=hacluster
+            dc-version=2.1.9-1.fc41-7188dbf
+            have-watchdog=false
+          err: ""
+        - command: [/testbin/pcs, cluster, status]
+          environ: *env-def
+          rc: 0
+          out: '   * Online: [ pc1, pc2, pc3 ]'
+          err: ""
+  - id: test_restart_minimal_input_initial_offline_all_maintenance
+    input:
+      state: restart
+    output:
+      changed: true
+      previous_value: 'Error: cluster is not currently running on this node'
+      value: '   * Online: [ pc1, pc2, pc3 ]'
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, cluster, status]
+          environ: *env-def
+          rc: 1
+          out: 'Error: cluster is not currently running on this node'
+          err: ""
+        - command: [/testbin/pcs, cluster, stop, --all, --wait=300]
+          environ: *env-def
+          rc: 0
+          out: "Stopping Cluster..."
+          err: ""
+        - command: [/testbin/pcs, cluster, start, --all, --wait=300]
+          environ: *env-def
+          rc: 0
+          out: "Starting Cluster..."
+          err: ""
+        - command: [/testbin/pcs, property, config]
+          environ: *env-def
+          rc: 0
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure=corosync
+            cluster-name=hacluster
+            dc-version=2.1.9-1.fc41-7188dbf
+            have-watchdog=false
+            maintenance-mode=true
+          err: ""
+        - command: [/testbin/pcs, property, set, maintenance-mode=false]
+          environ: *env-def
+          rc: 0
+          out: ""
+          err: ""
+        - command: [/testbin/pcs, cluster, status]
+          environ: *env-def
+          rc: 0
+          out: '   * Online: [ pc1, pc2, pc3 ]'
+          err: ""
+  - id: test_maintenance_minimal_input_initial_online
+    input:
+      state: maintenance
+    output:
+      changed: true
+      previous_value: 'maintenance-mode=false (default)'
+      value: 'maintenance-mode=true'
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, property, config, maintenance-mode]
+          environ: *env-def
+          rc: 0
+          out: 'maintenance-mode=false (default)'
+          err: ""
+        - command: [/testbin/pcs, property, set, maintenance-mode=true]
+          environ: *env-def
+          rc: 0
+          out: ""
+          err: ""
+        - command: [/testbin/pcs, property, config, maintenance-mode]
+          environ: *env-def
+          rc: 0
+          out: 'maintenance-mode=true'
+          err: ""
+  - id: test_maintenance_minimal_input_initial_offline
+    input:
+      state: maintenance
+    output:
+      failed: true
+      msg: "pcs failed with error (rc=1): Error: unable to get cib"
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, property, config, maintenance-mode]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: "Error: unable to get cib"
+        - command: [/testbin/pcs, property, set, maintenance-mode=true]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: "Error: unable to get cib"
+  - id: test_maintenance_minimal_input_initial_maintenance
+    input:
+      state: maintenance
+    output:
+      changed: false
+      previous_value: 'maintenance-mode=true'
+      value: 'maintenance-mode=true'
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, property, config, maintenance-mode]
+          environ: *env-def
+          rc: 0
+          out: 'maintenance-mode=true'
+          err: ""
+        - command: [/testbin/pcs, property, set, maintenance-mode=true]
+          environ: *env-def
+          rc: 0
+          out: ""
+          err: ""
+        - command: [/testbin/pcs, property, config, maintenance-mode]
+          environ: *env-def
+          rc: 0
+          out: 'maintenance-mode=true'
+          err: ""
+  - id: test_cleanup_minimal_input_initial_resources_not_exist
+    input:
+      state: cleanup
+    output:
+      changed: false
+      previous_value: "NO resources configured"
+      value: "NO resources configured"
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, resource, status]
+          environ: *env-def
+          rc: 0
+          out: "NO resources configured"
+          err: ""
+        - command: [/testbin/pcs, resource, cleanup]
+          environ: *env-def
+          rc: 0
+          out: "Cleaned up all resources on all nodes"
+          err: ""
+        - command: [/testbin/pcs, resource, status]
+          environ: *env-def
+          rc: 0
+          out: "NO resources configured"
+          err: ""
+  - id: test_cleanup_minimal_input_initial_resources_exists
+    input:
+      state: cleanup
+    output:
+      changed: true
+      previous_value: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+      value: "NO resources configured"
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, resource, status]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+          err: ""
+        - command: [/testbin/pcs, resource, cleanup]
+          environ: *env-def
+          rc: 0
+          out: "Cleaned up all resources on all nodes"
+          err: ""
+        - command: [/testbin/pcs, resource, status]
+          environ: *env-def
+          rc: 0
+          out: "NO resources configured"
+          err: ""
+  - id: test_cleanup_specific_minimal_input_initial_resources_exists
+    input:
+      state: cleanup
+      name: virtual-ip
+    output:
+      changed: true
+      previous_value: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+      value: "NO resources configured"
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+          err: ""
+        - command: [/testbin/pcs, resource, cleanup, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "Cleaned up virtual-ip on X"
+          err: ""
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "NO resources configured"
+          err: ""
