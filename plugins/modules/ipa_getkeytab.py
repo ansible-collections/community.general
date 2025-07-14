@@ -67,15 +67,15 @@ options:
   retrieve_mode:
     description:
       - Retrieve an existing key from the server instead of generating a new one.
-      - This is incompatible with the O(password), and will work only against a IPA server more recent than version 3.3.
+      - This is incompatible with the O(password), and works only against a IPA server more recent than version 3.3.
       - The user requesting the keytab must have access to the keys for this operation to succeed.
-      - Be aware that if set V(true), a new keytab will be generated.
+      - Be aware that if set V(true), a new keytab is generated.
       - This invalidates all previously retrieved keytabs for this service principal.
     type: bool
   encryption_types:
     description:
       - The list of encryption types to use to generate keys.
-      - It will use local client defaults if not provided.
+      - It uses local client defaults if not provided.
       - Valid values depend on the Kerberos library version and configuration.
     type: str
   state:

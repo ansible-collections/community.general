@@ -30,13 +30,13 @@ options:
       - HTTP, HTTPS, or FTP URL in the form V((http|https|ftp\)://[user[:pass]]@host.domain[:port]/path).
   use_proxy:
     description:
-      - If V(false), it will not use a proxy, even if one is defined in an environment variable on the target hosts.
+      - If V(false), it does not use a proxy, even if one is defined in an environment variable on the target hosts.
     type: bool
     default: true
   validate_certs:
     description:
-      - If V(false), SSL certificates will not be validated. This should only be used on personally controlled sites using
-        self-signed certificates.
+      - If V(false), SSL certificates are not validated. This should only be used on personally controlled sites using self-signed
+        certificates.
     type: bool
     default: true
   url_username:
@@ -48,12 +48,12 @@ options:
     type: str
     description:
       - The password for use in HTTP basic authentication.
-      - If the O(url_username) parameter is not specified, the O(url_password) parameter will not be used.
+      - If the O(url_username) parameter is not specified, the O(url_password) parameter is not used.
   force_basic_auth:
     description:
-      - C(httplib2), the library used by Ansible's HTTP request code only sends authentication information when a webservice responds to
-        an initial request with a 401 status. Since some basic auth services do not properly send a 401, logins will fail.
-        This option forces the sending of the Basic authentication header upon initial request.
+      - C(httplib2), the library used by Ansible's HTTP request code only sends authentication information when a webservice
+        responds to an initial request with a 401 status. Since some basic auth services do not properly send a 401, logins
+        may fail. This option forces the sending of the Basic authentication header upon initial request.
     type: bool
     default: false
   client_cert:

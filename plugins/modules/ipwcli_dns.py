@@ -16,7 +16,7 @@ short_description: Manage DNS Records for Ericsson IPWorks using C(ipwcli)
 version_added: '0.2.0'
 
 description:
-  - Manage DNS records for the Ericsson IPWorks DNS server. The module will use the C(ipwcli) to deploy the DNS records.
+  - Manage DNS records for the Ericsson IPWorks DNS server. The module uses the C(ipwcli) to deploy the DNS records.
 requirements:
   - ipwcli (installed on Ericsson IPWorks)
 

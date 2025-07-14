@@ -34,31 +34,31 @@ options:
   cmd:
     description:
       - List of commands assigned to the rule.
-      - If an empty list is passed all commands will be removed from the rule.
-      - If option is omitted commands will not be checked or changed.
+      - If an empty list is passed all commands are removed from the rule.
+      - If option is omitted commands are not checked nor changed.
     type: list
     elements: str
   cmdgroup:
     description:
       - List of command groups assigned to the rule.
-      - If an empty list is passed all command groups will be removed from the rule.
-      - If option is omitted command groups will not be checked or changed.
+      - If an empty list is passed all command groups are removed from the rule.
+      - If option is omitted command groups are not checked nor changed.
     type: list
     elements: str
     version_added: 2.0.0
   deny_cmd:
     description:
       - List of denied commands assigned to the rule.
-      - If an empty list is passed all commands will be removed from the rule.
-      - If option is omitted commands will not be checked or changed.
+      - If an empty list is passed all commands are removed from the rule.
+      - If option is omitted commands are not checked nor changed.
     type: list
     elements: str
     version_added: 8.1.0
   deny_cmdgroup:
     description:
       - List of denied command groups assigned to the rule.
-      - If an empty list is passed all command groups will be removed from the rule.
-      - If option is omitted command groups will not be checked or changed.
+      - If an empty list is passed all command groups are removed from the rule.
+      - If option is omitted command groups are not checked nor changed.
     type: list
     elements: str
     version_added: 8.1.0
@@ -69,8 +69,8 @@ options:
   host:
     description:
       - List of hosts assigned to the rule.
-      - If an empty list is passed all hosts will be removed from the rule.
-      - If option is omitted hosts will not be checked or changed.
+      - If an empty list is passed all hosts are removed from the rule.
+      - If option is omitted hosts are not checked nor changed.
       - Option O(hostcategory) must be omitted to assign hosts.
     type: list
     elements: str
@@ -84,8 +84,8 @@ options:
   hostgroup:
     description:
       - List of host groups assigned to the rule.
-      - If an empty list is passed all host groups will be removed from the rule.
-      - If option is omitted host groups will not be checked or changed.
+      - If an empty list is passed all host groups are removed from the rule.
+      - If option is omitted host groups are not checked nor changed.
       - Option O(hostcategory) must be omitted to assign host groups.
     type: list
     elements: str
@@ -113,8 +113,8 @@ options:
   user:
     description:
       - List of users assigned to the rule.
-      - If an empty list is passed all users will be removed from the rule.
-      - If option is omitted users will not be checked or changed.
+      - If an empty list is passed all users are removed from the rule.
+      - If option is omitted users are not checked nor changed.
     type: list
     elements: str
   usercategory:
@@ -125,8 +125,8 @@ options:
   usergroup:
     description:
       - List of user groups assigned to the rule.
-      - If an empty list is passed all user groups will be removed from the rule.
-      - If option is omitted user groups will not be checked or changed.
+      - If an empty list is passed all user groups are removed from the rule.
+      - If option is omitted user groups are not checked nor changed.
     type: list
     elements: str
   state:
