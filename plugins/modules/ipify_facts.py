@@ -24,7 +24,7 @@ options:
   api_url:
     description:
       - URL of the ipify.org API service.
-      - C(?format=json) will be appended per default.
+      - C(?format=json) is appended by default.
     type: str
     default: https://api.ipify.org/
   timeout:
@@ -34,7 +34,7 @@ options:
     default: 10
   validate_certs:
     description:
-      - When set to V(false), SSL certificates will not be validated.
+      - When set to V(false), SSL certificates are not validated.
     type: bool
     default: true
 notes:
