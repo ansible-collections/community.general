@@ -45,6 +45,11 @@
   ansible.builtin.command: pvs --noheadings -o pv_size --units M {{ loop_device_02.stdout }}
   register: pv_size_output_02
 
+- name: Making sure volume group vg_tmp_test does not exist
+  community.general.lvg:
+    vg: vg_tmp_test
+    state: absent
+
 - name: Creating volume group on top of first device {{ loop_device_01.stdout }}
   community.general.lvg:
     vg: vg_tmp_test
@@ -65,9 +70,6 @@
     fstype: xfs
     state: present
   register: fs_creation_result
-
-#- name: Mounting LV lv_tmp_test to {{ remote_tmp_dir }}/tmp_mount
-#  ansible.builtin.shell: mount -o rw,noauto /dev/vg_tmp_test/lv_tmp_test {{ remote_tmp_dir }}/tmp_mount
 
 - name: Mounting LV lv_tmp_test
   ansible.posix.mount:
