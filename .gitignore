@@ -530,3 +530,4 @@ tests/integration/cloud-config-*.ini
 
 # VSCode specific extensions
 .vscode/settings.json
+.ansible
