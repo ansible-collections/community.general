@@ -144,7 +144,7 @@ class PacemakerStonith(StateModuleHelper):
     )
 
     def __init_module__(self):
-        self.runner = pacemaker_runner(self.module, cli_action='stonith')
+        self.runner = pacemaker_runner(self.module)
         self.vars.set('previous_value', self._get()['out'])
         self.vars.set('value', self.vars.previous_value, change=True, diff=True)
 
@@ -160,8 +160,8 @@ class PacemakerStonith(StateModuleHelper):
         return process
 
     def _get(self):
-        with self.runner('state name') as ctx:
-            result = ctx.run(state='status')
+        with self.runner('cli_action state name') as ctx:
+            result = ctx.run(cli_action='stonith', state='status')
             return dict([('rc', result[0]),
                          ('out', result[1] if result[1] != "" else None),
                          ('err', result[2])])
@@ -178,27 +178,28 @@ class PacemakerStonith(StateModuleHelper):
         return modified_stonith_operations
 
     def state_absent(self):
-        with self.runner('state name', output_process=self._process_command_output(True, "does not exist"), check_mode_skip=True) as ctx:
-            ctx.run()
+        with self.runner('cli_action state name', output_process=self._process_command_output(True, "does not exist"), check_mode_skip=True) as ctx:
+            ctx.run(cli_action='stonith')
 
     def state_present(self):
         with self.runner(
-                'state name resource_type resource_option resource_operation resource_meta resource_argument agent_validation wait',
+                'cli_action state name resource_type resource_option resource_operation resource_meta resource_argument agent_validation wait',
                 output_process=self._process_command_output(True, "already exists"),
                 check_mode_skip=True) as ctx:
-            ctx.run(resource_type=self.fmt_stonith_resource(),
+            ctx.run(cli_action='stonith',
+                    resource_type=self.fmt_stonith_resource(),
                     resource_option=self.vars.stonith_options,
                     resource_operation=self.fmt_stonith_operations(),
                     resource_meta=self.vars.stonith_metas,
                     resource_argument=self.vars.stonith_argument)
 
     def state_enabled(self):
-        with self.runner('state name', output_process=self._process_command_output(True, "Starting"), check_mode_skip=True) as ctx:
-            ctx.run()
+        with self.runner('cli_action state name', output_process=self._process_command_output(True, "Starting"), check_mode_skip=True) as ctx:
+            ctx.run(cli_action='stonith')
 
     def state_disabled(self):
-        with self.runner('state name', output_process=self._process_command_output(True, "Stopped"), check_mode_skip=True) as ctx:
-            ctx.run()
+        with self.runner('cli_action state name', output_process=self._process_command_output(True, "Stopped"), check_mode_skip=True) as ctx:
+            ctx.run(cli_action='stonith')
 
 
 def main():
