@@ -408,6 +408,7 @@
       sysrc:
         name: k1
         value: v2
+        path: /tmp/10394.conf
       register: sysrc_10394_changed
 
     - name: Get file content
