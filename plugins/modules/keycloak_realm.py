@@ -309,6 +309,12 @@ options:
     aliases:
       - maxFailureWaitSeconds
     type: int
+  max_temporary_lockouts:
+    description:
+      - The realm max temporary lockouts.
+    aliases:
+      - maxTemporaryLockouts
+    type: int
   minimum_quick_login_wait_seconds:
     description:
       - The realm minimum quick login wait in seconds.
@@ -672,6 +678,7 @@ def main():
         login_with_email_allowed=dict(type='bool', aliases=['loginWithEmailAllowed']),
         max_delta_time_seconds=dict(type='int', aliases=['maxDeltaTimeSeconds']),
         max_failure_wait_seconds=dict(type='int', aliases=['maxFailureWaitSeconds']),
+        max_temporary_lockouts=dict(type='int', aliases=['maxTemporaryLockouts']),
         minimum_quick_login_wait_seconds=dict(type='int', aliases=['minimumQuickLoginWaitSeconds']),
         not_before=dict(type='int', aliases=['notBefore']),
         offline_session_idle_timeout=dict(type='int', aliases=['offlineSessionIdleTimeout']),
