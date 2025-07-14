@@ -42,9 +42,9 @@ options:
   mac_address:
     description:
       - List of Hardware MAC address(es) off this host.
-      - If option is omitted MAC addresses will not be checked or changed.
-      - If an empty list is passed all assigned MAC addresses will be removed.
-      - MAC addresses that are already assigned but not passed will be removed.
+      - If option is omitted MAC addresses are not checked nor changed.
+      - If an empty list is passed all assigned MAC addresses are removed.
+      - MAC addresses that are already assigned but not passed are removed.
     aliases: ["macaddress"]
     type: list
     elements: str
@@ -66,9 +66,9 @@ options:
   user_certificate:
     description:
       - List of Base-64 encoded server certificates.
-      - If option is omitted certificates will not be checked or changed.
-      - If an empty list is passed all assigned certificates will be removed.
-      - Certificates already assigned but not passed will be removed.
+      - If option is omitted certificates are not checked nor changed.
+      - If an empty list is passed all assigned certificates are removed.
+      - Certificates already assigned but not passed are removed.
     aliases: ["usercertificate"]
     type: list
     elements: str

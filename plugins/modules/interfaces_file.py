@@ -45,10 +45,10 @@ options:
   value:
     type: str
     description:
-      - If O(option) is not presented for the O(iface) and O(state) is V(present) option will be added. If O(option) already
-        exists and is not V(pre-up), V(up), V(post-up) or V(down), its value will be updated. V(pre-up), V(up), V(post-up)
-        and V(down) options cannot be updated, only adding new options, removing existing ones or cleaning the whole option
-        set are supported.
+      - If O(option) is not presented for the O(iface) and O(state) is V(present), then O(option) is added. If O(option) already
+        exists and is not V(pre-up), V(up), V(post-up) or V(down), its value is updated. V(pre-up), V(up), V(post-up) and
+        V(down) options cannot be updated, only adding new options, removing existing ones or cleaning the whole option set
+        are supported.
   backup:
     description:
       - Create a backup file including the timestamp information so you can get the original file back if you somehow clobbered
@@ -58,12 +58,12 @@ options:
   state:
     type: str
     description:
-      - If set to V(absent) the option or section will be removed if present instead of created.
+      - If set to V(absent) the option or section is removed if present instead of created.
     default: "present"
     choices: ["present", "absent"]
 
 notes:
-  - If option is defined multiple times last one will be updated but all will be deleted in case of an absent state.
+  - If option is defined multiple times last one is updated but all others are deleted in case of an O(state=absent).
 requirements: []
 author: "Roman Belyakovsky (@hryamzik)"
 """

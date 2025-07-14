@@ -27,8 +27,8 @@ description:
 notes:
   - The rollback feature is not a module option and depends on task's attributes. To enable it, the module must be played
     asynchronously, in other words by setting task attributes C(poll) to V(0), and C(async) to a value less or equal to C(ANSIBLE_TIMEOUT).
-    If C(async) is greater, the rollback will still happen if it shall happen, but you will experience a connection timeout
-    instead of more relevant info returned by the module after its failure.
+    If C(async) is greater, the rollback still happens when needed, but you experience a connection timeout instead of more
+    relevant info returned by the module after its failure.
 attributes:
   check_mode:
     support: full

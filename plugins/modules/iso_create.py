@@ -32,8 +32,8 @@ attributes:
 options:
   src_files:
     description:
-      - This is a list of absolute paths of source files or folders which will be contained in the new generated ISO file.
-      - Will fail if specified file or folder in O(src_files) does not exist on local machine.
+      - This is a list of absolute paths of source files or folders to be contained in the new generated ISO file.
+      - The module fails if specified file or folder in O(src_files) does not exist on local machine.
       - 'Note: With all ISO9660 levels from 1 to 3, all file names are restricted to uppercase letters, numbers and underscores
         (_). File names are limited to 31 characters, directory nesting is limited to 8 levels, and path names are limited
         to 255 characters.'
@@ -43,7 +43,7 @@ options:
   dest_iso:
     description:
       - The absolute path with file name of the new generated ISO file on local machine.
-      - Will create intermediate folders when they does not exist.
+      - It creates intermediate folders when they do not exist.
     type: path
     required: true
   interchange_level:

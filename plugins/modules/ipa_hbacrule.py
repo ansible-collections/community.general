@@ -32,8 +32,8 @@ options:
   host:
     description:
       - List of host names to assign.
-      - If an empty list is passed all hosts will be removed from the rule.
-      - If option is omitted hosts will not be checked or changed.
+      - If an empty list is passed all hosts are removed from the rule.
+      - If option is omitted hosts are not checked or changed.
     required: false
     type: list
     elements: str
@@ -44,15 +44,15 @@ options:
   hostgroup:
     description:
       - List of hostgroup names to assign.
-      - If an empty list is passed all hostgroups will be removed from the rule.
-      - If option is omitted hostgroups will not be checked or changed.
+      - If an empty list is passed all hostgroups are removed from the rule.
+      - If option is omitted hostgroups are not checked or changed.
     type: list
     elements: str
   service:
     description:
       - List of service names to assign.
-      - If an empty list is passed all services will be removed from the rule.
-      - If option is omitted services will not be checked or changed.
+      - If an empty list is passed all services are removed from the rule.
+      - If option is omitted services are not checked or changed.
     type: list
     elements: str
   servicecategory:
@@ -62,15 +62,15 @@ options:
   servicegroup:
     description:
       - List of service group names to assign.
-      - If an empty list is passed all assigned service groups will be removed from the rule.
-      - If option is omitted service groups will not be checked or changed.
+      - If an empty list is passed all assigned service groups are removed from the rule.
+      - If option is omitted service groups are not checked or changed.
     type: list
     elements: str
   sourcehost:
     description:
       - List of source host names to assign.
-      - If an empty list if passed all assigned source hosts will be removed from the rule.
-      - If option is omitted source hosts will not be checked or changed.
+      - If an empty list if passed all assigned source hosts are removed from the rule.
+      - If option is omitted source hosts are not checked or changed.
     type: list
     elements: str
   sourcehostcategory:
@@ -80,8 +80,8 @@ options:
   sourcehostgroup:
     description:
       - List of source host group names to assign.
-      - If an empty list if passed all assigned source host groups will be removed from the rule.
-      - If option is omitted source host groups will not be checked or changed.
+      - If an empty list if passed all assigned source host groups are removed from the rule.
+      - If option is omitted source host groups are not checked or changed.
     type: list
     elements: str
   state:
@@ -92,8 +92,8 @@ options:
   user:
     description:
       - List of user names to assign.
-      - If an empty list if passed all assigned users will be removed from the rule.
-      - If option is omitted users will not be checked or changed.
+      - If an empty list if passed all assigned users are removed from the rule.
+      - If option is omitted users are not checked or changed.
     type: list
     elements: str
   usercategory:
@@ -103,8 +103,8 @@ options:
   usergroup:
     description:
       - List of user group names to assign.
-      - If an empty list if passed all assigned user groups will be removed from the rule.
-      - If option is omitted user groups will not be checked or changed.
+      - If an empty list if passed all assigned user groups are removed from the rule.
+      - If option is omitted user groups are not checked or changed.
     type: list
     elements: str
 extends_documentation_fragment:

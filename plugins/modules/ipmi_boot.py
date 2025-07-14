@@ -95,17 +95,17 @@ author: "Bulat Gaifullin (@bgaifullin) <gaifullinbf@gmail.com>"
 
 RETURN = r"""
 bootdev:
-  description: The boot device name which will be used beyond next boot.
+  description: The boot device name which is used beyond next boot.
   returned: success
   type: str
   sample: default
 persistent:
-  description: If True, system firmware will use this device beyond next boot.
+  description: If V(true), system firmware uses this device beyond next boot.
   returned: success
   type: bool
   sample: false
 uefimode:
-  description: If True, system firmware will use UEFI boot explicitly beyond next boot.
+  description: If V(true), system firmware uses UEFI boot explicitly beyond next boot.
   returned: success
   type: bool
   sample: false
