@@ -12,6 +12,7 @@
   community.general.lvg:
     vg: testvg
     pvs: "{{ loop_device_02.stdout }}"
+    force: true
 
 - name: Moving data from {{ loop_device_01.stdout }} to {{ loop_device_02.stdout }} (both in same VG)
   community.general.lvm_pv_move_data:
