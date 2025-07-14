@@ -1,3 +1,0 @@
----
-bugfixes:
-    - logstash callback plugin - remove reference to Python 2 library (https://github.com/ansible-collections/community.general/pull/10345).

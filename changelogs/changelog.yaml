@@ -1931,3 +1931,28 @@ releases:
       - 10242-yaml.yml
       - 9692-update-more-than-10-keycloak-sub-groups.yml
     release_date: '2025-06-16'
+  10.7.2:
+    changes:
+      bugfixes:
+        - dependent lookup plugin - avoid deprecated ansible-core 2.19 functionality
+          (https://github.com/ansible-collections/community.general/pull/10359).
+        - github_release - support multiple types of GitHub tokens; no longer failing
+          when ``ghs_`` token type is provided (https://github.com/ansible-collections/community.general/issues/10338,
+          https://github.com/ansible-collections/community.general/pull/10339).
+        - icinga2 inventory plugin - avoid using deprecated option when templating
+          options (https://github.com/ansible-collections/community.general/pull/10271).
+        - incus connection plugin - fix error handling to return more useful Ansible
+          errors to the user (https://github.com/ansible-collections/community.general/issues/10344,
+          https://github.com/ansible-collections/community.general/pull/10349).
+        - linode inventory plugin - avoid using deprecated option when templating
+          options (https://github.com/ansible-collections/community.general/pull/10271).
+        - logstash callback plugin - remove reference to Python 2 library (https://github.com/ansible-collections/community.general/pull/10345).
+      release_summary: Regular bugfix release.
+    fragments:
+      - 10.7.2.yml
+      - 10271--disable_lookups.yml
+      - 10339-github_app_access_token.yml
+      - 10349-incus_connection-error-handling.yml
+      - 10359-dependent.yml
+      - logstash.yml
+    release_date: '2025-07-14'
