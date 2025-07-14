@@ -14,7 +14,12 @@ _state_map = {
     "absent": "remove",
     "status": "status",
     "enabled": "enable",
-    "disabled": "disable"
+    "disabled": "disable",
+    "online": "start",
+    "offline": "stop",
+    "maintenance": "set",
+    "config": "config",
+    "cleanup": "cleanup",
 }
 
 
@@ -38,20 +43,19 @@ def fmt_resource_argument(value):
 
 
 def get_pacemaker_maintenance_mode(runner):
-    with runner("config") as ctx:
-        rc, out, err = ctx.run()
+    with runner("cli_action config") as ctx:
+        rc, out, err = ctx.run(cli_action="property")
         maintenance_mode_output = list(filter(lambda string: "maintenance-mode=true" in string.lower(), out.splitlines()))
         return bool(maintenance_mode_output)
 
 
-def pacemaker_runner(module, cli_action=None, **kwargs):
+def pacemaker_runner(module, **kwargs):
     runner_command = ['pcs']
-    if cli_action:
-        runner_command.append(cli_action)
     runner = CmdRunner(
         module,
         command=runner_command,
         arg_formats=dict(
+            cli_action=cmd_runner_fmt.as_list(),
             state=cmd_runner_fmt.as_map(_state_map),
             name=cmd_runner_fmt.as_list(),
             resource_type=cmd_runner_fmt.as_func(fmt_resource_type),
@@ -59,6 +63,7 @@ def pacemaker_runner(module, cli_action=None, **kwargs):
             resource_operation=cmd_runner_fmt.as_func(fmt_resource_operation),
             resource_meta=cmd_runner_fmt.stack(cmd_runner_fmt.as_opt_val)("meta"),
             resource_argument=cmd_runner_fmt.as_func(fmt_resource_argument),
+            apply_all=cmd_runner_fmt.as_bool("--all"),
             wait=cmd_runner_fmt.as_opt_eq_val("--wait"),
             config=cmd_runner_fmt.as_fixed("config"),
             force=cmd_runner_fmt.as_bool("--force"),

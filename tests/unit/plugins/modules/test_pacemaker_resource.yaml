@@ -51,6 +51,63 @@ test_cases:
           rc: 0
           out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
           err: ""
+  - id: test_present_filled_input_resource_not_exist
+    input:
+      state: present
+      name: virtual-ip
+      resource_type:
+        resource_name: IPaddr2
+      resource_option:
+        - "ip=[192.168.2.1]"
+      resource_operation:
+        - operation_action: start
+          operation_option:
+            - timeout=1200
+        - operation_action: stop
+          operation_option:
+            - timeout=1200
+        - operation_action: monitor
+          operation_option:
+            - timeout=1200
+      resource_meta:
+        - test_meta1=123
+        - test_meta2=456
+      resource_argument:
+        argument_action: group
+        argument_option:
+          - test_group
+      wait: 200
+    output:
+      changed: true
+      previous_value: null
+      value: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: "Error: resource or tag id 'virtual-ip' not found"
+        - command: [/testbin/pcs, property, config]
+          environ: *env-def
+          rc: 1
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure=corosync
+            cluster-name=hacluster
+            dc-version=2.1.9-1.fc41-7188dbf
+            have-watchdog=false
+          err: ""
+        - command: [/testbin/pcs, resource, create, virtual-ip, IPaddr2, "ip=[192.168.2.1]", op, start, timeout=1200, op, stop, timeout=1200, op, monitor, timeout=1200, meta, test_meta1=123, meta, test_meta2=456, --group, test_group, --wait=200]
+          environ: *env-def
+          rc: 0
+          out: "Assumed agent name 'ocf:heartbeat:IPaddr2' (deduced from 'IPAddr2')"
+          err: ""
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+          err: ""
   - id: test_present_minimal_input_resource_exists
     input:
       state: present
