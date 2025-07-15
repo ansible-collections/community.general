@@ -194,7 +194,7 @@ class Sysrc(object):
         cmd.extend(args)
 
         (rc, out, err) = self.module.run_command(cmd)
-        if err.find("Permission denied"):
+        if err.find("Permission denied") > 0:
             raise OSError(errno.EACCES, "Permission denied for %s" % self.path)
 
         return (rc, out, err)
