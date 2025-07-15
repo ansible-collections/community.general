@@ -202,16 +202,24 @@ def main():
         module.fail_json(msg="FullScopeAllowed is active for Client '{realm}.{clientid}'".format(realm=realm, clientid=clientid))
 
     if client_scope_id:
-        objClientScope = kc.get_clientscope_by_clientscopeid(client_scope_id, realm)
+        objClientScope = kc.get_client_by_clientid(client_scope_id, realm)
+        
+        #SUGGESTED FIX
+        # objClientScope = kc.get_clientscope_by_clientscopeid(client_scope_id, realm)
         if not objClientScope:
             module.fail_json(msg="Failed to retrieve client '{realm}.{client_scope_id}'".format(realm=realm, client_scope_id=client_scope_id))
         before_role_mapping = kc.get_client_role_scope_from_client(objClient["id"], objClientScope["id"], realm)
     else:
         before_role_mapping = kc.get_client_role_scope_from_realm(objClient["id"], realm)
 
-    if objClient:
-        # retrieve all role from client
-        client_scope_roles_by_name = kc.get_client_roles_by_id(objClient["id"], realm)
+    if client_scope_id:
+        # retrive all role from client_scope
+        client_scope_roles_by_name = kc.get_client_roles_by_id(objClientScope["id"], realm)
+    
+    #SUGGESTED FIX
+    # if objClient:
+    #     # retrieve all role from client
+    #     client_scope_roles_by_name = kc.get_client_roles_by_id(objClient["id"], realm)
     else:
         # retrieve all role from realm
         client_scope_roles_by_name = kc.get_realm_roles(realm)
