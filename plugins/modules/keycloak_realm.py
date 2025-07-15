@@ -316,6 +316,7 @@ options:
     aliases:
       - maxTemporaryLockouts
     type: int
+    version_added: 11.2.0
   minimum_quick_login_wait_seconds:
     description:
       - The realm minimum quick login wait in seconds.
