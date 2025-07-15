@@ -148,6 +148,7 @@ options:
       - bruteForceStrategy
     choices: ['LINEAR', 'MULTIPLE']
     type: str
+    version_added: 11.2.0
   client_authentication_flow:
     description:
       - The realm client authentication flow.
