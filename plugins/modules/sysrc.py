@@ -103,6 +103,7 @@ changed:
 """
 
 from ansible.module_utils.basic import AnsibleModule
+improt errno
 import os
 import re
 
@@ -194,7 +195,7 @@ class Sysrc(object):
 
         (rc, out, err) = self.module.run_command(cmd)
         if err.find("Permission denied"):
-            raise PermissionError("Permission denied for %s" % self.path)
+            raise OSError(errno.EACCES, "Permission denied for %s" % self.path)
 
         return (rc, out, err)
 
@@ -231,7 +232,7 @@ def main():
     try:
         sysrc = Sysrc(module, name, result['value'], result['path'], result['delim'], result['jail'])
         result['changed'] = getattr(sysrc, result['state'])()
-    except PermissionError as err:
+    except OSError as err:
         module.fail_json(msg=str(err))
 
     module.exit_json(**result)
