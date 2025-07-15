@@ -65,11 +65,18 @@ options:
       - Although the type is specified as "raw", it should typically be specified as a string. However, boolean values in
         particular are handled properly even when specified as booleans rather than strings (in fact, handling booleans properly
         is why the type of this parameter is "raw").
+  remote_config:
+    type: str
+    required: false
+    description:
+      - Remote path to the configuration to apply.
+      - Required for O(state=load).
+
   state:
     type: str
     required: false
     default: present
-    choices: ['read', 'present', 'absent']
+    choices: ['read', 'load', 'present', 'absent']
     description:
       - The action to take upon the key/value.
 """
@@ -122,11 +129,19 @@ EXAMPLES = r"""
     key: "/org/cinnamon/desktop-effects"
     value: "false"
     state: present
+
+- name: Load terminal profile in Gnome
+  community.general.dconf:
+    key: "/org/gnome/terminal/legacy/profiles/:"
+    remote_config: "/tmp/solarized_dark.dump"
+    state: load
 """
 
 
 import os
 import sys
+
+from configparser import ConfigParser
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.respawn import (
@@ -224,7 +239,7 @@ class DBusWrapper(object):
 
         return None
 
-    def run_command(self, command):
+    def run_command(self, command, data=None):
         """
         Runs the specified command within a functional D-Bus session. Command is
         effectively passed-on to AnsibleModule.run_command() method, with
@@ -233,19 +248,21 @@ class DBusWrapper(object):
         :param command: Command to run, including parameters. Each element of the list should be a string.
         :type module: list
 
+        :kw data: If given, information to write to the stdin of the command
+
         :returns: tuple(result_code, standard_output, standard_error) -- Result code, standard output, and standard error from running the command.
         """
 
         if self.dbus_session_bus_address is None:
             self.module.debug("Using dbus-run-session wrapper for running commands.")
             command = [self.dbus_run_session_cmd] + command
-            rc, out, err = self.module.run_command(command)
+            rc, out, err = self.module.run_command(command, data=data)
 
             if self.dbus_session_bus_address is None and rc == 127:
                 self.module.fail_json(msg="Failed to run passed-in command, dbus-run-session faced an internal error: %s" % err)
         else:
             extra_environment = {'DBUS_SESSION_BUS_ADDRESS': self.dbus_session_bus_address}
-            rc, out, err = self.module.run_command(command, environ_update=extra_environment)
+            rc, out, err = self.module.run_command(command, data=data, environ_update=extra_environment)
 
         return rc, out, err
 
@@ -390,19 +407,86 @@ class DconfPreference(object):
         # Value was changed.
         return True
 
+    def load(self, key, remote_config):
+        """
+        Load the config file in specified path.
+
+        if an error occurs, a call will be made to AnsibleModule.fail_json.
+
+        :param key: dconf directory for which the config should be set.
+        :type key: str
+
+        :param remote_config: Remote configuration path to set for the specified dconf path.
+        :type value: str
+
+        :returns: bool -- True if a change was made, False if no change was required.
+        """
+        # Ensure key refers to a directory, as required by dconf
+        root_dir = key
+        if not root_dir.endswith('/'):
+            root_dir += '/'
+
+        # Read config to check if change is needed and passing to command line
+        try:
+            with open(remote_config, 'r') as fd:
+                raw_config = fd.read()
+        except FileNotFoundError as ex:
+            self.module.fail_json(msg='dconf failed while reading configuration file with error: %s' % ex)
+
+        # Parse configuratoin file
+        config = ConfigParser()
+        try:
+            config.read_string(raw_config)
+        except Exception as e:
+            self.module.fail_json(msg='dconf failed while reading config with error: %s' % e)
+
+        # For each sub-directory, check if at least on change is needed
+        for sub_dir in config.sections():
+            for sub_key, new_value in config[sub_dir].items():
+                absolute_key = '%s%s/%s' % (root_dir, sub_dir, sub_key)
+                if not self.variants_are_equal(self.read(absolute_key), new_value):
+                    # if at least one change is needed, load the whole config
+                    break
+            else:
+                # No change in the sub-directory, check the next one
+                continue
+            break
+        else:
+            # No change is needed
+            return False
+
+        if self.check_mode:
+            return True
+
+        # Set-up command to run. Since DBus is needed for write operation, wrap
+        # dconf command dbus-launch.
+        command = [self.dconf_bin, 'load', root_dir]
+
+        # Run the command and fetch standard return code, stdout, and stderr.
+        dbus_wrapper = DBusWrapper(self.module)
+        rc, out, err = dbus_wrapper.run_command(command, data=raw_config)
+
+        if rc != 0:
+            self.module.fail_json(msg='dconf failed while load config %s, root dir %s with error: %s' % (remote_config, root_dir, err),
+                                        out=out,
+                                        err=err)
+        # Value was changed.
+        return True
 
 def main():
     # Setup the Ansible module
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(default='present', choices=['present', 'absent', 'read']),
+            state=dict(default='present', choices=['present', 'absent', 'read', 'load']),
             key=dict(required=True, type='str', no_log=False),
             # Converted to str below after special handling of bool.
             value=dict(required=False, default=None, type='raw'),
+            remote_config=dict(required=False, default=None, type='str'),
         ),
         supports_check_mode=True,
         required_if=[
             ('state', 'present', ['value']),
+            ('state', 'load', ['remote_config']),
         ],
     )
 
@@ -466,6 +550,9 @@ def main():
         module.exit_json(changed=changed)
     elif module.params['state'] == 'absent':
         changed = dconf.reset(module.params['key'])
+        module.exit_json(changed=changed)
+    elif module.params['state'] == 'load':
+        changed = dconf.load(module.params['key'], module.params['remote_config'])
         module.exit_json(changed=changed)
 
 
