@@ -103,7 +103,7 @@ changed:
 """
 
 from ansible.module_utils.basic import AnsibleModule
-improt errno
+import errno
 import os
 import re
 
