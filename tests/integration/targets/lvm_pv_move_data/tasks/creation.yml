@@ -27,6 +27,15 @@
 - name: Associating loop device with file
   ansible.builtin.command: 'losetup {{ loop_device_02.stdout }} {{ remote_tmp_dir }}/test_lvm_pv_02.img'
 
+- name: Wiping existing LVM metadata
+  community.general.lvm_pv:
+    device: "{{ item }}"
+    force: true
+    state: absent
+  loop:
+    - "{{ loop_device_01.stdout }}"
+    - "{{ loop_device_02.stdout }}"
+
 - name: Creating physical volume for the first loop device
   community.general.lvm_pv:
     device: "{{ loop_device_01.stdout }}"
