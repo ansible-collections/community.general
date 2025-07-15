@@ -193,6 +193,8 @@ class Sysrc(object):
         cmd.extend(args)
 
         (rc, out, err) = self.module.run_command(cmd)
+        if err.find("Permission denied"):
+            raise PermissionError("Permission denied for %s" % self.path)
 
         return (rc, out, err)
 
@@ -226,8 +228,11 @@ def main():
         jail=module.params.pop('jail')
     )
 
-    sysrc = Sysrc(module, name, result['value'], result['path'], result['delim'], result['jail'])
-    result['changed'] = getattr(sysrc, result['state'])()
+    try:
+        sysrc = Sysrc(module, name, result['value'], result['path'], result['delim'], result['jail'])
+        result['changed'] = getattr(sysrc, result['state'])()
+    except PermissionError as err:
+        module.fail_json(msg=str(err))
 
     module.exit_json(**result)
 
