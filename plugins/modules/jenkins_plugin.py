@@ -79,13 +79,13 @@ options:
       - If using a custom O(updates_url), set this as the username of the user with access to the URL.
       - If the custom O(updates_url) does not require authentication, this can be left empty.
     type: str
-    version_added: 11.1.0
+    version_added: 11.2.0
   updates_url_password:
     description:
       - If using a custom O(updates_url), set this as the password of the user with access to the URL.
       - If the custom O(updates_url) does not require authentication, this can be left empty.
     type: str
-    version_added: 11.1.0
+    version_added: 11.2.0
   update_json_url_segment:
     type: list
     elements: str
@@ -99,7 +99,7 @@ options:
     description:
       - A list of URL segment(s) to retrieve the plugin versions JSON file from.
     default: ['plugin-versions.json', 'current/plugin-versions.json']
-    version_added: 11.1.0
+    version_added: 11.2.0
   latest_plugins_url_segments:
     type: list
     elements: str
@@ -132,7 +132,7 @@ options:
     description:
       - Defines whether to install plugin dependencies.
       - In earlier versions, this option had no effect when a specific O(version) was set.
-        Since community.general 11.1.0, dependencies are also installed for versioned plugins.
+        Since community.general 11.2.0, dependencies are also installed for versioned plugins.
     type: bool
     default: true
 
