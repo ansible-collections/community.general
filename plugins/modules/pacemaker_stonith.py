@@ -13,9 +13,13 @@ module: pacemaker_stonith
 short_description: Manage pacemaker STONITH
 author:
   - Dexter Le (@munchtoast)
-version_added: 11.1.0
+version_added: 11.2.0
 description:
   - This module manages STONITH in a Pacemaker cluster using the pacemaker CLI.
+seealso:
+  - name: Pacemaker STONITH documentation
+    description: Complete documentation for Pacemaker STONITH.
+    link: https://clusterlabs.org/projects/pacemaker/doc/3.0/Pacemaker_Explained/html/resources.html#stonith
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -122,8 +126,7 @@ from ansible_collections.community.general.plugins.module_utils.pacemaker import
 class PacemakerStonith(StateModuleHelper):
     module = dict(
         argument_spec=dict(
-            state=dict(type='str', default='present', choices=[
-                'present', 'absent', 'enabled', 'disabled']),
+            state=dict(type='str', default='present', choices=['present', 'absent', 'enabled', 'disabled']),
             name=dict(type='str', required=True),
             stonith_type=dict(type='str'),
             stonith_options=dict(type='list', elements='str', default=[]),
