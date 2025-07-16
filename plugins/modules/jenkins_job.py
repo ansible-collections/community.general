@@ -76,8 +76,8 @@ options:
     type: bool
     default: true
     description:
-      - If set to V(false), the SSL certificates will not be validated. This should only set to V(false) used on personally
-        controlled sites using self-signed certificates as it avoids verifying the source site.
+      - If set to V(false), the SSL certificates are not validated. This should only set to V(false) used on personally controlled
+        sites using self-signed certificates as it avoids verifying the source site.
       - The C(python-jenkins) library only handles this by using the environment variable E(PYTHONHTTPSVERIFY).
     version_added: 2.3.0
 """
