@@ -1,0 +1,2 @@
+minor_changes:
+  - "tasks_only callback plugin - add ``result_format`` and ``pretty_results`` options similarly to the default callback (https://github.com/ansible-collections/community.general/pull/10422)."
