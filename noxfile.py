@@ -32,6 +32,18 @@ def botmeta(session: nox.Session) -> None:
     session.run("python", "tests/sanity/extra/botmeta.py")
 
 
+@nox.session(name="ansible-output", default=False)
+def ansible_output(session: nox.Session) -> None:
+    session.install(
+        "ansible-core",
+        "antsibull-docs",
+        # Needed libs for some code blocks:
+        "jc",
+        "hashids",
+    )
+    session.run("antsibull-docs", "ansible-output", *session.posargs)
+
+
 # Allow to run the noxfile with `python noxfile.py`, `pipx run noxfile.py`, or similar.
 # Requires nox >= 2025.02.09
 if __name__ == "__main__":
