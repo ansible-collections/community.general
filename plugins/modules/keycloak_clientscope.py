@@ -22,9 +22,9 @@ description:
     the scope tailored to your needs and a user having the expected roles.
   - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation
     at U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html).
-  - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and will be returned that
-    way by this module. You may pass single values for attributes when calling the module, and this will be translated into
-    a list suitable for the API.
+  - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and are returned that way
+    by this module. You may pass single values for attributes when calling the module, and this is translated into a list
+    suitable for the API.
   - When updating a client_scope, where possible provide the client_scope ID to the module. This removes a lookup to the API
     to translate the name into the client_scope ID.
 attributes:
@@ -39,8 +39,8 @@ options:
   state:
     description:
       - State of the client_scope.
-      - On V(present), the client_scope will be created if it does not yet exist, or updated with the parameters you provide.
-      - On V(absent), the client_scope will be removed if it exists.
+      - On V(present), the client_scope is created if it does not yet exist, or updated with the parameters you provide.
+      - On V(absent), the client_scope is removed if it exists.
     default: 'present'
     type: str
     choices:
@@ -62,8 +62,8 @@ options:
     type: str
     description:
       - The unique identifier for this client_scope.
-      - This parameter is not required for updating or deleting a client_scope but providing it will reduce the number of
-        API calls required.
+      - This parameter is not required for updating or deleting a client_scope but providing it reduces the number of API
+        calls required.
   description:
     type: str
     description:
@@ -263,19 +263,31 @@ proposed:
   description: Representation of proposed client scope.
   returned: always
   type: dict
-  sample: {clientId: "test"}
+  sample: {"clientId": "test"}
 
 existing:
   description: Representation of existing client scope (sample is truncated).
   returned: always
   type: dict
-  sample: {"adminUrl": "http://www.example.com/admin_url", "attributes": {"request.object.signature.alg": "RS256"}}
+  sample:
+    {
+      "adminUrl": "http://www.example.com/admin_url",
+      "attributes": {
+        "request.object.signature.alg": "RS256"
+      }
+    }
 
 end_state:
   description: Representation of client scope after module execution (sample is truncated).
   returned: on success
   type: dict
-  sample: {"adminUrl": "http://www.example.com/admin_url", "attributes": {"request.object.signature.alg": "RS256"}}
+  sample:
+    {
+      "adminUrl": "http://www.example.com/admin_url",
+      "attributes": {
+        "request.object.signature.alg": "RS256"
+      }
+    }
 """
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
