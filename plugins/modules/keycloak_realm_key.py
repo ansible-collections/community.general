@@ -120,7 +120,7 @@ notes:
   - If O(config.certificate) is not explicitly provided it is dynamically created by Keycloak. Therefore comparing the current
     state of the certificate to the desired state (which may be empty) is not possible.
   - Due to the private key and certificate options the module is B(not fully idempotent). You can use O(force=true) to force
-    the module to ensure update if you know that the private key might have changed.
+    the module to ensure updating if you know that the private key might have changed.
 extends_documentation_fragment:
   - community.general.keycloak
   - community.general.keycloak.actiongroup_keycloak
