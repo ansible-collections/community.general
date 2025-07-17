@@ -65,7 +65,7 @@ options:
       - Although the type is specified as "raw", it should typically be specified as a string. However, boolean values in
         particular are handled properly even when specified as booleans rather than strings (in fact, handling booleans properly
         is why the type of this parameter is "raw").
-  remote_config:
+  path:
     type: str
     required: false
     description:
@@ -133,7 +133,7 @@ EXAMPLES = r"""
 - name: Load terminal profile in Gnome
   community.general.dconf:
     key: "/org/gnome/terminal/legacy/profiles/:"
-    remote_config: "/tmp/solarized_dark.dump"
+    path: "/tmp/solarized_dark.dump"
     state: load
 """
 
@@ -407,7 +407,7 @@ class DconfPreference(object):
         # Value was changed.
         return True
 
-    def load(self, key, remote_config):
+    def load(self, key, path):
         """
         Load the config file in specified path.
 
@@ -416,7 +416,7 @@ class DconfPreference(object):
         :param key: dconf directory for which the config should be set.
         :type key: str
 
-        :param remote_config: Remote configuration path to set for the specified dconf path.
+        :param path: Remote configuration path to set for the specified dconf path.
         :type value: str
 
         :returns: bool -- True if a change was made, False if no change was required.
@@ -428,7 +428,7 @@ class DconfPreference(object):
 
         # Read config to check if change is needed and passing to command line
         try:
-            with open(remote_config, 'r') as fd:
+            with open(path, 'r') as fd:
                 raw_config = fd.read()
         except FileNotFoundError as ex:
             self.module.fail_json(msg='dconf failed while reading configuration file with error: %s' % ex)
@@ -441,22 +441,14 @@ class DconfPreference(object):
             self.module.fail_json(msg='dconf failed while reading config with error: %s' % e)
 
         # For each sub-directory, check if at least on change is needed
-        for sub_dir in config.sections():
-            for sub_key, new_value in config[sub_dir].items():
-                absolute_key = '%s%s/%s' % (root_dir, sub_dir, sub_key)
-                if not self.variants_are_equal(self.read(absolute_key), new_value):
-                    # if at least one change is needed, load the whole config
-                    break
-            else:
-                # No change in the sub-directory, check the next one
-                continue
-            break
-        else:
-            # No change is needed
-            return False
+        changed = any(
+            not self.variants_are_equal(self.read("%s%s/%s" % (root_dir, sub_dir, k)), v)
+            for sub_dir in config.sections()
+                for k, v in config[sub_dir].items()
+        )
 
-        if self.check_mode:
-            return True
+        if self.check_mode or not changed:
+            return changed 
 
         # Set-up command to run. Since DBus is needed for write operation, wrap
         # dconf command dbus-launch.
@@ -467,11 +459,11 @@ class DconfPreference(object):
         rc, out, err = dbus_wrapper.run_command(command, data=raw_config)
 
         if rc != 0:
-            self.module.fail_json(msg='dconf failed while load config %s, root dir %s with error: %s' % (remote_config, root_dir, err),
+            self.module.fail_json(msg='dconf failed while load config %s, root dir %s with error: %s' % (path, root_dir, err),
                                         out=out,
                                         err=err)
         # Value was changed.
-        return True
+        return changed 
 
 def main():
     # Setup the Ansible module
@@ -481,12 +473,12 @@ def main():
             key=dict(required=True, type='str', no_log=False),
             # Converted to str below after special handling of bool.
             value=dict(required=False, default=None, type='raw'),
-            remote_config=dict(required=False, default=None, type='str'),
+            path=dict(required=False, default=None, type='str'),
         ),
         supports_check_mode=True,
         required_if=[
             ('state', 'present', ['value']),
-            ('state', 'load', ['remote_config']),
+            ('state', 'load', ['path']),
         ],
     )
 
@@ -552,7 +544,7 @@ def main():
         changed = dconf.reset(module.params['key'])
         module.exit_json(changed=changed)
     elif module.params['state'] == 'load':
-        changed = dconf.load(module.params['key'], module.params['remote_config'])
+        changed = dconf.load(module.params['key'], module.params['path'])
         module.exit_json(changed=changed)
 
 
