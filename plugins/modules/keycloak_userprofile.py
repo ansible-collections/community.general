@@ -405,7 +405,6 @@ data:
   description: The data returned by the Keycloak API.
   returned: when state is present
   type: dict
-  sample: {"...": "..."}
 """
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \

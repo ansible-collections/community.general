@@ -39,9 +39,9 @@ options:
   state:
     description:
       - State of the client_rolemapping.
-      - On V(present), the client_rolemapping __FIXME__(will) be created if it does not yet exist, or updated with the parameters
+      - On V(present), the client_rolemapping is created if it does not yet exist, or updated with the parameters
         you provide.
-      - On V(absent), the client_rolemapping __FIXME__(will) be removed if it exists.
+      - On V(absent), the client_rolemapping is removed if it exists.
     default: 'present'
     type: str
     choices:
