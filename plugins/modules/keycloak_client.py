@@ -37,8 +37,8 @@ options:
   state:
     description:
       - State of the client.
-      - On V(present), the client will be created (or updated if it exists already).
-      - On V(absent), the client will be removed if it exists.
+      - On V(present), the client are created (or updated if it exists already).
+      - On V(absent), the client are removed if it exists.
     choices: ['present', 'absent']
     default: 'present'
     type: str
@@ -116,8 +116,8 @@ options:
   secret:
     description:
       - When using O(client_authenticator_type=client-secret) (the default), you can specify a secret here (otherwise one
-        will be generated if it does not exit). If changing this secret, the module will not register a change currently (but
-        the changed secret will be saved).
+        is generated if it does not exit). If changing this secret, the module does not register a change currently (but the
+        changed secret is saved).
     type: str
 
   registration_access_token:
@@ -130,8 +130,8 @@ options:
 
   default_roles:
     description:
-      - List of default roles for this client. If the client roles referenced do not exist yet, they will be created. This
-        is C(defaultRoles) in the Keycloak REST API.
+      - List of default roles for this client. If the client roles referenced do not exist yet, they are created. This is
+        C(defaultRoles) in the Keycloak REST API.
     aliases:
       - defaultRoles
     type: list
@@ -232,7 +232,7 @@ options:
   protocol:
     description:
       - Type of client.
-      - At creation only, default value will be V(openid-connect) if O(protocol) is omitted.
+      - At creation only, default value is V(openid-connect) if O(protocol) is omitted.
       - The V(docker-v2) value was added in community.general 8.6.0.
     type: str
     choices: ['openid-connect', 'saml', 'docker-v2']
@@ -261,7 +261,7 @@ options:
 
   client_template:
     description:
-      - Client template to use for this client. If it does not exist this field will silently be dropped. This is C(clientTemplate)
+      - Client template to use for this client. If it does not exist this field is silently dropped. This is C(clientTemplate)
         in the Keycloak REST API.
     type: str
     aliases:
@@ -454,7 +454,7 @@ options:
       - A dict of further attributes for this client. This can contain various configuration settings; an example is given
         in the examples section. While an exhaustive list of permissible options is not available; possible options as of
         Keycloak 3.4 are listed below. The Keycloak API does not validate whether a given option is appropriate for the protocol
-        used; if specified anyway, Keycloak will simply not use it.
+        used; if specified anyway, Keycloak does not use it.
     type: dict
     suboptions:
       saml.authnstatement:
@@ -532,7 +532,7 @@ options:
           - For OpenID-Connect clients, client certificate for validating JWT issued by client and signed by its key, base64-encoded.
       x509.subjectdn:
         description:
-          - For OpenID-Connect clients, subject which will be used to authenticate the client.
+          - For OpenID-Connect clients, subject which is used to authenticate the client.
         type: str
         version_added: 9.5.0
 
@@ -704,19 +704,31 @@ proposed:
   description: Representation of proposed client.
   returned: always
   type: dict
-  sample: {clientId: "test"}
+  sample: {"clientId": "test"}
 
 existing:
   description: Representation of existing client (sample is truncated).
   returned: always
   type: dict
-  sample: {"adminUrl": "http://www.example.com/admin_url", "attributes": {"request.object.signature.alg": "RS256"}}
+  sample:
+    {
+      "adminUrl": "http://www.example.com/admin_url",
+      "attributes": {
+        "request.object.signature.alg": "RS256"
+      }
+    }
 
 end_state:
   description: Representation of client after module execution (sample is truncated).
   returned: on success
   type: dict
-  sample: {"adminUrl": "http://www.example.com/admin_url", "attributes": {"request.object.signature.alg": "RS256"}}
+  sample:
+    {
+      "adminUrl": "http://www.example.com/admin_url",
+      "attributes": {
+        "request.object.signature.alg": "RS256"
+      }
+    }
 """
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \

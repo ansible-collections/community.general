@@ -37,8 +37,8 @@ options:
   state:
     description:
       - State of the authorization scope.
-      - On V(present), the authorization scope will be created (or updated if it exists already).
-      - On V(absent), the authorization scope will be removed if it exists.
+      - On V(present), the authorization scope is created (or updated if it exists already).
+      - On V(absent), the authorization scope is removed if it exists.
     choices: ['present', 'absent']
     default: 'present'
     type: str

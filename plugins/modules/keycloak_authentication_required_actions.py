@@ -49,7 +49,7 @@ options:
         type: dict
       defaultAction:
         description:
-          - Indicates, if any new user will have the required action assigned to it.
+          - Indicates whether new users have the required action assigned to them.
         type: bool
       enabled:
         description:
@@ -149,7 +149,7 @@ end_state:
       type: dict
     defaultAction:
       description:
-        - Indicates, if any new user will have the required action assigned to it.
+        - Indicates whether new users have the required action assigned to them.
       sample: false
       type: bool
     enabled:

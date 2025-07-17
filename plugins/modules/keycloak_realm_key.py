@@ -25,11 +25,9 @@ description:
     at U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html). Aliases are provided so camelCased versions can be used
     as well.
   - This module is unable to detect changes to the actual cryptographic key after importing it. However, if some other property
-    is changed alongside the cryptographic key, then the key will also get changed as a side-effect, as the JSON payload needs
-    to include the private key. This can be considered either a bug or a feature, as the alternative would be to always update
-    the realm key whether it has changed or not.
-  - If certificate is not explicitly provided it will be dynamically created by Keycloak. Therefore comparing the current
-    state of the certificate to the desired state (which may be empty) is not possible.
+    is changed alongside the cryptographic key, then the key also changes as a side-effect, as the JSON payload needs to include
+    the private key. This can be considered either a bug or a feature, as the alternative would be to always update the realm
+    key whether it has changed or not.
 attributes:
   check_mode:
     support: full
@@ -42,8 +40,8 @@ options:
   state:
     description:
       - State of the keycloak realm key.
-      - On V(present), the realm key will be created (or updated if it exists already).
-      - On V(absent), the realm key will be removed if it exists.
+      - On V(present), the realm key is created (or updated if it exists already).
+      - On V(absent), the realm key is removed if it exists.
     choices: ['present', 'absent']
     default: 'present'
     type: str
@@ -119,10 +117,10 @@ options:
 notes:
   - Current value of the private key cannot be fetched from Keycloak. Therefore comparing its desired state to the current
     state is not possible.
-  - If certificate is not explicitly provided it will be dynamically created by Keycloak. Therefore comparing the current
+  - If O(config.certificate) is not explicitly provided it is dynamically created by Keycloak. Therefore comparing the current
     state of the certificate to the desired state (which may be empty) is not possible.
   - Due to the private key and certificate options the module is B(not fully idempotent). You can use O(force=true) to force
-    the module to always update if you know that the private key might have changed.
+    the module to ensure updating if you know that the private key might have changed.
 extends_documentation_fragment:
   - community.general.keycloak
   - community.general.keycloak.actiongroup_keycloak
@@ -208,7 +206,21 @@ end_state:
       description: Realm key configuration.
       type: dict
       returned: when O(state=present)
-      sample: {"active": ["true"], "algorithm": ["RS256"], "enabled": ["true"], "priority": ["140"]}
+      sample:
+        {
+          "active": [
+            "true"
+          ],
+          "algorithm": [
+            "RS256"
+          ],
+          "enabled": [
+            "true"
+          ],
+          "priority": [
+            "140"
+          ]
+        }
 """
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
