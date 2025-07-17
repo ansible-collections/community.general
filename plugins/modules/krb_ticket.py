@@ -30,7 +30,7 @@ options:
   principal:
     description:
       - The principal name.
-      - If not set, the user running this module will be used.
+      - If not set, the user running this module is used.
     type: str
   state:
     description:
@@ -50,17 +50,17 @@ options:
       - Use O(cache_name) as the ticket cache name and location.
       - If this option is not used, the default cache name and location are used.
       - The default credentials cache may vary between systems.
-      - If not set the the value of E(KRB5CCNAME) environment variable will be used instead, its value is used to name the
-        default ticket cache.
+      - If not set the the value of E(KRB5CCNAME) environment variable is used instead, its value is used to name the default
+        ticket cache.
     type: str
   lifetime:
     description:
       - Requests a ticket with the lifetime, if the O(lifetime) is not specified, the default ticket lifetime is used.
-      - Specifying a ticket lifetime longer than the maximum ticket lifetime (configured by each site) will not override the
+      - Specifying a ticket lifetime longer than the maximum ticket lifetime (configured by each site) does not override the
         configured maximum ticket lifetime.
       - 'The value for O(lifetime) must be followed by one of the following suffixes: V(s) - seconds, V(m) - minutes, V(h)
         - hours, V(d) - days.'
-      - You cannot mix units; a value of V(3h30m) will result in an error.
+      - You cannot mix units; a value of V(3h30m) results in an error.
       - See U(https://web.mit.edu/kerberos/krb5-1.12/doc/basic/date_format.html) for reference.
     type: str
   start_time:
@@ -78,7 +78,7 @@ options:
       - Requests renewable tickets, with a total lifetime equal to O(renewable).
       - 'The value for O(renewable) must be followed by one of the following delimiters: V(s) - seconds, V(m) - minutes, V(h)
         - hours, V(d) - days.'
-      - You cannot mix units; a value of V(3h30m) will result in an error.
+      - You cannot mix units; a value of V(3h30m) results in an error.
       - See U(https://web.mit.edu/kerberos/krb5-1.12/doc/basic/date_format.html) for reference.
     type: str
   forwardable:
@@ -119,7 +119,7 @@ options:
   keytab:
     description:
       - Requests a ticket, obtained from a key in the local host's keytab.
-      - If O(keytab_path) is not specified will try to use default client keytab path (C(-i) option).
+      - If O(keytab_path) is not specified it tries to use default client keytab path (C(-i) option).
     type: bool
   keytab_path:
     description:

@@ -22,9 +22,9 @@ description:
     scope tailored to your needs and a user having the expected roles.
   - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation
     at U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html).
-  - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and will be returned that
-    way by this module. You may pass single values for attributes when calling the module, and this will be translated into
-    a list suitable for the API.
+  - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and are returned that way
+    by this module. You may pass single values for attributes when calling the module, and this is translated into a list
+    suitable for the API.
 attributes:
   check_mode:
     support: full
@@ -37,8 +37,8 @@ options:
   state:
     description:
       - State of the role.
-      - On V(present), the role will be created if it does not yet exist, or updated with the parameters you provide.
-      - On V(absent), the role will be removed if it exists.
+      - On V(present), the role is created if it does not yet exist, or updated with the parameters you provide.
+      - On V(absent), the role is removed if it exists.
     default: 'present'
     type: str
     choices:
@@ -195,10 +195,7 @@ proposed:
   description: Representation of proposed role.
   returned: always
   type: dict
-  sample:
-    {
-      "description": "My updated test description"
-    }
+  sample: {"description": "My updated test description"}
 
 existing:
   description: Representation of existing role.

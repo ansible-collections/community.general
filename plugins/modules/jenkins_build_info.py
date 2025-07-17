@@ -30,7 +30,7 @@ options:
   build_number:
     description:
       - An integer which specifies a build of a job.
-      - If not specified the last build information will be returned.
+      - If not specified the last build information is returned.
     type: int
   password:
     description:

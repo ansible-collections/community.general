@@ -34,8 +34,8 @@ options:
   state:
     description:
       - State of the user federation.
-      - On V(present), the user federation will be created if it does not yet exist, or updated with the parameters you provide.
-      - On V(absent), the user federation will be removed if it exists.
+      - On V(present), the user federation is created if it does not yet exist, or updated with the parameters you provide.
+      - On V(absent), the user federation is removed if it exists.
     default: 'present'
     type: str
     choices:
@@ -50,7 +50,7 @@ options:
 
   id:
     description:
-      - The unique ID for this user federation. If left empty, the user federation will be searched by its O(name).
+      - The unique ID for this user federation. If left empty, the user federation is searched by its O(name).
     type: str
 
   name:
@@ -76,7 +76,7 @@ options:
 
   parent_id:
     description:
-      - Unique ID for the parent of this user federation. Realm ID will be automatically used if left blank.
+      - Unique ID for the parent of this user federation. Realm ID is automatically used if left blank.
     aliases:
       - parentId
     type: str
@@ -95,11 +95,11 @@ options:
         value with the desired value always evaluates to not equal. This means the before and desired states are never equal
         if the parameter is set.
       - Set to V(always) to include O(config.bindCredential) in the comparison of before and desired state. Because of the
-        redacted value returned by Keycloak the module will always detect a change and make an update if a O(config.bindCredential)
+        redacted value returned by Keycloak the module always detects a change and make an update if a O(config.bindCredential)
         value is set.
       - Set to V(only_indirect) to exclude O(config.bindCredential) when comparing the before state with the desired state.
-        The value of O(config.bindCredential) will only be updated if there are other changes to the user federation that
-        require an update.
+        The value of O(config.bindCredential) is only updated if there are other changes to the user federation that require
+        an update.
     type: str
     default: always
     choices:
@@ -129,14 +129,14 @@ options:
 
       importEnabled:
         description:
-          - If V(true), LDAP users will be imported into Keycloak DB and synced by the configured sync policies.
+          - If V(true), LDAP users are imported into Keycloak DB and synced by the configured sync policies.
         default: true
         type: bool
 
       editMode:
         description:
-          - V(READ_ONLY) is a read-only LDAP store. V(WRITABLE) means data will be synced back to LDAP on demand. V(UNSYNCED)
-            means user data will be imported, but not synced back to LDAP.
+          - V(READ_ONLY) is a read-only LDAP store. V(WRITABLE) means data is synced back to LDAP on demand. V(UNSYNCED) means
+            user data is imported, but not synced back to LDAP.
         type: str
         choices:
           - READ_ONLY
@@ -181,7 +181,7 @@ options:
       userObjectClasses:
         description:
           - All values of LDAP objectClass attribute for users in LDAP divided by comma. For example V(inetOrgPerson, organizationalPerson).
-            Newly created Keycloak users will be written to LDAP with all those object classes and existing LDAP user records
+            Newly created Keycloak users are written to LDAP with all those object classes and existing LDAP user records
             are found just if they contain all those object classes.
         type: str
 
@@ -222,7 +222,7 @@ options:
 
       bindDn:
         description:
-          - DN of LDAP user which will be used by Keycloak to access LDAP server.
+          - DN of LDAP user which is used by Keycloak to access LDAP server.
         type: str
 
       bindCredential:
@@ -232,7 +232,7 @@ options:
 
       startTls:
         description:
-          - Encrypts the connection to LDAP using STARTTLS, which will disable connection pooling.
+          - Encrypts the connection to LDAP using STARTTLS, which disables connection pooling.
         default: false
         type: bool
 
@@ -258,11 +258,11 @@ options:
 
       useTruststoreSpi:
         description:
-          - Specifies whether LDAP connection will use the truststore SPI with the truststore configured in standalone.xml/domain.xml.
-            V(always) means that it will always use it. V(never) means that it will not use it. V(ldapsOnly) means that it
-            will use if your connection URL use ldaps.
+          - Specifies whether LDAP connection uses the truststore SPI with the truststore configured in standalone.xml/domain.xml.
+            V(always) means that it always uses it. V(never) means that it does not use it. V(ldapsOnly) means that it uses
+            if your connection URL use ldaps.
           - Note even if standalone.xml/domain.xml is not configured, the default Java cacerts or certificate specified by
-            C(javax.net.ssl.trustStore) property will be used.
+            C(javax.net.ssl.trustStore) property is used.
         default: ldapsOnly
         type: str
         choices:
@@ -335,8 +335,8 @@ options:
 
       allowKerberosAuthentication:
         description:
-          - Enable/disable HTTP authentication of users with SPNEGO/Kerberos tokens. The data about authenticated users will
-            be provisioned from this LDAP server.
+          - Enable/disable HTTP authentication of users with SPNEGO/Kerberos tokens. The data about authenticated users is
+            provisioned from this LDAP server.
         default: false
         type: bool
 
@@ -348,9 +348,9 @@ options:
       krbPrincipalAttribute:
         description:
           - Name of the LDAP attribute, which refers to Kerberos principal. This is used to lookup appropriate LDAP user after
-            successful Kerberos/SPNEGO authentication in Keycloak. When this is empty, the LDAP user will be looked based
-            on LDAP username corresponding to the first part of his Kerberos principal. For instance, for principal C(john@KEYCLOAK.ORG),
-            it will assume that LDAP username is V(john).
+            successful Kerberos/SPNEGO authentication in Keycloak. When this is empty, the LDAP user is looked up based on
+            LDAP username corresponding to the first part of his Kerberos principal. For instance, for principal C(john@KEYCLOAK.ORG),
+            it assumes that LDAP username is V(john).
         type: str
         version_added: 8.1.0
 
@@ -419,17 +419,17 @@ options:
 
       evictionDay:
         description:
-          - Day of the week the entry will become invalid on.
+          - Day of the week the entry is set to become invalid on.
         type: str
 
       evictionHour:
         description:
-          - Hour of day the entry will become invalid on.
+          - Hour of day the entry is set to become invalid on.
         type: str
 
       evictionMinute:
         description:
-          - Minute of day the entry will become invalid on.
+          - Minute of day the entry is set to become invalid on.
         type: str
 
       maxLifespan:
@@ -461,12 +461,12 @@ options:
 
       name:
         description:
-          - Name of the mapper. If no ID is given, the mapper will be searched by name.
+          - Name of the mapper. If no ID is given, the mapper is searched by name.
         type: str
 
       parentId:
         description:
-          - Unique ID for the parent of this mapper. ID of the user federation will automatically be used if left blank.
+          - Unique ID for the parent of this mapper. ID of the user federation is automatically used if left blank.
         type: str
 
       providerId:

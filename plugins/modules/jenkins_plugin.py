@@ -51,7 +51,7 @@ options:
     type: str
     description:
       - Desired plugin state.
-      - If set to V(latest), the check for new version will be performed every time. This is suitable to keep the plugin up-to-date.
+      - If set to V(latest), the check for new version is performed every time. This is suitable to keep the plugin up-to-date.
     choices: [absent, present, pinned, unpinned, enabled, disabled, latest]
     default: present
   timeout:
@@ -64,8 +64,8 @@ options:
     description:
       - Number of seconds after which a new copy of the C(update-center.json) file is downloaded. This is used to avoid the
         need to download the plugin to calculate its checksum when O(state=latest) is specified.
-      - Set it to V(0) if no cache file should be used. In that case, the plugin file will always be downloaded to calculate
-        its checksum when O(state=latest) is specified.
+      - Set it to V(0) if no cache file should be used. In that case, the plugin file is always downloaded to calculate its
+        checksum when O(state=latest) is specified.
     default: 86400
   updates_url:
     type: list

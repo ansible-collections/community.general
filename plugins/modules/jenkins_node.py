@@ -65,9 +65,9 @@ options:
   offline_message:
     description:
       - Specifies the offline reason message to be set when configuring the Jenkins node state.
-      - If O(offline_message) is given and requested O(state) is not V(disabled), an error will be raised.
+      - If O(offline_message) is given and requested O(state) is not V(disabled), an error is raised.
       - Internally O(offline_message) is set using the V(toggleOffline) API, so updating the message when the node is already
-        offline (current state V(disabled)) is not possible. In this case, a warning will be issued.
+        offline (current state V(disabled)) is not possible. In this case, a warning is issued.
     type: str
     version_added: 10.0.0
 """

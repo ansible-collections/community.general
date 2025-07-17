@@ -38,8 +38,8 @@ options:
   state:
     description:
       - State of the custom policy.
-      - On V(present), the custom policy will be created (or updated if it exists already).
-      - On V(absent), the custom policy will be removed if it exists.
+      - On V(present), the custom policy is created (or updated if it exists already).
+      - On V(absent), the custom policy is removed if it exists.
     choices: ['present', 'absent']
     default: 'present'
     type: str

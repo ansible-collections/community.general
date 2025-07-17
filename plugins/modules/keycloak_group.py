@@ -20,9 +20,9 @@ description:
     scope tailored to your needs and a user having the expected roles.
   - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation
     at U(https://www.keycloak.org/docs-api/20.0.2/rest-api/index.html).
-  - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and will be returned that
-    way by this module. You may pass single values for attributes when calling the module, and this will be translated into
-    a list suitable for the API.
+  - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and are returned that way
+    by this module. You may pass single values for attributes when calling the module, and this is translated into a list
+    suitable for the API.
   - When updating a group, where possible provide the group ID to the module. This removes a lookup to the API to translate
     the name into the group ID.
 attributes:
@@ -37,9 +37,9 @@ options:
   state:
     description:
       - State of the group.
-      - On V(present), the group will be created if it does not yet exist, or updated with the parameters you provide.
-      - On V(absent), the group will be removed if it exists. Be aware that absenting a group with subgroups will automatically
-        delete all its subgroups too.
+      - On V(present), the group is created if it does not yet exist, or updated with the parameters you provide.
+      - On V(absent), the group is removed if it exists. Be aware that absenting a group with subgroups automatically deletes
+        all its subgroups too.
     default: 'present'
     type: str
     choices:
@@ -61,8 +61,7 @@ options:
     type: str
     description:
       - The unique identifier for this group.
-      - This parameter is not required for updating or deleting a group but providing it will reduce the number of API calls
-        required.
+      - This parameter is not required for updating or deleting a group but providing it reduces the number of API calls required.
   attributes:
     type: dict
     description:
@@ -282,8 +281,7 @@ end_state:
       returned: always
       sample: []
     subGroups:
-      description: A list of groups that are children of this group. These groups will have the same parameters as documented
-        here.
+      description: A list of groups that are children of this group. These groups have the same parameters as documented here.
       type: list
       returned: always
     clientRoles:

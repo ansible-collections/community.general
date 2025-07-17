@@ -17,12 +17,12 @@ description:
 options:
   path:
     description:
-      - Path to the config file. If the file does not exist it will be created.
+      - Path to the config file. If the file does not exist it is created.
     type: path
     required: true
   kwriteconfig_path:
     description:
-      - Path to the kwriteconfig executable. If not specified, Ansible will try to discover it.
+      - Path to the kwriteconfig executable. If not specified, Ansible tries to discover it.
     type: path
   values:
     description:

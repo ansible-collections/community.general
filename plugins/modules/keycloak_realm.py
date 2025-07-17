@@ -39,8 +39,8 @@ options:
   state:
     description:
       - State of the realm.
-      - On V(present), the realm will be created (or updated if it exists already).
-      - On V(absent), the realm will be removed if it exists.
+      - On V(present), the realm is created (or updated if it exists already).
+      - On V(absent), the realm is removed if it exists.
     choices: ['present', 'absent']
     default: 'present'
     type: str
@@ -553,19 +553,31 @@ proposed:
   description: Representation of proposed realm.
   returned: always
   type: dict
-  sample: {realm: "test"}
+  sample: {"realm": "test"}
 
 existing:
   description: Representation of existing realm (sample is truncated).
   returned: always
   type: dict
-  sample: {"adminUrl": "http://www.example.com/admin_url", "attributes": {"request.object.signature.alg": "RS256"}}
+  sample:
+    {
+      "adminUrl": "http://www.example.com/admin_url",
+      "attributes": {
+        "request.object.signature.alg": "RS256"
+      }
+    }
 
 end_state:
   description: Representation of realm after module execution (sample is truncated).
   returned: on success
   type: dict
-  sample: {"adminUrl": "http://www.example.com/admin_url", "attributes": {"request.object.signature.alg": "RS256"}}
+  sample:
+    {
+      "adminUrl": "http://www.example.com/admin_url",
+      "attributes": {
+        "request.object.signature.alg": "RS256"
+      }
+    }
 """
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \

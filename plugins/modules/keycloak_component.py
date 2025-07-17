@@ -35,8 +35,8 @@ options:
   state:
     description:
       - State of the Keycloak component.
-      - On V(present), the component will be created (or updated if it exists already).
-      - On V(absent), the component will be removed if it exists.
+      - On V(present), the component is created (or updated if it exists already).
+      - On V(absent), the component is removed if it exists.
     choices: ['present', 'absent']
     default: 'present'
     type: str

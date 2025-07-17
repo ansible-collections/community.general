@@ -99,20 +99,43 @@ proposed:
   description: Representation of proposed client-scope types mapping.
   returned: always
   type: dict
-  sample: {default_clientscopes: ["profile", "role"], optional_clientscopes: []}
+  sample:
+    {
+      "default_clientscopes": [
+        "profile",
+        "role"
+      ],
+      "optional_clientscopes": []
+    }
 existing:
   description:
     - Representation of client scopes before module execution.
   returned: always
   type: dict
-  sample: {default_clientscopes: ["profile", "role"], optional_clientscopes: ["phone"]}
+  sample:
+    {
+      "default_clientscopes": [
+        "profile",
+        "role"
+      ],
+      "optional_clientscopes": [
+        "phone"
+      ]
+    }
 end_state:
   description:
     - Representation of client scopes after module execution.
     - The sample is truncated.
   returned: on success
   type: dict
-  sample: {default_clientscopes: ["profile", "role"], optional_clientscopes: []}
+  sample:
+    {
+      "default_clientscopes": [
+        "profile",
+        "role"
+      ],
+      "optional_clientscopes": []
+    }
 """
 
 from ansible.module_utils.basic import AnsibleModule
