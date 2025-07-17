@@ -10,13 +10,13 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 DOCUMENTATION = r"""
----
 module: jenkins_credential
-short_description: Manage Jenkins credentials and domains via API
+short_description: Manage Jenkins credentials and domains through API
 version_added: 11.1.0
 description:
-  - This module allows managing Jenkins credentials and domain scopes via the Jenkins HTTP API.
-  - Create, update, and delete different credential types such as C(username/password), C(secret text), C(SSH key), C(certificates), C(GitHub App), and domains.
+  - This module allows managing Jenkins credentials and domain scopes through the Jenkins HTTP API.
+  - Create, update, and delete different credential types such as C(username/password), C(secret text), C(SSH key), C(certificates),
+    C(GitHub App), and domains.
   - For scoped domains (O(type=scope)), it supports restrictions based on V(hostname), V(hostname:port), V(path), and V(scheme).
 requirements:
   - urllib3 >= 1.26.0
@@ -170,7 +170,7 @@ options:
   inc_path:
     description:
       - List of URL paths to include when matching credentials to domains.
-      - "B(Matching is hierarchical): subpaths of excluded paths are also excluded, even if explicitly included."
+      - 'B(Matching is hierarchical): subpaths of excluded paths are also excluded, even if explicitly included.'
     type: list
     elements: str
   exc_path:

@@ -22,9 +22,9 @@ description:
     definition with the scope tailored to your needs and a user having the expected roles.
   - The names of module options are snake_cased versions of the camelCase ones found in the Keycloak API and its documentation
     at U(https://www.keycloak.org/docs-api/18.0/rest-api/index.html).
-  - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and will be returned that
-    way by this module. You may pass single values for attributes when calling the module, and this will be translated into
-    a list suitable for the API.
+  - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and are returned that way
+    by this module. You may pass single values for attributes when calling the module, and this is translated into a list
+    suitable for the API.
   - When updating a group_rolemapping, where possible provide the role ID to the module. This removes a lookup to the API
     to translate the name into the role ID.
 attributes:
@@ -39,9 +39,8 @@ options:
   state:
     description:
       - State of the realm_rolemapping.
-      - On C(present), the realm_rolemapping will be created if it does not yet exist, or updated with the parameters you
-        provide.
-      - On C(absent), the realm_rolemapping will be removed if it exists.
+      - On C(present), the realm_rolemapping is created if it does not yet exist, or updated with the parameters you provide.
+      - On C(absent), the realm_rolemapping is removed if it exists.
     default: 'present'
     type: str
     choices:
@@ -86,8 +85,8 @@ options:
     type: str
     description:
       - ID of the group to be mapped.
-      - This parameter is not required for updating or deleting the rolemapping but providing it will reduce the number of
-        API calls required.
+      - This parameter is not required for updating or deleting the rolemapping but providing it reduces the number of API
+        calls required.
   roles:
     description:
       - Roles to be mapped to the group.
@@ -103,8 +102,8 @@ options:
         type: str
         description:
           - The unique identifier for this role_representation.
-          - This parameter is not required for updating or deleting a role_representation but providing it will reduce the
-            number of API calls required.
+          - This parameter is not required for updating or deleting a role_representation but providing it reduces the number
+            of API calls required.
 extends_documentation_fragment:
   - community.general.keycloak
   - community.general.keycloak.actiongroup_keycloak
@@ -195,7 +194,7 @@ proposed:
   description: Representation of proposed client role mapping.
   returned: always
   type: dict
-  sample: {clientId: "test"}
+  sample: {"clientId": "test"}
 
 existing:
   description:
@@ -203,7 +202,13 @@ existing:
     - The sample is truncated.
   returned: always
   type: dict
-  sample: {"adminUrl": "http://www.example.com/admin_url", "attributes": {"request.object.signature.alg": "RS256"}}
+  sample:
+    {
+      "adminUrl": "http://www.example.com/admin_url",
+      "attributes": {
+        "request.object.signature.alg": "RS256"
+      }
+    }
 
 end_state:
   description:
@@ -211,7 +216,13 @@ end_state:
     - The sample is truncated.
   returned: on success
   type: dict
-  sample: {"adminUrl": "http://www.example.com/admin_url", "attributes": {"request.object.signature.alg": "RS256"}}
+  sample:
+    {
+      "adminUrl": "http://www.example.com/admin_url",
+      "attributes": {
+        "request.object.signature.alg": "RS256"
+      }
+    }
 """
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (

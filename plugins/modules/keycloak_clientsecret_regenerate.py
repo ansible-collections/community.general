@@ -43,8 +43,8 @@ options:
   id:
     description:
       - The unique identifier for this client.
-      - This parameter is not required for getting or generating a client secret but providing it will reduce the number of
-        API calls required.
+      - This parameter is not required for getting or generating a client secret but providing it reduces the number of API
+        calls required.
     type: str
 
   client_id:

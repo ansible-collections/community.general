@@ -59,11 +59,11 @@ options:
   version:
     description:
       - Version of the plugin to be installed.
-      - If plugin exists with previous version, plugin will B(not) be updated unless O(force) is set to V(true).
+      - If the plugin is installed with in a previous version, it is B(not) updated unless O(force=true).
     type: str
   force:
     description:
-      - Delete and re-install the plugin. Can be useful for plugins update.
+      - Delete and re-install the plugin. It can be useful for plugins update.
     type: bool
     default: false
   allow_root:

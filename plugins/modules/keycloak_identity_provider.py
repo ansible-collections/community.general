@@ -34,9 +34,8 @@ options:
   state:
     description:
       - State of the identity provider.
-      - On V(present), the identity provider will be created if it does not yet exist, or updated with the parameters you
-        provide.
-      - On V(absent), the identity provider will be removed if it exists.
+      - On V(present), the identity provider is created if it does not yet exist, or updated with the parameters you provide.
+      - On V(absent), the identity provider is removed if it exists.
     default: 'present'
     type: str
     choices:
@@ -148,14 +147,14 @@ options:
 
       sync_mode:
         description:
-          - Default sync mode for all mappers. The sync mode determines when user data will be synced using the mappers.
+          - Default sync mode for all mappers. The sync mode determines when user data is synced using the mappers.
         aliases:
           - syncMode
         type: str
 
       issuer:
         description:
-          - The issuer identifier for the issuer of the response. If not provided, no validation will be performed.
+          - The issuer identifier for the issuer of the response. If not provided, no validation is performed.
         type: str
 
       authorizationUrl:
@@ -205,7 +204,7 @@ options:
 
       useJwksUrl:
         description:
-          - If the switch is on, identity provider public keys will be downloaded from given JWKS URL.
+          - If V(true), identity provider public keys are downloaded from given JWKS URL.
         type: bool
 
       jwksUrl:
@@ -215,7 +214,7 @@ options:
 
       entityId:
         description:
-          - The Entity ID that will be used to uniquely identify this SAML Service Provider.
+          - The Entity ID that is used to uniquely identify this SAML Service Provider.
         type: str
 
       singleSignOnServiceUrl:

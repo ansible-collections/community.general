@@ -117,14 +117,13 @@ options:
     suboptions:
       type:
         description:
-          - Use type to specify which of the JIRA visibility restriction types will be used.
+          - Use O(comment_visibility.type) to specify which of the JIRA visibility restriction types is used.
         type: str
         required: true
         choices: [group, role]
       value:
         description:
-          - Use value to specify value corresponding to the type of visibility restriction. For example name of the group
-            or role.
+          - Specify value corresponding to the type of visibility restriction. For example name of the group or role.
         type: str
         required: true
     version_added: '3.2.0'
@@ -165,12 +164,12 @@ options:
     type: str
     required: false
     description:
-      - Set issue from which link will be created.
+      - Set issue from which link is created.
   outwardissue:
     type: str
     required: false
     description:
-      - Set issue to which link will be created.
+      - Set issue to which link is created.
   fields:
     type: dict
     required: false
@@ -192,7 +191,7 @@ options:
   maxresults:
     required: false
     description:
-      - Limit the result of O(operation=search). If no value is specified, the default jira limit will be used.
+      - Limit the result of O(operation=search). If no value is specified, the default JIRA limit is used.
       - Used when O(operation=search) only, ignored otherwise.
     type: int
     version_added: '0.2.0'
@@ -226,12 +225,12 @@ options:
       content:
         type: str
         description:
-          - The Base64 encoded contents of the file to attach. If not specified, the contents of O(attachment.filename) will
-            be used instead.
+          - The Base64 encoded contents of the file to attach. If not specified, the contents of O(attachment.filename) is
+            used instead.
       mimetype:
         type: str
         description:
-          - The MIME type to supply for the upload. If not specified, best-effort detection will be done.
+          - The MIME type to supply for the upload. If not specified, best-effort detection is performed.
 notes:
   - Currently this only works with basic-auth, or tokens.
   - To use with JIRA Cloud, pass the login e-mail as the O(username) and the API token as O(password).
