@@ -103,7 +103,7 @@ changed:
   sample: true
 """
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper, cause_changes
+from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
 
 import errno
 import os
@@ -130,11 +130,11 @@ class Sysrc(StateModuleHelper):
     def _contains(self):
         value = self._get()
         if value is None:
-            return (False, None)
+            return False, None
 
         value = value.split(self.vars.delim)
 
-        return (self.vars.value in value, value)
+        return self.vars.value in value, value
 
     def _get(self):
         if not os.path.exists(self.vars.path):
@@ -151,9 +151,11 @@ class Sysrc(StateModuleHelper):
         return out.strip()
 
     def _modify(self, op, changed):
-        (rc, out, err) = self._sysrc(f"{self.vars.name}{op}={self.vars.delim}{self.vars.value}")
-        if out.find(f"{self.vars.name}:") == 0:
+        (rc, out, err) = self._sysrc("%s%s=%s%s" % (self.vars.name, op, self.vars.delim, self.vars.value))
+        if out.startswith("%s:" % self.vars.name):
             return changed(out.split(' -> ')[1].strip().split(self.vars.delim))
+
+        return False
 
     def _sysrc(self, *args):
         cmd = [self.sysrc, '-f', self.vars.path]
@@ -163,54 +165,50 @@ class Sysrc(StateModuleHelper):
 
         (rc, out, err) = self.module.run_command(cmd)
         if "Permission denied" in err:
-            raise OSError(errno.EACCES, "Permission denied for %s" % self.path)
+            raise OSError(errno.EACCES, "Permission denied for %s" % self.vars.path)
 
-        return (rc, out, err)
+        return rc, out, err
 
-    @cause_changes(when="success")
     def state_absent(self):
         if self._get() is None:
-            return False
+            return
 
         if not self.check_mode:
             self._sysrc('-x', self.vars.name)
 
-        return True
+        self.changed = True
 
-    @cause_changes(when="success")
     def state_present(self):
         value = self._get()
         if value == self.vars.value:
-            return False
+            return
 
         if self.vars.value is None:
             self.vars.set('value', value)
-            return False
+            return
 
         if not self.check_mode:
-            self._sysrc(f"{self.name}={self.value}'")
+            self._sysrc("%s=%s" % (self.vars.name, self.vars.value))
 
-        return True
+        self.changed = True
 
-    @cause_changes(when="success")
-    def state_value_present(self):
-        (contains, value) = self._contains()
-        if contains:
-            return False
-
-        if self.vars.value is None:
-            self.vars.set('value', value)
-            return False
-
-        return self.check_mode or self._modify('+', lambda values: self.vars.value in values)
-
-    @cause_changes(when="success")
     def state_value_absent(self):
         (contains, _unused) = self._contains()
         if not contains:
-            return False
+            return
 
-        return self.check_mode or self._modify('-', lambda values: self.vars.value not in values)
+        self.changed = self.check_mode or self._modify('-', lambda values: self.vars.value not in values)
+
+    def state_value_present(self):
+        (contains, value) = self._contains()
+        if contains:
+            return
+
+        if self.vars.value is None:
+            self.vars.set('value', value)
+            return
+
+        self.changed = self.check_mode or self._modify('+', lambda values: self.vars.value in values)
 
 
 def main():
