@@ -83,12 +83,12 @@ EXAMPLES = r"""
 
 - name: Remove lock from nginx to be updated again
   community.general.dnf_versionlock:
-    package: nginx
+    name: nginx
     state: absent
 
 - name: Exclude bind 32:9.11 from installs or updates
   community.general.dnf_versionlock:
-    package: bind-32:9.11*
+    name: bind-32:9.11*
     state: excluded
 
 - name: Keep bash package in major version 4
