@@ -106,7 +106,6 @@ from ansible_collections.community.general.plugins.module_utils.module_helper im
 
 import errno
 import os
-import re
 
 class Sysrc(StateModuleHelper):
     module = dict(
@@ -162,7 +161,7 @@ class Sysrc(StateModuleHelper):
 
         (rc, out, err) = self.module.run_command(cmd)
         if "Permission denied" in err:
-            raise OSError("Permission denied for %s" % self.path)
+            raise OSError(errno.EACCES, "Permission denied for %s" % self.path)
 
         return (rc, out, err)
 
