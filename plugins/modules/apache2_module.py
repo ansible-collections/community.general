@@ -282,7 +282,7 @@ def main():
     module.warnings = []
 
     name = module.params['name']
-    if name == 'cgi' and _run_threaded(module):
+    if name == 'cgi' and module.params['state'] == 'present' and _run_threaded(module):
         module.fail_json(msg="Your MPM seems to be threaded. No automatic actions on module cgi possible.")
 
     if not module.params['identifier']:
