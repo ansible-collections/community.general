@@ -7,6 +7,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 DOCUMENTATION = r"""
@@ -107,6 +108,7 @@ from ansible_collections.community.general.plugins.module_utils.module_helper im
 import errno
 import os
 
+
 class Sysrc(StateModuleHelper):
     module = dict(
         argument_spec=dict(
@@ -186,7 +188,7 @@ class Sysrc(StateModuleHelper):
             return False
 
         if not self.check_mode:
-            self._sysrc(f"{self.name}={self.value if not self.value is None else ''}'")
+            self._sysrc(f"{self.name}={self.value}'")
 
         return True
 
@@ -204,14 +206,16 @@ class Sysrc(StateModuleHelper):
 
     @cause_changes(when="success")
     def state_value_absent(self):
-        (contains, _) = self._contains()
+        (contains, _unused) = self._contains()
         if not contains:
             return False
 
         return self.check_mode or self._modify('-', lambda values: self.vars.value not in values)
 
+
 def main():
     Sysrc.execute()
+
 
 if __name__ == '__main__':
     main()
