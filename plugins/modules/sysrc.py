@@ -102,7 +102,8 @@ changed:
   sample: true
 """
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper, cause_changes
+
 import errno
 import os
 import re
