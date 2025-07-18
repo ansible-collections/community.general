@@ -107,136 +107,111 @@ import errno
 import os
 import re
 
-
-class Sysrc(object):
-    def __init__(self, module, name, value, path, delim, jail):
-        self.module = module
-        self.name = name
-        self.changed = False
-        self.value = value
-        self.path = path
-        self.delim = delim
-        self.jail = jail
-        self.sysrc = module.get_bin_path('sysrc', True)
-
-    def load_sysrc_value(self):
-        """
-        Loads the value that sysrc has for the given variable. This checks that the variable exists in the file first
-        so that a default value is not loaded and then counted as changed.
-        """
-        # if the file doesn't exist, then there is no need to load it
-        if not os.path.exists(self.path):
-            return None
-
-        # Check if the name exists in the file 0 = true, 1 = false
-        (rc, out, err) = self.run_sysrc('-c', self.name)
-        if rc == 1:
-            return None
-
-        (rc, out, err) = self.run_sysrc('-n', self.name)
-        if err.find("unknown variable") > 0 or out.find("unknown variable") > 0:
-            return None
-
-        return out.strip()
-
-    def contains(self):
-        value = self.load_sysrc_value()
-        if value is None:
-            return False
-
-        return self.value in value.split(self.delim)
-
-    def modify(self, op, changed):
-        (rc, out, err) = self.run_sysrc('%s%s=%s%s' % (self.name, op, self.delim, self.value))
-        if out.find("%s:" % self.name) == 0:
-            return changed(out.split(' -> ')[1].strip().split(self.delim))
-
-    def present(self):
-        if self.load_sysrc_value() == self.value:
-            return False
-
-        if not self.module.check_mode:
-            self.run_sysrc("%s=%s" % (self.name, self.value))
-
-        return True
-
-    def absent(self):
-        if self.load_sysrc_value() is None:
-            return False
-
-        if not self.module.check_mode:
-            self.run_sysrc('-x', self.name)
-
-        return True
-
-    def value_present(self):
-        if self.contains():
-            return False
-
-        if self.module.check_mode or self.modify('+', lambda values: self.value in values):
-            return True
-
-        return False
-
-    def value_absent(self):
-        if not self.contains():
-            return False
-
-        if self.module.check_mode or self.modify('-', lambda values: self.value not in values):
-            return True
-
-        return False
-
-    def run_sysrc(self, *args):
-        cmd = [self.sysrc, '-f', self.path]
-        if self.jail:
-            cmd += ['-j', self.jail]
-        cmd.extend(args)
-
-        (rc, out, err) = self.module.run_command(cmd)
-        if err.find("Permission denied") > 0:
-            raise OSError(errno.EACCES, "Permission denied for %s" % self.path)
-
-        return (rc, out, err)
-
-
-def main():
-    module = AnsibleModule(
+class Sysrc(StateModuleHelper):
+    module = dict(
         argument_spec=dict(
             name=dict(type='str', required=True),
             value=dict(type='str', default=None),
             state=dict(type='str', default='present', choices=['absent', 'present', 'value_present', 'value_absent']),
             path=dict(type='str', default='/etc/rc.conf'),
             delim=dict(type='str', default=' '),
-            jail=dict(type='str', default=None),
+            jail=dict(type='str', default=None)
         ),
-        supports_check_mode=True,
+        supports_check_mode=True
     )
+    output_params = ('value')
+    use_old_vardict = False
 
-    name = module.params.pop('name')
-    # OID style names are not supported
-    if not re.match('^[a-zA-Z0-9_]+$', name):
-        module.fail_json(
-            msg="Name may only contain alphanumeric and underscore characters"
-        )
+    def __init_module__(self):
+        self.sysrc = self.module.get_bin_path('sysrc', True)
 
-    result = dict(
-        name=name,
-        state=module.params.pop('state'),
-        value=module.params.pop('value'),
-        path=module.params.pop('path'),
-        delim=module.params.pop('delim'),
-        jail=module.params.pop('jail')
-    )
+    def _contains(self):
+        value = self._get()
+        if value is None:
+            return (False, None)
 
-    try:
-        sysrc = Sysrc(module, name, result['value'], result['path'], result['delim'], result['jail'])
-        result['changed'] = getattr(sysrc, result['state'])()
-    except OSError as err:
-        module.fail_json(msg=str(err))
+        value = value.split(self.vars.delim)
 
-    module.exit_json(**result)
+        return (self.vars.value in value, value)
 
+    def _get(self):
+        if not os.path.exists(self.vars.path):
+            return None
+
+        (rc, out, err) = self._sysrc('-c', self.vars.name)
+        if rc == 1:
+            return None
+
+        (rc, out, err) = self._sysrc('-n', self.vars.name)
+        if "unknown variable" in err or "unknown variable" in out:
+            return None
+
+        return out.strip()
+
+    def _modify(self, op, changed):
+        (rc, out, err) = self._sysrc(f"{self.vars.name}{op}={self.vars.delim}{self.vars.value}")
+        if out.find(f"{self.vars.name}:") == 0:
+            return changed(out.split(' -> ')[1].strip().split(self.vars.delim))
+
+    def _sysrc(self, *args):
+        cmd = [self.sysrc, '-f', self.vars.path]
+        if self.vars.jail:
+            cmd += ['-j', self.vars.jail]
+        cmd.extend(args)
+
+        (rc, out, err) = self.module.run_command(cmd)
+        if "Permission denied" in err:
+            raise OSError("Permission denied for %s" % self.path)
+
+        return (rc, out, err)
+
+    @cause_changes(when="success")
+    def state_absent(self):
+        if self._get() is None:
+            return False
+
+        if not self.check_mode:
+            self._sysrc('-x', self.vars.name)
+
+        return True
+
+    @cause_changes(when="success")
+    def state_present(self):
+        value = self._get()
+        if value == self.vars.value:
+            return False
+
+        if self.vars.value is None:
+            self.vars.set('value', value)
+            return False
+
+        if not self.check_mode:
+            self._sysrc(f"{self.name}={self.value if not self.value is None else ''}'")
+
+        return True
+
+    @cause_changes(when="success")
+    def state_value_present(self):
+        (contains, value) = self._contains()
+        if contains:
+            return False
+
+        if self.vars.value is None:
+            self.vars.set('value', value)
+            return False
+
+        return self.check_mode or self._modify('+', lambda values: self.vars.value in values)
+
+    @cause_changes(when="success")
+    def state_value_absent(self):
+        (contains, _) = self._contains()
+        if not contains:
+            return False
+
+        return self.check_mode or self._modify('-', lambda values: self.vars.value not in values)
+
+def main():
+    Sysrc.execute()
 
 if __name__ == '__main__':
     main()
