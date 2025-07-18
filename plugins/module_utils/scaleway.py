@@ -353,11 +353,18 @@ SCALEWAY_LOCATION = {
         'api_endpoint_vpc': 'https://api.scaleway.com/vpc/v1/zones/fr-par-2'
     },
 
+    'par3': {
+        'name': 'Paris 3',
+        'country': 'FR',
+        'api_endpoint': 'https://api.scaleway.com/instance/v1/zones/fr-par-3',
+        'api_endpoint_vpc': 'https://api.scaleway.com/vpc/v1/zones/fr-par-3'
+    },
+
     'ams1': {
         'name': 'Amsterdam 1',
         'country': 'NL',
         'api_endpoint': 'https://api.scaleway.com/instance/v1/zones/nl-ams-1',
-        'api_endpoint_vpc': 'https://api.scaleway.com/vpc/v1/zones/nl-ams-10'
+        'api_endpoint_vpc': 'https://api.scaleway.com/vpc/v1/zones/nl-ams-1'
     },
 
     'EMEA-NL-EVS': {
@@ -365,6 +372,20 @@ SCALEWAY_LOCATION = {
         'country': 'NL',
         'api_endpoint': 'https://api.scaleway.com/instance/v1/zones/nl-ams-1',
         'api_endpoint_vpc': 'https://api.scaleway.com/vpc/v1/zones/nl-ams-1'
+    },
+
+    'ams2': {
+        'name': 'Amsterdam 2',
+        'country': 'NL',
+        'api_endpoint': 'https://api.scaleway.com/instance/v1/zones/nl-ams-2',
+        'api_endpoint_vpc': 'https://api.scaleway.com/vpc/v1/zones/nl-ams-2'
+    },
+
+    'ams3': {
+        'name': 'Amsterdam 3',
+        'country': 'NL',
+        'api_endpoint': 'https://api.scaleway.com/instance/v1/zones/nl-ams-3',
+        'api_endpoint_vpc': 'https://api.scaleway.com/vpc/v1/zones/nl-ams-3'
     },
 
     'waw1': {
@@ -380,6 +401,20 @@ SCALEWAY_LOCATION = {
         'api_endpoint': 'https://api.scaleway.com/instance/v1/zones/pl-waw-1',
         'api_endpoint_vpc': 'https://api.scaleway.com/vpc/v1/zones/pl-waw-1'
     },
+
+    'waw2': {
+        'name': 'Warsaw 2',
+        'country': 'PL',
+        'api_endpoint': 'https://api.scaleway.com/instance/v1/zones/pl-waw-2',
+        'api_endpoint_vpc': 'https://api.scaleway.com/vpc/v1/zones/pl-waw-2'
+    },
+
+    'waw3': {
+        'name': 'Warsaw 3',
+        'country': 'PL',
+        'api_endpoint': 'https://api.scaleway.com/instance/v1/zones/pl-waw-3',
+        'api_endpoint_vpc': 'https://api.scaleway.com/vpc/v1/zones/pl-waw-3'
+    },
 }
 
 SCALEWAY_ENDPOINT = "https://api.scaleway.com"
@@ -393,6 +428,11 @@ SCALEWAY_REGIONS = [
 SCALEWAY_ZONES = [
     "fr-par-1",
     "fr-par-2",
+    "fr-par-3",
     "nl-ams-1",
+    "nl-ams-2",
+    "nl-ams-3",
     "pl-waw-1",
+    "pl-waw-2",
+    "pl-waw-3",
 ]
