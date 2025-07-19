@@ -6,9 +6,13 @@
 # dependencies = ["nox>=2025.02.09", "antsibull-nox"]
 # ///
 
+import os
 import sys
 
 import nox
+
+# Whether the noxfile is running in CI:
+IN_CI = os.environ.get("CI") == "true"
 
 
 try:
@@ -43,7 +47,10 @@ def ansible_output(session: nox.Session) -> None:
         # Tools for post-processing
         "ruamel.yaml",  # used by docs/docsite/reformat-yaml.py
     )
-    session.run("antsibull-docs", "ansible-output", *session.posargs)
+    args = []
+    if IN_CI:
+        args.append("--check")
+    session.run("antsibull-docs", "ansible-output", *args, *session.posargs)
 
 
 # Allow to run the noxfile with `python noxfile.py`, `pipx run noxfile.py`, or similar.
