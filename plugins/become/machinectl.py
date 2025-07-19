@@ -106,6 +106,7 @@ class BecomeModule(BecomeBase):
     fail = ('==== AUTHENTICATION FAILED ====',)
     success = ('==== AUTHENTICATION COMPLETE ====',)
     require_tty = True  # see https://github.com/ansible-collections/community.general/issues/6932
+    has_pipelining = False  # see https://github.com/ansible/ansible/pull/84878
 
     @staticmethod
     def remove_ansi_codes(line):
