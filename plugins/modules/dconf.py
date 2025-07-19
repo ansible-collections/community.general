@@ -481,6 +481,9 @@ def main():
             ('state', 'present', ['value']),
             ('state', 'load', ['path']),
         ],
+        mutually_exclusive=[
+            ['value', 'path']
+        ],
     )
 
     if Variant is None:
