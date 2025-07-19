@@ -49,7 +49,7 @@ options:
   version:
     type: str
     description:
-      - Specify plugin Version of the plugin to install. If plugin exists with previous version, it will NOT be updated.
+      - Specify version of the plugin to install. If plugin exists with previous version, it is NOT updated.
 """
 
 EXAMPLES = r"""

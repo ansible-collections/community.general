@@ -33,7 +33,7 @@ options:
     description:
       - List of comma-separated devices to use as physical devices in this volume group.
       - Required when creating or resizing volume group.
-      - The module will take care of running pvcreate if needed.
+      - The module runs C(pvcreate) if needed.
       - O(remove_extra_pvs) controls whether or not unspecified physical devices are removed from the volume group.
     type: list
     elements: str

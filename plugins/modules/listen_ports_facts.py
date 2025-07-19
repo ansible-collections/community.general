@@ -20,7 +20,7 @@ requirements:
 short_description: Gather facts on processes listening on TCP and UDP ports
 notes:
   - C(ss) returns all processes for each listen address and port.
-  - This plugin will return each of them, so multiple entries for the same listen address and port are likely in results.
+  - This plugin returns each of them, so multiple entries for the same listen address and port are likely in results.
 extends_documentation_fragment:
   - community.general.attributes
   - community.general.attributes.facts
@@ -29,7 +29,7 @@ options:
   command:
     description:
       - Override which command to use for fetching listen ports.
-      - By default module will use first found supported command on the system (in alphanumerical order).
+      - By default module uses first found supported command on the system (in alphanumerical order).
     type: str
     choices:
       - netstat
