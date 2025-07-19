@@ -444,11 +444,11 @@ class DconfPreference(object):
         changed = any(
             not self.variants_are_equal(self.read("%s%s/%s" % (root_dir, sub_dir, k)), v)
             for sub_dir in config.sections()
-                for k, v in config[sub_dir].items()
+            for k, v in config[sub_dir].items()
         )
 
         if self.check_mode or not changed:
-            return changed 
+            return changed
 
         # Set-up command to run. Since DBus is needed for write operation, wrap
         # dconf command dbus-launch.
@@ -460,10 +460,11 @@ class DconfPreference(object):
 
         if rc != 0:
             self.module.fail_json(msg='dconf failed while load config %s, root dir %s with error: %s' % (path, root_dir, err),
-                                        out=out,
-                                        err=err)
+                                  out=out,
+                                  err=err)
         # Value was changed.
-        return changed 
+        return changed
+
 
 def main():
     # Setup the Ansible module
