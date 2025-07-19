@@ -66,7 +66,7 @@ options:
         particular are handled properly even when specified as booleans rather than strings (in fact, handling booleans properly
         is why the type of this parameter is "raw").
   path:
-    type: str
+    type: path
     required: false
     description:
       - Remote path to the configuration to apply.
