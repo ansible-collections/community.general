@@ -13,28 +13,39 @@
   args:
     creates: "{{ remote_tmp_dir }}/test_lvm_pv_02.img"
 
+- name: Pausing for a random time between 5-15 seconds
+  ansible.builtin.pause:
+    seconds: "{{ range(5, 16) | random }}"
+
 - name: Creating loop device
   ansible.builtin.command: losetup -f
   register: loop_device_01
 
+- name: Wiping existing LVM metadata
+  community.general.lvm_pv:
+    device: "{{ loop_device_01.stdout }}"
+    force: true
+    state: absent
+
 - name: Associating loop device with file
   ansible.builtin.command: 'losetup {{ loop_device_01.stdout }} {{ remote_tmp_dir }}/test_lvm_pv_01.img'
+
+- name: Pausing for a random time between 5-15 seconds
+  ansible.builtin.pause:
+    seconds: "{{ range(5, 16) | random }}"
 
 - name: Creating loop device
   ansible.builtin.command: losetup -f
   register: loop_device_02
 
-- name: Associating loop device with file
-  ansible.builtin.command: 'losetup {{ loop_device_02.stdout }} {{ remote_tmp_dir }}/test_lvm_pv_02.img'
-
 - name: Wiping existing LVM metadata
   community.general.lvm_pv:
-    device: "{{ item }}"
+    device: "{{ loop_device_02.stdout }}"
     force: true
     state: absent
-  loop:
-    - "{{ loop_device_01.stdout }}"
-    - "{{ loop_device_02.stdout }}"
+
+- name: Associating loop device with file
+  ansible.builtin.command: 'losetup {{ loop_device_02.stdout }} {{ remote_tmp_dir }}/test_lvm_pv_02.img'
 
 - name: Creating physical volume for the first loop device
   community.general.lvm_pv:
@@ -54,10 +65,12 @@
   ansible.builtin.command: pvs --noheadings -o pv_size --units M {{ loop_device_02.stdout }}
   register: pv_size_output_02
 
-- name: Creating volume group on top of first device {{ loop_device_01.stdout }}
+- name: Creating volume group
   community.general.lvg:
     vg: testvg
-    pvs: "{{ loop_device_01.stdout }}"
+    pvs:
+      - "{{ loop_device_01.stdout }}"
+      - "{{ loop_device_02.stdout }}"
     force: true
   register: vg_creation_result
 
@@ -88,9 +101,9 @@
 - name: Asserting physical volume was created
   ansible.builtin.assert:
     that:
-      - pv_creation_result_01.changed == true
-      - pv_creation_result_02.changed == true
-      - vg_creation_result.changed == true
+      - pv_creation_result_01 is changed
+      - pv_creation_result_02 is changed
+      - vg_creation_result is changed
       - (pv_size_output_01.stdout | trim | regex_replace('M', '') | float) > 450
       - (pv_size_output_01.stdout | trim | regex_replace('M', '') | float) < 600
       - (pv_size_output_02.stdout | trim | regex_replace('M', '') | float) > 950

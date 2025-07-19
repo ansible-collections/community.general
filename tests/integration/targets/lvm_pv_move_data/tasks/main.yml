@@ -12,11 +12,15 @@
 - name: Install required packages (Linux)
   when: ansible_system == 'Linux'
   ansible.builtin.package:
-    name: lvm2
+    name:
+      - lvm2
+      - xfsprogs
     state: present
 
 - name: Testing lvm_pv_move_data module
   block:
+    - import_tasks: prepare.yml
+
     - import_tasks: creation.yml
 
     - import_tasks: moving.yml

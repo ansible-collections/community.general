@@ -13,6 +13,14 @@
   community.general.filesystem:
     dev: /dev/vg_tmp_test/lv_tmp_test
     state: absent
+    force: true
+
+- name: Deleting testlv logical volume
+  community.general.lvol:
+    vg: testvg
+    lv: testlv
+    force: true
+    state: absent
 
 - name: Detaching first loop device
   ansible.builtin.command: losetup -d {{ loop_device_01.stdout }}
