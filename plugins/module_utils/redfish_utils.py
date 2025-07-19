@@ -2844,6 +2844,11 @@ class RedfishUtils(object):
             if (not data.get('Inserted', False) and
                     not data.get('ImageName')):
                 return uri, data
+            # WORKAROUND
+            # Supermicro systems do not properly clear out ImageName when media is ejected
+            if vendor == 'Supermicro':
+                if data.get('ConnectedVia') == 'NotConnected':
+                    return uri, data
         return None, None
 
     @staticmethod
