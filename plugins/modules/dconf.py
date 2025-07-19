@@ -440,7 +440,7 @@ class DconfPreference(object):
         except Exception as e:
             self.module.fail_json(msg='dconf failed while reading config with error: %s' % e)
 
-        # For each sub-directory, check if at least on change is needed
+        # For each sub-directory, check if at least one change is needed
         changed = any(
             not self.variants_are_equal(self.read("%s%s/%s" % (root_dir, sub_dir, k)), v)
             for sub_dir in config.sections()
