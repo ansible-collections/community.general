@@ -40,6 +40,8 @@ def ansible_output(session: nox.Session) -> None:
         # Needed libs for some code blocks:
         "jc",
         "hashids",
+        # Tools for post-processing
+        "ruamel.yaml",  # used by docs/docsite/reformat-yaml.py
     )
     session.run("antsibull-docs", "ansible-output", *session.posargs)
 
