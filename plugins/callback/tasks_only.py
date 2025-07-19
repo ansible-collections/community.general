@@ -17,7 +17,8 @@ description:
   - Can be used to generate output for documentation examples.
     For this, the O(number_of_columns) option should be set to an explicit value.
 extends_documentation_fragment:
-  - default_callback
+  - ansible.builtin.default_callback
+  - ansible.builtin.result_format_callback
 options:
   number_of_columns:
     description:
@@ -25,6 +26,12 @@ options:
     type: int
     env:
       - name: ANSIBLE_COLLECTIONS_TASKS_ONLY_NUMBER_OF_COLUMNS
+  result_format:
+    # Part of the ansible.builtin.result_format_callback doc fragment
+    version_added: 11.2.0
+  pretty_results:
+    # Part of the ansible.builtin.result_format_callback doc fragment
+    version_added: 11.2.0
 """
 
 EXAMPLES = r"""

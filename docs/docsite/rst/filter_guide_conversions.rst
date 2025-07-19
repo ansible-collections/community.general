@@ -24,6 +24,17 @@ Ansible offers the :ansplugin:`community.general.read_csv module <community.gene
 
 This produces:
 
+.. ansible-output-data::
+
+    variables:
+      task:
+        previous_code_block: yaml+jinja
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          @{{ task | indent(4) }}@
+
 .. code-block:: ansible-output
 
     TASK [Parse CSV from string] **************************************************************
@@ -68,6 +79,34 @@ Converting to JSON
         msg: "{{ result.stdout | community.general.jc('ls') }}"
 
 This produces:
+
+.. ansible-output-data::
+
+    skip_first_lines: 3
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          - ansible.builtin.set_fact:
+              result_stdout: |-
+                bin
+                boot
+                dev
+                etc
+                home
+                lib
+                proc
+                root
+                run
+                tmp
+
+          - name: Run 'ls' to list files in /
+            command: ls /
+            register: result
+
+          - name: Parse the ls output
+            debug:
+              msg: "{{ result_stdout | community.general.jc('ls') }}"
 
 .. code-block:: ansible-output
 

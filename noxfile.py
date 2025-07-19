@@ -6,9 +6,13 @@
 # dependencies = ["nox>=2025.02.09", "antsibull-nox"]
 # ///
 
+import os
 import sys
 
 import nox
+
+# Whether the noxfile is running in CI:
+IN_CI = os.environ.get("CI") == "true"
 
 
 try:
@@ -30,6 +34,23 @@ def aliases(session: nox.Session) -> None:
 def botmeta(session: nox.Session) -> None:
     session.install("PyYAML", "voluptuous")
     session.run("python", "tests/sanity/extra/botmeta.py")
+
+
+@nox.session(name="ansible-output", default=False)
+def ansible_output(session: nox.Session) -> None:
+    session.install(
+        "ansible-core",
+        "antsibull-docs",
+        # Needed libs for some code blocks:
+        "jc",
+        "hashids",
+        # Tools for post-processing
+        "ruamel.yaml",  # used by docs/docsite/reformat-yaml.py
+    )
+    args = []
+    if IN_CI:
+        args.append("--check")
+    session.run("antsibull-docs", "ansible-output", *args, *session.posargs)
 
 
 # Allow to run the noxfile with `python noxfile.py`, `pipx run noxfile.py`, or similar.
