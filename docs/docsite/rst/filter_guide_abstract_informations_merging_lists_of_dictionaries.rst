@@ -34,13 +34,42 @@ In the example below the lists are merged by the attribute ``name``:
 
 This produces:
 
+.. ansible-output-data::
+
+    env:
+      ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
+    variables:
+      data:
+        previous_code_block: yaml
+        previous_code_block_index: 0
+      computation:
+        previous_code_block: yaml+jinja
+    postprocessors:
+      - name: reformat-yaml
+    language: yaml
+    skip_first_lines: 2
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          - vars:
+              @{{ data | indent(8) }}@
+              @{{ computation | indent(8) }}@
+            ansible.builtin.debug:
+              var: list3
+
 .. code-block:: yaml
 
   list3:
-    - {name: bar, extra: false}
-    - {name: baz, path: /baz}
-    - {name: foo, extra: true, path: /foo}
-    - {name: meh, extra: true}
+    - extra: false
+      name: bar
+    - name: baz
+      path: /baz
+    - extra: true
+      name: foo
+      path: /foo
+    - extra: true
+      name: meh
 
 
 .. versionadded:: 2.0.0
@@ -56,13 +85,42 @@ It is possible to use a list of lists as an input of the filter:
 
 This produces the same result as in the previous example:
 
+.. ansible-output-data::
+
+    env:
+      ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
+    variables:
+      data:
+        previous_code_block: yaml
+        previous_code_block_index: 0
+      computation:
+        previous_code_block: yaml+jinja
+    postprocessors:
+      - name: reformat-yaml
+    language: yaml
+    skip_first_lines: 2
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          - vars:
+              @{{ data | indent(8) }}@
+              @{{ computation | indent(8) }}@
+            ansible.builtin.debug:
+              var: list3
+
 .. code-block:: yaml
 
   list3:
-    - {name: bar, extra: false}
-    - {name: baz, path: /baz}
-    - {name: foo, extra: true, path: /foo}
-    - {name: meh, extra: true}
+    - extra: false
+      name: bar
+    - name: baz
+      path: /baz
+    - extra: true
+      name: foo
+      path: /foo
+    - extra: true
+      name: meh
 
 Single list
 """""""""""
@@ -75,13 +133,42 @@ It is possible to merge single list:
 
 This produces the same result as in the previous example:
 
+.. ansible-output-data::
+
+    env:
+      ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
+    variables:
+      data:
+        previous_code_block: yaml
+        previous_code_block_index: 0
+      computation:
+        previous_code_block: yaml+jinja
+    postprocessors:
+      - name: reformat-yaml
+    language: yaml
+    skip_first_lines: 2
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          - vars:
+              @{{ data | indent(8) }}@
+              @{{ computation | indent(8) }}@
+            ansible.builtin.debug:
+              var: list3
+
 .. code-block:: yaml
 
   list3:
-    - {name: bar, extra: false}
-    - {name: baz, path: /baz}
-    - {name: foo, extra: true, path: /foo}
-    - {name: meh, extra: true}
+    - extra: false
+      name: bar
+    - name: baz
+      path: /baz
+    - extra: true
+      name: foo
+      path: /foo
+    - extra: true
+      name: meh
 
 
 The filter also accepts two optional parameters: :ansopt:`community.general.lists_mergeby#filter:recursive` and :ansopt:`community.general.lists_mergeby#filter:list_merge`. This is available since community.general 4.4.0.
@@ -128,17 +215,45 @@ Example :ansopt:`community.general.lists_mergeby#filter:list_merge=replace` (def
 
 This produces:
 
+.. ansible-output-data::
+
+    env:
+      ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
+    variables:
+      data:
+        previous_code_block: yaml
+        previous_code_block_index: 4
+      computation:
+        previous_code_block: yaml+jinja
+    postprocessors:
+      - name: reformat-yaml
+    language: yaml
+    skip_first_lines: 2
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          - vars:
+              @{{ data | indent(8) }}@
+              @{{ computation | indent(8) }}@
+            ansible.builtin.debug:
+              var: list3
+
 .. code-block:: yaml
 
   list3:
     - name: myname01
       param01:
+        list:
+          - patch_value
         x: default_value
         y: patch_value
-        list: [patch_value]
         z: patch_value
     - name: myname02
-      param01: [3, 4, 4]
+      param01:
+        - 3
+        - 4
+        - 4
 
 list_merge=keep
 """""""""""""""
@@ -153,17 +268,46 @@ Example :ansopt:`community.general.lists_mergeby#filter:list_merge=keep`:
 
 This produces:
 
+.. ansible-output-data::
+
+    env:
+      ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
+    variables:
+      data:
+        previous_code_block: yaml
+        previous_code_block_index: 4
+      computation:
+        previous_code_block: yaml+jinja
+    postprocessors:
+      - name: reformat-yaml
+    language: yaml
+    skip_first_lines: 2
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          - vars:
+              @{{ data | indent(8) }}@
+              @{{ computation | indent(8) }}@
+            ansible.builtin.debug:
+              var: list3
+
 .. code-block:: yaml
 
   list3:
     - name: myname01
       param01:
+        list:
+          - default_value
         x: default_value
         y: patch_value
-        list: [default_value]
         z: patch_value
     - name: myname02
-      param01: [1, 1, 2, 3]
+      param01:
+        - 1
+        - 1
+        - 2
+        - 3
 
 list_merge=append
 """""""""""""""""
@@ -178,17 +322,50 @@ Example :ansopt:`community.general.lists_mergeby#filter:list_merge=append`:
 
 This produces:
 
+.. ansible-output-data::
+
+    env:
+      ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
+    variables:
+      data:
+        previous_code_block: yaml
+        previous_code_block_index: 4
+      computation:
+        previous_code_block: yaml+jinja
+    postprocessors:
+      - name: reformat-yaml
+    language: yaml
+    skip_first_lines: 2
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          - vars:
+              @{{ data | indent(8) }}@
+              @{{ computation | indent(8) }}@
+            ansible.builtin.debug:
+              var: list3
+
 .. code-block:: yaml
 
   list3:
     - name: myname01
       param01:
+        list:
+          - default_value
+          - patch_value
         x: default_value
         y: patch_value
-        list: [default_value, patch_value]
         z: patch_value
     - name: myname02
-      param01: [1, 1, 2, 3, 3, 4, 4]
+      param01:
+        - 1
+        - 1
+        - 2
+        - 3
+        - 3
+        - 4
+        - 4
 
 list_merge=prepend
 """"""""""""""""""
@@ -203,17 +380,50 @@ Example :ansopt:`community.general.lists_mergeby#filter:list_merge=prepend`:
 
 This produces:
 
+.. ansible-output-data::
+
+    env:
+      ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
+    variables:
+      data:
+        previous_code_block: yaml
+        previous_code_block_index: 4
+      computation:
+        previous_code_block: yaml+jinja
+    postprocessors:
+      - name: reformat-yaml
+    language: yaml
+    skip_first_lines: 2
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          - vars:
+              @{{ data | indent(8) }}@
+              @{{ computation | indent(8) }}@
+            ansible.builtin.debug:
+              var: list3
+
 .. code-block:: yaml
 
   list3:
     - name: myname01
       param01:
+        list:
+          - patch_value
+          - default_value
         x: default_value
         y: patch_value
-        list: [patch_value, default_value]
         z: patch_value
     - name: myname02
-      param01: [3, 4, 4, 1, 1, 2, 3]
+      param01:
+        - 3
+        - 4
+        - 4
+        - 1
+        - 1
+        - 2
+        - 3
 
 list_merge=append_rp
 """"""""""""""""""""
@@ -228,17 +438,49 @@ Example :ansopt:`community.general.lists_mergeby#filter:list_merge=append_rp`:
 
 This produces:
 
+.. ansible-output-data::
+
+    env:
+      ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
+    variables:
+      data:
+        previous_code_block: yaml
+        previous_code_block_index: 4
+      computation:
+        previous_code_block: yaml+jinja
+    postprocessors:
+      - name: reformat-yaml
+    language: yaml
+    skip_first_lines: 2
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          - vars:
+              @{{ data | indent(8) }}@
+              @{{ computation | indent(8) }}@
+            ansible.builtin.debug:
+              var: list3
+
 .. code-block:: yaml
 
   list3:
     - name: myname01
       param01:
+        list:
+          - default_value
+          - patch_value
         x: default_value
         y: patch_value
-        list: [default_value, patch_value]
         z: patch_value
     - name: myname02
-      param01: [1, 1, 2, 3, 4, 4]
+      param01:
+        - 1
+        - 1
+        - 2
+        - 3
+        - 4
+        - 4
 
 list_merge=prepend_rp
 """""""""""""""""""""
@@ -253,15 +495,46 @@ Example :ansopt:`community.general.lists_mergeby#filter:list_merge=prepend_rp`:
 
 This produces:
 
+.. ansible-output-data::
+
+    env:
+      ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
+    variables:
+      data:
+        previous_code_block: yaml
+        previous_code_block_index: 4
+      computation:
+        previous_code_block: yaml+jinja
+    postprocessors:
+      - name: reformat-yaml
+    language: yaml
+    skip_first_lines: 2
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          - vars:
+              @{{ data | indent(8) }}@
+              @{{ computation | indent(8) }}@
+            ansible.builtin.debug:
+              var: list3
+
 .. code-block:: yaml
 
   list3:
     - name: myname01
       param01:
+        list:
+          - patch_value
+          - default_value
         x: default_value
         y: patch_value
-        list: [patch_value, default_value]
         z: patch_value
     - name: myname02
-      param01: [3, 4, 4, 1, 1, 2]
-
+      param01:
+        - 3
+        - 4
+        - 4
+        - 1
+        - 1
+        - 2
