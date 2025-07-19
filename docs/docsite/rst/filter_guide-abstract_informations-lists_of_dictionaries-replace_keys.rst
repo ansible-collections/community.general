@@ -40,17 +40,43 @@ Let us use the below list in the following examples:
 
 gives
 
+.. ansible-output-data::
+
+    env:
+      ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
+    variables:
+      data:
+        previous_code_block: yaml
+        previous_code_block_index: 0
+      computation:
+        previous_code_block: yaml+jinja
+    postprocessors:
+      - name: reformat-yaml
+    language: yaml
+    skip_first_lines: 2
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          - vars:
+              @{{ data | indent(8) }}@
+              @{{ computation | indent(8) }}@
+            ansible.builtin.debug:
+              var: result
+
 .. code-block:: yaml
    :emphasize-lines: 1-
 
    result:
      - a0: A0
        a1: B0
-       k2_x2: [C0]
+       k2_x2:
+         - C0
        k3_x3: foo
      - a0: A1
        a1: B1
-       k2_x2: [C1]
+       k2_x2:
+         - C1
        k3_x3: bar
 
 
@@ -58,17 +84,49 @@ gives
 
 * The results of the below examples 1-3 are all the same:
 
+.. ansible-output-data::
+
+    env:
+      ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
+    variables:
+      data:
+        previous_code_block: yaml
+        previous_code_block_index: 0
+      computation:
+        previous_code_block: yaml+jinja
+    postprocessors:
+      - name: reformat-yaml
+    language: yaml
+    skip_first_lines: 2
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          - vars:
+              @{{ data | indent(8) }}@
+
+              # I picked one of the examples
+              mp: starts_with
+              target:
+                - {after: a0, before: k0}
+                - {after: a1, before: k1}
+              result: "{{ input | community.general.replace_keys(target=target, matching_parameter=mp) }}"
+            ansible.builtin.debug:
+              var: result
+
 .. code-block:: yaml
    :emphasize-lines: 1-
 
    result:
      - a0: A0
        a1: B0
-       k2_x2: [C0]
+       k2_x2:
+         - C0
        k3_x3: foo
      - a0: A1
        a1: B1
-       k2_x2: [C1]
+       k2_x2:
+         - C1
        k3_x3: bar
 
 
@@ -111,12 +169,41 @@ gives
 
 * The results of the below examples 4-5 are the same:
 
+.. ansible-output-data::
+
+    env:
+      ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
+    variables:
+      data:
+        previous_code_block: yaml
+        previous_code_block_index: 0
+      computation:
+        previous_code_block: yaml+jinja
+    postprocessors:
+      - name: reformat-yaml
+    language: yaml
+    skip_first_lines: 2
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          - vars:
+              @{{ data | indent(8) }}@
+
+              # I picked one of the examples
+              mp: regex
+              target:
+                - {after: X, before: ^.*_x.*$}
+              result: "{{ input | community.general.replace_keys(target=target, matching_parameter=mp) }}"
+            ansible.builtin.debug:
+              var: result
+
 .. code-block:: yaml
    :emphasize-lines: 1-
 
    result:
-     - {X: foo}
-     - {X: bar}
+     - X: foo
+     - X: bar
 
 
 4. If more keys match the same attribute before the last one will be used.
@@ -165,11 +252,36 @@ gives
 
 gives
 
+.. ansible-output-data::
+
+    env:
+      ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
+    variables:
+      data:
+        previous_code_block: yaml
+      computation:
+        previous_code_block: yaml+jinja
+    postprocessors:
+      - name: reformat-yaml
+    language: yaml
+    skip_first_lines: 2
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          - vars:
+              @{{ data | indent(8) }}@
+              @{{ computation | indent(8) }}@
+            ansible.builtin.debug:
+              var: result
+
 .. code-block:: yaml
    :emphasize-lines: 1-
 
    result:
-     - {X: A, bbb1: B, ccc1: C}
-     - {X: D, bbb2: E, ccc2: F}
-
-
+     - X: A
+       bbb1: B
+       ccc1: C
+     - X: D
+       bbb2: E
+       ccc2: F
