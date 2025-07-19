@@ -1,2 +1,2 @@
 minor_changes:
-  - dconf - adds support of `load` to populate a subpath from file  
+  - dconf - adds support of `load` to populate a subpath from file
