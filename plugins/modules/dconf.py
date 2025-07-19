@@ -61,7 +61,7 @@ options:
     description:
       - Value to set for the specified dconf key. Value should be specified in GVariant format. Due to complexity of this
         format, it is best to have a look at existing values in the dconf database.
-      - Required for O(state=present).
+      - Required for O(state=present). If provided, O(path) is not required.
       - Although the type is specified as "raw", it should typically be specified as a string. However, boolean values in
         particular are handled properly even when specified as booleans rather than strings (in fact, handling booleans properly
         is why the type of this parameter is "raw").
@@ -70,13 +70,13 @@ options:
     required: false
     description:
       - Remote path to the configuration to apply.
-      - Required for O(state=load).
+      - Required for O(state=present). If provided, O(value) is not required.
 
   state:
     type: str
     required: false
     default: present
-    choices: ['read', 'load', 'present', 'absent']
+    choices: ['read', 'present', 'absent']
     description:
       - The action to take upon the key/value.
 """
@@ -134,7 +134,7 @@ EXAMPLES = r"""
   community.general.dconf:
     key: "/org/gnome/terminal/legacy/profiles/:"
     path: "/tmp/solarized_dark.dump"
-    state: load
+    state: present
 """
 
 
@@ -470,16 +470,15 @@ def main():
     # Setup the Ansible module
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(default='present', choices=['present', 'absent', 'read', 'load']),
+            state=dict(default='present', choices=['present', 'absent', 'read']),
             key=dict(required=True, type='str', no_log=False),
             # Converted to str below after special handling of bool.
             value=dict(required=False, default=None, type='raw'),
-            path=dict(required=False, default=None, type='str'),
+            path=dict(required=False, default=None, type='path'),
         ),
         supports_check_mode=True,
         required_if=[
-            ('state', 'present', ['value']),
-            ('state', 'load', ['path']),
+            ('state', 'present', ['value', 'path'], True),
         ],
         mutually_exclusive=[
             ['value', 'path']
@@ -539,16 +538,26 @@ def main():
 
     # Process based on different states.
     if module.params['state'] == 'read':
+        # TODO: Handle this case when 'state=present' and 'key' is the only one
         value = dconf.read(module.params['key'])
         module.exit_json(changed=False, value=value)
     elif module.params['state'] == 'present':
-        changed = dconf.write(module.params['key'], module.params['value'])
-        module.exit_json(changed=changed)
+        if module.params['path']:
+            # Use 'dconf load' to propagate multiple entries from the root given by 'key'
+            changed = dconf.load(module.params['key'], module.params['path'])
+            module.exit_json(changed=changed)
+        elif module.params['value']:
+            # Use 'dconf write' to modify the key
+            changed = dconf.write(module.params['key'], module.params['value'])
+            module.exit_json(changed=changed)
+        else:
+            # NOTE: This case shouldn't happen yet as 'key' and 'path' are
+            #       required with 'state=present'
+            # TODO: if 'key' ends with '/' then 'dconf list' should be used
+            #       else, 'dconf read'
+            module.fail_json(msg="'key' or 'path' must be defined.")
     elif module.params['state'] == 'absent':
         changed = dconf.reset(module.params['key'])
-        module.exit_json(changed=changed)
-    elif module.params['state'] == 'load':
-        changed = dconf.load(module.params['key'], module.params['path'])
         module.exit_json(changed=changed)
 
 
