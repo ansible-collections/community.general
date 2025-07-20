@@ -21,6 +21,11 @@ These filters preserve the item order, eliminate duplicates and are an extended 
 
 Let us use the lists below in the following examples:
 
+.. ansible-output-meta::
+
+  actions:
+    - name: reset-previous-blocks
+
 .. code-block:: yaml
 
   A: [9, 5, 7, 1, 9, 4, 10, 5, 9, 7]
@@ -35,9 +40,42 @@ The union of ``A`` and ``B`` can be written as:
 
 This statement produces:
 
+.. ansible-output-data::
+
+    env:
+      ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
+    variables:
+      data:
+        previous_code_block: yaml
+        previous_code_block_index: 0
+      computation:
+        previous_code_block: yaml+jinja
+    postprocessors:
+      - name: reformat-yaml
+    language: yaml
+    skip_first_lines: 2
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          - vars:
+              @{{ data | indent(8) }}@
+              @{{ computation | indent(8) }}@
+            ansible.builtin.debug:
+              var: result
+
 .. code-block:: yaml
 
-  result: [9, 5, 7, 1, 4, 10, 2, 8, 3]
+  result:
+    - 9
+    - 5
+    - 7
+    - 1
+    - 4
+    - 10
+    - 2
+    - 8
+    - 3
 
 If you want to calculate the intersection of ``A``, ``B`` and ``C``, you can use the following statement:
 
@@ -59,9 +97,34 @@ or
 
 All three statements are equivalent and give:
 
+.. ansible-output-data::
+
+    env:
+      ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
+    variables:
+      data:
+        previous_code_block: yaml
+        previous_code_block_index: 0
+      computation:
+        previous_code_block: yaml+jinja
+    postprocessors:
+      - name: reformat-yaml
+    language: yaml
+    skip_first_lines: 2
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          - vars:
+              @{{ data | indent(8) }}@
+              @{{ computation | indent(8) }}@
+            ansible.builtin.debug:
+              var: result
+
 .. code-block:: yaml
 
-  result: [1]
+  result:
+    - 1
 
 .. note:: Be aware that in most cases, filter calls without any argument require ``flatten=true``, otherwise the input is returned as result. The reason for this is, that the input is considered as a variable argument and is wrapped by an additional outer list. ``flatten=true`` ensures that this list is removed before the input is processed by the filter logic.
 
@@ -75,7 +138,34 @@ For example, the symmetric difference of ``A``, ``B`` and ``C`` may be written a
 
 This gives:
 
+.. ansible-output-data::
+
+    env:
+      ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
+    variables:
+      data:
+        previous_code_block: yaml
+        previous_code_block_index: 0
+      computation:
+        previous_code_block: yaml+jinja
+    postprocessors:
+      - name: reformat-yaml
+    language: yaml
+    skip_first_lines: 2
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          - vars:
+              @{{ data | indent(8) }}@
+              @{{ computation | indent(8) }}@
+            ansible.builtin.debug:
+              var: result
+
 .. code-block:: yaml
 
-  result: [5, 8, 3, 1]
-
+  result:
+    - 5
+    - 8
+    - 3
+    - 1
