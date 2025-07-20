@@ -13,6 +13,11 @@ Use the filter :ansplugin:`community.general.replace_keys#filter` if you have a 
 
 Let us use the below list in the following examples:
 
+.. ansible-output-meta::
+
+  actions:
+    - name: reset-previous-blocks
+
 .. code-block:: yaml
 
    input:
