@@ -438,7 +438,7 @@ class DconfPreference(object):
             with open(path, 'r') as fd:
                 raw_config = fd.read()
         except IOError as ex:
-            self.module.fail_json(msg='dconf failed while reading configuration file with error: %s' % ex)
+            self.module.fail_json(msg='Failed while reading configuration file %s with error: %s' % (path, ex))
 
         # Parse configuratoin file
         config = ConfigParser()
