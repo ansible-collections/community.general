@@ -488,7 +488,7 @@ def main():
             ('state', 'present', ['value', 'path'], True),
         ],
         mutually_exclusive=[
-            ['value', 'path']
+            ['value', 'path'],
         ],
     )
 
