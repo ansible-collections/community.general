@@ -61,7 +61,7 @@ options:
     description:
       - Value to set for the specified dconf key. Value should be specified in GVariant format. Due to complexity of this
         format, it is best to have a look at existing values in the dconf database.
-      - Required for O(state=present). If provided, O(path) is not required.
+      - One of O(value) and O(path) are required for O(state=present).
       - Although the type is specified as "raw", it should typically be specified as a string. However, boolean values in
         particular are handled properly even when specified as booleans rather than strings (in fact, handling booleans properly
         is why the type of this parameter is "raw").
