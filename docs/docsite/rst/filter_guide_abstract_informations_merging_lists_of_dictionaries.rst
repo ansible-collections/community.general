@@ -12,6 +12,11 @@ If you have two or more lists of dictionaries and want to combine them into a li
 
 Let us use the lists below in the following examples:
 
+.. ansible-output-meta::
+
+  actions:
+    - name: reset-previous-blocks
+
 .. code-block:: yaml
 
   list1:
@@ -183,6 +188,11 @@ The examples below set :ansopt:`community.general.lists_mergeby#filter:recursive
 
 Let us use the lists below in the following examples
 
+.. ansible-output-meta::
+
+  actions:
+    - name: reset-previous-blocks
+
 .. code-block:: yaml
 
   list1:
@@ -222,7 +232,7 @@ This produces:
     variables:
       data:
         previous_code_block: yaml
-        previous_code_block_index: 4
+        previous_code_block_index: 0
       computation:
         previous_code_block: yaml+jinja
     postprocessors:
@@ -275,7 +285,7 @@ This produces:
     variables:
       data:
         previous_code_block: yaml
-        previous_code_block_index: 4
+        previous_code_block_index: 0
       computation:
         previous_code_block: yaml+jinja
     postprocessors:
@@ -329,7 +339,7 @@ This produces:
     variables:
       data:
         previous_code_block: yaml
-        previous_code_block_index: 4
+        previous_code_block_index: 0
       computation:
         previous_code_block: yaml+jinja
     postprocessors:
@@ -387,7 +397,7 @@ This produces:
     variables:
       data:
         previous_code_block: yaml
-        previous_code_block_index: 4
+        previous_code_block_index: 0
       computation:
         previous_code_block: yaml+jinja
     postprocessors:
@@ -445,7 +455,7 @@ This produces:
     variables:
       data:
         previous_code_block: yaml
-        previous_code_block_index: 4
+        previous_code_block_index: 0
       computation:
         previous_code_block: yaml+jinja
     postprocessors:
@@ -502,7 +512,7 @@ This produces:
     variables:
       data:
         previous_code_block: yaml
-        previous_code_block_index: 4
+        previous_code_block_index: 0
       computation:
         previous_code_block: yaml+jinja
     postprocessors:

@@ -13,6 +13,11 @@ Use the filter :ansplugin:`community.general.remove_keys#filter` if you have a l
 
 Let us use the below list in the following examples:
 
+.. ansible-output-meta::
+
+  actions:
+    - name: reset-previous-blocks
+
 .. code-block:: yaml
 
    input:
