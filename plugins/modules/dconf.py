@@ -141,7 +141,7 @@ EXAMPLES = r"""
 import os
 import sys
 
-from configparser import ConfigParser
+from ansible.module_utils.six.moves.configparser import ConfigParser
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.respawn import (
