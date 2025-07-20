@@ -445,7 +445,7 @@ class DconfPreference(object):
         try:
             config.read_string(raw_config)
         except Exception as e:
-            self.module.fail_json(msg='dconf failed while reading config with error: %s' % e)
+            self.module.fail_json(msg='Failed while parsing config with error: %s' % e)
 
         # For each sub-directory, check if at least one change is needed
         changed = any(
