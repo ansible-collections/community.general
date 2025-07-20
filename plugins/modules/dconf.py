@@ -421,6 +421,13 @@ class DconfPreference(object):
 
         :returns: bool -- True if a change was made, False if no change was required.
         """
+        def _create_dconf_key(root, sub_dir, key):
+            # Root should end with '/'
+            if sub_dir == "/":
+                # No sub directory
+                return "%s%s" % (root, key)
+            return "%s%s/%s" % (root, sub_dir, key)
+
         # Ensure key refers to a directory, as required by dconf
         root_dir = key
         if not root_dir.endswith('/'):
@@ -442,7 +449,7 @@ class DconfPreference(object):
 
         # For each sub-directory, check if at least one change is needed
         changed = any(
-            not self.variants_are_equal(self.read("%s%s/%s" % (root_dir, sub_dir, k)), v)
+            not self.variants_are_equal(self.read(_create_dconf_key(root_dir, sub_dir, k)), v)
             for sub_dir in config.sections()
             for k, v in config[sub_dir].items()
         )
