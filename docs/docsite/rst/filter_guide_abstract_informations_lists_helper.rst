@@ -25,6 +25,29 @@ Let us use the lists below in the following examples:
 
   actions:
     - name: reset-previous-blocks
+    - name: set-template
+      template:
+        env:
+          ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
+        variables:
+          data:
+            previous_code_block: yaml
+            previous_code_block_index: 0
+          computation:
+            previous_code_block: yaml+jinja
+        postprocessors:
+          - name: reformat-yaml
+        language: yaml
+        skip_first_lines: 2
+        playbook: |-
+          - hosts: localhost
+            gather_facts: false
+            tasks:
+              - vars:
+                  @{{ data | indent(8) }}@
+                  @{{ computation | indent(8) }}@
+                ansible.builtin.debug:
+                  var: result
 
 .. code-block:: yaml
 
@@ -42,27 +65,7 @@ This statement produces:
 
 .. ansible-output-data::
 
-    env:
-      ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
-    variables:
-      data:
-        previous_code_block: yaml
-        previous_code_block_index: 0
-      computation:
-        previous_code_block: yaml+jinja
-    postprocessors:
-      - name: reformat-yaml
-    language: yaml
-    skip_first_lines: 2
-    playbook: |-
-      - hosts: localhost
-        gather_facts: false
-        tasks:
-          - vars:
-              @{{ data | indent(8) }}@
-              @{{ computation | indent(8) }}@
-            ansible.builtin.debug:
-              var: result
+    playbook: ~
 
 .. code-block:: yaml
 
@@ -99,27 +102,7 @@ All three statements are equivalent and give:
 
 .. ansible-output-data::
 
-    env:
-      ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
-    variables:
-      data:
-        previous_code_block: yaml
-        previous_code_block_index: 0
-      computation:
-        previous_code_block: yaml+jinja
-    postprocessors:
-      - name: reformat-yaml
-    language: yaml
-    skip_first_lines: 2
-    playbook: |-
-      - hosts: localhost
-        gather_facts: false
-        tasks:
-          - vars:
-              @{{ data | indent(8) }}@
-              @{{ computation | indent(8) }}@
-            ansible.builtin.debug:
-              var: result
+    playbook: ~
 
 .. code-block:: yaml
 
@@ -140,27 +123,7 @@ This gives:
 
 .. ansible-output-data::
 
-    env:
-      ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
-    variables:
-      data:
-        previous_code_block: yaml
-        previous_code_block_index: 0
-      computation:
-        previous_code_block: yaml+jinja
-    postprocessors:
-      - name: reformat-yaml
-    language: yaml
-    skip_first_lines: 2
-    playbook: |-
-      - hosts: localhost
-        gather_facts: false
-        tasks:
-          - vars:
-              @{{ data | indent(8) }}@
-              @{{ computation | indent(8) }}@
-            ansible.builtin.debug:
-              var: result
+    playbook: ~
 
 .. code-block:: yaml
 
