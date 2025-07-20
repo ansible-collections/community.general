@@ -70,7 +70,7 @@ options:
     required: false
     description:
       - Remote path to the configuration to apply.
-      - Required for O(state=present). If provided, O(value) is not required.
+      - One of O(value) and O(path) are required for O(state=present).
 
   state:
     type: str
