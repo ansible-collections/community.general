@@ -369,14 +369,67 @@
               - "value_2 == sysrc_equals_sign_2.value"
               - "value_2 == conf.spamd_flags"
 
+    ##
+    ## sysrc - #10004 state=absent when using default settings will report `changed=true`
+    ##
+    - name: Test that a key from /etc/defaults/rc.conf is not used to mark changed
+      sysrc:
+        name: dumpdev
+        state: absent
+        path: /tmp/10004.conf
+      register: sysrc_10004_absent
+
+    - name: Ensure that the defaults are not consulted
+      assert:
+        that:
+          - not sysrc_10004_absent.changed
+
+    - name: Test that a delimited key from /etc/defaults/rc.conf is not used to mark changed
+      sysrc:
+        name: rc_conf_files
+        state: value_absent
+        path: /tmp/10004.conf
+      register: sysrc_10004_value_absent
+
+    - name: Ensure that the default is not consulted
+      assert:
+        that:
+          - not sysrc_10004_value_absent.changed
+
+    ##
+    ## sysrc - #10394 Ensure that files with multi-line values work
+    ##
+    - name: Copy 10394.conf
+      copy:
+        src: 10394.conf
+        dest: /tmp/10394.conf
+
+    - name: Change value for k1
+      sysrc:
+        name: k1
+        value: v2
+        path: /tmp/10394.conf
+      register: sysrc_10394_changed
+
+    - name: Get file content
+      shell: "cat /tmp/10394.conf"
+      register: sysrc_10394_content
+
+    - name: Ensure sysrc changed k1 from v1 to v2
+      assert:
+        that:
+          - sysrc_10394_changed.changed
+          - >
+            'k1="v2"' in sysrc_10394_content.stdout_lines
+
   always:
 
     - name: Restore /etc/rc.conf
       copy:
-        content: "{{ cached_etc_rcconf_content }}"
+        content: "{{ cached_etc_rcconf_content.stdout }}"
         dest: /etc/rc.conf
 
     - name: Restore /boot/loader.conf
       copy:
-        content: "{{ cached_boot_loaderconf_content }}"
+        content: "{{ cached_boot_loaderconf_content.stdout }}"
         dest: /boot/loader.conf
