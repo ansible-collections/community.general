@@ -77,7 +77,7 @@ options:
   storage_path:
     type: str
     description:
-      - Storage path where the mksysb will stored.
+      - Storage path where the mksysb backup is stored.
     required: true
   use_snapshot:
     description:

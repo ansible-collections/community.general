@@ -13,8 +13,8 @@ DOCUMENTATION = r"""
 module: librato_annotation
 short_description: Create an annotation in Librato
 description:
-  - Create an annotation event on the given annotation stream :name. If the annotation stream does not exist, it will be created
-    automatically.
+  - Create an annotation event on the given annotation stream O(name). If the annotation stream does not exist, it creates
+    one automatically.
 author: "Seth Edwards (@Sedward)"
 requirements: []
 extends_documentation_fragment:
@@ -39,7 +39,7 @@ options:
     type: str
     description:
       - The annotation stream name.
-      - If the annotation stream does not exist, it will be created automatically.
+      - If the annotation stream does not exist, it creates one automatically.
     required: false
   title:
     type: str

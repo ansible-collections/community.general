@@ -48,7 +48,7 @@ options:
   params:
     description:
       - Any extra parameters to pass to make.
-      - If the value is empty, only the key will be used. For example, V(FOO:) will produce V(FOO), not V(FOO=).
+      - If the value is empty, only the key is used. For example, V(FOO:) produces V(FOO), not V(FOO=).
     type: dict
   target:
     description:

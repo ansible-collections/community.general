@@ -16,8 +16,7 @@ module: maven_artifact
 short_description: Downloads an Artifact from a Maven Repository
 description:
   - Downloads an artifact from a maven repository given the maven coordinates provided to the module.
-  - Can retrieve snapshots or release versions of the artifact and will resolve the latest available version if one is not
-    available.
+  - Can retrieve snapshots or release versions of the artifact and resolve the latest available version if one is not available.
 author: "Chris Schmidt (@chrisisbeef)"
 requirements:
   - lxml
@@ -85,8 +84,8 @@ options:
     type: dict
   force_basic_auth:
     description:
-      - C(httplib2), the library used by the URI module only sends authentication information when a webservice responds to an
-        initial request with a 401 status. Since some basic auth services do not properly send a 401, logins will fail. This
+      - C(httplib2), the library used by the URI module only sends authentication information when a webservice responds to
+        an initial request with a 401 status. Since some basic auth services do not properly send a 401, logins fail. This
         option forces the sending of the Basic authentication header upon initial request.
     default: false
     type: bool
@@ -110,7 +109,7 @@ options:
     default: 10
   validate_certs:
     description:
-      - If V(false), SSL certificates will not be validated. This should only be set to V(false) when no other option exists.
+      - If V(false), SSL certificates are not validated. This should only be set to V(false) when no other option exists.
     type: bool
     default: true
   client_cert:
@@ -135,13 +134,13 @@ options:
   verify_checksum:
     type: str
     description:
-      - If V(never), the MD5/SHA1 checksum will never be downloaded and verified.
-      - If V(download), the MD5/SHA1 checksum will be downloaded and verified only after artifact download. This is the default.
-      - If V(change), the MD5/SHA1 checksum will be downloaded and verified if the destination already exist, to verify if
-        they are identical. This was the behaviour before 2.6. Since it downloads the checksum before (maybe) downloading
-        the artifact, and since some repository software, when acting as a proxy/cache, return a 404 error if the artifact
-        has not been cached yet, it may fail unexpectedly. If you still need it, you should consider using V(always) instead
-        - if you deal with a checksum, it is better to use it to verify integrity after download.
+      - If V(never), the MD5/SHA1 checksum is never downloaded and verified.
+      - If V(download), the MD5/SHA1 checksum is downloaded and verified only after artifact download. This is the default.
+      - If V(change), the MD5/SHA1 checksum is downloaded and verified if the destination already exist, to verify if they
+        are identical. This was the behaviour before 2.6. Since it downloads the checksum before (maybe) downloading the artifact,
+        and since some repository software, when acting as a proxy/cache, return a 404 error if the artifact has not been
+        cached yet, it may fail unexpectedly. If you still need it, you should consider using V(always) instead - if you deal
+        with a checksum, it is better to use it to verify integrity after download.
       - V(always) combines V(download) and V(change).
     required: false
     default: 'download'
@@ -149,9 +148,9 @@ options:
   checksum_alg:
     type: str
     description:
-      - If V(md5), checksums will use the MD5 algorithm. This is the default.
-      - If V(sha1), checksums will use the SHA1 algorithm. This can be used on systems configured to use FIPS-compliant algorithms,
-        since MD5 will be blocked on such systems.
+      - If V(md5), checksums use the MD5 algorithm. This is the default.
+      - If V(sha1), checksums use the SHA1 algorithm. This can be used on systems configured to use FIPS-compliant algorithms,
+        since MD5 is blocked on such systems.
     default: 'md5'
     choices: ['md5', 'sha1']
     version_added: 3.2.0

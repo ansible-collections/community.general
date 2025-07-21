@@ -64,10 +64,10 @@ options:
     version_added: 7.1.0
   base64_attributes:
     description:
-      - If provided, all attribute values returned that are listed in this option will be Base64 encoded.
-      - If the special value V(*) appears in this list, all attributes will be Base64 encoded.
-      - All other attribute values will be converted to UTF-8 strings. If they contain binary data, please note that invalid
-        UTF-8 bytes will be omitted.
+      - If provided, all attribute values returned that are listed in this option are Base64 encoded.
+      - If the special value V(*) appears in this list, all attributes are Base64 encoded.
+      - All other attribute values are converted to UTF-8 strings. If they contain binary data, please note that invalid UTF-8
+        bytes are omitted.
     type: list
     elements: str
     version_added: 7.0.0
@@ -94,12 +94,12 @@ EXAMPLES = r"""
 RESULTS = r"""
 results:
   description:
-    - For every entry found, one dictionary will be returned.
+    - For every entry found, one dictionary is returned.
     - Every dictionary contains a key C(dn) with the entry's DN as a value.
     - Every attribute of the entry found is added to the dictionary. If the key has precisely one value, that value is taken
       directly, otherwise the key's value is a list.
-    - Note that all values (for single-element lists) and list elements (for multi-valued lists) will be UTF-8 strings. Some
-      might contain Base64-encoded binary data; which ones is determined by the O(base64_attributes) option.
+    - Note that all values (for single-element lists) and list elements (for multi-valued lists) are UTF-8 strings. Some might
+      contain Base64-encoded binary data; which ones is determined by the O(base64_attributes) option.
   type: list
   elements: dict
 """
