@@ -180,7 +180,7 @@ options:
     type: str
 notes:
   - Instances can be a container or a virtual machine, both of them must have unique name. If you attempt to create an instance
-    with a name that already existed in the users namespace the module __FIXME__(will) simply return as "unchanged".
+    with a name that already existed in the users namespace, the module simply returns as "unchanged".
   - There are two ways to run commands inside a container or virtual machine, using the command module or using the ansible
     lxd connection plugin bundled in Ansible >= 2.1, the later requires python to be installed in the instance which can be
     done with the command module.
