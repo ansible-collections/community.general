@@ -37,10 +37,10 @@ options:
     choices: [absent, present]
     default: present
 notes:
-  - If C(/etc/locale.gen) exists, the module will assume to be using the B(glibc) mechanism, else if C(/var/lib/locales/supported.d/)
-    exists it will assume to be using the B(ubuntu_legacy) mechanism, else it will raise an error.
-  - When using glibc mechanism, it will manage locales by editing C(/etc/locale.gen) and running C(locale-gen).
-  - When using ubuntu_legacy mechanism, it will manage locales by editing C(/var/lib/locales/supported.d/local) and then running
+  - If C(/etc/locale.gen) exists, the module assumes to be using the B(glibc) mechanism, else if C(/var/lib/locales/supported.d/)
+    exists it assumes to be using the B(ubuntu_legacy) mechanism, else it raises an error.
+  - When using glibc mechanism, it manages locales by editing C(/etc/locale.gen) and running C(locale-gen).
+  - When using ubuntu_legacy mechanism, it manages locales by editing C(/var/lib/locales/supported.d/local) and then running
     C(locale-gen).
   - Please note that the code path that uses ubuntu_legacy mechanism has not been tested for a while, because Ubuntu is already
     using the glibc mechanism. There is no support for that, given our inability to test it. Therefore, that mechanism is

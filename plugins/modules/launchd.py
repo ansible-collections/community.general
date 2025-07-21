@@ -37,9 +37,9 @@ options:
     version_added: 10.1.0
   state:
     description:
-      - V(started)/V(stopped) are idempotent actions that will not run commands unless necessary.
-      - Launchd does not support V(restarted) nor V(reloaded) natively. These will trigger a stop/start (restarted) or an
-        unload/load (reloaded).
+      - V(started)/V(stopped) are idempotent actions that do not run commands unless necessary.
+      - C(launchd) does not support V(restarted) nor V(reloaded) natively. These states trigger a stop/start (restarted) or
+        an unload/load (reloaded).
       - V(restarted) unloads and loads the service before start to ensure that the latest job definition (plist) is used.
       - V(reloaded) unloads and loads the service to ensure that the latest job definition (plist) is used. Whether a service
         is started or stopped depends on the content of the definition file.
@@ -53,8 +53,8 @@ options:
   force_stop:
     description:
       - Whether the service should not be restarted automatically by launchd.
-      - Services might have the 'KeepAlive' attribute set to true in a launchd configuration. In case this is set to true,
-        stopping a service will cause that launchd starts the service again.
+      - Services might have the C(KeepAlive) attribute set to V(true) in a launchd configuration. In case this is set to V(true),
+        stopping a service causes that C(launchd) starts the service again.
       - Set this option to V(true) to let this module change the C(KeepAlive) attribute to V(false).
     type: bool
     default: false

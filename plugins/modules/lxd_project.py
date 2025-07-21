@@ -42,14 +42,14 @@ options:
   new_name:
     description:
       - A new name of a project.
-      - If this parameter is specified a project will be renamed to this name.
+      - If this parameter is specified a project is renamed to this name.
       - See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/projects/project_post).
     required: false
     type: str
   merge_project:
     description:
       - Merge the configuration of the present project with the new desired configuration, instead of replacing it. If configuration
-        is the same after merged, no change will be made.
+        is the same after merged, no change is made.
     required: false
     default: false
     type: bool
@@ -98,7 +98,7 @@ options:
     type: str
 notes:
   - Projects must have a unique name. If you attempt to create a project with a name that already existed in the users namespace
-    the module will simply return as "unchanged".
+    the module simply returns as "unchanged".
 """
 
 EXAMPLES = r"""
