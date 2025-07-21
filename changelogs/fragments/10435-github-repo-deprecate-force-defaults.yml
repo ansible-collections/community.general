@@ -1,0 +1,2 @@
+deprecated_features:
+  - github_repo - deprecate ``force_defaults=true`` (https://github.com/ansible-collections/community.general/pull/10435).
