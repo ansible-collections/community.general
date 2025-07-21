@@ -97,13 +97,16 @@
     fstype: xfs
     opts: rw,noauto
     state: mounted
+  register: mount_result
 
-- name: Asserting physical volume was created
+- name: Asserting PVs, VG, LV and filesystem were created successfully
   ansible.builtin.assert:
     that:
       - pv_creation_result_01 is changed
       - pv_creation_result_02 is changed
       - vg_creation_result is changed
+      - lv_creation_result is changed
+      - fs_creation_result is changed
       - (pv_size_output_01.stdout | trim | regex_replace('M', '') | float) > 450
       - (pv_size_output_01.stdout | trim | regex_replace('M', '') | float) < 600
       - (pv_size_output_02.stdout | trim | regex_replace('M', '') | float) > 950

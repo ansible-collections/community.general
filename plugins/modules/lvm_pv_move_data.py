@@ -29,11 +29,27 @@ options:
       - Must be an existing PV with enough free space.
     type: path
     required: true
+  auto_answer:
+    description:
+      - Answer yes to all prompts automatically.
+    type: bool
+    default: false
+  atomic:
+    description:
+      - Makes a pvmove operation atomic, ensuring that all affected LVs are moved to the destination PV, or none are if the operation is aborted.
+    type: bool
+    default: true
+  autobackup:
+    description:
+      - Automatically backup metadata before changes (strongly advised!).
+    type: bool
+    default: true
 notes:
   - Requires LVM2 utilities installed on the target system.
-  - Both source and destination devices must exist.
-  - Both source and destination PVs must be in the same volume group.
-  - The destination PV must have enough free space to accommodate the source PV's allocated extents.
+  - Both O(source) and O(destination) devices must exist.
+  - Both O(source) and O(destination) PVs must be in the same volume group.
+  - The O(destination) PV must have enough free space to accommodate the O(source) PV's allocated extents.
+  - Verbosity is automatically controlled by Ansible's verbosity level (using multiple C(-v) flags).
 """
 
 EXAMPLES = r"""
@@ -49,53 +65,7 @@ RETURN = r"""
 
 import os
 from ansible.module_utils.basic import AnsibleModule
-
-
-def get_pv_status(module, device):
-    """Check if the device is already a PV."""
-    cmd = ['pvs', '--noheadings', '--readonly', device]
-    return module.run_command(cmd)[0] == 0
-
-
-def get_pv_vg(module, device):
-    """Get the VG name of a PV."""
-    cmd = ['pvs', '--noheadings', '-o', 'vg_name', device]
-    rc, out, err = module.run_command(cmd)
-    if rc != 0:
-        module.fail_json(msg="Failed to get VG for device %s: %s" % (device, err))
-    vg = out.strip()
-    return None if vg == '' else vg
-
-
-def get_pv_allocated_pe(module, device):
-    """Get count of allocated physical extents in a PV."""
-    cmd = ['pvs', '--noheadings', '-o', 'pv_pe_alloc_count', device]
-    rc, out, err = module.run_command(cmd)
-    if rc != 0:
-        module.fail_json(msg="Failed to get allocated PE count for device %s: %s" % (device, err))
-    try:
-        return int(out.strip())
-    except ValueError:
-        module.fail_json(msg="Invalid allocated PE count for device %s: %s" % (device, out))
-
-
-def get_pv_total_pe(module, device):
-    """Get total number of physical extents in a PV."""
-    cmd = ['pvs', '--noheadings', '-o', 'pv_pe_count', device]
-    rc, out, err = module.run_command(cmd)
-    if rc != 0:
-        module.fail_json(msg="Failed to get total PE count for device %s: %s" % (device, err))
-    try:
-        return int(out.strip())
-    except ValueError:
-        module.fail_json(msg="Invalid total PE count for device %s: %s" % (device, out))
-
-
-def get_pv_free_pe(module, device):
-    """Calculate free physical extents in a PV."""
-    total_pe = get_pv_total_pe(module, device)
-    allocated_pe = get_pv_allocated_pe(module, device)
-    return total_pe - allocated_pe
+from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
 
 
 def main():
@@ -103,14 +73,31 @@ def main():
         argument_spec=dict(
             source=dict(type='path', required=True),
             destination=dict(type='path', required=True),
+            auto_answer=dict(type='bool', default=False),
+            atomic=dict(type='bool', default=True),
+            autobackup=dict(type='bool', default=True),
         ),
         supports_check_mode=True,
+    )
+
+    pvs_runner = CmdRunner(
+        module,
+        command="pvs",
+        arg_formats=dict(
+            noheadings=cmd_runner_fmt.as_fixed("--noheadings"),
+            readonly=cmd_runner_fmt.as_fixed("--readonly"),
+            vg_name=cmd_runner_fmt.as_fixed("-o", "vg_name"),
+            pv_pe_alloc_count=cmd_runner_fmt.as_fixed("-o", "pv_pe_alloc_count"),
+            pv_pe_count=cmd_runner_fmt.as_fixed("-o", "pv_pe_count"),
+            device=cmd_runner_fmt.as_list(),
+        )
     )
 
     source = module.params['source']
     destination = module.params['destination']
     changed = False
     actions = []
+    result = {'changed': False}
 
     # Validate device existence
     if not os.path.exists(source):
@@ -120,27 +107,51 @@ def main():
     if source == destination:
         module.fail_json(msg="Source and destination devices must be different")
 
-    # Check both are PVs
-    if not get_pv_status(module, source):
+    def run_pvs_command(arguments, device):
+        with pvs_runner(arguments) as ctx:
+            rc, out, err = ctx.run(device=device)
+            if rc != 0:
+                module.fail_json(msg="Command failed: %s" % err)
+            return out.strip()
+
+    def is_pv(device):
+        with pvs_runner("noheadings readonly device", check_rc=False) as ctx:
+            rc, out, err = ctx.run(device=device)
+        return rc == 0
+
+    if not is_pv(source):
         module.fail_json(msg="Source device %s is not a PV" % source)
-    if not get_pv_status(module, destination):
+    if not is_pv(destination):
         module.fail_json(msg="Destination device %s is not a PV" % destination)
 
-    # Check both are in the same VG
-    vg_src = get_pv_vg(module, source)
-    vg_dest = get_pv_vg(module, destination)
+    vg_src = run_pvs_command("noheadings vg_name device", source)
+    vg_dest = run_pvs_command("noheadings vg_name device", destination)
     if vg_src != vg_dest:
         module.fail_json(
             msg="Source and destination must be in the same VG. Source VG: '%s', Destination VG: '%s'." % (vg_src, vg_dest)
         )
 
-    # Check source has data to move
-    allocated = get_pv_allocated_pe(module, source)
+    def get_allocated_pe(device):
+        try:
+            return int(run_pvs_command("noheadings pv_pe_alloc_count device", device))
+        except ValueError:
+            module.fail_json(msg="Invalid allocated PE count for device %s" % device)
+
+    allocated = get_allocated_pe(source)
     if allocated == 0:
         actions.append('no allocated extents to move')
     else:
         # Check destination has enough free space
-        free_pe_dest = get_pv_free_pe(module, destination)
+        def get_total_pe(device):
+            try:
+                return int(run_pvs_command("noheadings pv_pe_count device", device))
+            except ValueError:
+                module.fail_json(msg="Invalid total PE count for device %s" % device)
+
+        def get_free_pe(device):
+            return get_total_pe(device) - get_allocated_pe(device)
+
+        free_pe_dest = get_free_pe(destination)
         if free_pe_dest < allocated:
             module.fail_json(
                 msg="Destination device %s has only %d free physical extents, but source device %s has %d allocated extents. Not enough space." %
@@ -151,16 +162,42 @@ def main():
             changed = True
             actions.append('would move data from %s to %s' % (source, destination))
         else:
-            cmd = ['pvmove', source, destination]
-            rc, out, err = module.run_command(cmd, check_rc=True)
+            pvmove_runner = CmdRunner(
+                module,
+                command="pvmove",
+                arg_formats=dict(
+                    auto_answer=cmd_runner_fmt.as_bool("-y"),
+                    atomic=cmd_runner_fmt.as_bool("--atomic"),
+                    autobackup=cmd_runner_fmt.as_fixed("--autobackup", "y" if module.params['autobackup'] else "n"),
+                    verbosity=cmd_runner_fmt.as_func(lambda v: ['-' + 'v' * v] if v > 0 else []),
+                    source=cmd_runner_fmt.as_list(),
+                    destination=cmd_runner_fmt.as_list(),
+                )
+            )
+
+            verbosity = module._verbosity
+            with pvmove_runner("auto_answer atomic autobackup verbosity source destination") as ctx:
+                rc, out, err = ctx.run(
+                    auto_answer=module.params['auto_answer'],
+                    atomic=module.params['atomic'],
+                    verbosity=verbosity,
+                    source=source,
+                    destination=destination
+                )
+                result['stdout'] = out
+                result['stderr'] = err
+
             changed = True
             actions.append('moved data from %s to %s' % (source, destination))
 
+    result['changed'] = changed
+    result['actions'] = actions
     if actions:
-        msg = "PV data move: %s" % ', '.join(actions)
+        result['msg'] = "PV data move: " + ", ".join(actions)
     else:
-        msg = "No data to move from %s" % source
-    module.exit_json(changed=changed, msg=msg)
+        result['msg'] = "No data to move from %s" % source
+
+    module.exit_json(**result)
 
 
 if __name__ == '__main__':
