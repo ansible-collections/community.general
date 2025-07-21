@@ -211,6 +211,7 @@ class CPANMinus(ModuleHelper):
         if v.mode == "compatibility":
             if v.name_check:
                 self.do_raise("Parameter name_check can only be used with mode=new")
+            self.deprecate("'mode=compatibility' is deprecated, use 'mode=new' instead", version='12.0.0', collection_name="community.general")
         else:
             if v.name and v.from_path:
                 self.do_raise("Parameters 'name' and 'from_path' are mutually exclusive when 'mode=new'")
