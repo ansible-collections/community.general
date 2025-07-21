@@ -105,8 +105,7 @@ changed:
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
 
-import errno
-import os
+import re
 
 
 class Sysrc(StateModuleHelper):
@@ -125,6 +124,10 @@ class Sysrc(StateModuleHelper):
     use_old_vardict = False
 
     def __init_module__(self):
+        # OID style names are not supported
+        if not re.match('^[a-zA-Z0-9_]+$', self.vars.name):
+            self.module.fail_json(msg="Name may only contain alpha-numeric and underscore characters")
+
         self.sysrc = self.module.get_bin_path('sysrc', True)
 
     def _contains(self):
@@ -165,7 +168,7 @@ class Sysrc(StateModuleHelper):
 
         (rc, out, err) = self.module.run_command(cmd)
         if "Permission denied" in err:
-            raise OSError(errno.EACCES, "Permission denied for %s" % self.vars.path)
+            self.module.fail_json(msg="Permission denied for %s" % self.vars.path)
 
         return rc, out, err
 

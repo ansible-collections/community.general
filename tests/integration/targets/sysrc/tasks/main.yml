@@ -422,6 +422,19 @@
           - >
             'k1="v2"' in sysrc_10394_content.stdout_lines
 
+    ##
+    ## sysrc - additional tests
+    ##
+    - name: Ensure failure on OID style name since sysrc does not support them
+      sysrc:
+        name: not.valid.var
+        value: test
+      register: sysrc_name_check
+      failed_when:
+        - sysrc_name_check is not failed
+        - >
+          'Name may only contain alpha-numeric and underscore characters' != sysrc_name_check.msg
+
   always:
 
     - name: Restore /etc/rc.conf
