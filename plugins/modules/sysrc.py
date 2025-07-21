@@ -105,6 +105,7 @@ changed:
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
 
+import os
 import re
 
 
