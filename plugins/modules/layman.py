@@ -35,7 +35,7 @@ options:
     type: str
   list_url:
     description:
-      - An URL of the alternative overlays list that defines the overlay to install. This list will be fetched and saved under
+      - An URL of the alternative overlays list that defines the overlay to install. This list is fetched and saved under
         C(${overlay_defs}/${name}.xml), where C(overlay_defs) is read from the Layman's configuration.
     aliases: [url]
     type: str
@@ -47,7 +47,7 @@ options:
     type: str
   validate_certs:
     description:
-      - If V(false), SSL certificates will not be validated. This should only be set to V(false) when no other option exists.
+      - If V(false), SSL certificates are not validated. This should only be set to V(false) when no other option exists.
     type: bool
     default: true
 """

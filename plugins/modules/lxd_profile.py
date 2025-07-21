@@ -57,7 +57,7 @@ options:
   new_name:
     description:
       - A new name of a profile.
-      - If this parameter is specified a profile will be renamed to this name.
+      - If this parameter is specified a profile is renamed to this name.
       - See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/profiles/profile_post).
     required: false
     type: str
@@ -113,7 +113,7 @@ options:
     type: str
 notes:
   - Profiles must have a unique name. If you attempt to create a profile with a name that already existed in the users namespace
-    the module will simply return as "unchanged".
+    the module simply returns as "unchanged".
 """
 
 EXAMPLES = r"""

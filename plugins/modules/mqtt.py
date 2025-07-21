@@ -44,7 +44,7 @@ options:
     type: str
     description:
       - MQTT client identifier.
-      - If not specified, a value C(hostname + pid) will be used.
+      - If not specified, it uses a value C(hostname + pid).
   topic:
     type: str
     description:
@@ -72,22 +72,22 @@ options:
     type: path
     description:
       - The path to the Certificate Authority certificate files that are to be treated as trusted by this client. If this
-        is the only option given then the client will operate in a similar manner to a web browser. That is to say it will
-        require the broker to have a certificate signed by the Certificate Authorities in ca_certs and will communicate using
-        TLS v1, but will not attempt any form of authentication. This provides basic network encryption but may not be sufficient
+        is the only option given then the client operates in a similar manner to a web browser. That is to say it requires
+        the broker to have a certificate signed by the Certificate Authorities in ca_certs and communicates using TLS v1,
+        but does not attempt any form of authentication. This provides basic network encryption but may not be sufficient
         depending on how the broker is configured.
     aliases: [ca_certs]
   client_cert:
     type: path
     description:
-      - The path pointing to the PEM encoded client certificate. If this is not None it will be used as client information
-        for TLS based authentication. Support for this feature is broker dependent.
+      - The path pointing to the PEM encoded client certificate. If this is set it is used as client information for TLS based
+        authentication. Support for this feature is broker dependent.
     aliases: [certfile]
   client_key:
     type: path
     description:
-      - The path pointing to the PEM encoded client private key. If this is not None it will be used as client information
-        for TLS based authentication. Support for this feature is broker dependent.
+      - The path pointing to the PEM encoded client private key. If this is set it is used as client information for TLS based
+        authentication. Support for this feature is broker dependent.
     aliases: [keyfile]
   tls_version:
     description:

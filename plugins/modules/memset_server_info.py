@@ -148,7 +148,7 @@ memset_api:
       description: The network zone(s) the server is in.
       returned: always
       type: list
-      sample: ['reading']
+      sample: ["reading"]
     nickname:
       description: Customer-set nickname for the server.
       returned: always

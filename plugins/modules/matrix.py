@@ -13,7 +13,7 @@ author: "Jan Christian Grünhage (@jcgruenhage)"
 module: matrix
 short_description: Send notifications to matrix
 description:
-  - This module sends html formatted notifications to matrix rooms.
+  - This module sends HTML formatted notifications to matrix rooms.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:

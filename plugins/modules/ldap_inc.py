@@ -26,8 +26,8 @@ notes:
     and the control PostRead. This extension and the control are implemented in OpenLdap but not all directory servers implement
     them. In this case, the module automatically uses a more classic method based on two phases, first the current value is
     read then the modify operation remove the old value and add the new one in a single request. If the value has changed
-    by a concurrent call then the remove action will fail. Then the sequence is retried 3 times before raising an error to
-    the playbook. In an heavy modification environment, the module does not guarante to be systematically successful.
+    by a concurrent call then the remove action fails. Then the sequence is retried 3 times before raising an error to the
+    playbook. In an heavy modification environment, the module does not guarante to be systematically successful.
   - This only deals with integer attribute of an existing entry. To modify attributes of an entry, see M(community.general.ldap_attrs)
     or to add or remove whole entries, see M(community.general.ldap_entry).
 author:
