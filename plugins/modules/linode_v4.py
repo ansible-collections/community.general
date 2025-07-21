@@ -17,7 +17,7 @@ requirements:
 author:
   - Luke Murphy (@decentral1se)
 notes:
-  - No Linode resizing is currently implemented. This module will, in time, replace the current Linode module which uses deprecated
+  - No Linode resizing is currently implemented. This module aims to replace the current Linode module which uses deprecated
     API bindings on the Linode side.
 extends_documentation_fragment:
   - community.general.attributes
@@ -43,7 +43,7 @@ options:
     type: str
   label:
     description:
-      - The instance label. This label is used as the main determiner for idempotence for the module and is therefore mandatory.
+      - The instance label. This label is used as the main determiner for idempotency for the module and is therefore mandatory.
     type: str
     required: true
   group:
@@ -53,7 +53,7 @@ options:
     type: str
   private_ip:
     description:
-      - If V(true), the created Linode will have private networking enabled and assigned a private IPv4 address.
+      - If V(true), the created Linode instance has private networking enabled and assigned a private IPv4 address.
     type: bool
     default: false
     version_added: 3.0.0
@@ -65,8 +65,8 @@ options:
     elements: str
   root_pass:
     description:
-      - The password for the root user. If not specified, one will be generated. This generated password will be available
-        in the task success JSON.
+      - The password for the root user. If not specified, it generates a new one. This generated password is available in
+        the task success JSON.
     type: str
   authorized_keys:
     description:
@@ -128,45 +128,46 @@ instance:
   description: The instance description in JSON serialized form.
   returned: Always.
   type: dict
-  sample: {
-    "root_pass": "foobar",  # if auto-generated
-    "alerts": {
-      "cpu": 90,
-      "io": 10000,
-      "network_in": 10,
-      "network_out": 10,
-      "transfer_quota": 80
-    },
-    "backups": {
-      "enabled": false,
-      "schedule": {
-        "day": null,
-        "window": null
-      }
-    },
-    "created": "2018-09-26T08:12:33",
-    "group": "Foobar Group",
-    "hypervisor": "kvm",
-    "id": 10480444,
-    "image": "linode/centos7",
-    "ipv4": [
-      "130.132.285.233"
-    ],
-    "ipv6": "2a82:7e00::h03c:46ff:fe04:5cd2/64",
-    "label": "lin-foo",
-    "region": "eu-west",
-    "specs": {
-      "disk": 25600,
-      "memory": 1024,
-      "transfer": 1000,
-      "vcpus": 1
-    },
-    "status": "running",
-    "tags": [],
-    "type": "g6-nanode-1",
-    "updated": "2018-09-26T10:10:14",
-    "watchdog_enabled": true
-  }
+  sample:
+    {
+      "root_pass": "foobar",  # if auto-generated
+      "alerts": {
+        "cpu": 90,
+        "io": 10000,
+        "network_in": 10,
+        "network_out": 10,
+        "transfer_quota": 80
+      },
+      "backups": {
+        "enabled": false,
+        "schedule": {
+          "day": null,
+          "window": null
+        }
+      },
+      "created": "2018-09-26T08:12:33",
+      "group": "Foobar Group",
+      "hypervisor": "kvm",
+      "id": 10480444,
+      "image": "linode/centos7",
+      "ipv4": [
+        "130.132.285.233"
+      ],
+      "ipv6": "2a82:7e00::h03c:46ff:fe04:5cd2/64",
+      "label": "lin-foo",
+      "region": "eu-west",
+      "specs": {
+        "disk": 25600,
+        "memory": 1024,
+        "transfer": 1000,
+        "vcpus": 1
+      },
+      "status": "running",
+      "tags": [],
+      "type": "g6-nanode-1",
+      "updated": "2018-09-26T10:10:14",
+      "watchdog_enabled": true
+    }
 """
 
 import traceback

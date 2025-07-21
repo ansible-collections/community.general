@@ -75,8 +75,8 @@ options:
   managed_filters_merge_mode:
     type: str
     description:
-      - In merge mode existing categories are kept or updated, new categories are added.
-      - In replace mode all categories will be replaced with the supplied O(managed_filters).
+      - In V(merge) mode existing categories are kept or updated, new categories are added.
+      - In V(replace) mode all categories are replaced with the supplied O(managed_filters).
     choices: [merge, replace]
     default: replace
   belongsto_filters:

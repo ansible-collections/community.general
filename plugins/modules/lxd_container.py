@@ -101,9 +101,9 @@ options:
     type: str
   target:
     description:
-      - For cluster deployments. Will attempt to create an instance on a target node. If the instance exists elsewhere in
-        a cluster, then it will not be replaced or moved. The name should respond to same name of the node you see in C(lxc
-        cluster list).
+      - For cluster deployments. It attempts to create an instance on a target node. If the instance exists elsewhere in a
+        cluster, then it is not replaced nor moved. The name should respond to same name of the node you see in C(lxc cluster
+        list).
     type: str
     required: false
     version_added: 1.0.0
@@ -134,7 +134,7 @@ options:
     type: bool
   wait_for_container:
     description:
-      - If set to V(true), the tasks will wait till the task reports a success status when performing container operations.
+      - If set to V(true), the tasks wait until the task reports a success status when performing container operations.
     default: false
     type: bool
     version_added: 4.4.0
@@ -180,7 +180,7 @@ options:
     type: str
 notes:
   - Instances can be a container or a virtual machine, both of them must have unique name. If you attempt to create an instance
-    with a name that already existed in the users namespace the module will simply return as "unchanged".
+    with a name that already existed in the users namespace, the module simply returns as "unchanged".
   - There are two ways to run commands inside a container or virtual machine, using the command module or using the ansible
     lxd connection plugin bundled in Ansible >= 2.1, the later requires python to be installed in the instance which can be
     done with the command module.
@@ -262,7 +262,7 @@ EXAMPLES = r"""
         source:
           type: image
           mode: pull
-         # Provides Ubuntu minimal images
+          # Provides Ubuntu minimal images
           server: https://cloud-images.ubuntu.com/minimal/releases/
           protocol: simplestreams
           alias: "22.04"
@@ -393,7 +393,12 @@ addresses:
   description: Mapping from the network device name to a list of IPv4 addresses in the instance.
   returned: when state is started or restarted
   type: dict
-  sample: {"eth0": ["10.155.92.191"]}
+  sample:
+    {
+      "eth0": [
+        "10.155.92.191"
+      ]
+    }
 old_state:
   description: The old state of the instance.
   returned: when state is started or restarted
