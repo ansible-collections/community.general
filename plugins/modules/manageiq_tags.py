@@ -63,11 +63,11 @@ options:
   resource_name:
     type: str
     description:
-      - The name of the resource at which tags will be controlled.
+      - The name of the resource at which tags are be controlled.
       - Must be specified if O(resource_id) is not set. Both options are mutually exclusive.
   resource_id:
     description:
-      - The ID of the resource at which tags will be controlled.
+      - The ID of the resource at which tags are controlled.
       - Must be specified if O(resource_name) is not set. Both options are mutually exclusive.
     type: int
     version_added: 2.2.0

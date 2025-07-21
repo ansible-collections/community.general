@@ -90,7 +90,7 @@ options:
   attach:
     description:
       - A list of pathnames of files to attach to the message.
-      - Attached files will have their content-type set to C(application/octet-stream).
+      - Attached files have their content-type set to C(application/octet-stream).
     type: list
     elements: path
     default: []
@@ -115,12 +115,12 @@ options:
     default: plain
   secure:
     description:
-      - If V(always), the connection will only send email if the connection is Encrypted. If the server does not accept the
-        encrypted connection it will fail.
-      - If V(try), the connection will attempt to setup a secure SSL/TLS session, before trying to send.
-      - If V(never), the connection will not attempt to setup a secure SSL/TLS session, before sending.
-      - If V(starttls), the connection will try to upgrade to a secure SSL/TLS connection, before sending. If it is unable
-        to do so it will fail.
+      - If V(always), the connection only sends email if the connection is Encrypted. If the server does not accept the encrypted
+        connection it fails.
+      - If V(try), the connection attempts to setup a secure SSL/TLS session, before trying to send.
+      - If V(never), the connection does not attempt to setup a secure SSL/TLS session, before sending.
+      - If V(starttls), the connection tries to upgrade to a secure SSL/TLS connection, before sending. If it is unable to
+        do so it fails.
     type: str
     choices: [always, never, starttls, try]
     default: try
@@ -137,7 +137,7 @@ options:
   message_id_domain:
     description:
       - The domain name to use for the L(Message-ID header, https://en.wikipedia.org/wiki/Message-ID).
-      - Note that this is only available on Python 3+. On Python 2, this value will be ignored.
+      - Note that this is only available on Python 3+. On Python 2, this value is ignored.
     type: str
     default: ansible
     version_added: 8.2.0

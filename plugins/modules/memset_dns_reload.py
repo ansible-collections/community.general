@@ -36,9 +36,9 @@ options:
     default: false
     type: bool
     description:
-      - Boolean value, if set will poll the reload job's status and return when the job has completed (unless the 30 second
-        timeout is reached first). If the timeout is reached then the task will not be marked as failed, but stderr will indicate
-        that the polling failed.
+      - If V(true), it polls the reload job's status and return when the job has completed (unless the 30 second timeout is
+        reached first). If the timeout is reached then the task does not return as failed, but stderr indicates that the polling
+        failed.
 """
 
 EXAMPLES = r"""

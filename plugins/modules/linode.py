@@ -47,8 +47,8 @@ options:
   linode_id:
     description:
       - Unique ID of a Linode server. This value is read-only in the sense that if you specify it on creation of a Linode
-        it will not be used. The Linode API generates these IDs and we can those generated value here to reference a Linode
-        more specifically. This is useful for idempotence.
+        it is not used. The Linode API generates these IDs and we can those generated value here to reference a Linode more
+        specifically. This is useful for idempotency.
     aliases: [lid]
     type: int
   additional_disks:
@@ -103,7 +103,7 @@ options:
     type: int
   backupwindow:
     description:
-      - The time window in which backups will be taken.
+      - The time window in which backups are taken.
     type: int
   plan:
     description:

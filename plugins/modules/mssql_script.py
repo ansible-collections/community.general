@@ -23,7 +23,7 @@ attributes:
   check_mode:
     support: partial
     details:
-      - The script will not be executed in check mode.
+      - The script is not be executed in check mode.
   diff_mode:
     support: none
 
@@ -64,8 +64,8 @@ options:
     version_added: 8.4.0
   output:
     description:
-      - With V(default) each row will be returned as a list of values. See RV(query_results).
-      - Output format V(dict) will return dictionary with the column names as keys. See RV(query_results_dict).
+      - With V(default) each row is returned as a list of values. See RV(query_results).
+      - Output format V(dict) returns dictionary with the column names as keys. See RV(query_results_dict).
       - V(dict) requires named columns to be returned by each query otherwise an error is thrown.
     choices: ["dict", "default"]
     default: 'default'
@@ -170,12 +170,33 @@ query_results:
   type: list
   elements: list
   returned: success and O(output=default)
-  sample: [[[["Batch 0 - Select 0"]], [["Batch 0 - Select 1"]]], [[["Batch 1 - Select 0"]]]]
+  sample:
+    [
+      [
+        [
+          [
+            "Batch 0 - Select 0"
+          ]
+        ],
+        [
+          [
+            "Batch 0 - Select 1"
+          ]
+        ]
+      ],
+      [
+        [
+          [
+            "Batch 1 - Select 0"
+          ]
+        ]
+      ]
+    ]
   contains:
     queries:
       description:
         - List of result sets of each query.
-        - If a query returns no results, the results of this and all the following queries will not be included in the output.
+        - If a query returns no results, the results of this and all the following queries are not included in the output.
         - Use the V(GO) keyword in O(script) to separate queries.
       type: list
       elements: list
@@ -197,12 +218,33 @@ query_results_dict:
   type: list
   elements: list
   returned: success and O(output=dict)
-  sample: [[[["Batch 0 - Select 0"]], [["Batch 0 - Select 1"]]], [[["Batch 1 - Select 0"]]]]
+  sample:
+    [
+      [
+        [
+          [
+            "Batch 0 - Select 0"
+          ]
+        ],
+        [
+          [
+            "Batch 0 - Select 1"
+          ]
+        ]
+      ],
+      [
+        [
+          [
+            "Batch 1 - Select 0"
+          ]
+        ]
+      ]
+    ]
   contains:
     queries:
       description:
         - List of result sets of each query.
-        - If a query returns no results, the results of this and all the following queries will not be included in the output.
+        - If a query returns no results, the results of this and all the following queries are not included in the output.
           Use V(GO) keyword to separate queries.
       type: list
       elements: list

@@ -31,7 +31,7 @@ options:
     description:
       - V(absent) - provider should not exist,
       - V(present) - provider should be present,
-      - V(refresh) - provider will be refreshed.
+      - V(refresh) - provider is refreshed.
     choices: ['absent', 'present', 'refresh']
     default: 'present'
   name:
@@ -44,7 +44,7 @@ options:
     choices: ['Openshift', 'Amazon', 'oVirt', 'VMware', 'Azure', 'Director', 'OpenStack', 'GCE']
   zone:
     type: str
-    description: The ManageIQ zone name that will manage the provider.
+    description: The ManageIQ zone name that manages the provider.
     default: 'default'
   provider_region:
     type: str
