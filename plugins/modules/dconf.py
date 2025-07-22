@@ -67,7 +67,6 @@ options:
         is why the type of this parameter is "raw").
   path:
     type: path
-    required: false
     description:
       - Remote path to the configuration to apply.
       - One of O(value) and O(path) are required for O(state=present).
@@ -557,12 +556,6 @@ def main():
             # Use 'dconf write' to modify the key
             changed = dconf.write(module.params['key'], module.params['value'])
             module.exit_json(changed=changed)
-        else:
-            # NOTE: This case shouldn't happen yet as 'key' and 'path' are
-            #       required with 'state=present'
-            # TODO: if 'key' ends with '/' then 'dconf list' should be used
-            #       else, 'dconf read'
-            module.fail_json(msg="'key' or 'path' must be defined.")
     elif module.params['state'] == 'absent':
         changed = dconf.reset(module.params['key'])
         module.exit_json(changed=changed)
