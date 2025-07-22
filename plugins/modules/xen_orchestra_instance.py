@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2024 Ansible Project
+# Copyright (c) 2025 Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -11,7 +11,7 @@ module: xen_orchestra_instance
 short_description: Management of instances on Xen Orchestra
 description:
   - Allows you to create/delete/restart/stop instances on Xen Orchestra.
-version_added: 10.3.0
+version_added: 11.0.0
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -37,7 +37,7 @@ options:
     type: bool
     default: true
   use_tls:
-    description: Use wss when connecting to the Xen Orchestra API.
+    description: Use C(wss) when connecting to the Xen Orchestra API.
     type: bool
     default: true
   state:
@@ -45,7 +45,7 @@ options:
       - State in which the Virtual Machine should be.
       - If O(state=present) then O(template) and O(label) are required.
       - If O(state=absent), O(state=started), O(state=stopped) or O(state=restarted) then O(vm_uid) is required.
-      - When state is O(present) then O(boot_after_create) can be used to boot the VM after creation.
+      - When state is O(state=present) then O(boot_after_create) can be used to boot the VM after creation.
       - There is no idempotence guarantee when O(state=present), a new VM will always be created.
     type: str
     choices: ['present', 'started', 'absent', 'stopped', 'restarted']
@@ -64,7 +64,7 @@ options:
   template:
     description:
       - UID of a template to create Virtual Machine from.
-      - Muse be provided when O(state=present).
+      - Must be provided when O(state=present).
     type: str
   boot_after_create:
     description: Boot Virtual Machine after creation, can be used when O(state=present).
