@@ -494,8 +494,8 @@ def run_module():
         name=dict(type="str", required=True),
         state=dict(type="str", choices=["enabled", "disabled", "absent"], default="enabled"),
         chroot=dict(type="str"),
-        includepkgs=dict(type='list', elements="str", required=False),
-        excludepkgs=dict(type='list', elements="str", required=False),
+        includepkgs=dict(type='list', elements="str"),
+        excludepkgs=dict(type='list', elements="str"),
     )
     module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
     params = module.params

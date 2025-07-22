@@ -398,7 +398,7 @@ def main():
             state=dict(default='present', choices=['present', 'absent', 'read']),
             key=dict(required=True, type='str', no_log=False),
             # Converted to str below after special handling of bool.
-            value=dict(required=False, default=None, type='raw'),
+            value=dict(type='raw'),
         ),
         supports_check_mode=True,
         required_if=[

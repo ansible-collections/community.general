@@ -62,7 +62,7 @@ from ansible.module_utils.basic import AnsibleModule
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            arguments=dict(required=False, type='list', elements='str')
+            arguments=dict(type='list', elements='str')
         )
     )
 

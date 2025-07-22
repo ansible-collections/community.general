@@ -247,14 +247,14 @@ class Cargo(object):
 
 def main():
     arg_spec = dict(
-        executable=dict(default=None, type="path"),
+        executable=dict(type="path"),
         name=dict(required=True, type="list", elements="str"),
-        path=dict(default=None, type="path"),
+        path=dict(type="path"),
         state=dict(default="present", choices=["present", "absent", "latest"]),
-        version=dict(default=None, type="str"),
+        version=dict(type="str"),
         locked=dict(default=False, type="bool"),
-        directory=dict(default=None, type="path"),
-        features=dict(default=[], required=False, type="list", elements="str"),
+        directory=dict(type="path"),
+        features=dict(default=[], type="list", elements="str"),
     )
     module = AnsibleModule(argument_spec=arg_spec, supports_check_mode=True)
 

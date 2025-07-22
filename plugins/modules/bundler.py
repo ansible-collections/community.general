@@ -131,18 +131,18 @@ def get_bundler_executable(module):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            executable=dict(default=None, required=False),
-            state=dict(default='present', required=False, choices=['present', 'latest']),
-            chdir=dict(default=None, required=False, type='path'),
-            exclude_groups=dict(default=None, required=False, type='list', elements='str'),
-            clean=dict(default=False, required=False, type='bool'),
-            gemfile=dict(default=None, required=False, type='path'),
-            local=dict(default=False, required=False, type='bool'),
-            deployment_mode=dict(default=False, required=False, type='bool'),
-            user_install=dict(default=True, required=False, type='bool'),
-            gem_path=dict(default=None, required=False, type='path'),
-            binstub_directory=dict(default=None, required=False, type='path'),
-            extra_args=dict(default=None, required=False),
+            executable=dict(),
+            state=dict(default='present', choices=['present', 'latest']),
+            chdir=dict(type='path'),
+            exclude_groups=dict(type='list', elements='str'),
+            clean=dict(default=False, type='bool'),
+            gemfile=dict(type='path'),
+            local=dict(default=False, type='bool'),
+            deployment_mode=dict(default=False, type='bool'),
+            user_install=dict(default=True, type='bool'),
+            gem_path=dict(type='path'),
+            binstub_directory=dict(type='path'),
+            extra_args=dict(),
         ),
         supports_check_mode=True
     )

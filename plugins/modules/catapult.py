@@ -138,7 +138,7 @@ def main():
             user_id=dict(required=True),
             api_token=dict(required=True, no_log=True),
             api_secret=dict(required=True, no_log=True),
-            media=dict(default=None, required=False),
+            media=dict(),
         ),
     )
 
