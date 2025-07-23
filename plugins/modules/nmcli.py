@@ -34,7 +34,7 @@ options:
   state:
     description:
       - Whether the device should exist or not, taking action if the state is different from what is stated.
-      - Using O(state=present) creates connection set to be brought up automaticall.
+      - Using O(state=present) creates connection set to be brought up automatically.
       - Using O(state=up) and O(state=down) does not modify connection with other parameters. These states have been added
         in community.general 9.5.0.
     type: str
@@ -73,7 +73,7 @@ options:
       - The interface to bind the connection to.
       - The connection is only applicable to this interface name.
       - A special value of V(*) can be used for interface-independent connections.
-      - The ifname argument is mandatory for all connection types except bond, team, bridge, vlan and vpn.
+      - The O(ifname) argument is mandatory for all connection types except bond, team, bridge, vlan and vpn.
       - This parameter defaults to O(conn_name) when left unset for all connection types except vpn that removes it.
     type: str
   type:
