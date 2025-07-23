@@ -21,10 +21,10 @@ extends_documentation_fragment:
 description:
   - Manage the network devices. Create, modify and manage various connection and device type, for example V(ethernet), V(team),
     V(bond), V(vlan) and so on.
-  - 'On CentOS 8 and Fedora >=29 like systems, the requirements can be met by installing the following packages: NetworkManager.'
-  - 'On CentOS 7 and Fedora <=28 like systems, the requirements can be met by installing the following packages: NetworkManager-tui.'
-  - 'On Ubuntu and Debian like systems, the requirements can be met by installing the following packages: network-manager.'
-  - 'On openSUSE, the requirements can be met by installing the following packages: NetworkManager.'
+  - 'On CentOS 8 and Fedora >=29 like systems, the requirements can be met by installing the following packages: C(NetworkManager).'
+  - 'On CentOS 7 and Fedora <=28 like systems, the requirements can be met by installing the following packages: C(NetworkManager-tui).'
+  - 'On Ubuntu and Debian like systems, the requirements can be met by installing the following packages: C(network-manager).'
+  - 'On openSUSE, the requirements can be met by installing the following packages: C(NetworkManager).'
 attributes:
   check_mode:
     support: full
@@ -34,8 +34,8 @@ options:
   state:
     description:
       - Whether the device should exist or not, taking action if the state is different from what is stated.
-      - Using O(state=present) to create connection will automatically bring connection up.
-      - Using O(state=up) and O(state=down) will not modify connection with other parameters. These states have been added
+      - Using O(state=present) creates connection set to be brought up automaticall.
+      - Using O(state=up) and O(state=down) does not modify connection with other parameters. These states have been added
         in community.general 9.5.0.
     type: str
     required: true
@@ -48,7 +48,7 @@ options:
     default: true
   autoconnect_priority:
     description:
-      - The priority of the connection profile for autoconnect. If set, connection profiles with higher priority will be preferred.
+      - The priority of the connection profile for autoconnect. If set, connection profiles with higher priority are preferred.
     type: int
     version_added: 11.0.0
   autoconnect_retries:
@@ -71,7 +71,7 @@ options:
   ifname:
     description:
       - The interface to bind the connection to.
-      - The connection will only be applicable to this interface name.
+      - The connection is only applicable to this interface name.
       - A special value of V(*) can be used for interface-independent connections.
       - The ifname argument is mandatory for all connection types except bond, team, bridge, vlan and vpn.
       - This parameter defaults to O(conn_name) when left unset for all connection types except vpn that removes it.
@@ -501,7 +501,7 @@ options:
   runner_fast_rate:
     description:
       - Option specifies the rate at which our link partner is asked to transmit LACPDU packets. If this is V(true) then packets
-        will be sent once per second. Otherwise they will be sent every 30 seconds.
+        are sent once per second. Otherwise they are sent every 30 seconds.
       - Only allowed for O(runner=lacp).
     type: bool
     version_added: 6.5.0
@@ -595,7 +595,7 @@ options:
           - Indicates whether Fast Initial Link Setup (802.11ai) must be enabled for the connection.
           - One of V(0) (use global default value), V(1) (disable FILS), V(2) (enable FILS if the supplicant and the access
             point support it) or V(3) (enable FILS and fail if not supported).
-          - When set to V(0) and no global default is set, FILS will be optionally enabled.
+          - When set to V(0) and no global default is set, FILS is optionally enabled.
         type: int
         choices: [0, 1, 2, 3]
         default: 0
@@ -639,7 +639,7 @@ options:
           - Indicates whether Protected Management Frames (802.11w) must be enabled for the connection.
           - One of V(0) (use global default value), V(1) (disable PMF), V(2) (enable PMF if the supplicant and the access
             point support it) or V(3) (enable PMF and fail if not supported).
-          - When set to V(0) and no global default is set, PMF will be optionally enabled.
+          - When set to V(0) and no global default is set, PMF is optionally enabled.
         type: int
         choices: [0, 1, 2, 3]
         default: 0
@@ -672,8 +672,8 @@ options:
         description:
           - Controls the interpretation of WEP keys.
           - Allowed values are V(1), in which case the key is either a 10- or 26-character hexadecimal string, or a 5- or
-            13-character ASCII password; or V(2), in which case the passphrase is provided as a string and will be hashed
-            using the de-facto MD5 method to derive the actual WEP key.
+            13-character ASCII password; or V(2), in which case the passphrase is provided as a string and it is hashed using
+            the de-facto MD5 method to derive the actual WEP key.
         type: int
         choices: [1, 2]
       wep-key0:
@@ -708,8 +708,8 @@ options:
       wps-method:
         description:
           - Flags indicating which mode of WPS is to be used if any.
-          - There is little point in changing the default setting as NetworkManager will automatically determine whether it
-            is feasible to start WPS enrollment from the Access Point capabilities.
+          - There is little point in changing the default setting as NetworkManager automatically determines whether it is
+            feasible to start WPS enrollment from the Access Point capabilities.
           - WPS can be disabled by setting this property to a value of V(1).
         type: int
         default: 0
@@ -753,8 +753,8 @@ options:
         description:
           - 802.11 frequency band of the network.
           - One of V(a) for 5GHz 802.11a or V(bg) for 2.4GHz 802.11.
-          - This will lock associations to the Wi-Fi network to the specific band, so for example, if V(a) is specified, the
-            device will not associate with the same network in the 2.4GHz band even if the network's settings are compatible.
+          - This locks associations to the Wi-Fi network to the specific band, so for example, if V(a) is specified, the device
+            does not associate with the same network in the 2.4GHz band even if the network's settings are compatible.
           - This setting depends on specific driver capability and may not work with all drivers.
         type: str
         choices: [a, bg]
@@ -767,7 +767,7 @@ options:
       channel:
         description:
           - Wireless channel to use for the Wi-Fi connection.
-          - The device will only join (or create for Ad-Hoc networks) a Wi-Fi network on the specified channel.
+          - The device only joins (or creates for Ad-Hoc networks) a Wi-Fi network on the specified channel.
           - Because channel numbers overlap between bands, this property also requires the O(wifi.band) property to be set.
         type: int
         default: 0
@@ -782,7 +782,7 @@ options:
           - With O(wifi.cloned-mac-address) setting V(random) or V(stable), by default all bits of the MAC address are scrambled
             and a locally-administered, unicast MAC address is created. This property allows to specify that certain bits
             are fixed.
-          - Note that the least significant bit of the first MAC address will always be unset to create a unicast MAC address.
+          - Note that the least significant bit of the first MAC address is always unset to create a unicast MAC address.
           - If the property is V(null), it is eligible to be overwritten by a default connection setting.
           - If the value is still V(null) or an empty string, the default is to create a locally-administered, unicast MAC
             address.
@@ -792,12 +792,12 @@ options:
             3 bytes using the V(random) or V(stable) algorithm.
           - If the value contains one additional MAC address after the mask, this address is used instead of the current MAC
             address to fill the bits that shall not be randomized.
-          - For example, a value of V(FE:FF:FF:00:00:00 68:F7:28:00:00:00) will set the OUI of the MAC address to 68:F7:28,
-            while the lower bits are randomized.
-          - A value of V(02:00:00:00:00:00 00:00:00:00:00:00) will create a fully scrambled globally-administered, burned-in
-            MAC address.
+          - For example, a value of V(FE:FF:FF:00:00:00 68:F7:28:00:00:00) sets the OUI of the MAC address to 68:F7:28, while
+            the lower bits are randomized.
+          - A value of V(02:00:00:00:00:00 00:00:00:00:00:00) creates a fully scrambled globally-administered, burned-in MAC
+            address.
           - If the value contains more than one additional MAC addresses, one of them is chosen randomly. For example, V(02:00:00:00:00:00
-            00:00:00:00:00:00 02:00:00:00:00:00) will create a fully scrambled MAC address, randomly locally or globally administered.
+            00:00:00:00:00:00 02:00:00:00:00:00) creates a fully scrambled MAC address, randomly locally or globally administered.
         type: str
       hidden:
         description:
@@ -827,7 +827,7 @@ options:
         choices: [0, 1, 2]
       mac-address:
         description:
-          - If specified, this connection will only apply to the Wi-Fi device whose permanent MAC address matches.
+          - If specified, this connection only applies to the Wi-Fi device whose permanent MAC address matches.
           - This property does not change the MAC address of the device (for example for MAC spoofing).
         type: str
       mode:
@@ -896,25 +896,25 @@ options:
       apn:
         description:
           - The GPRS Access Point Name specifying the APN used when establishing a data session with the GSM-based network.
-          - The APN often determines how the user will be billed for their network usage and whether the user has access to
-            the Internet or just a provider-specific walled-garden, so it is important to use the correct APN for the user's
-            mobile broadband plan.
+          - The APN often determines how the user is billed for their network usage and whether the user has access to the
+            Internet or just a provider-specific walled-garden, so it is important to use the correct APN for the user's mobile
+            broadband plan.
           - The APN may only be composed of the characters a-z, 0-9, ., and - per GSM 03.60 Section 14.9.
         type: str
       auto-config:
-        description: When V(true), the settings such as O(gsm.apn), O(gsm.username), or O(gsm.password) will default to values
-          that match the network the modem will register to in the Mobile Broadband Provider database.
+        description: When V(true), the settings such as O(gsm.apn), O(gsm.username), or O(gsm.password) default to values
+          that match the network the modem registers to in the Mobile Broadband Provider database.
         type: bool
         default: false
       device-id:
         description:
           - The device unique identifier (as given by the V(WWAN) management service) which this connection applies to.
-          - If given, the connection will only apply to the specified device.
+          - If given, the connection only applies to the specified device.
         type: str
       home-only:
         description:
-          - When V(true), only connections to the home network will be allowed.
-          - Connections to roaming networks will not be made.
+          - When V(true), only connections to the home network are allowed.
+          - Connections to roaming networks are not made.
         type: bool
         default: false
       mtu:
@@ -925,7 +925,7 @@ options:
       network-id:
         description:
           - The Network ID (GSM LAI format, ie MCC-MNC) to force specific network registration.
-          - If the Network ID is specified, NetworkManager will attempt to force the device to register only on the specified
+          - If the Network ID is specified, NetworkManager attempts to force the device to register only on the specified
             network.
           - This can be used to ensure that the device does not roam when direct roaming control of the device is not otherwise
             possible.
@@ -944,7 +944,7 @@ options:
           - NMSettingSecretFlags indicating how to handle the O(gsm.password) property.
           - 'Following choices are allowed: V(0) B(NONE): The system is responsible for providing and storing this secret
             (default), V(1) B(AGENT_OWNED): A user secret agent is responsible for providing and storing this secret; when
-            it is required agents will be asked to retrieve it V(2) B(NOT_SAVED): This secret should not be saved, but should
+            it is required agents are asked to retrieve it V(2) B(NOT_SAVED): This secret should not be saved, but should
             be requested from the user each time it is needed V(4) B(NOT_REQUIRED): In situations where it cannot be automatically
             determined that the secret is required (some VPNs and PPP providers do not require all secrets) this flag indicates
             that the specific secret is not required.'
@@ -966,14 +966,14 @@ options:
       sim-id:
         description:
           - The SIM card unique identifier (as given by the C(WWAN) management service) which this connection applies to.
-          - If given, the connection will apply to any device also allowed by O(gsm.device-id) which contains a SIM card matching
+          - If given, the connection applies to any device also allowed by O(gsm.device-id) which contains a SIM card matching
             the given identifier.
         type: str
       sim-operator-id:
         description:
           - A MCC/MNC string like V(310260) or V(21601I) identifying the specific mobile network operator which this connection
             applies to.
-          - If given, the connection will apply to any device also allowed by O(gsm.device-id) and O(gsm.sim-id) which contains
+          - If given, the connection applies to any device also allowed by O(gsm.device-id) and O(gsm.sim-id) which contains
             a SIM card provisioned by the given operator.
         type: str
       username:
@@ -1032,8 +1032,8 @@ options:
       ip4-auto-default-route:
         description:
           - Whether to enable special handling of the IPv4 default route.
-          - If enabled, the IPv4 default route from O(wireguard.peer-routes) will be placed to a dedicated routing-table and
-            two policy routing rules will be added.
+          - If enabled, the IPv4 default route from O(wireguard.peer-routes) is placed to a dedicated routing-table and two
+            policy routing rules are added.
           - The fwmark number is also used as routing-table for the default-route, and if fwmark is zero, an unused fwmark/table
             is chosen automatically. This corresponds to what wg-quick does with Table=auto and what WireGuard calls "Improved
             Rule-based Routing".
@@ -1043,7 +1043,7 @@ options:
           - Like O(wireguard.ip4-auto-default-route), but for the IPv6 default route.
         type: bool
       listen-port:
-        description: The WireGuard connection listen-port. If not specified, the port will be chosen randomly when the interface
+        description: The WireGuard connection listen-port. If not specified, the port is chosen randomly when the interface
           comes up.
         type: int
       mtu:
@@ -1056,12 +1056,12 @@ options:
       peer-routes:
         description:
           - Whether to automatically add routes for the AllowedIPs ranges of the peers.
-          - If V(true) (the default), NetworkManager will automatically add routes in the routing tables according to C(ipv4.route-table)
+          - If V(true) (the default), NetworkManager automatically adds routes in the routing tables according to C(ipv4.route-table)
             and C(ipv6.route-table). Usually you want this automatism enabled.
           - If V(false), no such routes are added automatically. In this case, the user may want to configure static routes
             in C(ipv4.routes) and C(ipv6.routes), respectively.
           - Note that if the peer's AllowedIPs is V(0.0.0.0/0) or V(::/0) and the profile's C(ipv4.never-default) or C(ipv6.never-default)
-            setting is enabled, the peer route for this peer will not be added automatically.
+            setting is enabled, the peer route for this peer is not added automatically.
         type: bool
       private-key:
         description: The 256 bit private-key in base64 encoding.
@@ -1079,7 +1079,7 @@ options:
     version_added: 5.1.0
     suboptions:
       permissions:
-        description: User that will have permission to use the connection.
+        description: User that has permission to use the connection.
         type: str
         required: true
       service-type:
@@ -1096,7 +1096,7 @@ options:
           - NMSettingSecretFlags indicating how to handle the C(vpn.password) property.
           - 'Following choices are allowed: V(0) B(NONE): The system is responsible for providing and storing this secret
             (default); V(1) B(AGENT_OWNED): A user secret agent is responsible for providing and storing this secret; when
-            it is required agents will be asked to retrieve it; V(2) B(NOT_SAVED): This secret should not be saved, but should
+            it is required agents are asked to retrieve it; V(2) B(NOT_SAVED): This secret should not be saved, but should
             be requested from the user each time it is needed; V(4) B(NOT_REQUIRED): In situations where it cannot be automatically
             determined that the secret is required (some VPNs and PPP providers do not require all secrets) this flag indicates
             that the specific secret is not required.'
@@ -1115,7 +1115,8 @@ options:
       ipsec-psk:
         description:
           - The pre-shared key in base64 encoding.
-          - "You can encode using this Ansible jinja2 expression: V(\"0s{{ '[YOUR PRE-SHARED KEY]' | ansible.builtin.b64encode }}\")."
+          - >
+            You can encode using this Ansible Jinja2 expression: V("0s{{ '[YOUR PRE-SHARED KEY]' | ansible.builtin.b64encode }}").
           - This is only used when O(vpn.ipsec-enabled=true).
         type: str
   sriov:
