@@ -158,3 +158,52 @@
         that:
           - results is not changed
           - (results.packages | default([]) | length) == 0
+
+    - name: Install package with empty name
+      community.general.apk:
+        name: ""
+      register: result_empty
+      ignore_errors: true
+
+    - name: Assert failure due to empty package name
+      ansible.builtin.assert:
+        that:
+          - result_empty is failed
+          - "'Package name cannot be empty' in result_empty.msg"
+
+    - name: Install package name with only spaces
+      community.general.apk:
+        name: ["   "]
+      register: result_spaces
+      ignore_errors: true
+      
+
+    - name: Assert failure due to whitespace-only package name
+      ansible.builtin.assert:
+        that:
+          - result_spaces is failed
+          - "'Package name cannot be empty' in result_spaces.msg"
+
+    - name: Accept list with valid and empty string
+      community.general.apk:
+        name: ["busybox", ""]
+      register: result_valid_mixed
+      ignore_errors: true
+
+    - name: Assert success with mixed package list
+      ansible.builtin.assert:
+        that:
+          - result_valid_mixed is not failed
+
+    - name: Reject package name list with multiple empty/whitespace-only strings
+      community.general.apk:
+        name: ["", "   "]
+      register: result_multiple_empty
+      ignore_errors: true
+
+    - name: Assert failure due to all package names being empty or whitespace
+      ansible.builtin.assert:
+        that:
+          - result_multiple_empty is failed
+          - "'All package names are empty or whitespace' in result_multiple_empty.msg"
+      ignore_errors: true
