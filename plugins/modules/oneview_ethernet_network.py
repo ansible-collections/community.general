@@ -27,9 +27,9 @@ options:
   state:
     description:
       - Indicates the desired state for the Ethernet Network resource.
-      - V(present) will ensure data properties are compliant with OneView.
-      - V(absent) will remove the resource from OneView, if it exists.
-      - V(default_bandwidth_reset) will reset the network connection template to the default.
+      - V(present) ensures data properties are compliant with OneView.
+      - V(absent) removes the resource from OneView, if it exists.
+      - V(default_bandwidth_reset) resets the network connection template to the default.
     type: str
     default: present
     choices: [present, absent, default_bandwidth_reset]

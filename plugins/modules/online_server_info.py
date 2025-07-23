@@ -41,7 +41,7 @@ online_server_info:
   type: list
   elements: dict
   sample:
-    "online_server_info": [
+    [
       {
         "abuse": "abuse@example.com",
         "anti_ddos": false,
