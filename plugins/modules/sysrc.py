@@ -121,12 +121,12 @@ class Sysrc(StateModuleHelper):
         ),
         supports_check_mode=True
     )
-    output_params = ('value')
+    output_params = ('value',)
     use_old_vardict = False
 
     def __init_module__(self):
         # OID style names are not supported
-        if not re.match('^[a-zA-Z0-9_]+$', self.vars.name):
+        if not re.match(r'^\w+$', self.vars.name, re.ASCII):
             self.module.fail_json(msg="Name may only contain alpha-numeric and underscore characters")
 
         self.sysrc = self.module.get_bin_path('sysrc', True)
@@ -144,15 +144,16 @@ class Sysrc(StateModuleHelper):
         if not os.path.exists(self.vars.path):
             return None
 
-        (rc, out, err) = self._sysrc('-c', self.vars.name)
-        if rc == 1:
-            return None
-
-        (rc, out, err) = self._sysrc('-n', self.vars.name)
+        (rc, out, err) = self._sysrc('-v', '-n', self.vars.name)
         if "unknown variable" in err or "unknown variable" in out:
+            # Prior to FreeBSD 11.1 sysrc would write "unknown variable" to stdout and not stderr
+            # https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=229806
             return None
 
-        return out.strip()
+        if out.startswith(self.vars.path):
+            return out.split(':', 1)[1].strip()
+
+        return None
 
     def _modify(self, op, changed):
         (rc, out, err) = self._sysrc("%s%s=%s%s" % (self.vars.name, op, self.vars.delim, self.vars.value))

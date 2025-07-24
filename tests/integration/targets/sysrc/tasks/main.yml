@@ -378,11 +378,7 @@
         state: absent
         path: /tmp/10004.conf
       register: sysrc_10004_absent
-
-    - name: Ensure that the defaults are not consulted
-      assert:
-        that:
-          - not sysrc_10004_absent.changed
+      failed_when: sysrc_10004_absent.changed
 
     - name: Test that a delimited key from /etc/defaults/rc.conf is not used to mark changed
       sysrc:
@@ -390,11 +386,14 @@
         state: value_absent
         path: /tmp/10004.conf
       register: sysrc_10004_value_absent
+      failed_when: sysrc_10004_value_absent.changed
 
-    - name: Ensure that the default is not consulted
-      assert:
-        that:
-          - not sysrc_10004_value_absent.changed
+    - name: Test that a key from /etc/defaults/rc.conf is not used to mark changed without a path
+      sysrc:
+        name: static_routes
+        state: absent
+      register: sysrc_absent_default
+      failed_when: sysrc_absent_default.changed
 
     ##
     ## sysrc - #10394 Ensure that files with multi-line values work
