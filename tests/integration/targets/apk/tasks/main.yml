@@ -205,4 +205,3 @@
         that:
           - result_multiple_empty is failed
           - "'Package name(s) cannot be empty' in result_multiple_empty.msg"
-      ignore_errors: true
