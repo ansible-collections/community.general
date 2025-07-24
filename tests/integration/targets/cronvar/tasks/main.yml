@@ -123,6 +123,7 @@
       - custom_varcheck2.stdout == '1'
       - custom_varcheck3.stdout == '0'
 
+
 - name: Attempt to add cron variable to non-existent parent directory
   cronvar:
     name: NOPARENT_VAR
@@ -138,3 +139,17 @@
       - invalid_directory_cronvar_result is failed
       - >-
        "Parent directory '/nonexistent' does not exist for cron_file: '/nonexistent/foo'" == invalid_directory_cronvar_result.msg
+
+- name: Test setting empty string value for cronvar
+  community.general.cronvar:
+    name: EMPTY_VAR
+    value: ""
+    user: root
+  register: empty_var_result
+  ignore_errors: true
+
+- name: Assert task failed due to invalid empty value
+  ansible.builtin.assert:
+    that:
+      - empty_var_result.failed
+      - "'You must specify \\'value\\' to insert a new cron variable' in empty_var_result.msg"

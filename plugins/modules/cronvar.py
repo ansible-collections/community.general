@@ -378,7 +378,7 @@ def main():
     if name is None and ensure_present:
         module.fail_json(msg="You must specify 'name' to insert a new cron variable")
 
-    if value is None and ensure_present:
+    if (value is None or value == "") and ensure_present:
         module.fail_json(msg="You must specify 'value' to insert a new cron variable")
 
     if name is None and not ensure_present:
