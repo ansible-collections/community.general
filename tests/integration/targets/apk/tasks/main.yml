@@ -176,7 +176,6 @@
         name: ["   "]
       register: result_spaces
       ignore_errors: true
-      
 
     - name: Assert failure due to whitespace-only package name
       ansible.builtin.assert:
