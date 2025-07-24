@@ -1,0 +1,2 @@
+bugfixes:
+  - "cronvar - Reject empty string as value (https://github.com/ansible-collections/community.general/issues/10439, https://github.com/ansible-collections/community.general/pull/10445)."
