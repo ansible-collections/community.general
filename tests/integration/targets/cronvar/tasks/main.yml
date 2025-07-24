@@ -151,5 +151,5 @@
 - name: Assert task failed due to invalid empty value
   ansible.builtin.assert:
     that:
-      - empty_var_result.failed
+      - empty_var_result is failed
       - "'You must specify \\'value\\' to insert a new cron variable' in empty_var_result.msg"
