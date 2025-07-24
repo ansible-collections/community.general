@@ -372,10 +372,7 @@ def main():
         upgrade_packages(module, p['available'])
 
     if all(not name.strip() for name in p['name']):
-        if len(p['name']) == 1:
-            module.fail_json(msg="Package name cannot be empty or whitespace-only")
-        else:
-            module.fail_json(msg="Package names cannot be empty or whitespace-only")
+        module.fail_json(msg="Package name(s) cannot be empty or whitespace-only")
 
     if p['state'] in ['present', 'latest']:
         install_packages(module, p['name'], p['state'], p['world'])
