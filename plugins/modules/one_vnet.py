@@ -30,12 +30,12 @@ options:
   id:
     description:
       - A O(id) of the network you would like to manage.
-      - If not set then a new network will be created with the given O(name).
+      - If not set then a new network is created with the given O(name).
     type: int
   name:
     description:
-      - A O(name) of the network you would like to manage. If a network with the given name does not exist it will be created,
-        otherwise it will be managed by this module.
+      - A O(name) of the network you would like to manage. If a network with the given name does not exist it, then is created,
+        otherwise it is managed by this module.
     type: str
   template:
     description:

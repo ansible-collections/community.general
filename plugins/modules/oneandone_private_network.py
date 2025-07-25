@@ -50,7 +50,7 @@ options:
     type: str
   datacenter:
     description:
-      - The identifier of the datacenter where the private network will be created.
+      - The identifier of the datacenter where the private network is created.
     type: str
     choices: [US, ES, DE, GB]
   network_address:
@@ -143,7 +143,7 @@ RETURN = r"""
 private_network:
   description: Information about the private network.
   type: dict
-  sample: '{"name": "backup_network", "id": "55726DEDA20C99CF6F2AF8F18CAC9963"}'
+  sample: {"name": "backup_network", "id": "55726DEDA20C99CF6F2AF8F18CAC9963"}
   returned: always
 """
 

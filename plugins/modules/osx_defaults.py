@@ -69,7 +69,7 @@ options:
   state:
     description:
       - The state of the user defaults.
-      - If set to V(list) will query the given parameter specified by O(key). Returns V(null) is nothing found or mis-spelled.
+      - If set to V(list) it queries the given parameter specified by O(key). Returns V(null) is nothing found or misspelled.
     type: str
     choices: [absent, list, present]
     default: present

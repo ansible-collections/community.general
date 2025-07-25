@@ -45,12 +45,12 @@ options:
   msg:
     type: str
     description:
-      - Message to text to send. Messages longer than 160 characters will be split into multiple messages.
+      - Message text to send. Messages longer than 160 characters are split into multiple messages.
     required: true
   validate_certs:
     description:
-      - If V(false), SSL certificates will not be validated. This should only be used on personally controlled sites using
-        self-signed certificates.
+      - If V(false), SSL certificates are not validated. This should only be used on personally controlled sites using self-signed
+        certificates.
     type: bool
     default: true
 extends_documentation_fragment:
