@@ -116,6 +116,8 @@ options:
     description:
       - Upon successful registration, auto-consume available subscriptions.
       - Please note that the alias O(ignore:autosubscribe) was removed in community.general 9.0.0.
+      - Since community.general 11.1.0 resp. 10.7.2, this option does nothing for RHEL 10+ and Fedora 41+ where
+        C(attach) has been removed.
     type: bool
   activationkey:
     description:
@@ -430,6 +432,18 @@ class Rhsm(object):
             Raises:
               * Exception - if any error occurs during the registration
         '''
+        # subscription-manager attach command was removed in Fedora 41 and RHEL 10
+        distro_id = distro.id()
+        try:
+            distro_major_version = int(distro.major_version())
+        except ValueError:
+            distro_major_version = 0
+        if (
+            (distro_id == 'rhel' and distro_major_version >= 10)
+            or (distro_id == 'fedora' and distro_major_version >= 41)
+        ):
+            auto_attach = False
+
         # There is no support for token-based registration in the D-Bus API
         # of rhsm, so always use the CLI in that case;
         # also, since the specified environments are names, and the D-Bus APIs
