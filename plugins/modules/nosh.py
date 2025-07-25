@@ -35,22 +35,22 @@ options:
     required: false
     choices: [started, stopped, reset, restarted, reloaded]
     description:
-      - V(started)/V(stopped) are idempotent actions that will not run commands unless necessary.
-      - V(restarted) will always bounce the service.
-      - V(reloaded) will send a SIGHUP or start the service.
-      - V(reset) will start or stop the service according to whether it is enabled or not.
+      - V(started)/V(stopped) are idempotent actions that do not run commands unless necessary.
+      - V(restarted) always bounces the service.
+      - V(reloaded) sends a SIGHUP or starts the service.
+      - V(reset) starts or stops the service according to whether it is enabled or not.
   enabled:
     required: false
     type: bool
     description:
       - Enable or disable the service, independently of C(*.preset) file preference or running state. Mutually exclusive with
-        O(preset). Will take effect prior to O(state=reset).
+        O(preset). It takes effect prior to O(state=reset).
   preset:
     required: false
     type: bool
     description:
       - Enable or disable the service according to local preferences in C(*.preset) files. Mutually exclusive with O(enabled).
-        Only has an effect if set to true. Will take effect prior to O(state=reset).
+        Only has an effect if set to true. It takes effect prior to O(state=reset).
   user:
     required: false
     default: false

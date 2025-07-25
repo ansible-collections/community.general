@@ -22,11 +22,6 @@ description:
   - The C(nagios) module is not idempotent.
   - All actions require the O(host) parameter to be given explicitly. In playbooks you can use the C({{inventory_hostname}})
     variable to refer to the host the playbook is currently running on.
-  - You can specify multiple services at once by separating them with commas, for example O(services=httpd,nfs,puppet).
-  - When specifying what service to handle there is a special service value, O(host), which will handle alerts/downtime/acknowledge
-    for the I(host itself), for example O(services=host). This keyword may not be given with other services at the same time.
-    B(Setting alerts/downtime/acknowledge for a host does not affect alerts/downtime/acknowledge for any of the services running
-    on it.) To schedule downtime for all services on particular host use keyword "all", for example O(services=all).
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -88,6 +83,12 @@ options:
     description:
       - What to manage downtime/alerts for. Separate multiple services with commas.
       - 'B(Required) option when O(action) is one of: V(downtime), V(acknowledge), V(forced_check), V(enable_alerts), V(disable_alerts).'
+      - You can specify multiple services at once by separating them with commas, for example O(services=httpd,nfs,puppet).
+      - When specifying what O(services) to handle there is a special service value, V(host), which handles alerts/downtime/acknowledge
+        for the I(host itself), for example O(services=host). This keyword may not be given with other services at the same
+        time. B(Setting alerts/downtime/acknowledge for a host does not affect alerts/downtime/acknowledge for any of the
+        services running on it.) To schedule downtime for all O(services) on particular host use keyword V(all), for example
+        O(services=all).
     aliases: ["service"]
     type: str
   servicegroup:
@@ -97,8 +98,8 @@ options:
     type: str
   command:
     description:
-      - The raw command to send to nagios, which should not include the submitted time header or the line-feed.
-      - B(Required) option when using the V(command) O(action).
+      - The raw command to send to Nagios, which should not include the submitted time header or the line-feed.
+      - B(Required) option when O(action=command).
     type: str
 
 author: "Tim Bielawa (@tbielawa)"

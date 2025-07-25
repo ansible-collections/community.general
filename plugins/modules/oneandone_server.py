@@ -73,8 +73,8 @@ options:
     type: float
   hdds:
     description:
-      - A list of hard disks with nested O(ignore:hdds[].size) and O(ignore:hdds[].is_main) properties. It must be provided with O(vcore),
-        O(cores_per_processor), and O(ram) parameters.
+      - A list of hard disks with nested O(ignore:hdds[].size) and O(ignore:hdds[].is_main) properties. It must be provided
+        with O(vcore), O(cores_per_processor), and O(ram) parameters.
     type: list
     elements: dict
   private_network:

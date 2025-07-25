@@ -17,7 +17,7 @@ description:
     U(https://learn.microsoft.com/en-us/microsoftteams/platform/task-modules-and-cards/cards/cards-reference#connector-card-for-microsoft-365-groups).
 author: "Marc Sensenich (@marc-sensenich)"
 notes:
-  - This module is not idempotent, therefore if the same task is run twice there will be two Connector Cards created.
+  - This module is not idempotent, therefore if you run the same task twice then you create two Connector Cards.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -35,7 +35,7 @@ options:
     type: str
     description:
       - A string used for summarizing card content.
-      - This will be shown as the message subject.
+      - This is the message subject.
       - This is required if the text parameter is not populated.
   color:
     type: str
@@ -49,13 +49,13 @@ options:
     type: str
     description:
       - The main text of the card.
-      - This will be rendered below the sender information and optional title,
+      - This is rendered below the sender information and optional title,
       - And above any sections or actions present.
   actions:
     type: list
     elements: dict
     description:
-      - This array of objects will power the action links found at the bottom of the card.
+      - This array of objects is used to power the action links found at the bottom of the card.
   sections:
     type: list
     elements: dict

@@ -46,14 +46,14 @@ options:
     type: str
   rules:
     description:
-      - A list of rules that will be set for the firewall policy. Each rule must contain protocol parameter, in addition to
-        three optional parameters (port_from, port_to, and source).
+      - List of rules that are set for the firewall policy. Each rule must contain protocol parameter, in addition to three
+        optional parameters (port_from, port_to, and source).
     type: list
     elements: dict
     default: []
   add_server_ips:
     description:
-      - A list of server identifiers (id or name) to be assigned to a firewall policy. Used in combination with update state.
+      - A list of server identifiers (ID or name) to be assigned to a firewall policy. Used in combination with update state.
     type: list
     elements: str
     required: false
@@ -67,15 +67,15 @@ options:
     default: []
   add_rules:
     description:
-      - A list of rules that will be added to an existing firewall policy. It is syntax is the same as the one used for rules
-        parameter. Used in combination with update state.
+      - List of rules that are added to an existing firewall policy. It is syntax is the same as the one used for rules parameter.
+        Used in combination with update state.
     type: list
     elements: dict
     required: false
     default: []
   remove_rules:
     description:
-      - A list of rule IDs that will be removed from an existing firewall policy. Used in combination with update state.
+      - List of rule IDs that are removed from an existing firewall policy. Used in combination with update state.
     type: list
     elements: str
     required: false
@@ -194,7 +194,7 @@ RETURN = r"""
 firewall_policy:
   description: Information about the firewall policy that was processed.
   type: dict
-  sample: '{"id": "92B74394A397ECC3359825C1656D67A6", "name": "Default Policy"}'
+  sample: {"id": "92B74394A397ECC3359825C1656D67A6", "name": "Default Policy"}
   returned: always
 """
 

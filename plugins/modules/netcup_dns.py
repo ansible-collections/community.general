@@ -68,7 +68,7 @@ options:
     default: false
     description:
       - Whether the record should be the only one for that record type and record name. Only use with O(state=present).
-      - This will delete all other records with the same record name and type.
+      - This deletes all other records with the same record name and type.
   priority:
     description:
       - Record priority. Required for O(type=MX).

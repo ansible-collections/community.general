@@ -36,9 +36,9 @@ options:
     elements: str
   state:
     description:
-      - V(present) will make sure the package is installed.
-      - V(latest) will make sure the latest version of the package is installed.
-      - V(absent) will make sure the specified package is not installed.
+      - V(present) ensures the package is installed.
+      - V(latest) ensures the latest version of the package is installed.
+      - V(absent) ensures the specified package is not installed.
     choices: [absent, latest, present, installed, removed]
     default: present
     type: str
@@ -73,7 +73,7 @@ options:
     type: bool
     default: false
 notes:
-  - When used with a C(loop:) each package will be processed individually, it is much more efficient to pass the list directly
+  - When used with a C(loop:) each package is processed individually, it is much more efficient to pass the list directly
     to the O(name) option.
 """
 

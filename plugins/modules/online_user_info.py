@@ -37,7 +37,7 @@ online_user_info:
   returned: success
   type: dict
   sample:
-    "online_user_info": {
+    {
       "company": "foobar LLC",
       "email": "foobar@example.com",
       "first_name": "foo",

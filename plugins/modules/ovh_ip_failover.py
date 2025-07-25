@@ -49,13 +49,13 @@ options:
     default: true
     type: bool
     description:
-      - If true, the module will wait for the IP address to be moved. If false, exit without waiting. The taskId will be returned
+      - If V(true), the module waits for the IP address to be moved. If false, exit without waiting. The C(taskId) is returned
         in module output.
   wait_task_completion:
     required: false
     default: 0
     description:
-      - If not 0, the module will wait for this task ID to be completed. Use O(wait_task_completion) if you want to wait for
+      - If not V(0), the module waits for this task ID to be completed. Use O(wait_task_completion) if you want to wait for
         completion of a previously executed task with O(wait_completion=false). You can execute this module repeatedly on
         a list of failover IPs using O(wait_completion=false) (see examples).
     type: int

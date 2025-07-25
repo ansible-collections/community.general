@@ -28,8 +28,8 @@ options:
   state:
     description:
       - Indicates the desired state for the Logical Interconnect Group resource.
-      - V(absent) will remove the resource from OneView, if it exists.
-      - V(present) will ensure data properties are compliant with OneView.
+      - V(absent) removes the resource from OneView, if it exists.
+      - V(present) ensures data properties are compliant with OneView.
     type: str
     choices: [absent, present]
     default: present

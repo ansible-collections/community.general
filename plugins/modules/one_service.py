@@ -55,7 +55,7 @@ options:
     type: str
   unique:
     description:
-      - Setting O(unique=true) will make sure that there is only one service instance running with a name set with O(service_name)
+      - Setting O(unique=true) ensures that there is only one service instance running with a name set with O(service_name)
         when instantiating a service from a template specified with O(template_id) or O(template_name). Check examples below.
     type: bool
     default: false
@@ -73,11 +73,11 @@ options:
     type: str
   owner_id:
     description:
-      - ID of the user which will be set as the owner of the service.
+      - ID of the user which is set as the owner of the service.
     type: int
   group_id:
     description:
-      - ID of the group which will be set as the group of the service.
+      - ID of the group which is set as the group of the service.
     type: int
   wait:
     description:
@@ -91,7 +91,7 @@ options:
     type: int
   custom_attrs:
     description:
-      - Dictionary of key/value custom attributes which will be used when instantiating a new service.
+      - Dictionary of key/value custom attributes which is used when instantiating a new service.
     default: {}
     type: dict
   role:

@@ -89,7 +89,7 @@ options:
         required: true
   ports:
     description:
-      - Array of ports that will be monitoring.
+      - Array of ports that are to be monitored.
     type: list
     elements: dict
     default: []
@@ -114,7 +114,7 @@ options:
         required: true
   processes:
     description:
-      - Array of processes that will be monitoring.
+      - Array of processes that are to be monitored.
     type: list
     elements: dict
     default: []
@@ -413,7 +413,7 @@ RETURN = r"""
 monitoring_policy:
   description: Information about the monitoring policy that was processed.
   type: dict
-  sample: '{"id": "92B74394A397ECC3359825C1656D67A6", "name": "Default Policy"}'
+  sample: {"id": "92B74394A397ECC3359825C1656D67A6", "name": "Default Policy"}
   returned: always
 """
 

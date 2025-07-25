@@ -33,12 +33,12 @@ attributes:
 options:
   id:
     description:
-      - A O(id) of the template you would like to manage. If not set then a new template will be created with the given O(name).
+      - A O(id) of the template you would like to manage. If not set then a new template is created with the given O(name).
     type: int
   name:
     description:
-      - A O(name) of the template you would like to manage. If a template with the given name does not exist it will be created,
-        otherwise it will be managed by this module.
+      - A O(name) of the template you would like to manage. If a template with the given name does not exist it is created,
+        otherwise it is managed by this module.
     type: str
   template:
     description:
