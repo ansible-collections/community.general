@@ -169,7 +169,7 @@
       ansible.builtin.assert:
         that:
           - result_empty is failed
-          - "'Package name(s) cannot be empty' in result_empty.msg"
+          - "'Package name(s) cannot be empty or whitespace-only' == result_empty.msg"
 
     - name: Install package name with only spaces
       community.general.apk:
@@ -181,7 +181,7 @@
       ansible.builtin.assert:
         that:
           - result_spaces is failed
-          - "'Package name(s) cannot be empty' in result_spaces.msg"
+          - "'Package name(s) cannot be empty or whitespace-only' == result_spaces.msg"
 
     - name: Accept list with valid and empty string
       community.general.apk:
@@ -204,4 +204,17 @@
       ansible.builtin.assert:
         that:
           - result_multiple_empty is failed
-          - "'Package name(s) cannot be empty' in result_multiple_empty.msg"
+          - "'Package name(s) cannot be empty or whitespace-only' == result_multiple_empty.msg"
+
+    - name: Reject empty package name with update_cache parameter
+      community.general.apk:
+        name: ""
+        update_cache: true
+      register: result_empty_package_with_update_cache
+      ignore_errors: true
+
+    - name: Assert failure due to all package names being empty or whitespace
+      ansible.builtin.assert:
+        that:
+          - result_empty_package_with_update_cache is failed
+          - "'Package name(s) cannot be empty or whitespace-only' == result_empty_package_with_update_cache.msg"

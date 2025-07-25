@@ -351,6 +351,9 @@ def main():
 
     p = module.params
 
+    if all(not name.strip() for name in p['name']):
+        module.fail_json(msg="Package name(s) cannot be empty or whitespace-only")
+
     if p['no_cache']:
         APK_PATH = "%s --no-cache" % (APK_PATH, )
 
@@ -370,9 +373,6 @@ def main():
 
     if p['upgrade']:
         upgrade_packages(module, p['available'])
-
-    if all(not name.strip() for name in p['name']):
-        module.fail_json(msg="Package name(s) cannot be empty or whitespace-only")
 
     if p['state'] in ['present', 'latest']:
         install_packages(module, p['name'], p['state'], p['world'])
