@@ -1,2 +1,2 @@
 bugfixes:
-  - "listen-port-facts - Avoid crash when required commands are missing  (https://github.com/ansible-collections/community.general/issues/10457, https://github.com/ansible-collections/community.general/pull/10458).
+  - "listen-port-facts - Avoid crash when required commands are missing  (https://github.com/ansible-collections/community.general/issues/10457, https://github.com/ansible-collections/community.general/pull/10458)."
