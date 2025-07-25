@@ -241,8 +241,8 @@ def main():
             (msg, changed) = present(path, username, password, hash_scheme, create, check_mode)
         elif state == 'absent':
             if not os.path.exists(path):
-                module.exit_json(msg="%s not present" % username,
-                                 warnings="%s does not exist" % path, changed=False)
+                module.warn("%s does not exist" % path)
+                module.exit_json(msg="%s not present" % username, changed=False)
             (msg, changed) = absent(path, username, check_mode)
         else:
             module.fail_json(msg="Invalid state: %s" % state)
