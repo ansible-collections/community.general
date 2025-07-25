@@ -8,3 +8,8 @@
     name:
       - zfs
       - "zfs-{{ ansible_kernel.split('-')[-1] }}"
+
+- name: Load zfs module
+  community.general.modprobe:
+    name: zfs
+    state: present
