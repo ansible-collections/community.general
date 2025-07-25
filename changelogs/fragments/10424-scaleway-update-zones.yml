@@ -1,2 +1,2 @@
-bugfixes:
-  - update Scaleway available zones and API URLs
+minor_changes:
+  - scaleway_* modules - update available zones and API URLs (https://github.com/ansible-collections/community.general/issues/10383, https://github.com/ansible-collections/community.general/pull/10424).
