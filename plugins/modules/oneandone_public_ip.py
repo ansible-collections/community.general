@@ -43,7 +43,7 @@ options:
     required: false
   datacenter:
     description:
-      - ID of the datacenter where the IP will be created (only for unassigned IPs).
+      - ID of the datacenter where the IP is created (only for unassigned IPs).
     type: str
     choices: [US, ES, DE, GB]
     default: US
@@ -110,7 +110,7 @@ RETURN = r"""
 public_ip:
   description: Information about the public IP that was processed.
   type: dict
-  sample: '{"id": "F77CC589EBC120905B4F4719217BFF6D", "ip": "10.5.132.106"}'
+  sample: {"id": "F77CC589EBC120905B4F4719217BFF6D", "ip": "10.5.132.106"}
   returned: always
 """
 

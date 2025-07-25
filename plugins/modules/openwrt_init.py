@@ -32,20 +32,19 @@ options:
   state:
     type: str
     description:
-      - V(started)/V(stopped) are idempotent actions that will not run commands unless necessary.
-      - V(restarted) will always bounce the service.
-      - V(reloaded) will always reload.
+      - V(started)/V(stopped) are idempotent actions that do not run commands unless necessary.
+      - V(restarted) always bounces the service.
+      - V(reloaded) always reloads.
     choices: ['started', 'stopped', 'restarted', 'reloaded']
   enabled:
     description:
-      - Whether the service should start on boot. B(At least one of state and enabled are required).
+      - Whether the service should start on boot. B(At least one) of O(state) and O(enabled) are required.
     type: bool
   pattern:
     type: str
     description:
-      - If the service does not respond to the 'running' command, name a substring to look for as would be found in the output
-        of the C(ps) command as a stand-in for a 'running' result. If the string is found, the service will be assumed to
-        be running.
+      - If the service does not respond to the C(running) command, name a substring to look for as would be found in the output
+        of the C(ps) command as a stand-in for a C(running) result. If the string is found, the service is assumed to be running.
 notes:
   - One option other than O(name) is required.
 requirements:

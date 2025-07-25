@@ -48,8 +48,8 @@ options:
     type: bool
   new_name:
     description:
-      - A name that will be assigned to the existing or new image.
-      - In the case of cloning, by default O(new_name) will take the name of the origin image with the prefix 'Copy of'.
+      - A name that is assigned to the existing or new image.
+      - In the case of cloning, by default O(new_name) is set to the name of the origin image with the prefix 'Copy of'.
     type: str
   persistent:
     description:
@@ -325,7 +325,7 @@ datastore:
   returned: when O(state=present), O(state=cloned), or O(state=renamed)
   version_added: 9.5.0
 vms:
-  description: The image's list of vm ID's.
+  description: The image's list of VM ID's.
   type: list
   elements: int
   returned: when O(state=present), O(state=cloned), or O(state=renamed)

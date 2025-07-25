@@ -78,15 +78,15 @@ options:
     choices: ["ROUND_ROBIN", "LEAST_CONNECTIONS"]
   datacenter:
     description:
-      - ID or country code of the datacenter where the load balancer will be created.
+      - ID or country code of the datacenter where the load balancer is created.
       - If not specified, it defaults to V(US).
     type: str
     choices: ["US", "ES", "DE", "GB"]
     required: false
   rules:
     description:
-      - A list of rule objects that will be set for the load balancer. Each rule must contain protocol, port_balancer, and
-        port_server parameters, in addition to source parameter, which is optional.
+      - A list of rule objects that are set for the load balancer. Each rule must contain protocol, port_balancer, and port_server
+        parameters, in addition to source parameter, which is optional.
     type: list
     elements: dict
     default: []
@@ -111,15 +111,15 @@ options:
     default: []
   add_rules:
     description:
-      - A list of rules that will be added to an existing load balancer. It is syntax is the same as the one used for rules
-        parameter. Used in combination with O(state=update).
+      - A list of rules that are added to an existing load balancer. It is syntax is the same as the one used for rules parameter.
+        Used in combination with O(state=update).
     type: list
     elements: dict
     required: false
     default: []
   remove_rules:
     description:
-      - A list of rule IDs that will be removed from an existing load balancer. Used in combination with O(state=update).
+      - A list of rule IDs that are removed from an existing load balancer. Used in combination with O(state=update).
     type: list
     elements: str
     required: false
@@ -245,7 +245,7 @@ RETURN = r"""
 load_balancer:
   description: Information about the load balancer that was processed.
   type: dict
-  sample: '{"id": "92B74394A397ECC3359825C1656D67A6", "name": "Default Balancer"}'
+  sample: {"id": "92B74394A397ECC3359825C1656D67A6", "name": "Default Balancer"}
   returned: always
 """
 

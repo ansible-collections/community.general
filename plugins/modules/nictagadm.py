@@ -35,7 +35,7 @@ options:
     type: str
   etherstub:
     description:
-      - Specifies that the nic tag will be attached to a created O(etherstub).
+      - Specifies that the nic tag is attached to a created O(etherstub).
       - Parameter O(etherstub) is mutually exclusive with both O(mtu), and O(mac).
     type: bool
     default: false
@@ -46,7 +46,7 @@ options:
     type: int
   force:
     description:
-      - When O(state=absent) this switch will use the C(-f) parameter and delete the nic tag regardless of existing VMs.
+      - When O(state=absent) this switch uses the C(-f) parameter and delete the nic tag regardless of existing VMs.
     type: bool
     default: false
   state:
@@ -83,7 +83,7 @@ mac:
   type: str
   sample: 00:1b:21:a3:f5:4d
 etherstub:
-  description: Specifies if the nic tag will create and attach to an etherstub.
+  description: Specifies if the nic tag was created and attached to an etherstub.
   returned: always
   type: bool
   sample: false
@@ -93,7 +93,7 @@ mtu:
   type: int
   sample: 1500
 force:
-  description: Shows if -f was used during the deletion of a nic tag.
+  description: Shows if C(-f) was used during the deletion of a nic tag.
   returned: always
   type: bool
   sample: false

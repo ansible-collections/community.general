@@ -44,7 +44,7 @@ options:
   login:
     description:
       - Whether the target node should be connected.
-      - When O(target) is omitted, will login to all available.
+      - When O(target) is omitted, it logins to all available.
     type: bool
     aliases: [state]
   node_auth:
@@ -84,7 +84,7 @@ options:
     description:
       - Whether the list of target nodes on the portal should be (re)discovered and added to the persistent iSCSI database.
       - Keep in mind that C(iscsiadm) discovery resets configuration, like C(node.startup) to manual, hence combined with
-        O(auto_node_startup=true) will always return a changed state.
+        O(auto_node_startup=true) always returns a changed state.
     type: bool
     default: false
   show_nodes:
@@ -95,7 +95,7 @@ options:
   rescan:
     description:
       - Rescan an established session for discovering new targets.
-      - When O(target) is omitted, will rescan all sessions.
+      - When O(target) is omitted, it rescans all sessions.
     type: bool
     default: false
     version_added: 4.1.0

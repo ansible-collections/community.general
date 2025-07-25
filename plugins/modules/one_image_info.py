@@ -29,10 +29,10 @@ options:
     elements: str
   name:
     description:
-      - A O(name) of the image whose facts will be gathered.
-      - If the O(name) begins with V(~) the O(name) will be used as regex pattern, which restricts the list of images (whose
-        facts will be returned) whose names match specified regex.
-      - Also, if the O(name) begins with V(~*) case-insensitive matching will be performed.
+      - A O(name) of the image whose facts is gathered.
+      - If the O(name) begins with V(~) the O(name) is used as regex pattern, which restricts the list of images (whose facts
+        is returned) whose names match specified regex.
+      - Also, if the O(name) begins with V(~*) case-insensitive matching is performed.
       - See examples for more details.
     type: str
 author:
@@ -231,7 +231,7 @@ images:
       sample: image_datastore
       version_added: 9.5.0
     vms:
-      description: The image's list of vm ID's.
+      description: The image's list of VM ID's.
       type: list
       elements: int
       version_added: 9.5.0
