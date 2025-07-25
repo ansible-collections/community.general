@@ -38,7 +38,7 @@ options:
     choices: ['started', 'stopped', 'restarted', 'reloaded']
   enabled:
     description:
-      - Whether the service should start on boot. B(At least one of O(state) and O(enabled) are required).
+      - Whether the service should start on boot. B(At least one) of O(state) and O(enabled) are required.
     type: bool
   pattern:
     type: str

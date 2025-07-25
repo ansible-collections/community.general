@@ -157,7 +157,7 @@ options:
     type: float
   vcpu:
     description:
-      - Number of CPUs (cores) new VM is set to have.
+      - Number of CPUs (cores) the new VM uses.
     type: int
   networks:
     description:

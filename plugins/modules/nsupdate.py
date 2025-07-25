@@ -64,7 +64,7 @@ options:
   zone:
     description:
       - DNS record is modified on this O(zone).
-      - When omitted DNS, is queried to attempt finding the correct zone.
+      - When omitted, DNS is queried to attempt finding the correct zone.
     type: str
   record:
     description:
