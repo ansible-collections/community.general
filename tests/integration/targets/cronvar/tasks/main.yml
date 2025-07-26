@@ -127,7 +127,7 @@
   cronvar:
     name: NOPARENT_VAR
     value: noparentval
-    cron_file:  /nonexistent/foo
+    cron_file: /nonexistent/foo
     user: root
   register: invalid_directory_cronvar_result
   ignore_errors: true
