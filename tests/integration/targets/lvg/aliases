@@ -11,3 +11,4 @@ skip/freebsd
 skip/osx
 skip/macos
 skip/alpine3.21 # TODO try to fix
+skip/alpine3.22 # TODO try to fix
