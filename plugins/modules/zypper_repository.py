@@ -250,7 +250,7 @@ def repo_exists(module, repodata, overwrite_multiple):
             module.fail_json(msg=errmsg)
 
 
-def addmodify_repo(module, repodata, old_repos, zypper_version, warnings):
+def addmodify_repo(module, repodata, old_repos, zypper_version):
     "Adds the repo, removes old repos before, that would conflict."
     repo = repodata['url']
     cmd = _get_cmd(module, 'addrepo', '--check')
@@ -263,7 +263,7 @@ def addmodify_repo(module, repodata, old_repos, zypper_version, warnings):
         if zypper_version >= LooseVersion('1.12.25'):
             cmd.extend(['--priority', str(repodata['priority'])])
         else:
-            warnings.append("Setting priority only available for zypper >= 1.12.25. Ignoring priority argument.")
+            module.warn("Setting priority only available for zypper >= 1.12.25. Ignoring priority argument.")
 
     if repodata['enabled'] == '0':
         cmd.append('--disable')
@@ -277,7 +277,7 @@ def addmodify_repo(module, repodata, old_repos, zypper_version, warnings):
         else:
             cmd.append('--no-gpgcheck')
     else:
-        warnings.append("Enabling/disabling gpgcheck only available for zypper >= 1.6.2. Using zypper default value.")
+        module.warn("Enabling/disabling gpgcheck only available for zypper >= 1.6.2. Using zypper default value.")
 
     if repodata['autorefresh'] == '1':
         cmd.append('--refresh')
@@ -350,7 +350,6 @@ def main():
     runrefresh = module.params['runrefresh']
 
     zypper_version = get_zypper_version(module)
-    warnings = []  # collect warning messages for final output
 
     repodata = {
         'url': repo,
@@ -460,7 +459,7 @@ def main():
             if runrefresh:
                 runrefreshrepo(module, auto_import_keys, shortname)
             exit_unchanged()
-        rc, stdout, stderr = addmodify_repo(module, repodata, old_repos, zypper_version, warnings)
+        rc, stdout, stderr = addmodify_repo(module, repodata, old_repos, zypper_version)
         if rc == 0 and (runrefresh or auto_import_keys):
             runrefreshrepo(module, auto_import_keys, shortname)
     elif state == 'absent':
@@ -469,9 +468,9 @@ def main():
         rc, stdout, stderr = remove_repo(module, shortname)
 
     if rc == 0:
-        module.exit_json(changed=True, repodata=repodata, state=state, warnings=warnings)
+        module.exit_json(changed=True, repodata=repodata, state=state)
     else:
-        module.fail_json(msg="Zypper failed with rc %s" % rc, rc=rc, stdout=stdout, stderr=stderr, repodata=repodata, state=state, warnings=warnings)
+        module.fail_json(msg="Zypper failed with rc %s" % rc, rc=rc, stdout=stdout, stderr=stderr, repodata=repodata, state=state)
 
 
 if __name__ == '__main__':
