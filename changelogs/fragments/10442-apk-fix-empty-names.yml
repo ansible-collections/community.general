@@ -1,0 +1,3 @@
+bugfixes:
+  - apk - handle empty name strings properly
+    (https://github.com/ansible-collections/community.general/issues/10441, https://github.com/ansible-collections/community.general/pull/10442).

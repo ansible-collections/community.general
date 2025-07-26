@@ -158,3 +158,63 @@
         that:
           - results is not changed
           - (results.packages | default([]) | length) == 0
+
+    - name: Install package with empty name
+      community.general.apk:
+        name: ""
+      register: result_empty
+      ignore_errors: true
+
+    - name: Assert failure due to empty package name
+      ansible.builtin.assert:
+        that:
+          - result_empty is failed
+          - "'Package name(s) cannot be empty or whitespace-only' == result_empty.msg"
+
+    - name: Install package name with only spaces
+      community.general.apk:
+        name: ["   "]
+      register: result_spaces
+      ignore_errors: true
+
+    - name: Assert failure due to whitespace-only package name
+      ansible.builtin.assert:
+        that:
+          - result_spaces is failed
+          - "'Package name(s) cannot be empty or whitespace-only' == result_spaces.msg"
+
+    - name: Accept list with valid and empty string
+      community.general.apk:
+        name: ["busybox", ""]
+      register: result_valid_mixed
+      ignore_errors: true
+
+    - name: Assert success with mixed package list
+      ansible.builtin.assert:
+        that:
+          - result_valid_mixed is not failed
+
+    - name: Reject package name list with multiple empty/whitespace-only strings
+      community.general.apk:
+        name: ["", "   "]
+      register: result_multiple_empty
+      ignore_errors: true
+
+    - name: Assert failure due to all package names being empty or whitespace
+      ansible.builtin.assert:
+        that:
+          - result_multiple_empty is failed
+          - "'Package name(s) cannot be empty or whitespace-only' == result_multiple_empty.msg"
+
+    - name: Reject empty package name with update_cache parameter
+      community.general.apk:
+        name: ""
+        update_cache: true
+      register: result_empty_package_with_update_cache
+      ignore_errors: true
+
+    - name: Assert failure due to all package names being empty or whitespace
+      ansible.builtin.assert:
+        that:
+          - result_empty_package_with_update_cache is failed
+          - "'Package name(s) cannot be empty or whitespace-only' == result_empty_package_with_update_cache.msg"
