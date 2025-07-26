@@ -102,6 +102,7 @@ options:
 """
 
 EXAMPLES = r"""
+---
 - name: Create pacemaker resource
   hosts: localhost
   gather_facts: false
