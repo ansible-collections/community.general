@@ -534,12 +534,14 @@
   #
   # NOTE: FreeBSD 14.2 fails as well (someone with FreeBSD knowledge has to take a look)
   #
+  # NOTE: FreeBSD 14.3 fails as well (someone with FreeBSD knowledge has to take a look)
+  #
   # See also
   # https://github.com/ansible-collections/community.general/issues/5795
   when: >-
     (ansible_distribution_version is version('12.01', '>=') and ansible_distribution_version is version('12.3', '<'))
     or (ansible_distribution_version is version('13.6', '>=') and ansible_distribution_version is version('14.0', '<'))
-    or ansible_distribution_version is version('14.3', '>=')
+    or ansible_distribution_version is version('14.4', '>=')
   block:
     - name: Setup testjail
       include_tasks: setup-testjail.yml
