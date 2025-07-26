@@ -36,7 +36,7 @@ options:
     description:
       - C(httplib2), the library used by the M(ansible.builtin.uri) module only sends authentication information when a webservice
         responds to an initial request with a 401 status. Since some basic auth services do not properly send a 401, logins
-        will fail. This option forces the sending of the Basic authentication header upon initial request.
+        fail. This option forces the sending of the Basic authentication header upon initial request.
     type: bool
     default: false
   generate_sqlite:
@@ -131,22 +131,22 @@ options:
     default: true
   state:
     description:
-      - The repo state. A state of V(sync) will queue a sync of the repo. This is asynchronous but not delayed like a scheduled
-        sync. A state of V(publish) will use the repository's distributor to publish the content.
+      - The repo state. A state of V(sync) queues a sync of the repo. This is asynchronous but not delayed like a scheduled
+        sync. A state of V(publish) uses the repository's distributor to publish the content.
     default: present
     choices: ["present", "absent", "sync", "publish"]
     type: str
   url_password:
     description:
       - The password for use in HTTP basic authentication to the pulp API. If the O(url_username) parameter is not specified,
-        the O(url_password) parameter will not be used.
+        the O(url_password) parameter is not used.
   url_username:
     description:
       - The username for use in HTTP basic authentication to the pulp API.
   validate_certs:
     description:
-      - If V(false), SSL certificates will not be validated. This should only be used on personally controlled sites using
-        self-signed certificates.
+      - If V(false), SSL certificates are not validated. This should only be used on personally controlled sites using self-signed
+        certificates.
     type: bool
     default: true
   wait_for_completion:
