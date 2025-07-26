@@ -49,8 +49,8 @@ options:
         question.
       - Prompts are processed in the same order as the packages list.
       - You can optionally specify an answer to any question in the list.
-      - If no answer is provided, the list item contains only the regular expression.
-      - "To specify an answer, the item is a dict with the regular expression as key and the answer as value C(my_regular_expression:
+      - If no answer is provided, the list item must contain only the regular expression.
+      - "To specify an answer, the item must be a dictionary with the regular expression as key and the answer as value C(my_regular_expression:
         'an_answer')."
       - You can provide a list containing items with or without answer.
       - A prompt list can be shorter or longer than the packages list but it issues a warning.
