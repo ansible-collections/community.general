@@ -136,7 +136,7 @@ class CronVar(object):
             else:
                 self.cron_file = os.path.join('/etc/cron.d', cron_file)
             parent_dir = os.path.dirname(self.cron_file)
-            if not os.path.isdir(parent_dir):
+            if parent_dir and not os.path.isdir(parent_dir):
                 module.fail_json(msg="Parent directory '{}' does not exist for cron_file: '{}'".format(parent_dir, cron_file))
         else:
             self.cron_file = None
