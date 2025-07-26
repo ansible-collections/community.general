@@ -9,9 +9,6 @@
       - zfs
       - "zfs-{{ ansible_kernel.split('-')[-1] }}"
 
-- name: Check content of /lib/modules/6.12.38-0-virt/
-  ansible.builtin.command: ls -l /lib/modules/6.12.38-0-virt/
-
 - name: Load zfs module
   community.general.modprobe:
     name: zfs
