@@ -1,0 +1,13 @@
+# Copyright (c) Contributors to the Ansible project
+# Based on the integraton test for the lvm_pv module
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+azp/posix/1
+azp/posix/vm
+destructive
+needs/privileged
+skip/aix
+skip/freebsd
+skip/osx
+skip/macos
