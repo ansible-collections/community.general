@@ -397,7 +397,7 @@ def main():
                     break
 
         if bin_path is None:
-            raise EnvironmentError(msg='Unable to find any of the supported commands in PATH: {0}'.format(", ".join(sorted(commands_map))))
+            raise EnvironmentError('Unable to find any of the supported commands in PATH: {0}'.format(", ".join(sorted(commands_map))))
 
         # which ports are listening for connections?
         args = commands_map[command]['args']
