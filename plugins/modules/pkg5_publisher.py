@@ -16,7 +16,7 @@ author: "Peter Oliver (@mavit)"
 short_description: Manages Solaris 11 Image Packaging System publishers
 description:
   - IPS packages are the native packages in Solaris 11 and higher.
-  - This modules will configure which publishers a client will download IPS packages from.
+  - This module configures which publishers a client downloads IPS packages from.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:

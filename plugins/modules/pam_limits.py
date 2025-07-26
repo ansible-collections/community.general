@@ -80,7 +80,7 @@ options:
     default: false
   use_min:
     description:
-      - If set to V(true), the minimal value will be used or conserved.
+      - If set to V(true), the minimal value is used or conserved.
       - If the specified value is inferior to the value in the file, file content is replaced with the new value, else content
         is not modified.
     required: false
@@ -88,7 +88,7 @@ options:
     default: false
   use_max:
     description:
-      - If set to V(true), the maximal value will be used or conserved.
+      - If set to V(true), the maximal value is used or conserved.
       - If the specified value is superior to the value in the file, file content is replaced with the new value, else content
         is not modified.
     required: false

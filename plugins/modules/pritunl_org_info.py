@@ -27,7 +27,7 @@ options:
       - org
     default: null
     description:
-      - Name of the Pritunl organization to search for. If none provided, the module will return all Pritunl organizations.
+      - Name of the Pritunl organization to search for. If none provided, the module returns all Pritunl organizations.
 """
 
 EXAMPLES = r"""

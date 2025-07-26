@@ -35,7 +35,7 @@ options:
     type: str
   label:
     description:
-      - Label for the key. If you keep it empty, it will be read from key string.
+      - Label for the key. If you keep it empty, it is read from key string.
     type: str
     aliases: [name]
   id:

@@ -46,9 +46,9 @@ options:
     type: int
   reserved:
     description:
-      - Percentage of the capacity to reserve (V(0)-V(100)). O(reserved) will not be mapped into the system physical address
-        space and will be presented as reserved capacity with Show Device and Show Memory Resources Commands.
-      - O(reserved) will be set automatically if this is not configured.
+      - Percentage of the capacity to reserve (V(0)-V(100)). O(reserved) is not mapped into the system physical address space
+        and is presented as reserved capacity with Show Device and Show Memory Resources Commands.
+      - O(reserved) is set automatically if this is not configured.
     type: int
     required: false
   socket:
@@ -147,20 +147,21 @@ result:
     namespace:
       description: The list of the detail of namespace.
       type: list
-  sample: [
-    {
-      "appdirect": 111669149696,
-      "memorymode": 970662608896,
-      "reserved": 3626500096,
-      "socket": 0
-    },
-    {
-      "appdirect": 111669149696,
-      "memorymode": 970662608896,
-      "reserved": 3626500096,
-      "socket": 1
-    }
-  ]
+  sample:
+    [
+      {
+        "appdirect": 111669149696,
+        "memorymode": 970662608896,
+        "reserved": 3626500096,
+        "socket": 0
+      },
+      {
+        "appdirect": 111669149696,
+        "memorymode": 970662608896,
+        "reserved": 3626500096,
+        "socket": 1
+      }
+    ]
 """
 
 EXAMPLES = r"""

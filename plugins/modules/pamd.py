@@ -68,21 +68,20 @@ options:
     type: str
   module_arguments:
     description:
-      - When O(state=updated), the O(module_arguments) will replace existing module_arguments.
-      - When O(state=args_absent) args matching those listed in O(module_arguments) will be removed.
+      - When O(state=updated), the O(module_arguments) replace existing module_arguments.
+      - When O(state=args_absent) args matching those listed in O(module_arguments) are removed.
       - When O(state=args_present) any args listed in O(module_arguments) are added if missing from the existing rule.
-      - Furthermore, if the module argument takes a value denoted by C(=), the value will be changed to that specified in
-        module_arguments.
+      - Furthermore, if the module argument takes a value denoted by C(=), the value changes to that specified in module_arguments.
     type: list
     elements: str
   state:
     description:
-      - The default of V(updated) will modify an existing rule if type, control and module_path all match an existing rule.
-      - With V(before), the new rule will be inserted before a rule matching type, control and module_path.
-      - Similarly, with V(after), the new rule will be inserted after an existing rulematching type, control and module_path.
+      - The default of V(updated) modifies an existing rule if type, control and module_path all match an existing rule.
+      - With V(before), the new rule is inserted before a rule matching type, control and module_path.
+      - Similarly, with V(after), the new rule is inserted after an existing rulematching type, control and module_path.
       - With either V(before) or V(after) O(new_type), O(new_control), and O(new_module_path) must all be specified.
-      - If state is V(args_absent) or V(args_present), O(new_type), O(new_control), and O(new_module_path) will be ignored.
-      - State V(absent) will remove the rule.
+      - If state is V(args_absent) or V(args_present), O(new_type), O(new_control), and O(new_module_path) are ignored.
+      - State V(absent) removes the rule.
     type: str
     choices: [absent, before, after, args_absent, args_present, updated]
     default: updated

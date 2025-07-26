@@ -20,8 +20,8 @@ extends_documentation_fragment:
 options:
   clients:
     description:
-      - A list of the pip executables that will be used to get the packages. They can be supplied with the full path or just
-        the executable name, for example V(pip3.7).
+      - A list of the pip executables that are used to get the packages. They can be supplied with the full path or just the
+        executable name, for example V(pip3.7).
     default: ['pip']
     required: false
     type: list
@@ -59,37 +59,39 @@ packages:
       returned: always
       type: dict
       sample:
-        "packages": {
-          "pip": {
-            "Babel": [
-              {
-                "name": "Babel",
-                "source": "pip",
-                "version": "2.6.0"
-              }
-            ],
-            "Flask": [
-              {
-                "name": "Flask",
-                "source": "pip",
-                "version": "1.0.2"
-              }
-            ],
-            "Flask-SQLAlchemy": [
-              {
-                "name": "Flask-SQLAlchemy",
-                "source": "pip",
-                "version": "2.3.2"
-              }
-            ],
-            "Jinja2": [
-              {
-                "name": "Jinja2",
-                "source": "pip",
-                "version": "2.10"
-              }
-            ],
-          },
+        {
+          "packages": {
+            "pip": {
+              "Babel": [
+                {
+                  "name": "Babel",
+                  "source": "pip",
+                  "version": "2.6.0"
+                }
+              ],
+              "Flask": [
+                {
+                  "name": "Flask",
+                  "source": "pip",
+                  "version": "1.0.2"
+                }
+              ],
+              "Flask-SQLAlchemy": [
+                {
+                  "name": "Flask-SQLAlchemy",
+                  "source": "pip",
+                  "version": "2.3.2"
+                }
+              ],
+              "Jinja2": [
+                {
+                  "name": "Jinja2",
+                  "source": "pip",
+                  "version": "2.10"
+                }
+              ]
+            }
+          }
         }
 """
 

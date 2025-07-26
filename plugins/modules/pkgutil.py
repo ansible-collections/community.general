@@ -17,7 +17,7 @@ module: pkgutil
 short_description: OpenCSW package management on Solaris
 description:
   - This module installs, updates and removes packages from the OpenCSW project for Solaris.
-  - Unlike the M(community.general.svr4pkg) module, it will resolve and download dependencies.
+  - Unlike the M(community.general.svr4pkg) module, it resolves and downloads dependencies.
   - See U(https://www.opencsw.org/) for more information about the project.
 author:
   - Alexander Winkler (@dermute)
@@ -50,7 +50,7 @@ options:
   state:
     description:
       - Whether to install (V(present)/V(installed)), or remove (V(absent)/V(removed)) packages.
-      - The upgrade (V(latest)) operation will update/install the packages to the latest version available.
+      - The upgrade (V(latest)) operation updates/installs the packages to the latest version available.
     type: str
     required: true
     choices: [absent, installed, latest, present, removed]

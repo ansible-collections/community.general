@@ -50,7 +50,7 @@ options:
     type: int
   unit:
     description:
-      - Selects the current default unit that Parted will use to display locations and capacities on the disk and to interpret
+      - Selects the current default unit that Parted uses to display locations and capacities on the disk and to interpret
         those given by the user if they are not suffixed by an unit.
       - When fetching information about a disk, it is recommended to always specify a unit.
     type: str
@@ -59,8 +59,7 @@ options:
   label:
     description:
       - Disk label type or partition table to use.
-      - If O(device) already contains a different label, it will be changed to O(label) and any previous partitions will be
-        lost.
+      - If O(device) already contains a different label, it is changed to O(label) and any previous partitions are lost.
       - A O(name) must be specified for a V(gpt) partition table.
     type: str
     choices: [aix, amiga, bsd, dvh, gpt, loop, mac, msdos, pc98, sun]
@@ -74,8 +73,8 @@ options:
     default: primary
   part_start:
     description:
-      - Where the partition will start as offset from the beginning of the disk, that is, the "distance" from the start of
-        the disk. Negative numbers specify distance from the end of the disk.
+      - Where the partition starts as offset from the beginning of the disk, that is, the "distance" from the start of the
+        disk. Negative numbers specify distance from the end of the disk.
       - The distance can be specified with all the units supported by parted (except compat) and it is case sensitive, for
         example V(10GiB), V(15%).
       - Using negative values may require setting of O(fs_type) (see notes).
@@ -83,8 +82,8 @@ options:
     default: 0%
   part_end:
     description:
-      - Where the partition will end as offset from the beginning of the disk, that is, the "distance" from the start of the
-        disk. Negative numbers specify distance from the end of the disk.
+      - Where the partition ends as offset from the beginning of the disk, that is, the "distance" from the start of the disk.
+        Negative numbers specify distance from the end of the disk.
       - The distance can be specified with all the units supported by parted (except compat) and it is case sensitive, for
         example V(10GiB), V(15%).
     type: str
@@ -100,13 +99,13 @@ options:
   state:
     description:
       - Whether to create or delete a partition.
-      - If set to V(info) the module will only return the device information.
+      - If set to V(info) the module only returns the device information.
     type: str
     choices: [absent, present, info]
     default: info
   fs_type:
     description:
-      - If specified and the partition does not exist, will set filesystem type to given partition.
+      - If specified and the partition does not exist, sets filesystem type to given partition.
       - Parameter optional, but see notes below about negative O(part_start) values.
     type: str
     version_added: '0.2.0'

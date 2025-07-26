@@ -35,9 +35,9 @@ options:
     type: bool
     default: false
     description:
-      - If O(force) is V(true) and O(state) is V(absent), the module will delete the organization, no matter if it contains
-        users or not. By default O(force) is V(false), which will cause the module to fail the deletion of the organization
-        when it contains users.
+      - If O(force) is V(true) and O(state) is V(absent), the module deletes the organization, no matter if it contains users
+        or not. By default O(force) is V(false), which causes the module to fail the deletion of the organization when it
+        contains users.
   state:
     type: str
     default: 'present'

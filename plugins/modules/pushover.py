@@ -15,7 +15,7 @@ short_description: Send notifications through U(https://pushover.net)
 description:
   - Send notifications through pushover to subscriber list of devices and email addresses. Requires pushover app on devices.
 notes:
-  - You will require a pushover.net account to use this module. But no account is required to receive messages.
+  - You need a pushover.net account to use this module. But no account is required to receive messages.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:

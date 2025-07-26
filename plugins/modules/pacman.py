@@ -41,9 +41,9 @@ options:
   state:
     description:
       - Whether to install (V(present) or V(installed), V(latest)), or remove (V(absent) or V(removed)) a package.
-      - V(present) and V(installed) will simply ensure that a desired package is installed.
-      - V(latest) will update the specified package if it is not of the latest available version.
-      - V(absent) and V(removed) will remove the specified package.
+      - V(present) and V(installed) simply ensure that a desired package is installed.
+      - V(latest) updates the specified package if it is not of the latest available version.
+      - V(absent) and V(removed) remove the specified package.
     default: present
     choices: [absent, installed, latest, present, removed]
     type: str
@@ -116,15 +116,14 @@ options:
   reason_for:
     description:
       - Set the install reason for V(all) packages or only for V(new) packages.
-      - In case of O(state=latest) already installed packages which will be updated to a newer version are not counted as
-        V(new).
+      - In case of O(state=latest) already installed packages which are updated to a newer version are not counted as V(new).
     default: new
     choices: [all, new]
     type: str
     version_added: 5.4.0
 
 notes:
-  - When used with a C(loop:) each package will be processed individually, it is much more efficient to pass the list directly
+  - When used with a C(loop:) each package is processed individually, it is much more efficient to pass the list directly
     to the O(name) option.
   - To use an AUR helper (O(executable) option), a few extra setup steps might be required beforehand. For example, a dedicated
     build user with permissions to install packages could be necessary.
@@ -142,7 +141,7 @@ packages:
   returned: success and O(name) is specified or O(upgrade=true)
   type: list
   elements: str
-  sample: [package, other-package]
+  sample: ["package", "other-package"]
 
 cache_updated:
   description:
