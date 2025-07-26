@@ -1,2 +1,2 @@
 bugfixes:
-  - "cronvar - Fix crash on missing cron_file parent directories (https://github.com/ansible-collections/community.general/issues/10460, https://github.com/ansible-collections/community.general/pull/10461)."
+  - "cronvar - fix crash on missing ``cron_file`` parent directories (https://github.com/ansible-collections/community.general/issues/10460, https://github.com/ansible-collections/community.general/pull/10461)."
