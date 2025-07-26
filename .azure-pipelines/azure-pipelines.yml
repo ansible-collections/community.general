@@ -193,10 +193,10 @@ stages:
         parameters:
           testFormat: devel/{0}
           targets:
-            - name: Alpine 3.21
-              test: alpine/3.21
-            # - name: Fedora 41
-            #   test: fedora/41
+            - name: Alpine 3.22
+              test: alpine/3.22
+            # - name: Fedora 42
+            #   test: fedora/42
             - name: Ubuntu 22.04
               test: ubuntu/22.04
             - name: Ubuntu 24.04
@@ -215,10 +215,10 @@ stages:
               test: macos/15.3
             - name: RHEL 10.0
               test: rhel/10.0
-            - name: RHEL 9.5
-              test: rhel/9.5
-            - name: FreeBSD 14.2
-              test: freebsd/14.2
+            - name: RHEL 9.6
+              test: rhel/9.6
+            - name: FreeBSD 14.3
+              test: freebsd/14.3
             - name: FreeBSD 13.5
               test: freebsd/13.5
           groups:
@@ -233,8 +233,12 @@ stages:
         parameters:
           testFormat: 2.19/{0}
           targets:
+            - name: RHEL 9.5
+              test: rhel/9.5
             - name: RHEL 10.0
               test: rhel/10.0
+            - name: FreeBSD 14.2
+              test: freebsd/14.2
           groups:
             - 1
             - 2
@@ -305,10 +309,10 @@ stages:
         parameters:
           testFormat: devel/linux/{0}
           targets:
-            - name: Fedora 41
-              test: fedora41
-            - name: Alpine 3.21
-              test: alpine321
+            - name: Fedora 42
+              test: fedora42
+            - name: Alpine 3.22
+              test: alpine322
             - name: Ubuntu 22.04
               test: ubuntu2204
             - name: Ubuntu 24.04
@@ -325,8 +329,10 @@ stages:
         parameters:
           testFormat: 2.19/linux/{0}
           targets:
-            - name: Ubuntu 24.04
-              test: ubuntu2404
+            - name: Fedora 41
+              test: fedora41
+            - name: Alpine 3.21
+              test: alpine321
           groups:
             - 1
             - 2
