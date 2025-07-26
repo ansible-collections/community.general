@@ -61,10 +61,16 @@ options:
     description:
       - Value to set for the specified dconf key. Value should be specified in GVariant format. Due to complexity of this
         format, it is best to have a look at existing values in the dconf database.
-      - Required for O(state=present).
+      - One of O(value) and O(path) are required for O(state=present).
       - Although the type is specified as "raw", it should typically be specified as a string. However, boolean values in
         particular are handled properly even when specified as booleans rather than strings (in fact, handling booleans properly
         is why the type of this parameter is "raw").
+  path:
+    type: path
+    description:
+      - Remote path to the configuration to apply.
+      - One of O(value) and O(path) are required for O(state=present).
+
   state:
     type: str
     required: false
@@ -122,11 +128,19 @@ EXAMPLES = r"""
     key: "/org/cinnamon/desktop-effects"
     value: "false"
     state: present
+
+- name: Load terminal profile in Gnome
+  community.general.dconf:
+    key: "/org/gnome/terminal/legacy/profiles/:"
+    path: "/tmp/solarized_dark.dump"
+    state: present
 """
 
 
 import os
 import sys
+
+from ansible.module_utils.six.moves.configparser import ConfigParser
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.respawn import (
@@ -224,7 +238,7 @@ class DBusWrapper(object):
 
         return None
 
-    def run_command(self, command):
+    def run_command(self, command, data=None):
         """
         Runs the specified command within a functional D-Bus session. Command is
         effectively passed-on to AnsibleModule.run_command() method, with
@@ -233,19 +247,21 @@ class DBusWrapper(object):
         :param command: Command to run, including parameters. Each element of the list should be a string.
         :type module: list
 
+        :kw data: If given, information to write to the stdin of the command
+
         :returns: tuple(result_code, standard_output, standard_error) -- Result code, standard output, and standard error from running the command.
         """
 
         if self.dbus_session_bus_address is None:
             self.module.debug("Using dbus-run-session wrapper for running commands.")
             command = [self.dbus_run_session_cmd] + command
-            rc, out, err = self.module.run_command(command)
+            rc, out, err = self.module.run_command(command, data=data)
 
             if self.dbus_session_bus_address is None and rc == 127:
                 self.module.fail_json(msg="Failed to run passed-in command, dbus-run-session faced an internal error: %s" % err)
         else:
             extra_environment = {'DBUS_SESSION_BUS_ADDRESS': self.dbus_session_bus_address}
-            rc, out, err = self.module.run_command(command, environ_update=extra_environment)
+            rc, out, err = self.module.run_command(command, data=data, environ_update=extra_environment)
 
         return rc, out, err
 
@@ -390,6 +406,71 @@ class DconfPreference(object):
         # Value was changed.
         return True
 
+    def load(self, key, path):
+        """
+        Load the config file in specified path.
+
+        if an error occurs, a call will be made to AnsibleModule.fail_json.
+
+        :param key: dconf directory for which the config should be set.
+        :type key: str
+
+        :param path: Remote configuration path to set for the specified dconf path.
+        :type value: str
+
+        :returns: bool -- True if a change was made, False if no change was required.
+        """
+        def _create_dconf_key(root, sub_dir, key):
+            # Root should end with '/'
+            if sub_dir == "/":
+                # No sub directory
+                return "%s%s" % (root, key)
+            return "%s%s/%s" % (root, sub_dir, key)
+
+        # Ensure key refers to a directory, as required by dconf
+        root_dir = key
+        if not root_dir.endswith('/'):
+            root_dir += '/'
+
+        # Read config to check if change is needed and passing to command line
+        try:
+            with open(path, 'r') as fd:
+                raw_config = fd.read()
+        except IOError as ex:
+            self.module.fail_json(msg='Failed while reading configuration file %s with error: %s' % (path, ex))
+
+        # Parse configuration file
+        config = ConfigParser()
+        try:
+            config.read_string(raw_config)
+        except Exception as e:
+            self.module.fail_json(msg='Failed while parsing config with error: %s' % e)
+
+        # For each sub-directory, check if at least one change is needed
+        changed = any(
+            not self.variants_are_equal(self.read(_create_dconf_key(root_dir, sub_dir, k)), v)
+            for sub_dir in config.sections()
+            for k, v in config[sub_dir].items()
+        )
+
+        if self.check_mode or not changed:
+            return changed
+
+        # Set-up command to run. Since DBus is needed for write operation, wrap
+        # dconf command dbus-launch.
+        command = [self.dconf_bin, 'load', root_dir]
+
+        # Run the command and fetch standard return code, stdout, and stderr.
+        dbus_wrapper = DBusWrapper(self.module)
+        rc, out, err = dbus_wrapper.run_command(command, data=raw_config)
+
+        if rc != 0:
+            self.module.fail_json(msg='dconf failed while load config %s, root dir %s with error: %s' % (path, root_dir, err),
+                                  out=out,
+                                  err=err)
+        # Value was changed.
+        return changed
+
 
 def main():
     # Setup the Ansible module
@@ -398,11 +479,15 @@ def main():
             state=dict(default='present', choices=['present', 'absent', 'read']),
             key=dict(required=True, type='str', no_log=False),
             # Converted to str below after special handling of bool.
-            value=dict(required=False, default=None, type='raw'),
+            value=dict(type='raw'),
+            path=dict(type='path'),
         ),
         supports_check_mode=True,
         required_if=[
-            ('state', 'present', ['value']),
+            ('state', 'present', ['value', 'path'], True),
+        ],
+        mutually_exclusive=[
+            ['value', 'path'],
         ],
     )
 
@@ -459,11 +544,18 @@ def main():
 
     # Process based on different states.
     if module.params['state'] == 'read':
+        # TODO: Handle this case when 'state=present' and 'key' is the only one
         value = dconf.read(module.params['key'])
         module.exit_json(changed=False, value=value)
     elif module.params['state'] == 'present':
-        changed = dconf.write(module.params['key'], module.params['value'])
-        module.exit_json(changed=changed)
+        if module.params['path']:
+            # Use 'dconf load' to propagate multiple entries from the root given by 'key'
+            changed = dconf.load(module.params['key'], module.params['path'])
+            module.exit_json(changed=changed)
+        elif module.params['value']:
+            # Use 'dconf write' to modify the key
+            changed = dconf.write(module.params['key'], module.params['value'])
+            module.exit_json(changed=changed)
     elif module.params['state'] == 'absent':
         changed = dconf.reset(module.params['key'])
         module.exit_json(changed=changed)
