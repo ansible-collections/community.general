@@ -36,7 +36,8 @@ options:
     default: false
   atomic:
     description:
-      - Makes a pvmove operation atomic, ensuring that all affected LVs are moved to the destination PV, or none are if the operation is aborted.
+      - Makes the C(pvmove) operation atomic, ensuring that all affected LVs are moved to the destination PV,
+        or none are if the operation is aborted.
     type: bool
     default: true
   autobackup:
@@ -44,10 +45,9 @@ options:
       - Automatically backup metadata before changes (strongly advised!).
     type: bool
     default: true
-notes:
-  - Requires LVM2 utilities installed on the target system.
-  - Both O(source) and O(destination) devices must exist.
-  - Both O(source) and O(destination) PVs must be in the same volume group.
+requirements:
+  - LVM2 utilities
+  - Both O(source) and O(destination) devices must exist, and the PVs must be in the same volume group.
   - The O(destination) PV must have enough free space to accommodate the O(source) PV's allocated extents.
   - Verbosity is automatically controlled by Ansible's verbosity level (using multiple C(-v) flags).
 """
@@ -60,6 +60,15 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
+actions:
+  description: List of actions performed during module execution.
+  returned: always
+  type: list
+  sample: [
+    "moved data from /dev/sdb to /dev/sdc",
+    "no allocated extents to move",
+    "would move data from /dev/sdb to /dev/sdc"
+  ]
 """
 
 
@@ -111,7 +120,15 @@ def main():
         with pvs_runner(arguments) as ctx:
             rc, out, err = ctx.run(device=device)
             if rc != 0:
-                module.fail_json(msg="Command failed: %s" % err)
+                module.fail_json(
+                    msg="Command failed: %s" % err,
+                    stdout=out,
+                    stderr=err,
+                    rc=rc,
+                    cmd=ctx.cmd,
+                    arguments=arguments,
+                    device=device,
+                )
             return out.strip()
 
     def is_pv(device):
@@ -193,7 +210,7 @@ def main():
     result['changed'] = changed
     result['actions'] = actions
     if actions:
-        result['msg'] = "PV data move: " + ", ".join(actions)
+        result['msg'] = "PV data move: %s" % ", ".join(actions)
     else:
         result['msg'] = "No data to move from %s" % source
 
