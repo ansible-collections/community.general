@@ -13,5 +13,6 @@ skip/rhel9.2
 skip/rhel9.3
 skip/rhel9.4
 skip/rhel9.5
+skip/rhel9.6
 skip/rhel10.0
 skip/freebsd
