@@ -30,7 +30,7 @@ options:
   name:
     description:
       - Name or list of names of packages to install/remove.
-      - With O(name=*), O(state=latest) will operate, but O(state=present) and O(state=absent) will be noops.
+      - With O(name=*), O(state=latest) operates, but O(state=present) and O(state=absent) are noops.
     required: true
     aliases: [pkg]
     type: list
@@ -65,19 +65,19 @@ options:
     type: str
   rootdir:
     description:
-      - For C(pkgng) versions 1.5 and later, pkg will install all packages within the specified root directory.
+      - For C(pkgng) versions 1.5 and later, pkg installs all packages within the specified root directory.
       - Can not be used together with O(chroot) or O(jail) options.
     required: false
     type: path
   chroot:
     description:
-      - Pkg will chroot in the specified environment.
+      - Pkg chroots in the specified environment.
       - Can not be used together with O(rootdir) or O(jail) options.
     required: false
     type: path
   jail:
     description:
-      - Pkg will execute in the given jail name or ID.
+      - Pkg executes in the given jail name or ID.
       - Can not be used together with O(chroot) or O(rootdir) options.
     type: str
   autoremove:
@@ -103,8 +103,8 @@ options:
     version_added: 9.3.0
 author: "bleader (@bleader)"
 notes:
-  - When using pkgsite, be careful that already in cache packages will not be downloaded again.
-  - When used with a C(loop:) each package will be processed individually, it is much more efficient to pass the list directly
+  - When using pkgsite, be careful that already in cache packages are not downloaded again.
+  - When used with a C(loop:) each package is processed individually, it is much more efficient to pass the list directly
     to the O(name) option.
 """
 
