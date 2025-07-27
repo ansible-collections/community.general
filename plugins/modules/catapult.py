@@ -95,14 +95,6 @@ EXAMPLES = r"""
     api_secret: "{{ api_secret }}"
 """
 
-RETURN = r"""
-changed:
-  description: Whether the API accepted the message.
-  returned: always
-  type: bool
-  sample: true
-"""
-
 
 import json
 

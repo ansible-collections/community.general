@@ -82,16 +82,6 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
-rc:
-  description: Return code of rpm-ostree command.
-  returned: always
-  type: int
-  sample: 0
-changed:
-  description: State changes.
-  returned: always
-  type: bool
-  sample: true
 action:
   description: Action performed.
   returned: always
@@ -102,16 +92,6 @@ packages:
   returned: always
   type: list
   sample: ["nfs-utils"]
-stdout:
-  description: Stdout of rpm-ostree command.
-  returned: always
-  type: str
-  sample: 'Staging deployment...done\n...'
-stderr:
-  description: Stderr of rpm-ostree command.
-  returned: always
-  type: str
-  sample: ''
 cmd:
   description: Full command used for performed action.
   returned: always

@@ -159,13 +159,6 @@ EXAMPLES = r"""
   delegate_to: localhost
 """
 
-RETURN = r"""
-changed:
-  description: A flag indicating if any change was made or not.
-  returned: success
-  type: bool
-  sample: false
-"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
