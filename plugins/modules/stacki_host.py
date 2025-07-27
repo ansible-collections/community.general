@@ -119,7 +119,6 @@ EXAMPLES = r"""
     state: absent
 """
 
-RETURN = r"""   """
 
 import json
 
