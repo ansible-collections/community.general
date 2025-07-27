@@ -146,7 +146,7 @@ options:
       - The B(current default) is V(auto), which has been B(deprecated) since community.general 10.2.0. It is going to change
         to V(never) in community.general 12.0.0. To prevent deprecation warnings you can explicitly set O(prepend_hash) to
         the value you want. We suggest to only use V(always) or V(never), but not V(auto), when explicitly setting a value.
-      # when the default changes in community.general 12.0.0, add deprecation for the `auto` value for 14.0.0
+    # when the default changes in community.general 12.0.0, add deprecation for the `auto` value for 14.0.0
     choices:
       - 'always'
       - 'never'
