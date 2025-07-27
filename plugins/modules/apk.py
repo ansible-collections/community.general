@@ -351,6 +351,9 @@ def main():
 
     p = module.params
 
+    if all(not name.strip() for name in p['name']):
+        module.fail_json(msg="Package name(s) cannot be empty or whitespace-only")
+
     if p['no_cache']:
         APK_PATH = "%s --no-cache" % (APK_PATH, )
 
