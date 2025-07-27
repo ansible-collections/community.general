@@ -190,8 +190,8 @@
   ignore_errors: true
   register: result_missing
 
-- name: Assert module fails gracefully with file not found error
+- name: Assert module fails gracefully with missing directory error
   ansible.builtin.assert:
     that:
       - result_missing.failed
-      - "result_missing.msg is match(\"Error accessing or creating blacklist file '/tmp/nonexistent-dir/blacklist.conf': \\\\[Errno 2\\\\] No such file or directory: '.*'\")"
+      - result_missing.msg == "The directory '/tmp/nonexistent-dir' does not exist."

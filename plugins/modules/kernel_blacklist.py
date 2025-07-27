@@ -69,12 +69,15 @@ class Blacklist(StateModuleHelper):
     def __init_module__(self):
         self.pattern = re.compile(r'^blacklist\s+{0}$'.format(re.escape(self.vars.name)))
         self.vars.filename = self.vars.blacklist_file
-
         try:
-            if not os.path.exists(self.vars.filename):
-                os.makedirs(os.path.dirname(self.vars.filename), exist_ok=True)
+            dirpath = os.path.dirname(self.vars.filename)
+            if not os.path.isdir(dirpath):
+                self.module.fail_json(msg=f"The directory '{dirpath}' does not exist.")
+            self.vars.set('file_exists', os.path.exists(self.vars.filename), output=False, change=True)
+            if not self.vars.file_exists:
                 with open(self.vars.filename, 'a'):
                     pass
+                self.vars.file_exists = True
                 self.vars.set('lines', [], change=True, diff=True)
             else:
                 with open(self.vars.filename) as fd:
