@@ -80,7 +80,7 @@ packages:
   returned: success
   type: list
   elements: str
-  sample: ['httpd']
+  sample: ["httpd"]
 state:
   description: State of package(s).
   returned: success

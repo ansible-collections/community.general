@@ -20,8 +20,8 @@ attributes:
   check_mode:
     support: partial
     details:
-      - In check mode, any C(zpool) subcommand that supports the dry-run flag (C(-n)) will be run with C(-n) and its
-        simulated output is included in the module's diff results.
+      - In check mode, any C(zpool) subcommand that supports the dry-run flag (C(-n)) will be run with C(-n) and its simulated
+        output is included in the module's diff results.
   diff_mode:
     support: full
 author:
