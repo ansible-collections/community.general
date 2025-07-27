@@ -110,3 +110,32 @@
   loop: "{{ [tcp_listen, udp_listen]|flatten }}"
   when: item.name == 'nc'
   ignore_errors: true
+
+
+- when: ansible_os_family == "Debian"
+  block:
+    - name: Remove netstat and ss dependencies to simulate missing executables
+      ansible.builtin.package:
+        name:
+          - net-tools
+          - iproute2
+        state: absent
+      ignore_errors: true
+
+    - name: Trigger listen_ports_facts with missing tools
+      community.general.listen_ports_facts:
+      register: listen_ports_failure_result
+      ignore_errors: true
+
+    - name: Assert graceful failure when dependencies are missing
+      ansible.builtin.assert:
+        that:
+          - listen_ports_failure_result is failed
+          - "'Unable to find any of the supported commands' in listen_ports_failure_result.msg"
+
+    - name: Reinstall netstat and ss dependencies after test
+      ansible.builtin.package:
+        name:
+          - net-tools
+          - iproute2
+        state: present
