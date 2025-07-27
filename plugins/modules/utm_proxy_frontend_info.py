@@ -29,7 +29,7 @@ options:
   name:
     type: str
     description:
-      - The name of the object. Will be used to identify the entry.
+      - The name of the object that identifies the entry.
     required: true
 
 extends_documentation_fragment:
@@ -90,7 +90,7 @@ result:
       description: List of associated proxy exceptions.
       type: list
     htmlrewrite:
-      description: State of html rewrite.
+      description: State of HTML rewrite.
       type: bool
     htmlrewrite_cookies:
       description: Whether the HTML rewrite cookie is set.
