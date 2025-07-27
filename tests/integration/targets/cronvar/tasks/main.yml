@@ -122,3 +122,19 @@
       - custom_varcheck1.stdout == '1'
       - custom_varcheck2.stdout == '1'
       - custom_varcheck3.stdout == '0'
+
+- name: Attempt to add cron variable to non-existent parent directory
+  cronvar:
+    name: NOPARENT_VAR
+    value: noparentval
+    cron_file: /nonexistent/foo
+    user: root
+  register: invalid_directory_cronvar_result
+  ignore_errors: true
+
+- name: Assert that the cronvar task failed due to invalid directory
+  ansible.builtin.assert:
+    that:
+      - invalid_directory_cronvar_result is failed
+      - >-
+       "Parent directory '/nonexistent' does not exist for cron_file: '/nonexistent/foo'" == invalid_directory_cronvar_result.msg
