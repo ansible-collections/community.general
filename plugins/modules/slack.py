@@ -32,23 +32,24 @@ options:
   domain:
     type: str
     description:
-      - "When using new format 'Webhook token' and WebAPI tokens: this can be V(slack.com) or V(slack-gov.com) and is ignored otherwise."
+      - "When using new format 'Webhook token' and WebAPI tokens: this can be V(slack.com) or V(slack-gov.com) and is ignored
+        otherwise."
       - "When using old format 'Webhook token': Slack (sub)domain for your environment without protocol. (For example V(example.slack.com).)
-         in Ansible 1.8 and beyond, this is deprecated and may be ignored. See token documentation for information."
+        in Ansible 1.8 and beyond, this is deprecated and may be ignored. See token documentation for information."
   token:
     type: str
     description:
-      - Slack integration token. This authenticates you to the slack service. Make sure to use the correct type of token,
+      - Slack integration token. This authenticates you to the Slack service. Make sure to use the correct type of token,
         depending on what method you use.
       - 'Webhook token: Prior to Ansible 1.8, a token looked like V(3Ffe373sfhRE6y42Fg3rvf4GlK). In Ansible 1.8 and above,
-        Ansible adapts to the new slack API where tokens look like V(G922VJP24/D921DW937/3Ffe373sfhRE6y42Fg3rvf4GlK). If tokens
-        are in the new format then slack will ignore any value of domain except V(slack.com) or V(slack-gov.com). If the token
-        is in the old format the domain is required. Ansible has no control of when slack will get rid of the old API. When slack
-        does that the old format will stop working.
-        ** Please keep in mind the tokens are not the API tokens but are the webhook tokens. In slack these
-        are found in the webhook URL which are obtained under the apps and integrations. The incoming webhooks can be added
-        in that area. In some cases this may be locked by your Slack admin and you must request access. It is there that the
-        incoming webhooks can be added. The key is on the end of the URL given to you in that section.'
+        Ansible adapts to the new Slack API where tokens look like V(G922VJP24/D921DW937/3Ffe373sfhRE6y42Fg3rvf4GlK). If tokens
+        are in the new format then Slack ignores any value of domain except V(slack.com) or V(slack-gov.com). If the token
+        is in the old format the domain is required. Ansible has no control of when Slack is going to remove the old API.
+        When Slack does that the old format is going to cease working. B(Please keep in mind the tokens are not the API tokens
+        but are the webhook tokens.) In Slack these are found in the webhook URL which are obtained under the apps and integrations.
+        The incoming webhooks can be added in that area. In some cases this may be locked by your Slack admin and you must
+        request access. It is there that the incoming webhooks can be added. The key is on the end of the URL given to you
+        in that section.'
       - "WebAPI token: Slack WebAPI requires a personal, bot or work application token. These tokens start with V(xoxp-),
         V(xoxb-) or V(xoxa-), for example V(xoxb-1234-56789abcdefghijklmnop). WebAPI token is required if you intend to receive
         thread_id. See Slack's documentation (U(https://api.slack.com/docs/token-types)) for more information."
@@ -58,7 +59,8 @@ options:
     description:
       - Message to send. Note that the module does not handle escaping characters. Plain-text angle brackets and ampersands
         should be converted to HTML entities (for example C(&) to C(&amp;)) before sending. See Slack's documentation
-        (U(https://api.slack.com/docs/message-formatting)) for more.
+        (U(https://api.slack.com/docs/message-formatting))
+        for more.
   channel:
     type: str
     description:
@@ -90,7 +92,7 @@ options:
     type: str
     description:
       - Emoji for the message sender. See Slack documentation for options.
-      - If O(icon_emoji) is set, O(icon_url) will not be used.
+      - If O(icon_emoji) is set, O(icon_url) is not used.
   link_names:
     type: int
     description:
@@ -108,8 +110,8 @@ options:
       - 'none'
   validate_certs:
     description:
-      - If V(false), SSL certificates will not be validated. This should only be used on personally controlled sites using
-        self-signed certificates.
+      - If V(false), SSL certificates are not validated. This should only be used on personally controlled sites using self-signed
+        certificates.
     type: bool
     default: true
   color:
@@ -139,11 +141,12 @@ options:
       - Setting for automatically prepending a V(#) symbol on the passed in O(channel).
       - The V(auto) method prepends a V(#) unless O(channel) starts with one of V(#), V(@), V(C0), V(GF), V(G0), V(CP). These
         prefixes only cover a small set of the prefixes that should not have a V(#) prepended. Since an exact condition which
-        O(channel) values must not have the V(#) prefix is not known, the value V(auto) for this option will be deprecated
-        in the future. It is best to explicitly set O(prepend_hash=always) or O(prepend_hash=never) to obtain the needed behavior.
-      - The B(current default) is V(auto), which has been B(deprecated) since community.general 10.2.0. It will change to
-        V(never) in community.general 12.0.0. To prevent deprecation warnings you can explicitly set O(prepend_hash) to the
-        value you want. We suggest to only use V(always) or V(never), but not V(auto), when explicitly setting a value.
+        O(channel) values must not have the V(#) prefix is not known, the value V(auto) for this option is deprecated in the
+        future. It is best to explicitly set O(prepend_hash=always) or O(prepend_hash=never) to obtain the needed behavior.
+      - The B(current default) is V(auto), which has been B(deprecated) since community.general 10.2.0. It is going to change
+        to V(never) in community.general 12.0.0. To prevent deprecation warnings you can explicitly set O(prepend_hash) to
+        the value you want. We suggest to only use V(always) or V(never), but not V(auto), when explicitly setting a value.
+    # when the default changes in community.general 12.0.0, add deprecation for the `auto` value for 14.0.0
     choices:
       - 'always'
       - 'never'

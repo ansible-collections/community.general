@@ -49,7 +49,7 @@ options:
   host:
     description:
       - The endpoint this configuration is valid for.
-      - Can be an actual address on the internet or an alias that will connect to the value of O(hostname).
+      - It can be an actual address on the internet or an alias that connects to the value of O(hostname).
     required: true
     type: str
   hostname:
@@ -66,7 +66,7 @@ options:
     type: str
   identity_file:
     description:
-      - The path to an identity file (SSH private key) that will be used when connecting to this host.
+      - The path to an identity file (SSH private key) that is used when connecting to this host.
       - File need to exist and have mode V(0600) to be valid.
     type: path
   identities_only:
@@ -141,7 +141,7 @@ options:
     version_added: 10.1.0
   other_options:
     description:
-      - Provides the option to specify arbitrary SSH config entry options via a dictionary.
+      - Allows specifying arbitrary SSH config entry options using a dictionary.
       - The key names must be lower case. Keys with upper case values are rejected.
       - The values must be strings. Other values are rejected.
     type: dict
@@ -198,22 +198,27 @@ hosts_change_diff:
   description: A list of host diff changes.
   returned: on change
   type: list
-  sample: [
-    {
-      "example.com": {
-        "new": {
-          "hostname": "github.com",
-          "identityfile": ["/tmp/test_ssh_config/fake_id_rsa"],
-          "port": "2224"
-        },
-        "old": {
-          "hostname": "github.com",
-          "identityfile": ["/tmp/test_ssh_config/fake_id_rsa"],
-          "port": "2224"
+  sample:
+    [
+      {
+        "example.com": {
+          "new": {
+            "hostname": "github.com",
+            "identityfile": [
+              "/tmp/test_ssh_config/fake_id_rsa"
+            ],
+            "port": "2224"
+          },
+          "old": {
+            "hostname": "github.com",
+            "identityfile": [
+              "/tmp/test_ssh_config/fake_id_rsa"
+            ],
+            "port": "2224"
+          }
         }
       }
-    }
-  ]
+    ]
 """
 
 import os

@@ -11,9 +11,9 @@ short_description: Create, update or delete Spotinst AWS Elastigroups
 author: Spotinst (@talzur)
 description:
   - Can create, update, or delete Spotinst AWS Elastigroups Launch configuration is part of the elastigroup configuration,
-    so no additional modules are necessary for handling the launch configuration. You will have to have a credentials file
-    in this location - C($HOME/.spotinst/credentials). The credentials file must contain a row that looks like this C(token
-    = <YOUR TOKEN>).
+    so no additional modules are necessary for handling the launch configuration. You must have a credentials file in this
+    location - C($HOME/.spotinst/credentials). The credentials file must contain a row that looks like this C(token = <YOUR
+    TOKEN>).
   - Full documentation available at U(https://help.spotinst.com/hc/en-us/articles/115003530285-Ansible-).
 requirements:
   - spotinst_sdk >= 1.0.38
@@ -41,8 +41,8 @@ options:
   token:
     description:
       - A Personal API Access Token issued by Spotinst.
-      - 'When not specified, the module will try to obtain it, in that order, from: environment variable E(SPOTINST_TOKEN),
-        or from the credentials path.'
+      - When not specified, the module tries to obtain it, in that order, from environment variable E(SPOTINST_TOKEN), or
+        from the credentials path.
     type: str
 
   availability_vs_cost:
@@ -82,8 +82,7 @@ options:
 
   ebs_optimized:
     description:
-      - Enable EBS optimization for supported instances which are not enabled by default.; Note - additional charges will
-        be applied.
+      - Enable EBS optimization for supported instances which are not enabled by default. Note - additional charges are applied.
     type: bool
 
   ebs_volume_pool:
@@ -106,7 +105,7 @@ options:
 
   fallback_to_od:
     description:
-      - In case of no spots available, Elastigroup will launch an On-demand instance instead.
+      - In case of no spots available, Elastigroup launches an On-demand instance instead.
     type: bool
 
   health_check_grace_period:
@@ -140,15 +139,15 @@ options:
 
   id:
     description:
-      - The group ID if it already exists and you want to update, or delete it. This will not work unless the uniqueness_by
-        field is set to ID. When this is set, and the uniqueness_by field is set, the group will either be updated or deleted,
+      - The group ID if it already exists and you want to update, or delete it. This does not work unless the O(uniqueness_by)
+        field is set to ID. When this is set, and the O(uniqueness_by) field is set, the group is either updated or deleted,
         but not created.
     type: str
 
   image_id:
     description:
-      - The image ID used to launch the instance.; In case of conflict between Instance type and image type, an error will
-        be returned.
+      - The image ID used to launch the instance.; In case of conflict between Instance type and image type, an error is be
+        returned.
     required: true
     type: str
 
@@ -214,13 +213,13 @@ options:
   on_demand_count:
     description:
       - Required if risk is not set.
-      - Number of on demand instances to launch. All other instances will be spot instances.; Either set this parameter or
-        the risk parameter.
+      - Number of on demand instances to launch. All other instances are spot instances.; Either set this parameter or the
+        O(risk) parameter.
     type: int
 
   on_demand_instance_type:
     description:
-      - On-demand instance type that will be provisioned.
+      - On-demand instance type that is provisioned.
     type: str
 
   opsworks:
@@ -278,7 +277,7 @@ options:
   security_group_ids:
     description:
       - One or more security group IDs.
-      - In case of update it will override the existing Security Group with the new given array.
+      - In case of update it overrides the existing Security Group with the new given array.
     required: true
     type: list
     elements: str
@@ -302,7 +301,7 @@ options:
 
   spot_instance_types:
     description:
-      - Spot instance type that will be provisioned.
+      - Spot instance type that is provisioned.
     required: true
     type: list
     elements: str
@@ -388,7 +387,7 @@ options:
       - name
     description:
       - If your group names are not unique, you may use this feature to update or delete a specific group. Whenever this property
-        is set, you must set a group_id in order to update or delete a group, otherwise a group will be created.
+        is set, you must set a group_id in order to update or delete a group, otherwise a group is created.
     default: name
     type: str
 
@@ -399,7 +398,7 @@ options:
 
   utilize_reserved_instances:
     description:
-      - In case of any available Reserved Instances, Elastigroup will utilize your reservations before purchasing Spot instances.
+      - In case of any available Reserved Instances, Elastigroup utilizes your reservations before purchasing Spot instances.
     type: bool
 
   wait_for_instances:

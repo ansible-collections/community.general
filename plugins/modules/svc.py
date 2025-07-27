@@ -30,10 +30,10 @@ options:
     required: true
   state:
     description:
-      - V(started)/V(stopped) are idempotent actions that will not run commands unless necessary.
-      - V(restarted) will always bounce the svc (svc -t) and V(killed) will always bounce the svc (svc -k).
-      - V(reloaded) will send a sigusr1 (svc -1).
-      - V(once) will run a normally downed svc once (svc -o), not really an idempotent operation.
+      - V(started)/V(stopped) are idempotent actions that do not run commands unless necessary.
+      - V(restarted) always bounces the svc (svc -t) and V(killed) always bounces the svc (svc -k).
+      - V(reloaded) sends a sigusr1 (svc -1).
+      - V(once) runs a normally downed svc once (svc -o), not really an idempotent operation.
     type: str
     choices: [killed, once, reloaded, restarted, started, stopped]
   downed:

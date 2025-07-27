@@ -25,7 +25,7 @@ options:
   snapshot:
     description:
       - Apply the latest snapshot.
-      - Otherwise release will be applied.
+      - Otherwise release is applied.
     default: false
     type: bool
   force:
@@ -36,14 +36,13 @@ options:
   keep_files:
     description:
       - Keep the files under C(/home/_sysupgrade).
-      - By default, the files will be deleted after the upgrade.
+      - By default, the files are deleted after the upgrade.
     default: false
     type: bool
   fetch_only:
     description:
       - Fetch and verify files and create C(/bsd.upgrade) but do not reboot.
-      - Set to V(false) if you want C(sysupgrade) to reboot. This will cause Ansible to error, as it expects the module to
-        exit gracefully. See the examples.
+      - Set to V(false) if you want C(sysupgrade) to reboot. This causes the module to fail. See the examples.
     default: true
     type: bool
   installurl:

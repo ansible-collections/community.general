@@ -15,7 +15,7 @@ author:
   - Patrick Ogenstad (@ogenstad)
 short_description: Retrieve facts for a device using SNMP
 description:
-  - Retrieve facts for a device using SNMP, the facts will be inserted to the C(ansible_facts) key.
+  - Retrieve facts for a device using SNMP, the facts are inserted to the C(ansible_facts) key.
 requirements:
   - pysnmp
 extends_documentation_fragment:

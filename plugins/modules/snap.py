@@ -37,8 +37,8 @@ options:
   state:
     description:
       - Desired state of the package.
-      - When O(state=present) the module will use C(snap install) if the snap is not installed, and C(snap refresh) if it
-        is installed but from a different channel.
+      - When O(state=present) the module uses C(snap install) if the snap is not installed, and C(snap refresh) if it is installed
+        but from a different channel.
     default: present
     choices: [absent, present, enabled, disabled]
     type: str
@@ -56,19 +56,19 @@ options:
     description:
       - Define which release of a snap is installed and tracked for updates. This option can only be specified if there is
         a single snap in the task.
-      - If not passed, the C(snap) command will default to V(stable).
-      - If the value passed does not contain the C(track), it will default to C(latest). For example, if V(edge) is passed,
-        the module will assume the channel to be V(latest/edge).
+      - If not passed, the C(snap) command defaults to V(stable).
+      - If the value passed does not contain the C(track), it defaults to C(latest). For example, if V(edge) is passed, the
+        module assumes the channel to be V(latest/edge).
       - See U(https://snapcraft.io/docs/channels) for more details about snap channels.
     type: str
     required: false
   options:
     description:
-      - Set options with pattern C(key=value) or C(snap:key=value). If a snap name is given, the option will be applied to
-        that snap only. If the snap name is omitted, the options will be applied to all snaps listed in O(name). Options will
-        only be applied to active snaps.
-      - Options will only be applied when C(state) is set to V(present). This is done after the necessary installation or
-        refresh (upgrade/downgrade) of all the snaps listed in O(name).
+      - Set options with pattern C(key=value) or C(snap:key=value). If a snap name is given, the option is applied to that
+        snap only. If the snap name is omitted, the options are applied to all snaps listed in O(name). Options are only applied
+        to active snaps.
+      - Options are only applied when C(state) is set to V(present). This is done after the necessary installation or refresh
+        (upgrade/downgrade) of all the snaps listed in O(name).
       - See U(https://snapcraft.io/docs/configuration-in-snaps) for more details about snap configuration options.
     required: false
     type: list

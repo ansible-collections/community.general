@@ -17,8 +17,8 @@ description:
 notes:
   - This module is non-idempotent because it sends an email through the external API. It is idempotent only in the case that
     the module fails.
-  - Like the other notification modules, this one requires an external dependency to work. In this case, you will need an
-    active SendGrid account.
+  - Like the other notification modules, this one requires an external dependency to work. In this case, you need an active
+    SendGrid account.
   - In order to use O(api_key), O(cc), O(bcc), O(attachments), O(from_name), O(html_body), and O(headers) you must C(pip install
     sendgrid).
 requirements:
@@ -82,7 +82,7 @@ options:
       - The name you want to appear in the from field, for example V(John Doe).
   html_body:
     description:
-      - Whether the body is html content that should be rendered.
+      - Whether the body is HTML content that should be rendered.
     type: bool
     default: false
   headers:

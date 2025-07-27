@@ -57,7 +57,7 @@ scaleway_server_info:
   type: list
   elements: dict
   sample:
-    "scaleway_server_info": [
+    [
       {
         "arch": "x86_64",
         "boot_type": "local",

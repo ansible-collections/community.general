@@ -14,13 +14,13 @@ short_description: Gather C(systemd) unit info
 description:
   - This module gathers info about systemd units (services, targets, sockets, mounts, timers).
   - Timer units are supported since community.general 10.5.0.
-  - It runs C(systemctl list-units) (or processes selected units) and collects properties
-    for each unit using C(systemctl show).
-  - In case a unit has multiple properties with the same name, only the value of the first one will be collected.
-  - Even if a unit has a RV(units.loadstate) of V(not-found) or V(masked), it is returned,
-    but only with the minimal properties (RV(units.name), RV(units.loadstate), RV(units.activestate), RV(units.substate)).
-  - When O(unitname) and O(extra_properties) are used, the module first checks if the unit exists,
-    then check if properties exist. If not, the module fails.
+  - It runs C(systemctl list-units) (or processes selected units) and collects properties for each unit using C(systemctl
+    show).
+  - In case a unit has multiple properties with the same name, only the value of the first one is collected.
+  - Even if a unit has a RV(units.loadstate) of V(not-found) or V(masked), it is returned, but only with the minimal properties
+    (RV(units.name), RV(units.loadstate), RV(units.activestate), RV(units.substate)).
+  - When O(unitname) and O(extra_properties) are used, the module first checks if the unit exists, then check if properties
+    exist. If not, the module fails.
   - When O(unitname) is used with wildcard expressions, the module checks for units that match the indicated expressions,
     if units are not present for all the indicated expressions, the module fails.
 version_added: "10.4.0"
@@ -89,7 +89,7 @@ RETURN = r"""
 units:
   description:
     - Dictionary of systemd unit info keyed by unit name.
-    - Additional fields will be returned depending on the value of O(extra_properties).
+    - Additional fields are returned depending on the value of O(extra_properties).
   returned: success
   type: dict
   elements: dict
@@ -116,7 +116,8 @@ units:
     substate:
       description:
         - The detailed sub state of the unit.
-        - The most common values are V(running), V(dead), V(exited), V(failed), V(listening), V(active), and V(mounted), but other values are possible as well.
+        - The most common values are V(running), V(dead), V(exited), V(failed), V(listening), V(active), and V(mounted), but
+          other values are possible as well.
       returned: always
       type: str
       sample: running
