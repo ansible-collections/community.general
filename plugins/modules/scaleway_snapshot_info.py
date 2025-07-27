@@ -57,7 +57,7 @@ scaleway_snapshot_info:
   type: list
   elements: dict
   sample:
-    "scaleway_snapshot_info": [
+    [
       {
         "base_volume": {
           "id": "68386fae-4f55-4fbf-aabb-953036a85872",

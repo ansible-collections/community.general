@@ -14,7 +14,7 @@ author: "David Moreau Simard (@dmsimard)"
 short_description: Manages Sensu handler configuration
 description:
   - Manages Sensu handler configuration.
-  - 'For more information, refer to the L(Sensu documentation, https://sensuapp.org/docs/latest/reference/handlers.html).'
+  - For more information, refer to the L(Sensu documentation, https://sensuapp.org/docs/latest/reference/handlers.html).
 deprecated:
   removed_in: 13.0.0
   why: Sensu Core and Sensu Enterprise products have been End of Life since 2019/20.
@@ -57,7 +57,7 @@ options:
     type: list
     elements: str
     description:
-      - An array of check result severities the handler will handle.
+      - An array of check result severities the handler handles.
       - 'NOTE: event resolution bypasses this filtering.'
       - "Example: [ 'warning', 'critical', 'unknown' ]."
   mutator:
@@ -155,7 +155,12 @@ config:
   description: Effective handler configuration, when state is present.
   returned: success
   type: dict
-  sample: {'name': 'irc', 'type': 'pipe', 'command': '/usr/local/bin/notify-irc.sh'}
+  sample:
+    {
+      "name": "irc",
+      "type": "pipe",
+      "command": "/usr/local/bin/notify-irc.sh"
+    }
 file:
   description: Path to the handler configuration file.
   returned: success

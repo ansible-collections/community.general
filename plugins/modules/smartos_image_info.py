@@ -47,12 +47,20 @@ EXAMPLES = r"""
 
 - name: Print information
   ansible.builtin.debug:
-    msg: "{{ result.smartos_images[item]['name'] }}-{{ result.smartos_images[item]['version'] }} has {{ result.smartos_images[item]['clones'] }} VM(s)"
+    msg: >-
+      {{
+        result.smartos_images[item]['name'] }}-{{ result.smartos_images[item]['version'] }}
+        has {{ result.smartos_images[item]['clones']
+      }} VM(s)
   with_items: "{{ result.smartos_images.keys() | list }}"
 
 - name: Print information
   ansible.builtin.debug:
-    msg: "{{ smartos_images[item]['name'] }}-{{ smartos_images[item]['version'] }} has {{ smartos_images[item]['clones'] }} VM(s)"
+    msg: >-
+      {{
+        smartos_images[item]['name'] }}-{{ smartos_images[item]['version'] }}
+        has {{ smartos_images[item]['clones']
+      }} VM(s)
   with_items: "{{ smartos_images.keys() | list }}"
 """
 

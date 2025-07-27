@@ -42,7 +42,7 @@ options:
     required: true
     description:
       - The name of the sudoers rule.
-      - This will be used for the filename for the sudoers file managed by this rule.
+      - This is used for the filename for the sudoers file managed by this rule.
     type: str
   noexec:
     description:
@@ -69,12 +69,12 @@ options:
     version_added: 6.2.0
   runas:
     description:
-      - Specify the target user the command(s) will run as.
+      - Specify the target user the command(s) runs as.
     type: str
     version_added: 4.7.0
   sudoers_path:
     description:
-      - The path which sudoers config files will be managed in.
+      - The path which sudoers config files are managed in.
     default: /etc/sudoers.d
     type: str
   state:
@@ -92,9 +92,9 @@ options:
     type: str
   validation:
     description:
-      - If V(absent), the sudoers rule will be added without validation.
-      - If V(detect) and visudo is available, then the sudoers rule will be validated by visudo.
-      - If V(required), visudo must be available to validate the sudoers rule.
+      - If V(absent), the sudoers rule is added without validation.
+      - If V(detect) and C(visudo) is available, then the sudoers rule is validated by C(visudo).
+      - If V(required), C(visudo) must be available to validate the sudoers rule.
     type: str
     default: detect
     choices: [absent, detect, required]

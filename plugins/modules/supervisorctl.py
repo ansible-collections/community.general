@@ -26,8 +26,8 @@ options:
     type: str
     description:
       - The name of the supervisord program or group to manage.
-      - The name will be taken as group name when it ends with a colon V(:).
-      - If O(name=all), all programs and program groups will be managed.
+      - The name is taken as group name when it ends with a colon V(:).
+      - If O(name=all), all programs and program groups are managed.
     required: true
   config:
     type: path
@@ -67,12 +67,11 @@ options:
     description:
       - Path to C(supervisorctl) executable.
 notes:
-  - When O(state=present), the module will call C(supervisorctl reread) then C(supervisorctl add) if the program/group does
-    not exist.
-  - When O(state=restarted), the module will call C(supervisorctl update) then call C(supervisorctl restart).
-  - When O(state=absent), the module will call C(supervisorctl reread) then C(supervisorctl remove) to remove the target program/group.
-    If the program/group is still running, the action will fail. If you want to stop the program/group before removing, use
-    O(stop_before_removing=true).
+  - When O(state=present), the module calls C(supervisorctl reread) then C(supervisorctl add) if the program/group does not
+    exist.
+  - When O(state=restarted), the module calls C(supervisorctl update) then calls C(supervisorctl restart).
+  - When O(state=absent), the module calls C(supervisorctl reread) then C(supervisorctl remove) to remove the target program/group.
+    If the program/group is still running, the action fails. If you want to stop the program/group before removing, use O(stop_before_removing=true).
 requirements: ["supervisorctl"]
 author:
   - "Matt Wright (@mattupstate)"

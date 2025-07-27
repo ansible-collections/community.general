@@ -16,7 +16,7 @@ DOCUMENTATION = r"""
 module: swdepot
 short_description: Manage packages with swdepot package manager (HP-UX)
 description:
-  - Will install, upgrade and remove packages with swdepot package manager (HP-UX).
+  - Installs, upgrades, and removes packages with C(swdepot) package manager (HP-UX).
 notes: []
 author: "Raul Melo (@melodous)"
 extends_documentation_fragment:

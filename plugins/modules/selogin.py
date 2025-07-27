@@ -34,7 +34,8 @@ options:
     type: str
     aliases: [serange]
     description:
-      - MLS/MCS Security Range (MLS/MCS Systems only) SELinux Range for SELinux login mapping defaults to the SELinux user record range.
+      - MLS/MCS Security Range (MLS/MCS Systems only) SELinux Range for SELinux login mapping defaults to the SELinux user
+        record range.
     default: s0
   state:
     type: str
