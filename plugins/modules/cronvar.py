@@ -378,7 +378,7 @@ def main():
     if name is None and ensure_present:
         module.fail_json(msg="You must specify 'name' to insert a new cron variable")
 
-    if not value and ensure_present:
+    if value is None and ensure_present:
         module.fail_json(msg="You must specify 'value' to insert a new cron variable")
 
     if name is None and not ensure_present:
@@ -396,6 +396,8 @@ def main():
     old_value = cronvar.find_variable(name)
 
     if ensure_present:
+        if value == "":
+            value = '""'
         if old_value is None:
             cronvar.add_variable(name, value, insertbefore, insertafter)
             changed = True

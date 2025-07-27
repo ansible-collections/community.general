@@ -1,2 +1,2 @@
 bugfixes:
-  - "cronvar - reject empty string for ``value`` (https://github.com/ansible-collections/community.general/issues/10439, https://github.com/ansible-collections/community.general/pull/10445)."
+  - "cronvar - handle empty strings on ``value`` properly  (https://github.com/ansible-collections/community.general/issues/10439, https://github.com/ansible-collections/community.general/pull/10445)."
