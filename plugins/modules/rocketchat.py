@@ -104,7 +104,7 @@ options:
     description:
       - If V(true), the payload matches Rocket.Chat prior to 7.4.0 format. This format has been used by the module since its
         inception, but is no longer supported by Rocket.Chat 7.4.0.
-      - The default value of the option, V(true), is **deprecated** since community.general 11.2.0 and will change to V(false) in community.general 13.0.0.
+      - The default value of the option, V(true), is B(deprecated) since community.general 11.2.0 and will change to V(false) in community.general 13.0.0.
       - This parameter is going to be removed in a future release when Rocket.Chat 7.4.0 becomes the minimum supported version.
     type: bool
     version_added: 10.5.0
