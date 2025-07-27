@@ -39,14 +39,14 @@ options:
   token:
     type: str
     description:
-      - Slack integration token. This authenticates you to the slack service. Make sure to use the correct type of token,
+      - Slack integration token. This authenticates you to the Slack service. Make sure to use the correct type of token,
         depending on what method you use.
       - 'Webhook token: Prior to Ansible 1.8, a token looked like V(3Ffe373sfhRE6y42Fg3rvf4GlK). In Ansible 1.8 and above,
-        Ansible adapts to the new slack API where tokens look like V(G922VJP24/D921DW937/3Ffe373sfhRE6y42Fg3rvf4GlK). If tokens
-        are in the new format then slack ignores any value of domain except V(slack.com) or V(slack-gov.com). If the token
+        Ansible adapts to the new Slack API where tokens look like V(G922VJP24/D921DW937/3Ffe373sfhRE6y42Fg3rvf4GlK). If tokens
+        are in the new format then Slack ignores any value of domain except V(slack.com) or V(slack-gov.com). If the token
         is in the old format the domain is required. Ansible has no control of when Slack is going to remove the old API.
-        When Slack does that the old format is going to cease working. **Please keep in mind the tokens are not the API tokens
-        but are the webhook tokens** . In slack these are found in the webhook URL which are obtained under the apps and integrations.
+        When Slack does that the old format is going to cease working. B(Please keep in mind the tokens are not the API tokens
+        but are the webhook tokens.) In Slack these are found in the webhook URL which are obtained under the apps and integrations.
         The incoming webhooks can be added in that area. In some cases this may be locked by your Slack admin and you must
         request access. It is there that the incoming webhooks can be added. The key is on the end of the URL given to you
         in that section.'
