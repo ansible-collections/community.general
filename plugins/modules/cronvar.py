@@ -396,7 +396,7 @@ def main():
     old_value = cronvar.find_variable(name)
 
     if ensure_present:
-        if value == "":
+        if value == "" and old_value != "":
             value = '""'
         if old_value is None:
             cronvar.add_variable(name, value, insertbefore, insertafter)
