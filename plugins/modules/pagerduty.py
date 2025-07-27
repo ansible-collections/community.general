@@ -13,7 +13,7 @@ DOCUMENTATION = r"""
 module: pagerduty
 short_description: Create PagerDuty maintenance windows
 description:
-  - This module will let you create PagerDuty maintenance windows.
+  - This module lets you create PagerDuty maintenance windows.
 author:
   - "Andrew Newdigate (@suprememoocow)"
   - "Dylan Silva (@thaumos)"
@@ -79,8 +79,8 @@ options:
     default: Created by Ansible
   validate_certs:
     description:
-      - If V(false), SSL certificates will not be validated. This should only be used on personally controlled sites using
-        self-signed certificates.
+      - If V(false), SSL certificates are not validated. This should only be used on personally controlled sites using self-signed
+        certificates.
     type: bool
     default: true
 """

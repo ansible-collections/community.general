@@ -13,8 +13,8 @@ module: pagerduty_change
 short_description: Track a code or infrastructure change as a PagerDuty change event
 version_added: 1.3.0
 description:
-  - This module will let you create a PagerDuty change event each time the module is run.
-  - This is not an idempotent action and a new change event will be created each time it is run.
+  - This module lets you create a PagerDuty change event each time the module is run.
+  - This is not an idempotent action and a new change event is created each time it is run.
 author:
   - Adam Vaughan (@adamvaughan)
 requirements:
@@ -82,7 +82,7 @@ options:
     type: str
   validate_certs:
     description:
-      - If V(false), SSL certificates for the target URL will not be validated. This should only be used on personally controlled
+      - If V(false), SSL certificates for the target URL are not validated. This should only be used on personally controlled
         sites using self-signed certificates.
     required: false
     default: true

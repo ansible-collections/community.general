@@ -56,13 +56,13 @@ options:
     default: {}
   account:
     description:
-      - Name of PubNub account for from which O(application) will be used to manage blocks.
-      - User's account will be used if value not set or empty.
+      - Name of PubNub account for from which O(application) is used to manage blocks.
+      - User's account is used if value not set or empty.
     type: str
     default: ''
   application:
     description:
-      - Name of target PubNub application for which blocks configuration on specific O(keyset) will be done.
+      - Name of target PubNub application for which blocks configuration on specific O(keyset) is done.
     type: str
     required: true
   keyset:
@@ -72,19 +72,19 @@ options:
     required: true
   state:
     description:
-      - Intended block state after event handlers creation / update process will be completed.
+      - Intended block state after event handlers creation / update process is completed.
     required: false
     default: 'present'
     choices: ['started', 'stopped', 'present', 'absent']
     type: str
   name:
     description:
-      - Name of managed block which will be later visible on admin.pubnub.com.
+      - Name of managed block which is later visible on admin.pubnub.com.
     required: true
     type: str
   description:
     description:
-      - Short block description which will be later visible on U(https://admin.pubnub.com).
+      - Short block description which is later visible on U(https://admin.pubnub.com).
       - Used only if block does not exists and does not change description for existing block.
     required: false
     type: str
@@ -99,8 +99,8 @@ options:
       - Each entry for existing handlers should contain C(name) (so target handler can be identified). Rest parameters (C(src),
         C(channels) and C(event)) can be added if changes required for them.
       - It is possible to rename event handler by adding C(changes) key to event handler payload and pass dictionary, which
-        will contain single key C(name), where new name should be passed.
-      - To remove particular event handler it is possible to set C(state) for it to C(absent) and it will be removed.
+        contains single key C(name), where new name should be passed.
+      - To remove particular event handler it is possible to set C(state) for it to C(absent) and it is removed.
     required: false
     default: []
     type: list
@@ -115,7 +115,7 @@ options:
   validate_certs:
     description:
       - This key allow to try skip certificates check when performing REST API calls. Sometimes host may have issues with
-        certificates on it and this will cause problems to call PubNub REST API.
+        certificates on it and this causes problems to call PubNub REST API.
       - If check should be ignored V(false) should be passed to this parameter.
     required: false
     default: true
