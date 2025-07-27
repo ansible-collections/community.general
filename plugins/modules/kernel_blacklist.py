@@ -83,7 +83,7 @@ class Blacklist(StateModuleHelper):
                 with open(self.vars.filename) as fd:
                     self.vars.set('lines', [x.rstrip() for x in fd.readlines()], change=True, diff=True)
         except (OSError, IOError) as e:
-            self.module.fail_json(msg="Error accessing or creating blacklist file '{}': {}".format(self.vars.filename, e))
+            self.module.fail_json(msg="Error accessing or creating blacklist file {!r}: {}".format(self.vars.filename, e))
 
         self.vars.set('file_exists', True, output=False, change=True)
         self.vars.set('is_blacklisted', self._is_module_blocked(), change=True)
