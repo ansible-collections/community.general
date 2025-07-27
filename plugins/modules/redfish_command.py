@@ -229,8 +229,8 @@ options:
     description:
       - Custom OEM properties for HTTP Multipart Push updates.
       - If set, then O(update_custom_oem_header) is required too.
-      - The properties will be passed raw without any validation or conversion by Ansible. This means the content can be a
-        file, a string, or any other data. If the content is a dict that should be converted to JSON, then the content must
+      - The properties are passed raw without any validation or conversion by Ansible. This means the content can be a file,
+        a string, or any other data. If the content is a dictionary that should be converted to JSON, then the content must
         be converted to JSON before passing it to this module using the P(ansible.builtin.to_json#filter) filter.
     type: raw
     version_added: '10.1.0'
@@ -830,15 +830,16 @@ return_values:
   returned: on success
   type: dict
   version_added: 6.1.0
-  sample: {
-    "update_status": {
-      "handle": "/redfish/v1/TaskService/TaskMonitors/735",
-      "messages": [],
-      "resets_requested": [],
-      "ret": true,
-      "status": "New"
+  sample:
+    {
+      "update_status": {
+        "handle": "/redfish/v1/TaskService/TaskMonitors/735",
+        "messages": [],
+        "resets_requested": [],
+        "ret": true,
+        "status": "New"
+      }
     }
-  }
 """
 
 from ansible.module_utils.basic import AnsibleModule

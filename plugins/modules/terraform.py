@@ -58,19 +58,19 @@ options:
   purge_workspace:
     description:
       - Only works with state = absent.
-      - If true, the workspace will be deleted after the "terraform destroy" action.
-      - The 'default' workspace will not be deleted.
+      - If V(true), the O(workspace) is deleted after the C(terraform destroy) action.
+      - If O(workspace=default) then it is not deleted.
     default: false
     type: bool
   plan_file:
     description:
-      - The path to an existing Terraform plan file to apply. If this is not specified, Ansible will build a new TF plan and
-        execute it. Note that this option is required if 'state' has the 'planned' value.
+      - The path to an existing Terraform plan file to apply. If this is not specified, Ansible builds a new TF plan and execute
+        it. Note that this option is required if O(state=planned).
     type: path
   state_file:
     description:
       - The path to an existing Terraform state file to use when building plan. If this is not specified, the default C(terraform.tfstate)
-        will be used.
+        is used.
       - This option is ignored when plan is specified.
     type: path
   variables_files:
@@ -91,7 +91,7 @@ options:
       - Ansible dictionaries are mapped to terraform objects.
       - Ansible lists are mapped to terraform lists.
       - Ansible booleans are mapped to terraform booleans.
-      - B(Note) passwords passed as variables will be visible in the log output. Make sure to use C(no_log=true) in production!.
+      - B(Note) passwords passed as variables are visible in the log output. Make sure to use C(no_log=true) in production!.
     type: dict
   complex_vars:
     description:
@@ -104,7 +104,7 @@ options:
     version_added: 5.7.0
   targets:
     description:
-      - A list of specific resources to target in this plan/application. The resources selected here will also auto-include
+      - A list of specific resources to target in this plan/application. The resources selected here are also auto-include
         any dependencies.
     type: list
     elements: str
@@ -120,7 +120,7 @@ options:
     type: int
   force_init:
     description:
-      - To avoid duplicating infra, if a state file cannot be found this will force a C(terraform init). Generally, this should
+      - To avoid duplicating infra, if a state file cannot be found this forces a C(terraform init). Generally, this should
         be turned off unless you intend to provision an entirely new Terraform deployment.
     default: false
     type: bool

@@ -62,7 +62,7 @@ options:
     type: int
     description:
       - Job execution wait timeout in seconds.
-      - If the timeout is reached, the job will be aborted.
+      - If the timeout is reached, the job is aborted.
       - Keep in mind that there is a sleep based on O(wait_execution_delay) after each job status check.
     default: 120
   abort_on_timeout:
