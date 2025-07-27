@@ -21,7 +21,7 @@ description:
   - Send notifications using telegram bot, to a verified group or user.
   - Also, the user may try to use any other telegram bot API method, if you specify O(api_method) argument.
 notes:
-  - You will require a telegram account and create telegram bot to use this module.
+  - You need a telegram account and create telegram bot to use this module.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:

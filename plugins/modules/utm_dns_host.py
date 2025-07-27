@@ -29,7 +29,7 @@ options:
   name:
     type: str
     description:
-      - The name of the object. Will be used to identify the entry.
+      - The name of the object that identifies the entry.
     required: true
   address:
     type: str
@@ -130,7 +130,7 @@ result:
       description: Whether the ipv6 address is resolved or not.
       type: bool
     timeout:
-      description: The timeout until a new resolving will be attempted.
+      description: The timeout until a new resolving is attempted.
       type: int
 """
 

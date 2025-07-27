@@ -30,7 +30,7 @@ options:
   name:
     type: str
     description:
-      - The name of the object. Will be used to identify the entry.
+      - The name of the object that identifies the entry.
     required: true
   add_content_type_header:
     description:
@@ -76,12 +76,12 @@ options:
     default: []
   htmlrewrite:
     description:
-      - Whether to enable html rewrite or not.
+      - Whether to enable HTML rewrite or not.
     type: bool
     default: false
   htmlrewrite_cookies:
     description:
-      - Whether to enable html rewrite cookie or not.
+      - Whether to enable HTML rewrite cookie or not.
     type: bool
     default: false
   implicitredirect:
@@ -204,7 +204,7 @@ result:
       description: List of associated proxy exceptions.
       type: list
     htmlrewrite:
-      description: State of html rewrite.
+      description: State of HTML rewrite.
       type: bool
     htmlrewrite_cookies:
       description: Whether the HTML rewrite cookie is set.
