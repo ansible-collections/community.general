@@ -29,7 +29,7 @@ attributes:
 options:
   name:
     description:
-      - The name of the object. Will be used to identify the entry.
+      - The name of the object that identifies the entry.
     required: true
     type: str
   ca:

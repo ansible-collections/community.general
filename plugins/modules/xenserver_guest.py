@@ -394,141 +394,143 @@ instance:
   description: Metadata about the VM.
   returned: always
   type: dict
-  sample: {
-    "cdrom": {
-      "type": "none"
-    },
-    "customization_agent": "native",
-    "disks": [
-      {
-        "name": "testvm_11-0",
-        "name_desc": "",
-        "os_device": "xvda",
-        "size": 42949672960,
-        "sr": "Local storage",
-        "sr_uuid": "0af1245e-bdb0-ba33-1446-57a962ec4075",
-        "vbd_userdevice": "0"
+  sample:
+    {
+      "cdrom": {
+        "type": "none"
       },
-      {
-        "name": "testvm_11-1",
-        "name_desc": "",
-        "os_device": "xvdb",
-        "size": 42949672960,
-        "sr": "Local storage",
-        "sr_uuid": "0af1245e-bdb0-ba33-1446-57a962ec4075",
-        "vbd_userdevice": "1"
+      "customization_agent": "native",
+      "disks": [
+        {
+          "name": "testvm_11-0",
+          "name_desc": "",
+          "os_device": "xvda",
+          "size": 42949672960,
+          "sr": "Local storage",
+          "sr_uuid": "0af1245e-bdb0-ba33-1446-57a962ec4075",
+          "vbd_userdevice": "0"
+        },
+        {
+          "name": "testvm_11-1",
+          "name_desc": "",
+          "os_device": "xvdb",
+          "size": 42949672960,
+          "sr": "Local storage",
+          "sr_uuid": "0af1245e-bdb0-ba33-1446-57a962ec4075",
+          "vbd_userdevice": "1"
+        }
+      ],
+      "domid": "56",
+      "folder": "",
+      "hardware": {
+        "memory_mb": 8192,
+        "num_cpu_cores_per_socket": 2,
+        "num_cpus": 4
+      },
+      "home_server": "",
+      "is_template": false,
+      "name": "testvm_11",
+      "name_desc": "",
+      "networks": [
+        {
+          "gateway": "192.168.0.254",
+          "gateway6": "fc00::fffe",
+          "ip": "192.168.0.200",
+          "ip6": [
+            "fe80:0000:0000:0000:e9cb:625a:32c5:c291",
+            "fc00:0000:0000:0000:0000:0000:0000:0001"
+          ],
+          "mac": "ba:91:3a:48:20:76",
+          "mtu": "1500",
+          "name": "Pool-wide network associated with eth1",
+          "netmask": "255.255.255.128",
+          "prefix": "25",
+          "prefix6": "64",
+          "vif_device": "0"
+        }
+      ],
+      "other_config": {
+        "base_template_name": "Windows Server 2016 (64-bit)",
+        "import_task": "OpaqueRef:e43eb71c-45d6-5351-09ff-96e4fb7d0fa5",
+        "install-methods": "cdrom",
+        "instant": "true",
+        "mac_seed": "f83e8d8a-cfdc-b105-b054-ef5cb416b77e"
+      },
+      "platform": {
+        "acpi": "1",
+        "apic": "true",
+        "cores-per-socket": "2",
+        "device_id": "0002",
+        "hpet": "true",
+        "nx": "true",
+        "pae": "true",
+        "timeoffset": "-25200",
+        "vga": "std",
+        "videoram": "8",
+        "viridian": "true",
+        "viridian_reference_tsc": "true",
+        "viridian_time_ref_count": "true"
+      },
+      "state": "poweredon",
+      "uuid": "e3c0b2d5-5f05-424e-479c-d3df8b3e7cda",
+      "xenstore_data": {
+        "vm-data": ""
       }
-    ],
-    "domid": "56",
-    "folder": "",
-    "hardware": {
-      "memory_mb": 8192,
-      "num_cpu_cores_per_socket": 2,
-      "num_cpus": 4
-    },
-    "home_server": "",
-    "is_template": false,
-    "name": "testvm_11",
-    "name_desc": "",
-    "networks": [
-      {
-        "gateway": "192.168.0.254",
-        "gateway6": "fc00::fffe",
-        "ip": "192.168.0.200",
-        "ip6": [
-          "fe80:0000:0000:0000:e9cb:625a:32c5:c291",
-          "fc00:0000:0000:0000:0000:0000:0000:0001"
-        ],
-        "mac": "ba:91:3a:48:20:76",
-        "mtu": "1500",
-        "name": "Pool-wide network associated with eth1",
-        "netmask": "255.255.255.128",
-        "prefix": "25",
-        "prefix6": "64",
-        "vif_device": "0"
-      }
-    ],
-    "other_config": {
-      "base_template_name": "Windows Server 2016 (64-bit)",
-      "import_task": "OpaqueRef:e43eb71c-45d6-5351-09ff-96e4fb7d0fa5",
-      "install-methods": "cdrom",
-      "instant": "true",
-      "mac_seed": "f83e8d8a-cfdc-b105-b054-ef5cb416b77e"
-    },
-    "platform": {
-      "acpi": "1",
-      "apic": "true",
-      "cores-per-socket": "2",
-      "device_id": "0002",
-      "hpet": "true",
-      "nx": "true",
-      "pae": "true",
-      "timeoffset": "-25200",
-      "vga": "std",
-      "videoram": "8",
-      "viridian": "true",
-      "viridian_reference_tsc": "true",
-      "viridian_time_ref_count": "true"
-    },
-    "state": "poweredon",
-    "uuid": "e3c0b2d5-5f05-424e-479c-d3df8b3e7cda",
-    "xenstore_data": {
-      "vm-data": ""
     }
-  }
 changes:
   description: Detected or made changes to VM.
   returned: always
   type: list
-  sample: [
-    {
-      "hardware": [
-        "num_cpus"
-      ]
-    },
-    {
-      "disks_changed": [
-        [],
-        [
-          "size"
+  sample:
+    [
+      {
+        "hardware": [
+          "num_cpus"
         ]
-      ]
-    },
-    {
-      "disks_new": [
-        {
-          "name": "new-disk",
-          "name_desc": "",
-          "position": 2,
-          "size_gb": "4",
-          "vbd_userdevice": "2"
-        }
-      ]
-    },
-    {
-      "cdrom": [
-        "type",
-        "iso_name"
-      ]
-    },
-    {
-      "networks_changed": [
-        [
-          "mac"
-        ],
-      ]
-    },
-    {
-      "networks_new": [
-        {
-          "name": "Pool-wide network associated with eth2",
-          "position": 1,
-          "vif_device": "1"
-        }
-      ]
-    },
-    "need_poweredoff"
-  ]
+      },
+      {
+        "disks_changed": [
+          [],
+          [
+            "size"
+          ]
+        ]
+      },
+      {
+        "disks_new": [
+          {
+            "name": "new-disk",
+            "name_desc": "",
+            "position": 2,
+            "size_gb": "4",
+            "vbd_userdevice": "2"
+          }
+        ]
+      },
+      {
+        "cdrom": [
+          "type",
+          "iso_name"
+        ]
+      },
+      {
+        "networks_changed": [
+          [
+            "mac"
+          ]
+        ]
+      },
+      {
+        "networks_new": [
+          {
+            "name": "Pool-wide network associated with eth2",
+            "position": 1,
+            "vif_device": "1"
+          }
+        ]
+      },
+      "need_poweredoff"
+    ]
 """
 
 import re
