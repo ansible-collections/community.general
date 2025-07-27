@@ -1,0 +1,3 @@
+bugfixes:
+  - kernel_blacklist - Handle file exceptions gracefully
+    (https://github.com/ansible-collections/community.general/issues/10482, https://github.com/ansible-collections/community.general/pull/10484).
