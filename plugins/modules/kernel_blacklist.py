@@ -72,7 +72,7 @@ class Blacklist(StateModuleHelper):
         try:
             dirpath = os.path.dirname(self.vars.filename)
             if not os.path.isdir(dirpath):
-                self.module.fail_json(msg=f"The directory '{dirpath}' does not exist.")
+                self.module.fail_json(msg="The directory '{}' does not exist.".format(dirpath))
             self.vars.set('file_exists', os.path.exists(self.vars.filename), output=False, change=True)
             if not self.vars.file_exists:
                 with open(self.vars.filename, 'a'):
@@ -83,7 +83,7 @@ class Blacklist(StateModuleHelper):
                 with open(self.vars.filename) as fd:
                     self.vars.set('lines', [x.rstrip() for x in fd.readlines()], change=True, diff=True)
         except (OSError, IOError) as e:
-            self.module.fail_json(msg=f"Error accessing or creating blacklist file '{self.vars.filename}': {e}")
+            self.module.fail_json(msg="Error accessing or creating blacklist file '{}': {}".format(self.vars.filename, e))
 
         self.vars.set('file_exists', True, output=False, change=True)
         self.vars.set('is_blacklisted', self._is_module_blocked(), change=True)
@@ -114,9 +114,9 @@ class Blacklist(StateModuleHelper):
             bkp = self.module.backup_local(self.vars.filename)
             try:
                 with open(self.vars.filename, "w") as fd:
-                    fd.writelines(f"{x}\n" for x in self.vars.lines)
+                    fd.writelines(["{0}\n".format(x) for x in self.vars.lines])
             except (OSError, IOError) as e:
-                self.module.fail_json(msg=f"Failed to write to blacklist file '{self.vars.filename}': {e}")
+                self.module.fail_json(msg="Failed to write to blacklist file '{}': {}".format(self.vars.filename, e))
             self.module.add_cleanup_file(bkp)
 
 
