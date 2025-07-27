@@ -1,0 +1,2 @@
+bugfixes:
+    - capabilities - Using invalid path (symlink/directory/...) would return unrelated and incoherent error messages (https://github.com/ansible-collections/community.general/issues/5649)
