@@ -107,7 +107,8 @@ options:
   flexible_disk_size:
     required: false
     description:
-      - This sets an upper bound for the amount of space that a bhyve instance may use for its disks and snapshots of those disks (in MiBs).
+      - This sets an upper bound for the amount of space that a bhyve instance may use for its disks and snapshots of those
+        disks (in MiBs).
     type: int
     version_added: 10.5.0
   force:

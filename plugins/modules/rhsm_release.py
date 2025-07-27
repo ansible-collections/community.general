@@ -14,8 +14,8 @@ short_description: Set or Unset RHSM Release version
 description:
   - Sets or unsets the release version used by RHSM repositories.
 notes:
-  - This module will fail on an unregistered system. Use the M(community.general.redhat_subscription) module to register a
-    system prior to setting the RHSM release.
+  - This module fails on an unregistered system. Use the M(community.general.redhat_subscription) module to register a system
+    prior to setting the RHSM release.
   - It is possible to interact with C(subscription-manager) only as root, so root permissions are required to successfully
     run this module.
 requirements:

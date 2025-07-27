@@ -33,7 +33,7 @@ options:
     type: str
   expiration:
     description:
-      - Expiration time in milliseconds. Setting this flag will always result in a change in the database.
+      - Expiration time in milliseconds. Setting this option always results in a change in the database.
     required: false
     type: int
   non_existing:
