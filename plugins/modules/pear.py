@@ -47,14 +47,14 @@ options:
     description:
       - List of regular expressions that can be used to detect prompts during pear package installation to answer the expected
         question.
-      - Prompts will be processed in the same order as the packages list.
+      - Prompts are processed in the same order as the packages list.
       - You can optionally specify an answer to any question in the list.
-      - If no answer is provided, the list item will only contain the regular expression.
-      - "To specify an answer, the item will be a dict with the regular expression as key and the answer as value C(my_regular_expression:
+      - If no answer is provided, the list item must contain only the regular expression.
+      - "To specify an answer, the item must be a dictionary with the regular expression as key and the answer as value C(my_regular_expression:
         'an_answer')."
       - You can provide a list containing items with or without answer.
-      - A prompt list can be shorter or longer than the packages list but will issue a warning.
-      - If you want to specify that a package will not need prompts in the middle of a list, V(null).
+      - A prompt list can be shorter or longer than the packages list but it issues a warning.
+      - If you want to specify that a package does not need prompts in the middle of a list, V(null).
     type: list
     elements: raw
     version_added: 0.2.0
