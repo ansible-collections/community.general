@@ -12,7 +12,7 @@ DOCUMENTATION = r"""
 module: pingdom
 short_description: Pause/unpause Pingdom alerts
 description:
-  - This module will let you pause/unpause Pingdom alerts.
+  - This module lets you pause/unpause Pingdom alerts.
 author:
   - "Dylan Silva (@thaumos)"
   - "Justin Johns (!UNKNOWN)"

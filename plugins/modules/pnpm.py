@@ -77,14 +77,14 @@ options:
   production:
     description:
       - Install dependencies in production mode.
-      - Pnpm will ignore any dependencies under C(devDependencies) in package.json.
+      - Pnpm ignores any dependencies under C(devDependencies) in package.json.
     required: false
     type: bool
     default: false
   dev:
     description:
       - Install dependencies in development mode.
-      - Pnpm will ignore any regular dependencies in C(package.json).
+      - Pnpm ignores any regular dependencies in C(package.json).
     required: false
     default: false
     type: bool
