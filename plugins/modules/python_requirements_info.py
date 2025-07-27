@@ -92,7 +92,7 @@ python_system_path:
     - /usr/lib/python/site-packages/
 valid:
   description: A dictionary of dependencies that matched their desired versions. If no version was specified, then RV(ignore:desired)
-    will be V(null).
+    is V(null).
   returned: always
   type: dict
   sample:

@@ -115,7 +115,15 @@ cmd:
   returned: success
   type: list
   elements: str
-  sample: ["/usr/bin/python3.10", "-m", "pipx", "list", "--include-injected", "--json"]
+  sample:
+    [
+      "/usr/bin/python3.10",
+      "-m",
+      "pipx",
+      "list",
+      "--include-injected",
+      "--json"
+    ]
 
 version:
   description: Version of pipx.

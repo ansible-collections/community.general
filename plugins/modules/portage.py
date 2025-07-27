@@ -193,7 +193,7 @@ options:
   quietfail:
     description:
       - Suppresses display of the build log on stdout (--quiet-fail).
-      - Only the die message and the path of the build log will be displayed on stdout.
+      - Only the die message and the path of the build log are displayed on stdout.
     type: bool
     default: false
 
