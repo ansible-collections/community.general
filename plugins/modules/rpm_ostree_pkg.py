@@ -101,7 +101,7 @@ packages:
   description: A list of packages specified.
   returned: always
   type: list
-  sample: ['nfs-utils']
+  sample: ["nfs-utils"]
 stdout:
   description: Stdout of rpm-ostree command.
   returned: always

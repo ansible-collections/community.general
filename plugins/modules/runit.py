@@ -30,9 +30,10 @@ options:
     required: true
   state:
     description:
-      - V(started)/V(stopped) are idempotent actions that will not run commands unless necessary. V(restarted) will always
-        bounce the service (sv restart) and V(killed) will always bounce the service (sv force-stop). V(reloaded) will send
-        a HUP (sv reload). V(once) will run a normally downed sv once (sv once), not really an idempotent operation.
+      - V(started)/V(stopped) are idempotent actions that do not run commands unless necessary.
+      - V(restarted) always bounces the service (sv restart) and V(killed) always bounces the service (sv force-stop).
+      - V(reloaded) always sends a HUP (sv reload).
+      - V(once) runs a normally downed sv once (sv once), not really an idempotent operation.
     type: str
     choices: [killed, once, reloaded, restarted, started, stopped]
   enabled:

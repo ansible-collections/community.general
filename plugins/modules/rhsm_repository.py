@@ -48,7 +48,7 @@ options:
   purge:
     description:
       - Disable all currently enabled repositories that are not not specified in O(name). Only set this to V(true) if passing
-        in a list of repositories to the O(name) field. Using this with C(loop) will most likely not have the desired result.
+        in a list of repositories to the O(name) field. Using this with C(loop) is likely not to have the desired result.
     type: bool
     default: false
 """
