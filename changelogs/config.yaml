@@ -7,9 +7,9 @@ changelog_filename_template: ../CHANGELOG.rst
 changelog_filename_version_depth: 0
 changes_file: changelog.yaml
 changes_format: combined
+ignore_other_fragment_extensions: true
 keep_fragments: false
 mention_ancestor: true
-flatmap: true
 new_plugins_after_name: removed_features
 notesdir: fragments
 output_formats:
@@ -40,3 +40,4 @@ use_fqcn: true
 add_plugin_period: true
 changelog_nice_yaml: true
 changelog_sort: version
+vcs: auto
