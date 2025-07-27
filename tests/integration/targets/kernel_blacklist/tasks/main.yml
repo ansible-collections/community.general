@@ -154,13 +154,19 @@
   loop_control:
     loop_var: line_item
 
+- name: Resolve UID of nobody
+  ansible.builtin.command: id -u nobody
+  register: nobody_uid
+  ignore_errors: true
+
 - name: Create file owned by nobody
   ansible.builtin.copy:
     dest: /tmp/test-blacklist-perm.conf
     content: ""
-    owner: nobody
+    owner: "{{ nobody_uid.stdout | int }}"
     mode: '0600'
   become: true
+  when: nobody_uid.rc == 0
 
 - name: Run kernel_blacklist with unreadable file
   community.general.kernel_blacklist:
@@ -169,13 +175,14 @@
     blacklist_file: /tmp/test-blacklist-perm.conf
   ignore_errors: true
   register: result_perm
+  when: nobody_uid.rc == 0
 
 - name: Assert module fails gracefully with permission error
   ansible.builtin.assert:
     that:
       - result_perm.failed
       - "result_perm.msg is match(\"Failed to write to blacklist file '/tmp/test-blacklist-perm.conf': \\\\[Errno 13\\\\] Permission denied: '.*'\")"
-
+  when: nobody_uid.rc == 0
 
 - name: Ensure non-existing path
   ansible.builtin.file:
