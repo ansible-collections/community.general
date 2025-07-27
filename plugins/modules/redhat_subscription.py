@@ -21,7 +21,7 @@ notes:
   - 'The module tries to use the D-Bus C(rhsm) service (part of C(subscription-manager)) to register, starting from community.general
     6.5.0: this is done so credentials (username, password, activation keys) can be passed to C(rhsm) in a secure way. C(subscription-manager)
     itself gets credentials only as arguments of command line parameters, which is I(not) secure, as they can be easily stolen
-    by checking the process listing on the system. Due to limitations of the D-Bus interface of C(rhsm), the module will I(not)
+    by checking the process listing on the system. Due to limitations of the D-Bus interface of C(rhsm), the module does I(not)
     use D-Bus for registration when trying either to register using O(token), or when specifying O(environment), or when the
     system is old (typically RHEL 7 older than 7.4, RHEL 6, and older).'
   - In order to register a system, subscription-manager requires either a username and password, or an activationkey and an
@@ -132,10 +132,9 @@ options:
   pool_ids:
     description:
       - Specify subscription pool IDs to consume.
-      - 'A pool ID may be specified as a C(string) - just the pool ID (for example
-        V(0123456789abcdef0123456789abcdef)), or as a C(dict) with the pool ID as the key, and a quantity as the value (for
-        example V(0123456789abcdef0123456789abcdef: 2). If the quantity is provided, it is used to consume multiple entitlements
-        from a pool (the pool must support this).'
+      - 'A pool ID may be specified as a C(string) - just the pool ID (for example V(0123456789abcdef0123456789abcdef)), or
+        as a C(dict) with the pool ID as the key, and a quantity as the value (for example V(0123456789abcdef0123456789abcdef:
+        2). If the quantity is provided, it is used to consume multiple entitlements from a pool (the pool must support this).'
     default: []
     type: list
     elements: raw
@@ -167,8 +166,8 @@ options:
       - Set syspurpose attributes in file C(/etc/rhsm/syspurpose/syspurpose.json) and synchronize these attributes with RHSM
         server. Syspurpose attributes help attach the most appropriate subscriptions to the system automatically. When C(syspurpose.json)
         file already contains some attributes, then new attributes overwrite existing attributes. When some attribute is not
-        listed in the new list of attributes, the existing attribute will be removed from C(syspurpose.json) file. Unknown
-        attributes are ignored.
+        listed in the new list of attributes, the existing attribute is removed from C(syspurpose.json) file. Unknown attributes
+        are ignored.
     type: dict
     suboptions:
       usage:
@@ -187,7 +186,7 @@ options:
       sync:
         description:
           - When this option is V(true), then syspurpose attributes are synchronized with RHSM server immediately. When this
-            option is V(false), then syspurpose attributes will be synchronized with RHSM server by rhsmcertd daemon.
+            option is V(false), then syspurpose attributes are synchronized with RHSM server by rhsmcertd daemon.
         type: bool
         default: false
 """

@@ -69,7 +69,7 @@ options:
     description:
       - Emoji for the message sender. The representation for the available emojis can be got from Rocket Chat.
       - For example V(:thumbsup:).
-      - If O(icon_emoji) is set, O(icon_url) will not be used.
+      - If O(icon_emoji) is set, O(icon_url) is not used.
   link_names:
     type: int
     description:
@@ -80,8 +80,8 @@ options:
       - 0
   validate_certs:
     description:
-      - If V(false), SSL certificates will not be validated. This should only be used on personally controlled sites using
-        self-signed certificates.
+      - If V(false), SSL certificates are not validated. This should only be used on personally controlled sites using self-signed
+        certificates.
     type: bool
     default: true
   color:
@@ -102,10 +102,10 @@ options:
       - Define a list of attachments.
   is_pre740:
     description:
-      - If V(true), the payload matches Rocket.Chat prior to 7.4.0 format.
-        This format has been used by the module since its inception, but is no longer supported by Rocket.Chat 7.4.0.
-      - The default value of the option will change to V(false) eventually.
-      - This parameter will be removed in a future release when Rocket.Chat 7.4.0 becomes the minimum supported version.
+      - If V(true), the payload matches Rocket.Chat prior to 7.4.0 format. This format has been used by the module since its
+        inception, but is no longer supported by Rocket.Chat 7.4.0.
+      - The default value of the option is going to change to V(false) eventually.
+      - This parameter is going to be removed in a future release when Rocket.Chat 7.4.0 becomes the minimum supported version.
     type: bool
     default: true
     version_added: 10.5.0
