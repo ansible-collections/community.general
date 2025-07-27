@@ -38,10 +38,10 @@ options:
   expire:
     type: int
     description:
-      - If specified, the silence entry will be automatically cleared after this number of seconds.
+      - If specified, the silence entry is automatically cleared after this number of seconds.
   expire_on_resolve:
     description:
-      - If specified as true, the silence entry will be automatically cleared once the condition it is silencing is resolved.
+      - If specified as true, the silence entry is automatically cleared once the condition it is silencing is resolved.
     type: bool
   reason:
     type: str

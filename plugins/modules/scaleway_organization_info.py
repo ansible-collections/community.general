@@ -44,7 +44,7 @@ scaleway_organization_info:
   type: list
   elements: dict
   sample:
-    "scaleway_organization_info": [
+    [
       {
         "address_city_name": "Paris",
         "address_country_code": "FR",

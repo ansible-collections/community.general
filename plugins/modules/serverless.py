@@ -51,7 +51,7 @@ options:
   deploy:
     description:
       - Whether or not to deploy artifacts after building them.
-      - When this option is V(false) all the functions will be built, but no stack update will be run to send them out.
+      - When this option is V(false) all the functions are built, but no stack update is run to send them out.
       - This is mostly useful for generating artifacts to be stored/deployed elsewhere.
     type: bool
     default: true

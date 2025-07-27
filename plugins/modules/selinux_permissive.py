@@ -24,7 +24,7 @@ attributes:
 options:
   domain:
     description:
-      - The domain that will be added or removed from the list of permissive domains.
+      - The domain that is added or removed from the list of permissive domains.
     type: str
     required: true
     aliases: [name]

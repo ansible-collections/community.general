@@ -30,7 +30,7 @@ options:
     required: true
     description:
       - IP address of the device.
-      - If a hostname is given, it will be resolved to the IP address.
+      - If a hostname is given, it is resolved to the IP address.
   community:
     type: str
     description:
@@ -69,13 +69,13 @@ options:
       - Oneclick user password.
   use_proxy:
     description:
-      - If V(false), it will not use a proxy, even if one is defined in an environment variable on the target hosts.
+      - If V(false), it does not use a proxy, even if one is defined in an environment variable on the target hosts.
     default: true
     type: bool
   validate_certs:
     description:
-      - If V(false), SSL certificates will not be validated. This should only be used on personally controlled sites using
-        self-signed certificates.
+      - If V(false), SSL certificates are not validated. This should only be used on personally controlled sites using self-signed
+        certificates.
     default: true
     type: bool
   agentport:
@@ -85,8 +85,8 @@ options:
       - UDP port used for SNMP discovery.
     default: 161
 notes:
-  - The devices will be created inside the I(Universe) container of the specified landscape.
-  - All the operations will be performed only on the specified landscape.
+  - The devices are created inside the I(Universe) container of the specified landscape.
+  - All the operations are performed only on the specified landscape.
 """
 
 EXAMPLES = r"""
@@ -119,7 +119,12 @@ device:
   description: Device data when O(state=present).
   returned: success
   type: dict
-  sample: {'model_handle': '0x1007ab', 'landscape': '0x100000', 'address': '10.10.5.1'}
+  sample:
+    {
+      "model_handle": "0x1007ab",
+      "landscape": "0x100000",
+      "address": "10.10.5.1"
+    }
 """
 
 from socket import gethostbyname, gaierror

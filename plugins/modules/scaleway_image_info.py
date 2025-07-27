@@ -57,7 +57,7 @@ scaleway_image_info:
   type: list
   elements: dict
   sample:
-    "scaleway_image_info": [
+    [
       {
         "arch": "x86_64",
         "creation_date": "2018-07-17T16:18:49.276456+00:00",

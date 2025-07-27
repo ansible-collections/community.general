@@ -14,7 +14,7 @@ author: "David Moreau Simard (@dmsimard)"
 short_description: Manages Sensu client configuration
 description:
   - Manages Sensu client configuration.
-  - 'For more information, refer to the L(Sensu documentation, https://sensuapp.org/docs/latest/reference/clients.html).'
+  - For more information, refer to the L(Sensu documentation, https://sensuapp.org/docs/latest/reference/clients.html).
 deprecated:
   removed_in: 13.0.0
   why: Sensu Core and Sensu Enterprise products have been End of Life since 2019/20.
@@ -42,8 +42,8 @@ options:
     type: str
     description:
       - An address to help identify and reach the client. This is only informational, usually an IP address or hostname.
-      - If not specified it defaults to non-loopback IPv4 address as determined by Ruby C(Socket.ip_address_list) (provided by
-        Sensu).
+      - If not specified it defaults to non-loopback IPv4 address as determined by Ruby C(Socket.ip_address_list) (provided
+        by Sensu).
   subscriptions:
     type: list
     elements: str
@@ -158,7 +158,13 @@ config:
   description: Effective client configuration, when state is present.
   returned: success
   type: dict
-  sample: {'name': 'client', 'subscriptions': ['default']}
+  sample:
+    {
+      "name": "client",
+      "subscriptions": [
+        "default"
+      ]
+    }
 file:
   description: Path to the client configuration file.
   returned: success
