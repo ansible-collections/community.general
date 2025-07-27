@@ -57,7 +57,7 @@ scaleway_volume_info:
   type: list
   elements: dict
   sample:
-    "scaleway_volume_info": [
+    [
       {
         "creation_date": "2018-08-14T20:56:24.949660+00:00",
         "export_uri": null,

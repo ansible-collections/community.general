@@ -71,7 +71,7 @@ options:
     type: str
     description:
       - Default visibility policy.
-      - Everyone will be able to pull images from a V(public) registry.
+      - Everyone can pull images from a V(public) registry.
     choices:
       - public
       - private

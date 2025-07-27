@@ -111,7 +111,7 @@ options:
   minutes:
     type: int
     description:
-      - The length of time in UTC that the maintenance will run (starting from playbook runtime).
+      - The duration of the maintenance window (starting from playbook runtime).
     default: 10
   start_date:
     type: str

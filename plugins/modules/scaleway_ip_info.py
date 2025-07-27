@@ -52,12 +52,12 @@ RETURN = r"""
 scaleway_ip_info:
   description:
     - Response from Scaleway API.
-    - 'For more details please refer to U(https://developers.scaleway.com/en/products/instance/api/).'
+    - For more details please refer to U(https://developers.scaleway.com/en/products/instance/api/).
   returned: success
   type: list
   elements: dict
   sample:
-    "scaleway_ip_info": [
+    [
       {
         "address": "163.172.170.243",
         "id": "ea081794-a581-8899-8451-386ddaf0a451",

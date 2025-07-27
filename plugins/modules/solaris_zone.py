@@ -51,7 +51,7 @@ options:
     required: true
   path:
     description:
-      - The path where the zone will be created. This is required when the zone is created, but not used otherwise.
+      - The path where the zone is created. This is required when the zone is created, but not used otherwise.
     type: str
   sparse:
     description:
@@ -60,7 +60,7 @@ options:
     default: false
   root_password:
     description:
-      - The password hash for the root account. If not specified, the zone's root account will not have a password.
+      - The password hash for the root account. If not specified, the zone's root account does not have a password.
     type: str
   config:
     description:

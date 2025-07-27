@@ -38,7 +38,7 @@ options:
     type: str
   domain:
     description:
-      - Specifies the name of the domain in which the object will reside.
+      - Specifies the name of the domain in which the object resides.
     type: str
   growth_increment:
     description:
@@ -46,11 +46,12 @@ options:
     type: str
   growth_limit:
     description:
-      - Specifies that the autogrow operation is limited to the specified storage amount that sets the growth limit(in MiB, GiB or TiB).
+      - Specifies that the autogrow operation is limited to the specified storage amount that sets the growth limit (in MiB,
+        GiB or TiB).
     type: str
   growth_warning:
     description:
-      - Specifies that the threshold(in MiB, GiB or TiB) of used logical disk space when exceeded results in a warning alert.
+      - Specifies that the threshold (in MiB, GiB or TiB) of used logical disk space when exceeded results in a warning alert.
     type: str
   high_availability:
     choices:

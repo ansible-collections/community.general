@@ -34,7 +34,7 @@ options:
     description:
       - Name of the spell or grimoire.
       - Multiple names can be given, separated by commas.
-      - Special value V(*) in conjunction with states V(latest) or V(rebuild) will update or rebuild the whole system respectively.
+      - Special value V(*) in conjunction with states V(latest) or V(rebuild) updates or rebuilds the whole system respectively.
       - The alias O(grimoire) was added in community.general 7.3.0.
     aliases: ["spell", "grimoire"]
     type: list
@@ -44,7 +44,7 @@ options:
     description:
       - Repository location.
       - If specified, O(name) represents grimoire(s) instead of spell(s).
-      - Special value V(*) will pull grimoire from the official location.
+      - Special value V(*) pulls grimoire from the official location.
       - Only single item in O(name) in conjunction with V(*) can be used.
       - O(state=absent) must be used with a special value V(*).
     type: str

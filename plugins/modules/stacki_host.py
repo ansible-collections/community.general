@@ -119,25 +119,6 @@ EXAMPLES = r"""
     state: absent
 """
 
-RETURN = r"""
-changed:
-  description: Response to whether or not the API call completed successfully.
-  returned: always
-  type: bool
-  sample: true
-
-stdout:
-  description: The set of responses from the commands.
-  returned: always
-  type: list
-  sample: ['...', '...']
-
-stdout_lines:
-  description: The value of stdout split into a list.
-  returned: always
-  type: list
-  sample: [['...', '...'], ['...'], ['...']]
-"""
 
 import json
 

@@ -47,7 +47,7 @@ options:
     aliases: [password]
   use_proxy:
     description:
-      - If V(false), it will not use a proxy, even if one is defined in an environment variable on the target hosts.
+      - If V(false), it does not use a proxy, even if one is defined in an environment variable on the target hosts.
     default: true
     required: false
     type: bool
@@ -99,7 +99,7 @@ options:
           - C(sysName) (C(0x10b5b));
           - C(Vendor_Name) (C(0x11570));
           - C(Description) (C(0x230017)).
-          - Hex IDs are the direct identifiers in Spectrum and will always work.
+          - Hex IDs are the direct identifiers in Spectrum and always work.
           - 'To lookup hex IDs go to the UI: Locator -> Devices -> By Model Name -> <enter any model> -> Attributes tab.'
         type: str
         required: true
@@ -123,7 +123,9 @@ EXAMPLES = r"""
       - name: "isManaged"
         value: "false"
       - name: "Notes"
-        value: "MM set on {{ ansible_date_time.iso8601 }} via CO {{ CO }} by {{ tower_user_name | default(ansible_user_id) }}"
+        value: >-
+          MM set on {{ ansible_date_time.iso8601 }} via CO {{ CO }}
+          by {{ tower_user_name | default(ansible_user_id) }}
   delegate_to: localhost
   register: spectrum_model_attrs_status
 """

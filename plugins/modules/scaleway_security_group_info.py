@@ -56,7 +56,7 @@ scaleway_security_group_info:
   type: list
   elements: dict
   sample:
-    "scaleway_security_group_info": [
+    [
       {
         "description": "test-ams",
         "enable_default_security": true,

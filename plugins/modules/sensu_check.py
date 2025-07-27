@@ -14,7 +14,7 @@ module: sensu_check
 short_description: Manage Sensu checks
 description:
   - Manage the checks that should be run on a machine by I(Sensu).
-  - Most options do not have a default and will not be added to the check definition unless specified.
+  - Most options do not have a default and are not added to the check definition unless specified.
   - All defaults except O(path), O(state), O(backup) and O(metric) are not managed by this module, they are simply specified
     for your convenience.
 deprecated:
@@ -45,8 +45,8 @@ options:
     type: str
     description:
       - Path to the JSON file of the check to be added/removed.
-      - Will be created if it does not exist (unless O(state=absent)).
-      - The parent folders need to exist when O(state=present), otherwise an error will be thrown.
+      - It is created if it does not exist (unless O(state=absent)).
+      - The parent folders need to exist when O(state=present), otherwise an error is thrown.
     default: /etc/sensu/conf.d/checks.json
   backup:
     description:
@@ -99,7 +99,8 @@ options:
     type: list
     elements: str
     description:
-      - Other checks this check depends on, if dependencies fail handling of this check will be disabled.
+      - Other checks this one depends on.
+      - If dependencies fail handling of this check is disabled.
   metric:
     description:
       - Whether the check is a metric.
