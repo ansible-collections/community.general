@@ -137,7 +137,8 @@
 
 - name: Assert line is quoted
   ansible.builtin.assert:
-    that: "'EMPTY_VAR=\"\"' in result.stdout"
+    that: >-
+      'EMPTY_VAR=""' in result.stdout
 
 - name: Attempt to add cron variable to non-existent parent directory
   cronvar:
