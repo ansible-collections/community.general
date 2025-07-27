@@ -232,9 +232,11 @@ def send_msg(msg, server='localhost', port='6667', channel=None, nick_to=None, k
 
     irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     if use_tls:
+        kwargs = {}
         if validate_certs:
             try:
                 context = ssl.create_default_context()
+                kwargs["server_hostname"] = server
             except AttributeError:
                 raise Exception('Need at least Python 2.7.9 for SSL certificate validation')
         else:
@@ -244,7 +246,7 @@ def send_msg(msg, server='localhost', port='6667', channel=None, nick_to=None, k
             else:
                 context = ssl.SSLContext()
             context.verify_mode = ssl.CERT_NONE
-        irc = context.wrap_socket(irc)
+        irc = context.wrap_socket(irc, **kwargs)
     irc.connect((server, int(port)))
 
     if passwd:
