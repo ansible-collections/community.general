@@ -82,7 +82,7 @@ options:
 
   ebs_optimized:
     description:
-      - Enable EBS optimization for supported instances which are not enabled by default.; Note - additional charges are applied.
+      - Enable EBS optimization for supported instances which are not enabled by default. Note - additional charges are applied.
     type: bool
 
   ebs_volume_pool:
