@@ -123,8 +123,9 @@ EXAMPLES = r"""
       - name: "isManaged"
         value: "false"
       - name: "Notes"
-        value: "MM set on {{ ansible_date_time.iso8601 }} via CO {{ CO }} by {{ tower_user_name | default(ansible_user_id)
-          }}"
+        value: >-
+          MM set on {{ ansible_date_time.iso8601 }} via CO {{ CO }}
+          by {{ tower_user_name | default(ansible_user_id) }}
   delegate_to: localhost
   register: spectrum_model_attrs_status
 """
