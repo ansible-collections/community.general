@@ -102,7 +102,6 @@ def sysupgrade_run(module):
     sysupgrade_bin = module.get_bin_path('/usr/sbin/sysupgrade', required=True)
     cmd = [sysupgrade_bin]
     changed = False
-    warnings = []
 
     # Setup command flags
     if module.params['snapshot']:
@@ -138,7 +137,6 @@ def sysupgrade_run(module):
         rc=rc,
         stderr=err,
         stdout=out,
-        warnings=warnings
     )
 
 
