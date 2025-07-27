@@ -69,15 +69,20 @@ class Blacklist(StateModuleHelper):
     def __init_module__(self):
         self.pattern = re.compile(r'^blacklist\s+{0}$'.format(re.escape(self.vars.name)))
         self.vars.filename = self.vars.blacklist_file
-        self.vars.set('file_exists', os.path.exists(self.vars.filename), output=False, change=True)
-        if not self.vars.file_exists:
-            with open(self.vars.filename, 'a'):
-                pass
-            self.vars.file_exists = True
-            self.vars.set('lines', [], change=True, diff=True)
-        else:
-            with open(self.vars.filename) as fd:
-                self.vars.set('lines', [x.rstrip() for x in fd.readlines()], change=True, diff=True)
+
+        try:
+            if not os.path.exists(self.vars.filename):
+                os.makedirs(os.path.dirname(self.vars.filename), exist_ok=True)
+                with open(self.vars.filename, 'a'):
+                    pass
+                self.vars.set('lines', [], change=True, diff=True)
+            else:
+                with open(self.vars.filename) as fd:
+                    self.vars.set('lines', [x.rstrip() for x in fd.readlines()], change=True, diff=True)
+        except (OSError, IOError) as e:
+            self.module.fail_json(msg=f"Error accessing or creating blacklist file '{self.vars.filename}': {e}")
+
+        self.vars.set('file_exists', True, output=False, change=True)
         self.vars.set('is_blacklisted', self._is_module_blocked(), change=True)
 
     def _is_module_blocked(self):
@@ -104,8 +109,11 @@ class Blacklist(StateModuleHelper):
     def __quit_module__(self):
         if self.has_changed() and not self.module.check_mode:
             bkp = self.module.backup_local(self.vars.filename)
-            with open(self.vars.filename, "w") as fd:
-                fd.writelines(["{0}\n".format(x) for x in self.vars.lines])
+            try:
+                with open(self.vars.filename, "w") as fd:
+                    fd.writelines(f"{x}\n" for x in self.vars.lines)
+            except (OSError, IOError) as e:
+                self.module.fail_json(msg=f"Failed to write to blacklist file '{self.vars.filename}': {e}")
             self.module.add_cleanup_file(bkp)
 
 
