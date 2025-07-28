@@ -285,10 +285,10 @@ class IpbaseInfo(object):
 
 def main():
     module_args = dict(
-        ip=dict(type='str', required=False, no_log=False),
-        apikey=dict(type='str', required=False, no_log=True),
-        hostname=dict(type='bool', required=False, no_log=False, default=False),
-        language=dict(type='str', required=False, no_log=False, default='en'),
+        ip=dict(type='str', no_log=False),
+        apikey=dict(type='str', no_log=True),
+        hostname=dict(type='bool', no_log=False, default=False),
+        language=dict(type='str', no_log=False, default='en'),
     )
 
     module = AnsibleModule(

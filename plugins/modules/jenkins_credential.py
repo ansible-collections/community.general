@@ -565,7 +565,7 @@ def run_module():
             name=dict(type="str"),
             username=dict(type="str"),
             password=dict(type="str", no_log=True),
-            file_path=dict(type="path", default=None),
+            file_path=dict(type="path"),
             secret=dict(type="str", no_log=True),
             appID=dict(type="str"),
             api_uri=dict(type="str", default="https://api.github.com"),

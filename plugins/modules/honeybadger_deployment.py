@@ -88,9 +88,9 @@ def main():
             token=dict(required=True, no_log=True),
             environment=dict(required=True),
             user=dict(required=False),
-            repo=dict(required=False),
-            revision=dict(required=False),
-            url=dict(required=False, default='https://api.honeybadger.io/v1/deploys'),
+            repo=dict(),
+            revision=dict(),
+            url=dict(default='https://api.honeybadger.io/v1/deploys'),
             validate_certs=dict(default=True, type='bool'),
         ),
         supports_check_mode=True

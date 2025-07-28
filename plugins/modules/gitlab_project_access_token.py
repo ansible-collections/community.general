@@ -243,7 +243,7 @@ def main():
                              'create_runner',
                              'ai_features',
                              'k8s_proxy']),
-        access_level=dict(type='str', required=False, default='maintainer', choices=['guest', 'reporter', 'developer', 'maintainer', 'owner']),
+        access_level=dict(type='str', default='maintainer', choices=['guest', 'reporter', 'developer', 'maintainer', 'owner']),
         expires_at=dict(type='str', required=True),
         recreate=dict(type='str', default='never', choices=['never', 'always', 'state_change'])
     ))

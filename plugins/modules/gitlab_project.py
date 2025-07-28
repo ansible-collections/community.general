@@ -600,7 +600,7 @@ def main():
         builds_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
         build_timeout=dict(type='int'),
         ci_config_path=dict(type='str'),
-        container_expiration_policy=dict(type='dict', default=None, options=dict(
+        container_expiration_policy=dict(type='dict', options=dict(
             cadence=dict(type='str', choices=["1d", "7d", "14d", "1month", "3month"]),
             enabled=dict(type='bool'),
             keep_n=dict(type='int', choices=[0, 1, 5, 10, 25, 50, 100]),

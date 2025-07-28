@@ -235,11 +235,11 @@ def main():
         state=dict(default="present", choices=["absent", "present"]),
         name=dict(required=True, aliases=['host']),
         zone=dict(),
-        template=dict(default=None),
+        template=dict(),
         check_command=dict(default="hostalive"),
-        display_name=dict(default=None),
+        display_name=dict(),
         ip=dict(),
-        variables=dict(type='dict', default=None),
+        variables=dict(type='dict'),
     )
 
     # Define the main module
