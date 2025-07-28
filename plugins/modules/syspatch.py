@@ -59,20 +59,6 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
-rc:
-  description: The command return code (0 means success).
-  returned: always
-  type: int
-stdout:
-  description: C(syspatch) standard output.
-  returned: always
-  type: str
-  sample: "001_rip6cksum"
-stderr:
-  description: C(syspatch) standard error.
-  returned: always
-  type: str
-  sample: "syspatch: need root privileges"
 reboot_needed:
   description: Whether or not a reboot is required after an update.
   returned: always

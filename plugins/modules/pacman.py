@@ -129,6 +129,7 @@ notes:
     build user with permissions to install packages could be necessary.
   - 'In the tests, while using C(yay) as the O(executable) option, the module failed to install AUR packages with the error:
     C(error: target not found: <pkg>).'
+  - The common return values `stdout` and `stderr` are returned upon success, when needed, since community.general 4.1.0.
 """
 
 RETURN = r"""
@@ -151,22 +152,6 @@ cache_updated:
   type: bool
   sample: false
   version_added: 4.6.0
-
-stdout:
-  description:
-    - Output from pacman.
-  returned: success, when needed
-  type: str
-  sample: ":: Synchronizing package databases...  core is up to date :: Starting full system upgrade..."
-  version_added: 4.1.0
-
-stderr:
-  description:
-    - Error output from pacman.
-  returned: success, when needed
-  type: str
-  sample: "warning: libtool: local (2.4.6+44+gb9b44533-14) is newer than core (2.4.6+42+gb88cebd5-15)\nwarning ..."
-  version_added: 4.1.0
 """
 
 EXAMPLES = r"""

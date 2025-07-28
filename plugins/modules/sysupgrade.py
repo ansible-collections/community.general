@@ -79,21 +79,6 @@ EXAMPLES = r"""
   ignore_errors: true
 """
 
-RETURN = r"""
-rc:
-  description: The command return code (0 means success).
-  returned: always
-  type: int
-stdout:
-  description: Sysupgrade standard output.
-  returned: always
-  type: str
-stderr:
-  description: Sysupgrade standard error.
-  returned: always
-  type: str
-  sample: "sysupgrade: need root privileges"
-"""
 
 from ansible.module_utils.basic import AnsibleModule
 

@@ -96,10 +96,6 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
-changed:
-  description: Return changed for mksysb actions as true or false.
-  returned: always
-  type: bool
 msg:
   description: Return message regarding the action.
   returned: always

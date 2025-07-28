@@ -197,18 +197,6 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
-msg:
-  description: Output from stdout of keytool command after execution of given command.
-  returned: success
-  type: str
-  sample: "Module require existing keystore at keystore_path '/tmp/test/cacerts'"
-
-rc:
-  description: Keytool command execution return value.
-  returned: success
-  type: int
-  sample: "0"
-
 cmd:
   description: Executed command to get action done.
   returned: success

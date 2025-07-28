@@ -110,12 +110,6 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
-changed:
-  description: True if a project was created or removed.
-  type: bool
-  sample: true
-  returned: success
-
 name:
   description: Name of addressed project.
   type: str
