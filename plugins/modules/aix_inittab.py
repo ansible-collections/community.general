@@ -112,16 +112,6 @@ name:
   returned: always
   type: str
   sample: startmyservice
-msg:
-  description: Action done with the C(inittab) entry.
-  returned: changed
-  type: str
-  sample: changed inittab entry startmyservice
-changed:
-  description: Whether the C(inittab) changed or not.
-  returned: always
-  type: bool
-  sample: true
 """
 
 # Import necessary libraries

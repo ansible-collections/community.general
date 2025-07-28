@@ -144,10 +144,6 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
-changed:
-  description: If module has modified record.
-  returned: success
-  type: str
 record:
   description: DNS record.
   returned: success

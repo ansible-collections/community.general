@@ -272,11 +272,6 @@ outputs:
       type: str
       returned: always
       description: The value of the output as interpolated by Terraform.
-stdout:
-  type: str
-  description: Full C(terraform) command stdout, in case you want to display it or examine the event log.
-  returned: always
-  sample: ''
 command:
   type: str
   description: Full C(terraform) command built by this module, in case you want to re-run the command outside the module or

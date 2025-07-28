@@ -109,14 +109,6 @@ timeout:
   description: The timeout for plugin download.
   returned: success
   type: str
-stdout:
-  description: The command stdout.
-  returned: success
-  type: str
-stderr:
-  description: The command stderr.
-  returned: success
-  type: str
 state:
   description: The state for the managed plugin.
   returned: success
