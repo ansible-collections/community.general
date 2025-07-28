@@ -83,12 +83,14 @@ options:
     description:
       - What to manage downtime/alerts for. Separate multiple services with commas.
       - 'B(Required) option when O(action) is one of: V(downtime), V(acknowledge), V(forced_check), V(enable_alerts), V(disable_alerts).'
-      - You can specify multiple services at once by separating them with commas, for example O(services=httpd,nfs,puppet).
       - When specifying what O(services) to handle there is a special service value, V(host), which handles alerts/downtime/acknowledge
         for the I(host itself), for example O(services=host). This keyword may not be given with other services at the same
         time. B(Setting alerts/downtime/acknowledge for a host does not affect alerts/downtime/acknowledge for any of the
         services running on it.) To schedule downtime for all O(services) on particular host use keyword V(all), for example
         O(services=all).
+      - Before community.general 11.2.0, one could specify multiple services at once by separating them with commas, for example
+        O(services=httpd,nfs,puppet). Since community.general 11.2.0, there can be spaces around the commas, and an actual
+        list can be provided.
     aliases: ["service"]
     type: list
     elements: str
@@ -224,7 +226,9 @@ EXAMPLES = r"""
 - name: Disable httpd and nfs alerts
   community.general.nagios:
     action: disable_alerts
-    service: httpd,nfs
+    service:
+      - httpd
+      - nfs
     host: '{{ inventory_hostname }}'
 
 - name: Disable HOST alerts
