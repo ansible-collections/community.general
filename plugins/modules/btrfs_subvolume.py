@@ -644,16 +644,16 @@ class BtrfsSubvolumeModule(object):
 
 def run_module():
     module_args = dict(
-        automount=dict(type='bool', required=False, default=False),
-        default=dict(type='bool', required=False, default=False),
-        filesystem_device=dict(type='path', required=False),
-        filesystem_label=dict(type='str', required=False),
-        filesystem_uuid=dict(type='str', required=False),
+        automount=dict(type='bool', default=False),
+        default=dict(type='bool', default=False),
+        filesystem_device=dict(type='path'),
+        filesystem_label=dict(type='str'),
+        filesystem_uuid=dict(type='str'),
         name=dict(type='str', required=True),
         recursive=dict(type='bool', default=False),
-        state=dict(type='str', required=False, default='present', choices=['present', 'absent']),
-        snapshot_source=dict(type='str', required=False),
-        snapshot_conflict=dict(type='str', required=False, default='skip', choices=['skip', 'clobber', 'error'])
+        state=dict(type='str', default='present', choices=['present', 'absent']),
+        snapshot_source=dict(type='str'),
+        snapshot_conflict=dict(type='str', default='skip', choices=['skip', 'clobber', 'error'])
     )
 
     module = AnsibleModule(

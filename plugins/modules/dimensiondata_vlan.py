@@ -186,7 +186,7 @@ class DimensionDataVlanModule(DimensionDataModule):
                     network_domain=dict(required=True, type='str'),
                     private_ipv4_base_address=dict(default='', type='str'),
                     private_ipv4_prefix_size=dict(default=0, type='int'),
-                    allow_expand=dict(required=False, default=False, type='bool'),
+                    allow_expand=dict(default=False, type='bool'),
                     state=dict(default='present', choices=['present', 'absent', 'readonly'])
                 ),
                 required_together=DimensionDataModule.required_together()

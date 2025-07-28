@@ -133,14 +133,13 @@ def _get_easy_install(module, env=None, executable=None):
 def main():
     arg_spec = dict(
         name=dict(required=True),
-        state=dict(required=False,
-                   default='present',
+        state=dict(default='present',
                    choices=['present', 'latest'],
                    type='str'),
-        virtualenv=dict(default=None, required=False),
+        virtualenv=dict(),
         virtualenv_site_packages=dict(default=False, type='bool'),
-        virtualenv_command=dict(default='virtualenv', required=False),
-        executable=dict(default='easy_install', required=False),
+        virtualenv_command=dict(default='virtualenv'),
+        executable=dict(default='easy_install'),
     )
 
     module = AnsibleModule(argument_spec=arg_spec, supports_check_mode=True)

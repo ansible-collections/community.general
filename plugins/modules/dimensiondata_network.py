@@ -140,7 +140,7 @@ class DimensionDataNetworkModule(DimensionDataModule):
             module=AnsibleModule(
                 argument_spec=DimensionDataModule.argument_spec_with_wait(
                     name=dict(type='str', required=True),
-                    description=dict(type='str', required=False),
+                    description=dict(type='str'),
                     service_plan=dict(default='ESSENTIALS', choices=['ADVANCED', 'ESSENTIALS']),
                     state=dict(default='present', choices=['present', 'absent'])
                 ),
