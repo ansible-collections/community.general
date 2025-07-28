@@ -84,16 +84,16 @@ class PacemakerInfo(ModuleHelper):
             rc, out, err = ctx.run()
             self.vars.version = out.strip()
 
-    def _process_command_output(self, fail_on_err, ignore_err_msg="", cli_action=""):
+    def _process_command_output(self, cli_action=""):
         def process(rc, out, err):
-            if fail_on_err and rc != 0 and err and ignore_err_msg not in err:
+            if rc != 0:
                 self.do_raise('pcs {0} config failed with error (rc={1}): {2}'.format(cli_action, rc, err))
             out = json.loads(out)
             return None if out == "" else out
         return process
 
     def _get_info(self, cli_action):
-        with self.runner("cli_action config output_format", output_process=self._process_command_output(True, "Fail", cli_action)) as ctx:
+        with self.runner("cli_action config output_format", output_process=self._process_command_output(cli_action)) as ctx:
             return ctx.run(cli_action=cli_action, output_format="json")
 
     def __run__(self):
