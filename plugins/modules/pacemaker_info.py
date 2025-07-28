@@ -37,7 +37,7 @@ version:
   returned: always
   type: str
 cluster_info:
-  description: Cluster information such as the name, uuid, and nodes.
+  description: Cluster information such as the name, UUID, and nodes.
   returned: always
   type: dict
 resource_info:
