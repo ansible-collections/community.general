@@ -237,13 +237,13 @@ def main():
         state=dict(type='str', default='present',
                    choices=['present', 'absent']),
         name=dict(type='str', required=True),
-        description=dict(type='str', required=False),
+        description=dict(type='str'),
         permission_type=dict(type='str', choices=['scope', 'resource'], required=True),
         decision_strategy=dict(type='str', default='UNANIMOUS',
                                choices=['UNANIMOUS', 'AFFIRMATIVE', 'CONSENSUS']),
-        resources=dict(type='list', elements='str', default=[], required=False),
-        scopes=dict(type='list', elements='str', default=[], required=False),
-        policies=dict(type='list', elements='str', default=[], required=False),
+        resources=dict(type='list', elements='str', default=[]),
+        scopes=dict(type='list', elements='str', default=[]),
+        policies=dict(type='list', elements='str', default=[]),
         client_id=dict(type='str', required=True),
         realm=dict(type='str', required=True)
     )

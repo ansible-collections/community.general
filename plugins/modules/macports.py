@@ -280,7 +280,7 @@ def main():
             selfupdate=dict(aliases=["update_cache", "update_ports"], default=False, type='bool'),
             state=dict(default="present", choices=["present", "installed", "absent", "removed", "active", "inactive"]),
             upgrade=dict(default=False, type='bool'),
-            variant=dict(aliases=["variants"], default=None, type='str')
+            variant=dict(aliases=["variants"], type='str')
         )
     )
 

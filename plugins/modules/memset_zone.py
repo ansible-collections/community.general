@@ -289,8 +289,8 @@ def main():
             state=dict(required=True, choices=['present', 'absent'], type='str'),
             api_key=dict(required=True, type='str', no_log=True),
             name=dict(required=True, aliases=['nickname'], type='str'),
-            ttl=dict(required=False, default=0, choices=[0, 300, 600, 900, 1800, 3600, 7200, 10800, 21600, 43200, 86400], type='int'),
-            force=dict(required=False, default=False, type='bool')
+            ttl=dict(default=0, choices=[0, 300, 600, 900, 1800, 3600, 7200, 10800, 21600, 43200, 86400], type='int'),
+            force=dict(default=False, type='bool')
         ),
         supports_check_mode=True
     )

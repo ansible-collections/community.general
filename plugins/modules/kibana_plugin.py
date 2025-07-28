@@ -228,11 +228,11 @@ def main():
         argument_spec=dict(
             name=dict(required=True),
             state=dict(default="present", choices=list(PACKAGE_STATE_MAP.keys())),
-            url=dict(default=None),
+            url=dict(),
             timeout=dict(default="1m"),
             plugin_bin=dict(default="/opt/kibana/bin/kibana", type="path"),
             plugin_dir=dict(default="/opt/kibana/installedPlugins/", type="path"),
-            version=dict(default=None),
+            version=dict(),
             force=dict(default=False, type="bool"),
             allow_root=dict(default=False, type="bool"),
         ),

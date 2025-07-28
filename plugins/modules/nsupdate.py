@@ -472,18 +472,18 @@ def main():
 
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(required=False, default='present', choices=['present', 'absent'], type='str'),
+            state=dict(default='present', choices=['present', 'absent'], type='str'),
             server=dict(required=True, type='str'),
-            port=dict(required=False, default=53, type='int'),
-            key_name=dict(required=False, type='str'),
-            key_secret=dict(required=False, type='str', no_log=True),
-            key_algorithm=dict(required=False, default='hmac-md5', choices=tsig_algs, type='str'),
-            zone=dict(required=False, default=None, type='str'),
+            port=dict(default=53, type='int'),
+            key_name=dict(type='str'),
+            key_secret=dict(type='str', no_log=True),
+            key_algorithm=dict(default='hmac-md5', choices=tsig_algs, type='str'),
+            zone=dict(type='str'),
             record=dict(required=True, type='str'),
-            type=dict(required=False, default='A', type='str'),
-            ttl=dict(required=False, default=3600, type='int'),
-            value=dict(required=False, default=None, type='list', elements='str'),
-            protocol=dict(required=False, default='tcp', choices=['tcp', 'udp'], type='str')
+            type=dict(default='A', type='str'),
+            ttl=dict(default=3600, type='int'),
+            value=dict(type='list', elements='str'),
+            protocol=dict(default='tcp', choices=['tcp', 'udp'], type='str')
         ),
         supports_check_mode=True
     )

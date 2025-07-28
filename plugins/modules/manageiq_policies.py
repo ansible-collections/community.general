@@ -147,7 +147,7 @@ def main():
         resource_name=dict(type='str'),
         resource_type=dict(required=True, type='str',
                            choices=list(manageiq_entities().keys())),
-        state=dict(required=False, type='str',
+        state=dict(type='str',
                    choices=['present', 'absent'], default='present'),
     )
     # add the manageiq connection arguments to the arguments

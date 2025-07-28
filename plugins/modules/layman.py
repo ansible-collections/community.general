@@ -236,7 +236,7 @@ def main():
             name=dict(required=True),
             list_url=dict(aliases=['url']),
             state=dict(default="present", choices=['present', 'absent', 'updated']),
-            validate_certs=dict(required=False, default=True, type='bool'),
+            validate_certs=dict(default=True, type='bool'),
         ),
         supports_check_mode=True
     )

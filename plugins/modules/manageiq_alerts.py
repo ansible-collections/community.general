@@ -300,7 +300,7 @@ def main():
         expression=dict(type='dict'),
         options=dict(type='dict'),
         enabled=dict(type='bool'),
-        state=dict(required=False, default='present',
+        state=dict(default='present',
                    choices=['present', 'absent']),
     )
     # add the manageiq connection arguments to the arguments

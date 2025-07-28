@@ -244,7 +244,7 @@ def main():
 
     composites_spec = dict(
         name=dict(type='str', required=True),
-        client_id=dict(type='str', aliases=['clientId'], required=False),
+        client_id=dict(type='str', aliases=['clientId']),
         state=dict(type='str', default='present', choices=['present', 'absent'])
     )
 

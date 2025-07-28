@@ -142,8 +142,8 @@ def main():
         state=dict(type='str', default='present',
                    choices=['present', 'absent']),
         name=dict(type='str', required=True),
-        display_name=dict(type='str', required=False),
-        icon_uri=dict(type='str', required=False),
+        display_name=dict(type='str'),
+        icon_uri=dict(type='str'),
         client_id=dict(type='str', required=True),
         realm=dict(type='str', required=True)
     )

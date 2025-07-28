@@ -175,7 +175,7 @@ INPUT_ARG_SPEC = dict(
                                                    'nodes_by_chassis_uuid',
                                                    'nodes_status_managed',
                                                    'nodes_status_unmanaged']),
-    uuid=dict(default=None), chassis=dict(default=None)
+    uuid=dict(), chassis=dict()
 )
 
 
