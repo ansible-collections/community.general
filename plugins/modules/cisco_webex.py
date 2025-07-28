@@ -177,7 +177,7 @@ def main():
         argument_spec=dict(
             recipient_type=dict(required=True, choices=['roomId', 'toPersonEmail', 'toPersonId']),
             recipient_id=dict(required=True, no_log=True),
-            msg_type=dict(required=False, default='text', aliases=['message_type'], choices=['text', 'markdown']),
+            msg_type=dict(default='text', aliases=['message_type'], choices=['text', 'markdown']),
             personal_token=dict(required=True, no_log=True, aliases=['token']),
             msg=dict(required=True),
         ),

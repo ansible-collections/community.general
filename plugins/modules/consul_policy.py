@@ -132,7 +132,7 @@ from ansible_collections.community.general.plugins.module_utils.consul import (
 
 _ARGUMENT_SPEC = {
     "name": dict(required=True),
-    "description": dict(required=False, type="str"),
+    "description": dict(type="str"),
     "rules": dict(type="str"),
     "valid_datacenters": dict(type="list", elements="str"),
     "state": dict(default="present", choices=["present", "absent"]),

@@ -29,7 +29,6 @@ options:
   host:
     description:
       - Which host do we use as seed for info connection.
-    required: false
     type: str
     default: localhost
   port:
@@ -180,19 +179,19 @@ else:
 def run_module():
     """run ansible module"""
     module_args = dict(
-        host=dict(type='str', required=False, default='localhost'),
-        port=dict(type='int', required=False, default=3000),
-        connect_timeout=dict(type='int', required=False, default=1000),
-        consecutive_good_checks=dict(type='int', required=False, default=3),
-        sleep_between_checks=dict(type='int', required=False, default=60),
-        tries_limit=dict(type='int', required=False, default=300),
+        host=dict(type='str', default='localhost'),
+        port=dict(type='int', default=3000),
+        connect_timeout=dict(type='int', default=1000),
+        consecutive_good_checks=dict(type='int', default=3),
+        sleep_between_checks=dict(type='int', default=60),
+        tries_limit=dict(type='int', default=300),
         local_only=dict(type='bool', required=True),
-        min_cluster_size=dict(type='int', required=False, default=1),
-        target_cluster_size=dict(type='int', required=False, default=None),
-        fail_on_cluster_change=dict(type='bool', required=False, default=True),
-        migrate_tx_key=dict(type='str', required=False, no_log=False,
+        min_cluster_size=dict(type='int', default=1),
+        target_cluster_size=dict(type='int'),
+        fail_on_cluster_change=dict(type='bool', default=True),
+        migrate_tx_key=dict(type='str', no_log=False,
                             default="migrate_tx_partitions_remaining"),
-        migrate_rx_key=dict(type='str', required=False, no_log=False,
+        migrate_rx_key=dict(type='str', no_log=False,
                             default="migrate_rx_partitions_remaining")
     )
 
