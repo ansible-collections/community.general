@@ -633,7 +633,7 @@ def main():
             opts=dict(type='str'),
             force=dict(type='bool', default=False),
             resizefs=dict(type='bool', default=False),
-            uuid=dict(type='str', required=False),
+            uuid=dict(type='str'),
         ),
         required_if=[
             ('state', 'present', ['fstype'])

@@ -187,13 +187,13 @@ class Bower(object):
 
 def main():
     arg_spec = dict(
-        name=dict(default=None),
+        name=dict(),
         offline=dict(default=False, type='bool'),
         production=dict(default=False, type='bool'),
         path=dict(required=True, type='path'),
-        relative_execpath=dict(default=None, required=False, type='path'),
+        relative_execpath=dict(type='path'),
         state=dict(default='present', choices=['present', 'absent', 'latest', ]),
-        version=dict(default=None),
+        version=dict(),
     )
     module = AnsibleModule(
         argument_spec=arg_spec

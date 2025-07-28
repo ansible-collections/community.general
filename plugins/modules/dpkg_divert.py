@@ -166,11 +166,11 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             path=dict(required=True, type='path'),
-            state=dict(required=False, type='str', default='present', choices=['absent', 'present']),
-            holder=dict(required=False, type='str'),
-            divert=dict(required=False, type='path'),
-            rename=dict(required=False, type='bool', default=False),
-            force=dict(required=False, type='bool', default=False),
+            state=dict(type='str', default='present', choices=['absent', 'present']),
+            holder=dict(type='str'),
+            divert=dict(type='path'),
+            rename=dict(type='bool', default=False),
+            force=dict(type='bool', default=False),
         ),
         supports_check_mode=True,
     )

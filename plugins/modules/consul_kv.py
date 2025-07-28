@@ -300,7 +300,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             cas=dict(type='str'),
-            datacenter=dict(type='str', default=None),
+            datacenter=dict(type='str'),
             flags=dict(type='str'),
             key=dict(type='str', required=True, no_log=False),
             host=dict(type='str', default='localhost'),
