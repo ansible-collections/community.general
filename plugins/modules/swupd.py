@@ -96,16 +96,6 @@ EXAMPLES = r"""
     manifest: 12920
 """
 
-RETURN = r"""
-stdout:
-  description: C(stdout) of C(swupd).
-  returned: always
-  type: str
-stderr:
-  description: C(stderr) of C(swupd).
-  returned: always
-  type: str
-"""
 
 import os
 from ansible.module_utils.basic import AnsibleModule

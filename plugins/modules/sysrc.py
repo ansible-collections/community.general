@@ -94,13 +94,6 @@ EXAMPLES = r"""
     jail: testjail
 """
 
-RETURN = r"""
-changed:
-  description: Return changed for sysrc actions.
-  returned: always
-  type: bool
-  sample: true
-"""
 
 from ansible.module_utils.basic import AnsibleModule
 from shlex import split

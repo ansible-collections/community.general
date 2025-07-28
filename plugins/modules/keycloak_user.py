@@ -332,11 +332,6 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
-msg:
-  description: Message as to what action was taken.
-  returned: always
-  type: str
-  sample: User f18c709c-03d6-11ee-970b-c74bf2721112 created
 proposed:
   description: Representation of the proposed user.
   returned: on success
@@ -349,10 +344,6 @@ end_state:
   description: Representation of the user after module execution.
   returned: on success
   type: dict
-changed:
-  description: Return V(true) if the operation changed the user on the keycloak server, V(false) otherwise.
-  returned: always
-  type: bool
 """
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \

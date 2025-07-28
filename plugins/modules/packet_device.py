@@ -258,12 +258,6 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
-changed:
-  description: True if a device was altered in any way (created, modified or removed).
-  type: bool
-  sample: true
-  returned: success
-
 devices:
   description: Information about each device that was processed.
   type: list

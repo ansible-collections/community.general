@@ -166,23 +166,11 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
-msg:
-  description: Output from stdout of keytool/openssl command after execution of given command or an error.
-  returned: changed and failure
-  type: str
-  sample: "Unable to find the current certificate fingerprint in ..."
-
 err:
   description: Output from stderr of keytool/openssl command after error of given command.
   returned: failure
   type: str
   sample: "Keystore password is too short - must be at least 6 characters\n"
-
-rc:
-  description: Keytool/openssl command execution return value.
-  returned: changed and failure
-  type: int
-  sample: "0"
 
 cmd:
   description: Executed command to get action done.

@@ -113,22 +113,6 @@ result:
   description: Message about action taken.
   returned: always
   type: str
-warnings:
-  description: List of warning messages.
-  returned: when needed
-  type: list
-rc:
-  description: Return code of underlying command.
-  returned: failed
-  type: int
-stdout:
-  description: The stdout of underlying command.
-  returned: failed
-  type: str
-stderr:
-  description: The stderr of underlying command.
-  returned: failed
-  type: str
 """
 
 import re

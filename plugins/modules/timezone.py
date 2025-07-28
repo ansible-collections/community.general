@@ -57,20 +57,6 @@ author:
   - Indrajit Raychaudhuri (@indrajitr)
 """
 
-RETURN = r"""
-diff:
-  description: The differences about the given arguments.
-  returned: success
-  type: complex
-  contains:
-    before:
-      description: The values before change.
-      type: dict
-    after:
-      description: The values after change.
-      type: dict
-"""
-
 EXAMPLES = r"""
 - name: Set timezone to Asia/Tokyo
   become: true
