@@ -10,19 +10,19 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 module: pacemaker_info
-short_description: Gather information about pacemaker cluster
+short_description: Gather information about Pacemaker cluster
 author:
   - Dexter Le (@munchtoast)
 version_added: 11.2.0
 description:
-  - Gather information about the cluster
+  - Gather information about a Pacemaker cluster.
 extends_documentation_fragment:
   - community.general.attributes
   - community.general.attributes.info_module
 """
 
 EXAMPLES = r"""
-- name: Gather pacemaker cluster info
+- name: Gather Pacemaker cluster info
   community.general.pacemaker_info:
   register: result
 
