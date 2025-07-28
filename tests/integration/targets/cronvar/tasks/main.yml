@@ -123,6 +123,23 @@
       - custom_varcheck2.stdout == '1'
       - custom_varcheck3.stdout == '0'
 
+
+- name: Add variable with empty string
+  community.general.cronvar:
+    name: EMPTY_VAR
+    value: ""
+    state: present
+
+- name: Assert empty var present
+  ansible.builtin.shell: crontab -l
+  register: result
+  changed_when: false
+
+- name: Assert line is quoted
+  ansible.builtin.assert:
+    that: >-
+      'EMPTY_VAR=""' in result.stdout
+
 - name: Attempt to add cron variable to non-existent parent directory
   cronvar:
     name: NOPARENT_VAR
