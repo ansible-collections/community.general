@@ -1,4 +1,4 @@
-minor changes:
+minor_changes:
   - aerospike_migrations - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10494).
   - airbrake_deployment - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10494).
   - bigpanda - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10494).
