@@ -6,6 +6,60 @@ Community General Release Notes
 
 This changelog describes changes after version 10.0.0.
 
+v11.1.1
+=======
+
+Release Summary
+---------------
+
+Bugfix release for the next Ansible 12 pre-release.
+
+Minor Changes
+-------------
+
+- aerospike_migrations - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10494).
+- airbrake_deployment - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10494).
+- bigpanda - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10494).
+- bootc_manage - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10494).
+- bower - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10494).
+- btrfs_subvolume - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10494).
+- bundler - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10494).
+- campfire - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10494).
+- cargo - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10494).
+- catapult - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10494).
+- cisco_webex - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10494).
+- consul_kv - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10494).
+- consul_policy - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10494).
+- copr - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10494).
+- datadog_downtime - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10494).
+- datadog_monitor - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10494).
+- dconf - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10494).
+- dimensiondata_network - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10494).
+- dimensiondata_vlan - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10494).
+- dnf_config_manager - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10494).
+- dnsmadeeasy - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10494).
+- dpkg_divert - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10494).
+- easy_install - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10494).
+- elasticsearch_plugin - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10494).
+- facter - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10494).
+- filesystem - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10494).
+- sysrc - adjustments to the code (https://github.com/ansible-collections/community.general/pull/10417).
+
+Bugfixes
+--------
+
+- apache2_module - avoid ansible-core 2.19 deprecation (https://github.com/ansible-collections/community.general/pull/10459).
+- apk - handle empty name strings properly (https://github.com/ansible-collections/community.general/issues/10441, https://github.com/ansible-collections/community.general/pull/10442).
+- cronvar - fix crash on missing ``cron_file`` parent directories (https://github.com/ansible-collections/community.general/issues/10460, https://github.com/ansible-collections/community.general/pull/10461).
+- cronvar - handle empty strings on ``value`` properly  (https://github.com/ansible-collections/community.general/issues/10439, https://github.com/ansible-collections/community.general/pull/10445).
+- htpasswd - avoid ansible-core 2.19 deprecation (https://github.com/ansible-collections/community.general/pull/10459).
+- irc - pass hostname to ``wrap_socket()`` if ``use_tls=true`` and ``validate_certs=true`` (https://github.com/ansible-collections/community.general/issues/10472, https://github.com/ansible-collections/community.general/pull/10491).
+- listen_port_facts - avoid crash when required commands are missing (https://github.com/ansible-collections/community.general/issues/10457, https://github.com/ansible-collections/community.general/pull/10458).
+- syspatch - avoid ansible-core 2.19 deprecation (https://github.com/ansible-collections/community.general/pull/10459).
+- sysrc - fixes parsing with multi-line variables (https://github.com/ansible-collections/community.general/issues/10394, https://github.com/ansible-collections/community.general/pull/10417).
+- sysupgrade - avoid ansible-core 2.19 deprecation (https://github.com/ansible-collections/community.general/pull/10459).
+- zypper_repository - avoid ansible-core 2.19 deprecation (https://github.com/ansible-collections/community.general/pull/10459).
+
 v11.1.0
 =======
 
