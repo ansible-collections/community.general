@@ -85,11 +85,6 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
-changed:
-  description: True if a sshkey was created or removed.
-  type: bool
-  sample: true
-  returned: always
 sshkeys:
   description: Information about sshkeys that were created/removed.
   type: list

@@ -123,12 +123,6 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
-changed:
-  description: True if an IP address assignments were altered in any way (created or removed).
-  type: bool
-  sample: true
-  returned: success
-
 device_id:
   type: str
   description: UUID of the device associated with the specified IP address.
