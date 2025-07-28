@@ -195,8 +195,6 @@ def main():
             verbosity = module._verbosity
             with pvmove_runner("auto_answer atomic autobackup verbosity source destination") as ctx:
                 rc, out, err = ctx.run(
-                    auto_answer=module.params['auto_answer'],
-                    atomic=module.params['atomic'],
                     verbosity=verbosity,
                     source=source,
                     destination=destination
