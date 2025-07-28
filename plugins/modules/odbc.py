@@ -66,6 +66,7 @@ EXAMPLES = r"""
   changed_when: false
 """
 
+# @FIXME RV 'results' is meant to be used when 'loop:' was used with the module.
 RETURN = r"""
 results:
   description: List of lists of strings containing selected rows, likely empty for DDL statements.

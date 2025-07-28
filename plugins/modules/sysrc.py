@@ -95,13 +95,6 @@ EXAMPLES = r"""
     jail: testjail
 """
 
-RETURN = r"""
-changed:
-  description: Return changed for sysrc actions.
-  returned: always
-  type: bool
-  sample: true
-"""
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
 

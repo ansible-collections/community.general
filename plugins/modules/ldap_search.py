@@ -91,6 +91,7 @@ EXAMPLES = r"""
   register: ldap_group_gids
 """
 
+# @FIXME RV 'results' is meant to be used when 'loop:' was used with the module.
 RESULTS = r"""
 results:
   description:

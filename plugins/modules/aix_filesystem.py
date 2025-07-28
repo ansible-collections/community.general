@@ -165,16 +165,6 @@ EXAMPLES = r"""
     state: absent
 """
 
-RETURN = r"""
-changed:
-  description: Return changed for aix_filesystems actions as true or false.
-  returned: always
-  type: bool
-msg:
-  description: Return message regarding the action.
-  returned: always
-  type: str
-"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils._mount import ismount
