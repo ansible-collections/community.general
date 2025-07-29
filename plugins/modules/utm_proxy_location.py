@@ -198,19 +198,19 @@ def main():
     module = UTMModule(
         argument_spec=dict(
             name=dict(type='str', required=True),
-            access_control=dict(type='str', required=False, default="0", choices=['0', '1']),
-            allowed_networks=dict(type='list', elements='str', required=False, default=['REF_NetworkAny']),
-            auth_profile=dict(type='str', required=False, default=""),
-            backend=dict(type='list', elements='str', required=False, default=[]),
-            be_path=dict(type='str', required=False, default=""),
-            comment=dict(type='str', required=False, default=""),
-            denied_networks=dict(type='list', elements='str', required=False, default=[]),
-            hot_standby=dict(type='bool', required=False, default=False),
-            path=dict(type='str', required=False, default="/"),
-            status=dict(type='bool', required=False, default=True),
-            stickysession_id=dict(type='str', required=False, default='ROUTEID'),
-            stickysession_status=dict(type='bool', required=False, default=False),
-            websocket_passthrough=dict(type='bool', required=False, default=False),
+            access_control=dict(type='str', default="0", choices=['0', '1']),
+            allowed_networks=dict(type='list', elements='str', default=['REF_NetworkAny']),
+            auth_profile=dict(type='str', default=""),
+            backend=dict(type='list', elements='str', default=[]),
+            be_path=dict(type='str', default=""),
+            comment=dict(type='str', default=""),
+            denied_networks=dict(type='list', elements='str', default=[]),
+            hot_standby=dict(type='bool', default=False),
+            path=dict(type='str', default="/"),
+            status=dict(type='bool', default=True),
+            stickysession_id=dict(type='str', default='ROUTEID'),
+            stickysession_status=dict(type='bool', default=False),
+            websocket_passthrough=dict(type='bool', default=False),
         )
     )
     try:

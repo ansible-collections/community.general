@@ -363,7 +363,7 @@ def main():
 
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(default=None, aliases=['pkg', 'package'], type='list', elements='str'),
+            name=dict(aliases=['pkg', 'package'], type='list', elements='str'),
             state=dict(default='present', choices=['present', 'installed',
                                                    'latest', 'absent',
                                                    'removed']),

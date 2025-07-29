@@ -227,9 +227,9 @@ def main():
         argument_spec=dict(
             cluster=dict(default='localhost'),
             port=dict(default='5433'),
-            db=dict(default=None),
+            db=dict(),
             login_user=dict(default='dbadmin'),
-            login_password=dict(default=None, no_log=True),
+            login_password=dict(no_log=True),
         ), supports_check_mode=True)
 
     if not pyodbc_found:
