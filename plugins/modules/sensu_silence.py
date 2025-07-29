@@ -265,14 +265,14 @@ def create(
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            check=dict(required=False),
-            creator=dict(required=False),
-            expire=dict(type='int', required=False),
-            expire_on_resolve=dict(type='bool', required=False),
-            reason=dict(required=False),
+            check=dict(),
+            creator=dict(),
+            expire=dict(type='int'),
+            expire_on_resolve=dict(type='bool'),
+            reason=dict(),
             state=dict(default='present', choices=['present', 'absent']),
             subscription=dict(required=True),
-            url=dict(required=False, default='http://127.0.01:4567'),
+            url=dict(default='http://127.0.01:4567'),
         ),
         supports_check_mode=True
     )

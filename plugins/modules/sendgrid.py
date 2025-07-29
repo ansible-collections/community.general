@@ -214,19 +214,19 @@ def post_sendgrid_api(module, username, password, from_address, to_addresses,
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            username=dict(required=False),
-            password=dict(required=False, no_log=True),
-            api_key=dict(required=False, no_log=True),
-            bcc=dict(required=False, type='list', elements='str'),
-            cc=dict(required=False, type='list', elements='str'),
-            headers=dict(required=False, type='dict'),
+            username=dict(),
+            password=dict(no_log=True),
+            api_key=dict(no_log=True),
+            bcc=dict(type='list', elements='str'),
+            cc=dict(type='list', elements='str'),
+            headers=dict(type='dict'),
             from_address=dict(required=True),
-            from_name=dict(required=False),
+            from_name=dict(),
             to_addresses=dict(required=True, type='list', elements='str'),
             subject=dict(required=True),
             body=dict(required=True),
-            html_body=dict(required=False, default=False, type='bool'),
-            attachments=dict(required=False, type='list', elements='path')
+            html_body=dict(default=False, type='bool'),
+            attachments=dict(type='list', elements='path')
         ),
         supports_check_mode=True,
         mutually_exclusive=[

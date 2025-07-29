@@ -98,10 +98,10 @@ def main():
         argument_spec=dict(
             project_id=dict(required=True),
             instance_id=dict(required=True),
-            endpoint=dict(required=False),
-            application_key=dict(required=False, no_log=True),
-            application_secret=dict(required=False, no_log=True),
-            consumer_key=dict(required=False, no_log=True),
+            endpoint=dict(),
+            application_key=dict(no_log=True),
+            application_secret=dict(no_log=True),
+            consumer_key=dict(no_log=True),
         ),
         supports_check_mode=True
     )

@@ -163,11 +163,11 @@ from ansible_collections.community.general.plugins.module_utils.opennebula impor
 class TemplateModule(OpenNebulaModule):
     def __init__(self):
         argument_spec = dict(
-            id=dict(type='int', required=False),
-            name=dict(type='str', required=False),
+            id=dict(type='int'),
+            name=dict(type='str'),
             state=dict(type='str', choices=['present', 'absent'], default='present'),
-            template=dict(type='str', required=False),
-            filter=dict(type='str', required=False, choices=['user_primary_group', 'user', 'all', 'user_groups'], default='user'),
+            template=dict(type='str'),
+            filter=dict(type='str', choices=['user_primary_group', 'user', 'all', 'user_groups'], default='user'),
         )
 
         mutually_exclusive = [

@@ -167,17 +167,17 @@ def main():
     module_args = dict(
         ident=dict(type='str', default='ansible_syslogger'),
         msg=dict(type='str', required=True),
-        priority=dict(type='str', required=False,
+        priority=dict(type='str',
                       choices=["emerg", "alert", "crit", "err", "warning",
                                "notice", "info", "debug"],
                       default='info'),
-        facility=dict(type='str', required=False,
+        facility=dict(type='str',
                       choices=["kern", "user", "mail", "daemon", "auth",
                                "lpr", "news", "uucp", "cron", "syslog",
                                "local0", "local1", "local2", "local3",
                                "local4", "local5", "local6", "local7"],
                       default='daemon'),
-        log_pid=dict(type='bool', required=False, default=False)
+        log_pid=dict(type='bool', default=False)
     )
 
     module = AnsibleModule(

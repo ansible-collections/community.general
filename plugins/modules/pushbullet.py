@@ -114,12 +114,12 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             api_key=dict(type='str', required=True, no_log=True),
-            channel=dict(type='str', default=None),
-            device=dict(type='str', default=None),
+            channel=dict(type='str'),
+            device=dict(type='str'),
             push_type=dict(type='str', default="note", choices=['note', 'link']),
             title=dict(type='str', required=True),
-            body=dict(type='str', default=None),
-            url=dict(type='str', default=None),
+            body=dict(type='str'),
+            url=dict(type='str'),
         ),
         mutually_exclusive=(
             ['channel', 'device'],

@@ -113,7 +113,7 @@ def main():
 
     argument_spec.update(
         dict(
-            organization=dict(required=False, type="str", default=None, aliases=["org"])
+            organization=dict(type="str", aliases=["org"])
         )
     )
 

@@ -97,12 +97,12 @@ def main():
     """Encrypt secret using systemd-creds."""
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(type="str", required=False),
-            not_after=dict(type="str", required=False),
+            name=dict(type="str"),
+            not_after=dict(type="str"),
             pretty=dict(type="bool", default=False),
             secret=dict(type="str", required=True, no_log=True),
-            timestamp=dict(type="str", required=False),
-            user=dict(type="str", required=False),
+            timestamp=dict(type="str"),
+            user=dict(type="str"),
         ),
         supports_check_mode=True,
     )
