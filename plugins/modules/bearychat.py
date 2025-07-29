@@ -12,6 +12,10 @@ module: bearychat
 short_description: Send BearyChat notifications
 description:
   - The M(community.general.bearychat) module sends notifications to U(https://bearychat.com) using the Incoming Robot integration.
+deprecated:
+  removed_in: 12.0.0
+  why: Chat service is no longer available.
+  alternative: There is none.
 author: "Jiangge Zhang (@tonyseek)"
 extends_documentation_fragment:
   - community.general.attributes
