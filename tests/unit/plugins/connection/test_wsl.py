@@ -20,6 +20,9 @@ from pathlib import Path
 from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch, MagicMock, mock_open
 
 
+pytest.importorskip('paramiko')
+
+
 @pytest.fixture
 def connection():
     play_context = PlayContext()

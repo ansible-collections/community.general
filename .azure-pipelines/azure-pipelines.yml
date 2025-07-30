@@ -124,7 +124,7 @@ stages:
             - test: '3.11'
             - test: '3.12'
             - test: '3.13'
-            # - test: '3.14'
+            - test: '3.14'
   - stage: Units_2_19
     displayName: Units 2.19
     dependsOn: []
