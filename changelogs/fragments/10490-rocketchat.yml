@@ -1,0 +1,3 @@
+deprecated_features:
+  - "rocketchat - the default value for ``is_pre740``, currently ``true``, is deprecated and will change to ``false`` in community.general 13.0.0
+     (https://github.com/ansible-collections/community.general/pull/10490)."
