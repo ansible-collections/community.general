@@ -1417,6 +1417,8 @@ files:
     maintainers: panyy3 renxulei
   $modules/xdg_mime.py:
     maintainers: mhalano
+  $modules/xen_orchestra_instance.py:
+    maintainers: shinuza
   $modules/xenserver_:
     maintainers: bvitnik
   $modules/xenserver_facts.py:
