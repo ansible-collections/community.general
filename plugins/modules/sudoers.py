@@ -52,7 +52,7 @@ options:
     version_added: 8.4.0
   nopassword:
     description:
-      - Whether a password is required when command is run with sudo.
+      - Whether a password is not required when command is run with sudo.
     default: true
     type: bool
   setenv:
