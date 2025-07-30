@@ -22,6 +22,9 @@ from pathlib import Path
 from unittest.mock import patch, MagicMock, mock_open
 
 
+pytest.importorskip('paramiko')
+
+
 @pytest.fixture
 def connection():
     play_context = PlayContext()
