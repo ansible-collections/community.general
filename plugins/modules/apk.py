@@ -281,7 +281,7 @@ def install_packages(module, names, state, world):
         upgrade = True
     if not to_install and not upgrade:
         module.exit_json(changed=False, msg="package(s) already installed")
-    packages = " ".join(to_install + to_upgrade)
+    packages = to_install + to_upgrade
     if upgrade:
         if module.check_mode:
             cmd = APK_PATH + ["add", "--upgrade", "--simulate", packages]
@@ -306,7 +306,7 @@ def remove_packages(module, names):
             installed.append(name)
     if not installed:
         module.exit_json(changed=False, msg="package(s) already removed")
-    names = " ".join(installed)
+    names = installed
     if module.check_mode:
         cmd = APK_PATH + ["del", "--purge", "--simulate", names]
     else:
