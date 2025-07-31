@@ -242,6 +242,12 @@ options:
           - Way to identify and track external users from the assertion.
         type: str
 
+      fromUrl:
+        description:
+          - IDP well-known OpenID Connect configuration URL.
+          - O(fromUrl) is mutually exclusive with O(userInfoUrl), O(authorizationUrl), O(tokenUrl), O(userInfoUrl), O(logoutUrl), O(issuer) and O(jwksUrl).
+        type: str
+
   mappers:
     description:
       - A list of dicts defining mappers associated with this Identity Provider.
@@ -460,6 +466,18 @@ def get_identity_provider_with_mappers(kc, alias, realm):
         idp = {}
     return idp
 
+def fetch_identity_provider_wellknown_config(kc, config):
+    if 'fromUrl' in config :
+        endpoints = ['userInfoUrl', 'authorizationUrl', 'tokenUrl', 'logoutUrl', 'issuer', 'jwksUrl']
+        if any(k in config for k in endpoints):
+            kc.module.fail_json(msg="Cannot specify both 'fromUrl' and 'userInfoUrl', 'authorizationUrl', 'tokenUrl', 'logoutUrl', 'issuer' or 'jwksUrl'.")
+        openIdConfig = kc.fetch_idp_endpoints_import_config_url(
+            fromUrl=config['fromUrl'],
+            realm=kc.module.params.get('realm', 'master'))
+        for k in endpoints:
+            if k in openIdConfig:
+                config[k] = openIdConfig[k]
+        del config['fromUrl']
 
 def main():
     """
@@ -517,6 +535,9 @@ def main():
     realm = module.params.get('realm')
     alias = module.params.get('alias')
     state = module.params.get('state')
+    config = module.params.get('config')
+
+    fetch_identity_provider_wellknown_config(kc, config)
 
     # Filter and map the parameters names that apply to the identity provider.
     idp_params = [x for x in module.params
