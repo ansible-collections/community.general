@@ -326,6 +326,24 @@ EXAMPLES = r"""
           user.attribute: last_name
           syncMode: INHERIT
 
+- name: Create OIDC identity provider, with well-known configuration URL
+  community.general.keycloak_identity_provider:
+    state: present
+    auth_keycloak_url: https://auth.example.com/auth
+    auth_realm: master
+    auth_username: admin
+    auth_password: admin
+    realm: myrealm
+    alias: oidc-idp
+    display_name: OpenID Connect IdP
+    enabled: true
+    provider_id: oidc
+    config:
+      fromUrl: https://the-idp.example.com/auth/realms/idprealm/.well-known/openid-configuration
+      clientAuthMethod: client_secret_post
+      clientId: my-client
+      clientSecret: secret
+
 - name: Create SAML identity provider, authentication with credentials
   community.general.keycloak_identity_provider:
     state: present
