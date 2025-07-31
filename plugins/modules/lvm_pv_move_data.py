@@ -62,8 +62,9 @@ EXAMPLES = r"""
 RETURN = r"""
 actions:
   description: List of actions performed during module execution.
-  returned: always
+  returned: success
   type: list
+  elements: str
   sample: [
     "moved data from /dev/sdb to /dev/sdc",
     "no allocated extents to move",
