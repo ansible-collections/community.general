@@ -374,7 +374,7 @@ def main():
                 username=dict(type='str'),
                 master_password=dict(required=True, type='str', no_log=True),
                 secret_key=dict(type='str', no_log=True),
-            ), default=None),
+            )),
             search_terms=dict(required=True, type='list', elements='dict'),
         ),
         supports_check_mode=True

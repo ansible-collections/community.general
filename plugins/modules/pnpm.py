@@ -339,11 +339,11 @@ class Pnpm(object):
 
 def main():
     arg_spec = dict(
-        name=dict(default=None),
-        alias=dict(default=None),
-        path=dict(default=None, type="path"),
-        version=dict(default=None),
-        executable=dict(default=None, type="path"),
+        name=dict(),
+        alias=dict(),
+        path=dict(type="path"),
+        version=dict(),
+        executable=dict(type="path"),
         ignore_scripts=dict(default=False, type="bool"),
         no_optional=dict(default=False, type="bool"),
         production=dict(default=False, type="bool"),

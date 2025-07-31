@@ -162,17 +162,12 @@ def main():
     )
     module_args.update(
         dict(
-            cidr_block=dict(type="str", required=False),
-            compartment_id=dict(type="str", required=False),
-            display_name=dict(type="str", required=False, aliases=["name"]),
-            dns_label=dict(type="str", required=False),
-            state=dict(
-                type="str",
-                required=False,
-                default="present",
-                choices=["absent", "present"],
-            ),
-            vcn_id=dict(type="str", required=False, aliases=["id"]),
+            cidr_block=dict(type="str"),
+            compartment_id=dict(type="str"),
+            display_name=dict(type="str", aliases=["name"]),
+            dns_label=dict(type="str"),
+            state=dict(type="str", default="present", choices=["absent", "present"]),
+            vcn_id=dict(type="str", aliases=["id"]),
         )
     )
 

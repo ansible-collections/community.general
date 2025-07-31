@@ -422,17 +422,17 @@ def autoremove_packages(module, run_pkgng):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(default="present", choices=["present", "latest", "absent"], required=False),
+            state=dict(default="present", choices=["present", "latest", "absent"]),
             name=dict(aliases=["pkg"], required=True, type='list', elements='str'),
             cached=dict(default=False, type='bool'),
-            ignore_osver=dict(default=False, required=False, type='bool'),
-            annotation=dict(required=False, type='list', elements='str'),
-            pkgsite=dict(required=False),
-            rootdir=dict(required=False, type='path'),
-            chroot=dict(required=False, type='path'),
-            jail=dict(required=False, type='str'),
+            ignore_osver=dict(default=False, type='bool'),
+            annotation=dict(type='list', elements='str'),
+            pkgsite=dict(),
+            rootdir=dict(type='path'),
+            chroot=dict(type='path'),
+            jail=dict(type='str'),
             autoremove=dict(default=False, type='bool'),
-            use_globs=dict(default=True, required=False, type='bool'),
+            use_globs=dict(default=True, type='bool'),
         ),
         supports_check_mode=True,
         mutually_exclusive=[["rootdir", "chroot", "jail"]])

@@ -121,15 +121,14 @@ def main():
         argument_spec=dict(
             integration_key=dict(required=True, type='str', no_log=True),
             summary=dict(required=True, type='str'),
-            source=dict(required=False, default='Ansible', type='str'),
-            user=dict(required=False, type='str'),
-            repo=dict(required=False, type='str'),
-            revision=dict(required=False, type='str'),
-            environment=dict(required=False, type='str'),
-            link_url=dict(required=False, type='str'),
-            link_text=dict(required=False, type='str'),
-            url=dict(required=False,
-                     default='https://events.pagerduty.com/v2/change/enqueue', type='str'),
+            source=dict(default='Ansible', type='str'),
+            user=dict(type='str'),
+            repo=dict(type='str'),
+            revision=dict(type='str'),
+            environment=dict(type='str'),
+            link_url=dict(type='str'),
+            link_text=dict(type='str'),
+            url=dict(default='https://events.pagerduty.com/v2/change/enqueue', type='str'),
             validate_certs=dict(default=True, type='bool')
         ),
         supports_check_mode=True
