@@ -100,16 +100,12 @@ def main():
     """Decrypt secret using systemd-creds."""
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(type="str", required=False),
-            newline=dict(type="bool", required=False, default=False),
+            name=dict(type="str"),
+            newline=dict(type="bool", default=False),
             secret=dict(type="str", required=True, no_log=True),
-            timestamp=dict(type="str", required=False),
-            transcode=dict(
-                type="str",
-                choices=["base64", "unbase64", "hex", "unhex"],
-                required=False,
-            ),
-            user=dict(type="str", required=False),
+            timestamp=dict(type="str"),
+            transcode=dict(type="str", choices=["base64", "unbase64", "hex", "unhex"]),
+            user=dict(type="str"),
         ),
         supports_check_mode=True,
     )

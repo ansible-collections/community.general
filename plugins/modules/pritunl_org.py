@@ -176,10 +176,8 @@ def main():
     argument_spec.update(
         dict(
             name=dict(required=True, type="str", aliases=["org"]),
-            force=dict(required=False, type="bool", default=False),
-            state=dict(
-                required=False, choices=["present", "absent"], default="present"
-            ),
+            force=dict(type="bool", default=False),
+            state=dict(choices=["present", "absent"], default="present"),
         )
     )
 

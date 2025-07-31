@@ -532,9 +532,9 @@ def _content_of_file_at_path(path):
 
 def main():
     fields = dict(
-        email=dict(default='', required=False, type='str'),
-        password=dict(default='', required=False, type='str', no_log=True),
-        account=dict(default='', required=False, type='str'),
+        email=dict(default='', type='str'),
+        password=dict(default='', type='str', no_log=True),
+        account=dict(default='', type='str'),
         application=dict(required=True, type='str'),
         keyset=dict(required=True, type='str', no_log=False),
         state=dict(default='present', type='str',

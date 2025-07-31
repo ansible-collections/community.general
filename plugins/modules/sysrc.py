@@ -106,11 +106,11 @@ class Sysrc(StateModuleHelper):
     module = dict(
         argument_spec=dict(
             name=dict(type='str', required=True),
-            value=dict(type='str', default=None),
+            value=dict(type='str'),
             state=dict(type='str', default='present', choices=['absent', 'present', 'value_present', 'value_absent']),
             path=dict(type='str', default='/etc/rc.conf'),
             delim=dict(type='str', default=' '),
-            jail=dict(type='str', default=None)
+            jail=dict(type='str')
         ),
         supports_check_mode=True
     )

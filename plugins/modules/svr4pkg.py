@@ -192,10 +192,10 @@ def main():
         argument_spec=dict(
             name=dict(required=True),
             state=dict(required=True, choices=['present', 'absent']),
-            src=dict(default=None),
-            proxy=dict(default=None),
-            response_file=dict(default=None),
-            zone=dict(required=False, default='all', choices=['current', 'all']),
+            src=dict(),
+            proxy=dict(),
+            response_file=dict(),
+            zone=dict(default='all', choices=['current', 'all']),
             category=dict(default=False, type='bool')
         ),
         supports_check_mode=True

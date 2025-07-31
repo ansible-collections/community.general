@@ -140,7 +140,7 @@ def main():
             msg=dict(required=True),
             app_token=dict(required=True, no_log=True),
             user_key=dict(required=True, no_log=True),
-            pri=dict(required=False, default='0', choices=['-2', '-1', '0', '1', '2']),
+            pri=dict(default='0', choices=['-2', '-1', '0', '1', '2']),
             device=dict(type='str'),
         ),
     )

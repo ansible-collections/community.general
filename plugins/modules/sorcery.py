@@ -697,11 +697,11 @@ def manage_spells(module):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(default=None, aliases=['spell', 'grimoire'], type='list', elements='str'),
-            repository=dict(default=None, type='str'),
+            name=dict(aliases=['spell', 'grimoire'], type='list', elements='str'),
+            repository=dict(type='str'),
             state=dict(default='present', choices=['present', 'latest',
                                                    'absent', 'cast', 'dispelled', 'rebuild']),
-            depends=dict(default=None),
+            depends=dict(),
             update=dict(default=False, type='bool'),
             update_cache=dict(default=False, aliases=['update_codex'], type='bool'),
             cache_valid_time=dict(default=0, type='int')

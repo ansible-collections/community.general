@@ -183,7 +183,7 @@ def main():
             use_min=dict(default=False, type='bool'),
             backup=dict(default=False, type='bool'),
             dest=dict(default=limits_conf, type='str'),
-            comment=dict(required=False, default='', type='str')
+            comment=dict(default='', type='str')
         ),
         supports_check_mode=True,
     )

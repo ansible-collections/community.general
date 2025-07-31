@@ -103,15 +103,13 @@ def main():
 
     module = AnsibleModule(
         argument_spec=dict(
-            command=dict(required=False, default=None, choices=[
-                'ping', 'kv_test', 'join', 'plan', 'commit']),
+            command=dict(choices=['ping', 'kv_test', 'join', 'plan', 'commit']),
             config_dir=dict(default='/etc/riak', type='path'),
-            http_conn=dict(required=False, default='127.0.0.1:8098'),
-            target_node=dict(default='riak@127.0.0.1', required=False),
+            http_conn=dict(default='127.0.0.1:8098'),
+            target_node=dict(default='riak@127.0.0.1'),
             wait_for_handoffs=dict(default=0, type='int'),
             wait_for_ring=dict(default=0, type='int'),
-            wait_for_service=dict(
-                required=False, default=None, choices=['kv']),
+            wait_for_service=dict(choices=['kv']),
             validate_certs=dict(default=True, type='bool'))
     )
 
