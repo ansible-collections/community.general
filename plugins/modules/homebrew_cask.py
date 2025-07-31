@@ -734,13 +734,11 @@ def main():
         argument_spec=dict(
             name=dict(
                 aliases=["pkg", "package", "cask"],
-                required=False,
                 type='list',
                 elements='str',
             ),
             path=dict(
                 default="/usr/local/bin:/opt/homebrew/bin",
-                required=False,
                 type='path',
             ),
             state=dict(
@@ -753,7 +751,6 @@ def main():
             ),
             sudo_password=dict(
                 type="str",
-                required=False,
                 no_log=True,
             ),
             update_homebrew=dict(
@@ -761,7 +758,6 @@ def main():
                 type='bool',
             ),
             install_options=dict(
-                default=None,
                 aliases=['options'],
                 type='list',
                 elements='str',

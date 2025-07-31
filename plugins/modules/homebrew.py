@@ -807,13 +807,11 @@ def main():
         argument_spec=dict(
             name=dict(
                 aliases=["pkg", "package", "formula"],
-                required=False,
                 type='list',
                 elements='str',
             ),
             path=dict(
                 default="/usr/local/bin:/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin",
-                required=False,
                 type='path',
             ),
             state=dict(
@@ -835,13 +833,11 @@ def main():
                 type='bool',
             ),
             install_options=dict(
-                default=None,
                 aliases=['options'],
                 type='list',
                 elements='str',
             ),
             upgrade_options=dict(
-                default=None,
                 type='list',
                 elements='str',
             ),

@@ -246,12 +246,12 @@ def main():
         password=dict(type='str', no_log=True),
         access_token=dict(type='str', no_log=True),
         name=dict(type='str', required=True),
-        state=dict(type='str', required=False, default="present",
+        state=dict(type='str', default="present",
                    choices=["present", "absent"]),
-        organization=dict(type='str', required=False, default=None),
+        organization=dict(type='str', ),
         private=dict(type='bool'),
         description=dict(type='str'),
-        api_url=dict(type='str', required=False, default='https://api.github.com'),
+        api_url=dict(type='str', default='https://api.github.com'),
         force_defaults=dict(type='bool', default=True),
     )
     module = AnsibleModule(

@@ -301,8 +301,8 @@ def main():
     argument_spec = basic_auth_argument_spec()
     argument_spec.update(auth_argument_spec())
     argument_spec.update(
-        purge=dict(type='bool', required=False, default=False),
-        variables=dict(type='list', elements='dict', required=False, default=list(), options=dict(
+        purge=dict(type='bool', default=False),
+        variables=dict(type='list', elements='dict', default=list(), options=dict(
             name=dict(type='str', required=True),
             value=dict(type='str', no_log=True),
             masked=dict(type='bool', default=False),

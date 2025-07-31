@@ -353,7 +353,7 @@ def main():
         record_value=dict(type='str'),
         record_values=dict(type='list', elements='str'),
         state=dict(type='str', default='present', choices=['present', 'absent']),
-        record_ttl=dict(type='int', required=False),
+        record_ttl=dict(type='int'),
     )
 
     module = AnsibleModule(

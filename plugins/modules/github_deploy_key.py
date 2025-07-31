@@ -301,18 +301,18 @@ class GithubDeployKey(object):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            github_url=dict(required=False, type='str', default="https://api.github.com"),
+            github_url=dict(type='str', default="https://api.github.com"),
             owner=dict(required=True, type='str', aliases=['account', 'organization']),
             repo=dict(required=True, type='str', aliases=['repository']),
             name=dict(required=True, type='str', aliases=['title', 'label']),
             key=dict(required=True, type='str', no_log=False),
-            read_only=dict(required=False, type='bool', default=True),
+            read_only=dict(type='bool', default=True),
             state=dict(default='present', choices=['present', 'absent']),
-            force=dict(required=False, type='bool', default=False),
-            username=dict(required=False, type='str'),
-            password=dict(required=False, type='str', no_log=True),
-            otp=dict(required=False, type='int', no_log=True),
-            token=dict(required=False, type='str', no_log=True)
+            force=dict(type='bool', default=False),
+            username=dict(type='str'),
+            password=dict(type='str', no_log=True),
+            otp=dict(type='int', no_log=True),
+            token=dict(type='str', no_log=True)
         ),
         mutually_exclusive=[
             ['password', 'token']

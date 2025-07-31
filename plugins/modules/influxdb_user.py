@@ -217,7 +217,7 @@ def main():
     argument_spec.update(
         state=dict(default='present', type='str', choices=['present', 'absent']),
         user_name=dict(required=True, type='str'),
-        user_password=dict(required=False, type='str', no_log=True),
+        user_password=dict(type='str', no_log=True),
         admin=dict(default='False', type='bool'),
         grants=dict(type='list', elements='dict'),
     )

@@ -350,14 +350,14 @@ def job_config_to_string(xml_str):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            config=dict(type='str', required=False),
+            config=dict(type='str'),
             name=dict(type='str', required=True),
-            password=dict(type='str', required=False, no_log=True),
-            state=dict(type='str', required=False, choices=['present', 'absent'], default="present"),
-            enabled=dict(required=False, type='bool'),
-            token=dict(type='str', required=False, no_log=True),
-            url=dict(type='str', required=False, default="http://localhost:8080"),
-            user=dict(type='str', required=False),
+            password=dict(type='str', no_log=True),
+            state=dict(type='str', choices=['present', 'absent'], default="present"),
+            enabled=dict(type='bool'),
+            token=dict(type='str', no_log=True),
+            url=dict(type='str', default="http://localhost:8080"),
+            user=dict(type='str'),
             validate_certs=dict(type='bool', default=True),
         ),
         mutually_exclusive=[
