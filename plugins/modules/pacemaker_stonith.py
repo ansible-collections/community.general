@@ -165,12 +165,12 @@ class PacemakerStonith(StateModuleHelper):
     def _get(self):
         with self.runner('cli_action state name') as ctx:
             result = ctx.run(cli_action='stonith', state='status')
-            return dict([('rc', result[0]),
-                         ('out', result[1] if result[1] != "" else None),
-                         ('err', result[2])])
+            return dict(rc=result[0],
+                        out=result[1] if result[1] != "" else None,
+                        err=result[2])
 
     def fmt_stonith_resource(self):
-        return dict([("resource_name", self.vars.stonith_type)])
+        return dict(resource_name=self.vars.stonith_type)
 
     # TODO: Pluralize operation_options in separate PR and remove this helper fmt function
     def fmt_stonith_operations(self):
