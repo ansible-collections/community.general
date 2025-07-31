@@ -249,7 +249,7 @@ options:
           - O(config.fromUrl) is mutually exclusive with O(config.userInfoUrl), O(config.authorizationUrl),
             O(config.tokenUrl), O(config.logoutUrl), O(config.issuer) and O(config.jwksUrl).
         type: str
-        version_added: '11.1.0'
+        version_added: '11.2.0'
 
   mappers:
     description:
