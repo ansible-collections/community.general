@@ -80,7 +80,7 @@ class Bzr(object):
     def get_version(self):
         '''samples the version of the bzr branch'''
 
-        cmd = "%s revno" % self.bzr_path
+        cmd = [self.bzr_path, "revno"]
         rc, stdout, stderr = self.module.run_command(cmd, cwd=self.dest)
         revno = stdout.strip()
         return revno
@@ -100,7 +100,7 @@ class Bzr(object):
 
     def has_local_mods(self):
 
-        cmd = "%s status -S" % self.bzr_path
+        cmd = [self.bzr_path, "status", "-S"]
         rc, stdout, stderr = self.module.run_command(cmd, cwd=self.dest)
         lines = stdout.splitlines()
 
