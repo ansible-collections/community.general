@@ -108,9 +108,9 @@ def main():
             password=dict(required=True, no_log=True),
             to=dict(required=True),
             msg=dict(required=True),
-            host=dict(required=False),
-            port=dict(required=False, default=5222, type='int'),
-            encoding=dict(required=False),
+            host=dict(),
+            port=dict(default=5222, type='int'),
+            encoding=dict(),
         ),
         supports_check_mode=True
     )

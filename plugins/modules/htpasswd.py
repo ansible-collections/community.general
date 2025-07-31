@@ -191,9 +191,9 @@ def main():
     arg_spec = dict(
         path=dict(type='path', required=True, aliases=["dest", "destfile"]),
         name=dict(type='str', required=True, aliases=["username"]),
-        password=dict(type='str', required=False, default=None, no_log=True),
-        hash_scheme=dict(type='str', required=False, default="apr_md5_crypt", aliases=["crypt_scheme"]),
-        state=dict(type='str', required=False, default="present", choices=["present", "absent"]),
+        password=dict(type='str', no_log=True),
+        hash_scheme=dict(type='str', default="apr_md5_crypt", aliases=["crypt_scheme"]),
+        state=dict(type='str', default="present", choices=["present", "absent"]),
         create=dict(type='bool', default=True),
 
     )

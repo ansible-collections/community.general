@@ -410,16 +410,16 @@ def main():
     argument_spec = basic_auth_argument_spec()
     argument_spec.update(auth_argument_spec())
     argument_spec.update(
-        project=dict(type='str', required=False, default=None),
-        group=dict(type='str', required=False, default=None),
-        purge=dict(type='bool', required=False, default=False),
-        labels=dict(type='list', elements='dict', required=False, default=list(),
+        project=dict(type='str'),
+        group=dict(type='str'),
+        purge=dict(type='bool', default=False),
+        labels=dict(type='list', elements='dict', default=list(),
                     options=dict(
                         name=dict(type='str', required=True),
-                        color=dict(type='str', required=False),
-                        description=dict(type='str', required=False),
-                        priority=dict(type='int', required=False),
-                        new_name=dict(type='str', required=False),)
+                        color=dict(type='str'),
+                        description=dict(type='str'),
+                        priority=dict(type='int'),
+                        new_name=dict(type='str'),)
                     ),
         state=dict(type='str', default="present", choices=["absent", "present"]),
     )

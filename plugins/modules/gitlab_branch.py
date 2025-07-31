@@ -118,7 +118,7 @@ def main():
     argument_spec.update(
         project=dict(type='str', required=True),
         branch=dict(type='str', required=True),
-        ref_branch=dict(type='str', required=False),
+        ref_branch=dict(type='str'),
         state=dict(type='str', default="present", choices=["absent", "present"]),
     )
 

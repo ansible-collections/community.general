@@ -101,8 +101,8 @@ def main():
             channel_token=dict(type='str', required=True, no_log=True),
             message_content=dict(type='str', required=True),
             service=dict(type='str', default='ansible'),
-            url=dict(type='str', default=None),
-            icon_url=dict(type='str', default=None),
+            url=dict(type='str'),
+            icon_url=dict(type='str'),
             validate_certs=dict(default=True, type='bool'),
         )
     )

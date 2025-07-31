@@ -173,8 +173,8 @@ def main():
     argument_spec = ipa_argument_spec()
     argument_spec.update(zone_name=dict(type='str', required=True),
                          state=dict(type='str', default='present', choices=['present', 'absent']),
-                         dynamicupdate=dict(type='bool', required=False, default=False),
-                         allowsyncptr=dict(type='bool', required=False, default=False),
+                         dynamicupdate=dict(type='bool', default=False),
+                         allowsyncptr=dict(type='bool', default=False),
                          )
 
     module = AnsibleModule(argument_spec=argument_spec,

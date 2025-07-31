@@ -220,11 +220,10 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(aliases=['tap'], type='list', required=True, elements='str'),
-            url=dict(default=None, required=False),
+            url=dict(),
             state=dict(default='present', choices=['present', 'absent']),
             path=dict(
                 default="/usr/local/bin:/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin",
-                required=False,
                 type='path',
             ),
         ),
