@@ -246,7 +246,8 @@ options:
         description:
           - IDP well-known OpenID Connect configuration URL.
           - Support only O(provider_id=oidc).
-          - O(config.fromUrl) is mutually exclusive with O(config.userInfoUrl), O(config.authorizationUrl), O(config.tokenUrl), O(config.logoutUrl), O(config.issuer) and O(config.jwksUrl).
+          - O(config.fromUrl) is mutually exclusive with O(config.userInfoUrl), O(config.authorizationUrl),
+            O(config.tokenUrl), O(config.logoutUrl), O(config.issuer) and O(config.jwksUrl).
         type: str
         version_added: 11.1
 
