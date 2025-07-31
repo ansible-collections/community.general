@@ -167,7 +167,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             api_key=dict(required=True, type='str', no_log=True),
-            poll=dict(required=False, default=False, type='bool')
+            poll=dict(default=False, type='bool')
         ),
         supports_check_mode=False
     )
