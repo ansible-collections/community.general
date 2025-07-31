@@ -153,7 +153,7 @@ def main():
     module = AnsibleModule(
         argument_spec=gen_specs(
             attribute=dict(type='str', required=True),
-            increment=dict(type='int', default=1, required=False),
+            increment=dict(type='int', default=1),
             method=dict(type='str', default='auto', choices=['auto', 'rfc4525', 'legacy']),
         ),
         supports_check_mode=True,

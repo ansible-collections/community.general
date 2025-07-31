@@ -242,7 +242,7 @@ def main():
             password=dict(type='str', no_log=True),
             host=dict(type='str', default='localhost'),
             port=dict(type='int', default=25),
-            ehlohost=dict(type='str', default=None),
+            ehlohost=dict(type='str'),
             sender=dict(type='str', default='root', aliases=['from']),
             to=dict(type='list', elements='str', default=['root'], aliases=['recipients']),
             cc=dict(type='list', elements='str', default=[]),

@@ -99,9 +99,9 @@ def run_module():
         msg_html=dict(type='str', required=True),
         room_id=dict(type='str', required=True),
         hs_url=dict(type='str', required=True),
-        token=dict(type='str', required=False, no_log=True),
-        user_id=dict(type='str', required=False),
-        password=dict(type='str', required=False, no_log=True),
+        token=dict(type='str', no_log=True),
+        user_id=dict(type='str'),
+        password=dict(type='str', no_log=True),
     )
 
     result = dict(

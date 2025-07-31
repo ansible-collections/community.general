@@ -162,15 +162,15 @@ def main():
             port=dict(default=1883, type='int'),
             topic=dict(required=True),
             payload=dict(required=True),
-            client_id=dict(default=None),
+            client_id=dict(),
             qos=dict(default="0", choices=["0", "1", "2"]),
             retain=dict(default=False, type='bool'),
-            username=dict(default=None),
-            password=dict(default=None, no_log=True),
-            ca_cert=dict(default=None, type='path', aliases=['ca_certs']),
-            client_cert=dict(default=None, type='path', aliases=['certfile']),
-            client_key=dict(default=None, type='path', aliases=['keyfile']),
-            tls_version=dict(default=None, choices=['tlsv1.1', 'tlsv1.2'])
+            username=dict(),
+            password=dict(no_log=True),
+            ca_cert=dict(type='path', aliases=['ca_certs']),
+            client_cert=dict(type='path', aliases=['certfile']),
+            client_key=dict(type='path', aliases=['keyfile']),
+            tls_version=dict(choices=['tlsv1.1', 'tlsv1.2'])
         ),
         supports_check_mode=True
     )

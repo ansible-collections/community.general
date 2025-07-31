@@ -296,7 +296,7 @@ def main():
     module = AnsibleModule(
         argument_spec=gen_specs(
             attributes=dict(type='dict', required=True),
-            ordered=dict(type='bool', default=False, required=False),
+            ordered=dict(type='bool', default=False),
             state=dict(type='str', default='present', choices=['absent', 'exact', 'present']),
         ),
         supports_check_mode=True,

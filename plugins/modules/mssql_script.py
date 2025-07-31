@@ -282,7 +282,7 @@ def clean_output(o):
 
 def run_module():
     module_args = dict(
-        name=dict(required=False, aliases=['db'], default=''),
+        name=dict(aliases=['db'], default=''),
         login_user=dict(),
         login_password=dict(no_log=True),
         login_host=dict(required=True),

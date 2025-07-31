@@ -98,7 +98,7 @@ def gather_lldp(module):
 
 def main():
     module_args = dict(
-        multivalues=dict(type='bool', required=False, default=False)
+        multivalues=dict(type='bool', default=False)
     )
     module = AnsibleModule(module_args)
 

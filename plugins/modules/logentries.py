@@ -139,8 +139,8 @@ def main():
         argument_spec=dict(
             path=dict(required=True),
             state=dict(default="present", choices=["present", "followed", "absent", "unfollowed"]),
-            name=dict(required=False, default=None, type='str'),
-            logtype=dict(required=False, default=None, type='str', aliases=['type'])
+            name=dict(type='str'),
+            logtype=dict(type='str', aliases=['type'])
         ),
         supports_check_mode=True
     )
