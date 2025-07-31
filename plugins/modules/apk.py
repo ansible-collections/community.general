@@ -284,14 +284,14 @@ def install_packages(module, names, state, world):
     packages = to_install + to_upgrade
     if upgrade:
         if module.check_mode:
-            cmd = APK_PATH + ["add", "--upgrade", "--simulate", packages]
+            cmd = APK_PATH + ["add", "--upgrade", "--simulate"] + packages
         else:
-            cmd = APK_PATH + ["add", "--upgrade", packages]
+            cmd = APK_PATH + ["add", "--upgrade"] + packages
     else:
         if module.check_mode:
-            cmd = APK_PATH + ["add", "--simulate", packages]
+            cmd = APK_PATH + ["add", "--simulate"] + packages
         else:
-            cmd = APK_PATH + ["add", packages]
+            cmd = APK_PATH + ["add"] + packages
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
     packagelist = parse_for_packages(stdout)
     if rc != 0:
@@ -308,9 +308,9 @@ def remove_packages(module, names):
         module.exit_json(changed=False, msg="package(s) already removed")
     names = installed
     if module.check_mode:
-        cmd = APK_PATH + ["del", "--purge", "--simulate", names]
+        cmd = APK_PATH + ["del", "--purge", "--simulate"] + names
     else:
-        cmd = APK_PATH + ["del", "--purge", names]
+        cmd = APK_PATH + ["del", "--purge"] + names
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
     packagelist = parse_for_packages(stdout)
     # Check to see if packages are still present because of dependencies
