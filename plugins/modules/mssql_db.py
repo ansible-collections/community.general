@@ -158,7 +158,7 @@ def main():
             login_password=dict(default='', no_log=True),
             login_host=dict(required=True),
             login_port=dict(default='1433'),
-            target=dict(default=None),
+            target=dict(),
             autocommit=dict(type='bool', default=False),
             state=dict(
                 default='present', choices=['present', 'absent', 'import'])

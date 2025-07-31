@@ -482,8 +482,8 @@ def main():
     argument_spec = dict(
         name=dict(required=True, type='str'),
         description=dict(required=True, type='str'),
-        parent_id=dict(required=False, type='int'),
-        parent=dict(required=False, type='str'),
+        parent_id=dict(type='int'),
+        parent=dict(type='str'),
         state=dict(choices=['absent', 'present'], default='present'),
         quotas=dict(type='dict', default={})
     )

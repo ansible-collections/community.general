@@ -206,10 +206,10 @@ def run_module():
         username=dict(type="str", required=True),
         keyring_password=dict(type="str", required=True, no_log=True),
         user_password=dict(
-            type="str", required=False, no_log=True, aliases=["password"]
+            type="str", no_log=True, aliases=["password"]
         ),
         state=dict(
-            type="str", required=False, default="present", choices=["absent", "present"]
+            type="str", default="present", choices=["absent", "present"]
         ),
     )
 

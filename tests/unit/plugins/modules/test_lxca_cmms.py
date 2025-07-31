@@ -61,8 +61,8 @@ class TestMyModule():
             command_options=dict(default='cmms', choices=['cmms', 'cmms_by_uuid',
                                                           'cmms_by_chassis_uuid']),
             auth_url=dict(required=True),
-            uuid=dict(default=None),
-            chassis=dict(default=None),
+            uuid=dict(),
+            chassis=dict(),
         )
         _setup_conn.return_value = "Fake connection"
         _execute_module.return_value = []

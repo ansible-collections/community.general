@@ -356,15 +356,15 @@ def main():
     global module
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(required=False, default='present', choices=['present', 'absent'], type='str'),
+            state=dict(default='present', choices=['present', 'absent'], type='str'),
             api_key=dict(required=True, type='str', no_log=True),
             zone=dict(required=True, type='str'),
             type=dict(required=True, choices=['A', 'AAAA', 'CNAME', 'MX', 'NS', 'SRV', 'TXT'], type='str'),
             address=dict(required=True, aliases=['ip', 'data'], type='str'),
-            record=dict(required=False, default='', type='str'),
-            ttl=dict(required=False, default=0, choices=[0, 300, 600, 900, 1800, 3600, 7200, 10800, 21600, 43200, 86400], type='int'),
-            priority=dict(required=False, default=0, type='int'),
-            relative=dict(required=False, default=False, type='bool')
+            record=dict(default='', type='str'),
+            ttl=dict(default=0, choices=[0, 300, 600, 900, 1800, 3600, 7200, 10800, 21600, 43200, 86400], type='int'),
+            priority=dict(default=0, type='int'),
+            relative=dict(default=False, type='bool')
         ),
         supports_check_mode=True
     )

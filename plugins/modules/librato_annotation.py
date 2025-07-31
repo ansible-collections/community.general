@@ -160,12 +160,12 @@ def main():
         argument_spec=dict(
             user=dict(required=True),
             api_key=dict(required=True, no_log=True),
-            name=dict(required=False),
+            name=dict(),
             title=dict(required=True),
-            source=dict(required=False),
-            description=dict(required=False),
-            start_time=dict(required=False, default=None, type='int'),
-            end_time=dict(required=False, default=None, type='int'),
+            source=dict(),
+            description=dict(),
+            start_time=dict(type='int'),
+            end_time=dict(type='int'),
             links=dict(type='list', elements='dict')
         )
     )
