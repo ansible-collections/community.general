@@ -245,8 +245,10 @@ options:
       fromUrl:
         description:
           - IDP well-known OpenID Connect configuration URL.
-          - O(fromUrl) is mutually exclusive with O(userInfoUrl), O(authorizationUrl), O(tokenUrl), O(userInfoUrl), O(logoutUrl), O(issuer) and O(jwksUrl).
+          - Support only V(oidc) for O(provider_id).
+          - O(fromUrl) is mutually exclusive with O(userInfoUrl), O(authorizationUrl), O(tokenUrl), O(logoutUrl), O(issuer) and O(jwksUrl).
         type: str
+        version_added: 11.1.2
 
   mappers:
     description:
@@ -467,7 +469,16 @@ def get_identity_provider_with_mappers(kc, alias, realm):
     return idp
 
 def fetch_identity_provider_wellknown_config(kc, config):
-    if 'fromUrl' in config :
+    """
+    Fetches OpenID Connect well-known configuration from a given URL and updates the config dict with discovered endpoints.
+    Support for oidc providers only.
+    :param kc: KeycloakAPI instance used to fetch endpoints and handle errors.
+    :param config: Dictionary containing identity provider configuration, must include 'fromUrl' key to trigger fetch.
+    :return: None. The config dict is updated in-place.
+    """
+    if config and 'fromUrl' in config :
+        if 'providerId' in config and config['providerId'] != 'oidc':
+            kc.module.fail_json(msg="Only 'oidc' provider_id is supported when using 'fromUrl'.")
         endpoints = ['userInfoUrl', 'authorizationUrl', 'tokenUrl', 'logoutUrl', 'issuer', 'jwksUrl']
         if any(k in config for k in endpoints):
             kc.module.fail_json(msg="Cannot specify both 'fromUrl' and 'userInfoUrl', 'authorizationUrl', 'tokenUrl', 'logoutUrl', 'issuer' or 'jwksUrl'.")

@@ -2581,24 +2581,23 @@ class KeycloakAPI(object):
             self.fail_request(e, msg='Could not obtain list of identity provider mappers for idp %s in realm %s: %s'
                                      % (alias, realm, str(e)))
 
-    def fetch_idp_endpoints_import_config_url(self, fromUrl, realm='master'):
-        """
-        Import an identity provider on a Keycloak server form url.
+    def fetch_idp_endpoints_import_config_url(self, fromUrl, providerId='oidc', realm='master'):
+        """ Import an identity provider configuration through Keycloak server from a well-known URL.
         :param fromUrl: URL to import the identity provider configuration from.
+        "param providerId: Provider ID of the identity provider to import, default 'oidc'.
         :param realm: Realm
-        :return: Actual representation of the idp created.
+        :return: IDP endpoins.
         """
         try:
-            payload = dict(
-                providerId='oidc',
-                fromUrl=fromUrl
-            )
+            payload = {
+                "providerId": providerId,
+                "fromUrl": fromUrl
+            }
             idps_url = URL_IDENTITY_PROVIDER_IMPORT.format(url=self.baseurl, realm=realm)
             return self._request_and_deserialize(idps_url, method='POST', data=json.dumps(payload))
         except Exception as e:
-            self.fail_request(e, msg='Could not import the IdP config in realm %s: %s'
-                                      % (realm, str(e)))
-            
+            self.fail_request(e, msg='Could not import the IdP config in realm %s: %s' % (realm, str(e)))
+
     def get_identity_provider_mapper(self, mid, alias, realm='master'):
         """ Fetch identity provider representation from a realm using the idp's alias.
         If the identity provider does not exist, None is returned.
