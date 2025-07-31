@@ -1,0 +1,2 @@
+minor_changes:
+  - keycloak - add support for ``fromUrl`` to keycloak_identity_provider module, so that specifying ``fromUrl`` while configure IDP oidc endpoint (https://github.com/ansible-collections/community.general/pull/10527).

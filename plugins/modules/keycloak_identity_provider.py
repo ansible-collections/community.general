@@ -245,10 +245,10 @@ options:
       fromUrl:
         description:
           - IDP well-known OpenID Connect configuration URL.
-          - Support only V(oidc) for O(provider_id).
-          - O(fromUrl) is mutually exclusive with O(userInfoUrl), O(authorizationUrl), O(tokenUrl), O(logoutUrl), O(issuer) and O(jwksUrl).
+          - Support only O(provider_id=oidc).
+          - O(config.fromUrl) is mutually exclusive with O(config.userInfoUrl), O(config.authorizationUrl), O(config.tokenUrl), O(config.logoutUrl), O(config.issuer) and O(config.jwksUrl).
         type: str
-        version_added: 11.1.2
+        version_added: 11.1
 
   mappers:
     description:
@@ -486,6 +486,7 @@ def get_identity_provider_with_mappers(kc, alias, realm):
         idp = {}
     return idp
 
+
 def fetch_identity_provider_wellknown_config(kc, config):
     """
     Fetches OpenID Connect well-known configuration from a given URL and updates the config dict with discovered endpoints.
@@ -507,6 +508,7 @@ def fetch_identity_provider_wellknown_config(kc, config):
             if k in openIdConfig:
                 config[k] = openIdConfig[k]
         del config['fromUrl']
+
 
 def main():
     """
