@@ -222,12 +222,12 @@ def main():
         argument_spec=dict(
             repo=dict(type='str', required=True, aliases=['name']),
             dest=dict(type='path'),
-            revision=dict(type='str', default=None, aliases=['version']),
+            revision=dict(type='str', aliases=['version']),
             force=dict(type='bool', default=False),
             purge=dict(type='bool', default=False),
             update=dict(type='bool', default=True),
             clone=dict(type='bool', default=True),
-            executable=dict(type='str', default=None),
+            executable=dict(type='str'),
         ),
     )
     repo = module.params['repo']

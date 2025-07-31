@@ -372,11 +372,11 @@ def main():
     argument_spec.update(auth_argument_spec())
     argument_spec.update(
         group=dict(type='str', required=True),
-        purge=dict(type='bool', required=False, default=False),
-        vars=dict(type='dict', required=False, default=dict(), no_log=True),
+        purge=dict(type='bool', default=False),
+        vars=dict(type='dict', default=dict(), no_log=True),
         # please mind whenever changing the variables dict to also change module_utils/gitlab.py's
         # KNOWN dict in filter_returned_variables or bad evil will happen
-        variables=dict(type='list', elements='dict', required=False, default=list(), options=dict(
+        variables=dict(type='list', elements='dict', default=list(), options=dict(
             name=dict(type='str', required=True),
             value=dict(type='str', no_log=True),
             masked=dict(type='bool', default=False),

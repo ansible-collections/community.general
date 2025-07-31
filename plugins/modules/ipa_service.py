@@ -197,10 +197,10 @@ def main():
     argument_spec = ipa_argument_spec()
     argument_spec.update(
         krbcanonicalname=dict(type='str', required=True, aliases=['name']),
-        force=dict(type='bool', required=False),
-        skip_host_check=dict(type='bool', default=False, required=False),
-        hosts=dict(type='list', required=False, elements='str'),
-        state=dict(type='str', required=False, default='present',
+        force=dict(type='bool'),
+        skip_host_check=dict(type='bool', default=False),
+        hosts=dict(type='list', elements='str'),
+        state=dict(type='str', default='present',
                    choices=['present', 'absent']))
 
     module = AnsibleModule(argument_spec=argument_spec,

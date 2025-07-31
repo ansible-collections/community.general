@@ -113,7 +113,7 @@ def main():
         argument_spec=dict(
             name=dict(type="str"),
             path=dict(type="path"),
-            scope=dict(required=False, type="str", default="system", choices=["global", "system", "local", "file"]),
+            scope=dict(type="str", default="system", choices=["global", "system", "local", "file"]),
         ),
         required_if=[
             ("scope", "local", ["path"]),

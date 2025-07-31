@@ -411,15 +411,15 @@ def main():
     argument_spec = basic_auth_argument_spec()
     argument_spec.update(auth_argument_spec())
     argument_spec.update(
-        project=dict(type='str', required=False, default=None),
-        group=dict(type='str', required=False, default=None),
-        purge=dict(type='bool', required=False, default=False),
-        milestones=dict(type='list', elements='dict', required=False, default=list(),
+        project=dict(type='str'),
+        group=dict(type='str'),
+        purge=dict(type='bool', default=False),
+        milestones=dict(type='list', elements='dict', default=list(),
                         options=dict(
                             title=dict(type='str', required=True),
-                            description=dict(type='str', required=False),
-                            due_date=dict(type='str', required=False),
-                            start_date=dict(type='str', required=False),)
+                            description=dict(type='str'),
+                            due_date=dict(type='str'),
+                            start_date=dict(type='str'),)
                         ),
         state=dict(type='str', default="present", choices=["absent", "present"]),
     )

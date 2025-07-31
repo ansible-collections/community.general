@@ -124,10 +124,10 @@ def main():
         argument_spec=dict(
             repository=dict(type='str', required=True, aliases=["repo"]),
             user=dict(type='str', required=True),
-            password=dict(type='str', required=False, no_log=True),
-            token=dict(type='str', required=False, no_log=True),
+            password=dict(type='str', no_log=True),
+            token=dict(type='str', no_log=True),
             github_url=dict(
-                type='str', required=False, default="https://api.github.com")),
+                type='str', default="https://api.github.com")),
         mutually_exclusive=(('password', 'token'), ),
         required_one_of=(("password", "token"), ),
         supports_check_mode=True)
