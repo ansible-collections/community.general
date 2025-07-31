@@ -293,8 +293,8 @@ def main():
         argument_spec=dict(
             name=dict(aliases=['pkg'], required=True),
             state=dict(default='present', choices=['present', 'installed', "latest", 'absent', 'removed']),
-            executable=dict(default=None, required=False, type='path'),
-            prompts=dict(default=None, required=False, type='list', elements='raw'),
+            executable=dict(type='path'),
+            prompts=dict(type='list', elements='raw'),
         ),
         supports_check_mode=True)
 

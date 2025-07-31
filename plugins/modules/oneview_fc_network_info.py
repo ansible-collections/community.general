@@ -87,8 +87,8 @@ class FcNetworkInfoModule(OneViewModuleBase):
     def __init__(self):
 
         argument_spec = dict(
-            name=dict(required=False, type='str'),
-            params=dict(required=False, type='dict')
+            name=dict(type='str'),
+            params=dict(type='dict')
         )
 
         super(FcNetworkInfoModule, self).__init__(

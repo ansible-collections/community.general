@@ -263,10 +263,10 @@ class NetworksModule(OpenNebulaModule):
 
     def __init__(self):
         argument_spec = dict(
-            id=dict(type='int', required=False),
-            name=dict(type='str', required=False),
+            id=dict(type='int'),
+            name=dict(type='str'),
             state=dict(type='str', choices=['present', 'absent'], default='present'),
-            template=dict(type='str', required=False),
+            template=dict(type='str'),
         )
 
         mutually_exclusive = [

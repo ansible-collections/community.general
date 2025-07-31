@@ -67,7 +67,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             msg=dict(required=True),
-            voice=dict(required=False),
+            voice=dict(),
         ),
         supports_check_mode=True
     )

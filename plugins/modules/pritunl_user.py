@@ -320,18 +320,14 @@ def main():
     argument_spec.update(
         dict(
             organization=dict(required=True, type="str", aliases=["org"]),
-            state=dict(
-                required=False, choices=["present", "absent"], default="present"
-            ),
+            state=dict(choices=["present", "absent"], default="present"),
             user_name=dict(required=True, type="str"),
-            user_type=dict(
-                required=False, choices=["client", "server"], default="client"
-            ),
-            user_email=dict(required=False, type="str", default=None),
-            user_groups=dict(required=False, type="list", elements="str", default=None),
-            user_disabled=dict(required=False, type="bool", default=None),
-            user_gravatar=dict(required=False, type="bool", default=None),
-            user_mac_addresses=dict(required=False, type="list", elements="str", default=None),
+            user_type=dict(choices=["client", "server"], default="client"),
+            user_email=dict(type="str"),
+            user_groups=dict(type="list", elements="str"),
+            user_disabled=dict(type="bool"),
+            user_gravatar=dict(type="bool"),
+            user_mac_addresses=dict(type="list", elements="str"),
         )
     )
 

@@ -98,8 +98,8 @@ def main():
     redis_auth_args = redis_auth_argument_spec()
     module_args = dict(
         key=dict(type='str', required=True, no_log=False),
-        increment_int=dict(type='int', required=False),
-        increment_float=dict(type='float', required=False),
+        increment_int=dict(type='int'),
+        increment_float=dict(type='float'),
     )
     module_args.update(redis_auth_args)
 

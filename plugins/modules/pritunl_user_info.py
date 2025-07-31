@@ -151,12 +151,8 @@ def main():
     argument_spec.update(
         dict(
             organization=dict(required=True, type="str", aliases=["org"]),
-            user_name=dict(required=False, type="str", default=None),
-            user_type=dict(
-                required=False,
-                choices=["client", "server"],
-                default="client",
-            ),
+            user_name=dict(type="str"),
+            user_type=dict(choices=["client", "server"], default="client"),
         )
     )
 

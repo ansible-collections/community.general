@@ -281,8 +281,8 @@ IMAGE_STATES = ['INIT', 'READY', 'USED', 'DISABLED', 'LOCKED', 'ERROR', 'CLONE',
 class ImageInfoModule(OpenNebulaModule):
     def __init__(self):
         argument_spec = dict(
-            ids=dict(type='list', aliases=['id'], elements='str', required=False),
-            name=dict(type='str', required=False),
+            ids=dict(type='list', aliases=['id'], elements='str'),
+            name=dict(type='str'),
         )
         mutually_exclusive = [
             ['ids', 'name'],

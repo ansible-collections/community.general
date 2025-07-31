@@ -143,11 +143,11 @@ def main():
     redis_auth_args = redis_auth_argument_spec()
     module_args = dict(
         key=dict(type='str', required=True, no_log=False),
-        value=dict(type='str', required=False),
-        expiration=dict(type='int', required=False),
-        non_existing=dict(type='bool', required=False),
-        existing=dict(type='bool', required=False),
-        keep_ttl=dict(type='bool', required=False),
+        value=dict(type='str'),
+        expiration=dict(type='int'),
+        non_existing=dict(type='bool'),
+        existing=dict(type='bool'),
+        keep_ttl=dict(type='bool'),
         state=dict(type='str', default='present',
                    choices=['present', 'absent']),
     )
