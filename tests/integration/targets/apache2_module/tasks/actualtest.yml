@@ -186,7 +186,7 @@
     - name: ensure configcheck fails task with when run without mpm modules
       assert:
         that:
-          - "{{ item.failed }}"
+          - item is failed
       with_items: "{{ remove_with_configcheck.results }}"
 
     - name: try to disable all mpm modules without configcheck
