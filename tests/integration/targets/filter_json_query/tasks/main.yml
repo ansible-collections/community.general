@@ -11,4 +11,13 @@
 - name: Test json_query filter
   assert:
     that:
-      - "users | community.general.json_query('[*].hosts[].host') == ['host_a', 'host_b', 'host_c', 'host_d']"
+      - >-
+        users | community.general.json_query('[*].hosts[].host') == ['host_a', 'host_b', 'host_c', 'host_d']
+      - >-
+        ports | json_query("[?contains(ports, `22`)]") == [ports[0]]
+  vars:
+    ports:
+      - ports: [22]
+        rule_desc: "ssh"
+      - ports: [80]
+        rule_desc: "http"
