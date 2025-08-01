@@ -283,12 +283,12 @@ class Yarn(object):
 
 def main():
     arg_spec = dict(
-        name=dict(default=None),
-        path=dict(default=None, type='path'),
-        version=dict(default=None),
+        name=dict(),
+        path=dict(type='path'),
+        version=dict(),
         production=dict(default=False, type='bool'),
-        executable=dict(default=None, type='path'),
-        registry=dict(default=None),
+        executable=dict(type='path'),
+        registry=dict(),
         state=dict(default='present', choices=['present', 'absent', 'latest']),
         ignore_scripts=dict(default=False, type='bool'),
     )

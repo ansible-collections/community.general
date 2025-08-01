@@ -148,9 +148,9 @@ def main():
             ca=dict(type='str', required=True),
             meta=dict(type='str', required=True),
             certificate=dict(type='str', required=True),
-            comment=dict(type='str', required=False),
-            encrypted=dict(type='bool', required=False, default=False),
-            key=dict(type='str', required=False, no_log=True),
+            comment=dict(type='str'),
+            encrypted=dict(type='bool', default=False),
+            key=dict(type='str', no_log=True),
         )
     )
     try:

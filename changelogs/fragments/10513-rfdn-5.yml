@@ -1,0 +1,18 @@
+minor_changes:
+  - taiga_issue - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10513).
+  - twilio - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10513).
+  - utm_aaa_group - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10513).
+  - utm_ca_host_key_cert - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10513).
+  - utm_dns_host - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10513).
+  - utm_network_interface_address - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10513).
+  - utm_proxy_auth_profile - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10513).
+  - utm_proxy_exception - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10513).
+  - utm_proxy_frontend - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10513).
+  - utm_proxy_location - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10513).
+  - vertica_configuration - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10513).
+  - vertica_info - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10513).
+  - vertica_role - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10513).
+  - xbps - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10513).
+  - yarn - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10513).
+  - zypper - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10513).
+  - zypper_repository - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10513).
