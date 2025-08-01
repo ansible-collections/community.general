@@ -8,5 +8,3 @@ admin_realm: master
 admin_user: admin
 admin_password: password
 realm: myrealm
-
-
