@@ -234,7 +234,7 @@ class Imgadm(object):
                 else:
                     self.changed = True
         if self.present:
-            cmd = [self.cmd, 'import', '-P', pool, '-q'] + [self.uuid] if self.uuid else []
+            cmd = [self.cmd, 'import', '-P', pool, '-q'] + ([self.uuid] if self.uuid else [])
             (rc, stdout, stderr) = self.module.run_command(cmd)
 
             if rc != 0:
