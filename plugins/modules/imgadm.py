@@ -252,7 +252,7 @@ class Imgadm(object):
             if re.match(regex, stdout.splitlines()[-1]):
                 self.changed = True
         else:
-            cmd = [self.cmd, 'delete', '-P', pool] + [self.uuid] if self.uuid else []
+            cmd = [self.cmd, 'delete', '-P', pool] + ([self.uuid] if self.uuid else [])
             (rc, stdout, stderr) = self.module.run_command(cmd)
 
             regex = '.*ImageNotInstalled.*'
