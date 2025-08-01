@@ -180,7 +180,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             role=dict(required=True, aliases=['name']),
-            assigned_roles=dict(default=None, aliases=['assigned_role']),
+            assigned_roles=dict(aliases=['assigned_role']),
             state=dict(default='present', choices=['absent', 'present']),
             db=dict(),
             cluster=dict(default='localhost'),

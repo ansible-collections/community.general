@@ -139,12 +139,12 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             parameter=dict(required=True, aliases=['name']),
-            value=dict(default=None),
-            db=dict(default=None),
+            value=dict(),
+            db=dict(),
             cluster=dict(default='localhost'),
             port=dict(default='5433'),
             login_user=dict(default='dbadmin'),
-            login_password=dict(default=None, no_log=True),
+            login_password=dict(no_log=True),
         ), supports_check_mode=True)
 
     if not pyodbc_found:

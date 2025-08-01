@@ -150,7 +150,7 @@ def main():
             msg=dict(required=True),
             from_number=dict(required=True),
             to_numbers=dict(required=True, aliases=['to_number'], type='list', elements='str'),
-            media_url=dict(default=None, required=False),
+            media_url=dict(),
         ),
         supports_check_mode=True
     )

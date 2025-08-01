@@ -210,20 +210,20 @@ def main():
     module = UTMModule(
         argument_spec=dict(
             name=dict(type='str', required=True),
-            adirectory_groups=dict(type='list', elements='str', required=False, default=[]),
-            adirectory_groups_sids=dict(type='dict', required=False, default={}),
-            backend_match=dict(type='str', required=False, default="none",
+            adirectory_groups=dict(type='list', elements='str', default=[]),
+            adirectory_groups_sids=dict(type='dict', default={}),
+            backend_match=dict(type='str', default="none",
                                choices=["none", "adirectory", "edirectory", "radius", "tacacs", "ldap"]),
-            comment=dict(type='str', required=False, default=""),
-            dynamic=dict(type='str', required=False, default="none", choices=["none", "ipsec_dn", "directory_groups"]),
-            edirectory_groups=dict(type='list', elements='str', required=False, default=[]),
-            ipsec_dn=dict(type='str', required=False, default=""),
-            ldap_attribute=dict(type='str', required=False, default=""),
-            ldap_attribute_value=dict(type='str', required=False, default=""),
-            members=dict(type='list', elements='str', required=False, default=[]),
-            network=dict(type='str', required=False, default=""),
-            radius_groups=dict(type='list', elements='str', required=False, default=[]),
-            tacacs_groups=dict(type='list', elements='str', required=False, default=[]),
+            comment=dict(type='str', default=""),
+            dynamic=dict(type='str', default="none", choices=["none", "ipsec_dn", "directory_groups"]),
+            edirectory_groups=dict(type='list', elements='str', default=[]),
+            ipsec_dn=dict(type='str', default=""),
+            ldap_attribute=dict(type='str', default=""),
+            ldap_attribute_value=dict(type='str', default=""),
+            members=dict(type='list', elements='str', default=[]),
+            network=dict(type='str', default=""),
+            radius_groups=dict(type='list', elements='str', default=[]),
+            tacacs_groups=dict(type='list', elements='str', default=[]),
         )
     )
     try:
