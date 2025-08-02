@@ -124,10 +124,17 @@ def json_query(data, expr):
                            'json_query filter')
 
     # Hack to handle Ansible Unsafe text, AnsibleMapping and AnsibleSequence
-    # See issue: https://github.com/ansible-collections/community.general/issues/320
-    jmespath.functions.REVERSE_TYPES_MAP['string'] = jmespath.functions.REVERSE_TYPES_MAP['string'] + ('AnsibleUnicode', 'AnsibleUnsafeText', )
-    jmespath.functions.REVERSE_TYPES_MAP['array'] = jmespath.functions.REVERSE_TYPES_MAP['array'] + ('AnsibleSequence', )
-    jmespath.functions.REVERSE_TYPES_MAP['object'] = jmespath.functions.REVERSE_TYPES_MAP['object'] + ('AnsibleMapping', )
+    # See issues https://github.com/ansible-collections/community.general/issues/320
+    # and https://github.com/ansible/ansible/issues/85600.
+    jmespath.functions.REVERSE_TYPES_MAP['string'] = jmespath.functions.REVERSE_TYPES_MAP['string'] + (
+        'AnsibleUnicode', 'AnsibleUnsafeText', '_AnsibleTaggedStr',
+    )
+    jmespath.functions.REVERSE_TYPES_MAP['array'] = jmespath.functions.REVERSE_TYPES_MAP['array'] + (
+        'AnsibleSequence', '_AnsibleLazyTemplateList',
+    )
+    jmespath.functions.REVERSE_TYPES_MAP['object'] = jmespath.functions.REVERSE_TYPES_MAP['object'] + (
+        'AnsibleMapping', '_AnsibleLazyTemplateDict',
+    )
     try:
         return jmespath.search(expr, data)
     except jmespath.exceptions.JMESPathError as e:
