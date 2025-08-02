@@ -41,6 +41,7 @@ options:
   pretty:
     description:
       - Pretty print the output so that it may be pasted directly into a unit file.
+      - Does not affect anything when the O(dest) option is used.
     type: bool
     default: false
   secret:
@@ -48,6 +49,11 @@ options:
       - The secret to encrypt.
     type: str
     required: true
+  dest:
+    description:
+      - The destination for the credential file.
+    type: path
+    version_added: 11.3.0
   timestamp:
     description:
       - The timestamp to embed into the encrypted credential.
@@ -75,6 +81,13 @@ EXAMPLES = r"""
 - name: Print the encrypted secret
   ansible.builtin.debug:
     msg: "{{ encrypted_secret }}"
+
+- name: Create a credential file
+  become: true
+  community.general.systemd_creds_encrypt:
+    name: db
+    secret: access_token
+    dest: /etc/credstore.encrypted/db.cred
 """
 
 RETURN = r"""
@@ -98,6 +111,7 @@ def main():
             secret=dict(type="str", required=True, no_log=True),
             timestamp=dict(type="str"),
             user=dict(type="str"),
+            dest=dict(type="path"),
         ),
         supports_check_mode=True,
     )
@@ -110,6 +124,7 @@ def main():
     secret = module.params["secret"]
     timestamp = module.params["timestamp"]
     user = module.params["user"]
+    dest = module.params["dest"]
 
     encrypt_cmd = [cmd, "encrypt"]
     if name:
@@ -118,19 +133,25 @@ def main():
         encrypt_cmd.append("--name=")
     if not_after:
         encrypt_cmd.append("--not-after=" + not_after)
-    if pretty:
+    if pretty and not dest:
         encrypt_cmd.append("--pretty")
     if timestamp:
         encrypt_cmd.append("--timestamp=" + timestamp)
     if user:
         encrypt_cmd.append("--uid=" + user)
-    encrypt_cmd.extend(["-", "-"])
+
+    encrypt_cmd.append("-")
+
+    if dest:
+        encrypt_cmd.append(dest)
+    else:
+        encrypt_cmd.append("-")
 
     rc, stdout, stderr = module.run_command(encrypt_cmd, data=secret, binary_data=True)
 
     module.exit_json(
         changed=False,
-        value=stdout,
+        value=stdout if not dest else None,
         rc=rc,
         stderr=stderr,
     )
