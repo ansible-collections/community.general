@@ -83,14 +83,17 @@ options:
     description:
       - What to manage downtime/alerts for. Separate multiple services with commas.
       - 'B(Required) option when O(action) is one of: V(downtime), V(acknowledge), V(forced_check), V(enable_alerts), V(disable_alerts).'
-      - You can specify multiple services at once by separating them with commas, for example O(services=httpd,nfs,puppet).
       - When specifying what O(services) to handle there is a special service value, V(host), which handles alerts/downtime/acknowledge
         for the I(host itself), for example O(services=host). This keyword may not be given with other services at the same
         time. B(Setting alerts/downtime/acknowledge for a host does not affect alerts/downtime/acknowledge for any of the
         services running on it.) To schedule downtime for all O(services) on particular host use keyword V(all), for example
         O(services=all).
+      - Before community.general 11.2.0, one could specify multiple services at once by separating them with commas, for example
+        O(services=httpd,nfs,puppet). Since community.general 11.2.0, there can be spaces around the commas, and an actual
+        list can be provided.
     aliases: ["service"]
-    type: str
+    type: list
+    elements: str
   servicegroup:
     description:
       - The Servicegroup we want to set downtimes/alerts for.
@@ -223,7 +226,9 @@ EXAMPLES = r"""
 - name: Disable httpd and nfs alerts
   community.general.nagios:
     action: disable_alerts
-    service: httpd,nfs
+    service:
+      - httpd
+      - nfs
     host: '{{ inventory_hostname }}'
 
 - name: Disable HOST alerts
@@ -324,7 +329,7 @@ def main():
             start=dict(type='str'),
             minutes=dict(type='int', default=30),
             cmdfile=dict(type='str', default=which_cmdfile()),
-            services=dict(type='str', aliases=['service']),
+            services=dict(type='list', elements='str', aliases=['service']),
             command=dict(type='str'),
         ),
         required_if=[
@@ -382,10 +387,12 @@ class Nagios(object):
         self.cmdfile = kwargs['cmdfile']
         self.command = kwargs['command']
 
-        if (kwargs['services'] is None) or (kwargs['services'] == 'host') or (kwargs['services'] == 'all'):
+        if kwargs['services'] is None :
             self.services = kwargs['services']
+        elif len(kwargs['services']) == 1 and kwargs['services'][0] in ['host', 'all']:
+            self.services = kwargs['services'][0]
         else:
-            self.services = kwargs['services'].split(',')
+            self.services = kwargs['services']
 
         self.command_results = []
 
@@ -1243,13 +1250,8 @@ class Nagios(object):
         elif self.action == 'unsilence_nagios':
             self.unsilence_nagios()
 
-        elif self.action == 'command':
+        else:    # self.action == 'command'
             self.nagios_cmd(self.command)
-
-        # wtf?
-        else:
-            self.module.fail_json(msg="unknown action specified: '%s'" %
-                                      self.action)
 
         self.module.exit_json(nagios_commands=self.command_results,
                               changed=True)
