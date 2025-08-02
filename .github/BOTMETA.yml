@@ -903,6 +903,8 @@ files:
     maintainers: abulimov
   $modules/lvm_pv.py:
     maintainers: klention
+  $modules/lvm_pv_move_data.py:
+    maintainers: klention
   $modules/lvg_rename.py:
     maintainers: lszomor
   $modules/lvol.py:

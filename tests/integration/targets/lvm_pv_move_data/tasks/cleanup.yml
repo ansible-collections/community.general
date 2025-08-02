@@ -1,0 +1,39 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Unmounting temp file system
+  ansible.posix.mount:
+    fstab: '{{ remote_tmp_dir }}/fstab'
+    path: '{{ remote_tmp_dir }}/tmp_mount'
+    state: absent
+
+- name: Removing xfs filesystem from LV lv_tmp_test
+  community.general.filesystem:
+    dev: /dev/vg_tmp_test/lv_tmp_test
+    state: absent
+    force: true
+
+- name: Deleting testlv logical volume
+  community.general.lvol:
+    vg: testvg
+    lv: testlv
+    force: true
+    state: absent
+
+- name: Detaching first loop device
+  ansible.builtin.command: losetup -d {{ loop_device_01.stdout }}
+
+- name: Detaching second loop device
+  ansible.builtin.command: losetup -d {{ loop_device_02.stdout }}
+
+- name: Removing first loop device file
+  ansible.builtin.file:
+    path: "{{ remote_tmp_dir }}/test_lvm_pv_01.img"
+    state: absent
+
+- name: Removing second loop device file
+  ansible.builtin.file:
+    path: "{{ remote_tmp_dir }}/test_lvm_pv_02.img"
+    state: absent
