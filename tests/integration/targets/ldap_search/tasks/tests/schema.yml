@@ -22,4 +22,5 @@
     that:
       - output is not failed
       - output.results | length >= 1
-      - "{{ 'displayName' in output.results.0.attrs }}"
+      - >-
+        'displayName' in output.results.0.attrs
