@@ -109,7 +109,7 @@ class CapabilitiesModule(object):
 
     def getcap(self, path):
         rval = []
-        cmd = "%s -v %s" % (self.getcap_cmd, path)
+        cmd = [self.getcap_cmd, "-v", path]
         rc, stdout, stderr = self.module.run_command(cmd)
         # If file xattrs are set but no caps are set the output will be:
         #   '/foo ='
@@ -144,7 +144,7 @@ class CapabilitiesModule(object):
 
     def setcap(self, path, caps):
         caps = ' '.join([''.join(cap) for cap in caps])
-        cmd = "%s '%s' %s" % (self.setcap_cmd, caps, path)
+        cmd = [self.setcap_cmd, caps, path]
         rc, stdout, stderr = self.module.run_command(cmd)
         if rc != 0:
             self.module.fail_json(msg="Unable to set capabilities of %s" % path, stdout=stdout, stderr=stderr)
