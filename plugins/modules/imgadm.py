@@ -158,9 +158,9 @@ class Imgadm(object):
 
     def update_images(self):
         if self.uuid == '*':
-            cmd = '{0} update'.format(self.cmd)
+            cmd = [self.cmd, 'update']
         else:
-            cmd = '{0} update {1}'.format(self.cmd, self.uuid)
+            cmd = [self.cmd, 'update', self.uuid]
 
         (rc, stdout, stderr) = self.module.run_command(cmd)
 
@@ -177,13 +177,13 @@ class Imgadm(object):
         source = self.params['source']
         imgtype = self.params['type']
 
-        cmd = '{0} sources'.format(self.cmd)
+        cmd = [self.cmd, 'sources']
 
         if force:
-            cmd += ' -f'
+            cmd = cmd + ['-f']
 
         if self.present:
-            cmd = '{0} -a {1} -t {2}'.format(cmd, source, imgtype)
+            cmd = cmd + ['-a', source, '-t', imgtype]
             (rc, stdout, stderr) = self.module.run_command(cmd)
 
             if rc != 0:
@@ -222,7 +222,7 @@ class Imgadm(object):
 
         if state == 'vacuumed':
             # Unconditionally pass '--force', otherwise we're prompted with 'y/N'
-            cmd = '{0} vacuum -f'.format(self.cmd)
+            cmd = [self.cmd, 'vacuum', '-f']
 
             (rc, stdout, stderr) = self.module.run_command(cmd)
 
@@ -234,8 +234,7 @@ class Imgadm(object):
                 else:
                     self.changed = True
         if self.present:
-            cmd = '{0} import -P {1} -q {2}'.format(self.cmd, pool, self.uuid)
-
+            cmd = [self.cmd, 'import', '-P', pool, '-q'] + ([self.uuid] if self.uuid else [])
             (rc, stdout, stderr) = self.module.run_command(cmd)
 
             if rc != 0:
@@ -253,8 +252,7 @@ class Imgadm(object):
             if re.match(regex, stdout.splitlines()[-1]):
                 self.changed = True
         else:
-            cmd = '{0} delete -P {1} {2}'.format(self.cmd, pool, self.uuid)
-
+            cmd = [self.cmd, 'delete', '-P', pool] + ([self.uuid] if self.uuid else [])
             (rc, stdout, stderr) = self.module.run_command(cmd)
 
             regex = '.*ImageNotInstalled.*'
