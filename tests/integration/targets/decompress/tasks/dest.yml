@@ -34,7 +34,8 @@
 
 - name: Test that file exists
   assert:
-    that: "{{ item.stat.exists }}"
+    that:
+      - item.stat.exists
     quiet: true
   loop: "{{ result_files_stat.results }}"
   loop_control:
