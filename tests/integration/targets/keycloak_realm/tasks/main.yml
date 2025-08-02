@@ -1,0 +1,98 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+- name: Wait for Keycloak
+  uri:
+    url: "{{ url }}/admin/"
+    status_code: 200
+    validate_certs: false
+  register: result
+  until: result.status == 200
+  retries: 10
+  delay: 10
+
+- name: Delete realm if exists
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    state: absent
+
+- name: Create realm
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    id: "{{ realm }}"
+    realm: "{{ realm }}"
+    state: present
+  register: result
+
+- name: Modify realm
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    id: "{{ realm }}"
+    realm: "{{ realm }}"
+    client_session_idle_timeout: 240
+    client_session_max_lifespan: 21600
+    client_offline_session_idle_timeout: 100
+    client_offline_session_max_lifespan: 200
+    oauth2_device_code_lifespan: 700
+    oauth2_device_polling_interval: 800
+    state: present
+  register: result
+
+- name: Assert result
+  assert:
+    that:
+      - result is changed
+      - result.end_state.clientSessionIdleTimeout == 240
+      - result.end_state.clientSessionMaxLifespan == 21600
+      - result.end_state.clientOfflineSessionIdleTimeout == 100
+      - result.end_state.clientOfflineSessionMaxLifespan == 200
+      - result.end_state.oauth2DeviceCodeLifespan == 700
+      - result.end_state.oauth2DevicePollingInterval == 800
+
+- name: Delete realm
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    state: absent
+
+- name: create realm
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    id: "{{ realm }}"
+    realm: "{{ realm }}"
+    client_session_idle_timeout: 240
+    client_session_max_lifespan: 21600
+    client_offline_session_idle_timeout: 100
+    client_offline_session_max_lifespan: 200
+    oauth2_device_code_lifespan: 700
+    oauth2_device_polling_interval: 800
+    state: present
+  register: result
+
+- name: Assert result
+  assert:
+    that:
+      - result is changed
+      - result.end_state.clientSessionIdleTimeout == 240
+      - result.end_state.clientSessionMaxLifespan == 21600
+      - result.end_state.clientOfflineSessionIdleTimeout == 100
+      - result.end_state.clientOfflineSessionMaxLifespan == 200
+      - result.end_state.oauth2DeviceCodeLifespan == 700
+      - result.end_state.oauth2DevicePollingInterval == 800
