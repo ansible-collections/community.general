@@ -53,3 +53,25 @@
           - '"SetCredentialEncrypted=web: " in pretty_encrypted_secret.value'
         fail_msg: "SetCredentialEncrypted is not in the output"
         success_msg: "SetCredentialEncrypted is in the output"
+
+    - name: Ensure the dest file doesn't already exist
+      ansible.builtin.file:
+        path: "{{ remote_tmp_dir }}/systemd_cred_encrypt_test_secret.cred"
+        state: absent
+
+    - name: Encrypt secret into the dest file
+      community.general.systemd_creds_encrypt:
+        secret: token
+        dest: "{{ remote_tmp_dir }}/systemd_cred_encrypt_test_secret.cred"
+
+    - name: Check if the dest file exists
+      stat:
+        path: "{{ remote_tmp_dir }}/systemd_cred_encrypt_test_secret.cred"
+      register: dest_file
+
+    - name: Assert that the dest file exists
+      ansible.builtin.assert:
+        that:
+          - "dest_file.stat.exists"
+        fail_msg: "The dest file doesn't exist"
+        success_msg: "The dest file does exist"
