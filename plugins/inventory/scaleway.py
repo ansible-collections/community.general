@@ -27,9 +27,14 @@ options:
     elements: string
     default:
       - ams1
+      - ams2
+      - ams3
       - par1
       - par2
+      - par3
       - waw1
+      - waw2
+      - waw3
   tags:
     description: Filter results on a specific tag.
     type: list
