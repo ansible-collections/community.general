@@ -14,7 +14,6 @@ from ansible_collections.community.general.plugins.connection.proxmox_pct_remote
 from ansible_collections.community.general.plugins.module_utils._filelock import FileLock, LockTimeout
 from ansible.errors import AnsibleError, AnsibleAuthenticationFailure, AnsibleConnectionFailure
 from ansible.module_utils.common.text.converters import to_bytes
-from ansible.module_utils.compat.paramiko import paramiko
 from ansible.playbook.play_context import PlayContext
 from ansible.plugins.loader import connection_loader
 from io import StringIO
@@ -22,7 +21,7 @@ from pathlib import Path
 from unittest.mock import patch, MagicMock, mock_open
 
 
-pytest.importorskip('paramiko')
+paramiko = pytest.importorskip('paramiko')
 
 
 @pytest.fixture

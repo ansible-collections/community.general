@@ -398,6 +398,7 @@ import os
 import pathlib
 import socket
 import tempfile
+import traceback
 import typing as t
 
 from ansible.errors import (
@@ -406,13 +407,19 @@ from ansible.errors import (
     AnsibleError,
 )
 from ansible_collections.community.general.plugins.module_utils._filelock import FileLock, LockTimeout
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
-from ansible.module_utils.compat.paramiko import PARAMIKO_IMPORT_ERR, paramiko
-from ansible.module_utils.compat.version import LooseVersion
 from ansible.plugins.connection import ConnectionBase
 from ansible.utils.display import Display
 from ansible.utils.path import makedirs_safe
 from binascii import hexlify
+
+try:
+    import paramiko
+    PARAMIKO_IMPORT_ERR = None
+except ImportError:
+    paramiko = None
+    PARAMIKO_IMPORT_ERR = traceback.format_exc()
 
 
 display = Display()
@@ -513,7 +520,7 @@ class Connection(ConnectionBase):
     def _connect(self) -> Connection:
         """ activates the connection object """
 
-        if paramiko is None:
+        if PARAMIKO_IMPORT_ERR is not None:
             raise AnsibleError(f'paramiko is not installed: {to_native(PARAMIKO_IMPORT_ERR)}')
 
         port = self.get_option('port')
