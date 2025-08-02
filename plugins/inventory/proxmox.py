@@ -682,7 +682,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         for o in ('url', 'user', 'password', 'token_id', 'token_secret'):
             v = self.get_option(o)
             if self.templar.is_template(v):
-                v = self.templar.template(v, disable_lookups=False)
+                v = self.templar.template(v)
             setattr(self, 'proxmox_%s' % o, v)
 
         # some more cleanup and validation
