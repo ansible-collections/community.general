@@ -242,6 +242,15 @@ options:
           - Way to identify and track external users from the assertion.
         type: str
 
+      fromUrl:
+        description:
+          - IDP well-known OpenID Connect configuration URL.
+          - Support only O(provider_id=oidc).
+          - O(config.fromUrl) is mutually exclusive with O(config.userInfoUrl), O(config.authorizationUrl),
+            O(config.tokenUrl), O(config.logoutUrl), O(config.issuer) and O(config.jwksUrl).
+        type: str
+        version_added: '11.2.0'
+
   mappers:
     description:
       - A list of dicts defining mappers associated with this Identity Provider.
@@ -317,6 +326,24 @@ EXAMPLES = r"""
           claim: last_name
           user.attribute: last_name
           syncMode: INHERIT
+
+- name: Create OIDC identity provider, with well-known configuration URL
+  community.general.keycloak_identity_provider:
+    state: present
+    auth_keycloak_url: https://auth.example.com/auth
+    auth_realm: master
+    auth_username: admin
+    auth_password: admin
+    realm: myrealm
+    alias: oidc-idp
+    display_name: OpenID Connect IdP
+    enabled: true
+    provider_id: oidc
+    config:
+      fromUrl: https://the-idp.example.com/auth/realms/idprealm/.well-known/openid-configuration
+      clientAuthMethod: client_secret_post
+      clientId: my-client
+      clientSecret: secret
 
 - name: Create SAML identity provider, authentication with credentials
   community.general.keycloak_identity_provider:
@@ -461,6 +488,29 @@ def get_identity_provider_with_mappers(kc, alias, realm):
     return idp
 
 
+def fetch_identity_provider_wellknown_config(kc, config):
+    """
+    Fetches OpenID Connect well-known configuration from a given URL and updates the config dict with discovered endpoints.
+    Support for oidc providers only.
+    :param kc: KeycloakAPI instance used to fetch endpoints and handle errors.
+    :param config: Dictionary containing identity provider configuration, must include 'fromUrl' key to trigger fetch.
+    :return: None. The config dict is updated in-place.
+    """
+    if config and 'fromUrl' in config :
+        if 'providerId' in config and config['providerId'] != 'oidc':
+            kc.module.fail_json(msg="Only 'oidc' provider_id is supported when using 'fromUrl'.")
+        endpoints = ['userInfoUrl', 'authorizationUrl', 'tokenUrl', 'logoutUrl', 'issuer', 'jwksUrl']
+        if any(k in config for k in endpoints):
+            kc.module.fail_json(msg="Cannot specify both 'fromUrl' and 'userInfoUrl', 'authorizationUrl', 'tokenUrl', 'logoutUrl', 'issuer' or 'jwksUrl'.")
+        openIdConfig = kc.fetch_idp_endpoints_import_config_url(
+            fromUrl=config['fromUrl'],
+            realm=kc.module.params.get('realm', 'master'))
+        for k in endpoints:
+            if k in openIdConfig:
+                config[k] = openIdConfig[k]
+        del config['fromUrl']
+
+
 def main():
     """
     Module execution
@@ -517,6 +567,9 @@ def main():
     realm = module.params.get('realm')
     alias = module.params.get('alias')
     state = module.params.get('state')
+    config = module.params.get('config')
+
+    fetch_identity_provider_wellknown_config(kc, config)
 
     # Filter and map the parameters names that apply to the identity provider.
     idp_params = [x for x in module.params
