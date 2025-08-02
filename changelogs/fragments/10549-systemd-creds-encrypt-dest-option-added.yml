@@ -1,0 +1,2 @@
+minor_changes:
+  - systemd_creds_encrypt - add ``dest`` option to control path to the credential file to be created (https://github.com/ansible-collections/community.general/pull/10549).
