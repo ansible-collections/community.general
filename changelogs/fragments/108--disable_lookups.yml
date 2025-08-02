@@ -1,0 +1,2 @@
+bugfixes:
+  - "proxmox inventory plugin - avoid using deprecated option when templating options (https://github.com/ansible-collections/community.proxmox/pull/108, https://github.com/ansible-collections/community.general/pull/10553)."
