@@ -443,3 +443,63 @@
           - ""
           - "PLAY RECAP *********************************************************************"
           - "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
+
+      - name: Set on_any_msg
+        environment:
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
+          ANSIBLE_STDOUT_CALLBACK: community.general.diy
+          ANSIBLE_CALLBACK_DIY_ON_ANY_MSG: foo
+        playbook: !unsafe |
+          - hosts: testhost
+            gather_facts: false
+            tasks:
+              - name: A loop
+                debug:
+                  msg: "{{ item }}"
+                loop:
+                  - 1
+                  - 2
+              - name: Sample task name
+                debug:
+                  msg: sample debug msg
+              - name: Skipped task
+                command: ls /
+                when: false
+        expected_output:
+          - "foo"
+          - ""
+          - "PLAY [testhost] ****************************************************************"
+          - "foo"
+          - ""
+          - "TASK [A loop] ******************************************************************"
+          - "foo"
+          - "foo"
+          - "ok: [testhost] => (item=1) => {"
+          - "    \"msg\": 1"
+          - "}"
+          - "foo"
+          - "ok: [testhost] => (item=2) => {"
+          - "    \"msg\": 2"
+          - "}"
+          - "foo"
+          - "foo"
+          - ""
+          - "TASK [Sample task name] ********************************************************"
+          - "foo"
+          - "foo"
+          - "ok: [testhost] => {"
+          - "    \"msg\": \"sample debug msg\""
+          - "}"
+          - "foo"
+          - ""
+          - "TASK [Skipped task] ************************************************************"
+          - "foo"
+          - "foo"
+          - "skipping: [testhost]"
+          - "foo"
+          - ""
+          - "PLAY RECAP *********************************************************************"
+          - "testhost                   : ok=2    changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   "
+          - ""
+          - "foo"
