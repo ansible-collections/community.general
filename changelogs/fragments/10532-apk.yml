@@ -1,0 +1,2 @@
+bugfixes:
+  - "apk - fix check for empty/whitespace-only package names (https://github.com/ansible-collections/community.general/pull/10532)."

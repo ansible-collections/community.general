@@ -183,16 +183,17 @@
           - result_spaces is failed
           - "'Package name(s) cannot be empty or whitespace-only' == result_spaces.msg"
 
-    - name: Accept list with valid and empty string
+    - name: Do not accept list with valid and empty string
       community.general.apk:
         name: ["busybox", ""]
-      register: result_valid_mixed
+      register: result_invalid_mixed
       ignore_errors: true
 
-    - name: Assert success with mixed package list
+    - name: Assert failure with mixed package list
       ansible.builtin.assert:
         that:
-          - result_valid_mixed is not failed
+          - result_invalid_mixed is failed
+          - "'Package name(s) cannot be empty or whitespace-only' == result_invalid_mixed.msg"
 
     - name: Reject package name list with multiple empty/whitespace-only strings
       community.general.apk:
