@@ -1,0 +1,216 @@
+# -*- coding: utf-8 -*-
+# Copyright (c) Dexter Le (dextersydney2001@gmail.com)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+anchors:
+  environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+test_cases:
+  - id: test_missing_input
+    input: {}
+    output:
+      failed: true
+      msg: "missing required arguments: name"
+  - id: test_present_minimal_input_stonith_not_exists
+    input:
+      state: present
+      name: virtual-stonith
+      stonith_type: fence_virt
+      stonith_options:
+        - "pcmk_host_list=f1"
+      stonith_operations:
+        - operation_action: monitor
+          operation_options:
+            - "interval=30s"
+    output:
+      changed: true
+      previous_value: null
+      value: "  * virtual-stonith\t(stonith:fence_virt):\t Started"
+    mocks:
+      run_command:
+        - command: ["/testbin/pcs", stonith, status, virtual-stonith]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: ""
+        - command: ["/testbin/pcs", stonith, create, virtual-stonith, fence_virt, "pcmk_host_list=f1", "op", "monitor", "interval=30s", "--wait=300"]
+          environ: *env-def
+          rc: 0
+          out: ""
+          err: ""
+        - command: ["/testbin/pcs", stonith, status, virtual-stonith]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-stonith\t(stonith:fence_virt):\t Started"
+          err: ""
+  - id: test_present_minimal_input_stonith_exists
+    input:
+      state: present
+      name: virtual-stonith
+      stonith_type: fence_virt
+      stonith_options:
+        - "pcmk_host_list=f1"
+      stonith_operations:
+        - operation_action: monitor
+          operation_options:
+            - "interval=30s"
+    output:
+      changed: false
+      previous_value: "  * virtual-stonith\t(stonith:fence_virt):\t Started"
+      value: "  * virtual-stonith\t(stonith:fence_virt):\t Started"
+    mocks:
+      run_command:
+        - command: ["/testbin/pcs", stonith, status, virtual-stonith]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-stonith\t(stonith:fence_virt):\t Started"
+          err: ""
+        - command: ["/testbin/pcs", stonith, create, virtual-stonith, fence_virt, "pcmk_host_list=f1", "op", "monitor", "interval=30s", "--wait=300"]
+          environ: *env-def
+          rc: 0
+          out: ""
+          err: "Error: 'virtual-stonith' already exists.\n"
+        - command: ["/testbin/pcs", stonith, status, virtual-stonith]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-stonith\t(stonith:fence_virt):\t Started"
+          err: ""
+  - id: test_absent_minimal_input_stonith_not_exists
+    input:
+      state: absent
+      name: virtual-stonith
+    output:
+      changed: false
+      previous_value: null
+      value: null
+    mocks:
+      run_command:
+        - command: ["/testbin/pcs", stonith, status, virtual-stonith]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: ""
+        - command: ["/testbin/pcs", stonith, remove, virtual-stonith]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: "Error: Resource 'virtual-stonith' does not exist.\n"
+        - command: ["/testbin/pcs", stonith, status, virtual-stonith]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: ""
+  - id: test_absent_minimal_input_stonith_exists
+    input:
+      state: absent
+      name: virtual-stonith
+    output:
+      changed: true
+      previous_value: "  * virtual-stonith\t(stonith:fence_virt):\t Started"
+      value: null
+    mocks:
+      run_command:
+        - command: ["/testbin/pcs", stonith, status, virtual-stonith]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-stonith\t(stonith:fence_virt):\t Started"
+          err: ""
+        - command: ["/testbin/pcs", stonith, remove, virtual-stonith]
+          environ: *env-def
+          rc: 0
+          out: ""
+          err: "Attempting to stop: virtual-ip... Stopped\n"
+        - command: ["/testbin/pcs", stonith, status, virtual-stonith]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: ""
+  - id: test_enabled_minimal_input_stonith_not_exists
+    input:
+      state: enabled
+      name: virtual-stonith
+    output:
+      failed: true
+      msg: "pcs failed with error (rc=1): Error: Resource 'virtual-stonith' does not exist."
+    mocks:
+      run_command:
+        - command: ["/testbin/pcs", stonith, status, virtual-stonith]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: ""
+        - command: ["/testbin/pcs", stonith, enable, virtual-stonith]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: "Error: Resource 'virtual-stonith' does not exist."
+  - id: test_enabled_minimal_input_stonith_exists
+    input:
+      state: enabled
+      name: virtual-stonith
+    output:
+      changed: true
+      previous_value: "  * virtual-stonith\t(stonith:fence_virt):\t Stopped (disabled)"
+      value: "  * virtual-stonith\t(stonith:fence_virt):\t Starting"
+    mocks:
+      run_command:
+        - command: ["/testbin/pcs", stonith, status, virtual-stonith]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-stonith\t(stonith:fence_virt):\t Stopped (disabled)"
+          err: ""
+        - command: ["/testbin/pcs", stonith, enable, virtual-stonith]
+          environ: *env-def
+          rc: 0
+          out: ""
+          err: ""
+        - command: ["/testbin/pcs", stonith, status, virtual-stonith]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-stonith\t(stonith:fence_virt):\t Starting"
+          err: ""
+  - id: test_disable_minimal_input_stonith_not_exists
+    input:
+      state: disabled
+      name: virtual-stonith
+    output:
+      failed: true
+      msg: "pcs failed with error (rc=1): Error: Resource 'virtual-stonith' does not exist."
+    mocks:
+      run_command:
+        - command: ["/testbin/pcs", stonith, status, virtual-stonith]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: ""
+        - command: ["/testbin/pcs", stonith, disable, virtual-stonith]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: "Error: Resource 'virtual-stonith' does not exist."
+  - id: test_disable_minimal_input_stonith_exists
+    input:
+      state: disabled
+      name: virtual-stonith
+    output:
+      changed: true
+      previous_value: "  * virtual-stonith\t(stonith:fence_virt):\t Started"
+      value: "  * virtual-stonith\t(stonith:fence_virt):\t Stopped (disabled)"
+    mocks:
+      run_command:
+        - command: ["/testbin/pcs", stonith, status, virtual-stonith]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-stonith\t(stonith:fence_virt):\t Started"
+          err: ""
+        - command: ["/testbin/pcs", stonith, disable, virtual-stonith]
+          environ: *env-def
+          rc: 0
+          out: ""
+          err: ""
+        - command: ["/testbin/pcs", stonith, status, virtual-stonith]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-stonith\t(stonith:fence_virt):\t Stopped (disabled)"
+          err: ""
