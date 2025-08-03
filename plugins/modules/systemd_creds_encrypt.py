@@ -43,7 +43,6 @@ options:
   pretty:
     description:
       - Pretty print the output so that it may be pasted directly into a unit file.
-      - Does not affect anything when the O(dest) option is used.
     type: bool
     required: false
     default: false
@@ -120,6 +119,9 @@ def main():
             dest=dict(type="path"),
         ),
         supports_check_mode=True,
+        mutually_exclusive=[
+            ['pretty', 'dest']
+        ]
     )
 
     cmd = module.get_bin_path("systemd-creds", required=True)
