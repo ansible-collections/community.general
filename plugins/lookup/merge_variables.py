@@ -194,8 +194,8 @@ class LookupModule(LookupBase):
             result = initial_value
 
         for var_name in var_merge_names:
-            with self._templar.set_temporary_context(available_variables=variables):  # tmp. switch renderer to context of current variables
-                var_value = self._templar.template(variables[var_name])  # Render jinja2 templates
+            temp_templar = self._templar.copy_with_new_env(available_variables=variables)  # tmp. switch renderer to context of current variables
+            var_value = temp_templar.template(variables[var_name])  # Render jinja2 templates
             var_type = _verify_and_get_type(var_value)
 
             if prev_var_type is None:
