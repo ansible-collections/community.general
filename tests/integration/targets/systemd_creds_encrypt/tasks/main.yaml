@@ -63,6 +63,14 @@
       community.general.systemd_creds_encrypt:
         secret: token
         dest: "{{ remote_tmp_dir }}/systemd_cred_encrypt_test_secret.cred"
+      register: encrypted_dest
+
+    - name: Assert that the task changes when no secret was present
+      ansible.builtin.assert:
+        that:
+          - "encrypted_dest.changed"
+        fail_msg: "The task didn't change, but should have"
+        success_msg: "The task changed, as it should have"
 
     - name: Check if the dest file exists
       stat:
@@ -75,3 +83,29 @@
           - "dest_file.stat.exists"
         fail_msg: "The dest file doesn't exist"
         success_msg: "The dest file does exist"
+
+    - name: Encrypt the same secret into the same dest file as before
+      community.general.systemd_creds_encrypt:
+        secret: token
+        dest: "{{ remote_tmp_dir }}/systemd_cred_encrypt_test_secret.cred"
+      register: encrypted_dest_again
+
+    - name: Assert that the task doesn't change with the same secret
+      ansible.builtin.assert:
+        that:
+          - "not encrypted_dest_again.changed"
+        fail_msg: "The task changed, but shouldn't have"
+        success_msg: "The task didn't change, as it should have"
+
+    - name: Encrypt a different secret into the same dest file as before
+      community.general.systemd_creds_encrypt:
+        secret: another token
+        dest: "{{ remote_tmp_dir }}/systemd_cred_encrypt_test_secret.cred"
+      register: encrypted_dest_again
+
+    - name: Assert that the task changes with a different secret
+      ansible.builtin.assert:
+        that:
+          - "encrypted_dest_again.changed"
+        fail_msg: "The task didn't change, but should have"
+        success_msg: "The task changed, as it should have"

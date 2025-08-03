@@ -103,6 +103,7 @@ value:
 """
 
 from ansible.module_utils.basic import AnsibleModule
+import os
 
 
 def main():
@@ -133,6 +134,31 @@ def main():
     user = module.params["user"]
     dest = module.params["dest"]
 
+    if dest and os.path.isfile(dest):
+        decrypt_cmd = [cmd, "decrypt"]
+        if name:
+            decrypt_cmd.append("--name=" + name)
+
+        decrypt_cmd.append(dest)
+        decrypt_cmd.append("-")
+
+        rc, stdout, stderr = module.run_command(decrypt_cmd)
+        if rc != 0:
+            return module.fail_json(
+                "The credential file already exists; Couldn't decrypt to verify if it contains the same secret",
+                changed=False,
+                value=None,
+                rc=rc,
+                stderr=stderr,
+            )
+        elif stdout == secret:
+            return module.exit_json(
+                changed=False,
+                value=None,
+                rc=rc,
+                stderr=stderr,
+            )
+
     encrypt_cmd = [cmd, "encrypt"]
     if name is not None:
         encrypt_cmd.append("--name=" + name)
@@ -157,7 +183,7 @@ def main():
     rc, stdout, stderr = module.run_command(encrypt_cmd, data=secret, binary_data=True)
 
     module.exit_json(
-        changed=False,
+        changed=bool(dest),
         value=stdout if not dest else None,
         rc=rc,
         stderr=stderr,
