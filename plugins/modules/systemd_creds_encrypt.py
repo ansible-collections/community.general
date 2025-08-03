@@ -32,6 +32,11 @@ options:
   name:
     description:
       - The credential name to embed in the encrypted credential data.
+        When using the O(dest) option, you can set this to an empty
+        string ("") to prevent C(systemd-creds encrypt) from using
+        filename from O(dest) as the credential name. Conversely,
+        leave out the O(name) option to let C(systemd-creds encrypt)
+        use the filename from O(dest) as the credential name.
     type: str
   not_after:
     description:
@@ -129,9 +134,9 @@ def main():
     dest = module.params["dest"]
 
     encrypt_cmd = [cmd, "encrypt"]
-    if name:
+    if name is not None:
         encrypt_cmd.append("--name=" + name)
-    else:
+    elif not dest:
         encrypt_cmd.append("--name=")
     if not_after:
         encrypt_cmd.append("--not-after=" + not_after)
