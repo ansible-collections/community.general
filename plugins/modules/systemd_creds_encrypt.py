@@ -144,7 +144,7 @@ def main():
 
     encrypt_cmd.append("-")
 
-    if dest:
+    if dest and not module.check_mode:
         encrypt_cmd.append(dest)
     else:
         encrypt_cmd.append("-")
