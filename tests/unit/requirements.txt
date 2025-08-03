@@ -52,7 +52,8 @@ python-nomad < 2.0.0 ; python_version <= '3.6'
 python-nomad >= 2.0.0 ; python_version >= '3.7'
 
 # requirement for jenkins_build, jenkins_node, jenkins_plugin modules
-python-jenkins >= 0.4.12
+python-jenkins < 1.8.0 ; python_version < '3.8'
+python-jenkins >= 0.4.12 ; python_version >= '3.8'
 
 # requirement for json_patch, json_patch_recipe and json_patch plugins
 jsonpatch
