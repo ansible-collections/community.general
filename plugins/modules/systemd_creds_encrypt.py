@@ -41,7 +41,6 @@ options:
   pretty:
     description:
       - Pretty print the output so that it may be pasted directly into a unit file.
-      - Does not affect anything when the O(dest) option is used.
     type: bool
     default: false
   secret:
@@ -114,6 +113,9 @@ def main():
             dest=dict(type="path"),
         ),
         supports_check_mode=True,
+        mutually_exclusive=[
+            ['pretty', 'dest']
+        ]
     )
 
     cmd = module.get_bin_path("systemd-creds", required=True)
@@ -133,7 +135,7 @@ def main():
         encrypt_cmd.append("--name=")
     if not_after:
         encrypt_cmd.append("--not-after=" + not_after)
-    if pretty and not dest:
+    if pretty:
         encrypt_cmd.append("--pretty")
     if timestamp:
         encrypt_cmd.append("--timestamp=" + timestamp)
