@@ -6,9 +6,16 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 from io import BytesIO
+import json
+from collections import OrderedDict
 
 from ansible_collections.community.general.plugins.modules.jenkins_plugin import JenkinsPlugin
 from ansible.module_utils.common._collections_compat import Mapping
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import (
+    MagicMock,
+    patch,
+)
+from ansible.module_utils.urls import basic_auth_header
 
 
 def pass_function(*args, **kwargs):
@@ -190,3 +197,98 @@ def isInList(l, i):
         if item == i:
             return True
     return False
+
+
+@patch("ansible_collections.community.general.plugins.modules.jenkins_plugin.fetch_url")
+def test__get_latest_compatible_plugin_version(fetch_mock, mocker):
+    "test the latest compatible plugin version retrieval"
+
+    params = {
+        "url": "http://fake.jenkins.server",
+        "timeout": 30,
+        "name": "git",
+        "version": "latest",
+        "updates_url": ["https://some.base.url"],
+        "plugin_versions_url_segment": ["plugin-versions.json"],
+        "latest_plugins_url_segments": ["test_latest"],
+        "jenkins_home": "/var/lib/jenkins",
+    }
+    module = mocker.Mock()
+    module.params = params
+
+    jenkins_info = {"x-jenkins": "2.263.1"}
+    jenkins_response = MagicMock()
+    jenkins_response.read.return_value = b"{}"
+
+    plugin_data = {
+        "plugins": {
+            "git": OrderedDict([
+                ("4.8.2", {"requiredCore": "2.263.1"}),
+                ("4.8.3", {"requiredCore": "2.263.1"}),
+                ("4.9.0", {"requiredCore": "2.289.1"}),
+                ("4.9.1", {"requiredCore": "2.289.1"}),
+            ])
+        }
+    }
+    plugin_versions_response = MagicMock()
+    plugin_versions_response.read.return_value = json.dumps(plugin_data).encode("utf-8")
+    plugin_versions_info = {"status": 200}
+
+    def fetch_url_side_effect(module, url, **kwargs):
+        if "plugin-versions.json" in url:
+            return (plugin_versions_response, plugin_versions_info)
+        else:
+            return (jenkins_response, jenkins_info)
+
+    fetch_mock.side_effect = fetch_url_side_effect
+
+    JenkinsPlugin._csrf_enabled = lambda self: False
+    JenkinsPlugin._get_installed_plugins = lambda self: None
+
+    jenkins_plugin = JenkinsPlugin(module)
+    latest_version = jenkins_plugin._get_latest_compatible_plugin_version()
+    assert latest_version == '4.8.3'
+
+
+@patch("ansible_collections.community.general.plugins.modules.jenkins_plugin.fetch_url")
+def test__get_urls_data_sets_correct_headers(fetch_mock, mocker):
+    params = {
+        "url": "http://jenkins.example.com",
+        "timeout": 30,
+        "name": "git",
+        "jenkins_home": "/var/lib/jenkins",
+        "updates_url": ["http://updates.example.com"],
+        "latest_plugins_url_segments": ["latest"],
+        "update_json_url_segment": ["update-center.json"],
+        "versioned_plugins_url_segments": ["plugins"],
+        "url_username": "jenkins_user",
+        "url_password": "jenkins_pass",
+        "updates_url_username": "update_user",
+        "updates_url_password": "update_pass",
+    }
+    module = mocker.Mock()
+    module.params = params
+
+    dummy_response = MagicMock()
+    fetch_mock.return_value = (dummy_response, {"status": 200})
+
+    JenkinsPlugin._csrf_enabled = lambda self: False
+    JenkinsPlugin._get_installed_plugins = lambda self: None
+
+    jp = JenkinsPlugin(module)
+
+    update_url = "http://updates.example.com/plugin-versions.json"
+    jp._get_urls_data([update_url])
+
+    jenkins_url = "http://jenkins.example.com/some-endpoint"
+    jp._get_urls_data([jenkins_url])
+
+    calls = fetch_mock.call_args_list
+
+    dummy, kwargs_2 = calls[1]
+    jenkins_auth = basic_auth_header("jenkins_user", "jenkins_pass")
+    assert kwargs_2["headers"]["Authorization"] == jenkins_auth
+
+    dummy, kwargs_1 = calls[0]
+    updates_auth = basic_auth_header("update_user", "update_pass")
+    assert kwargs_1["headers"]["Authorization"] == updates_auth
