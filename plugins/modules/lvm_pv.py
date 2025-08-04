@@ -94,6 +94,7 @@ def rescan_device(module, device):
     # Extract the base device name (e.g., /dev/sdb -> sdb)
     base_device = os.path.basename(device)
     rescan_path = "/sys/block/{0}/device/rescan".format(base_device)
+    pv_partition = "/sys/class/block/{0}/partition".format(base_device)
 
     if os.path.exists(rescan_path):
         try:
@@ -103,6 +104,8 @@ def rescan_device(module, device):
         except IOError as e:
             module.warn("Failed to rescan device {0}: {1}".format(device, str(e)))
             return False
+    elif os.path.exists(pv_partition):
+        return False
     else:
         module.warn("Rescan path not found for device {0}".format(device))
         return False
