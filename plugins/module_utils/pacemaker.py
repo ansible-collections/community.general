@@ -67,6 +67,8 @@ def pacemaker_runner(module, **kwargs):
             wait=cmd_runner_fmt.as_opt_eq_val("--wait"),
             config=cmd_runner_fmt.as_fixed("config"),
             force=cmd_runner_fmt.as_bool("--force"),
+            version=cmd_runner_fmt.as_fixed("--version"),
+            output_format=cmd_runner_fmt.as_opt_eq_val("--output-format"),
         ),
         **kwargs
     )
