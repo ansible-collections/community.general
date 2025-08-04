@@ -89,7 +89,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def install_package(module, name, easy_install, executable_arguments):
-    cmd = '%s %s %s' % (easy_install, ' '.join(executable_arguments), name)
+    cmd = [easy_install] + executable_arguments + [name]
     rc, out, err = module.run_command(cmd)
     return rc, out, err
 
