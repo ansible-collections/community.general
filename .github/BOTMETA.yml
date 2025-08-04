@@ -1060,6 +1060,8 @@ files:
     maintainers: fraff
   $modules/pacemaker_cluster.py:
     maintainers: matbu munchtoast
+  $modules/pacemaker_info.py:
+    maintainers: munchtoast
   $modules/pacemaker_resource.py:
     maintainers: munchtoast
   $modules/packet_:
