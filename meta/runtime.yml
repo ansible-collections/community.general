@@ -116,6 +116,10 @@ plugin_routing:
       deprecation:
         removal_version: 13.0.0
         warning_text: Project Atomic was sunset by the end of 2019.
+    bearychat:
+      deprecation:
+        removal_version: 12.0.0
+        warning_text: Chat service is no longer available.
     catapult:
       deprecation:
         removal_version: 13.0.0
