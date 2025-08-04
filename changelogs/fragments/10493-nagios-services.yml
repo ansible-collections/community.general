@@ -1,0 +1,2 @@
+minor_changes:
+  - nagios - make parameter ``services`` a ``list`` instead of a ``str`` (https://github.com/ansible-collections/community.general/pull/10493).
