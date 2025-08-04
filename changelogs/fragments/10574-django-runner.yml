@@ -1,0 +1,2 @@
+minor_changes:
+  - django module utils - remove deprecated parameter ``_DjangoRunner`` call (https://github.com/ansible-collections/community.general/pull/10574).

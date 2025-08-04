@@ -55,11 +55,11 @@ class _DjangoRunner(PythonRunner):
 
         super(_DjangoRunner, self).__init__(module, ["-m", "django"], arg_formats=arg_fmts, **kwargs)
 
-    def __call__(self, output_process=None, ignore_value_none=True, check_mode_skip=False, check_mode_return=None, **kwargs):
+    def __call__(self, output_process=None, check_mode_skip=False, check_mode_return=None, **kwargs):
         args_order = (
             ("command", "no_color", "settings", "pythonpath", "traceback", "verbosity", "skip_checks") + self._prepare_args_order(self.default_args_order)
         )
-        return super(_DjangoRunner, self).__call__(args_order, output_process, ignore_value_none, check_mode_skip, check_mode_return, **kwargs)
+        return super(_DjangoRunner, self).__call__(args_order, output_process, check_mode_skip=check_mode_skip, check_mode_return=check_mode_return, **kwargs)
 
     def bare_context(self, *args, **kwargs):
         return super(_DjangoRunner, self).__call__(*args, **kwargs)
