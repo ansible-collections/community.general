@@ -104,10 +104,9 @@ options:
     description:
       - If V(true), the payload matches Rocket.Chat prior to 7.4.0 format. This format has been used by the module since its
         inception, but is no longer supported by Rocket.Chat 7.4.0.
-      - The default value of the option is going to change to V(false) eventually.
+      - The default value of the option, V(true), is B(deprecated) since community.general 11.2.0 and will change to V(false) in community.general 13.0.0.
       - This parameter is going to be removed in a future release when Rocket.Chat 7.4.0 becomes the minimum supported version.
     type: bool
-    default: true
     version_added: 10.5.0
 """
 
@@ -230,7 +229,7 @@ def main():
             validate_certs=dict(default=True, type='bool'),
             color=dict(type='str', default='normal', choices=['normal', 'good', 'warning', 'danger']),
             attachments=dict(type='list', elements='dict'),
-            is_pre740=dict(default=True, type='bool')
+            is_pre740=dict(type='bool')
         )
     )
 
@@ -246,6 +245,15 @@ def main():
     color = module.params['color']
     attachments = module.params['attachments']
     is_pre740 = module.params['is_pre740']
+
+    if is_pre740 is None:
+        module.deprecate(
+            "The default value 'true' for 'is_pre740' is deprecated and will change to 'false' in community.general 13.0.0."
+            " You can explicitly set 'is_pre740' in your task to avoid this deprecation warning",
+            version="13.0.0",
+            collection_name="community.general",
+        )
+        is_pre740 = True
 
     payload = build_payload_for_rocketchat(module, text, channel, username, icon_url, icon_emoji, link_names, color, attachments, is_pre740)
     do_notify_rocketchat(module, domain, token, protocol, payload)
