@@ -104,6 +104,7 @@ URL_IDENTITY_PROVIDERS = "{url}/admin/realms/{realm}/identity-provider/instances
 URL_IDENTITY_PROVIDER = "{url}/admin/realms/{realm}/identity-provider/instances/{alias}"
 URL_IDENTITY_PROVIDER_MAPPERS = "{url}/admin/realms/{realm}/identity-provider/instances/{alias}/mappers"
 URL_IDENTITY_PROVIDER_MAPPER = "{url}/admin/realms/{realm}/identity-provider/instances/{alias}/mappers/{id}"
+URL_IDENTITY_PROVIDER_IMPORT = "{url}/admin/realms/{realm}/identity-provider/import-config"
 
 URL_COMPONENTS = "{url}/admin/realms/{realm}/components"
 URL_COMPONENT = "{url}/admin/realms/{realm}/components/{id}"
@@ -2579,6 +2580,23 @@ class KeycloakAPI(object):
         except Exception as e:
             self.fail_request(e, msg='Could not obtain list of identity provider mappers for idp %s in realm %s: %s'
                                      % (alias, realm, str(e)))
+
+    def fetch_idp_endpoints_import_config_url(self, fromUrl, providerId='oidc', realm='master'):
+        """ Import an identity provider configuration through Keycloak server from a well-known URL.
+        :param fromUrl: URL to import the identity provider configuration from.
+        "param providerId: Provider ID of the identity provider to import, default 'oidc'.
+        :param realm: Realm
+        :return: IDP endpoins.
+        """
+        try:
+            payload = {
+                "providerId": providerId,
+                "fromUrl": fromUrl
+            }
+            idps_url = URL_IDENTITY_PROVIDER_IMPORT.format(url=self.baseurl, realm=realm)
+            return self._request_and_deserialize(idps_url, method='POST', data=json.dumps(payload))
+        except Exception as e:
+            self.fail_request(e, msg='Could not import the IdP config in realm %s: %s' % (realm, str(e)))
 
     def get_identity_provider_mapper(self, mid, alias, realm='master'):
         """ Fetch identity provider representation from a realm using the idp's alias.
