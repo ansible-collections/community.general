@@ -104,17 +104,17 @@ def install_plugin(module, plugin_bin, plugin_name, version, proxy_host, proxy_p
     cmd_args = [plugin_bin, PACKAGE_STATE_MAP["present"], plugin_name]
 
     if version:
-        cmd_args.append("--version %s" % version)
+        cmd_args.extend(["--version", version])
 
     if proxy_host and proxy_port:
-        cmd_args.append("-DproxyHost=%s -DproxyPort=%s" % (proxy_host, proxy_port))
+        cmd_args.extend(["-DproxyHost=%s" % proxy_host, "-DproxyPort=%s" % proxy_port])
 
     cmd = " ".join(cmd_args)
 
     if module.check_mode:
         rc, out, err = 0, "check mode", ""
     else:
-        rc, out, err = module.run_command(cmd)
+        rc, out, err = module.run_command(cmd_args)
 
     if rc != 0:
         reason = parse_error(out)
@@ -131,7 +131,7 @@ def remove_plugin(module, plugin_bin, plugin_name):
     if module.check_mode:
         rc, out, err = 0, "check mode", ""
     else:
-        rc, out, err = module.run_command(cmd)
+        rc, out, err = module.run_command(cmd_args)
 
     if rc != 0:
         reason = parse_error(out)
