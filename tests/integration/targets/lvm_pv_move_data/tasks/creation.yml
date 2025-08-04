@@ -1,0 +1,115 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Creating a 500MB file for the first loop device
+  ansible.builtin.command: dd if=/dev/zero of={{ remote_tmp_dir }}/test_lvm_pv_01.img bs=1M count=500
+  args:
+    creates: "{{ remote_tmp_dir }}/test_lvm_pv_01.img"
+
+- name: Creating a 1000MB file for the second loop device
+  ansible.builtin.command: dd if=/dev/zero of={{ remote_tmp_dir }}/test_lvm_pv_02.img bs=1M count=1000
+  args:
+    creates: "{{ remote_tmp_dir }}/test_lvm_pv_02.img"
+
+- name: Pausing for a random time between 5-15 seconds
+  ansible.builtin.pause:
+    seconds: "{{ range(5, 16) | random }}"
+
+- name: Creating loop device
+  ansible.builtin.command: losetup -f
+  register: loop_device_01
+
+- name: Wiping existing LVM metadata
+  community.general.lvm_pv:
+    device: "{{ loop_device_01.stdout }}"
+    force: true
+    state: absent
+
+- name: Associating loop device with file
+  ansible.builtin.command: 'losetup {{ loop_device_01.stdout }} {{ remote_tmp_dir }}/test_lvm_pv_01.img'
+
+- name: Pausing for a random time between 5-15 seconds
+  ansible.builtin.pause:
+    seconds: "{{ range(5, 16) | random }}"
+
+- name: Creating loop device
+  ansible.builtin.command: losetup -f
+  register: loop_device_02
+
+- name: Wiping existing LVM metadata
+  community.general.lvm_pv:
+    device: "{{ loop_device_02.stdout }}"
+    force: true
+    state: absent
+
+- name: Associating loop device with file
+  ansible.builtin.command: 'losetup {{ loop_device_02.stdout }} {{ remote_tmp_dir }}/test_lvm_pv_02.img'
+
+- name: Creating physical volume for the first loop device
+  community.general.lvm_pv:
+    device: "{{ loop_device_01.stdout }}"
+  register: pv_creation_result_01
+
+- name: Checking the first physical volume size
+  ansible.builtin.command: pvs --noheadings -o pv_size --units M {{ loop_device_01.stdout }}
+  register: pv_size_output_01
+
+- name: Creating physical volume for the second loop device
+  community.general.lvm_pv:
+    device: "{{ loop_device_02.stdout }}"
+  register: pv_creation_result_02
+
+- name: Checking the second physical volume size
+  ansible.builtin.command: pvs --noheadings -o pv_size --units M {{ loop_device_02.stdout }}
+  register: pv_size_output_02
+
+- name: Creating volume group
+  community.general.lvg:
+    vg: testvg
+    pvs:
+      - "{{ loop_device_01.stdout }}"
+      - "{{ loop_device_02.stdout }}"
+    force: true
+  register: vg_creation_result
+
+- name: Creating LV testlv on VG testvg
+  community.general.lvol:
+    vg: testvg
+    lv: testlv
+    size: 100%FREE
+    force: true
+  register: lv_creation_result
+
+- name: Creating xfs filesystem on LV testlv
+  community.general.filesystem:
+    dev: /dev/testvg/testlv
+    fstype: xfs
+    state: present
+  register: fs_creation_result
+
+- name: Mounting LV testlv
+  ansible.posix.mount:
+    fstab: '{{ remote_tmp_dir }}/fstab'
+    path: '{{ remote_tmp_dir }}/tmp_mount'
+    src: '/dev/testvg/testlv'
+    fstype: xfs
+    opts: rw,noauto
+    state: mounted
+  register: mount_result
+
+- name: Asserting PVs, VG, LV and filesystem were created successfully
+  ansible.builtin.assert:
+    that:
+      - pv_creation_result_01 is changed
+      - pv_creation_result_02 is changed
+      - vg_creation_result is changed
+      - lv_creation_result is changed
+      - fs_creation_result is changed
+      - (pv_size_output_01.stdout | trim | regex_replace('M', '') | float) > 450
+      - (pv_size_output_01.stdout | trim | regex_replace('M', '') | float) < 600
+      - (pv_size_output_02.stdout | trim | regex_replace('M', '') | float) > 950
+      - (pv_size_output_02.stdout | trim | regex_replace('M', '') | float) < 1100
+      - "'created' in pv_creation_result_01.msg"
+      - "'created' in pv_creation_result_02.msg"
