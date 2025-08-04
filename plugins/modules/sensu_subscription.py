@@ -60,7 +60,7 @@ reasons:
   description: The reasons why the module changed or did not change something.
   returned: success
   type: list
-  sample: ["channel subscription was absent and state is `present'"]
+  sample: ["channel subscription was absent and state is 'present'"]
 """
 
 EXAMPLES = r"""
@@ -89,7 +89,7 @@ def sensu_subscription(module, path, name, state='present', backup=False):
     except IOError as e:
         if e.errno == 2:  # File not found, non-fatal
             if state == 'absent':
-                reasons.append('file did not exist and state is `absent\'')
+                reasons.append("file did not exist and state is 'absent'")
                 return changed, reasons
             config = {}
         else:
@@ -100,32 +100,32 @@ def sensu_subscription(module, path, name, state='present', backup=False):
 
     if 'client' not in config:
         if state == 'absent':
-            reasons.append('`client\' did not exist and state is `absent\'')
+            reasons.append("'client' did not exist and state is 'absent'")
             return changed, reasons
         config['client'] = {}
         changed = True
-        reasons.append('`client\' did not exist')
+        reasons.append("'client' did not exist")
 
     if 'subscriptions' not in config['client']:
         if state == 'absent':
-            reasons.append('`client.subscriptions\' did not exist and state is `absent\'')
+            reasons.append("'client.subscriptions' did not exist and state is 'absent'")
             return changed, reasons
         config['client']['subscriptions'] = []
         changed = True
-        reasons.append('`client.subscriptions\' did not exist')
+        reasons.append("'client.subscriptions' did not exist")
 
     if name not in config['client']['subscriptions']:
         if state == 'absent':
-            reasons.append('channel subscription was absent')
+            reasons.append("channel subscription was absent")
             return changed, reasons
         config['client']['subscriptions'].append(name)
         changed = True
-        reasons.append('channel subscription was absent and state is `present\'')
+        reasons.append("channel subscription was absent and state is 'present'")
     else:
         if state == 'absent':
             config['client']['subscriptions'].remove(name)
             changed = True
-            reasons.append('channel subscription was present and state is `absent\'')
+            reasons.append("channel subscription was present and state is 'absent'")
 
     if changed and not module.check_mode:
         if backup:
