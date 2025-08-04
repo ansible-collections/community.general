@@ -188,7 +188,7 @@ def composer_command(module, command, arguments="", options=None):
     else:
         composer_path = module.params['composer_executable']
 
-    cmd = "%s %s %s %s %s %s" % (php_path, composer_path, "global" if global_command else "", command, " ".join(options), arguments)
+    cmd = [php_path, composer_path, "global" if global_command else "", command] + options + [arguments]
     return module.run_command(cmd)
 
 
