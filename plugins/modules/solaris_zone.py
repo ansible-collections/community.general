@@ -208,7 +208,7 @@ class Zone(object):
             t.write('%s\n' % self.config)
             t.close()
 
-            cmd = '%s -z %s -f %s' % (self.zonecfg_cmd, self.name, t.name)
+            cmd = [self.zonecfg_cmd, '-z', self.name, '-f', t.name]
             (rc, out, err) = self.module.run_command(cmd)
             if rc != 0:
                 self.module.fail_json(msg='Failed to create zone. %s' % (out + err))
@@ -219,7 +219,7 @@ class Zone(object):
 
     def install(self):
         if not self.module.check_mode:
-            cmd = '%s -z %s install %s' % (self.zoneadm_cmd, self.name, self.install_options)
+            cmd = [self.zoneadm_cmd, '-z', self.name, 'install', self.install_options]
             (rc, out, err) = self.module.run_command(cmd)
             if rc != 0:
                 self.module.fail_json(msg='Failed to install zone. %s' % (out + err))
@@ -233,7 +233,7 @@ class Zone(object):
     def uninstall(self):
         if self.is_installed():
             if not self.module.check_mode:
-                cmd = '%s -z %s uninstall -F' % (self.zoneadm_cmd, self.name)
+                cmd = [self.zoneadm_cmd, '-z', self.name, 'uninstall', '-F']
                 (rc, out, err) = self.module.run_command(cmd)
                 if rc != 0:
                     self.module.fail_json(msg='Failed to uninstall zone. %s' % (out + err))
@@ -268,13 +268,13 @@ class Zone(object):
         dsa_key_file = '%s/root/etc/ssh/ssh_host_dsa_key' % self.path
 
         if not os.path.isfile(rsa_key_file):
-            cmd = '%s -f %s -t rsa -N ""' % (self.ssh_keygen_cmd, rsa_key_file)
+            cmd = [self.ssh_keygen_cmd, '-f', rsa_key_file, '-t', 'rsa', '-N', '']
             (rc, out, err) = self.module.run_command(cmd)
             if rc != 0:
                 self.module.fail_json(msg='Failed to create rsa key. %s' % (out + err))
 
         if not os.path.isfile(dsa_key_file):
-            cmd = '%s -f %s -t dsa -N ""' % (self.ssh_keygen_cmd, dsa_key_file)
+            cmd = [self.ssh_keygen_cmd, '-f', dsa_key_file, '-t', 'dsa', '-N', '']
             (rc, out, err) = self.module.run_command(cmd)
             if rc != 0:
                 self.module.fail_json(msg='Failed to create dsa key. %s' % (out + err))
@@ -297,7 +297,7 @@ class Zone(object):
 
     def boot(self):
         if not self.module.check_mode:
-            cmd = '%s -z %s boot' % (self.zoneadm_cmd, self.name)
+            cmd = [self.zoneadm_cmd, '-z', self.name, 'boot']
             (rc, out, err) = self.module.run_command(cmd)
             if rc != 0:
                 self.module.fail_json(msg='Failed to boot zone. %s' % (out + err))
@@ -327,7 +327,7 @@ class Zone(object):
         if self.is_installed():
             self.uninstall()
         if not self.module.check_mode:
-            cmd = '%s -z %s delete -F' % (self.zonecfg_cmd, self.name)
+            cmd = [self.zonecfg_cmd, '-z', self.name, 'delete', '-F']
             (rc, out, err) = self.module.run_command(cmd)
             if rc != 0:
                 self.module.fail_json(msg='Failed to delete zone. %s' % (out + err))
@@ -336,7 +336,7 @@ class Zone(object):
 
     def stop(self):
         if not self.module.check_mode:
-            cmd = '%s -z %s halt' % (self.zoneadm_cmd, self.name)
+            cmd = [self.zoneadm_cmd, '-z', self.name, 'halt']
             (rc, out, err) = self.module.run_command(cmd)
             if rc != 0:
                 self.module.fail_json(msg='Failed to stop zone. %s' % (out + err))
@@ -345,7 +345,7 @@ class Zone(object):
 
     def detach(self):
         if not self.module.check_mode:
-            cmd = '%s -z %s detach' % (self.zoneadm_cmd, self.name)
+            cmd = [self.zoneadm_cmd, '-z', self.name, 'detach']
             (rc, out, err) = self.module.run_command(cmd)
             if rc != 0:
                 self.module.fail_json(msg='Failed to detach zone. %s' % (out + err))
@@ -354,7 +354,7 @@ class Zone(object):
 
     def attach(self):
         if not self.module.check_mode:
-            cmd = '%s -z %s attach %s' % (self.zoneadm_cmd, self.name, self.attach_options)
+            cmd = [self.zoneadm_cmd, '-z', self.name, 'attach', self.attach_options]
             (rc, out, err) = self.module.run_command(cmd)
             if rc != 0:
                 self.module.fail_json(msg='Failed to attach zone. %s' % (out + err))
@@ -362,7 +362,7 @@ class Zone(object):
         self.msg.append('zone attached')
 
     def exists(self):
-        cmd = '%s -z %s list' % (self.zoneadm_cmd, self.name)
+        cmd = [self.zoneadm_cmd, '-z', self.name, 'list']
         (rc, out, err) = self.module.run_command(cmd)
         if rc == 0:
             return True
@@ -379,7 +379,7 @@ class Zone(object):
         return self.status() == 'configured'
 
     def status(self):
-        cmd = '%s -z %s list -p' % (self.zoneadm_cmd, self.name)
+        cmd = [self.zoneadm_cmd, '-z', self.name, 'list', '-p']
         (rc, out, err) = self.module.run_command(cmd)
         if rc == 0:
             return out.split(':')[2]
