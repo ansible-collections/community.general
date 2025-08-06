@@ -174,10 +174,10 @@ def is_installed(xbps_output):
 def append_flags(module, xbps_path, cmd, skip_repo=False):
     """Appends the repository/root flags when needed"""
     if module.params["root"]:
-        cmd = "%s -r %s" % (cmd, module.params["root"])
-    if module.params["repositories"] and not cmd.startswith(xbps_path["remove"]) and not skip_repo:
+        cmd = cmd + ["-r", module.params["root"]]
+    if module.params["repositories"] and cmd[0] != xbps_path["remove"] and not skip_repo:
         for repo in module.params["repositories"]:
-            cmd = "%s --repository=%s" % (cmd, repo)
+            cmd = cmd + ["--repository=%s" % repo]
 
     return cmd
 
@@ -185,14 +185,14 @@ def append_flags(module, xbps_path, cmd, skip_repo=False):
 def query_package(module, xbps_path, name, state="present"):
     """Returns Package info"""
     if state == "present":
-        lcmd = "%s %s" % (xbps_path['query'], name)
+        lcmd = [xbps_path['query'], name]
         lcmd = append_flags(module, xbps_path, lcmd, skip_repo=True)
         lrc, lstdout, lstderr = module.run_command(lcmd, check_rc=False)
         if not is_installed(lstdout):
             # package is not installed locally
             return False, False
 
-        rcmd = "%s -Sun" % (xbps_path['install'])
+        rcmd = [xbps_path['install'], "-Sun"]
         rcmd = append_flags(module, xbps_path, rcmd)
         rrc, rstdout, rstderr = module.run_command(rcmd, check_rc=False)
         if rrc == 0 or rrc == 17:
@@ -206,7 +206,7 @@ def query_package(module, xbps_path, name, state="present"):
 
 def update_package_db(module, xbps_path):
     """Returns True if update_package_db changed"""
-    cmd = "%s -S" % (xbps_path['install'])
+    cmd = [xbps_path['install'], "-S"]
     cmd = append_flags(module, xbps_path, cmd)
     if module.params['accept_pubkey']:
         stdin = "y\n"
@@ -225,7 +225,7 @@ def update_package_db(module, xbps_path):
 
 
 def upgrade_xbps(module, xbps_path, exit_on_success=False):
-    cmdupgradexbps = "%s -uy xbps" % (xbps_path['install'])
+    cmdupgradexbps = [xbps_path['install'], "-uy", "xbps"]
     cmdupgradexbps = append_flags(module, xbps_path, cmdupgradexbps)
     rc, stdout, stderr = module.run_command(cmdupgradexbps, check_rc=False)
     if rc != 0:
@@ -234,8 +234,8 @@ def upgrade_xbps(module, xbps_path, exit_on_success=False):
 
 def upgrade(module, xbps_path):
     """Returns true is full upgrade succeeds"""
-    cmdupgrade = "%s -uy" % (xbps_path['install'])
-    cmdneedupgrade = "%s -un" % (xbps_path['install'])
+    cmdupgrade = [xbps_path['install'], "-uy"]
+    cmdneedupgrade = [xbps_path['install'], "-un"]
     cmdupgrade = append_flags(module, xbps_path, cmdupgrade)
     cmdneedupgrade = append_flags(module, xbps_path, cmdneedupgrade)
 
@@ -270,7 +270,7 @@ def remove_packages(module, xbps_path, packages):
         if not installed:
             continue
 
-        cmd = "%s -y %s" % (xbps_path['remove'], package)
+        cmd = [xbps_path['remove'], "-y", package]
         cmd = append_flags(module, xbps_path, cmd, skip_repo=True)
         rc, stdout, stderr = module.run_command(cmd, check_rc=False)
 
@@ -303,7 +303,7 @@ def install_packages(module, xbps_path, state, packages):
     if len(toInstall) == 0:
         module.exit_json(changed=False, msg="Nothing to Install")
 
-    cmd = "%s -y %s" % (xbps_path['install'], " ".join(toInstall))
+    cmd = [xbps_path['install'], "-y"] + toInstall
     cmd = append_flags(module, xbps_path, cmd)
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
 
