@@ -282,7 +282,7 @@ def query_atom(module, atom, action):
     return bool(exists)
 
 
-def query_set(module, set, action):
+def query_set(module, set_, action):
     system_sets = [
         '@live-rebuild',
         '@module-rebuild',
@@ -294,16 +294,16 @@ def query_set(module, set, action):
         '@x11-module-rebuild',
     ]
 
-    if set in system_sets:
+    if set_ in system_sets:
         if action == 'unmerge':
-            module.fail_json(msg='set %s cannot be removed' % set)
+            module.fail_json(msg='set %s cannot be removed' % set_)
         return False
 
     world_sets_path = '/var/lib/portage/world_sets'
     if not os.path.exists(world_sets_path):
         return False
 
-    cmd = 'grep %s %s' % (set, world_sets_path)
+    cmd = ['grep', set_, world_sets_path]
 
     rc, out, err = module.run_command(cmd)
     return rc == 0
@@ -315,9 +315,9 @@ def sync_repositories(module, webrsync=False):
 
     if webrsync:
         webrsync_path = module.get_bin_path('emerge-webrsync', required=True)
-        cmd = '%s --quiet' % webrsync_path
+        cmd = [webrsync_path, '--quiet']
     else:
-        cmd = '%s --sync --quiet --ask=n' % module.emerge_path
+        cmd = [module.emerge_path, '--sync', '--quiet', '--ask=n']
 
     rc, out, err = module.run_command(cmd)
     if rc != 0:
