@@ -130,19 +130,19 @@ class Swupd(object):
         self.rc, self.stdout, self.stderr = self.module.run_command(cmd, check_rc=False)
 
     def _get_cmd(self, command):
-        cmd = "%s %s" % (self.swupd_cmd, command)
+        cmd = [self.swupd_cmd] + command
 
         if self.format:
-            cmd += " --format=%s" % self.format
+            cmd.append("--format=%s" % self.format)
         if self.manifest:
-            cmd += " --manifest=%s" % self.manifest
+            cmd.append("--manifest=%s" % self.manifest)
         if self.url:
-            cmd += " --url=%s" % self.url
+            cmd.append("--url=%s" % self.url)
         else:
             if self.contenturl and command != "check-update":
-                cmd += " --contenturl=%s" % self.contenturl
+                cmd.append("--contenturl=%s" % self.contenturl)
             if self.versionurl:
-                cmd += " --versionurl=%s" % self.versionurl
+                cmd.append("--versionurl=%s" % self.versionurl)
 
         return cmd
 
@@ -155,7 +155,7 @@ class Swupd(object):
         return True
 
     def _needs_update(self):
-        cmd = self._get_cmd("check-update")
+        cmd = self._get_cmd(["check-update"])
         self._run_cmd(cmd)
 
         if self.rc == 0:
@@ -168,7 +168,7 @@ class Swupd(object):
         self.msg = "Failed to check for updates"
 
     def _needs_verify(self):
-        cmd = self._get_cmd("verify")
+        cmd = self._get_cmd(["verify"])
         self._run_cmd(cmd)
 
         if self.rc != 0:
@@ -189,7 +189,7 @@ class Swupd(object):
             self.msg = "Bundle %s is already installed" % bundle
             return
 
-        cmd = self._get_cmd("bundle-add %s" % bundle)
+        cmd = self._get_cmd(["bundle-add", bundle])
         self._run_cmd(cmd)
 
         if self.rc == 0:
@@ -209,7 +209,7 @@ class Swupd(object):
             self.msg = "Bundle %s not installed"
             return
 
-        cmd = self._get_cmd("bundle-remove %s" % bundle)
+        cmd = self._get_cmd(["bundle-remove", bundle])
         self._run_cmd(cmd)
 
         if self.rc == 0:
@@ -229,7 +229,7 @@ class Swupd(object):
             self.msg = "There are no updates available"
             return
 
-        cmd = self._get_cmd("update")
+        cmd = self._get_cmd(["update"])
         self._run_cmd(cmd)
 
         if self.rc == 0:
@@ -249,7 +249,7 @@ class Swupd(object):
             self.msg = "No files where changed"
             return
 
-        cmd = self._get_cmd("verify --fix")
+        cmd = self._get_cmd(["verify", "--fix"])
         self._run_cmd(cmd)
 
         if self.rc == 0 and (self.FILES_REPLACED in self.stdout or self.FILES_FIXED in self.stdout or self.FILES_DELETED in self.stdout):
