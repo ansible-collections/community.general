@@ -52,8 +52,17 @@ options:
       - The SQL script to be executed.
       - Script can contain multiple SQL statements. Multiple Batches can be separated by V(GO) command.
       - Each batch must return at least one result set.
-    required: true
+      - Mutually exclusive with O(script_path).
     type: str
+  script_path:
+    description:
+      - Path to a file containing the SQL script to be executed.
+      - Script can contain multiple SQL statements. Multiple Batches can be separated by V(GO) command.
+      - Each batch must return at least one result set.
+      - If the file contains a Byte Order Mark (BOM), it will be automatically detected and removed.
+      - Mutually exclusive with O(script).
+    type: path
+    version_added: 10.8.0
   transaction:
     description:
       - If transactional mode is requested, start a transaction and commit the change only if the script succeed. Otherwise,
@@ -82,6 +91,7 @@ requirements:
 
 author:
   - Kris Budde (@kbudde)
+  - Joe Zollo (@zollo)
 """
 
 EXAMPLES = r"""
@@ -105,10 +115,26 @@ EXAMPLES = r"""
     params:
       dbname: msdb
   register: result_params
+
 - assert:
     that:
       - result_params.query_results[0][0][0][0] == 'msdb'
       - result_params.query_results[0][0][0][1] == 'ONLINE'
+
+- name: Execute script from file with BOM present
+  community.general.mssql_script:
+    login_user: "{{ mssql_login_user }}"
+    login_password: "{{ mssql_login_password }}"
+    login_host: "{{ mssql_host }}"
+    login_port: "{{ mssql_port }}"
+    script_path: /path/to/sql/script_with_bom.sql
+  register: result_bom
+
+- assert:
+    that:
+      - result_bom.script_source = 'file'
+      - result_bom.bom_removed = True
+      - result_bom.bom_type = 'UTF-8'
 
 - name: Query within a transaction
   community.general.mssql_script:
@@ -165,6 +191,27 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
+script_source:
+  description: Source of the executed script.
+  type: str
+  returned: always
+  sample: "file"
+  choices: ["file", "parameter"]
+script_path:
+  description: Path to the script file that was executed.
+  type: str
+  returned: when script_path parameter is used
+  sample: "/path/to/script.sql"
+bom_removed:
+  description: Whether a Byte Order Mark was detected and removed from the script file.
+  type: bool
+  returned: when script_path parameter is used and BOM was found
+  sample: true
+bom_type:
+  description: Type of Byte Order Mark that was detected and removed.
+  type: str
+  returned: when script_path parameter is used and BOM was found
+  sample: "UTF-8"
 query_results:
   description: List of batches (queries separated by V(GO) keyword).
   type: list
@@ -266,6 +313,9 @@ query_results_dict:
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 import traceback
 import json
+import os
+import codecs
+
 PYMSSQL_IMP_ERR = None
 try:
     import pymssql
@@ -280,6 +330,97 @@ def clean_output(o):
     return str(o)
 
 
+def detect_and_remove_bom(content):
+    """
+    Detect and remove Byte Order Mark (BOM) from content.
+    Returns tuple (cleaned_content, bom_removed, bom_type)
+    """
+    bom_removed = False
+    bom_type = None
+
+    # Common BOM patterns
+    boms = [
+        (codecs.BOM_UTF8, 'UTF-8'),
+        (codecs.BOM_UTF16_LE, 'UTF-16 LE'),
+        (codecs.BOM_UTF16_BE, 'UTF-16 BE'),
+        (codecs.BOM_UTF32_LE, 'UTF-32 LE'),
+        (codecs.BOM_UTF32_BE, 'UTF-32 BE'),
+    ]
+
+    # Check if content is bytes or string
+    if isinstance(content, str):
+        content_bytes = content.encode('utf-8')
+    else:
+        content_bytes = content
+
+    # Check for BOM
+    for bom, bom_name in boms:
+        if content_bytes.startswith(bom):
+            content_bytes = content_bytes[len(bom):]
+            bom_removed = True
+            bom_type = bom_name
+            break
+
+    # Convert back to string if original was string
+    if isinstance(content, str):
+        try:
+            cleaned_content = content_bytes.decode('utf-8')
+        except UnicodeDecodeError:
+            # Fallback to original encoding detection
+            cleaned_content = content_bytes.decode('utf-8', errors='replace')
+    else:
+        cleaned_content = content_bytes
+
+    return cleaned_content, bom_removed, bom_type
+
+
+def read_script_file(script_path):
+    """
+    Read SQL script file and remove BOM if present.
+    Returns tuple (script_content, bom_info)
+    """
+    if not os.path.exists(script_path):
+        raise IOError(f"Script file not found: {script_path}")
+
+    if not os.path.isfile(script_path):
+        raise IOError(f"Path is not a file: {script_path}")
+
+    try:
+        with open(script_path, 'rb') as f:
+            raw_content = f.read()
+
+        # Convert to string for processing
+        try:
+            script_content = raw_content.decode('utf-8')
+        except UnicodeDecodeError:
+            # Try other common encodings
+            for encoding in ['utf-16', 'latin1', 'cp1252']:
+                try:
+                    script_content = raw_content.decode(encoding)
+                    break
+                except UnicodeDecodeError:
+                    continue
+            else:
+                # Last resort - decode with error replacement
+                script_content = raw_content.decode('utf-8', errors='replace')
+
+        # Detect and remove BOM
+        cleaned_content, bom_removed, bom_type = detect_and_remove_bom(
+            script_content)
+
+        bom_info = {
+            'bom_found': bom_removed,
+            'bom_type': bom_type,
+            'file_path': script_path
+        }
+
+        return cleaned_content, bom_info
+
+    except IOError as e:
+        raise IOError(f"Error reading script file \
+                      {script_path}: {str(e)}") from e
+
+
 def run_module():
     module_args = dict(
         name=dict(aliases=['db'], default=''),
@@ -287,7 +428,8 @@ def run_module():
         login_password=dict(no_log=True),
         login_host=dict(required=True),
         login_port=dict(type='int', default=1433),
-        script=dict(required=True),
+        script=dict(),
+        script_path=dict(type='path'),
         output=dict(default='default', choices=['dict', 'default']),
         params=dict(type='dict'),
         transaction=dict(type='bool', default=False),
@@ -299,7 +441,9 @@ def run_module():
 
     module = AnsibleModule(
         argument_spec=module_args,
-        supports_check_mode=True
+        supports_check_mode=True,
+        mutually_exclusive=[('script', 'script_path')],
+        required_one_of=[('script', 'script_path')],
     )
     if not MSSQL_FOUND:
         module.fail_json(msg=missing_required_lib(
@@ -311,10 +455,26 @@ def run_module():
     login_host = module.params['login_host']
     login_port = module.params['login_port']
     script = module.params['script']
+    script_path = module.params['script_path']
     output = module.params['output']
     sql_params = module.params['params']
     # Added param to set the transactional mode (true/false)
     transaction = module.params['transaction']
+
+    # Handle script source - either from direct script or file
+    bom_info = None
+    if script_path:
+        try:
+            script, bom_info = read_script_file(script_path)
+            result['script_source'] = 'file'
+            result['script_path'] = script_path
+            if bom_info['bom_found']:
+                result['bom_removed'] = True
+                result['bom_type'] = bom_info['bom_type']
+        except (IOError, OSError) as e:
+            module.fail_json(msg=f"Error reading script file: {str(e)}")
+    else:
+        result['script_source'] = 'parameter'
 
     login_querystring = login_host
     if login_port != 1433:
