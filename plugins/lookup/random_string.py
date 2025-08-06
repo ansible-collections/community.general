@@ -26,19 +26,19 @@ options:
   upper:
     description:
       - Possibly include uppercase letters in the string.
-      - To ensure atleast one uppercase letter, set C(min_upper) to V(1).
+      - To ensure atleast one uppercase letter, set O(min_upper) to V(1).
     default: true
     type: bool
   lower:
     description:
       - Possibly include lowercase letters in the string.
-      - To ensure atleast one lowercase letter, set C(min_lower) to V(1).
+      - To ensure atleast one lowercase letter, set O(min_lower) to V(1).
     default: true
     type: bool
   numbers:
     description:
       - Possibly include numbers in the string.
-      - To ensure atleast one numeric character, set C(min_numeric) to V(1).
+      - To ensure atleast one numeric character, set O(min_numeric) to V(1).
     default: true
     type: bool
   special:
@@ -48,7 +48,7 @@ options:
         string.punctuation,https://docs.python.org/3/library/string.html#string.punctuation)
         for which characters are used.
       - The choice of special characters can be changed to setting O(override_special).
-      - To ensure atleast one special character, set C(min_special) to V(1).
+      - To ensure atleast one special character, set O(min_special) to V(1).
     default: true
     type: bool
   min_numeric:
