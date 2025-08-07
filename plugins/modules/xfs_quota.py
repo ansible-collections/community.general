@@ -457,8 +457,8 @@ def quota_report(module, xfs_quota_bin, mountpoint, name, quota_type, used_type)
 
 
 def exec_quota(module, xfs_quota_bin, cmd, mountpoint):
-    cmd = [xfs_quota_bin, "-x", "-c"] + [cmd, mountpoint]
-    (rc, stdout, stderr) = module.run_command(cmd, use_unsafe_shell=True)
+    cmd = [xfs_quota_bin, "-x", "-c", cmd, mountpoint]
+    (rc, stdout, stderr) = module.run_command(cmd)
     if (
         "XFS_GETQUOTA: Operation not permitted" in stderr.split("\n")
         or rc == 1
