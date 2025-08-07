@@ -106,14 +106,14 @@ def do_nothing_func_nothing(*args, **kwarg):
 def do_nothing_func_ipv6(*args, **kwarg):
     key = " ".join(args[0])
     if key == "":
-        raise Exception("A: args={} kwargs={}".format(args, kwarg))
+        raise Exception("B: args={} kwargs={}".format(args, kwarg))
     return 0, dry_mode_cmd_with_ipv6[key], ""
 
 
 def do_nothing_func_port_7000(*args, **kwarg):
     key = " ".join(args[0])
     if key == "":
-        raise Exception("A: args={} kwargs={}".format(args, kwarg))
+        raise Exception("C: args={} kwargs={}".format(args, kwarg))
     return 0, dry_mode_cmd_with_port_700[key], ""
 
 
