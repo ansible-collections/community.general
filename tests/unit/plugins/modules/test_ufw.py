@@ -96,6 +96,8 @@ dry_mode_cmd_nothing = {
 }
 
 
+def _return
+
 def do_nothing_func_nothing(*args, **kwarg):
     key = " ".join(args[0])
     if key == "":

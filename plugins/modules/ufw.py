@@ -389,7 +389,7 @@ def main():
         return ipv6_regexp.match(ip) is not None
 
     def execute(cmd, ignore_error=False):
-        cmd_args = map(itemgetter(-1), filter(itemgetter(0), cmd))
+        cmd_args = list(map(itemgetter(-1), filter(itemgetter(0), cmd)))
         cmd = ' '.join(cmd_args)
 
         cmds.append(cmd)
