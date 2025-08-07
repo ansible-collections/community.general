@@ -97,15 +97,15 @@ dry_mode_cmd_nothing = {
 
 
 def do_nothing_func_nothing(*args, **kwarg):
-    return 0, dry_mode_cmd_nothing[args[0]], ""
+    return 0, dry_mode_cmd_nothing[" ".join(args[0])], ""
 
 
 def do_nothing_func_ipv6(*args, **kwarg):
-    return 0, dry_mode_cmd_with_ipv6[args[0]], ""
+    return 0, dry_mode_cmd_with_ipv6[" ".join(args[0])], ""
 
 
 def do_nothing_func_port_7000(*args, **kwarg):
-    return 0, dry_mode_cmd_with_port_700[args[0]], ""
+    return 0, dry_mode_cmd_with_port_700[" ".join(args[0])], ""
 
 
 def get_bin_path(self, arg, required=False):
