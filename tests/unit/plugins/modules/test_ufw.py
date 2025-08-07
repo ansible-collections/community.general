@@ -105,6 +105,8 @@ def do_nothing_func_ipv6(*args, **kwarg):
 
 
 def do_nothing_func_port_7000(*args, **kwarg):
+    if args[0] == []:
+        raise Exception("A: args={} kwargs={}".format(args, kwarg))
     return 0, dry_mode_cmd_with_port_700[" ".join(args[0])], ""
 
 
