@@ -1,0 +1,4 @@
+bugfixes:
+  - github_app_access_token lookup plugin - avoid using jwt library requirement that conflicts with other modules requirements (https://github.com/ansible-collections/community.general/issues/10299)
+breaking_changes:
+  - github_app_access_token lookup plugin - depends now on pyjwt rather than jwt (https://github.com/ansible-collections/community.general/issues/10299)
