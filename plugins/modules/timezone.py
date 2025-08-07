@@ -350,7 +350,7 @@ class NosystemdTimezone(Timezone):
             planned_tz = self.value['name']['planned']
             # `--remove-destination` is needed if /etc/localtime is a symlink so
             # that it overwrites it instead of following it.
-            self.update_timezone = ['%s --remove-destination %s /etc/localtime' % (self.module.get_bin_path('cp', required=True), tzfile)]
+            self.update_timezone = [[self.module.get_bin_path('cp', required=True), '--remove-destination', tzfile, '/etc/localtime']]
         self.update_hwclock = self.module.get_bin_path('hwclock', required=True)
         distribution = get_distribution()
         self.conf_files['name'] = '/etc/timezone'
@@ -360,13 +360,13 @@ class NosystemdTimezone(Timezone):
         if self.module.get_bin_path('dpkg-reconfigure') is not None:
             # Debian/Ubuntu
             if 'name' in self.value:
-                self.update_timezone = ['%s -sf %s /etc/localtime' % (self.module.get_bin_path('ln', required=True), tzfile),
-                                        '%s --frontend noninteractive tzdata' % self.module.get_bin_path('dpkg-reconfigure', required=True)]
+                self.update_timezone = [[self.module.get_bin_path('ln', required=True), '-sf', tzfile, '/etc/localtime'],
+                                        [self.module.get_bin_path('dpkg-reconfigure', required=True), '--frontend', 'noninteractive', 'tzdata']]
             self.conf_files['hwclock'] = '/etc/default/rcS'
         elif distribution == 'Alpine' or distribution == 'Gentoo':
             self.conf_files['hwclock'] = '/etc/conf.d/hwclock'
             if distribution == 'Alpine':
-                self.update_timezone = ['%s -z %s' % (self.module.get_bin_path('setup-timezone', required=True), planned_tz)]
+                self.update_timezone = [[self.module.get_bin_path('setup-timezone', required=True), '-z', planned_tz]]
         else:
             # RHEL/CentOS/SUSE
             if self.module.get_bin_path('tzdata-update') is not None:
@@ -374,7 +374,7 @@ class NosystemdTimezone(Timezone):
                 # a symlink so we have to use cp to update the time zone which
                 # was set above.
                 if not os.path.islink('/etc/localtime'):
-                    self.update_timezone = [self.module.get_bin_path('tzdata-update', required=True)]
+                    self.update_timezone = [[self.module.get_bin_path('tzdata-update', required=True)]]
                 # else:
                 #   self.update_timezone       = 'cp --remove-destination ...' <- configured above
             self.conf_files['name'] = '/etc/sysconfig/clock'
@@ -559,7 +559,7 @@ class NosystemdTimezone(Timezone):
                         value=self.tzline_format % value,
                         key='name')
         for cmd in self.update_timezone:
-            self.execute(cmd)
+            self.execute(*cmd)
 
     def set_hwclock(self, value):
         if value == 'local':
