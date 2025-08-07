@@ -168,17 +168,15 @@ class Timezone(object):
 
         Args:
             *commands: The command to execute.
-                It will be concatenated with single space.
             **kwargs:  Only 'log' key is checked.
                 If kwargs['log'] is true, record the command to self.msg.
 
         Returns:
             stdout: Standard output of the command.
         """
-        command = ' '.join(commands)
-        (rc, stdout, stderr) = self.module.run_command(command, check_rc=True)
+        (rc, stdout, stderr) = self.module.run_command(list(commands), check_rc=True)
         if kwargs.get('log', False):
-            self.msg.append('executed `%s`' % command)
+            self.msg.append('executed `%s`' % ' '.join(commands))
         return stdout
 
     def diff(self, phase1='before', phase2='after'):
@@ -623,7 +621,7 @@ class SmartOSTimezone(Timezone):
         will be rejected and we have no further input validation to perform.
         """
         if key == 'name':
-            cmd = 'sm-set-timezone %s' % value
+            cmd = ['sm-set-timezone', value]
 
             (rc, stdout, stderr) = self.module.run_command(cmd)
 
@@ -839,7 +837,7 @@ class AIXTimezone(Timezone):
                 self.module.fail_json(msg='Failed to check %s.' % zonefile)
 
             # Now set the TZ using chtz
-            cmd = 'chtz %s' % value
+            cmd = ['chtz', value]
             (rc, stdout, stderr) = self.module.run_command(cmd)
 
             if rc != 0:
