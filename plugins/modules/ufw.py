@@ -389,10 +389,11 @@ def main():
         return ipv6_regexp.match(ip) is not None
 
     def execute(cmd, ignore_error=False):
-        cmd = ' '.join(map(itemgetter(-1), filter(itemgetter(0), cmd)))
+        cmd_args = map(itemgetter(-1), filter(itemgetter(0), cmd))
+        cmd = ' '.join(cmd_args)
 
         cmds.append(cmd)
-        (rc, out, err) = module.run_command(cmd, environ_update={"LANG": "C"})
+        (rc, out, err) = module.run_command(cmd_args, environ_update={"LANG": "C"})
 
         if rc != 0 and not ignore_error:
             module.fail_json(msg=err or out, commands=cmds)
