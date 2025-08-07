@@ -97,11 +97,17 @@ dry_mode_cmd_nothing = {
 
 
 def do_nothing_func_nothing(*args, **kwarg):
-    return 0, dry_mode_cmd_nothing[" ".join(args[0])], ""
+    key = " ".join(args[0])
+    if key == "":
+        raise Exception("A: args={} kwargs={}".format(args, kwarg))
+    return 0, dry_mode_cmd_nothing[key], ""
 
 
 def do_nothing_func_ipv6(*args, **kwarg):
-    return 0, dry_mode_cmd_with_ipv6[" ".join(args[0])], ""
+    key = " ".join(args[0])
+    if key == "":
+        raise Exception("A: args={} kwargs={}".format(args, kwarg))
+    return 0, dry_mode_cmd_with_ipv6[key], ""
 
 
 def do_nothing_func_port_7000(*args, **kwarg):
