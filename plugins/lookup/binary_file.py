@@ -14,7 +14,7 @@ description:
   - The file is read as a binary file and its contents are returned Base64 encoded.
     This is similar to using P(ansible.builtin.file#lookup) combined with P(ansible.builtin.b64encode#filter),
     except that P(ansible.builtin.file#lookup) does not support binary files as it interprets the contents as UTF-8,
-    which can cause the wrong content being Base64 encoded. It also will print a deprecation message since ansible-core 2.19.
+    which can cause the wrong content being Base64 encoded.
 options:
   _terms:
     description:
