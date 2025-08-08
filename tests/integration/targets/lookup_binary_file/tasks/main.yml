@@ -1,0 +1,57 @@
+---
+# Copyright (c) 2025, Felix Fontein <felix@fontein.de>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Read some files
+  ansible.builtin.set_fact:
+    file_1: >-
+      {{ query('community.general.binary_file', 'file_1') }}
+    empty: >-
+      {{ query('community.general.binary_file', 'does-not-exist', not_exist='empty') }}
+    empty_str: >-
+      {{ query('community.general.binary_file', 'does-not-exist', not_exist='empty_str') }}
+    multiple: >-
+      {{ query('community.general.binary_file', 'file_1', 'file_2') }}
+    multiple_empty: >-
+      {{ query('community.general.binary_file', 'file_1', 'does-not-exist', 'file_2', not_exist='empty') }}
+    multiple_empty_str: >-
+      {{ query('community.general.binary_file', 'file_1', 'does-not-exist', 'file_2', not_exist='empty_str') }}
+
+- name: Check results
+  ansible.builtin.assert:
+    that:
+      - file_1 == ["file 1" | ansible.builtin.b64encode]
+      - empty == [""]
+      - empty_str == ["empty"]
+      - multiple == ["file 1" | ansible.builtin.b64encode, "file 2" | ansible.builtin.b64encode]
+      - multiple_empty == ["file 1" | ansible.builtin.b64encode, "", "file 2" | ansible.builtin.b64encode]
+      - multiple_empty_str == ["file 1" | ansible.builtin.b64encode, "empty", "file 2" | ansible.builtin.b64encode]
+
+- name: Fail on non-existing file
+  ansible.builtin.debug:
+    msg: >-
+      {{ query('community.general.binary_file', 'does-not-exist') }}
+  ignore_errors: true
+  register: result
+
+- name: Check results
+  ansible.builtin.assert:
+    that:
+      - result is failed
+      - >-
+        "Could not locate file in community.general.binary_file lookup: does-not-exist" in result.msg
+
+- name: Fail on non-existing file after some existing ones
+  ansible.builtin.debug:
+    msg: >-
+      {{ query('community.general.binary_file', 'file_1', 'does-not-exist', 'file_2') }}
+  ignore_errors: true
+  register: result
+
+- name: Check results
+  ansible.builtin.assert:
+    that:
+      - result is failed
+      - >-
+        "Could not locate file in community.general.binary_file lookup: does-not-exist" in result.msg
