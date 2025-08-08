@@ -94,6 +94,7 @@ options:
     type: bool
 extends_documentation_fragment:
   - community.general.ipa.documentation
+  - community.general.ipa.connection_notes
   - community.general.attributes
 """
 

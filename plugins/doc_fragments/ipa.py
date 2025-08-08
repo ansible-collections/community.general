@@ -74,3 +74,11 @@ options:
     type: int
     default: 10
 """
+
+    CONNECTION_NOTES = r"""
+options: {}
+notes:
+  - This module uses JSON-RPC over HTTP(S) to communicate with the FreeIPA server.
+    If you need to enroll the managed node into FreeIPA realm, you might want to consider using the collection
+    L(freeipa.ansible_freeipa, https://galaxy.ansible.com/ui/repo/published/freeipa/ansible_freeipa/), but that will require shell access to the managed node.
+"""
