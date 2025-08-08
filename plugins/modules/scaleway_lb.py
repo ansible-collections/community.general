@@ -113,47 +113,52 @@ EXAMPLES = r"""
     region: fr-par
 """
 
-RETURNS = """
-{
-   "scaleway_lb": {
-      "backend_count": 0,
-      "frontend_count": 0,
-      "description": "Description of my load-balancer",
-      "id": "00000000-0000-0000-0000-000000000000",
-      "instances": [
-         {
+RETURN = r"""
+scaleway_lb:
+  description: The load-balancer object.
+  returned: success
+  type: dict
+  sample:
+    {
+      "scaleway_lb": {
+        "backend_count": 0,
+        "frontend_count": 0,
+        "description": "Description of my load-balancer",
+        "id": "00000000-0000-0000-0000-000000000000",
+        "instances": [
+          {
             "id": "00000000-0000-0000-0000-000000000000",
             "ip_address": "10.0.0.1",
             "region": "fr-par",
             "status": "ready"
-         },
-         {
+          },
+          {
             "id": "00000000-0000-0000-0000-000000000000",
             "ip_address": "10.0.0.2",
             "region": "fr-par",
             "status": "ready"
-         }
-      ],
-      "ip": [
-         {
+          }
+        ],
+        "ip": [
+          {
             "id": "00000000-0000-0000-0000-000000000000",
             "ip_address": "192.168.0.1",
             "lb_id": "00000000-0000-0000-0000-000000000000",
             "region": "fr-par",
             "organization_id": "00000000-0000-0000-0000-000000000000",
             "reverse": ""
-         }
-      ],
-      "name": "lb_ansible_test",
-      "organization_id": "00000000-0000-0000-0000-000000000000",
-      "region": "fr-par",
-      "status": "ready",
-      "tags": [
-        "first_tag",
-        "second_tag"
-      ]
-   }
-}
+          }
+        ],
+        "name": "lb_ansible_test",
+        "organization_id": "00000000-0000-0000-0000-000000000000",
+        "region": "fr-par",
+        "status": "ready",
+        "tags": [
+          "first_tag",
+          "second_tag"
+        ]
+      }
+    }
 """
 
 import datetime
