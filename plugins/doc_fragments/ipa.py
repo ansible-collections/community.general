@@ -79,6 +79,6 @@ options:
 options: {}
 notes:
   - This module uses JSON-RPC over HTTP(S) to communicate with the FreeIPA server.
-  - If you need to enroll the managed node into FreeIPA realm, you might want to consider using the collection
+    If you need to enroll the managed node into FreeIPA realm, you might want to consider using the collection
     V(freeipa.ansible_freeipa), but that will require shell access to the managed node.
 """
