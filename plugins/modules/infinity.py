@@ -110,26 +110,38 @@ network_id:
   type: str
   sample: '1501'
 ip_info:
-  description: When reserve next available IP address from a network, the IP address info is returned.
+  description:
+    - When reserve next available IP address from a network, the IP address info is returned.
+    - Please note that the value is a B(string) containing JSON data.
   returned: success
   type: str
-  sample: '{"address": "192.168.10.3", "hostname": "", "FQDN": "", "domainname": "", "id": 3229}'
+  sample: >-
+    {
+      "address": "192.168.10.3",
+      "hostname": "",
+      "FQDN": "",
+      "domainname": "",
+      "id": 3229
+    }
 network_info:
-  description: When reserving a LAN network from a Infinity supernet by providing network_size, the information about the
-    reserved network is returned.
+  description:
+    - When reserving a LAN network from a Infinity supernet by providing network_size, the information about the reserved
+      network is returned.
+    - Please note that the value is a B(string) containing JSON data.
   returned: success
   type: str
-  sample: {
-    "network_address": "192.168.10.32/28",
-    "network_family": "4",
-    "network_id": 3102,
-    "network_size": null,
-    "description": null,
-    "network_location": "3085",
-    "ranges": {"id": 0, "name": null, "first_ip": null, "type": null, "last_ip": null},
-    "network_type": "lan",
-    "network_name": "'reserve_new_ansible_network'"
-  }
+  sample: >-
+    {
+      "network_address": "192.168.10.32/28",
+      "network_family": "4",
+      "network_id": 3102,
+      "network_size": null,
+      "description": null,
+      "network_location": "3085",
+      "ranges": {"id": 0, "name": null, "first_ip": null, "type": null, "last_ip": null},
+      "network_type": "lan",
+      "network_name": "'reserve_new_ansible_network'"
+    }
 """
 
 
