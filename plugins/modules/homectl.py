@@ -297,8 +297,6 @@ else:
 
 
 class Homectl(object):
-    '''#TODO DOC STRINGS'''
-
     def __init__(self, module):
         self.module = module
         self.state = module.params['state']
