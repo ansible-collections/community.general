@@ -630,7 +630,7 @@ def main():
             password=dict(no_log=True, aliases=['aws_secret_access_key']),
             headers=dict(type='dict'),
             force_basic_auth=dict(default=False, type='bool'),
-            state=dict(default="present", choices=["present", "absent"]),  # TODO - Implement a "latest" state
+            state=dict(default="present", choices=["present", "absent"]),
             timeout=dict(default=10, type='int'),
             dest=dict(type="path", required=True),
             validate_certs=dict(default=True, type='bool'),
@@ -647,7 +647,7 @@ def main():
     )
 
     if module.params['unredirected_headers'] is None:
-        # if the user did not supply unredirected params, we use the default, ONLY on ansible core 2.12 and above
+        # if the user did not supply unredirected params, we use the default
         module.params['unredirected_headers'] = ['Authorization', 'Cookie']
 
     if not HAS_LXML_ETREE:

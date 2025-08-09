@@ -269,7 +269,7 @@ def main():
         for param in ['appliance', 'rack', 'rank', 'prim_intf', 'prim_intf_ip', 'network', 'prim_intf_mac']:
             if not module.params[param]:
                 missing_params.append(param)
-        if len(missing_params) > 0:   # @FIXME replace with required_if
+        if len(missing_params) > 0:
             module.fail_json(msg="missing required arguments: {0}".format(missing_params))
 
         stacki.stack_add(result)
