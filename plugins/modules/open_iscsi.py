@@ -242,7 +242,7 @@ def target_login(module, target, check_rc, portal=None, port=None):
         params = [('node.session.auth.username_in', node_user_in),
                   ('node.session.auth.password_in', node_pass_in)]
         for (name, value) in params:
-            cmd = '%s --mode node --targetname %s --op=update --name %s --value %s' % (iscsiadm_cmd, target, name, value)
+            cmd = [iscsiadm_cmd, '--mode', 'node', '--targetname', target, '--op=update', '--name', name, '--value', value]
             module.run_command(cmd, check_rc=check_rc)
 
     cmd = [iscsiadm_cmd, '--mode', 'node', '--targetname', target, '--login']
