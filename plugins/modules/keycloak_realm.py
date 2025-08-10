@@ -141,6 +141,14 @@ options:
     aliases:
       - bruteForceProtected
     type: bool
+  brute_force_strategy:
+    description:
+      - The realm brute force strategy.
+    aliases:
+      - bruteForceStrategy
+    choices: ['LINEAR', 'MULTIPLE']
+    type: str
+    version_added: 11.2.0
   client_authentication_flow:
     description:
       - The realm client authentication flow.
@@ -302,6 +310,13 @@ options:
     aliases:
       - maxFailureWaitSeconds
     type: int
+  max_temporary_lockouts:
+    description:
+      - The realm max temporary lockouts.
+    aliases:
+      - maxTemporaryLockouts
+    type: int
+    version_added: 11.2.0
   minimum_quick_login_wait_seconds:
     description:
       - The realm minimum quick login wait in seconds.
@@ -692,6 +707,7 @@ def main():
         browser_flow=dict(type='str', aliases=['browserFlow']),
         browser_security_headers=dict(type='dict', aliases=['browserSecurityHeaders']),
         brute_force_protected=dict(type='bool', aliases=['bruteForceProtected']),
+        brute_force_strategy=dict(type='str', choices=['LINEAR', 'MULTIPLE'], aliases=['bruteForceStrategy']),
         client_authentication_flow=dict(type='str', aliases=['clientAuthenticationFlow']),
         client_scope_mappings=dict(type='dict', aliases=['clientScopeMappings']),
         default_default_client_scopes=dict(type='list', elements='str', aliases=['defaultDefaultClientScopes']),
@@ -718,6 +734,7 @@ def main():
         login_with_email_allowed=dict(type='bool', aliases=['loginWithEmailAllowed']),
         max_delta_time_seconds=dict(type='int', aliases=['maxDeltaTimeSeconds']),
         max_failure_wait_seconds=dict(type='int', aliases=['maxFailureWaitSeconds']),
+        max_temporary_lockouts=dict(type='int', aliases=['maxTemporaryLockouts']),
         minimum_quick_login_wait_seconds=dict(type='int', aliases=['minimumQuickLoginWaitSeconds']),
         not_before=dict(type='int', aliases=['notBefore']),
         offline_session_idle_timeout=dict(type='int', aliases=['offlineSessionIdleTimeout']),
