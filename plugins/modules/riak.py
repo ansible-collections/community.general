@@ -153,7 +153,7 @@ def main():
                   version=version)
 
     if command == 'ping':
-        cmd = '%s ping %s' % (riak_bin, target_node)
+        cmd = [riak_bin, 'ping', target_node]
         rc, out, err = module.run_command(cmd)
         if rc == 0:
             result['ping'] = out
