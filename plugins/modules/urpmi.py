@@ -93,7 +93,7 @@ def query_package(module, name, root):
     # rpm -q returns 0 if the package is installed,
     # 1 if it is not installed
     rpm_path = module.get_bin_path("rpm", True)
-    cmd = "%s -q %s %s" % (rpm_path, name, root_option(root))
+    cmd = [rpm_path, "-q", name] + root_option(root)
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
     if rc == 0:
         return True
@@ -105,7 +105,7 @@ def query_package_provides(module, name, root):
     # rpm -q returns 0 if the package is installed,
     # 1 if it is not installed
     rpm_path = module.get_bin_path("rpm", True)
-    cmd = "%s -q --whatprovides %s %s" % (rpm_path, name, root_option(root))
+    cmd = [rpm_path, "-q", "--whatprovides", name] + root_option(root)
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
     return rc == 0
 
@@ -113,7 +113,7 @@ def query_package_provides(module, name, root):
 def update_package_db(module):
 
     urpmiupdate_path = module.get_bin_path("urpmi.update", True)
-    cmd = "%s -a -q" % (urpmiupdate_path,)
+    cmd = [urpmiupdate_path, "-a", "-q"]
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
     if rc != 0:
         module.fail_json(msg="could not update package db")
@@ -129,7 +129,7 @@ def remove_packages(module, packages, root):
             continue
 
         urpme_path = module.get_bin_path("urpme", True)
-        cmd = "%s --auto %s %s" % (urpme_path, root_option(root), package)
+        cmd = [urpme_path, "--auto"] + root_option(root) + [package]
         rc, stdout, stderr = module.run_command(cmd, check_rc=False)
 
         if rc != 0:
@@ -153,20 +153,17 @@ def install_packages(module, pkgspec, root, force=True, no_recommends=True):
 
     if len(packages) != 0:
         if no_recommends:
-            no_recommends_yes = '--no-recommends'
+            no_recommends_yes = ['--no-recommends']
         else:
-            no_recommends_yes = ''
+            no_recommends_yes = []
 
         if force:
-            force_yes = '--force'
+            force_yes = ['--force']
         else:
-            force_yes = ''
+            force_yes = []
 
         urpmi_path = module.get_bin_path("urpmi", True)
-        cmd = ("%s --auto %s --quiet %s %s %s" % (urpmi_path, force_yes,
-                                                  no_recommends_yes,
-                                                  root_option(root),
-                                                  packages))
+        cmd = [urpmi_path, "--auto"] + force_yes + ["--quiet"] + no_recommends_yes + root_option(root) + packages
 
         rc, out, err = module.run_command(cmd)
 
@@ -185,9 +182,9 @@ def install_packages(module, pkgspec, root, force=True, no_recommends=True):
 
 def root_option(root):
     if root:
-        return "--root=%s" % (root)
+        return ["--root=%s" % (root)]
     else:
-        return ""
+        return []
 
 
 def main():
