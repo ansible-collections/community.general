@@ -91,9 +91,22 @@ def get_pv_size(module, device):
 
 def rescan_device(module, device):
     """Perform storage rescan for the device."""
-    # Extract the base device name (e.g., /dev/sdb -> sdb)
     base_device = os.path.basename(device)
-    rescan_path = "/sys/block/{0}/device/rescan".format(base_device)
+    is_partition = "/sys/class/block/{0}/partition".format(base_device)
+
+    # Determine parent device if partition exists
+    parent_device = base_device
+    if os.path.exists(is_partition):
+        parent_device = (
+            base_device.rpartition('p')[0] if base_device.startswith('nvme')
+            else base_device.rstrip('0123456789')
+        )
+
+    # Determine rescan path
+    rescan_path = "/sys/block/{0}/device/{1}".format(
+        parent_device,
+        "rescan_controller" if base_device.startswith('nvme') else "rescan"
+    )
 
     if os.path.exists(rescan_path):
         try:
@@ -102,9 +115,8 @@ def rescan_device(module, device):
             return True
         except IOError as e:
             module.warn("Failed to rescan device {0}: {1}".format(device, str(e)))
-            return False
     else:
-        module.warn("Rescan path not found for device {0}".format(device))
+        module.warn("Rescan path does not exist for device {0}".format(device))
         return False
 
 
