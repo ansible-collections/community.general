@@ -79,7 +79,7 @@ from ansible.errors import AnsibleError, AnsibleFilterError
 import importlib
 
 try:
-    import jc  # noqa: F401, pylint: disable=unused-import
+    import jc
     HAS_LIB = True
 except ImportError:
     HAS_LIB = False
