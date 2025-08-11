@@ -217,14 +217,14 @@
     name: tox
   register: uninstall_tox_2
 
-- name: install tox with dependency group 'docs'
+- name: install tox with extra 'docs'
   community.general.pipx:
     name: tox
     source: tox[docs]
     state: latest
   register: install_tox_latest_docs
 
-- name: install tox with dependency group 'docs' again
+- name: install tox with extra 'docs' again
   community.general.pipx:
     name: tox
     source: tox[docs]
