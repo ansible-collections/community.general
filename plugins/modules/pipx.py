@@ -175,7 +175,7 @@ EXAMPLES = r"""
     name: tox
     state: upgrade
 
-- name: Install or upgrade tox with dependency group 'docs'
+- name: Install or upgrade tox with extra 'docs'
   community.general.pipx:
     name: tox
     source: tox[docs]
