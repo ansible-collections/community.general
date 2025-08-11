@@ -567,7 +567,7 @@ def parted(script, device, align):
         script_option = ['-s']
 
     if script and not module.check_mode:
-        command = [parted_exec] + script_option + align_option + [device, script]
+        command = [parted_exec] + script_option + ['-m'] +align_option + [device, '--', script]
         rc, out, err = module.run_command(command)
 
         if rc != 0:
