@@ -2,84 +2,87 @@
 
 **Topics**
 
-- <a href="#v10-7-2">v10\.7\.2</a>
+- <a href="#v10-7-3">v10\.7\.3</a>
     - <a href="#release-summary">Release Summary</a>
     - <a href="#bugfixes">Bugfixes</a>
-- <a href="#v10-7-1">v10\.7\.1</a>
+- <a href="#v10-7-2">v10\.7\.2</a>
     - <a href="#release-summary-1">Release Summary</a>
+    - <a href="#bugfixes-1">Bugfixes</a>
+- <a href="#v10-7-1">v10\.7\.1</a>
+    - <a href="#release-summary-2">Release Summary</a>
     - <a href="#minor-changes">Minor Changes</a>
     - <a href="#deprecated-features">Deprecated Features</a>
-    - <a href="#bugfixes-1">Bugfixes</a>
+    - <a href="#bugfixes-2">Bugfixes</a>
 - <a href="#v10-7-0">v10\.7\.0</a>
-    - <a href="#release-summary-2">Release Summary</a>
+    - <a href="#release-summary-3">Release Summary</a>
     - <a href="#minor-changes-1">Minor Changes</a>
     - <a href="#deprecated-features-1">Deprecated Features</a>
-    - <a href="#bugfixes-2">Bugfixes</a>
+    - <a href="#bugfixes-3">Bugfixes</a>
     - <a href="#new-plugins">New Plugins</a>
         - <a href="#callback">Callback</a>
         - <a href="#filter">Filter</a>
     - <a href="#new-modules">New Modules</a>
 - <a href="#v10-6-0">v10\.6\.0</a>
-    - <a href="#release-summary-3">Release Summary</a>
+    - <a href="#release-summary-4">Release Summary</a>
     - <a href="#minor-changes-2">Minor Changes</a>
     - <a href="#deprecated-features-2">Deprecated Features</a>
-    - <a href="#bugfixes-3">Bugfixes</a>
+    - <a href="#bugfixes-4">Bugfixes</a>
     - <a href="#known-issues">Known Issues</a>
     - <a href="#new-plugins-1">New Plugins</a>
         - <a href="#connection">Connection</a>
 - <a href="#v10-5-0">v10\.5\.0</a>
-    - <a href="#release-summary-4">Release Summary</a>
+    - <a href="#release-summary-5">Release Summary</a>
     - <a href="#minor-changes-3">Minor Changes</a>
-    - <a href="#bugfixes-4">Bugfixes</a>
+    - <a href="#bugfixes-5">Bugfixes</a>
     - <a href="#new-modules-1">New Modules</a>
 - <a href="#v10-4-0">v10\.4\.0</a>
-    - <a href="#release-summary-5">Release Summary</a>
+    - <a href="#release-summary-6">Release Summary</a>
     - <a href="#minor-changes-4">Minor Changes</a>
     - <a href="#deprecated-features-3">Deprecated Features</a>
-    - <a href="#bugfixes-5">Bugfixes</a>
+    - <a href="#bugfixes-6">Bugfixes</a>
     - <a href="#new-modules-2">New Modules</a>
 - <a href="#v10-3-1">v10\.3\.1</a>
-    - <a href="#release-summary-6">Release Summary</a>
-    - <a href="#minor-changes-5">Minor Changes</a>
-    - <a href="#bugfixes-6">Bugfixes</a>
-- <a href="#v10-3-0">v10\.3\.0</a>
     - <a href="#release-summary-7">Release Summary</a>
+    - <a href="#minor-changes-5">Minor Changes</a>
+    - <a href="#bugfixes-7">Bugfixes</a>
+- <a href="#v10-3-0">v10\.3\.0</a>
+    - <a href="#release-summary-8">Release Summary</a>
     - <a href="#minor-changes-6">Minor Changes</a>
     - <a href="#deprecated-features-4">Deprecated Features</a>
     - <a href="#security-fixes">Security Fixes</a>
-    - <a href="#bugfixes-7">Bugfixes</a>
+    - <a href="#bugfixes-8">Bugfixes</a>
     - <a href="#new-plugins-2">New Plugins</a>
         - <a href="#connection-1">Connection</a>
         - <a href="#filter-1">Filter</a>
         - <a href="#lookup">Lookup</a>
     - <a href="#new-modules-3">New Modules</a>
 - <a href="#v10-2-0">v10\.2\.0</a>
-    - <a href="#release-summary-8">Release Summary</a>
+    - <a href="#release-summary-9">Release Summary</a>
     - <a href="#minor-changes-7">Minor Changes</a>
     - <a href="#deprecated-features-5">Deprecated Features</a>
     - <a href="#security-fixes-1">Security Fixes</a>
-    - <a href="#bugfixes-8">Bugfixes</a>
+    - <a href="#bugfixes-9">Bugfixes</a>
     - <a href="#new-plugins-3">New Plugins</a>
         - <a href="#inventory">Inventory</a>
     - <a href="#new-modules-4">New Modules</a>
 - <a href="#v10-1-0">v10\.1\.0</a>
-    - <a href="#release-summary-9">Release Summary</a>
+    - <a href="#release-summary-10">Release Summary</a>
     - <a href="#minor-changes-8">Minor Changes</a>
     - <a href="#deprecated-features-6">Deprecated Features</a>
-    - <a href="#bugfixes-9">Bugfixes</a>
+    - <a href="#bugfixes-10">Bugfixes</a>
     - <a href="#new-plugins-4">New Plugins</a>
         - <a href="#filter-2">Filter</a>
     - <a href="#new-modules-5">New Modules</a>
 - <a href="#v10-0-1">v10\.0\.1</a>
-    - <a href="#release-summary-10">Release Summary</a>
-    - <a href="#bugfixes-10">Bugfixes</a>
-- <a href="#v10-0-0">v10\.0\.0</a>
     - <a href="#release-summary-11">Release Summary</a>
+    - <a href="#bugfixes-11">Bugfixes</a>
+- <a href="#v10-0-0">v10\.0\.0</a>
+    - <a href="#release-summary-12">Release Summary</a>
     - <a href="#minor-changes-9">Minor Changes</a>
     - <a href="#breaking-changes--porting-guide">Breaking Changes / Porting Guide</a>
     - <a href="#deprecated-features-7">Deprecated Features</a>
     - <a href="#removed-features-previously-deprecated">Removed Features \(previously deprecated\)</a>
-    - <a href="#bugfixes-11">Bugfixes</a>
+    - <a href="#bugfixes-12">Bugfixes</a>
     - <a href="#known-issues-1">Known Issues</a>
     - <a href="#new-plugins-5">New Plugins</a>
         - <a href="#filter-3">Filter</a>
@@ -87,8 +90,8 @@
     - <a href="#new-modules-6">New Modules</a>
 This changelog describes changes after version 9\.0\.0\.
 
-<a id="v10-7-2"></a>
-## v10\.7\.2
+<a id="v10-7-3"></a>
+## v10\.7\.3
 
 <a id="release-summary"></a>
 ### Release Summary
@@ -96,6 +99,38 @@ This changelog describes changes after version 9\.0\.0\.
 Regular bugfix release\.
 
 <a id="bugfixes"></a>
+### Bugfixes
+
+* apache2\_module \- avoid ansible\-core 2\.19 deprecation \([https\://github\.com/ansible\-collections/community\.general/pull/10459](https\://github\.com/ansible\-collections/community\.general/pull/10459)\)\.
+* apk \- fix check for empty/whitespace\-only package names \([https\://github\.com/ansible\-collections/community\.general/pull/10532](https\://github\.com/ansible\-collections/community\.general/pull/10532)\)\.
+* apk \- handle empty name strings properly \([https\://github\.com/ansible\-collections/community\.general/issues/10441](https\://github\.com/ansible\-collections/community\.general/issues/10441)\, [https\://github\.com/ansible\-collections/community\.general/pull/10442](https\://github\.com/ansible\-collections/community\.general/pull/10442)\)\.
+* capabilities \- using invalid path \(symlink/directory/\.\.\.\) returned unrelated and incoherent error messages \([https\://github\.com/ansible\-collections/community\.general/issues/5649](https\://github\.com/ansible\-collections/community\.general/issues/5649)\, [https\://github\.com/ansible\-collections/community\.general/pull/10455](https\://github\.com/ansible\-collections/community\.general/pull/10455)\)\.
+* cronvar \- fix crash on missing <code>cron\_file</code> parent directories \([https\://github\.com/ansible\-collections/community\.general/issues/10460](https\://github\.com/ansible\-collections/community\.general/issues/10460)\, [https\://github\.com/ansible\-collections/community\.general/pull/10461](https\://github\.com/ansible\-collections/community\.general/pull/10461)\)\.
+* cronvar \- handle empty strings on <code>value</code> properly  \([https\://github\.com/ansible\-collections/community\.general/issues/10439](https\://github\.com/ansible\-collections/community\.general/issues/10439)\, [https\://github\.com/ansible\-collections/community\.general/pull/10445](https\://github\.com/ansible\-collections/community\.general/pull/10445)\)\.
+* doas become plugin \- disable pipelining on ansible\-core 2\.19\+\. The plugin does not work with pipelining\, and since ansible\-core 2\.19 become plugins can indicate that they do not work with pipelining \([https\://github\.com/ansible\-collections/community\.general/issues/9977](https\://github\.com/ansible\-collections/community\.general/issues/9977)\, [https\://github\.com/ansible\-collections/community\.general/pull/10537](https\://github\.com/ansible\-collections/community\.general/pull/10537)\)\.
+* htpasswd \- avoid ansible\-core 2\.19 deprecation \([https\://github\.com/ansible\-collections/community\.general/pull/10459](https\://github\.com/ansible\-collections/community\.general/pull/10459)\)\.
+* irc \- pass hostname to <code>wrap\_socket\(\)</code> if <code>use\_tls\=true</code> and <code>validate\_certs\=true</code> \([https\://github\.com/ansible\-collections/community\.general/issues/10472](https\://github\.com/ansible\-collections/community\.general/issues/10472)\, [https\://github\.com/ansible\-collections/community\.general/pull/10491](https\://github\.com/ansible\-collections/community\.general/pull/10491)\)\.
+* json\_query filter plugin \- make compatible with lazy evaluation list and dictionary types of ansible\-core 2\.19 \([https\://github\.com/ansible\-collections/community\.general/pull/10539](https\://github\.com/ansible\-collections/community\.general/pull/10539)\)\.
+* listen\_port\_facts \- avoid crash when required commands are missing \([https\://github\.com/ansible\-collections/community\.general/issues/10457](https\://github\.com/ansible\-collections/community\.general/issues/10457)\, [https\://github\.com/ansible\-collections/community\.general/pull/10458](https\://github\.com/ansible\-collections/community\.general/pull/10458)\)\.
+* machinectl become plugin \- disable pipelining on ansible\-core 2\.19\+\. The plugin does not work with pipelining\, and since ansible\-core 2\.19 become plugins can indicate that they do not work with pipelining \([https\://github\.com/ansible\-collections/community\.general/pull/10537](https\://github\.com/ansible\-collections/community\.general/pull/10537)\)\.
+* merge\_variables lookup plugin \- avoid deprecated functionality from ansible\-core 2\.19 \([https\://github\.com/ansible\-collections/community\.general/pull/10566](https\://github\.com/ansible\-collections/community\.general/pull/10566)\)\.
+* proxmox inventory plugin \- avoid using deprecated option when templating options \([https\://github\.com/ansible\-collections/community\.proxmox/pull/108](https\://github\.com/ansible\-collections/community\.proxmox/pull/108)\, [https\://github\.com/ansible\-collections/community\.general/pull/10553](https\://github\.com/ansible\-collections/community\.general/pull/10553)\)\.
+* proxmox\_pct\_remote connection plugin \- avoid deprecated ansible\-core paramiko import helper\, import paramiko directly instead \([https\://github\.com/ansible\-collections/community\.proxmox/issues/146](https\://github\.com/ansible\-collections/community\.proxmox/issues/146)\, [https\://github\.com/ansible\-collections/community\.proxmox/pull/151](https\://github\.com/ansible\-collections/community\.proxmox/pull/151)\, [https\://github\.com/ansible\-collections/community\.general/pull/10553](https\://github\.com/ansible\-collections/community\.general/pull/10553)\)\.
+* syspatch \- avoid ansible\-core 2\.19 deprecation \([https\://github\.com/ansible\-collections/community\.general/pull/10459](https\://github\.com/ansible\-collections/community\.general/pull/10459)\)\.
+* sysrc \- use <code>shlex</code> to improve parsing of <code>sysrc \-e \-a</code> output \([https\://github\.com/ansible\-collections/community\.general/issues/10394](https\://github\.com/ansible\-collections/community\.general/issues/10394)\, [https\://github\.com/ansible\-collections/community\.general/pull/10400](https\://github\.com/ansible\-collections/community\.general/pull/10400)\)\.
+* sysupgrade \- avoid ansible\-core 2\.19 deprecation \([https\://github\.com/ansible\-collections/community\.general/pull/10459](https\://github\.com/ansible\-collections/community\.general/pull/10459)\)\.
+* wsl connection plugin \- avoid deprecated ansible\-core paramiko import helper\, import paramiko directly instead \([https\://github\.com/ansible\-collections/community\.general/issues/10515](https\://github\.com/ansible\-collections/community\.general/issues/10515)\, [https\://github\.com/ansible\-collections/community\.general/pull/10531](https\://github\.com/ansible\-collections/community\.general/pull/10531)\)\.
+* zypper\_repository \- avoid ansible\-core 2\.19 deprecation \([https\://github\.com/ansible\-collections/community\.general/pull/10459](https\://github\.com/ansible\-collections/community\.general/pull/10459)\)\.
+
+<a id="v10-7-2"></a>
+## v10\.7\.2
+
+<a id="release-summary-1"></a>
+### Release Summary
+
+Regular bugfix release\.
+
+<a id="bugfixes-1"></a>
 ### Bugfixes
 
 * dependent lookup plugin \- avoid deprecated ansible\-core 2\.19 functionality \([https\://github\.com/ansible\-collections/community\.general/pull/10359](https\://github\.com/ansible\-collections/community\.general/pull/10359)\)\.
@@ -108,7 +143,7 @@ Regular bugfix release\.
 <a id="v10-7-1"></a>
 ## v10\.7\.1
 
-<a id="release-summary-1"></a>
+<a id="release-summary-2"></a>
 ### Release Summary
 
 Regular bugfix release\.
@@ -124,7 +159,7 @@ Regular bugfix release\.
 
 * yaml callback plugin \- the YAML callback plugin was deprecated for removal in community\.general 13\.0\.0\. Since it needs to use ansible\-core internals since ansible\-core 2\.19 that are changing a lot\, we will remove this plugin already from community\.general 12\.0\.0 to ease the maintenance burden \([https\://github\.com/ansible\-collections/community\.general/pull/10213](https\://github\.com/ansible\-collections/community\.general/pull/10213)\)\.
 
-<a id="bugfixes-1"></a>
+<a id="bugfixes-2"></a>
 ### Bugfixes
 
 * cobbler\_system \- update minimum version number to avoid wrong comparisons that happen in some cases using LooseVersion class which results in TypeError \([https\://github\.com/ansible\-collections/community\.general/issues/8506](https\://github\.com/ansible\-collections/community\.general/issues/8506)\, [https\://github\.com/ansible\-collections/community\.general/pull/10145](https\://github\.com/ansible\-collections/community\.general/pull/10145)\, [https\://github\.com/ansible\-collections/community\.general/pull/10178](https\://github\.com/ansible\-collections/community\.general/pull/10178)\)\.
@@ -138,7 +173,7 @@ Regular bugfix release\.
 <a id="v10-7-0"></a>
 ## v10\.7\.0
 
-<a id="release-summary-2"></a>
+<a id="release-summary-3"></a>
 ### Release Summary
 
 Bugfix and feature release\.
@@ -162,7 +197,7 @@ From now on\, there will only be bugfix 10\.7\.x releases for the community\.gen
 * The proxmox content \(modules and plugins\) is being moved to the [new collection community\.proxmox](https\://github\.com/ansible\-collections/community\.proxmox)\. In community\.general 11\.0\.0\, these modules and plugins will be replaced by deprecated redirections to community\.proxmox\. You need to explicitly install community\.proxmox\, for example with <code>ansible\-galaxy collection install community\.proxmox</code>\. We suggest to update your roles and playbooks to use the new FQCNs as soon as possible to avoid getting deprecation messages \([https\://github\.com/ansible\-collections/community\.general/pull/10109](https\://github\.com/ansible\-collections/community\.general/pull/10109)\)\.
 * pipx module\_utils \- function <code>make\_process\_list\(\)</code> is deprecated and will be removed in community\.general 13\.0\.0 \([https\://github\.com/ansible\-collections/community\.general/pull/10031](https\://github\.com/ansible\-collections/community\.general/pull/10031)\)\.
 
-<a id="bugfixes-2"></a>
+<a id="bugfixes-3"></a>
 ### Bugfixes
 
 * cobbler\_system \- fix bug with Cobbler \>\= 3\.4\.0 caused by giving more than 2 positional arguments to <code>CobblerXMLRPCInterface\.get\_system\_handle\(\)</code> \([https\://github\.com/ansible\-collections/community\.general/issues/8506](https\://github\.com/ansible\-collections/community\.general/issues/8506)\, [https\://github\.com/ansible\-collections/community\.general/pull/10145](https\://github\.com/ansible\-collections/community\.general/pull/10145)\)\.
@@ -194,7 +229,7 @@ From now on\, there will only be bugfix 10\.7\.x releases for the community\.gen
 <a id="v10-6-0"></a>
 ## v10\.6\.0
 
-<a id="release-summary-3"></a>
+<a id="release-summary-4"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
@@ -238,7 +273,7 @@ Regular bugfix and feature release\.
 * manifold lookup plugin \- plugin is deprecated and will be removed in community\.general 11\.0\.0 \([https\://github\.com/ansible\-collections/community\.general/pull/10028](https\://github\.com/ansible\-collections/community\.general/pull/10028)\)\.
 * stackpath\_compute inventory plugin \- plugin is deprecated and will be removed in community\.general 11\.0\.0 \([https\://github\.com/ansible\-collections/community\.general/pull/10026](https\://github\.com/ansible\-collections/community\.general/pull/10026)\)\.
 
-<a id="bugfixes-3"></a>
+<a id="bugfixes-4"></a>
 ### Bugfixes
 
 * dependent look plugin \- make compatible with ansible\-core\'s Data Tagging feature \([https\://github\.com/ansible\-collections/community\.general/pull/9833](https\://github\.com/ansible\-collections/community\.general/pull/9833)\)\.
@@ -271,7 +306,7 @@ Regular bugfix and feature release\.
 <a id="v10-5-0"></a>
 ## v10\.5\.0
 
-<a id="release-summary-4"></a>
+<a id="release-summary-5"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
@@ -293,7 +328,7 @@ Regular bugfix and feature release\.
 * systemd\_info \- extend support to timer units \([https\://github\.com/ansible\-collections/community\.general/pull/9891](https\://github\.com/ansible\-collections/community\.general/pull/9891)\)\.
 * vmadm \- add new options <code>flexible\_disk\_size</code> and <code>owner\_uuid</code> \([https\://github\.com/ansible\-collections/community\.general/pull/9892](https\://github\.com/ansible\-collections/community\.general/pull/9892)\)\.
 
-<a id="bugfixes-4"></a>
+<a id="bugfixes-5"></a>
 ### Bugfixes
 
 * cloudlare\_dns \- handle exhausted response stream in case of HTTP errors to show nice error message to the user \([https\://github\.com/ansible\-collections/community\.general/issues/9782](https\://github\.com/ansible\-collections/community\.general/issues/9782)\, [https\://github\.com/ansible\-collections/community\.general/pull/9818](https\://github\.com/ansible\-collections/community\.general/pull/9818)\)\.
@@ -313,7 +348,7 @@ Regular bugfix and feature release\.
 <a id="v10-4-0"></a>
 ## v10\.4\.0
 
-<a id="release-summary-5"></a>
+<a id="release-summary-6"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
@@ -343,7 +378,7 @@ Regular bugfix and feature release\.
 * profitbricks\_volume \- module is deprecated and will be removed in community\.general 11\.0\.0 \([https\://github\.com/ansible\-collections/community\.general/pull/9733](https\://github\.com/ansible\-collections/community\.general/pull/9733)\)\.
 * profitbricks\_volume\_attachments \- module is deprecated and will be removed in community\.general 11\.0\.0 \([https\://github\.com/ansible\-collections/community\.general/pull/9733](https\://github\.com/ansible\-collections/community\.general/pull/9733)\)\.
 
-<a id="bugfixes-5"></a>
+<a id="bugfixes-6"></a>
 ### Bugfixes
 
 * apache2\_mod\_proxy \- make compatible with Python 3 \([https\://github\.com/ansible\-collections/community\.general/pull/9762](https\://github\.com/ansible\-collections/community\.general/pull/9762)\)\.
@@ -371,7 +406,7 @@ Regular bugfix and feature release\.
 <a id="v10-3-1"></a>
 ## v10\.3\.1
 
-<a id="release-summary-6"></a>
+<a id="release-summary-7"></a>
 ### Release Summary
 
 Bugfix release\.
@@ -381,7 +416,7 @@ Bugfix release\.
 
 * onepassword\_ssh\_key \- refactor to move code to lookup class \([https\://github\.com/ansible\-collections/community\.general/pull/9633](https\://github\.com/ansible\-collections/community\.general/pull/9633)\)\.
 
-<a id="bugfixes-6"></a>
+<a id="bugfixes-7"></a>
 ### Bugfixes
 
 * cloudflare\_dns \- fix crash when deleting a DNS record or when updating a record with <code>solo\=true</code> \([https\://github\.com/ansible\-collections/community\.general/issues/9652](https\://github\.com/ansible\-collections/community\.general/issues/9652)\, [https\://github\.com/ansible\-collections/community\.general/pull/9649](https\://github\.com/ansible\-collections/community\.general/pull/9649)\)\.
@@ -395,7 +430,7 @@ Bugfix release\.
 <a id="v10-3-0"></a>
 ## v10\.3\.0
 
-<a id="release-summary-7"></a>
+<a id="release-summary-8"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
@@ -534,7 +569,7 @@ Regular bugfix and feature release\.
 
 * keycloak\_client \- Sanitize <code>saml\.encryption\.private\.key</code> so it does not show in the logs \([https\://github\.com/ansible\-collections/community\.general/pull/9621](https\://github\.com/ansible\-collections/community\.general/pull/9621)\)\.
 
-<a id="bugfixes-7"></a>
+<a id="bugfixes-8"></a>
 ### Bugfixes
 
 * homebrew \- fix incorrect handling of homebrew modules when a tap is requested \([https\://github\.com/ansible\-collections/community\.general/pull/9546](https\://github\.com/ansible\-collections/community\.general/pull/9546)\, [https\://github\.com/ansible\-collections/community\.general/issues/9533](https\://github\.com/ansible\-collections/community\.general/issues/9533)\)\.
@@ -578,7 +613,7 @@ Regular bugfix and feature release\.
 <a id="v10-2-0"></a>
 ## v10\.2\.0
 
-<a id="release-summary-8"></a>
+<a id="release-summary-9"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
@@ -737,7 +772,7 @@ Regular bugfix and feature release\.
 
 * keycloak\_authentication \- API calls did not properly set the <code>priority</code> during update resulting in incorrectly sorted authentication flows\. This apparently only affects Keycloak 25 or newer \([https\://github\.com/ansible\-collections/community\.general/pull/9263](https\://github\.com/ansible\-collections/community\.general/pull/9263)\)\.
 
-<a id="bugfixes-8"></a>
+<a id="bugfixes-9"></a>
 ### Bugfixes
 
 * dig lookup plugin \- correctly handle <code>NoNameserver</code> exception \([https\://github\.com/ansible\-collections/community\.general/pull/9363](https\://github\.com/ansible\-collections/community\.general/pull/9363)\, [https\://github\.com/ansible\-collections/community\.general/issues/9362](https\://github\.com/ansible\-collections/community\.general/issues/9362)\)\.
@@ -768,7 +803,7 @@ Regular bugfix and feature release\.
 <a id="v10-1-0"></a>
 ## v10\.1\.0
 
-<a id="release-summary-9"></a>
+<a id="release-summary-10"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
@@ -800,7 +835,7 @@ Regular bugfix and feature release\.
 * opkg \- deprecate value <code>\"\"</code> for parameter <code>force</code> \([https\://github\.com/ansible\-collections/community\.general/pull/9172](https\://github\.com/ansible\-collections/community\.general/pull/9172)\)\.
 * redfish\_utils module utils \- deprecate method <code>RedfishUtils\.\_init\_session\(\)</code> \([https\://github\.com/ansible\-collections/community\.general/pull/9190](https\://github\.com/ansible\-collections/community\.general/pull/9190)\)\.
 
-<a id="bugfixes-9"></a>
+<a id="bugfixes-10"></a>
 ### Bugfixes
 
 * dnf\_config\_manager \- fix hanging when prompting to import GPG keys \([https\://github\.com/ansible\-collections/community\.general/pull/9124](https\://github\.com/ansible\-collections/community\.general/pull/9124)\, [https\://github\.com/ansible\-collections/community\.general/issues/8830](https\://github\.com/ansible\-collections/community\.general/issues/8830)\)\.
@@ -829,12 +864,12 @@ Regular bugfix and feature release\.
 <a id="v10-0-1"></a>
 ## v10\.0\.1
 
-<a id="release-summary-10"></a>
+<a id="release-summary-11"></a>
 ### Release Summary
 
 Bugfix release for inclusion in Ansible 11\.0\.0rc1\.
 
-<a id="bugfixes-10"></a>
+<a id="bugfixes-11"></a>
 ### Bugfixes
 
 * keycloak\_client \- fix diff by removing code that turns the attributes dict which contains additional settings into a list \([https\://github\.com/ansible\-collections/community\.general/pull/9077](https\://github\.com/ansible\-collections/community\.general/pull/9077)\)\.
@@ -844,7 +879,7 @@ Bugfix release for inclusion in Ansible 11\.0\.0rc1\.
 <a id="v10-0-0"></a>
 ## v10\.0\.0
 
-<a id="release-summary-11"></a>
+<a id="release-summary-12"></a>
 ### Release Summary
 
 This is release 10\.0\.0 of <code>community\.general</code>\, released on 2024\-11\-04\.
@@ -1079,7 +1114,7 @@ This is release 10\.0\.0 of <code>community\.general</code>\, released on 2024\-
 * proxmox\_kvm \- removed the <code>proxmox\_default\_behavior</code> option\. Explicitly specify the old default values if you were using <code>proxmox\_default\_behavior\=compatibility</code>\, otherwise simply remove it \([https\://github\.com/ansible\-collections/community\.general/pull/8918](https\://github\.com/ansible\-collections/community\.general/pull/8918)\)\.
 * redhat\_subscriptions \- removed the <code>pool</code> option\. Use <code>pool\_ids</code> instead \([https\://github\.com/ansible\-collections/community\.general/pull/8918](https\://github\.com/ansible\-collections/community\.general/pull/8918)\)\.
 
-<a id="bugfixes-11"></a>
+<a id="bugfixes-12"></a>
 ### Bugfixes
 
 * bitwarden lookup plugin \- fix <code>KeyError</code> in <code>search\_field</code> \([https\://github\.com/ansible\-collections/community\.general/issues/8549](https\://github\.com/ansible\-collections/community\.general/issues/8549)\, [https\://github\.com/ansible\-collections/community\.general/pull/8557](https\://github\.com/ansible\-collections/community\.general/pull/8557)\)\.

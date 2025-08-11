@@ -1,2 +1,0 @@
-bugfixes:
-  - "merge_variables lookup plugin - avoid deprecated functionality from ansible-core 2.19 (https://github.com/ansible-collections/community.general/pull/10566)."

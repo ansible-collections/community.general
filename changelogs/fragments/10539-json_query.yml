@@ -1,2 +1,0 @@
-bugfixes:
-  - "json_query filter plugin - make compatible with lazy evaluation list and dictionary types of ansible-core 2.19 (https://github.com/ansible-collections/community.general/pull/10539)."
