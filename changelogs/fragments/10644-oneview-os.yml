@@ -1,2 +1,2 @@
-minor_changes:
+breaking_changes:
   - oneview module utils - remove import of standard library ``os`` (https://github.com/ansible-collections/community.general/pull/10644).
