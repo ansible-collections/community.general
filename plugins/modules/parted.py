@@ -552,9 +552,9 @@ def parted(script, device, align):
     """
     global module, parted_exec  # pylint: disable=global-variable-not-assigned
 
-    align_option = '-a %s' % align
+    align_option = ['-a', align]
     if align == 'undefined':
-        align_option = ''
+        align_option = []
 
     """
     Use option --fix (-f) if available. Versions prior
@@ -562,13 +562,12 @@ def parted(script, device, align):
     http://savannah.gnu.org/news/?id=10114
     """
     if parted_version() >= (3, 4, 64):
-        script_option = '-s -f'
+        script_option = ['-s', '-f']
     else:
-        script_option = '-s'
+        script_option = ['-s']
 
     if script and not module.check_mode:
-        # TODO: convert run_comand() argument to list!
-        command = "%s %s -m %s %s -- %s" % (parted_exec, script_option, align_option, device, script)
+        command = [parted_exec] + script_option + align_option + [device, script]
         rc, out, err = module.run_command(command)
 
         if rc != 0:
