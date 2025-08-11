@@ -1474,3 +1474,106 @@ releases:
       - 11.1.2.yml
       - become-pipelining.yml
     release_date: '2025-08-04'
+  11.2.0:
+    changes:
+      bugfixes:
+        - jenkins_plugin - install latest compatible version instead of latest (https://github.com/ansible-collections/community.general/issues/854,
+          https://github.com/ansible-collections/community.general/pull/10346).
+        - jenkins_plugin - separate Jenkins and external URL credentials (https://github.com/ansible-collections/community.general/issues/4419,
+          https://github.com/ansible-collections/community.general/pull/10346).
+        - lvm_pv - properly detect SCSI or NVMe devices to rescan (https://github.com/ansible-collections/community.general/issues/10444,
+          https://github.com/ansible-collections/community.general/pull/10596).
+      deprecated_features:
+        - bearychat - module is deprecated and will be removed in community.general
+          12.0.0 (https://github.com/ansible-collections/community.general/issues/10514).
+        - cpanm - deprecate ``mode=compatibility``, ``mode=new`` should be used instead
+          (https://github.com/ansible-collections/community.general/pull/10434).
+        - github_repo - deprecate ``force_defaults=true`` (https://github.com/ansible-collections/community.general/pull/10435).
+        - rocketchat - the default value for ``is_pre740``, currently ``true``, is
+          deprecated and will change to ``false`` in community.general 13.0.0 (https://github.com/ansible-collections/community.general/pull/10490).
+      minor_changes:
+        - apk - using safer mechanism to run external command (https://github.com/ansible-collections/community.general/issues/10479,
+          https://github.com/ansible-collections/community.general/pull/10520).
+        - bzr - using safer mechanism to run external command (https://github.com/ansible-collections/community.general/pull/10523).
+        - capabilities - using safer mechanism to run external command (https://github.com/ansible-collections/community.general/pull/10524).
+        - composer - using safer mechanism to run external command (https://github.com/ansible-collections/community.general/pull/10525).
+        - django module utils - remove deprecated parameter ``_DjangoRunner`` call
+          (https://github.com/ansible-collections/community.general/pull/10574).
+        - easy_install - using safer mechanism to run external command (https://github.com/ansible-collections/community.general/pull/10526).
+        - imgadm - using safer mechanism to run external command (https://github.com/ansible-collections/community.general/pull/10536).
+        - jenkins_plugin - install dependencies for specific version (https://github.com/ansible-collections/community.general/issue/4995,
+          https://github.com/ansible-collections/community.general/pull/10346).
+        - "keycloak_identity_provider \u2013 add support for ``fromUrl`` to automatically\
+          \ fetch OIDC endpoints from the well-known discovery URL, simplifying identity\
+          \ provider configuration (https://github.com/ansible-collections/community.general/pull/10527)."
+        - keycloak_realm - add support for ``brute_force_strategy`` and ``max_temporary_lockouts``
+          (https://github.com/ansible-collections/community.general/issues/10412,
+          https://github.com/ansible-collections/community.general/pull/10415).
+        - keycloak_realm - add support for client-related options and Oauth2 device
+          (https://github.com/ansible-collections/community.general/pull/10538).
+        - logstash_plugin - using safer mechanism to run external command (https://github.com/ansible-collections/community.general/issues/10479,
+          https://github.com/ansible-collections/community.general/pull/10520).
+        - nagios - make parameter ``services`` a ``list`` instead of a ``str`` (https://github.com/ansible-collections/community.general/pull/10493).
+        - open_iscsi - using safer mechanism to run external command (https://github.com/ansible-collections/community.general/pull/10599).
+        - pear - using safer mechanism to run external command (https://github.com/ansible-collections/community.general/pull/10601).
+        - portage - using safer mechanism to run external command (https://github.com/ansible-collections/community.general/pull/10602).
+        - riak - using safer mechanism to run external command (https://github.com/ansible-collections/community.general/pull/10603).
+        - scaleway_* modules, scaleway inventory plugin - update available zones and
+          API URLs (https://github.com/ansible-collections/community.general/issues/10383,
+          https://github.com/ansible-collections/community.general/pull/10424).
+        - sensu_subscription - normalize quotes in the module output (https://github.com/ansible-collections/community.general/pull/10483).
+        - solaris_zone - using safer mechanism to run external command (https://github.com/ansible-collections/community.general/pull/10604).
+        - swupd - using safer mechanism to run external command (https://github.com/ansible-collections/community.general/pull/10605).
+        - tasks_only callback plugin - add ``result_format`` and ``pretty_results``
+          options similarly to the default callback (https://github.com/ansible-collections/community.general/pull/10422).
+        - timezone - using safer mechanism to run external command (https://github.com/ansible-collections/community.general/pull/10612).
+        - urpmi - using safer mechanism to run external command (https://github.com/ansible-collections/community.general/pull/10606).
+        - xbps - using safer mechanism to run external command (https://github.com/ansible-collections/community.general/pull/10608).
+        - xfs_quota - using safer mechanism to run external command (https://github.com/ansible-collections/community.general/pull/10609).
+      release_summary: Regular bugfix and features release.
+    fragments:
+      - 10346-jenkins-plugins-fixes.yml
+      - 10415-keycloak-realm-brute-force-attributes.yml
+      - 10422-tasks_only-result_format.yml
+      - 10424-scaleway-update-zones.yml
+      - 10434-cpanm-deprecate-compat-mode.yml
+      - 10435-github-repo-deprecate-force-defaults.yml
+      - 10483-sensu-subscription-quotes.yml
+      - 10490-rocketchat.yml
+      - 10493-nagios-services.yml
+      - 10514-deprecate-bearychat.yml
+      - 10520-arg-runcommand-list.yml
+      - 10523-bzr-cmd-list.yml
+      - 10524-capabilities-cmd-list.yml
+      - 10525-composer-cmd-list.yml
+      - 10526-easy-install-cmd-list.yml
+      - 10527-keycloak-idp-well-known-url-support.yml
+      - 10536-imgadm-cmd-list.yml
+      - 10538-keycloak-realm-add-support-client-options.yml
+      - 10573-logstash-plugin-cmd-list.yml
+      - 10574-django-runner.yml
+      - 10599-open-iscsi-cmd-list.yml
+      - 10601-pear-cmd-list.yml
+      - 10602-portage-cmd-list.yml
+      - 10603-riak-cmd-list.yml
+      - 10604-solaris-zone-cmd-list.yml
+      - 10605-swupd-cmd-list.yml
+      - 10606-urpmi-cmd-list.yml
+      - 10608-xbps-cmd-list.yml
+      - 10609-xfs-quota-cmd-list.yml
+      - 10612-timezone-cmd-list.yml
+      - 11.2.0.yml
+      - lvm_pv.yml
+    modules:
+      - description: Move data between LVM Physical Volumes (PVs).
+        name: lvm_pv_move_data
+        namespace: ''
+      - description: Gather information about Pacemaker cluster.
+        name: pacemaker_info
+        namespace: ''
+    plugins:
+      lookup:
+        - description: Read binary file and return it Base64 encoded.
+          name: binary_file
+          namespace: null
+    release_date: '2025-08-11'
