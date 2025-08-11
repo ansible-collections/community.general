@@ -10,15 +10,10 @@ import logging
 import logging.config
 import os
 import tempfile
-# (TODO: remove next line!)
-from datetime import datetime  # noqa: F401, pylint: disable=unused-import
-from operator import eq
 
 import time
 
 try:
-    import yaml  # noqa: F401, pylint: disable=unused-import
-
     import oci
     from oci.constants import HEADER_NEXT_PAGE
 
@@ -443,7 +438,7 @@ def check_and_update_attributes(
     :param changed: Flag to indicate whether there is any difference between the values
     :return: Returns a boolean value indicating whether there is any difference between the values
     """
-    if input_value is not None and not eq(input_value, existing_value):
+    if input_value is not None and input_value != existing_value:
         changed = True
         target_instance.__setattr__(attr_name, input_value)
     else:
