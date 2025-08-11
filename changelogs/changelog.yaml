@@ -1757,3 +1757,38 @@ releases:
       - 10359-dependent.yml
       - 9.5.10.yml
     release_date: '2025-07-13'
+  9.5.11:
+    changes:
+      bugfixes:
+        - apache2_module - avoid ansible-core 2.19 deprecation (https://github.com/ansible-collections/community.general/pull/10459).
+        - doas become plugin - disable pipelining on ansible-core 2.19+. The plugin
+          does not work with pipelining, and since ansible-core 2.19 become plugins
+          can indicate that they do not work with pipelining (https://github.com/ansible-collections/community.general/issues/9977,
+          https://github.com/ansible-collections/community.general/pull/10537).
+        - htpasswd - avoid ansible-core 2.19 deprecation (https://github.com/ansible-collections/community.general/pull/10459).
+        - irc - pass hostname to ``wrap_socket()`` if ``use_tls=true`` and ``validate_certs=true``
+          (https://github.com/ansible-collections/community.general/issues/10472,
+          https://github.com/ansible-collections/community.general/pull/10491).
+        - json_query filter plugin - make compatible with lazy evaluation list and
+          dictionary types of ansible-core 2.19 (https://github.com/ansible-collections/community.general/pull/10539).
+        - machinectl become plugin - disable pipelining on ansible-core 2.19+. The
+          plugin does not work with pipelining, and since ansible-core 2.19 become
+          plugins can indicate that they do not work with pipelining (https://github.com/ansible-collections/community.general/pull/10537).
+        - merge_variables lookup plugin - avoid deprecated functionality from ansible-core
+          2.19 (https://github.com/ansible-collections/community.general/pull/10566).
+        - proxmox inventory plugin - avoid using deprecated option when templating
+          options (https://github.com/ansible-collections/community.proxmox/pull/108,
+          https://github.com/ansible-collections/community.general/pull/10553).
+        - syspatch - avoid ansible-core 2.19 deprecation (https://github.com/ansible-collections/community.general/pull/10459).
+        - sysupgrade - avoid ansible-core 2.19 deprecation (https://github.com/ansible-collections/community.general/pull/10459).
+        - zypper_repository - avoid ansible-core 2.19 deprecation (https://github.com/ansible-collections/community.general/pull/10459).
+      release_summary: Bugfix release.
+    fragments:
+      - 10459-deprecations.yml
+      - 10491-irc.yml
+      - 10539-json_query.yml
+      - 10566-merge_variables.yml
+      - 108--disable_lookups.yml
+      - 9.5.11.yml
+      - become-pipelining.yml
+    release_date: '2025-08-11'
