@@ -5,3 +5,4 @@
 
 keytool_package_names:
   - ca-certificates-java
+  - openjdk-11-jre-headless
