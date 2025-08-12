@@ -27,6 +27,8 @@ attributes:
     support: full
   diff_mode:
     support: partial
+    details:
+      - Only works when check mode is not enabled.
 options:
   state:
     description:
@@ -112,11 +114,16 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-cluster_stonith:
-  description: The cluster STONITH output message.
+previous_value:
+  description: The value of the STONITH before executing the module.
   type: str
-  sample: ""
-  returned: always
+  sample: "  * virtual-stonith\t(stonith:fence_virt):\t Started"
+  returned: on success
+value:
+  description: The value of the STONITH after executing the module.
+  type: str
+  sample: "  * virtual-stonith\t(stonith:fence_virt):\t Started"
+  returned: on success
 '''
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
