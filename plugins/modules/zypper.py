@@ -85,9 +85,11 @@ options:
   auto_import_keys:
     description:
       - Whether to automatically import new repository signing keys. Adds C(--gpg-auto-import-keys) option to I(zypper).
+      - Is only used when installing.
     required: false
     default: false
     type: bool
+    version_added: 11.3.0
   disable_recommends:
     description:
       - Corresponds to the C(--no-recommends) option for I(zypper). Default behavior (V(true)) modifies zypper's default behavior;
