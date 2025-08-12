@@ -13,7 +13,7 @@ module: pacemaker_stonith
 short_description: Manage Pacemaker STONITH
 author:
   - Dexter Le (@munchtoast)
-version_added: 11.2.0
+version_added: 11.3.0
 description:
   - This module manages STONITH in a Pacemaker cluster using the Pacemaker CLI.
 seealso:
