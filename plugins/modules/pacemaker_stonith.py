@@ -26,7 +26,7 @@ attributes:
   check_mode:
     support: full
   diff_mode:
-    support: none
+    support: partial
 options:
   state:
     description:
