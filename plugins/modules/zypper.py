@@ -617,6 +617,7 @@ def main():
             type=dict(default='package', choices=['package', 'patch', 'pattern', 'product', 'srcpackage', 'application']),
             extra_args_precommand=dict(),
             disable_gpg_check=dict(default=False, type='bool'),
+            auto_import_keys=dict(default=False, type='bool'),
             disable_recommends=dict(default=True, type='bool'),
             force=dict(default=False, type='bool'),
             force_resolution=dict(default=False, type='bool'),
