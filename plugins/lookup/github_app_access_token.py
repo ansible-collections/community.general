@@ -69,16 +69,23 @@ _raw:
 """
 
 try:
-    from cryptography.hazmat.primitives import serialization
-    HAS_CRYPTOGRAPHY = True
-except ImportError:
-    HAS_CRYPTOGRAPHY = False
-
-try:
-    import jwt  # pyjwt
+    import jwt
     HAS_JWT = True
 except ImportError:
     HAS_JWT = False
+
+HAS_PYTHON_JWT = False  # vs pyjwt
+if HAS_JWT and hasattr(jwt, 'JWT'):
+    HAS_PYTHON_JWT = True
+    from jwt import jwk_from_pem, jwt_instance
+
+if not HAS_PYTHON_JWT:
+    try:
+        from cryptography.hazmat.primitives import serialization
+        HAS_CRYPTOGRAPHY = True
+    except ImportError:
+        HAS_CRYPTOGRAPHY = False
+
 
 import time
 import json
@@ -91,7 +98,35 @@ from ansible.utils.display import Display
 display = Display()
 
 
+class PythonJWT:
+
+    @staticmethod
+    def read_key(path, private_key=None):
+        try:
+            if private_key:
+                return jwk_from_pem(private_key.encode('utf-8'))
+            with open(path, 'rb') as pem_file:
+                return jwk_from_pem(pem_file.read())
+        except Exception as e:
+            raise AnsibleError(f"Error while parsing key file: {e}")
+
+    @staticmethod
+    def encode_jwt(app_id, jwk, exp=600):
+        now = int(time.time())
+        payload = {
+            'iat': now,
+            'exp': now + exp,
+            'iss': app_id,
+        }
+        try:
+            return jwt_instance.encode(payload, jwk, alg='RS256')
+        except Exception as e:
+            raise AnsibleError(f"Error while encoding jwt: {e}")
+
+
 def read_key(path, private_key=None):
+    if HAS_PYTHON_JWT:
+        return PythonJWT.read_key(path, private_key)
     try:
         if private_key:
             key_bytes = private_key.encode('utf-8')
@@ -104,6 +139,8 @@ def read_key(path, private_key=None):
 
 
 def encode_jwt(app_id, private_key_obj, exp=600):
+    if HAS_PYTHON_JWT:
+        return PythonJWT.encode_jwt(app_id, private_key_obj)
     now = int(time.time())
     payload = {
         'iat': now,
@@ -155,9 +192,16 @@ class LookupModule(LookupBase):
             raise AnsibleError('Python jwt library is required. '
                                'Please install using "pip install pyjwt"')
 
-        if not HAS_CRYPTOGRAPHY:
+        if not HAS_PYTHON_JWT and not HAS_CRYPTOGRAPHY:
             raise AnsibleError('Python cryptography library is required. '
                                'Please install using "pip install cryptography"')
+        if HAS_PYTHON_JWT:
+            display.deprecated(
+                msg="jwt is being deprecated, please use pyjwt",
+                version="11.2.1",
+                collection_name='community.general',
+                removed=False,
+            )
 
         self.set_options(var_options=variables, direct=kwargs)
 
