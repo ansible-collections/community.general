@@ -13,6 +13,7 @@ from ansible_collections.community.general.plugins.module_utils.cmd_runner impor
 _state_map = {
     "present": "create",
     "absent": "remove",
+    "clone": "clone",
     "status": "status",
     "enabled": "enable",
     "disabled": "disable",
@@ -65,6 +66,8 @@ def pacemaker_runner(module, **kwargs):
             resource_operation=cmd_runner_fmt.as_func(fmt_resource_operation),
             resource_meta=cmd_runner_fmt.stack(cmd_runner_fmt.as_opt_val)("meta"),
             resource_argument=cmd_runner_fmt.as_func(fmt_resource_argument),
+            resource_clone_ids=cmd_runner_fmt.as_list(),
+            resource_clone_meta=cmd_runner_fmt.as_list(),
             apply_all=cmd_runner_fmt.as_bool("--all"),
             agent_validation=cmd_runner_fmt.as_bool("--agent-validation"),
             wait=cmd_runner_fmt.as_opt_eq_val("--wait"),
