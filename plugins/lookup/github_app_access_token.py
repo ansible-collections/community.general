@@ -198,7 +198,7 @@ class LookupModule(LookupBase):
         if HAS_PYTHON_JWT:
             display.deprecated(
                 msg="jwt is being deprecated, please use pyjwt",
-                version="11.2.1",
+                version="14.0.0",
                 collection_name='community.general',
                 removed=False,
             )
