@@ -626,6 +626,13 @@ def main():
                         changed = True
                 else:
                     diff = None
+    if (not changed) and (not module.check_mode):
+        post_rules = get_current_rules()
+        diff = dict(
+            before="{}\n\n---\n\n{}".format(pre_state, pre_rules),
+            after="{}\n\n---\n\n{}".format(post_state, post_rules),
+        )
+        changed = (pre_state != post_state) or (pre_rules != post_rules)
 
     if (type(diff) == dict) and (diff["before"] == diff["after"]):
         diff = None
@@ -640,9 +647,6 @@ def main():
         return module.exit_json(changed=changed, commands=cmds, diff=diff)
     else:
         post_state = execute([[ufw_bin], ['status'], ['verbose']])
-        if not changed:
-            post_rules = get_current_rules()
-            changed = (pre_state != post_state) or (pre_rules != post_rules)
         return module.exit_json(changed=changed, commands=cmds, msg=post_state.rstrip(), diff=diff)
 
 
