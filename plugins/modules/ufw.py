@@ -635,7 +635,7 @@ def main():
         )
         changed = (pre_state != post_state) or (pre_rules != post_rules)
 
-    if (type(diff) == dict) and (diff["before"] == diff["after"]):
+    if (diff is not None) and (diff["before"] == diff["after"]):
         diff = None
 
     if (changed) and (diff is None):
