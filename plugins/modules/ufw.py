@@ -600,8 +600,8 @@ def main():
 
             rules_dry = execute(cmd)
             diff = dict(
-                before=execute([[ufw_bin], ["--dry-run allow in from 0.0.0.1/0 to any port 1 proto udp"]]).replace(
-                    '### tuple ### allow udp 1 0.0.0.0/0 any 0.0.0.1 in\n-A ufw-user-input -p udp --dport 1 -s 0.0.0.1 -j ACCEPT\n', '').replace(
+                before=execute([[ufw_bin], ["ufw --dry-run route allow in on foo out on bar from 1.1.1.1 port 7000 to 8.8.8.8 port 7001 proto tcp"]]).replace(
+                    "### tuple ### route:allow tcp 7001 8.8.8.8 7000 1.1.1.1 in_foo!out_bar\n -A ufw-user-forward -i foo -o bar -p tcp -d 8.8.8.8 --dport 7001 -s 1.1.1.1 --sport 7000 -j ACCEPT\n").replace(
                     '\n\n\n', '\n\n'),
                 after=rules_dry,
             )
