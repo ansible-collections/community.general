@@ -160,7 +160,7 @@ def has_changed(string):
 
 def get_available_options(module, command='install'):
     # get all available options from a composer command using composer help to json
-    rc, out, err = composer_command(module, "help %s" % command, arguments="--no-interaction --format=json")
+    rc, out, err = composer_command(module, ["help", command], arguments=["--no-interaction", "--format=json"])
     if rc != 0:
         output = parse_out(err)
         module.fail_json(msg=output)
@@ -169,14 +169,16 @@ def get_available_options(module, command='install'):
     return command_help_json['definition']['options']
 
 
-def composer_command(module, command, arguments="", options=None):
+def composer_command(module, command, arguments=None, options=None):
+    if arguments is None:
+        arguments = []
     if options is None:
         options = []
 
-    global_command = module.params['global_command']
+    global_command = ["global"] if module.params['global_command'] else []
 
     if not global_command:
-        options.extend(['--working-dir', "'%s'" % module.params['working_dir']])
+        options.extend(['--working-dir', module.params['working_dir']])
 
     if module.params['executable'] is None:
         php_path = module.get_bin_path("php", True, ["/usr/local/bin"])
@@ -188,15 +190,14 @@ def composer_command(module, command, arguments="", options=None):
     else:
         composer_path = module.params['composer_executable']
 
-    cmd = [php_path, composer_path, "global" if global_command else "", command] + options + [arguments]
+    cmd = [php_path, composer_path] + global_command + command + options + arguments
     return module.run_command(cmd)
-
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
             command=dict(default="install", type="str"),
-            arguments=dict(default="", type="str"),
+            arguments=dict(default=[], type="list", elements="str"),
             executable=dict(type="path", aliases=["php_path"]),
             working_dir=dict(type="path"),
             global_command=dict(default=False, type="bool"),
@@ -260,7 +261,7 @@ def main():
         else:
             module.exit_json(skipped=True, msg="command '%s' does not support check mode, skipping" % command)
 
-    rc, out, err = composer_command(module, command, arguments, options)
+    rc, out, err = composer_command(module, [command], arguments, options)
 
     if rc != 0:
         output = parse_out(err)
