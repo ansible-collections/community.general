@@ -644,7 +644,7 @@ def main():
     if (changed) and (diff is None):
         raise Exception("ufw module reported a change, but no differences detected")
     elif (changed is False) and (diff is not None):
-        raise Exception("ufw module reported no change, but differences were detcted", diff)
+        raise Exception("ufw module reported no change, but differences were detcted", diff, cmds)
 
     # Get the new state
     if module.check_mode:
