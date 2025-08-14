@@ -627,14 +627,16 @@ def main():
                         changed = True
                 else:
                     diff = None
-    if (not changed) and (not module.check_mode):
+
+    if not module.check_mode:
         post_state = execute([[ufw_bin], ['status'], ['verbose']])
         post_rules = get_current_rules()
-        diff = dict(
-            before="{}\n\n---\n\n{}".format(pre_state, pre_rules),
-            after="{}\n\n---\n\n{}".format(post_state, post_rules),
-        )
-        changed = (pre_state != post_state) or (pre_rules != post_rules)
+        if (not changed):
+            diff = dict(
+                before="{}\n\n---\n\n{}".format(pre_state, pre_rules),
+                after="{}\n\n---\n\n{}".format(post_state, post_rules),
+            )
+            changed = (pre_state != post_state) or (pre_rules != post_rules)
 
     if (diff is not None) and (diff["before"] == diff["after"]):
         diff = None
