@@ -143,6 +143,7 @@ EXAMPLES = r"""
 """
 
 import re
+import shlex
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -193,11 +194,12 @@ def composer_command(module, command, arguments=None, options=None):
     cmd = [php_path, composer_path] + global_command + command + options + arguments
     return module.run_command(cmd)
 
+
 def main():
     module = AnsibleModule(
         argument_spec=dict(
             command=dict(default="install", type="str"),
-            arguments=dict(default=[], type="list", elements="str"),
+            arguments=dict(default="", type="str"),
             executable=dict(type="path", aliases=["php_path"]),
             working_dir=dict(type="path"),
             global_command=dict(default=False, type="bool"),
@@ -221,7 +223,7 @@ def main():
     if re.search(r"\s", command):
         module.fail_json(msg="Use the 'arguments' param for passing arguments with the 'command'")
 
-    arguments = module.params['arguments']
+    arguments = shlex.split(module.params['arguments'])
     available_options = get_available_options(module=module, command=command)
 
     options = []
