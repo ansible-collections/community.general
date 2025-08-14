@@ -627,6 +627,7 @@ def main():
                 else:
                     diff = None
     if (not changed) and (not module.check_mode):
+        post_state = execute([[ufw_bin], ['status'], ['verbose']])
         post_rules = get_current_rules()
         diff = dict(
             before="{}\n\n---\n\n{}".format(pre_state, pre_rules),
@@ -646,7 +647,6 @@ def main():
     if module.check_mode:
         return module.exit_json(changed=changed, commands=cmds, diff=diff)
     else:
-        post_state = execute([[ufw_bin], ['status'], ['verbose']])
         return module.exit_json(changed=changed, commands=cmds, msg=post_state.rstrip(), diff=diff)
 
 
