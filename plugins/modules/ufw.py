@@ -599,10 +599,10 @@ def main():
                 cmd.append([params['comment'], "comment '%s'" % params['comment']])
 
             rules_dry = execute(cmd)
+            cmd = [[ufw_bin], ["--dry-run route allow in on foo out on bar from 1.1.1.1 port 7000 to 8.8.8.8 port 7001 proto tcp"]]
+            remove = "### tuple ### route:allow tcp 7001 8.8.8.8 7000 1.1.1.1 in_foo!out_bar\n -A ufw-user-forward -i foo -o bar -p tcp -d 8.8.8.8 --dport 7001 -s 1.1.1.1 --sport 7000 -j ACCEPT\n"
             diff = dict(
-                before=execute([[ufw_bin], ["--dry-run route allow in on foo out on bar from 1.1.1.1 port 7000 to 8.8.8.8 port 7001 proto tcp"]]).replace(
-                    "### tuple ### route:allow tcp 7001 8.8.8.8 7000 1.1.1.1 in_foo!out_bar\n -A ufw-user-forward -i foo -o bar -p tcp -d 8.8.8.8 --dport 7001 -s 1.1.1.1 --sport 7000 -j ACCEPT\n").replace(
-                    '\n\n\n', '\n\n'),
+                before=execute(cmd).replace(remove, '').replace('\n\n\n', '\n\n'),
                 after=rules_dry,
             )
             diff["before"] = re.sub(r"(comment=)([\da-f]+)(\n)", decode_comment, diff["before"])
