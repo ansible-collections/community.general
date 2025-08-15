@@ -13,8 +13,8 @@ author:
 short_description: Obtain short-lived Github App Access tokens
 version_added: '8.2.0'
 requirements:
-  - PyJWT (https://pypi.org/project/PyJWT/)
-  - cryptography (https://pypi.org/project/cryptography/)
+  - jwt (https://github.com/GehirnInc/python-jwt) OR 
+  - PyJWT (https://pypi.org/project/PyJWT/) AND cryptography (https://pypi.org/project/cryptography/)
 description:
   - This generates a Github access token that can be used with a C(git) command, if you use a Github App.
 options:
