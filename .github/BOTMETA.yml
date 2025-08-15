@@ -474,8 +474,6 @@ files:
     keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
     labels: beadm solaris
     maintainers: $team_solaris
-  $modules/bearychat.py:
-    maintainers: tonyseek
   $modules/bigpanda.py:
     ignore: hkariti
   $modules/bitbucket_:
