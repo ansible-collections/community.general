@@ -253,7 +253,7 @@ class RunCommandMock(TestCaseMock):
 
     def check(self, test_case, results):
         call_args_list = [(item[0][0], item[1]) for item in self.mock_run_cmd.call_args_list]
-        expected_call_args_list = [(item['command'], item['environ']) for item in self.mock_specs]
+        expected_call_args_list = [(item['command'], item.get('environ', {})) for item in self.mock_specs]
         print("call args list =\n%s" % call_args_list)
         print("expected args list =\n%s" % expected_call_args_list)
 

@@ -97,7 +97,7 @@ options:
     type: bool
   ignore_platform_reqs:
     description:
-      - Ignore php, hhvm, lib-* and ext-* requirements and force the installation even if the local machine does not fulfill
+      - Ignore C(php), C(hhvm), C(lib-*) and C(ext-*) requirements and force the installation even if the local machine does not fulfill
         these.
     default: false
     type: bool
@@ -143,6 +143,7 @@ EXAMPLES = r"""
 """
 
 import re
+import shlex
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -160,7 +161,7 @@ def has_changed(string):
 
 def get_available_options(module, command='install'):
     # get all available options from a composer command using composer help to json
-    rc, out, err = composer_command(module, "help %s" % command, arguments="--no-interaction --format=json")
+    rc, out, err = composer_command(module, ["help", command], arguments=["--no-interaction", "--format=json"])
     if rc != 0:
         output = parse_out(err)
         module.fail_json(msg=output)
@@ -169,14 +170,19 @@ def get_available_options(module, command='install'):
     return command_help_json['definition']['options']
 
 
-def composer_command(module, command, arguments="", options=None):
+def composer_command(module, command, arguments=None, options=None):
     if options is None:
         options = []
+    if arguments is None:
+        arguments = []
 
     global_command = module.params['global_command']
 
-    if not global_command:
-        options.extend(['--working-dir', "'%s'" % module.params['working_dir']])
+    if global_command:
+        global_arg = ["global"]
+    else:
+        global_arg = []
+        options.extend(['--working-dir', module.params['working_dir']])
 
     if module.params['executable'] is None:
         php_path = module.get_bin_path("php", True, ["/usr/local/bin"])
@@ -188,7 +194,7 @@ def composer_command(module, command, arguments="", options=None):
     else:
         composer_path = module.params['composer_executable']
 
-    cmd = [php_path, composer_path, "global" if global_command else "", command] + options + [arguments]
+    cmd = [php_path, composer_path] + global_arg + command + options + arguments
     return module.run_command(cmd)
 
 
@@ -220,7 +226,7 @@ def main():
     if re.search(r"\s", command):
         module.fail_json(msg="Use the 'arguments' param for passing arguments with the 'command'")
 
-    arguments = module.params['arguments']
+    arguments = shlex.split(module.params['arguments'])
     available_options = get_available_options(module=module, command=command)
 
     options = []
@@ -260,7 +266,7 @@ def main():
         else:
             module.exit_json(skipped=True, msg="command '%s' does not support check mode, skipping" % command)
 
-    rc, out, err = composer_command(module, command, arguments, options)
+    rc, out, err = composer_command(module, [command], arguments, options)
 
     if rc != 0:
         output = parse_out(err)
