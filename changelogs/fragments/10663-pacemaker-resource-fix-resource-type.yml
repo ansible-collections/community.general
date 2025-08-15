@@ -1,0 +1,2 @@
+bugfixes:
+  - "pacemaker_resource - fix resource_type parameter formatting (https://github.com/ansible-collections/community.general/issues/10426, https://github.com/ansible-collections/community.general/pull/10663)."

@@ -57,6 +57,8 @@ test_cases:
       name: virtual-ip
       resource_type:
         resource_name: IPaddr2
+        resource_standard: ocf
+        resource_provider: heartbeat
       resource_option:
         - "ip=[192.168.2.1]"
       resource_operation:
@@ -98,10 +100,10 @@ test_cases:
             dc-version=2.1.9-1.fc41-7188dbf
             have-watchdog=false
           err: ""
-        - command: [/testbin/pcs, resource, create, virtual-ip, IPaddr2, "ip=[192.168.2.1]", op, start, timeout=1200, op, stop, timeout=1200, op, monitor, timeout=1200, meta, test_meta1=123, meta, test_meta2=456, --group, test_group, --wait=200]
+        - command: [/testbin/pcs, resource, create, virtual-ip, ocf:heartbeat:IPaddr2, "ip=[192.168.2.1]", op, start, timeout=1200, op, stop, timeout=1200, op, monitor, timeout=1200, meta, test_meta1=123, meta, test_meta2=456, --group, test_group, --wait=200]
           environ: *env-def
           rc: 0
-          out: "Assumed agent name 'ocf:heartbeat:IPaddr2' (deduced from 'IPAddr2')"
+          out: "Assumed agent name 'ocf:heartbeat:IPaddr2'"
           err: ""
         - command: [/testbin/pcs, resource, status, virtual-ip]
           environ: *env-def
