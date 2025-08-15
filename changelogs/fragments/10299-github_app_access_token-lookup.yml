@@ -1,4 +1,4 @@
-bugfixes:
+minor_changes:
   - github_app_access_token lookup plugin - Support both jwt and pyjwt to avoid conflict with other modules requirements (https://github.com/ansible-collections/community.general/issues/10299)
 deprecated_features:
   - github_app_access_token lookup plugin - Support both jwt and pyjwt. jwt support is deprecated, and will be removed in community.general 14.0.0 (https://github.com/ansible-collections/community.general/issues/10299)
