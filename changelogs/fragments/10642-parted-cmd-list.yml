@@ -1,0 +1,2 @@
+minor_changes:
+  - parted - using safer mechanism to run external command (https://github.com/ansible-collections/community.general/pull/10642).
