@@ -1,0 +1,27 @@
+# -*- coding: utf-8 -*-
+# Copyright (c) Alexei Znamensky (russoz@gmail.com)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+anchors:
+  environ_true: &env-def-true {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+  environ_false: &env-def-false {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+test_cases:
+  - id: composer
+    input:
+      command: install
+      working_dir: "/var/www/foo"
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: ["/testbin/php", "/testbin/composer", "help", "install", "--working-dir", "/var/www/foo", "--no-interaction", "--format=json"]
+          rc: 0
+          out: |
+            {"definition": {"options": ["a", "b", "c"]}}
+          err: ''
+        - command: ["/testbin/php", "/testbin/composer", "install", "--working-dir", "/var/www/foo"]
+          rc: 0
+          out: ''
+          err: ''
