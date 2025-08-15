@@ -94,10 +94,19 @@ options:
     type: dict
     default: {}
 
+  cpu_limit:
+    description:
+      - Resources define performance characteristics of your container.
+      - They are allocated to your container at runtime.
+      - Unit is 1/1000 of a VCPU.
+    type: int
+    version_added: 11.3.0
+
   memory_limit:
     description:
       - Resources define performance characteristics of your container.
       - They are allocated to your container at runtime.
+      - Unit is MB of memory.
     type: int
 
   container_timeout:
@@ -223,6 +232,7 @@ MUTABLE_ATTRIBUTES = (
     "min_scale",
     "max_scale",
     "environment_variables",
+    "cpu_limit",
     "memory_limit",
     "timeout",
     "privacy",
@@ -243,6 +253,7 @@ def payload_from_wished_cn(wished_cn):
         "max_scale": wished_cn["max_scale"],
         "environment_variables": wished_cn["environment_variables"],
         "secret_environment_variables": SecretVariables.dict_to_list(wished_cn["secret_environment_variables"]),
+        "cpu_limit": wished_cn["cpu_limit"],
         "memory_limit": wished_cn["memory_limit"],
         "timeout": wished_cn["timeout"],
         "privacy": wished_cn["privacy"],
@@ -358,6 +369,7 @@ def core(module):
         "max_scale": module.params["max_scale"],
         "environment_variables": module.params['environment_variables'],
         "secret_environment_variables": module.params['secret_environment_variables'],
+        "cpu_limit": module.params["cpu_limit"],
         "memory_limit": module.params["memory_limit"],
         "timeout": module.params["container_timeout"],
         "privacy": module.params["privacy"],
@@ -387,6 +399,7 @@ def main():
         description=dict(type='str', default=''),
         min_scale=dict(type='int'),
         max_scale=dict(type='int'),
+        cpu_limit=dict(type='int'),
         memory_limit=dict(type='int'),
         container_timeout=dict(type='str'),
         privacy=dict(type='str', default='public', choices=['public', 'private']),
