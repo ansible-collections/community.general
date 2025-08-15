@@ -9,10 +9,12 @@ DOCUMENTATION = r"""
 name: github_app_access_token
 author:
   - Poh Wei Sheng (@weisheng-p)
+  - Bruno Lavoie (@blavoie)
 short_description: Obtain short-lived Github App Access tokens
 version_added: '8.2.0'
 requirements:
-  - jwt (https://github.com/GehirnInc/python-jwt)
+  - jwt (https://github.com/GehirnInc/python-jwt) OR
+  - PyJWT (https://pypi.org/project/PyJWT/) AND cryptography (https://pypi.org/project/cryptography/)
 description:
   - This generates a Github access token that can be used with a C(git) command, if you use a Github App.
 options:
@@ -66,12 +68,23 @@ _raw:
   elements: str
 """
 
-
 try:
-    from jwt import JWT, jwk_from_pem
+    import jwt
     HAS_JWT = True
 except ImportError:
     HAS_JWT = False
+
+HAS_PYTHON_JWT = False  # vs pyjwt
+if HAS_JWT and hasattr(jwt, 'JWT'):
+    HAS_PYTHON_JWT = True
+    from jwt import jwk_from_pem, jwt_instance
+
+try:
+    from cryptography.hazmat.primitives import serialization
+    HAS_CRYPTOGRAPHY = True
+except ImportError:
+    HAS_CRYPTOGRAPHY = False
+
 
 import time
 import json
@@ -81,26 +94,52 @@ from ansible.errors import AnsibleError, AnsibleOptionsError
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
 
-if HAS_JWT:
-    jwt_instance = JWT()
-else:
-    jwk_from_pem = None
-    jwt_instance = None
-
 display = Display()
 
 
+class PythonJWT:
+
+    @staticmethod
+    def read_key(path, private_key=None):
+        try:
+            if private_key:
+                return jwk_from_pem(private_key.encode('utf-8'))
+            with open(path, 'rb') as pem_file:
+                return jwk_from_pem(pem_file.read())
+        except Exception as e:
+            raise AnsibleError(f"Error while parsing key file: {e}")
+
+    @staticmethod
+    def encode_jwt(app_id, jwk, exp=600):
+        now = int(time.time())
+        payload = {
+            'iat': now,
+            'exp': now + exp,
+            'iss': app_id,
+        }
+        try:
+            return jwt_instance.encode(payload, jwk, alg='RS256')
+        except Exception as e:
+            raise AnsibleError(f"Error while encoding jwt: {e}")
+
+
 def read_key(path, private_key=None):
+    if HAS_PYTHON_JWT:
+        return PythonJWT.read_key(path, private_key)
     try:
         if private_key:
-            return jwk_from_pem(private_key.encode('utf-8'))
-        with open(path, 'rb') as pem_file:
-            return jwk_from_pem(pem_file.read())
+            key_bytes = private_key.encode('utf-8')
+        else:
+            with open(path, 'rb') as pem_file:
+                key_bytes = pem_file.read()
+        return serialization.load_pem_private_key(key_bytes, password=None)
     except Exception as e:
         raise AnsibleError(f"Error while parsing key file: {e}")
 
 
-def encode_jwt(app_id, jwk, exp=600):
+def encode_jwt(app_id, private_key_obj, exp=600):
+    if HAS_PYTHON_JWT:
+        return PythonJWT.encode_jwt(app_id, private_key_obj)
     now = int(time.time())
     payload = {
         'iat': now,
@@ -108,7 +147,7 @@ def encode_jwt(app_id, jwk, exp=600):
         'iss': app_id,
     }
     try:
-        return jwt_instance.encode(payload, jwk, alg='RS256')
+        return jwt.encode(payload, private_key_obj, algorithm='RS256')
     except Exception as e:
         raise AnsibleError(f"Error while encoding jwt: {e}")
 
@@ -150,7 +189,11 @@ class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
         if not HAS_JWT:
             raise AnsibleError('Python jwt library is required. '
-                               'Please install using "pip install jwt"')
+                               'Please install using "pip install pyjwt"')
+
+        if not HAS_PYTHON_JWT and not HAS_CRYPTOGRAPHY:
+            raise AnsibleError('Python cryptography library is required. '
+                               'Please install using "pip install cryptography"')
 
         self.set_options(var_options=variables, direct=kwargs)
 
