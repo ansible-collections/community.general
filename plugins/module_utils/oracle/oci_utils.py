@@ -6,6 +6,12 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
+#
+# DEPRECATED
+#
+# This module utils is deprecated and will be removed in community.general 13.0.0
+#
+
 import logging
 import logging.config
 import os

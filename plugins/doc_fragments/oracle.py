@@ -6,6 +6,12 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
+#
+# DEPRECATED
+#
+# This fragment is deprecated and will be removed in community.general 13.0.0
+#
+
 
 class ModuleDocFragment(object):
     DOCUMENTATION = r"""

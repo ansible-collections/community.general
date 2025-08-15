@@ -447,6 +447,10 @@ plugin_routing:
       redirect: infoblox.nios_modules.nios_txt_record
     nios_zone:
       redirect: infoblox.nios_modules.nios_zone
+    oci_vcn:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Use oracle.oci.oci_network_vcn instead.
     ome_device_info:
       redirect: dellemc.openmanage.ome_device_info
     one_image_facts:
@@ -1012,6 +1016,30 @@ plugin_routing:
       redirect: community.kubevirt.kubevirt_vm_options
     nios:
       redirect: infoblox.nios_modules.nios
+    oracle:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Code is unmaintained here and official Oracle collection is available for a number of years.
+    oracle_creatable_resource:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Code is unmaintained here and official Oracle collection is available for a number of years.
+    oracle_display_name_option:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Code is unmaintained here and official Oracle collection is available for a number of years.
+    oracle_name_option:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Code is unmaintained here and official Oracle collection is available for a number of years.
+    oracle_tags:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Code is unmaintained here and official Oracle collection is available for a number of years.
+    oracle_wait_options:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Code is unmaintained here and official Oracle collection is available for a number of years.
     postgresql:
       redirect: community.postgresql.postgresql
     proxmox:
@@ -1045,6 +1073,10 @@ plugin_routing:
       redirect: community.kubevirt.kubevirt
     net_tools.nios.api:
       redirect: infoblox.nios_modules.api
+    oci_utils:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: Code is unmaintained here and official Oracle collection is available for a number of years.
     postgresql:
       redirect: community.postgresql.postgresql
     proxmox:

@@ -11,6 +11,10 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 module: oci_vcn
 short_description: Manage Virtual Cloud Networks(VCN) in OCI
+deprecated:
+  removed_in: 13.0.0
+  why: Superseded by official Oracle collection.
+  alternative: Use module C(oci_network_vcn) from the C(oracle.oci) collection.
 description:
   - This module allows the user to create, delete and update virtual cloud networks(VCNs) in OCI. The complete Oracle Cloud
     Infrastructure Ansible Modules can be downloaded from U(https://github.com/oracle/oci-ansible-modules/releases).
