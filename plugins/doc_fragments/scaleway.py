@@ -47,3 +47,13 @@ notes:
     E(SCW_TOKEN), E(SCW_API_KEY), E(SCW_OAUTH_TOKEN) or E(SCW_API_TOKEN).
   - If one wants to use a different O(api_url) one can also set the E(SCW_API_URL) environment variable.
 """
+
+    ACTIONGROUP_SCALEWAY = r"""
+options: {}
+attributes:
+  action_group:
+    description: Use C(group/community.general.scaleway) in C(module_defaults) to set defaults for this module.
+    support: full
+    membership:
+      - community.general.scaleway
+"""

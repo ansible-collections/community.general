@@ -46,6 +46,36 @@ action_groups:
     - keycloak_user_federation
     - keycloak_user_rolemapping
     - keycloak_userprofile
+  scaleway:
+    - scaleway_compute
+    - scaleway_compute_private_network
+    - scaleway_container
+    - scaleway_container_info
+    - scaleway_container_namespace
+    - scaleway_container_namespace_info
+    - scaleway_container_registry
+    - scaleway_container_registry_info
+    - scaleway_database_backup
+    - scaleway_function
+    - scaleway_function_info
+    - scaleway_function_namespace
+    - scaleway_function_namespace_info
+    - scaleway_image_info
+    - scaleway_ip
+    - scaleway_ip_info
+    - scaleway_lb
+    - scaleway_organization_info
+    - scaleway_private_network
+    - scaleway_security_group
+    - scaleway_security_group_info
+    - scaleway_security_group_rule
+    - scaleway_server_info
+    - scaleway_snapshot_info
+    - scaleway_sshkey
+    - scaleway_user_data
+    - scaleway_volume
+    - scaleway_volume_info
+
 plugin_routing:
   callback:
     actionable:

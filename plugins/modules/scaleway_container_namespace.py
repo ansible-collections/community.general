@@ -22,6 +22,7 @@ extends_documentation_fragment:
   - community.general.scaleway
   - community.general.scaleway_waitable_resource
   - community.general.attributes
+  - community.general.scaleway.actiongroup_scaleway
 requirements:
   - passlib[argon2] >= 1.7.4
 
@@ -30,6 +31,8 @@ attributes:
     support: full
   diff_mode:
     support: none
+  action_group:
+    version_added: 11.3.0
 
 options:
   state:
