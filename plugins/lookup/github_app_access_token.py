@@ -194,13 +194,6 @@ class LookupModule(LookupBase):
         if not HAS_PYTHON_JWT and not HAS_CRYPTOGRAPHY:
             raise AnsibleError('Python cryptography library is required. '
                                'Please install using "pip install cryptography"')
-        if HAS_PYTHON_JWT:
-            display.deprecated(
-                msg="jwt is being deprecated, please use pyjwt",
-                version="14.0.0",
-                collection_name='community.general',
-                removed=False,
-            )
 
         self.set_options(var_options=variables, direct=kwargs)
 
