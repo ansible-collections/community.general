@@ -79,12 +79,11 @@ if HAS_JWT and hasattr(jwt, 'JWT'):
     HAS_PYTHON_JWT = True
     from jwt import jwk_from_pem, jwt_instance
 
-if not HAS_PYTHON_JWT:
-    try:
-        from cryptography.hazmat.primitives import serialization
-        HAS_CRYPTOGRAPHY = True
-    except ImportError:
-        HAS_CRYPTOGRAPHY = False
+try:
+    from cryptography.hazmat.primitives import serialization
+    HAS_CRYPTOGRAPHY = True
+except ImportError:
+    HAS_CRYPTOGRAPHY = False
 
 
 import time
