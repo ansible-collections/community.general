@@ -70,7 +70,7 @@ options:
       - Access level of the access token.
     type: str
     default: maintainer
-    choices: ["guest", "reporter", "developer", "maintainer", "owner"]
+    choices: ["guest", "planner", "reporter", "developer", "maintainer", "owner"]
   expires_at:
     description:
       - Expiration date of the access token in C(YYYY-MM-DD) format.
@@ -160,7 +160,7 @@ from ansible_collections.community.general.plugins.module_utils.gitlab import (
     auth_argument_spec, find_group, gitlab_authentication, gitlab
 )
 
-ACCESS_LEVELS = dict(guest=10, reporter=20, developer=30, maintainer=40, owner=50)
+ACCESS_LEVELS = dict(guest=10, planner=15, reporter=20, developer=30, maintainer=40, owner=50)
 
 
 class GitLabGroupAccessToken(object):
@@ -245,7 +245,7 @@ def main():
                              'create_runner',
                              'ai_features',
                              'k8s_proxy']),
-        access_level=dict(type='str', default='maintainer', choices=['guest', 'reporter', 'developer', 'maintainer', 'owner']),
+        access_level=dict(type='str', default='maintainer', choices=['guest', 'planner', 'reporter', 'developer', 'maintainer', 'owner']),
         expires_at=dict(type='str', required=True),
         recreate=dict(type='str', default='never', choices=['never', 'always', 'state_change'])
     ))
