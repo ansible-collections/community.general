@@ -32,6 +32,11 @@ options:
   name:
     description:
       - The credential name to embed in the encrypted credential data.
+      - When using the O(dest) option, you can set this to an empty
+      - string ("") to prevent C(systemd-creds encrypt) from using
+      - filename from O(dest) as the credential name. And vice versa,
+      - leave out the O(name) option to let C(systemd-creds encrypt)
+      - use the filename from O(dest) as the credential name.
     type: str
     required: false
   not_after:
@@ -51,6 +56,12 @@ options:
       - The secret to encrypt.
     type: str
     required: true
+  dest:
+    description:
+      - The destination for the credential file.
+    type: path
+    required: false
+    version_added: 11.2.0
   timestamp:
     description:
       - The timestamp to embed into the encrypted credential.
@@ -80,6 +91,13 @@ EXAMPLES = r"""
 - name: Print the encrypted secret
   ansible.builtin.debug:
     msg: "{{ encrypted_secret }}"
+
+- name: Create a credential file
+  become: true
+  community.general.systemd_creds_encrypt:
+    name: db
+    secret: access_token
+    dest: /etc/credstore.encrypted/db.cred
 """
 
 RETURN = r"""
@@ -91,6 +109,7 @@ value:
 """
 
 from ansible.module_utils.basic import AnsibleModule
+import os
 
 
 def main():
@@ -103,8 +122,12 @@ def main():
             secret=dict(type="str", required=True, no_log=True),
             timestamp=dict(type="str"),
             user=dict(type="str"),
+            dest=dict(type="path"),
         ),
         supports_check_mode=True,
+        mutually_exclusive=[
+            ['pretty', 'dest']
+        ]
     )
 
     cmd = module.get_bin_path("systemd-creds", required=True)
@@ -115,27 +138,59 @@ def main():
     secret = module.params["secret"]
     timestamp = module.params["timestamp"]
     user = module.params["user"]
+    dest = module.params["dest"]
+
+    if dest and os.path.isfile(dest):
+        decrypt_cmd = [cmd, "decrypt"]
+        if name:
+            decrypt_cmd.append("--name=" + name)
+
+        decrypt_cmd.append(dest)
+        decrypt_cmd.append("-")
+
+        rc, stdout, stderr = module.run_command(decrypt_cmd)
+        if rc != 0:
+            return module.fail_json(
+                "The credential file already exists; Couldn't decrypt to verify if it contains the same secret",
+                changed=False,
+                value=None,
+                rc=rc,
+                stderr=stderr,
+            )
+        elif stdout == secret:
+            return module.exit_json(
+                changed=False,
+                value=None,
+                rc=rc,
+                stderr=stderr,
+            )
 
     encrypt_cmd = [cmd, "encrypt"]
-    if name:
+    if name is not None:
         encrypt_cmd.append("--name=" + name)
-    else:
+    elif not dest:
         encrypt_cmd.append("--name=")
     if not_after:
         encrypt_cmd.append("--not-after=" + not_after)
-    if pretty:
+    if pretty and not dest:
         encrypt_cmd.append("--pretty")
     if timestamp:
         encrypt_cmd.append("--timestamp=" + timestamp)
     if user:
         encrypt_cmd.append("--uid=" + user)
-    encrypt_cmd.extend(["-", "-"])
+
+    encrypt_cmd.append("-")
+
+    if dest and not module.check_mode:
+        encrypt_cmd.append(dest)
+    else:
+        encrypt_cmd.append("-")
 
     rc, stdout, stderr = module.run_command(encrypt_cmd, data=secret, binary_data=True)
 
     module.exit_json(
-        changed=False,
-        value=stdout,
+        changed=bool(dest),
+        value=stdout if not dest else None,
         rc=rc,
         stderr=stderr,
     )
