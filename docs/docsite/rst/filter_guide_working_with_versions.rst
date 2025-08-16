@@ -23,6 +23,17 @@ If you need to sort a list of version numbers, the Jinja ``sort`` filter is prob
 
 This produces:
 
+.. ansible-output-data::
+
+    variables:
+      task:
+        previous_code_block: yaml+jinja
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          @{{ task | indent(4) }}@
+
 .. code-block:: ansible-output
 
     TASK [Sort list by version number] ********************************************************

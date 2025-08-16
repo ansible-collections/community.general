@@ -13,6 +13,34 @@ Use the filter :ansplugin:`community.general.keep_keys#filter` if you have a lis
 
 Let us use the below list in the following examples:
 
+.. ansible-output-meta::
+
+  actions:
+    - name: reset-previous-blocks
+    - name: set-template
+      template:
+        env:
+          ANSIBLE_CALLBACK_RESULT_FORMAT: yaml
+        variables:
+          data:
+            previous_code_block: yaml
+            previous_code_block_index: 0
+          computation:
+            previous_code_block: yaml+jinja
+        postprocessors:
+          - name: reformat-yaml
+        language: yaml
+        skip_first_lines: 2
+        playbook: |-
+          - hosts: localhost
+            gather_facts: false
+            tasks:
+              - vars:
+                  @{{ data | indent(8) }}@
+                  @{{ computation | indent(8) }}@
+                ansible.builtin.debug:
+                  var: result
+
 .. code-block:: yaml
 
    input:
@@ -37,24 +65,48 @@ Let us use the below list in the following examples:
 
 gives
 
+.. ansible-output-data::
+
+    playbook: ~
+
 .. code-block:: yaml
    :emphasize-lines: 1-
 
    result:
-     - {k0_x0: A0, k1_x1: B0}
-     - {k0_x0: A1, k1_x1: B1}
+     - k0_x0: A0
+       k1_x1: B0
+     - k0_x0: A1
+       k1_x1: B1
 
 
 .. versionadded:: 9.1.0
 
 * The results of the below examples 1-5 are all the same:
 
+.. ansible-output-data::
+
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          - vars:
+              @{{ data | indent(8) }}@
+
+              # I picked one of the examples
+              mp: equal
+              target: ['k0_x0', 'k1_x1']
+              result: "{{ input | community.general.keep_keys(target=target, matching_parameter=mp) }}"
+            ansible.builtin.debug:
+              var: result
+
 .. code-block:: yaml
    :emphasize-lines: 1-
 
    result:
-     - {k0_x0: A0, k1_x1: B0}
-     - {k0_x0: A1, k1_x1: B1}
+     - k0_x0: A0
+       k1_x1: B0
+     - k0_x0: A1
+       k1_x1: B1
 
 
 1. Match keys that equal any of the items in the target.
@@ -105,12 +157,28 @@ gives
 
 * The results of the below examples 6-9 are all the same:
 
+.. ansible-output-data::
+
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          - vars:
+              @{{ data | indent(8) }}@
+
+              # I picked one of the examples
+              mp: equal
+              target: k0_x0
+              result: "{{ input | community.general.keep_keys(target=target, matching_parameter=mp) }}"
+            ansible.builtin.debug:
+              var: result
+
 .. code-block:: yaml
    :emphasize-lines: 1-
 
    result:
-     - {k0_x0: A0}
-     - {k0_x0: A1}
+     - k0_x0: A0
+     - k0_x0: A1
 
 
 6. Match keys that equal the target.
@@ -148,4 +216,3 @@ gives
    mp: regex
    target: ^.*0_x.*$
    result: "{{ input | community.general.keep_keys(target=target, matching_parameter=mp) }}"
-
