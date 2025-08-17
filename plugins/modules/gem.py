@@ -243,7 +243,8 @@ def uninstall(module):
     if module.params['force']:
         cmd.append('--force')
     cmd.append(module.params['name'])
-    module.run_command(cmd, environ_update=environ, check_rc=True)
+    rc, out, err = module.run_command(cmd, environ_update=environ, check_rc=True)
+    return rc, out, err
 
 
 def install(module):
@@ -334,9 +335,18 @@ def main():
             changed = True
     elif module.params['state'] == 'absent':
         if exists(module):
-            uninstall(module)
-            changed = True
-
+            rc, out, err = uninstall(module)
+            if exists(module):
+                module.fail_json(
+                    msg="Gem could not be removed.",
+                    rc=rc,
+                    stdout=out,
+                    stderr=err,
+                    name=module.params['name'],
+                    state='absent'
+                )
+            else:
+                changed = True
     result = {}
     result['name'] = module.params['name']
     result['state'] = module.params['state']
