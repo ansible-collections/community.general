@@ -338,7 +338,7 @@ def main():
             if isinstance(command_output, (list, tuple)) and len(command_output) == 3 and exists(module):
                 rc, out, err = command_output
                 module.fail_json(
-                    msg="Gem could not be removed.",
+                    msg="Gem could not be removed",
                     rc=rc,
                     stdout=out,
                     stderr=err,

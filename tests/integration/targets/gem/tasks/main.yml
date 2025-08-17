@@ -212,7 +212,7 @@
         that:
           - install_gem_result is changed
           - not gem_bindir_stat.stat.exists
-  
+
     - name: Attempt to uninstall default gem 'json'
       community.general.gem:
         name: json
