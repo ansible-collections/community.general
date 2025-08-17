@@ -243,8 +243,7 @@ def uninstall(module):
     if module.params['force']:
         cmd.append('--force')
     cmd.append(module.params['name'])
-    rc, out, err = module.run_command(cmd, environ_update=environ, check_rc=True)
-    return rc, out, err
+    return module.run_command(cmd, environ_update=environ, check_rc=True)
 
 
 def install(module):
