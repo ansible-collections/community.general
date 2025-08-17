@@ -334,8 +334,9 @@ def main():
             changed = True
     elif module.params['state'] == 'absent':
         if exists(module):
-            rc, out, err = uninstall(module)
-            if exists(module):
+            command_output = uninstall(module)
+            if command_output and exists(module):
+                rc, out, err = command_output
                 module.fail_json(
                     msg="Gem could not be removed.",
                     rc=rc,
