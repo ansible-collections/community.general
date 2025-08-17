@@ -36,7 +36,7 @@ _value:
 """
 
 from ansible.errors import AnsibleFilterError
-from ansible.module_utils.common._collections_compat import Sequence
+from collections.abc import Sequence
 from collections import Counter
 
 
