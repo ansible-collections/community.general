@@ -1,0 +1,2 @@
+bugfixes:
+  - "pids - prevent error when an empty string is provided for ``name`` (https://github.com/ansible-collections/community.general/issues/10672, https://github.com/ansible-collections/community.general/pull/10688)."
