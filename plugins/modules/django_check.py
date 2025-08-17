@@ -112,6 +112,9 @@ class DjangoCheck(DjangoModuleHelper):
     django_admin_cmd = "check"
     django_admin_arg_order = "databases deploy fail_level tags apps"
 
+    def __init_module__(self):
+        self.vars.set("dash_database", self.var.database, output=False)
+
 
 def main():
     DjangoCheck.execute()

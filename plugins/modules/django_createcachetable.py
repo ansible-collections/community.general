@@ -64,6 +64,9 @@ class DjangoCreateCacheTable(DjangoModuleHelper):
     _django_args = ["noinput", "dash_database", "dry_run"]
     _check_mode_arg = "dry_run"
 
+    def __init_module__(self):
+        self.vars.set("dash_database", self.var.database, output=False)
+
 
 def main():
     DjangoCreateCacheTable.execute()
