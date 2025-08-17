@@ -108,7 +108,7 @@ class DjangoCheck(DjangoModuleHelper):
         self.vars.set("database_stacked_dash", self.vars.databases, output=False)
 
     def __init_module__(self):
-        self.vars.set("dash_database", self.var.database, output=False)
+        self.vars.set("dash_database", self.vars.database, output=False)
 
 
 def main():
