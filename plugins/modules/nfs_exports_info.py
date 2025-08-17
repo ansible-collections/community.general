@@ -57,8 +57,8 @@ exports_info:
 
 file_digest:
   description:
-    - A dictionary containing various hash values of the /etc/exports file for integrity verification.
-    - Keys are the hash algorithm names (e.g., 'sha256', 'sha1', 'md5'), and values are their corresponding hexadecimal digests.
+    - A dictionary containing various hash values of the C(/etc/exports) file for integrity verification.
+    - Keys are the hash algorithm names (for example C(sha256), C(sha1), C(md5)), and values are their corresponding hexadecimal digests.
     - At least one hash value is guaranteed to be present if the file exists and is readable.
   type: dict
   returned: always
