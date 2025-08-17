@@ -113,7 +113,7 @@ class DjangoCheck(DjangoModuleHelper):
     django_admin_arg_order = "databases deploy fail_level tags apps"
 
     def __init_module__(self):
-        self.vars.set("dash_database", self.var.database, output=False)
+        self.vars.set("dash_database", self.vars.database, output=False)
 
 
 def main():
