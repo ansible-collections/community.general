@@ -1,0 +1,2 @@
+bugfixes:
+  - "composer - fix broken command lines (https://github.com/ansible-collections/community.general/issues/10662, https://github.com/ansible-collections/community.general/pull/10669)."
