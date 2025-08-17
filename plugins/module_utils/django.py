@@ -44,7 +44,7 @@ _django_dash_database_args = dict(
 
 _args_menu = dict(
     std=(django_std_args, _django_std_arg_fmts),
-    database=(_django_database_args, {"database": cmd_runner_fmt.as_opt_eq_val("--database")}), # deprecate, remove in 13.0.0
+    database=(_django_dash_database_args, {"database": cmd_runner_fmt.as_opt_eq_val("--database")}), # deprecate, remove in 13.0.0
     noinput=({}, {"noinput": cmd_runner_fmt.as_fixed("--noinput")}),  # deprecate, remove in 13.0.0
     dry_run=({}, {"dry_run": cmd_runner_fmt.as_bool("--dry-run")}),   # deprecate, remove in 13.0.0
     check=({}, {"check": cmd_runner_fmt.as_bool("--check")}),         # deprecate, remove in 13.0.0
