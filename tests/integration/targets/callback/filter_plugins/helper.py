@@ -9,27 +9,25 @@ import difflib
 
 
 def callback_results_extractor(outputs_results):
-    results = []
-    for result in outputs_results:
-        differences = []
-        expected_output = result['test']['expected_output']
-        stdout_lines = result['stdout_lines']
-        results.append({
+    return [
+        {
             'name': result['test']['name'],
             'output': {
                 'diff': list(
                     difflib.unified_diff(
-                        expected_output,
-                        stdout_lines,
+                        result['test']['expected_output'],
+                        result['stdout_lines'],
                         fromfile="expected",
                         tofile="got",
                     )
                 ),
-                'expected': expected_output,
-                'got': stdout_lines,
+                'expected': result['test']['expected_output'],
+                'got': result['stdout_lines'],
             },
-        })
-    return results
+        }
+        for result in outputs_results
+    ]
+
 
 
 class FilterModule:
