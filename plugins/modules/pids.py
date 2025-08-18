@@ -195,7 +195,7 @@ class Pids(object):
         self._pids = []
 
     def execute(self):
-        if self._name:
+        if self._name is not None:
             self._pids = self._ps.get_pids_by_name(self._name)
         else:
             try:
