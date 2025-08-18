@@ -8,7 +8,7 @@ __metaclass__ = type
 from io import BytesIO
 
 from ansible_collections.community.general.plugins.modules.jenkins_plugin import JenkinsPlugin
-from ansible.module_utils.common._collections_compat import Mapping
+from ansible.module_utils.six.moves.collections_abc import Mapping
 
 
 def pass_function(*args, **kwargs):
