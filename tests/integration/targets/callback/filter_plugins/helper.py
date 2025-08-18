@@ -7,6 +7,7 @@ __metaclass__ = type
 
 import difflib
 
+
 def callback_results_extractor(outputs_results):
     results = []
     for result in outputs_results:
