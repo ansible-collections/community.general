@@ -2,37 +2,40 @@
 
 **Topics**
 
-- <a href="#v11-2-0">v11\.2\.0</a>
+- <a href="#v11-2-1">v11\.2\.1</a>
     - <a href="#release-summary">Release Summary</a>
+    - <a href="#bugfixes">Bugfixes</a>
+- <a href="#v11-2-0">v11\.2\.0</a>
+    - <a href="#release-summary-1">Release Summary</a>
     - <a href="#minor-changes">Minor Changes</a>
     - <a href="#deprecated-features">Deprecated Features</a>
-    - <a href="#bugfixes">Bugfixes</a>
+    - <a href="#bugfixes-1">Bugfixes</a>
     - <a href="#new-plugins">New Plugins</a>
         - <a href="#lookup">Lookup</a>
     - <a href="#new-modules">New Modules</a>
 - <a href="#v11-1-2">v11\.1\.2</a>
-    - <a href="#release-summary-1">Release Summary</a>
-    - <a href="#minor-changes-1">Minor Changes</a>
-    - <a href="#bugfixes-1">Bugfixes</a>
-- <a href="#v11-1-1">v11\.1\.1</a>
     - <a href="#release-summary-2">Release Summary</a>
-    - <a href="#minor-changes-2">Minor Changes</a>
+    - <a href="#minor-changes-1">Minor Changes</a>
     - <a href="#bugfixes-2">Bugfixes</a>
-- <a href="#v11-1-0">v11\.1\.0</a>
+- <a href="#v11-1-1">v11\.1\.1</a>
     - <a href="#release-summary-3">Release Summary</a>
+    - <a href="#minor-changes-2">Minor Changes</a>
+    - <a href="#bugfixes-3">Bugfixes</a>
+- <a href="#v11-1-0">v11\.1\.0</a>
+    - <a href="#release-summary-4">Release Summary</a>
     - <a href="#minor-changes-3">Minor Changes</a>
     - <a href="#deprecated-features-1">Deprecated Features</a>
-    - <a href="#bugfixes-3">Bugfixes</a>
+    - <a href="#bugfixes-4">Bugfixes</a>
     - <a href="#new-plugins-1">New Plugins</a>
         - <a href="#callback">Callback</a>
     - <a href="#new-modules-1">New Modules</a>
 - <a href="#v11-0-0">v11\.0\.0</a>
-    - <a href="#release-summary-4">Release Summary</a>
+    - <a href="#release-summary-5">Release Summary</a>
     - <a href="#minor-changes-4">Minor Changes</a>
     - <a href="#deprecated-features-2">Deprecated Features</a>
     - <a href="#removed-features-previously-deprecated">Removed Features \(previously deprecated\)</a>
     - <a href="#security-fixes">Security Fixes</a>
-    - <a href="#bugfixes-4">Bugfixes</a>
+    - <a href="#bugfixes-5">Bugfixes</a>
     - <a href="#known-issues">Known Issues</a>
     - <a href="#new-plugins-2">New Plugins</a>
         - <a href="#callback-1">Callback</a>
@@ -43,10 +46,27 @@
     - <a href="#new-modules-2">New Modules</a>
 This changelog describes changes after version 10\.0\.0\.
 
+<a id="v11-2-1"></a>
+## v11\.2\.1
+
+<a id="release-summary"></a>
+### Release Summary
+
+Bugfix release\.
+
+<a id="bugfixes"></a>
+### Bugfixes
+
+* Avoid deprecated functionality in ansible\-core 2\.20 \([https\://github\.com/ansible\-collections/community\.general/pull/10687](https\://github\.com/ansible\-collections/community\.general/pull/10687)\)\.
+* apache2\_module \- check the <code>cgi</code> module restrictions only during activation \([https\://github\.com/ansible\-collections/community\.general/pull/10423](https\://github\.com/ansible\-collections/community\.general/pull/10423)\)\.
+* composer \- fix broken command lines \([https\://github\.com/ansible\-collections/community\.general/issues/10662](https\://github\.com/ansible\-collections/community\.general/issues/10662)\, [https\://github\.com/ansible\-collections/community\.general/pull/10669](https\://github\.com/ansible\-collections/community\.general/pull/10669)\)\.
+* pacemaker\_resource \- fix <code>resource\_type</code> parameter formatting \([https\://github\.com/ansible\-collections/community\.general/issues/10426](https\://github\.com/ansible\-collections/community\.general/issues/10426)\, [https\://github\.com/ansible\-collections/community\.general/pull/10663](https\://github\.com/ansible\-collections/community\.general/pull/10663)\)\.
+* pids \- prevent error when an empty string is provided for <code>name</code> \([https\://github\.com/ansible\-collections/community\.general/issues/10672](https\://github\.com/ansible\-collections/community\.general/issues/10672)\, [https\://github\.com/ansible\-collections/community\.general/pull/10688](https\://github\.com/ansible\-collections/community\.general/pull/10688)\)\.
+
 <a id="v11-2-0"></a>
 ## v11\.2\.0
 
-<a id="release-summary"></a>
+<a id="release-summary-1"></a>
 ### Release Summary
 
 Regular bugfix and features release\.
@@ -89,7 +109,7 @@ Regular bugfix and features release\.
 * github\_repo \- deprecate <code>force\_defaults\=true</code> \([https\://github\.com/ansible\-collections/community\.general/pull/10435](https\://github\.com/ansible\-collections/community\.general/pull/10435)\)\.
 * rocketchat \- the default value for <code>is\_pre740</code>\, currently <code>true</code>\, is deprecated and will change to <code>false</code> in community\.general 13\.0\.0 \([https\://github\.com/ansible\-collections/community\.general/pull/10490](https\://github\.com/ansible\-collections/community\.general/pull/10490)\)\.
 
-<a id="bugfixes"></a>
+<a id="bugfixes-1"></a>
 ### Bugfixes
 
 * jenkins\_plugin \- install latest compatible version instead of latest \([https\://github\.com/ansible\-collections/community\.general/issues/854](https\://github\.com/ansible\-collections/community\.general/issues/854)\, [https\://github\.com/ansible\-collections/community\.general/pull/10346](https\://github\.com/ansible\-collections/community\.general/pull/10346)\)\.
@@ -113,7 +133,7 @@ Regular bugfix and features release\.
 <a id="v11-1-2"></a>
 ## v11\.1\.2
 
-<a id="release-summary-1"></a>
+<a id="release-summary-2"></a>
 ### Release Summary
 
 Bugfix release\.
@@ -252,7 +272,7 @@ Bugfix release\.
 * zypper \- remove redundant constructs from argument specs \([https\://github\.com/ansible\-collections/community\.general/pull/10513](https\://github\.com/ansible\-collections/community\.general/pull/10513)\)\.
 * zypper\_repository \- remove redundant constructs from argument specs \([https\://github\.com/ansible\-collections/community\.general/pull/10513](https\://github\.com/ansible\-collections/community\.general/pull/10513)\)\.
 
-<a id="bugfixes-1"></a>
+<a id="bugfixes-2"></a>
 ### Bugfixes
 
 * apk \- fix check for empty/whitespace\-only package names \([https\://github\.com/ansible\-collections/community\.general/pull/10532](https\://github\.com/ansible\-collections/community\.general/pull/10532)\)\.
@@ -266,7 +286,7 @@ Bugfix release\.
 <a id="v11-1-1"></a>
 ## v11\.1\.1
 
-<a id="release-summary-2"></a>
+<a id="release-summary-3"></a>
 ### Release Summary
 
 Bugfix release for the next Ansible 12 pre\-release\.
@@ -302,7 +322,7 @@ Bugfix release for the next Ansible 12 pre\-release\.
 * filesystem \- remove redundant constructs from argument specs \([https\://github\.com/ansible\-collections/community\.general/pull/10494](https\://github\.com/ansible\-collections/community\.general/pull/10494)\)\.
 * sysrc \- adjustments to the code \([https\://github\.com/ansible\-collections/community\.general/pull/10417](https\://github\.com/ansible\-collections/community\.general/pull/10417)\)\.
 
-<a id="bugfixes-2"></a>
+<a id="bugfixes-3"></a>
 ### Bugfixes
 
 * apache2\_module \- avoid ansible\-core 2\.19 deprecation \([https\://github\.com/ansible\-collections/community\.general/pull/10459](https\://github\.com/ansible\-collections/community\.general/pull/10459)\)\.
@@ -320,7 +340,7 @@ Bugfix release for the next Ansible 12 pre\-release\.
 <a id="v11-1-0"></a>
 ## v11\.1\.0
 
-<a id="release-summary-3"></a>
+<a id="release-summary-4"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
@@ -380,7 +400,7 @@ Regular bugfix and feature release\.
 * catapult \- module is deprecated and will be removed in community\.general 13\.0\.0 \([https\://github\.com/ansible\-collections/community\.general/issues/10318](https\://github\.com/ansible\-collections/community\.general/issues/10318)\, [https\://github\.com/ansible\-collections/community\.general/pull/10329](https\://github\.com/ansible\-collections/community\.general/pull/10329)\)\.
 * pacemaker\_cluster \- the parameter <code>state</code> will become a required parameter in community\.general 12\.0\.0 \([https\://github\.com/ansible\-collections/community\.general/pull/10227](https\://github\.com/ansible\-collections/community\.general/pull/10227)\)\.
 
-<a id="bugfixes-3"></a>
+<a id="bugfixes-4"></a>
 ### Bugfixes
 
 * dependent lookup plugin \- avoid deprecated ansible\-core 2\.19 functionality \([https\://github\.com/ansible\-collections/community\.general/pull/10359](https\://github\.com/ansible\-collections/community\.general/pull/10359)\)\.
@@ -406,7 +426,7 @@ Regular bugfix and feature release\.
 <a id="v11-0-0"></a>
 ## v11\.0\.0
 
-<a id="release-summary-4"></a>
+<a id="release-summary-5"></a>
 ### Release Summary
 
 This is release 11\.0\.0 of <code>community\.general</code>\, released on 2025\-06\-16\.
@@ -805,7 +825,7 @@ This is release 11\.0\.0 of <code>community\.general</code>\, released on 2025\-
 * keycloak\_authentication \- API calls did not properly set the <code>priority</code> during update resulting in incorrectly sorted authentication flows\. This apparently only affects Keycloak 25 or newer \([https\://github\.com/ansible\-collections/community\.general/pull/9263](https\://github\.com/ansible\-collections/community\.general/pull/9263)\)\.
 * keycloak\_client \- Sanitize <code>saml\.encryption\.private\.key</code> so it does not show in the logs \([https\://github\.com/ansible\-collections/community\.general/pull/9621](https\://github\.com/ansible\-collections/community\.general/pull/9621)\)\.
 
-<a id="bugfixes-4"></a>
+<a id="bugfixes-5"></a>
 ### Bugfixes
 
 * apache2\_mod\_proxy \- make compatible with Python 3 \([https\://github\.com/ansible\-collections/community\.general/pull/9762](https\://github\.com/ansible\-collections/community\.general/pull/9762)\)\.

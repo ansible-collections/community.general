@@ -6,6 +6,23 @@ Community General Release Notes
 
 This changelog describes changes after version 10.0.0.
 
+v11.2.1
+=======
+
+Release Summary
+---------------
+
+Bugfix release.
+
+Bugfixes
+--------
+
+- Avoid deprecated functionality in ansible-core 2.20 (https://github.com/ansible-collections/community.general/pull/10687).
+- apache2_module - check the ``cgi`` module restrictions only during activation (https://github.com/ansible-collections/community.general/pull/10423).
+- composer - fix broken command lines (https://github.com/ansible-collections/community.general/issues/10662, https://github.com/ansible-collections/community.general/pull/10669).
+- pacemaker_resource - fix ``resource_type`` parameter formatting (https://github.com/ansible-collections/community.general/issues/10426, https://github.com/ansible-collections/community.general/pull/10663).
+- pids - prevent error when an empty string is provided for ``name`` (https://github.com/ansible-collections/community.general/issues/10672, https://github.com/ansible-collections/community.general/pull/10688).
+
 v11.2.0
 =======
 

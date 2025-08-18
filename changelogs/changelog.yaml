@@ -1577,3 +1577,24 @@ releases:
           name: binary_file
           namespace: null
     release_date: '2025-08-11'
+  11.2.1:
+    changes:
+      bugfixes:
+        - Avoid deprecated functionality in ansible-core 2.20 (https://github.com/ansible-collections/community.general/pull/10687).
+        - apache2_module - check the ``cgi`` module restrictions only during activation
+          (https://github.com/ansible-collections/community.general/pull/10423).
+        - composer - fix broken command lines (https://github.com/ansible-collections/community.general/issues/10662,
+          https://github.com/ansible-collections/community.general/pull/10669).
+        - pacemaker_resource - fix ``resource_type`` parameter formatting (https://github.com/ansible-collections/community.general/issues/10426,
+          https://github.com/ansible-collections/community.general/pull/10663).
+        - pids - prevent error when an empty string is provided for ``name`` (https://github.com/ansible-collections/community.general/issues/10672,
+          https://github.com/ansible-collections/community.general/pull/10688).
+      release_summary: Bugfix release.
+    fragments:
+      - 10423-apache_module-condition.yml
+      - 10663-pacemaker-resource-fix-resource-type.yml
+      - 10680-composer.yml
+      - 10687-deprecations.yml
+      - 10688-pids.yml
+      - 11.2.1.yml
+    release_date: '2025-08-18'

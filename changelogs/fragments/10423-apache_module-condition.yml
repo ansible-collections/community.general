@@ -1,2 +1,0 @@
-bugfixes:
-  - apache2_module - check the ``cgi`` module restrictions only during activation (https://github.com/ansible-collections/community.general/pull/10423).
