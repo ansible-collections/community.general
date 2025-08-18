@@ -10,7 +10,7 @@ import re
 
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils.six import string_types
-from ansible.module_utils.common._collections_compat import Mapping, Sequence
+from collections.abc import Mapping, Sequence
 
 
 def _keys_filter_params(data, matching_parameter):
