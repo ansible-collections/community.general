@@ -99,9 +99,10 @@ options:
         elements: str
   resource_clone_ids:
     description:
-      - List of clone resource ids to clone.
+      - List of clone resource IDs to clone.
     type: list
     elements: str
+    version_added: 11.3.0
   resource_clone_meta:
     description:
       - List of meta to associate with clone resource.
