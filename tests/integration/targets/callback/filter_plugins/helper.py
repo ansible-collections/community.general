@@ -29,7 +29,6 @@ def callback_results_extractor(outputs_results):
     ]
 
 
-
 class FilterModule:
     ''' Jinja2 compat filters '''
 
