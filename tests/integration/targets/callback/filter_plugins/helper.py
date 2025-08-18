@@ -23,9 +23,11 @@ def callback_results_extractor(outputs_results):
                     expected_output,
                     stdout_lines,
                     fromfile="expected",
-                    tofile="found",
+                    tofile="got",
                 )
-            )
+            ),
+            'expected': expected_output,
+            'got': stdout_lines,
         })
     return results
 
