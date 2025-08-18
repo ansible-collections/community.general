@@ -22,8 +22,8 @@ description:
   - The C(nagios) module is not idempotent.
   - All actions require the O(host) parameter to be given explicitly. In playbooks you can use the C({{inventory_hostname}})
     variable to refer to the host the playbook is currently running on.
-  - Protocol and mode of operation: The C(nagios) module executes commands directly on the nagios server over SSH and not via HTTP API.
-    You could use "delegate_to:" to specify the nagios management server.
+  - 'Protocol and mode of operation: The C(nagios) module executes commands directly on the nagios server over SSH and not via HTTP API.
+    You could use "delegate_to:" to specify the nagios management server.'
   - Various paths on the nagios server are searched for a nagios config.
     The most common path is "/etc/nagios/nagios.cfg" which should be readable by the ansible user.
 extends_documentation_fragment:
