@@ -54,7 +54,7 @@ from multiprocessing import Lock
 from itertools import chain
 
 from ansible.errors import AnsibleError
-from ansible.module_utils.common._collections_compat import MutableSet
+from collections.abc import MutableSet
 from ansible.plugins.cache import BaseCacheModule
 from ansible.utils.display import Display
 

@@ -121,7 +121,7 @@ _list:
 """
 
 from ansible.errors import AnsibleLookupError
-from ansible.module_utils.common._collections_compat import Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from ansible.module_utils.six import string_types
 from ansible.plugins.lookup import LookupBase
 from ansible.template import Templar
