@@ -377,8 +377,8 @@ except ImportError:
 
 from ansible.module_utils.basic import AnsibleModule, json_dict_bytes_to_unicode, missing_required_lib
 from ansible.module_utils.six import iteritems, string_types
+from ansible.module_utils.six.moves.collections_abc import MutableMapping
 from ansible.module_utils.common.text.converters import to_bytes, to_native
-from ansible.module_utils.common._collections_compat import MutableMapping
 
 _IDENT = r"[a-zA-Z-][a-zA-Z0-9_\-\.]*"
 _NSIDENT = _IDENT + "|" + _IDENT + ":" + _IDENT

@@ -28,7 +28,7 @@ except ImportError:
     pass
 
 from ansible.module_utils.six import binary_type, text_type
-from ansible.module_utils.common._collections_compat import MutableMapping, MutableSequence
+from collections.abc import MutableMapping, MutableSequence
 from ansible.plugins.callback.default import CallbackModule as CallbackModule_default
 from ansible.utils.color import colorize, hostcolor
 from ansible.utils.display import Display

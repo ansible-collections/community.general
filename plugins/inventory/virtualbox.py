@@ -78,7 +78,7 @@ from subprocess import Popen, PIPE
 
 from ansible.errors import AnsibleParserError
 from ansible.module_utils.common.text.converters import to_bytes, to_text
-from ansible.module_utils.common._collections_compat import MutableMapping
+from collections.abc import MutableMapping
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
 from ansible.module_utils.common.process import get_bin_path
 
