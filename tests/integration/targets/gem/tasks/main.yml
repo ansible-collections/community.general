@@ -226,6 +226,6 @@
       assert:
         that:
           - gem_result is failed
-          - "'Gem could not be removed' == gem_result.msg"
+          - gem_result.msg == "Gem could not be removed"
           - gem_result.state == "absent"
           - gem_result.name == "json"
