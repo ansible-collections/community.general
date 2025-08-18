@@ -31,7 +31,7 @@ except ImportError:
 from ansible.module_utils import six
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
-from ansible.module_utils.common._collections_compat import Mapping
+from ansible.module_utils.six.moves.collections_abc import Mapping
 
 
 def transform_list_to_dict(list_):
