@@ -49,7 +49,7 @@
 
     - name: Assert test output equals expected output
       assert:
-        that: result.diff | length == 0
+        that: result.output.diff | length == 0
       loop: "{{ outputs.results | callback_results_extractor }}"
       loop_control:
         loop_var: result

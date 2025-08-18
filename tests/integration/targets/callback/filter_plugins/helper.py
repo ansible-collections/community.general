@@ -18,16 +18,18 @@ def callback_results_extractor(outputs_results):
         stdout_lines = result['stdout_lines']
         results.append({
             'name': result['test']['name'],
-            'diff': list(
-                difflib.unified_diff(
-                    expected_output,
-                    stdout_lines,
-                    fromfile="expected",
-                    tofile="got",
-                )
-            ),
-            'expected': expected_output,
-            'got': stdout_lines,
+            'output': {
+                'diff': list(
+                    difflib.unified_diff(
+                        expected_output,
+                        stdout_lines,
+                        fromfile="expected",
+                        tofile="got",
+                    )
+                ),
+                'expected': expected_output,
+                'got': stdout_lines,
+            },
         })
     return results
 
