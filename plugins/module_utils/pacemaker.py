@@ -24,7 +24,7 @@ _state_map = {
 
 
 def fmt_resource_type(value):
-    return [value[k] for k in ['resource_standard', 'resource_provider', 'resource_name'] if value.get(k) is not None]
+    return [":".join(value[k] for k in ['resource_standard', 'resource_provider', 'resource_name'] if value.get(k) is not None)]
 
 
 def fmt_resource_operation(value):
