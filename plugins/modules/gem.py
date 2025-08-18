@@ -341,9 +341,7 @@ def main():
                     msg="Gem could not be removed",
                     rc=rc,
                     stdout=out,
-                    stderr=err,
-                    name=module.params['name'],
-                    state='absent'
+                    stderr=err
                 )
             else:
                 changed = True
