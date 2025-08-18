@@ -7,9 +7,6 @@ __metaclass__ = type
 
 import difflib
 
-from ansible.module_utils.six import string_types
-
-
 def callback_results_extractor(outputs_results):
     results = []
     for result in outputs_results:
