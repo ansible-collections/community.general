@@ -12,6 +12,7 @@ redis
 async-timeout ; python_version == '3.11'
 
 # requirement for the linode module
+linode-python # APIv3
 linode_api4  # APIv4
 
 # requirement for the gitlab and github modules
