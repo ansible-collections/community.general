@@ -42,9 +42,6 @@ _django_std_arg_fmts = dict(
     traceback=cmd_runner_fmt.as_bool("--traceback"),
     verbosity=cmd_runner_fmt.as_opt_val("--verbosity"),
     version=cmd_runner_fmt.as_fixed("--version"),
-    noinput=cmd_runner_fmt.as_fixed("--noinput"),
-    dry_run=cmd_runner_fmt.as_bool("--dry-run"),
-    check=cmd_runner_fmt.as_bool("--check"),
 )
 
 _database_dash = dict(
