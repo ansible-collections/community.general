@@ -8,7 +8,7 @@ __metaclass__ = type
 
 
 from ansible.module_utils.common.dict_transformations import dict_merge
-from ansible_collections.community.general.plugins.module_utils.cmd_runner import cmd_runner_fmt
+from ansible_collections.community.general.plugins.module_utils import cmd_runner_fmt
 from ansible_collections.community.general.plugins.module_utils.python_runner import PythonRunner
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
 
@@ -25,30 +25,36 @@ django_std_args = dict(
 )
 
 _django_std_arg_fmts = dict(
+    apps=cmd_runner_fmt.as_list(),
+    check=cmd_runner_fmt.as_bool("--check"),
     command=cmd_runner_fmt.as_list(),
-    settings=cmd_runner_fmt.as_opt_eq_val("--settings"),
+    database_dash=cmd_runner_fmt.as_opt_eq_val("--database"),
+    database_stacked_dash=cmd_runner_fmt.stack(cmd_runner_fmt.as_opt_val)("--database"),
+    deploy=cmd_runner_fmt.as_bool("--deploy"),
+    dry_run=cmd_runner_fmt.as_bool("--dry-run"),
+    fail_level=cmd_runner_fmt.as_opt_val("--fail-level"),
+    no_color=cmd_runner_fmt.as_fixed("--no-color"),
+    noinput=cmd_runner_fmt.as_fixed("--noinput"),
     pythonpath=cmd_runner_fmt.as_opt_eq_val("--pythonpath"),
+    settings=cmd_runner_fmt.as_opt_eq_val("--settings"),
+    skip_checks=cmd_runner_fmt.as_bool("--skip-checks"),
+    tags=cmd_runner_fmt.stack(cmd_runner_fmt.as_opt_val)("--tag"),
     traceback=cmd_runner_fmt.as_bool("--traceback"),
     verbosity=cmd_runner_fmt.as_opt_val("--verbosity"),
-    no_color=cmd_runner_fmt.as_fixed("--no-color"),
-    skip_checks=cmd_runner_fmt.as_bool("--skip-checks"),
     version=cmd_runner_fmt.as_fixed("--version"),
-    noinput=cmd_runner_fmt.as_fixed("--noinput"),
-    dry_run=cmd_runner_fmt.as_bool("--dry-run"),
-    check=cmd_runner_fmt.as_bool("--check"),
 )
 
-_django_dash_database_args = dict(
+_database_dash = dict(
     database=dict(type="str", default="default"),
 )
 
 _args_menu = dict(
     std=(django_std_args, _django_std_arg_fmts),
-    database=(_django_dash_database_args, {"database": cmd_runner_fmt.as_opt_eq_val("--database")}),    # deprecate, remove in 13.0.0
+    database=(_database_dash, {"database": _django_std_arg_fmts["database_dash"]}),    # deprecate, remove in 13.0.0
     noinput=({}, {"noinput": cmd_runner_fmt.as_fixed("--noinput")}),  # deprecate, remove in 13.0.0
     dry_run=({}, {"dry_run": cmd_runner_fmt.as_bool("--dry-run")}),   # deprecate, remove in 13.0.0
     check=({}, {"check": cmd_runner_fmt.as_bool("--check")}),         # deprecate, remove in 13.0.0
-    dash_database=(_django_dash_database_args, {"dash_database": cmd_runner_fmt.as_opt_eq_val("--database")}),
+    database_dash=(_database_dash, {}),
 )
 
 
