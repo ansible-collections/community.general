@@ -2,8 +2,6 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-unittest2 ; python_version < '2.7'
-importlib ; python_version < '2.7'
 
 # requirement for the memcached cache plugin
 python-memcached < 1.60 ; python_version < '3.6'
@@ -14,8 +12,8 @@ redis
 async-timeout ; python_version == '3.11'
 
 # requirement for the linode module
-linode-python  # APIv3
-linode_api4 ; python_version > '2.6'  # APIv4
+linode-python # APIv3
+linode_api4  # APIv4
 
 # requirement for the gitlab and github modules
 python-gitlab
@@ -23,8 +21,7 @@ PyGithub
 httmock
 
 # requirement for maven_artifact module
-lxml < 4.3.0 ; python_version < '2.7' # lxml 4.3.0 and later require python 2.7 or later
-lxml ; python_version >= '2.7'
+lxml
 semantic_version
 
 # requirement for datadog_downtime module
