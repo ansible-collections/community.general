@@ -23,6 +23,7 @@ options:
     description:
       - Specify databases to run checks against.
       - If not specified, Django does not run database tests.
+      - The parameter has been renamed to O(databases) in community.general 11.3.0. The old name is still available as an alias.
     type: list
     elements: str
     aliases: ["database"]
