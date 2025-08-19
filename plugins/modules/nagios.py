@@ -24,10 +24,10 @@ description:
     variable to refer to the host the playbook is currently running on.
   - The module executes commands and needs to be run directly on the Nagios server
     with a user that has appropriate access rights. It does not use Nagios' HTTP API.
-  - Searches for a "nagios.cfg" in "/etc/nagios", "/etc/nagios2", "/etc/nagios3", "/usr/local/etc/nagios",
-    "/usr/local/groundwork/nagios/etc", "/omd/sites/oppy/tmp/nagios", "/usr/local/nagios/etc",
-    "/usr/local/nagios", "/opt/nagios/etc", and "/opt/nagios"
-    or a "icinga.cfg" in "/etc/icinga" and "/usr/local/icinga/etc"
+  - Searches for a I(nagios.cfg) in I(/etc/nagios), I(/etc/nagios2), I(/etc/nagios3), I(/usr/local/etc/nagios),
+    I(/usr/local/groundwork/nagios/etc), I(/omd/sites/oppy/tmp/nagios), I(/usr/local/nagios/etc),
+    I(/usr/local/nagios), I(/opt/nagios/etc), and I(/opt/nagios)
+    or a I(icinga.cfg) in I(/etc/icinga) and I(/usr/local/icinga/etc)
     (The Nagios configuration file should be readable by the Ansible user.)
 extends_documentation_fragment:
   - community.general.attributes
