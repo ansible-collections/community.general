@@ -104,7 +104,7 @@ test_cases:
             dc-version=2.1.9-1.fc41-7188dbf
             have-watchdog=false
           err: ""
-        - command: [/testbin/pcs, resource, create, virtual-ip, ocf:heartbeat:IPaddr2, "ip=[192.168.2.1]", op, start, timeout=1200, op, stop, timeout=1200, op, monitor, timeout=1200, meta, test_meta1=123, meta, test_meta2=456, --group, test_group, clone, test_clone, test_clone_meta1=789,  --wait=200]
+        - command: [/testbin/pcs, resource, create, virtual-ip, ocf:heartbeat:IPaddr2, "ip=[192.168.2.1]", op, start, timeout=1200, op, stop, timeout=1200, op, monitor, timeout=1200, meta, test_meta1=123, meta, test_meta2=456, --group, test_group, clone, test_clone, test_clone_meta1=789, --wait=200]
           environ: *env-def
           rc: 0
           out: "Assumed agent name 'ocf:heartbeat:IPaddr2'"
