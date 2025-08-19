@@ -24,8 +24,11 @@ description:
     variable to refer to the host the playbook is currently running on.
   - The module executes commands and needs to be run directly on the Nagios server
     with a user that has appropriate access rights. It does not use Nagios' HTTP API.
-  - Various paths on the nagios server are searched for a nagios config.
-    The most common path is "/etc/nagios/nagios.cfg" which should be readable by the ansible user.
+  - Searches for a "nagios.cfg" in "/etc/nagios", "/etc/nagios2", "/etc/nagios3", "/usr/local/etc/nagios",
+    "/usr/local/groundwork/nagios/etc", "/omd/sites/oppy/tmp/nagios", "/usr/local/nagios/etc",
+    "/usr/local/nagios", "/opt/nagios/etc", and "/opt/nagios"
+    or a "icinga.cfg" in "/etc/icinga" and "/usr/local/icinga/etc"
+    (The Nagios configuration file should be readable by the Ansible user.)
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
