@@ -39,7 +39,8 @@ options:
       - V(present) ensures the package is installed.
       - V(latest) ensures the latest version of the package is installed.
       - V(absent) ensures the specified package is not installed.
-    choices: [absent, latest, present, installed, removed]
+      - V(rm_unused_deps) removes unused dependencies. When using this state, O(name) must be set to C("*").
+    choices: [absent, latest, present, installed, removed, rm_unused_deps]
     default: present
     type: str
   build:
@@ -130,6 +131,11 @@ EXAMPLES = r"""
     name: qt5
     quick: true
     state: absent
+
+- name: Remove unused dependencies
+  community.general.openbsd_pkg:
+    name: '*'
+    state: rm_unused_deps
 """
 
 import os
@@ -383,6 +389,29 @@ def package_absent(names, pkg_spec, module):
             pkg_spec[name]['changed'] = False
 
 
+# Function used to remove unused dependencies.
+def package_rm_unused_deps(pkg_spec, module):
+    remove_unused_cmd = 'pkg_delete -a'
+
+    if module.check_mode:
+        remove_unused_cmd += 'n'
+
+    if module.params['clean']:
+        remove_unused_cmd += 'c'
+
+    if module.params['quick']:
+        remove_unused_cmd += 'q'
+
+    # Create a minimal pkg_spec entry for '*' to store return values.
+    pkg_spec['*'] = {}
+
+    # Attempt to remove unused dependencies.
+    pkg_spec['*']['rc'], pkg_spec['*']['stdout'], pkg_spec['*']['stderr'] = execute_command(remove_unused_cmd, module)
+
+    # RC is 0 if we had no errors so always be true and let change
+    # detection handle if anything changed.
+    pkg_spec['*']['changed'] = True
+
 # Function used to parse the package name based on packages-specs(7).
 # The general name structure is "stem-version[-flavors]".
 #
@@ -561,7 +590,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(type='list', elements='str', required=True),
-            state=dict(type='str', default='present', choices=['absent', 'installed', 'latest', 'present', 'removed']),
+            state=dict(type='str', default='present', choices=['absent', 'installed', 'latest', 'present', 'removed', 'rm_unused_deps']),
             build=dict(type='bool', default=False),
             snapshot=dict(type='bool', default=False),
             ports_dir=dict(type='path', default='/usr/ports'),
@@ -611,12 +640,18 @@ def main():
             asterisk_name = True
 
     if asterisk_name:
-        if state != 'latest':
-            module.fail_json(msg="the package name '*' is only valid when using state=latest")
-        else:
+        if state == 'latest':
             # Perform an upgrade of all installed packages.
             upgrade_packages(pkg_spec, module)
+        elif state == 'rm_unused_deps':
+            # Remove unused dependencies.
+            package_rm_unused_deps(pkg_spec, module)
+        else:
+            module.fail_json(msg="the package name '*' is only valid when using state=latest or state=rm_unused_deps")
     else:
+        if state == 'rm_unused_deps':
+            module.fail_json(msg="state=rm_unused_deps can only be used with name='*'")
+
         # Parse package names and put results in the pkg_spec dictionary.
         parse_package_name(name, pkg_spec, module)
 
