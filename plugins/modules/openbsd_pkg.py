@@ -412,6 +412,7 @@ def package_rm_unused_deps(pkg_spec, module):
     # detection handle if anything changed.
     pkg_spec['*']['changed'] = True
 
+
 # Function used to parse the package name based on packages-specs(7).
 # The general name structure is "stem-version[-flavors]".
 #
