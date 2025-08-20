@@ -607,9 +607,6 @@ def main():
     build = module.params['build']
     ports_dir = module.params['ports_dir']
 
-    rc = 0
-    stdout = ''
-    stderr = ''
     result = {}
     result['name'] = name
     result['state'] = state
@@ -714,6 +711,8 @@ def main():
     if result['changed'] and not module.check_mode:
         new_package_list = get_all_installed(module)
         result['diff'] = dict(before=original_package_list, after=new_package_list)
+        if result['diff']['before'] == result['diff']['after']:
+            result['changed'] = False
 
     module.exit_json(**result)
 
