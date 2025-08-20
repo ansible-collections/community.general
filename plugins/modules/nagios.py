@@ -27,7 +27,7 @@ description:
   - Searches for a I(nagios.cfg) in I(/etc/nagios), I(/etc/nagios2), I(/etc/nagios3), I(/usr/local/etc/nagios),
     I(/usr/local/groundwork/nagios/etc), I(/omd/sites/oppy/tmp/nagios), I(/usr/local/nagios/etc),
     I(/usr/local/nagios), I(/opt/nagios/etc), and I(/opt/nagios),
-    or a I(icinga.cfg) in I(/etc/icinga) and I(/usr/local/icinga/etc)
+    or a I(icinga.cfg) in I(/etc/icinga) and I(/usr/local/icinga/etc).
     (The Nagios configuration file should be readable by the Ansible user.)
 extends_documentation_fragment:
   - community.general.attributes
