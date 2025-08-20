@@ -391,7 +391,7 @@ def package_absent(names, pkg_spec, module):
 
 # Function used to remove unused dependencies.
 def package_rm_unused_deps(pkg_spec, module):
-    remove_unused_cmd = 'pkg_delete -a'
+    remove_unused_cmd = 'pkg_delete -Ia'
 
     if module.check_mode:
         remove_unused_cmd += 'n'
