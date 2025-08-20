@@ -391,22 +391,22 @@ def package_absent(names, pkg_spec, module):
 
 # Function used to remove unused dependencies.
 def package_rm_unused_deps(pkg_spec, module):
-    remove_unused_cmd = 'pkg_delete -Ia'
+    rm_unused_deps_cmd = 'pkg_delete -Ia'
 
     if module.check_mode:
-        remove_unused_cmd += 'n'
+        rm_unused_deps_cmd += 'n'
 
     if module.params['clean']:
-        remove_unused_cmd += 'c'
+        rm_unused_deps_cmd += 'c'
 
     if module.params['quick']:
-        remove_unused_cmd += 'q'
+        rm_unused_deps_cmd += 'q'
 
     # Create a minimal pkg_spec entry for '*' to store return values.
     pkg_spec['*'] = {}
 
     # Attempt to remove unused dependencies.
-    pkg_spec['*']['rc'], pkg_spec['*']['stdout'], pkg_spec['*']['stderr'] = execute_command(remove_unused_cmd, module)
+    pkg_spec['*']['rc'], pkg_spec['*']['stdout'], pkg_spec['*']['stderr'] = execute_command(rm_unused_deps_cmd, module)
 
     # RC is 0 if we had no errors so always be true and let change
     # detection handle if anything changed.
