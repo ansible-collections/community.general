@@ -1,0 +1,6 @@
+bugfixes:
+  - "pacemaker - Use regex for matching ``maintenance-mode`` output to determine cluster maintenance status (https://github.com/ansible-collections/community.general/issues/10426, https://github.com/ansible-collections/community.general/pull/10707)."
+
+minor_changes:
+  - "pacemaker_resource - Additional unit test for handling different Pacemaker CLI output for ``maintenance-mode`` (https://github.com/ansible-collections/community.general/issues/10426, https://github.com/ansible-collections/community.general/pull/10707)."
+  - "pacemaker_cluster - Additional unit test for handling different Pacemaker CLI output for ``maintenance-mode`` (https://github.com/ansible-collections/community.general/issues/10426, https://github.com/ansible-collections/community.general/pull/10707)."
