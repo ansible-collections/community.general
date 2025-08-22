@@ -11,15 +11,15 @@
 - name: Ensure this is run on the right distro and version the integration test was written for
   ansible.builtin.assert:
     that:
-    - ansible_distribution_major_version | int == 13
-    - ansible_distribution | lower == 'debian'
+      - ansible_distribution_major_version | int == 13
+      - ansible_distribution | lower == 'debian'
     fail_msg: "This test was written for a Debian 13 (trixie) container due to uses of its default configuration"
     quiet: yes
 
 - name: Install prerequisites
   ansible.builtin.apt:
     name:
-    - iproute2
+      - iproute2
     state: present
     install_recommends: no
     update_cache: yes
@@ -42,8 +42,8 @@
 - name: Install KEA servers for DHCP and DHCPv6
   ansible.builtin.apt:
     name:
-    - kea-dhcp4-server
-    - kea-dhcp6-server
+      - kea-dhcp4-server
+      - kea-dhcp6-server
     state: present
     install_recommends: no
 
@@ -94,11 +94,11 @@
 - name: Ensure dhcp4 and dhcp6 PIDs are different
   ansible.builtin.assert:
     that:
-    - kea4_status.response.arguments.pid is integer
-    - kea4_status.response.arguments.pid > 0
-    - kea6_status.response.arguments.pid is integer
-    - kea6_status.response.arguments.pid > 0
-    - kea4_status.response.arguments.pid != kea6_status.response.arguments.pid
+      - kea4_status.response.arguments.pid is integer
+      - kea4_status.response.arguments.pid > 0
+      - kea6_status.response.arguments.pid is integer
+      - kea6_status.response.arguments.pid > 0
+      - kea4_status.response.arguments.pid != kea6_status.response.arguments.pid
     fail_msg: 'PIDs are invalid or do not differ (4: {{ kea4_status.response.arguments.pid }}, 6: {{ kea6_status.response.arguments.pid }})'
     success_msg: 'PIDs differ (4: {{ kea4_status.response.arguments.pid }}, 6: {{ kea6_status.response.arguments.pid }})'
 
@@ -129,10 +129,10 @@
 - name: Check results
   ansible.builtin.assert:
     that:
-    - kea6_status is not changed
-    - kea6_status is not failed
-    - kea4_status is not changed
-    - kea4_status is not failed
-    - lease_add is changed
-    - lease_add is not failed
-    - uc_status is failed
+      - kea6_status is not changed
+      - kea6_status is not failed
+      - kea4_status is not changed
+      - kea4_status is not failed
+      - lease_add is changed
+      - lease_add is not failed
+      - uc_status is failed
