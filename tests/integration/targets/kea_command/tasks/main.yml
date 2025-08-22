@@ -14,15 +14,15 @@
       - ansible_distribution_major_version | int == 13
       - ansible_distribution | lower == 'debian'
     fail_msg: "This test was written for a Debian 13 (trixie) container due to uses of its default configuration"
-    quiet: yes
+    quiet: true
 
 - name: Install prerequisites
   ansible.builtin.apt:
     name:
       - iproute2
     state: present
-    install_recommends: no
-    update_cache: yes
+    install_recommends: false
+    update_cache: true
 
 - name: Networking setup, interface
   ansible.builtin.command:
@@ -45,7 +45,7 @@
       - kea-dhcp4-server
       - kea-dhcp6-server
     state: present
-    install_recommends: no
+    install_recommends: false
 
 - name: Set up dhcp4 server, network
   ansible.builtin.lineinfile:
