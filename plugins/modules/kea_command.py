@@ -5,6 +5,7 @@
 # Copyright © Thorsten Glaser <tglaser@b1-systems.de>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 
+# note: this module has not been tested with Python, as the switch from ISC DHCPD to KEA occurs at a time where distros only ship Python3 instead.
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
