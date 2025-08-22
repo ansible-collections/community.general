@@ -59,3 +59,19 @@ options:
     type: str
     default: default
 """
+
+    DATA = r"""
+options:
+  excludes:
+    description:
+      - Applications or models to be excluded.
+      - Format must be either V(app_label) or V(app_label.ModelName).
+    type: list
+    elements: str
+  format:
+    description:
+      - Serialization format of the output data.
+    type: str
+    default: json
+    choices: [xml, json, jsonl, yaml]
+"""
