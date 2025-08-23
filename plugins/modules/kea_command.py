@@ -113,10 +113,6 @@ response:
   description: The server JSON response.
   returned: if available and not check mode
   type: dict
-msg:
-  description: An error message.
-  returned: failure
-  type: str
 """
 
 import json
