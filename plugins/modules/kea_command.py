@@ -97,13 +97,13 @@ tasks:
         ip-address: "{{ ipaddr }}"
       rv_changed: [0]
       rv_unchanged: [3]
-- name: Add DHCP lease for {{ ipaddr }}
-  kea_command:
-    command: lease4-add
-    arguments:
-      ip-address: "{{ ipaddr }}"
-      hw-address: "{{ hwaddr }}"
-    rv_changed: [0]
+  - name: Add DHCP lease for {{ ipaddr }}
+    kea_command:
+      command: lease4-add
+      arguments:
+        ip-address: "{{ ipaddr }}"
+        hw-address: "{{ hwaddr }}"
+      rv_changed: [0]
 """
 
 RETURN = r"""
