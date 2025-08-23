@@ -8,6 +8,7 @@ unsupported
 
 # sets up networks and services
 needs/root
+needs/privileged
 destructive
 
 # run this with:
