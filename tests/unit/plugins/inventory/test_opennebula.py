@@ -316,7 +316,7 @@ keyed_groups:
     # note the vm_pool (and json data file) has four hosts,
     # but the options above asks ansible to filter one out
     assert len(get_vm_pool_json().VM) == 4
-    assert set([vm.NAME for vm in get_vm_pool_json().VM]) == set([
+    assert set(vm.NAME for vm in get_vm_pool_json().VM) == set([
         'terraform_demo_00',
         'terraform_demo_01',
         'terraform_demo_srv_00',

@@ -1146,7 +1146,7 @@ def create_count_of_vms(module, client,
         base_name = vm_name[:len(vm_name) - num_sign_cnt]
         vm_name = base_name
         # Make list which contains used indexes in format ['000', '001',...]
-        vm_filled_indexes_list = list((vm.NAME[len(base_name):].zfill(num_sign_cnt)) for vm in vm_list)
+        vm_filled_indexes_list = [vm.NAME[len(base_name):].zfill(num_sign_cnt) for vm in vm_list]
 
     while count > 0:
         new_vm_name = vm_name
