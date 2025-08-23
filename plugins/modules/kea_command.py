@@ -19,7 +19,7 @@ description:
   - This module supports sending arbitrary commands and returns the server response unchecked;
     while it would be possible to write individual modules for specific KEA service commands,
     that approach would not scale, as the FOSS hooks alone provide dozens of commands.
-  - Between sending the command and parsing the result status, changed will register as true if an error occurs,
+  - Between sending the command and parsing the result status, RV(ignore:changed) will register as V(true) if an error occurs,
     to err on the safe side.
 version_added: '11.3.0'
 author: Thorsten Glaser (@mirabilos)
