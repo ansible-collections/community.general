@@ -138,7 +138,7 @@ EXAMPLES = r"""
 
 - name: Remove some unused dependencies
   community.general.openbsd_pkg:
-    name: ["nmap", "mtr"]
+    name: ["lua", "pcre"]
     autoremove: true
 
 - name: Remove all unused dependencies
