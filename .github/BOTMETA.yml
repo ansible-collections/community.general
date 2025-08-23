@@ -1066,6 +1066,8 @@ files:
     maintainers: munchtoast
   $modules/pacemaker_resource.py:
     maintainers: munchtoast
+  $modules/pacemaker_stonith.py:
+    maintainers: munchtoast
   $modules/packet_:
     maintainers: nurfet-becirevic t0mk
   $modules/packet_device.py:
