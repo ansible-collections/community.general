@@ -63,6 +63,7 @@ options:
     default: /run/kea/kea4-ctrl-socket
 extends_documentation_fragment:
   - community.general.attributes
+  - community.general.attributes.platform
 attributes:
   check_mode:
     support: none
