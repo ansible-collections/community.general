@@ -201,7 +201,7 @@ class ManageIQAlertProfiles(object):
         # alert which currently exist in the profile
         if 'alert_definitions' in old_profile:
             # we use get_alert_href to have a direct href to the alert
-            existing_alerts = set([self.get_alert_href(alert) for alert in old_profile['alert_definitions']])
+            existing_alerts = set(self.get_alert_href(alert) for alert in old_profile['alert_definitions'])
         else:
             # no alerts in this profile
             existing_alerts = set()
