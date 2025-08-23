@@ -79,6 +79,7 @@ vars:
   ipaddr: "192.168.123.45"
   hwaddr: "00:00:5E:00:53:00"
 tasks:
+
   # an example for a request acquiring information
   - name: Get KEA DHCP6 status
     kea_command:
@@ -89,6 +90,7 @@ tasks:
   - name: Display registered status result
     ansible.builtin.debug:
       msg: KEA DHCP6 running on PID {{ kea6_status.response.arguments.pid }}
+
   # an example for requests modifying state
   - name: Remove existing leases for {{ ipaddr }}, if any
     kea_command:
