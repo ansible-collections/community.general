@@ -404,7 +404,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             results['_meta']['hostvars'][iocage_name]['iocage_basejail'] = jail[9]
 
     def get_properties(self, t_stdout, results, hostname):
-        properties = dict([x.split(':', 1) for x in t_stdout.splitlines()])
+        properties = dict(x.split(':', 1) for x in t_stdout.splitlines())
         results['_meta']['hostvars'][hostname]['iocage_properties'] = properties
 
     def populate(self, results):
