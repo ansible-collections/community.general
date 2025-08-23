@@ -297,7 +297,7 @@ class ManageIQPolicies(object):
 
         # make a list of assigned full profile names strings
         # e.g. ['openscap profile', ...]
-        assigned_profiles_set = set([profile['profile_name'] for profile in assigned_profiles])
+        assigned_profiles_set = set(profile['profile_name'] for profile in assigned_profiles)
 
         for profile in profiles:
             assigned = profile.get('name') in assigned_profiles_set
@@ -424,7 +424,7 @@ class ManageIQTags(object):
 
         # make a list of assigned full tag names strings
         # e.g. ['/managed/environment/prod', ...]
-        assigned_tags_set = set([tag['full_name'] for tag in assigned_tags])
+        assigned_tags_set = set(tag['full_name'] for tag in assigned_tags)
 
         for tag in tags:
             assigned = self.full_tag_name(tag) in assigned_tags_set

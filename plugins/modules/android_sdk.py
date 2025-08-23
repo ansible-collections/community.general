@@ -160,7 +160,7 @@ class AndroidSdk(StateModuleHelper):
         arg_pkgs = set(self.vars.package)
         if len(arg_pkgs) < len(self.vars.package):
             self.do_raise("Packages may not repeat")
-        return set([Package(p) for p in arg_pkgs])
+        return set(Package(p) for p in arg_pkgs)
 
     def state_present(self):
         packages = self._parse_packages()
