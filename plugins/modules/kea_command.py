@@ -155,7 +155,8 @@ def main():
     rsp = b''
 
     if not os.path.exists(sockfn):
-        module.fail_json(**r, msg='socket (%s) does not exist' % sockfn)
+        r['msg'] = 'socket (%s) does not exist' % sockfn
+        module.fail_json(**r)
     if module.check_mode:
         module.exit_json(**r)
 
@@ -163,13 +164,17 @@ def main():
         try:
             sock.connect(sockfn)
         except OSError as ex:
-            module.fail_json(**r, msg='could not connect to socket (%s)' % sockfn, exception=ex)
+            r['msg'] = 'could not connect to socket (%s)' % sockfn
+            r['exception'] = ex
+            module.fail_json(**r)
         # better safe in case anything fails…
         r['changed'] = True
         try:
             sock.sendall(cmdstr.encode('ASCII'))
         except OSError as ex:
-            module.fail_json(**r, msg='could not write to socket (%s)' % sockfn, exception=ex)
+            r['msg'] = 'could not write to socket (%s)' % sockfn
+            r['exception'] = ex
+            module.fail_json(**r)
 
         try:
             while True:
@@ -178,27 +183,36 @@ def main():
                     break
                 rsp += rspnew
         except OSError as ex:
-            module.fail_json(**r, msg='error reading from socket (%s)' % sockfn, exception=ex)
+            r['msg'] = 'error reading from socket (%s)' % sockfn
+            r['exception'] = ex
+            module.fail_json(**r)
 
     if len(rsp) < 15:
-        module.fail_json(**r, msg='unrealistically short response ' + repr(rsp))
+        r['msg'] = 'unrealistically short response ' + repr(rsp)
+        module.fail_json(**r)
 
     try:
         r['response'] = json.loads(rsp, parse_constant=_parse_constant)
     except ValueError as ex:
-        module.fail_json(**r, msg='error parsing JSON response', exception=ex)
+        r['msg'] = 'error parsing JSON response'
+        r['exception'] = ex
+        module.fail_json(**r)
     if not isinstance(r['response'], dict):
-        module.fail_json(**r, msg='bogus JSON response (JSONObject expected)')
+        r['msg'] = 'bogus JSON response (JSONObject expected)'
+        module.fail_json(**r)
     if 'result' not in r['response']:
-        module.fail_json(**r, msg='bogus JSON response (missing result)')
+        r['msg'] = 'bogus JSON response (missing result)'
+        module.fail_json(**r)
     res = r['response']['result']
     if not isinstance(res, int):
-        module.fail_json(**r, msg='bogus JSON response (nōn-integer result)')
+        r['msg'] = 'bogus JSON response (nōn-integer result)'
+        module.fail_json(**r)
 
     if res in rvok:
         r['changed'] = False
     elif res not in rvch:
-        module.fail_json(**r, msg='failure result (code %d)' % res)
+        r['msg'] = 'failure result (code %d)' % res
+        module.fail_json(**r)
 
     module.exit_json(**r)
 
