@@ -15,54 +15,54 @@ DOCUMENTATION = r"""
 module: kea_command
 short_description: Submits generic command to ISC KEA server on target
 description:
-- Submits a command to the JSON API of an ISC KEA server running on the target and obtains the result.
-- This module supports sending arbitrary commands and returns the server response unchecked;
-  while it would be possible to write individual modules for specific KEA service commands,
-  that approach would not scale, as the FOSS hooks alone provide dozens of commands.
-- Between sending the command and parsing the result status, changed will register as true if an error occurs,
-  to err on the safe side.
+  - Submits a command to the JSON API of an ISC KEA server running on the target and obtains the result.
+  - This module supports sending arbitrary commands and returns the server response unchecked;
+    while it would be possible to write individual modules for specific KEA service commands,
+    that approach would not scale, as the FOSS hooks alone provide dozens of commands.
+  - Between sending the command and parsing the result status, changed will register as true if an error occurs,
+    to err on the safe side.
 version_added: '11.3.0'
 author: Thorsten Glaser (@mirabilos)
 options:
   command:
     description:
-    - The name of the command to send, for example C(status-get).
+      - The name of the command to send, for example C(status-get).
     required: true
     type: str
   arguments:
     description:
-    - The arguments sent along with the command, if any.
-    - Use V({}) to send an empty JSONObject instead of omitting.
+      - The arguments sent along with the command, if any.
+      - Use V({}) to send an empty JSONObject instead of omitting.
     type: dict
   rv_unchanged:
     description:
-    - A list of C(result) codes to indicate success but unchanged system state.
-    - Set this to V([0]) for most acquisition commands.
-    - Use V([3]) for C(lease4-del) and similar which have a separate code for this.
-    - Any C(result) codes not listed in either O(rv_unchanged) or O(rv_changed) are interpreted as indicating an error result.
-    - O(rv_unchanged) has precedence over O(rv_changed) if a result code is in both lists.
+      - A list of C(result) codes to indicate success but unchanged system state.
+      - Set this to V([0]) for most acquisition commands.
+      - Use V([3]) for C(lease4-del) and similar which have a separate code for this.
+      - Any C(result) codes not listed in either O(rv_unchanged) or O(rv_changed) are interpreted as indicating an error result.
+      - O(rv_unchanged) has precedence over O(rv_changed) if a result code is in both lists.
     type: list
     elements: int
     default: []
   rv_changed:
     description:
-    - A list of C(result) codes to indicate success and changed system state.
-    - Omit this for most acquisition commands.
-    - Set it to V([0]) for C(lease4-del) and similar which return changed system state that way.
-    - Any C(result) codes not listed in either O(rv_unchanged) or O(rv_changed) are interpreted as indicating an error result.
-    - O(rv_unchanged) has precedence over O(rv_changed) if a result code is in both lists.
+      - A list of C(result) codes to indicate success and changed system state.
+      - Omit this for most acquisition commands.
+      - Set it to V([0]) for C(lease4-del) and similar which return changed system state that way.
+      - Any C(result) codes not listed in either O(rv_unchanged) or O(rv_changed) are interpreted as indicating an error result.
+      - O(rv_unchanged) has precedence over O(rv_changed) if a result code is in both lists.
     type: list
     elements: int
     default: []
   socket:
     description:
-    - The full pathname of the Unix Domain Socket to connect to.
-    - The default value is suitable for C(kea-dhcp4-server) on Debian trixie.
-    - This module directly interfacees via UDS; the HTTP wrappers are not supported.
+      - The full pathname of the Unix Domain Socket to connect to.
+      - The default value is suitable for C(kea-dhcp4-server) on Debian trixie.
+      - This module directly interfacees via UDS; the HTTP wrappers are not supported.
     type: path
     default: /run/kea/kea4-ctrl-socket
 extends_documentation_fragment:
-- action_common_attributes
+  - action_common_attributes
 attributes:
   check_mode:
     details: Neither return codes nor the server response are available during check mode, and in fact not returned by the module in check mode.
@@ -79,24 +79,24 @@ vars:
   ipaddr: "192.168.123.45"
   hwaddr: "00:00:5E:00:53:00"
 tasks:
-# an example for a request acquiring information
-- name: Get KEA DHCP6 status
-  kea_command:
-    command: status-get
-    rv_unchanged: [0]
-    socket: /run/kea/kea6-ctrl-socket
-  register: kea6_status
-- name: Display registered status result
-  ansible.builtin.debug:
-    msg: KEA DHCP6 running on PID {{ kea6_status.response.arguments.pid }}
-# an example for requests modifying state
-- name: Remove existing leases for {{ ipaddr }}, if any
-  kea_command:
-    command: lease4-del
-    arguments:
-      ip-address: "{{ ipaddr }}"
-    rv_changed: [0]
-    rv_unchanged: [3]
+  # an example for a request acquiring information
+  - name: Get KEA DHCP6 status
+    kea_command:
+      command: status-get
+      rv_unchanged: [0]
+      socket: /run/kea/kea6-ctrl-socket
+    register: kea6_status
+  - name: Display registered status result
+    ansible.builtin.debug:
+      msg: KEA DHCP6 running on PID {{ kea6_status.response.arguments.pid }}
+  # an example for requests modifying state
+  - name: Remove existing leases for {{ ipaddr }}, if any
+    kea_command:
+      command: lease4-del
+      arguments:
+        ip-address: "{{ ipaddr }}"
+      rv_changed: [0]
+      rv_unchanged: [3]
 - name: Add DHCP lease for {{ ipaddr }}
   kea_command:
     command: lease4-add
