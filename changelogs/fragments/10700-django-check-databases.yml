@@ -1,0 +1,2 @@
+minor_changes:
+  - django_check - rename parameter ``database`` to ``databases``, add alias for compatibility (https://github.com/ansible-collections/community.general/pull/10700).
