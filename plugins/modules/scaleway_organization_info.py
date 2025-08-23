@@ -16,6 +16,11 @@ description:
 author:
   - "Yanis Guenane (@Spredzy)"
   - "Remy Leone (@remyleone)"
+
+attributes:
+  action_group:
+    version_added: 11.3.0
+
 options:
   api_url:
     description:
@@ -25,6 +30,7 @@ options:
 extends_documentation_fragment:
   - community.general.scaleway
   - community.general.attributes
+  - community.general.scaleway.actiongroup_scaleway
   - community.general.attributes.info_module
 """
 
