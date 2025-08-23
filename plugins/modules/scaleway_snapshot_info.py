@@ -19,7 +19,12 @@ author:
 extends_documentation_fragment:
   - community.general.scaleway
   - community.general.attributes
+  - community.general.scaleway.actiongroup_scaleway
   - community.general.attributes.info_module
+
+attributes:
+  action_group:
+    version_added: 11.3.0
 
 options:
   region:
