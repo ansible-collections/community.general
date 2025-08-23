@@ -287,7 +287,7 @@ files:
     maintainers: dagwieers
   $lookups/flattened.py: {}
   $lookups/github_app_access_token.py:
-    maintainers: weisheng-p
+    maintainers: weisheng-p blavoie
   $lookups/hiera.py:
     maintainers: jparrill
   $lookups/keyring.py: {}
