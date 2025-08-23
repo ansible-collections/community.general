@@ -57,8 +57,8 @@ EXAMPLES = r"""
 from ansible.module_utils.basic import AnsibleModule
 
 argument_spec = dict(
-    vg=dict(type='str', required=True,),
-    vg_new=dict(type='str', required=True,),
+    vg=dict(type='str', required=True),
+    vg_new=dict(type='str', required=True),
 )
 
 

@@ -1,0 +1,6 @@
+minor_changes:
+  - gitlab_label - minor refactor to improve readability (https://github.com/ansible-collections/community.general/pull/10711).
+  - gitlab_milestone - minor refactor to improve readability (https://github.com/ansible-collections/community.general/pull/10711).
+  - ipa_host - minor refactor to improve readability (https://github.com/ansible-collections/community.general/pull/10711).
+  - lvg_rename - minor refactor to improve readability (https://github.com/ansible-collections/community.general/pull/10711).
+  - terraform - minor refactor to improve readability (https://github.com/ansible-collections/community.general/pull/10711).
