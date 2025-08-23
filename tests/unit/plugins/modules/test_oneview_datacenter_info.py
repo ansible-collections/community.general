@@ -29,7 +29,7 @@ class TestDatacenterInfoModule(FactsParamsTest):
     def test_should_get_all_datacenters(self):
         self.resource.get_all.return_value = {"name": "Data Center Name"}
 
-        self.mock_ansible_module.params = dict(config='config.json',)
+        self.mock_ansible_module.params = dict(config='config.json')
 
         DatacenterInfoModule().run()
 

@@ -414,12 +414,12 @@ def main():
         project=dict(type='str'),
         group=dict(type='str'),
         purge=dict(type='bool', default=False),
-        milestones=dict(type='list', elements='dict', default=list(),
+        milestones=dict(type='list', elements='dict', default=[],
                         options=dict(
                             title=dict(type='str', required=True),
                             description=dict(type='str'),
                             due_date=dict(type='str'),
-                            start_date=dict(type='str'),)
+                            start_date=dict(type='str'))
                         ),
         state=dict(type='str', default="present", choices=["absent", "present"]),
     )
