@@ -62,7 +62,7 @@ options:
     type: path
     default: /run/kea/kea4-ctrl-socket
 extends_documentation_fragment:
-  - action_common_attributes
+  - community.general.attributes
 attributes:
   check_mode:
     support: none
