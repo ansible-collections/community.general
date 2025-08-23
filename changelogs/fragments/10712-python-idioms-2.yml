@@ -1,0 +1,7 @@
+minor_changes:
+  - iocage inventory plugin - minor refactor to improve readability (https://github.com/ansible-collections/community.general/pull/10712).
+  - manageiq - minor refactor to improve readability (https://github.com/ansible-collections/community.general/pull/10712).
+  - android_sdk - minor refactor to improve readability (https://github.com/ansible-collections/community.general/pull/10712).
+  - elasticsearch_plugin - minor refactor to improve readability (https://github.com/ansible-collections/community.general/pull/10712).
+  - manageiq_alert_profiles - minor refactor to improve readability (https://github.com/ansible-collections/community.general/pull/10712).
+  - one_vm - minor refactor to improve readability (https://github.com/ansible-collections/community.general/pull/10712).
