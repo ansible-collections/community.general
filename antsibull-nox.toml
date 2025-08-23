@@ -79,6 +79,11 @@ exclusions = [
 ]
 doc_fragment = "community.general.keycloak.actiongroup_keycloak"
 
+[[sessions.extra_checks.action_groups_config]]
+name = "scaleway"
+pattern = "^scaleway_.*$"
+doc_fragment = "community.general.scaleway.actiongroup_scaleway"
+
 [sessions.build_import_check]
 run_galaxy_importer = true
 
