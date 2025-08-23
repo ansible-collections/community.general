@@ -200,7 +200,7 @@ def main():
         module.fail_json(**r)
     res = r['response']['result']
     if not isinstance(res, int):
-        r['msg'] = 'bogus JSON response (nōn-integer result)'
+        r['msg'] = 'bogus JSON response (non-integer result)'
         module.fail_json(**r)
 
     if res in rvok:
