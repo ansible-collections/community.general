@@ -82,6 +82,14 @@ options:
     required: false
     default: false
     type: bool
+  auto_import_keys:
+    description:
+      - Whether to automatically import new repository signing keys. Adds C(--gpg-auto-import-keys) option to I(zypper).
+      - Is only used when installing.
+    required: false
+    default: false
+    type: bool
+    version_added: 11.3.0
   disable_recommends:
     description:
       - Corresponds to the C(--no-recommends) option for I(zypper). Default behavior (V(true)) modifies zypper's default behavior;
@@ -427,6 +435,8 @@ def get_cmd(m, subcommand):
     # add global options before zypper command
     if (is_install or is_refresh) and m.params['disable_gpg_check']:
         cmd.append('--no-gpg-checks')
+    if is_install and m.params['auto_import_keys']:
+        cmd.append('--gpg-auto-import-keys')
 
     if subcommand == 'search':
         cmd.append('--disable-repositories')
@@ -609,6 +619,7 @@ def main():
             type=dict(default='package', choices=['package', 'patch', 'pattern', 'product', 'srcpackage', 'application']),
             extra_args_precommand=dict(),
             disable_gpg_check=dict(default=False, type='bool'),
+            auto_import_keys=dict(default=False, type='bool'),
             disable_recommends=dict(default=True, type='bool'),
             force=dict(default=False, type='bool'),
             force_resolution=dict(default=False, type='bool'),
