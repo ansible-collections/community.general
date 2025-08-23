@@ -65,8 +65,7 @@ extends_documentation_fragment:
   - action_common_attributes
 attributes:
   check_mode:
-    details: Neither return codes nor the server response are available during check mode, and in fact not returned by the module in check mode.
-    support: partial
+    support: none
   diff_mode:
     support: none
   platform:
@@ -111,7 +110,7 @@ tasks:
 RETURN = r"""
 response:
   description: The server JSON response.
-  returned: if available and not check mode
+  returned: when available
   type: dict
 """
 
@@ -135,7 +134,6 @@ def main():
             rv_changed=dict(type='list', elements='int', default=[]),
             socket=dict(type='path', default='/run/kea/kea4-ctrl-socket'),
         ),
-        supports_check_mode=True,
     )
 
     cmd = {}
@@ -155,8 +153,6 @@ def main():
     if not os.path.exists(sockfn):
         r['msg'] = 'socket (%s) does not exist' % sockfn
         module.fail_json(**r)
-    if module.check_mode:
-        module.exit_json(**r)
 
     with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
         try:
