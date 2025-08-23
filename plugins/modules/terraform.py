@@ -507,7 +507,7 @@ def main():
             state_file=dict(type='path'),
             targets=dict(type='list', elements='str', default=[]),
             lock=dict(type='bool', default=True),
-            lock_timeout=dict(type='int',),
+            lock_timeout=dict(type='int'),
             force_init=dict(type='bool', default=False),
             backend_config=dict(type='dict'),
             backend_config_files=dict(type='list', elements='path'),

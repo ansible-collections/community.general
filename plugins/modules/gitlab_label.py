@@ -419,7 +419,7 @@ def main():
                         color=dict(type='str'),
                         description=dict(type='str'),
                         priority=dict(type='int'),
-                        new_name=dict(type='str'),)
+                        new_name=dict(type='str'))
                     ),
         state=dict(type='str', default="present", choices=["absent", "present"]),
     )
