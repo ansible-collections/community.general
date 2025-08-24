@@ -178,7 +178,7 @@ def main():
     try:
         session = get_xenapi_session()
     except XenAPI.Failure as e:
-        module.fail_json(msg='%s' % e)
+        module.fail_json(msg=str(e))
 
     data = {
         'xenserver_version': obj.version,
