@@ -46,9 +46,11 @@
   become: true
   become_user: yaybuilder
   ansible.builtin.git:
-    repo: https://aur.archlinux.org/yay.git
-    dest: "{{ remote_tmp_dir  }}/builder/yay"
     depth: 1
+    dest: "{{ remote_tmp_dir  }}/builder/yay"
+    repo: https://github.com/archlinux/aur.git
+    single_branch: true
+    version: yay
 
 - name: make package
   become: true
