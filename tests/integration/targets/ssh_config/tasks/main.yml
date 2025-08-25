@@ -6,7 +6,7 @@
 - name: Install required libs
   pip:
     name:
-      - 'paramiko<3.0.0'
+      - paramiko
     state: present
     extra_args: "-c {{ remote_constraints }}"
 
