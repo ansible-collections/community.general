@@ -4,5 +4,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 dependencies:
-  - setup_remote_constraints
+  - setup_paramiko
   - setup_remote_tmp_dir
