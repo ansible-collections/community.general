@@ -28,7 +28,7 @@ options:
     description:
       - Indicate desired state for cluster resource.
       - O(state=clone) was added in community.general 11.3.0.
-      - If O(state=clone), then O(resource_clone_ids) and O(resource_clone_meta) are optional.
+      - If O(state=clone) or O(state=present), you can set O(resource_clone_ids) and O(resource_clone_meta) to determine exactly what and how to clone.
     choices: [present, absent, clone, enabled, disabled]
     default: present
     type: str
