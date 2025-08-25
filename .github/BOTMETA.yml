@@ -550,6 +550,10 @@ files:
     maintainers: russoz
   $modules/django_createcachetable.py:
     maintainers: russoz
+  $modules/django_dumpdata.py:
+    maintainers: russoz
+  $modules/django_loaddata.py:
+    maintainers: russoz
   $modules/django_manage.py:
     ignore: scottanderson42 tastychutney
     labels: django_manage

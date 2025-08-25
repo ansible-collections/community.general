@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (c) 2024, Alexei Znamensky <russoz@gmail.com>
+# Copyright (c) 2025, Alexei Znamensky <russoz@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -8,27 +8,40 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 DOCUMENTATION = r"""
-module: django_createcachetable
+module: django_loaddata
 author:
   - Alexei Znamensky (@russoz)
-short_description: Wrapper for C(django-admin createcachetable)
-version_added: 9.1.0
+short_description: Wrapper for C(django-admin loaddata)
+version_added: 11.3.0
 description:
-  - This module is a wrapper for the execution of C(django-admin createcachetable).
+  - This module is a wrapper for the execution of C(django-admin loaddata).
 extends_documentation_fragment:
   - community.general.attributes
   - community.general.django
   - community.general.django.database
+  - community.general.django.data
 attributes:
   check_mode:
-    support: full
+    support: none
   diff_mode:
     support: none
+options:
+  app:
+    description: Specifies a single app to look for fixtures in rather than looking in all apps.
+    type: str
+  ignore_non_existent:
+    description: Ignores fields and models that may have been removed since the fixture was originally generated.
+    type: bool
+  fixtures:
+    description:
+      - List of paths to the fixture files.
+    type: list
+    elements: path
 """
 
 EXAMPLES = r"""
-- name: Create cache table in the default database
-  community.general.django_createcachetable:
+- name: Dump all data
+  community.general.django_dumpdata:
     settings: myproject.settings
 
 - name: Create cache table in the other database
@@ -49,27 +62,30 @@ version:
   type: str
   returned: always
   sample: 5.1.2
-  version_added: 10.0.0
 """
 
 from ansible_collections.community.general.plugins.module_utils.django import DjangoModuleHelper
 
 
-class DjangoCreateCacheTable(DjangoModuleHelper):
+class DjangoLoadData(DjangoModuleHelper):
     module = dict(
-        supports_check_mode=True,
+        argument_spec=dict(
+            app=dict(type="str"),
+            ignore_non_existent=dict(type="bool"),
+            fixtures=dict(type="list", elements="path"),
+        ),
+        supports_check_mode=False,
     )
-    django_admin_cmd = "createcachetable"
-    django_admin_arg_order = "noinput database_dash dry_run"
-    _django_args = ["database_dash"]
-    _check_mode_arg = "dry_run"
+    django_admin_cmd = "loaddata"
+    django_admin_arg_order = "database_dash ignore_non_existent app format excludes fixtures"
+    _django_args = ["data", "database_dash"]
 
     def __init_module__(self):
         self.vars.set("database_dash", self.vars.database, output=False)
 
 
 def main():
-    DjangoCreateCacheTable.execute()
+    DjangoLoadData.execute()
 
 
 if __name__ == '__main__':
