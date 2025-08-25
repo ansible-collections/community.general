@@ -29,7 +29,7 @@ options:
       - Indicate desired state for cluster resource.
       - The state V(cleanup) has been added in community.general 11.3.0.
       - O(state=clone) was added in community.general 11.3.0.
-      - If O(state=clone), then O(resource_clone_ids) and O(resource_clone_meta) are optional.
+      - If O(state=clone) or O(state=present), you can set O(resource_clone_ids) and O(resource_clone_meta) to determine exactly what and how to clone.
     choices: [present, absent, clone, enabled, disabled, cleanup]
     default: present
     type: str
