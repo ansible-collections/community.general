@@ -27,9 +27,9 @@ options:
   state:
     description:
       - Indicate desired state for cluster resource.
-      - The state V(cleanup) has been added in community.general 12.0.0.
+      - The state V(cleanup) has been added in community.general 11.3.0.
     choices: [present, absent, enabled, disabled, cleanup]
-    required: true
+    default: present
     type: str
   name:
     description:
@@ -141,7 +141,7 @@ from ansible_collections.community.general.plugins.module_utils.pacemaker import
 class PacemakerResource(StateModuleHelper):
     module = dict(
         argument_spec=dict(
-            state=dict(type='str', required=True, choices=[
+            state=dict(type='str', default='present', choices=[
                 'present', 'absent', 'enabled', 'disabled', 'cleanup']),
             name=dict(type='str'),
             resource_type=dict(type='dict', options=dict(
@@ -166,7 +166,6 @@ class PacemakerResource(StateModuleHelper):
             ('state', 'absent', ['name']),
             ('state', 'enabled', ['name']),
             ('state', 'disabled', ['name']),
-            ('state', ['present', 'absent', 'enabled', 'disabled'], ['name']),
         ],
         supports_check_mode=True,
     )

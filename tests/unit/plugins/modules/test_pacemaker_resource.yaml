@@ -11,7 +11,7 @@ test_cases:
     input: {}
     output:
       failed: true
-      msg: "missing required arguments: state"
+      msg: "state is present but all of the following are missing: resource_type, name"
   - id: test_present_minimal_input_resource_not_exist
     input:
       state: present
