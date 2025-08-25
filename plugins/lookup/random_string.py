@@ -100,6 +100,9 @@ options:
   seed:
     description:
       - Seed for random string generator.
+      - B(Note) that this drastically reduces the security of this plugin. First, when O(seed) is provided, a non-cryptographic random number generator is used.
+        Second, if the seed does not contain enough entropy, the generated string is weak.
+        B(Do not use the generated string as a password or a secure token when using this option!)
     type: str
     version_added: 11.3.0
 """
@@ -114,6 +117,9 @@ EXAMPLES = r"""
   ansible.builtin.debug:
     var: lookup('community.general.random_string', seed=12345)
   # Example result: '6[~(2q5O'
+  # NOTE: Do **not** use this string as a password or a secure token,
+  #       unless you know exactly what you are doing!
+  #       Specifying seed uses a non-secure random number generator.
 
 - name: Generate random string with length 12
   ansible.builtin.debug:
