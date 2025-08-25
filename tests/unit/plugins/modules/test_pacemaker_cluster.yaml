@@ -371,6 +371,30 @@ test_cases:
           rc: 0
           out: 'maintenance-mode=true'
           err: ""
+  - id: test_maintenance_minimal_input_initial_online_version_change
+    input:
+      state: maintenance
+    output:
+      changed: true
+      previous_value: 'maintenance-mode: false'
+      value: 'maintenance-mode: true'
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, property, config, maintenance-mode]
+          environ: *env-def
+          rc: 0
+          out: 'maintenance-mode: false'
+          err: ""
+        - command: [/testbin/pcs, property, set, maintenance-mode=true]
+          environ: *env-def
+          rc: 0
+          out: ""
+          err: ""
+        - command: [/testbin/pcs, property, config, maintenance-mode]
+          environ: *env-def
+          rc: 0
+          out: 'maintenance-mode: true'
+          err: ""
   - id: test_maintenance_minimal_input_initial_offline
     input:
       state: maintenance
