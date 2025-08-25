@@ -99,6 +99,13 @@ class PacemakerCluster(StateModuleHelper):
         self.vars.set('previous_value', self._get()['out'])
         self.vars.set('value', self.vars.previous_value, change=True, diff=True)
 
+        if self.module.params['state'] == "cleanup":
+            self.module.deprecate(
+                'The value `cleanup` for "state" is being deprecated, use pacemaker_resource module instead.',
+                version='12.0.0',
+                collection_name='community.general'
+            )
+
         if not self.module.params['state']:
             self.module.deprecate(
                 'Parameter "state" values not set is being deprecated. Make sure to provide a value for "state"',
