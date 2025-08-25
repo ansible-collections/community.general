@@ -77,6 +77,7 @@ options:
       - Remove automatically installed packages which are no longer needed.
     type: bool
     default: false
+    version_added: 11.3.0
 notes:
   - When used with a C(loop:) each package is processed individually, it is much more efficient to pass the list directly
     to the O(name) option.
