@@ -137,9 +137,9 @@ EXAMPLES = r"""
     quick: true
     state: absent
 
-- name: Remove some unused dependencies
+- name: Install packages, remove unused dependencies
   community.general.openbsd_pkg:
-    name: ["lua", "pcre"]
+    name: ["tree", "mtr"]
     autoremove: true
 
 - name: Remove all unused dependencies
@@ -400,7 +400,7 @@ def package_absent(names, pkg_spec, module):
 
 
 # Function used to remove unused dependencies.
-def package_rm_unused_deps(names, pkg_spec, module):
+def package_rm_unused_deps(pkg_spec, module):
     rm_unused_deps_cmd = 'pkg_delete -Ia'
 
     if module.check_mode:
@@ -415,25 +415,12 @@ def package_rm_unused_deps(names, pkg_spec, module):
     # If we run the commands, we set changed to true to let
     # the package list change detection code do the actual work.
 
-    if '*' in names:
-        # Create a minimal pkg_spec entry for '*' to store return values.
-        pkg_spec['*'] = {}
+    # Create a minimal pkg_spec entry for '*' to store return values.
+    pkg_spec['*'] = {}
 
-        # Attempt to remove unused dependencies.
-        pkg_spec['*']['rc'], pkg_spec['*']['stdout'], pkg_spec['*']['stderr'] = execute_command(rm_unused_deps_cmd, module)
-        pkg_spec['*']['changed'] = True
-    else:
-        # Handle specific package names
-        for name in names:
-            if pkg_spec[name]['installed_state'] is True:
-                # Attempt to remove the package if it's an unused dependency.
-                (pkg_spec[name]['rc'], pkg_spec[name]['stdout'], pkg_spec[name]['stderr']) = execute_command("%s %s" % (rm_unused_deps_cmd, name), module)
-                pkg_spec[name]['changed'] = True
-            else:
-                pkg_spec[name]['rc'] = 0
-                pkg_spec[name]['stdout'] = ''
-                pkg_spec[name]['stderr'] = ''
-                pkg_spec[name]['changed'] = False
+    # Attempt to remove unused dependencies.
+    pkg_spec['*']['rc'], pkg_spec['*']['stdout'], pkg_spec['*']['stderr'] = execute_command(rm_unused_deps_cmd, module)
+    pkg_spec['*']['changed'] = True
 
 
 # Function used to parse the package name based on packages-specs(7).
@@ -668,7 +655,7 @@ def main():
 
         if module.params['autoremove']:
             # Remove unused dependencies.
-            package_rm_unused_deps(['*'], pkg_spec, module)
+            package_rm_unused_deps(pkg_spec, module)
 
         if state != 'latest' and not module.params['autoremove']:
             module.fail_json(msg="the package name '*' is only valid when using state=latest or autoremove=true")
@@ -695,7 +682,7 @@ def main():
 
         # Handle autoremove if requested for non-asterisk packages
         if module.params['autoremove']:
-            package_rm_unused_deps(name, pkg_spec, module)
+            package_rm_unused_deps(pkg_spec, module)
 
     # The combined changed status for all requested packages. If anything
     # is changed this is set to True.
@@ -735,10 +722,12 @@ def main():
 
     result['changed'] = combined_changed
 
-    if result['changed'] and not module.check_mode:
+    if not module.check_mode:
         new_package_list = get_all_installed(module)
         result['diff'] = dict(before=original_package_list, after=new_package_list)
-        if result['diff']['before'] == result['diff']['after']:
+        if result['diff']['before'] != result['diff']['after']:
+            result['changed'] = True
+        else:
             result['changed'] = False
 
     module.exit_json(**result)
