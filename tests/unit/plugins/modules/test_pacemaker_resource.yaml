@@ -11,7 +11,7 @@ test_cases:
     input: {}
     output:
       failed: true
-      msg: "missing required arguments: name"
+      msg: "missing required arguments: state"
   - id: test_present_minimal_input_resource_not_exist
     input:
       state: present
@@ -382,4 +382,77 @@ test_cases:
           environ: *env-def
           rc: 0
           out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Stopped (disabled)"
+          err: ""
+  - id: test_cleanup_minimal_input_initial_resources_not_exist
+    input:
+      state: cleanup
+    output:
+      changed: false
+      previous_value: "NO resources configured"
+      value: "NO resources configured"
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, resource, status]
+          environ: *env-def
+          rc: 0
+          out: "NO resources configured"
+          err: ""
+        - command: [/testbin/pcs, resource, cleanup]
+          environ: *env-def
+          rc: 0
+          out: "Cleaned up all resources on all nodes"
+          err: ""
+        - command: [/testbin/pcs, resource, status]
+          environ: *env-def
+          rc: 0
+          out: "NO resources configured"
+          err: ""
+  - id: test_cleanup_minimal_input_initial_resources_exists
+    input:
+      state: cleanup
+    output:
+      changed: true
+      previous_value: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+      value: "NO resources configured"
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, resource, status]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+          err: ""
+        - command: [/testbin/pcs, resource, cleanup]
+          environ: *env-def
+          rc: 0
+          out: "Cleaned up all resources on all nodes"
+          err: ""
+        - command: [/testbin/pcs, resource, status]
+          environ: *env-def
+          rc: 0
+          out: "NO resources configured"
+          err: ""
+  - id: test_cleanup_specific_minimal_input_initial_resources_exists
+    input:
+      state: cleanup
+      name: virtual-ip
+    output:
+      changed: true
+      previous_value: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+      value: "NO resources configured"
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+          err: ""
+        - command: [/testbin/pcs, resource, cleanup, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "Cleaned up virtual-ip on X"
+          err: ""
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "NO resources configured"
           err: ""
