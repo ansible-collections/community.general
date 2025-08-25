@@ -210,7 +210,7 @@ def main():
             rc, stdout, stderr = db_import(conn, cursor, module, db, target)
 
             if rc != 0:
-                module.fail_json(msg="%s" % stderr)
+                module.fail_json(msg=stderr)
             else:
                 module.exit_json(changed=True, db=db, msg=stdout)
     else:
@@ -229,7 +229,7 @@ def main():
             rc, stdout, stderr = db_import(conn, cursor, module, db, target)
 
             if rc != 0:
-                module.fail_json(msg="%s" % stderr)
+                module.fail_json(msg=stderr)
             else:
                 module.exit_json(changed=True, db=db, msg=stdout)
 

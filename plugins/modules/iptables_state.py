@@ -414,7 +414,7 @@ def main():
         COMMANDARGS.extend(['--table', table])
 
     if wait is not None:
-        TESTCOMMAND.extend(['--wait', '%s' % wait])
+        TESTCOMMAND.extend(['--wait', '%d' % wait])
 
     if modprobe is not None:
         b_modprobe = to_bytes(modprobe, errors='surrogate_or_strict')
@@ -502,7 +502,7 @@ def main():
     MAINCOMMAND.insert(0, bin_iptables_restore)
 
     if wait is not None:
-        MAINCOMMAND.extend(['--wait', '%s' % wait])
+        MAINCOMMAND.extend(['--wait', '%d' % wait])
 
     if _back is not None:
         b_back = to_bytes(_back, errors='surrogate_or_strict')

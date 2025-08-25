@@ -251,7 +251,7 @@ class ManageIQgroup(object):
                 if not tenant_res:
                     self.module.fail_json(msg="Tenant '%s' not found in manageiq" % tenant_name)
                 if len(tenant_res) > 1:
-                    self.module.fail_json(msg="Multiple tenants found in manageiq with name '%s" % tenant_name)
+                    self.module.fail_json(msg="Multiple tenants found in manageiq with name '%s'" % tenant_name)
                 tenant = tenant_res[0]
                 return tenant
             else:
@@ -276,7 +276,7 @@ class ManageIQgroup(object):
                 if not role_res:
                     self.module.fail_json(msg="Role '%s' not found in manageiq" % role_name)
                 if len(role_res) > 1:
-                    self.module.fail_json(msg="Multiple roles found in manageiq with name '%s" % role_name)
+                    self.module.fail_json(msg="Multiple roles found in manageiq with name '%s'" % role_name)
                 return role_res[0]
             else:
                 # No role name or role id supplied
