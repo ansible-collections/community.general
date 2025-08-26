@@ -25,6 +25,9 @@ URL_REALMS = "{url}/admin/realms"
 URL_REALM = "{url}/admin/realms/{realm}"
 URL_REALM_KEYS_METADATA = "{url}/admin/realms/{realm}/keys"
 
+URL_LOCALIZATIONS = "{url}/admin/realms/{realm}/localization/{locale}"
+URL_LOCALIZATION = "{url}/admin/realms/{realm}/localization/{locale}/{key}"
+
 URL_TOKEN = "{url}/realms/{realm}/protocol/openid-connect/token"
 URL_CLIENT = "{url}/admin/realms/{realm}/clients/{id}"
 URL_CLIENTS = "{url}/admin/realms/{realm}/clients"
@@ -589,6 +592,81 @@ class KeycloakAPI:
             return self._request(realm_url, method="DELETE")
         except Exception as e:
             self.fail_request(e, msg=f"Could not delete realm {realm}: {e}", exception=traceback.format_exc())
+
+def get_localization_values(self, locale, realm="master"):
+    """
+    Get all localization overrides for a given realm and locale.
+
+    Parameters:
+        locale (str): Locale code (for example, 'en', 'fi', 'de').
+        realm (str): Realm name. Defaults to 'master'.
+
+    Returns:
+        dict[str, str]: Mapping of localization keys to override values.
+
+    Raises:
+        KeycloakError: Wrapped HTTP/JSON error with context via fail_open_url().
+    """
+    realm_url = URL_LOCALIZATIONS.format(url=self.baseurl, realm=realm, locale=locale)
+
+    try:
+        return json.loads(to_native(open_url(realm_url, method='GET', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                                             validate_certs=self.validate_certs).read()))
+    except Exception as e:
+        self.fail_open_url(e, msg='Could not read localization overrides for realm %s, locale %s: %s' % (realm, locale, str(e)),
+                           exception=traceback.format_exc())
+
+def set_localization_value(self, locale, key, value, realm="master"):
+    """
+    Create or update a single localization override for the given key.
+
+    Parameters:
+        locale (str): Locale code (for example, 'en').
+        key (str): Localization message key to set.
+        value (str): Override value to set.
+        realm (str): Realm name. Defaults to 'master'.
+
+    Returns:
+        HTTPResponse: Response object on success.
+
+    Raises:
+        KeycloakError: Wrapped HTTP error with context via fail_open_url().
+    """
+    realm_url = URL_LOCALIZATION.format(url=self.baseurl, realm=realm, locale=locale, key=key)
+
+    headers = self.restheaders.copy()
+    headers['Content-Type'] = 'text/plain; charset=utf-8'
+
+    try:
+        return open_url(realm_url, method='PUT', http_agent=self.http_agent, headers=headers, timeout=self.connection_timeout,
+                        data=to_native(value), validate_certs=self.validate_certs)
+    except Exception as e:
+        self.fail_open_url(e, msg='Could not set localization value in realm %s, locale %s: %s=%s: %s' % (realm, locale, key, value, str(e)),
+                           exception=traceback.format_exc())
+
+def delete_localization_value(self, locale, key, realm="master"):
+    """
+    Delete a single localization override key for the given locale.
+
+    Parameters:
+        locale (str): Locale code (for example, 'en').
+        key (str): Localization message key to delete.
+        realm (str): Realm name. Defaults to 'master'.
+
+    Returns:
+        HTTPResponse: Response object on success.
+
+    Raises:
+        KeycloakError: Wrapped HTTP error with context via fail_open_url().
+    """
+    realm_url = URL_LOCALIZATION.format(url=self.baseurl, realm=realm, locale=locale, key=key)
+
+    try:
+        return open_url(realm_url, method='DELETE', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                        validate_certs=self.validate_certs)
+    except Exception as e:
+        self.fail_open_url(e, msg='Could not delete localization value in realm %s, locale %s, key %s: %s' % (realm, locale, key, str(e)),
+                           exception=traceback.format_exc())
 
     def get_clients(self, realm: str = "master", filter=None):
         """Obtains client representations for clients in a realm
