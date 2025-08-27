@@ -176,6 +176,7 @@ def main():
         r['exception'] = ex
         module.fail_json(**r)
 
+    # 15 is the length of the minimum response {"response":0} as formatted by KEA
     if len(rsp) < 15:
         r['msg'] = 'unrealistically short response ' + repr(rsp)
         module.fail_json(**r)
