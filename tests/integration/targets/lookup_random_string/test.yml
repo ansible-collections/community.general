@@ -21,6 +21,8 @@
         result11: "{{ query('community.general.random_string', base64=true, length=8) }}"
         result12: "{{ query('community.general.random_string', upper=false, numbers=false, special=false) }}" # all lower case
         result13: "{{ query('community.general.random_string', override_all='0', length=2) }}"
+        result14: "{{ query('community.general.random_string', seed='1234') }}"
+        result15: "{{ query('community.general.random_string', seed='1234') }}"
 
     - name: Raise error when impossible constraints are provided
       set_fact:
@@ -51,3 +53,4 @@
           - result13[0] == '00'
           - impossible_result is failed
           - "'Available characters cannot' in impossible_result.msg"
+          - result15[0] == result14[0]
