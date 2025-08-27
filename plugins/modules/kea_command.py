@@ -26,7 +26,7 @@ author: Thorsten Glaser (@mirabilos)
 options:
   command:
     description:
-      - The name of the command to send, for example C(status-get).
+      - The name of the command to send, for example V(status-get).
     required: true
     type: str
   arguments:
