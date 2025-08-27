@@ -122,6 +122,10 @@ import socket
 from ansible.module_utils.basic import AnsibleModule
 
 
+# default buffer size for socket I/O
+BUFSIZ = 8192
+
+
 def _parse_constant(s):
     raise ValueError('Invalid JSON: "%s"' % s)
 
@@ -166,7 +170,7 @@ def main():
             sock.sendall(cmdstr.encode('ASCII'))
             phase = 'reading'
             while True:
-                rspnew = sock.recv(8192)
+                rspnew = sock.recv(BUFSIZ)
                 if len(rspnew) == 0:
                     break
                 rsp += rspnew
