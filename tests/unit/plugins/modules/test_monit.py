@@ -127,7 +127,8 @@ BASIC_OUTPUT_CASES = [
     (TEST_OUTPUT % ('Process', 'processX', 'Some Unknown Status'), monit.Status.EXECUTION_FAILED),
 ])
 def test_parse_status(output, expected):
-    status = monit.Monit(None, '', 'processX', 0)._parse_status(output, '')
+    module = mock.MagicMock()
+    status = monit.Monit(module, '', 'processX', 0)._parse_status(output, '')
     assert status == expected
 
 
