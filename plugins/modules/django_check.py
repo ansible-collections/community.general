@@ -88,7 +88,6 @@ version:
 """
 
 from ansible_collections.community.general.plugins.module_utils.django import DjangoModuleHelper
-from ansible_collections.community.general.plugins.module_utils.cmd_runner import cmd_runner_fmt
 
 
 class DjangoCheck(DjangoModuleHelper):
@@ -102,15 +101,11 @@ class DjangoCheck(DjangoModuleHelper):
         ),
         supports_check_mode=True,
     )
-    arg_formats = dict(
-        databases=cmd_runner_fmt.stack(cmd_runner_fmt.as_opt_val)("--database"),
-        deploy=cmd_runner_fmt.as_bool("--deploy"),
-        fail_level=cmd_runner_fmt.as_opt_val("--fail-level"),
-        tags=cmd_runner_fmt.stack(cmd_runner_fmt.as_opt_val)("--tag"),
-        apps=cmd_runner_fmt.as_list(),
-    )
     django_admin_cmd = "check"
-    django_admin_arg_order = "databases deploy fail_level tags apps"
+    django_admin_arg_order = "database_stacked_dash deploy fail_level tags apps"
+
+    def __init_module__(self):
+        self.vars.set("database_stacked_dash", self.vars.databases, output=False)
 
 
 def main():
