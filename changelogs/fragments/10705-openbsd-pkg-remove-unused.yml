@@ -1,2 +1,2 @@
 minor_changes:
-  - openbsd_pkg - add ``autoremove`` parameter to remove unused dependencies. When set to ``true`` it uses OpenBSD's ``pkg_delete -a`` command to remove autoinstalled packages that are no longer required. (https://github.com/ansible-collections/community.general/pull/10705).
+  - openbsd_pkg - add ``autoremove`` parameter to remove unused dependencies. (https://github.com/ansible-collections/community.general/pull/10705).

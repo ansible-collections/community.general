@@ -74,7 +74,7 @@ options:
     default: false
   autoremove:
     description:
-      - Remove automatically installed packages which are no longer needed.
+      - Calls C(pkg_delete -a) to remove automatically installed packages which are no longer needed.
     type: bool
     default: false
     version_added: 11.3.0
@@ -649,6 +649,9 @@ def main():
             asterisk_name = True
 
     if asterisk_name:
+        if state != 'latest' and not module.params['autoremove']:
+            module.fail_json(msg="the package name '*' is only valid when using state=latest or autoremove=true")
+
         if state == 'latest':
             # Perform an upgrade of all installed packages.
             upgrade_packages(pkg_spec, module)
@@ -656,9 +659,6 @@ def main():
         if module.params['autoremove']:
             # Remove unused dependencies.
             package_rm_unused_deps(pkg_spec, module)
-
-        if state != 'latest' and not module.params['autoremove']:
-            module.fail_json(msg="the package name '*' is only valid when using state=latest or autoremove=true")
     else:
         # Parse package names and put results in the pkg_spec dictionary.
         parse_package_name(name, pkg_spec, module)
@@ -725,10 +725,7 @@ def main():
     if not module.check_mode:
         new_package_list = get_all_installed(module)
         result['diff'] = dict(before=original_package_list, after=new_package_list)
-        if result['diff']['before'] != result['diff']['after']:
-            result['changed'] = True
-        else:
-            result['changed'] = False
+        result['changed'] = (result['diff']['before'] != result['diff']['after'])
 
     module.exit_json(**result)
 
