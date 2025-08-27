@@ -124,6 +124,7 @@ BASIC_OUTPUT_CASES = [
     (TEST_OUTPUT % ('Process', 'processX', 'Not monitored'), monit.Status.NOT_MONITORED),
     (TEST_OUTPUT % ('Process', 'processX', 'Running'), monit.Status.OK),
     (TEST_OUTPUT % ('Process', 'processX', 'Execution failed | Does not exist'), monit.Status.EXECUTION_FAILED),
+    (TEST_OUTPUT % ('Process', 'processX', 'Some Unknown Status'), monit.Status.EXECUTION_FAILED),
 ])
 def test_parse_status(output, expected):
     status = monit.Monit(None, '', 'processX', 0)._parse_status(output, '')
