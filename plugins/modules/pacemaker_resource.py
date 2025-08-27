@@ -27,13 +27,14 @@ options:
   state:
     description:
       - Indicate desired state for cluster resource.
-    choices: [present, absent, enabled, disabled]
+      - The state V(cleanup) has been added in community.general 11.3.0.
+    choices: [present, absent, enabled, disabled, cleanup]
     default: present
     type: str
   name:
     description:
       - Specify the resource name to create.
-    required: true
+      - This is required if O(state=present), O(state=absent), O(state=enabled), or O(state=disabled).
     type: str
   resource_type:
     description:
@@ -141,8 +142,8 @@ class PacemakerResource(StateModuleHelper):
     module = dict(
         argument_spec=dict(
             state=dict(type='str', default='present', choices=[
-                'present', 'absent', 'enabled', 'disabled']),
-            name=dict(type='str', required=True),
+                'present', 'absent', 'enabled', 'disabled', 'cleanup']),
+            name=dict(type='str'),
             resource_type=dict(type='dict', options=dict(
                 resource_name=dict(type='str'),
                 resource_standard=dict(type='str'),
@@ -160,7 +161,12 @@ class PacemakerResource(StateModuleHelper):
             )),
             wait=dict(type='int', default=300),
         ),
-        required_if=[('state', 'present', ['resource_type', 'resource_option'])],
+        required_if=[
+            ('state', 'present', ['resource_type', 'resource_option', 'name']),
+            ('state', 'absent', ['name']),
+            ('state', 'enabled', ['name']),
+            ('state', 'disabled', ['name']),
+        ],
         supports_check_mode=True,
     )
 
@@ -206,6 +212,13 @@ class PacemakerResource(StateModuleHelper):
 
     def state_disabled(self):
         with self.runner('cli_action state name', output_process=self._process_command_output(True, "Stopped"), check_mode_skip=True) as ctx:
+            ctx.run(cli_action='resource')
+
+    def state_cleanup(self):
+        runner_args = ['cli_action', 'state']
+        if self.module.params['name']:
+            runner_args.append('name')
+        with self.runner(runner_args, output_process=self._process_command_output(True, "Clean"), check_mode_skip=True) as ctx:
             ctx.run(cli_action='resource')
 
 
