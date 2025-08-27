@@ -1,0 +1,2 @@
+deprecated_features:
+  - pacemaker_cluster - the state ``cleanup`` will be removed from community.general 14.0.0 (https://github.com/ansible-collections/community.general/pull/10741).
