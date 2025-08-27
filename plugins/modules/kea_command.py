@@ -183,7 +183,7 @@ def main():
     try:
         r['response'] = json.loads(rsp, parse_constant=_parse_constant)
     except ValueError as ex:
-        r['msg'] = 'error parsing JSON response'
+        r['msg'] = 'error parsing JSON response: ' + str(ex)
         r['exception'] = ex
         module.fail_json(**r)
     if not isinstance(r['response'], dict):
