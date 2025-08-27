@@ -155,32 +155,26 @@ def main():
         r['msg'] = 'socket (%s) does not exist' % sockfn
         module.fail_json(**r)
 
-    with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
-        try:
+    phase = 'opening'
+    try:
+        with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
+            phase = 'connecting'
             sock.connect(sockfn)
-        except OSError as ex:
-            r['msg'] = 'could not connect to socket (%s)' % sockfn
-            r['exception'] = ex
-            module.fail_json(**r)
-        # better safe in case anything fails…
-        r['changed'] = True
-        try:
+            # better safe in case anything fails…
+            r['changed'] = True
+            phase = 'writing'
             sock.sendall(cmdstr.encode('ASCII'))
-        except OSError as ex:
-            r['msg'] = 'could not write to socket (%s)' % sockfn
-            r['exception'] = ex
-            module.fail_json(**r)
-
-        try:
+            phase = 'reading'
             while True:
                 rspnew = sock.recv(8192)
                 if len(rspnew) == 0:
                     break
                 rsp += rspnew
-        except OSError as ex:
-            r['msg'] = 'error reading from socket (%s)' % sockfn
-            r['exception'] = ex
-            module.fail_json(**r)
+            phase = 'closing'
+    except OSError as ex:
+        r['msg'] = 'error %s socket (%s): %s' % (phase, sockfn, str(ex))
+        r['exception'] = ex
+        module.fail_json(**r)
 
     if len(rsp) < 15:
         r['msg'] = 'unrealistically short response ' + repr(rsp)
