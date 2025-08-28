@@ -1,0 +1,2 @@
+minor_changes:
+  - ipa module utils - support environment fallback for validate_certs parameter
