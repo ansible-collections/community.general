@@ -1,0 +1,2 @@
+bugfixes:
+  - selective - specify `ansible_loop_var` instead of the explicit value `item` when printing task result
