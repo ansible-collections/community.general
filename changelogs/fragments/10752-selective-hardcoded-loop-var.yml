@@ -1,2 +1,2 @@
 bugfixes:
-  - selective - specify `ansible_loop_var` instead of the explicit value `item` when printing task result
+  - selective callback plugin - specify ``ansible_loop_var`` instead of the explicit value ``item`` when printing task result (https://github.com/ansible-collections/community.general/pull/10752).
