@@ -257,7 +257,7 @@ def main():
     if module.params['kwriteconfig_path'] is not None:
         kwriteconfig = module.get_bin_path(module.params['kwriteconfig_path'], required=True)
     else:
-        for progname in ('kwriteconfig5', 'kwriteconfig', 'kwriteconfig4'):
+        for progname in ('kwriteconfig6', 'kwriteconfig5', 'kwriteconfig', 'kwriteconfig4'):
             kwriteconfig = module.get_bin_path(progname)
             if kwriteconfig is not None:
                 break
