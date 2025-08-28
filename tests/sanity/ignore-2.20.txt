@@ -9,6 +9,7 @@ plugins/filter/to_prettytable.py pylint:ansible-bad-import-from
 plugins/filter/unicode_normalize.py pylint:ansible-bad-import-from
 plugins/inventory/cobbler.py pylint:ansible-bad-import-from
 plugins/inventory/lxd.py pylint:ansible-bad-import-from
+plugins/inventory/proxmox.py pylint:ansible-bad-import-from
 plugins/inventory/scaleway.py pylint:ansible-bad-import-from
 plugins/lookup/dependent.py pylint:ansible-bad-import-from
 plugins/lookup/flattened.py pylint:ansible-bad-import-from
