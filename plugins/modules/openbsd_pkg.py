@@ -72,6 +72,12 @@ options:
       - Replace or delete packages quickly; do not bother with checksums before removing normal files.
     type: bool
     default: false
+  autoremove:
+    description:
+      - Calls C(pkg_delete -a) to remove automatically installed packages which are no longer needed.
+    type: bool
+    default: false
+    version_added: 11.3.0
 notes:
   - When used with a C(loop:) each package is processed individually, it is much more efficient to pass the list directly
     to the O(name) option.
@@ -130,6 +136,16 @@ EXAMPLES = r"""
     name: qt5
     quick: true
     state: absent
+
+- name: Install packages, remove unused dependencies
+  community.general.openbsd_pkg:
+    name: ["tree", "mtr"]
+    autoremove: true
+
+- name: Remove all unused dependencies
+  community.general.openbsd_pkg:
+    name: '*'
+    autoremove: true
 """
 
 import os
@@ -383,6 +399,30 @@ def package_absent(names, pkg_spec, module):
             pkg_spec[name]['changed'] = False
 
 
+# Function used to remove unused dependencies.
+def package_rm_unused_deps(pkg_spec, module):
+    rm_unused_deps_cmd = 'pkg_delete -Ia'
+
+    if module.check_mode:
+        rm_unused_deps_cmd += 'n'
+
+    if module.params['clean']:
+        rm_unused_deps_cmd += 'c'
+
+    if module.params['quick']:
+        rm_unused_deps_cmd += 'q'
+
+    # If we run the commands, we set changed to true to let
+    # the package list change detection code do the actual work.
+
+    # Create a minimal pkg_spec entry for '*' to store return values.
+    pkg_spec['*'] = {}
+
+    # Attempt to remove unused dependencies.
+    pkg_spec['*']['rc'], pkg_spec['*']['stdout'], pkg_spec['*']['stderr'] = execute_command(rm_unused_deps_cmd, module)
+    pkg_spec['*']['changed'] = True
+
+
 # Function used to parse the package name based on packages-specs(7).
 # The general name structure is "stem-version[-flavors]".
 #
@@ -567,6 +607,7 @@ def main():
             ports_dir=dict(type='path', default='/usr/ports'),
             quick=dict(type='bool', default=False),
             clean=dict(type='bool', default=False),
+            autoremove=dict(type='bool', default=False),
         ),
         mutually_exclusive=[['snapshot', 'build']],
         supports_check_mode=True
@@ -577,9 +618,6 @@ def main():
     build = module.params['build']
     ports_dir = module.params['ports_dir']
 
-    rc = 0
-    stdout = ''
-    stderr = ''
     result = {}
     result['name'] = name
     result['state'] = state
@@ -611,11 +649,16 @@ def main():
             asterisk_name = True
 
     if asterisk_name:
-        if state != 'latest':
-            module.fail_json(msg="the package name '*' is only valid when using state=latest")
-        else:
+        if state != 'latest' and not module.params['autoremove']:
+            module.fail_json(msg="the package name '*' is only valid when using state=latest or autoremove=true")
+
+        if state == 'latest':
             # Perform an upgrade of all installed packages.
             upgrade_packages(pkg_spec, module)
+
+        if module.params['autoremove']:
+            # Remove unused dependencies.
+            package_rm_unused_deps(pkg_spec, module)
     else:
         # Parse package names and put results in the pkg_spec dictionary.
         parse_package_name(name, pkg_spec, module)
@@ -636,6 +679,10 @@ def main():
             package_absent(name, pkg_spec, module)
         elif state == 'latest':
             package_latest(name, pkg_spec, module)
+
+        # Handle autoremove if requested for non-asterisk packages
+        if module.params['autoremove']:
+            package_rm_unused_deps(pkg_spec, module)
 
     # The combined changed status for all requested packages. If anything
     # is changed this is set to True.
@@ -675,9 +722,10 @@ def main():
 
     result['changed'] = combined_changed
 
-    if result['changed'] and not module.check_mode:
+    if not module.check_mode:
         new_package_list = get_all_installed(module)
         result['diff'] = dict(before=original_package_list, after=new_package_list)
+        result['changed'] = (result['diff']['before'] != result['diff']['after'])
 
     module.exit_json(**result)
 
