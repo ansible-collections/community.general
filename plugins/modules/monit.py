@@ -174,7 +174,11 @@ class Monit(object):
             status_val = status_val.split(' | ')[0]
         if ' - ' not in status_val:
             status_val = status_val.replace(' ', '_')
-            return getattr(Status, status_val)
+            try:
+                return getattr(Status, status_val)
+            except AttributeError:
+                self.module.warn("Unknown monit status '%s', treating as execution failed" % status_val)
+                return Status.EXECUTION_FAILED
         else:
             status_val, substatus = status_val.split(' - ')
             action, state = substatus.split()
