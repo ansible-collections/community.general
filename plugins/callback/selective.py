@@ -208,7 +208,7 @@ class CallbackModule(CallbackBase):
                     stderr = [r.get('exception', None), r.get('module_stderr', None)]
                     stderr = "\n".join([e for e in stderr if e]).strip()
 
-                    self._print_host_or_item(r['item'],
+                    self._print_host_or_item(r[r['ansible_loop_var']],
                                              r.get('changed', False),
                                              to_text(r.get('msg', '')),
                                              r.get('diff', None),
