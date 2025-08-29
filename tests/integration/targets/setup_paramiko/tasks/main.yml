@@ -1,0 +1,23 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install required libs
+  pip:
+    name:
+      - paramiko
+    state: present
+    extra_args: "-c {{ remote_constraints }}"
+  when: ansible_distribution != 'Debian' or ansible_distribution_major_version is version('13', '<')
+
+- name: Install required libs (Debian 13+)
+  package:
+    name: python3-paramiko
+    state: present
+  when: ansible_distribution == 'Debian' and ansible_distribution_major_version is version('13', '>=')
