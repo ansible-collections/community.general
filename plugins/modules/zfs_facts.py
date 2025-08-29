@@ -188,9 +188,9 @@ class ZFSFacts(object):
             cmd.append('-p')
         if self.recurse:
             cmd.append('-r')
-        if int(self.depth) != 0:
+        if self.depth != 0:
             cmd.append('-d')
-            cmd.append('%s' % self.depth)
+            cmd.append('%d' % self.depth)
         if self.type:
             cmd.append('-t')
             cmd.append(','.join(self.type))

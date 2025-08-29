@@ -576,7 +576,7 @@ def upgrade_packages(pkg_spec, module):
     pkg_spec['*'] = {}
 
     # Attempt to upgrade all packages.
-    pkg_spec['*']['rc'], pkg_spec['*']['stdout'], pkg_spec['*']['stderr'] = execute_command("%s" % upgrade_cmd, module)
+    pkg_spec['*']['rc'], pkg_spec['*']['stdout'], pkg_spec['*']['stderr'] = execute_command(upgrade_cmd, module)
 
     # Try to find any occurrence of a package changing version like:
     # "bzip2-1.0.6->1.0.6p0: ok".
