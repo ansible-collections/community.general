@@ -61,7 +61,7 @@ command -v pip
 pip --version
 pip list --disable-pip-version-check
 if [ "${ansible_version}" == "devel" ]; then
-    retry pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
+    retry pip install https://github.com/felixfontein/ansible/archive/show-deprecations.tar.gz --disable-pip-version-check
 else
     retry pip install "https://github.com/ansible/ansible/archive/stable-${ansible_version}.tar.gz" --disable-pip-version-check
 fi
@@ -86,7 +86,7 @@ retry git clone --depth=1 --single-branch https://github.com/ansible-collections
 
 if [ "${script}" != "sanity" ] && [ "${script}" != "units" ]; then
     # To prevent Python dependencies on other collections only install other collections for integration tests
-    retry git clone --depth=1 --single-branch https://github.com/ansible-collections/ansible.posix.git "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/ansible/posix"
+    retry git clone --depth=1 --single-branch --branch deprecations https://github.com/felixfontein/ansible.posix.git "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/ansible/posix"
     retry git clone --depth=1 --single-branch --branch "${COMMUNITY_CRYPTO_BRANCH}" https://github.com/ansible-collections/community.crypto.git "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/crypto"
     retry git clone --depth=1 --single-branch https://github.com/ansible-collections/community.docker.git "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/docker"
     # NOTE: we're installing with git to work around Galaxy being a huge PITA (https://github.com/ansible/galaxy/issues/2429)
