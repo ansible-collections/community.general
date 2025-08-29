@@ -28,9 +28,9 @@ options:
     description:
       - Indicate desired state for cluster resource.
       - The state V(cleanup) has been added in community.general 11.3.0.
-      - O(state=clone) was added in community.general 11.3.0.
-      - If O(state=clone) or O(state=present), you can set O(resource_clone_ids) and O(resource_clone_meta) to determine exactly what and how to clone.
-    choices: [present, absent, clone, enabled, disabled, cleanup]
+      - O(state=cloned) was added in community.general 11.3.0.
+      - If O(state=cloned) or O(state=present), you can set O(resource_clone_ids) and O(resource_clone_meta) to determine exactly what and how to clone.
+    choices: [present, absent, cloned, enabled, disabled, cleanup]
     default: present
     type: str
   name:
@@ -155,7 +155,7 @@ class PacemakerResource(StateModuleHelper):
     module = dict(
         argument_spec=dict(
             state=dict(type='str', default='present', choices=[
-                'present', 'absent', 'clone', 'enabled', 'disabled', 'cleanup']),
+                'present', 'absent', 'cloned', 'enabled', 'disabled', 'cleanup']),
             name=dict(type='str'),
             resource_type=dict(type='dict', options=dict(
                 resource_name=dict(type='str'),
@@ -226,7 +226,7 @@ class PacemakerResource(StateModuleHelper):
                 check_mode_skip=True) as ctx:
             ctx.run(cli_action='resource', resource_clone_ids=self.fmt_as_stack_argument(self.module.params["resource_clone_ids"], "clone"))
 
-    def state_clone(self):
+    def state_cloned(self):
         with self.runner(
             'cli_action state name resource_clone_ids resource_clone_meta wait',
             output_process=self._process_command_output(

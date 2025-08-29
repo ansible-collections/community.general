@@ -13,7 +13,7 @@ from ansible_collections.community.general.plugins.module_utils.cmd_runner impor
 _state_map = {
     "present": "create",
     "absent": "remove",
-    "clone": "clone",
+    "cloned": "clone",
     "status": "status",
     "enabled": "enable",
     "disabled": "disable",

@@ -502,7 +502,7 @@ test_cases:
           err: ""
   - id: test_clone_minimal_input_resource_not_exist
     input:
-      state: clone
+      state: cloned
       name: virtual-ip
     output:
       failed: true
@@ -531,7 +531,7 @@ test_cases:
           err: "Error: unable to find group or resource: virtual-ip"
   - id: test_clone_filled_input_resource_exists
     input:
-      state: clone
+      state: cloned
       name: virtual-ip
       resource_clone_ids:
         - test_clone
