@@ -62,6 +62,8 @@ options:
       - This only applies if O(ipa_prot) is V(https).
       - If set to V(false), the SSL certificates are not validated.
       - This should only set to V(false) used on personally controlled sites using self-signed certificates.
+      - If the value is not specified in the task, the value of environment variable E(IPA_VALIDATE_CERTS) is used instead.
+      - If both the environment variable E(IPA_VALIDATE_CERTS) and the value are not specified in the task, then default value is set.
     type: bool
     default: true
   ipa_timeout:
