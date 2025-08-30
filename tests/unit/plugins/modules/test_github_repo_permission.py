@@ -7,7 +7,14 @@ __metaclass__ = type
 
 import json
 import unittest
-from unittest.mock import patch
+import sys
+try:  # Python 3
+    from unittest.mock import patch
+except Exception:  # Python 2 fallback
+    try:
+        from mock import patch  # type: ignore
+    except Exception:
+        patch = None  # type: ignore
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (  # type: ignore
     ModuleTestCase,
     set_module_args,
@@ -15,6 +22,11 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
 )
 
 from ansible_collections.community.general.plugins.modules import github_repo_permission as mod
+
+# Skip the entire module on Python 2.7 if 'mock' isn't available
+if sys.version_info[0] < 3 and patch is None:  # type: ignore
+    import pytest  # type: ignore
+    pytest.skip("mock not available on Python 2.7 test env", allow_module_level=True)
 
 
 def _resp(status=200, body=None, extra_info=None):
