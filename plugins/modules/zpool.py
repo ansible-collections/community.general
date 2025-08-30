@@ -125,9 +125,7 @@ EXAMPLES = r"""
 - name: Set pool and filesystem properties
   community.general.zpool:
     name: tank
-    pool_properties:
     ashift: 12
-    filesystem_properties:
     compression: lz4
     vdevs:
       - disks:
