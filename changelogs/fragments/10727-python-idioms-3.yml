@@ -1,0 +1,10 @@
+minor_changes:
+ - filesize - minor refactor to simplify string formatting (https://github.com/ansible-collections/community.general/pull/10727).
+ - iptables_state - minor refactor to simplify string formatting (https://github.com/ansible-collections/community.general/pull/10727).
+ - manageiq_group - minor refactor to simplify string formatting (https://github.com/ansible-collections/community.general/pull/10727).
+ - manageiq_tenant - minor refactor to simplify string formatting (https://github.com/ansible-collections/community.general/pull/10727).
+ - mssql_db - minor refactor to simplify string formatting (https://github.com/ansible-collections/community.general/pull/10727).
+ - openbsd_pkg - minor refactor to simplify string formatting (https://github.com/ansible-collections/community.general/pull/10727).
+ - ufw - minor refactor to simplify string formatting (https://github.com/ansible-collections/community.general/pull/10727).
+ - xenserver_facts - minor refactor to simplify string formatting (https://github.com/ansible-collections/community.general/pull/10727).
+ - zfs_facts - minor refactor to simplify string formatting (https://github.com/ansible-collections/community.general/pull/10727).
