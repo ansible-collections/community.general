@@ -5,3 +5,13 @@
 
 changelog:
   write_changelog: true
+
+ansible_output:
+  global_env:
+    ANSIBLE_STDOUT_CALLBACK: community.general.tasks_only
+    ANSIBLE_COLLECTIONS_TASKS_ONLY_NUMBER_OF_COLUMNS: 90
+  global_postprocessors:
+    reformat-yaml:
+      command:
+        - python
+        - docs/docsite/reformat-yaml.py
