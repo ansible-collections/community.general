@@ -15,6 +15,7 @@ description:
   - Credits to authors of splunk callback plugin.
 version_added: "2.4.0"
 requirements:
+  - The Python 'requests' module.
   - Whitelisting this callback plugin.
   - An Azure log analytics work space has been established.
 options:
