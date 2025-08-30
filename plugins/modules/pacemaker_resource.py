@@ -108,6 +108,7 @@ options:
       - List of meta to associate with clone resource.
     type: list
     elements: str
+    version_added: 11.3.0
   wait:
     description:
       - Timeout period for polling the resource creation.
