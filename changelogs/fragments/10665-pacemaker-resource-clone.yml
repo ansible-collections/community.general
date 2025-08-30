@@ -1,0 +1,2 @@
+minor_changes:
+  - pacemaker_resource - add ``state=clone`` for cloning pacemaker resources or groups (https://github.com/ansible-collections/community.general/issues/10322, https://github.com/ansible-collections/community.general/pull/10665).
