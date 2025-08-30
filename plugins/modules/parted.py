@@ -740,7 +740,8 @@ def main():
 
             # Assign name to the partition
             if name is not None and partition.get('name', None) != name:
-                script += ['name', str(number), name]
+                # The double quotes need to be included in the arg passed to parted
+                script += ['name', str(number), '"%s"' % name]
 
             # Manage flags
             if flags:
