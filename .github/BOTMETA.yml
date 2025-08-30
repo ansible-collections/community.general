@@ -623,6 +623,8 @@ files:
     maintainers: adrianmoisey
   $modules/github_repo.py:
     maintainers: atorrescogollo
+  $modules/github_repo_permission.py:
+    maintainers: danielino
   $modules/gitlab_:
     keywords: gitlab source_control
     maintainers: $team_gitlab
