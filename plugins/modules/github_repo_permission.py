@@ -45,12 +45,12 @@ options:
       - GitHub username (login) of the user to add as a collaborator on the repository.
       - Mutually exclusive with O(team_slug).
     type: str
-    permission:
-        description:
-            - Permission to grant when O(state=present).
-            - Supports built-ins C(pull), C(triage), C(push), C(maintain), C(admin) and custom repository roles (GitHub Enterprise).
-            - Synonyms C(read) -> C(pull) and C(write) -> C(push) are accepted.
-        type: str
+  permission:
+    description:
+      - Permission to grant when O(state=present).
+      - Supports built-ins C(pull), C(triage), C(push), C(maintain), C(admin) and custom repository roles (GitHub Enterprise).
+      - Synonyms C(read) -> C(pull) and C(write) -> C(push) are accepted.
+    type: str
   state:
     description:
       - Whether the permission should be present or absent.
@@ -298,14 +298,18 @@ def team_has_access(session, owner, repo, team_slug):
 
 
 def ensure_team_permission(module, session, owner, repo, team_slug, desired_permission, state):
+    # For team operations, the repository owner must be the organization.
+    # Use a local alias for clarity when calling org-scoped endpoints.
+    org = owner
+
     # Get current teams on repo and find team's current permission
-    role_name, current_builtin = get_team_repo_permission(session, owner, team_slug, owner, repo)
+    role_name, current_builtin = get_team_repo_permission(session, org, team_slug, owner, repo)
     current_display = role_name or current_builtin
 
     changed = False
     if state == 'present':
         # Compare: if desired is builtin, use lowercase compare; else, compare to role_name (case-insensitive)
-        resolved_perm, is_builtin = resolve_permission_for_org(session, owner, desired_permission)
+        resolved_perm, is_builtin = resolve_permission_for_org(session, org, desired_permission)
         equal = False
         if is_builtin:
             equal = (current_builtin or '').lower() == (resolved_perm or '').lower()
@@ -320,7 +324,7 @@ def ensure_team_permission(module, session, owner, repo, team_slug, desired_perm
             if not module.check_mode:
                 resp = session.request_json(
                     'PUT',
-                    '%s/orgs/%s/teams/%s/repos/%s/%s' % (session.api_url, owner, team_slug, owner, repo),
+                    '%s/orgs/%s/teams/%s/repos/%s/%s' % (session.api_url, org, team_slug, owner, repo),
                     body={'permission': resolved_perm}
                 )
                 # Re-read to verify change applied (with small retries for propagation)
@@ -329,7 +333,7 @@ def ensure_team_permission(module, session, owner, repo, team_slug, desired_perm
                 last_role_name = None
                 last_builtin = None
                 for i in range(attempts):
-                    new_role_name, new_builtin = get_team_repo_permission(session, owner, team_slug, owner, repo)
+                    new_role_name, new_builtin = get_team_repo_permission(session, org, team_slug, owner, repo)
                     last_role_name, last_builtin = new_role_name, new_builtin
                     if resolved_perm.lower() in BUILTIN_PERMISSIONS:
                         if (new_builtin or '').lower() == resolved_perm.lower():
@@ -337,7 +341,11 @@ def ensure_team_permission(module, session, owner, repo, team_slug, desired_perm
                             break
                     else:
                         # Custom role: accept if any permission is present or role_name matches
-                        if (new_role_name and new_role_name.lower() == resolved_perm.lower()) or bool(new_builtin) or team_has_access(session, owner, repo, team_slug):
+                        if (
+                            (new_role_name and new_role_name.lower() == resolved_perm.lower())
+                            or bool(new_builtin)
+                            or team_has_access(session, owner, repo, team_slug)
+                        ):
                             verified = True
                             break
                     time.sleep(0.5)
@@ -358,7 +366,7 @@ def ensure_team_permission(module, session, owner, repo, team_slug, desired_perm
         if current_display is not None:
             if not module.check_mode:
                 # Remove team access
-                r = session.request('DELETE', '%s/orgs/%s/teams/%s/repos/%s/%s' % (session.api_url, owner, team_slug, owner, repo))
+                r = session.request('DELETE', '%s/orgs/%s/teams/%s/repos/%s/%s' % (session.api_url, org, team_slug, owner, repo))
                 if not (200 <= r.status < 400 or r.status == 204 or r.status == 404):
                     module.fail_json(msg=(
                         "GitHub API DELETE failed for team '%s' on %s/%s: %s" % (team_slug, owner, repo, r.info.get('msg'))
@@ -401,7 +409,7 @@ def ensure_user_permission(module, session, owner, repo, username, desired_permi
     changed = False
 
     if state == 'present':
-        resolved_perm, _ = resolve_permission_for_org(session, owner, desired_permission)
+        resolved_perm, is_builtin_unused = resolve_permission_for_org(session, owner, desired_permission)
         # Compare with case-insensitive match (role_name or builtin value)
         if (current or '').lower() != (resolved_perm or '').lower():
             if not module.check_mode:
@@ -479,7 +487,10 @@ def main():
 
     # Heuristic warning: api_url '/api/v4' is typical of GitLab, not GitHub Enterprise
     if '/api/v4' in (api_url or ''):
-        module.warn("The configured api_url ends with '/api/v4', which looks like a GitLab endpoint. For GitHub Enterprise Server, api_url usually ends with '/api/v3'.")
+        module.warn(
+            "The configured api_url ends with '/api/v4', which looks like a GitLab endpoint. "
+            "For GitHub Enterprise Server, api_url usually ends with '/api/v3'."
+        )
 
     try:
         if team_slug:

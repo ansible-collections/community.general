@@ -72,7 +72,7 @@ class TestGithubRepoPermission(ModuleTestCase):
             # First GET shows current pull
             if method == 'GET' and url.endswith('/orgs/myorg/teams/backend/repos/myorg/myrepo'):
                 # Return pull first, then push after PUT
-                if any(m == 'PUT' for m, _ in calls):
+                if any(m == 'PUT' for m, url_value in calls):
                     return _resp(200, {"permission": "push"})
                 return _resp(200, {"permission": "pull"})
             if method == 'PUT' and url.endswith('/orgs/myorg/teams/backend/repos/myorg/myrepo'):
@@ -152,13 +152,13 @@ class TestGithubRepoPermission(ModuleTestCase):
             'permission': 'Maintainer',
             'state': 'present',
             'api_url': 'https://api.github.com',
-    } ):
+        }):
             with patch.object(mod, 'fetch_url', side_effect=side_effect):
                 with self.assertRaises(AnsibleExitJson) as ctx:
                     mod.main()
-    result = ctx.exception.args[0]
-    assert result['changed'] is True
-    assert result['result']['permission'] == 'Maintainer'
+        result = ctx.exception.args[0]
+        assert result['changed'] is True
+        assert result['result']['permission'] == 'Maintainer'
 
     def test_user_present_idempotent_read_synonym(self):
         # User has permission 'read' -> normalized to 'pull'; desired 'pull' => idempotent
@@ -213,7 +213,7 @@ class TestGithubRepoPermission(ModuleTestCase):
             calls.append((method, url))
             if method == 'GET' and url.endswith('/repos/myorg/myrepo/collaborators/bob/permission'):
                 # Before PUT return read, after PUT return write
-                if any(m == 'PUT' for m, _ in calls):
+                if any(m == 'PUT' for m, url_value in calls):
                     return _resp(200, {"permission": "write"})
                 return _resp(200, {"permission": "read"})
             if method == 'PUT' and url.endswith('/repos/myorg/myrepo/collaborators/bob'):
