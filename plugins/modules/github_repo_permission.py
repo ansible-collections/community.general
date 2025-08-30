@@ -315,11 +315,12 @@ def ensure_team_permission(module, session, owner, repo, team_slug, desired_perm
             equal = (current_builtin or '').lower() == (resolved_perm or '').lower()
         else:
             # custom role: if role_name matches, equal; otherwise, when API doesn't expose role_name,
-            # consider equal if the team already has any access (idempotency for custom roles)
+            # consider equal if the team already has any access (idempotency for custom roles).
+            # Avoid re-calling the teams list here; rely on the state we already fetched.
             if (role_name or '').lower() == (resolved_perm or '').lower():
                 equal = True
             else:
-                equal = team_has_access(session, owner, repo, team_slug)
+                equal = current_display is not None
         if not equal:
             if not module.check_mode:
                 resp = session.request_json(
@@ -340,7 +341,8 @@ def ensure_team_permission(module, session, owner, repo, team_slug, desired_perm
                             verified = True
                             break
                     else:
-                        # Custom role: accept if any permission is present or role_name matches
+                        # Custom role: accept if any permission is present or role_name matches,
+                        # or if team is now present in repo teams list (first-grant scenario).
                         if (
                             (new_role_name and new_role_name.lower() == resolved_perm.lower())
                             or bool(new_builtin)
