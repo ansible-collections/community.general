@@ -74,6 +74,7 @@ section above, but there are more elements that will take part in it.
 
     from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
 
+
     class MyTest(ModuleHelper):
         # behavior for module paramaters ONLY, see below for further information
         output_params = ()
@@ -253,9 +254,9 @@ With that, MH will automatically generate the diff output for variables that hav
     class MyTest(ModuleHelper):
         diff_params = ('value', )
 
-    def __run__(self):
-        # example from community.general.gio_mime
-        self.vars.set_meta("handler", initial_value=gio_mime_get(self.runner, self.vars.mime_type), diff=True, change=True)
+        def __run__(self):
+            # example from community.general.gio_mime
+            self.vars.set_meta("handler", initial_value=gio_mime_get(self.runner, self.vars.mime_type), diff=True, change=True)
 
 .. important::
 
