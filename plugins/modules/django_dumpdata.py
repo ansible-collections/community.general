@@ -50,7 +50,7 @@ options:
   fixture:
     description:
       - Path to the output file.
-      - The fixture filename may end with V(.bz2), V(gz), V(lzma) or V(xz), in which case the corresponding
+      - The fixture filename may end with V(.bz2), V(.gz), V(.lzma) or V(.xz), in which case the corresponding
         compression format will be used.
       - This corresponds to the C(--output) parameter for the C(django-admin dumpdata) command.
     type: path
