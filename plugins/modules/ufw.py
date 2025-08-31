@@ -546,7 +546,7 @@ def main():
                         insert_to = None
                 cmd.append([insert_to is not None, "insert %s" % insert_to])
             cmd.append([value])
-            cmd.append([params['direction'], "%s" % params['direction']])
+            cmd.append([params['direction'], params['direction']])
             cmd.append([params['interface'], "on %s" % params['interface']])
             cmd.append([params['interface_in'], "in on %s" % params['interface_in']])
             cmd.append([params['interface_out'], "out on %s" % params['interface_out']])

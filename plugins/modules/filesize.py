@@ -304,7 +304,7 @@ def split_size_unit(string, isint=False):
        Support optional space(s) between the numeric value and the unit.
     """
     unit = re.sub(r'(\d|\.)', r'', string).strip()
-    value = float(re.sub(r'%s' % unit, r'', string).strip())
+    value = float(re.sub(unit, r'', string).strip())
     if isint and unit in ('B', ''):
         if int(value) != value:
             raise AssertionError("invalid blocksize value: bytes require an integer value")
