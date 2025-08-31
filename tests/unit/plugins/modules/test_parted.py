@@ -202,7 +202,7 @@ class TestParted(ModuleTestCase):
             'state': 'present',
         }):
             with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
-                self.execute_module(changed=True, script='unit KiB mkpart primary 0% 100%')
+                self.execute_module(changed=True, script=['unit', 'KiB', 'mkpart', 'primary', '0%', '100%'])
 
     def test_create_new_partition_1G(self):
         with set_module_args({
@@ -212,7 +212,7 @@ class TestParted(ModuleTestCase):
             'part_end': '1GiB',
         }):
             with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
-                self.execute_module(changed=True, script='unit KiB mkpart primary 0% 1GiB')
+                self.execute_module(changed=True, script=['unit', 'KiB', 'mkpart', 'primary', '0%', '1GiB'])
 
     def test_create_new_partition_minus_1G(self):
         with set_module_args({
@@ -223,7 +223,7 @@ class TestParted(ModuleTestCase):
             'part_start': '-1GiB',
         }):
             with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
-                self.execute_module(changed=True, script='unit KiB mkpart primary ext2 -1GiB 100%')
+                self.execute_module(changed=True, script=['unit', 'KiB', 'mkpart', 'primary', 'ext2', '-1GiB', '100%'])
 
     def test_remove_partition_number_1(self):
         with set_module_args({
@@ -232,7 +232,7 @@ class TestParted(ModuleTestCase):
             'state': 'absent',
         }):
             with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
-                self.execute_module(changed=True, script='rm 1')
+                self.execute_module(changed=True, script=['rm', '1'])
 
     def test_resize_partition(self):
         with set_module_args({
@@ -243,7 +243,7 @@ class TestParted(ModuleTestCase):
             'resize': True
         }):
             with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
-                self.execute_module(changed=True, script='resizepart 3 100%')
+                self.execute_module(changed=True, script=['resizepart', '3', '100%'])
 
     def test_change_flag(self):
         # Flags are set in a second run of parted().
@@ -264,9 +264,9 @@ class TestParted(ModuleTestCase):
                 # When using multiple flags:
                 # order of execution is non deterministic, because set() operations are used in
                 # the current implementation.
-                expected_calls_order1 = [call('unit KiB set 3 lvm on set 3 boot on ',
+                expected_calls_order1 = [call(['unit', 'KiB', 'set', '3', 'lvm', 'on', 'set', '3', 'boot', 'on'],
                                               '/dev/sdb', 'optimal')]
-                expected_calls_order2 = [call('unit KiB set 3 boot on set 3 lvm on ',
+                expected_calls_order2 = [call(['unit', 'KiB', 'set', '3', 'boot', 'on', 'set', '3', 'lvm', 'on'],
                                               '/dev/sdb', 'optimal')]
                 self.assertTrue(self.parted.mock_calls == expected_calls_order1 or
                                 self.parted.mock_calls == expected_calls_order2)
@@ -283,7 +283,8 @@ class TestParted(ModuleTestCase):
             '_ansible_check_mode': True,
         }):
             with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
-                self.execute_module(changed=True, script='unit KiB mkpart primary ext3 257GiB 100% unit KiB set 4 boot on')
+                self.execute_module(changed=True,
+                                    script=['unit', 'KiB', 'mkpart', 'primary', 'ext3', '257GiB', '100%', 'unit', 'KiB', 'set', '4', 'boot', 'on'])
 
     def test_create_label_gpt(self):
         # Like previous test, current implementation use parted to create the partition and
@@ -299,7 +300,10 @@ class TestParted(ModuleTestCase):
             '_ansible_check_mode': True,
         }):
             with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict2):
-                self.execute_module(changed=True, script='unit KiB mklabel gpt mkpart primary 0% 100% unit KiB name 1 \'"lvmpartition"\' set 1 lvm on')
+                self.execute_module(
+                    changed=True,
+                    script=['unit', 'KiB', 'mklabel', 'gpt', 'mkpart', 'primary', '0%', '100%',
+                            'unit', 'KiB', 'name', '1', '"lvmpartition"', 'set', '1', 'lvm', 'on'])
 
     def test_change_label_gpt(self):
         # When partitions already exists and label is changed, mkpart should be called even when partition already exists,
@@ -312,7 +316,7 @@ class TestParted(ModuleTestCase):
             '_ansible_check_mode': True,
         }):
             with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
-                self.execute_module(changed=True, script='unit KiB mklabel gpt mkpart primary 0% 100%')
+                self.execute_module(changed=True, script=['unit', 'KiB', 'mklabel', 'gpt', 'mkpart', 'primary', '0%', '100%'])
 
     def test_check_mode_unchanged(self):
         # Test that get_device_info result is checked in check mode too
