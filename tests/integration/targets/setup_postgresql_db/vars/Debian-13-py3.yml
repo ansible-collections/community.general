@@ -8,6 +8,6 @@ postgresql_packages:
   - "postgresql-common"
   - "python3-psycopg2"
 
-pg_hba_location: "/etc/postgresql/15/main/pg_hba.conf"
-pg_dir: "/var/lib/postgresql/15/main"
-pg_ver: 15
+pg_hba_location: "/etc/postgresql/17/main/pg_hba.conf"
+pg_dir: "/var/lib/postgresql/17/main"
+pg_ver: 17
