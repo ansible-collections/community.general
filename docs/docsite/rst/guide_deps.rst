@@ -22,6 +22,7 @@ The same example from the Developer Guide would become:
 
     from ansible_collections.community.general.plugins.module_utils import deps
 
+
     with deps.declare("foo"):
         import foo
 
