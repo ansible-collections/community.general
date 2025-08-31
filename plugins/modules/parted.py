@@ -552,9 +552,9 @@ def parted(script, device, align):
     """
     global module, parted_exec  # pylint: disable=global-variable-not-assigned
 
-    align_option = '-a %s' % align
+    align_option = ['-a', align]
     if align == 'undefined':
-        align_option = ''
+        align_option = []
 
     """
     Use option --fix (-f) if available. Versions prior
@@ -562,13 +562,12 @@ def parted(script, device, align):
     http://savannah.gnu.org/news/?id=10114
     """
     if parted_version() >= (3, 4, 64):
-        script_option = '-s -f'
+        script_option = ['-s', '-f']
     else:
-        script_option = '-s'
+        script_option = ['-s']
 
     if script and not module.check_mode:
-        # TODO: convert run_comand() argument to list!
-        command = "%s %s -m %s %s -- %s" % (parted_exec, script_option, align_option, device, script)
+        command = [parted_exec] + script_option + ['-m'] + align_option + [device, '--'] + script
         rc, out, err = module.run_command(command)
 
         if rc != 0:
@@ -594,10 +593,7 @@ def part_exists(partitions, attribute, number):
     Looks if a partition that has a specific value for a specific attribute
     actually exists.
     """
-    return any(
-        part[attribute] and
-        part[attribute] == number for part in partitions
-    )
+    return any(part.get(attribute) == number for part in partitions)
 
 
 def check_size_format(size_str):
@@ -612,8 +608,8 @@ def main():
     global module, units_si, units_iec, parted_exec  # pylint: disable=global-variable-not-assigned
 
     changed = False
-    output_script = ""
-    script = ""
+    output_script = []
+    script = []
     module = AnsibleModule(
         argument_spec=dict(
             device=dict(type='str', required=True),
@@ -695,20 +691,19 @@ def main():
         # Assign label if required
         mklabel_needed = current_device['generic'].get('table', None) != label
         if mklabel_needed:
-            script += "mklabel %s " % label
+            script += ["mklabel", label]
 
         # Create partition if required
         if part_type and (mklabel_needed or not part_exists(current_parts, 'num', number)):
-            script += "mkpart %s %s%s %s " % (
-                part_type,
-                '%s ' % fs_type if fs_type is not None else '',
-                part_start,
-                part_end
-            )
+            script += ["mkpart"]
+            script += [part_type]
+            if fs_type is not None:
+                script += [fs_type]
+            script += [part_start, part_end]
 
         # Set the unit of the run
         if unit and script:
-            script = "unit %s %s" % (unit, script)
+            script = ["unit", unit] + script
 
         # If partition exists, try to resize
         if resize and part_exists(current_parts, 'num', number):
@@ -724,10 +719,7 @@ def main():
             desired_part_end = convert_to_bytes(size, parsed_unit)
 
             if current_part_end != desired_part_end:
-                script += "resizepart %s %s " % (
-                    number,
-                    part_end
-                )
+                script += ["resizepart", str(number), part_end]
 
         # Execute the script and update the data structure.
         # This will create the partition for the next steps
@@ -735,7 +727,7 @@ def main():
             output_script += script
             parted(script, device, align)
             changed = True
-            script = ""
+            script = []
 
             if not module.check_mode:
                 current_parts = get_device_info(device, unit)['partitions']
@@ -748,10 +740,8 @@ def main():
 
             # Assign name to the partition
             if name is not None and partition.get('name', None) != name:
-                # Wrap double quotes in single quotes so the shell doesn't strip
-                # the double quotes as those need to be included in the arg
-                # passed to parted
-                script += 'name %s \'"%s"\' ' % (number, name)
+                # The double quotes need to be included in the arg passed to parted
+                script += ['name', str(number), '"%s"' % name]
 
             # Manage flags
             if flags:
@@ -765,14 +755,14 @@ def main():
                 flags_on = list(set(flags) - set(partition['flags']))
 
                 for f in flags_on:
-                    script += "set %s %s on " % (number, f)
+                    script += ["set", str(number), f, "on"]
 
                 for f in flags_off:
-                    script += "set %s %s off " % (number, f)
+                    script += ["set", str(number), f, "off"]
 
         # Set the unit of the run
         if unit and script:
-            script = "unit %s %s" % (unit, script)
+            script = ["unit", unit] + script
 
         # Execute the script
         if script:
@@ -783,21 +773,20 @@ def main():
     elif state == 'absent':
         # Remove the partition
         if part_exists(current_parts, 'num', number) or module.check_mode:
-            script = "rm %s " % number
+            script = ["rm", str(number)]
             output_script += script
             changed = True
             parted(script, device, align)
 
     elif state == 'info':
-        output_script = "unit '%s' print " % unit
-
+        output_script = ["unit", unit, "print"]
     # Final status of the device
     final_device_status = get_device_info(device, unit)
     module.exit_json(
         changed=changed,
         disk=final_device_status['generic'],
         partitions=final_device_status['partitions'],
-        script=output_script.strip()
+        script=output_script
     )
 
 
