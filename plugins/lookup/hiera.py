@@ -15,6 +15,12 @@ requirements:
   - hiera (command line utility)
 description:
   - Retrieves data from an Puppetmaster node using Hiera as ENC.
+deprecated:
+  removed_in: 13.0.0
+  why: >-
+    Hiera has been deprecated a long time ago.
+    If you disagree with this deprecation, please create an issue in the community.general repository.
+  alternative: Unknown.
 options:
   _terms:
     description:
