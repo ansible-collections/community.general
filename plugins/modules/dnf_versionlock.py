@@ -161,7 +161,7 @@ def do_versionlock(module, command, patterns=None, raw=False):
         outs = []
         for p in patterns:
             rc, out, err = module.run_command(
-                [DNF_BIN, "-q", "versionlock", command, *raw_parameter, p],
+                [DNF_BIN, "-q", "versionlock", command] + raw_parameter [p],
                 check_rc=True)
             outs.append(out)
         out = "\n".join(outs)
