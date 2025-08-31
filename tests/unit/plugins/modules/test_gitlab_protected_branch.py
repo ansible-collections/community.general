@@ -68,12 +68,17 @@ class TestGitlabProtectedBranch(GitlabModuleTestCase):
 
     @with_httmock(resp_get_protected_branch)
     def test_compare_protected_branch(self):
-        rvalue = self.moduleUtil.compare_protected_branch(name="master", merge_access_levels="maintainer", push_access_level="maintainer")
+        rvalue = self.moduleUtil.compare_protected_branch(name="master", options={"merge_access_levels": 40, "push_access_level": 40})
         self.assertEqual(rvalue, True)
+
+    @with_httmock(resp_get_protected_branch_not_exist)
+    def test_compare_protected_branch_not_exist(self):
+        rvalue = self.moduleUtil.compare_protected_branch(name="master", options={"merge_access_levels": 40, "push_access_level": 40})
+        self.assertEqual(rvalue, False)
 
     @with_httmock(resp_get_protected_branch)
     def test_compare_protected_branch_different_settings(self):
-        rvalue = self.moduleUtil.compare_protected_branch(name="master", merge_access_levels="developer", push_access_level="maintainer")
+        rvalue = self.moduleUtil.compare_protected_branch(name="master", options={"merge_access_levels": 30, "push_access_level": 40})
         self.assertEqual(rvalue, False)
 
     @with_httmock(resp_get_protected_branch)

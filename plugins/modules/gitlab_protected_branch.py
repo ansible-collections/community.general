@@ -106,26 +106,25 @@ class GitlabProtectedBranch(object):
         except Exception as e:
             return False
 
-    def create_protected_branch(self, name, merge_access_levels, push_access_level):
+    def create_protected_branch(self, name, options):
         if self._module.check_mode:
             return True
-        merge = self.ACCESS_LEVEL[merge_access_levels]
-        push = self.ACCESS_LEVEL[push_access_level]
         self.project.protectedbranches.create({
             'name': name,
-            'merge_access_level': merge,
-            'push_access_level': push
+            'merge_access_level': options['merge_access_levels'],
+            'push_access_level': options['push_access_level'],
         })
 
-    def compare_protected_branch(self, name, merge_access_levels, push_access_level):
-        configured_merge = self.ACCESS_LEVEL[merge_access_levels]
-        configured_push = self.ACCESS_LEVEL[push_access_level]
+    def compare_protected_branch(self, name, options):
+        configured_merge = options['merge_access_levels']
+        configured_push = options['push_access_level']
         current = self.protected_branch_exist(name=name)
-        current_merge = current.merge_access_levels[0]['access_level']
-        current_push = current.push_access_levels[0]['access_level']
         if current:
-            if current.name == name and current_merge == configured_merge and current_push == configured_push:
-                return True
+            current_merge = current.merge_access_levels[0]['access_level']
+            current_push = current.push_access_levels[0]['access_level']
+            return (current.name == name and
+                    (configured_merge is None or current_merge == configured_merge) and
+                    (configured_push is None or current_push == configured_push))
         return False
 
     def delete_protected_branch(self, name):
@@ -180,13 +179,17 @@ def main():
     this_gitlab = GitlabProtectedBranch(module=module, project=project, gitlab_instance=gitlab_instance)
 
     p_branch = this_gitlab.protected_branch_exist(name=name)
+    options = {
+        "merge_access_levels": this_gitlab.ACCESS_LEVEL[merge_access_levels],
+        "push_access_level": this_gitlab.ACCESS_LEVEL[push_access_level],
+    }
     if not p_branch and state == "present":
-        this_gitlab.create_protected_branch(name=name, merge_access_levels=merge_access_levels, push_access_level=push_access_level)
+        this_gitlab.create_protected_branch(name, options)
         module.exit_json(changed=True, msg="Created the protected branch.")
     elif p_branch and state == "present":
-        if not this_gitlab.compare_protected_branch(name, merge_access_levels, push_access_level):
+        if not this_gitlab.compare_protected_branch(name, options):
             this_gitlab.delete_protected_branch(name=name)
-            this_gitlab.create_protected_branch(name=name, merge_access_levels=merge_access_levels, push_access_level=push_access_level)
+            this_gitlab.create_protected_branch(name, options)
             module.exit_json(changed=True, msg="Recreated the protected branch.")
     elif p_branch and state == "absent":
         this_gitlab.delete_protected_branch(name=name)
