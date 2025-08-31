@@ -174,7 +174,7 @@ def main():
 
     gitlab_version = gitlab.__version__
     if LooseVersion(gitlab_version) < LooseVersion('2.3.0'):
-        module.fail_json(msg="community.general.gitlab_proteched_branch requires python-gitlab Python module >= 2.3.0 (installed version: [%s])."
+        module.fail_json(msg="community.general.gitlab_protected_branch requires python-gitlab Python module >= 2.3.0 (installed version: [%s])."
                              " Please upgrade python-gitlab to version 2.3.0 or above." % gitlab_version)
 
     this_gitlab = GitlabProtectedBranch(module=module, project=project, gitlab_instance=gitlab_instance)
@@ -182,15 +182,15 @@ def main():
     p_branch = this_gitlab.protected_branch_exist(name=name)
     if not p_branch and state == "present":
         this_gitlab.create_protected_branch(name=name, merge_access_levels=merge_access_levels, push_access_level=push_access_level)
-        module.exit_json(changed=True, msg="Created the proteched branch.")
+        module.exit_json(changed=True, msg="Created the protected branch.")
     elif p_branch and state == "present":
         if not this_gitlab.compare_protected_branch(name, merge_access_levels, push_access_level):
             this_gitlab.delete_protected_branch(name=name)
             this_gitlab.create_protected_branch(name=name, merge_access_levels=merge_access_levels, push_access_level=push_access_level)
-            module.exit_json(changed=True, msg="Recreated the proteched branch.")
+            module.exit_json(changed=True, msg="Recreated the protected branch.")
     elif p_branch and state == "absent":
         this_gitlab.delete_protected_branch(name=name)
-        module.exit_json(changed=True, msg="Deleted the proteched branch.")
+        module.exit_json(changed=True, msg="Deleted the protected branch.")
     module.exit_json(changed=False, msg="No changes are needed.")
 
 
