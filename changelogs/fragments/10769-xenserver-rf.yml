@@ -1,0 +1,2 @@
+minor_changes:
+  - xenserver module utils - remove redundant constructs from argument specs (https://github.com/ansible-collections/community.general/pull/10769).
