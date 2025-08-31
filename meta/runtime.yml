@@ -119,6 +119,12 @@ plugin_routing:
       redirect: community.google.gcp_storage_file
     hashi_vault:
       redirect: community.hashi_vault.hashi_vault
+    hiera:
+      deprecation:
+        removal_version: 13.0.0
+        warning_text: >-
+          Hiera has been deprecated a long time ago.
+          If you disagree with this deprecation, please create an issue in the community.general repository.
     manifold:
       tombstone:
         removal_version: 11.0.0
