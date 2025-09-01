@@ -61,7 +61,7 @@ notes:
     far we have to work with a best guess as close as possible to the behaviour inferred from its code.
   - For most of cases where you want to lock and unlock specific versions of a package, this works fairly well.
   - Does not work with C(dnf5).
-  - This module requires Python 3.6 to run, which should not be a problem for most systems that use C(dnf).
+  - This module requires Python 3.6 or greater to run, which should not be a problem for most systems that use C(dnf).
 requirements:
   - dnf
   - dnf-plugin-versionlock
