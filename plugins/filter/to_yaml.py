@@ -1,0 +1,87 @@
+# Copyright (c) Contributors to the Ansible project
+# (c) 2012, Jeroen Hoekx <jeroen@hoekx.be>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+from __future__ import annotations
+
+import typing as t
+from collections.abc import Mapping, Set
+
+from yaml import dump
+try:
+    from yaml.cyaml import CSafeDumper as SafeDumper
+except ImportError:
+    from yaml import SafeDumper
+
+from ansible.module_utils.common.collections import is_sequence
+try:
+    # This is ansible-core 2.19+
+    from ansible.utils.vars import transform_to_native_types
+except ImportError:
+    transform_to_native_types = None
+
+from ansible.parsing.yaml.objects import AnsibleVaultEncryptedUnicode
+from ansible.utils.unsafe_proxy import AnsibleUnsafe
+
+
+def _to_native_types(value: t.Any) -> t.Any:
+    if value is None:
+        return value
+    if isinstance(value, AnsibleUnsafe):
+        # This only works up to ansible-core 2.18:
+        return _to_native_types(value._strip_unsafe())
+        # But that's fine, since this code path isn't taken on ansible-core 2.19+ anyway.
+    if isinstance(value, Mapping):
+        return {_to_native_types(key): _to_native_types(val) for key, val in value.items()}
+    if isinstance(value, Set):
+        return set(_to_native_types(elt) for elt in value)
+    if is_sequence(value):
+        return [_to_native_types(elt) for elt in value]
+    if isinstance(value, AnsibleVaultEncryptedUnicode):
+        # This only works up to ansible-core 2.18:
+        return value.data
+        # But that's fine, since this code path isn't taken on ansible-core 2.19+ anyway.
+    if isinstance(value, bytes):
+        return bytes(value)
+    if isinstance(value, str):
+        return str(value)
+
+    return value
+
+
+def remove_all_tags(value: t.Any) -> t.Any:
+    if transform_to_native_types is not None:
+        return transform_to_native_types(value, redact=False)
+
+    return _to_native_types(value)
+
+
+def to_yaml(value: t.Any, *, default_flow_style: bool | None = None, **kwargs) -> str:
+    """Serialize input as terse flow-style YAML."""
+    return dump(
+        remove_all_tags(value),
+        Dumper=SafeDumper,
+        allow_unicode=True,
+        default_flow_style=default_flow_style,
+        **kwargs,
+    )
+
+
+def to_nice_yaml(value: t.Any, *, indent: int = 2, default_flow_style: bool = False, **kwargs) -> str:
+    """Serialize input as verbose multi-line YAML."""
+    return to_yaml(
+        value,
+        default_flow_style=default_flow_style,
+        indent=indent,
+        **kwargs,
+    )
+
+
+class FilterModule(object):
+    def filters(self):
+        return {
+            # 'remove_all_tags': remove_all_tags,  # TODO: can be added as a standalone filter
+            'to_yaml': to_yaml,
+            'to_nice_yaml': to_nice_yaml,
+        }

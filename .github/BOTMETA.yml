@@ -209,6 +209,8 @@ files:
     maintainers: resmo
   $filters/to_months.yml:
     maintainers: resmo
+  $filters/to_nice_yaml.yml:
+    maintainers: felixfontein
   $filters/to_prettytable.py:
     maintainers: tgadiev
   $filters/to_seconds.yml:
@@ -217,6 +219,10 @@ files:
     maintainers: resmo
   $filters/to_weeks.yml:
     maintainers: resmo
+  $filters/to_yaml.py:
+    maintainers: felixfontein
+  $filters/to_yaml.yml:
+    maintainers: felixfontein
   $filters/to_years.yml:
     maintainers: resmo
   $filters/unicode_normalize.py:
