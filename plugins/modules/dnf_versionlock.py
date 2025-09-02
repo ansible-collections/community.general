@@ -299,9 +299,8 @@ def main():
 
         if raw:
             # Add raw patterns as specs to add.
-            raw_patterns = patterns if state == "present" else ["!{0}".format(p) for p in patterns]
-            for p in raw_patterns:
-                if p not in locklist_pre:
+            for p in patterns:
+                if (p if state == "present" else "!" + p) not in locklist_pre:
                     specs_toadd.append(p)
         else:
             # Get available packages that match the patterns.
