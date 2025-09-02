@@ -106,26 +106,41 @@ class GitlabProtectedBranch(object):
         except Exception as e:
             return False
 
-    def create_protected_branch(self, name, options):
-        if self._module.check_mode:
-            return True
-        self.project.protectedbranches.create({
+    def create_or_update_protected_branch(self, name, options):
+        protected_branch_options = {
             'name': name,
-            'merge_access_level': options['merge_access_levels'],
-            'push_access_level': options['push_access_level'],
-        })
+        }
+        protected_branch = self.protected_branch_exist(name=name)
+        changed = False
+        if protected_branch and self.can_update(protected_branch, options):
+            for arg_key, arg_value in protected_branch_options.items():
+                if arg_value is not None:
+                    if getattr(protected_branch, arg_key) != arg_value:
+                        setattr(protected_branch, arg_key, arg_value)
+                        changed = True
+            if changed and not self._module.check_mode:
+                protected_branch.save()
+        else:
+            # Set immutable options only on (re)creation
+            protected_branch_options['merge_access_level'] = options['merge_access_levels']
+            protected_branch_options['push_access_level'] = options['push_access_level']
+            if protected_branch:
+                # Exists, but couldn't update. So, delete first
+                self.delete_protected_branch(name)
+            if not self._module.check_mode:
+                self.project.protectedbranches.create(protected_branch_options)
+            changed = True
 
-    def compare_protected_branch(self, name, options):
+        return changed
+
+    def can_update(self, protected_branch, options):
+        # these keys are not set on update the same way they are on creation
         configured_merge = options['merge_access_levels']
         configured_push = options['push_access_level']
-        current = self.protected_branch_exist(name=name)
-        if current:
-            current_merge = current.merge_access_levels[0]['access_level']
-            current_push = current.push_access_levels[0]['access_level']
-            return (current.name == name and
-                    (configured_merge is None or current_merge == configured_merge) and
-                    (configured_push is None or current_push == configured_push))
-        return False
+        current_merge = protected_branch.merge_access_levels[0]['access_level']
+        current_push = protected_branch.push_access_levels[0]['access_level']
+        return ((configured_merge is None or current_merge == configured_merge) and
+                (configured_push is None or current_push == configured_push))
 
     def delete_protected_branch(self, name):
         if self._module.check_mode:
@@ -183,14 +198,9 @@ def main():
         "merge_access_levels": this_gitlab.ACCESS_LEVEL[merge_access_levels],
         "push_access_level": this_gitlab.ACCESS_LEVEL[push_access_level],
     }
-    if not p_branch and state == "present":
-        this_gitlab.create_protected_branch(name, options)
-        module.exit_json(changed=True, msg="Created the protected branch.")
-    elif p_branch and state == "present":
-        if not this_gitlab.compare_protected_branch(name, options):
-            this_gitlab.delete_protected_branch(name=name)
-            this_gitlab.create_protected_branch(name, options)
-            module.exit_json(changed=True, msg="Recreated the protected branch.")
+    if state == "present":
+        changed = this_gitlab.create_or_update_protected_branch(name, options)
+        module.exit_json(changed=changed, msg="Created or updated the protected branch.")
     elif p_branch and state == "absent":
         this_gitlab.delete_protected_branch(name=name)
         module.exit_json(changed=True, msg="Deleted the protected branch.")
