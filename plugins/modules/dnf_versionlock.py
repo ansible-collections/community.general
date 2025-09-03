@@ -61,6 +61,7 @@ notes:
     far we have to work with a best guess as close as possible to the behaviour inferred from its code.
   - For most of cases where you want to lock and unlock specific versions of a package, this works fairly well.
   - Does not work with C(dnf5).
+  - This module requires Python 3.6 or greater to run, which should not be a problem for most systems that use C(dnf).
 requirements:
   - dnf
   - dnf-plugin-versionlock
@@ -137,8 +138,7 @@ import re
 DNF_BIN = "/usr/bin/dnf"
 VERSIONLOCK_CONF = "/etc/dnf/plugins/versionlock.conf"
 # NEVRA regex.
-NEVRA_RE = re.compile(r"^(?P<name>.+)-(?P<epoch>\d+):(?P<version>.+)-"
-                      r"(?P<release>.+)\.(?P<arch>.+)$")
+NEVRA_RE = re.compile(r"^(?P<name>.+)-(?P<epoch>\d+):(?P<version>.+)-(?P<release>.+)\.(?P<arch>.+)$")
 
 
 def do_versionlock(module, command, patterns=None, raw=False):
@@ -179,6 +179,7 @@ def match(entry, pattern):
     m = NEVRA_RE.match(entry)
     if not m:
         return False
+    # indexing a match object with [] is a Python 3.6+ construct
     for name in (
         '%s' % m["name"],
         '%s.%s' % (m["name"], m["arch"]),
@@ -299,8 +300,7 @@ def main():
         if raw:
             # Add raw patterns as specs to add.
             for p in patterns:
-                if ((p if state == "present" else "!" + p)
-                        not in locklist_pre):
+                if (p if state == "present" else "!" + p) not in locklist_pre:
                     specs_toadd.append(p)
         else:
             # Get available packages that match the patterns.
@@ -324,8 +324,7 @@ def main():
                 for evr in packages_map_name_evrs[name]:
                     locklist_entry = "%s-%s.*" % (name, evr)
 
-                    if (locklist_entry if state == "present"
-                            else "!%s" % locklist_entry) not in locklist_pre:
+                    if (locklist_entry if state == "present" else "!%s" % locklist_entry) not in locklist_pre:
                         specs_toadd.append(locklist_entry)
 
         if specs_toadd and not module.check_mode:
