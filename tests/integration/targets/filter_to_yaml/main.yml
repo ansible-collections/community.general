@@ -33,8 +33,7 @@
         that:
           - 'vstr == "foo\n"'
           - 'vvstr == "bar\n"'
-          # TODO right now this doesn't work with ansible-core 2.19+, see https://github.com/ansible/ansible/issues/85783
-          - 'vvstr_redact == ("<redacted>\n" if ansible_version.full is version("2.19", "<") else "bar\n")'
+          - 'vvstr_redact == "<redacted>\n"'
           - 'vint == "42\n"'
           - 'vfloat == "-3.1415\n"'
           - 'vbool == "true\n"'
@@ -59,8 +58,7 @@
         that:
           - 'vstr == "foo\n"'
           - 'vvstr == "bar\n"'
-          # TODO right now this doesn't work with ansible-core 2.19+, see https://github.com/ansible/ansible/issues/85783
-          - 'vvstr_redact == ("<redacted>\n" if ansible_version.full is version("2.19", "<") else "bar\n")'
+          - 'vvstr_redact == "<redacted>\n"'
           - 'vint == "42\n"'
           - 'vfloat == "-3.1415\n"'
           - 'vbool == "true\n"'
@@ -78,11 +76,9 @@
     - assert:
         that:
           - complex == exp_complex
-          # TODO right now this doesn't work with ansible-core 2.19+, see https://github.com/ansible/ansible/issues/85783
-          - complex_redact == (exp_complex_redact if ansible_version.full is version("2.19", "<") else exp_complex)
+          - complex_redact == exp_complex_redact
           - complex_nice == exp_complex_nice
-          # TODO right now this doesn't work with ansible-core 2.19+, see https://github.com/ansible/ansible/issues/85783
-          - complex_nice_redact == (exp_complex_nice_redact if ansible_version.full is version("2.19", "<") else exp_complex_nice)
+          - complex_nice_redact == exp_complex_nice_redact
       vars:
         exp_complex: |
           a_list: [bar, ! '2025-02-03 04:05:06', Hello!, true, false]
@@ -156,11 +152,9 @@
       assert:
         that:
           - complex == exp_complex
-          # TODO right now this doesn't work with ansible-core 2.19+, see https://github.com/ansible/ansible/issues/85783
-          - complex_redact == exp_complex
+          - complex_redact == exp_complex_redact
           - complex_nice == exp_complex_nice
-          # TODO right now this doesn't work with ansible-core 2.19+, see https://github.com/ansible/ansible/issues/85783
-          - complex_nice_redact == exp_complex_nice
+          - complex_nice_redact == exp_complex_nice_redact
       vars:
         exp_complex: |
           bam: foobar
