@@ -35,7 +35,7 @@ options:
     type: str
   name:
     description:
-      - Specify the resource name to create or clone.
+      - Specify the resource name to create or clone to.
       - This is required if O(state=present), O(state=absent), O(state=enabled), or O(state=disabled).
     type: str
   resource_type:
@@ -99,13 +99,13 @@ options:
         elements: str
   resource_clone_ids:
     description:
-      - List of clone resource IDs to clone.
+      - List of clone resource IDs to clone from.
     type: list
     elements: str
     version_added: 11.3.0
   resource_clone_meta:
     description:
-      - List of meta to associate with clone resource.
+      - List of metadata to associate with clone resource.
     type: list
     elements: str
     version_added: 11.3.0
