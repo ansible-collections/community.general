@@ -59,3 +59,24 @@ options:
     type: str
     default: default
 """
+
+    DATA = r"""
+options:
+  excludes:
+    description:
+      - Applications or models to be excluded.
+      - Format must be either V(app_label) or V(app_label.ModelName).
+    type: list
+    elements: str
+  format:
+    description:
+      - Serialization format of the output data.
+    type: str
+    default: json
+    choices: [xml, json, jsonl, yaml]
+notes:
+  - As it is now, the module is B(not idempotent). Ensuring idempotency for this case can be a bit tricky, because it would
+    amount to ensuring beforehand that all the data in the fixture file is already in the database, which is not a trivial feat.
+    Unfortunately, neither C(django loaddata) nor C(django dumpdata) have a C(--dry-run) option, so the only way to know whether
+    there is a change or not is to actually load or dump the data.
+"""
