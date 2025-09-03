@@ -23,18 +23,40 @@ django_std_args = dict(
     verbosity=dict(type="int", choices=[0, 1, 2, 3]),
     skip_checks=dict(type="bool"),
 )
+_database_dash = dict(
+    database=dict(type="str", default="default"),
+)
+_data = dict(
+    excludes=dict(type="list", elements="str"),
+    format=dict(type="str", default="json", choices=["xml", "json", "jsonl", "yaml"]),
+)
+_pks = dict(
+    primary_keys=dict(type="list", elements="str"),
+)
 
 _django_std_arg_fmts = dict(
+    all=cmd_runner_fmt.as_bool("--all"),
+    app=cmd_runner_fmt.as_opt_val("--app"),
     apps=cmd_runner_fmt.as_list(),
+    apps_models=cmd_runner_fmt.as_list(),
     check=cmd_runner_fmt.as_bool("--check"),
     command=cmd_runner_fmt.as_list(),
     database_dash=cmd_runner_fmt.as_opt_eq_val("--database"),
     database_stacked_dash=cmd_runner_fmt.stack(cmd_runner_fmt.as_opt_val)("--database"),
     deploy=cmd_runner_fmt.as_bool("--deploy"),
     dry_run=cmd_runner_fmt.as_bool("--dry-run"),
+    excludes=cmd_runner_fmt.stack(cmd_runner_fmt.as_opt_val)("--exclude"),
     fail_level=cmd_runner_fmt.as_opt_val("--fail-level"),
+    fixture=cmd_runner_fmt.as_opt_val("--output"),
+    fixtures=cmd_runner_fmt.as_list(),
+    format=cmd_runner_fmt.as_opt_val("--format"),
+    ignore_non_existent=cmd_runner_fmt.as_bool("--ignorenonexistent"),
+    indent=cmd_runner_fmt.as_opt_val("--indent"),
+    natural_foreign=cmd_runner_fmt.as_bool("--natural-foreign"),
+    natural_primary=cmd_runner_fmt.as_bool("--natural-primary"),
     no_color=cmd_runner_fmt.as_fixed("--no-color"),
     noinput=cmd_runner_fmt.as_fixed("--noinput"),
+    primary_keys=lambda v: ["--pks", ",".join(v)],
     pythonpath=cmd_runner_fmt.as_opt_eq_val("--pythonpath"),
     settings=cmd_runner_fmt.as_opt_eq_val("--settings"),
     skip_checks=cmd_runner_fmt.as_bool("--skip-checks"),
@@ -44,10 +66,7 @@ _django_std_arg_fmts = dict(
     version=cmd_runner_fmt.as_fixed("--version"),
 )
 
-_database_dash = dict(
-    database=dict(type="str", default="default"),
-)
-
+# keys can be used in _django_args
 _args_menu = dict(
     std=(django_std_args, _django_std_arg_fmts),
     database=(_database_dash, {"database": _django_std_arg_fmts["database_dash"]}),    # deprecate, remove in 13.0.0
@@ -55,6 +74,7 @@ _args_menu = dict(
     dry_run=({}, {"dry_run": cmd_runner_fmt.as_bool("--dry-run")}),   # deprecate, remove in 13.0.0
     check=({}, {"check": cmd_runner_fmt.as_bool("--check")}),         # deprecate, remove in 13.0.0
     database_dash=(_database_dash, {}),
+    data=(_data, {}),
 )
 
 
