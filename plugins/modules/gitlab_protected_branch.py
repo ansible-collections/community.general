@@ -63,6 +63,11 @@ options:
       - Whether or not to allow force pushes to the protected branch.
     type: bool
     version_added: '11.3.0'
+  code_owner_approval_required:
+    description:
+      - Whether or not to require code owner approval to push.
+    type: bool
+    version_added: '11.3.0'
 """
 
 
@@ -115,6 +120,7 @@ class GitlabProtectedBranch(object):
         protected_branch_options = {
             'name': name,
             'allow_force_push': options['allow_force_push'],
+            'code_owner_approval_required': options['code_owner_approval_required'],
         }
         protected_branch = self.protected_branch_exist(name=name)
         changed = False
@@ -163,6 +169,7 @@ def main():
         merge_access_levels=dict(type='str', default="maintainer", choices=["maintainer", "developer", "nobody"]),
         push_access_level=dict(type='str', default="maintainer", choices=["maintainer", "developer", "nobody"]),
         allow_force_push=dict(type='bool'),
+        code_owner_approval_required=dict(type='bool'),
         state=dict(type='str', default="present", choices=["absent", "present"]),
     )
 
@@ -205,6 +212,7 @@ def main():
         "merge_access_levels": this_gitlab.ACCESS_LEVEL[merge_access_levels],
         "push_access_level": this_gitlab.ACCESS_LEVEL[push_access_level],
         "allow_force_push": module.params["allow_force_push"],
+        "code_owner_approval_required": module.params["code_owner_approval_required"],
     }
     if state == "present":
         changed = this_gitlab.create_or_update_protected_branch(name, options)
