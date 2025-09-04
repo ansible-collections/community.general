@@ -925,16 +925,30 @@ def main():
         webauthn_policy_acceptable_aaguids=dict(type='list', elements='str', aliases=['webAuthnPolicyAcceptableAaguids']),
         webauthn_policy_extra_origins=dict(type='list', elements='str', aliases=['webAuthnPolicyExtraOrigins']),
         webauthn_policy_passwordless_rp_entity_name=dict(type='str', aliases=['webAuthnPolicyPasswordlessRpEntityName']),
-        webauthn_policy_passwordless_signature_algorithms=dict(type='list', elements='str', aliases=['webAuthnPolicyPasswordlessSignatureAlgorithms'], no_log=False),
+        webauthn_policy_passwordless_signature_algorithms=dict(
+            type='list', elements='str', aliases=['webAuthnPolicyPasswordlessSignatureAlgorithms'], no_log=False
+        ),
         webauthn_policy_passwordless_rp_id=dict(type='str', aliases=['webAuthnPolicyPasswordlessRpId']),
-        webauthn_policy_passwordless_attestation_conveyance_preference=dict(type='str', aliases=['webAuthnPolicyPasswordlessAttestationConveyancePreference'], no_log=False),
-        webauthn_policy_passwordless_authenticator_attachment=dict(type='str', aliases=['webAuthnPolicyPasswordlessAuthenticatorAttachment'], no_log=False),
-        webauthn_policy_passwordless_require_resident_key=dict(type='str', aliases=['webAuthnPolicyPasswordlessRequireResidentKey'], no_log=False),
-        webauthn_policy_passwordless_user_verification_requirement=dict(type='str', aliases=['webAuthnPolicyPasswordlessUserVerificationRequirement'], no_log=False),
+        webauthn_policy_passwordless_attestation_conveyance_preference=dict(
+            type='str', aliases=['webAuthnPolicyPasswordlessAttestationConveyancePreference'], no_log=False
+        ),
+        webauthn_policy_passwordless_authenticator_attachment=dict(
+            type='str', aliases=['webAuthnPolicyPasswordlessAuthenticatorAttachment'], no_log=False
+        ),
+        webauthn_policy_passwordless_require_resident_key=dict(
+            type='str', aliases=['webAuthnPolicyPasswordlessRequireResidentKey'], no_log=False
+        ),
+        webauthn_policy_passwordless_user_verification_requirement=dict(
+            type='str', aliases=['webAuthnPolicyPasswordlessUserVerificationRequirement'], no_log=False
+        ),
         webauthn_policy_passwordless_create_timeout=dict(type='int', aliases=['webAuthnPolicyPasswordlessCreateTimeout']),
         webauthn_policy_passwordless_avoid_same_authenticator_register=dict(type='bool', aliases=['webAuthnPolicyPasswordlessAvoidSameAuthenticatorRegister']),
-        webauthn_policy_passwordless_acceptable_aaguids=dict(type='list', elements='str', aliases=['webAuthnPolicyPasswordlessAcceptableAaguids'], no_log=False),
-        webauthn_policy_passwordless_extra_origins=dict(type='list', elements='str', aliases=['webAuthnPolicyPasswordlessExtraOrigins'], no_log=False),
+        webauthn_policy_passwordless_acceptable_aaguids=dict(
+            type='list', elements='str', aliases=['webAuthnPolicyPasswordlessAcceptableAaguids'], no_log=False
+        ),
+        webauthn_policy_passwordless_extra_origins=dict(
+            type='list', elements='str', aliases=['webAuthnPolicyPasswordlessExtraOrigins'], no_log=False
+        ),
     )
 
     argument_spec.update(meta_args)
