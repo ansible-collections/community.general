@@ -51,11 +51,12 @@ options:
     type: bool
   vars:
     description:
-      - When the list element is a simple key-value pair, masked, raw and protected are set to V(false).
-      - When the list element is a dict with the keys C(value), C(masked), C(raw) and C(protected), the user can have full
-        control about whether a value should be masked, raw, protected or both.
+      - When the list element is a simple key-value pair, C(masked), C(hidden), C(raw), and C(protected) are set to V(false).
+      - When the list element is a dict with the keys C(value), C(masked), C(hidden), C(raw), and C(protected), the user can have full
+        control about whether a value should be masked, hidden, raw, protected, or a combination.
       - Support for protected values requires GitLab >= 9.3.
       - Support for masked values requires GitLab >= 11.10.
+      - Support for hidden values requires GitLab >= 17.4.
       - Support for raw values requires GitLab >= 15.7.
       - Support for environment_scope requires GitLab Premium >= 13.11.
       - Support for variable_type requires GitLab >= 11.11.
