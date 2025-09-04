@@ -1,0 +1,2 @@
+minor_changes:
+  - keycloak_realm - add support for WebAuthn policy configuration options, including both regular and passwordless WebAuthn policies (https://github.com/ansible-collections/community.general/commit/e64f5bf39300b1b631c4ae1589fbeadc2414b945).
