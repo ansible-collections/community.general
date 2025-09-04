@@ -58,6 +58,11 @@ options:
     default: maintainer
     type: str
     choices: ["maintainer", "developer", "nobody"]
+  allow_force_push:
+    description:
+      - Whether or not to allow force pushes to the protected branch.
+    type: bool
+    version_added: '11.3.0'
 """
 
 
@@ -109,6 +114,7 @@ class GitlabProtectedBranch(object):
     def create_or_update_protected_branch(self, name, options):
         protected_branch_options = {
             'name': name,
+            'allow_force_push': options['allow_force_push'],
         }
         protected_branch = self.protected_branch_exist(name=name)
         changed = False
@@ -156,6 +162,7 @@ def main():
         name=dict(type='str', required=True),
         merge_access_levels=dict(type='str', default="maintainer", choices=["maintainer", "developer", "nobody"]),
         push_access_level=dict(type='str', default="maintainer", choices=["maintainer", "developer", "nobody"]),
+        allow_force_push=dict(type='bool'),
         state=dict(type='str', default="present", choices=["absent", "present"]),
     )
 
@@ -197,6 +204,7 @@ def main():
     options = {
         "merge_access_levels": this_gitlab.ACCESS_LEVEL[merge_access_levels],
         "push_access_level": this_gitlab.ACCESS_LEVEL[push_access_level],
+        "allow_force_push": module.params["allow_force_push"],
     }
     if state == "present":
         changed = this_gitlab.create_or_update_protected_branch(name, options)
