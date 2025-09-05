@@ -573,12 +573,14 @@ options:
     aliases:
       - webAuthnPolicyRpEntityName
     type: str
+    version_added: 11.3.0
   web_authn_policy_signature_algorithms:
     description:
       - List of acceptable WebAuthn signature algorithms.
     aliases:
       - webAuthnPolicySignatureAlgorithms
     type: list
+    version_added: 11.3.0
     elements: str
   web_authn_policy_rp_id:
     description:
@@ -586,48 +588,56 @@ options:
     aliases:
       - webAuthnPolicyRpId
     type: str
+    version_added: 11.3.0
   web_authn_policy_attestation_conveyance_preference:
     description:
       - Attestation conveyance preference for WebAuthn.
     aliases:
       - webAuthnPolicyAttestationConveyancePreference
     type: str
+    version_added: 11.3.0
   web_authn_policy_authenticator_attachment:
     description:
       - Authenticator attachment preference for WebAuthn authenticators.
     aliases:
       - webAuthnPolicyAuthenticatorAttachment
     type: str
+    version_added: 11.3.0
   web_authn_policy_require_resident_key:
     description:
       - Whether resident keys are required for WebAuthn (Yes/No/not specified).
     aliases:
       - webAuthnPolicyRequireResidentKey
     type: str
+    version_added: 11.3.0
   web_authn_policy_user_verification_requirement:
     description:
       - User verification requirement for WebAuthn.
     aliases:
       - webAuthnPolicyUserVerificationRequirement
     type: str
+    version_added: 11.3.0
   web_authn_policy_create_timeout:
     description:
       - Timeout for WebAuthn credential creation (ms).
     aliases:
       - webAuthnPolicyCreateTimeout
     type: int
+    version_added: 11.3.0
   web_authn_policy_avoid_same_authenticator_register:
     description:
       - Avoid registering the same authenticator multiple times.
     aliases:
       - webAuthnPolicyAvoidSameAuthenticatorRegister
     type: bool
+    version_added: 11.3.0
   web_authn_policy_acceptable_aaguids:
     description:
       - List of acceptable AAGUIDs for WebAuthn authenticators.
     aliases:
       - webAuthnPolicyAcceptableAaguids
     type: list
+    version_added: 11.3.0
     elements: str
   web_authn_policy_extra_origins:
     description:
@@ -635,6 +645,7 @@ options:
     aliases:
       - webAuthnPolicyExtraOrigins
     type: list
+    version_added: 11.3.0
     elements: str
   web_authn_policy_passwordless_rp_entity_name:
     description:
@@ -642,12 +653,14 @@ options:
     aliases:
       - webAuthnPolicyPasswordlessRpEntityName
     type: str
+    version_added: 11.3.0
   web_authn_policy_passwordless_signature_algorithms:
     description:
       - List of acceptable WebAuthn signature algorithms for passwordless.
     aliases:
       - webAuthnPolicyPasswordlessSignatureAlgorithms
     type: list
+    version_added: 11.3.0
     elements: str
   web_authn_policy_passwordless_rp_id:
     description:
@@ -655,48 +668,56 @@ options:
     aliases:
       - webAuthnPolicyPasswordlessRpId
     type: str
+    version_added: 11.3.0
   web_authn_policy_passwordless_attestation_conveyance_preference:
     description:
       - Attestation conveyance preference for WebAuthn passwordless.
     aliases:
       - webAuthnPolicyPasswordlessAttestationConveyancePreference
     type: str
+    version_added: 11.3.0
   web_authn_policy_passwordless_authenticator_attachment:
     description:
       - Authenticator attachment for WebAuthn passwordless.
     aliases:
       - webAuthnPolicyPasswordlessAuthenticatorAttachment
     type: str
+    version_added: 11.3.0
   web_authn_policy_passwordless_require_resident_key:
     description:
       - Whether resident keys are required for WebAuthn passwordless (Yes/No/not specified).
     aliases:
       - webAuthnPolicyPasswordlessRequireResidentKey
     type: str
+    version_added: 11.3.0
   web_authn_policy_passwordless_user_verification_requirement:
     description:
       - User verification requirement for WebAuthn passwordless.
     aliases:
       - webAuthnPolicyPasswordlessUserVerificationRequirement
     type: str
+    version_added: 11.3.0
   web_authn_policy_passwordless_create_timeout:
     description:
       - Timeout for WebAuthn passwordless credential creation (ms).
     aliases:
       - webAuthnPolicyPasswordlessCreateTimeout
     type: int
+    version_added: 11.3.0
   web_authn_policy_passwordless_avoid_same_authenticator_register:
     description:
       - Avoid registering the same authenticator multiple times for passwordless.
     aliases:
       - webAuthnPolicyPasswordlessAvoidSameAuthenticatorRegister
     type: bool
+    version_added: 11.3.0
   web_authn_policy_passwordless_acceptable_aaguids:
     description:
       - List of acceptable AAGUIDs for WebAuthn passwordless authenticators.
     aliases:
       - webAuthnPolicyPasswordlessAcceptableAaguids
     type: list
+    version_added: 11.3.0
     elements: str
   web_authn_policy_passwordless_extra_origins:
     description:
@@ -704,6 +725,7 @@ options:
     aliases:
       - webAuthnPolicyPasswordlessExtraOrigins
     type: list
+    version_added: 11.3.0
     elements: str
 
 extends_documentation_fragment:
