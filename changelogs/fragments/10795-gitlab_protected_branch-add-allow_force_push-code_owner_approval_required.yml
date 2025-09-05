@@ -1,0 +1,2 @@
+minor_changes:
+  - gitlab_protected_branch - add ``allow_force_push``, ``code_owner_approval_required`` (https://github.com/ansible-collections/community.general/pull/10795).
