@@ -27,13 +27,14 @@ options:
   state:
     description:
       - Indicate desired state for cluster resource.
-      - The state V(cleanup) has been added in community.general 11.3.0.
-    choices: [present, absent, enabled, disabled, cleanup]
+      - The states V(cleanup) and V(cloned) have been added in community.general 11.3.0.
+      - If O(state=cloned) or O(state=present), you can set O(resource_clone_ids) and O(resource_clone_meta) to determine exactly what and how to clone.
+    choices: [present, absent, cloned, enabled, disabled, cleanup]
     default: present
     type: str
   name:
     description:
-      - Specify the resource name to create.
+      - Specify the resource name to create or clone to.
       - This is required if O(state=present), O(state=absent), O(state=enabled), or O(state=disabled).
     type: str
   resource_type:
@@ -95,6 +96,18 @@ options:
           - Options to associate with resource action.
         type: list
         elements: str
+  resource_clone_ids:
+    description:
+      - List of clone resource IDs to clone from.
+    type: list
+    elements: str
+    version_added: 11.3.0
+  resource_clone_meta:
+    description:
+      - List of metadata to associate with clone resource.
+    type: list
+    elements: str
+    version_added: 11.3.0
   wait:
     description:
       - Timeout period for polling the resource creation.
@@ -142,7 +155,7 @@ class PacemakerResource(StateModuleHelper):
     module = dict(
         argument_spec=dict(
             state=dict(type='str', default='present', choices=[
-                'present', 'absent', 'enabled', 'disabled', 'cleanup']),
+                'present', 'absent', 'cloned', 'enabled', 'disabled', 'cleanup']),
             name=dict(type='str'),
             resource_type=dict(type='dict', options=dict(
                 resource_name=dict(type='str'),
@@ -159,6 +172,8 @@ class PacemakerResource(StateModuleHelper):
                 argument_action=dict(type='str', choices=['clone', 'master', 'group', 'promotable']),
                 argument_option=dict(type='list', elements='str'),
             )),
+            resource_clone_ids=dict(type='list', elements='str'),
+            resource_clone_meta=dict(type='list', elements='str'),
             wait=dict(type='int', default=300),
         ),
         required_if=[
@@ -194,6 +209,10 @@ class PacemakerResource(StateModuleHelper):
                          ('out', result[1] if result[1] != "" else None),
                          ('err', result[2])])
 
+    def fmt_as_stack_argument(self, value, arg):
+        if value is not None:
+            return [x for k in value for x in (arg, k)]
+
     def state_absent(self):
         force = get_pacemaker_maintenance_mode(self.runner)
         with self.runner('cli_action state name force', output_process=self._process_command_output(True, "does not exist"), check_mode_skip=True) as ctx:
@@ -201,10 +220,19 @@ class PacemakerResource(StateModuleHelper):
 
     def state_present(self):
         with self.runner(
-                'cli_action state name resource_type resource_option resource_operation resource_meta resource_argument wait',
+                'cli_action state name resource_type resource_option resource_operation resource_meta resource_argument '
+                'resource_clone_ids resource_clone_meta wait',
                 output_process=self._process_command_output(not get_pacemaker_maintenance_mode(self.runner), "already exists"),
                 check_mode_skip=True) as ctx:
-            ctx.run(cli_action='resource')
+            ctx.run(cli_action='resource', resource_clone_ids=self.fmt_as_stack_argument(self.module.params["resource_clone_ids"], "clone"))
+
+    def state_cloned(self):
+        with self.runner(
+            'cli_action state name resource_clone_ids resource_clone_meta wait',
+            output_process=self._process_command_output(
+                not get_pacemaker_maintenance_mode(self.runner),
+                "already a clone resource"), check_mode_skip=True) as ctx:
+            ctx.run(cli_action='resource', resource_clone_meta=self.fmt_as_stack_argument(self.module.params["resource_clone_meta"], "meta"))
 
     def state_enabled(self):
         with self.runner('cli_action state name', output_process=self._process_command_output(True, "Starting"), check_mode_skip=True) as ctx:
