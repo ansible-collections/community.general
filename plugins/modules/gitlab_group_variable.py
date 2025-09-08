@@ -15,7 +15,8 @@ short_description: Creates, updates, or deletes GitLab groups variables
 version_added: 1.2.0
 description:
   - Creates a group variable if it does not exist.
-  - When a group variable does exist, its value is updated when the values are different.
+  - When a group variable does exist and is not hidden, its value is updated when the values are different.
+    When a group variable does exist and is hidden, its value is updated. In this case, the module is B(not idempotent).
   - Variables which are untouched in the playbook, but are not untouched in the GitLab group, they stay untouched (O(purge=false))
     or are deleted (O(purge=true)).
 author:
@@ -52,13 +53,14 @@ options:
     type: bool
   vars:
     description:
-      - When the list element is a simple key-value pair, masked, raw and protected are set to V(false).
-      - When the list element is a dict with the keys C(value), C(masked), C(raw) and C(protected), the user can have full
-        control about whether a value should be masked, raw, protected or both.
+      - When the list element is a simple key-value pair, C(masked), C(hidden), C(raw), and C(protected) are set to V(false).
+      - When the list element is a dict with the keys C(value), C(masked), C(hidden), C(raw), and C(protected), the user can have full
+        control about whether a value should be masked, hidden, raw, protected, or a combination.
       - Support for group variables requires GitLab >= 9.5.
       - Support for environment_scope requires GitLab Premium >= 13.11.
       - Support for protected values requires GitLab >= 9.3.
       - Support for masked values requires GitLab >= 11.10.
+      - Support for hidden values requires GitLab >= 17.4, and was added in community.general 11.3.0.
       - Support for raw values requires GitLab >= 15.7.
       - A C(value) must be a string or a number.
       - Field C(variable_type) must be a string with either V(env_var), which is the default, or V(file).
@@ -90,6 +92,14 @@ options:
           - Whether variable value is masked or not.
         type: bool
         default: false
+      hidden:
+        description:
+          - Whether variable value is hidden or not.
+          - Implies C(masked).
+          - Support for hidden values requires GitLab >= 17.4.
+        type: bool
+        default: false
+        version_added: '11.3.0'
       protected:
         description:
           - Whether variable value is protected or not.
@@ -231,6 +241,7 @@ class GitlabGroupVariables(object):
             "key": var_obj.get('key'),
             "value": var_obj.get('value'),
             "masked": var_obj.get('masked'),
+            "masked_and_hidden": var_obj.get('hidden'),
             "protected": var_obj.get('protected'),
             "raw": var_obj.get('raw'),
             "variable_type": var_obj.get('variable_type'),
@@ -305,6 +316,8 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
             item['raw'] = False
         if item.get('masked') is None:
             item['masked'] = False
+        if item.get('hidden') is None:
+            item['hidden'] = False
         if item.get('environment_scope') is None:
             item['environment_scope'] = '*'
         if item.get('variable_type') is None:
@@ -380,6 +393,7 @@ def main():
             name=dict(type='str', required=True),
             value=dict(type='str', no_log=True),
             masked=dict(type='bool', default=False),
+            hidden=dict(type='bool', default=False),
             protected=dict(type='bool', default=False),
             raw=dict(type='bool', default=False),
             environment_scope=dict(type='str', default='*'),
