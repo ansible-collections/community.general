@@ -567,6 +567,166 @@ options:
       - oauth2DevicePollingInterval
     type: int
     version_added: 11.2.0
+  web_authn_policy_rp_entity_name:
+    description:
+      - WebAuthn Relying Party Entity Name.
+    aliases:
+      - webAuthnPolicyRpEntityName
+    type: str
+    version_added: 11.3.0
+  web_authn_policy_signature_algorithms:
+    description:
+      - List of acceptable WebAuthn signature algorithms.
+    aliases:
+      - webAuthnPolicySignatureAlgorithms
+    type: list
+    version_added: 11.3.0
+    elements: str
+  web_authn_policy_rp_id:
+    description:
+      - WebAuthn Relying Party ID (domain). Empty string means use request host.
+    aliases:
+      - webAuthnPolicyRpId
+    type: str
+    version_added: 11.3.0
+  web_authn_policy_attestation_conveyance_preference:
+    description:
+      - Attestation conveyance preference for WebAuthn.
+    aliases:
+      - webAuthnPolicyAttestationConveyancePreference
+    type: str
+    version_added: 11.3.0
+  web_authn_policy_authenticator_attachment:
+    description:
+      - Authenticator attachment preference for WebAuthn authenticators.
+    aliases:
+      - webAuthnPolicyAuthenticatorAttachment
+    type: str
+    version_added: 11.3.0
+  web_authn_policy_require_resident_key:
+    description:
+      - Whether resident keys are required for WebAuthn (Yes/No/not specified).
+    aliases:
+      - webAuthnPolicyRequireResidentKey
+    type: str
+    version_added: 11.3.0
+  web_authn_policy_user_verification_requirement:
+    description:
+      - User verification requirement for WebAuthn.
+    aliases:
+      - webAuthnPolicyUserVerificationRequirement
+    type: str
+    version_added: 11.3.0
+  web_authn_policy_create_timeout:
+    description:
+      - Timeout for WebAuthn credential creation (ms).
+    aliases:
+      - webAuthnPolicyCreateTimeout
+    type: int
+    version_added: 11.3.0
+  web_authn_policy_avoid_same_authenticator_register:
+    description:
+      - Avoid registering the same authenticator multiple times.
+    aliases:
+      - webAuthnPolicyAvoidSameAuthenticatorRegister
+    type: bool
+    version_added: 11.3.0
+  web_authn_policy_acceptable_aaguids:
+    description:
+      - List of acceptable AAGUIDs for WebAuthn authenticators.
+    aliases:
+      - webAuthnPolicyAcceptableAaguids
+    type: list
+    version_added: 11.3.0
+    elements: str
+  web_authn_policy_extra_origins:
+    description:
+      - Additional acceptable origins for WebAuthn requests.
+    aliases:
+      - webAuthnPolicyExtraOrigins
+    type: list
+    version_added: 11.3.0
+    elements: str
+  web_authn_policy_passwordless_rp_entity_name:
+    description:
+      - WebAuthn Passwordless Relying Party Entity Name.
+    aliases:
+      - webAuthnPolicyPasswordlessRpEntityName
+    type: str
+    version_added: 11.3.0
+  web_authn_policy_passwordless_signature_algorithms:
+    description:
+      - List of acceptable WebAuthn signature algorithms for passwordless.
+    aliases:
+      - webAuthnPolicyPasswordlessSignatureAlgorithms
+    type: list
+    version_added: 11.3.0
+    elements: str
+  web_authn_policy_passwordless_rp_id:
+    description:
+      - WebAuthn Passwordless Relying Party ID (domain).
+    aliases:
+      - webAuthnPolicyPasswordlessRpId
+    type: str
+    version_added: 11.3.0
+  web_authn_policy_passwordless_attestation_conveyance_preference:
+    description:
+      - Attestation conveyance preference for WebAuthn passwordless.
+    aliases:
+      - webAuthnPolicyPasswordlessAttestationConveyancePreference
+    type: str
+    version_added: 11.3.0
+  web_authn_policy_passwordless_authenticator_attachment:
+    description:
+      - Authenticator attachment for WebAuthn passwordless.
+    aliases:
+      - webAuthnPolicyPasswordlessAuthenticatorAttachment
+    type: str
+    version_added: 11.3.0
+  web_authn_policy_passwordless_require_resident_key:
+    description:
+      - Whether resident keys are required for WebAuthn passwordless (V(Yes)/V(No)/V(not specified)).
+    aliases:
+      - webAuthnPolicyPasswordlessRequireResidentKey
+    type: str
+    version_added: 11.3.0
+  web_authn_policy_passwordless_user_verification_requirement:
+    description:
+      - User verification requirement for WebAuthn passwordless.
+    aliases:
+      - webAuthnPolicyPasswordlessUserVerificationRequirement
+    type: str
+    version_added: 11.3.0
+  web_authn_policy_passwordless_create_timeout:
+    description:
+      - Timeout for WebAuthn passwordless credential creation (ms).
+    aliases:
+      - webAuthnPolicyPasswordlessCreateTimeout
+    type: int
+    version_added: 11.3.0
+  web_authn_policy_passwordless_avoid_same_authenticator_register:
+    description:
+      - Avoid registering the same authenticator multiple times for passwordless.
+    aliases:
+      - webAuthnPolicyPasswordlessAvoidSameAuthenticatorRegister
+    type: bool
+    version_added: 11.3.0
+  web_authn_policy_passwordless_acceptable_aaguids:
+    description:
+      - List of acceptable AAGUIDs for WebAuthn passwordless authenticators.
+    aliases:
+      - webAuthnPolicyPasswordlessAcceptableAaguids
+    type: list
+    version_added: 11.3.0
+    elements: str
+  web_authn_policy_passwordless_extra_origins:
+    description:
+      - Additional acceptable origins for WebAuthn passwordless requests.
+    aliases:
+      - webAuthnPolicyPasswordlessExtraOrigins
+    type: list
+    version_added: 11.3.0
+    elements: str
 
 extends_documentation_fragment:
   - community.general.keycloak
@@ -775,6 +935,42 @@ def main():
         client_offline_session_max_lifespan=dict(type='int', aliases=['clientOfflineSessionMaxLifespan']),
         oauth2_device_code_lifespan=dict(type='int', aliases=['oauth2DeviceCodeLifespan']),
         oauth2_device_polling_interval=dict(type='int', aliases=['oauth2DevicePollingInterval']),
+        web_authn_policy_rp_entity_name=dict(type='str', aliases=['webAuthnPolicyRpEntityName']),
+        web_authn_policy_signature_algorithms=dict(type='list', elements='str', aliases=['webAuthnPolicySignatureAlgorithms']),
+        web_authn_policy_rp_id=dict(type='str', aliases=['webAuthnPolicyRpId']),
+        web_authn_policy_attestation_conveyance_preference=dict(type='str', aliases=['webAuthnPolicyAttestationConveyancePreference']),
+        web_authn_policy_authenticator_attachment=dict(type='str', aliases=['webAuthnPolicyAuthenticatorAttachment']),
+        web_authn_policy_require_resident_key=dict(type='str', aliases=['webAuthnPolicyRequireResidentKey'], no_log=False),
+        web_authn_policy_user_verification_requirement=dict(type='str', aliases=['webAuthnPolicyUserVerificationRequirement']),
+        web_authn_policy_create_timeout=dict(type='int', aliases=['webAuthnPolicyCreateTimeout']),
+        web_authn_policy_avoid_same_authenticator_register=dict(type='bool', aliases=['webAuthnPolicyAvoidSameAuthenticatorRegister']),
+        web_authn_policy_acceptable_aaguids=dict(type='list', elements='str', aliases=['webAuthnPolicyAcceptableAaguids']),
+        web_authn_policy_extra_origins=dict(type='list', elements='str', aliases=['webAuthnPolicyExtraOrigins']),
+        web_authn_policy_passwordless_rp_entity_name=dict(type='str', aliases=['webAuthnPolicyPasswordlessRpEntityName']),
+        web_authn_policy_passwordless_signature_algorithms=dict(
+            type='list', elements='str', aliases=['webAuthnPolicyPasswordlessSignatureAlgorithms'], no_log=False
+        ),
+        web_authn_policy_passwordless_rp_id=dict(type='str', aliases=['webAuthnPolicyPasswordlessRpId']),
+        web_authn_policy_passwordless_attestation_conveyance_preference=dict(
+            type='str', aliases=['webAuthnPolicyPasswordlessAttestationConveyancePreference'], no_log=False
+        ),
+        web_authn_policy_passwordless_authenticator_attachment=dict(
+            type='str', aliases=['webAuthnPolicyPasswordlessAuthenticatorAttachment'], no_log=False
+        ),
+        web_authn_policy_passwordless_require_resident_key=dict(
+            type='str', aliases=['webAuthnPolicyPasswordlessRequireResidentKey'], no_log=False
+        ),
+        web_authn_policy_passwordless_user_verification_requirement=dict(
+            type='str', aliases=['webAuthnPolicyPasswordlessUserVerificationRequirement'], no_log=False
+        ),
+        web_authn_policy_passwordless_create_timeout=dict(type='int', aliases=['webAuthnPolicyPasswordlessCreateTimeout']),
+        web_authn_policy_passwordless_avoid_same_authenticator_register=dict(type='bool', aliases=['webAuthnPolicyPasswordlessAvoidSameAuthenticatorRegister']),
+        web_authn_policy_passwordless_acceptable_aaguids=dict(
+            type='list', elements='str', aliases=['webAuthnPolicyPasswordlessAcceptableAaguids'], no_log=False
+        ),
+        web_authn_policy_passwordless_extra_origins=dict(
+            type='list', elements='str', aliases=['webAuthnPolicyPasswordlessExtraOrigins'], no_log=False
+        ),
     )
 
     argument_spec.update(meta_args)
