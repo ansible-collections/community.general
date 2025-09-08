@@ -1,0 +1,188 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- hosts: localhost
+  gather_facts: false
+  vars_files:
+    - vaulted_vars.yml
+  vars:
+    timestamp: 2025-01-02T03:04:05Z
+    bar: foobarbaz
+  tasks:
+    - name: Print vaulted values
+      debug:
+        msg:
+          foo: "{{ foo }}"
+
+    - name: Convert values to YAML
+      set_fact:
+        vstr: "{{ 'foo' | community.general.to_yaml }}"
+        vvstr: "{{ foo | community.general.to_yaml }}"
+        vvstr_redact: "{{ foo | community.general.to_yaml(redact_sensitive_values=true) }}"
+        vint: "{{ 42 | community.general.to_yaml }}"
+        vfloat: "{{ -3.1415 | community.general.to_yaml }}"
+        vbool: "{{ true | community.general.to_yaml }}"
+        vtimestamp: "{{ timestamp | community.general.to_yaml }}"
+        vlist: "{{ [1, false, 'bar'] | community.general.to_yaml }}"
+        vdict: "{{ {'a': 'b', 1: 2} | community.general.to_yaml }}"
+
+    - name: Check values
+      assert:
+        that:
+          - 'vstr == "foo\n"'
+          - 'vvstr == "bar\n"'
+          - 'vvstr_redact == "<redacted>\n"'
+          - 'vint == "42\n"'
+          - 'vfloat == "-3.1415\n"'
+          - 'vbool == "true\n"'
+          - 'vtimestamp == "2025-01-02 03:04:05+00:00\n"'
+          - 'vlist == "[1, false, bar]\n"'
+          - 'vdict == "{a: b, 1: 2}\n"'
+
+    - name: Convert values to nice YAML
+      set_fact:
+        vstr: "{{ 'foo' | community.general.to_nice_yaml }}"
+        vvstr: "{{ foo | community.general.to_nice_yaml }}"
+        vvstr_redact: "{{ foo | community.general.to_nice_yaml(redact_sensitive_values=true) }}"
+        vint: "{{ 42 | community.general.to_nice_yaml }}"
+        vfloat: "{{ -3.1415 | community.general.to_nice_yaml }}"
+        vbool: "{{ true | community.general.to_nice_yaml }}"
+        vtimestamp: "{{ timestamp | community.general.to_nice_yaml }}"
+        vlist: "{{ [1, false, 'bar'] | community.general.to_nice_yaml }}"
+        vdict: "{{ {'a': 'b', 1: 2} | community.general.to_nice_yaml }}"
+
+    - name: Check values
+      assert:
+        that:
+          - 'vstr == "foo\n"'
+          - 'vvstr == "bar\n"'
+          - 'vvstr_redact == "<redacted>\n"'
+          - 'vint == "42\n"'
+          - 'vfloat == "-3.1415\n"'
+          - 'vbool == "true\n"'
+          - 'vtimestamp == "2025-01-02 03:04:05+00:00\n"'
+          - 'vlist == "- 1\n- false\n- bar\n"'
+          - 'vdict == "a: b\n1: 2\n"'
+
+    - name: Convert more complex data structure (from vars file)
+      set_fact:
+        complex: "{{ foobar | community.general.to_yaml }}"
+        complex_redact: "{{ foobar | community.general.to_yaml(redact_sensitive_values=true) }}"
+        complex_nice: "{{ foobar | community.general.to_nice_yaml }}"
+        complex_nice_redact: "{{ foobar | community.general.to_nice_yaml(redact_sensitive_values=true) }}"
+
+    - assert:
+        that:
+          - complex == exp_complex
+          - complex_redact == exp_complex_redact
+          - complex_nice == exp_complex_nice
+          - complex_nice_redact == exp_complex_nice_redact
+      vars:
+        exp_complex: |
+          a_list: [bar, ! '2025-02-03 04:05:06', Hello!, true, false]
+          a_value: 123
+        exp_complex_redact: |
+          a_list: [<redacted>, ! '2025-02-03 04:05:06', Hello!, true, false]
+          a_value: 123
+        exp_complex_nice: |
+          a_list:
+          - bar
+          - 2025-02-03 04:05:06
+          - Hello!
+          - true
+          - false
+          a_value: 123
+        exp_complex_nice_redact: |
+          a_list:
+          - <redacted>
+          - 2025-02-03 04:05:06
+          - Hello!
+          - true
+          - false
+          a_value: 123
+
+    - name: Convert more complex data structure (from vars)
+      set_fact:
+        complex: "{{ data | community.general.to_yaml }}"
+        complex_redact: "{{ data | community.general.to_yaml(redact_sensitive_values=true) }}"
+        complex_nice: "{{ data | community.general.to_nice_yaml }}"
+        complex_nice_redact: "{{ data | community.general.to_nice_yaml(redact_sensitive_values=true) }}"
+      vars:
+        data:
+          foo: 123
+          bar: 1.23
+          baz: true
+          bam: foobar
+          bang:
+            - "{{ timestamp }}"
+            - "{{ bar }}"
+            - "{{ foo }}"
+
+    - when: ansible_version.full is version("2.19", "<")
+      assert:
+        that:
+          - complex == exp_complex
+          # With ansible-core 2.18 and before, the vaulted string is decryped before it reaches the filter,
+          # so the redaction does not work there.
+          - complex_redact == exp_complex
+          - complex_nice == exp_complex_nice
+          # With ansible-core 2.18 and before, the vaulted string is decryped before it reaches the filter,
+          # so the redaction does not work there.
+          - complex_nice_redact == exp_complex_nice
+      vars:
+        exp_complex: |
+          bam: foobar
+          bang: ['2025-01-02 03:04:05+00:00', foobarbaz, bar]
+          bar: 1.23
+          baz: true
+          foo: 123
+        exp_complex_nice: |
+          bam: foobar
+          bang:
+          - '2025-01-02 03:04:05+00:00'
+          - foobarbaz
+          - bar
+          bar: 1.23
+          baz: true
+          foo: 123
+
+    - when: ansible_version.full is version("2.19", ">=")
+      assert:
+        that:
+          - complex == exp_complex
+          - complex_redact == exp_complex_redact
+          - complex_nice == exp_complex_nice
+          - complex_nice_redact == exp_complex_nice_redact
+      vars:
+        exp_complex: |
+          bam: foobar
+          bang: [! '2025-01-02 03:04:05+00:00', foobarbaz, bar]
+          bar: 1.23
+          baz: true
+          foo: 123
+        exp_complex_redact: |
+          bam: foobar
+          bang: [! '2025-01-02 03:04:05+00:00', foobarbaz, <redacted>]
+          bar: 1.23
+          baz: true
+          foo: 123
+        exp_complex_nice: |
+          bam: foobar
+          bang:
+          - 2025-01-02 03:04:05+00:00
+          - foobarbaz
+          - bar
+          bar: 1.23
+          baz: true
+          foo: 123
+        exp_complex_nice_redact: |
+          bam: foobar
+          bang:
+          - 2025-01-02 03:04:05+00:00
+          - foobarbaz
+          - <redacted>
+          bar: 1.23
+          baz: true
+          foo: 123
