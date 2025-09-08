@@ -1,5 +1,4 @@
 # Copyright (c) Contributors to the Ansible project
-# (c) 2012, Jeroen Hoekx <jeroen@hoekx.be>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -109,7 +108,6 @@ def to_nice_yaml(value: t.Any, *, redact_sensitive_values: bool = False, indent:
 class FilterModule(object):
     def filters(self):
         return {
-            # 'remove_all_tags': remove_all_tags,  # TODO: can be added as a standalone filter
             'to_yaml': to_yaml,
             'to_nice_yaml': to_nice_yaml,
         }
