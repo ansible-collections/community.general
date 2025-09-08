@@ -6,6 +6,24 @@ Community General Release Notes
 
 This changelog describes changes after version 9.0.0.
 
+v10.7.4
+=======
+
+Release Summary
+---------------
+
+Regular bugfix release.
+
+Bugfixes
+--------
+
+- Avoid deprecated functionality in ansible-core 2.20 (https://github.com/ansible-collections/community.general/pull/10687).
+- apache2_module - check the ``cgi`` module restrictions only during activation (https://github.com/ansible-collections/community.general/pull/10423).
+- kdeconfig - ``kwriteconfig`` executable could not be discovered automatically on systems with only ``kwriteconfig6`` installed. ``kwriteconfig6`` can now be discovered by Ansible (https://github.com/ansible-collections/community.general/issues/10746, https://github.com/ansible-collections/community.general/pull/10751).
+- monit - fix crash caused by an unknown status value returned from the monit service (https://github.com/ansible-collections/community.general/issues/10742, https://github.com/ansible-collections/community.general/pull/10743).
+- pids - prevent error when an empty string is provided for ``name`` (https://github.com/ansible-collections/community.general/issues/10672, https://github.com/ansible-collections/community.general/pull/10688).
+- selective callback plugin - specify ``ansible_loop_var`` instead of the explicit value ``item`` when printing task result (https://github.com/ansible-collections/community.general/pull/10752).
+
 v10.7.3
 =======
 
