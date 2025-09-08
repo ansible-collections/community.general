@@ -1,2 +1,0 @@
-minor_changes:
-  - openbsd_pkg - add ``autoremove`` parameter to remove unused dependencies (https://github.com/ansible-collections/community.general/pull/10705).

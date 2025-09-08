@@ -1598,3 +1598,144 @@ releases:
       - 10688-pids.yml
       - 11.2.1.yml
     release_date: '2025-08-18'
+  11.3.0:
+    changes:
+      bugfixes:
+        - kdeconfig - ``kwriteconfig`` executable could not be discovered automatically
+          on systems with only ``kwriteconfig6`` installed. ``kwriteconfig6`` can
+          now be discovered by Ansible (https://github.com/ansible-collections/community.general/issues/10746,
+          https://github.com/ansible-collections/community.general/pull/10751).
+        - monit - fix crash caused by an unknown status value returned from the monit
+          service (https://github.com/ansible-collections/community.general/issues/10742,
+          https://github.com/ansible-collections/community.general/pull/10743).
+        - pacemaker - use regex for matching ``maintenance-mode`` output to determine
+          cluster maintenance status (https://github.com/ansible-collections/community.general/issues/10426,
+          https://github.com/ansible-collections/community.general/pull/10707).
+        - selective callback plugin - specify ``ansible_loop_var`` instead of the
+          explicit value ``item`` when printing task result (https://github.com/ansible-collections/community.general/pull/10752).
+      deprecated_features:
+        - hiera lookup plugin - retrieving data with Hiera has been deprecated a long
+          time ago; because of that this plugin will be removed from community.general
+          13.0.0. If you disagree with this deprecation, please create an issue in
+          the community.general repository (https://github.com/ansible-collections/community.general/issues/4462,
+          https://github.com/ansible-collections/community.general/pull/10779).
+        - oci_utils module utils - utils is deprecated and will be removed in community.general
+          13.0.0 (https://github.com/ansible-collections/community.general/issues/10318,
+          https://github.com/ansible-collections/community.general/pull/10652).
+        - oci_vcn - module is deprecated and will be removed in community.general
+          13.0.0 (https://github.com/ansible-collections/community.general/issues/10318,
+          https://github.com/ansible-collections/community.general/pull/10652).
+        - oracle* doc fragments - fragments are deprecated and will be removed in
+          community.general 13.0.0 (https://github.com/ansible-collections/community.general/issues/10318,
+          https://github.com/ansible-collections/community.general/pull/10652).
+      minor_changes:
+        - android_sdk - minor refactor to improve readability (https://github.com/ansible-collections/community.general/pull/10712).
+        - django module utils - simplify/consolidate the common settings for the command
+          line (https://github.com/ansible-collections/community.general/pull/10684).
+        - django_check - rename parameter ``database`` to ``databases``, add alias
+          for compatibility (https://github.com/ansible-collections/community.general/pull/10700).
+        - django_check - simplify/consolidate the common settings for the command
+          line (https://github.com/ansible-collections/community.general/pull/10684).
+        - django_createcachetable - simplify/consolidate the common settings for the
+          command line (https://github.com/ansible-collections/community.general/pull/10684).
+        - elasticsearch_plugin - minor refactor to improve readability (https://github.com/ansible-collections/community.general/pull/10712).
+        - filesize - minor refactor to simplify string formatting (https://github.com/ansible-collections/community.general/pull/10727).
+        - github_app_access_token lookup plugin - support both ``jwt`` and ``pyjwt``
+          to avoid conflict with other modules requirements (https://github.com/ansible-collections/community.general/issues/10299).
+        - gitlab_group_access_token - add ``planner`` access level (https://github.com/ansible-collections/community.general/pull/10679).
+        - gitlab_group_access_token - add missing scopes (https://github.com/ansible-collections/community.general/pull/10785).
+        - gitlab_group_variable - support masked-and-hidden variables (https://github.com/ansible-collections/community.general/pull/10787).
+        - gitlab_label - minor refactor to improve readability (https://github.com/ansible-collections/community.general/pull/10711).
+        - gitlab_milestone - minor refactor to improve readability (https://github.com/ansible-collections/community.general/pull/10711).
+        - gitlab_project_access_token - add ``planner`` access level (https://github.com/ansible-collections/community.general/pull/10679).
+        - gitlab_project_access_token - add missing scopes (https://github.com/ansible-collections/community.general/pull/10785).
+        - gitlab_project_variable - support masked-and-hidden variables (https://github.com/ansible-collections/community.general/pull/10787).
+        - gitlab_protected_branch - add ``allow_force_push``, ``code_owner_approval_required``
+          (https://github.com/ansible-collections/community.general/pull/10795, https://github.com/ansible-collections/community.general/issues/6432,
+          https://github.com/ansible-collections/community.general/issues/10289, https://github.com/ansible-collections/community.general/issues/10765).
+        - gitlab_protected_branch - update protected branches if possible instead
+          of recreating them (https://github.com/ansible-collections/community.general/pull/10795).
+        - iocage inventory plugin - minor refactor to improve readability (https://github.com/ansible-collections/community.general/pull/10712).
+        - ipa_host - minor refactor to improve readability (https://github.com/ansible-collections/community.general/pull/10711).
+        - iptables_state - minor refactor to simplify string formatting (https://github.com/ansible-collections/community.general/pull/10727).
+        - keycloak_realm - add support for WebAuthn policy configuration options,
+          including both regular and passwordless WebAuthn policies (https://github.com/ansible-collections/community.general/pull/10791).
+        - lvg_rename - minor refactor to improve readability (https://github.com/ansible-collections/community.general/pull/10711).
+        - manageiq - minor refactor to improve readability (https://github.com/ansible-collections/community.general/pull/10712).
+        - manageiq_alert_profiles - minor refactor to improve readability (https://github.com/ansible-collections/community.general/pull/10712).
+        - manageiq_group - minor refactor to simplify string formatting (https://github.com/ansible-collections/community.general/pull/10727).
+        - manageiq_tenant - minor refactor to simplify string formatting (https://github.com/ansible-collections/community.general/pull/10727).
+        - mssql_db - minor refactor to simplify string formatting (https://github.com/ansible-collections/community.general/pull/10727).
+        - one_vm - minor refactor to improve readability (https://github.com/ansible-collections/community.general/pull/10712).
+        - openbsd_pkg - add ``autoremove`` parameter to remove unused dependencies
+          (https://github.com/ansible-collections/community.general/pull/10705).
+        - openbsd_pkg - minor refactor to simplify string formatting (https://github.com/ansible-collections/community.general/pull/10727).
+        - pacemaker_resource - add ``state=cleanup`` for cleaning up pacemaker resources
+          (https://github.com/ansible-collections/community.general/pull/10413)
+        - pacemaker_resource - add ``state=cloned`` for cloning pacemaker resources
+          or groups (https://github.com/ansible-collections/community.general/issues/10322,
+          https://github.com/ansible-collections/community.general/pull/10665).
+        - pacemaker_resource - the parameter ``name`` is no longer a required parameter
+          in community.general 11.3.0 (https://github.com/ansible-collections/community.general/pull/10413)
+        - parted - using safer mechanism to run external command (https://github.com/ansible-collections/community.general/pull/10642).
+        - random_string lookup plugin - allow to specify seed while generating random
+          string (https://github.com/ansible-collections/community.general/issues/5362,
+          https://github.com/ansible-collections/community.general/pull/10710).
+        - scaleway modules - add a ``scaleway`` group to use ``module_defaults`` (https://github.com/ansible-collections/community.general/pull/10647).
+        - scaleway_container - add a ``cpu_limit`` argument (https://github.com/ansible-collections/community.general/pull/10646).
+        - terraform - minor refactor to improve readability (https://github.com/ansible-collections/community.general/pull/10711).
+        - ufw - minor refactor to simplify string formatting (https://github.com/ansible-collections/community.general/pull/10727).
+        - xenserver module utils - remove redundant constructs from argument specs
+          (https://github.com/ansible-collections/community.general/pull/10769).
+        - xenserver_facts - minor refactor to simplify string formatting (https://github.com/ansible-collections/community.general/pull/10727).
+        - zfs_facts - minor refactor to simplify string formatting (https://github.com/ansible-collections/community.general/pull/10727).
+        - zypper - support the ``--gpg-auto-import-keys`` option in zypper (https://github.com/ansible-collections/community.general/issues/10660,
+          https://github.com/ansible-collections/community.general/pull/10661).
+      release_summary: Regular bugfix and feature release.
+    fragments:
+      - 10299-github_app_access_token-lookup.yml
+      - 10413-pacemaker-resource-cleanup.yml
+      - 10642-parted-cmd-list.yml
+      - 10646-scaleway_container_cpu_limit.yml
+      - 10647-scaleway-module-defaults.yml
+      - 10652-oracle-deprecation.yml
+      - 10661-support-gpg-auto-impor-keys-in-zypper.yml
+      - 10665-pacemaker-resource-clone.yml
+      - 10679-gitlab-access-token-add-planner-role.yml
+      - 10684-django-improvements.yml
+      - 10700-django-check-databases.yml
+      - 10705-openbsd-pkg-remove-unused.yml
+      - 10707-pacemaker-maintenance-mode-regex.yml
+      - 10711-pytohn-idioms-1.yml
+      - 10712-python-idioms-2.yml
+      - 10727-python-idioms-3.yml
+      - 10743-monit-handle-unknown-status.yml
+      - 10751-kdeconfig-support-kwriteconfig6.yml
+      - 10752-selective-hardcoded-loop-var.yml
+      - 10769-xenserver-rf.yml
+      - 10785-gitlab-token-add-missing-scopes.yml
+      - 10787-gitlab-variable-support-masked-and-hidden-variables.yml
+      - 10795-gitlab_protected_branch-add-allow_force_push-code_owner_approval_required.yml
+      - 11.3.0.yml
+      - hiera.yml
+      - keycloak-realm-webauthn-policies.yml
+      - random_string_seed.yml
+    modules:
+      - description: Wrapper for C(django-admin dumpdata).
+        name: django_dumpdata
+        namespace: ''
+      - description: Wrapper for C(django-admin loaddata).
+        name: django_loaddata
+        namespace: ''
+      - description: Manage Pacemaker STONITH.
+        name: pacemaker_stonith
+        namespace: ''
+    plugins:
+      filter:
+        - description: Convert variable to YAML string.
+          name: to_nice_yaml
+          namespace: null
+        - description: Convert variable to YAML string.
+          name: to_yaml
+          namespace: null
+    release_date: '2025-09-08'
