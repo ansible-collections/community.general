@@ -14,3 +14,4 @@
     - include_tasks: 'formulae.yml'
     - include_tasks: 'casks.yml'
     - include_tasks: 'docker.yml'
+    - include_tasks: 'package_names.yml'
