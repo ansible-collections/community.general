@@ -16,7 +16,7 @@ version_added: 1.2.0
 description:
   - Creates a group variable if it does not exist.
   - When a group variable does exist and is not hidden, its value is updated when the values are different.
-  - When a group variable does exist and is hidden, its value is updated. In this case, the module is B(not idempotent).
+    When a group variable does exist and is hidden, its value is updated. In this case, the module is B(not idempotent).
   - Variables which are untouched in the playbook, but are not untouched in the GitLab group, they stay untouched (O(purge=false))
     or are deleted (O(purge=true)).
 author:
@@ -60,7 +60,7 @@ options:
       - Support for environment_scope requires GitLab Premium >= 13.11.
       - Support for protected values requires GitLab >= 9.3.
       - Support for masked values requires GitLab >= 11.10.
-      - Support for hidden values requires GitLab >= 17.4.
+      - Support for hidden values requires GitLab >= 17.4, and was added in community.general 11.3.0.
       - Support for raw values requires GitLab >= 15.7.
       - A C(value) must be a string or a number.
       - Field C(variable_type) must be a string with either V(env_var), which is the default, or V(file).

@@ -13,7 +13,7 @@ short_description: Creates/updates/deletes GitLab Projects Variables
 description:
   - When a project variable does not exist, it is created.
   - When a project variable does exist and is not hidden, its value is updated when the values are different.
-  - When a project variable does exist and is hidden, its value is updated. In this case, the module is B(not idempotent).
+    When a project variable does exist and is hidden, its value is updated. In this case, the module is B(not idempotent).
   - Variables which are untouched in the playbook, but are not untouched in the GitLab project, they stay untouched (O(purge=false))
     or are deleted (O(purge=true)).
 author:
@@ -56,7 +56,7 @@ options:
         control about whether a value should be masked, hidden, raw, protected, or a combination.
       - Support for protected values requires GitLab >= 9.3.
       - Support for masked values requires GitLab >= 11.10.
-      - Support for hidden values requires GitLab >= 17.4.
+      - Support for hidden values requires GitLab >= 17.4, and was added in community.general 11.3.0.
       - Support for raw values requires GitLab >= 15.7.
       - Support for environment_scope requires GitLab Premium >= 13.11.
       - Support for variable_type requires GitLab >= 11.11.
