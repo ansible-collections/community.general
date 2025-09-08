@@ -47,6 +47,12 @@ except ImportError:
     with_httmock = _dummy
 
 
+class MockProtectedBranch():
+    def __init__(self, merge_access_levels, push_access_levels):
+        self.merge_access_levels = merge_access_levels
+        self.push_access_levels = push_access_levels
+
+
 class TestGitlabProtectedBranch(GitlabModuleTestCase):
     @with_httmock(resp_get_project_by_name)
     @with_httmock(resp_get_user)
@@ -66,14 +72,40 @@ class TestGitlabProtectedBranch(GitlabModuleTestCase):
         rvalue = self.moduleUtil.protected_branch_exist(name="master")
         self.assertEqual(rvalue, False)
 
-    @with_httmock(resp_get_protected_branch)
-    def test_compare_protected_branch(self):
-        rvalue = self.moduleUtil.compare_protected_branch(name="master", merge_access_levels="maintainer", push_access_level="maintainer")
+    def test_can_update_zero_delta(self):
+        protected_branch = MockProtectedBranch(
+            merge_access_levels=[{"access_level": 40}],
+            push_access_levels=[{"access_level": 40}],
+        )
+        options = {
+            "merge_access_levels": 40,
+            "push_access_level": 40
+        }
+        rvalue = self.moduleUtil.can_update(protected_branch, options)
         self.assertEqual(rvalue, True)
 
-    @with_httmock(resp_get_protected_branch)
-    def test_compare_protected_branch_different_settings(self):
-        rvalue = self.moduleUtil.compare_protected_branch(name="master", merge_access_levels="developer", push_access_level="maintainer")
+    def test_can_update_no_configured(self):
+        protected_branch = MockProtectedBranch(
+            merge_access_levels=[{"access_level": 40}],
+            push_access_levels=[{"access_level": 40}],
+        )
+        options = {
+            "merge_access_levels": None,
+            "push_access_level": None
+        }
+        rvalue = self.moduleUtil.can_update(protected_branch, options)
+        self.assertEqual(rvalue, True)
+
+    def test_can_update_different_settings(self):
+        protected_branch = MockProtectedBranch(
+            merge_access_levels=[{"access_level": 40}],
+            push_access_levels=[{"access_level": 40}],
+        )
+        options = {
+            "merge_access_levels": 40,
+            "push_access_level": 30
+        }
+        rvalue = self.moduleUtil.can_update(protected_branch, options)
         self.assertEqual(rvalue, False)
 
     @with_httmock(resp_get_protected_branch)
