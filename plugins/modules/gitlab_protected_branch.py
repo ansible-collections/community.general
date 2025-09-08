@@ -58,6 +58,16 @@ options:
     default: maintainer
     type: str
     choices: ["maintainer", "developer", "nobody"]
+  allow_force_push:
+    description:
+      - Whether or not to allow force pushes to the protected branch.
+    type: bool
+    version_added: '11.3.0'
+  code_owner_approval_required:
+    description:
+      - Whether or not to require code owner approval to push.
+    type: bool
+    version_added: '11.3.0'
 """
 
 
@@ -106,27 +116,43 @@ class GitlabProtectedBranch(object):
         except Exception as e:
             return False
 
-    def create_protected_branch(self, name, merge_access_levels, push_access_level):
-        if self._module.check_mode:
-            return True
-        merge = self.ACCESS_LEVEL[merge_access_levels]
-        push = self.ACCESS_LEVEL[push_access_level]
-        self.project.protectedbranches.create({
+    def create_or_update_protected_branch(self, name, options):
+        protected_branch_options = {
             'name': name,
-            'merge_access_level': merge,
-            'push_access_level': push
-        })
+            'allow_force_push': options['allow_force_push'],
+            'code_owner_approval_required': options['code_owner_approval_required'],
+        }
+        protected_branch = self.protected_branch_exist(name=name)
+        changed = False
+        if protected_branch and self.can_update(protected_branch, options):
+            for arg_key, arg_value in protected_branch_options.items():
+                if arg_value is not None:
+                    if getattr(protected_branch, arg_key) != arg_value:
+                        setattr(protected_branch, arg_key, arg_value)
+                        changed = True
+            if changed and not self._module.check_mode:
+                protected_branch.save()
+        else:
+            # Set immutable options only on (re)creation
+            protected_branch_options['merge_access_level'] = options['merge_access_levels']
+            protected_branch_options['push_access_level'] = options['push_access_level']
+            if protected_branch:
+                # Exists, but couldn't update. So, delete first
+                self.delete_protected_branch(name)
+            if not self._module.check_mode:
+                self.project.protectedbranches.create(protected_branch_options)
+            changed = True
 
-    def compare_protected_branch(self, name, merge_access_levels, push_access_level):
-        configured_merge = self.ACCESS_LEVEL[merge_access_levels]
-        configured_push = self.ACCESS_LEVEL[push_access_level]
-        current = self.protected_branch_exist(name=name)
-        current_merge = current.merge_access_levels[0]['access_level']
-        current_push = current.push_access_levels[0]['access_level']
-        if current:
-            if current.name == name and current_merge == configured_merge and current_push == configured_push:
-                return True
-        return False
+        return changed
+
+    def can_update(self, protected_branch, options):
+        # these keys are not set on update the same way they are on creation
+        configured_merge = options['merge_access_levels']
+        configured_push = options['push_access_level']
+        current_merge = protected_branch.merge_access_levels[0]['access_level']
+        current_push = protected_branch.push_access_levels[0]['access_level']
+        return ((configured_merge is None or current_merge == configured_merge) and
+                (configured_push is None or current_push == configured_push))
 
     def delete_protected_branch(self, name):
         if self._module.check_mode:
@@ -142,6 +168,8 @@ def main():
         name=dict(type='str', required=True),
         merge_access_levels=dict(type='str', default="maintainer", choices=["maintainer", "developer", "nobody"]),
         push_access_level=dict(type='str', default="maintainer", choices=["maintainer", "developer", "nobody"]),
+        allow_force_push=dict(type='bool'),
+        code_owner_approval_required=dict(type='bool'),
         state=dict(type='str', default="present", choices=["absent", "present"]),
     )
 
@@ -174,23 +202,24 @@ def main():
 
     gitlab_version = gitlab.__version__
     if LooseVersion(gitlab_version) < LooseVersion('2.3.0'):
-        module.fail_json(msg="community.general.gitlab_proteched_branch requires python-gitlab Python module >= 2.3.0 (installed version: [%s])."
+        module.fail_json(msg="community.general.gitlab_protected_branch requires python-gitlab Python module >= 2.3.0 (installed version: [%s])."
                              " Please upgrade python-gitlab to version 2.3.0 or above." % gitlab_version)
 
     this_gitlab = GitlabProtectedBranch(module=module, project=project, gitlab_instance=gitlab_instance)
 
     p_branch = this_gitlab.protected_branch_exist(name=name)
-    if not p_branch and state == "present":
-        this_gitlab.create_protected_branch(name=name, merge_access_levels=merge_access_levels, push_access_level=push_access_level)
-        module.exit_json(changed=True, msg="Created the proteched branch.")
-    elif p_branch and state == "present":
-        if not this_gitlab.compare_protected_branch(name, merge_access_levels, push_access_level):
-            this_gitlab.delete_protected_branch(name=name)
-            this_gitlab.create_protected_branch(name=name, merge_access_levels=merge_access_levels, push_access_level=push_access_level)
-            module.exit_json(changed=True, msg="Recreated the proteched branch.")
+    options = {
+        "merge_access_levels": this_gitlab.ACCESS_LEVEL[merge_access_levels],
+        "push_access_level": this_gitlab.ACCESS_LEVEL[push_access_level],
+        "allow_force_push": module.params["allow_force_push"],
+        "code_owner_approval_required": module.params["code_owner_approval_required"],
+    }
+    if state == "present":
+        changed = this_gitlab.create_or_update_protected_branch(name, options)
+        module.exit_json(changed=changed, msg="Created or updated the protected branch.")
     elif p_branch and state == "absent":
         this_gitlab.delete_protected_branch(name=name)
-        module.exit_json(changed=True, msg="Deleted the proteched branch.")
+        module.exit_json(changed=True, msg="Deleted the protected branch.")
     module.exit_json(changed=False, msg="No changes are needed.")
 
 
