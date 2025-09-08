@@ -685,7 +685,7 @@ options:
     version_added: 11.3.0
   web_authn_policy_passwordless_require_resident_key:
     description:
-      - Whether resident keys are required for WebAuthn passwordless (Yes/No/not specified).
+      - Whether resident keys are required for WebAuthn passwordless (V(Yes)/V(No)/V(not specified)).
     aliases:
       - webAuthnPolicyPasswordlessRequireResidentKey
     type: str
