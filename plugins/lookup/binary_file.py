@@ -105,10 +105,6 @@ class LookupModule(LookupBase):
                     continue
                 raise AnsibleLookupError(f"Could not locate file in community.general.binary_file lookup: {term}")
 
-            try:
-                with open(path, "rb") as f:
-                    result.append(base64.b64encode(f.read()).decode("utf-8"))
-            except Exception as exc:
-                raise AnsibleLookupError(f"Error while reading {path}: {exc}")
+            result.append(base64.b64encode(self._loader._get_file_contents(path)[0]).decode("utf-8"))
 
         return result
