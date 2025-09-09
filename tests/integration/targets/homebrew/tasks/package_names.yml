@@ -1,7 +1,7 @@
 # A series of package tests that check all the
 # different ways that "brew info" can refer to a package.
 #
-# The homebrew module must mimic what brew info supports, 
+# The homebrew module must mimic what brew info supports,
 # or else errors will occur.
 
 - name: Find brew binary
@@ -31,23 +31,25 @@
 # the valid ways of referring to a cask. That is issue #10804, herein
 # fixed.
 
-- name: Test brew uninstall/install using various names accepted by "brew info" 
+- name: Test brew uninstall/install using various names accepted by "brew info"
   vars:
-    packages: 
+    packages:
       # All packages are carefully selected to have no dependencies, to reduce install time
       # homebrew/cask/kitty crashed on 4867eb4 - Ref: issue #9777
-      - [ kitty, homebrew/cask/kitty, "cask by name with tap prefix" ] 
+      - [kitty, homebrew/cask/kitty, "cask by name with tap prefix"]
       # mdocml test replaces old sqlite3 test, see above.
-      - [ mandoc, mdocml, "formula alias" ]       
-      - [ mandoc, homebrew/core/mdocml, "formula alias with tap prefix" ] 
+      - [mandoc, mdocml, "formula alias"]
+      - [mandoc, homebrew/core/mdocml, "formula alias with tap prefix"]
       # These all crash on f772bcd - Ref: issue #10804
-      - [ cmark, commonmark, "formula with oldnames" ]
-      - [ cmark, homebrew/core/commonmark, "formula with oldnames and tap prefix" ]
-      - [ sipgate, clinq, "cask with old_tokens" ]
-      - [ sipgate, homebrew/cask/clinq, "cask with old_tokens and tap prefix" ]
+      - [cmark, commonmark, "formula with oldnames"]
+      - [
+          cmark,
+          homebrew/core/commonmark,
+          "formula with oldnames and tap prefix",
+        ]
+      - [sipgate, clinq, "cask with old_tokens"]
+      - [sipgate, homebrew/cask/clinq, "cask with old_tokens and tap prefix"]
   include_tasks: package_names_item.yml
   loop: "{{ packages }}"
   loop_control:
     loop_var: package
-
-

@@ -406,16 +406,16 @@ class Homebrew(object):
         #
         # Issue https://github.com/ansible-collections/community.general/issues/10012:
         # package_detail["tap"] is None if package is no longer available.
-        # 
+        #
         # Issue https://github.com/ansible-collections/community.general/issues/10804
         # name can be an alias, oldnames or old_tokens optionally prefixed by tap
-        package_names = { name, full_name }
+        package_names = {name, full_name}
         package_names.update(package_detail.get("aliases", []))
         package_names.update(package_detail.get("oldnames", []))
         package_names.update(package_detail.get("old_tokens", []))
         if package_detail['tap']:
             # names so far, with tap prefix added to each
-            tapped_names = {f"{package_detail["tap"]}/{x}" for x in package_names}
+            tapped_names = {package_detail["tap"] + "/" + x for x in package_names}
             package_names.update(tapped_names)
 
         # Finally, identify which of all those package names was the one supplied by the user.
