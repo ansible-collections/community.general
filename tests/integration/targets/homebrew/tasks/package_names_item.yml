@@ -1,4 +1,9 @@
-# included, having set package variable to the name to test
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# This task block is included by package_names.yml once for each test package,
+# having set package variable to the name to test
 - name: Test one package
   block:
     - debug:

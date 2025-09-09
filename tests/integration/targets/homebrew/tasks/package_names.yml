@@ -1,3 +1,7 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # A series of package tests that check all the
 # different ways that "brew info" can refer to a package.
 #
@@ -42,11 +46,7 @@
       - [mandoc, homebrew/core/mdocml, "formula alias with tap prefix"]
       # These all crash on f772bcd - Ref: issue #10804
       - [cmark, commonmark, "formula with oldnames"]
-      - [
-          cmark,
-          homebrew/core/commonmark,
-          "formula with oldnames and tap prefix",
-        ]
+      - [cmark, homebrew/core/commonmark, "formula with oldnames and tap prefix"]
       - [sipgate, clinq, "cask with old_tokens"]
       - [sipgate, homebrew/cask/clinq, "cask with old_tokens and tap prefix"]
   include_tasks: package_names_item.yml
