@@ -36,7 +36,7 @@ options:
       - Whether the device should exist or not, taking action if the state is different from what is stated.
       - Using O(state=present) creates connection set to be brought up automatically.
       - Using O(state=up) and O(state=down) does not modify connection with other parameters. These states have been added
-        in community.general 9.5.0.
+        in community.general 10.0.0.
     type: str
     required: true
     choices: [absent, present, up, down]
@@ -67,7 +67,7 @@ options:
     type: bool
     required: false
     default: false
-    version_added: 9.5.0
+    version_added: 10.0.0
   ifname:
     description:
       - The interface to bind the connection to.
