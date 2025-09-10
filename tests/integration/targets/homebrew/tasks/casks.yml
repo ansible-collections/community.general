@@ -95,5 +95,3 @@
     - assert:
         that:
           - package_result is not changed
-
-    # Tests for tap prefixes have been moved to package_names.yml
