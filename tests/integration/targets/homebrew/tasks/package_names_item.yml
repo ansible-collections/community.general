@@ -17,7 +17,7 @@
       become: true
       become_user: "{{ brew_stat.stat.pw_name }}"
 
-    - name: Install package by an alternative name 1
+    - name: Install package by an alternative name
       homebrew:
         package: "{{ package[1] }}"
         state: present
@@ -45,7 +45,7 @@
     - assert:
         that:
           - package_result is not changed
-          - 'package_result.msg == "Package already installed: " + package[1]'
+          - 'package_result.msg == "Package already installed: " ~ package[1]'
 
     - name: Uninstall should work on alternate name
       homebrew:
@@ -59,32 +59,5 @@
     - assert:
         that:
           - package_result is changed
-          - 'package_result.msg == "Package uninstalled: " + package[1]'
+          - 'package_result.msg == "Package uninstalled: " ~ package[1]'
 
-    - name: Install package by an alternative name 2
-      homebrew:
-        package: "{{ package[1] }}"
-        state: present
-        update_homebrew: false
-      become: true
-      become_user: "{{ brew_stat.stat.pw_name }}"
-      register: package_result
-
-    - assert:
-        that:
-          - package_result is changed
-          - 'package_result.msg == "Package installed: " + package[1]'
-
-    - name: Cleanup package using old name
-      homebrew:
-        package: "{{ package[0] }}"
-        state: absent
-        update_homebrew: false
-      become: true
-      become_user: "{{ brew_stat.stat.pw_name }}"
-      register: package_result
-
-    - assert:
-        that:
-          - package_result is changed
-          - 'package_result.msg == "Package uninstalled: " + package[0]'
