@@ -60,4 +60,3 @@
         that:
           - package_result is changed
           - 'package_result.msg == "Package uninstalled: " ~ package[1]'
-
