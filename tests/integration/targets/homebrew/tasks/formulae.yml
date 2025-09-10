@@ -303,8 +303,6 @@
           - "package_result.changed_pkgs == []"
           - "package_result.unchanged_pkgs | sort == ['gnu-tar', 'gnu-time']"
 
-# Test alias handling moved to package_names.yml.
-
 # Test install from homebrew tap
 - block:
     - name: Tap hashicorp repository
