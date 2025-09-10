@@ -31,7 +31,7 @@
           - package_result is changed
           - package_result.changed_pkgs[0] == package[1]
           - package_result.unchanged_pkgs | length == 0
-          - 'package_result.msg == "Package installed: " + package[1]'
+          - 'package_result.msg == "Package installed: " ~ package[1]'
 
     - name: Reinstall should do nothing
       homebrew:
