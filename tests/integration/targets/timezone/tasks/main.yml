@@ -74,22 +74,9 @@
     - ansible_distribution == 'Ubuntu'
     - ansible_facts.distribution_major_version is version('24', '>=')
 
-- name: make sure the dbus service is started under systemd
-  systemd:
-    name: dbus
-    state: started
-  when:
-    - ansible_service_mgr == 'systemd'
-    - ansible_distribution == 'Fedora'
-    - ansible_facts.distribution_major_version is version('31', '<')
-
 
 - name: Run tests
-  # Skip tests on Fedora 31 and 32 because dbus fails to start unless the container is run in privileged mode.
-  # Even then, it starts unreliably. This may be due to the move to cgroup v2 in Fedora 31 and 32.
-  # https://www.redhat.com/sysadmin/fedora-31-control-group-v2
   when:
-    - ansible_facts.distribution ~ ansible_facts.distribution_major_version not in ['Fedora31', 'Fedora32']
     - not (ansible_os_family == 'Alpine')  # TODO
     - not (ansible_distribution == 'Archlinux')  # TODO
   block:
