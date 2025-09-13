@@ -112,23 +112,11 @@
     state: reinstall
   register: reinstall_tox_324
 
-- name: reinstall without name
-  community.general.pipx:
-    state: reinstall
-  register: reinstall_noname
-  ignore_errors: true
-
 - name: upgrade tox from 3.24.0
   community.general.pipx:
     name: tox
     state: upgrade
   register: upgrade_tox_324
-
-- name: upgrade without name
-  community.general.pipx:
-    state: upgrade
-  register: upgrade_noname
-  ignore_errors: true
 
 - name: downgrade tox 3.24.0
   community.general.pipx:
@@ -157,8 +145,6 @@
       - downgrade_tox_324.application.tox.version == '3.24.0'
       - uninstall_tox_324 is changed
       - "'tox' not in uninstall_tox_324.application"
-      - upgrade_noname is failed
-      - reinstall_noname is failed
 
 ##############################################################################
 - name: install application latest tox

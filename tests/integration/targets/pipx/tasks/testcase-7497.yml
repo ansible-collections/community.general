@@ -3,25 +3,25 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: ensure application pyinstaller is uninstalled
+- name: ensure application conan is uninstalled
   community.general.pipx:
-    name: pyinstaller
+    name: conan
     state: absent
 
-- name: Install Python Package pyinstaller
+- name: Install conan
   community.general.pipx:
-    name: pyinstaller
+    name: conan
     state: present
     system_site_packages: true
     pip_args: "--no-cache-dir"
-  register: install_pyinstaller
+  register: install_conan
 
-- name: cleanup pyinstaller
+- name: cleanup conan
   community.general.pipx:
-    name: pyinstaller
+    name: conan
     state: absent
 
 - name: check assertions
   assert:
     that:
-      - install_pyinstaller is changed
+      - install_conan is changed
