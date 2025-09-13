@@ -77,7 +77,8 @@ except ImportError:
 HAS_PYTHON_JWT = False  # vs pyjwt
 if HAS_JWT and hasattr(jwt, 'JWT'):
     HAS_PYTHON_JWT = True
-    from jwt import jwk_from_pem, jwt_instance
+    from jwt import jwk_from_pem, JWT
+    jwt_instance = JWT()
 
 try:
     from cryptography.hazmat.primitives import serialization
