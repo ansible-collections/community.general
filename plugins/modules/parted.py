@@ -572,7 +572,7 @@ def parted(script, device, align):
 
         if rc != 0:
             module.fail_json(
-                msg="Error while running parted script: %s" % command.strip(),
+                msg="Error while running parted script: %s" % " ".join(command).strip(),
                 rc=rc, out=out, err=err
             )
 
