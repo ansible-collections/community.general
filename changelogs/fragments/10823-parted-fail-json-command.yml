@@ -1,0 +1,2 @@
+bugfixes:
+  - parted - variable is a list, not text (https://github.com/ansible-collections/community.general/pull/10823, https://github.com/ansible-collections/community.general/issues/10817).
