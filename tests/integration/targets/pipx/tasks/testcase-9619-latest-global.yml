@@ -23,9 +23,9 @@
     global: true
   register: latest_hw
 
-- name: 9619-Ensure application pylint is uninstalled
+- name: 9619-Ensure application hello-world is uninstalled
   community.general.pipx:
-    name: pylint
+    name: hello-world
     state: absent
     global: true
 
