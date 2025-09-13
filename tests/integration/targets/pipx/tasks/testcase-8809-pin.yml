@@ -54,11 +54,7 @@
     - name: Uninstall pycowsay and black (again)
       community.general.pipx:
         state: uninstall
-        name: "{{ item }}"
-      loop:
-        - black
-        - pycowsay
-      register: uninstall_all_2
+        name: pycowsay
 
     - name: Assert pin/unpin
       ansible.builtin.assert:
