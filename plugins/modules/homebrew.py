@@ -385,12 +385,13 @@ class Homebrew(object):
             self.outdated_packages.add(package_name)
 
     def _extract_package_name(self, package_detail, is_cask):
-        # "brew info" can lookup by name, full_name, token, full_token, or aliases
-        # In addition, any name can be prefixed by the tap.
-        # Any of these can be supplied by the user as the package name.  In case
-        # of ambiguity, where a given name might match multiple packages,
-        # formulae are preferred over casks. For all other ambiguities, the
-        # results are an error.  Note that in the homebrew/core and
+        # "brew info" can lookup by name, full_name, token, full_token,
+        # oldnames, old_tokens, or aliases. In addition, any of the
+        # above names can be prefixed by the tap. Any of these can be
+        # supplied by the user as the package name.  In case of
+        # ambiguity, where a given name might match multiple packages,
+        # formulae are preferred over casks. For all other ambiguities,
+        # the results are an error.  Note that in the homebrew/core and
         # homebrew/cask taps, there are no "other" ambiguities.
         if is_cask:  # according to brew info
             name = package_detail["token"]
@@ -405,15 +406,26 @@ class Homebrew(object):
         #
         # Issue https://github.com/ansible-collections/community.general/issues/10012:
         # package_detail["tap"] is None if package is no longer available.
-        tapped_name = [package_detail["tap"] + "/" + name] if package_detail["tap"] else []
-        aliases = package_detail.get("aliases", [])
-        package_names = set([name, full_name] + tapped_name + aliases)
+        #
+        # Issue https://github.com/ansible-collections/community.general/issues/10804
+        # name can be an alias, oldnames or old_tokens optionally prefixed by tap
+        package_names = {name, full_name}
+        package_names.update(package_detail.get("aliases", []))
+        package_names.update(package_detail.get("oldnames", []))
+        package_names.update(package_detail.get("old_tokens", []))
+        if package_detail['tap']:
+            # names so far, with tap prefix added to each
+            tapped_names = {package_detail["tap"] + "/" + x for x in package_names}
+            package_names.update(tapped_names)
 
         # Finally, identify which of all those package names was the one supplied by the user.
         package_names = package_names & set(self.packages)
         if len(package_names) != 1:
             self.failed = True
-            self.message = "Package names are missing or ambiguous: " + ", ".join(str(p) for p in package_names)
+            self.message = "Package names for {name} are missing or ambiguous: {packages}".format(
+                name=name,
+                packages=", ".join(str(p) for p in package_names),
+            )
             raise HomebrewException(self.message)
 
         # Then make sure the user provided name resurface.
