@@ -291,6 +291,8 @@ def run_module():
         output=dict(default='default', choices=['dict', 'default']),
         params=dict(type='dict'),
         transaction=dict(type='bool', default=False),
+        tds_version=dict(type='str', required=False),
+        encryption=dict(type='str', required=False)
     )
 
     result = dict(
@@ -315,6 +317,9 @@ def run_module():
     sql_params = module.params['params']
     # Added param to set the transactional mode (true/false)
     transaction = module.params['transaction']
+    # When connecting to lower versions such as SQL Server 2008, you can try setting tds_version to 7.0 and encryption to off.
+    tds_version = module.params['tds_version']
+    encryption = module.params['encryption']
 
     login_querystring = login_host
     if login_port != 1433:
@@ -326,7 +331,7 @@ def run_module():
 
     try:
         conn = pymssql.connect(
-            user=login_user, password=login_password, host=login_querystring, database=db)
+            user=login_user, password=login_password, host=login_querystring, database=db, encryption=encryption, tds_version=tds_version)
         cursor = conn.cursor()
     except Exception as e:
         if "Unknown database" in str(e):
