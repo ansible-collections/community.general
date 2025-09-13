@@ -7,7 +7,7 @@
   environment:
     PATH: /usr/local/bin:{{ ansible_env.PATH }}
   block:
-    - name: Uninstall pycowsay and black
+    - name: Uninstall pycowsay
       community.general.pipx:
         state: uninstall
         name: pycowsay
@@ -54,11 +54,7 @@
     - name: Uninstall pycowsay and black (again)
       community.general.pipx:
         state: uninstall
-        name: "{{ item }}"
-      loop:
-        - black
-        - pycowsay
-      register: uninstall_all_2
+        name: pycowsay
 
     - name: Assert uninstall-all
       ansible.builtin.assert:

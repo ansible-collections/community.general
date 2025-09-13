@@ -23,9 +23,9 @@
     global: true
   register: upgrade_hw
 
-- name: 9103-Ensure application pylint is uninstalled
+- name: 9103-Ensure application hello-world is uninstalled
   community.general.pipx:
-    name: pylint
+    name: hello-world
     state: absent
     global: true
 
