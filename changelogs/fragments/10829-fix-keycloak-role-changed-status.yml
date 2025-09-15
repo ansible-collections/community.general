@@ -1,0 +1,2 @@
+bugfixes:
+  - keycloak_role - Fixes an issue where `keycloak_role` incorrectly returns `"changed"` when using the alias `clientId` in composite roles (https://github.com/ansible-collections/community.general/pull/10829).
