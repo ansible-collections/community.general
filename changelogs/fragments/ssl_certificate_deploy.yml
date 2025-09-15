@@ -1,0 +1,2 @@
+minor_changes:
+  - "ssl_certificate_deploy - new module for secure SSL certificate deployment to web services with automatic detection, validation, and rollback capabilities"
