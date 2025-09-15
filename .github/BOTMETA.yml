@@ -9,7 +9,7 @@ files:
   plugins/:
     supershipit: quidame
   plugins/modules/web_infrastructure/ssl_certificate_deploy.py:
-    maintainers: shindman
+    maintainers: mangesh-shinde
   changelogs/: {}
   changelogs/fragments/:
     support: community
