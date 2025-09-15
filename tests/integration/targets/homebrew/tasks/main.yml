@@ -14,3 +14,8 @@
     - include_tasks: 'formulae.yml'
     - include_tasks: 'casks.yml'
     - include_tasks: 'docker.yml'
+
+    # Slow tests to exhaustively test install/uninstall on alternate package names,
+    # Commented out for normal use:
+
+    # - include_tasks: 'package_names.yml'
