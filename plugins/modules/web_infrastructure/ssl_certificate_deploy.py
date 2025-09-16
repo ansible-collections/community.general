@@ -16,113 +16,113 @@ DOCUMENTATION = r'''
 module: ssl_certificate_deploy
 short_description: Deploy SSL certificates to web services
 description:
-    - Automatically detect running web services (nginx/httpd/apache2)
-    - Parse configuration files to find SSL certificate paths
-    - Securely copy new certificates to detected locations
-    - Generate comprehensive audit reports with proper logging
-    - Create backups of existing certificates before replacement
-    - Validate certificates before deployment
+  - Automatically detect running web services (nginx/httpd/apache2)
+  - Parse configuration files to find SSL certificate paths
+  - Securely copy new certificates to detected locations
+  - Generate comprehensive audit reports with proper logging
+  - Create backups of existing certificates before replacement
+  - Validate certificates before deployment
 version_added: "11.3.0"
 options:
-    src:
-        description:
-            - Path to the source SSL certificate file
-            - Must be a valid SSL certificate file
-            - "This will be used for SSL certificate files (nginx: ssl_certificate, apache: SSLCertificateFile)"
-        required: true
-        type: path
-    key_src:
-        description:
-            - Path to the SSL private key file
-            - "If not provided, 'src' will be used for key files"
-            - "Used for SSL key files (nginx: ssl_certificate_key, apache: SSLCertificateKeyFile)"
-        required: false
-        type: path
-    chain_src:
-        description:
-            - Path to the SSL certificate chain file
-            - "If not provided, chain files will not be updated"
-            - "Used for SSL chain files (apache: SSLCertificateChainFile)"
-        required: false
-        type: path
-    httpd_conf_path:
-        description: Path to httpd/apache configuration directory
-        default: /etc/httpd/conf.d
-        type: path
-    nginx_conf_path:
-        description: Path to nginx configuration directory
-        default: /etc/nginx/conf.d
-        type: path
-    report_path:
-        description: Path for the audit report JSON file
-        default: /var/log/ssl_renewal.json
-        type: path
-    backup:
-        description: Create backup of existing certificates before replacement
-        default: true
-        type: bool
-    validate_cert:
-        description:
-            - Validate certificate using openssl before copying
-            - Requires openssl command to be available
-        default: true
-        type: bool
-    file_mode:
-        description:
-            - File permissions for certificates in octal notation
-            - "Example: '0644' for rw-r--r--"
-        default: '0644'
-        type: str
-    owner:
-        description: Owner for certificate files
-        default: root
-        type: str
-    group:
-        description: Group for certificate files
-        default: root
-        type: str
-    reload_service:
-        description:
-            - Reload web service after certificate deployment
-            - Service configuration is validated before reload
-        default: true
-        type: bool
-    validate_config:
-        description:
-            - Validate web service configuration before and after certificate deployment
-            - Prevents service failures due to configuration errors
-            - "When true, certificates are tested before deployment and rolled back if validation fails"
-        default: true
-        type: bool
-    strict_validation:
-        description:
-            - Enable strict certificate-key matching validation before any deployment
-            - "When true, certificate and private key compatibility is verified using OpenSSL"
-            - Also validates new certificates against existing keys in destination paths
-            - Prevents deployment of mismatched certificate-key pairs
-        default: true
-        type: bool
-    check_existing_keys:
-        description:
-            - Check if new certificates are compatible with existing keys in destination paths
-            - "When true, prevents deploying certificates that don't match existing keys"
-            - "Helps avoid 'key values mismatch' errors in web server configurations"
-        default: true
-        type: bool
+  src:
+    description:
+      - Path to the source SSL certificate file
+      - Must be a valid SSL certificate file
+      - "This will be used for SSL certificate files (nginx: ssl_certificate, apache: SSLCertificateFile)"
+    required: true
+    type: path
+  key_src:
+    description:
+      - Path to the SSL private key file
+      - "If not provided, 'src' will be used for key files"
+      - "Used for SSL key files (nginx: ssl_certificate_key, apache: SSLCertificateKeyFile)"
+    required: false
+    type: path
+  chain_src:
+    description:
+      - Path to the SSL certificate chain file
+      - "If not provided, chain files will not be updated"
+      - "Used for SSL chain files (apache: SSLCertificateChainFile)"
+    required: false
+    type: path
+  httpd_conf_path:
+    description: Path to httpd/apache configuration directory
+    default: /etc/httpd/conf.d
+    type: path
+  nginx_conf_path:
+    description: Path to nginx configuration directory
+    default: /etc/nginx/conf.d
+    type: path
+  report_path:
+    description: Path for the audit report JSON file
+    default: /var/log/ssl_renewal.json
+    type: path
+  backup:
+    description: Create backup of existing certificates before replacement
+    default: true
+    type: bool
+  validate_cert:
+    description:
+      - Validate certificate using openssl before copying
+      - Requires openssl command to be available
+    default: true
+    type: bool
+  file_mode:
+    description:
+      - File permissions for certificates in octal notation
+      - "Example: '0644' for rw-r--r--"
+    default: '0644'
+    type: str
+  owner:
+    description: Owner for certificate files
+    default: root
+    type: str
+  group:
+    description: Group for certificate files
+    default: root
+    type: str
+  reload_service:
+    description:
+      - Reload web service after certificate deployment
+      - Service configuration is validated before reload
+    default: true
+    type: bool
+  validate_config:
+    description:
+      - Validate web service configuration before and after certificate deployment
+      - Prevents service failures due to configuration errors
+      - "When true, certificates are tested before deployment and rolled back if validation fails"
+    default: true
+    type: bool
+  strict_validation:
+    description:
+      - Enable strict certificate-key matching validation before any deployment
+      - "When true, certificate and private key compatibility is verified using OpenSSL"
+      - Also validates new certificates against existing keys in destination paths
+      - Prevents deployment of mismatched certificate-key pairs
+    default: true
+    type: bool
+  check_existing_keys:
+    description:
+      - Check if new certificates are compatible with existing keys in destination paths
+      - "When true, prevents deploying certificates that don't match existing keys"
+      - "Helps avoid 'key values mismatch' errors in web server configurations"
+    default: true
+    type: bool
 requirements:
-    - openssl (if validate_cert is true)
-    - systemctl or pgrep (for service detection)
+  - openssl (if validate_cert is true)
+  - systemctl or pgrep (for service detection)
 notes:
-    - This module requires root privileges to modify system certificate files
-    - Backup files are created with timestamp suffix for easy identification
-    - The module supports both systemd and non-systemd systems
-    - Configuration files are parsed safely to prevent directory traversal attacks
+  - This module requires root privileges to modify system certificate files
+  - Backup files are created with timestamp suffix for easy identification
+  - The module supports both systemd and non-systemd systems
+  - Configuration files are parsed safely to prevent directory traversal attacks
 seealso:
-    - module: ansible.builtin.copy
-    - module: community.crypto.x509_certificate
-    - module: community.crypto.acme_certificate
+  - module: ansible.builtin.copy
+  - module: community.crypto.x509_certificate
+  - module: community.crypto.acme_certificate
 author:
-    - Mangesh Shinde (@mangesh-shinde)
+  - Mangesh Shinde (@mangesh-shinde)
 '''
 
 
@@ -199,50 +199,50 @@ EXAMPLES = r'''
 
 RETURN = r'''
 changed:
-    description: Whether any changes were made to the system
-    type: bool
-    returned: always
-    sample: true
+  description: Whether any changes were made to the system
+  type: bool
+  returned: always
+  sample: true
 services:
-    description: List of detected web services
-    type: list
-    returned: always
-    sample: ["nginx", "httpd"]
+  description: List of detected web services
+  type: list
+  returned: always
+  sample: ["nginx", "httpd"]
 updated:
-    description: List of updated certificate file paths
-    type: list
-    returned: always
-    sample: ["/etc/nginx/ssl/cert.pem", "/etc/httpd/ssl/cert.pem"]
+  description: List of updated certificate file paths
+  type: list
+  returned: always
+  sample: ["/etc/nginx/ssl/cert.pem", "/etc/httpd/ssl/cert.pem"]
 backed_up:
-    description: List of backup file paths created
-    type: list
-    returned: when backup=true and files existed
-    sample: ["/etc/nginx/ssl/cert.pem.backup.20241213_143022"]
+  description: List of backup file paths created
+  type: list
+  returned: when backup=true and files existed
+  sample: ["/etc/nginx/ssl/cert.pem.backup.20241213_143022"]
 certificates_found:
-    description: Total number of certificate paths found in configurations
-    type: int
-    returned: always
-    sample: 4
+  description: Total number of certificate paths found in configurations
+  type: int
+  returned: always
+  sample: 4
 report:
-    description: Path to the generated audit report file
-    type: str
-    returned: always
-    sample: "/var/log/ssl_renewal.json"
+  description: Path to the generated audit report file
+  type: str
+  returned: always
+  sample: "/var/log/ssl_renewal.json"
 reloaded_services:
-    description: List of services that were successfully reloaded
-    type: list
-    returned: when reload_service=true
-    sample: ["nginx", "httpd"]
+  description: List of services that were successfully reloaded
+  type: list
+  returned: when reload_service=true
+  sample: ["nginx", "httpd"]
 config_validation:
-    description: Configuration validation results for each service
-    type: dict
-    returned: when validate_config=true
-    sample: {"nginx": {"valid": true, "message": "Configuration OK"}}
+  description: Configuration validation results for each service
+  type: dict
+  returned: when validate_config=true
+  sample: {"nginx": {"valid": true, "message": "Configuration OK"}}
 msg:
-    description: Summary message of the operation
-    type: str
-    returned: always
-    sample: "Processed 4 certificate paths for nginx, httpd, updated 2, reloaded 2 services"
+  description: Summary message of the operation
+  type: str
+  returned: always
+  sample: "Processed 4 certificate paths for nginx, httpd, updated 2, reloaded 2 services"
 '''
 
 from ansible.module_utils.basic import AnsibleModule
