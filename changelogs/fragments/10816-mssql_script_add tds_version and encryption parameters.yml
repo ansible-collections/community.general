@@ -1,0 +1,2 @@
+minor_changes:
+  - mssql_script - adds ``tds_version`` and ``encryption`` parameters for pymssql (https://github.com/ansible-collections/community.general/pull/10816).

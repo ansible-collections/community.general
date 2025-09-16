@@ -62,6 +62,14 @@ options:
     type: bool
     default: false
     version_added: 8.4.0
+  encryption:
+    description:
+      - Specify whether to use encryption for the connection to the server, Please refer to the pymssql documentation for detailed information.
+    type: str
+  tds_version:
+    description:
+      - Specify the TDS protocol version to use when connecting to the server, Please refer to the pymssql documentation for detailed information.
+    type: str
   output:
     description:
       - With V(default) each row is returned as a list of values. See RV(query_results).
@@ -330,8 +338,17 @@ def run_module():
             msg="when supplying login_user argument, login_password must also be provided")
 
     try:
-        conn = pymssql.connect(
-            user=login_user, password=login_password, host=login_querystring, database=db, encryption=encryption, tds_version=tds_version)
+        kwargs = {
+            "user": login_user,
+            "password": login_password,
+            "host": login_querystring,
+            "database": db,
+        }
+        if encryption is not None:
+            kwargs["encryption"] = encryption
+        if tds_version is not None:
+            kwargs["tds_version"] = tds_version
+        conn = pymssql.connect(**kwargs)
         cursor = conn.cursor()
     except Exception as e:
         if "Unknown database" in str(e):
