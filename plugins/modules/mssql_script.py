@@ -64,12 +64,16 @@ options:
     version_added: 8.4.0
   encryption:
     description:
-      - Specify whether to use encryption for the connection to the server, Please refer to the pymssql documentation for detailed information.
+      - Specify whether to use encryption for the connection to the server.
+        Please refer to the pymssql documentation for detailed information.
     type: str
+    version_added: 11.4.0
   tds_version:
     description:
-      - Specify the TDS protocol version to use when connecting to the server, Please refer to the pymssql documentation for detailed information.
+      - Specify the TDS protocol version to use when connecting to the server.
+        Please refer to the pymssql documentation for detailed information.
     type: str
+    version_added: 11.4.0
   output:
     description:
       - With V(default) each row is returned as a list of values. See RV(query_results).
