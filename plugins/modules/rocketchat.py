@@ -201,6 +201,7 @@ def build_payload_for_rocketchat(module, text, channel, username, icon_url, icon
         payload = "payload=" + payload
     return payload
 
+
 def do_notify_rocketchat(module, domain, token, protocol, payload, is_pre740):
 
     if token.count('/') < 1:
