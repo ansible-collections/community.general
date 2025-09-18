@@ -1,0 +1,4 @@
+minor_changes:
+  - gitlab_group_variable - add ``description`` option (https://github.com/ansible-collections/community.general/pull/10812).
+  - gitlab_instance_variable - add ``description`` option (https://github.com/ansible-collections/community.general/pull/10812).
+  - gitlab_project_variable - add ``description`` option (https://github.com/ansible-collections/community.general/pull/10812, https://github.com/ansible-collections/community.general/issues/8584, https://github.com/ansible-collections/community.general/issues/10809).

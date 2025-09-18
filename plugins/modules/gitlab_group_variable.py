@@ -87,6 +87,12 @@ options:
           - The variable value.
           - Required when O(state=present).
         type: str
+      description:
+        description:
+          - A description for the variable.
+          - Support for descriptions requires GitLab >= 16.2.
+        type: str
+        version_added: '11.4.0'
       masked:
         description:
           - Whether variable value is masked or not.
@@ -240,6 +246,7 @@ class GitlabGroupVariables(object):
         var = {
             "key": var_obj.get('key'),
             "value": var_obj.get('value'),
+            "description": var_obj.get('description'),
             "masked": var_obj.get('masked'),
             "masked_and_hidden": var_obj.get('hidden'),
             "protected": var_obj.get('protected'),
@@ -348,14 +355,13 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
                     return_value['removed'].append(item)
 
     elif state == 'absent':
-        # value does not matter on removing variables.
-        # key and environment scope are sufficient
-        for item in existing_variables:
-            item.pop('value')
-            item.pop('variable_type')
-        for item in requested_variables:
-            item.pop('value')
-            item.pop('variable_type')
+        # value, type, and description do not matter on removing variables.
+        keys_ignored_on_deletion = ['value', 'variable_type', 'description']
+        for key in keys_ignored_on_deletion:
+            for item in existing_variables:
+                item.pop(key)
+            for item in requested_variables:
+                item.pop(key)
 
         if not purge:
             remove_requested = [x for x in requested_variables if x in existing_variables]
@@ -392,6 +398,7 @@ def main():
         variables=dict(type='list', elements='dict', default=list(), options=dict(
             name=dict(type='str', required=True),
             value=dict(type='str', no_log=True),
+            description=dict(type='str'),
             masked=dict(type='bool', default=False),
             hidden=dict(type='bool', default=False),
             protected=dict(type='bool', default=False),
