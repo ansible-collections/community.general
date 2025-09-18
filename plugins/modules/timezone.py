@@ -47,7 +47,7 @@ options:
     aliases: [rtc]
     choices: [local, UTC]
 notes:
-  - On Ubuntu 24.04 the C(util-linux-extra) package is required to provide the C(hwclock) command.
+  - On Ubuntu 24.04 and Debian 13 (Trixie), the C(util-linux-extra) package is required to provide the C(hwclock) command.
   - On SmartOS the C(sm-set-timezone) utility (part of the smtools package) is required to set the zone timezone.
   - On AIX only Olson/tz database timezones are usable (POSIX is not supported). An OS reboot is also required on AIX for
     the new timezone setting to take effect. Note that AIX 6.1+ is needed (OS level 61 or newer).
