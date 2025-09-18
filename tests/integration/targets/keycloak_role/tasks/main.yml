@@ -3,6 +3,15 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+- name: Delete realm if exists
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    state: absent
+
 - name: Create realm
   community.general.keycloak_realm:
     auth_keycloak_url: "{{ url }}"
@@ -296,6 +305,29 @@
     that:
       - result is not changed
       - result.end_state.composites | length == 3
+
+- name: Change realm role with composites using aliases no change
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "{{ keycloak_role_name }}"
+    realm: "{{ realm }}"
+    description: "{{ keycloak_role_description }}"
+    composite: "{{ keycloak_role_composite }}"
+    composites: "{{ keycloak_role_composites_with_aliases }}"
+    state: present
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Assert realm role with composites using aliases have not changed
+  assert:
+    that:
+      - result is not changed
 
 - name: Remove composite from realm role with composites
   community.general.keycloak_role:
