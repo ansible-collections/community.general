@@ -1,0 +1,2 @@
+bugfixes:
+  - keycloak_group - fixes an issue where module ignores realm when searching subgroups by name (https://github.com/ansible-collections/community.general/pull/10830).
