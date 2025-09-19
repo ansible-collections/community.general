@@ -8,8 +8,6 @@
       - jmespath
   register: result
   until: result is success
-  environment:
-    https_proxy: http://proxy.reg00.rtss.qc.ca:8080/
 
 - name: Wait for Keycloak
   uri:
