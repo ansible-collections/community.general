@@ -1,2 +1,2 @@
-bug_fixes:
+bugfixes:
   - rocketchat - Fix message delivery in Rocket Chat >= 7.5.3 by forcing Content-Type header to application/json instead of the default application/x-www-form-urlencoded (https://github.com/ansible-collections/community.general/pull/10796).
