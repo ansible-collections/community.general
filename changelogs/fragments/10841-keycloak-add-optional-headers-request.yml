@@ -1,0 +1,2 @@
+minor_changes:
+  - keycloak - adds optional headers parameter override for _request method in module_utils/identity/keycloak (https://github.com/ansible-collections/community.general/pull/10841).
