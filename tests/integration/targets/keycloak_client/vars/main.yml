@@ -93,5 +93,5 @@ protocol_mappers3_modifed:
       "user.attribute": "email"
       "jsonType.label": "String"
       "id.token.claim": true
-      "access.token.claim": False
+      "access.token.claim": false
       "userinfo.token.claim": true
