@@ -798,12 +798,12 @@ def normalise_cr(clientrep, remove_ids=False):
     else:
         clientrep['attributes'] = []
 
-    if 'webOrigins' in clientrep: 
+    if 'webOrigins' in clientrep:
         clientrep['webOrigins'] = sorted(clientrep['webOrigins'])
     else:
         clientrep['webOrigins'] = []
 
-    if 'redirectUris' in clientrep: 
+    if 'redirectUris' in clientrep:
         clientrep['redirectUris'] = sorted(clientrep['redirectUris'])
     else:
         clientrep['redirectUris'] = []
@@ -899,7 +899,7 @@ def find_match(iterable, attribut, name):
     """
     Search for an element in a list of dictionaries based on a given attribute and value.
 
-    This function iterates over the elements of an iterable (typically a list of dictionaries) 
+    This function iterates over the elements of an iterable (typically a list of dictionaries)
     and returns the first element whose value for the specified attribute matches `name`.
 
     :param iterable:
