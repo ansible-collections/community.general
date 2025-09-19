@@ -361,7 +361,7 @@
     state: present
     attributes: '{{ client_attributes1 }}'
   register: check_client_when_present_and_attributes_modified
-      
+
 - name: Modify attributes
   community.general.keycloak_client:
     auth_keycloak_url: "{{ url }}"
