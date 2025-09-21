@@ -1671,7 +1671,7 @@ class KeycloakAPI(object):
             return None
 
         for p in name_chain[1:]:
-            for sg in self.get_subgroups(tmp):
+            for sg in self.get_subgroups(tmp, realm):
                 pv, is_id = self._get_normed_group_parent(p)
 
                 if is_id:
