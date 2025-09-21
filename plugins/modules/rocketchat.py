@@ -203,14 +203,17 @@ def build_payload_for_rocketchat(module, text, channel, username, icon_url, icon
     return payload
 
 
-def do_notify_rocketchat(module, domain, token, protocol, payload):
+def do_notify_rocketchat(module, domain, token, protocol, payload, is_pre740):
 
     if token.count('/') < 1:
         module.fail_json(msg="Invalid Token specified, provide a valid token")
 
     rocketchat_incoming_webhook = ROCKETCHAT_INCOMING_WEBHOOK % (protocol, domain, token)
 
-    response, info = fetch_url(module, rocketchat_incoming_webhook, data=payload)
+    headers = None
+    if not is_pre740:
+        headers = {'Content-type': 'application/json'}
+    response, info = fetch_url(module, rocketchat_incoming_webhook, data=payload, headers=headers)
     if info['status'] != 200:
         module.fail_json(msg="failed to send message, return status=%s" % str(info['status']))
 
@@ -248,7 +251,7 @@ def main():
     is_pre740 = module.params['is_pre740']
 
     payload = build_payload_for_rocketchat(module, text, channel, username, icon_url, icon_emoji, link_names, color, attachments, is_pre740)
-    do_notify_rocketchat(module, domain, token, protocol, payload)
+    do_notify_rocketchat(module, domain, token, protocol, payload, is_pre740)
 
     module.exit_json(msg="OK")
 
