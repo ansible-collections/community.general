@@ -362,7 +362,7 @@ options:
   default_client_scopes:
     description:
       - List of default client scopes.
-      - 'Idempotent support added in version 11.4.0: scopes not listed will be removed, and missing scopes will be added.'
+      - 'Idempotent support added in community.general 11.4.0: scopes not listed will be removed, and missing scopes will be added.'
     aliases:
       - defaultClientScopes
     type: list
