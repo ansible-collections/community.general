@@ -359,10 +359,23 @@ options:
       - authenticationFlowBindingOverrides
     version_added: 3.4.0
 
+  client_scopes_behavior:
+    description:
+      - Determine how C(default_client_scopes) and C(optional_client_scopes) behave when updating an existing client.
+      - V(ignore): Do not change the client scopes of an existing client. This is the default for backward compatibility.
+      - V(patch): Add missing scopes, do not remove any missing scopes.
+      - V(idempotent): Make the client scopes exactly as specified, adding and removing scopes as needed.
+    aliases:
+      - clientScopesBehavior
+    type: str
+    choices: ['ignore', 'patch', 'idempotent']
+    default: 'ignore'
+    version_added: 11.4.0
+
   default_client_scopes:
     description:
       - List of default client scopes.
-      - 'Idempotent support added in community.general 11.4.0: scopes not listed will be removed, and missing scopes will be added.'
+      - See O(client_scopes_behavior) for how this behaves when updating an existing client.
     aliases:
       - defaultClientScopes
     type: list
@@ -372,7 +385,7 @@ options:
   optional_client_scopes:
     description:
       - List of optional client scopes.
-      - 'Idempotent support added in version 11.4.0: scopes not listed will be removed, and missing scopes will be added.'
+      - See O(client_scopes_behavior) for how this behaves when updating an existing client.
     aliases:
       - optionalClientScopes
     type: list
@@ -744,6 +757,78 @@ PROTOCOL_SAML = 'saml'
 PROTOCOL_DOCKER_V2 = 'docker-v2'
 CLIENT_META_DATA = ['authorizationServicesEnabled']
 
+def normalise_scopes_for_behavior(desired_client, before_client, clientScopesBehavior):
+    """
+    Normalize the desired and existing client scopes according to the specified behavior.
+
+    This function adjusts the lists of default and optional client scopes in the desired client
+    configuration based on the selected behavior:
+      - 'ignore': The desired scopes are set to match the existing scopes.
+      - 'patch': Any scopes present in the existing configuration but missing from the desired configuration
+        are appended to the desired scopes.
+      - 'idempotent': No modification is made; the desired scopes are used as-is.
+
+    :param desired_client:
+        type: dict
+        description: The desired client configuration, including default and optional client scopes.
+
+    :param before_client:
+        type: dict
+        description: The current client configuration, including default and optional client scopes.
+
+    :param clientScopesBehavior:
+        type: str
+        description: The behavior mode for handling client scopes. Must be one of 'ignore', 'patch', or 'idempotent'.
+
+    :return:
+        type: tuple
+        description: Returns a tuple of (desired_client, before_client) after normalization.
+    """
+    desired_client = copy.deepcopy(desired_client)
+    before_client = copy.deepcopy(before_client)
+    if clientScopesBehavior == 'ignore':
+        desired_client['defaultClientScopes'] = copy.deepcopy(before_client['defaultClientScopes'])
+        desired_client['optionalClientScopes'] = copy.deepcopy(before_client['optionalClientScopes'])
+    elif clientScopesBehavior == 'patch':
+        for scope in before_client['defaultClientScopes']:
+            if scope not in desired_client['defaultClientScopes']:
+                desired_client['defaultClientScopes'].append(scope)
+        for scope in before_client['optionalClientScopes']:
+            if scope not in desired_client['optionalClientScopes']:
+                desired_client['optionalClientScopes'].append(scope)
+
+    return desired_client, before_client
+
+
+def check_optional_scopes_not_default(desired_client, clientScopesBehavior, module):
+    """
+    Ensure that no client scope is assigned as both default and optional.
+
+    This function checks the desired client configuration to verify that no scope is present
+    in both the default and optional client scopes. If such a conflict is found, the module
+    execution fails with an appropriate error message.
+
+    :param desired_client:
+        type: dict
+        description: The desired client configuration, including default and optional client scopes.
+
+    :param clientScopesBehavior:
+        type: str
+        description: The behavior mode for handling client scopes. Must be one of 'ignore', 'patch', or 'idempotent'.
+
+    :param module:
+        type: AnsibleModule
+        description: The Ansible module instance, used to fail execution if a conflict is detected.
+
+    :return:
+        type: None
+        description: Returns None. Fails the module if a scope is both default and optional.
+    """
+    if clientScopesBehavior == 'ignore':
+        return
+    for scope in desired_client['optionalClientScopes']:
+        if scope in desired_client['defaultClientScopes']:
+            module.fail_json(msg='Client scope %s cannot be both default and optional' % scope)
 
 def normalise_cr(clientrep, remove_ids=False):
     """ Re-sorts any properties where the order so that diff's is minimised, and adds default values where appropriate so that the
@@ -918,10 +1003,18 @@ def find_match(iterable, attribut, name):
 
     :return:
         type: dict | None
-        description: Returns the first dictionary where the attribute matches the given value.
+        description: Returns the first dictionary where the attribute matches the given value case insensitive.
                      Returns `None` if no match is found.
     """
-    return next((value for value in iterable if value[attribut] == name), None)
+    name_lower = str(name).lower()
+    return next(
+        (
+            value
+            for value in iterable
+            if attribut in value and str(value[attribut]).lower() == name_lower
+        ),
+        None,
+    )
 
 
 def add_default_client_scopes(desired_client, before_client, realm, kc):
@@ -1153,6 +1246,7 @@ def main():
         ),
         protocol_mappers=dict(type='list', elements='dict', options=protmapper_spec, aliases=['protocolMappers']),
         authorization_settings=dict(type='dict', aliases=['authorizationSettings']),
+        client_scopes_behavior=dict(type='str', aliases=['clientScopesBehavior'], choices=['ignore', 'patch', 'idempotent'], default='ignore'),
         default_client_scopes=dict(type='list', elements='str', aliases=['defaultClientScopes']),
         optional_client_scopes=dict(type='list', elements='str', aliases=['optionalClientScopes']),
     )
@@ -1179,6 +1273,7 @@ def main():
 
     realm = module.params.get('realm')
     cid = module.params.get('id')
+    clientScopesBehavior = module.params.get('client_scopes_behavior')
     state = module.params.get('state')
 
     # Filter and map the parameters names that apply to the client
@@ -1215,6 +1310,8 @@ def main():
             attributes_copy = copy.deepcopy(before_client['attributes'])
             attributes_copy.update(new_param_value)
             new_param_value = attributes_copy
+        elif client_param in ['clientScopesBehavior', 'client_scopes_behavior']:
+            continue
 
         changeset[camel(client_param)] = new_param_value
 
@@ -1262,8 +1359,10 @@ def main():
     else:
         if state == 'present':
             # We can only compare the current client with the proposed updates we have
-            before_norm = normalise_cr(before_client, remove_ids=True)
-            desired_norm = normalise_cr(desired_client, remove_ids=True)
+            desired_client_with_scopes, before_client_with_scopes = normalise_scopes_for_behavior(desired_client, before_client, clientScopesBehavior)
+            check_optional_scopes_not_default(desired_client, clientScopesBehavior, module)
+            before_norm = normalise_cr(before_client_with_scopes, remove_ids=True)
+            desired_norm = normalise_cr(desired_client_with_scopes, remove_ids=True)
             # no changes
             if before_norm == desired_norm:
                 result['changed'] = False
@@ -1275,18 +1374,19 @@ def main():
             result['changed'] = True
 
             if module.check_mode:
+                result['end_state'] = sanitize_cr(desired_client_with_scopes)
                 if module._diff:
-                    result['diff'] = dict(before=sanitize_cr(before_norm),
-                                          after=sanitize_cr(desired_norm))
+                    result['diff'] = dict(before=sanitize_cr(before_client),
+                                          after=sanitize_cr(desired_client))
                 module.exit_json(**result)
 
             # do the update
             kc.update_client(cid, desired_client, realm=realm)
 
-            remove_default_client_scopes(desired_client, before_client, realm, kc)
-            remove_optional_client_scopes(desired_client, before_client, realm, kc)
-            add_default_client_scopes(desired_client, before_client, realm, kc)
-            add_optional_client_scopes(desired_client, before_client, realm, kc)
+            remove_default_client_scopes(desired_client_with_scopes, before_client_with_scopes, realm, kc)
+            remove_optional_client_scopes(desired_client_with_scopes, before_client_with_scopes, realm, kc)
+            add_default_client_scopes(desired_client_with_scopes, before_client_with_scopes, realm, kc)
+            add_optional_client_scopes(desired_client_with_scopes, before_client_with_scopes, realm, kc)
 
             after_client = kc.get_client_by_id(cid, realm=realm)
             normalize_kc_resp(after_client)
