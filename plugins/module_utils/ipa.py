@@ -211,5 +211,5 @@ def ipa_argument_spec():
         ipa_user=dict(type='str', default='admin', fallback=(env_fallback, ['IPA_USER'])),
         ipa_pass=dict(type='str', no_log=True, fallback=(env_fallback, ['IPA_PASS'])),
         ipa_timeout=dict(type='int', default=10, fallback=(env_fallback, ['IPA_TIMEOUT'])),
-        validate_certs=dict(type='bool', default=True),
+        validate_certs=dict(type='bool', default=True, fallback=(env_fallback, ['IPA_VALIDATE_CERTS'])),
     )
