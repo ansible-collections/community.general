@@ -44,8 +44,7 @@ options:
         # TODO: determine whether it is OK to change to: type: float
 """
 
-
-import codecs
+import os
 
 import yaml
 
@@ -60,9 +59,9 @@ class CacheModule(BaseFileCacheModule):
     """
 
     def _load(self, filepath):
-        with codecs.open(filepath, 'r', encoding='utf-8') as f:
+        with open(os.path.abspath(filepath), 'r', encoding='utf-8') as f:
             return AnsibleLoader(f).get_single_data()
 
     def _dump(self, value, filepath):
-        with codecs.open(filepath, 'w', encoding='utf-8') as f:
+        with open(os.path.abspath(filepath), 'w', encoding='utf-8') as f:
             yaml.dump(value, f, Dumper=AnsibleDumper, default_flow_style=False)
