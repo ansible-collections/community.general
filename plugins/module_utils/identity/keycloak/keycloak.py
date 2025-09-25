@@ -384,11 +384,8 @@ class KeycloakAPI(object):
         :param headers headers to be sent with request, defaults to self.restheaders
         :return: raw API response
         """
-        def make_request_catching_401():
+        def make_request_catching_401(headers):
             try:
-                if headers is None:
-                    headers = self.restheaders
-
                 return open_url(url, method=method, data=data,
                                 http_agent=self.http_agent, headers=headers,
                                 timeout=self.connection_timeout,
@@ -398,7 +395,10 @@ class KeycloakAPI(object):
                     raise e
                 return e
 
-        r = make_request_catching_401()
+        if headers is None:
+            headers = self.restheaders
+
+        r = make_request_catching_401(headers)
 
         if isinstance(r, Exception):
             # Try to refresh token and retry, if available
