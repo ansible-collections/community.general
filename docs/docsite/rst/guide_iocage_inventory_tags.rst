@@ -19,7 +19,7 @@ Quoting `man iocage <https://man.freebsd.org/cgi/man.cgi?query=iocage>`_
          Default: none
          Source: local
 
-We will use the format `notes="tag1=value1 tag2=value2 ..."`.
+We will use the format ``notes="tag1=value1 tag2=value2 ..."``.
 
 .. note::
 
