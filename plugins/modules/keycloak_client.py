@@ -757,6 +757,7 @@ PROTOCOL_SAML = 'saml'
 PROTOCOL_DOCKER_V2 = 'docker-v2'
 CLIENT_META_DATA = ['authorizationServicesEnabled']
 
+
 def normalise_scopes_for_behavior(desired_client, before_client, clientScopesBehavior):
     """
     Normalize the desired and existing client scopes according to the specified behavior.
@@ -829,6 +830,7 @@ def check_optional_scopes_not_default(desired_client, clientScopesBehavior, modu
     for scope in desired_client['optionalClientScopes']:
         if scope in desired_client['defaultClientScopes']:
             module.fail_json(msg='Client scope %s cannot be both default and optional' % scope)
+
 
 def normalise_cr(clientrep, remove_ids=False):
     """ Re-sorts any properties where the order so that diff's is minimised, and adds default values where appropriate so that the
