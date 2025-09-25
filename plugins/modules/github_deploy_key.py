@@ -284,6 +284,8 @@ class GithubDeployKey(object):
         body = info.get('body')
         if body:
             err = self.module.from_json(body)['message']
+        else:
+            err = None
 
         if status_code == 401:
             self.module.fail_json(msg="Failed to connect to {0} due to invalid credentials".format(self.github_url), http_status_code=status_code, error=err)
