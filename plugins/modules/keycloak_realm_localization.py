@@ -301,7 +301,7 @@ def main():
         # - to_update: keys missing or with different values
         # - to_remove: keys existing in current state but not in desired
         to_update = []
-        to_remove = list(old_overrides)
+        to_remove = deepcopy(old_overrides)
 
         # Mark updates and remove matched ones from to_remove
         for record in desired_overrides:
