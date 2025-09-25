@@ -43,6 +43,77 @@
     - "{{ realm_role_admin }}"
     - "{{ realm_role_user }}"
 
+#############################
+### Additional Steps which lead to failure
+
+- name: Client private 2
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "client_name_private_2"
+    state: present
+    redirect_uris:
+      - "https://my-backend-api.c.org/"
+    fullScopeAllowed: false
+    attributes: "{{client_attributes1}}"
+    public_client: false
+
+- name: Create a Keycloak client role for Client private 2
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "{{ item }}"
+    realm: "{{ realm }}"
+    client_id: "client_name_private_2"
+  with_items:
+    - "client_role_admin_2"
+    - "client_role_user_2"
+
+- name: Create client scope
+  community.general.keycloak_clientscope:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+
+    name: client_scope_name
+    protocol: openid-connect
+    attributes:
+      "include.in.token.scope": "true"
+      "display.on.consent.screen": "false"
+    state: present
+  register: new_scope
+
+# This step fails - expectation was for role to be assigned to client scope - when making suggested changes this steps works
+# when client_scope_id is given instead the {{ client_name_private }} (as for the task 'Map roles to public client') this step does not fail, however no role is assigned to this scope
+# With the fix I am providing, when client_scope_id is provided with the scope_id (as opposed to a client name), the role is indeed assigned
+# to the scope but the 'Map roles to public client' task fails probably for the reverse reasons
+# Unless mistaken, somehow the underlying code seems to be confusing the notion of a client_scope_id with that of a client_id
+
+- name: STEP which fails - Assign admin role to client scope
+  community.general.keycloak_client_rolescope:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+
+    client_scope_id: "{{ new_scope.end_state.id}}"
+    # client_scope_id: "{{ client_name_private }}"
+    client_id: "client_name_private_2"
+
+    role_names:
+      - "client_role_admin_2"
+    state: present
+
+#############################
+
 - name: Client private
   community.general.keycloak_client:
     auth_keycloak_url: "{{ url }}"
@@ -55,7 +126,7 @@
     redirect_uris:
       - "https://my-backend-api.c.org/"
     fullScopeAllowed: true
-    attributes: '{{client_attributes1}}'
+    attributes: "{{client_attributes1}}"
     public_client: false
 
 - name: Create a Keycloak client role
@@ -81,10 +152,9 @@
     client_id: "{{ client_name_public }}"
     redirect_uris:
       - "https://my-onepage-app-frontend.c.org/"
-    attributes: '{{client_attributes1}}'
+    attributes: "{{client_attributes1}}"
     full_scope_allowed: false
     public_client: true
-
 
 - name: Map roles to public client
   community.general.keycloak_client_rolescope:
