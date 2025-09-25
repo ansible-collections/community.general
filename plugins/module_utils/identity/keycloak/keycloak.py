@@ -617,7 +617,7 @@ def get_localization_values(self, locale, realm="master"):
             return self._request_and_deserialize(realm_url, method='GET')
         except Exception as e:
             self.fail_request(e, msg='Could not read localization overrides for realm %s, locale %s: %s' % (realm, locale, str(e)),
-                               exception=traceback.format_exc())
+                              exception=traceback.format_exc())
 
 def set_localization_value(self, locale, key, value, realm="master"):
     """
@@ -644,7 +644,7 @@ def set_localization_value(self, locale, key, value, realm="master"):
             return self._request(realm_url, method='PUT', data=to_native(value), headers=headers)
         except Exception as e:
             self.fail_request(e, msg='Could not set localization value in realm %s, locale %s: %s=%s: %s' % (realm, locale, key, value, str(e)),
-                               exception=traceback.format_exc())
+                              exception=traceback.format_exc())
 
 def delete_localization_value(self, locale, key, realm="master"):
     """
@@ -667,7 +667,7 @@ def delete_localization_value(self, locale, key, realm="master"):
             return self._request(realm_url, method='DELETE')
         except Exception as e:
             self.fail_request(e, msg='Could not delete localization value in realm %s, locale %s, key %s: %s' % (realm, locale, key, str(e)),
-                               exception=traceback.format_exc())
+                              exception=traceback.format_exc())
 
     def get_clients(self, realm: str = "master", filter=None):
         """Obtains client representations for clients in a realm

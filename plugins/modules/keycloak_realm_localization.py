@@ -1,5 +1,5 @@
 # Python
-#!/usr/bin/python
+# !/usr/bin/python
 # -*- coding: utf-8 -*-
 
 # This Ansible module manages realm localization overrides in Keycloak.
@@ -13,8 +13,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: keycloak_realm_localization
 
 short_description: Manage Keycloak realm localization overrides via the Keycloak API
@@ -23,7 +22,7 @@ version_added: 10.5.0
 
 description:
     - Manage per-locale message overrides for a Keycloak realm using the Keycloak Admin REST API.
-      Requires access via OpenID Connect; the connecting user/client must have sufficient privileges.
+    - Requires access via OpenID Connect; the connecting user/client must have sufficient privileges.
     - The names of module options are snake_cased versions of the names found in the Keycloak API.
 
 attributes:
@@ -46,16 +45,16 @@ options:
     state:
         description:
             - Desired state of localization overrides for the given locale.
-            - On C(present), the set of overrides for the locale will be made to match C(overrides) exactly:
-              keys not listed in C(overrides) will be removed, and listed keys will be created or updated.
+            - On C(present), the set of overrides for the locale will be made to match C(overrides) exactly
+            - keys not listed in C(overrides) will be removed, and listed keys will be created or updated.
             - On C(absent), all overrides for the locale will be removed.
         type: str
-        choices: [present, absent]
+        choices: ['present', 'absent']
         default: present
     overrides:
         description:
             - List of overrides to ensure for the locale when C(state=present). Each item is a mapping with
-              the message C(key) and its C(value).
+            - the message C(key) and its C(value).
             - Ignored when C(state=absent).
         type: list
         elements: dict
@@ -74,13 +73,14 @@ options:
 
 extends_documentation_fragment:
     - community.general.keycloak
+    - community.general.keycloak.actiongroup_keycloak
     - community.general.attributes
 
 author:
     - Jakub Danek (@danekja)
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Replace all overrides for locale "en" (credentials auth)
   community.general.keycloak_realm_localization:
     auth_client_id: admin-cli
@@ -123,7 +123,7 @@ EXAMPLES = '''
     state: absent
   delegate_to: localhost
 
-- name: Dry run: see what would change for locale "en"
+- name: Dry run - see what would change for locale "en"
   community.general.keycloak_realm_localization:
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
@@ -138,9 +138,9 @@ EXAMPLES = '''
         value: "Hello again"
   check_mode: true
   delegate_to: localhost
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 msg:
     description: Human-readable message about what action was taken.
     returned: always
@@ -173,16 +173,28 @@ diff:
     type: dict
     contains:
         before:
+            description: State of localization overrides before execution
             type: dict
+            sample:
+              - key: greeting
+                value: Hello
+              - key: farewell
+                value: Bye
         after:
+            description: State of localization overrides after execution
             type: dict
-'''
-
+            sample:
+              - key: greeting
+                value: Hello
+              - key: farewell
+                value: Bye
+"""
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, \
     keycloak_argument_spec, get_token, KeycloakError
 from ansible.module_utils.basic import AnsibleModule
 from copy import deepcopy
+
 
 def _normalize_overrides_from_api(current):
     """
@@ -218,7 +230,7 @@ def main():
 
     # Describe a single override record
     overrides_spec = dict(
-        key=dict(type='str', required=True),
+        key=dict(type='str', no_log=False, required=True),
         value=dict(type='str', required=True),
     )
 
@@ -340,7 +352,12 @@ def main():
             result['msg'] = "Locale %s overrides are in sync." % (locale)
 
         # For accurate end_state, read back from API unless we are in check_mode
-        final_overrides = _normalize_overrides_from_api(kc.get_localization_values(locale, parent_id) or {}) if not module.check_mode else changeset['overrides']
+        if not module.check_mode:
+            final_overrides = _normalize_overrides_from_api(kc.get_localization_values(locale, parent_id) or {})
+
+        else:
+            final_overrides = ['overrides']
+
         result['end_state'] = {'locale': locale, 'overrides': final_overrides}
 
     elif state == 'absent':
@@ -366,7 +383,6 @@ def main():
             result['msg'] = "Locale %s has no overrides." % (locale)
 
         result['end_state'] = changeset
-
 
     module.exit_json(**result)
 
