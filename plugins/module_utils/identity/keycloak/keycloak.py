@@ -404,11 +404,8 @@ class KeycloakAPI:
         :return: raw API response
         """
 
-        def make_request_catching_401() -> object | HTTPError:
+        def make_request_catching_401(headers) -> object | HTTPError:
             try:
-                if headers is None:
-                    headers = self.restheaders
-
                 return open_url(
                     url,
                     method=method,
@@ -423,7 +420,10 @@ class KeycloakAPI:
                     raise e
                 return e
 
-        r = make_request_catching_401()
+        if headers is None:
+            headers = self.restheaders
+
+        r = make_request_catching_401(headers)
 
         if isinstance(r, Exception):
             # Try to refresh token and retry, if available
