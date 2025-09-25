@@ -21,63 +21,63 @@ short_description: Manage Keycloak realm localization overrides via the Keycloak
 version_added: 10.5.0
 
 description:
-    - Manage per-locale message overrides for a Keycloak realm using the Keycloak Admin REST API.
-    - Requires access via OpenID Connect; the connecting user/client must have sufficient privileges.
-    - The names of module options are snake_cased versions of the names found in the Keycloak API.
+  - Manage per-locale message overrides for a Keycloak realm using the Keycloak Admin REST API.
+  - Requires access via OpenID Connect; the connecting user/client must have sufficient privileges.
+  - The names of module options are snake_cased versions of the names found in the Keycloak API.
 
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: full
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
 
 options:
-    locale:
+  locale:
+    description:
+      - Locale code for which the overrides apply (for example, C(en), C(fi), C(de)).
+    type: str
+    required: true
+  parent_id:
+    description:
+      - Name of the realm that owns the locale overrides.
+    type: str
+    required: true
+  state:
+    description:
+      - Desired state of localization overrides for the given locale.
+      - On C(present), the set of overrides for the locale will be made to match C(overrides) exactly
+      - keys not listed in C(overrides) will be removed, and listed keys will be created or updated.
+      - On C(absent), all overrides for the locale will be removed.
+    type: str
+    choices: ['present', 'absent']
+    default: present
+  overrides:
+    description:
+      - List of overrides to ensure for the locale when C(state=present). Each item is a mapping with
+      - the message C(key) and its C(value).
+      - Ignored when C(state=absent).
+    type: list
+    elements: dict
+    default: []
+    suboptions:
+      key:
         description:
-            - Locale code for which the overrides apply (for example, C(en), C(fi), C(de)).
+          - The message key to override.
         type: str
         required: true
-    parent_id:
+      value:
         description:
-            - Name of the realm that owns the locale overrides.
+          - The override value for the message key.
         type: str
         required: true
-    state:
-        description:
-            - Desired state of localization overrides for the given locale.
-            - On C(present), the set of overrides for the locale will be made to match C(overrides) exactly
-            - keys not listed in C(overrides) will be removed, and listed keys will be created or updated.
-            - On C(absent), all overrides for the locale will be removed.
-        type: str
-        choices: ['present', 'absent']
-        default: present
-    overrides:
-        description:
-            - List of overrides to ensure for the locale when C(state=present). Each item is a mapping with
-            - the message C(key) and its C(value).
-            - Ignored when C(state=absent).
-        type: list
-        elements: dict
-        default: []
-        suboptions:
-            key:
-                description:
-                    - The message key to override.
-                type: str
-                required: true
-            value:
-                description:
-                    - The override value for the message key.
-                type: str
-                required: true
 
 extends_documentation_fragment:
-    - community.general.keycloak
-    - community.general.keycloak.actiongroup_keycloak
-    - community.general.attributes
+  - community.general.keycloak
+  - community.general.keycloak.actiongroup_keycloak
+  - community.general.attributes
 
 author:
-    - Jakub Danek (@danekja)
+  - Jakub Danek (@danekja)
 """
 
 EXAMPLES = r"""
@@ -142,52 +142,52 @@ EXAMPLES = r"""
 
 RETURN = r"""
 msg:
-    description: Human-readable message about what action was taken.
-    returned: always
-    type: str
+  description: Human-readable message about what action was taken.
+  returned: always
+  type: str
 end_state:
-    description:
-      - Final state of localization overrides for the locale after module execution.
-      - Contains the C(locale) and the list of C(overrides) as key/value items.
-    returned: on success
-    type: dict
-    contains:
-        locale:
-            description: The locale code affected.
-            type: str
-            sample: en
-        overrides:
-            description: The list of overrides that exist after execution.
-            type: list
-            elements: dict
-            sample:
-              - key: greeting
-                value: Hello
-              - key: farewell
-                value: Bye
+  description:
+    - Final state of localization overrides for the locale after module execution.
+    - Contains the C(locale) and the list of C(overrides) as key/value items.
+  returned: on success
+  type: dict
+  contains:
+    locale:
+      description: The locale code affected.
+      type: str
+      sample: en
+    overrides:
+      description: The list of overrides that exist after execution.
+      type: list
+      elements: dict
+      sample:
+        - key: greeting
+          value: Hello
+        - key: farewell
+          value: Bye
 diff:
-    description:
-      - When run with C(--diff), shows the before and after structures
-        for the locale and its overrides.
-    returned: when supported and requested
-    type: dict
-    contains:
-        before:
-            description: State of localization overrides before execution
-            type: dict
-            sample:
-              - key: greeting
-                value: Hello
-              - key: farewell
-                value: Bye
-        after:
-            description: State of localization overrides after execution
-            type: dict
-            sample:
-              - key: greeting
-                value: Hello
-              - key: farewell
-                value: Bye
+  description:
+    - When run with C(--diff), shows the before and after structures
+      for the locale and its overrides.
+  returned: when supported and requested
+  type: dict
+  contains:
+    before:
+      description: State of localization overrides before execution
+      type: dict
+      sample:
+        - key: greeting
+          value: Hello
+        - key: farewell
+          value: Bye
+    after:
+      description: State of localization overrides after execution
+      type: dict
+      sample:
+        - key: greeting
+          value: Hello
+        - key: farewell
+          value: Bye
 """
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, \
