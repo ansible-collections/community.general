@@ -19,7 +19,7 @@ from ansible_collections.community.general.plugins.modules import keycloak_realm
 
 from itertools import count
 
-from ansible.module_utils.six import StringIO
+from io import StringIO
 
 
 @contextmanager
@@ -244,7 +244,7 @@ class TestKeycloakRealmLocalization(ModuleTestCase):
             'locale': 'en',
             'state': 'present',
             'overrides': [
-                {'key': 'greeting', 'value': None},
+                {'key': 'greeting'},
             ],
         }
 
@@ -255,7 +255,7 @@ class TestKeycloakRealmLocalization(ModuleTestCase):
                     with self.assertRaises(AnsibleFailJson) as exec_info:
                         self.module.main()
 
-        self.assertIn("requires 'value' for keys", exec_info.exception.args[0]['msg'])
+        self.assertIn("missing required arguments: value", exec_info.exception.args[0]['msg'])
 
 
 if __name__ == '__main__':
