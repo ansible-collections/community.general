@@ -198,9 +198,8 @@ from copy import deepcopy
 
 def _normalize_overrides_from_api(current):
     """
-    Accept either:
+    Accepts:
       - dict: {'k1': 'v1', ...}
-      - list of dicts: [{'key': 'k1', 'value': 'v1'}, ...]
     Return a sorted list of {'key', 'value'}.
 
     This helper provides a consistent shape for downstream comparison/diff logic.
@@ -208,12 +207,8 @@ def _normalize_overrides_from_api(current):
     if not current:
         return []
 
-    if isinstance(current, dict):
-        # Convert mapping to list of key/value dicts
-        items = [{'key': k, 'value': v} for k, v in current.items()]
-    else:
-        # Assume a list of dicts with keys 'key' and 'value'
-        items = [{'key': o['key'], 'value': o.get('value')} for o in current]
+    # Convert mapping to list of key/value dicts
+    items = [{'key': k, 'value': v} for k, v in current.items()]
 
     # Sort for stable comparisons and diff output
     return sorted(items, key=lambda x: x['key'])
@@ -266,14 +261,7 @@ def main():
     state = module.params.get('state')
     parent_id = module.params.get('parent_id')
 
-    # Desired overrides: deduplicate by key via dict (last wins), then sort
     desired_raw = module.params.get('overrides') or []
-    if state == 'present':
-        # Validate that all keys have a value in present mode
-        missing_values = [r['key'] for r in desired_raw if r.get('value') is None]
-        if missing_values:
-            module.fail_json(msg="state=present requires 'value' for keys: %s" % ", ".join(missing_values))
-
     desired_map = {r['key']: r.get('value') for r in desired_raw}
     desired_overrides = [{'key': k, 'value': v} for k, v in sorted(desired_map.items())]
 
@@ -327,7 +315,7 @@ def main():
                 result['changed'] = True
 
         # Any leftovers in to_remove must be deleted
-        if len(to_remove) > 0:
+        if to_remove:
             result['changed'] = True
 
         if result['changed']:
