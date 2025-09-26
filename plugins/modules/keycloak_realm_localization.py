@@ -18,7 +18,7 @@ module: keycloak_realm_localization
 
 short_description: Manage Keycloak realm localization overrides via the Keycloak API
 
-version_added: 10.5.0
+version_added: 11.4.0
 
 description:
   - Manage per-locale message overrides for a Keycloak realm using the Keycloak Admin REST API.
