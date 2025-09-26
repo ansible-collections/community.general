@@ -69,7 +69,7 @@ options:
 
 seealso:
   - module: community.general.keycloak_realm
-    description: Keycloak module which can be used specify list of supported locales using O(community.general.keycloak_realm#module:supported_locales).
+    description: You can specify list of supported locales using O(community.general.keycloak_realm#module:supported_locales).
 
 extends_documentation_fragment:
   - community.general.keycloak
