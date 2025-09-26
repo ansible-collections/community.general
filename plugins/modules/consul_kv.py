@@ -20,7 +20,7 @@ description:
     of the results.
   - See http://www.consul.io/docs/agent/http.html#kv for more details.
 requirements:
-  - python-consul
+  - py-consul
   - requests
 author:
   - Steve Gargan (@sgargan)
