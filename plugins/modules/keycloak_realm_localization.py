@@ -2,11 +2,7 @@
 # !/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# This Ansible module manages realm localization overrides in Keycloak.
-# It ensures the set of message key/value overrides for a given locale
-# either matches the provided list (state=present) or is fully removed (state=absent).
-
-# Copyright (c) 2025, Jakub Danek <danek.ja@gmail.com>
+# Copyright: Contributors to the Ansible project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or
 # https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
