@@ -30,7 +30,7 @@ attributes:
 options:
   locale:
     description:
-      - Locale code for which the overrides apply (for example, C(en), C(fi), C(de)).
+      - Locale code for which the overrides apply (for example, V(en), V(fi), V(de)).
     type: str
     required: true
   parent_id:
@@ -41,17 +41,17 @@ options:
   state:
     description:
       - Desired state of localization overrides for the given locale.
-      - On C(present), the set of overrides for the locale will be made to match C(overrides) exactly
-      - keys not listed in C(overrides) will be removed, and listed keys will be created or updated.
-      - On C(absent), all overrides for the locale will be removed.
+      - On V(present), the set of overrides for the locale will be made to match O(overrides) exactly.
+      - Keys not listed in O(overrides) will be removed, and the listed keys will be created or updated.
+      - On V(absent), all overrides for the locale will be removed.
     type: str
     choices: ['present', 'absent']
     default: present
   overrides:
     description:
-      - List of overrides to ensure for the locale when C(state=present). Each item is a mapping with
-      - the message C(key) and its C(value).
-      - Ignored when C(state=absent).
+      - List of overrides to ensure for the locale when O(state=present). Each item is a mapping with
+        the record's O(overrides.key) and its O(overrides.value).
+      - Ignored when O(state=absent).
     type: list
     elements: dict
     default: []
@@ -67,13 +67,16 @@ options:
         type: str
         required: true
 
+seealso:
+  - module: community.general.keycloak_realm
+    description: Keycloak module which can be used specify list of supported locales using O(plugin.community.keycloak.general.keycloak_realm#module:supported_locales).
+
 extends_documentation_fragment:
   - community.general.keycloak
   - community.general.keycloak.actiongroup_keycloak
   - community.general.attributes
 
-author:
-  - Jakub Danek (@danekja)
+author: Jakub Danek (@danekja)
 """
 
 EXAMPLES = r"""
@@ -137,14 +140,10 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
-msg:
-  description: Human-readable message about what action was taken.
-  returned: always
-  type: str
 end_state:
   description:
     - Final state of localization overrides for the locale after module execution.
-    - Contains the C(locale) and the list of C(overrides) as key/value items.
+    - Contains the O(locale) and the list of O(overrides) as key/value items.
   returned: on success
   type: dict
   contains:
@@ -156,29 +155,6 @@ end_state:
       description: The list of overrides that exist after execution.
       type: list
       elements: dict
-      sample:
-        - key: greeting
-          value: Hello
-        - key: farewell
-          value: Bye
-diff:
-  description:
-    - When run with C(--diff), shows the before and after structures
-      for the locale and its overrides.
-  returned: when supported and requested
-  type: dict
-  contains:
-    before:
-      description: State of localization overrides before execution
-      type: dict
-      sample:
-        - key: greeting
-          value: Hello
-        - key: farewell
-          value: Bye
-    after:
-      description: State of localization overrides after execution
-      type: dict
       sample:
         - key: greeting
           value: Hello
