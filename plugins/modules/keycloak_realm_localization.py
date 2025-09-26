@@ -50,7 +50,7 @@ options:
   overrides:
     description:
       - List of overrides to ensure for the locale when O(state=present). Each item is a mapping with
-        the record's O(overrides.key) and its O(overrides.value).
+        the record's O(overrides[].key) and its O(overrides[].value).
       - Ignored when O(state=absent).
     type: list
     elements: dict
