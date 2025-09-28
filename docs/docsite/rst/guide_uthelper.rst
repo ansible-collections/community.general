@@ -276,9 +276,9 @@ RunCommandMock Specification
       Creates an ``UTHelper`` instance from a given test specification.
 
       :param ansible_module: The Ansible module to be tested.
-      :type ansible_module: module
+      :type ansible_module: :py:class:`types.ModuleType`
       :param test_module: The test module.
-      :type test_module: module
+      :type test_module: :py:class:`types.ModuleType`
       :param test_spec: The test specification.
       :type test_spec: dict
       :param mocks: List of ``TestCaseMocks`` to be used during testing. Currently only ``RunCommandMock`` exists.
@@ -308,11 +308,11 @@ RunCommandMock Specification
       Creates an ``UTHelper`` instance from a test specification file.
 
       :param ansible_module: The Ansible module to be tested.
-      :type ansible_module: module
+      :type ansible_module: :py:class:`types.ModuleType`
       :param test_module: The test module.
-      :type test_module: module
+      :type test_module: :py:class:`types.ModuleType`
       :param test_spec_filehandle: A file handle to an file stream handle providing the test specification in YAML format.
-      :type test_spec_filehandle: file
+      :type test_spec_filehandle: ``file-like object``
       :param mocks: List of ``TestCaseMocks`` to be used during testing. Currently only ``RunCommandMock`` exists.
       :type mocks: list or None
       :return: An ``UTHelper`` instance.
@@ -335,7 +335,7 @@ RunCommandMock Specification
       Creates an ``UTHelper`` instance from a given Ansible module and test module.
 
       :param ansible_module: The Ansible module to be tested.
-      :type ansible_module: module
+      :type ansible_module: :py:class:`types.ModuleType`
       :param test_module_name: The name of the test module. It works if passed ``__name__``.
       :type test_module_name: str
       :param mocks: List of ``TestCaseMocks`` to be used during testing. Currently only ``RunCommandMock`` exists.
