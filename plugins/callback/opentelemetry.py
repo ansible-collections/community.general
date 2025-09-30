@@ -97,7 +97,7 @@ options:
   otel_exporter_otlp_traces_protocol:
     type: str
     description:
-      - E(OTEL_EXPORTER_OTLP_TRACES_PROTOCOL) represents the the transport protocol for spans.
+      - E(OTEL_EXPORTER_OTLP_TRACES_PROTOCOL) represents the transport protocol for spans.
       - See
         U(https://opentelemetry-python.readthedocs.io/en/latest/sdk/environment_variables.html#envvar-OTEL_EXPORTER_OTLP_TRACES_PROTOCOL).
     default: grpc
