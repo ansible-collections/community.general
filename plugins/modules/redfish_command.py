@@ -1111,7 +1111,7 @@ def main():
             module.fail_json(msg=to_native(result['msg']))
 
         for command in command_list:
-            # standardize on the Power* commands, but allow the the legacy
+            # standardize on the Power* commands, but allow the legacy
             # GracefulRestart command
             if command == 'GracefulRestart':
                 command = 'PowerGracefulRestart'

@@ -103,7 +103,7 @@ plugin_routing:
       deprecation:
         removal_version: 12.0.0
         warning_text: >-
-          The plugin has been superseded by the the option `result_format=yaml` in callback plugin ansible.builtin.default from ansible-core 2.13 onwards.
+          The plugin has been superseded by the option `result_format=yaml` in callback plugin ansible.builtin.default from ansible-core 2.13 onwards.
   connection:
     docker:
       redirect: community.docker.docker
