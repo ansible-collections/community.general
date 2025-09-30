@@ -50,7 +50,7 @@ options:
       - Use O(cache_name) as the ticket cache name and location.
       - If this option is not used, the default cache name and location are used.
       - The default credentials cache may vary between systems.
-      - If not set the the value of E(KRB5CCNAME) environment variable is used instead, its value is used to name the default
+      - If not set the value of E(KRB5CCNAME) environment variable is used instead, its value is used to name the default
         ticket cache.
     type: str
   lifetime:
