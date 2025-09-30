@@ -12,7 +12,7 @@ class ModuleDocFragment(object):
 options:
   venv:
     description:
-      - Use the the Python interpreter from this virtual environment.
+      - Use the Python interpreter from this virtual environment.
       - Pass the path to the root of the virtualenv, not the C(bin/) directory nor the C(python) executable.
     type: path
   settings:

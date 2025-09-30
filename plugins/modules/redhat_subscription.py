@@ -32,7 +32,7 @@ notes:
   - It is possible to interact with C(subscription-manager) only as root, so root permissions are required to successfully
     run this module.
   - Since community.general 6.5.0, credentials (that is, O(username) and O(password), O(activationkey), or O(token)) are needed
-    only in case the the system is not registered, or O(force_register) is specified; this makes it possible to use the module
+    only in case the system is not registered, or O(force_register) is specified; this makes it possible to use the module
     to tweak an already registered system, for example attaching pools to it (using O(pool_ids)), and modifying the C(syspurpose)
     attributes (using O(syspurpose)).
 requirements:

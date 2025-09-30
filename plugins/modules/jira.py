@@ -145,7 +145,7 @@ options:
     type: str
     required: false
     description:
-      - Sets the the assignee when O(operation) is V(create), V(transition), or V(edit).
+      - Sets the assignee when O(operation) is V(create), V(transition), or V(edit).
       - Recent versions of JIRA no longer accept a user name as a user identifier. In that case, use O(account_id) instead.
       - Note that JIRA may not allow changing field values on specific transitions or states.
   account_id:
