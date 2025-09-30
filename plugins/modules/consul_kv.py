@@ -150,9 +150,9 @@ except ImportError:
 
 from ansible.module_utils.basic import AnsibleModule
 
-# Note: although the python-consul documentation implies that using a key with a value of `None` with `put` has a
-# special meaning (https://python-consul.readthedocs.io/en/latest/#consul-kv), if not set in the subsequently API call,
-# the value just defaults to an empty string (https://www.consul.io/api/kv.html#create-update-key)
+# Note: although the python-consul documentation (and py-consul implementation) implies that using a key with a value of
+# `None` with `put` has a special meaning (https://python-consul.readthedocs.io/en/latest/#consul-kv), if not set in the
+# subsequently API call, the value just defaults to an empty string (https://www.consul.io/api/kv.html#create-update-key)
 NOT_SET = None
 
 
