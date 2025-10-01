@@ -52,7 +52,9 @@ class TestGem(ModuleTestCase):
 
     def patch_run_command(self):
         target = 'ansible.module_utils.basic.AnsibleModule.run_command'
-        return self.mocker.patch(target)
+        mock = self.mocker.patch(target)
+        mock.return_value = (0, '', '')
+        return mock
 
     def test_fails_when_user_install_and_install_dir_are_combined(self):
         with set_module_args({
