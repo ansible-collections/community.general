@@ -109,12 +109,11 @@ class TestGem(ModuleTestCase):
 
             run_command = self.patch_run_command()
 
-            with pytest.raises(AnsibleExitJson) as exc:
+            with pytest.raises(AnsibleFailJson) as exc:
                 gem.main()
 
         result = exc.value.args[0]
-
-        assert result['changed']
+        assert result['failed']
         assert run_command.called
 
         assert '--install-dir /opt/dummy' in get_command(run_command)
