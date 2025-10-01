@@ -226,4 +226,5 @@
       assert:
         that:
           - gem_result is failed
-          - gem_result.msg == "Gem could not be removed"
+          - gem_result.msg.startswith("Failed to uninstall gem 'json'")
+
