@@ -1,0 +1,2 @@
+minor_changes:
+  - nmcli - add support for duplicate address detection (DAD) timeout configuration via new parameters ``dad_timeout4`` and ``dad_timeout6`` which map to the ``ipv4.dad-timeout`` and ``ipv6.dad-timeout`` NetworkManager properties (https://github.com/ansible-collections/community.general/pull/XXXX).
