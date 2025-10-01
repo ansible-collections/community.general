@@ -26,6 +26,8 @@
         name: py-consul
         extra_args: "-c {{ remote_constraints }}"
       register: result
+      retries: 3
+      delay: 5
       until: result is success
     - name: Generate privatekey
       community.crypto.openssl_privatekey:
