@@ -338,11 +338,11 @@ def main():
             if command_output is not None and exists(module):
                 rc, out, err = command_output
                 module.fail_json(
-                msg=(
-                    "Failed to uninstall gem '%s': it is still present after 'gem uninstall'. "
-                    "This usually happens with default or system gems provided by the OS, "
-                    "which cannot be removed with the gem command."
-                ) % module.params['name'],
+                    msg=(
+                        "Failed to uninstall gem '%s': it is still present after 'gem uninstall'. "
+                        "This usually happens with default or system gems provided by the OS, "
+                        "which cannot be removed with the gem command."
+                    ) % module.params['name'],
                     rc=rc,
                     stdout=out,
                     stderr=err
