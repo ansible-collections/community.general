@@ -227,4 +227,3 @@
         that:
           - gem_result is failed
           - gem_result.msg.startswith("Failed to uninstall gem 'json'")
-
