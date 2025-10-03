@@ -180,10 +180,10 @@ def _normalize_overrides_from_api(current):
         return []
 
     # Convert mapping to list of key/value dicts
-    items = [{'key': k, 'value': v} for k, v in current.items()]
+    items = [{'key': k, 'value': v} for k, v in sorted(current.items())]
 
     # Sort for stable comparisons and diff output
-    return sorted(items, key=lambda x: x['key'])
+    return items
 
 
 def main():
