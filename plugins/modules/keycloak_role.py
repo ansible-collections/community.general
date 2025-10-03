@@ -361,7 +361,7 @@ def main():
 
     else:
         if state == 'present':
-            compare_exclude = []
+            compare_exclude = ['clientId']
             if 'composites' in desired_role and isinstance(desired_role['composites'], list) and len(desired_role['composites']) > 0:
                 composites = kc.get_role_composites(rolerep=before_role, clientid=clientid, realm=realm)
                 before_role['composites'] = []
