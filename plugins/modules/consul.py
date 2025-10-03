@@ -25,7 +25,7 @@ description:
     metadata so at that stage change management is to be added.
   - See U(http://consul.io) for more details.
 requirements:
-  - python-consul
+  - py-consul
   - requests
 author: "Steve Gargan (@sgargan)"
 extends_documentation_fragment:
@@ -549,7 +549,7 @@ class ConsulCheck(object):
 
 def test_dependencies(module):
     if not python_consul_installed:
-        module.fail_json(msg="python-consul required for this module. see https://python-consul.readthedocs.io/en/latest/#installation")
+        module.fail_json(msg="py-consul required for this module. see https://github.com/criteo/py-consul?tab=readme-ov-file#installation")
 
 
 def main():
