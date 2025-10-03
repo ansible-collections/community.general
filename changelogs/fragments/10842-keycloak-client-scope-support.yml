@@ -1,0 +1,2 @@
+minor_changes:
+  - keycloak_client - add idempotent support for ``optional_client_scopes`` and ``optional_client_scopes``, and ensure consistent change detection between check mode and live run (https://github.com/ansible-collections/community.general/issues/5495, https://github.com/ansible-collections/community.general/pull/10842).

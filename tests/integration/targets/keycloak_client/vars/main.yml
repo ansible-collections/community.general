@@ -9,6 +9,7 @@ admin_user: admin
 admin_password: password
 realm: myrealm
 client_id: myclient
+client_id_2: mynewclient
 role: myrole
 description_1: desc 1
 description_2: desc 2
@@ -24,7 +25,9 @@ redirect_uris1:
   - "http://example.b.com/"
   - "http://example.a.com/"
 
-client_attributes1: {"backchannel.logout.session.required": true, "backchannel.logout.revoke.offline.tokens": false, "client.secret.creation.time": 0}
+client_attributes1: {"backchannel.logout.session.required": true, "backchannel.logout.revoke.offline.tokens": false, "oauth2.device.authorization.grant.enabled": true, "client.secret.creation.time": 0}
+
+client_attributes2: {"backchannel.logout.session.required": false, "oauth2.device.authorization.grant.enabled": false, "client.secret.creation.time": 0}
 
 protocol_mappers1:
   - name: 'email'
@@ -59,3 +62,36 @@ protocol_mappers1:
       "id.token.claim": "true"
       "access.token.claim": "true"
       "userinfo.token.claim": "true"
+
+protocol_mappers2_unordered:
+  - "{{ protocol_mappers1[2] }}"
+  - "{{ protocol_mappers1[1] }}"
+  - "{{ protocol_mappers1[0] }}"
+
+protocol_mappers3_modifed:
+  - "{{ protocol_mappers1[2] }}"
+  - name: address
+    protocol: openid-connect
+    protocolMapper: oidc-address-mapper
+    consentRequired: false
+    config:
+      user.attribute.formatted: formatted
+      user.attribute.country: country
+      introspection.token.claim: 'true'
+      user.attribute.postal_code: postal_code
+      userinfo.token.claim: 'true'
+      user.attribute.street: street
+      id.token.claim: 'true'
+      user.attribute.region: region
+      access.token.claim: 'true'
+      user.attribute.locality: locality
+  - name: 'email'
+    protocol: 'openid-connect'
+    protocolMapper: 'oidc-usermodel-property-mapper'
+    config:
+      "claim.name": "email"
+      "user.attribute": "email"
+      "jsonType.label": "String"
+      "id.token.claim": true
+      "access.token.claim": false
+      "userinfo.token.claim": true

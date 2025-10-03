@@ -12,7 +12,7 @@ To run Keycloak client module's integration test, start a keycloak server using 
 
 Run the integration tests:
 
-    ansible-test integration -v keycloak_client --allow-unsupported --docker fedora35 --docker-network host
+    ansible-test integration -v keycloak_client --allow-unsupported --docker --docker-network host
 
 Cleanup:
 
