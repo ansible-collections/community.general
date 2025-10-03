@@ -361,7 +361,7 @@ options:
 
   client_scopes_behavior:
     description:
-      - Determine how C(default_client_scopes) and C(optional_client_scopes) behave when updating an existing client.
+      - Determine how O(default_client_scopes) and O(optional_client_scopes) behave when updating an existing client.
       - 'V(ignore): Do not change the client scopes of an existing client. This is the default for backward compatibility.'
       - 'V(patch): Add missing scopes, do not remove any missing scopes.'
       - 'V(idempotent): Make the client scopes exactly as specified, adding and removing scopes as needed.'
