@@ -243,7 +243,7 @@ def uninstall(module):
     if module.params['force']:
         cmd.append('--force')
     cmd.append(module.params['name'])
-    module.run_command(cmd, environ_update=environ, check_rc=True)
+    return module.run_command(cmd, environ_update=environ, check_rc=True)
 
 
 def install(module):
@@ -334,9 +334,21 @@ def main():
             changed = True
     elif module.params['state'] == 'absent':
         if exists(module):
-            uninstall(module)
-            changed = True
-
+            command_output = uninstall(module)
+            if command_output is not None and exists(module):
+                rc, out, err = command_output
+                module.fail_json(
+                    msg=(
+                        "Failed to uninstall gem '%s': it is still present after 'gem uninstall'. "
+                        "This usually happens with default or system gems provided by the OS, "
+                        "which cannot be removed with the gem command."
+                    ) % module.params['name'],
+                    rc=rc,
+                    stdout=out,
+                    stderr=err
+                )
+            else:
+                changed = True
     result = {}
     result['name'] = module.params['name']
     result['state'] = module.params['state']
