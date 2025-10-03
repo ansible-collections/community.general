@@ -27,3 +27,5 @@ redis ; python_version >= '3.6'
 pycdlib < 1.13.0 ; python_version < '3'  # 1.13.0 does not work with Python 2, while not declaring that
 python-daemon <= 2.3.0 ; python_version < '3'
 bcrypt < 4.0.0  # TEMP: restrict to < 4.0.0 since installing 4.0.0 fails on RHEL 8
+py-consul < 1.3.0 ; python_version < '3.8'  # 1.3.0 dropped support for Python 3.5, 3.6, 3.7
+py-consul < 1.5.4 ; python_version < '3.9'  # 1.5.4 dropped support for Python 3.8
