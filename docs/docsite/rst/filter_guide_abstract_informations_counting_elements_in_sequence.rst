@@ -20,6 +20,17 @@ The :ansplugin:`community.general.counter filter plugin <community.general.count
 
 This produces:
 
+.. ansible-output-data::
+
+    variables:
+      task:
+        previous_code_block: yaml+jinja
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          @{{ task | indent(4) }}@
+
 .. code-block:: ansible-output
 
     TASK [Count character occurrences in a string] ********************************************
@@ -72,9 +83,20 @@ This plugin is useful for selecting resources based on current allocation:
 
 This produces:
 
+.. ansible-output-data::
+
+    variables:
+      task:
+        previous_code_block: yaml+jinja
+    playbook: |-
+      - hosts: localhost
+        gather_facts: false
+        tasks:
+          @{{ task | indent(4) }}@
+
 .. code-block:: ansible-output
 
-    TASK [Get ID of SCSI controller(s) with less than 4 disks attached and choose the one with the least disks]
+    TASK [Get ID of SCSI controller(s) with less than 4 disks attached and choose the one with the least disks] ***
     ok: [localhost] => {
         "msg": "scsi_2"
     }
