@@ -328,7 +328,7 @@ def main():
 
         if module.check_mode:
 
-            if len(old_overrides) > 0:
+            if old_overrides:
                 result['changed'] = True
                 result['msg'] = "All overrides for locale %s would be deleted." % (locale)
             else:
