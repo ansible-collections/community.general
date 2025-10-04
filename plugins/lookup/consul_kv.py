@@ -112,7 +112,8 @@ _raw:
   type: dict
 """
 
-from ansible.module_utils.six.moves.urllib.parse import urlparse
+from urllib.parse import urlparse
+
 from ansible.errors import AnsibleError, AnsibleAssertionError
 from ansible.plugins.lookup import LookupBase
 from ansible.module_utils.common.text.converters import to_text

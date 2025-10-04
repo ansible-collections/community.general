@@ -66,7 +66,8 @@ options:
     type: string
 """
 
-from ansible.module_utils.six.moves.urllib.parse import urlencode
+from urllib.parse import urlencode
+
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible.module_utils.urls import open_url
 from ansible.plugins.callback import CallbackBase

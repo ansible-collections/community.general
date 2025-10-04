@@ -122,7 +122,6 @@ _list:
 
 from ansible.errors import AnsibleLookupError
 from collections.abc import Mapping, Sequence
-from ansible.module_utils.six import string_types
 from ansible.plugins.lookup import LookupBase
 from ansible.template import Templar
 
@@ -215,7 +214,7 @@ class LookupModule(LookupBase):
                     raise AnsibleLookupError(
                         f'The variable {k!r} appears more than once')
                 vars_so_far.add(k)
-                if isinstance(v, string_types):
+                if isinstance(v, str):
                     data.append((k, v, None))
                 elif isinstance(v, (Sequence, Mapping)):
                     data.append((k, None, v))

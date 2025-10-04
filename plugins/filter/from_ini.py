@@ -45,10 +45,10 @@ _value:
 """
 
 
+from io import StringIO
+from configparser import ConfigParser
+
 from ansible.errors import AnsibleFilterError
-from ansible.module_utils.six import string_types
-from ansible.module_utils.six.moves import StringIO
-from ansible.module_utils.six.moves.configparser import ConfigParser
 
 
 class IniParser(ConfigParser):
@@ -73,7 +73,7 @@ class IniParser(ConfigParser):
 def from_ini(obj):
     ''' Read the given string as INI file and return a dict '''
 
-    if not isinstance(obj, string_types):
+    if not isinstance(obj, str):
         raise AnsibleFilterError(f'from_ini requires a str, got {type(obj)}')
 
     parser = IniParser()

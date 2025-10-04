@@ -223,8 +223,9 @@ _value:
   type: bool
 '''
 
+from collections.abc import Sequence
+
 from ansible.errors import AnsibleFilterError
-from ansible.module_utils.six.moves.collections_abc import Sequence
 from ansible_collections.community.general.plugins.plugin_utils.ansible_type import _ansible_type
 
 

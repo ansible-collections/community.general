@@ -132,9 +132,8 @@ from ansible_collections.community.general.plugins.module_utils.scaleway import 
 from ansible_collections.community.general.plugins.plugin_utils.unsafe import make_unsafe
 from ansible.module_utils.urls import open_url
 from ansible.module_utils.common.text.converters import to_text
-from ansible.module_utils.six import raise_from
 
-import ansible.module_utils.six.moves.urllib.parse as urllib_parse
+import urllib.parse as urllib_parse
 
 
 def _fetch_information(token, url):
@@ -338,7 +337,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
 
     def parse(self, inventory, loader, path, cache=True):
         if YAML_IMPORT_ERROR:
-            raise_from(AnsibleError('PyYAML is probably missing'), YAML_IMPORT_ERROR)
+            raise AnsibleError('PyYAML is probably missing') from YAML_IMPORT_ERROR
         super(InventoryModule, self).parse(inventory, loader, path)
         self._read_config_data(path=path)
 

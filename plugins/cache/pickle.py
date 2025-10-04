@@ -48,7 +48,6 @@ try:
 except ImportError:
     import pickle
 
-from ansible.module_utils.six import PY3
 from ansible.plugins.cache import BaseFileCacheModule
 
 
@@ -61,10 +60,7 @@ class CacheModule(BaseFileCacheModule):
     def _load(self, filepath):
         # Pickle is a binary format
         with open(filepath, 'rb') as f:
-            if PY3:
-                return pickle.load(f, encoding='bytes')
-            else:
-                return pickle.load(f)
+            return pickle.load(f, encoding='bytes')
 
     def _dump(self, value, filepath):
         with open(filepath, 'wb') as f:

@@ -5,16 +5,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-from ansible.errors import AnsibleError
-from ansible.module_utils.six import raise_from
-
-try:
-    from fqdn import FQDN
-except ImportError as imp_exc:
-    ANOTHER_LIBRARY_IMPORT_ERROR = imp_exc
-else:
-    ANOTHER_LIBRARY_IMPORT_ERROR = None
-
 
 DOCUMENTATION = '''
 name: fqdn_valid
@@ -74,6 +64,15 @@ _value:
   type: bool
 '''
 
+from ansible.errors import AnsibleError
+
+try:
+    from fqdn import FQDN
+except ImportError as imp_exc:
+    ANOTHER_LIBRARY_IMPORT_ERROR = imp_exc
+else:
+    ANOTHER_LIBRARY_IMPORT_ERROR = None
+
 
 def fqdn_valid(name, min_labels=1, allow_underscores=False):
     """
@@ -83,10 +82,7 @@ def fqdn_valid(name, min_labels=1, allow_underscores=False):
     """
 
     if ANOTHER_LIBRARY_IMPORT_ERROR:
-        raise_from(
-            AnsibleError('Python package fqdn must be installed to use this test.'),
-            ANOTHER_LIBRARY_IMPORT_ERROR
-        )
+        raise AnsibleError('Python package fqdn must be installed to use this test.') from ANOTHER_LIBRARY_IMPORT_ERROR
 
     fobj = FQDN(name, min_labels=min_labels, allow_underscores=allow_underscores)
     return (fobj.is_valid)

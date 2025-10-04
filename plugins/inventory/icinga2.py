@@ -95,11 +95,11 @@ compose:
 """
 
 import json
+from urllib.error import HTTPError
 
 from ansible.errors import AnsibleParserError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable
 from ansible.module_utils.urls import open_url
-from ansible.module_utils.six.moves.urllib.error import HTTPError
 
 from ansible_collections.community.general.plugins.plugin_utils.unsafe import make_unsafe
 

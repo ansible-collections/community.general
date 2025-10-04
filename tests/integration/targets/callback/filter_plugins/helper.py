@@ -5,8 +5,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-from ansible.module_utils.six import string_types
-
 
 def callback_results_extractor(outputs_results):
     results = []
@@ -18,7 +16,7 @@ def callback_results_extractor(outputs_results):
             line = "line_%s" % (i + 1)
             test_line = stdout_lines[i] if i < len(stdout_lines) else None
             expected_lines = expected_output[i] if i < len(expected_output) else None
-            if not isinstance(expected_lines, string_types) and expected_lines is not None:
+            if not isinstance(expected_lines, str) and expected_lines is not None:
                 if test_line not in expected_lines:
                     differences.append({
                         'line': {

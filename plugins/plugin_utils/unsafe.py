@@ -7,7 +7,6 @@ __metaclass__ = type
 
 import re
 
-from ansible.module_utils.six import binary_type, text_type
 from collections.abc import Mapping, Set
 from ansible.module_utils.common.collections import is_sequence
 from ansible.utils.unsafe_proxy import (
@@ -29,11 +28,11 @@ def make_unsafe(value):
         return set(make_unsafe(elt) for elt in value)
     elif is_sequence(value):
         return type(value)(make_unsafe(elt) for elt in value)
-    elif isinstance(value, binary_type):
+    elif isinstance(value, bytes):
         if _RE_TEMPLATE_CHARS_BYTES.search(value):
             value = _make_unsafe(value)
         return value
-    elif isinstance(value, text_type):
+    elif isinstance(value, str):
         if _RE_TEMPLATE_CHARS.search(value):
             value = _make_unsafe(value)
         return value

@@ -117,7 +117,6 @@ except ImportError:
 
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils.common.text.converters import to_text
-from ansible.module_utils.six import string_types
 
 
 class TypeValidationError(AnsibleFilterError):
@@ -128,7 +127,7 @@ class TypeValidationError(AnsibleFilterError):
         expected: Description of expected type
     """
     def __init__(self, obj, expected):
-        type_name = "string" if isinstance(obj, string_types) else type(obj).__name__
+        type_name = "string" if isinstance(obj, str) else type(obj).__name__
         super().__init__(f"Expected {expected}, got a {type_name}")
 
 
@@ -157,7 +156,7 @@ def _validate_list_param(param, param_name, ensure_strings=True):
 
     if ensure_strings:
         for item in param:
-            if not isinstance(item, string_types):
+            if not isinstance(item, str):
                 # Maintain original error message format
                 if param_name == "column_order":
                     error_msg = "a string for column name"
@@ -183,7 +182,7 @@ def _match_key(item_dict, lookup_key):
         return lookup_key
 
     # Try boolean conversion for 'true'/'false' strings
-    if isinstance(lookup_key, string_types):
+    if isinstance(lookup_key, str):
         if lookup_key.lower() == 'true' and True in item_dict:
             return True
         if lookup_key.lower() == 'false' and False in item_dict:
@@ -335,11 +334,11 @@ def to_prettytable(data, *args, **kwargs):
     # Validate column_alignments keys and values
     for key, value in column_alignments.items():
         # Check that keys are strings
-        if not isinstance(key, string_types):
+        if not isinstance(key, str):
             raise TypeValidationError(key, "a string for column_alignments key")
 
         # Check that values are strings
-        if not isinstance(value, string_types):
+        if not isinstance(value, str):
             raise TypeValidationError(value, "a string for column_alignments value")
 
         # Check that values are valid alignments
@@ -391,7 +390,7 @@ def to_prettytable(data, *args, **kwargs):
                     row.append(item.get(matched_key, ""))
                 else:
                     # Try case-insensitive lookup as last resort
-                    lower_col = col.lower() if isinstance(col, string_types) else str(col).lower()
+                    lower_col = col.lower() if isinstance(col, str) else str(col).lower()
                     if lower_col in reverse_key_map:
                         row.append(item.get(reverse_key_map[lower_col], ""))
                     else:

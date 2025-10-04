@@ -66,7 +66,6 @@ EXAMPLES = r"""
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
 from ansible.errors import AnsibleError
-from ansible.module_utils.six import raise_from
 
 try:
     from pam.revbits_ansible.server import SecretServer
@@ -87,10 +86,7 @@ class LookupModule(LookupBase):
 
     def run(self, terms, variables, **kwargs):
         if ANOTHER_LIBRARY_IMPORT_ERROR:
-            raise_from(
-                AnsibleError('revbits_ansible must be installed to use this plugin'),
-                ANOTHER_LIBRARY_IMPORT_ERROR
-            )
+            raise AnsibleError('revbits_ansible must be installed to use this plugin') from ANOTHER_LIBRARY_IMPORT_ERROR
         self.set_options(var_options=variables, direct=kwargs)
         secret_server = LookupModule.Client(
             {

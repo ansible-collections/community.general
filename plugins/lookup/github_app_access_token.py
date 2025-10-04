@@ -89,8 +89,9 @@ except ImportError:
 
 import time
 import json
+from urllib.error import HTTPError
+
 from ansible.module_utils.urls import open_url
-from ansible.module_utils.six.moves.urllib.error import HTTPError
 from ansible.errors import AnsibleError, AnsibleOptionsError
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
