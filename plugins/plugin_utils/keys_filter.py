@@ -9,7 +9,6 @@ __metaclass__ = type
 import re
 
 from ansible.errors import AnsibleFilterError
-from ansible.module_utils.six import string_types
 from collections.abc import Mapping, Sequence
 
 
@@ -32,7 +31,7 @@ def _keys_filter_params(data, matching_parameter):
             raise AnsibleFilterError(msg % (elem, type(elem)))
 
     for elem in data:
-        if not all(isinstance(item, string_types) for item in elem.keys()):
+        if not all(isinstance(item, str) for item in elem.keys()):
             msg = "Top level keys must be strings. keys: %s"
             raise AnsibleFilterError(msg % elem.keys())
 
@@ -65,12 +64,12 @@ def _keys_filter_target_str(target, matching_parameter):
 
     if isinstance(target, list):
         for elem in target:
-            if not isinstance(elem, string_types):
+            if not isinstance(elem, str):
                 msg = "The target items must be strings. %s is %s"
                 raise AnsibleFilterError(msg % (elem, type(elem)))
 
     if matching_parameter == 'regex':
-        if isinstance(target, string_types):
+        if isinstance(target, str):
             r = target
         else:
             if len(target) > 1:
@@ -83,7 +82,7 @@ def _keys_filter_target_str(target, matching_parameter):
         except re.error:
             msg = "The target must be a valid regex if matching_parameter=regex. target is %s"
             raise AnsibleFilterError(msg % r)
-    elif isinstance(target, string_types):
+    elif isinstance(target, str):
         tt = (target, )
     else:
         tt = tuple(set(target))
@@ -117,10 +116,10 @@ def _keys_filter_target_dict(target, matching_parameter):
         if not all(k in elem for k in ('before', 'after')):
             msg = "All dictionaries in target must include attributes: after, before."
             raise AnsibleFilterError(msg)
-        if not isinstance(elem['before'], string_types):
+        if not isinstance(elem['before'], str):
             msg = "The attributes before must be strings. %s is %s"
             raise AnsibleFilterError(msg % (elem['before'], type(elem['before'])))
-        if not isinstance(elem['after'], string_types):
+        if not isinstance(elem['after'], str):
             msg = "The attributes after must be strings. %s is %s"
             raise AnsibleFilterError(msg % (elem['after'], type(elem['after'])))
 
