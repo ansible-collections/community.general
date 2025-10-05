@@ -1,0 +1,2 @@
+bugfixes:
+  - "Avoid usage of deprecated ``ansible.module_utils.six`` in all code that does not have to support Python 2 (https://github.com/ansible-collections/community.general/pull/10873)."

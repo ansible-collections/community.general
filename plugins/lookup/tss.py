@@ -258,7 +258,6 @@ EXAMPLES = r"""
 import abc
 import os
 from ansible.errors import AnsibleError, AnsibleOptionsError
-from ansible.module_utils import six
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
 
@@ -289,8 +288,7 @@ except ImportError:
 display = Display()
 
 
-@six.add_metaclass(abc.ABCMeta)
-class TSSClient(object):
+class TSSClient(object, metaclass=abc.ABCMeta):
     def __init__(self):
         self._client = None
 
