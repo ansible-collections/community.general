@@ -64,7 +64,7 @@ def pipx_runner(module, command, **kwargs):
         module,
         command=command,
         arg_formats=arg_formats,
-        environ_update={'USE_EMOJI': '0'},
+        environ_update={'USE_EMOJI': '0', 'PIPX_USE_EMOJI': '0'},
         check_rc=True,
         **kwargs
     )
