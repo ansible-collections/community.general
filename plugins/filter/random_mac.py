@@ -45,14 +45,13 @@ import re
 from random import Random, SystemRandom
 
 from ansible.errors import AnsibleFilterError
-from ansible.module_utils.six import string_types
 
 
 def random_mac(value, seed=None):
     ''' takes string prefix, and return it completed with random bytes
         to get a complete 6 bytes MAC address '''
 
-    if not isinstance(value, string_types):
+    if not isinstance(value, str):
         raise AnsibleFilterError('Invalid value type (%s) for random_mac (%s)' %
                                  (type(value), value))
 

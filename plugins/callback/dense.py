@@ -27,7 +27,6 @@ try:
 except ImportError:
     pass
 
-from ansible.module_utils.six import binary_type, text_type
 from collections.abc import MutableMapping, MutableSequence
 from ansible.plugins.callback.default import CallbackModule as CallbackModule_default
 from ansible.utils.color import colorize, hostcolor
@@ -236,7 +235,7 @@ class CallbackModule(CallbackModule_default):
 
         # Remove empty attributes (list, dict, str)
         for attr in result.copy():
-            if isinstance(result[attr], (MutableSequence, MutableMapping, binary_type, text_type)):
+            if isinstance(result[attr], (MutableSequence, MutableMapping, bytes, str)):
                 if not result[attr]:
                     del result[attr]
 

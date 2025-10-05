@@ -63,16 +63,18 @@ RETURN = '''
               the same environment variable(s), the last one returned by the Manifold API will take precedence.
         type: dict
 '''
+
+import json
+import sys
+from traceback import format_exception
+from urllib.error import HTTPError, URLError
+from urllib.parse import urlencode
+
 from ansible.errors import AnsibleError
 from ansible.plugins.lookup import LookupBase
 from ansible.module_utils.urls import open_url, ConnectionError, SSLValidationError
-from ansible.module_utils.six.moves.urllib.error import HTTPError, URLError
-from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils import six
 from ansible.utils.display import Display
-from traceback import format_exception
-import json
-import sys
 
 display = Display()
 

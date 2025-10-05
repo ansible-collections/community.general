@@ -9,12 +9,12 @@ from ansible_collections.community.internal_test_tools.tests.unit.compat import 
 from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch, call
 from ansible.errors import AnsibleError
 from ansible.module_utils.urls import ConnectionError, SSLValidationError
-from ansible.module_utils.six.moves.urllib.error import HTTPError, URLError
 from ansible.module_utils import six
 from ansible.plugins.loader import lookup_loader
 from ansible_collections.community.general.plugins.lookup.manifold import ManifoldApiClient, ApiError
 import json
 import os
+from urllib.error import HTTPError, URLError
 
 
 API_FIXTURES = {
