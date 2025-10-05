@@ -54,7 +54,6 @@ options:
     default: https://api.github.com
     type: str
     version_added: 11.4.0
-
 """
 
 EXAMPLES = r"""
@@ -179,7 +178,7 @@ def post_request(generated_jwt, installation_id, api_base=None):
         except Exception:
             error_body = {}
         if e.code == 404:
-            raise AnsibleError("Github return error. Please confirm your installationd_id value is valid")
+            raise AnsibleError("Github return error. Please confirm your installation_id value is valid")
         elif e.code == 401:
             raise AnsibleError("Github return error. Please confirm your private key is valid")
         raise AnsibleError(f"Unexpected data returned: {e} -- {error_body}")
