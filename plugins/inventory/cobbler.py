@@ -135,7 +135,6 @@ import socket
 
 from ansible.errors import AnsibleError
 from ansible.plugins.inventory import BaseInventoryPlugin, Cacheable, to_safe_group_name
-from ansible.module_utils.six import text_type
 
 from ansible_collections.community.general.plugins.plugin_utils.unsafe import make_unsafe
 
@@ -264,7 +263,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
             self.cobbler = xmlrpc_client.Server(self.cobbler_url, allow_none=True)
         self.token = None
         if self.get_option('user') is not None:
-            self.token = self.cobbler.login(text_type(self.get_option('user')), text_type(self.get_option('password')))
+            self.token = self.cobbler.login(str(self.get_option('user')), str(self.get_option('password')))
 
         self.cache_key = self.get_cache_key(path)
         self.use_cache = cache and self.get_option('cache')
