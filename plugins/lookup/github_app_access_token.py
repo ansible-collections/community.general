@@ -47,6 +47,14 @@ options:
       - How long the token should last for in seconds.
     default: 600
     type: int
+  github_api_url:
+    description:
+      - Base URL for the GitHub API (for GitHub Enterprise Server).
+      - If not provided, defaults to C(https://api.github.com).
+      - "Example: C(https://github-enterprise-server.example.com/api/v3)"
+    required: false
+    type: str
+
 """
 
 EXAMPLES = r"""
@@ -154,8 +162,13 @@ def encode_jwt(app_id, private_key_obj, exp=600):
         raise AnsibleError(f"Error while encoding jwt: {e}")
 
 
-def post_request(generated_jwt, installation_id):
-    github_api_url = f'https://api.github.com/app/installations/{installation_id}/access_tokens'
+def post_request(generated_jwt, installation_id, api_base=None):
+    if api_base:
+        base = api_base.rstrip('/')
+        github_api_url = f"{base}/app/installations/{installation_id}/access_tokens"
+    else:
+        github_api_url = f'https://api.github.com/app/installations/{installation_id}/access_tokens'
+
     headers = {
         "Authorization": f'Bearer {generated_jwt}',
         "Accept": "application/vnd.github.v3+json",
@@ -181,10 +194,10 @@ def post_request(generated_jwt, installation_id):
     return json_data.get('token')
 
 
-def get_token(key_path, app_id, installation_id, private_key, expiry=600):
+def get_token(key_path, app_id, installation_id, private_key, expiry=600, github_api_url=None):
     jwk = read_key(key_path, private_key)
     generated_jwt = encode_jwt(app_id, jwk, exp=expiry)
-    return post_request(generated_jwt, installation_id)
+    return post_request(generated_jwt, installation_id, github_api_url)
 
 
 class LookupModule(LookupBase):
@@ -210,6 +223,7 @@ class LookupModule(LookupBase):
             self.get_option('installation_id'),
             self.get_option('private_key'),
             self.get_option('token_expiry'),
+            self.get_option('github_api_url')
         )
 
         return [t]
