@@ -87,7 +87,6 @@ from contextlib import closing
 from os.path import basename
 
 from ansible.errors import AnsibleError, AnsibleRuntimeError
-from ansible.module_utils.six import raise_from
 from ansible.plugins.callback import CallbackBase
 
 try:
@@ -312,9 +311,7 @@ class CallbackModule(CallbackBase):
         self.disabled = False
 
         if ELASTIC_LIBRARY_IMPORT_ERROR:
-            raise_from(
-                AnsibleError('The `elastic-apm` must be installed to use this plugin'),
-                ELASTIC_LIBRARY_IMPORT_ERROR)
+            raise AnsibleError('The `elastic-apm` must be installed to use this plugin') from ELASTIC_LIBRARY_IMPORT_ERROR
 
         self.tasks_data = OrderedDict()
 

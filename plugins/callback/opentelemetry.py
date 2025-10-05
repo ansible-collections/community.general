@@ -137,14 +137,12 @@ import json
 import os
 import socket
 import uuid
-from time import time_ns
-
 from collections import OrderedDict
 from os.path import basename
+from time import time_ns
+from urllib.parse import urlparse
 
 from ansible.errors import AnsibleError
-from ansible.module_utils.six import raise_from
-from ansible.module_utils.six.moves.urllib.parse import urlparse
 from ansible.plugins.callback import CallbackBase
 
 try:
@@ -499,9 +497,9 @@ class CallbackModule(CallbackBase):
         self.otel_exporter_otlp_traces_protocol = None
 
         if OTEL_LIBRARY_IMPORT_ERROR:
-            raise_from(
-                AnsibleError('The `opentelemetry-api`, `opentelemetry-exporter-otlp` or `opentelemetry-sdk` must be installed to use this plugin'),
-                OTEL_LIBRARY_IMPORT_ERROR)
+            raise AnsibleError(
+                'The `opentelemetry-api`, `opentelemetry-exporter-otlp` or `opentelemetry-sdk` must be installed to use this plugin'
+            ) from OTEL_LIBRARY_IMPORT_ERROR
 
         self.tasks_data = OrderedDict()
 

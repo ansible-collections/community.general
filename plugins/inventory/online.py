@@ -62,13 +62,13 @@ groups:
 
 import json
 from sys import version as python_version
+from urllib.parse import urljoin
 
 from ansible.errors import AnsibleError
 from ansible.module_utils.urls import open_url
 from ansible.plugins.inventory import BaseInventoryPlugin
 from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.ansible_release import __version__ as ansible_version
-from ansible.module_utils.six.moves.urllib.parse import urljoin
 
 from ansible_collections.community.general.plugins.plugin_utils.unsafe import make_unsafe
 

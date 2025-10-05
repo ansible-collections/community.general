@@ -59,8 +59,8 @@ notes:
   - This plugin ignores the C(become_user) supplied and uses C(pmrun)'s own configuration to select the user.
 """
 
+from shlex import quote as shlex_quote
 from ansible.plugins.become import BecomeBase
-from ansible.module_utils.six.moves import shlex_quote
 
 
 class BecomeModule(BecomeBase):
