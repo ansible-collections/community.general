@@ -2,6 +2,13 @@
 # Copyright (c) Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
+- name: Install required packages
+  pip:
+    name:
+      - jmespath
+  register: result
+  until: result is success
+
 - name: Wait for Keycloak
   uri:
     url: "{{ url }}/admin/"
@@ -71,7 +78,7 @@
     state: present
     redirect_uris: '{{redirect_uris1}}'
     attributes: '{{client_attributes1}}'
-    protocol_mappers: '{{protocol_mappers1}}'
+    protocol_mappers: '{{protocol_mappers2_unordered}}'
     authorization_services_enabled: false
   check_mode: true
   register: check_client_when_present_and_same
@@ -103,6 +110,37 @@
   assert:
     that:
       - check_client_when_present_and_changed is changed
+
+- name: Check client with modified protocol_mappers idempotence
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    state: present
+    redirect_uris: '{{redirect_uris1}}'
+    attributes: '{{client_attributes1}}'
+    protocol_mappers: '{{protocol_mappers3_modifed}}'
+    authorization_services_enabled: false
+    service_accounts_enabled: true
+  register: check_client_protocol_mappers_idempotence
+
+- name: Assert idempotence changes to protocol_mappers
+  assert:
+    that:
+      - check_client_protocol_mappers_idempotence is changed
+      - end_state.protocolMappers | length == 3
+      - end_state.protocolMappers | community.general.json_query("[?name == 'email_verified']") | length == 0
+      - end_state.protocolMappers | community.general.json_query("[?name == 'address']") | length == 1
+      - end_state.protocolMappers | community.general.json_query("[?name == 'email']") | length == 1
+      - end_state.protocolMappers | community.general.json_query("[?name == 'family_name']") | length == 1
+      - email.config is defined
+      - email.config['access.token.claim'] == "false"
+  vars:
+    end_state: "{{ check_client_protocol_mappers_idempotence.end_state }}"
+    email: "{{ end_state.protocolMappers | community.general.json_query('[?name == `email`]') | first | d({}) }}"
 
 - name: Desire client with flow binding overrides
   community.general.keycloak_client:
@@ -231,3 +269,191 @@
       - "'authenticationFlowBindingOverrides' in desire_client_with_flow_binding_overrides.end_state"
       - "'browser' not in desire_client_with_flow_binding_overrides.end_state.authenticationFlowBindingOverrides"
       - "'direct_grant' not in desire_client_with_flow_binding_overrides.end_state.authenticationFlowBindingOverrides"
+
+- name: Create a scope1 client scope
+  community.general.keycloak_clientscope:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: scope1
+    description: "test 1"
+    protocol: openid-connect
+
+- name: Create a scope2 client scope
+  community.general.keycloak_clientscope:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: scope2
+    description: "test 2"
+    protocol: openid-connect
+
+- name: Create a scope3 client scope
+  community.general.keycloak_clientscope:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: scope3
+    description: "test 3"
+    protocol: openid-connect
+
+- name: Create Keycloak client with default_client_scopes (idempotent behavior)
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_scopes_behavior: idempotent
+    default_client_scopes: ['scope1']
+    optional_client_scopes: ['scope2']
+    client_id: testSD-bug
+    state: present
+  register: desire_client_with_default_client_scopes
+
+- name: Assert default_client_scopes and optional_client_scopes are set correctly
+  assert:
+    that:
+      - desire_client_with_default_client_scopes is changed
+      - '"scope1" in end_state.defaultClientScopes'
+      - '"scope2" in end_state.optionalClientScopes'
+      - end_state.defaultClientScopes | length == 1
+      - end_state.optionalClientScopes | length == 1
+  vars:
+    end_state: "{{ desire_client_with_default_client_scopes.end_state }}"
+
+- name: Update Keycloak client with new scopes (ignore behavior, check mode)
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    default_client_scopes: ['scope3']
+    optional_client_scopes: ['scope3']
+    client_id: testSD-bug
+    state: present
+  check_mode: true
+  register: desire_client_with_default_client_scopes
+
+- name: Assert client scopes remain unchanged with ignore behavior
+  assert:
+    that:
+      - desire_client_with_default_client_scopes is not changed
+      - end_state.defaultClientScopes | length == 1
+      - end_state.optionalClientScopes | length == 1
+      - '"scope1" in end_state.defaultClientScopes'
+      - '"scope2" in end_state.optionalClientScopes'
+  vars:
+    end_state: "{{ desire_client_with_default_client_scopes.end_state }}"
+
+- name: Update Keycloak client with conflicting scopes (patch behavior, should fail)
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_scopes_behavior: patch
+    default_client_scopes: ['scope3']
+    optional_client_scopes: ['scope1', 'scope2', 'scope3']
+    client_id: testSD-bug
+    state: present
+  ignore_errors: true
+  register: desire_client_with_default_client_scopes
+
+- name: Assert patch behavior fails when scope is both default and optional
+  assert:
+    that:
+      - desire_client_with_default_client_scopes is failed
+      - "'scope3' in desire_client_with_default_client_scopes.msg"
+
+- name: Update Keycloak client with new scopes (patch behavior)
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_scopes_behavior: patch
+    default_client_scopes: ['scope1', 'scope3']
+    optional_client_scopes: []
+    client_id: testSD-bug
+    state: present
+  register: desire_client_with_default_client_scopes
+
+- name: Assert client scopes are patched correctly
+  assert:
+    that:
+      - desire_client_with_default_client_scopes is changed
+      - end_state.defaultClientScopes | length == 2
+      - end_state.optionalClientScopes | length == 1
+      - '"scope1" in end_state.defaultClientScopes'
+      - '"scope3" in end_state.defaultClientScopes'
+      - '"scope2" in end_state.optionalClientScopes'
+  vars:
+    end_state: "{{ desire_client_with_default_client_scopes.end_state }}"
+
+- name: Update Keycloak client with empty default_client_scopes (idempotent behavior)
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_scopes_behavior: idempotent
+    default_client_scopes: []
+    optional_client_scopes: ['scope3']
+    client_id: testSD-bug
+    state: present
+  register: desire_client_with_default_client_scopes
+
+- name: Assert idempotent behavior with empty default_client_scopes
+  assert:
+    that:
+      - desire_client_with_default_client_scopes is changed
+      - end_state.defaultClientScopes | length == 0
+      - end_state.optionalClientScopes | length == 1
+      - '"scope3" in end_state.optionalClientScopes'
+  vars:
+    end_state: "{{ desire_client_with_default_client_scopes.end_state }}"
+
+- name: Create client with initial attributes
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id_2 }}"
+    state: present
+    attributes: '{{ client_attributes1 }}'
+  register: check_client_when_present_and_attributes_modified
+
+- name: Update client attributes
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id_2 }}"
+    state: present
+    attributes: '{{ client_attributes2 }}'
+  register: check_client_when_present_and_attributes_modified
+
+- name: Assert client attributes are updated
+  assert:
+    that:
+      - check_client_when_present_and_attributes_modified is changed
+      - end_state.attributes["backchannel.logout.revoke.offline.tokens"] == 'false'
+      - end_state.attributes["backchannel.logout.session.required"] == 'false'
+      - end_state.attributes["oauth2.device.authorization.grant.enabled"] == 'false'
+  vars:
+    end_state: "{{ check_client_when_present_and_attributes_modified.end_state }}"
