@@ -1,2 +1,0 @@
-bugfixes:
-  - "github_deploy_key - fix bug during error handling if no body was present in the result (https://github.com/ansible-collections/community.general/issues/10853, https://github.com/ansible-collections/community.general/pull/10857)."
