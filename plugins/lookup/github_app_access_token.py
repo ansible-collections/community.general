@@ -161,7 +161,7 @@ def encode_jwt(app_id, private_key_obj, exp=600):
         raise AnsibleError(f"Error while encoding jwt: {e}")
 
 
-def post_request(generated_jwt, installation_id, api_base=None):
+def post_request(generated_jwt, installation_id, api_base):
     base = api_base.rstrip('/')
     github_url = f"{base}/app/installations/{installation_id}/access_tokens"
 
@@ -190,7 +190,7 @@ def post_request(generated_jwt, installation_id, api_base=None):
     return json_data.get('token')
 
 
-def get_token(key_path, app_id, installation_id, private_key, expiry=600, github_url=None):
+def get_token(key_path, app_id, installation_id, private_key, github_url, expiry=600):
     jwk = read_key(key_path, private_key)
     generated_jwt = encode_jwt(app_id, jwk, exp=expiry)
     return post_request(generated_jwt, installation_id, github_url)
@@ -218,8 +218,8 @@ class LookupModule(LookupBase):
             self.get_option('app_id'),
             self.get_option('installation_id'),
             self.get_option('private_key'),
-            self.get_option('token_expiry'),
-            self.get_option('github_url')
+            self.get_option('github_url'),
+            self.get_option('token_expiry')
         )
 
         return [t]
