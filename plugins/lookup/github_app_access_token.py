@@ -47,6 +47,13 @@ options:
       - How long the token should last for in seconds.
     default: 600
     type: int
+  github_url:
+    description:
+      - Base URL for the GitHub API (for GitHub Enterprise Server).
+      - "Example: C(https://github-enterprise-server.example.com/api/v3)"
+    default: https://api.github.com
+    type: str
+    version_added: 11.4.0
 """
 
 EXAMPLES = r"""
@@ -154,14 +161,16 @@ def encode_jwt(app_id, private_key_obj, exp=600):
         raise AnsibleError(f"Error while encoding jwt: {e}")
 
 
-def post_request(generated_jwt, installation_id):
-    github_api_url = f'https://api.github.com/app/installations/{installation_id}/access_tokens'
+def post_request(generated_jwt, installation_id, api_base):
+    base = api_base.rstrip('/')
+    github_url = f"{base}/app/installations/{installation_id}/access_tokens"
+
     headers = {
         "Authorization": f'Bearer {generated_jwt}',
         "Accept": "application/vnd.github.v3+json",
     }
     try:
-        response = open_url(github_api_url, headers=headers, method='POST')
+        response = open_url(github_url, headers=headers, method='POST')
     except HTTPError as e:
         try:
             error_body = json.loads(e.read().decode())
@@ -169,7 +178,7 @@ def post_request(generated_jwt, installation_id):
         except Exception:
             error_body = {}
         if e.code == 404:
-            raise AnsibleError("Github return error. Please confirm your installationd_id value is valid")
+            raise AnsibleError("Github return error. Please confirm your installation_id value is valid")
         elif e.code == 401:
             raise AnsibleError("Github return error. Please confirm your private key is valid")
         raise AnsibleError(f"Unexpected data returned: {e} -- {error_body}")
@@ -181,10 +190,10 @@ def post_request(generated_jwt, installation_id):
     return json_data.get('token')
 
 
-def get_token(key_path, app_id, installation_id, private_key, expiry=600):
+def get_token(key_path, app_id, installation_id, private_key, github_url, expiry=600):
     jwk = read_key(key_path, private_key)
     generated_jwt = encode_jwt(app_id, jwk, exp=expiry)
-    return post_request(generated_jwt, installation_id)
+    return post_request(generated_jwt, installation_id, github_url)
 
 
 class LookupModule(LookupBase):
@@ -209,6 +218,7 @@ class LookupModule(LookupBase):
             self.get_option('app_id'),
             self.get_option('installation_id'),
             self.get_option('private_key'),
+            self.get_option('github_url'),
             self.get_option('token_expiry'),
         )
 
