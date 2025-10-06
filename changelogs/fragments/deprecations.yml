@@ -1,0 +1,6 @@
+removed_features:
+  - "yaml callback plugin - the deprecated plugin has been removed. Use the default callback with ``result_format=yaml`` instead (https://github.com/ansible-collections/community.general/pull/10883)."
+  - "purestorage doc fragment - the modules using this doc fragment have been removed from community.general 3.0.0 (https://github.com/ansible-collections/community.general/pull/10883)."
+  - "pure module utils - the modules using this module utils have been removed from community.general 3.0.0 (https://github.com/ansible-collections/community.general/pull/10883)."
+  - "bearychat - the module has been removed as the chat service is no longer available (https://github.com/ansible-collections/community.general/pull/10883)."
+  - "facter - the module has been replaced by ``community.general.facter_facts`` (https://github.com/ansible-collections/community.general/pull/10883)."
