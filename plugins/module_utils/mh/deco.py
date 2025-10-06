@@ -13,22 +13,16 @@ from functools import wraps
 from ansible_collections.community.general.plugins.module_utils.mh.exceptions import ModuleHelperException
 
 
-def cause_changes(on_success=None, on_failure=None, when=None):
-    # Parameters on_success and on_failure are deprecated and should be removed in community.general 12.0.0
-
+def cause_changes(when=None):
     def deco(func):
         @wraps(func)
         def wrapper(self, *args, **kwargs):
             try:
                 func(self, *args, **kwargs)
-                if on_success is not None:
-                    self.changed = on_success
-                elif when == "success":
+                if when == "success":
                     self.changed = True
             except Exception:
-                if on_failure is not None:
-                    self.changed = on_failure
-                elif when == "failure":
+                if when == "failure":
                     self.changed = True
                 raise
             finally:
