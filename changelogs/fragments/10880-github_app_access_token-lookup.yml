@@ -1,0 +1,2 @@
+minor_changes:
+  - "github_app_access_token lookup plugin - add support for GitHub Enterprise Server (https://github.com/ansible-collections/community.general/issues/10879, https://github.com/ansible-collections/community.general/pull/10880)."
