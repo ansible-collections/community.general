@@ -1739,3 +1739,63 @@ releases:
           name: to_yaml
           namespace: null
     release_date: '2025-09-08'
+  11.4.0:
+    changes:
+      bugfixes:
+        - Avoid usage of deprecated ``ansible.module_utils.six`` in all code that
+          does not have to support Python 2 (https://github.com/ansible-collections/community.general/pull/10873).
+        - gem - fix soundness issue when uninstalling default gems on Ubuntu  (https://github.com/ansible-collections/community.general/issues/10451,
+          https://github.com/ansible-collections/community.general/pull/10689).
+        - github_app_access_token lookup plugin - fix compatibility imports for using
+          jwt (https://github.com/ansible-collections/community.general/issues/10807,
+          https://github.com/ansible-collections/community.general/pull/10810).
+        - github_deploy_key - fix bug during error handling if no body was present
+          in the result (https://github.com/ansible-collections/community.general/issues/10853,
+          https://github.com/ansible-collections/community.general/pull/10857).
+        - homebrew - do not fail when cask or formula name has changed in homebrew
+          repo (https://github.com/ansible-collections/community.general/issues/10804,
+          https://github.com/ansible-collections/community.general/pull/10805).
+        - keycloak_group - fixes an issue where module ignores realm when searching
+          subgroups by name (https://github.com/ansible-collections/community.general/pull/10840).
+        - keycloak_role - fixes an issue where the module incorrectly returns ``changed=true``
+          when using the alias ``clientId`` in composite roles (https://github.com/ansible-collections/community.general/pull/10829).
+        - parted - variable is a list, not text (https://github.com/ansible-collections/community.general/pull/10823,
+          https://github.com/ansible-collections/community.general/issues/10817).
+        - rocketchat - fix message delivery in Rocket Chat >= 7.5.3 by forcing ``Content-Type``
+          header to ``application/json`` instead of the default ``application/x-www-form-urlencoded``
+          (https://github.com/ansible-collections/community.general/issues/10796,
+          https://github.com/ansible-collections/community.general/pull/10796).
+        - yaml cache plugin - make compatible with ansible-core 2.19 (https://github.com/ansible-collections/community.general/issues/10849,
+          https://github.com/ansible-collections/community.general/issues/10852).
+      minor_changes:
+        - github_app_access_token lookup plugin - add support for GitHub Enterprise
+          Server (https://github.com/ansible-collections/community.general/issues/10879,
+          https://github.com/ansible-collections/community.general/pull/10880).
+        - gitlab_group_variable - add ``description`` option (https://github.com/ansible-collections/community.general/pull/10812).
+        - gitlab_instance_variable - add ``description`` option (https://github.com/ansible-collections/community.general/pull/10812).
+        - gitlab_project_variable - add ``description`` option (https://github.com/ansible-collections/community.general/pull/10812,
+          https://github.com/ansible-collections/community.general/issues/8584, https://github.com/ansible-collections/community.general/issues/10809).
+        - keycloak_client - add idempotent support for ``optional_client_scopes``
+          and ``optional_client_scopes``, and ensure consistent change detection between
+          check mode and live run (https://github.com/ansible-collections/community.general/issues/5495,
+          https://github.com/ansible-collections/community.general/pull/10842).
+        - pipx module_utils - use ``PIPX_USE_EMOJI`` to disable emojis in the output
+          of ``pipx`` 1.8.0 (https://github.com/ansible-collections/community.general/pull/10874).
+      release_summary: Regular bugfix and feature release.
+    fragments:
+      - 10689-gem-prevent-soundness-issue.yml
+      - 10796-rocketchat-force-content-type.yml
+      - 10805-homebrew-support-old-names.yml
+      - 10810-github_app_access_token-jwt.yml
+      - 10812-gitlab-variable-add-description.yml
+      - 10823-parted-fail-json-command.yml
+      - 10829-fix-keycloak-role-changed-status.yml
+      - 10840-fix-keycloak-subgroup-search-realm.yml
+      - 10842-keycloak-client-scope-support.yml
+      - 10852-yaml.yml
+      - 10857-github_deploy_key-err.yml
+      - 10873-six.yml
+      - 10874-pipx-180.yml
+      - 10880-github_app_access_token-lookup.yml
+      - 11.4.0.yml
+    release_date: '2025-10-06'
