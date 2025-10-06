@@ -1088,7 +1088,7 @@ def add_optional_client_scopes(desired_client, before_client, realm, kc):
     """
     desired_optional_scope = desired_client["optionalClientScopes"]
     missing_scopes = [item for item in desired_optional_scope if item not in before_client['optionalClientScopes']]
-    if len(missing_scopes) == 0:
+    if not missing_scopes:
         return
     client_scopes = kc.get_clientscopes(realm)
     for name in missing_scopes:
