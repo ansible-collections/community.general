@@ -5,3 +5,5 @@ removed_features:
   - "bearychat - the module has been removed as the chat service is no longer available (https://github.com/ansible-collections/community.general/pull/10883)."
   - "facter - the module has been replaced by ``community.general.facter_facts`` (https://github.com/ansible-collections/community.general/pull/10883)."
   - "pacemaker_cluster - the option ``state`` is now required (https://github.com/ansible-collections/community.general/pull/10883)."
+breaking_changes:
+  - "slack - the default of ``prepend_hash`` changed from ``auto`` to ``never`` (https://github.com/ansible-collections/community.general/pull/10883)."
