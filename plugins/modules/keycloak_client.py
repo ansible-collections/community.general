@@ -984,7 +984,7 @@ def flow_binding_from_dict_to_model(newClientFlowBinding, realm, kc):
     return modelFlow
 
 
-def find_match(iterable, attribut, name):
+def find_match(iterable, attribute, name):
     """
     Search for an element in a list of dictionaries based on a given attribute and value.
 
@@ -995,7 +995,7 @@ def find_match(iterable, attribut, name):
         type: iterable (commonly list[dict])
         description: The collection of elements to search within (usually a list of dictionaries).
 
-    :param attribut:
+    :param attribute:
         type: str
         description: The dictionary key/attribute used for comparison.
 
@@ -1013,7 +1013,7 @@ def find_match(iterable, attribut, name):
         (
             value
             for value in iterable
-            if attribut in value and str(value[attribut]).lower() == name_lower
+            if attribute in value and str(value[attribute]).lower() == name_lower
         ),
         None,
     )
