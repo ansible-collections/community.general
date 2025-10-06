@@ -99,7 +99,6 @@ files:
   $callbacks/unixy.py:
     labels: unixy
     maintainers: akatch
-  $callbacks/yaml.py: {}
   $connections/:
     labels: connections
   $connections/chroot.py: {}
@@ -394,9 +393,6 @@ files:
   $module_utils/puppet.py:
     labels: puppet
     maintainers: russoz
-  $module_utils/pure.py:
-    labels: pure pure_storage
-    maintainers: $team_purestorage
   $module_utils/redfish_utils.py:
     labels: redfish_utils
     maintainers: $team_redfish
@@ -480,8 +476,6 @@ files:
     keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
     labels: beadm solaris
     maintainers: $team_solaris
-  $modules/bearychat.py:
-    maintainers: tonyseek
   $modules/bigpanda.py:
     ignore: hkariti
   $modules/bitbucket_:
@@ -587,9 +581,6 @@ files:
   $modules/etcd3.py:
     ignore: vfauth
     maintainers: evrardjp
-  $modules/facter.py:
-    labels: facter
-    maintainers: $team_ansible_core gamethis
   $modules/facter_facts.py:
     labels: facter
     maintainers: russoz $team_ansible_core gamethis
@@ -1610,7 +1601,6 @@ macros:
   team_networking: NilashishC Qalthos danielmellado ganeshrn justjais trishnaguha sganesh-infoblox privateip
   team_opennebula: ilicmilan meerkampdvv rsmontero xorel nilsding
   team_oracle: manojmeda mross22 nalsaber
-  team_purestorage: bannaych dnix101 genegr lionmax opslounge raekins sdodsley sile16
   team_redfish: mraineri tomasg2012 xmadsen renxulei rajeevkallur bhavya06 jyundt
   team_rhsm: cnsnyder ptoscano
   team_scaleway: remyleone abarbare
