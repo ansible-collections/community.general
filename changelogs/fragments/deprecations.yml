@@ -4,3 +4,4 @@ removed_features:
   - "pure module utils - the modules using this module utils have been removed from community.general 3.0.0 (https://github.com/ansible-collections/community.general/pull/10883)."
   - "bearychat - the module has been removed as the chat service is no longer available (https://github.com/ansible-collections/community.general/pull/10883)."
   - "facter - the module has been replaced by ``community.general.facter_facts`` (https://github.com/ansible-collections/community.general/pull/10883)."
+  - "pacemaker_cluster - the option ``state`` is now required (https://github.com/ansible-collections/community.general/pull/10883)."
