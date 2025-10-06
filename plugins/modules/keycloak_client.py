@@ -1127,7 +1127,7 @@ def remove_default_client_scopes(desired_client, before_client, realm, kc):
     """
     before_default_scope = before_client["defaultClientScopes"]
     missing_scopes = [item for item in before_default_scope if item not in desired_client['defaultClientScopes']]
-    if len(missing_scopes) == 0:
+    if not missing_scopes:
         return
     client_scopes = kc.get_default_clientscopes(realm, desired_client['clientId'])
     for name in missing_scopes:
