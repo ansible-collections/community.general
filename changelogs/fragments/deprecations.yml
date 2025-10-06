@@ -8,3 +8,4 @@ removed_features:
   - "opkg - the value ``""`` for the option ``force`` is no longer allowed. Omit ``force`` instead (https://github.com/ansible-collections/community.general/pull/10883)."
 breaking_changes:
   - "slack - the default of ``prepend_hash`` changed from ``auto`` to ``never`` (https://github.com/ansible-collections/community.general/pull/10883)."
+  - "mh.base module utils - ``debug`` will now always be delegated to the underlying ``AnsibleModule`` object (https://github.com/ansible-collections/community.general/pull/10883)."
