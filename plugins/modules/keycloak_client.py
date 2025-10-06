@@ -1049,7 +1049,7 @@ def add_default_client_scopes(desired_client, before_client, realm, kc):
     """
     desired_default_scope = desired_client["defaultClientScopes"]
     missing_scopes = [item for item in desired_default_scope if item not in before_client['defaultClientScopes']]
-    if len(missing_scopes) == 0:
+    if not missing_scopes:
         return
     client_scopes = kc.get_clientscopes(realm)
     for name in missing_scopes:
