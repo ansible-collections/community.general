@@ -75,7 +75,7 @@ class PacemakerCluster(StateModuleHelper):
     module = dict(
         argument_spec=dict(
             state=dict(type='str', choices=[
-                'cleanup', 'offline', 'online', 'restart', 'maintenance']),
+                'cleanup', 'offline', 'online', 'restart', 'maintenance'], required=True),
             name=dict(type='str', aliases=['node']),
             timeout=dict(type='int', default=300),
             force=dict(type='bool', default=True)
