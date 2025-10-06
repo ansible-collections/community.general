@@ -219,7 +219,7 @@ class LookupModule(LookupBase):
             self.get_option('installation_id'),
             self.get_option('private_key'),
             self.get_option('github_url'),
-            self.get_option('token_expiry')
+            self.get_option('token_expiry'),
         )
 
         return [t]
