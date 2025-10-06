@@ -6,6 +6,20 @@ Community General Release Notes
 
 This changelog describes changes after version 8.0.0.
 
+v9.5.12
+=======
+
+Release Summary
+---------------
+
+Bugfix release.
+
+Bugfixes
+--------
+
+- github_deploy_key - fix bug during error handling if no body was present in the result (https://github.com/ansible-collections/community.general/issues/10853, https://github.com/ansible-collections/community.general/pull/10857).
+- yaml cache plugin - make compatible with ansible-core 2.19 (https://github.com/ansible-collections/community.general/issues/10849, https://github.com/ansible-collections/community.general/issues/10852).
+
 v9.5.11
 =======
 

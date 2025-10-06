@@ -1792,3 +1792,17 @@ releases:
       - 9.5.11.yml
       - become-pipelining.yml
     release_date: '2025-08-11'
+  9.5.12:
+    changes:
+      bugfixes:
+        - github_deploy_key - fix bug during error handling if no body was present
+          in the result (https://github.com/ansible-collections/community.general/issues/10853,
+          https://github.com/ansible-collections/community.general/pull/10857).
+        - yaml cache plugin - make compatible with ansible-core 2.19 (https://github.com/ansible-collections/community.general/issues/10849,
+          https://github.com/ansible-collections/community.general/issues/10852).
+      release_summary: Bugfix release.
+    fragments:
+      - 10852-yaml.yml
+      - 10857-github_deploy_key-err.yml
+      - 9.5.12.yml
+    release_date: '2025-10-06'
