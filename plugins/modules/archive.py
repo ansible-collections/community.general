@@ -190,7 +190,6 @@ import shutil
 import tarfile
 import zipfile
 from fnmatch import fnmatch
-from sys import version_info
 from traceback import format_exc
 from zlib import crc32
 
