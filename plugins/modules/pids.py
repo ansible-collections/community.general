@@ -67,7 +67,6 @@ import abc
 import re
 from os.path import basename
 
-from ansible.module_utils import six
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils import deps
 from ansible.module_utils.common.text.converters import to_native
@@ -82,8 +81,7 @@ class PSAdapterError(Exception):
     pass
 
 
-@six.add_metaclass(abc.ABCMeta)
-class PSAdapter(object):
+class PSAdapter(object, metaclass=abc.ABCMeta):
     NAME_ATTRS = ('name', 'cmdline')
     PATTERN_ATTRS = ('name', 'exe', 'cmdline')
 

@@ -11,7 +11,6 @@ from ansible_collections.community.internal_test_tools.tests.unit.compat import 
 from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
 
 from ansible.errors import AnsibleError
-from ansible.module_utils import six
 from ansible.plugins.loader import lookup_loader
 from ansible_collections.community.general.plugins.lookup.bitwarden import Bitwarden, BitwardenException
 from ansible.parsing.ajson import AnsibleJSONEncoder
@@ -242,7 +241,7 @@ class TestLookupModule(unittest.TestCase):
         # Entry 0, "a_test" of the test input should have no duplicates.
         record = MOCK_RECORDS[0]
         record_name = record['name']
-        for k, v in six.iteritems(record['login']):
+        for k, v in record['login'].items():
             self.assertEqual([v],
                              self.lookup.run([record_name], field=k)[0])
 

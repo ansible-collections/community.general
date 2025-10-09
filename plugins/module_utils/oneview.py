@@ -27,7 +27,6 @@ except ImportError:
     HPE_ONEVIEW_IMP_ERR = traceback.format_exc()
     HAS_HPE_ONEVIEW = False
 
-from ansible.module_utils import six
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
 
@@ -130,7 +129,7 @@ class OneViewModuleException(Exception):
         self.msg = None
         self.oneview_response = None
 
-        if isinstance(data, six.string_types):
+        if isinstance(data, str):
             self.msg = data
         else:
             self.oneview_response = data
@@ -180,8 +179,7 @@ class OneViewModuleResourceNotFound(OneViewModuleException):
     pass
 
 
-@six.add_metaclass(abc.ABCMeta)
-class OneViewModuleBase(object):
+class OneViewModuleBase(object, metaclass=abc.ABCMeta):
     MSG_CREATED = 'Resource created successfully.'
     MSG_UPDATED = 'Resource updated successfully.'
     MSG_DELETED = 'Resource deleted successfully.'

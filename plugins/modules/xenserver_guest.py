@@ -544,7 +544,6 @@ except ImportError:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.network import is_mac
-from ansible.module_utils import six
 from ansible_collections.community.general.plugins.module_utils.xenserver import (
     xenserver_common_argument_spec, XenServerObject, get_object_ref,
     gather_vm_params, gather_vm_facts, set_vm_power_state,
@@ -716,7 +715,7 @@ class XenServerVM(XenServerObject):
 
         try:
             for change in config_changes:
-                if isinstance(change, six.string_types):
+                if isinstance(change, str):
                     if change == "name":
                         self.xapi_session.xenapi.VM.set_name_label(self.vm_ref, self.module.params['name'])
                     elif change == "name_desc":

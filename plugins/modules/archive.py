@@ -196,7 +196,6 @@ from zlib import crc32
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes, to_native
-from ansible.module_utils import six
 
 try:  # python 3.2+
     from zipfile import BadZipFile  # type: ignore[attr-defined]
@@ -204,22 +203,12 @@ except ImportError:  # older python
     from zipfile import BadZipfile as BadZipFile
 
 LZMA_IMP_ERR = None
-if six.PY3:
-    try:
-        import lzma
-        HAS_LZMA = True
-    except ImportError:
-        LZMA_IMP_ERR = format_exc()
-        HAS_LZMA = False
-else:
-    try:
-        from backports import lzma
-        HAS_LZMA = True
-    except ImportError:
-        LZMA_IMP_ERR = format_exc()
-        HAS_LZMA = False
-
-PY27 = version_info[0:2] >= (2, 7)
+try:
+    import lzma
+    HAS_LZMA = True
+except ImportError:
+    LZMA_IMP_ERR = format_exc()
+    HAS_LZMA = False
 
 STATE_ABSENT = 'absent'
 STATE_ARCHIVED = 'archive'
@@ -228,7 +217,7 @@ STATE_INCOMPLETE = 'incomplete'
 
 
 def common_path(paths):
-    empty = b'' if paths and isinstance(paths[0], six.binary_type) else ''
+    empty = b'' if paths and isinstance(paths[0], bytes) else ''
 
     return os.path.join(
         os.path.dirname(os.path.commonprefix([os.path.join(os.path.dirname(p), empty) for p in paths])), empty
@@ -273,8 +262,7 @@ def _to_native_ascii(s):
     return to_native(s, errors='surrogate_or_strict', encoding='ascii')
 
 
-@six.add_metaclass(abc.ABCMeta)
-class Archive(object):
+class Archive(object, metaclass=abc.ABCMeta):
     def __init__(self, module):
         self.module = module
 
@@ -576,16 +564,10 @@ class TarArchive(Archive):
             self.module.fail_json(msg="%s is not a valid archive format" % self.format)
 
     def _add(self, path, archive_name):
-        def py27_filter(tarinfo):
+        def filter(tarinfo):
             return None if matches_exclusion_patterns(tarinfo.name, self.exclusion_patterns) else tarinfo
 
-        def py26_filter(path):
-            return matches_exclusion_patterns(path, self.exclusion_patterns)
-
-        if PY27:
-            self.file.add(path, archive_name, recursive=False, filter=py27_filter)
-        else:
-            self.file.add(path, archive_name, recursive=False, exclude=py26_filter)
+        self.file.add(path, archive_name, recursive=False, filter=filter)
 
     def _get_checksums(self, path):
         if HAS_LZMA:
