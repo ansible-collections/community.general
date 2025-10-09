@@ -753,7 +753,7 @@ def child_to_element(module, child, in_type):
             if len(child) > 1:
                 module.fail_json(msg="Can only create children from hashes with one key")
 
-            (key, value) = next(child.items())
+            (key, value) = list(child.items())[0]
             if isinstance(value, MutableMapping):
                 children = value.pop('_', None)
                 child_value = value.pop('+value', None)
