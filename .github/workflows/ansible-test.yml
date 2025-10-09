@@ -29,7 +29,7 @@ jobs:
     strategy:
       matrix:
         ansible:
-          - '2.16'
+          - '2.17'
     runs-on: ubuntu-latest
     steps:
       - name: Perform sanity testing
@@ -57,12 +57,12 @@ jobs:
         exclude:
           - ansible: ''
         include:
-          - ansible: '2.16'
-            python: '2.7'
-          - ansible: '2.16'
-            python: '3.6'
-          - ansible: '2.16'
-            python: '3.11'
+          - ansible: '2.17'
+            python: '3.7'
+          - ansible: '2.17'
+            python: '3.10'
+          - ansible: '2.17'
+            python: '3.12'
 
     steps:
       - name: >-
@@ -98,56 +98,51 @@ jobs:
         exclude:
           - ansible: ''
         include:
-          # 2.16
-          # CentOS 7 does not work in GHA, that's why it's not listed here.
-          - ansible: '2.16'
-            docker: fedora38
+          # 2.17
+          - ansible: '2.17'
+            docker: fedora39
             python: ''
             target: azp/posix/1/
-          - ansible: '2.16'
-            docker: fedora38
+          - ansible: '2.17'
+            docker: fedora39
             python: ''
             target: azp/posix/2/
-          - ansible: '2.16'
-            docker: fedora38
+          - ansible: '2.17'
+            docker: fedora39
             python: ''
             target: azp/posix/3/
-          - ansible: '2.16'
-            docker: opensuse15
+          - ansible: '2.17'
+            docker: ubuntu2004
             python: ''
             target: azp/posix/1/
-          - ansible: '2.16'
-            docker: opensuse15
+          - ansible: '2.17'
+            docker: ubuntu2004
             python: ''
             target: azp/posix/2/
-          - ansible: '2.16'
-            docker: opensuse15
+          - ansible: '2.17'
+            docker: ubuntu2004
             python: ''
             target: azp/posix/3/
-          - ansible: '2.16'
-            docker: alpine3
+          - ansible: '2.17'
+            docker: alpine319
             python: ''
             target: azp/posix/1/
-          - ansible: '2.16'
-            docker: alpine3
+          - ansible: '2.17'
+            docker: alpine319
             python: ''
             target: azp/posix/2/
-          - ansible: '2.16'
-            docker: alpine3
+          - ansible: '2.17'
+            docker: alpine319
             python: ''
             target: azp/posix/3/
           # Right now all generic tests are disabled. Uncomment when at least one of them is re-enabled.
-          # - ansible: '2.16'
+          # - ansible: '2.17'
           #   docker: default
-          #   python: '2.7'
+          #   python: '3.7'
           #   target: azp/generic/1/
-          # - ansible: '2.16'
+          # - ansible: '2.17'
           #   docker: default
-          #   python: '3.6'
-          #   target: azp/generic/1/
-          # - ansible: '2.16'
-          #   docker: default
-          #   python: '3.11'
+          #   python: '3.12'
           #   target: azp/generic/1/
 
     steps:
