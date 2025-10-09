@@ -19,7 +19,7 @@ description:
 extends_documentation_fragment:
   - community.general.attributes
 requirements:
-  - Python package C(BeautifulSoup) on Python 2, C(beautifulsoup4) on Python 3.
+  - Python package C(beautifulsoup4)
 attributes:
   check_mode:
     support: full
@@ -215,14 +215,10 @@ from ansible_collections.community.general.plugins.module_utils.module_helper im
 
 from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.urls import fetch_url
-from ansible.module_utils.six import raise_from, PY2
+from ansible.module_utils.six import raise_from
 
-if PY2:
-    with deps.declare("BeautifulSoup"):
-        from BeautifulSoup import BeautifulSoup
-else:
-    with deps.declare("beautifulsoup4"):
-        from bs4 import BeautifulSoup
+with deps.declare("beautifulsoup4"):
+    from bs4 import BeautifulSoup
 
 # balancer member attributes extraction regexp:
 EXPRESSION = re.compile(to_text(r"(b=([\w\.\-]+)&w=(https?|ajp|wss?|ftp|[sf]cgi)://([\w\.\-]+):?(\d*)([/\w\.\-]*)&?[\w\-\=]*)"))
@@ -231,8 +227,6 @@ APACHE_VERSION_EXPRESSION = re.compile(to_text(r"SERVER VERSION: APACHE/([\d.]+)
 
 
 def find_all(where, what):
-    if PY2:
-        return where.findAll(what)
     return where.find_all(what)
 
 

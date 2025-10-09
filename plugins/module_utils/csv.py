@@ -12,7 +12,6 @@ import csv
 from io import BytesIO, StringIO
 
 from ansible.module_utils.common.text.converters import to_native
-from ansible.module_utils.six import PY3
 
 
 class CustomDialectFailureError(Exception):
@@ -60,10 +59,7 @@ def read_csv(data, dialect, fieldnames=None):
     if data.startswith(BOM):
         data = data[len(BOM):]
 
-    if PY3:
-        fake_fh = StringIO(data)
-    else:
-        fake_fh = BytesIO(data)
+    fake_fh = StringIO(data)
 
     reader = csv.DictReader(fake_fh, fieldnames=fieldnames, dialect=dialect)
 
