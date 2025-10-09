@@ -1,7 +1,7 @@
 # Copyright (c) 2018 Antoine Catton
 # MIT License (see LICENSES/MIT.txt or https://opensource.org/licenses/MIT)
 # SPDX-License-Identifier: MIT
-from __future__ import (absolute_import, division, print_function)
+from __future__ import annotations
 __metaclass__ = type
 
 import copy

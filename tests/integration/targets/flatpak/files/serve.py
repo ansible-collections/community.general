@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # -*- coding: utf-8 -*-
-from __future__ import (absolute_import, division, print_function)
+from __future__ import annotations
 __metaclass__ = type
 
 import os

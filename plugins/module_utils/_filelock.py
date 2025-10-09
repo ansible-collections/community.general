@@ -5,7 +5,7 @@
 # NOTE:
 # This has been vendored from ansible.module_utils.common.file. This code has been removed from there for ansible-core 2.16.
 
-from __future__ import (absolute_import, division, print_function)
+from __future__ import annotations
 __metaclass__ = type
 
 import os

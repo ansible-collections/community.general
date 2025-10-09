@@ -7,7 +7,7 @@
 Pritunl API that offers CRUD operations on Pritunl Organizations and Users
 """
 
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
 import base64
 import hashlib

@@ -10,7 +10,7 @@
 
 # TODO: Add support for diff mode
 
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 __metaclass__ = type
 
 DOCUMENTATION = r"""

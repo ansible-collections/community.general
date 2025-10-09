@@ -5,7 +5,7 @@
 #
 # The API responses used in these tests were recorded from OpenNebula version 5.10.
 
-from __future__ import (absolute_import, division, print_function)
+from __future__ import annotations
 
 __metaclass__ = type
 
