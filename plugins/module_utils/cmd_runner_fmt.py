@@ -16,16 +16,13 @@ def _ensure_list(value):
 
 
 class _ArgFormat(object):
-    # DEPRECATION: set default value for ignore_none to True in community.general 12.0.0
-    def __init__(self, func, ignore_none=None, ignore_missing_value=False):
+    def __init__(self, func, ignore_none=True, ignore_missing_value=False):
         self.func = func
         self.ignore_none = ignore_none
         self.ignore_missing_value = ignore_missing_value
 
-    # DEPRECATION: remove parameter ctx_ignore_none in community.general 12.0.0
-    def __call__(self, value, ctx_ignore_none=True):
-        # DEPRECATION: replace ctx_ignore_none with True in community.general 12.0.0
-        ignore_none = self.ignore_none if self.ignore_none is not None else ctx_ignore_none
+    def __call__(self, value):
+        ignore_none = self.ignore_none if self.ignore_none is not None else True
         if value is None and ignore_none:
             return []
         f = self.func

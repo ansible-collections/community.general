@@ -132,16 +132,7 @@ class CmdRunner(object):
     def binary(self):
         return self.command[0]
 
-    # remove parameter ignore_value_none in community.general 12.0.0
-    def __call__(self, args_order=None, output_process=None, ignore_value_none=None, check_mode_skip=False, check_mode_return=None, **kwargs):
-        if ignore_value_none is None:
-            ignore_value_none = True
-        else:
-            self.module.deprecate(
-                "Using ignore_value_none when creating the runner context is now deprecated, "
-                "and the parameter will be removed in community.general 12.0.0. ",
-                version="12.0.0", collection_name="community.general"
-            )
+    def __call__(self, args_order=None, output_process=None, check_mode_skip=False, check_mode_return=None, **kwargs):
         if output_process is None:
             output_process = _process_as_is
         if args_order is None:
@@ -153,7 +144,6 @@ class CmdRunner(object):
         return _CmdRunnerContext(runner=self,
                                  args_order=args_order,
                                  output_process=output_process,
-                                 ignore_value_none=ignore_value_none,           # DEPRECATION: remove in community.general 12.0.0
                                  check_mode_skip=check_mode_skip,
                                  check_mode_return=check_mode_return, **kwargs)
 
@@ -165,12 +155,10 @@ class CmdRunner(object):
 
 
 class _CmdRunnerContext(object):
-    def __init__(self, runner, args_order, output_process, ignore_value_none, check_mode_skip, check_mode_return, **kwargs):
+    def __init__(self, runner, args_order, output_process, check_mode_skip, check_mode_return, **kwargs):
         self.runner = runner
         self.args_order = tuple(args_order)
         self.output_process = output_process
-        # DEPRECATION: parameter ignore_value_none at the context level is deprecated and will be removed in community.general 12.0.0
-        self.ignore_value_none = ignore_value_none
         self.check_mode_skip = check_mode_skip
         self.check_mode_return = check_mode_return
         self.run_command_args = dict(kwargs)
@@ -209,8 +197,7 @@ class _CmdRunnerContext(object):
                     value = named_args[arg_name]
                 elif not runner.arg_formats[arg_name].ignore_missing_value:
                     raise MissingArgumentValue(self.args_order, arg_name)
-                # DEPRECATION: remove parameter ctx_ignore_none in 12.0.0
-                self.cmd.extend(runner.arg_formats[arg_name](value, ctx_ignore_none=self.ignore_value_none))
+                self.cmd.extend(runner.arg_formats[arg_name](value))
             except MissingArgumentValue:
                 raise
             except Exception as e:
@@ -226,7 +213,6 @@ class _CmdRunnerContext(object):
     @property
     def run_info(self):
         return dict(
-            ignore_value_none=self.ignore_value_none,         # DEPRECATION: remove in community.general 12.0.0
             check_rc=self.check_rc,
             environ_update=self.environ_update,
             args_order=self.args_order,

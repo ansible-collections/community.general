@@ -205,7 +205,7 @@ TC_RUNNER = dict(
             results="0-/-ni-/-nu"
         ),
     ),
-    aa_bb_ignore_none_with_none=(
+    aa_bb_with_none=(
         dict(
             args_bundle=dict(
                 aa=dict(type="int", value=49, fmt_func=cmd_runner_fmt.as_opt_eq_val, fmt_arg="--answer"),
@@ -214,32 +214,12 @@ TC_RUNNER = dict(
             runner_init_args=dict(default_args_order=['bb', 'aa']),
             runner_ctx_args=dict(
                 args_order=['aa', 'bb'],
-                ignore_value_none=True,  # default
             ),
         ),
         dict(runner_ctx_run_args=dict(bb=None), rc=0, out="ni", err="nu"),
         dict(
             run_info=dict(
                 cmd=['/mock/bin/testing', '--answer=49'],
-            ),
-        ),
-    ),
-    aa_bb_ignore_not_none_with_none=(
-        dict(
-            args_bundle=dict(
-                aa=dict(type="int", value=49, fmt_func=cmd_runner_fmt.as_opt_eq_val, fmt_arg="--answer"),
-                bb=dict(fmt_func=cmd_runner_fmt.as_bool, fmt_arg="--bb-here"),
-            ),
-            runner_init_args=dict(default_args_order=['bb', 'aa']),
-            runner_ctx_args=dict(
-                args_order=['aa', 'bb'],
-                ignore_value_none=False,
-            ),
-        ),
-        dict(runner_ctx_run_args=dict(aa=None, bb=True), rc=0, out="ni", err="nu"),
-        dict(
-            run_info=dict(
-                cmd=['/mock/bin/testing', '--answer=None', '--bb-here'],
             ),
         ),
     ),

@@ -23,12 +23,6 @@ CAUSE_CHG_DECO_PARAMS = ['deco_args', 'expect_exception', 'expect_changed']
 CAUSE_CHG_DECO = dict(
     none_succ=dict(deco_args={}, expect_exception=False, expect_changed=None),
     none_fail=dict(deco_args={}, expect_exception=True, expect_changed=None),
-    onsucc_succ=dict(deco_args=dict(on_success=True), expect_exception=False, expect_changed=True),
-    onsucc_fail=dict(deco_args=dict(on_success=True), expect_exception=True, expect_changed=None),
-    onfail_succ=dict(deco_args=dict(on_failure=True), expect_exception=False, expect_changed=None),
-    onfail_fail=dict(deco_args=dict(on_failure=True), expect_exception=True, expect_changed=True),
-    onboth_succ=dict(deco_args=dict(on_success=True, on_failure=True), expect_exception=False, expect_changed=True),
-    onboth_fail=dict(deco_args=dict(on_success=True, on_failure=True), expect_exception=True, expect_changed=True),
     whensucc_succ=dict(deco_args=dict(when="success"), expect_exception=False, expect_changed=True),
     whensucc_fail=dict(deco_args=dict(when="success"), expect_exception=True, expect_changed=None),
     whenfail_succ=dict(deco_args=dict(when="failure"), expect_exception=False, expect_changed=None),

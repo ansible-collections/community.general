@@ -30,6 +30,7 @@ options:
       - The value V(maintenance) has been added in community.general 11.1.0.
     choices: [cleanup, offline, online, restart, maintenance]
     type: str
+    required: true
   name:
     description:
       - Specify which node of the cluster you want to manage. V(null) == the cluster status itself, V(all) == check the status
@@ -74,7 +75,7 @@ class PacemakerCluster(StateModuleHelper):
     module = dict(
         argument_spec=dict(
             state=dict(type='str', choices=[
-                'cleanup', 'offline', 'online', 'restart', 'maintenance']),
+                'cleanup', 'offline', 'online', 'restart', 'maintenance'], required=True),
             name=dict(type='str', aliases=['node']),
             timeout=dict(type='int', default=300),
             force=dict(type='bool', default=True)
@@ -103,13 +104,6 @@ class PacemakerCluster(StateModuleHelper):
             self.module.deprecate(
                 'The value `cleanup` for "state" is being deprecated, use pacemaker_resource module instead.',
                 version='14.0.0',
-                collection_name='community.general'
-            )
-
-        if not self.module.params['state']:
-            self.module.deprecate(
-                'Parameter "state" values not set is being deprecated. Make sure to provide a value for "state"',
-                version='12.0.0',
                 collection_name='community.general'
             )
 
