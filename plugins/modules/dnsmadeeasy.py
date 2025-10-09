@@ -367,7 +367,6 @@ from urllib.parse import urlencode
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
-from ansible.module_utils.six import string_types
 
 
 class DME2(object):
@@ -417,7 +416,7 @@ class DME2(object):
 
     def query(self, resource, method, data=None):
         url = self.baseurl + resource
-        if data and not isinstance(data, string_types):
+        if data and not isinstance(data, str):
             data = urlencode(data)
 
         response, info = fetch_url(self.module, url, data=data, method=method, headers=self._headers())

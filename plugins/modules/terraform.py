@@ -284,7 +284,6 @@ import os
 import json
 import tempfile
 from shlex import quote as shlex_quote
-from ansible.module_utils.six import integer_types
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -601,11 +600,11 @@ def main():
                     ret_out.append('{0}={{{1}}}'.format(k, process_complex_args(v)))
                 elif isinstance(v, list):
                     ret_out.append("{0}={1}".format(k, process_complex_args(v)))
-                elif isinstance(v, (integer_types, float, str, bool)):
+                elif isinstance(v, (int, float, str, bool)):
                     ret_out.append('{0}={1}'.format(k, format_args(v)))
                 else:
                     # only to handle anything unforeseen
-                    module.fail_json(msg="Supported types are, dictionaries, lists, strings, integer_types, boolean and float.")
+                    module.fail_json(msg="Supported types are, dictionaries, lists, strings, integers, boolean and float.")
         if isinstance(vars, list):
             l_out = []
             for item in vars:
@@ -613,11 +612,11 @@ def main():
                     l_out.append("{{{0}}}".format(process_complex_args(item)))
                 elif isinstance(item, list):
                     l_out.append("{0}".format(process_complex_args(item)))
-                elif isinstance(item, (str, integer_types, float, bool)):
+                elif isinstance(item, (str, int, float, bool)):
                     l_out.append(format_args(item))
                 else:
                     # only to handle anything unforeseen
-                    module.fail_json(msg="Supported types are, dictionaries, lists, strings, integer_types, boolean and float.")
+                    module.fail_json(msg="Supported types are, dictionaries, lists, strings, integers, boolean and float.")
 
             ret_out.append("[{0}]".format(",".join(l_out)))
         return ",".join(ret_out)

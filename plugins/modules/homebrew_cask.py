@@ -160,7 +160,6 @@ from ansible_collections.community.general.plugins.module_utils.homebrew import 
 
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six import string_types
 
 
 # exceptions -------------------------------------------------------------- {{{
@@ -203,7 +202,7 @@ class HomebrewCask(object):
             return True
 
         return (
-            isinstance(cask, string_types)
+            isinstance(cask, str)
             and not cls.INVALID_CASK_REGEX.search(cask)
         )
 
@@ -219,7 +218,7 @@ class HomebrewCask(object):
             return True
         else:
             return (
-                isinstance(state, string_types)
+                isinstance(state, str)
                 and state.lower() in (
                     'installed',
                     'absent',
@@ -263,7 +262,7 @@ class HomebrewCask(object):
             raise HomebrewCaskException(self.message)
 
         else:
-            if isinstance(path, string_types):
+            if isinstance(path, str):
                 self._path = path.split(':')
             else:
                 self._path = path
@@ -490,7 +489,7 @@ class HomebrewCask(object):
             'update',
         ])
         if rc == 0:
-            if out and isinstance(out, string_types):
+            if out and isinstance(out, str):
                 already_updated = any(
                     re.search(r'Already up-to-date.', s.strip(), re.IGNORECASE)
                     for s in out.split('\n')

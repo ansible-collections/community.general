@@ -9,7 +9,6 @@ __metaclass__ = type
 
 import os
 import re
-from ansible.module_utils.six import string_types
 
 
 def _create_regex_group_complement(s):
@@ -72,7 +71,7 @@ class HomebrewValidate(object):
              - os.path.sep
         """
 
-        if isinstance(path, string_types):
+        if isinstance(path, str):
             return not cls.INVALID_PATH_REGEX.search(path)
 
         try:
@@ -100,7 +99,7 @@ class HomebrewValidate(object):
             return True
 
         return isinstance(
-            brew_path, string_types
+            brew_path, str
         ) and not cls.INVALID_BREW_PATH_REGEX.search(brew_path)
 
     @classmethod
@@ -111,7 +110,7 @@ class HomebrewValidate(object):
             return True
 
         return isinstance(
-            package, string_types
+            package, str
         ) and not cls.INVALID_PACKAGE_REGEX.search(package)
 
 
@@ -128,7 +127,7 @@ def parse_brew_path(module):
     if not HomebrewValidate.valid_path(path):
         module.fail_json(msg="Invalid path: {0}".format(path))
 
-    if isinstance(path, string_types):
+    if isinstance(path, str):
         paths = path.split(":")
     elif isinstance(path, list):
         paths = path

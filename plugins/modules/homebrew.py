@@ -183,7 +183,6 @@ import re
 from ansible_collections.community.general.plugins.module_utils.homebrew import HomebrewValidate
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six import string_types
 
 
 # exceptions -------------------------------------------------------------- {{{
@@ -226,7 +225,7 @@ class Homebrew(object):
             return True
         else:
             return (
-                isinstance(state, string_types)
+                isinstance(state, str)
                 and state.lower() in (
                     'installed',
                     'upgraded',
@@ -275,7 +274,7 @@ class Homebrew(object):
             raise HomebrewException(self.message)
 
         else:
-            if isinstance(path, string_types):
+            if isinstance(path, str):
                 self._path = path.split(':')
             else:
                 self._path = path
@@ -509,7 +508,7 @@ class Homebrew(object):
             'update',
         ])
         if rc == 0:
-            if out and isinstance(out, string_types):
+            if out and isinstance(out, str):
                 already_updated = any(
                     re.search(r'Already up-to-date.', s.strip(), re.IGNORECASE)
                     for s in out.split('\n')

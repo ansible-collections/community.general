@@ -377,7 +377,6 @@ except ImportError:
     HAS_LXML = False
 
 from ansible.module_utils.basic import AnsibleModule, json_dict_bytes_to_unicode, missing_required_lib
-from ansible.module_utils.six import string_types
 from ansible.module_utils.common.text.converters import to_bytes, to_native
 
 _IDENT = r"[a-zA-Z-][a-zA-Z0-9_\-\.]*"
@@ -748,7 +747,7 @@ def child_to_element(module, child, in_type):
         except etree.XMLSyntaxError as e:
             module.fail_json(msg="Error while parsing child element: %s" % e)
     elif in_type == 'yaml':
-        if isinstance(child, string_types):
+        if isinstance(child, str):
             return etree.Element(child)
         elif isinstance(child, MutableMapping):
             if len(child) > 1:

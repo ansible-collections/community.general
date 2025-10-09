@@ -140,7 +140,6 @@ from datetime import datetime
 import re
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six import binary_type, text_type
 
 
 # exceptions --------------------------------------------------------------- {{{
@@ -202,7 +201,7 @@ class OSXDefaults(object):
         if data_type == "string":
             return str(value)
         elif data_type in ["bool", "boolean"]:
-            if isinstance(value, (binary_type, text_type)):
+            if isinstance(value, (bytes, str)):
                 value = value.lower()
             if value in [True, 1, "true", "1", "yes"]:
                 return True

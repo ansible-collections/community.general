@@ -10,7 +10,6 @@ __metaclass__ = type
 
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
-from ansible.module_utils.six import integer_types, string_types
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
@@ -146,7 +145,7 @@ def vars_to_variables(vars, module):
     # transform old vars to new variables structure
     variables = list()
     for item, value in vars.items():
-        if isinstance(value, (string_types, integer_types, float)):
+        if isinstance(value, (str, int, float)):
             variables.append(
                 {
                     "name": item,
