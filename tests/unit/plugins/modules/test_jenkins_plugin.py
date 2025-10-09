@@ -8,9 +8,9 @@ __metaclass__ = type
 from io import BytesIO
 import json
 from collections import OrderedDict
+from collections.abc import Mapping
 
 from ansible_collections.community.general.plugins.modules.jenkins_plugin import JenkinsPlugin
-from ansible.module_utils.six.moves.collections_abc import Mapping
 from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import (
     MagicMock,
     patch,

@@ -6,6 +6,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
+import http.client as http_client
 import json
 import os
 import random
@@ -16,9 +17,8 @@ from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible.module_utils.six import text_type
-from ansible.module_utils.six.moves import http_client
-from ansible.module_utils.six.moves.urllib.error import URLError, HTTPError
-from ansible.module_utils.six.moves.urllib.parse import urlparse
+from urllib.error import URLError, HTTPError
+from urllib.parse import urlparse
 
 GET_HEADERS = {'accept': 'application/json', 'OData-Version': '4.0'}
 POST_HEADERS = {'content-type': 'application/json', 'accept': 'application/json',

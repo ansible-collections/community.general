@@ -363,6 +363,7 @@ import os
 import re
 import traceback
 
+from collections.abc import MutableMapping
 from io import BytesIO
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
@@ -377,7 +378,6 @@ except ImportError:
 
 from ansible.module_utils.basic import AnsibleModule, json_dict_bytes_to_unicode, missing_required_lib
 from ansible.module_utils.six import iteritems, string_types
-from ansible.module_utils.six.moves.collections_abc import MutableMapping
 from ansible.module_utils.common.text.converters import to_bytes, to_native
 
 _IDENT = r"[a-zA-Z-][a-zA-Z0-9_\-\.]*"

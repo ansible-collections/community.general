@@ -173,7 +173,8 @@ command:
   sample: "/usr/bin/flatpak install --user --nontinteractive flathub org.gnome.Calculator"
 """
 
-from ansible.module_utils.six.moves.urllib.parse import urlparse
+from urllib.parse import urlparse
+
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion

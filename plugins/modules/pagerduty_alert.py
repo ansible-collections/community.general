@@ -220,8 +220,8 @@ import json
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
-from ansible.module_utils.six.moves.urllib.parse import urlparse, urlencode, urlunparse
 from datetime import datetime
+from urllib.parse import urlparse, urlencode, urlunparse
 
 
 def check(module, name, state, service_id, integration_key, api_key, incident_key=None, http_call=fetch_url):

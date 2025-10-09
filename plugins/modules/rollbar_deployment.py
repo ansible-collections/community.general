@@ -85,10 +85,11 @@ EXAMPLES = r"""
   revision: "{{ lookup('pipe', 'git rev-parse HEAD') }}"
   user: "{{ lookup('env', 'USER') }}"
 """
+
 import traceback
+from urllib.parse import urlencode
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.urls import fetch_url
 

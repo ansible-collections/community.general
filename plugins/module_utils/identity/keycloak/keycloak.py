@@ -10,10 +10,10 @@ __metaclass__ = type
 import json
 import traceback
 import copy
+from urllib.parse import urlencode, quote
+from urllib.error import HTTPError
 
 from ansible.module_utils.urls import open_url
-from ansible.module_utils.six.moves.urllib.parse import urlencode, quote
-from ansible.module_utils.six.moves.urllib.error import HTTPError
 from ansible.module_utils.common.text.converters import to_native, to_text
 
 URL_REALM_INFO = "{url}/realms/{realm}"

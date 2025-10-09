@@ -86,10 +86,10 @@ telegram_error:
 """
 
 import json
+from urllib.parse import quote
 
 from ansible.module_utils.basic import AnsibleModule
 # noinspection PyUnresolvedReferences
-from ansible.module_utils.six.moves.urllib.parse import quote
 from ansible.module_utils.urls import fetch_url
 
 

@@ -130,8 +130,8 @@ executions:
     ]
 """
 
+from urllib.parse import quote
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six.moves.urllib.parse import quote
 from ansible_collections.community.general.plugins.module_utils.rundeck import (
     api_argument_spec,
     api_request

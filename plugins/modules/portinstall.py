@@ -66,8 +66,8 @@ EXAMPLES = r"""
 
 import re
 
+from shlex import quote as shlex_quote
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six.moves import shlex_quote
 
 
 def query_package(module, name):

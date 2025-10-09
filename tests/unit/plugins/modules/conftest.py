@@ -7,11 +7,11 @@ __metaclass__ = type
 
 import contextlib as _contextlib
 import json
+from collections.abc import MutableMapping
 
 import pytest
 
 from ansible.module_utils.six import string_types
-from ansible.module_utils.six.moves.collections_abc import MutableMapping
 
 from ansible_collections.community.general.plugins.module_utils import deps
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args as _set_module_args

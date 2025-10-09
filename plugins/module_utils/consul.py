@@ -11,9 +11,9 @@ __metaclass__ = type
 import copy
 import json
 import re
+from urllib import error as urllib_error
+from urllib.parse import urlencode
 
-from ansible.module_utils.six.moves.urllib import error as urllib_error
-from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.urls import open_url
 
 

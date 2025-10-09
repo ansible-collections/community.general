@@ -75,9 +75,9 @@ RETURN = r"""
 """
 
 import ssl
+import xmlrpc.client as xmlrpc_client
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six.moves import xmlrpc_client
 from ansible.module_utils.common.text.converters import to_text
 
 from ansible_collections.community.general.plugins.module_utils.datetime import (

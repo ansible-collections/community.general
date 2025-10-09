@@ -283,7 +283,7 @@ command:
 import os
 import json
 import tempfile
-from ansible.module_utils.six.moves import shlex_quote
+from shlex import quote as shlex_quote
 from ansible.module_utils.six import integer_types
 
 from ansible.module_utils.basic import AnsibleModule

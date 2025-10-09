@@ -144,8 +144,8 @@ targets:
   version_added: 7.2.0
 """
 
+from shlex import quote as shlex_quote
 from ansible.module_utils.six import iteritems
-from ansible.module_utils.six.moves import shlex_quote
 from ansible.module_utils.basic import AnsibleModule
 
 

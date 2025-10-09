@@ -104,10 +104,10 @@ output:
 """
 
 import json
+from http import cookiejar
+from urllib.parse import urlencode
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six.moves import http_cookiejar as cookiejar
-from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.common.text.converters import to_native
 

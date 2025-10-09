@@ -340,10 +340,10 @@ import os
 import tempfile
 import time
 from collections import OrderedDict
+from http import cookiejar
+from urllib.parse import urlencode
 
 from ansible.module_utils.basic import AnsibleModule, to_bytes
-from ansible.module_utils.six.moves import http_cookiejar as cookiejar
-from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.urls import fetch_url, url_argument_spec, basic_auth_header
 from ansible.module_utils.six import text_type, binary_type
 from ansible.module_utils.common.text.converters import to_native

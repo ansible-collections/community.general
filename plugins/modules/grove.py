@@ -66,8 +66,9 @@ EXAMPLES = r"""
     message: 'deployed {{ target }}'
 """
 
+from urllib.parse import urlencode
+
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.urls import fetch_url
 
 

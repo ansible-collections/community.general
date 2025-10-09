@@ -17,7 +17,7 @@ import os
 import hmac
 import re
 
-from ansible.module_utils.six.moves.urllib.parse import urlparse
+from urllib.parse import urlparse
 
 try:
     from hashlib import sha1

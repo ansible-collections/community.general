@@ -202,7 +202,6 @@ servers:
 
 import os
 import time
-from ansible.module_utils.six.moves import xrange
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.oneandone import (
     get_datacenter,
@@ -578,7 +577,7 @@ def _auto_increment_hostname(count, hostname):
 
     return [
         hostname % i
-        for i in xrange(1, count + 1)
+        for i in range(1, count + 1)
     ]
 
 
@@ -590,7 +589,7 @@ def _auto_increment_description(count, description):
     if '%' in description:
         return [
             description % i
-            for i in xrange(1, count + 1)
+            for i in range(1, count + 1)
         ]
     else:
         return [description] * count
