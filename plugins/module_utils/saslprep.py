@@ -11,7 +11,6 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 from __future__ import annotations
-__metaclass__ = type
 
 from stringprep import (
     in_table_a1,

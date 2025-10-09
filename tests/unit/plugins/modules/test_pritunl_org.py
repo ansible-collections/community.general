@@ -25,8 +25,6 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
     set_module_args,
 )
 
-__metaclass__ = type
-
 
 class TestPritunlOrg(ModuleTestCase):
     def setUp(self):

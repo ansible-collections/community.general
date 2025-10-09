@@ -6,9 +6,6 @@
 
 from __future__ import annotations
 
-__metaclass__ = type
-
-
 DOCUMENTATION = r"""
 module: ocapi_info
 version_added: 6.3.0

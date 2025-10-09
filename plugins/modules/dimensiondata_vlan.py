@@ -7,7 +7,6 @@
 #   - Adam Friedman  <tintoy@tintoy.io>
 
 from __future__ import annotations
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 module: dimensiondata_vlan

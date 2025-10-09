@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 from __future__ import annotations
-__metaclass__ = type
 
 
 from ansible.module_utils import basic

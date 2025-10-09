@@ -8,9 +8,6 @@
 
 from __future__ import annotations
 
-__metaclass__ = type
-
-
 DOCUMENTATION = r"""
 module: emc_vnx_sg_member
 

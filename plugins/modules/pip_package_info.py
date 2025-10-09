@@ -6,7 +6,6 @@
 # started out with AWX's scan_packages module
 
 from __future__ import annotations
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 module: pip_package_info

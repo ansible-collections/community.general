@@ -14,8 +14,6 @@ from ansible_collections.community.general.plugins.module_utils.net_tools.pritun
 )
 from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import MagicMock
 
-__metaclass__ = type
-
 
 # Pritunl Mocks
 

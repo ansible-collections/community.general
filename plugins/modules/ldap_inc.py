@@ -11,7 +11,6 @@
 # The code of this module is derived from that of ldap_attrs.py
 
 from __future__ import annotations
-__metaclass__ = type
 
 
 DOCUMENTATION = r"""

@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
-__metaclass__ = type
 
 
 from ansible_collections.community.general.plugins.modules import xfconf_info

@@ -6,7 +6,6 @@
 from __future__ import annotations
 
 import gitlab
-__metaclass__ = type
 
 import pytest
 

@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 from __future__ import annotations
-__metaclass__ = type
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.mh.exceptions import ModuleHelperException as _MHE

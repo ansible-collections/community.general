@@ -6,7 +6,6 @@
 # https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 module: keycloak_authz_permission

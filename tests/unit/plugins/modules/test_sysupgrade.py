@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
-__metaclass__ = type
 
 from ansible.module_utils import basic
 from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch

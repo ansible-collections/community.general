@@ -6,9 +6,6 @@
 
 from __future__ import annotations
 
-
-__metaclass__ = type
-
 DOCUMENTATION = r"""
 module: utm_aaa_group_info
 

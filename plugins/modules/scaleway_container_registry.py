@@ -8,7 +8,6 @@
 
 from __future__ import annotations
 
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 module: scaleway_container_registry

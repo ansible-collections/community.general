@@ -9,7 +9,6 @@ Ansible Module - community.general.keyring_info
 
 from __future__ import annotations
 
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 module: keyring_info

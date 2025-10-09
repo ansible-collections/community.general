@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-__metaclass__ = type
 
 from collections import OrderedDict
 import json

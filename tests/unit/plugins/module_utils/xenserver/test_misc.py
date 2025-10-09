@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
-__metaclass__ = type
 
 
 def test_xapi_to_module_vm_power_state_bad_power_state(xenserver):

@@ -10,7 +10,6 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 from __future__ import annotations
-__metaclass__ = type
 
 from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.urls import open_url

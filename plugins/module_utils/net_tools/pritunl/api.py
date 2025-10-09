@@ -18,8 +18,6 @@ import uuid
 from ansible.module_utils.six import iteritems
 from ansible.module_utils.urls import open_url
 
-__metaclass__ = type
-
 
 class PritunlException(Exception):
     pass

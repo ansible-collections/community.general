@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 """Check extra collection docs with antsibull-docs."""
 from __future__ import annotations
-__metaclass__ = type
 
 import glob
 import sys

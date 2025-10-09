@@ -5,9 +5,6 @@
 # Make coding more python3-ish
 from __future__ import annotations
 
-__metaclass__ = type
-
-
 import pytest
 
 from ansible_collections.community.internal_test_tools.tests.unit.utils.trust import (

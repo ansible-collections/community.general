@@ -7,9 +7,6 @@
 
 from __future__ import annotations
 
-__metaclass__ = type
-
-
 DOCUMENTATION = r"""
 module: simpleinit_msb
 short_description: Manage services on Source Mage GNU/Linux

@@ -7,7 +7,6 @@ from json import loads
 from typing import TYPE_CHECKING
 from ansible.errors import AnsibleFilterError
 
-__metaclass__ = type  # pylint: disable=C0103
 
 if TYPE_CHECKING:
     from typing import Any, Callable, Union

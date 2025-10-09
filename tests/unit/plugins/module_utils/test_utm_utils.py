@@ -10,7 +10,6 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 from __future__ import annotations
-__metaclass__ = type
 
 from ansible_collections.community.general.plugins.module_utils.utm_utils import UTM
 

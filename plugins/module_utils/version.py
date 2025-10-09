@@ -6,7 +6,6 @@
 """Provide version object to compare version numbers."""
 
 from __future__ import annotations
-__metaclass__ = type
 
 
 from ansible.module_utils.compat.version import LooseVersion  # noqa: F401, pylint: disable=unused-import

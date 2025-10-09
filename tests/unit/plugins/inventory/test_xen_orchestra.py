@@ -5,7 +5,6 @@
 # The API responses used in these tests were recorded from PVE version 6.2.
 
 from __future__ import annotations
-__metaclass__ = type
 
 import pytest
 

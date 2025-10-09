@@ -14,7 +14,6 @@
 # This module is based on the crontab module.
 
 from __future__ import annotations
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 module: cronvar

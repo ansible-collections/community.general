@@ -10,7 +10,6 @@ import re
 import traceback
 from operator import itemgetter
 
-__metaclass__ = type
 
 try:
     from paramiko.config import SSHConfig

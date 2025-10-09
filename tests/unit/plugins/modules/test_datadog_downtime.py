@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-__metaclass__ = type
 
 from ansible_collections.community.general.plugins.modules import datadog_downtime
 from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import MagicMock, patch

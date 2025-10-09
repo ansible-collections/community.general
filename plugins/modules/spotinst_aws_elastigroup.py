@@ -712,7 +712,6 @@ group_id:
 """
 
 HAS_SPOTINST_SDK = False
-__metaclass__ = type
 
 import os
 import time

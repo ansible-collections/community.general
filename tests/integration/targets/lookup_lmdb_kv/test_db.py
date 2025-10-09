@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
-__metaclass__ = type
 import lmdb
 map_size = 1024 * 100
 env = lmdb.open('./jp.mdb', map_size=map_size)

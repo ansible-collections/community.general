@@ -26,8 +26,6 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
     set_module_args,
 )
 
-__metaclass__ = type
-
 
 def mock_pritunl_api(func, **kwargs):
     def wrapped(self=None):

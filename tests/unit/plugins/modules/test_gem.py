@@ -2,7 +2,6 @@
 # MIT License (see LICENSES/MIT.txt or https://opensource.org/licenses/MIT)
 # SPDX-License-Identifier: MIT
 from __future__ import annotations
-__metaclass__ = type
 
 import copy
 

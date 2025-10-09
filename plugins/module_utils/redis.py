@@ -6,7 +6,6 @@
 from __future__ import annotations
 
 from ansible.module_utils.basic import missing_required_lib
-__metaclass__ = type
 
 import traceback
 
