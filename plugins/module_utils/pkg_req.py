@@ -6,8 +6,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-from ansible.module_utils.six import raise_from
-
 from ansible_collections.community.general.plugins.module_utils import deps
 
 
@@ -51,7 +49,7 @@ class PackageRequirement:
             return req.name, req
 
         except Exception as e:
-            raise_from(ValueError("Invalid package specification for '{0}': {1}".format(name, e)), e)
+            raise ValueError("Invalid package specification for '{0}': {1}".format(name, e)) from e
 
     def matches_version(self, version):
         """
@@ -72,4 +70,4 @@ class PackageRequirement:
             return ver in self.requirement.specifier
 
         except InvalidVersion as e:
-            raise_from(ValueError("Invalid version '{0}': {1}".format(version, e)))
+            raise ValueError("Invalid version '{0}': {1}".format(version, e)) from e

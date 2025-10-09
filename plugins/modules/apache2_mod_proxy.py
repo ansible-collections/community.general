@@ -215,7 +215,6 @@ from ansible_collections.community.general.plugins.module_utils.module_helper im
 
 from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.urls import fetch_url
-from ansible.module_utils.six import raise_from
 
 with deps.declare("beautifulsoup4"):
     from bs4 import BeautifulSoup
@@ -275,7 +274,7 @@ class BalancerMember(object):
         try:
             soup = BeautifulSoup(resp)
         except TypeError as exc:
-            raise_from(ModuleHelperException("Cannot parse balancer_member_page HTML! {0}".format(exc)), exc)
+            raise ModuleHelperException("Cannot parse balancer_member_page HTML! {0}".format(exc)) from exc
 
         subsoup = find_all(find_all(soup, 'table')[1], 'tr')
         keys = find_all(subsoup[0], 'th')
@@ -355,7 +354,7 @@ class Balancer(object):
         try:
             soup = BeautifulSoup(self.page)
         except TypeError as e:
-            raise_from(ModuleHelperException("Cannot parse balancer page HTML! {0}".format(self.page)), e)
+            raise ModuleHelperException("Cannot parse balancer page HTML! {0}".format(self.page)) from e
 
         elements = find_all(soup, 'a')
         for element in elements[1::1]:
