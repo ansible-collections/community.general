@@ -48,7 +48,6 @@ except ImportError:
 
 
 from ansible.module_utils.common.text.converters import to_bytes
-from ansible.module_utils.six import iteritems
 
 __version__ = "1.6.0-dev"
 
@@ -822,7 +821,7 @@ def is_attr_assigned_default(default_attribute_values, attr, assigned_value):
             # this is to ensure forward compatibility when the API returns new keys that are not known during
             # the time when the module author provided default values for the attribute
             keys = {}
-            for k, v in iteritems(assigned_value.items()):
+            for k, v in assigned_value.items().items():
                 if k in default_val_for_attr:
                     keys[k] = v
 

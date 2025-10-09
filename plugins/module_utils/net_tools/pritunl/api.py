@@ -16,7 +16,6 @@ import json
 import time
 import uuid
 
-from ansible.module_utils.six import iteritems
 from ansible.module_utils.urls import open_url
 
 __metaclass__ = type
@@ -170,7 +169,7 @@ def list_pritunl_organizations(
             else:
                 if not any(
                     filter_val != org[filter_key]
-                    for filter_key, filter_val in iteritems(filters)
+                    for filter_key, filter_val in filters.items()
                 ):
                     orgs.append(org)
 
@@ -201,7 +200,7 @@ def list_pritunl_users(
             else:
                 if not any(
                     filter_val != user[filter_key]
-                    for filter_key, filter_val in iteritems(filters)
+                    for filter_key, filter_val in filters.items()
                 ):
                     users.append(user)
 

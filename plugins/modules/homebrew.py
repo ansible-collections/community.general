@@ -183,7 +183,7 @@ import re
 from ansible_collections.community.general.plugins.module_utils.homebrew import HomebrewValidate
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six import iteritems, string_types
+from ansible.module_utils.six import string_types
 
 
 # exceptions -------------------------------------------------------------- {{{
@@ -338,7 +338,7 @@ class Homebrew(object):
     def _setup_instance_vars(self, **kwargs):
         self.installed_packages = set()
         self.outdated_packages = set()
-        for key, val in iteritems(kwargs):
+        for key, val in kwargs.items():
             setattr(self, key, val)
 
     def _prep(self):

@@ -160,7 +160,7 @@ from ansible_collections.community.general.plugins.module_utils.homebrew import 
 
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six import iteritems, string_types
+from ansible.module_utils.six import string_types
 
 
 # exceptions -------------------------------------------------------------- {{{
@@ -350,7 +350,7 @@ class HomebrewCask(object):
         self.message = ''
 
     def _setup_instance_vars(self, **kwargs):
-        for key, val in iteritems(kwargs):
+        for key, val in kwargs.items():
             setattr(self, key, val)
 
     def _prep(self):

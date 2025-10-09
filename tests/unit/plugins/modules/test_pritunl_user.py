@@ -8,7 +8,6 @@ from __future__ import absolute_import, division, print_function
 import sys
 
 from ansible.module_utils.common.dict_transformations import dict_merge
-from ansible.module_utils.six import iteritems
 from ansible_collections.community.general.plugins.modules import (
     pritunl_user,
 )
@@ -156,7 +155,7 @@ class TestPritunlUser(ModuleTestCase):
         update_exc = update_result.exception.args[0]
 
         # Ensure only certain settings changed and the rest remained untouched.
-        for k, v in iteritems(update_exc):
+        for k, v in update_exc.items():
             if k in new_user_params:
                 assert update_exc[k] == v
             else:

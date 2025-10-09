@@ -118,7 +118,6 @@ parsable:
 
 from collections import defaultdict
 
-from ansible.module_utils.six import iteritems
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -154,7 +153,7 @@ class ZPoolFacts(object):
 
             self._pools[pool].update({prop: value})
 
-        for k, v in iteritems(self._pools):
+        for k, v in self._pools.items():
             v.update({'name': k})
             self.facts.append(v)
 

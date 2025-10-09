@@ -8,7 +8,6 @@ from __future__ import absolute_import, division, print_function
 import sys
 
 from ansible.module_utils.common.dict_transformations import dict_merge
-from ansible.module_utils.six import iteritems
 from ansible_collections.community.general.plugins.modules import (
     pritunl_org,
 )
@@ -111,7 +110,7 @@ class TestPritunlOrg(ModuleTestCase):
 
         # Ensure both calls resulted in the same returned value
         # except for changed which should be false the second time
-        for k, v in iteritems(idempotent_exc):
+        for k, v in idempotent_exc.items():
             if k == "changed":
                 self.assertFalse(idempotent_exc[k])
             else:
