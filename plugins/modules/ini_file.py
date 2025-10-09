@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2012, Jan-Piet Mens <jpmens () gmail.com>
 # Copyright (c) 2015, Ales Nosek <anosek.nosek () gmail.com>

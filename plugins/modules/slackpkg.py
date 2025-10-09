@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2014, Kim Nørgaard
 # Written by Kim Nørgaard <jasen@jasen.dk>

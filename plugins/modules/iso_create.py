@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2020, Ansible Project
 # Copyright (c) 2020, VMware, Inc. All Rights Reserved.

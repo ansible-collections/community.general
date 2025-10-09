@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) Benjamin Jolivot <bjolivot@gmail.com>
 # Inspired by slack module :

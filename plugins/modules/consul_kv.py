@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # Copyright (c) 2015, Steve Gargan <steve.gargan@gmail.com>
 # Copyright (c) 2018 Genome Research Ltd.

@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2016-2023, Vlad Glagolev <scm@vaygr.net>
 #

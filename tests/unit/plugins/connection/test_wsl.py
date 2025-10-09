@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Derived from test_proxmox_pct_remote.py (c) 2024 Nils Stein (@mietzen) <github.nstein@mailbox.org>
 # Copyright (c) 2025 Rui Lopes (@rgl) <ruilopes.com>
 # Copyright (c) 2025 Ansible Project

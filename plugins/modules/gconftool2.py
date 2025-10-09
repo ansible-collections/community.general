@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2016, Kenneth D. Evensen <kevensen@redhat.com>
 # Copyright (c) 2017, Abhijeet Kasurde <akasurde@redhat.com>

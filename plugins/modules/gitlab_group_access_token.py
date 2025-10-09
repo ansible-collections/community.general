@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2024, Zoran Krleza (zoran.krleza@true-north.hr)
 # Based on code:

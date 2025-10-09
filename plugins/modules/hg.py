@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2013, Yeukhon Wong <yeukhon@acm.org>
 # Copyright (c) 2014, Nate Coraor <nate@bx.psu.edu>

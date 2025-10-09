@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2016, Deepak Kothandan <deepak.kothandan@outlook.com>
 # Copyright (c) 2015, Stefan Berggren <nsg@nsg.cc>

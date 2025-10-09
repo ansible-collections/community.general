@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # 2018.07.26 --- use DictComparison instead of GcpRequest
 #
 # Copyright (c) 2016, Tom Melendez <tom@supertom.com>

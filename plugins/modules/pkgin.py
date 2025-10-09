@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2013 Shaun Zinck <shaun.zinck at gmail.com>
 # Copyright (c) 2015 Lawrence Leonard Gilbert <larry@L2G.to>

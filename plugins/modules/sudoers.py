@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 
 # Copyright (c) 2019, Jon Ellis (@JonEllis) <ellis.jp@gmail.com>

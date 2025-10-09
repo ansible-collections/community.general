@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # (c) 2017 David Gunter <david.gunter@tivix.com>
 # Copyright (c) 2017 Chris Hoffman <christopher.hoffman@gmail.com>

@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2013, Raul Melo
 # Written by Raul Melo <raulmelo@gmail.com>

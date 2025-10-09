@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Author: Alexei Znamensky (russoz@gmail.com)
 # Largely adapted from test_redhat_subscription by
 # Jiri Hnidek (jhnidek@redhat.com)

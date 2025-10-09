@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2024, Tobias Zeuch <tobias.zeuch@sap.com>
 #

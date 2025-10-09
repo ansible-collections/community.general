@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2021, quidame <quidame@poivron.org>
 # Copyright (c) 2013, Alexander Bulimov <lazywolf0@gmail.com>

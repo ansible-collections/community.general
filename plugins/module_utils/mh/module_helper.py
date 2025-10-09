@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # (c) 2020-2024, Alexei Znamensky <russoz@gmail.com>
 # Copyright (c) 2020-2024, Ansible Project
 # Simplified BSD License (see LICENSES/BSD-2-Clause.txt or https://opensource.org/licenses/BSD-2-Clause)

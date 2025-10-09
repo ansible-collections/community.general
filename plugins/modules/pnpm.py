@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2023 Aritra Sen <aretrosen@proton.me>
 # Copyright (c) 2017 Chris Hoffman <christopher.hoffman@gmail.com>

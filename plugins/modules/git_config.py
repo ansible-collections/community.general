@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2015, Marius Gedminas <marius@pov.lt>
 # Copyright (c) 2016, Matthew Gamble <git@matthewgamble.net>

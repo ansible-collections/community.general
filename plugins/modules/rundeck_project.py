@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Ansible module to manage rundeck projects
 # Copyright (c) 2017, Loic Blot <loic.blot@unix-experience.fr>

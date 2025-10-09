@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # This module is proudly sponsored by CGI (www.cgi.com) and
 # KPN (www.kpn.com).

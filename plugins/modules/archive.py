@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2016, Ben Doherty <bendohmv@gmail.com>
 # Sponsored by Oomph, Inc. http://www.oomphinc.com

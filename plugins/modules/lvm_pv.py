@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2025, Klention Mali <klention@gmail.com>
 # Based on lvol module by Jeroen Hoekx <jeroen.hoekx@dsquare.be>

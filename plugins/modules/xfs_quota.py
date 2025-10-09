@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2018, Emmanouil Kampitakis <info@kampitakis.de>
 # Copyright (c) 2018, William Leemans <willie@elaba.net>

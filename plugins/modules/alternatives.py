@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2014, Gabe Mulley <gabe.mulley@gmail.com>
 # Copyright (c) 2015, David Wittman <dwittman@gmail.com>

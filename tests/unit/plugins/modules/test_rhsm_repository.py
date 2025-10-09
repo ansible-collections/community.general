@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Author: Pino Toscano (ptoscano@redhat.com)
 # Largely adapted from test_rhsm_repository by
 # Jiri Hnidek (jhnidek@redhat.com)

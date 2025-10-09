@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright 2016 Dino Occhialini <dino.occhialini@gmail.com>
 #

@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2017, Milan Ilic <milani@nordeus.com>
 # Copyright (c) 2019, Jan Meerkamp <meerkamp@dvv.de>
 # Copyright (c) 2025, Tom Paine <github@aioue.net>

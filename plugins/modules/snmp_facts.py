@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # This file is part of Networklore's snmp library for Ansible
 # Copyright (c) Ansible project

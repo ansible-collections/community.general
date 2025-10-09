@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Based on lxd.py (c) 2016, Matt Clay <matt@mystile.com>
 # (c) 2023, Stephane Graber <stgraber@stgraber.org>
 # Copyright (c) 2023 Ansible Project

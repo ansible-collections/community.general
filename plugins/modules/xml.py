@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2014, Red Hat, Inc.
 # Copyright (c) 2014, Tim Bielawa <tbielawa@redhat.com>

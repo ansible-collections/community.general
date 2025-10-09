@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2013, Matthias Vogelgesang <matthias.vogelgesang@gmail.com>
 # Copyright (c) 2014, Justin Lecher <jlec@gentoo.org>

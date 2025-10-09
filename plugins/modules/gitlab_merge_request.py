@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2023, Ondrej Zvara (ozvara1@gmail.com)
 # Based on code:

@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2019, Maciej Delmanowski <drybjed@gmail.com>
 # Copyright (c) 2017, Alexander Korinek <noles@a3k.net>

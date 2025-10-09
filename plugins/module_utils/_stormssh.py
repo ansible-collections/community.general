@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # This code is part of Ansible, but is an independent component.
 # This particular file snippet, and this file snippet only, is based on
 # the config parser from here: https://github.com/emre/storm/blob/master/storm/parsers/ssh_config_parser.py

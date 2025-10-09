@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2014, Jasper N. Brouwer <jasper@nerdsweide.nl>
 # Copyright (c) 2014, Ramon de la Fuente <ramon@delafuente.nl>

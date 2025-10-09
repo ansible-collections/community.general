@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2021, Raphaël Droz (raphael.droz@gmail.com)
 # Copyright (c) 2019, Guillaume Martinez (lunik@tiwabbit.fr)

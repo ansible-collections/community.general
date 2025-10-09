@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2022, Alexei Znamensky <russoz@gmail.com>
 # Copyright (c) 2013, Scott Anderson <scottanderson42@gmail.com>

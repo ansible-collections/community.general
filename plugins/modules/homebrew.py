@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2013, Andrew Dunham <andrew@du.nham.ca>
 # Copyright (c) 2013, Daniel Jaouen <dcj24@cornell.edu>

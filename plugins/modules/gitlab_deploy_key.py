@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2019, Guillaume Martinez (lunik@tiwabbit.fr)
 # Copyright (c) 2018, Marcus Watkins <marwatk@marcuswatkins.net>

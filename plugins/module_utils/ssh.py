@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2015, Björn Andersson
 # Copyright (c) 2021, Ansible Project
 # Copyright (c) 2021, Abhijeet Kasurde <akasurde@redhat.com>

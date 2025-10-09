@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2016, William L Thomson Jr
 # Copyright (c) 2013, Yap Sok Ann

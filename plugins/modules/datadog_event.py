@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # Author: Artūras 'arturaz' Šlajus <x11@arturaz.net>
 # Author: Naoya Nakazawa <naoya.n@gmail.com>

@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # This file is largely copied from the Nagios module included in the
 # Func project. Original copyright follows:

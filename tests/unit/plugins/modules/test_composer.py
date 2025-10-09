@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Author: Alexei Znamensky (russoz@gmail.com)
 #
 # Copyright (c) Alexei Znamensky (russoz@gmail.com)

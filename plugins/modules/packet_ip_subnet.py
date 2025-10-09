@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2019, Nurfet Becirevic <nurfet.becirevic@gmail.com>
 # Copyright (c) 2017, Tomas Karasek <tom.to.the.k@gmail.com>

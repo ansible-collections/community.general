@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2021, Sergey Mikhaltsov <metanovii@gmail.com>
 # Copyright (c) 2020, Zainab Alsaffar <Zainab.Alsaffar@mail.rit.edu>

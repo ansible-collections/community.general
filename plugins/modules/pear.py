@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2012, Afterburn <https://github.com/afterburn>
 # Copyright (c) 2013, Aaron Bull Schaefer <aaron@elasticdog.com>

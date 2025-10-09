@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2016, Tomas Karasek <tom.to.the.k@gmail.com>
 # Copyright (c) 2016, Matt Baldwin <baldwin@stackpointcloud.com>
 # Copyright (c) 2016, Thibaud Morel l'Horset <teebes@gmail.com>

@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2023, Benedikt Braunger (bebr@adm.ku.dk)
 # Based on code:

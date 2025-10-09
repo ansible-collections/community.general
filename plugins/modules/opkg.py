@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2013, Patrick Pelletier <pp.pelletier@gmail.com>
 # Based on pacman (Afterburn) and pkgin (Shaun Zinck) modules

@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2013, Johan Wiren <johan.wiren.se@gmail.com>
 # Copyright (c) 2017, Ansible Project

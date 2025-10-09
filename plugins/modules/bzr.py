@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2013, André Paramés <git@andreparames.com>
 # Based on the Git module by Michael DeHaan <michael.dehaan@gmail.com>

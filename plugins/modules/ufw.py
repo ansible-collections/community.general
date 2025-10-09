@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2014, Ahti Kitsik <ak@ahtik.com>
 # Copyright (c) 2014, Jarno Keskikangas <jarno.keskikangas@gmail.com>
