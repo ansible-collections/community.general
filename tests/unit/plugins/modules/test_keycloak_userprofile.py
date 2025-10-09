@@ -15,11 +15,10 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
 
 from ansible_collections.community.general.plugins.modules import keycloak_userprofile
 
+from io import StringIO
 from itertools import count
 
 from json import dumps
-
-from ansible.module_utils.six import StringIO
 
 
 @contextmanager

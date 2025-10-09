@@ -15,9 +15,8 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
 
 from ansible_collections.community.general.plugins.modules import keycloak_client_rolemapping
 
+from io import StringIO
 from itertools import count
-
-from ansible.module_utils.six import StringIO
 
 
 @contextmanager

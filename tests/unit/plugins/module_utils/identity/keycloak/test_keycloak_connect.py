@@ -6,6 +6,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 import pytest
+from io import StringIO
 from itertools import count
 from urllib.error import HTTPError
 
@@ -13,7 +14,6 @@ from ansible_collections.community.general.plugins.module_utils.identity.keycloa
     get_token,
     KeycloakError,
 )
-from ansible.module_utils.six import StringIO
 
 module_params_creds = {
     'auth_keycloak_url': 'http://keycloak.url/auth',

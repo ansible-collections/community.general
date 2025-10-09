@@ -9,9 +9,9 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 from contextlib import contextmanager
+from io import StringIO
 from itertools import count
 
-from ansible.module_utils.six import StringIO
 from ansible_collections.community.general.plugins.modules import keycloak_realm_key
 from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
 from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
