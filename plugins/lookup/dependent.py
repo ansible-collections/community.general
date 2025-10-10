@@ -180,7 +180,7 @@ class LookupModule(LookupBase):
 
         if isinstance(values, Mapping):
             for idx, val in sorted(values.items()):
-                current[key] = dict([('key', idx), ('value', val)])
+                current[key] = dict(key=idx, value=val)
                 self.__process(result, terms, index + 1, current, templar, variables)
         elif isinstance(values, Sequence):
             for elt in values:

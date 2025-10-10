@@ -86,7 +86,7 @@ class PacemakerCluster(StateModuleHelper):
     def __init_module__(self):
         self.runner = pacemaker_runner(self.module)
         self.vars.set('apply_all', True if not self.module.params['name'] else False)
-        get_args = dict([('cli_action', 'cluster'), ('state', 'status'), ('name', None), ('apply_all', self.vars.apply_all)])
+        get_args = dict(cli_action='cluster', state='status', name=None, apply_all=self.vars.apply_all)
         if self.module.params['state'] == "maintenance":
             get_args['cli_action'] = "property"
             get_args['state'] = "config"
@@ -120,9 +120,9 @@ class PacemakerCluster(StateModuleHelper):
     def _get(self):
         with self.runner('cli_action state name') as ctx:
             result = ctx.run(cli_action=self.vars.get_args['cli_action'], state=self.vars.get_args['state'], name=self.vars.get_args['name'])
-            return dict([('rc', result[0]),
-                         ('out', result[1] if result[1] != "" else None),
-                         ('err', result[2])])
+            return dict(rc=result[0],
+                        out=(result[1] if result[1] != "" else None),
+                        err=result[2])
 
     def state_cleanup(self):
         with self.runner('cli_action state name', output_process=self._process_command_output(True, "Fail"), check_mode_skip=True) as ctx:
