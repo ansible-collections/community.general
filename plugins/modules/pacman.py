@@ -128,7 +128,8 @@ notes:
   - To use an AUR helper (O(executable) option), a few extra setup steps might be required beforehand. For example, a dedicated
     build user with permissions to install packages could be necessary.
   - 'In the tests, while using C(yay) as the O(executable) option, the module failed to install AUR packages with the error:
-    C(error: target not found: <pkg>).'
+    C(error: target not found: <pkg>). This is caused by an incompatibility of yay with the arguments passed by this module.
+    See L(yay bug #1744 report for details, https://github.com/Jguer/yay/issues/1744).'
   - The common return values `stdout` and `stderr` are returned upon success, when needed, since community.general 4.1.0.
 """
 
