@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 # (c) 2020-2024, Alexei Znamensky <russoz@gmail.com>
 # Copyright (c) 2020-2024, Ansible Project
 # Simplified BSD License (see LICENSES/BSD-2-Clause.txt or https://opensource.org/licenses/BSD-2-Clause)
 # SPDX-License-Identifier: BSD-2-Clause
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 from ansible.module_utils.common.dict_transformations import dict_merge

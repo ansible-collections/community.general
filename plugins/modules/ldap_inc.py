@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2024, Philippe Duveau <pduvax@gmail.com>
 # Copyright (c) 2019, Maciej Delmanowski <drybjed@gmail.com> (ldap_attrs.py)
@@ -11,8 +10,7 @@
 
 # The code of this module is derived from that of ldap_attrs.py
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""

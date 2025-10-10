@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # (c) 2017 David Gunter <david.gunter@tivix.com>
 # Copyright (c) 2017 Chris Hoffman <christopher.hoffman@gmail.com>
@@ -7,8 +6,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""

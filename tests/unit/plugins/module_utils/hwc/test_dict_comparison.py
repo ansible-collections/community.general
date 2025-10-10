@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # 2018.07.26 --- use DictComparison instead of GcpRequest
 #
 # Copyright (c) 2016, Tom Melendez <tom@supertom.com>
@@ -6,8 +5,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
 from ansible_collections.community.general.plugins.module_utils.hwc_utils import are_different_dicts

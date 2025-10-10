@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) Stanislav Meduna (@numo68)
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -8,7 +7,6 @@ from json import loads
 from typing import TYPE_CHECKING
 from ansible.errors import AnsibleFilterError
 
-__metaclass__ = type  # pylint: disable=C0103
 
 if TYPE_CHECKING:
     from typing import Any, Callable, Union

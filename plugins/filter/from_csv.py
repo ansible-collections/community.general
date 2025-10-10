@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2021, Andrew Pantuso (@ajpantuso) <ajpantuso@gmail.com>
 # Copyright (c) 2018, Dag Wieers (@dagwieers) <dag@wieers.com>

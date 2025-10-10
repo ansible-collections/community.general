@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # This code is part of Ansible, but is an independent component.
 # This particular file snippet, and this file snippet only, is based on
 # Lib/posixpath.py of cpython
@@ -8,9 +7,8 @@
 # (See LICENSES/PSF-2.0.txt in this collection)
 # SPDX-License-Identifier: PSF-2.0
 
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
-__metaclass__ = type
 
 import os
 

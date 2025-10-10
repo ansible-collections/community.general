@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 # Copyright (c) 2024, kurokobo <kurokobo@protonmail.com>
 # Copyright (c) 2014, Michael DeHaan <michael.dehaan@gmail.com>

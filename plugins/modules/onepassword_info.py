@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # Copyright (c) 2018, Ryan Conway (@rylon)
 # Copyright (c) 2018, Scott Buchanan <sbuchanan@ri.pn> (onepassword.py used as starting point)
@@ -8,8 +7,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 
 DOCUMENTATION = r"""

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2021, Florian Dambrine <android.florian@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -7,7 +6,7 @@
 Pritunl API that offers CRUD operations on Pritunl Organizations and Users
 """
 
-from __future__ import absolute_import, division, print_function
+from __future__ import annotations
 
 import base64
 import hashlib
@@ -18,8 +17,6 @@ import uuid
 
 from ansible.module_utils.six import iteritems
 from ansible.module_utils.urls import open_url
-
-__metaclass__ = type
 
 
 class PritunlException(Exception):

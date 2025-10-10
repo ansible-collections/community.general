@@ -1,17 +1,15 @@
-# -*- coding: utf-8 -*-
 # This code is part of Ansible, but is an independent component.
 # This particular file snippet, and this file snippet only, is based on
 # the config parser from here: https://github.com/emre/storm/blob/master/storm/parsers/ssh_config_parser.py
 # Copyright (C) <2013> <Emre Yilmaz>
 # SPDX-License-Identifier: MIT
 
-from __future__ import (absolute_import, division, print_function)
+from __future__ import annotations
 import os
 import re
 import traceback
 from operator import itemgetter
 
-__metaclass__ = type
 
 try:
     from paramiko.config import SSHConfig

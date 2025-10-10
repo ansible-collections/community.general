@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2017, Milan Ilic <milani@nordeus.com>
 # Copyright (c) 2019, Jan Meerkamp <meerkamp@dvv.de>
 # Copyright (c) 2025, Tom Paine <github@aioue.net>
@@ -7,8 +6,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # Make coding more python3-ish
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: one_vm

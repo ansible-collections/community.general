@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Derived from ansible/plugins/connection/proxmox_pct_remote.py (c) 2024 Nils Stein (@mietzen) <github.nstein@mailbox.org>
 # Derived from ansible/plugins/connection/paramiko_ssh.py (c) 2012, Michael DeHaan <michael.dehaan@gmail.com>
 # Copyright (c) 2025 Rui Lopes (@rgl) <ruilopes.com>
