@@ -205,9 +205,9 @@ class PacemakerResource(StateModuleHelper):
     def _get(self):
         with self.runner('cli_action state name') as ctx:
             result = ctx.run(cli_action="resource", state='status')
-            return dict([('rc', result[0]),
-                         ('out', result[1] if result[1] != "" else None),
-                         ('err', result[2])])
+            return dict(rc=result[0],
+                        out=(result[1] if result[1] != "" else None),
+                        err=result[2])
 
     def fmt_as_stack_argument(self, value, arg):
         if value is not None:

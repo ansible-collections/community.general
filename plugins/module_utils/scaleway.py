@@ -109,10 +109,7 @@ class SecretVariables(object):
 
     @staticmethod
     def dict_to_list(source_dict):
-        return [
-            dict(key=var[0], value=var[1])
-            for var in source_dict.items()
-        ]
+        return [dict(key=k, value=v) for k, v in source_dict.items()]
 
     @staticmethod
     def list_to_dict(source_list, hashed=False):
