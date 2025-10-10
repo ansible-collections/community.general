@@ -16,7 +16,7 @@ short_description: Generates random string
 version_added: '3.2.0'
 description:
   - Generates random string based upon the given constraints.
-  - Uses L(random.SystemRandom,https://docs.python.org/3/library/random.html#random.SystemRandom), so should be strong enough
+  - Uses L(secrets.SystemRandom,https://docs.python.org/3/library/secrets.html#secrets.SystemRandom), so should be strong enough
     for cryptographic purposes.
 options:
   length:
@@ -169,6 +169,7 @@ _raw:
 
 import base64
 import random
+import secrets
 import string
 
 from ansible.errors import AnsibleLookupError
@@ -209,7 +210,7 @@ class LookupModule(LookupBase):
         seed = self.get_option("seed")
 
         if seed is None:
-            random_generator = random.SystemRandom()
+            random_generator = secrets.SystemRandom()
         else:
             random_generator = random.Random(seed)
 
