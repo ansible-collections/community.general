@@ -273,6 +273,14 @@ options:
     type: bool
     default: true
     version_added: 3.3.0
+  dad_timeout4:
+    description:
+      - Timeout in milliseconds for IPv4 duplicate address detection (DAD).
+      - Set to V(0) to disable DAD, or a positive value to enable it with the specified timeout.
+      - Maps to the C(ipv4.dad-timeout) NetworkManager property.
+      - This helps prevent IP address conflicts by detecting duplicate addresses before assignment.
+    type: int
+    version_added: 10.1.0
   ip6:
     description:
       - List of IPv6 addresses to this interface.
@@ -385,6 +393,14 @@ options:
     type: str
     choices: [default, default-or-eui64, eui64, stable-privacy]
     version_added: 4.2.0
+  dad_timeout6:
+    description:
+      - Timeout in milliseconds for IPv6 duplicate address detection (DAD).
+      - Set to V(0) to disable DAD, or a positive value to enable it with the specified timeout.
+      - Maps to the C(ipv6.dad-timeout) NetworkManager property.
+      - This helps prevent IP address conflicts by detecting duplicate addresses before assignment.
+    type: int
+    version_added: 10.1.0
   mtu:
     description:
       - The connection MTU, for example V(9000). This can not be applied when creating the interface and is done once the
@@ -1678,6 +1694,18 @@ EXAMPLES = r"""
     slave_type: ovs-port
     type: ethernet
     state: present
+
+## Configuring duplicate address detection (DAD) timeout
+- name: Configure connection with IPv4 and IPv6 DAD timeout
+  community.general.nmcli:
+    conn_name: ens192
+    type: ethernet
+    ip4: 192.168.1.100/24
+    ip6: 2001:db8::100/64
+    state: present
+    dad_timeout4: 3000  # Enable IPv4 DAD with 3-second timeout
+    dad_timeout6: 1000  # Enable IPv6 DAD with 1-second timeout
+    may_fail4: false    # Fail if IPv4 configuration fails
 """
 
 RETURN = r"""#
@@ -1745,6 +1773,7 @@ class Nmcli(object):
         self.dns4_ignore_auto = module.params['dns4_ignore_auto']
         self.method4 = module.params['method4']
         self.may_fail4 = module.params['may_fail4']
+        self.dad_timeout4 = module.params['dad_timeout4']
         self.ip6 = module.params['ip6']
         self.gw6 = module.params['gw6']
         self.gw6_ignore_auto = module.params['gw6_ignore_auto']
@@ -1758,6 +1787,7 @@ class Nmcli(object):
         self.method6 = module.params['method6']
         self.ip_privacy6 = module.params['ip_privacy6']
         self.addr_gen_mode6 = module.params['addr_gen_mode6']
+        self.dad_timeout6 = module.params['dad_timeout6']
         self.mtu = module.params['mtu']
         self.stp = module.params['stp']
         self.priority = module.params['priority']
@@ -1877,6 +1907,7 @@ class Nmcli(object):
                 'ipv4.never-default': self.never_default4,
                 'ipv4.method': self.ipv4_method,
                 'ipv4.may-fail': self.may_fail4,
+                'ipv4.dad-timeout': self.dad_timeout4,
                 'ipv6.addresses': self.enforce_ipv6_cidr_notation(self.ip6),
                 'ipv6.dns': self.dns6,
                 'ipv6.dns-search': self.dns6_search,
@@ -1888,7 +1919,8 @@ class Nmcli(object):
                 'ipv6.route-metric': self.route_metric6,
                 'ipv6.method': self.ipv6_method,
                 'ipv6.ip6-privacy': self.ip_privacy6,
-                'ipv6.addr-gen-mode': self.addr_gen_mode6
+                'ipv6.addr-gen-mode': self.addr_gen_mode6,
+                'ipv6.dad-timeout': self.dad_timeout6
             })
             # when 'method' is disabled the 'may_fail' no make sense but accepted by nmcli with keeping 'yes'
             # force ignoring to save idempotency
@@ -2299,7 +2331,9 @@ class Nmcli(object):
                          '802-11-wireless.mac-address-blacklist'}:
             return list
         elif setting in {'connection.autoconnect-priority',
-                         'connection.autoconnect-retries'}:
+                         'connection.autoconnect-retries',
+                         'ipv4.dad-timeout',
+                         'ipv6.dad-timeout'}:
             return int
         return str
 
@@ -2671,6 +2705,7 @@ def main():
             dns4_ignore_auto=dict(type='bool', default=False),
             method4=dict(type='str', choices=['auto', 'link-local', 'manual', 'shared', 'disabled']),
             may_fail4=dict(type='bool', default=True),
+            dad_timeout4=dict(type='int'),
             dhcp_client_id=dict(type='str'),
             ip6=dict(type='list', elements='str'),
             gw6=dict(type='str'),
@@ -2695,6 +2730,7 @@ def main():
             method6=dict(type='str', choices=['ignore', 'auto', 'dhcp', 'link-local', 'manual', 'shared', 'disabled']),
             ip_privacy6=dict(type='str', choices=['disabled', 'prefer-public-addr', 'prefer-temp-addr', 'unknown']),
             addr_gen_mode6=dict(type='str', choices=['default', 'default-or-eui64', 'eui64', 'stable-privacy']),
+            dad_timeout6=dict(type='int'),
             # Bond Specific vars
             mode=dict(type='str', default='balance-rr',
                       choices=['802.3ad', 'active-backup', 'balance-alb', 'balance-rr', 'balance-tlb', 'balance-xor', 'broadcast']),
