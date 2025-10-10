@@ -61,6 +61,20 @@ options:
     type: bool
     default: false
     version_added: 8.4.0
+  encryption:
+    description:
+      - Specify whether to use encryption for the connection to the server.
+        Please refer to the pymssql documentation for detailed information.
+      - The available values are "off" and "on"
+    type: str
+    version_added: 11.4.0
+  tds_version:
+    description:
+      - Specify the TDS protocol version to use when connecting to the server.
+        Please refer to the pymssql documentation for detailed information.
+      - The available values are "7.0", "7.1", "7.2", "7.3", "7.4", "8.0" etc.
+    type: str
+    version_added: 11.4.0
   output:
     description:
       - With V(default) each row is returned as a list of values. See RV(query_results).
@@ -161,6 +175,18 @@ EXAMPLES = r"""
       - result_batches_dict.query_results_dict[0] | length == 2 # two selects in first batch
       - result_batches_dict.query_results_dict[0][0] | length == 1 # one row in first select
       - result_batches_dict.query_results_dict[0][0][0]['b0s0'] == 'Batch 0 - Select 0' # column 'b0s0' of first row
+      
+- name: Get lower version DB information
+  community.general.mssql_script:
+    login_user: "{{ mssql_login_user }}"
+    login_password: "{{ mssql_login_password }}"
+    login_host: "{{ mssql_host }}"
+    login_port: "{{ mssql_port }}"
+    db: master
+    tds_version: "7.0"
+    encryption: off
+    script: |
+      SELECT @@version
 """
 
 RETURN = r"""
@@ -290,6 +316,8 @@ def run_module():
         output=dict(default='default', choices=['dict', 'default']),
         params=dict(type='dict'),
         transaction=dict(type='bool', default=False),
+        tds_version=dict(type='str'),
+        encryption=dict(type='str')
     )
 
     result = dict(
@@ -314,6 +342,9 @@ def run_module():
     sql_params = module.params['params']
     # Added param to set the transactional mode (true/false)
     transaction = module.params['transaction']
+    # When connecting to lower versions such as SQL Server 2008, you can try setting tds_version to 7.0 and encryption to off.
+    tds_version = module.params['tds_version']
+    encryption = module.params['encryption']
 
     login_querystring = login_host
     if login_port != 1433:
@@ -324,8 +355,17 @@ def run_module():
             msg="when supplying login_user argument, login_password must also be provided")
 
     try:
-        conn = pymssql.connect(
-            user=login_user, password=login_password, host=login_querystring, database=db)
+        connection_args = {
+            "user": login_user,
+            "password": login_password,
+            "host": login_querystring,
+            "database": db,
+        }
+        if encryption is not None:
+            connection_args["encryption"] = encryption
+        if tds_version is not None:
+            connection_args["tds_version"] = tds_version
+        conn = pymssql.connect(**connection_args)
         cursor = conn.cursor()
     except Exception as e:
         if "Unknown database" in str(e):
