@@ -56,8 +56,6 @@ author:
 todo:
 notes:
   - Concurrently syncing Cobbler is bound to fail with weird errors.
-  - On Python 2.7.8 and older (such as RHEL7) you may need to tweak the Python behaviour to disable certificate validation.
-    More information at L(Certificate verification in Python standard library HTTP clients,https://access.redhat.com/articles/2039753).
 """
 
 EXAMPLES = r"""

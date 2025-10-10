@@ -15,7 +15,7 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
 
 from pytest import importorskip
 
-# Skip this test if python 2 so datadog_api_client cannot be installed
+# Skip this test if datadog_api_client cannot be installed
 datadog_api_client = importorskip("datadog_api_client")
 Downtime = datadog_api_client.v1.model.downtime.Downtime
 DowntimeRecurrence = datadog_api_client.v1.model.downtime_recurrence.DowntimeRecurrence

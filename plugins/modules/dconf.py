@@ -421,8 +421,7 @@ def main():
                 msg="%s must be installed and visible from %s." %
                 (glib_module_name, sys.executable))
 
-        interpreters = ['/usr/bin/python3', '/usr/bin/python2',
-                        '/usr/bin/python']
+        interpreters = ['/usr/bin/python3', '/usr/bin/python']
 
         interpreter = probe_interpreters_for_module(
             interpreters, glib_module_name)
