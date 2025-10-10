@@ -29,17 +29,11 @@
 
 - when: ansible_facts.distribution ~ ansible_facts.distribution_major_version not in  ['CentOS6', 'RedHat6']
   block:
-    - name: Install cryptography (Python 3)
+    - name: Install cryptography
       become: true
       package:
         name: '{{ cryptography_package_name_python3 }}'
-      when: not cryptography_from_pip and ansible_python_version is version('3.0', '>=')
-
-    - name: Install cryptography (Python 2)
-      become: true
-      package:
-        name: '{{ cryptography_package_name }}'
-      when: not cryptography_from_pip and ansible_python_version is version('3.0', '<')
+      when: not cryptography_from_pip
 
     - name: Install cryptography (pip)
       become: true
@@ -48,17 +42,11 @@
         extra_args: "-c {{ remote_constraints }}"
       when: cryptography_from_pip
 
-- name: Install pyOpenSSL (Python 3)
+- name: Install pyOpenSSL
   become: true
   package:
     name: '{{ pyopenssl_package_name_python3 }}'
-  when: pyopenssl_package_name_python3 is defined and ansible_python_version is version('3.0', '>=')
-
-- name: Install pyOpenSSL (Python 2)
-  become: true
-  package:
-    name: '{{ pyopenssl_package_name }}'
-  when: pyopenssl_package_name is defined and ansible_python_version is version('3.0', '<')
+  when: pyopenssl_package_name_python3 is defined
 
 - name: register openssl version
   shell: "openssl version | cut -d' ' -f2"
