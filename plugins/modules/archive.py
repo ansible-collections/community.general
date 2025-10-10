@@ -74,11 +74,8 @@ options:
     default: false
 notes:
   - Can produce C(gzip), C(bzip2), C(lzma), and C(zip) compressed files or archives.
-  - This module uses C(tarfile), C(zipfile), C(gzip), and C(bz2) packages on the target host to create archives. These are
-    part of the Python standard library for Python 2 and 3.
-requirements:
-  - Requires C(lzma) (standard library of Python 3) or L(backports.lzma, https://pypi.org/project/backports.lzma/) (Python
-    2) if using C(xz) format.
+  - This module uses C(tarfile), C(zipfile), C(gzip), C(bz2), and C(lzma) packages on the target host to create archives. These are
+    part of the Python standard library.
 seealso:
   - module: ansible.builtin.unarchive
 author:

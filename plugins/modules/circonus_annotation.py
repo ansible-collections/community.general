@@ -16,7 +16,7 @@ description:
   - Create an annotation event with a given category, title and description. Optionally start, end or durations can be provided.
 author: "Nick Harring (@NickatEpic)"
 requirements:
-  - requests (either >= 2.0.0 for Python 3, or >= 1.0.0 for Python 2)
+  - requests >= 2.0.0
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
