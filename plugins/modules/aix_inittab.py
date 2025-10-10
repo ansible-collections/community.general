@@ -114,12 +114,6 @@ name:
   sample: startmyservice
 """
 
-# Import necessary libraries
-try:
-    # python 2
-    from itertools import izip
-except ImportError:
-    izip = zip
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -138,7 +132,7 @@ def check_current_entry(module):
         values = out.split(":")
         # strip non readable characters as \n
         values = map(lambda s: s.strip(), values)
-        existsdict = dict(izip(keys, values))
+        existsdict = dict(zip(keys, values))
         existsdict.update({'exist': True})
     return existsdict
 

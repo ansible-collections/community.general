@@ -137,7 +137,6 @@ options:
   message_id_domain:
     description:
       - The domain name to use for the L(Message-ID header, https://en.wikipedia.org/wiki/Message-ID).
-      - Note that this is only available on Python 3+. On Python 2, this value is ignored.
     type: str
     default: ansible
     version_added: 8.2.0
@@ -352,12 +351,7 @@ def main():
     msg['From'] = formataddr((sender_phrase, sender_addr))
     msg['Date'] = formatdate(localtime=True)
     msg['Subject'] = Header(subject, charset)
-    try:
-        msg['Message-ID'] = make_msgid(domain=message_id_domain)
-    except TypeError:
-        # `domain` is only available in Python 3
-        msg['Message-ID'] = make_msgid()
-        module.warn("The Message-ID domain cannot be set on Python 2; the system's hostname is used")
+    msg['Message-ID'] = make_msgid(domain=message_id_domain)
     msg.preamble = "Multipart message"
 
     for header in headers:

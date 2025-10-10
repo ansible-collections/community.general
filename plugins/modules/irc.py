@@ -234,17 +234,10 @@ def send_msg(msg, server='localhost', port='6667', channel=None, nick_to=None, k
     if use_tls:
         kwargs = {}
         if validate_certs:
-            try:
-                context = ssl.create_default_context()
-                kwargs["server_hostname"] = server
-            except AttributeError:
-                raise Exception('Need at least Python 2.7.9 for SSL certificate validation')
+            context = ssl.create_default_context()
+            kwargs["server_hostname"] = server
         else:
-            if getattr(ssl, 'PROTOCOL_TLS', None) is not None:
-                # Supported since Python 2.7.13
-                context = ssl.SSLContext(ssl.PROTOCOL_TLS)
-            else:
-                context = ssl.SSLContext()
+            context = ssl.SSLContext(ssl.PROTOCOL_TLS)
             context.verify_mode = ssl.CERT_NONE
         irc = context.wrap_socket(irc, **kwargs)
     irc.connect((server, int(port)))

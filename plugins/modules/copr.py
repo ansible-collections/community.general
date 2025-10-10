@@ -129,7 +129,6 @@ def _respawn_dnf():
     system_interpreters = (
         "/usr/libexec/platform-python",
         "/usr/bin/python3",
-        "/usr/bin/python2",
         "/usr/bin/python",
     )
     interpreter = respawn.probe_interpreters_for_module(system_interpreters, "dnf")
