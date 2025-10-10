@@ -183,8 +183,8 @@ class PacemakerStonith(StateModuleHelper):
     def fmt_stonith_operations(self):
         modified_stonith_operations = []
         for stonith_operation in self.vars.stonith_operations:
-            modified_stonith_operations.append(dict([("operation_action", stonith_operation.get('operation_action')),
-                                                     ("operation_option", stonith_operation.get('operation_options'))]))
+            modified_stonith_operations.append(dict(operation_action=stonith_operation.get('operation_action'),
+                                                    operation_option=stonith_operation.get('operation_options')))
         return modified_stonith_operations
 
     def state_absent(self):
