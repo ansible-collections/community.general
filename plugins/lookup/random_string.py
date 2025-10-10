@@ -174,6 +174,7 @@ from ansible.errors import AnsibleLookupError
 from ansible.plugins.lookup import LookupBase
 from ansible.module_utils.common.text.converters import to_bytes, to_text
 
+
 class LookupModule(LookupBase):
     @staticmethod
     def get_random(random_generator, chars, length):
