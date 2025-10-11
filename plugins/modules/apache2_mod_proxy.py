@@ -17,7 +17,7 @@ description:
 extends_documentation_fragment:
   - community.general.attributes
 requirements:
-  - Python package C(BeautifulSoup) on Python 2, C(beautifulsoup4) on Python 3.
+  - Python package C(beautifulsoup4)
 attributes:
   check_mode:
     support: full
@@ -213,14 +213,9 @@ from ansible_collections.community.general.plugins.module_utils.module_helper im
 
 from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.urls import fetch_url
-from ansible.module_utils.six import raise_from, PY2
 
-if PY2:
-    with deps.declare("BeautifulSoup"):
-        from BeautifulSoup import BeautifulSoup
-else:
-    with deps.declare("beautifulsoup4"):
-        from bs4 import BeautifulSoup
+with deps.declare("beautifulsoup4"):
+    from bs4 import BeautifulSoup
 
 # balancer member attributes extraction regexp:
 EXPRESSION = re.compile(to_text(r"(b=([\w\.\-]+)&w=(https?|ajp|wss?|ftp|[sf]cgi)://([\w\.\-]+):?(\d*)([/\w\.\-]*)&?[\w\-\=]*)"))
@@ -229,8 +224,6 @@ APACHE_VERSION_EXPRESSION = re.compile(to_text(r"SERVER VERSION: APACHE/([\d.]+)
 
 
 def find_all(where, what):
-    if PY2:
-        return where.findAll(what)
     return where.find_all(what)
 
 
@@ -279,7 +272,7 @@ class BalancerMember(object):
         try:
             soup = BeautifulSoup(resp)
         except TypeError as exc:
-            raise_from(ModuleHelperException("Cannot parse balancer_member_page HTML! {0}".format(exc)), exc)
+            raise ModuleHelperException("Cannot parse balancer_member_page HTML! {0}".format(exc)) from exc
 
         subsoup = find_all(find_all(soup, 'table')[1], 'tr')
         keys = find_all(subsoup[0], 'th')
@@ -359,7 +352,7 @@ class Balancer(object):
         try:
             soup = BeautifulSoup(self.page)
         except TypeError as e:
-            raise_from(ModuleHelperException("Cannot parse balancer page HTML! {0}".format(self.page)), e)
+            raise ModuleHelperException("Cannot parse balancer page HTML! {0}".format(self.page)) from e
 
         elements = find_all(soup, 'a')
         for element in elements[1::1]:

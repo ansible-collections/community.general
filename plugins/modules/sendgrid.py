@@ -125,6 +125,7 @@ EXAMPLES = r"""
 #
 import os
 import traceback
+from urllib.parse import urlencode
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
@@ -137,7 +138,6 @@ except ImportError:
     HAS_SENDGRID = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible.module_utils.urls import fetch_url
 

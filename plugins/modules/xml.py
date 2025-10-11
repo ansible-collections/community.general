@@ -361,6 +361,7 @@ import os
 import re
 import traceback
 
+from collections.abc import MutableMapping
 from io import BytesIO
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
@@ -374,8 +375,6 @@ except ImportError:
     HAS_LXML = False
 
 from ansible.module_utils.basic import AnsibleModule, json_dict_bytes_to_unicode, missing_required_lib
-from ansible.module_utils.six import iteritems, string_types
-from ansible.module_utils.six.moves.collections_abc import MutableMapping
 from ansible.module_utils.common.text.converters import to_bytes, to_native
 
 _IDENT = r"[a-zA-Z-][a-zA-Z0-9_\-\.]*"
@@ -746,13 +745,13 @@ def child_to_element(module, child, in_type):
         except etree.XMLSyntaxError as e:
             module.fail_json(msg="Error while parsing child element: %s" % e)
     elif in_type == 'yaml':
-        if isinstance(child, string_types):
+        if isinstance(child, str):
             return etree.Element(child)
         elif isinstance(child, MutableMapping):
             if len(child) > 1:
                 module.fail_json(msg="Can only create children from hashes with one key")
 
-            (key, value) = next(iteritems(child))
+            (key, value) = list(child.items())[0]
             if isinstance(value, MutableMapping):
                 children = value.pop('_', None)
                 child_value = value.pop('+value', None)

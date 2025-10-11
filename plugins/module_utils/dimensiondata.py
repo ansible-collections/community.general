@@ -13,13 +13,13 @@
 
 from __future__ import annotations
 
+import configparser
 import os
 import re
 import traceback
 
 # (TODO: remove AnsibleModule from next line!)
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib  # noqa: F401, pylint: disable=unused-import
-from ansible.module_utils.six.moves import configparser
 from os.path import expanduser
 from uuid import UUID
 

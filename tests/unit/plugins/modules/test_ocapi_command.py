@@ -7,6 +7,7 @@ from __future__ import annotations
 import os
 import shutil
 import tempfile
+from urllib.parse import urljoin
 
 from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
 from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
@@ -14,7 +15,6 @@ from ansible.module_utils import basic
 import ansible_collections.community.general.plugins.modules.ocapi_command as module
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args, exit_json, fail_json
-from ansible.module_utils.six.moves.urllib.parse import urljoin
 
 
 MOCK_BASE_URI = "mockBaseUri/"

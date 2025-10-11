@@ -5,14 +5,14 @@
 from __future__ import annotations
 
 import pytest
+from io import StringIO
 from itertools import count
+from urllib.error import HTTPError
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
     get_token,
     KeycloakError,
 )
-from ansible.module_utils.six import StringIO
-from ansible.module_utils.six.moves.urllib.error import HTTPError
 
 module_params_creds = {
     'auth_keycloak_url': 'http://keycloak.url/auth',

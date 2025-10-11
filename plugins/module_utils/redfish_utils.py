@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import http.client as http_client
 import json
 import os
 import random
@@ -13,10 +14,8 @@ from ansible.module_utils.urls import open_url
 from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.common.text.converters import to_bytes
-from ansible.module_utils.six import text_type
-from ansible.module_utils.six.moves import http_client
-from ansible.module_utils.six.moves.urllib.error import URLError, HTTPError
-from ansible.module_utils.six.moves.urllib.parse import urlparse
+from urllib.error import URLError, HTTPError
+from urllib.parse import urlparse
 
 GET_HEADERS = {'accept': 'application/json', 'OData-Version': '4.0'}
 POST_HEADERS = {'content-type': 'application/json', 'accept': 'application/json',
@@ -378,7 +377,7 @@ class RedfishUtils(object):
         def write_buffer(body, line):
             # Adds to the multipart body based on the provided data type
             # At this time there is only support for strings, dictionaries, and bytes (default)
-            if isinstance(line, text_type):
+            if isinstance(line, str):
                 body.append(to_bytes(line, encoding='utf-8'))
             elif isinstance(line, dict):
                 body.append(to_bytes(json.dumps(line), encoding='utf-8'))

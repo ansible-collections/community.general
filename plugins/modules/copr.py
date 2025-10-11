@@ -101,6 +101,7 @@ repo:
 import stat
 import os
 import traceback
+from urllib.error import HTTPError
 
 try:
     import dnf
@@ -114,7 +115,6 @@ except ImportError:
     HAS_DNF_PACKAGES = False
 
 from ansible.module_utils.common import respawn
-from ansible.module_utils.six.moves.urllib.error import HTTPError
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils import distro
 from ansible.module_utils.basic import AnsibleModule

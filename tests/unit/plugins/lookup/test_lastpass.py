@@ -11,7 +11,6 @@ from ansible_collections.community.internal_test_tools.tests.unit.compat import 
 from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
 
 from ansible.errors import AnsibleError
-from ansible.module_utils import six
 from ansible.plugins.loader import lookup_loader
 from ansible_collections.community.general.plugins.lookup.lastpass import LPass, LPassException
 
@@ -142,7 +141,7 @@ class TestLPass(unittest.TestCase):
         lp = MockLPass()
         for entry in MOCK_ENTRIES:
             entry_id = entry.get('id')
-            for k, v in six.iteritems(entry):
+            for k, v in entry.items():
                 self.assertEqual(v.strip(), lp.get_field(entry_id, k))
 
 
@@ -155,7 +154,7 @@ class TestLastpassPlugin(unittest.TestCase):
     def test_lastpass_plugin_normal(self):
         for entry in MOCK_ENTRIES:
             entry_id = entry.get('id')
-            for k, v in six.iteritems(entry):
+            for k, v in entry.items():
                 self.assertEqual(v.strip(),
                                  self.lookup.run([entry_id], field=k)[0])
 

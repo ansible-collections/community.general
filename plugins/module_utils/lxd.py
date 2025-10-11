@@ -6,14 +6,14 @@
 from __future__ import annotations
 
 
+import http.client as http_client
 import os
 import socket
 import ssl
 import json
+from urllib.parse import urlparse
 
 from ansible.module_utils.urls import generic_urlparse
-from ansible.module_utils.six.moves.urllib.parse import urlparse
-from ansible.module_utils.six.moves import http_client
 from ansible.module_utils.common.text.converters import to_text
 
 # httplib/http.client connection using unix domain socket

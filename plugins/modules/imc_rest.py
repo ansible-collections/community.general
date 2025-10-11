@@ -266,6 +266,7 @@ output:
 
 import os
 import traceback
+from itertools import zip_longest
 
 LXML_ETREE_IMP_ERR = None
 try:
@@ -284,7 +285,6 @@ except ImportError:
     HAS_XMLJSON_COBRA = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.six.moves import zip_longest
 from ansible.module_utils.urls import fetch_url
 
 from ansible_collections.community.general.plugins.module_utils.datetime import (

@@ -148,10 +148,9 @@ system:
 """
 
 import ssl
+import xmlrpc.client as xmlrpc_client
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six import iteritems
-from ansible.module_utils.six.moves import xmlrpc_client
 from ansible.module_utils.common.text.converters import to_text
 
 from ansible_collections.community.general.plugins.module_utils.datetime import (
@@ -281,7 +280,7 @@ def main():
             else:
                 system_id = conn.get_system_handle(name, token)
 
-            for key, value in iteritems(module.params['properties']):
+            for key, value in module.params['properties'].items():
                 if key not in system:
                     module.warn("Property '{0}' is not a valid system property.".format(key))
                 if system[key] != value:
@@ -298,7 +297,7 @@ def main():
             result['changed'] = True
 
             if module.params['properties']:
-                for key, value in iteritems(module.params['properties']):
+                for key, value in module.params['properties'].items():
                     try:
                         conn.modify_system(system_id, key, value, token)
                     except Exception as e:
@@ -307,8 +306,8 @@ def main():
         # Add interface properties
         interface_properties = dict()
         if module.params['interfaces']:
-            for device, values in iteritems(module.params['interfaces']):
-                for key, value in iteritems(values):
+            for device, values in module.params['interfaces'].items():
+                for key, value in values.items():
                     if key == 'name':
                         continue
                     if key not in IFPROPS_MAPPING:

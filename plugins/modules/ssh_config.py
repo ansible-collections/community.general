@@ -225,7 +225,6 @@ from copy import deepcopy
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
-from ansible.module_utils.six import string_types
 from ansible_collections.community.general.plugins.module_utils._stormssh import ConfigParser, HAS_PARAMIKO, PARAMIKO_IMPORT_ERROR
 from ansible_collections.community.general.plugins.module_utils.ssh import determine_config_file
 
@@ -301,7 +300,7 @@ class SSHConfig(object):
                 if key.lower() != key:
                     self.module.fail_json(msg="The other_options key {key!r} must be lower case".format(key=key))
                 if key not in args:
-                    if not isinstance(value, string_types):
+                    if not isinstance(value, str):
                         self.module.fail_json(msg="The other_options value provided for key {key!r} must be a string, got {type}".format(key=key,
                                                                                                                                          type=type(value)))
                     args[key] = value

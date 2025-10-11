@@ -55,7 +55,6 @@ import re
 from collections import namedtuple
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six import python_2_unicode_compatible
 
 
 STATE_COMMAND_MAP = {
@@ -70,7 +69,6 @@ MONIT_SERVICES = ['Process', 'File', 'Fifo', 'Filesystem', 'Directory', 'Remote 
                   'Network']
 
 
-@python_2_unicode_compatible
 class StatusValue(namedtuple("Status", "value, is_pending")):
     MISSING = 'missing'
     OK = 'ok'

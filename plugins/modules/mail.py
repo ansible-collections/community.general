@@ -227,7 +227,6 @@ from email.mime.text import MIMEText
 from email.header import Header
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six import PY3
 from ansible.module_utils.common.text.converters import to_native
 
 
@@ -286,10 +285,7 @@ def main():
     try:
         if secure != 'never':
             try:
-                if PY3:
-                    smtp = smtplib.SMTP_SSL(host=host, port=port, local_hostname=local_hostname, timeout=timeout)
-                else:
-                    smtp = smtplib.SMTP_SSL(local_hostname=local_hostname, timeout=timeout)
+                smtp = smtplib.SMTP_SSL(host=host, port=port, local_hostname=local_hostname, timeout=timeout)
                 code, smtpmessage = smtp.connect(host, port)
                 secure_state = True
             except ssl.SSLError as e:
@@ -300,10 +296,7 @@ def main():
                 pass
 
         if not secure_state:
-            if PY3:
-                smtp = smtplib.SMTP(host=host, port=port, local_hostname=local_hostname, timeout=timeout)
-            else:
-                smtp = smtplib.SMTP(local_hostname=local_hostname, timeout=timeout)
+            smtp = smtplib.SMTP(host=host, port=port, local_hostname=local_hostname, timeout=timeout)
             code, smtpmessage = smtp.connect(host, port)
 
     except smtplib.SMTPException as e:

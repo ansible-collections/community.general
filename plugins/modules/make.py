@@ -142,8 +142,7 @@ targets:
   version_added: 7.2.0
 """
 
-from ansible.module_utils.six import iteritems
-from ansible.module_utils.six.moves import shlex_quote
+from shlex import quote as shlex_quote
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -200,7 +199,7 @@ def main():
             # Fall back to system make
             make_path = module.get_bin_path('make', required=True)
     if module.params['params'] is not None:
-        make_parameters = [k + (('=' + str(v)) if v is not None else '') for k, v in iteritems(module.params['params'])]
+        make_parameters = [k + (('=' + str(v)) if v is not None else '') for k, v in module.params['params'].items()]
     else:
         make_parameters = []
 

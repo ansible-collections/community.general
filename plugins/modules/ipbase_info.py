@@ -214,10 +214,8 @@ data:
 """
 
 from ansible.module_utils.basic import AnsibleModule
-
 from ansible.module_utils.urls import fetch_url
-
-from ansible.module_utils.six.moves.urllib.parse import urlencode
+from urllib.parse import urlencode
 
 
 USER_AGENT = 'ansible-community.general.ipbase_info/0.1.0'

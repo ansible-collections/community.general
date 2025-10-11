@@ -50,8 +50,7 @@ options:
     type: bool
     default: false
 requirements:
-  - Requires C(lzma) (standard library of Python 3) or L(backports.lzma, https://pypi.org/project/backports.lzma/) (Python
-    2) if using C(xz) format.
+  - Requires C(lzma) (standard library of Python 3) if using C(xz) format.
 author:
   - Stanislav Shamilov (@shamilovstas)
 """
@@ -94,16 +93,12 @@ import os
 import shutil
 import tempfile
 
-from ansible.module_utils import six
 from ansible_collections.community.general.plugins.module_utils.mh.module_helper import ModuleHelper
 from ansible.module_utils.common.text.converters import to_native, to_bytes
 from ansible_collections.community.general.plugins.module_utils import deps
 
 with deps.declare("lzma"):
-    if six.PY3:
-        import lzma
-    else:
-        from backports import lzma
+    import lzma
 
 
 def lzma_decompress(src):
@@ -111,10 +106,7 @@ def lzma_decompress(src):
 
 
 def bz2_decompress(src):
-    if six.PY3:
-        return bz2.open(src, "rb")
-    else:
-        return bz2.BZ2File(src, "rb")
+    return bz2.open(src, "rb")
 
 
 def gzip_decompress(src):

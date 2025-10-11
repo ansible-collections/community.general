@@ -13,7 +13,6 @@ import json
 import pytest
 
 from .FakeAnsibleModule import FakeAnsibleModule
-from ansible.module_utils import six
 from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import MagicMock
 
 
@@ -98,7 +97,7 @@ def fixture_data_from_file(request):
     fixture_path = os.path.join(os.path.dirname(__file__), 'fixtures')
     fixture_data = {}
 
-    if isinstance(request.param, six.string_types):
+    if isinstance(request.param, str):
         request.param = [request.param]
 
     for fixture_name in request.param:

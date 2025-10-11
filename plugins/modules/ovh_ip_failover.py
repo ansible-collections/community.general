@@ -112,6 +112,7 @@ RETURN = r"""
 """
 
 import time
+from urllib.parse import quote_plus
 
 try:
     import ovh
@@ -122,7 +123,6 @@ except ImportError:
     HAS_OVH = False
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six.moves.urllib.parse import quote_plus
 
 
 def getOvhClient(ansibleModule):

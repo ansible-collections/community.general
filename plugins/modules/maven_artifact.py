@@ -244,6 +244,7 @@ import re
 
 from ansible.module_utils.ansible_release import __version__ as ansible_version
 from re import match
+from urllib.parse import urlparse
 
 LXML_ETREE_IMP_ERR = None
 try:
@@ -271,7 +272,6 @@ except ImportError:
 
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.six.moves.urllib.parse import urlparse
 from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
 

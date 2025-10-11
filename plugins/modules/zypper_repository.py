@@ -126,6 +126,7 @@ EXAMPLES = r"""
     runrefresh: true
 """
 
+import configparser
 import traceback
 
 XML_IMP_ERR = None
@@ -140,9 +141,7 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.common.text.converters import to_text
-from ansible.module_utils.six import PY3
-from ansible.module_utils.six.moves import configparser, StringIO
-from io import open
+from io import StringIO, open
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
@@ -408,10 +407,7 @@ def main():
 
         repofile = configparser.ConfigParser()
         try:
-            if PY3:
-                repofile.read_file(StringIO(repofile_text))
-            else:
-                repofile.readfp(StringIO(repofile_text))
+            repofile.read_file(StringIO(repofile_text))
         except configparser.Error:
             module.fail_json(msg='Invalid format, .repo file could not be parsed')
 

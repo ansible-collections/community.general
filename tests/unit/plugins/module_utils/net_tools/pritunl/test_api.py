@@ -8,7 +8,6 @@ import json
 
 import pytest
 from ansible.module_utils.common.dict_transformations import dict_merge
-from ansible.module_utils.six import iteritems
 from ansible_collections.community.general.plugins.module_utils.net_tools.pritunl import (
     api,
 )
@@ -527,7 +526,7 @@ class TestPritunlApi:
         )
 
         # Ensure provided settings match with the ones returned by Pritunl
-        for k, v in iteritems(pritunl_organization_data):
+        for k, v in pritunl_organization_data.items():
             assert create_response[k] == v
 
     @pytest.mark.parametrize("org_id", [("58070daee63f3b2e6e472c36")])
@@ -553,7 +552,7 @@ class TestPritunlApi:
         )
 
         # Ensure provided settings match with the ones returned by Pritunl
-        for k, v in iteritems(pritunl_user_data):
+        for k, v in pritunl_user_data.items():
             assert create_response[k] == v
 
         # Update the newly created user to ensure only certain settings are changed
@@ -576,7 +575,8 @@ class TestPritunlApi:
         )
 
         # Ensure only certain settings changed and the rest remained untouched.
-        for k, v in iteritems(update_response):
+        # TODO: there is something wrong with this check!
+        for k, v in update_response.items():
             if k in update_response:
                 assert update_response[k] == v
             else:

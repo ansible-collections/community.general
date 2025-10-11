@@ -205,12 +205,11 @@ cmd:
 import os
 import tempfile
 import re
-
+from urllib.parse import urlparse
+from urllib.request import getproxies
 
 # import module snippets
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six.moves.urllib.parse import urlparse
-from ansible.module_utils.six.moves.urllib.request import getproxies
 
 
 def _get_keystore_type_keytool_parameters(keystore_type):

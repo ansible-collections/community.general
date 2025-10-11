@@ -14,7 +14,7 @@ description:
   - Create an annotation event with a given category, title and description. Optionally start, end or durations can be provided.
 author: "Nick Harring (@NickatEpic)"
 requirements:
-  - requests (either >= 2.0.0 for Python 3, or >= 1.0.0 for Python 2)
+  - requests >= 2.0.0
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -159,7 +159,6 @@ except ImportError:
     HAS_REQUESTS = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.six import PY3
 from ansible.module_utils.common.text.converters import to_native
 
 
@@ -168,7 +167,7 @@ def check_requests_dep(module):
     if not HAS_REQUESTS:
         module.fail_json(msg=missing_required_lib('requests'), exception=REQUESTS_IMP_ERR)
     else:
-        required_version = '2.0.0' if PY3 else '1.0.0'
+        required_version = '2.0.0'
         if LooseVersion(requests.__version__) < LooseVersion(required_version):
             module.fail_json(msg="'requests' library version should be >= %s, found: %s." % (required_version, requests.__version__))
 

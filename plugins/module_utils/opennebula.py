@@ -10,7 +10,6 @@ from __future__ import annotations
 import time
 import ssl
 from os import environ
-from ansible.module_utils.six import string_types
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -263,7 +262,7 @@ class OpenNebulaModule:
                 self.cast_template(template[key])
             elif isinstance(value, list):
                 template[key] = ', '.join(value)
-            elif not isinstance(value, string_types):
+            elif not isinstance(value, str):
                 template[key] = str(value)
 
     def requires_template_update(self, current, desired):

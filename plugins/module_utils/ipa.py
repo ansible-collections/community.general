@@ -18,10 +18,9 @@ import uuid
 
 import re
 from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
-from ansible.module_utils.six import PY3
-from ansible.module_utils.six.moves.urllib.parse import quote
 from ansible.module_utils.urls import fetch_url, HAS_GSSAPI
 from ansible.module_utils.basic import env_fallback, AnsibleFallbackNotFound
+from urllib.parse import quote
 
 
 def _env_then_dns_fallback(*args, **kwargs):
@@ -135,14 +134,7 @@ class IPAClient(object):
         except Exception as e:
             self._fail('post %s' % method, to_native(e))
 
-        if PY3:
-            charset = resp.headers.get_content_charset('latin-1')
-        else:
-            response_charset = resp.headers.getparam('charset')
-            if response_charset:
-                charset = response_charset
-            else:
-                charset = 'latin-1'
+        charset = resp.headers.get_content_charset('latin-1')
         resp = json.loads(to_text(resp.read(), encoding=charset))
         err = resp.get('error')
         if err is not None:

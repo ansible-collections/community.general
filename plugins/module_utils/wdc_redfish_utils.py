@@ -10,11 +10,10 @@ import re
 import time
 import tarfile
 import os
+from urllib.parse import urlparse, urlunparse
 
 from ansible.module_utils.urls import fetch_file
 from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils
-
-from ansible.module_utils.six.moves.urllib.parse import urlparse, urlunparse
 
 
 class WdcRedfishUtils(RedfishUtils):

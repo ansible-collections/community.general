@@ -438,9 +438,9 @@ record:
 """
 
 import json
+from urllib.parse import urlencode
 
 from ansible.module_utils.basic import AnsibleModule, env_fallback
-from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.common.text.converters import to_native, to_text
 from ansible.module_utils.urls import fetch_url
 

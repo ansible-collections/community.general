@@ -1,0 +1,2 @@
+bugfixes:
+  - "Remove all usage of ``ansible.module_utils.six`` (https://github.com/ansible-collections/community.general/pull/10888)."

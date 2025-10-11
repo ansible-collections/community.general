@@ -7,9 +7,9 @@ from __future__ import annotations
 
 
 from contextlib import contextmanager
+from io import StringIO
 from itertools import count
 
-from ansible.module_utils.six import StringIO
 from ansible_collections.community.general.plugins.modules import \
     keycloak_realm_keys_metadata_info
 from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
