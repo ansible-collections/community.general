@@ -1,0 +1,2 @@
+minor_changes:
+  - linode module utils - remove redundant code for ancient versions of Ansible (https://github.com/ansible-collections/community.general/pull/10906).
