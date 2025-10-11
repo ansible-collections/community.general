@@ -179,6 +179,7 @@ import bz2
 import glob
 import gzip
 import io
+import lzma
 import os
 import re
 import shutil
@@ -186,23 +187,12 @@ import tarfile
 import zipfile
 from fnmatch import fnmatch
 from traceback import format_exc
+from zipfile import BadZipFile
 from zlib import crc32
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes, to_native
 
-try:  # python 3.2+
-    from zipfile import BadZipFile  # type: ignore[attr-defined]
-except ImportError:  # older python
-    from zipfile import BadZipfile as BadZipFile
-
-LZMA_IMP_ERR = None
-try:
-    import lzma
-    HAS_LZMA = True
-except ImportError:
-    LZMA_IMP_ERR = format_exc()
-    HAS_LZMA = False
 
 STATE_ABSENT = 'absent'
 STATE_ARCHIVED = 'archive'
@@ -564,11 +554,8 @@ class TarArchive(Archive):
         self.file.add(path, archive_name, recursive=False, filter=filter)
 
     def _get_checksums(self, path):
-        if HAS_LZMA:
-            LZMAError = lzma.LZMAError
-        else:
-            # Just picking another exception that's also listed below
-            LZMAError = tarfile.ReadError
+        LZMAError = lzma.LZMAError
+
         try:
             if self.format == 'xz':
                 with lzma.open(_to_native_ascii(path), 'r') as f:
@@ -618,11 +605,6 @@ def main():
         add_file_common_args=True,
         supports_check_mode=True,
     )
-
-    if not HAS_LZMA and module.params['format'] == 'xz':
-        module.fail_json(
-            msg=missing_required_lib("lzma or backports.lzma", reason="when using xz format"), exception=LZMA_IMP_ERR
-        )
 
     check_mode = module.check_mode
 
