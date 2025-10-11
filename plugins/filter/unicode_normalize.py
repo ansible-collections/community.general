@@ -71,7 +71,7 @@ def unicode_normalize(data, form='NFC'):
         raise AnsibleTypeError(f"{type(data)} is not a valid input type")
 
     if form not in ('NFC', 'NFD', 'NFKC', 'NFKD'):
-        raise AnsibleFilterError(f"{form} is not a valid form")
+        raise AnsibleFilterError(f"{form!r} is not a valid form")
 
     return normalize(form, data)
 
