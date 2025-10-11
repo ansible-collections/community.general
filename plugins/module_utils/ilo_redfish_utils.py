@@ -20,8 +20,7 @@ class iLORedfishUtils(RedfishUtils):
         properties = ['Description', 'Id', 'Name', 'UserName']
 
         # Changed self.sessions_uri to Hardcoded string.
-        response = self.get_request(
-            self.root_uri + self.service_root + "SessionService/Sessions/")
+        response = self.get_request(f"{self.root_uri}{self.service_root}SessionService/Sessions/")
         if not response['ret']:
             return response
         result['ret'] = True
@@ -83,7 +82,7 @@ class iLORedfishUtils(RedfishUtils):
             if not res_dhv6['ret']:
                 return res_dhv6
 
-        datetime_uri = self.manager_uri + "DateTime"
+        datetime_uri = f"{self.manager_uri}DateTime"
 
         listofips = mgr_attributes['mgr_attr_value'].split(" ")
         if len(listofips) > 2:
@@ -102,12 +101,12 @@ class iLORedfishUtils(RedfishUtils):
         if not response1['ret']:
             return response1
 
-        return {'ret': True, 'changed': True, 'msg': "Modified %s" % mgr_attributes['mgr_attr_name']}
+        return {'ret': True, 'changed': True, 'msg': f"Modified {mgr_attributes['mgr_attr_name']}"}
 
     def set_time_zone(self, attr):
         key = attr['mgr_attr_name']
 
-        uri = self.manager_uri + "DateTime/"
+        uri = f"{self.manager_uri}DateTime/"
         response = self.get_request(self.root_uri + uri)
         if not response['ret']:
             return response
@@ -115,7 +114,7 @@ class iLORedfishUtils(RedfishUtils):
         data = response["data"]
 
         if key not in data:
-            return {'ret': False, 'changed': False, 'msg': "Key %s not found" % key}
+            return {'ret': False, 'changed': False, 'msg': f"Key {key} not found"}
 
         timezones = data["TimeZoneList"]
         index = ""
@@ -129,7 +128,7 @@ class iLORedfishUtils(RedfishUtils):
         if not response['ret']:
             return response
 
-        return {'ret': True, 'changed': True, 'msg': "Modified %s" % attr['mgr_attr_name']}
+        return {'ret': True, 'changed': True, 'msg': f"Modified {attr['mgr_attr_name']}"}
 
     def set_dns_server(self, attr):
         key = attr['mgr_attr_name']
@@ -161,7 +160,7 @@ class iLORedfishUtils(RedfishUtils):
         if not response['ret']:
             return response
 
-        return {'ret': True, 'changed': True, 'msg': "Modified %s" % attr['mgr_attr_name']}
+        return {'ret': True, 'changed': True, 'msg': f"Modified {attr['mgr_attr_name']}"}
 
     def set_domain_name(self, attr):
         key = attr['mgr_attr_name']
@@ -206,7 +205,7 @@ class iLORedfishUtils(RedfishUtils):
         response = self.patch_request(self.root_uri + ethuri, payload)
         if not response['ret']:
             return response
-        return {'ret': True, 'changed': True, 'msg': "Modified %s" % attr['mgr_attr_name']}
+        return {'ret': True, 'changed': True, 'msg': f"Modified {attr['mgr_attr_name']}"}
 
     def set_wins_registration(self, mgrattr):
         Key = mgrattr['mgr_attr_name']
@@ -227,7 +226,7 @@ class iLORedfishUtils(RedfishUtils):
         response = self.patch_request(self.root_uri + ethuri, payload)
         if not response['ret']:
             return response
-        return {'ret': True, 'changed': True, 'msg': "Modified %s" % mgrattr['mgr_attr_name']}
+        return {'ret': True, 'changed': True, 'msg': f"Modified {mgrattr['mgr_attr_name']}"}
 
     def get_server_poststate(self):
         # Get server details
@@ -302,5 +301,5 @@ class iLORedfishUtils(RedfishUtils):
         return {
             "ret": False,
             "changed": False,
-            "msg": "Server Reboot has failed, server state: {state} ".format(state=state)
+            "msg": f"Server Reboot has failed, server state: {state} "
         }

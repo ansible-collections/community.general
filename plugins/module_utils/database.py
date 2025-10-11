@@ -102,19 +102,19 @@ def _identifier_parse(identifier, quote_char):
             dot = identifier.index('.')
         except ValueError:
             identifier = identifier.replace(quote_char, quote_char * 2)
-            identifier = ''.join((quote_char, identifier, quote_char))
+            identifier = f"{quote_char}{identifier}{quote_char}"
             further_identifiers = [identifier]
         else:
             if dot == 0 or dot >= len(identifier) - 1:
                 identifier = identifier.replace(quote_char, quote_char * 2)
-                identifier = ''.join((quote_char, identifier, quote_char))
+                identifier = f"{quote_char}{identifier}{quote_char}"
                 further_identifiers = [identifier]
             else:
                 first_identifier = identifier[:dot]
                 next_identifier = identifier[dot + 1:]
                 further_identifiers = _identifier_parse(next_identifier, quote_char)
                 first_identifier = first_identifier.replace(quote_char, quote_char * 2)
-                first_identifier = ''.join((quote_char, first_identifier, quote_char))
+                first_identifier = f"{quote_char}{first_identifier}{quote_char}"
                 further_identifiers.insert(0, first_identifier)
 
     return further_identifiers
@@ -123,14 +123,14 @@ def _identifier_parse(identifier, quote_char):
 def pg_quote_identifier(identifier, id_type):
     identifier_fragments = _identifier_parse(identifier, quote_char='"')
     if len(identifier_fragments) > _PG_IDENTIFIER_TO_DOT_LEVEL[id_type]:
-        raise SQLParseError('PostgreSQL does not support %s with more than %i dots' % (id_type, _PG_IDENTIFIER_TO_DOT_LEVEL[id_type]))
+        raise SQLParseError(f'PostgreSQL does not support {id_type} with more than {int(_PG_IDENTIFIER_TO_DOT_LEVEL[id_type])} dots')
     return '.'.join(identifier_fragments)
 
 
 def mysql_quote_identifier(identifier, id_type):
     identifier_fragments = _identifier_parse(identifier, quote_char='`')
     if (len(identifier_fragments) - 1) > _MYSQL_IDENTIFIER_TO_DOT_LEVEL[id_type]:
-        raise SQLParseError('MySQL does not support %s with more than %i dots' % (id_type, _MYSQL_IDENTIFIER_TO_DOT_LEVEL[id_type]))
+        raise SQLParseError(f'MySQL does not support {id_type} with more than {int(_MYSQL_IDENTIFIER_TO_DOT_LEVEL[id_type])} dots')
 
     special_cased_fragments = []
     for fragment in identifier_fragments:
@@ -185,5 +185,4 @@ def check_input(module, *args):
                 dangerous_elements.append(elem)
 
     if dangerous_elements:
-        module.fail_json(msg="Passed input '%s' is "
-                             "potentially dangerous" % ', '.join(dangerous_elements))
+        module.fail_json(msg=f"Passed input '{', '.join(dangerous_elements)}' is potentially dangerous")

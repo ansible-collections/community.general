@@ -209,7 +209,7 @@ def wait_for_resource_creation_completion(oneandone_conn,
                 (resource_type != OneAndOneResources.server and resource_state.lower() == 'active')):
             return
         elif resource_state.lower() == 'failed':
-            raise Exception('%s creation failed for %s' % (resource_type, resource_id))
+            raise Exception(f'{resource_type} creation failed for {resource_id}')
         elif resource_state.lower() in ('active',
                                         'enabled',
                                         'deploying',
@@ -217,10 +217,10 @@ def wait_for_resource_creation_completion(oneandone_conn,
             continue
         else:
             raise Exception(
-                'Unknown %s state %s' % (resource_type, resource_state))
+                f'Unknown {resource_type} state {resource_state}')
 
     raise Exception(
-        'Timed out waiting for %s completion for %s' % (resource_type, resource_id))
+        f'Timed out waiting for {resource_type} completion for {resource_id}')
 
 
 def wait_for_resource_deletion_completion(oneandone_conn,
@@ -246,7 +246,7 @@ def wait_for_resource_deletion_completion(oneandone_conn,
             _type = 'PRIVATENETWORK'
         else:
             raise Exception(
-                'Unsupported wait_for delete operation for %s resource' % resource_type)
+                f'Unsupported wait_for delete operation for {resource_type} resource')
 
         for log in logs:
             if (log['resource']['id'] == resource_id and
@@ -255,4 +255,4 @@ def wait_for_resource_deletion_completion(oneandone_conn,
                     log['status']['state'] == 'OK'):
                 return
     raise Exception(
-        'Timed out waiting for %s deletion for %s' % (resource_type, resource_id))
+        f'Timed out waiting for {resource_type} deletion for {resource_id}')

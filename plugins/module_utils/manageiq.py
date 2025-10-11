@@ -93,12 +93,12 @@ class ManageIQ(object):
         ca_bundle_path = params['ca_cert']
 
         self._module = module
-        self._api_url = url + '/api'
+        self._api_url = f"{url}/api"
         self._auth = dict(user=username, password=password, token=token)
         try:
             self._client = ManageIQClient(self._api_url, self._auth, verify_ssl=verify_ssl, ca_bundle_path=ca_bundle_path)
         except Exception as e:
-            self.module.fail_json(msg="failed to open connection (%s): %s" % (url, str(e)))
+            self.module.fail_json(msg=f"failed to open connection ({url}): {e!s}")
 
     @property
     def module(self):
@@ -138,7 +138,7 @@ class ManageIQ(object):
         except ValueError:
             return None
         except Exception as e:
-            self.module.fail_json(msg="failed to find resource {error}".format(error=e))
+            self.module.fail_json(msg=f"failed to find resource {e}")
         return vars(entity)
 
     def find_collection_resource_or_fail(self, collection_name, **params):
@@ -151,8 +151,7 @@ class ManageIQ(object):
         if resource:
             return resource
         else:
-            msg = "{collection_name} where {params} does not exist in manageiq".format(
-                collection_name=collection_name, params=str(params))
+            msg = f"{collection_name} where {params!s} does not exist in manageiq"
             self.module.fail_json(msg=msg)
 
     def policies(self, resource_id, resource_type, resource_name):
@@ -174,8 +173,7 @@ class ManageIQ(object):
         if resource:
             return resource["id"]
         else:
-            msg = "{resource_name} {resource_type} does not exist in manageiq".format(
-                resource_name=resource_name, resource_type=resource_type)
+            msg = f"{resource_name} {resource_type} does not exist in manageiq"
             self.module.fail_json(msg=msg)
 
 
@@ -193,10 +191,7 @@ class ManageIQPolicies(object):
 
         self.resource_type = resource_type
         self.resource_id = resource_id
-        self.resource_url = '{api_url}/{resource_type}/{resource_id}'.format(
-            api_url=self.api_url,
-            resource_type=resource_type,
-            resource_id=resource_id)
+        self.resource_url = f'{self.api_url}/{resource_type}/{resource_id}'
 
     def query_profile_href(self, profile):
         """ Add or Update the policy_profile href field
@@ -215,9 +210,7 @@ class ManageIQPolicies(object):
         try:
             response = self.client.get(url.format(resource_url=self.resource_url))
         except Exception as e:
-            msg = "Failed to query {resource_type} policies: {error}".format(
-                resource_type=self.resource_type,
-                error=e)
+            msg = f"Failed to query {self.resource_type} policies: {e}"
             self.module.fail_json(msg=msg)
 
         resources = response.get('resources', [])
@@ -235,9 +228,7 @@ class ManageIQPolicies(object):
         try:
             response = self.client.get(url.format(api_url=self.api_url, profile_id=profile_id))
         except Exception as e:
-            msg = "Failed to query {resource_type} policies: {error}".format(
-                resource_type=self.resource_type,
-                error=e)
+            msg = f"Failed to query {self.resource_type} policies: {e}"
             self.module.fail_json(msg=msg)
 
         resources = response.get('policies', [])
@@ -316,34 +307,26 @@ class ManageIQPolicies(object):
         if not profiles_to_post:
             return dict(
                 changed=False,
-                msg="Profiles {profiles} already {action}ed, nothing to do".format(
-                    action=action,
-                    profiles=profiles))
+                msg=f"Profiles {profiles} already {action}ed, nothing to do")
 
         # try to assign or unassign profiles to resource
-        url = '{resource_url}/policy_profiles'.format(resource_url=self.resource_url)
+        url = f'{self.resource_url}/policy_profiles'
         try:
             response = self.client.post(url, action=action, resources=profiles_to_post)
         except Exception as e:
-            msg = "Failed to {action} profile: {error}".format(
-                action=action,
-                error=e)
+            msg = f"Failed to {action} profile: {e}"
             self.module.fail_json(msg=msg)
 
         # check all entities in result to be successful
         for result in response['results']:
             if not result['success']:
-                msg = "Failed to {action}: {message}".format(
-                    action=action,
-                    message=result['message'])
+                msg = f"Failed to {action}: {result['message']}"
                 self.module.fail_json(msg=msg)
 
         # successfully changed all needed profiles
         return dict(
             changed=True,
-            msg="Successfully {action}ed profiles: {profiles}".format(
-                action=action,
-                profiles=profiles))
+            msg=f"Successfully {action}ed profiles: {profiles}")
 
 
 class ManageIQTags(object):
@@ -360,17 +343,12 @@ class ManageIQTags(object):
 
         self.resource_type = resource_type
         self.resource_id = resource_id
-        self.resource_url = '{api_url}/{resource_type}/{resource_id}'.format(
-            api_url=self.api_url,
-            resource_type=resource_type,
-            resource_id=resource_id)
+        self.resource_url = f'{self.api_url}/{resource_type}/{resource_id}'
 
     def full_tag_name(self, tag):
         """ Returns the full tag name in manageiq
         """
-        return '/managed/{tag_category}/{tag_name}'.format(
-            tag_category=tag['category'],
-            tag_name=tag['name'])
+        return f"/managed/{tag['category']}/{tag['name']}"
 
     def clean_tag_object(self, tag):
         """ Clean a tag object to have human readable form of:
@@ -397,9 +375,7 @@ class ManageIQTags(object):
         try:
             response = self.client.get(url.format(resource_url=self.resource_url))
         except Exception as e:
-            msg = "Failed to query {resource_type} tags: {error}".format(
-                resource_type=self.resource_type,
-                error=e)
+            msg = f"Failed to query {self.resource_type} tags: {e}"
             self.module.fail_json(msg=msg)
 
         resources = response.get('resources', [])
@@ -442,27 +418,23 @@ class ManageIQTags(object):
         if not tags_to_post:
             return dict(
                 changed=False,
-                msg="Tags already {action}ed, nothing to do".format(action=action))
+                msg=f"Tags already {action}ed, nothing to do")
 
         # try to assign or unassign tags to resource
-        url = '{resource_url}/tags'.format(resource_url=self.resource_url)
+        url = f'{self.resource_url}/tags'
         try:
             response = self.client.post(url, action=action, resources=tags)
         except Exception as e:
-            msg = "Failed to {action} tag: {error}".format(
-                action=action,
-                error=e)
+            msg = f"Failed to {action} tag: {e}"
             self.module.fail_json(msg=msg)
 
         # check all entities in result to be successful
         for result in response['results']:
             if not result['success']:
-                msg = "Failed to {action}: {message}".format(
-                    action=action,
-                    message=result['message'])
+                msg = f"Failed to {action}: {result['message']}"
                 self.module.fail_json(msg=msg)
 
         # successfully changed all needed tags
         return dict(
             changed=True,
-            msg="Successfully {action}ed tags".format(action=action))
+            msg=f"Successfully {action}ed tags")

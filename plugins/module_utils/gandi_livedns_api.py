@@ -42,7 +42,7 @@ class GandiLiveDNSAPI(object):
                 error = errors[0]
                 name = error.get('name')
                 if name:
-                    s += '{0} :'.format(name)
+                    s += f'{name} :'
                 description = error.get('description')
                 if description:
                     s += description
@@ -50,9 +50,9 @@ class GandiLiveDNSAPI(object):
 
     def _gandi_api_call(self, api_call, method='GET', payload=None, error_on_404=True):
         authorization_header = (
-            'Bearer {0}'.format(self.personal_access_token)
+            f'Bearer {self.personal_access_token}'
             if self.personal_access_token
-            else 'Apikey {0}'.format(self.api_key)
+            else f'Apikey {self.api_key}'
         )
         headers = {'Authorization': authorization_header,
                    'Content-Type': 'application/json'}
@@ -61,7 +61,7 @@ class GandiLiveDNSAPI(object):
             try:
                 data = json.dumps(payload)
             except Exception as e:
-                self.module.fail_json(msg="Failed to encode payload as JSON: %s " % to_native(e))
+                self.module.fail_json(msg=f"Failed to encode payload as JSON: {to_native(e)} ")
 
         resp, info = fetch_url(self.module,
                                self.api_endpoint + api_call,
@@ -73,7 +73,7 @@ class GandiLiveDNSAPI(object):
         if info['status'] >= 400 and (info['status'] != 404 or error_on_404):
             err_s = self.error_strings.get(info['status'], '')
 
-            error_msg = "API Error {0}: {1}".format(err_s, self._build_error_message(self.module, info))
+            error_msg = f"API Error {err_s}: {self._build_error_message(self.module, info)}"
 
         result = None
         try:
@@ -85,7 +85,7 @@ class GandiLiveDNSAPI(object):
             try:
                 result = json.loads(to_text(content, errors='surrogate_or_strict'))
             except (getattr(json, 'JSONDecodeError', ValueError)) as e:
-                error_msg += "; Failed to parse API response with error {0}: {1}".format(to_native(e), content)
+                error_msg += f"; Failed to parse API response with error {to_native(e)}: {content}"
 
         if error_msg:
             self.module.fail_json(msg=error_msg)
@@ -114,11 +114,11 @@ class GandiLiveDNSAPI(object):
         return [self.build_result(r, domain) for r in results]
 
     def get_records(self, record, type, domain):
-        url = '/domains/%s/records' % (domain)
+        url = f'/domains/{domain}/records'
         if record:
-            url += '/%s' % (record)
+            url += f'/{record}'
             if type:
-                url += '/%s' % (type)
+                url += f'/{type}'
 
         records, status = self._gandi_api_call(url, error_on_404=False)
 
@@ -137,7 +137,7 @@ class GandiLiveDNSAPI(object):
         return records
 
     def create_record(self, record, type, values, ttl, domain):
-        url = '/domains/%s/records' % (domain)
+        url = f'/domains/{domain}/records'
         new_record = {
             'rrset_name': record,
             'rrset_type': type,
@@ -152,7 +152,7 @@ class GandiLiveDNSAPI(object):
         return None
 
     def update_record(self, record, type, values, ttl, domain):
-        url = '/domains/%s/records/%s/%s' % (domain, record, type)
+        url = f'/domains/{domain}/records/{record}/{type}'
         new_record = {
             'rrset_values': values,
             'rrset_ttl': ttl,
@@ -161,7 +161,7 @@ class GandiLiveDNSAPI(object):
         return record
 
     def delete_record(self, record, type, domain):
-        url = '/domains/%s/records/%s/%s' % (domain, record, type)
+        url = f'/domains/{domain}/records/{record}/{type}'
 
         self._gandi_api_call(url, method='DELETE')
 

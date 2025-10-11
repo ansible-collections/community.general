@@ -67,7 +67,7 @@ def keycloak_clientsecret_module_resolve_params(module, kc):
 
         if client is None:
             module.fail_json(
-                msg='Client does not exist {client_id}'.format(client_id=client_id)
+                msg=f'Client does not exist {client_id}'
             )
 
         id = client['id']

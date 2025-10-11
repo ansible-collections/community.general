@@ -37,7 +37,7 @@ def initialize_dialect(dialect, **kwargs):
     csv.register_dialect("unix", unix_dialect)
 
     if dialect not in csv.list_dialects():
-        raise DialectNotAvailableError("Dialect '%s' is not supported by your version of python." % dialect)
+        raise DialectNotAvailableError(f"Dialect '{dialect}' is not supported by your version of python.")
 
     # Create a dictionary from only set options
     dialect_params = {k: v for k, v in kwargs.items() if v is not None}
@@ -45,7 +45,7 @@ def initialize_dialect(dialect, **kwargs):
         try:
             csv.register_dialect('custom', dialect, **dialect_params)
         except TypeError as e:
-            raise CustomDialectFailureError("Unable to create custom dialect: %s" % to_native(e))
+            raise CustomDialectFailureError(f"Unable to create custom dialect: {to_native(e)}")
         dialect = 'custom'
 
     return dialect

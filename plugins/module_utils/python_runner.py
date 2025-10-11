@@ -25,7 +25,7 @@ class PythonRunner(CmdRunner):
             path_prefix.append(os.path.join(venv, "bin"))
             if environ_update is None:
                 environ_update = {}
-            environ_update["PATH"] = "%s:%s" % (":".join(path_prefix), os.environ["PATH"])
+            environ_update["PATH"] = f"{':'.join(path_prefix)}:{os.environ['PATH']}"
             environ_update["VIRTUAL_ENV"] = venv
 
         python_cmd = [self.python] + _ensure_list(command)

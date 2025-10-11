@@ -35,7 +35,7 @@ def snap_runner(module, **kwargs):
             _set=cmd_runner_fmt.as_fixed("set"),
             get=cmd_runner_fmt.as_fixed(["get", "-d"]),
             classic=cmd_runner_fmt.as_bool("--classic"),
-            channel=cmd_runner_fmt.as_func(lambda v: [] if v == 'stable' else ['--channel', '{0}'.format(v)]),
+            channel=cmd_runner_fmt.as_func(lambda v: [] if v == 'stable' else ['--channel', f'{v}']),
             options=cmd_runner_fmt.as_list(),
             info=cmd_runner_fmt.as_fixed("info"),
             dangerous=cmd_runner_fmt.as_bool("--dangerous"),

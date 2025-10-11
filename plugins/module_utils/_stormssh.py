@@ -68,7 +68,7 @@ class StormConfig(SSHConfig):
                 while (i < len(line)) and not line[i].isspace():
                     i += 1
                 if i == len(line):
-                    raise Exception('Unparsable line: %r' % line)
+                    raise Exception(f'Unparsable line: {line!r}')
                 key = line[:i].lower()
                 value = line[i:].lstrip()
             if key == 'host':
@@ -185,7 +185,7 @@ class ConfigParser(object):
                 if isinstance(value, int):
                     value = str(value)
 
-                searchable_information += " " + value
+                searchable_information += f" {value}"
 
             if search_string in searchable_information:
                 results.append(host_entry)
@@ -218,21 +218,17 @@ class ConfigParser(object):
 
         for host_item in self.config_data:
             if host_item.get("type") in ['comment', 'empty_line']:
-                file_content += host_item.get("value") + "\n"
+                file_content += f"{host_item.get('value')}\n"
                 continue
-            host_item_content = "Host {0}\n".format(host_item.get("host"))
+            host_item_content = f"Host {host_item.get('host')}\n"
             for key, value in host_item.get("options").items():
                 if isinstance(value, list):
                     sub_content = ""
                     for value_ in value:
-                        sub_content += "    {0} {1}\n".format(
-                            key, value_
-                        )
+                        sub_content += f"    {key} {value_}\n"
                     host_item_content += sub_content
                 else:
-                    host_item_content += "    {0} {1}\n".format(
-                        key, value
-                    )
+                    host_item_content += f"    {key} {value}\n"
             file_content += host_item_content
 
         return file_content

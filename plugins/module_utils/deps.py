@@ -53,7 +53,7 @@ class _Dependency(object):
             module.fail_json(msg=self.message, exception=self.trace)
 
     def __str__(self):
-        return "<dependency: {0} [{1}]>".format(self.name, self._states[self.state])
+        return f"<dependency: {self.name} [{self._states[self.state]}]>"
 
 
 @contextmanager

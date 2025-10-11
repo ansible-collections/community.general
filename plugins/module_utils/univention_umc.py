@@ -89,7 +89,7 @@ def uldap():
     def construct():
         try:
             secret_file = open('/etc/ldap.secret', 'r')
-            bind_dn = 'cn=admin,{0}'.format(base_dn())
+            bind_dn = f'cn=admin,{base_dn()}'
         except IOError:  # pragma: no cover
             secret_file = open('/etc/machine.secret', 'r')
             bind_dn = config_registry()["ldap/hostdn"]
@@ -186,7 +186,7 @@ def module_by_name(module_name_):
         univention.admin.modules.init(uldap(), position_base_dn(), module)
         return module
 
-    return _singleton('module/%s' % module_name_, construct)
+    return _singleton(f'module/{module_name_}', construct)
 
 
 def get_umc_admin_objects():

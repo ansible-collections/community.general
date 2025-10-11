@@ -98,8 +98,9 @@ class _Variable(object):
         return
 
     def __str__(self):
-        return "<Variable: value={0!r}, initial={1!r}, diff={2}, output={3}, change={4}, verbosity={5}>".format(
-            self.value, self.initial_value, self.diff, self.output, self.change, self.verbosity
+        return (
+            f"<Variable: value={self.value!r}, initial={self.initial_value!r}, diff={self.diff}, "
+            f"output={self.output}, change={self.change}, verbosity={self.verbosity}>"
         )
 
 
@@ -163,7 +164,7 @@ class VarDict(object):
             ValueError: Raised if trying to set a variable with a reserved name.
         """
         if name in self.reserved_names:
-            raise ValueError("Name {0} is reserved".format(name))
+            raise ValueError(f"Name {name} is reserved")
         if name in self.__vars__:
             var = self._var(name)
             var.set_meta(**kwargs)

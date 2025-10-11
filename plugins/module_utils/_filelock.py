@@ -56,7 +56,7 @@ class FileLock:
             Default is None, wait indefinitely until lock is released.
         :returns: True
         '''
-        lock_path = os.path.join(tmpdir, 'ansible-{0}.lock'.format(os.path.basename(path)))
+        lock_path = os.path.join(tmpdir, f'ansible-{os.path.basename(path)}.lock')
         l_wait = 0.1
         r_exception = IOError
         if sys.version_info[0] == 3:
@@ -82,7 +82,7 @@ class FileLock:
                     continue
 
             self.lockfd.close()
-            raise LockTimeout('{0} sec'.format(lock_timeout))
+            raise LockTimeout(f'{lock_timeout} sec')
 
         fcntl.flock(self.lockfd, fcntl.LOCK_EX)
         os.chmod(lock_path, stat.S_IWRITE | stat.S_IREAD)

@@ -395,11 +395,11 @@ class OneViewModuleBase(object, metaclass=abc.ABCMeta):
         resource1 = first_resource
         resource2 = second_resource
 
-        debug_resources = "resource1 = {0}, resource2 = {1}".format(resource1, resource2)
+        debug_resources = f"resource1 = {resource1}, resource2 = {resource2}"
 
         # The first resource is True / Not Null and the second resource is False / Null
         if resource1 and not resource2:
-            self.module.log("resource1 and not resource2. " + debug_resources)
+            self.module.log(f"resource1 and not resource2. {debug_resources}")
             return False
 
         # Checks all keys in first dict against the second dict
@@ -449,15 +449,15 @@ class OneViewModuleBase(object, metaclass=abc.ABCMeta):
         resource1 = first_resource
         resource2 = second_resource
 
-        debug_resources = "resource1 = {0}, resource2 = {1}".format(resource1, resource2)
+        debug_resources = f"resource1 = {resource1}, resource2 = {resource2}"
 
         # The second list is null / empty  / False
         if not resource2:
-            self.module.log("resource 2 is null. " + debug_resources)
+            self.module.log(f"resource 2 is null. {debug_resources}")
             return False
 
         if len(resource1) != len(resource2):
-            self.module.log("resources have different length. " + debug_resources)
+            self.module.log(f"resources have different length. {debug_resources}")
             return False
 
         resource1 = sorted(resource1, key=_str_sorted)
@@ -467,15 +467,15 @@ class OneViewModuleBase(object, metaclass=abc.ABCMeta):
             if isinstance(val, Mapping):
                 # change comparison function to compare dictionaries
                 if not self.compare(val, resource2[i]):
-                    self.module.log("resources are different. " + debug_resources)
+                    self.module.log(f"resources are different. {debug_resources}")
                     return False
             elif isinstance(val, list):
                 # recursive call
                 if not self.compare_list(val, resource2[i]):
-                    self.module.log("lists are different. " + debug_resources)
+                    self.module.log(f"lists are different. {debug_resources}")
                     return False
             elif _standardize_value(val) != _standardize_value(resource2[i]):
-                self.module.log("values are different. " + debug_resources)
+                self.module.log(f"values are different. {debug_resources}")
                 return False
 
         # no differences found

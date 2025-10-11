@@ -30,18 +30,10 @@ class MissingArgumentFormat(CmdRunnerException):
         self.args_formats = args_formats
 
     def __repr__(self):
-        return "MissingArgumentFormat({0!r}, {1!r}, {2!r})".format(
-            self.arg,
-            self.args_order,
-            self.args_formats,
-        )
+        return f"MissingArgumentFormat({self.arg!r}, {self.args_order!r}, {self.args_formats!r})"
 
     def __str__(self):
-        return "Cannot find format for parameter {0} {1} in: {2}".format(
-            self.arg,
-            self.args_order,
-            self.args_formats,
-        )
+        return f"Cannot find format for parameter {self.arg} {self.args_order} in: {self.args_formats}"
 
 
 class MissingArgumentValue(CmdRunnerException):
@@ -50,16 +42,10 @@ class MissingArgumentValue(CmdRunnerException):
         self.arg = arg
 
     def __repr__(self):
-        return "MissingArgumentValue({0!r}, {1!r})".format(
-            self.args_order,
-            self.arg,
-        )
+        return f"MissingArgumentValue({self.args_order!r}, {self.arg!r})"
 
     def __str__(self):
-        return "Cannot find value for parameter {0} in {1}".format(
-            self.arg,
-            self.args_order,
-        )
+        return f"Cannot find value for parameter {self.arg} in {self.args_order}"
 
 
 class FormatError(CmdRunnerException):
@@ -71,19 +57,10 @@ class FormatError(CmdRunnerException):
         super(FormatError, self).__init__()
 
     def __repr__(self):
-        return "FormatError({0!r}, {1!r}, {2!r}, {3!r})".format(
-            self.name,
-            self.value,
-            self.args_formats,
-            self.exc,
-        )
+        return f"FormatError({self.name!r}, {self.value!r}, {self.args_formats!r}, {self.exc!r})"
 
     def __str__(self):
-        return "Failed to format parameter {0} with value {1}: {2}".format(
-            self.name,
-            self.value,
-            self.exc,
-        )
+        return f"Failed to format parameter {self.name} with value {self.value}: {self.exc}"
 
 
 class CmdRunner(object):
