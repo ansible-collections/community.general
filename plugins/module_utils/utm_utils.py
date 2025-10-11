@@ -183,7 +183,7 @@ class UTM:
         result = None
         if response is not None:
             results = json.loads(response.read())
-            result = next(iter([d for d in results if d['name'] == module.params.get('name')]), None)
+            result = next((d for d in results if d['name'] == module.params.get('name')), None)
         return info, result
 
     def _clean_result(self, result):
