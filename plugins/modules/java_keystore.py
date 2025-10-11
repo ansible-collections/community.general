@@ -259,7 +259,7 @@ class JavaKeystore:
             except (OSError, ValueError) as e:
                 self.module.fail_json(msg="Unable to read the provided certificate: %s" % to_native(e))
 
-            fp = hex_decode(cert.fingerprint(hashes.SHA256())).upper()
+            fp = cert.fingerprint(hashes.SHA256()).hex().upper()
             fingerprint = ':'.join([fp[i:i + 2] for i in range(0, len(fp), 2)])
         else:
             current_certificate_fingerprint_cmd = [
@@ -505,10 +505,6 @@ def create_file(content):
     with os.fdopen(tmpfd, 'w') as f:
         f.write(content)
     return tmpfile
-
-
-def hex_decode(s):
-    return s.hex()
 
 
 def main():
