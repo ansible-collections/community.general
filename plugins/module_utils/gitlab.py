@@ -10,10 +10,7 @@ from ansible.module_utils.basic import missing_required_lib
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
-try:
-    from urlparse import urljoin
-except ImportError:
-    from urllib.parse import urljoin  # Python 3+
+from urllib.parse import urljoin
 
 import traceback
 
