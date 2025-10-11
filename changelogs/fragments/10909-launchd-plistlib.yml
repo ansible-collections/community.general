@@ -1,0 +1,2 @@
+minor_changes:
+  - launchd - remove conditional code supporting Python versions prior to 3.4 (https://github.com/ansible-collections/community.general/pull/10909).
