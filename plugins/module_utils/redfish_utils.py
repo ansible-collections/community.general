@@ -396,7 +396,7 @@ class RedfishUtils(object):
             # Insert the headers (Content-Disposition and Content-Type)
             if 'filename' in fields[form]:
                 name = os.path.basename(fields[form]['filename']).replace('"', '\\"')
-                write_buffer(body, u'Content-Disposition: form-data; name="%s"; filename="%s"' % (to_text(form), to_text(name)))
+                write_buffer(body, 'Content-Disposition: form-data; name="%s"; filename="%s"' % (to_text(form), to_text(name)))
             else:
                 write_buffer(body, 'Content-Disposition: form-data; name="%s"' % form)
             write_buffer(body, 'Content-Type: %s' % fields[form]['mime_type'])
@@ -562,9 +562,9 @@ class RedfishUtils(object):
             data = response['data']
             self.firmware_uri = self.software_uri = None
             if 'FirmwareInventory' in data:
-                self.firmware_uri = data['FirmwareInventory'][u'@odata.id']
+                self.firmware_uri = data['FirmwareInventory']['@odata.id']
             if 'SoftwareInventory' in data:
-                self.software_uri = data['SoftwareInventory'][u'@odata.id']
+                self.software_uri = data['SoftwareInventory']['@odata.id']
             return {'ret': True}
 
     def _find_chassis_resource(self):
@@ -696,12 +696,12 @@ class RedfishUtils(object):
             return response
         data = response['data']
         for log_svcs_entry in data.get('Members', []):
-            response = self.get_request(self.root_uri + log_svcs_entry[u'@odata.id'])
+            response = self.get_request(self.root_uri + log_svcs_entry['@odata.id'])
             if response['ret'] is False:
                 return response
             _data = response['data']
             if 'Entries' in _data:
-                log_svcs_uri_list.append(_data['Entries'][u'@odata.id'])
+                log_svcs_uri_list.append(_data['Entries']['@odata.id'])
 
         # For each entry in LogServices, get log name and all log entries
         for log_svcs_uri in log_svcs_uri_list:
@@ -744,15 +744,15 @@ class RedfishUtils(object):
             return response
         data = response['data']
 
-        for log_svcs_entry in data[u'Members']:
+        for log_svcs_entry in data['Members']:
             response = self.get_request(self.root_uri + log_svcs_entry["@odata.id"])
             if response['ret'] is False:
                 return response
             _data = response['data']
             # Check to make sure option is available, otherwise error is ugly
             if "Actions" in _data:
-                if "#LogService.ClearLog" in _data[u"Actions"]:
-                    self.post_request(self.root_uri + _data[u"Actions"]["#LogService.ClearLog"]["target"], {})
+                if "#LogService.ClearLog" in _data["Actions"]:
+                    self.post_request(self.root_uri + _data["Actions"]["#LogService.ClearLog"]["target"], {})
                     if response['ret'] is False:
                         return response
         return {'ret': True}
@@ -807,14 +807,14 @@ class RedfishUtils(object):
 
         # Loop through Members and their StorageControllers
         # and gather properties from each StorageController
-        if data[u'Members']:
-            for storage_member in data[u'Members']:
-                storage_member_uri = storage_member[u'@odata.id']
+        if data['Members']:
+            for storage_member in data['Members']:
+                storage_member_uri = storage_member['@odata.id']
                 response = self.get_request(self.root_uri + storage_member_uri)
                 data = response['data']
 
                 if key in data:
-                    controllers_uri = data[key][u'@odata.id']
+                    controllers_uri = data[key]['@odata.id']
 
                     response = self.get_request(self.root_uri + controllers_uri)
                     if response['ret'] is False:
@@ -822,9 +822,9 @@ class RedfishUtils(object):
                     result['ret'] = True
                     data = response['data']
 
-                    if data[u'Members']:
-                        for controller_member in data[u'Members']:
-                            controller_member_uri = controller_member[u'@odata.id']
+                    if data['Members']:
+                        for controller_member in data['Members']:
+                            controller_member_uri = controller_member['@odata.id']
                             response = self.get_request(self.root_uri + controller_member_uri)
                             if response['ret'] is False:
                                 return response
@@ -875,16 +875,16 @@ class RedfishUtils(object):
 
         if 'Storage' in data:
             # Get a list of all storage controllers and build respective URIs
-            storage_uri = data[u'Storage'][u'@odata.id']
+            storage_uri = data['Storage']['@odata.id']
             response = self.get_request(self.root_uri + storage_uri)
             if response['ret'] is False:
                 return response
             result['ret'] = True
             data = response['data']
 
-            if data[u'Members']:
-                for controller in data[u'Members']:
-                    controller_list.append(controller[u'@odata.id'])
+            if data['Members']:
+                for controller in data['Members']:
+                    controller_list.append(controller['@odata.id'])
                 for c in controller_list:
                     uri = self.root_uri + c
                     response = self.get_request(uri)
@@ -894,7 +894,7 @@ class RedfishUtils(object):
                     controller_name = 'Controller 1'
                     storage_id = data['Id']
                     if 'Controllers' in data:
-                        controllers_uri = data['Controllers'][u'@odata.id']
+                        controllers_uri = data['Controllers']['@odata.id']
 
                         response = self.get_request(self.root_uri + controllers_uri)
                         if response['ret'] is False:
@@ -902,8 +902,8 @@ class RedfishUtils(object):
                         result['ret'] = True
                         cdata = response['data']
 
-                        if cdata[u'Members']:
-                            controller_member_uri = cdata[u'Members'][0][u'@odata.id']
+                        if cdata['Members']:
+                            controller_member_uri = cdata['Members'][0]['@odata.id']
 
                             response = self.get_request(self.root_uri + controller_member_uri)
                             if response['ret'] is False:
@@ -921,8 +921,8 @@ class RedfishUtils(object):
                                 controller_name = 'Controller %s' % sc_id
                     drive_results = []
                     if 'Drives' in data:
-                        for device in data[u'Drives']:
-                            disk_uri = self.root_uri + device[u'@odata.id']
+                        for device in data['Drives']:
+                            disk_uri = self.root_uri + device['@odata.id']
                             response = self.get_request(disk_uri)
                             data = response['data']
 
@@ -952,8 +952,8 @@ class RedfishUtils(object):
             result['ret'] = True
             data = response['data']
 
-            for controller in data[u'Members']:
-                controller_list.append(controller[u'@odata.id'])
+            for controller in data['Members']:
+                controller_list.append(controller['@odata.id'])
 
             for c in controller_list:
                 uri = self.root_uri + c
@@ -967,7 +967,7 @@ class RedfishUtils(object):
                     sc_id = data.get('Id', '1')
                     controller_name = 'Controller %s' % sc_id
                 drive_results = []
-                for device in data[u'Devices']:
+                for device in data['Devices']:
                     drive_result = {}
                     for property in properties:
                         if property in device:
@@ -1005,7 +1005,7 @@ class RedfishUtils(object):
 
         if 'Storage' in data:
             # Get a list of all storage controllers and build respective URIs
-            storage_uri = data[u'Storage'][u'@odata.id']
+            storage_uri = data['Storage']['@odata.id']
             response = self.get_request(self.root_uri + storage_uri)
             if response['ret'] is False:
                 return response
@@ -1013,8 +1013,8 @@ class RedfishUtils(object):
             data = response['data']
 
             if data.get('Members'):
-                for controller in data[u'Members']:
-                    controller_list.append(controller[u'@odata.id'])
+                for controller in data['Members']:
+                    controller_list.append(controller['@odata.id'])
                 for idx, c in enumerate(controller_list):
                     uri = self.root_uri + c
                     response = self.get_request(uri)
@@ -1023,13 +1023,13 @@ class RedfishUtils(object):
                     data = response['data']
                     controller_name = 'Controller %s' % str(idx)
                     if 'Controllers' in data:
-                        response = self.get_request(self.root_uri + data['Controllers'][u'@odata.id'])
+                        response = self.get_request(self.root_uri + data['Controllers']['@odata.id'])
                         if response['ret'] is False:
                             return response
                         c_data = response['data']
 
                         if c_data.get('Members') and c_data['Members']:
-                            response = self.get_request(self.root_uri + c_data['Members'][0][u'@odata.id'])
+                            response = self.get_request(self.root_uri + c_data['Members'][0]['@odata.id'])
                             if response['ret'] is False:
                                 return response
                             member_data = response['data']
@@ -1052,13 +1052,13 @@ class RedfishUtils(object):
                     volume_list = []
                     if 'Volumes' in data:
                         # Get a list of all volumes and build respective URIs
-                        volumes_uri = data[u'Volumes'][u'@odata.id']
+                        volumes_uri = data['Volumes']['@odata.id']
                         response = self.get_request(self.root_uri + volumes_uri)
                         data = response['data']
 
                         if data.get('Members'):
-                            for volume in data[u'Members']:
-                                volume_list.append(volume[u'@odata.id'])
+                            for volume in data['Members']:
+                                volume_list.append(volume['@odata.id'])
                             for v in volume_list:
                                 uri = self.root_uri + v
                                 response = self.get_request(uri)
@@ -1075,9 +1075,9 @@ class RedfishUtils(object):
                                 # Get related Drives Id
                                 drive_id_list = []
                                 if 'Links' in data:
-                                    if 'Drives' in data[u'Links']:
-                                        for link in data[u'Links'][u'Drives']:
-                                            drive_id_link = link[u'@odata.id']
+                                    if 'Drives' in data['Links']:
+                                        for link in data['Links']['Drives']:
+                                            drive_id_link = link['@odata.id']
                                             drive_id = drive_id_link.rstrip('/').split('/')[-1]
                                             drive_id_list.append({'Id': drive_id})
                                         volume_result['Linked_drives'] = drive_id_list
@@ -1364,7 +1364,7 @@ class RedfishUtils(object):
         data = response['data']
 
         for users in data.get('Members', []):
-            user_list.append(users[u'@odata.id'])   # user_list[] are URIs
+            user_list.append(users['@odata.id'])   # user_list[] are URIs
 
         # for each user, get details
         for uri in user_list:
@@ -1644,8 +1644,8 @@ class RedfishUtils(object):
         result['ret'] = True
         data = response['data']
 
-        for sessions in data[u'Members']:
-            session_list.append(sessions[u'@odata.id'])   # session_list[] are URIs
+        for sessions in data['Members']:
+            session_list.append(sessions['@odata.id'])   # session_list[] are URIs
 
         # for each session, get details
         for uri in session_list:
@@ -1674,8 +1674,8 @@ class RedfishUtils(object):
             return {'ret': True, 'changed': False, 'msg': "There are no active sessions"}
 
         # loop to delete every active session
-        for session in data[u'Members']:
-            response = self.delete_request(self.root_uri + session[u'@odata.id'])
+        for session in data['Members']:
+            response = self.delete_request(self.root_uri + session['@odata.id'])
             if response['ret'] is False:
                 return response
 
@@ -1776,8 +1776,8 @@ class RedfishUtils(object):
             else:
                 uri = None
 
-            for member in data[u'Members']:
-                fw_uri = self.root_uri + member[u'@odata.id']
+            for member in data['Members']:
+                fw_uri = self.root_uri + member['@odata.id']
                 # Get details for each software or firmware member
                 response = self.get_request(fw_uri)
                 if response['ret'] is False:
@@ -2084,7 +2084,7 @@ class RedfishUtils(object):
             return response
         result['ret'] = True
         data = response['data']
-        for attribute in data[u'Attributes'].items():
+        for attribute in data['Attributes'].items():
             bios_attributes[attribute[0]] = attribute[1]
         result["entries"] = bios_attributes
         return result
@@ -2340,14 +2340,14 @@ class RedfishUtils(object):
         # Check the attributes
         for attr_name, attr_value in attributes.items():
             # Check if attribute exists
-            if attr_name not in data[u'Attributes']:
+            if attr_name not in data['Attributes']:
                 # Remove and proceed to next attribute if this isn't valid
                 attrs_bad.update({attr_name: attr_value})
                 del attrs_to_patch[attr_name]
                 continue
 
             # If already set to requested value, remove it from PATCH payload
-            if data[u'Attributes'][attr_name] == attr_value:
+            if data['Attributes'][attr_name] == attr_value:
                 del attrs_to_patch[attr_name]
 
         warning = ""
@@ -2492,8 +2492,8 @@ class RedfishUtils(object):
                 data = response['data']
 
                 # Checking if fans are present
-                if u'Fans' in data:
-                    for device in data[u'Fans']:
+                if 'Fans' in data:
+                    for device in data['Fans']:
                         fan = {}
                         for property in properties:
                             if property in device:
@@ -2568,7 +2568,7 @@ class RedfishUtils(object):
                 result['ret'] = True
                 data = response['data']
                 if "Temperatures" in data:
-                    for sensor in data[u'Temperatures']:
+                    for sensor in data['Temperatures']:
                         sensor_result = {}
                         for property in properties:
                             if property in sensor:
@@ -2610,8 +2610,8 @@ class RedfishUtils(object):
         result['ret'] = True
         data = response['data']
 
-        for cpu in data[u'Members']:
-            cpu_list.append(cpu[u'@odata.id'])
+        for cpu in data['Members']:
+            cpu_list.append(cpu['@odata.id'])
 
         for c in cpu_list:
             cpu = {}
@@ -2660,8 +2660,8 @@ class RedfishUtils(object):
         result['ret'] = True
         data = response['data']
 
-        for dimm in data[u'Members']:
-            memory_list.append(dimm[u'@odata.id'])
+        for dimm in data['Members']:
+            memory_list.append(dimm['@odata.id'])
 
         for m in memory_list:
             dimm = {}
@@ -2730,8 +2730,8 @@ class RedfishUtils(object):
         result['ret'] = True
         data = response['data']
 
-        for nic in data[u'Members']:
-            nic_list.append(nic[u'@odata.id'])
+        for nic in data['Members']:
+            nic_list.append(nic['@odata.id'])
 
         for n in nic_list:
             nic = self.get_nic(n)
@@ -2786,8 +2786,8 @@ class RedfishUtils(object):
         result['ret'] = True
         data = response['data']
 
-        for virtualmedia in data[u'Members']:
-            virtualmedia_list.append(virtualmedia[u'@odata.id'])
+        for virtualmedia in data['Members']:
+            virtualmedia_list.append(virtualmedia['@odata.id'])
 
         for n in virtualmedia_list:
             virtualmedia = {}
@@ -2953,8 +2953,8 @@ class RedfishUtils(object):
             return response
         data = response['data']
         virt_media_list = []
-        for member in data[u'Members']:
-            virt_media_list.append(member[u'@odata.id'])
+        for member in data['Members']:
+            virt_media_list.append(member['@odata.id'])
         resources, headers = self._read_virt_media_resources(virt_media_list)
 
         # see if image already inserted; if so, nothing to do
@@ -3068,8 +3068,8 @@ class RedfishUtils(object):
             return response
         data = response['data']
         virt_media_list = []
-        for member in data[u'Members']:
-            virt_media_list.append(member[u'@odata.id'])
+        for member in data['Members']:
+            virt_media_list.append(member['@odata.id'])
         resources, headers = self._read_virt_media_resources(virt_media_list)
 
         # find the VirtualMedia resource to eject
@@ -3136,7 +3136,7 @@ class RedfishUtils(object):
             data = response['data']
 
             if 'Power' in data:
-                power_uri = data[u'Power'][u'@odata.id']
+                power_uri = data['Power']['@odata.id']
             else:
                 continue
 

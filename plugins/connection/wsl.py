@@ -525,9 +525,9 @@ class Connection(ConnectionBase):
             raise AnsibleAuthenticationFailure(msg)
         except Exception as e:
             msg = to_text(e)
-            if u'PID check failed' in msg:
+            if 'PID check failed' in msg:
                 raise AnsibleError('paramiko version issue, please upgrade paramiko on the machine running ansible')
-            elif u'Private key file is encrypted' in msg:
+            elif 'Private key file is encrypted' in msg:
                 msg = (
                     f'ssh {self.get_option("remote_user")}@{self.get_options("remote_addr")}:{port} : '
                     f'{msg}\nTo connect as a different user, use -u <username>.'
