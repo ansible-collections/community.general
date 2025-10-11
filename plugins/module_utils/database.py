@@ -123,14 +123,14 @@ def _identifier_parse(identifier, quote_char):
 def pg_quote_identifier(identifier, id_type):
     identifier_fragments = _identifier_parse(identifier, quote_char='"')
     if len(identifier_fragments) > _PG_IDENTIFIER_TO_DOT_LEVEL[id_type]:
-        raise SQLParseError(f'PostgreSQL does not support {id_type} with more than {int(_PG_IDENTIFIER_TO_DOT_LEVEL[id_type])} dots')
+        raise SQLParseError(f'PostgreSQL does not support {id_type} with more than {_PG_IDENTIFIER_TO_DOT_LEVEL[id_type]} dots')
     return '.'.join(identifier_fragments)
 
 
 def mysql_quote_identifier(identifier, id_type):
     identifier_fragments = _identifier_parse(identifier, quote_char='`')
     if (len(identifier_fragments) - 1) > _MYSQL_IDENTIFIER_TO_DOT_LEVEL[id_type]:
-        raise SQLParseError(f'MySQL does not support {id_type} with more than {int(_MYSQL_IDENTIFIER_TO_DOT_LEVEL[id_type])} dots')
+        raise SQLParseError(f'MySQL does not support {id_type} with more than {_MYSQL_IDENTIFIER_TO_DOT_LEVEL[id_type]} dots')
 
     special_cased_fragments = []
     for fragment in identifier_fragments:

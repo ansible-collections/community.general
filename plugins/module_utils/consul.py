@@ -35,12 +35,12 @@ class RequestError(Exception):
         if self.response_data is None:
             # self.status is already the message (backwards compat)
             return self.status
-        return f"HTTP {int(self.status)}: {self.response_data}"
+        return f"HTTP {self.status}: {self.response_data}"
 
 
 def handle_consul_response_error(response):
     if 400 <= response.status_code < 600:
-        raise RequestError(f"{int(response.status_code)} {response.content}")
+        raise RequestError(f"{response.status_code} {response.content}")
 
 
 AUTH_ARGUMENTS_SPEC = dict(
@@ -328,7 +328,7 @@ class _ConsulModule:
                 response_data = e.fp.read()
             else:
                 self._module.fail_json(
-                    msg=f"Could not connect to consul agent at {module_params['host']}:{module_params['port']}, error was {e!s}"
+                    msg=f"Could not connect to consul agent at {module_params['host']}:{module_params['port']}, error was {e}"
                 )
                 raise
 

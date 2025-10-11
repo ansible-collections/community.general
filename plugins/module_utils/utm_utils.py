@@ -72,7 +72,7 @@ class UTM:
         self.info_only = info_only
         self.module = module
         self.request_url = (
-            f"{module.params.get('utm_protocol')}://{module.params.get('utm_host')}:{to_native(module.params.get('utm_port'))}/api/objects/{endpoint}/"
+            f"{module.params.get('utm_protocol')}://{module.params.get('utm_host')}:{module.params.get('utm_port')}/api/objects/{endpoint}/"
         )
 
         """
@@ -83,7 +83,7 @@ class UTM:
         self.module.params['url_password'] = module.params.get('utm_token')
         if all(elem in self.change_relevant_keys for elem in module.params.keys()):
             raise UTMModuleConfigurationError(
-                f"The keys {to_native(self.change_relevant_keys)} to check are not in the modules keys:\n{to_native(list(module.params.keys()))}"
+                f"The keys {self.change_relevant_keys} to check are not in the modules keys:\n{list(module.params.keys())}"
             )
 
     def execute(self):

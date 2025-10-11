@@ -98,7 +98,7 @@ class ManageIQ(object):
         try:
             self._client = ManageIQClient(self._api_url, self._auth, verify_ssl=verify_ssl, ca_bundle_path=ca_bundle_path)
         except Exception as e:
-            self.module.fail_json(msg=f"failed to open connection ({url}): {e!s}")
+            self.module.fail_json(msg=f"failed to open connection ({url}): {e}")
 
     @property
     def module(self):

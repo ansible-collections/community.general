@@ -61,7 +61,7 @@ class GandiLiveDNSAPI(object):
             try:
                 data = json.dumps(payload)
             except Exception as e:
-                self.module.fail_json(msg=f"Failed to encode payload as JSON: {to_native(e)} ")
+                self.module.fail_json(msg=f"Failed to encode payload as JSON: {e} ")
 
         resp, info = fetch_url(self.module,
                                self.api_endpoint + api_call,
@@ -85,7 +85,7 @@ class GandiLiveDNSAPI(object):
             try:
                 result = json.loads(to_text(content, errors='surrogate_or_strict'))
             except (getattr(json, 'JSONDecodeError', ValueError)) as e:
-                error_msg += f"; Failed to parse API response with error {to_native(e)}: {content}"
+                error_msg += f"; Failed to parse API response with error {e}: {content}"
 
         if error_msg:
             self.module.fail_json(msg=error_msg)

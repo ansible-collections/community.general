@@ -119,10 +119,10 @@ def gitlab_authentication(module, min_version=None):
                                         oauth_token=gitlab_oauth_token, job_token=gitlab_job_token, api_version=4)
         gitlab_instance.auth()
     except (gitlab.exceptions.GitlabAuthenticationError, gitlab.exceptions.GitlabGetError) as e:
-        module.fail_json(msg=f"Failed to connect to GitLab server: {to_native(e)}")
+        module.fail_json(msg=f"Failed to connect to GitLab server: {e}")
     except (gitlab.exceptions.GitlabHttpError) as e:
         module.fail_json(msg=(
-            f"Failed to connect to GitLab server: {to_native(e)}. GitLab remove Session API now "
+            f"Failed to connect to GitLab server: {e}. GitLab remove Session API now "
             "that private tokens are removed from user API endpoints since version 10.2."
         ))
 

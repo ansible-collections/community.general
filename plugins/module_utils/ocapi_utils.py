@@ -64,7 +64,7 @@ class OcapiUtils(object):
         # Almost all errors should be caught above, but just in case
         except Exception as e:
             return {'ret': False,
-                    'msg': f"Failed GET request to '{uri}': '{to_text(e)}'"}
+                    'msg': f"Failed GET request to '{uri}': '{e}'"}
         return {'ret': True, 'data': data, 'headers': headers}
 
     def delete_request(self, uri, etag=None):
@@ -92,7 +92,7 @@ class OcapiUtils(object):
         # Almost all errors should be caught above, but just in case
         except Exception as e:
             return {'ret': False,
-                    'msg': f"Failed DELETE request to '{uri}': '{to_text(e)}'"}
+                    'msg': f"Failed DELETE request to '{uri}': '{e}'"}
         return {'ret': True, 'data': data, 'headers': headers}
 
     def put_request(self, uri, payload, etag=None):
@@ -117,7 +117,7 @@ class OcapiUtils(object):
         # Almost all errors should be caught above, but just in case
         except Exception as e:
             return {'ret': False,
-                    'msg': f"Failed PUT request to '{uri}': '{to_text(e)}'"}
+                    'msg': f"Failed PUT request to '{uri}': '{e}'"}
         return {'ret': True, 'headers': headers, 'resp': resp}
 
     def post_request(self, uri, payload, content_type="application/json", timeout=None):
@@ -146,7 +146,7 @@ class OcapiUtils(object):
         # Almost all errors should be caught above, but just in case
         except Exception as e:
             return {'ret': False,
-                    'msg': f"Failed POST request to '{uri}': '{to_text(e)}'"}
+                    'msg': f"Failed POST request to '{uri}': '{e}'"}
         return {'ret': True, 'headers': headers, 'resp': resp}
 
     def get_uri_with_slot_number_query_param(self, uri):
@@ -158,7 +158,7 @@ class OcapiUtils(object):
         """
         if self.proxy_slot_number is not None:
             parsed_url = urlparse(uri)
-            return parsed_url._replace(query=f"slotnumber={self.proxy_slot_number!s}").geturl()
+            return parsed_url._replace(query=f"slotnumber={self.proxy_slot_number}").geturl()
         else:
             return uri
 

@@ -339,7 +339,7 @@ def wait_to_finish(target, pending, refresh, timeout, min_interval=1, delay=3):
 
             if not_found_times > 10:
                 raise HwcModuleException(
-                    f"not found the object for {int(not_found_times)} times")
+                    f"not found the object for {not_found_times} times")
         else:
             not_found_times = 0
 
@@ -359,7 +359,7 @@ def wait_to_finish(target, pending, refresh, timeout, min_interval=1, delay=3):
 
             time.sleep(wait)
 
-    raise HwcModuleException(f"async wait timeout after {int(timeout)} seconds")
+    raise HwcModuleException(f"async wait timeout after {timeout} seconds")
 
 
 def navigate_value(data, index, array_index=None):

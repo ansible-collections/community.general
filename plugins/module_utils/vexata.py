@@ -58,7 +58,7 @@ def get_array(module):
         else:
             module.fail_json(msg='Test connection to array failed.')
     except Exception as e:
-        module.fail_json(msg=f'Vexata API access failed: {to_native(e)}')
+        module.fail_json(msg=f'Vexata API access failed: {e}')
 
 
 def argument_spec():

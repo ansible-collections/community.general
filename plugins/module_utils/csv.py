@@ -45,7 +45,7 @@ def initialize_dialect(dialect, **kwargs):
         try:
             csv.register_dialect('custom', dialect, **dialect_params)
         except TypeError as e:
-            raise CustomDialectFailureError(f"Unable to create custom dialect: {to_native(e)}")
+            raise CustomDialectFailureError(f"Unable to create custom dialect: {e}")
         dialect = 'custom'
 
     return dialect
