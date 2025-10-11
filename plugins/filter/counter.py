@@ -42,14 +42,13 @@ from collections import Counter
 def counter(sequence):
     ''' Count elements in a sequence. Returns dict with count result. '''
     if not isinstance(sequence, Sequence):
-        raise AnsibleFilterError('Argument for community.general.counter must be a sequence (string or list). %s is %s' %
-                                 (sequence, type(sequence)))
+        raise AnsibleFilterError(f'Argument for community.general.counter must be a sequence (string or list). {sequence} is {type(sequence)}')
 
     try:
         result = dict(Counter(sequence))
     except TypeError as e:
         raise AnsibleFilterError(
-            "community.general.counter needs a sequence with hashable elements (int, float or str) - %s" % (e)
+            f"community.general.counter needs a sequence with hashable elements (int, float or str) - {e}"
         )
     return result
 

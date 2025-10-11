@@ -50,9 +50,7 @@ def lists_union(*args, **kwargs):
     if kwargs:
         # Some unused kwargs remain
         raise AnsibleFilterError(
-            "lists_union() got unexpected keywords arguments: {0}".format(
-                ", ".join(kwargs.keys())
-            )
+            f"lists_union() got unexpected keywords arguments: {', '.join(kwargs.keys())}"
         )
 
     if flatten:
@@ -81,9 +79,7 @@ def lists_intersect(*args, **kwargs):
     if kwargs:
         # Some unused kwargs remain
         raise AnsibleFilterError(
-            "lists_intersect() got unexpected keywords arguments: {0}".format(
-                ", ".join(kwargs.keys())
-            )
+            f"lists_intersect() got unexpected keywords arguments: {', '.join(kwargs.keys())}"
         )
 
     if flatten:
@@ -121,9 +117,7 @@ def lists_difference(*args, **kwargs):
     if kwargs:
         # Some unused kwargs remain
         raise AnsibleFilterError(
-            "lists_difference() got unexpected keywords arguments: {0}".format(
-                ", ".join(kwargs.keys())
-            )
+            f"lists_difference() got unexpected keywords arguments: {', '.join(kwargs.keys())}"
         )
 
     if flatten:
@@ -161,9 +155,7 @@ def lists_symmetric_difference(*args, **kwargs):
     if kwargs:
         # Some unused kwargs remain
         raise AnsibleFilterError(
-            "lists_difference() got unexpected keywords arguments: {0}".format(
-                ", ".join(kwargs.keys())
-            )
+            f"lists_difference() got unexpected keywords arguments: {', '.join(kwargs.keys())}"
         )
 
     if flatten:

@@ -70,12 +70,12 @@ def groupby_as_dict(sequence, attribute):
     result = dict()
     for list_index, element in enumerate(sequence):
         if not isinstance(element, Mapping):
-            raise AnsibleFilterError('Sequence element #{0} is not a mapping'.format(list_index))
+            raise AnsibleFilterError(f'Sequence element #{list_index} is not a mapping')
         if attribute not in element:
-            raise AnsibleFilterError('Attribute not contained in element #{0} of sequence'.format(list_index))
+            raise AnsibleFilterError(f'Attribute not contained in element #{list_index} of sequence')
         result_index = element[attribute]
         if result_index in result:
-            raise AnsibleFilterError('Multiple sequence entries have attribute value {0!r}'.format(result_index))
+            raise AnsibleFilterError(f'Multiple sequence entries have attribute value {result_index!r}')
         result[result_index] = element
     return result
 

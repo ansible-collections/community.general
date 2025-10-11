@@ -649,7 +649,7 @@ class Connection(ConnectionBase):
                 if password_prompt:
                     if self.become:
                         become_pass = self.become.get_option('become_pass')
-                        chan.sendall(to_bytes(become_pass + '\n', errors='surrogate_or_strict'))
+                        chan.sendall(to_bytes(f"{become_pass}\n", errors='surrogate_or_strict'))
                     else:
                         raise AnsibleError('A password is required but none was supplied')
                 else:
@@ -687,9 +687,7 @@ class Connection(ConnectionBase):
             with open(in_path, 'rb') as f:
                 data = f.read()
                 returncode, stdout, stderr = self.exec_command(
-                    ' '.join([
-                        self._shell.executable, '-c',
-                        self._shell.quote(f'cat > {out_path}')]),
+                    f"{self._shell.executable} -c {self._shell.quote(f'cat > {out_path}')}",
                     in_data=data,
                     sudoable=False)
             if returncode != 0:
@@ -708,9 +706,7 @@ class Connection(ConnectionBase):
         display.vvv(f'FETCH {in_path} TO {out_path}', host=self.get_option('remote_addr'))
         try:
             returncode, stdout, stderr = self.exec_command(
-                ' '.join([
-                    self._shell.executable, '-c',
-                    self._shell.quote(f'cat {in_path}')]),
+                f"{self._shell.executable} -c {self._shell.quote(f'cat {in_path}')}",
                 sudoable=False)
             if returncode != 0:
                 if 'cat: not found' in stderr.decode('utf-8'):

@@ -49,8 +49,7 @@ from ansible.errors import AnsibleFilterError
 
 def list_accumulate(sequence):
     if not isinstance(sequence, Sequence):
-        raise AnsibleFilterError('Invalid value type (%s) for accumulate (%r)' %
-                                 (type(sequence), sequence))
+        raise AnsibleFilterError(f'Invalid value type ({type(sequence)}) for accumulate ({sequence!r})')
 
     return accumulate(sequence)
 

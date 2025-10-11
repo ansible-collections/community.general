@@ -137,10 +137,10 @@ def json_query(data, expr):
     try:
         return jmespath.search(expr, data)
     except jmespath.exceptions.JMESPathError as e:
-        raise AnsibleFilterError('JMESPathError in json_query filter plugin:\n%s' % e)
+        raise AnsibleFilterError(f'JMESPathError in json_query filter plugin:\n{e}')
     except Exception as e:
         # For older jmespath, we can get ValueError and TypeError without much info.
-        raise AnsibleFilterError('Error in jmespath.search in json_query filter plugin:\n%s' % e)
+        raise AnsibleFilterError(f'Error in jmespath.search in json_query filter plugin:\n{e}')
 
 
 class FilterModule(object):
