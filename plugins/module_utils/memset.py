@@ -55,7 +55,7 @@ def memset_api_call(api_key, api_method, payload=None):
     data = urlencode(payload)
     headers = {'Content-Type': 'application/x-www-form-urlencoded'}
     api_uri_base = 'https://api.memset.com/v1/json/'
-    api_uri = '{0}{1}/' . format(api_uri_base, api_method)
+    api_uri = f'{api_uri_base}{api_method}/'
 
     try:
         resp = open_url(api_uri, data=data, headers=headers, method="POST", force_basic_auth=True, url_username=api_key)
@@ -72,13 +72,13 @@ def memset_api_call(api_key, api_method, payload=None):
         response.status_code = errorcode
 
         if response.status_code is not None:
-            msg = "Memset API returned a {0} response ({1}, {2})." . format(response.status_code, response.json()['error_type'], response.json()['error'])
+            msg = f"Memset API returned a {response.status_code} response ({response.json()['error_type']}, {response.json()['error']})."
         else:
-            msg = "Memset API returned an error ({0}, {1})." . format(response.json()['error_type'], response.json()['error'])
+            msg = f"Memset API returned an error ({response.json()['error_type']}, {response.json()['error']})."
     except urllib_error.URLError as e:
         has_failed = True
-        msg = "An URLError occurred ({0})." . format(type(e))
-        response.stderr = "{0}" . format(e)
+        msg = f"An URLError occurred ({type(e)})."
+        response.stderr = f"{e}"
 
     if msg is None:
         msg = response.json()

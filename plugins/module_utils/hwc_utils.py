@@ -30,7 +30,7 @@ class HwcModuleException(Exception):
         self._message = message
 
     def __str__(self):
-        return "[HwcClientException] message=%s" % self._message
+        return f"[HwcClientException] message={self._message}"
 
 
 class HwcClientException(Exception):
@@ -41,9 +41,8 @@ class HwcClientException(Exception):
         self._message = message
 
     def __str__(self):
-        msg = " code=%s," % str(self._code) if self._code != 0 else ""
-        return "[HwcClientException]%s message=%s" % (
-            msg, self._message)
+        msg = f" code={self._code!s}," if self._code != 0 else ""
+        return f"[HwcClientException]{msg} message={self._message}"
 
 
 class HwcClientException404(HwcClientException):
@@ -51,7 +50,7 @@ class HwcClientException404(HwcClientException):
         super(HwcClientException404, self).__init__(404, message)
 
     def __str__(self):
-        return "[HwcClientException404] message=%s" % self._message
+        return f"[HwcClientException404] message={self._message}"
 
 
 def session_method_wrapper(f):
@@ -61,7 +60,7 @@ def session_method_wrapper(f):
             r = f(self, url, *args, **kwargs)
         except Exception as ex:
             raise HwcClientException(
-                0, "Sending request failed, error=%s" % ex)
+                0, f"Sending request failed, error={ex}")
 
         result = None
         if r.content:
@@ -69,7 +68,7 @@ def session_method_wrapper(f):
                 result = r.json()
             except Exception as ex:
                 raise HwcClientException(
-                    0, "Parsing response to json failed, error: %s" % ex)
+                    0, f"Parsing response to json failed, error: {ex}")
 
         code = r.status_code
         if code not in [200, 201, 202, 203, 204, 205, 206, 207, 208, 226]:
@@ -98,7 +97,7 @@ class _ServiceClient(object):
         self._client = client
         self._endpoint = endpoint
         self._default_header = {
-            'User-Agent': "Huawei-Ansible-MM-%s" % product,
+            'User-Agent': f"Huawei-Ansible-MM-{product}",
             'Accept': 'application/json',
         }
 
@@ -186,7 +185,7 @@ class Config(object):
             raise_exc=False)
 
     def _get_service_endpoint(self, client, service_type, region):
-        k = "%s.%s" % (service_type, region if region else "")
+        k = f"{service_type}.{region if region else ''}"
 
         if k in self._endpoints:
             return self._endpoints.get(k)
@@ -197,11 +196,11 @@ class Config(object):
                                       region_name=region, interface="public")
         except Exception as ex:
             raise HwcClientException(
-                0, "Getting endpoint failed, error=%s" % ex)
+                0, f"Getting endpoint failed, error={ex}")
 
         if url == "":
             raise HwcClientException(
-                0, "Cannot find the endpoint for %s" % service_type)
+                0, f"Cannot find the endpoint for {service_type}")
 
         if url[-1] != "/":
             url += "/"
@@ -340,7 +339,7 @@ def wait_to_finish(target, pending, refresh, timeout, min_interval=1, delay=3):
 
             if not_found_times > 10:
                 raise HwcModuleException(
-                    "not found the object for %d times" % not_found_times)
+                    f"not found the object for {not_found_times} times")
         else:
             not_found_times = 0
 
@@ -349,7 +348,7 @@ def wait_to_finish(target, pending, refresh, timeout, min_interval=1, delay=3):
 
             if pending and status not in pending:
                 raise HwcModuleException(
-                    "unexpected status(%s) occurred" % status)
+                    f"unexpected status({status}) occurred")
 
         if not is_last_time:
             wait *= 2
@@ -360,7 +359,7 @@ def wait_to_finish(target, pending, refresh, timeout, min_interval=1, delay=3):
 
             time.sleep(wait)
 
-    raise HwcModuleException("async wait timeout after %d seconds" % timeout)
+    raise HwcModuleException(f"async wait timeout after {timeout} seconds")
 
 
 def navigate_value(data, index, array_index=None):
@@ -379,7 +378,7 @@ def navigate_value(data, index, array_index=None):
         i = index[n]
         if i not in d:
             raise HwcModuleException(
-                "navigate value failed: key(%s) is not exist in dict" % i)
+                f"navigate value failed: key({i}) is not exist in dict")
         d = d[i]
 
         if not array_index:

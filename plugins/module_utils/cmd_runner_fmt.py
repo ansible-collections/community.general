@@ -27,11 +27,7 @@ class _ArgFormat(object):
         return [str(x) for x in f(value)]
 
     def __str__(self):
-        return "<ArgFormat: func={0}, ignore_none={1}, ignore_missing_value={2}>".format(
-            self.func,
-            self.ignore_none,
-            self.ignore_missing_value,
-        )
+        return f"<ArgFormat: func={self.func}, ignore_none={self.ignore_none}, ignore_missing_value={self.ignore_missing_value}>"
 
     def __repr__(self):
         return str(self)
@@ -51,7 +47,7 @@ def as_bool_not(args):
 
 
 def as_optval(arg, ignore_none=None):
-    return _ArgFormat(lambda value: ["{0}{1}".format(arg, value)], ignore_none=ignore_none)
+    return _ArgFormat(lambda value: [f"{arg}{value}"], ignore_none=ignore_none)
 
 
 def as_opt_val(arg, ignore_none=None):
@@ -59,16 +55,16 @@ def as_opt_val(arg, ignore_none=None):
 
 
 def as_opt_eq_val(arg, ignore_none=None):
-    return _ArgFormat(lambda value: ["{0}={1}".format(arg, value)], ignore_none=ignore_none)
+    return _ArgFormat(lambda value: [f"{arg}={value}"], ignore_none=ignore_none)
 
 
 def as_list(ignore_none=None, min_len=0, max_len=None):
     def func(value):
         value = _ensure_list(value)
         if len(value) < min_len:
-            raise ValueError("Parameter must have at least {0} element(s)".format(min_len))
+            raise ValueError(f"Parameter must have at least {min_len} element(s)")
         if max_len is not None and len(value) > max_len:
-            raise ValueError("Parameter must have at most {0} element(s)".format(max_len))
+            raise ValueError(f"Parameter must have at most {max_len} element(s)")
         return value
     return _ArgFormat(func, ignore_none=ignore_none)
 

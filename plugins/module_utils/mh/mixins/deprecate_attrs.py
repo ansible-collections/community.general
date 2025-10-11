@@ -15,7 +15,7 @@ class DeprecateAttrsMixin(object):
         if target is None:
             target = self
         if not hasattr(target, attr):
-            raise ValueError("Target {0} has no attribute {1}".format(target, attr))
+            raise ValueError(f"Target {target} has no attribute {attr}")
         if module is None:
             if isinstance(target, AnsibleModule):
                 module = target
@@ -57,4 +57,4 @@ class DeprecateAttrsMixin(object):
         # override attribute
         prop = property(_getter)
         setattr(target, attr, prop)
-        setattr(target, "_{0}_setter".format(attr), prop.setter(_setter))
+        setattr(target, f"_{attr}_setter", prop.setter(_setter))

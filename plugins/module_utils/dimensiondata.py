@@ -73,7 +73,7 @@ class DimensionDataModule(object):
 
         # Region and location are common to all Dimension Data modules.
         region = self.module.params['region']
-        self.region = 'dd-{0}'.format(region)
+        self.region = f'dd-{region}'
         self.location = self.module.params['location']
 
         libcloud.security.VERIFY_SSL_CERT = self.module.params['validate_certs']
@@ -140,7 +140,7 @@ class DimensionDataModule(object):
         if not user_id or not key:
             home = expanduser('~')
             config = configparser.RawConfigParser()
-            config.read("%s/.dimensiondata" % home)
+            config.read(f"{home}/.dimensiondata")
 
             try:
                 user_id = config.get("dimensiondatacloud", "MCP_USER")
@@ -190,7 +190,7 @@ class DimensionDataModule(object):
         if network_domain:
             return network_domain
 
-        raise UnknownNetworkError("Network '%s' could not be found" % locator)
+        raise UnknownNetworkError(f"Network '{locator}' could not be found")
 
     def get_vlan(self, locator, location, network_domain):
         """
@@ -212,7 +212,7 @@ class DimensionDataModule(object):
         if vlan:
             return vlan
 
-        raise UnknownVLANError("VLAN '%s' could not be found" % locator)
+        raise UnknownVLANError(f"VLAN '{locator}' could not be found")
 
     @staticmethod
     def argument_spec(**additional_argument_spec):

@@ -47,7 +47,7 @@ class PackageRequirement:
             return req.name, req
 
         except Exception as e:
-            raise ValueError("Invalid package specification for '{0}': {1}".format(name, e)) from e
+            raise ValueError(f"Invalid package specification for '{name}': {e}") from e
 
     def matches_version(self, version):
         """
@@ -68,4 +68,4 @@ class PackageRequirement:
             return ver in self.requirement.specifier
 
         except InvalidVersion as e:
-            raise ValueError("Invalid version '{0}': {1}".format(version, e)) from e
+            raise ValueError(f"Invalid version '{version}': {e}") from e

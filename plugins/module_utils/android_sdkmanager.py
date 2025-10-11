@@ -26,7 +26,7 @@ __channel_map = {
 
 def __map_channel(channel_name):
     if channel_name not in __channel_map:
-        raise ValueError("Unknown channel name '%s'" % channel_name)
+        raise ValueError(f"Unknown channel name '{channel_name}'")
     return __channel_map[channel_name]
 
 
@@ -41,7 +41,7 @@ def sdkmanager_runner(module, **kwargs):
             list=cmd_runner_fmt.as_fixed('--list'),
             newer=cmd_runner_fmt.as_fixed("--newer"),
             sdk_root=cmd_runner_fmt.as_opt_eq_val("--sdk_root"),
-            channel=cmd_runner_fmt.as_func(lambda x: ["{0}={1}".format("--channel", __map_channel(x))])
+            channel=cmd_runner_fmt.as_func(lambda x: [f"--channel={__map_channel(x)}"])
         ),
         force_lang="C.UTF-8",  # Without this, sdkmanager binary crashes
         **kwargs
@@ -126,7 +126,7 @@ class AndroidSdkManager(object):
             unknown_package_regex = self._RE_UNKNOWN_PACKAGE.match(line)
             if unknown_package_regex:
                 package = unknown_package_regex.group('package')
-                raise SdkManagerException("Unknown package %s" % package)
+                raise SdkManagerException(f"Unknown package {package}")
 
     @staticmethod
     def _parse_packages(stdout, header_regexp, row_regexp):

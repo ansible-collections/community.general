@@ -12,32 +12,28 @@ import re
 def _create_regex_group_complement(s):
     lines = (line.strip() for line in s.split("\n") if line.strip())
     chars = filter(None, (line.split("#")[0].strip() for line in lines))
-    group = r"[^" + r"".join(chars) + r"]"
+    group = rf"[^{''.join(chars)}]"
     return re.compile(group)
 
 
 class HomebrewValidate(object):
     # class regexes ------------------------------------------------ {{{
-    VALID_PATH_CHARS = r"""
+    VALID_PATH_CHARS = rf"""
         \w                  # alphanumeric characters (i.e., [a-zA-Z0-9_])
         \s                  # spaces
         :                   # colons
-        {sep}               # the OS-specific path separator
+        {os.path.sep}       # the OS-specific path separator
         .                   # dots
         \-                  # dashes
-    """.format(
-        sep=os.path.sep
-    )
+    """
 
-    VALID_BREW_PATH_CHARS = r"""
+    VALID_BREW_PATH_CHARS = rf"""
         \w                  # alphanumeric characters (i.e., [a-zA-Z0-9_])
         \s                  # spaces
-        {sep}               # the OS-specific path separator
+        {os.path.sep}       # the OS-specific path separator
         .                   # dots
         \-                  # dashes
-    """.format(
-        sep=os.path.sep
-    )
+    """
 
     VALID_PACKAGE_CHARS = r"""
         \w                  # alphanumeric characters (i.e., [a-zA-Z0-9_])
@@ -123,17 +119,17 @@ def parse_brew_path(module):
     """
     path = module.params["path"]
     if not HomebrewValidate.valid_path(path):
-        module.fail_json(msg="Invalid path: {0}".format(path))
+        module.fail_json(msg=f"Invalid path: {path}")
 
     if isinstance(path, str):
         paths = path.split(":")
     elif isinstance(path, list):
         paths = path
     else:
-        module.fail_json(msg="Invalid path: {0}".format(path))
+        module.fail_json(msg=f"Invalid path: {path}")
 
     brew_path = module.get_bin_path("brew", required=True, opt_dirs=paths)
     if not HomebrewValidate.valid_brew_path(brew_path):
-        module.fail_json(msg="Invalid brew path: {0}".format(brew_path))
+        module.fail_json(msg=f"Invalid brew path: {brew_path}")
 
     return brew_path

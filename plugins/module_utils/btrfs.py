@@ -15,7 +15,7 @@ def normalize_subvolume_path(path):
     In addition, if the path is prefixed with a leading <FS_TREE>, this value is removed.
     """
     fstree_stripped = re.sub(r'^<FS_TREE>', '', path)
-    result = re.sub(r'/+$', '', re.sub(r'/+', '/', '/' + fstree_stripped))
+    result = re.sub(r'/+$', '', re.sub(r'/+', '/', f"/{fstree_stripped}"))
     return result if len(result) > 0 else '/'
 
 
@@ -34,7 +34,7 @@ class BtrfsCommands(object):
         self.__btrfs = self.__module.get_bin_path("btrfs", required=True)
 
     def filesystem_show(self):
-        command = "%s filesystem show -d" % (self.__btrfs)
+        command = f"{self.__btrfs} filesystem show -d"
         result = self.__module.run_command(command, check_rc=True)
         stdout = [x.strip() for x in result[1].splitlines()]
         filesystems = []
@@ -64,7 +64,7 @@ class BtrfsCommands(object):
         return re.sub(r'^.*path\s', '', line)
 
     def subvolumes_list(self, filesystem_path):
-        command = "%s subvolume list -tap %s" % (self.__btrfs, filesystem_path)
+        command = f"{self.__btrfs} subvolume list -tap {filesystem_path}"
         result = self.__module.run_command(command, check_rc=True)
         stdout = [x.split('\t') for x in result[1].splitlines()]
         subvolumes = [{'id': 5, 'parent': None, 'path': '/'}]
@@ -143,7 +143,7 @@ class BtrfsInfoProvider(object):
         return [m for m in mountpoints if (m['device'] in devices)]
 
     def __find_mountpoints(self):
-        command = "%s -t btrfs -nvP" % self.__findmnt_path
+        command = f"{self.__findmnt_path} -t btrfs -nvP"
         result = self.__module.run_command(command)
         mountpoints = []
         if result[0] == 0:
@@ -165,13 +165,13 @@ class BtrfsInfoProvider(object):
                 'subvolid': self.__extract_mount_subvolid(groups['options']),
             }
         else:
-            raise BtrfsModuleException("Failed to parse findmnt result for line: '%s'" % line)
+            raise BtrfsModuleException(f"Failed to parse findmnt result for line: '{line}'")
 
     def __extract_mount_subvolid(self, mount_options):
         for option in mount_options.split(','):
             if option.startswith('subvolid='):
                 return int(option[len('subvolid='):])
-        raise BtrfsModuleException("Failed to find subvolid for mountpoint in options '%s'" % mount_options)
+        raise BtrfsModuleException(f"Failed to find subvolid for mountpoint in options '{mount_options}'")
 
 
 class BtrfsSubvolume(object):
@@ -222,7 +222,7 @@ class BtrfsSubvolume(object):
             relative = absolute_child_path[len(path):]
             return re.sub(r'^/*', '', relative)
         else:
-            raise BtrfsModuleException("Path '%s' doesn't start with '%s'" % (absolute_child_path, path))
+            raise BtrfsModuleException(f"Path '{absolute_child_path}' doesn't start with '{path}'")
 
     def get_parent_subvolume(self):
         parent_id = self.parent
@@ -373,7 +373,7 @@ class BtrfsFilesystem(object):
         if nearest.path == subvolume_name:
             nearest = nearest.get_parent_subvolume()
         if nearest is None or nearest.get_mounted_path() is None:
-            raise BtrfsModuleException("Failed to find a path '%s' through a mounted parent subvolume" % subvolume_name)
+            raise BtrfsModuleException(f"Failed to find a path '{subvolume_name}' through a mounted parent subvolume")
         else:
             return nearest.get_mounted_path() + os.path.sep + nearest.get_child_relative_path(subvolume_name)
 
@@ -431,12 +431,9 @@ class BtrfsFilesystemsProvider(object):
         if len(matching) == 1:
             return matching[0]
         else:
-            raise BtrfsModuleException("Found %d filesystems matching criteria uuid=%s label=%s device=%s" % (
-                len(matching),
-                criteria['uuid'],
-                criteria['label'],
-                criteria['device']
-            ))
+            raise BtrfsModuleException(
+                f"Found {len(matching)} filesystems matching criteria uuid={criteria['uuid']} label={criteria['label']} device={criteria['device']}"
+            )
 
     def __filesystem_matches_criteria(self, filesystem, criteria):
         return ((criteria['uuid'] is None or filesystem.uuid == criteria['uuid']) and

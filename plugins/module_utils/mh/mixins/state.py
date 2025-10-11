@@ -15,7 +15,7 @@ class StateMixin(object):
         return self.default_state if state is None else state
 
     def _method(self, state):
-        return "{0}_{1}".format(self.state_param, state)
+        return f"{self.state_param}_{state}"
 
     def __run__(self):
         state = self._state()
@@ -35,4 +35,4 @@ class StateMixin(object):
         return func()
 
     def __state_fallback__(self):
-        raise ValueError("Cannot find method: {0}".format(self._method(self._state())))
+        raise ValueError(f"Cannot find method: {self._method(self._state())}")

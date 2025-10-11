@@ -64,7 +64,7 @@ class WdcRedfishUtils(RedfishUtils):
         A URI is considered good if we can GET uri/redfish/v1.
         """
         for root_uri in root_uris:
-            uri = root_uri + "/redfish/v1"
+            uri = f"{root_uri}/redfish/v1"
             response = self.get_request(uri)
             if response['ret']:
                 self.root_uri = root_uri
@@ -86,7 +86,7 @@ class WdcRedfishUtils(RedfishUtils):
         :return: True/False if the enclosure is multi-tenant or not and return enclosure generation;
         None if unable to determine.
         """
-        response = self.get_request(self.root_uri + self.service_root + "Chassis/Enclosure")
+        response = self.get_request(f"{self.root_uri}{self.service_root}Chassis/Enclosure")
         if response['ret'] is False:
             return None
         pattern = r".*-[A,B]"
@@ -114,7 +114,7 @@ class WdcRedfishUtils(RedfishUtils):
 
         # Simple update status URI is not provided via GET /redfish/v1/UpdateService
         # So we have to hard code it.
-        self.simple_update_status_uri = "{0}/Status".format(self.simple_update_uri)
+        self.simple_update_status_uri = f"{self.simple_update_uri}/Status"
 
         # FWActivate URI
         if 'Oem' not in data['Actions']:
@@ -267,9 +267,7 @@ class WdcRedfishUtils(RedfishUtils):
             parsed_url = urlparse(update_opts["update_image_uri"])
             if update_creds:
                 original_netloc = parsed_url.netloc
-                parsed_url = parsed_url._replace(netloc="{0}:{1}@{2}".format(update_creds.get("username"),
-                                                                             update_creds.get("password"),
-                                                                             original_netloc))
+                parsed_url = parsed_url._replace(netloc=f"{update_creds.get('username')}:{update_creds.get('password')}@{original_netloc}")
                 update_opts["update_image_uri"] = urlunparse(parsed_url)
                 del update_opts["update_creds"]
 
@@ -294,9 +292,7 @@ class WdcRedfishUtils(RedfishUtils):
         ]:
             return {
                 'ret': False,
-                'msg': 'Target is not ready for FW update.  Current status: {0} ({1})'.format(
-                    status_code, status_description
-                )}
+                'msg': f'Target is not ready for FW update.  Current status: {status_code} ({status_description})'}
 
         # Check the FW version in the bundle file, and compare it to what is already on the IOMs
 
@@ -314,20 +310,14 @@ class WdcRedfishUtils(RedfishUtils):
         if is_enclosure_multi_tenant != is_bundle_multi_tenant:
             return {
                 'ret': False,
-                'msg': 'Enclosure multi-tenant is {0} but bundle multi-tenant is {1}'.format(
-                    is_enclosure_multi_tenant,
-                    is_bundle_multi_tenant,
-                )
+                'msg': f'Enclosure multi-tenant is {is_enclosure_multi_tenant} but bundle multi-tenant is {is_bundle_multi_tenant}'
             }
 
         # Verify that the bundle is compliant with the target enclosure
         if enclosure_gen != bundle_gen:
             return {
                 'ret': False,
-                'msg': 'Enclosure generation is {0} but bundle is of {1}'.format(
-                    enclosure_gen,
-                    bundle_gen,
-                )
+                'msg': f'Enclosure generation is {enclosure_gen} but bundle is of {bundle_gen}'
             }
 
         # Version number installed on IOMs
@@ -355,7 +345,7 @@ class WdcRedfishUtils(RedfishUtils):
             return {
                 'ret': True,
                 'changed': False,
-                'msg': 'Version {0} already installed'.format(bundle_firmware_version)
+                'msg': f'Version {bundle_firmware_version} already installed'
             }
 
         # Version numbers don't match the bundle -- proceed with update (unless we are in check mode)
@@ -425,9 +415,7 @@ class WdcRedfishUtils(RedfishUtils):
         if status_code != self.UPDATE_STATUS_CODE_FW_UPDATE_COMPLETED_WAITING_FOR_ACTIVATION:
             return {
                 'ret': False,
-                'msg': 'Target is not ready for FW activation after update.  Current status: {0} ({1})'.format(
-                    status_code, status_description
-                )}
+                'msg': f'Target is not ready for FW activation after update.  Current status: {status_code} ({status_description})'}
 
         self.firmware_activate(update_opts)
         return {'ret': True, 'changed': True,
@@ -447,7 +435,7 @@ class WdcRedfishUtils(RedfishUtils):
         # The other will return an error with message "IOM Module A/B cannot be read"
         which_iom_is_this = None
         for iom_letter in ['A', 'B']:
-            iom_uri = "Chassis/IOModule{0}FRU".format(iom_letter)
+            iom_uri = f"Chassis/IOModule{iom_letter}FRU"
             response = self.get_request(self.root_uri + self.service_root + iom_uri)
             if response['ret'] is False:
                 continue
@@ -505,7 +493,7 @@ class WdcRedfishUtils(RedfishUtils):
         result['ret'] = True
         data = response['data']
         if key not in data:
-            return {'ret': False, 'msg': "Key %s not found" % key}
+            return {'ret': False, 'msg': f"Key {key} not found"}
         current_led_status = data[key]
         if current_led_status == current_led_status_map[command]:
             return {'ret': True, 'changed': False}

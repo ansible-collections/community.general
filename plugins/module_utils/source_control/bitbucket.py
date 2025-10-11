@@ -54,14 +54,14 @@ class BitbucketHelper:
             if info['status'] == 200:
                 self.access_token = content['access_token']
             else:
-                self.module.fail_json(msg='Failed to retrieve access token: {0}'.format(info))
+                self.module.fail_json(msg=f'Failed to retrieve access token: {info}')
 
     def request(self, api_url, method, data=None, headers=None):
         headers = headers or {}
 
         if self.access_token:
             headers.update({
-                'Authorization': 'Bearer {0}'.format(self.access_token),
+                'Authorization': f'Bearer {self.access_token}',
             })
         elif self.module.params['user'] and self.module.params['password']:
             headers.update({

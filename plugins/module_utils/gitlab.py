@@ -7,7 +7,6 @@
 from __future__ import annotations
 
 from ansible.module_utils.basic import missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
@@ -62,7 +61,7 @@ def find_project(gitlab_instance, identifier):
     except Exception as e:
         current_user = gitlab_instance.user
         try:
-            project = gitlab_instance.projects.get(current_user.username + '/' + identifier)
+            project = gitlab_instance.projects.get(f"{current_user.username}/{identifier}")
         except Exception as e:
             return None
 
@@ -86,11 +85,10 @@ def ensure_gitlab_package(module, min_version=None):
         )
     gitlab_version = gitlab.__version__
     if min_version is not None and LooseVersion(gitlab_version) < LooseVersion(min_version):
-        module.fail_json(
-            msg="This module requires python-gitlab Python module >= %s "
-                "(installed version: %s). Please upgrade python-gitlab to version %s or above."
-                % (min_version, gitlab_version, min_version)
-        )
+        module.fail_json(msg=(
+            f"This module requires python-gitlab Python module >= {min_version} (installed version: "
+            f"{gitlab_version}). Please upgrade python-gitlab to version {min_version} or above."
+        ))
 
 
 def gitlab_authentication(module, min_version=None):
@@ -120,10 +118,12 @@ def gitlab_authentication(module, min_version=None):
                                         oauth_token=gitlab_oauth_token, job_token=gitlab_job_token, api_version=4)
         gitlab_instance.auth()
     except (gitlab.exceptions.GitlabAuthenticationError, gitlab.exceptions.GitlabGetError) as e:
-        module.fail_json(msg="Failed to connect to GitLab server: %s" % to_native(e))
+        module.fail_json(msg=f"Failed to connect to GitLab server: {e}")
     except (gitlab.exceptions.GitlabHttpError) as e:
-        module.fail_json(msg="Failed to connect to GitLab server: %s. \
-            GitLab remove Session API now that private tokens are removed from user API endpoints since version 10.2." % to_native(e))
+        module.fail_json(msg=(
+            f"Failed to connect to GitLab server: {e}. GitLab remove Session API now "
+            "that private tokens are removed from user API endpoints since version 10.2."
+        ))
 
     return gitlab_instance
 

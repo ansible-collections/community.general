@@ -12,7 +12,6 @@ try:
 except ImportError:
     HAS_VEXATAPI = False
 
-from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.basic import env_fallback
 
 VXOS_VERSION = None
@@ -58,7 +57,7 @@ def get_array(module):
         else:
             module.fail_json(msg='Test connection to array failed.')
     except Exception as e:
-        module.fail_json(msg='Vexata API access failed: {0}'.format(to_native(e)))
+        module.fail_json(msg=f'Vexata API access failed: {e}')
 
 
 def argument_spec():

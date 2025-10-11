@@ -78,7 +78,7 @@ class LXDClient(object):
     def do(self, method, url, body_json=None, ok_error_codes=None, timeout=None, wait_for_container=None):
         resp_json = self._send_request(method, url, body_json=body_json, ok_error_codes=ok_error_codes, timeout=timeout)
         if resp_json['type'] == 'async':
-            url = '{0}/wait'.format(resp_json['operation'])
+            url = f"{resp_json['operation']}/wait"
             resp_json = self._send_request('GET', url)
             if wait_for_container:
                 while resp_json['metadata']['status'] == 'Running':

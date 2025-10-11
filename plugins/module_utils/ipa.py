@@ -51,16 +51,16 @@ class IPAClient(object):
         self.use_gssapi = False
 
     def get_base_url(self):
-        return '%s://%s/ipa' % (self.protocol, self.host)
+        return f'{self.protocol}://{self.host}/ipa'
 
     def get_json_url(self):
-        return '%s/session/json' % self.get_base_url()
+        return f'{self.get_base_url()}/session/json'
 
     def login(self, username, password):
         if 'KRB5CCNAME' in os.environ and HAS_GSSAPI:
             self.use_gssapi = True
         elif 'KRB5_CLIENT_KTNAME' in os.environ and HAS_GSSAPI:
-            ccache = "MEMORY:" + str(uuid.uuid4())
+            ccache = f"MEMORY:{uuid.uuid4()!s}"
             os.environ['KRB5CCNAME'] = ccache
             self.use_gssapi = True
         else:
@@ -71,8 +71,8 @@ class IPAClient(object):
                            'GSSAPI. To use GSSAPI, please set the '
                            'KRB5_CLIENT_KTNAME or KRB5CCNAME (or both) '
                            ' environment variables.')
-            url = '%s/session/login_password' % self.get_base_url()
-            data = 'user=%s&password=%s' % (quote(username, safe=''), quote(password, safe=''))
+            url = f'{self.get_base_url()}/session/login_password'
+            data = f"user={quote(username, safe='')}&password={quote(password, safe='')}"
             headers = {'referer': self.get_base_url(),
                        'Content-Type': 'application/x-www-form-urlencoded',
                        'Accept': 'text/plain'}
@@ -97,7 +97,7 @@ class IPAClient(object):
             err_string = e.get('message')
         else:
             err_string = e
-        self.module.fail_json(msg='%s: %s' % (msg, err_string))
+        self.module.fail_json(msg=f'{msg}: {err_string}')
 
     def get_ipa_version(self):
         response = self.ping()['summary']
@@ -114,7 +114,7 @@ class IPAClient(object):
     def _post_json(self, method, name, item=None):
         if item is None:
             item = {}
-        url = '%s/session/json' % self.get_base_url()
+        url = f'{self.get_base_url()}/session/json'
         data = dict(method=method)
 
         # TODO: We should probably handle this a little better.
@@ -132,13 +132,13 @@ class IPAClient(object):
             if status_code not in [200, 201, 204]:
                 self._fail(method, info['msg'])
         except Exception as e:
-            self._fail('post %s' % method, to_native(e))
+            self._fail(f'post {method}', to_native(e))
 
         charset = resp.headers.get_content_charset('latin-1')
         resp = json.loads(to_text(resp.read(), encoding=charset))
         err = resp.get('error')
         if err is not None:
-            self._fail('response %s' % method, err)
+            self._fail(f'response {method}', err)
 
         if 'result' in resp:
             result = resp.get('result')

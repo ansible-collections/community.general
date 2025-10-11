@@ -16,11 +16,7 @@ from ansible.module_utils.urls import open_url
 
 
 def get_consul_url(configuration):
-    return "%s://%s:%s/v1" % (
-        configuration.scheme,
-        configuration.host,
-        configuration.port,
-    )
+    return f"{configuration.scheme}://{configuration.host}:{configuration.port}/v1"
 
 
 def get_auth_headers(configuration):
@@ -39,12 +35,12 @@ class RequestError(Exception):
         if self.response_data is None:
             # self.status is already the message (backwards compat)
             return self.status
-        return "HTTP %d: %s" % (self.status, self.response_data)
+        return f"HTTP {self.status}: {self.response_data}"
 
 
 def handle_consul_response_error(response):
     if 400 <= response.status_code < 600:
-        raise RequestError("%d %s" % (response.status_code, response.content))
+        raise RequestError(f"{response.status_code} {response.content}")
 
 
 AUTH_ARGUMENTS_SPEC = dict(
@@ -82,7 +78,7 @@ def validate_check(check):
 def validate_duration(duration):
     if duration:
         if not re.search(r"\d+(?:ns|us|ms|s|m|h)", duration):
-            duration = "{0}s".format(duration)
+            duration = f"{duration}s"
     return duration
 
 
@@ -246,7 +242,7 @@ class _ConsulModule:
         if operation == OPERATION_CREATE:
             return self.api_endpoint
         elif identifier:
-            return "/".join([self.api_endpoint, identifier])
+            return f"{self.api_endpoint}/{identifier}"
         raise RuntimeError("invalid arguments passed")
 
     def read_object(self):
@@ -299,11 +295,7 @@ class _ConsulModule:
             params = {k: v for k, v in params.items() if v is not None}
 
         ca_path = module_params.get("ca_path")
-        base_url = "%s://%s:%s/v1" % (
-            module_params["scheme"],
-            module_params["host"],
-            module_params["port"],
-        )
+        base_url = f"{module_params['scheme']}://{module_params['host']}:{module_params['port']}/v1"
         url = "/".join([base_url] + list(url_parts))
 
         headers = {}
@@ -316,7 +308,7 @@ class _ConsulModule:
                 data = json.dumps(data)
                 headers["Content-Type"] = "application/json"
             if params:
-                url = "%s?%s" % (url, urlencode(params))
+                url = f"{url}?{urlencode(params)}"
             response = open_url(
                 url,
                 method=method,
@@ -336,8 +328,7 @@ class _ConsulModule:
                 response_data = e.fp.read()
             else:
                 self._module.fail_json(
-                    msg="Could not connect to consul agent at %s:%s, error was %s"
-                    % (module_params["host"], module_params["port"], str(e))
+                    msg=f"Could not connect to consul agent at {module_params['host']}:{module_params['port']}, error was {e}"
                 )
                 raise
 

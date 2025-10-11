@@ -88,10 +88,10 @@ def connect_to_acs(acs_module, region, **params):
     if not conn:
         if region not in [acs_module_region.id for acs_module_region in acs_module.regions()]:
             raise AnsibleACSError(
-                "Region %s does not seem to be available for acs module %s." % (region, acs_module.__name__))
+                f"Region {region} does not seem to be available for acs module {acs_module.__name__}.")
         else:
             raise AnsibleACSError(
-                "Unknown problem connecting to region %s for acs module %s." % (region, acs_module.__name__))
+                f"Unknown problem connecting to region {region} for acs module {acs_module.__name__}.")
     return conn
 
 
@@ -125,7 +125,7 @@ def get_assume_role(params):
 
 def get_profile(params):
     if not params['alicloud_access_key'] and not params['ecs_role_name'] and params['profile']:
-        path = params['shared_credentials_file'] if params['shared_credentials_file'] else os.getenv('HOME') + '/.aliyun/config.json'
+        path = params['shared_credentials_file'] if params['shared_credentials_file'] else f"{os.getenv('HOME')}/.aliyun/config.json"
         auth = {}
         with open(path, 'r') as f:
             for pro in json.load(f)['profiles']:

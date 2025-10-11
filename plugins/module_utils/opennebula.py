@@ -46,16 +46,16 @@ def render(to_render):
             if value is None:
                 continue
             if isinstance(value, dict):
-                yield '{0:}=[{1:}]'.format(key, ','.join(recurse(value)))
+                yield f"{key}=[{','.join(recurse(value))}]"
                 continue
             if isinstance(value, list):
                 for item in value:
-                    yield '{0:}=[{1:}]'.format(key, ','.join(recurse(item)))
+                    yield f"{key}=[{','.join(recurse(item))}]"
                 continue
             if isinstance(value, str):
                 yield '{0:}="{1:}"'.format(key, value.replace('\\', '\\\\').replace('"', '\\"'))
                 continue
-            yield '{0:}="{1:}"'.format(key, value)
+            yield f'{key}="{value}"'
     return '\n'.join(recurse(to_render))
 
 
@@ -124,7 +124,7 @@ class OpenNebulaModule:
         else:
             self.fail("Either api_password or the environment variable ONE_PASSWORD must be provided")
 
-        session = "%s:%s" % (username, password)
+        session = f"{username}:{password}"
 
         if not self.module.params.get("validate_certs") and "PYTHONHTTPSVERIFY" not in environ:
             return OneServer(url, session=session, context=no_ssl_validation_context)
@@ -312,11 +312,11 @@ class OpenNebulaModule:
             current_state = state()
 
             if current_state in invalid_states:
-                self.fail('invalid %s state %s' % (element_name, state_name(current_state)))
+                self.fail(f'invalid {element_name} state {state_name(current_state)}')
 
             if transition_states:
                 if current_state not in transition_states:
-                    self.fail('invalid %s transition state %s' % (element_name, state_name(current_state)))
+                    self.fail(f'invalid {element_name} transition state {state_name(current_state)}')
 
             if current_state in target_states:
                 return True
@@ -334,7 +334,7 @@ class OpenNebulaModule:
         try:
             self.run(self.one, self.module, self.result)
         except OneException as e:
-            self.fail(msg="OpenNebula Exception: %s" % e)
+            self.fail(msg=f"OpenNebula Exception: {e}")
 
     def run(self, one, module, result):
         """

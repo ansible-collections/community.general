@@ -13,7 +13,6 @@ from urllib.parse import urlparse
 
 from ansible.module_utils.urls import open_url
 from ansible.module_utils.common.text.converters import to_native
-from ansible.module_utils.common.text.converters import to_text
 
 
 GET_HEADERS = {'accept': 'application/json'}
@@ -57,16 +56,14 @@ class OcapiUtils(object):
             headers = {k.lower(): v for (k, v) in resp.info().items()}
         except HTTPError as e:
             return {'ret': False,
-                    'msg': "HTTP Error %s on GET request to '%s'"
-                           % (e.code, uri),
+                    'msg': f"HTTP Error {e.code} on GET request to '{uri}'",
                     'status': e.code}
         except URLError as e:
-            return {'ret': False, 'msg': "URL Error on GET request to '%s': '%s'"
-                                         % (uri, e.reason)}
+            return {'ret': False, 'msg': f"URL Error on GET request to '{uri}': '{e.reason}'"}
         # Almost all errors should be caught above, but just in case
         except Exception as e:
             return {'ret': False,
-                    'msg': "Failed GET request to '%s': '%s'" % (uri, to_text(e))}
+                    'msg': f"Failed GET request to '{uri}': '{e}'"}
         return {'ret': True, 'data': data, 'headers': headers}
 
     def delete_request(self, uri, etag=None):
@@ -87,16 +84,14 @@ class OcapiUtils(object):
             headers = {k.lower(): v for (k, v) in resp.info().items()}
         except HTTPError as e:
             return {'ret': False,
-                    'msg': "HTTP Error %s on DELETE request to '%s'"
-                           % (e.code, uri),
+                    'msg': f"HTTP Error {e.code} on DELETE request to '{uri}'",
                     'status': e.code}
         except URLError as e:
-            return {'ret': False, 'msg': "URL Error on DELETE request to '%s': '%s'"
-                                         % (uri, e.reason)}
+            return {'ret': False, 'msg': f"URL Error on DELETE request to '{uri}': '{e.reason}'"}
         # Almost all errors should be caught above, but just in case
         except Exception as e:
             return {'ret': False,
-                    'msg': "Failed DELETE request to '%s': '%s'" % (uri, to_text(e))}
+                    'msg': f"Failed DELETE request to '{uri}': '{e}'"}
         return {'ret': True, 'data': data, 'headers': headers}
 
     def put_request(self, uri, payload, etag=None):
@@ -114,16 +109,14 @@ class OcapiUtils(object):
             headers = {k.lower(): v for (k, v) in resp.info().items()}
         except HTTPError as e:
             return {'ret': False,
-                    'msg': "HTTP Error %s on PUT request to '%s'"
-                           % (e.code, uri),
+                    'msg': f"HTTP Error {e.code} on PUT request to '{uri}'",
                     'status': e.code}
         except URLError as e:
-            return {'ret': False, 'msg': "URL Error on PUT request to '%s': '%s'"
-                                         % (uri, e.reason)}
+            return {'ret': False, 'msg': f"URL Error on PUT request to '{uri}': '{e.reason}'"}
         # Almost all errors should be caught above, but just in case
         except Exception as e:
             return {'ret': False,
-                    'msg': "Failed PUT request to '%s': '%s'" % (uri, to_text(e))}
+                    'msg': f"Failed PUT request to '{uri}': '{e}'"}
         return {'ret': True, 'headers': headers, 'resp': resp}
 
     def post_request(self, uri, payload, content_type="application/json", timeout=None):
@@ -145,16 +138,14 @@ class OcapiUtils(object):
             headers = {k.lower(): v for (k, v) in resp.info().items()}
         except HTTPError as e:
             return {'ret': False,
-                    'msg': "HTTP Error %s on POST request to '%s'"
-                           % (e.code, uri),
+                    'msg': f"HTTP Error {e.code} on POST request to '{uri}'",
                     'status': e.code}
         except URLError as e:
-            return {'ret': False, 'msg': "URL Error on POST request to '%s': '%s'"
-                                         % (uri, e.reason)}
+            return {'ret': False, 'msg': f"URL Error on POST request to '{uri}': '{e.reason}'"}
         # Almost all errors should be caught above, but just in case
         except Exception as e:
             return {'ret': False,
-                    'msg': "Failed POST request to '%s': '%s'" % (uri, to_text(e))}
+                    'msg': f"Failed POST request to '{uri}': '{e}'"}
         return {'ret': True, 'headers': headers, 'resp': resp}
 
     def get_uri_with_slot_number_query_param(self, uri):
@@ -166,7 +157,7 @@ class OcapiUtils(object):
         """
         if self.proxy_slot_number is not None:
             parsed_url = urlparse(uri)
-            return parsed_url._replace(query="slotnumber=" + str(self.proxy_slot_number)).geturl()
+            return parsed_url._replace(query=f"slotnumber={self.proxy_slot_number}").geturl()
         else:
             return uri
 
@@ -201,7 +192,7 @@ class OcapiUtils(object):
         elif command.startswith("PowerMode"):
             return self.manage_power_mode(command)
         else:
-            return {'ret': False, 'msg': 'Invalid command: ' + command}
+            return {'ret': False, 'msg': f"Invalid command: {command}"}
 
         return {'ret': True}
 
@@ -240,7 +231,7 @@ class OcapiUtils(object):
             return response
         data = response['data']
         if key not in data:
-            return {'ret': False, 'msg': "Key %s not found" % key}
+            return {'ret': False, 'msg': f"Key {key} not found"}
         if 'ID' not in data[key]:
             return {'ret': False, 'msg': 'IndicatorLED for resource has no ID.'}
 
@@ -283,7 +274,7 @@ class OcapiUtils(object):
             return response
         data = response['data']
         if key not in data:
-            return {'ret': False, 'msg': "Key %s not found" % key}
+            return {'ret': False, 'msg': f"Key {key} not found"}
         if 'ID' not in data[key]:
             return {'ret': False, 'msg': 'PowerState for resource has no ID.'}
 
@@ -305,7 +296,7 @@ class OcapiUtils(object):
             if response['ret'] is False:
                 return response
         else:
-            return {'ret': False, 'msg': 'Invalid command: ' + command}
+            return {'ret': False, 'msg': f"Invalid command: {command}"}
 
         return {'ret': True}
 
@@ -322,14 +313,14 @@ class OcapiUtils(object):
         this method sends the file as binary.
         """
         boundary = str(uuid.uuid4())  # Generate a random boundary
-        body = "--" + boundary + '\r\n'
-        body += 'Content-Disposition: form-data; name="FirmwareFile"; filename="%s"\r\n' % to_native(os.path.basename(filename))
+        body = f"--{boundary}\r\n"
+        body += f'Content-Disposition: form-data; name="FirmwareFile"; filename="{to_native(os.path.basename(filename))}"\r\n'
         body += 'Content-Type: application/octet-stream\r\n\r\n'
         body_bytes = bytearray(body, 'utf-8')
         with open(filename, 'rb') as f:
             body_bytes += f.read()
-        body_bytes += bytearray("\r\n--%s--" % boundary, 'utf-8')
-        return ("multipart/form-data; boundary=%s" % boundary,
+        body_bytes += bytearray(f"\r\n--{boundary}--", 'utf-8')
+        return (f"multipart/form-data; boundary={boundary}",
                 body_bytes)
 
     def upload_firmware_image(self, update_image_path):
@@ -339,7 +330,7 @@ class OcapiUtils(object):
         """
         if not (os.path.exists(update_image_path) and os.path.isfile(update_image_path)):
             return {'ret': False, 'msg': 'File does not exist.'}
-        url = self.root_uri + "OperatingSystem"
+        url = f"{self.root_uri}OperatingSystem"
         url = self.get_uri_with_slot_number_query_param(url)
         content_type, b_form_data = self.prepare_multipart_firmware_upload(update_image_path)
 

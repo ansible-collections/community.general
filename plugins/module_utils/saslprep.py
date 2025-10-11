@@ -105,35 +105,31 @@ def prohibited_output_profile(string):
     for c in string:
         # RFC4013 2.3. Prohibited Output:
         if in_table_c12(c):
-            raise ValueError('%s: prohibited non-ASCII space characters '
-                             'that cannot be replaced (C.1.2).' % RFC)
+            raise ValueError(f'{RFC}: prohibited non-ASCII space characters that cannot be replaced (C.1.2).')
         if in_table_c21_c22(c):
-            raise ValueError('%s: prohibited control characters (C.2.1).' % RFC)
+            raise ValueError(f'{RFC}: prohibited control characters (C.2.1).')
         if in_table_c3(c):
-            raise ValueError('%s: prohibited private Use characters (C.3).' % RFC)
+            raise ValueError(f'{RFC}: prohibited private Use characters (C.3).')
         if in_table_c4(c):
-            raise ValueError('%s: prohibited non-character code points (C.4).' % RFC)
+            raise ValueError(f'{RFC}: prohibited non-character code points (C.4).')
         if in_table_c5(c):
-            raise ValueError('%s: prohibited surrogate code points (C.5).' % RFC)
+            raise ValueError(f'{RFC}: prohibited surrogate code points (C.5).')
         if in_table_c6(c):
-            raise ValueError('%s: prohibited inappropriate for plain text '
-                             'characters (C.6).' % RFC)
+            raise ValueError(f'{RFC}: prohibited inappropriate for plain text characters (C.6).')
         if in_table_c7(c):
-            raise ValueError('%s: prohibited inappropriate for canonical '
-                             'representation characters (C.7).' % RFC)
+            raise ValueError(f'{RFC}: prohibited inappropriate for canonical representation characters (C.7).')
         if in_table_c8(c):
-            raise ValueError('%s: prohibited change display properties / '
-                             'deprecated characters (C.8).' % RFC)
+            raise ValueError(f'{RFC}: prohibited change display properties / deprecated characters (C.8).')
         if in_table_c9(c):
-            raise ValueError('%s: prohibited tagging characters (C.9).' % RFC)
+            raise ValueError(f'{RFC}: prohibited tagging characters (C.9).')
 
         # RFC4013, 2.4. Bidirectional Characters:
         if is_prohibited_bidi_ch(c):
-            raise ValueError('%s: prohibited bidi characters (%s).' % (RFC, bidi_table))
+            raise ValueError(f'{RFC}: prohibited bidi characters ({bidi_table}).')
 
         # RFC4013, 2.5. Unassigned Code Points:
         if in_table_a1(c):
-            raise ValueError('%s: prohibited unassigned code points (A.1).' % RFC)
+            raise ValueError(f'{RFC}: prohibited unassigned code points (A.1).')
 
 
 def saslprep(string):
@@ -155,7 +151,7 @@ def saslprep(string):
     # comprised of characters from the Unicode [Unicode] character set."
     # Validate the string is a Unicode string
     if not is_unicode_str(string):
-        raise TypeError('input must be of type str, not %s' % type(string))
+        raise TypeError(f'input must be of type str, not {type(string)}')
 
     # RFC4013: 2.1. Mapping.
     string = mapping_profile(string)

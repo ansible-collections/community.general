@@ -53,11 +53,7 @@ def api_request(module, endpoint, data=None, method="GET", content_type="applica
 
     response, info = fetch_url(
         module=module,
-        url="%s/api/%s/%s" % (
-            module.params["url"],
-            module.params["api_version"],
-            endpoint
-        ),
+        url=f"{module.params['url']}/api/{module.params['api_version']}/{endpoint}",
         data=json.dumps(data),
         method=method,
         headers={

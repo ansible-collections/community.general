@@ -20,7 +20,7 @@ def convert_to_binary_multiple(size_with_unit):
             if float(size) < 0:
                 return -1
     if not valid_unit:
-        raise ValueError("%s does not have a valid unit. The unit must be one of %s" % (size_with_unit, valid_units))
+        raise ValueError(f"{size_with_unit} does not have a valid unit. The unit must be one of {valid_units}")
 
     size = size_with_unit.replace(" ", "").split('iB')[0]
     size_kib = basic.human_to_bytes(size)

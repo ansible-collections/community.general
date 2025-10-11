@@ -146,28 +146,28 @@ def add_host_key(module, fqdn, port=22, key_type="rsa", create_dir=False):
             try:
                 os.makedirs(user_ssh_dir, int('700', 8))
             except Exception:
-                module.fail_json(msg="failed to create host key directory: %s" % user_ssh_dir)
+                module.fail_json(msg=f"failed to create host key directory: {user_ssh_dir}")
         else:
-            module.fail_json(msg="%s does not exist" % user_ssh_dir)
+            module.fail_json(msg=f"{user_ssh_dir} does not exist")
     elif not os.path.isdir(user_ssh_dir):
-        module.fail_json(msg="%s is not a directory" % user_ssh_dir)
+        module.fail_json(msg=f"{user_ssh_dir} is not a directory")
 
     if port:
-        this_cmd = "%s -t %s -p %s %s" % (keyscan_cmd, key_type, port, fqdn)
+        this_cmd = f"{keyscan_cmd} -t {key_type} -p {port} {fqdn}"
     else:
-        this_cmd = "%s -t %s %s" % (keyscan_cmd, key_type, fqdn)
+        this_cmd = f"{keyscan_cmd} -t {key_type} {fqdn}"
 
     rc, out, err = module.run_command(this_cmd)
     # ssh-keyscan gives a 0 exit code and prints nothing on timeout
     if rc != 0 or not out:
         msg = 'failed to retrieve hostkey'
         if not out:
-            msg += '. "%s" returned no matches.' % this_cmd
+            msg += f'. "{this_cmd}" returned no matches.'
         else:
-            msg += ' using command "%s". [stdout]: %s' % (this_cmd, out)
+            msg += f' using command "{this_cmd}". [stdout]: {out}'
 
         if err:
-            msg += ' [stderr]: %s' % err
+            msg += f' [stderr]: {err}'
 
         module.fail_json(msg=msg)
 

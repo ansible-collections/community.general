@@ -62,7 +62,7 @@ def _delete_pritunl_organization(
         api_token=api_token,
         api_secret=api_secret,
         method="DELETE",
-        path="/organization/%s" % (organization_id),
+        path=f"/organization/{organization_id}",
         validate_certs=validate_certs,
     )
 
@@ -90,7 +90,7 @@ def _get_pritunl_users(
         api_secret=api_secret,
         base_url=base_url,
         method="GET",
-        path="/user/%s" % organization_id,
+        path=f"/user/{organization_id}",
         validate_certs=validate_certs,
     )
 
@@ -103,7 +103,7 @@ def _delete_pritunl_user(
         api_secret=api_secret,
         base_url=base_url,
         method="DELETE",
-        path="/user/%s/%s" % (organization_id, user_id),
+        path=f"/user/{organization_id}/{user_id}",
         validate_certs=validate_certs,
     )
 
@@ -116,7 +116,7 @@ def _post_pritunl_user(
         api_secret=api_secret,
         base_url=base_url,
         method="POST",
-        path="/user/%s" % organization_id,
+        path=f"/user/{organization_id}",
         headers={"Content-Type": "application/json"},
         data=json.dumps(user_data),
         validate_certs=validate_certs,
@@ -137,7 +137,7 @@ def _put_pritunl_user(
         api_secret=api_secret,
         base_url=base_url,
         method="PUT",
-        path="/user/%s/%s" % (organization_id, user_id),
+        path=f"/user/{organization_id}/{user_id}",
         headers={"Content-Type": "application/json"},
         data=json.dumps(user_data),
         validate_certs=validate_certs,
@@ -221,7 +221,7 @@ def post_pritunl_organization(
 
     if response.getcode() != 200:
         raise PritunlException(
-            "Could not add organization %s to Pritunl" % (organization_name)
+            f"Could not add organization {organization_name} to Pritunl"
         )
     # The user PUT request returns the updated user object
     return json.loads(response.read())
@@ -249,8 +249,7 @@ def post_pritunl_user(
 
         if response.getcode() != 200:
             raise PritunlException(
-                "Could not remove user %s from organization %s from Pritunl"
-                % (user_id, organization_id)
+                f"Could not remove user {user_id} from organization {organization_id} from Pritunl"
             )
         # user POST request returns an array of a single item,
         # so return this item instead of the list
@@ -268,8 +267,7 @@ def post_pritunl_user(
 
         if response.getcode() != 200:
             raise PritunlException(
-                "Could not update user %s from organization %s from Pritunl"
-                % (user_id, organization_id)
+                f"Could not update user {user_id} from organization {organization_id} from Pritunl"
             )
         # The user PUT request returns the updated user object
         return json.loads(response.read())
@@ -288,7 +286,7 @@ def delete_pritunl_organization(
 
     if response.getcode() != 200:
         raise PritunlException(
-            "Could not remove organization %s from Pritunl" % (organization_id)
+            f"Could not remove organization {organization_id} from Pritunl"
         )
 
     return json.loads(response.read())
@@ -308,8 +306,7 @@ def delete_pritunl_user(
 
     if response.getcode() != 200:
         raise PritunlException(
-            "Could not remove user %s from organization %s from Pritunl"
-            % (user_id, organization_id)
+            f"Could not remove user {user_id} from organization {organization_id} from Pritunl"
         )
 
     return json.loads(response.read())
@@ -332,9 +329,7 @@ def pritunl_auth_request(
     auth_timestamp = str(int(time.time()))
     auth_nonce = uuid.uuid4().hex
 
-    auth_string = "&".join(
-        [api_token, auth_timestamp, auth_nonce, method.upper(), path]
-    )
+    auth_string = f"{api_token}&{auth_timestamp}&{auth_nonce}&{method.upper()}&{path}"
 
     auth_signature = base64.b64encode(
         hmac.new(
@@ -353,7 +348,7 @@ def pritunl_auth_request(
         auth_headers.update(headers)
 
     try:
-        uri = "%s%s" % (base_url, path)
+        uri = f"{base_url}{path}"
 
         return open_url(
             uri,
