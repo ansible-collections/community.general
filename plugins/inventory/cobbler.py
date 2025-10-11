@@ -139,14 +139,10 @@ from ansible_collections.community.general.plugins.plugin_utils.unsafe import ma
 
 # xmlrpc
 try:
-    import xmlrpclib as xmlrpc_client
+    import xmlrpc.client as xmlrpc_client
     HAS_XMLRPC_CLIENT = True
 except ImportError:
-    try:
-        import xmlrpc.client as xmlrpc_client
-        HAS_XMLRPC_CLIENT = True
-    except ImportError:
-        HAS_XMLRPC_CLIENT = False
+    HAS_XMLRPC_CLIENT = False
 
 
 class TimeoutTransport (xmlrpc_client.SafeTransport):

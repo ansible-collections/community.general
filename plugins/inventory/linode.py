@@ -167,13 +167,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     def _add_groups(self):
         """Add Linode instance groups to the dynamic inventory."""
-        self.linode_groups = set(
-            filter(None, [
-                instance.group
-                for instance
-                in self.instances
-            ])
-        )
+        self.linode_groups = {instance.group for instance in self.instances if instance.group}
 
         for linode_group in self.linode_groups:
             self.inventory.add_group(linode_group)
