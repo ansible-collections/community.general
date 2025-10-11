@@ -20,7 +20,7 @@ VXOS_VERSION = None
 def get_version(iocs_json):
     if not iocs_json:
         raise Exception('Invalid IOC json')
-    active = filter(lambda x: x['mgmtRole'], iocs_json)
+    active = [x for x in iocs_json if x['mgmtRole']]
     if not active:
         raise Exception('Unable to detect active IOC')
     active = active[0]
