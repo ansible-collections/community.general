@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import json
 import os
+from unittest import mock
 
 import pytest
 
@@ -17,7 +18,6 @@ from linode_api4 import LinodeClient
 from ansible_collections.community.general.plugins.modules import linode_v4
 from ansible_collections.community.general.plugins.module_utils.linode import get_user_agent
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args
-from ansible_collections.community.internal_test_tools.tests.unit.compat import mock
 
 from .linode_conftest import access_token, no_access_token_in_env, default_args, mock_linode  # noqa: F401, pylint: disable=unused-import
 

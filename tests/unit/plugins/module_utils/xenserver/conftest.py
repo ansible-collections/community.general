@@ -10,10 +10,11 @@ import sys
 import importlib
 import os
 import json
+from unittest.mock import MagicMock
+
 import pytest
 
 from .FakeAnsibleModule import FakeAnsibleModule
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import MagicMock
 
 
 @pytest.fixture

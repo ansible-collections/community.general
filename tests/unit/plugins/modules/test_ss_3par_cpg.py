@@ -4,8 +4,8 @@
 
 from __future__ import annotations
 
-import mock
 import sys
+from unittest import mock
 sys.modules['hpe3par_sdk'] = mock.Mock()
 sys.modules['hpe3par_sdk.client'] = mock.Mock()
 sys.modules['hpe3parclient'] = mock.Mock()

@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from .hpe_test_utils import FactsParamsTestCase
 
-from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
+import unittest
 from ansible_collections.community.general.plugins.modules.oneview_enclosure_info import EnclosureInfoModule
 
 

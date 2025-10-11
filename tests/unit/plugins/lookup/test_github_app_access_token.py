@@ -3,16 +3,17 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
-import json
-import types
-import sys
 
-from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import (
+import json
+import sys
+import types
+import unittest
+from unittest.mock import (
     patch,
     MagicMock,
     mock_open,
 )
+
 from ansible.plugins.loader import lookup_loader
 
 ENCODE_RESULT = 'Foobar'

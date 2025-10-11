@@ -5,13 +5,13 @@
 # Make coding more python3-ish
 from __future__ import annotations
 
-
-from ansible_collections.community.internal_test_tools.tests.unit.compat.unittest import TestCase
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import (
+from unittest import TestCase
+from unittest.mock import (
     patch,
     DEFAULT,
     MagicMock,
 )
+
 from ansible_collections.community.general.plugins.lookup import tss
 from ansible.plugins.loader import lookup_loader
 

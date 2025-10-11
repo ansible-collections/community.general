@@ -4,13 +4,14 @@
 
 from __future__ import annotations
 
+import sys
+import unittest
+from collections import OrderedDict
+from unittest.mock import patch, MagicMock, Mock
+
 from ansible.playbook.task import Task
 from ansible.executor.task_result import TaskResult
-from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch, MagicMock, Mock
 from ansible_collections.community.general.plugins.callback.elastic import ElasticSource, TaskData
-from collections import OrderedDict
-import sys
 
 ELASTIC_MINIMUM_PYTHON_VERSION = (3, 6)
 

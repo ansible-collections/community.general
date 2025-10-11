@@ -15,7 +15,7 @@ from ansible.playbook.play_context import PlayContext
 from ansible.plugins.loader import connection_loader
 from io import StringIO
 from pathlib import Path
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch, MagicMock, mock_open
+from unittest.mock import patch, MagicMock, mock_open
 
 
 paramiko = pytest.importorskip('paramiko')

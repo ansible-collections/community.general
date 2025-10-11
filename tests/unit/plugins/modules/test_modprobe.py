@@ -5,10 +5,8 @@
 from __future__ import annotations
 
 import sys
+from unittest.mock import patch, Mock, mock_open
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import ModuleTestCase, set_module_args
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import Mock
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import mock_open
 from ansible_collections.community.general.plugins.modules.modprobe import Modprobe, build_module
 
 

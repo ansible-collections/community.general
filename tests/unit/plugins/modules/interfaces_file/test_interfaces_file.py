@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
 from ansible_collections.community.general.plugins.modules import interfaces_file
 from shutil import copyfile, move
 import difflib
@@ -18,6 +17,7 @@ import os
 import re
 import shutil
 import tempfile
+import unittest
 
 
 class AnsibleFailJson(Exception):

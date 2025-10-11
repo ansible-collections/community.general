@@ -9,11 +9,11 @@ import pytest
 import sys
 
 from io import StringIO
+from unittest import mock
 
 from ansible.errors import AnsibleError
 from ansible.playbook.play_context import PlayContext
 from ansible.plugins.loader import connection_loader
-from ansible_collections.community.internal_test_tools.tests.unit.compat import mock
 
 
 @pytest.fixture(autouse=True)

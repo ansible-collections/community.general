@@ -5,12 +5,12 @@
 from __future__ import annotations
 
 import sys
+from unittest.mock import patch
 
 from ansible.module_utils.common.dict_transformations import dict_merge
 from ansible_collections.community.general.plugins.modules import (
     pritunl_org,
 )
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
 from ansible_collections.community.general.tests.unit.plugins.module_utils.net_tools.pritunl.test_api import (
     PritunlDeleteOrganizationMock,
     PritunlListOrganizationMock,

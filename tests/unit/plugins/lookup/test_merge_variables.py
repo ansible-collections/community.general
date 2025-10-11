@@ -4,8 +4,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
 
-from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
+import unittest
+from unittest.mock import patch
+
 from ansible_collections.community.internal_test_tools.tests.unit.mock.loader import DictDataLoader
 
 from ansible.plugins import AnsiblePlugin

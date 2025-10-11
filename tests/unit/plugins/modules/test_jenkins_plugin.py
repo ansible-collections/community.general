@@ -8,12 +8,12 @@ from io import BytesIO
 import json
 from collections import OrderedDict
 from collections.abc import Mapping
-
-from ansible_collections.community.general.plugins.modules.jenkins_plugin import JenkinsPlugin
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import (
+from unittest.mock import (
     MagicMock,
     patch,
 )
+
+from ansible_collections.community.general.plugins.modules.jenkins_plugin import JenkinsPlugin
 from ansible.module_utils.urls import basic_auth_header
 
 

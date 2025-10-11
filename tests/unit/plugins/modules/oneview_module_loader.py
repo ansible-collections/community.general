@@ -5,7 +5,7 @@
 from __future__ import annotations
 
 import sys
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import Mock
+from unittest.mock import Mock
 
 # FIXME: These should be done inside of a fixture so that they're only mocked during
 # these unittests

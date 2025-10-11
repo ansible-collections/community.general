@@ -4,10 +4,9 @@
 
 from __future__ import annotations
 
-
 import json
-from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
+import unittest
+from unittest.mock import patch
 
 from ansible.errors import AnsibleLookupError
 from ansible.plugins.loader import lookup_loader

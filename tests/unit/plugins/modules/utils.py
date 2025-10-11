@@ -6,9 +6,9 @@ from __future__ import annotations
 
 import contextlib as _contextlib
 import json
+import unittest
+from unittest.mock import patch
 
-from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
 from ansible.module_utils import basic
 from ansible.module_utils.common.text.converters import to_bytes
 

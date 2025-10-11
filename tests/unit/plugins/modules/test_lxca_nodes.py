@@ -5,9 +5,9 @@
 from __future__ import annotations
 
 import json
+from unittest import mock
 
 import pytest
-from ansible_collections.community.internal_test_tools.tests.unit.compat import mock
 from ansible_collections.community.general.plugins.modules import lxca_nodes
 
 

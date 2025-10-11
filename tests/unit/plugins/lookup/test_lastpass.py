@@ -5,10 +5,9 @@
 # Make coding more python3-ish
 from __future__ import annotations
 
+import unittest
 from argparse import ArgumentParser
-
-from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
+from unittest.mock import patch
 
 from ansible.errors import AnsibleError
 from ansible.plugins.loader import lookup_loader

@@ -4,7 +4,8 @@
 
 from __future__ import annotations
 
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch, call
+from unittest.mock import patch, call
+
 from ansible_collections.community.general.plugins.modules import parted as parted_module
 from ansible_collections.community.general.plugins.modules.parted import parse_parted_version
 from ansible_collections.community.general.plugins.modules.parted import parse_partition_info

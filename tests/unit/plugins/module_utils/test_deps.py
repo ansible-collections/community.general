@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import MagicMock
+from unittest.mock import MagicMock
 
 import pytest
 
