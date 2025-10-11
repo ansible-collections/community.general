@@ -167,28 +167,28 @@ def manage_issue(taiga_host, project_name, issue_subject, issue_priority,
             api.auth(username=username, password=password)
 
         user_id = api.me().id
-        project_list = list(filter(lambda x: x.name == project_name, api.projects.list(member=user_id)))
+        project_list = [x for x in api.projects.list(member=user_id) if x.name == project_name]
         if len(project_list) != 1:
             return False, changed, "Unable to find project %s" % project_name, {}
         project = project_list[0]
         project_id = project.id
 
-        priority_list = list(filter(lambda x: x.name == issue_priority, api.priorities.list(project=project_id)))
+        priority_list = [x for x in api.priorities.list(project=project_id) if x.name == issue_priority]
         if len(priority_list) != 1:
             return False, changed, "Unable to find issue priority %s for project %s" % (issue_priority, project_name), {}
         priority_id = priority_list[0].id
 
-        status_list = list(filter(lambda x: x.name == issue_status, api.issue_statuses.list(project=project_id)))
+        status_list = [x for x in api.issue_statuses.list(project=project_id) if x.name == issue_status]
         if len(status_list) != 1:
             return False, changed, "Unable to find issue status %s for project %s" % (issue_status, project_name), {}
         status_id = status_list[0].id
 
-        type_list = list(filter(lambda x: x.name == issue_type, project.list_issue_types()))
+        type_list = [x for x in project.list_issue_types() if x.name == issue_type]
         if len(type_list) != 1:
             return False, changed, "Unable to find issue type %s for project %s" % (issue_type, project_name), {}
         type_id = type_list[0].id
 
-        severity_list = list(filter(lambda x: x.name == issue_severity, project.list_severities()))
+        severity_list = [x for x in project.list_severities() if x.name == issue_severity]
         if len(severity_list) != 1:
             return False, changed, "Unable to find severity %s for project %s" % (issue_severity, project_name), {}
         severity_id = severity_list[0].id
@@ -205,7 +205,7 @@ def manage_issue(taiga_host, project_name, issue_subject, issue_priority,
         }
 
         # An issue is identified by the project_name, the issue_subject and the issue_type
-        matching_issue_list = list(filter(lambda x: x.subject == issue_subject and x.type == type_id, project.list_issues()))
+        matching_issue_list = [x for x in project.list_issues() if x.subject == issue_subject and x.type == type_id]
         matching_issue_list_len = len(matching_issue_list)
 
         if matching_issue_list_len == 0:

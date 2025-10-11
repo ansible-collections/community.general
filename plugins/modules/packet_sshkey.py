@@ -174,7 +174,7 @@ def get_sshkey_selector(module):
 def act_on_sshkeys(target_state, module, packet_conn):
     selector = get_sshkey_selector(module)
     existing_sshkeys = packet_conn.list_ssh_keys()
-    matching_sshkeys = filter(selector, existing_sshkeys)
+    matching_sshkeys = list(filter(selector, existing_sshkeys))
     changed = False
     if target_state == 'present':
         if matching_sshkeys == []:

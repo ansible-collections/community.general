@@ -91,7 +91,7 @@ class CapabilitiesModule(object):
                 self.module.exit_json(changed=True, msg='capabilities changed')
             else:
                 # remove from current cap list if it is already set (but op/flags differ)
-                current = list(filter(lambda x: x[0] != self.capability_tup[0], current))
+                current = [x for x in current if x[0] != self.capability_tup[0]]
                 # add new cap with correct op/flags
                 current.append(self.capability_tup)
                 self.module.exit_json(changed=True, state=self.state, msg='capabilities changed', stdout=self.setcap(self.path, current))
@@ -101,7 +101,7 @@ class CapabilitiesModule(object):
                 self.module.exit_json(changed=True, msg='capabilities changed')
             else:
                 # remove from current cap list and then set current list
-                current = filter(lambda x: x[0] != self.capability_tup[0], current)
+                current = [x for x in current if x[0] != self.capability_tup[0]]
                 self.module.exit_json(changed=True, state=self.state, msg='capabilities changed', stdout=self.setcap(self.path, current))
         self.module.exit_json(changed=False, state=self.state)
 

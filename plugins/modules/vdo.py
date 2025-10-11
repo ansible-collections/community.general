@@ -270,7 +270,7 @@ def inventory_vdos(module, vdocmd):
 
 def list_running_vdos(module, vdocmd):
     rc, vdolistout, err = module.run_command([vdocmd, "list"])
-    runningvdolist = filter(None, vdolistout.split('\n'))
+    runningvdolist = [_f for _f in vdolistout.split('\n') if _f]
     return runningvdolist
 
 
