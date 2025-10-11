@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import json
 
-from ansible.module_utils.common.text.converters import to_native, to_text
+from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.urls import fetch_url
 
 
