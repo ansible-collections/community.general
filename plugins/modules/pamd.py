@@ -436,15 +436,15 @@ class PamdService(object):
         while current_line is not None:
             if current_line.matches(rule_type, rule_control, rule_path):
                 if current_line.prev is not None:
-                    current_line.prev.next = current_line.__next__
-                    if current_line.__next__ is not None:
+                    current_line.prev.next = current_line.next
+                    if current_line.next is not None:
                         current_line.next.prev = current_line.prev
                 else:
-                    self._head = current_line.__next__
+                    self._head = current_line.next
                     current_line.next.prev = None
                 changed += 1
 
-            current_line = current_line.__next__
+            current_line = current_line.next
         return changed
 
     def get(self, rule_type, rule_control, rule_path):
@@ -455,7 +455,7 @@ class PamdService(object):
             if isinstance(current_line, PamdRule) and current_line.matches(rule_type, rule_control, rule_path):
                 lines.append(current_line)
 
-            current_line = current_line.__next__
+            current_line = current_line.next
 
         return lines
 
@@ -554,11 +554,11 @@ class PamdService(object):
         # 2. The new rule exists
         for current_rule in rules_to_find:
             # First we'll get the next rule.
-            next_rule = current_rule.__next__
+            next_rule = current_rule.next
             # Next we may have to loop forwards if the next line is a comment.  If it
             # is, we'll get the next "rule's" next.
             while next_rule is not None and isinstance(next_rule, (PamdComment, PamdEmptyLine)):
-                next_rule = next_rule.__next__
+                next_rule = next_rule.next
 
             # First we create a new rule
             new_rule = PamdRule(new_type, new_control, new_path, new_args)
@@ -689,7 +689,7 @@ class PamdService(object):
             curr_validate = current_line.validate()
             if not curr_validate[0]:
                 return curr_validate
-            current_line = current_line.__next__
+            current_line = current_line.next
         return True, "Module is valid"
 
     def __str__(self):
@@ -699,7 +699,7 @@ class PamdService(object):
         mark = "# Updated by Ansible - %s" % datetime.now().isoformat()
         while current_line is not None:
             lines.append(str(current_line))
-            current_line = current_line.__next__
+            current_line = current_line.next
 
         if len(lines) <= 1:
             lines.insert(0, "")
@@ -729,7 +729,7 @@ def parse_module_arguments(module_arguments, return_none=False):
 
     re_clear_spaces = re.compile(r"\s*=\s*")
     for arg in module_arguments:
-        for item in [_f for _f in RULE_ARG_REGEX.findall(arg) if _f]:
+        for item in filter(None, RULE_ARG_REGEX.findall(arg)):
             if not item.startswith("["):
                 re_clear_spaces.sub("=", item)
             parsed_args.append(item)
