@@ -12,6 +12,7 @@ import re
 def _create_regex_group_complement(s):
     lines = (line.strip() for line in s.split("\n") if line.strip())
     chars = [_f for _f in (line.split("#")[0].strip() for line in lines) if _f]
+    group = rf"[^{''.join(chars)}]"
     return re.compile(group)
 
 
