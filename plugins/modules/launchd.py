@@ -160,9 +160,6 @@ class Plist:
 
         state, pid, dummy, dummy = LaunchCtlList(module, self.__service).run()
 
-        # Check if readPlist is available or not
-        self.old_plistlib = hasattr(plistlib, 'readPlist')
-
         self.__file = self.__find_service_plist(self.__filename)
         if self.__file is None:
             msg = 'Unable to find the plist file %s for service %s' % (
@@ -201,10 +198,6 @@ class Plist:
 
     def __read_plist_file(self, module):
         service_plist = {}
-        if self.old_plistlib:
-            return plistlib.readPlist(self.__file)
-
-        # readPlist is deprecated in Python 3 and onwards
         try:
             with open(self.__file, 'rb') as plist_fp:
                 service_plist = plistlib.load(plist_fp)
@@ -217,10 +210,6 @@ class Plist:
         if not service_plist:
             service_plist = {}
 
-        if self.old_plistlib:
-            plistlib.writePlist(service_plist, self.__file)
-            return
-        # writePlist is deprecated in Python 3 and onwards
         try:
             with open(self.__file, 'wb') as plist_fp:
                 plistlib.dump(service_plist, plist_fp)
