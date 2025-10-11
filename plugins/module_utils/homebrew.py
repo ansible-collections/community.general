@@ -11,8 +11,7 @@ import re
 
 def _create_regex_group_complement(s):
     lines = (line.strip() for line in s.split("\n") if line.strip())
-    chars = filter(None, (line.split("#")[0].strip() for line in lines))
-    group = rf"[^{''.join(chars)}]"
+    chars = [_f for _f in (line.split("#")[0].strip() for line in lines) if _f]
     return re.compile(group)
 
 
