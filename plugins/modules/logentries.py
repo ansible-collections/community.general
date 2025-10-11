@@ -149,7 +149,7 @@ def main():
 
     # Handle multiple log files
     logs = p["path"].split(",")
-    logs = filter(None, logs)
+    logs = [_f for _f in logs if _f]
 
     if p["state"] in ["present", "followed"]:
         follow_log(module, le_path, logs, name=p['name'], logtype=p['logtype'])

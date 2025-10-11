@@ -84,7 +84,7 @@ def get_eg(module, array):
     name = module.params['name']
     try:
         egs = array.list_egs()
-        eg = filter(lambda eg: eg['name'] == name, egs)
+        eg = [eg for eg in egs if eg['name'] == name]
         if len(eg) == 1:
             return eg[0]
         else:
@@ -98,7 +98,7 @@ def get_vg_id(module, array):
     name = module.params['vg']
     try:
         vgs = array.list_vgs()
-        vg = filter(lambda vg: vg['name'] == name, vgs)
+        vg = [vg for vg in vgs if vg['name'] == name]
         if len(vg) == 1:
             return vg[0]['id']
         else:
@@ -112,7 +112,7 @@ def get_ig_id(module, array):
     name = module.params['ig']
     try:
         igs = array.list_igs()
-        ig = filter(lambda ig: ig['name'] == name, igs)
+        ig = [ig for ig in igs if ig['name'] == name]
         if len(ig) == 1:
             return ig[0]['id']
         else:
@@ -126,7 +126,7 @@ def get_pg_id(module, array):
     name = module.params['pg']
     try:
         pgs = array.list_pgs()
-        pg = filter(lambda pg: pg['name'] == name, pgs)
+        pg = [pg for pg in pgs if pg['name'] == name]
         if len(pg) == 1:
             return pg[0]['id']
         else:

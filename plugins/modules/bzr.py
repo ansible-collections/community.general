@@ -101,8 +101,9 @@ class Bzr(object):
         cmd = [self.bzr_path, "status", "-S"]
         rc, stdout, stderr = self.module.run_command(cmd, cwd=self.dest)
         lines = stdout.splitlines()
+        mods_re = re.compile('^\\?\\?.*$')
 
-        lines = filter(lambda c: not re.search('^\\?\\?.*$', c), lines)
+        lines = [c for c in lines if not mods_re.search(c)]
         return len(lines) > 0
 
     def reset(self, force):
