@@ -10,8 +10,6 @@
   ansible.builtin.package:
     name: '{{ item }}'
     state: present
-  # xfsprogs on OpenSUSE requires Python 3, skip this for our newer Py2 OpenSUSE builds
-  when: not (item == 'xfsprogs' and ansible_os_family == 'Suse' and ansible_python.version.major == 2 and ansible_distribution_major_version|int != 42)
   loop:
     - e2fsprogs
     - xfsprogs
@@ -48,7 +46,7 @@
 - name: "Install btrfs progs (OpenSuse)"
   ansible.builtin.package:
     name:
-      - python{{ ansible_python.version.major }}-xml
+      - python3-xml
       - btrfsprogs
     state: present
   when: ansible_os_family == 'Suse'

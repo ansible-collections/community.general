@@ -82,11 +82,6 @@
     - 'not (ansible_distribution == "CentOS" and ansible_distribution_version is version("7.0", "<") and
             item.1 == "overwrite_another_fs")'
 
-    # The xfsprogs package on newer versions of OpenSUSE (15+) require Python 3, we skip this on our Python 2 container
-    # OpenSUSE 42.3 Python2 and the other py3 containers are not affected so we will continue to run that
-    - 'not (ansible_os_family == "Suse" and ansible_distribution_major_version|int != 42 and
-            item.0.key == "xfs" and ansible_python.version.major == 2)'
-
     # TODO: something seems to be broken on Alpine
     - 'not (ansible_distribution == "Alpine")'
 

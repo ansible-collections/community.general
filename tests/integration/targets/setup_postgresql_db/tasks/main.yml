@@ -20,25 +20,15 @@
 - meta: end_play
   when: ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version == '34'
 
-- name: python 2
-  set_fact:
-    python_suffix: ''
-  when: ansible_python_version is version('3', '<')
-
-- name: python 3
-  set_fact:
-    python_suffix: -py3
-  when: ansible_python_version is version('3', '>=')
-
 - name: Include distribution and Python version specific variables
   include_vars: '{{ lookup(''first_found'', params) }}'
   vars:
     params:
       files:
-        - '{{ ansible_distribution }}-{{ ansible_distribution_major_version }}{{ python_suffix }}.yml'
-        - '{{ ansible_distribution }}-{{ ansible_distribution_version }}{{ python_suffix }}.yml'
-        - '{{ ansible_os_family }}{{ python_suffix }}.yml'
-        - default{{ python_suffix }}.yml
+        - '{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml'
+        - '{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml'
+        - '{{ ansible_os_family }}.yml'
+        - default.yml
       paths:
         - '{{ role_path }}/vars'
 

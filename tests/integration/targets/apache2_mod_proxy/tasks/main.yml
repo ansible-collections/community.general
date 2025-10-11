@@ -71,7 +71,7 @@
 
 - name: Install BeautifulSoup
   pip:
-    name: "{{ 'BeautifulSoup' if ansible_python_version is version('3', '<') else 'BeautifulSoup4' }}"
+    name: BeautifulSoup4
     extra_args: "-c {{ remote_constraints }}"
 
 - name: Get all current balancer pool members attributes

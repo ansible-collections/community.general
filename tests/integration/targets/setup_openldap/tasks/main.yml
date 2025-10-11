@@ -19,17 +19,10 @@
         name: '{{ item }}'
       loop: '{{ openldap_packages_name }}'
 
-    - name: Install python-ldap (Python 3)
+    - name: Install python-ldap
       become: true
       package:
         name: '{{ python_ldap_package_name_python3 }}'
-      when: ansible_python_version is version('3.0', '>=')
-
-    - name: Install python-ldap (Python 2)
-      become: true
-      package:
-        name: '{{ python_ldap_package_name }}'
-      when: ansible_python_version is version('3.0', '<')
 
     - name: Make sure OpenLDAP service is stopped
       become: true

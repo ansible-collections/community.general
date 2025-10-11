@@ -51,49 +51,6 @@
   apt: name=zip state=latest
   when: ansible_facts.pkg_mgr == 'apt'
 
-- name: Install prerequisites for backports.lzma when using python2 (non OSX)
-  block:
-    - name: Set liblzma package name depending on the OS
-      set_fact:
-        liblzma_dev_package:
-          Debian: liblzma-dev
-          RedHat: xz-devel
-          Suse: xz-devel
-    - name: Ensure liblzma-dev is present to install backports-lzma
-      package: name={{ liblzma_dev_package[ansible_os_family] }} state=latest
-      when: ansible_os_family in liblzma_dev_package.keys()
-  when:
-    - ansible_python_version.split('.')[0] == '2'
-    - ansible_os_family != 'Darwin'
-
-- name: Install prerequisites for backports.lzma when using python2 (OSX)
-  block:
-    - name: Find brew binary
-      command: which brew
-      register: brew_which
-    - name: Get owner of brew binary
-      stat: path="{{ brew_which.stdout }}"
-      register: brew_stat
-    - name: "Install package"
-      homebrew:
-        name: xz
-        state: present
-        update_homebrew: false
-      become: true
-      become_user: "{{ brew_stat.stat.pw_name }}"
-      # Newer versions of brew want to compile a package which takes a long time. Do not upgrade homebrew until a
-      # proper solution can be found
-      environment:
-        HOMEBREW_NO_AUTO_UPDATE: "True"
-  when:
-    - ansible_python_version.split('.')[0] == '2'
-    - ansible_os_family == 'Darwin'
-
-- name: Ensure backports.lzma is present to create test archive (pip)
-  pip: name=backports.lzma state=latest
-  when: ansible_python_version.split('.')[0] == '2'
-  register: backports_lzma_pip
-
 - name: Define formats to test
   set_fact:
     formats:
@@ -138,8 +95,3 @@
   loop: "{{ formats }}"
   loop_control:
     loop_var: format
-
-# Test cleanup
-- name: Remove backports.lzma if previously installed (pip)
-  pip: name=backports.lzma state=absent
-  when: backports_lzma_pip is changed
