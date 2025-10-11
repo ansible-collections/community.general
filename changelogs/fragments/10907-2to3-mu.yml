@@ -1,0 +1,9 @@
+minor_changes:
+  - csv module_utils plugin - use Python 3 idioms (https://github.com/ansible-collections/community.general/pull/10907).
+  - gitlab module_utils plugin - use Python 3 idioms (https://github.com/ansible-collections/community.general/pull/10907).
+  - homebrew module_utils plugin - use Python 3 idioms (https://github.com/ansible-collections/community.general/pull/10907).
+  - ilo_redfish_utils module_utils plugin - use Python 3 idioms (https://github.com/ansible-collections/community.general/pull/10907).
+  - redfish_utils module_utils plugin - use Python 3 idioms (https://github.com/ansible-collections/community.general/pull/10907).
+  - saslprep module_utils plugin - use Python 3 idioms (https://github.com/ansible-collections/community.general/pull/10907).
+  - utm_utils module_utils plugin - use Python 3 idioms (https://github.com/ansible-collections/community.general/pull/10907).
+  - vexata module_utils plugin - use Python 3 idioms (https://github.com/ansible-collections/community.general/pull/10907).
