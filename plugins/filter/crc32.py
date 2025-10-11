@@ -45,14 +45,13 @@ _value:
 
 def crc32s(value):
     if not is_string(value):
-        raise AnsibleFilterError('Invalid value type (%s) for crc32 (%r)' %
-                                 (type(value), value))
+        raise AnsibleFilterError(f'Invalid value type ({type(value)}) for crc32 ({value!r})')
 
     if not HAS_ZLIB:
         raise AnsibleFilterError('Failed to import zlib module')
 
     data = to_bytes(value, errors='surrogate_or_strict')
-    return "{0:x}".format(crc32(data) & 0xffffffff)
+    return f"{crc32(data) & 0xffffffff:x}"
 
 
 class FilterModule:

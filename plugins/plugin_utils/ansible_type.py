@@ -48,13 +48,13 @@ def _ansible_type(data, alias, *, use_native_type: bool = False):
     if data_type == 'list' and len(data) > 0:
         items = [_atype(i, alias, use_native_type=use_native_type) for i in data]
         items_type = '|'.join(sorted(set(items)))
-        return ''.join((data_type, '[', items_type, ']'))
+        return f"{data_type}[{items_type}]"
 
     if data_type == 'dict' and len(data) > 0:
         keys = [_atype(i, alias, use_native_type=use_native_type) for i in data.keys()]
         vals = [_atype(i, alias, use_native_type=use_native_type) for i in data.values()]
         keys_type = '|'.join(sorted(set(keys)))
         vals_type = '|'.join(sorted(set(vals)))
-        return ''.join((data_type, '[', keys_type, ', ', vals_type, ']'))
+        return f"{data_type}[{keys_type}, {vals_type}]"
 
     return data_type

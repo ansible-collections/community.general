@@ -66,9 +66,7 @@ def hashids_encode(nums, salt=None, alphabet=None, min_length=None):
     try:
         hashid = hashids.encode(*nums)
     except TypeError as e:
-        raise AnsibleTypeError(
-            "Data to encode must by a tuple or list of ints: %s" % to_native(e)
-        )
+        raise AnsibleTypeError(f"Data to encode must by a tuple or list of ints: {to_native(e)}")
 
     return hashid
 
