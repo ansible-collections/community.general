@@ -181,7 +181,7 @@ def parse_duration_literal(value, extended=False):
     lookup = (EXTENDED_DURATION_REGEX if extended else DURATION_REGEX).findall(value)
 
     for duration_literal in lookup:
-        filtered_literal = list(filter(None, duration_literal))
+        filtered_literal = [_f for _f in duration_literal if _f]
         duration_val = float(filtered_literal[0])
         duration += duration_val * DURATION_UNIT_NANOSECS[filtered_literal[1]]
 

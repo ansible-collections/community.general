@@ -268,7 +268,7 @@ class GitlabMilestones(object):
 
     def get_milestone_id(self, _title):
         _milestone_list = self.gitlab_object.milestones.list()
-        _found = list(filter(lambda x: x.title == _title, _milestone_list))
+        _found = [x for x in _milestone_list if x.title == _title]
         if _found:
             return _found[0].id
         else:

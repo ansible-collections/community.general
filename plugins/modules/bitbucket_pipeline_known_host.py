@@ -151,7 +151,7 @@ def get_existing_known_host(module, bitbucket):
         if info['status'] != 200:
             module.fail_json(msg='Failed to retrieve list of known hosts: {0}'.format(info))
 
-        host = next(filter(lambda v: v['hostname'] == module.params['name'], content['values']), None)
+        host = next([v for v in content['values'] if v['hostname'] == module.params['name']], None)
 
         if host is not None:
             return host

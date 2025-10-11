@@ -297,7 +297,7 @@ class HAProxy(object):
         """
         data = self.execute('show stat', 200, False).lstrip('# ')
         r = csv.DictReader(data.splitlines())
-        return tuple(map(lambda d: d['pxname'], filter(lambda d: d['svname'] == 'BACKEND', r)))
+        return tuple(map(lambda d: d['pxname'], [d for d in r if d['svname'] == 'BACKEND']))
 
     def discover_version(self):
         """
@@ -349,8 +349,7 @@ class HAProxy(object):
         state = tuple(
             map(
                 lambda d: {'status': d['status'], 'weight': d['weight'], 'scur': d['scur']},
-                filter(lambda d: (pxname is None or d['pxname']
-                                  == pxname) and d['svname'] == svname, r)
+                [d for d in r if (pxname is None or d['pxname'] == pxname) and d['svname'] == svname]
             )
         )
         return state or None

@@ -81,7 +81,7 @@ def get_volume(module, array):
     name = module.params['name']
     try:
         vols = array.list_volumes()
-        vol = filter(lambda v: v['name'] == name, vols)
+        vol = [v for v in vols if v['name'] == name]
         if len(vol) == 1:
             return vol[0]
         else:
