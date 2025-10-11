@@ -5,10 +5,9 @@
 
 from __future__ import annotations
 
-
 from ansible_collections.community.general.plugins.modules import dnsimple as dnsimple_module
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleFailJson, ModuleTestCase, set_module_args
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
+from unittest.mock import patch
 import pytest
 import sys
 

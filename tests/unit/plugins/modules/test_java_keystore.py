@@ -8,10 +8,9 @@
 from __future__ import annotations
 
 import os
+from unittest.mock import patch, Mock
 
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import ModuleTestCase, set_module_args
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import Mock
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.modules.java_keystore import JavaKeystore
 

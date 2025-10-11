@@ -4,9 +4,9 @@
 
 from __future__ import annotations
 
+import unittest
+from unittest.mock import patch, Mock
 from ansible.executor.task_result import TaskResult
-from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch, Mock
 from ansible_collections.community.general.plugins.callback.splunk import SplunkHTTPCollectorSource
 from datetime import datetime
 

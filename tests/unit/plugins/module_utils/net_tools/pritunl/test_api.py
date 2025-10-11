@@ -5,13 +5,14 @@
 from __future__ import annotations
 
 import json
+from unittest.mock import MagicMock
 
 import pytest
+
 from ansible.module_utils.common.dict_transformations import dict_merge
 from ansible_collections.community.general.plugins.module_utils.net_tools.pritunl import (
     api,
 )
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import MagicMock
 
 
 # Pritunl Mocks

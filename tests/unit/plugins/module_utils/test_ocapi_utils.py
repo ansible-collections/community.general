@@ -8,8 +8,8 @@ import os
 import re
 import shutil
 import tempfile
+import unittest
 
-from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
 from ansible_collections.community.general.plugins.module_utils.ocapi_utils import OcapiUtils
 
 

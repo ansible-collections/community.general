@@ -5,9 +5,9 @@
 
 from __future__ import annotations
 
+import unittest
+from unittest.mock import patch, MagicMock
 
-from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch, MagicMock
 from ansible_collections.community.general.plugins.lookup import etcd3
 from ansible.plugins.loader import lookup_loader
 

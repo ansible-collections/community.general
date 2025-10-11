@@ -9,9 +9,9 @@ import uuid
 import tarfile
 import tempfile
 import os
+import unittest
+from unittest.mock import patch
 
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
-from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
 from ansible.module_utils import basic
 import ansible_collections.community.general.plugins.modules.wdc_redfish_command as module
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson

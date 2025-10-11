@@ -6,11 +6,11 @@ from __future__ import annotations
 
 import jenkins
 
+from unittest.mock import patch, call
 from xml.etree import ElementTree as et
 
 import pytest
 
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch, call
 from ansible_collections.community.general.plugins.modules import jenkins_node
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,

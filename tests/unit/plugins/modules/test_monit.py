@@ -4,10 +4,11 @@
 
 from __future__ import annotations
 
-import mock
+import unittest
+from unittest import mock
+
 import pytest
 
-from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
 from ansible_collections.community.general.plugins.modules import monit
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson
 

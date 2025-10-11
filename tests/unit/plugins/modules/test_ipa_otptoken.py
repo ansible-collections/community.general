@@ -5,10 +5,10 @@
 
 from __future__ import annotations
 
+import unittest
 from contextlib import contextmanager
+from unittest.mock import call, patch
 
-from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import call, patch
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
 
 from ansible_collections.community.general.plugins.modules import ipa_otptoken

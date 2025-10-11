@@ -5,10 +5,10 @@
 from __future__ import annotations
 
 import os
+from unittest.mock import MagicMock, PropertyMock
 
 import pytest
 
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import MagicMock, PropertyMock
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import cmd_runner_fmt
 from ansible_collections.community.general.plugins.module_utils.python_runner import PythonRunner
 

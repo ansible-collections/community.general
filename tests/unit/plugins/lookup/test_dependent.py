@@ -5,12 +5,12 @@
 # Make coding more python3-ish
 from __future__ import annotations
 
-from ansible.template import Templar
-
-from ansible_collections.community.internal_test_tools.tests.unit.compat.unittest import TestCase
-from ansible_collections.community.internal_test_tools.tests.unit.utils.trust import make_trusted
+from unittest import TestCase
 
 from ansible.plugins.loader import lookup_loader
+from ansible.template import Templar
+
+from ansible_collections.community.internal_test_tools.tests.unit.utils.trust import make_trusted
 
 
 class TestLookupModule(TestCase):

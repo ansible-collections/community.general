@@ -9,7 +9,7 @@ import pytest
 import re
 import yaml
 
-from mock import Mock, patch
+from unittest.mock import Mock, patch
 from .oneview_module_loader import ONEVIEW_MODULE_UTILS_PATH
 from hpOneView.oneview_client import OneViewClient
 

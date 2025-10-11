@@ -3,8 +3,9 @@
 
 from __future__ import annotations
 
-from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch
+import unittest
+from unittest.mock import patch
+
 from ansible.module_utils import basic
 import ansible_collections.community.general.plugins.modules.ufw as module
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (

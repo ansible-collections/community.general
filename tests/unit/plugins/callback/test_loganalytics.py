@@ -4,13 +4,13 @@
 
 from __future__ import annotations
 
-from ansible.executor.task_result import TaskResult
-from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import patch, Mock
-from ansible_collections.community.general.plugins.callback.loganalytics import AzureLogAnalyticsSource
-
-from datetime import datetime
 import json
+import unittest
+from datetime import datetime
+from unittest.mock import patch, Mock
+
+from ansible.executor.task_result import TaskResult
+from ansible_collections.community.general.plugins.callback.loganalytics import AzureLogAnalyticsSource
 
 
 class TestAzureLogAnalytics(unittest.TestCase):

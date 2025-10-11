@@ -4,7 +4,8 @@
 
 from __future__ import annotations
 
-from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
+import unittest
+
 from ansible_collections.community.general.plugins.filter.crc32 import crc32s
 
 

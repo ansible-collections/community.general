@@ -6,11 +6,10 @@
 from __future__ import annotations
 
 import sys
+import unittest
 
 from httmock import response  # noqa
 from httmock import urlmatch  # noqa
-
-from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
 
 import gitlab
 

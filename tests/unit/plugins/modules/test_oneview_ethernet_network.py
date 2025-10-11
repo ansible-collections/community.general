@@ -5,9 +5,11 @@
 
 from __future__ import annotations
 
+import unittest
+from unittest import mock
+
 import yaml
 
-from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest, mock
 from .oneview_module_loader import EthernetNetworkModule
 from .hpe_test_utils import OneViewBaseTestCase
 

@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-from ansible_collections.community.internal_test_tools.tests.unit.compat import unittest
+import unittest
 from .oneview_module_loader import FcoeNetworkModule
 from .hpe_test_utils import OneViewBaseTestCase
 
