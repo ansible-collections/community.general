@@ -114,7 +114,7 @@ class LookupModule(LookupBase):
                         while cursor.key().startswith(to_text(prefix).encode()):
                             for key, value in cursor:
                                 ret.append((to_text(key), to_native(value)))
-                            next(cursor)
+                            cursor.next()
                     else:
                         value = txn.get(to_text(term).encode())
                         if value is not None:
