@@ -67,7 +67,7 @@ class CallbackModule(CallbackBase):
     def v2_playbook_on_play_start(self, play):
         name = play.get_name().strip()
         if not name:
-            msg = u"play"
+            msg = "play"
         else:
             msg = f"PLAY [{name}]"
 

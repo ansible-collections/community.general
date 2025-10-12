@@ -42,10 +42,7 @@ options:
     type: float
 """
 
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
+import pickle
 
 from ansible.plugins.cache import BaseFileCacheModule
 
