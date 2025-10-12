@@ -4,6 +4,5 @@ minor_changes:
   - wsl connection plugin - use Python 3 idioms (https://github.com/ansible-collections/community.general/pull/10903).
   - cobbler inventory plugin - use Python 3 idioms (https://github.com/ansible-collections/community.general/pull/10903).
   - linode inventory plugin - use Python 3 idioms (https://github.com/ansible-collections/community.general/pull/10903).
-  - gitlab module_utils plugin - use Python 3 idioms (https://github.com/ansible-collections/community.general/pull/10903).
   - utm_utils module_utils plugin - use Python 3 idioms (https://github.com/ansible-collections/community.general/pull/10903).
   - vexata module_utils plugin - use Python 3 idioms (https://github.com/ansible-collections/community.general/pull/10903).
