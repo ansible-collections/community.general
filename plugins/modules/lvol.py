@@ -230,6 +230,25 @@ EXAMPLES = r"""
     lv: test
     thinpool: testpool
     size: 128g
+
+- name: Create a logical volume the size of 2 times the main memory
+  community.general.lvol:
+    vg: firefly
+    lv: test
+    size: 2ram
+
+- name: Create a logical volume the size of half times the main memory
+  community.general.lvol:
+    vg: firefly
+    lv: test
+    size: 0.5ram
+
+- name: Extend the logical volume by size of the main memory
+  community.general.lvol:
+    vg: firefly
+    lv: test
+    size: +1ram
+    force: true
 """
 
 import re
@@ -287,6 +306,13 @@ def get_lvm_version(module):
         return None
     return mkversion(m.group(1), m.group(2), m.group(3))
 
+def get_mem_size_in_mb():
+    with open('/proc/meminfo', 'r') as file:
+        for line in file:
+            parts = line.split()
+            if parts[0] == "MemTotal:":
+                return int(parts[1])/1000
+    return 0
 
 def main():
     module = AnsibleModule(
@@ -367,6 +393,13 @@ def main():
                 module.fail_json(msg="Specify extents as a percentage of VG|PVS|FREE|ORIGIN")
             size_opt = 'l'
             size_unit = ''
+
+        # LVCREATE(8)/LVEXTEND(8)/LVREDUCE(8) --size option <multiplier>RAM
+        if size.lower().endswith('ram'):
+            try:
+                size = '{0}m'.format(int(float(size[:-3]) * get_mem_size_in_mb()))
+            except ValueError:
+                module.fail_json(msg="Bad size specification of '%s'" % size)
 
         # LVCREATE(8)/LVEXTEND(8)/LVREDUCE(8) -L --size option unit
         if '%' not in size:
