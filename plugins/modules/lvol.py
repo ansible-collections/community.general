@@ -306,13 +306,15 @@ def get_lvm_version(module):
         return None
     return mkversion(m.group(1), m.group(2), m.group(3))
 
+
 def get_mem_size_in_mb():
     with open('/proc/meminfo', 'r') as file:
         for line in file:
             parts = line.split()
             if parts[0] == "MemTotal:":
-                return int(parts[1])/1000
+                return int(parts[1]) / 1000
     return 0
+
 
 def main():
     module = AnsibleModule(
