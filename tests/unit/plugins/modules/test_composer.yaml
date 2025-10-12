@@ -3,9 +3,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 ---
-anchors:
-  environ_true: &env-def-true {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
-  environ_false: &env-def-false {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
 test_cases:
   - id: composer
     input:
