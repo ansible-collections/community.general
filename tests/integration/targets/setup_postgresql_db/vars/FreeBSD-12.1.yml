@@ -5,7 +5,7 @@
 
 postgresql_packages:
   - postgresql11-server
-  - py27-psycopg2
+  - "py{{ ansible_python.version.major }}{{ ansible_python.version.minor }}-psycopg2"
 
 pg_dir: /var/db/postgres/data11
 pg_hba_location: "{{ pg_dir }}/pg_hba.conf"
