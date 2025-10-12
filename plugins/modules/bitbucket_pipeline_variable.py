@@ -139,7 +139,7 @@ def get_existing_pipeline_variable(module, bitbucket):
             return None
 
         page += 1
-        var = next([v for v in content['values'] if v['key'] == module.params['name']], None)
+        var = next((v for v in content['values'] if v['key'] == module.params['name']), None)
 
         if var is not None:
             var['name'] = var.pop('key')

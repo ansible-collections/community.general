@@ -297,7 +297,7 @@ class HAProxy(object):
         """
         data = self.execute('show stat', 200, False).lstrip('# ')
         r = csv.DictReader(data.splitlines())
-        return tuple(map(lambda d: d['pxname'], [d for d in r if d['svname'] == 'BACKEND']))
+        return tuple(d['pxname'] for d in r if d['svname'] == 'BACKEND')
 
     def discover_version(self):
         """
@@ -346,12 +346,11 @@ class HAProxy(object):
         """
         data = self.execute('show stat', 200, False).lstrip('# ')
         r = csv.DictReader(data.splitlines())
-        state = tuple(
-            map(
-                lambda d: {'status': d['status'], 'weight': d['weight'], 'scur': d['scur']},
-                [d for d in r if (pxname is None or d['pxname'] == pxname) and d['svname'] == svname]
-            )
-        )
+
+        def unpack_state(d):
+            return {'status': d['status'], 'weight': d['weight'], 'scur': d['scur']}
+
+        state = tuple(unpack_state(d) for d in r if (pxname is None or d['pxname'] == pxname) and d['svname'] == svname)
         return state or None
 
     def wait_until_status(self, pxname, svname, status):
