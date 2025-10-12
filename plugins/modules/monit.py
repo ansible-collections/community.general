@@ -51,11 +51,12 @@ EXAMPLES = r"""
 
 import time
 import re
-
 from collections import namedtuple
 
 from ansible.module_utils.basic import AnsibleModule
 
+
+# forcing change to trigger monit tests
 
 STATE_COMMAND_MAP = {
     'stopped': 'stop',
