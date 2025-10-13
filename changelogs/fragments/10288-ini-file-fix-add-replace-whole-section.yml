@@ -1,0 +1,2 @@
+bugfixes:
+  - "ini_file - fixes adding or replacing a whole section (https://github.com/ansible-collections/community.general/pull/10288)."

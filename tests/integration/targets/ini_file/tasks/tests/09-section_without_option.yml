@@ -1,0 +1,147 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+## testing section selection
+
+- name: test-section 1 - Create starting ini file
+  copy:
+    content: |
+      [drinks]
+      fav = lemonade
+      beverage = orange juice
+
+    dest: "{{ output_file }}"
+
+- name: test-section 1 - Add new block
+  ini_file:
+    dest: "{{ output_file }}"
+    section: food
+    value: |
+      fav = hamburger
+      beverage = None
+    state: present
+  register: result1
+
+- name: test-section 1 - Read modified file
+  slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: test-section 1 - Create expected result
+  set_fact:
+    expected1: |
+      [drinks]
+      fav = lemonade
+      beverage = orange juice
+      car = volvo
+
+      [food]
+      fav = hamburger
+      beverage = None
+    output1: "{{ output_content.content | b64decode }}"
+
+- name: test-section 1 - Section was added at end
+  assert:
+    that:
+      - result1 is changed
+      - result1.msg == 'section added'
+      - output1 == expected1
+
+# ----------------
+
+- name: test-section 2 - Create starting ini file
+  copy:
+    content: |
+      [drinks]
+      fav = lemonade
+      beverage = orange juice
+
+      [drinks]
+      fav = lemonade
+      beverage = pineapple juice
+
+    dest: "{{ output_file }}"
+
+- name: test-section 2 - Modify starting ini file
+  ini_file:
+    dest: "{{ output_file }}"
+    section: drinks
+    section_has_values:
+      - option: beverage
+        value: pineapple juice
+    value: |
+      fav = lemonade
+      car = volvo
+    state: present
+  register: result1
+
+- name: test-section 2 - Read modified file
+  slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: test-section 2 - Create expected result
+  set_fact:
+    expected1: |
+      [drinks]
+      fav = lemonade
+      beverage = orange juice
+
+      [drinks]
+      fav = lemonade
+      car = volvo
+    output1: "{{ output_content.content | b64decode }}"
+
+- name: test-section 2 - Second section was replaced with value
+  assert:
+    that:
+      - result1 is changed
+      - result1.msg == 'section replaced'
+      - output1 == expected1
+
+# ----------------
+
+- name: test-section 3 - Create starting ini file
+  copy:
+    content: |
+      [drinks]
+      fav = lemonade
+      beverage = orange juice
+
+      [drinks]
+      fav = lemonade
+      beverage = pineapple juice
+
+    dest: "{{ output_file }}"
+
+- name: test-section 3 - Modify starting ini file
+  ini_file:
+    dest: "{{ output_file }}"
+    section: drinks
+    section_has_values:
+      - option: beverage
+        value: pineapple juice
+    state: absent
+  register: result1
+
+- name: test-section 3 - Read modified file
+  slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: test-section 3 - Create expected result
+  set_fact:
+    expected1: |
+      [drinks]
+      fav = lemonade
+      beverage = orange juice
+    output1: "{{ output_content.content | b64decode }}"
+
+- name: test-section 3 - Section was removed for matching section
+  assert:
+    that:
+      - result1 is changed
+      - result1.msg == 'section removed'
+      - output1 == expected1
