@@ -65,12 +65,9 @@
 
     - name: install dependencies
       pip:
-        name: "{{ item }}"
+        name: python-daemon
         virtualenv: "{{ process_venv }}"
         extra_args: "-c {{ remote_constraints }}"
-      loop:
-        - setuptools==44
-        - python-daemon
 
     - name: restart monit
       become: true
