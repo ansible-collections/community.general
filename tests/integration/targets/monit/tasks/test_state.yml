@@ -13,6 +13,7 @@
     name: httpd_echo
     state: "{{ state }}"
   register: result
+  ignore_errors: true
 
 - name: Check for recent SIGTERM processes
   ansible.builtin.shell: |
