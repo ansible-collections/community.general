@@ -260,20 +260,19 @@ class Bitwarden(object):
 
     def get_attachment(self, attachment_name, search_value, search_field="name", collection_id=None, organization_id=None):
         """Download attachment from records whose search_field match search_value.
-        
         Returns a list of attachment contents (as raw bytes converted to text) for each matching item.
         """
         matches = self._get_matches(search_value, search_field, collection_id, organization_id)
         
         if not matches:
             raise AnsibleError(f"No item found matching {search_field}={search_value}")
-        
+
         attachment_contents = []
         for match in matches:
             item_id = match.get('id')
             if not item_id:
                 raise AnsibleError(f"Item {match.get('name', 'unknown')} has no ID")
-            
+
             try:
                 params = ['get', 'attachment', attachment_name, '--itemid', item_id, '--raw']
                 out, err = self._run(params)
@@ -284,7 +283,6 @@ class Bitwarden(object):
                 raise AnsibleError(
                     f"Failed to get attachment '{attachment_name}' from item '{item_name}' (ID: {item_id}): {str(e)}"
                 )
-        
         return attachment_contents
 
     def get_collection_ids(self, collection_name: str, organization_id=None) -> list[str]:
