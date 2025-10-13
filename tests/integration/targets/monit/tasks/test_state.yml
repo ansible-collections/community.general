@@ -10,7 +10,7 @@
 
 - name: Sleep
   ansible.builtin.pause:
-    seconds: "{{ range(-10, 10) | random + 30}}"
+    seconds: "{{ range(-20, 20) | random + 30}}"
 
 - name: change httpd_echo process state to {{ state }}
   monit:
