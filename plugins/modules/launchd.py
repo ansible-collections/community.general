@@ -269,7 +269,7 @@ class Plist:
         return self.__file
 
 
-class LaunchCtlTask(object, metaclass=ABCMeta):
+class LaunchCtlTask(metaclass=ABCMeta):
     WAITING_TIME = 5  # seconds
 
     def __init__(self, module, service, plist):
