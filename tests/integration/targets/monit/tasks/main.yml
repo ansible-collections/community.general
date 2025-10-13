@@ -41,8 +41,8 @@
 
     - name: monit config
       become: true
-      template:
-        src: "monitrc.j2"
+      copy:
+        src: "monitrc"
         dest: "{{ monitrc }}"
         mode: '0700'
 
