@@ -263,7 +263,7 @@ class Bitwarden(object):
         Returns a list of attachment contents (as raw bytes converted to text) for each matching item.
         """
         matches = self._get_matches(search_value, search_field, collection_id, organization_id)
-        
+
         if not matches:
             raise AnsibleError(f"No item found matching {search_field}={search_value}")
 
