@@ -14,6 +14,12 @@
     state: "{{ state }}"
   register: result
 
+- name: Check for recent SIGTERM processes
+  ansible.builtin.shell: |
+    journalctl --since '5 minutes ago' | grep -i "killed"
+  register: process_logs
+  failed_when: false
+
 - name: check that state changed
   assert:
     that:
