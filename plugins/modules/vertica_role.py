@@ -194,7 +194,7 @@ def main():
     assigned_roles = []
     if module.params['assigned_roles']:
         assigned_roles = module.params['assigned_roles'].split(',')
-        assigned_roles = filter(None, assigned_roles)
+        assigned_roles = [_f for _f in assigned_roles if _f]
     state = module.params['state']
     db = ''
     if module.params['db']:

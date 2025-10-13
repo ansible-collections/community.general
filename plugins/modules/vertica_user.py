@@ -320,7 +320,7 @@ def main():
     roles = []
     if module.params['roles']:
         roles = module.params['roles'].split(',')
-        roles = filter(None, roles)
+        roles = [_f for _f in roles if _f]
     state = module.params['state']
     if state == 'locked':
         locked = True

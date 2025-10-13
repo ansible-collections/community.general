@@ -256,11 +256,11 @@ def main():
     usage_roles = []
     if module.params['usage_roles']:
         usage_roles = module.params['usage_roles'].split(',')
-        usage_roles = filter(None, usage_roles)
+        usage_roles = [_f for _f in usage_roles if _f]
     create_roles = []
     if module.params['create_roles']:
         create_roles = module.params['create_roles'].split(',')
-        create_roles = filter(None, create_roles)
+        create_roles = [_f for _f in create_roles if _f]
     owner = module.params['owner']
     state = module.params['state']
     db = ''

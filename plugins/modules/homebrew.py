@@ -192,7 +192,7 @@ class HomebrewException(Exception):
 # utils ------------------------------------------------------------------- {{{
 def _create_regex_group_complement(s):
     lines = (line.strip() for line in s.split('\n') if line.strip())
-    chars = filter(None, (line.split('#')[0].strip() for line in lines))
+    chars = [_f for _f in (line.split('#')[0].strip() for line in lines) if _f]
     group = r'[^' + r''.join(chars) + r']'
     return re.compile(group)
 

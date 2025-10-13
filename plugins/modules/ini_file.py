@@ -342,30 +342,30 @@ def do_ini(module, filename, section=None, section_has_values=None, option=None,
             ini_lines = [to_text(line) for line in ini_file.readlines()]
 
     if module._diff:
-        diff['before'] = u''.join(ini_lines)
+        diff['before'] = ''.join(ini_lines)
 
     changed = False
 
     # ini file could be empty
     if not ini_lines:
-        ini_lines.append(u'\n')
+        ini_lines.append('\n')
 
     # last line of file may not contain a trailing newline
-    if ini_lines[-1] == u"" or ini_lines[-1][-1] != u'\n':
-        ini_lines[-1] += u'\n'
+    if ini_lines[-1] == "" or ini_lines[-1][-1] != '\n':
+        ini_lines[-1] += '\n'
         changed = True
 
     # append fake section lines to simplify the logic
     # At top:
     # Fake random section to do not match any other in the file
     # Using commit hash as fake section name
-    fake_section_name = u"ad01e11446efb704fcdbdb21f2c43757423d91c5"
+    fake_section_name = "ad01e11446efb704fcdbdb21f2c43757423d91c5"
 
     # Insert it at the beginning
-    ini_lines.insert(0, u'[%s]' % fake_section_name)
+    ini_lines.insert(0, '[%s]' % fake_section_name)
 
     # At bottom:
-    ini_lines.append(u'[')
+    ini_lines.append('[')
 
     # If no section is defined, fake section is used
     if not section:
@@ -375,9 +375,9 @@ def do_ini(module, filename, section=None, section_has_values=None, option=None,
     section_start = section_end = 0
     msg = 'OK'
     if no_extra_spaces:
-        assignment_format = u'%s=%s\n'
+        assignment_format = '%s=%s\n'
     else:
-        assignment_format = u'%s = %s\n'
+        assignment_format = '%s = %s\n'
 
     option_no_value_present = False
 
@@ -390,7 +390,7 @@ def do_ini(module, filename, section=None, section_has_values=None, option=None,
 
     for index, line in enumerate(ini_lines):
         # end of section:
-        if within_section and line.startswith(u'['):
+        if within_section and line.startswith('['):
             if check_section_has_values(
                 section_has_values, ini_lines[section_start:index]
             ):
@@ -434,7 +434,7 @@ def do_ini(module, filename, section=None, section_has_values=None, option=None,
                     matched_value = match.group(8)
                     if not matched_value and allow_no_value:
                         # replace existing option with no value line(s)
-                        newline = u'%s\n' % option
+                        newline = '%s\n' % option
                         option_no_value_present = True
                     else:
                         # replace existing option=value line(s)
@@ -443,7 +443,7 @@ def do_ini(module, filename, section=None, section_has_values=None, option=None,
                     values.remove(matched_value)
                 elif not values and allow_no_value:
                     # replace existing option with no value line(s)
-                    newline = u'%s\n' % option
+                    newline = '%s\n' % option
                     (changed, msg) = update_section_line(option, changed, section_lines, index, changed_lines, ignore_spaces, newline, msg)
                     option_no_value_present = True
                     break
@@ -482,12 +482,12 @@ def do_ini(module, filename, section=None, section_has_values=None, option=None,
                             changed = True
                         elif element is None and allow_no_value:
                             # insert option with no value line
-                            section_lines.insert(index, u'%s\n' % option)
+                            section_lines.insert(index, '%s\n' % option)
                             msg = 'option added'
                             changed = True
                 elif option and not values and allow_no_value and not option_no_value_present:
                     # insert option with no value line(s)
-                    section_lines.insert(index, u'%s\n' % option)
+                    section_lines.insert(index, '%s\n' % option)
                     msg = 'option added'
                     changed = True
                 break
@@ -523,7 +523,7 @@ def do_ini(module, filename, section=None, section_has_values=None, option=None,
     del ini_lines[-1:]
 
     if not within_section and state == 'present':
-        ini_lines.append(u'[%s]\n' % section)
+        ini_lines.append('[%s]\n' % section)
         msg = 'section and option added'
         if section_has_values:
             for condition in section_has_values:
@@ -532,7 +532,7 @@ def do_ini(module, filename, section=None, section_has_values=None, option=None,
                         for value in condition['values']:
                             ini_lines.append(assignment_format % (condition['option'], value))
                     elif allow_no_value:
-                        ini_lines.append(u'%s\n' % condition['option'])
+                        ini_lines.append('%s\n' % condition['option'])
                 elif not exclusive:
                     for value in condition['values']:
                         if value not in values:
@@ -541,13 +541,13 @@ def do_ini(module, filename, section=None, section_has_values=None, option=None,
             for value in values:
                 ini_lines.append(assignment_format % (option, value))
         elif option and not values and allow_no_value:
-            ini_lines.append(u'%s\n' % option)
+            ini_lines.append('%s\n' % option)
         else:
             msg = 'only section added'
         changed = True
 
     if module._diff:
-        diff['after'] = u''.join(ini_lines)
+        diff['after'] = ''.join(ini_lines)
 
     backup_file = None
     if changed and not module.check_mode:

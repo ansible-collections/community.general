@@ -155,7 +155,7 @@ def get_existing_deploy_key(module, bitbucket):
         if info['status'] != 200:
             module.fail_json(msg='Failed to retrieve the list of deploy keys: {0}'.format(info))
 
-        res = next(iter(filter(lambda v: v['label'] == module.params['label'], content['values'])), None)
+        res = next((v for v in content['values'] if v['label'] == module.params['label']), None)
 
         if res is not None:
             return res
