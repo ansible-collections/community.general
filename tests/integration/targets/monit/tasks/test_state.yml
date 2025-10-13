@@ -8,9 +8,9 @@
     reason: verify initial service state
     service_state: "{{ initial_state }}"
 
-- name: Sleep for 5 seconds to allow service to stabilize
+- name: Sleep for 10 seconds to allow service to stabilize
   ansible.builtin.pause:
-    seconds: 5
+    seconds: 10
 
 - name: change httpd_echo process state to {{ state }}
   monit:
