@@ -31,8 +31,17 @@ options:
     default: name
     version_added: 5.7.0
   field:
-    description: Field to fetch. Leave unset to fetch whole response.
+    description:
+      - Field to fetch. Leave unset to fetch whole response.
+      - Mutually exclusive with O(attachment).
     type: str
+  attachment:
+    description:
+      - Name of the attachment to download from the item.
+      - When set, the plugin will download the attachment content in raw format.
+      - Mutually exclusive with O(field).
+    type: str
+    version_added: 11.0.0
   collection_id:
     description:
       - Collection ID to filter results by collection. Leave unset to skip filtering.
@@ -71,6 +80,22 @@ EXAMPLES = r"""
   ansible.builtin.debug:
     msg: >-
       {{ lookup('community.general.bitwarden', 'bafba515-af11-47e6-abe3-af1200cd18b2', search='id', field='password') | first }}
+
+- name: "Get attachment 'vpn-server.key' from Bitwarden record named 'VPN Config'"
+  ansible.builtin.debug:
+    msg: >-
+      {{ lookup('community.general.bitwarden', 'VPN Config', attachment='vpn-server.key') }}
+
+- name: "Save attachment to file"
+  ansible.builtin.copy:
+    content: "{{ lookup('community.general.bitwarden', 'VPN Config', attachment='vpn-server.key') | first }}"
+    dest: /etc/vpn/server.key
+    mode: '0600'
+
+- name: "Get attachment from item by ID"
+  ansible.builtin.debug:
+    msg: >-
+      {{ lookup('community.general.bitwarden', 'bafba515-af11-47e6-abe3-af1200cd18b2', search='id', attachment='cert.pem') | first }}
 
 - name: "Get 'password' from all Bitwarden records named 'a_test' from collection"
   ansible.builtin.debug:
@@ -114,6 +139,7 @@ _raw:
     - A one-element list that contains a list of requested fields or JSON objects of matches.
     - If you use C(query), you get a list of lists. If you use C(lookup) without C(wantlist=true), this always gets reduced
       to a list of field values or JSON objects.
+    - When O(attachment) is specified, returns the raw content of the attachment(s).
   type: list
   elements: list
 """
@@ -232,6 +258,35 @@ class Bitwarden(object):
 
         return field_matches
 
+    def get_attachment(self, attachment_name, search_value, search_field="name", collection_id=None, organization_id=None):
+        """Download attachment from records whose search_field match search_value.
+        
+        Returns a list of attachment contents (as raw bytes converted to text) for each matching item.
+        """
+        matches = self._get_matches(search_value, search_field, collection_id, organization_id)
+        
+        if not matches:
+            raise AnsibleError(f"No item found matching {search_field}={search_value}")
+        
+        attachment_contents = []
+        for match in matches:
+            item_id = match.get('id')
+            if not item_id:
+                raise AnsibleError(f"Item {match.get('name', 'unknown')} has no ID")
+            
+            try:
+                params = ['get', 'attachment', attachment_name, '--itemid', item_id, '--raw']
+                out, err = self._run(params)
+                attachment_contents.append(out)
+            except BitwardenException as e:
+                # Provide more context about which item failed
+                item_name = match.get('name', item_id)
+                raise AnsibleError(
+                    f"Failed to get attachment '{attachment_name}' from item '{item_name}' (ID: {item_id}): {str(e)}"
+                )
+        
+        return attachment_contents
+
     def get_collection_ids(self, collection_name: str, organization_id=None) -> list[str]:
         """Return matching IDs of collections whose name is equal to collection_name."""
 
@@ -256,6 +311,7 @@ class LookupModule(LookupBase):
     def run(self, terms=None, variables=None, **kwargs):
         self.set_options(var_options=variables, direct=kwargs)
         field = self.get_option('field')
+        attachment = self.get_option('attachment')
         search_field = self.get_option('search')
         collection_id = self.get_option('collection_id')
         collection_name = self.get_option('collection_name')
@@ -265,6 +321,10 @@ class LookupModule(LookupBase):
 
         if not _bitwarden.unlocked:
             raise AnsibleError("Bitwarden Vault locked. Run 'bw unlock'.")
+
+        # Validate mutually exclusive options
+        if field and attachment:
+            raise AnsibleOptionsError("'field' and 'attachment' are mutually exclusive!")
 
         if not terms:
             terms = [None]
@@ -278,11 +338,19 @@ class LookupModule(LookupBase):
         else:
             collection_ids = [collection_id]
 
-        results = [
-            _bitwarden.get_field(field, term, search_field, collection_id, organization_id)
-            for collection_id in collection_ids
-            for term in terms
-        ]
+        # Choose the appropriate method based on what's requested
+        if attachment:
+            results = [
+                _bitwarden.get_attachment(attachment, term, search_field, collection_id, organization_id)
+                for collection_id in collection_ids
+                for term in terms
+            ]
+        else:
+            results = [
+                _bitwarden.get_field(field, term, search_field, collection_id, organization_id)
+                for collection_id in collection_ids
+                for term in terms
+            ]
 
         for result in results:
             if result_count is not None and len(result) != result_count:
