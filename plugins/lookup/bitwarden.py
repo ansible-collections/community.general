@@ -41,7 +41,7 @@ options:
       - When set, the plugin will download the attachment content in raw format.
       - Mutually exclusive with O(field).
     type: str
-    version_added: 11.0.0
+    version_added: 12.0.0
   collection_id:
     description:
       - Collection ID to filter results by collection. Leave unset to skip filtering.
@@ -91,6 +91,9 @@ EXAMPLES = r"""
     content: "{{ lookup('community.general.bitwarden', 'VPN Config', attachment='vpn-server.key') | first }}"
     dest: /etc/vpn/server.key
     mode: '0600'
+    # Be aware, as the lookup run into the Ansible computer, it can generate important network traffic.
+    # Once from bitwarden/vaultwarden to the Ansible computer;
+    # Twice (as for locally stored files) from Ansible computer to the Ansible target.
 
 - name: "Get attachment from item by ID"
   ansible.builtin.debug:
