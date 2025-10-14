@@ -256,6 +256,8 @@ class Monit(object):
         current_status = self.get_status()
         self.run_command(STATE_COMMAND_MAP[state])
         status = self.wait_for_status_change(current_status)
+        if state == 'stopped':
+            raise Exception('DD')
         status = self.wait_for_monit_to_stop_pending(status)
         status_match = status.value == expected_status.value
         if state == 'stopped':
