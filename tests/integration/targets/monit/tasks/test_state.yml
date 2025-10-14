@@ -8,10 +8,6 @@
     reason: verify initial service state
     service_state: "{{ initial_state }}"
 
-- name: Sleep
-  ansible.builtin.pause:
-    seconds: "{{ range(-20, 20) | random + 30}}"
-
 - name: change httpd_echo process state to {{ state }}
   monit:
     name: httpd_echo
