@@ -153,7 +153,7 @@ class Monit(object):
         check_rc = False if validate else True  # 'validate' always has rc = 1
         command = [self.monit_bin_path, monit_command] + self.command_args + [self.process_name]
         rc, out, err = self.module.run_command(command, check_rc=check_rc)
-        raise Exception('HH')
+        # raise Exception('HH')
         return self._parse_status(out, err)
 
     def _parse_status(self, output, err):
@@ -172,9 +172,11 @@ class Monit(object):
         if ' - ' not in status_val:
             status_val = status_val.replace(' ', '_')
             try:
+                raise Exception('II1')
                 return getattr(Status, status_val)
             except AttributeError:
                 self.module.warn("Unknown monit status '%s', treating as execution failed" % status_val)
+                raise Exception('II2')
                 return Status.EXECUTION_FAILED
         else:
             status_val, substatus = status_val.split(' - ')
@@ -186,6 +188,7 @@ class Monit(object):
 
             if state == 'pending':
                 status = status.pending()
+            raise Exception('II3')
             return status
 
     def is_process_present(self):
