@@ -204,6 +204,7 @@ class Monit(object):
         if running_status.value != current_status.value or current_status.value == StatusValue.EXECUTION_FAILED:
             return running_status
 
+        raise Exception('GG')
         loop_count = 0
         while running_status.value == current_status.value:
             if loop_count >= self._status_change_retry_count:
