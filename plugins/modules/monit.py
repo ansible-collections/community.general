@@ -325,7 +325,6 @@ def main():
         monit.stop()
         raise Exception('Failed to stop process')
 
-
     if running and state == 'unmonitored':
         exit_if_check_mode()
         monit.unmonitor()
