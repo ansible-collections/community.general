@@ -172,7 +172,7 @@ class Monit(object):
         if ' - ' not in status_val:
             status_val = status_val.replace(' ', '_')
             try:
-                raise Exception(f'II1 {status_val=} {dir(Status)=}')
+                # raise Exception(f'II1 {status_val=} {dir(Status)=}')
                 return getattr(Status, status_val)
             except AttributeError:
                 self.module.warn("Unknown monit status '%s', treating as execution failed" % status_val)
@@ -205,6 +205,7 @@ class Monit(object):
 
     def wait_for_status_change(self, current_status):
         running_status = self.get_status()
+        raise Exception('JJ')
         if running_status.value != current_status.value or current_status.value == StatusValue.EXECUTION_FAILED:
             return running_status
 
