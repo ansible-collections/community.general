@@ -13,7 +13,7 @@
     name: httpd_echo
     state: "{{ state }}"
   register: result
-  failed_when: result.rc is not in [0, -15]
+  failed_when: result.rc | default(0) is not in [0, -15]
 
 - name: check that state changed
   assert:
