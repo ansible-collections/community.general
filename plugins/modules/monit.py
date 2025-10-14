@@ -265,7 +265,9 @@ class Monit(object):
         self.exit_fail('%s process not %s' % (self.process_name, state), status)
 
     def stop(self):
+        raise Exception('INSIDE-BEFORE: Failed to stop process')
         self.change_state('stopped', Status.NOT_MONITORED)
+        raise Exception('INSIDE-AFTER: Failed to stop process')
 
     def unmonitor(self):
         self.change_state('unmonitored', Status.NOT_MONITORED)
@@ -323,7 +325,7 @@ def main():
     if running and state == 'stopped':
         exit_if_check_mode()
         monit.stop()
-        raise Exception('Failed to stop process')
+        raise Exception('OUTSIDE-AFTER: Failed to stop process')
 
     if running and state == 'unmonitored':
         exit_if_check_mode()
