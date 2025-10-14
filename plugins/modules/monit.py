@@ -262,6 +262,7 @@ class Monit(object):
             status_match = not status_match
         if status_match:
             self.exit_success(state=state)
+        raise Exception('AA')
         self.exit_fail('%s process not %s' % (self.process_name, state), status)
 
     def stop(self):
