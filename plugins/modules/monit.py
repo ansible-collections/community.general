@@ -153,6 +153,7 @@ class Monit(object):
         check_rc = False if validate else True  # 'validate' always has rc = 1
         command = [self.monit_bin_path, monit_command] + self.command_args + [self.process_name]
         rc, out, err = self.module.run_command(command, check_rc=check_rc)
+        raise Exception('HH')
         return self._parse_status(out, err)
 
     def _parse_status(self, output, err):
