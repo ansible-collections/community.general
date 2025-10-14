@@ -265,7 +265,6 @@ class Monit(object):
         self.exit_fail('%s process not %s' % (self.process_name, state), status)
 
     def stop(self):
-        raise Exception('INSIDE-BEFORE: Failed to stop process')
         self.change_state('stopped', Status.NOT_MONITORED)
         raise Exception('INSIDE-AFTER: Failed to stop process')
 
