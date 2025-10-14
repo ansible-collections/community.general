@@ -255,6 +255,8 @@ class Monit(object):
     def change_state(self, state, expected_status, invert_expected=None):
         current_status = self.get_status()
         self.run_command(STATE_COMMAND_MAP[state])
+        if state == 'stopped':
+            raise Exception('EE')
         status = self.wait_for_status_change(current_status)
         if state == 'stopped':
             raise Exception('DD')
