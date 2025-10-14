@@ -258,11 +258,16 @@ class Monit(object):
         status = self.wait_for_status_change(current_status)
         status = self.wait_for_monit_to_stop_pending(status)
         status_match = status.value == expected_status.value
+        if state == 'stopped':
+            raise Exception('CC')
         if invert_expected:
             status_match = not status_match
+        if state == 'stopped':
+            raise Exception('BB')
         if status_match:
             self.exit_success(state=state)
-        raise Exception('AA')
+        if state == 'stopped':
+            raise Exception('AA')
         self.exit_fail('%s process not %s' % (self.process_name, state), status)
 
     def stop(self):
