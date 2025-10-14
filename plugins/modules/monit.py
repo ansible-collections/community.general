@@ -213,6 +213,7 @@ class Monit(object):
             time.sleep(0.5)
             validate = loop_count % 2 == 0  # force recheck of status every second try
             running_status = self.get_status(validate)
+        raise Exception('FF')
         return running_status
 
     def wait_for_monit_to_stop_pending(self, current_status=None):
