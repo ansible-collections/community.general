@@ -172,6 +172,7 @@ class Monit(object):
         if ' - ' not in status_val:
             status_val = status_val.replace(' ', '_')
             try:
+                raise Exception(f'II1A {getattr(Status, status_val)=}')
                 # raise Exception(f'II1 {status_val=} {dir(Status)=}')
                 return getattr(Status, status_val)
             except AttributeError:
