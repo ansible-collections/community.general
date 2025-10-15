@@ -1,64 +1,14 @@
-plugins/module_utils/csv.py pylint:ansible-bad-import-from
-plugins/module_utils/gitlab.py pylint:ansible-bad-import-from
-plugins/module_utils/homebrew.py pylint:ansible-bad-import-from
-plugins/module_utils/ipa.py pylint:ansible-bad-import-from
-plugins/module_utils/net_tools/pritunl/api.py pylint:ansible-bad-import-from
-plugins/module_utils/opennebula.py pylint:ansible-bad-import-from
-plugins/module_utils/oracle/oci_utils.py pylint:ansible-bad-import-from
-plugins/module_utils/pkg_req.py pylint:ansible-bad-import-from
-plugins/module_utils/redfish_utils.py pylint:ansible-bad-import-from
-plugins/module_utils/saslprep.py pylint:ansible-bad-import-from
 plugins/module_utils/univention_umc.py pylint:use-yield-from  # suggested construct does not work with Python 2
-plugins/modules/apache2_mod_proxy.py pylint:ansible-bad-import-from
-plugins/modules/circonus_annotation.py pylint:ansible-bad-import-from
-plugins/modules/cobbler_system.py pylint:ansible-bad-import-from
 plugins/modules/consul_session.py validate-modules:parameter-state-invalid-choice
-plugins/modules/dnsmadeeasy.py pylint:ansible-bad-import-from
-plugins/modules/homebrew.py pylint:ansible-bad-import-from
-plugins/modules/homebrew_cask.py pylint:ansible-bad-import-from
 plugins/modules/homectl.py import-3.11  # Uses deprecated stdlib library 'crypt'
 plugins/modules/homectl.py import-3.12  # Uses deprecated stdlib library 'crypt'
 plugins/modules/iptables_state.py validate-modules:undocumented-parameter             # params _back and _timeout used by action plugin
-plugins/modules/java_keystore.py pylint:ansible-bad-import-from
-plugins/modules/jenkins_plugin.py pylint:ansible-bad-import-from
-plugins/modules/ldap_search.py pylint:ansible-bad-import-from
 plugins/modules/lxc_container.py validate-modules:use-run-command-not-popen
-plugins/modules/mail.py pylint:ansible-bad-import-from
-plugins/modules/make.py pylint:ansible-bad-import-from
-plugins/modules/monit.py pylint:ansible-bad-import-from
-plugins/modules/osx_defaults.py pylint:ansible-bad-import-from
 plugins/modules/osx_defaults.py validate-modules:parameter-state-invalid-choice
 plugins/modules/parted.py validate-modules:parameter-state-invalid-choice
 plugins/modules/rhevm.py validate-modules:parameter-state-invalid-choice
-plugins/modules/sl_vm.py pylint:ansible-bad-import-from
-plugins/modules/ssh_config.py pylint:ansible-bad-import-from
-plugins/modules/terraform.py pylint:ansible-bad-import-from
-plugins/modules/timezone.py pylint:ansible-bad-import-from
 plugins/modules/udm_user.py import-3.11  # Uses deprecated stdlib library 'crypt'
 plugins/modules/udm_user.py import-3.12  # Uses deprecated stdlib library 'crypt'
 plugins/modules/xfconf.py validate-modules:return-syntax-error
-plugins/modules/xml.py pylint:ansible-bad-import-from
-plugins/modules/zpool_facts.py pylint:ansible-bad-import-from
-plugins/modules/zypper_repository.py pylint:ansible-bad-import-from
-tests/unit/plugins/module_utils/identity/keycloak/test_keycloak_connect.py pylint:ansible-bad-import-from
-tests/unit/plugins/module_utils/net_tools/pritunl/test_api.py pylint:ansible-bad-import-from
-tests/unit/plugins/modules/conftest.py pylint:ansible-bad-import-from
 tests/unit/plugins/modules/uthelper.py pylint:use-yield-from  # suggested construct does not work with Python 2
 tests/unit/plugins/modules/test_gio_mime.yaml no-smart-quotes
-tests/unit/plugins/modules/test_keycloak_authentication.py pylint:ansible-bad-import-from
-tests/unit/plugins/modules/test_keycloak_authentication_required_actions.py pylint:ansible-bad-import-from
-tests/unit/plugins/modules/test_keycloak_client.py pylint:ansible-bad-import-from
-tests/unit/plugins/modules/test_keycloak_client_rolemapping.py pylint:ansible-bad-import-from
-tests/unit/plugins/modules/test_keycloak_clientscope.py pylint:ansible-bad-import-from
-tests/unit/plugins/modules/test_keycloak_component.py pylint:ansible-bad-import-from
-tests/unit/plugins/modules/test_keycloak_identity_provider.py pylint:ansible-bad-import-from
-tests/unit/plugins/modules/test_keycloak_realm.py pylint:ansible-bad-import-from
-tests/unit/plugins/modules/test_keycloak_realm_info.py pylint:ansible-bad-import-from
-tests/unit/plugins/modules/test_keycloak_realm_keys.py pylint:ansible-bad-import-from
-tests/unit/plugins/modules/test_keycloak_realm_keys_metadata_info.py pylint:ansible-bad-import-from
-tests/unit/plugins/modules/test_keycloak_role.py pylint:ansible-bad-import-from
-tests/unit/plugins/modules/test_keycloak_user.py pylint:ansible-bad-import-from
-tests/unit/plugins/modules/test_keycloak_user_federation.py pylint:ansible-bad-import-from
-tests/unit/plugins/modules/test_keycloak_userprofile.py pylint:ansible-bad-import-from
-tests/unit/plugins/modules/test_pritunl_org.py pylint:ansible-bad-import-from
-tests/unit/plugins/modules/test_pritunl_user.py pylint:ansible-bad-import-from
