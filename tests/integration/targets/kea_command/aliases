@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Copyright © Thorsten Glaser <tglaser@b1-systems.de>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+# needs to be run in a debian:trixie container
+unsupported
+
+# sets up networks and services
+needs/root
+needs/privileged
+destructive
+
+# run this with:
+# ansible-test integration --docker quay.io/ansible-community/test-image:debian-13-trixie --python 3.13 --docker-privileged -v unsupported/kea_command
