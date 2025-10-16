@@ -224,6 +224,8 @@ files:
     maintainers: felixfontein
   $filters/to_years.yml:
     maintainers: resmo
+  $filters/time_delta.yml:
+    maintainers: Akasurde
   $filters/unicode_normalize.py:
     maintainers: Ajpantuso
   $filters/version_sort.py:
