@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - github_repo_permission - new module to manage team or user permissions on a GitHub repository (organization members and collaborators).
