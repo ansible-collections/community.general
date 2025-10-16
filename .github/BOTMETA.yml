@@ -1355,6 +1355,8 @@ files:
     maintainers: precurse
   $modules/taiga_issue.py:
     maintainers: lekum
+  $modules/tanzu_mission_control_secret.py:
+    maintainers: massix
   $modules/telegram.py:
     maintainers: tyouxa loms lomserman
   $modules/terraform.py:
