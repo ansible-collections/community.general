@@ -929,7 +929,7 @@ def main():
         required_if=[
             ('state', 'present', ['record', 'type', 'value']),
             ('state', 'absent', ['record']),
-            ('type', 'SRV', ['proto', 'service', 'value']),
+            ('type', 'SRV', ['proto', 'service']),
             ('type', 'TLSA', ['proto', 'port']),
             ('type', 'CAA', ['flag', 'tag', 'value']),
         ],
@@ -942,8 +942,11 @@ def main():
     )
 
     if module.params['type'] == 'SRV':
-        if not module.params['value'] == '':
-            module.fail_json(msg="For SRV records the params weight, port and value all need to be defined.")
+        if not ((module.params['weight'] is not None and module.params['port'] is not None
+                 and not (module.params['value'] is None or module.params['value'] == ''))
+                or (module.params['weight'] is None and module.params['port'] is None
+                    and (module.params['value'] is None or module.params['value'] == ''))):
+            module.fail_json(msg="For SRV records the params weight, port and value all need to be defined, or not at all.")
 
     if module.params['type'] == 'SSHFP':
         if not ((module.params['algorithm'] is not None and module.params['hash_type'] is not None
