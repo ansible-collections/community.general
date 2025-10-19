@@ -195,7 +195,7 @@ def update_package_db(module, exit):
 def query_toplevel(module, name, world):
     # world contains a list of top-level packages separated by ' ' or \n
     # packages may contain repository (@) or version (=<>~) separator characters or start with negation !
-    regex = re.compile(r'^' + re.escape(name) + r'([@=<>~].+)?$')
+    regex = re.compile(rf"^{re.escape(name)}([@=<>~].+)?$")
     with open(world) as f:
         content = f.read().split()
         for p in content:
@@ -216,7 +216,7 @@ def query_package(module, name):
 def query_latest(module, name):
     cmd = APK_PATH + ["version", name]
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
-    search_pattern = r"(%s)-[\d\.\w]+-[\d\w]+\s+(.)\s+[\d\.\w]+-[\d\w]+\s+" % (re.escape(name))
+    search_pattern = rf"({re.escape(name)})-[\d\.\w]+-[\d\w]+\s+(.)\s+[\d\.\w]+-[\d\w]+\s+"
     match = re.search(search_pattern, stdout)
     if match and match.group(2) == "<":
         return False
@@ -226,7 +226,7 @@ def query_latest(module, name):
 def query_virtual(module, name):
     cmd = APK_PATH + ["-v", "info", "--description", name]
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
-    search_pattern = r"^%s: virtual meta package" % (re.escape(name))
+    search_pattern = rf"^{re.escape(name)}: virtual meta package"
     if re.search(search_pattern, stdout):
         return True
     return False
@@ -293,8 +293,8 @@ def install_packages(module, names, state, world):
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
     packagelist = parse_for_packages(stdout)
     if rc != 0:
-        module.fail_json(msg="failed to install %s" % (packages), stdout=stdout, stderr=stderr, packages=packagelist)
-    module.exit_json(changed=True, msg="installed %s package(s)" % (packages), stdout=stdout, stderr=stderr, packages=packagelist)
+        module.fail_json(msg=f"failed to install {packages}", stdout=stdout, stderr=stderr, packages=packagelist)
+    module.exit_json(changed=True, msg=f"installed {packages} package(s)", stdout=stdout, stderr=stderr, packages=packagelist)
 
 
 def remove_packages(module, names):
@@ -317,8 +317,8 @@ def remove_packages(module, names):
             rc = 1
             break
     if rc != 0:
-        module.fail_json(msg="failed to remove %s package(s)" % (names), stdout=stdout, stderr=stderr, packages=packagelist)
-    module.exit_json(changed=True, msg="removed %s package(s)" % (names), stdout=stdout, stderr=stderr, packages=packagelist)
+        module.fail_json(msg=f"failed to remove {names} package(s)", stdout=stdout, stderr=stderr, packages=packagelist)
+    module.exit_json(changed=True, msg=f"removed {names} package(s)", stdout=stdout, stderr=stderr, packages=packagelist)
 
 # ==========================================
 # Main control flow.

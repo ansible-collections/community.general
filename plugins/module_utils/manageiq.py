@@ -151,7 +151,7 @@ class ManageIQ(object):
         if resource:
             return resource
         else:
-            msg = f"{collection_name} where {params!s} does not exist in manageiq"
+            msg = f"{collection_name} where {params} does not exist in manageiq"
             self.module.fail_json(msg=msg)
 
     def policies(self, resource_id, resource_type, resource_name):

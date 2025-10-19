@@ -169,7 +169,7 @@ class AndroidSdk(StateModuleHelper):
         if not self.check_mode:
             rc, stdout, stderr = self.sdkmanager.apply_packages_changes(pending_installation, self.vars.accept_licenses)
             if rc != 0:
-                self.do_raise("Could not install packages: %s" % stderr)
+                self.do_raise(f"Could not install packages: {stderr}")
 
     def state_absent(self):
         packages = self._parse_packages()
@@ -179,7 +179,7 @@ class AndroidSdk(StateModuleHelper):
         if not self.check_mode:
             rc, stdout, stderr = self.sdkmanager.apply_packages_changes(to_be_deleted)
             if rc != 0:
-                self.do_raise("Could not uninstall packages: %s" % stderr)
+                self.do_raise(f"Could not uninstall packages: {stderr}")
 
     def state_latest(self):
         packages = self._parse_packages()
@@ -192,7 +192,7 @@ class AndroidSdk(StateModuleHelper):
         if not self.check_mode:
             rc, stdout, stderr = self.sdkmanager.apply_packages_changes(to_be_installed, self.vars.accept_licenses)
             if rc != 0:
-                self.do_raise("Could not install packages: %s" % stderr)
+                self.do_raise(f"Could not install packages: {stderr}")
 
     @staticmethod
     def _map_packages_to_names(packages):

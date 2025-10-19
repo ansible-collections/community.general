@@ -217,7 +217,7 @@ def run_module():
         if has_migrations:
             module.fail_json(msg="Failed.", skip_reason=skip_reason)
     except Exception as e:
-        module.fail_json(msg="Error: {0}".format(e))
+        module.fail_json(msg=f"Error: {e}")
 
     module.exit_json(**result)
 
@@ -263,8 +263,7 @@ class Migrations:
         data = data.split("\t")
         if len(data) != 1 and len(data) != 2:
             self.module.fail_json(
-                msg="Unexpected number of values returned in info command: " +
-                str(len(data))
+                msg=f"Unexpected number of values returned in info command: {len(data)}"
             )
         # data will be in format 'command\touput'
         data = data[-1]
@@ -329,7 +328,7 @@ class Migrations:
         """returns a True or False.
         Does the namespace have migrations for the node passed?
         If no node passed, uses the local node or the first one in the list"""
-        namespace_stats = self._info_cmd_helper("namespace/" + namespace, node)
+        namespace_stats = self._info_cmd_helper(f"namespace/{namespace}", node)
         try:
             namespace_tx = \
                 int(namespace_stats[self.module.params['migrate_tx_key']])
@@ -337,13 +336,10 @@ class Migrations:
                 int(namespace_stats[self.module.params['migrate_rx_key']])
         except KeyError:
             self.module.fail_json(
-                msg="Did not find partition remaining key:" +
-                self.module.params['migrate_tx_key'] +
-                " or key:" +
-                self.module.params['migrate_rx_key'] +
-                " in 'namespace/" +
-                namespace +
-                "' output."
+                msg=(
+                    f"Did not find partition remaining key:{self.module.params['migrate_tx_key']} "
+                    f"or key:{self.module.params['migrate_rx_key']} in 'namespace/{namespace}' output."
+                )
             )
         except TypeError:
             self.module.fail_json(
@@ -433,7 +429,7 @@ class Migrations:
         cmd = "cluster-stable:"
         target_cluster_size = self.module.params['target_cluster_size']
         if target_cluster_size is not None:
-            cmd = cmd + "size=" + str(target_cluster_size) + ";"
+            cmd = f"{cmd}size={target_cluster_size};"
         for node in self._nodes:
             try:
                 cluster_key.add(self._info_cmd_helper(cmd, node))
@@ -475,8 +471,7 @@ class Migrations:
             stable, reason = self._cluster_good_state()
             if stable is not True:
                 skip_reason.append(
-                    "Skipping on try#" + str(try_num) +
-                    " for reason:" + reason
+                    f"Skipping on try#{try_num} for reason:{reason}"
                 )
             else:
                 if self._can_use_cluster_stable():
@@ -485,14 +480,12 @@ class Migrations:
                     else:
                         consecutive_good = 0
                         skip_reason.append(
-                            "Skipping on try#" + str(try_num) +
-                            " for reason:" + " cluster_stable"
+                            f"Skipping on try#{try_num} for reason: cluster_stable"
                         )
                 elif self._has_migs(local):
                     # print("_has_migs")
                     skip_reason.append(
-                        "Skipping on try#" + str(try_num) +
-                        " for reason:" + " migrations"
+                        f"Skipping on try#{try_num} for reason: migrations"
                     )
                     consecutive_good = 0
                 else:

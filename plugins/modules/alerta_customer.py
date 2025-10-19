@@ -109,7 +109,7 @@ class AlertaInterface(object):
         self.headers = {"Content-Type": "application/json"}
 
         if module.params.get('api_key', None):
-            self.headers["Authorization"] = "Key %s" % module.params['api_key']
+            self.headers["Authorization"] = f"Key {module.params['api_key']}"
         else:
             self.headers["Authorization"] = basic_auth_header(module.params['api_username'], module.params['api_password'])
 
@@ -118,28 +118,28 @@ class AlertaInterface(object):
 
         status_code = info["status"]
         if status_code == 401:
-            self.module.fail_json(failed=True, response=info, msg="Unauthorized to request '%s' on '%s'" % (method, url))
+            self.module.fail_json(failed=True, response=info, msg=f"Unauthorized to request '{method}' on '{url}'")
         elif status_code == 403:
-            self.module.fail_json(failed=True, response=info, msg="Permission Denied for '%s' on '%s'" % (method, url))
+            self.module.fail_json(failed=True, response=info, msg=f"Permission Denied for '{method}' on '{url}'")
         elif status_code == 404:
-            self.module.fail_json(failed=True, response=info, msg="Not found for request '%s' on '%s'" % (method, url))
+            self.module.fail_json(failed=True, response=info, msg=f"Not found for request '{method}' on '{url}'")
         elif status_code in (200, 201):
             return self.module.from_json(response.read())
-        self.module.fail_json(failed=True, response=info, msg="Alerta API error with HTTP %d for %s" % (status_code, url))
+        self.module.fail_json(failed=True, response=info, msg=f"Alerta API error with HTTP {status_code} for {url}")
 
     def get_customers(self):
-        url = "%s/api/customers" % self.alerta_url
+        url = f"{self.alerta_url}/api/customers"
         response = self.send_request(url)
         pages = response["pages"]
         if pages > 1:
             for page in range(2, pages + 1):
-                page_url = url + '?page=' + str(page)
+                page_url = f"{url}?page={page}"
                 new_results = self.send_request(page_url)
                 response.update(new_results)
         return response
 
     def create_customer(self):
-        url = "%s/api/customer" % self.alerta_url
+        url = f"{self.alerta_url}/api/customer"
 
         payload = {
             'customer': self.customer,
@@ -151,7 +151,7 @@ class AlertaInterface(object):
         return response
 
     def delete_customer(self, id):
-        url = "%s/api/customer/%s" % (self.alerta_url, id)
+        url = f"{self.alerta_url}/api/customer/{id}"
 
         response = self.send_request(url, None, 'DELETE')
         return response
@@ -184,20 +184,20 @@ def main():
     if alerta_iface.state == 'present':
         response = alerta_iface.get_customers()
         if alerta_iface.find_customer_id(response):
-            module.exit_json(changed=False, response=response, msg="Customer %s already exists" % alerta_iface.customer)
+            module.exit_json(changed=False, response=response, msg=f"Customer {alerta_iface.customer} already exists")
         else:
             if not module.check_mode:
                 response = alerta_iface.create_customer()
-            module.exit_json(changed=True, response=response, msg="Customer %s created" % alerta_iface.customer)
+            module.exit_json(changed=True, response=response, msg=f"Customer {alerta_iface.customer} created")
     else:
         response = alerta_iface.get_customers()
         id = alerta_iface.find_customer_id(response)
         if id:
             if not module.check_mode:
                 alerta_iface.delete_customer(id)
-            module.exit_json(changed=True, response=response, msg="Customer %s with id %s deleted" % (alerta_iface.customer, id))
+            module.exit_json(changed=True, response=response, msg=f"Customer {alerta_iface.customer} with id {id} deleted")
         else:
-            module.exit_json(changed=False, response=response, msg="Customer %s does not exists" % alerta_iface.customer)
+            module.exit_json(changed=False, response=response, msg=f"Customer {alerta_iface.customer} does not exists")
 
 
 if __name__ == "__main__":

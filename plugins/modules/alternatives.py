@@ -222,7 +222,7 @@ class AlternativesModule(object):
 
     def install(self):
         if not os.path.exists(self.path):
-            self.module.fail_json(msg="Specified path %s does not exist" % self.path)
+            self.module.fail_json(msg=f"Specified path {self.path} does not exist")
         if not self.link:
             self.module.fail_json(msg='Needed to install the alternative, but unable to do so as we are missing the link')
 
@@ -235,7 +235,7 @@ class AlternativesModule(object):
             cmd += [item for sublist in subcommands for item in sublist]
 
         self.result['changed'] = True
-        self.messages.append("Install alternative '%s' for '%s'." % (self.path, self.name))
+        self.messages.append(f"Install alternative '{self.path}' for '{self.name}'.")
 
         if not self.module.check_mode:
             self.module.run_command(cmd, check_rc=True)
@@ -256,7 +256,7 @@ class AlternativesModule(object):
     def remove(self):
         cmd = [self.UPDATE_ALTERNATIVES, '--remove', self.name, self.path]
         self.result['changed'] = True
-        self.messages.append("Remove alternative '%s' from '%s'." % (self.path, self.name))
+        self.messages.append(f"Remove alternative '{self.path}' from '{self.name}'.")
 
         if not self.module.check_mode:
             self.module.run_command(cmd, check_rc=True)
@@ -273,7 +273,7 @@ class AlternativesModule(object):
 
         cmd = [self.UPDATE_ALTERNATIVES, '--set', self.name, arg]
         self.result['changed'] = True
-        self.messages.append("Set alternative '%s' for '%s'." % (arg, self.name))
+        self.messages.append(f"Set alternative '{arg}' for '{self.name}'.")
 
         if not self.module.check_mode:
             self.module.run_command(cmd, check_rc=True)
@@ -283,7 +283,7 @@ class AlternativesModule(object):
 
     def auto(self):
         cmd = [self.UPDATE_ALTERNATIVES, '--auto', self.name]
-        self.messages.append("Set alternative to auto for '%s'." % (self.name))
+        self.messages.append(f"Set alternative to auto for '{self.name}'.")
         self.result['changed'] = True
 
         if not self.module.check_mode:
@@ -340,7 +340,7 @@ class AlternativesModule(object):
         )
 
         if rc != 0:
-            self.module.debug("No current alternative found. '%s' exited with %s" % (self.UPDATE_ALTERNATIVES, rc))
+            self.module.debug(f"No current alternative found. '{self.UPDATE_ALTERNATIVES}' exited with {rc}")
             return
 
         current_mode_regex = re.compile(r'\s-\s(?:status\sis\s)?(\w*)(?:\smode|.)$', re.MULTILINE)

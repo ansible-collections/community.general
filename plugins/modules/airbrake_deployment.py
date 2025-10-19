@@ -146,7 +146,7 @@ def main():
         params["version"] = module.params["version"]
 
     # Build deploy url
-    url = module.params.get('url') + module.params["project_id"] + '/deploys?key=' + module.params["project_key"]
+    url = f"{module.params.get('url')}{module.params['project_id']}/deploys?key={module.params['project_key']}"
     json_body = module.jsonify(params)
 
     # Build header
@@ -159,7 +159,7 @@ def main():
     if info['status'] == 200 or info['status'] == 201:
         module.exit_json(changed=True)
     else:
-        module.fail_json(msg="HTTP result code: %d connecting to %s" % (info['status'], url))
+        module.fail_json(msg=f"HTTP result code: {info['status']} connecting to {url}")
 
 
 if __name__ == '__main__':

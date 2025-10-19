@@ -142,7 +142,7 @@ def _module_is_enabled(module):
     result, stdout, stderr = module.run_command([control_binary, "-M"])
 
     if result != 0:
-        error_msg = "Error executing %s: %s" % (control_binary, stderr)
+        error_msg = f"Error executing {control_binary}: {stderr}"
         if module.params['ignore_configcheck']:
             if 'AH00534' in stderr and 'mpm_' in module.params['name']:
                 if module.params['warn_mpm_absent']:
@@ -156,7 +156,7 @@ def _module_is_enabled(module):
         else:
             module.fail_json(msg=error_msg)
 
-    searchstring = ' ' + module.params['identifier']
+    searchstring = f" {module.params['identifier']}"
     return searchstring in stdout
 
 
@@ -188,11 +188,11 @@ def create_apache_identifier(name):
         if search in name:
             try:
                 rematch = reexpr.search(name)
-                return rematch.group(1) + '_module'
+                return f"{rematch.group(1)}_module"
             except AttributeError:
                 pass
 
-    return name + '_module'
+    return f"{name}_module"
 
 
 def _set_state(module, state):
@@ -202,7 +202,7 @@ def _set_state(module, state):
     want_enabled = state == 'present'
     state_string = {'present': 'enabled', 'absent': 'disabled'}[state]
     a2mod_binary = {'present': 'a2enmod', 'absent': 'a2dismod'}[state]
-    success_msg = "Module %s %s" % (name, state_string)
+    success_msg = f"Module {name} {state_string}"
 
     if _module_is_enabled(module) != want_enabled:
         if module.check_mode:
@@ -210,7 +210,7 @@ def _set_state(module, state):
 
         a2mod_binary_path = module.get_bin_path(a2mod_binary)
         if a2mod_binary_path is None:
-            module.fail_json(msg="%s not found. Perhaps this system does not use %s to manage apache" % (a2mod_binary, a2mod_binary))
+            module.fail_json(msg=f"{a2mod_binary} not found. Perhaps this system does not use {a2mod_binary} to manage apache")
 
         a2mod_binary_cmd = [a2mod_binary_path]
 
@@ -224,15 +224,10 @@ def _set_state(module, state):
             module.exit_json(changed=True, result=success_msg)
         else:
             msg = (
-                'Failed to set module {name} to {state}:\n'
-                '{stdout}\n'
-                'Maybe the module identifier ({identifier}) was guessed incorrectly.'
+                f'Failed to set module {name} to {state_string}:\n'
+                f'{stdout}\n'
+                f'Maybe the module identifier ({module.params["identifier"]}) was guessed incorrectly.'
                 'Consider setting the "identifier" option.'
-            ).format(
-                name=name,
-                state=state_string,
-                stdout=stdout,
-                identifier=module.params['identifier']
             )
             module.fail_json(msg=msg,
                              rc=result,

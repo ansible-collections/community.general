@@ -674,7 +674,7 @@ def run_instance(module, ecs, exact_count):
     if len(security_groups) <= 0:
         module.fail_json(msg='Expected the parameter security_groups is non-empty when create new ECS instances, aborting')
 
-    client_token = "Ansible-Alicloud-{0}-{1}".format(hash(str(module.params)), str(time.time()))
+    client_token = f"Ansible-Alicloud-{hash(str(module.params))}-{time.time()}"
 
     try:
         # call to create_instance method from footmark
@@ -691,7 +691,7 @@ def run_instance(module, ecs, exact_count):
                                       spot_price_limit=spot_price_limit, spot_strategy=spot_strategy, unique_suffix=unique_suffix)
 
     except Exception as e:
-        module.fail_json(msg='Unable to create instance, error: {0}'.format(e))
+        module.fail_json(msg=f'Unable to create instance, error: {e}')
 
     return instances
 
@@ -730,7 +730,7 @@ def modify_instance(module, instance):
     try:
         return instance.modify(name=name, description=description, host_name=host_name, password=password, user_data=user_data)
     except Exception as e:
-        module.fail_json(msg="Modify instance {0} attribute got an error: {1}".format(instance.id, e))
+        module.fail_json(msg=f"Modify instance {instance.id} attribute got an error: {e}")
 
 
 def wait_for_instance_modify_charge(ecs, instance_ids, charge_type, delay=10, timeout=300):
@@ -749,7 +749,7 @@ def wait_for_instance_modify_charge(ecs, instance_ids, charge_type, delay=10, ti
             timeout -= delay
             time.sleep(delay)
             if timeout <= 0:
-                raise Exception("Timeout Error: Waiting for instance to {0}. ".format(charge_type))
+                raise Exception(f"Timeout Error: Waiting for instance to {charge_type}. ")
     except Exception as e:
         raise e
 
@@ -824,8 +824,7 @@ def main():
             module.fail_json(msg='The parameter instance_ids should be a list, aborting')
         instances = ecs.describe_instances(zone_id=zone_id, instance_ids=instance_ids)
         if not instances:
-            module.fail_json(msg="There are no instances in our record based on instance_ids {0}. "
-                                 "Please check it and try again.".format(instance_ids))
+            module.fail_json(msg=f"There are no instances in our record based on instance_ids {instance_ids}. Please check it and try again.")
     elif count_tag:
         instances = ecs.describe_instances(zone_id=zone_id, tags=eval(count_tag))
     elif instance_name:
@@ -848,7 +847,7 @@ def main():
 
             module.exit_json(changed=changed, ids=ids, instances=[])
         except Exception as e:
-            module.fail_json(msg='Delete instance got an error: {0}'.format(e))
+            module.fail_json(msg=f'Delete instance got an error: {e}')
 
     if module.params['allocate_public_ip'] and max_bandwidth_out < 0:
         module.fail_json(msg="'max_bandwidth_out' should be greater than 0 when 'allocate_public_ip' is True.")
@@ -861,13 +860,13 @@ def main():
                 for i in range(0, len(instances) - count):
                     inst = instances[len(instances) - 1]
                     if inst.status != 'stopped' and not force:
-                        module.fail_json(msg="That to delete instance {0} is failed results from it is running, "
-                                             "and please stop it or set 'force' as True.".format(inst.id))
+                        module.fail_json(msg=f"That to delete instance {inst.id} is failed results from it is running, "
+                                             "and please stop it or set 'force' as True.")
                     try:
                         if inst.terminate(force=force):
                             changed = True
                     except Exception as e:
-                        module.fail_json(msg="Delete instance {0} got an error: {1}".format(inst.id, e))
+                        module.fail_json(msg=f"Delete instance {inst.id} got an error: {e}")
                     instances.pop(len(instances) - 1)
             else:
                 try:
@@ -879,7 +878,7 @@ def main():
                         changed = True
                         instances.extend(new_instances)
                 except Exception as e:
-                    module.fail_json(msg="Create new instances got an error: {0}".format(e))
+                    module.fail_json(msg=f"Create new instances got an error: {e}")
 
         # Security Group join/leave begin
         security_groups = module.params['security_groups']
@@ -951,7 +950,7 @@ def main():
                     changed = True
                     ids.extend(targets)
             except Exception as e:
-                module.fail_json(msg='Start instances got an error: {0}'.format(e))
+                module.fail_json(msg=f'Start instances got an error: {e}')
         elif state == 'stopped':
             try:
                 targets = []
@@ -965,7 +964,7 @@ def main():
                     if modify_instance(module, inst):
                         changed = True
             except Exception as e:
-                module.fail_json(msg='Stop instances got an error: {0}'.format(e))
+                module.fail_json(msg=f'Stop instances got an error: {e}')
         elif state == 'restarted':
             try:
                 targets = []
@@ -977,7 +976,7 @@ def main():
                     changed = True
                     ids.extend(targets)
             except Exception as e:
-                module.fail_json(msg='Reboot instances got an error: {0}'.format(e))
+                module.fail_json(msg=f'Reboot instances got an error: {e}')
 
     tags = module.params['tags']
     if module.params['purge_tags']:
@@ -988,7 +987,7 @@ def main():
                 if inst.remove_tags(tags):
                     changed = True
             except Exception as e:
-                module.fail_json(msg="{0}".format(e))
+                module.fail_json(msg=f"{e}")
         module.exit_json(changed=changed, instances=get_instances_info(ecs, ids))
 
     if tags:
@@ -997,7 +996,7 @@ def main():
                 if inst.add_tags(tags):
                     changed = True
             except Exception as e:
-                module.fail_json(msg="{0}".format(e))
+                module.fail_json(msg=f"{e}")
     module.exit_json(changed=changed, instances=get_instances_info(ecs, ids))
 
 

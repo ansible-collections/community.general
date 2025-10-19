@@ -182,8 +182,7 @@ def main():
     if module.params['state'] == 'present':
 
         # create new entry string
-        new_entry = module.params['name'] + ":" + module.params['runlevel'] + \
-            ":" + module.params['action'] + ":" + module.params['command']
+        new_entry = f"{module.params['name']}:{module.params['runlevel']}:{module.params['action']}:{module.params['command']}"
 
         # If current entry exists or fields are different(if the entry does not
         # exists, then the entry will be created
@@ -199,7 +198,7 @@ def main():
                 if rc != 0:
                     module.fail_json(
                         msg="could not change inittab", rc=rc, err=err)
-                result['msg'] = "changed inittab entry" + " " + current_entry['name']
+                result['msg'] = f"changed inittab entry {current_entry['name']}"
                 result['changed'] = True
 
             # If the entry does not exist create the entry
@@ -215,7 +214,7 @@ def main():
 
                 if rc != 0:
                     module.fail_json(msg="could not adjust inittab", rc=rc, err=err)
-                result['msg'] = "add inittab entry" + " " + module.params['name']
+                result['msg'] = f"add inittab entry {module.params['name']}"
                 result['changed'] = True
 
     elif module.params['state'] == 'absent':
@@ -227,7 +226,7 @@ def main():
                 if rc != 0:
                     module.fail_json(
                         msg="could not remove entry from inittab)", rc=rc, err=err)
-            result['msg'] = "removed inittab entry" + " " + current_entry['name']
+            result['msg'] = f"removed inittab entry {current_entry['name']}"
             result['changed'] = True
 
     module.exit_json(**result)

@@ -305,7 +305,7 @@ class Archive(object, metaclass=abc.ABCMeta):
             if self.contains(_to_native(archive_name)):
                 self.successes.append(path)
         except Exception as e:
-            self.errors.append('%s: %s' % (_to_native_ascii(path), _to_native(e)))
+            self.errors.append(f'{_to_native_ascii(path)}: {e}')
 
     def add_single_target(self, path):
         if self.format in ('zip', 'tar'):
@@ -325,7 +325,7 @@ class Archive(object, metaclass=abc.ABCMeta):
                 self.module.fail_json(
                     path=_to_native(path),
                     dest=_to_native(self.destination),
-                    msg='Unable to write to compressed file: %s' % _to_native(e), exception=format_exc()
+                    msg=f'Unable to write to compressed file: {e}', exception=format_exc()
                 )
 
     def add_targets(self):
@@ -347,18 +347,16 @@ class Archive(object, metaclass=abc.ABCMeta):
             if self.format in ('zip', 'tar'):
                 archive_format = self.format
             else:
-                archive_format = 'tar.' + self.format
+                archive_format = f"tar.{self.format}"
             self.module.fail_json(
-                msg='Error when writing %s archive at %s: %s' % (
-                    archive_format, _to_native(self.destination), _to_native(e)
-                ),
+                msg=f'Error when writing {archive_format} archive at {_to_native(self.destination)}: {e}',
                 exception=format_exc()
             )
         self.close()
 
         if self.errors:
             self.module.fail_json(
-                msg='Errors when writing archive at %s: %s' % (_to_native(self.destination), '; '.join(self.errors))
+                msg=f"Errors when writing archive at {_to_native(self.destination)}: {'; '.join(self.errors)}"
             )
 
     def is_different_from_original(self):
@@ -400,7 +398,7 @@ class Archive(object, metaclass=abc.ABCMeta):
         except OSError as e:
             self.module.fail_json(
                 path=_to_native(path),
-                msg='Unable to remove source file: %s' % _to_native(e), exception=format_exc()
+                msg=f'Unable to remove source file: {e}', exception=format_exc()
             )
 
     def remove_targets(self):
@@ -459,7 +457,7 @@ class Archive(object, metaclass=abc.ABCMeta):
         elif self.format == 'xz':
             f = lzma.LZMAFile(path, mode)
         else:
-            self.module.fail_json(msg="%s is not a valid format" % self.format)
+            self.module.fail_json(msg=f"{self.format} is not a valid format")
 
         return f
 
@@ -536,7 +534,7 @@ class TarArchive(Archive):
 
     def open(self):
         if self.format in ('gz', 'bz2'):
-            self.file = tarfile.open(_to_native_ascii(self.destination), 'w|' + self.format)
+            self.file = tarfile.open(_to_native_ascii(self.destination), f"w|{self.format}")
         # python3 tarfile module allows xz format but for python2 we have to create the tarfile
         # in memory and then compress it with lzma.
         elif self.format == 'xz':
@@ -545,7 +543,7 @@ class TarArchive(Archive):
         elif self.format == 'tar':
             self.file = tarfile.open(_to_native_ascii(self.destination), 'w')
         else:
-            self.module.fail_json(msg="%s is not a valid archive format" % self.format)
+            self.module.fail_json(msg=f"{self.format} is not a valid archive format")
 
     def _add(self, path, archive_name):
         def filter(tarinfo):
@@ -563,7 +561,7 @@ class TarArchive(Archive):
                     checksums = set((info.name, info.chksum) for info in archive.getmembers())
                     archive.close()
             else:
-                archive = tarfile.open(_to_native_ascii(path), 'r|' + self.format)
+                archive = tarfile.open(_to_native_ascii(path), f"r|{self.format}")
                 checksums = set((info.name, info.chksum) for info in archive.getmembers())
                 archive.close()
         except (LZMAError, tarfile.ReadError, tarfile.CompressionError):
