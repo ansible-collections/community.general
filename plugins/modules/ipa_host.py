@@ -30,7 +30,7 @@ options:
     type: str
   userclass:
     description:
-      - Host category (semantics placed on this attribute are for local interpretation)
+      - Host category (semantics placed on this attribute are for local interpretation).
     type: str
     version_added: 12.0.0
   force:
