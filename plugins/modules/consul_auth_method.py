@@ -153,12 +153,12 @@ def normalize_ttl(ttl):
     new_ttl = ""
     hours, remainder = divmod(ttl, 3600)
     if hours:
-        new_ttl += "{0}h".format(hours)
+        new_ttl += f"{hours}h"
     minutes, seconds = divmod(remainder, 60)
     if minutes:
-        new_ttl += "{0}m".format(minutes)
+        new_ttl += f"{minutes}m"
     if seconds:
-        new_ttl += "{0}s".format(seconds)
+        new_ttl += f"{seconds}s"
     return new_ttl
 
 

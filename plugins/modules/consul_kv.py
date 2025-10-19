@@ -188,7 +188,7 @@ def execute(module):
     elif state == 'absent':
         remove_value(module)
     else:
-        module.exit_json(msg="Unsupported state: %s" % (state, ))
+        module.exit_json(msg=f"Unsupported state: {state}")
 
 
 def lock(module, state):
@@ -201,8 +201,7 @@ def lock(module, state):
 
     if not session:
         module.fail(
-            msg='%s of lock for %s requested but no session supplied' %
-            (state, key))
+            msg=f'{state} of lock for {key} requested but no session supplied')
 
     index, changed = _has_value_changed(consul_api, key, value)
 
@@ -239,7 +238,7 @@ def set_value(module):
     value = module.params.get('value')
 
     if value is NOT_SET:
-        raise AssertionError('Cannot set value of "%s" to `NOT_SET`' % key)
+        raise AssertionError(f'Cannot set value of "{key}" to `NOT_SET`')
 
     index, changed = _has_value_changed(consul_api, key, value)
 
@@ -320,8 +319,7 @@ def main():
     try:
         execute(module)
     except ConnectionError as e:
-        module.fail_json(msg='Could not connect to consul agent at %s:%s, error was %s' % (
-            module.params.get('host'), module.params.get('port'), e))
+        module.fail_json(msg=f"Could not connect to consul agent at {module.params.get('host')}:{module.params.get('port')}, error was {e}")
     except Exception as e:
         module.fail_json(msg=str(e))
 

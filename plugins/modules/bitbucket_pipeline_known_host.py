@@ -149,7 +149,7 @@ def get_existing_known_host(module, bitbucket):
             module.fail_json(msg='Invalid `repository` or `workspace`.')
 
         if info['status'] != 200:
-            module.fail_json(msg='Failed to retrieve list of known hosts: {0}'.format(info))
+            module.fail_json(msg=f'Failed to retrieve list of known hosts: {info}')
 
         host = next((v for v in content['values'] if v['hostname'] == module.params['name']), None)
 
@@ -179,14 +179,14 @@ def get_host_key(module, hostname):
         sock = socket.socket()
         sock.connect((hostname, 22))
     except socket.error:
-        module.fail_json(msg='Error opening socket to {0}'.format(hostname))
+        module.fail_json(msg=f'Error opening socket to {hostname}')
 
     try:
         trans = paramiko.transport.Transport(sock)
         trans.start_client()
         host_key = trans.get_remote_server_key()
     except paramiko.SSHException:
-        module.fail_json(msg='SSH error on retrieving {0} server key'.format(hostname))
+        module.fail_json(msg=f'SSH error on retrieving {hostname} server key')
 
     trans.close()
     sock.close()
@@ -227,10 +227,7 @@ def create_known_host(module, bitbucket):
         module.fail_json(msg=error_messages['invalid_params'])
 
     if info['status'] != 201:
-        module.fail_json(msg='Failed to create known host `{hostname}`: {info}'.format(
-            hostname=module.params['hostname'],
-            info=info,
-        ))
+        module.fail_json(msg=f"Failed to create known host `{module.params['hostname']}`: {info}")
 
 
 def delete_known_host(module, bitbucket, known_host_uuid):
@@ -247,10 +244,7 @@ def delete_known_host(module, bitbucket, known_host_uuid):
         module.fail_json(msg=error_messages['invalid_params'])
 
     if info['status'] != 204:
-        module.fail_json(msg='Failed to delete known host `{hostname}`: {info}'.format(
-            hostname=module.params['name'],
-            info=info,
-        ))
+        module.fail_json(msg=f"Failed to delete known host `{module.params['name']}`: {info}")
 
 
 def main():

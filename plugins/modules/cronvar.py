@@ -135,7 +135,7 @@ class CronVar(object):
                 self.cron_file = os.path.join('/etc/cron.d', cron_file)
             parent_dir = os.path.dirname(self.cron_file)
             if parent_dir and not os.path.isdir(parent_dir):
-                module.fail_json(msg="Parent directory '{}' does not exist for cron_file: '{}'".format(parent_dir, cron_file))
+                module.fail_json(msg=f"Parent directory '{parent_dir}' does not exist for cron_file: '{cron_file}'")
         else:
             self.cron_file = None
 
@@ -170,7 +170,7 @@ class CronVar(object):
                 count += 1
 
     def log_message(self, message):
-        self.module.debug('ansible: "%s"' % message)
+        self.module.debug(f'ansible: "{message}"')
 
     def write(self, backup_file=None):
         """
@@ -244,18 +244,18 @@ class CronVar(object):
     def add_variable(self, name, value, insertbefore, insertafter):
         if insertbefore is None and insertafter is None:
             # Add the variable to the top of the file.
-            self.lines.insert(0, "%s=%s" % (name, value))
+            self.lines.insert(0, f"{name}={value}")
         else:
             newlines = []
             for l in self.lines:
                 try:
                     varname, dummy = self.parse_for_var(l)  # Throws if not a var line
                     if varname == insertbefore:
-                        newlines.append("%s=%s" % (name, value))
+                        newlines.append(f"{name}={value}")
                         newlines.append(l)
                     elif varname == insertafter:
                         newlines.append(l)
-                        newlines.append("%s=%s" % (name, value))
+                        newlines.append(f"{name}={value}")
                     else:
                         raise CronVarError  # Append.
                 except CronVarError:
@@ -274,7 +274,7 @@ class CronVar(object):
                 if varname != name:
                     raise CronVarError  # Append.
                 if not remove:
-                    newlines.append("%s=%s" % (name, value))
+                    newlines.append(f"{name}={value}")
             except CronVarError:
                 newlines.append(l)
 
@@ -297,14 +297,14 @@ class CronVar(object):
 
         if self.user:
             if platform.system() == 'SunOS':
-                return "su %s -c '%s -l'" % (shlex_quote(self.user), shlex_quote(self.cron_cmd))
+                return f"su {shlex_quote(self.user)} -c '{shlex_quote(self.cron_cmd)} -l'"
             elif platform.system() == 'AIX':
-                return "%s -l %s" % (shlex_quote(self.cron_cmd), shlex_quote(self.user))
+                return f"{shlex_quote(self.cron_cmd)} -l {shlex_quote(self.user)}"
             elif platform.system() == 'HP-UX':
-                return "%s %s %s" % (self.cron_cmd, '-l', shlex_quote(self.user))
+                return f"{self.cron_cmd} -l {shlex_quote(self.user)}"
             elif pwd.getpwuid(os.getuid())[0] != self.user:
-                user = '-u %s' % shlex_quote(self.user)
-        return "%s %s %s" % (self.cron_cmd, user, '-l')
+                user = f'-u {shlex_quote(self.user)}'
+        return f"{self.cron_cmd} {user} -l"
 
     def _write_execute(self, path):
         """
@@ -313,11 +313,10 @@ class CronVar(object):
         user = ''
         if self.user:
             if platform.system() in ['SunOS', 'HP-UX', 'AIX']:
-                return "chown %s %s ; su '%s' -c '%s %s'" % (
-                    shlex_quote(self.user), shlex_quote(path), shlex_quote(self.user), self.cron_cmd, shlex_quote(path))
+                return f"chown {shlex_quote(self.user)} {shlex_quote(path)} ; su '{shlex_quote(self.user)}' -c '{self.cron_cmd} {shlex_quote(path)}'"
             elif pwd.getpwuid(os.getuid())[0] != self.user:
-                user = '-u %s' % shlex_quote(self.user)
-        return "%s %s %s" % (self.cron_cmd, user, shlex_quote(path))
+                user = f'-u {shlex_quote(self.user)}'
+        return f"{self.cron_cmd} {user} {shlex_quote(path)}"
 
 
 # ==================================================
@@ -369,7 +368,7 @@ def main():
     os.umask(int('022', 8))
     cronvar = CronVar(module, user, cron_file)
 
-    module.debug('cronvar instantiated - name: "%s"' % name)
+    module.debug(f'cronvar instantiated - name: "{name}"')
 
     # --- user input validation ---
 

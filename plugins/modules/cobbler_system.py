@@ -254,7 +254,7 @@ def main():
     except xmlrpc_client.Fault as e:
         module.fail_json(msg="Failed to log in to Cobbler '{url}' as '{username}'. {error}".format(url=url, error=to_text(e), **module.params))
     except Exception as e:
-        module.fail_json(msg="Connection to '{url}' failed. {error}".format(url=url, error=to_text(e), **module.params))
+        module.fail_json(msg=f"Connection to '{url}' failed. {e}")
 
     system = getsystem(conn, name, token)
     # result['system'] = system
@@ -282,13 +282,13 @@ def main():
 
             for key, value in module.params['properties'].items():
                 if key not in system:
-                    module.warn("Property '{0}' is not a valid system property.".format(key))
+                    module.warn(f"Property '{key}' is not a valid system property.")
                 if system[key] != value:
                     try:
                         conn.modify_system(system_id, key, value, token)
                         result['changed'] = True
                     except Exception as e:
-                        module.fail_json(msg="Unable to change '{0}' to '{1}'. {2}".format(key, value, e))
+                        module.fail_json(msg=f"Unable to change '{key}' to '{value}'. {e}")
 
         else:
             # Create a new entry
@@ -301,7 +301,7 @@ def main():
                     try:
                         conn.modify_system(system_id, key, value, token)
                     except Exception as e:
-                        module.fail_json(msg="Unable to change '{0}' to '{1}'. {2}".format(key, value, e))
+                        module.fail_json(msg=f"Unable to change '{key}' to '{value}'. {e}")
 
         # Add interface properties
         interface_properties = dict()
@@ -311,10 +311,10 @@ def main():
                     if key == 'name':
                         continue
                     if key not in IFPROPS_MAPPING:
-                        module.warn("Property '{0}' is not a valid system property.".format(key))
+                        module.warn(f"Property '{key}' is not a valid system property.")
                     if not system or system['interfaces'][device][IFPROPS_MAPPING[key]] != value:
                         result['changed'] = True
-                    interface_properties['{0}-{1}'.format(key, device)] = value
+                    interface_properties[f'{key}-{device}'] = value
 
             if result['changed'] is True:
                 conn.modify_system(system_id, "modify_interface", interface_properties, token)
@@ -334,7 +334,7 @@ def main():
         try:
             conn.sync(token)
         except Exception as e:
-            module.fail_json(msg="Failed to sync Cobbler. {0}".format(to_text(e)))
+            module.fail_json(msg=f"Failed to sync Cobbler. {e}")
 
     if state in ('absent', 'present'):
         result['system'] = getsystem(conn, name, token)

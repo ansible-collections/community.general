@@ -153,7 +153,7 @@ def get_existing_deploy_key(module, bitbucket):
             module.fail_json(msg=error_messages['required_permission'])
 
         if info['status'] != 200:
-            module.fail_json(msg='Failed to retrieve the list of deploy keys: {0}'.format(info))
+            module.fail_json(msg=f'Failed to retrieve the list of deploy keys: {info}')
 
         res = next((v for v in content['values'] if v['label'] == module.params['label']), None)
 
@@ -186,10 +186,7 @@ def create_deploy_key(module, bitbucket):
         module.fail_json(msg=error_messages['invalid_key'])
 
     if info['status'] != 200:
-        module.fail_json(msg='Failed to create deploy key `{label}`: {info}'.format(
-            label=module.params['label'],
-            info=info,
-        ))
+        module.fail_json(msg=f"Failed to create deploy key `{module.params['label']}`: {info}")
 
 
 def delete_deploy_key(module, bitbucket, key_id):
@@ -209,10 +206,7 @@ def delete_deploy_key(module, bitbucket, key_id):
         module.fail_json(msg=error_messages['required_permission'])
 
     if info['status'] != 204:
-        module.fail_json(msg='Failed to delete deploy key `{label}`: {info}'.format(
-            label=module.params['label'],
-            info=info,
-        ))
+        module.fail_json(msg=f"Failed to delete deploy key `{module.params['label']}`: {info}")
 
 
 def main():

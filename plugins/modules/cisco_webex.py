@@ -129,7 +129,7 @@ def webex_msg(module):
     ansible = module.params
 
     headers = {
-        'Authorization': 'Bearer {0}'.format(ansible['personal_token']),
+        'Authorization': f"Bearer {ansible['personal_token']}",
         'content-type': 'application/json'
     }
 

@@ -169,7 +169,7 @@ def check_requests_dep(module):
     else:
         required_version = '2.0.0'
         if LooseVersion(requests.__version__) < LooseVersion(required_version):
-            module.fail_json(msg="'requests' library version should be >= %s, found: %s." % (required_version, requests.__version__))
+            module.fail_json(msg=f"'requests' library version should be >= {required_version}, found: {requests.__version__}.")
 
 
 def post_annotation(annotation, api_key):

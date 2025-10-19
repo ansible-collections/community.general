@@ -183,7 +183,7 @@ def main():
             if v is not None:
                 body[k] = v
 
-        request_url = url + '/data/events/deployments/start'
+        request_url = f"{url}/data/events/deployments/start"
     else:
         message = module.params['deployment_message']
         if message is not None:
@@ -194,7 +194,7 @@ def main():
         else:
             body['status'] = 'failure'
 
-        request_url = url + '/data/events/deployments/end'
+        request_url = f"{url}/data/events/deployments/end"
 
     # Build the deployment object we return
     deployment = dict(token=token, url=url)
@@ -209,7 +209,7 @@ def main():
 
     # Send the data to bigpanda
     data = json.dumps(body)
-    headers = {'Authorization': 'Bearer %s' % token, 'Content-Type': 'application/json'}
+    headers = {'Authorization': f'Bearer {token}', 'Content-Type': 'application/json'}
     try:
         response, info = fetch_url(module, request_url, data=data, headers=headers)
         if info['status'] == 200:

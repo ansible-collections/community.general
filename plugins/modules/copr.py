@@ -214,9 +214,7 @@ class CoprModule(object):
             Info about a repository and status code of the get request.
         """
         repo_info = None
-        url = "{0}://{1}/coprs/{2}/repo/{3}/dnf.repo?arch={4}".format(
-            self.protocol, self.host, self.name, chroot, self.arch
-        )
+        url = f"{self.protocol}://{self.host}/coprs/{self.name}/repo/{chroot}/dnf.repo?arch={self.arch}"
         try:
             r = open_url(url)
             status_code = r.getcode()
@@ -245,7 +243,7 @@ class CoprModule(object):
                     version = "8"
                 elif version == "stream-9":
                     version = "9"
-                chroot = "epel-{0}".format(version)
+                chroot = f"epel-{version}"
                 distribution = "epel"
             else:
                 if str(status_code) != "404":
@@ -254,7 +252,7 @@ class CoprModule(object):
                     )
                 else:
                     self.raise_exception(
-                        "Chroot {0} does not exist in {1}".format(self.chroot, self.name)
+                        f"Chroot {self.chroot} does not exist in {self.name}"
                     )
 
     def _enable_repo(self, repo_filename_path, repo_content=None):
@@ -272,10 +270,10 @@ class CoprModule(object):
             repo_content = self._download_repo_info()
         if self.ansible_module.params["includepkgs"]:
             includepkgs_value = ','.join(self.ansible_module.params['includepkgs'])
-            repo_content = repo_content.rstrip('\n') + '\nincludepkgs={0}\n'.format(includepkgs_value)
+            repo_content = f"{repo_content.rstrip('\n')}\nincludepkgs={includepkgs_value}\n"
         if self.ansible_module.params["excludepkgs"]:
             excludepkgs_value = ','.join(self.ansible_module.params['excludepkgs'])
-            repo_content = repo_content.rstrip('\n') + '\nexcludepkgs={0}\n'.format(excludepkgs_value)
+            repo_content = f"{repo_content.rstrip('\n')}\nexcludepkgs={excludepkgs_value}\n"
         if self._compare_repo_content(repo_filename_path, repo_content):
             return False
         if not self.check_mode:
@@ -288,7 +286,7 @@ class CoprModule(object):
 
     def _get_repo_with_old_id(self):
         """Try to get a repository with the old name."""
-        repo_id = "{0}-{1}".format(self.user, self.project)
+        repo_id = f"{self.user}-{self.project}"
         if repo_id in self.base.repos and "_copr" in self.base.repos[repo_id].repofile:
             file_name = self.base.repos[repo_id].repofile.split("/")[-1]
             try:
@@ -325,7 +323,7 @@ class CoprModule(object):
         Returns:
             The repository that a user wants to enable, disable, or remove.
         """
-        repo_id = "copr:{0}:{1}:{2}".format(self.host, self.user, self.project)
+        repo_id = f"copr:{self.host}:{self.user}:{self.project}"
         if repo_id not in self.base.repos:
             if self._get_repo_with_old_id() is None:
                 return None
@@ -347,7 +345,7 @@ class CoprModule(object):
             if self.check_mode:
                 return True
             self._enable_repo(repo_filename_path)
-            self._read_all_repos("copr:{0}:{1}:{2}".format(self.host, self.user, self.project))
+            self._read_all_repos(f"copr:{self.host}:{self.user}:{self.project}")
             repo = self._get_copr_repo()
         for repo_id in repo.cfg.sections():
             repo_content_api = self._download_repo_info()
@@ -420,12 +418,10 @@ class CoprModule(object):
         """
         self.need_root()
         state = dict()
-        repo_filename = "_copr:{0}:{1}:{2}.repo".format(self.host, self.user, self.project)
-        state["repo"] = "{0}/{1}/{2}".format(self.host, self.user, self.project)
+        repo_filename = f"_copr:{self.host}:{self.user}:{self.project}.repo"
+        state["repo"] = f"{self.host}/{self.user}/{self.project}"
         state["repo_filename"] = repo_filename
-        repo_filename_path = "{0}/_copr:{1}:{2}:{3}.repo".format(
-            self.base.conf.get_reposdir, self.host, self.user, self.project
-        )
+        repo_filename_path = f"{self.base.conf.get_reposdir}/_copr:{self.host}:{self.user}:{self.project}.repo"
         if self.state == "enabled":
             enabled = self._enable_repo(repo_filename_path)
             state["msg"] = "enabled"
@@ -466,7 +462,7 @@ class CoprModule(object):
         """
         (distribution, version, codename) = distro.linux_distribution(full_distribution_name=False)
         base = CoprModule.get_base()
-        return "{0}-{1}-{2}".format(distribution, version, base.conf.arch)
+        return f"{distribution}-{version}-{base.conf.arch}"
 
     @staticmethod
     def _sanitize_username(user):
@@ -479,7 +475,7 @@ class CoprModule(object):
             Modified user name if it is a group name with @.
         """
         if user[0] == "@":
-            return "group_{0}".format(user[1:])
+            return f"group_{user[1:]}"
         return user
 
 

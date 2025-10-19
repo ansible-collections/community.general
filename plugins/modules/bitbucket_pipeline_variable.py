@@ -122,7 +122,7 @@ def get_existing_pipeline_variable(module, bitbucket):
     # Look through the all response pages in search of variable we need
     page = 1
     while True:
-        next_url = "%s?page=%s" % (variables_base_url, page)
+        next_url = f"{variables_base_url}?page={page}"
         info, content = bitbucket.request(
             api_url=next_url,
             method='GET',
@@ -132,7 +132,7 @@ def get_existing_pipeline_variable(module, bitbucket):
             module.fail_json(msg='Invalid `repository` or `workspace`.')
 
         if info['status'] != 200:
-            module.fail_json(msg='Failed to retrieve the list of pipeline variables: {0}'.format(info))
+            module.fail_json(msg=f'Failed to retrieve the list of pipeline variables: {info}')
 
         # We are at the end of list
         if 'pagelen' in content and content['pagelen'] == 0:
@@ -161,10 +161,7 @@ def create_pipeline_variable(module, bitbucket):
     )
 
     if info['status'] != 201:
-        module.fail_json(msg='Failed to create pipeline variable `{name}`: {info}'.format(
-            name=module.params['name'],
-            info=info,
-        ))
+        module.fail_json(msg=f"Failed to create pipeline variable `{module.params['name']}`: {info}")
 
 
 def update_pipeline_variable(module, bitbucket, variable_uuid):
@@ -182,10 +179,7 @@ def update_pipeline_variable(module, bitbucket, variable_uuid):
     )
 
     if info['status'] != 200:
-        module.fail_json(msg='Failed to update pipeline variable `{name}`: {info}'.format(
-            name=module.params['name'],
-            info=info,
-        ))
+        module.fail_json(msg=f"Failed to update pipeline variable `{module.params['name']}`: {info}")
 
 
 def delete_pipeline_variable(module, bitbucket, variable_uuid):
@@ -199,10 +193,7 @@ def delete_pipeline_variable(module, bitbucket, variable_uuid):
     )
 
     if info['status'] != 204:
-        module.fail_json(msg='Failed to delete pipeline variable `{name}`: {info}'.format(
-            name=module.params['name'],
-            info=info,
-        ))
+        module.fail_json(msg=f"Failed to delete pipeline variable `{module.params['name']}`: {info}")
 
 
 class BitBucketPipelineVariable(AnsibleModule):

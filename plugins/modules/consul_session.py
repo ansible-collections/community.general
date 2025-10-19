@@ -178,7 +178,7 @@ def lookup_sessions(module, consul_module):
                              sessions=session_by_id)
 
     except Exception as e:
-        module.fail_json(msg="Could not retrieve session info %s" % e)
+        module.fail_json(msg=f"Could not retrieve session info {e}")
 
 
 def create_session(consul_module, name, behavior, ttl, node,
@@ -191,7 +191,7 @@ def create_session(consul_module, name, behavior, ttl, node,
         "Behavior": behavior,
     }
     if ttl is not None:
-        create_data["TTL"] = "%ss" % str(ttl)  # TTL is in seconds
+        create_data["TTL"] = f"{ttl}s"  # TTL is in seconds
     create_session_response_dict = consul_module.put(
         'session/create',
         params={
@@ -229,7 +229,7 @@ def update_session(module, consul_module):
                          checks=checks,
                          node=node)
     except Exception as e:
-        module.fail_json(msg="Could not create/update session %s" % e)
+        module.fail_json(msg=f"Could not create/update session {e}")
 
 
 def destroy_session(consul_module, session_id):
@@ -245,8 +245,7 @@ def remove_session(module, consul_module):
         module.exit_json(changed=True,
                          session_id=session_id)
     except Exception as e:
-        module.fail_json(msg="Could not remove session with id '%s' %s" % (
-                         session_id, e))
+        module.fail_json(msg=f"Could not remove session with id '{session_id}' {e}")
 
 
 def main():

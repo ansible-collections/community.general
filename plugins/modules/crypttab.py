@@ -85,7 +85,7 @@ import os
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_bytes, to_native
+from ansible.module_utils.common.text.converters import to_bytes
 
 
 def main():
@@ -115,7 +115,7 @@ def main():
                          **module.params)
 
     if 'opts' in state and (backing_device is not None or password is not None):
-        module.fail_json(msg="cannot update 'backing_device' or 'password' when state=%s" % state,
+        module.fail_json(msg=f"cannot update 'backing_device' or 'password' when state={state}",
                          **module.params)
 
     for arg_name, arg in (('name', name),
@@ -123,15 +123,14 @@ def main():
                           ('password', password),
                           ('opts', opts)):
         if arg is not None and (' ' in arg or '\t' in arg or arg == ''):
-            module.fail_json(msg="invalid '%s': contains white space or is empty" % arg_name,
+            module.fail_json(msg=f"invalid '{arg_name}': contains white space or is empty",
                              **module.params)
 
     try:
         crypttab = Crypttab(path)
         existing_line = crypttab.match(name)
     except Exception as e:
-        module.fail_json(msg="failed to open and parse crypttab file: %s" % to_native(e),
-                         exception=traceback.format_exc(), **module.params)
+        module.fail_json(msg=f"failed to open and parse crypttab file: {e}", exception=traceback.format_exc(), **module.params)
 
     if 'present' in state and existing_line is None and backing_device is None:
         module.fail_json(msg="'backing_device' required to add a new entry",
@@ -349,7 +348,7 @@ class Options(dict):
             if v is None:
                 ret.append(k)
             else:
-                ret.append('%s=%s' % (k, v))
+                ret.append(f'{k}={v}')
         return ','.join(ret)
 
 

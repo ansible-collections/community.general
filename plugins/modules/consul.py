@@ -232,7 +232,7 @@ try:
             if token:
                 params['token'] = token
             return self.agent.http.put(consul.base.CB.bool(),
-                                       '/v1/agent/service/deregister/%s' % service_id,
+                                       f'/v1/agent/service/deregister/{service_id}',
                                        params=params)
 
     python_consul_installed = True
@@ -501,7 +501,7 @@ class ConsulCheck(object):
         if duration:
             duration_units = ['ns', 'us', 'ms', 's', 'm', 'h']
             if not any(duration.endswith(suffix) for suffix in duration_units):
-                duration = "{0}s".format(duration)
+                duration = f"{duration}s"
         return duration
 
     def register(self, consul_api):
@@ -603,7 +603,7 @@ def main():
     except SystemExit:
         raise
     except ConnectionError as e:
-        module.fail_json(msg='Could not connect to consul agent at %s:%s, error was %s' % (p['host'], p['port'], str(e)))
+        module.fail_json(msg=f"Could not connect to consul agent at {p['host']}:{p['port']}, error was {e}")
     except Exception as e:
         module.fail_json(msg=str(e))
 

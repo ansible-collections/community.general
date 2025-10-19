@@ -498,15 +498,15 @@ class CloudflareAPI(object):
 
         if self.type == 'SRV':
             if (self.proto is not None) and (not self.proto.startswith('_')):
-                self.proto = '_{0}'.format(self.proto)
+                self.proto = f'_{self.proto}'
             if (self.service is not None) and (not self.service.startswith('_')):
-                self.service = '_{0}'.format(self.service)
+                self.service = f'_{self.service}'
 
         if self.type == 'TLSA':
             if (self.proto is not None) and (not self.proto.startswith('_')):
-                self.proto = '_{0}'.format(self.proto)
+                self.proto = f'_{self.proto}'
             if (self.port is not None):
-                self.port = '_{0}'.format(self.port)
+                self.port = f'_{self.port}'
 
         if not self.record.endswith(self.zone):
             self.record = join_str('.', self.record, self.zone)
@@ -518,7 +518,7 @@ class CloudflareAPI(object):
     def _cf_simple_api_call(self, api_call, method='GET', payload=None):
         if self.api_token:
             headers = {
-                'Authorization': 'Bearer {0}'.format(self.api_token),
+                'Authorization': f'Bearer {self.api_token}',
                 'Content-Type': 'application/json',
             }
         else:
@@ -532,7 +532,7 @@ class CloudflareAPI(object):
             try:
                 data = json.dumps(payload)
             except Exception as e:
-                self.module.fail_json(msg="Failed to encode payload as JSON: %s " % to_native(e))
+                self.module.fail_json(msg=f"Failed to encode payload as JSON: {e} ")
 
         resp, info = fetch_url(self.module,
                                self.cf_api_endpoint + api_call,
@@ -542,27 +542,27 @@ class CloudflareAPI(object):
                                timeout=self.timeout)
 
         if info['status'] not in [200, 304, 400, 401, 403, 429, 405, 415]:
-            self.module.fail_json(msg="Failed API call {0}; got unexpected HTTP code {1}: {2}".format(api_call, info['status'], info.get('msg')))
+            self.module.fail_json(msg=f"Failed API call {api_call}; got unexpected HTTP code {info['status']}: {info.get('msg')}")
 
         error_msg = ''
         if info['status'] == 401:
             # Unauthorized
-            error_msg = "API user does not have permission; Status: {0}; Method: {1}: Call: {2}".format(info['status'], method, api_call)
+            error_msg = f"API user does not have permission; Status: {info['status']}; Method: {method}: Call: {api_call}"
         elif info['status'] == 403:
             # Forbidden
-            error_msg = "API request not authenticated; Status: {0}; Method: {1}: Call: {2}".format(info['status'], method, api_call)
+            error_msg = f"API request not authenticated; Status: {info['status']}; Method: {method}: Call: {api_call}"
         elif info['status'] == 429:
             # Too many requests
-            error_msg = "API client is rate limited; Status: {0}; Method: {1}: Call: {2}".format(info['status'], method, api_call)
+            error_msg = f"API client is rate limited; Status: {info['status']}; Method: {method}: Call: {api_call}"
         elif info['status'] == 405:
             # Method not allowed
-            error_msg = "API incorrect HTTP method provided; Status: {0}; Method: {1}: Call: {2}".format(info['status'], method, api_call)
+            error_msg = f"API incorrect HTTP method provided; Status: {info['status']}; Method: {method}: Call: {api_call}"
         elif info['status'] == 415:
             # Unsupported Media Type
-            error_msg = "API request is not valid JSON; Status: {0}; Method: {1}: Call: {2}".format(info['status'], method, api_call)
+            error_msg = f"API request is not valid JSON; Status: {info['status']}; Method: {method}: Call: {api_call}"
         elif info['status'] == 400:
             # Bad Request
-            error_msg = "API bad request; Status: {0}; Method: {1}: Call: {2}".format(info['status'], method, api_call)
+            error_msg = f"API bad request; Status: {info['status']}; Method: {method}: Call: {api_call}"
 
         result = None
         try:
@@ -580,23 +580,23 @@ class CloudflareAPI(object):
             try:
                 result = json.loads(to_text(content, errors='surrogate_or_strict'))
             except (getattr(json, 'JSONDecodeError', ValueError)) as e:
-                error_msg += "; Failed to parse API response with error {0}: {1}".format(to_native(e), content)
+                error_msg += f"; Failed to parse API response with error {to_native(e)}: {content}"
 
         # Without a valid/parsed JSON response no more error processing can be done
         if result is None:
             self.module.fail_json(msg=error_msg)
 
         if 'success' not in result:
-            error_msg += "; Unexpected error details: {0}".format(result.get('error'))
+            error_msg += f"; Unexpected error details: {result.get('error')}"
             self.module.fail_json(msg=error_msg)
 
         if not result['success']:
             error_msg += "; Error details: "
             for error in result['errors']:
-                error_msg += "code: {0}, error: {1}; ".format(error['code'], error['message'])
+                error_msg += f"code: {error['code']}, error: {error['message']}; "
                 if 'error_chain' in error:
                     for chain_error in error['error_chain']:
-                        error_msg += "code: {0}, error: {1}; ".format(chain_error['code'], chain_error['message'])
+                        error_msg += f"code: {chain_error['code']}, error: {chain_error['message']}; "
             self.module.fail_json(msg=error_msg)
 
         return result, info['status']
@@ -610,7 +610,7 @@ class CloudflareAPI(object):
             pagination = result['result_info']
             if pagination['total_pages'] > 1:
                 next_page = int(pagination['page']) + 1
-                parameters = ['page={0}'.format(next_page)]
+                parameters = [f'page={next_page}']
                 # strip "page" parameter from call parameters (if there are any)
                 if '?' in api_call:
                     raw_api_call, query = api_call.split('?', 1)
@@ -618,7 +618,7 @@ class CloudflareAPI(object):
                 else:
                     raw_api_call = api_call
                 while next_page <= pagination['total_pages']:
-                    raw_api_call += '?{0}'.format('&'.join(parameters))
+                    raw_api_call += f"?{'&'.join(parameters)}"
                     result, status = self._cf_simple_api_call(raw_api_call, method, payload)
                     data += result['result']
                     next_page += 1
@@ -631,10 +631,10 @@ class CloudflareAPI(object):
 
         zones = self.get_zones(zone)
         if len(zones) > 1:
-            self.module.fail_json(msg="More than one zone matches {0}".format(zone))
+            self.module.fail_json(msg=f"More than one zone matches {zone}")
 
         if len(zones) < 1:
-            self.module.fail_json(msg="No zone found with name {0}".format(zone))
+            self.module.fail_json(msg=f"No zone found with name {zone}")
 
         return zones[0]['id']
 
@@ -643,8 +643,8 @@ class CloudflareAPI(object):
             name = self.zone
         param = ''
         if name:
-            param = '?{0}'.format(urlencode({'name': name}))
-        zones, status = self._cf_api_call('/zones{0}'.format(param))
+            param = f"?{urlencode({'name': name})}"
+        zones, status = self._cf_api_call(f'/zones{param}')
         return zones
 
     def get_dns_records(self, zone_name=None, type=None, record=None, value=''):
@@ -660,7 +660,7 @@ class CloudflareAPI(object):
             value = self.value
 
         zone_id = self._get_zone_id()
-        api_call = '/zones/{0}/dns_records'.format(zone_id)
+        api_call = f'/zones/{zone_id}/dns_records'
         query = {}
         if type:
             query['type'] = type
@@ -669,7 +669,7 @@ class CloudflareAPI(object):
         if value:
             query['content'] = value
         if query:
-            api_call += '?{0}'.format(urlencode(query))
+            api_call += f'?{urlencode(query)}'
 
         records, status = self._cf_api_call(api_call)
         return records
@@ -705,11 +705,11 @@ class CloudflareAPI(object):
                 if not ((rr['type'] == self.type) and (rr['name'] == search_record) and (rr['content'] == content)):
                     self.changed = True
                     if not self.module.check_mode:
-                        result, info = self._cf_api_call('/zones/{0}/dns_records/{1}'.format(zone_id, rr['id']), 'DELETE')
+                        result, info = self._cf_api_call(f"/zones/{zone_id}/dns_records/{rr['id']}", 'DELETE')
             else:
                 self.changed = True
                 if not self.module.check_mode:
-                    result, info = self._cf_api_call('/zones/{0}/dns_records/{1}'.format(zone_id, rr['id']), 'DELETE')
+                    result, info = self._cf_api_call(f"/zones/{zone_id}/dns_records/{rr['id']}", 'DELETE')
         return self.changed
 
     def ensure_dns_record(self):
@@ -880,7 +880,7 @@ class CloudflareAPI(object):
                 if self.module.check_mode:
                     result = new_record
                 else:
-                    result, info = self._cf_api_call('/zones/{0}/dns_records/{1}'.format(zone_id, records[0]['id']), 'PUT', new_record)
+                    result, info = self._cf_api_call(f"/zones/{zone_id}/dns_records/{records[0]['id']}", 'PUT', new_record)
                 self.changed = True
                 return result, self.changed
             else:
@@ -888,7 +888,7 @@ class CloudflareAPI(object):
         if self.module.check_mode:
             result = new_record
         else:
-            result, info = self._cf_api_call('/zones/{0}/dns_records'.format(zone_id), 'POST', new_record)
+            result, info = self._cf_api_call(f'/zones/{zone_id}/dns_records', 'POST', new_record)
         self.changed = True
         return result, self.changed
 
