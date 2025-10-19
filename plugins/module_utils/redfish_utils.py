@@ -104,7 +104,7 @@ class RedfishUtils(object):
             if prop not in cur_pyld:
                 return {'ret': False,
                         'changed': False,
-                        'msg': '%s does not support the property %s' % (uri, prop),
+                        'msg': f'{uri} does not support the property {prop}',
                         'changes_required': False}
 
             # Perform additional checks based on the type of property
@@ -139,7 +139,7 @@ class RedfishUtils(object):
         if not change_required:
             # No changes required; all properties set
             resp['changed'] = False
-            resp['msg'] = 'Properties in %s are already set' % uri
+            resp['msg'] = f'Properties in {uri} are already set'
         return resp
 
     def _request(self, uri, **kwargs):
@@ -185,16 +185,14 @@ class RedfishUtils(object):
         except HTTPError as e:
             msg, data = self._get_extended_message(e)
             return {'ret': False,
-                    'msg': "HTTP Error %s on GET request to '%s', extended message: '%s'"
-                           % (e.code, uri, msg),
+                    'msg': f"HTTP Error {e.code} on GET request to '{uri}', extended message: '{msg}'",
                     'status': e.code, 'data': data}
         except URLError as e:
-            return {'ret': False, 'msg': "URL Error on GET request to '%s': '%s'"
-                                         % (uri, e.reason)}
+            return {'ret': False, 'msg': f"URL Error on GET request to '{uri}': '{e.reason}'"}
         # Almost all errors should be caught above, but just in case
         except Exception as e:
             return {'ret': False,
-                    'msg': "Failed GET request to '%s': '%s'" % (uri, to_text(e))}
+                    'msg': f"Failed GET request to '{uri}': '{e}'"}
         return {'ret': True, 'data': data, 'headers': headers, 'resp': resp}
 
     def post_request(self, uri, pyld, multipart=False):
@@ -230,16 +228,14 @@ class RedfishUtils(object):
         except HTTPError as e:
             msg, data = self._get_extended_message(e)
             return {'ret': False,
-                    'msg': "HTTP Error %s on POST request to '%s', extended message: '%s'"
-                           % (e.code, uri, msg),
+                    'msg': f"HTTP Error {e.code} on POST request to '{uri}', extended message: '{msg}'",
                     'status': e.code, 'data': data}
         except URLError as e:
-            return {'ret': False, 'msg': "URL Error on POST request to '%s': '%s'"
-                                         % (uri, e.reason)}
+            return {'ret': False, 'msg': f"URL Error on POST request to '{uri}': '{e.reason}'"}
         # Almost all errors should be caught above, but just in case
         except Exception as e:
             return {'ret': False,
-                    'msg': "Failed POST request to '%s': '%s'" % (uri, to_text(e))}
+                    'msg': f"Failed POST request to '{uri}': '{e}'"}
         return {'ret': True, 'data': data, 'headers': headers, 'resp': resp}
 
     def patch_request(self, uri, pyld, check_pyld=False):
@@ -281,17 +277,16 @@ class RedfishUtils(object):
         except HTTPError as e:
             msg, data = self._get_extended_message(e)
             return {'ret': False, 'changed': False,
-                    'msg': "HTTP Error %s on PATCH request to '%s', extended message: '%s'"
-                           % (e.code, uri, msg),
+                    'msg': f"HTTP Error {e.code} on PATCH request to '{uri}', extended message: '{msg}'",
                     'status': e.code, 'data': data}
         except URLError as e:
             return {'ret': False, 'changed': False,
-                    'msg': "URL Error on PATCH request to '%s': '%s'" % (uri, e.reason)}
+                    'msg': f"URL Error on PATCH request to '{uri}': '{e.reason}'"}
         # Almost all errors should be caught above, but just in case
         except Exception as e:
             return {'ret': False, 'changed': False,
-                    'msg': "Failed PATCH request to '%s': '%s'" % (uri, to_text(e))}
-        return {'ret': True, 'changed': True, 'resp': resp, 'msg': 'Modified %s' % uri}
+                    'msg': f"Failed PATCH request to '{uri}': '{e}'"}
+        return {'ret': True, 'changed': True, 'resp': resp, 'msg': f'Modified {uri}'}
 
     def put_request(self, uri, pyld):
         req_headers = dict(PUT_HEADERS)
@@ -319,16 +314,14 @@ class RedfishUtils(object):
         except HTTPError as e:
             msg, data = self._get_extended_message(e)
             return {'ret': False,
-                    'msg': "HTTP Error %s on PUT request to '%s', extended message: '%s'"
-                           % (e.code, uri, msg),
+                    'msg': f"HTTP Error {e.code} on PUT request to '{uri}', extended message: '{msg}'",
                     'status': e.code, 'data': data}
         except URLError as e:
-            return {'ret': False, 'msg': "URL Error on PUT request to '%s': '%s'"
-                                         % (uri, e.reason)}
+            return {'ret': False, 'msg': f"URL Error on PUT request to '{uri}': '{e.reason}'"}
         # Almost all errors should be caught above, but just in case
         except Exception as e:
             return {'ret': False,
-                    'msg': "Failed PUT request to '%s': '%s'" % (uri, to_text(e))}
+                    'msg': f"Failed PUT request to '{uri}': '{e}'"}
         return {'ret': True, 'resp': resp}
 
     def delete_request(self, uri, pyld=None):
@@ -348,16 +341,14 @@ class RedfishUtils(object):
         except HTTPError as e:
             msg, data = self._get_extended_message(e)
             return {'ret': False,
-                    'msg': "HTTP Error %s on DELETE request to '%s', extended message: '%s'"
-                           % (e.code, uri, msg),
+                    'msg': f"HTTP Error {e.code} on DELETE request to '{uri}', extended message: '{msg}'",
                     'status': e.code, 'data': data}
         except URLError as e:
-            return {'ret': False, 'msg': "URL Error on DELETE request to '%s': '%s'"
-                                         % (uri, e.reason)}
+            return {'ret': False, 'msg': f"URL Error on DELETE request to '{uri}': '{e.reason}'"}
         # Almost all errors should be caught above, but just in case
         except Exception as e:
             return {'ret': False,
-                    'msg': "Failed DELETE request to '%s': '%s'" % (uri, to_text(e))}
+                    'msg': f"Failed DELETE request to '{uri}': '{e}'"}
         return {'ret': True, 'resp': resp}
 
     @staticmethod
@@ -391,15 +382,15 @@ class RedfishUtils(object):
         body = []
         for form in fields:
             # Fill in the form details
-            write_buffer(body, '--' + boundary)
+            write_buffer(body, f"--{boundary}")
 
             # Insert the headers (Content-Disposition and Content-Type)
             if 'filename' in fields[form]:
                 name = os.path.basename(fields[form]['filename']).replace('"', '\\"')
-                write_buffer(body, 'Content-Disposition: form-data; name="%s"; filename="%s"' % (to_text(form), to_text(name)))
+                write_buffer(body, f'Content-Disposition: form-data; name="{to_text(form)}"; filename="{to_text(name)}"')
             else:
-                write_buffer(body, 'Content-Disposition: form-data; name="%s"' % form)
-            write_buffer(body, 'Content-Type: %s' % fields[form]['mime_type'])
+                write_buffer(body, f'Content-Disposition: form-data; name="{form}"')
+            write_buffer(body, f"Content-Type: {fields[form]['mime_type']}")
             write_buffer(body, '')
 
             # Insert the payload; read from the file if not given by the caller
@@ -409,9 +400,9 @@ class RedfishUtils(object):
             write_buffer(body, fields[form]['content'])
 
         # Finalize the entire request
-        write_buffer(body, '--' + boundary + '--')
+        write_buffer(body, f"--{boundary}--")
         write_buffer(body, '')
-        return (b'\r\n'.join(body), 'multipart/form-data; boundary=' + boundary)
+        return (b'\r\n'.join(body), f"multipart/form-data; boundary={boundary}")
 
     @staticmethod
     def _get_extended_message(error):
@@ -541,7 +532,7 @@ class RedfishUtils(object):
                 if not self.systems_uri:
                     return {
                         'ret': False,
-                        'msg': "System resource %s not found" % self.resource_id}
+                        'msg': f"System resource {self.resource_id} not found"}
             elif len(self.systems_uris) > 1:
                 self.module.fail_json(msg=FAIL_MSG % {'resource': 'System'})
         return {'ret': True}
@@ -591,7 +582,7 @@ class RedfishUtils(object):
                 if not self.chassis_uri:
                     return {
                         'ret': False,
-                        'msg': "Chassis resource %s not found" % self.resource_id}
+                        'msg': f"Chassis resource {self.resource_id} not found"}
             elif len(self.chassis_uris) > 1:
                 self.module.fail_json(msg=FAIL_MSG % {'resource': 'Chassis'})
         return {'ret': True}
@@ -620,7 +611,7 @@ class RedfishUtils(object):
                 if not self.manager_uri:
                     return {
                         'ret': False,
-                        'msg': "Manager resource %s not found" % self.resource_id}
+                        'msg': f"Manager resource {self.resource_id} not found"}
             elif len(self.manager_uris) > 1:
                 self.module.fail_json(msg=FAIL_MSG % {'resource': 'Manager'})
         return {'ret': True}
@@ -918,7 +909,7 @@ class RedfishUtils(object):
                                 controller_name = sc[0]['Name']
                             else:
                                 sc_id = sc[0].get('Id', '1')
-                                controller_name = 'Controller %s' % sc_id
+                                controller_name = f'Controller {sc_id}'
                     drive_results = []
                     if 'Drives' in data:
                         for device in data['Drives']:
@@ -965,7 +956,7 @@ class RedfishUtils(object):
                     controller_name = data['Name']
                 else:
                     sc_id = data.get('Id', '1')
-                    controller_name = 'Controller %s' % sc_id
+                    controller_name = f'Controller {sc_id}'
                 drive_results = []
                 for device in data['Devices']:
                     drive_result = {}
@@ -1021,7 +1012,7 @@ class RedfishUtils(object):
                     if response['ret'] is False:
                         return response
                     data = response['data']
-                    controller_name = 'Controller %s' % str(idx)
+                    controller_name = f'Controller {idx}'
                     if 'Controllers' in data:
                         response = self.get_request(self.root_uri + data['Controllers']['@odata.id'])
                         if response['ret'] is False:
@@ -1039,7 +1030,7 @@ class RedfishUtils(object):
                                     controller_name = member_data['Name']
                                 else:
                                     controller_id = member_data.get('Id', '1')
-                                    controller_name = 'Controller %s' % controller_id
+                                    controller_name = f'Controller {controller_id}'
                     elif 'StorageControllers' in data:
                         sc = data['StorageControllers']
                         if sc:
@@ -1047,7 +1038,7 @@ class RedfishUtils(object):
                                 controller_name = sc[0]['Name']
                             else:
                                 sc_id = sc[0].get('Id', '1')
-                                controller_name = 'Controller %s' % sc_id
+                                controller_name = f'Controller {sc_id}'
                     volume_results = []
                     volume_list = []
                     if 'Volumes' in data:
@@ -1107,11 +1098,11 @@ class RedfishUtils(object):
         # Perform a PATCH on the IndicatorLED property based on the requested command
         payloads = {'IndicatorLedOn': 'Lit', 'IndicatorLedOff': 'Off', "IndicatorLedBlink": 'Blinking'}
         if command not in payloads.keys():
-            return {'ret': False, 'msg': 'Invalid command (%s)' % command}
+            return {'ret': False, 'msg': f'Invalid command ({command})'}
         payload = {'IndicatorLED': payloads[command]}
         resp = self.patch_request(self.root_uri + resource_uri, payload, check_pyld=True)
         if resp['ret'] and resp['changed']:
-            resp['msg'] = 'Set IndicatorLED to %s' % payloads[command]
+            resp['msg'] = f'Set IndicatorLED to {payloads[command]}'
         return resp
 
     def _map_reset_type(self, reset_type, allowable_values):
@@ -1151,7 +1142,7 @@ class RedfishUtils(object):
 
         # command should be PowerOn, PowerForceOff, etc.
         if not command.startswith('Power'):
-            return {'ret': False, 'msg': 'Invalid Command (%s)' % command}
+            return {'ret': False, 'msg': f'Invalid Command ({command})'}
 
         # Commands (except PowerCycle) will be stripped of the 'Power' prefix
         if command == 'PowerCycle':
@@ -1164,7 +1155,7 @@ class RedfishUtils(object):
             reset_type = 'GracefulRestart'
 
         if reset_type not in reset_type_values:
-            return {'ret': False, 'msg': 'Invalid Command (%s)' % command}
+            return {'ret': False, 'msg': f'Invalid Command ({command})'}
 
         # read the resource and get the current power state
         response = self.get_request(self.root_uri + resource_uri)
@@ -1181,11 +1172,11 @@ class RedfishUtils(object):
 
         # get the reset Action and target URI
         if key not in data or action_name not in data[key]:
-            return {'ret': False, 'msg': 'Action %s not found' % action_name}
+            return {'ret': False, 'msg': f'Action {action_name} not found'}
         reset_action = data[key][action_name]
         if 'target' not in reset_action:
             return {'ret': False,
-                    'msg': 'target URI missing from Action %s' % action_name}
+                    'msg': f'target URI missing from Action {action_name}'}
         action_uri = reset_action['target']
 
         # get AllowableValues
@@ -1226,7 +1217,7 @@ class RedfishUtils(object):
             if elapsed_time > wait_timeout:
                 # Exhausted the wait timer; error
                 return {'ret': False, 'changed': True,
-                        'msg': 'The service did not become available after %d seconds' % wait_timeout}
+                        'msg': f'The service did not become available after {int(wait_timeout)} seconds'}
         return {'ret': True, 'changed': True}
 
     def manager_reset_to_defaults(self, command):
@@ -1240,7 +1231,7 @@ class RedfishUtils(object):
                              'PreserveNetwork']
 
         if command not in reset_type_values:
-            return {'ret': False, 'msg': 'Invalid Command (%s)' % command}
+            return {'ret': False, 'msg': f'Invalid Command ({command})'}
 
         # read the resource and get the current power state
         response = self.get_request(self.root_uri + resource_uri)
@@ -1250,11 +1241,11 @@ class RedfishUtils(object):
 
         # get the reset Action and target URI
         if key not in data or action_name not in data[key]:
-            return {'ret': False, 'msg': 'Action %s not found' % action_name}
+            return {'ret': False, 'msg': f'Action {action_name} not found'}
         reset_action = data[key][action_name]
         if 'target' not in reset_action:
             return {'ret': False,
-                    'msg': 'target URI missing from Action %s' % action_name}
+                    'msg': f'target URI missing from Action {action_name}'}
         action_uri = reset_action['target']
 
         # get AllowableValues
@@ -1264,9 +1255,7 @@ class RedfishUtils(object):
         # map ResetType to an allowable value if needed
         if allowable_values and command not in allowable_values:
             return {'ret': False,
-                    'msg': 'Specified reset type (%s) not supported '
-                           'by service. Supported types: %s' %
-                           (command, allowable_values)}
+                    'msg': f'Specified reset type ({command}) not supported by service. Supported types: {allowable_values}'}
 
         # define payload
         payload = {'ResetType': command}
@@ -1911,18 +1900,14 @@ class RedfishUtils(object):
                                                           default_values)
             if protocol not in allowable_values:
                 return {'ret': False,
-                        'msg': 'Specified update_protocol (%s) not supported '
-                               'by service. Supported protocols: %s' %
-                               (protocol, allowable_values)}
+                        'msg': f'Specified update_protocol ({protocol}) not supported by service. Supported protocols: {allowable_values}'}
         if targets:
             allowable_values = self._get_allowable_values(action, 'Targets')
             if allowable_values:
                 for target in targets:
                     if target not in allowable_values:
                         return {'ret': False,
-                                'msg': 'Specified target (%s) not supported '
-                                       'by service. Supported targets: %s' %
-                                       (target, allowable_values)}
+                                'msg': f'Specified target ({target}) not supported by service. Supported targets: {allowable_values}'}
 
         payload = {
             'ImageURI': image_uri
@@ -1975,8 +1960,7 @@ class RedfishUtils(object):
             with open(image_file, 'rb') as f:
                 image_payload = f.read()
         except Exception as e:
-            return {'ret': False, 'msg':
-                    'Could not read file %s' % image_file}
+            return {'ret': False, 'msg': f'Could not read file {image_file}'}
 
         # Check that multipart HTTP push updates are supported
         response = self.get_request(self.root_uri + self.update_uri)
@@ -2075,7 +2059,7 @@ class RedfishUtils(object):
         data = response['data']
 
         if key not in data:
-            return {'ret': False, 'msg': "Key %s not found" % key}
+            return {'ret': False, 'msg': f"Key {key} not found"}
 
         bios_uri = data[key]["@odata.id"]
 
@@ -2252,8 +2236,7 @@ class RedfishUtils(object):
                 allowable_values = boot[annotation]
                 if isinstance(allowable_values, list) and bootdevice not in allowable_values:
                     return {'ret': False,
-                            'msg': "Boot device %s not in list of allowable values (%s)" %
-                                   (bootdevice, allowable_values)}
+                            'msg': f"Boot device {bootdevice} not in list of allowable values ({allowable_values})"}
 
         # Build the request payload based on the desired boot override options
         if override_enabled == 'Disabled':
@@ -2352,7 +2335,7 @@ class RedfishUtils(object):
 
         warning = ""
         if attrs_bad:
-            warning = "Unsupported attributes %s" % (attrs_bad)
+            warning = f"Unsupported attributes {attrs_bad}"
 
         # Return success w/ changed=False if no attrs need to be changed
         if not attrs_to_patch:
@@ -2379,7 +2362,7 @@ class RedfishUtils(object):
         if response['ret'] is False:
             return response
         return {'ret': True, 'changed': True,
-                'msg': "Modified BIOS attributes %s. A reboot is required" % (attrs_to_patch),
+                'msg': f"Modified BIOS attributes {attrs_to_patch}. A reboot is required",
                 'warning': warning}
 
     def set_boot_order(self, boot_list):
@@ -2407,7 +2390,7 @@ class RedfishUtils(object):
             for ref in boot_list:
                 if ref not in boot_option_references:
                     return {'ret': False,
-                            'msg': "BootOptionReference %s not found in BootOptions" % ref}
+                            'msg': f"BootOptionReference {ref} not found in BootOptions"}
 
         # Apply the boot order
         payload = {
@@ -2430,10 +2413,9 @@ class RedfishUtils(object):
         # get the #ComputerSystem.SetDefaultBootOrder Action and target URI
         action = '#ComputerSystem.SetDefaultBootOrder'
         if 'Actions' not in data or action not in data['Actions']:
-            return {'ret': False, 'msg': 'Action %s not found' % action}
+            return {'ret': False, 'msg': f'Action {action} not found'}
         if 'target' not in data['Actions'][action]:
-            return {'ret': False,
-                    'msg': 'target URI missing from Action %s' % action}
+            return {'ret': False, 'msg': f'target URI missing from Action {action}'}
         action_uri = data['Actions'][action]['target']
 
         # POST to Action URI
@@ -2599,7 +2581,7 @@ class RedfishUtils(object):
         data = response['data']
 
         if key not in data:
-            return {'ret': False, 'msg': "Key %s not found" % key}
+            return {'ret': False, 'msg': f"Key {key} not found"}
 
         processors_uri = data[key]["@odata.id"]
 
@@ -2649,7 +2631,7 @@ class RedfishUtils(object):
         data = response['data']
 
         if key not in data:
-            return {'ret': False, 'msg': "Key %s not found" % key}
+            return {'ret': False, 'msg': f"Key {key} not found"}
 
         memory_uri = data[key]["@odata.id"]
 
@@ -2719,7 +2701,7 @@ class RedfishUtils(object):
         data = response['data']
 
         if key not in data:
-            return {'ret': False, 'msg': "Key %s not found" % key}
+            return {'ret': False, 'msg': f"Key {key} not found"}
 
         ethernetinterfaces_uri = data[key]["@odata.id"]
 
@@ -2775,7 +2757,7 @@ class RedfishUtils(object):
         data = response['data']
 
         if key not in data:
-            return {'ret': False, 'msg': "Key %s not found" % key}
+            return {'ret': False, 'msg': f"Key {key} not found"}
 
         virtualmedia_uri = data[key]["@odata.id"]
 
@@ -2884,10 +2866,7 @@ class RedfishUtils(object):
                 allowable = ai.get(param, {}).get('AllowableValues', [])
                 if allowable and options.get(option) not in allowable:
                     return {'ret': False,
-                            'msg': "Value '%s' specified for option '%s' not "
-                                   "in list of AllowableValues %s" % (
-                                       options.get(option), option,
-                                       allowable)}
+                            'msg': f"Value '{options.get(option)}' specified for option '{option}' not in list of AllowableValues {allowable}"}
                 payload[param] = options.get(option)
         return payload
 
@@ -2960,7 +2939,7 @@ class RedfishUtils(object):
         # see if image already inserted; if so, nothing to do
         if self._virt_media_image_inserted(resources, image_url):
             return {'ret': True, 'changed': False,
-                    'msg': "VirtualMedia '%s' already inserted" % image_url}
+                    'msg': f"VirtualMedia '{image_url}' already inserted"}
 
         # find an empty slot to insert the media
         # try first with strict media_type matching
@@ -2973,9 +2952,7 @@ class RedfishUtils(object):
                 resources, media_types, media_match_strict=False, vendor=vendor)
         if not uri:
             return {'ret': False,
-                    'msg': "Unable to find an available VirtualMedia resource "
-                           "%s" % ('supporting ' + str(media_types)
-                                   if media_types else '')}
+                    'msg': f"Unable to find an available VirtualMedia resource {f"supporting {media_types}" if media_types else ''}"}
 
         # confirm InsertMedia action found
         if ('Actions' not in data or
@@ -2987,8 +2964,7 @@ class RedfishUtils(object):
                 if 'PATCH' not in methods:
                     # if Allow header present and PATCH missing, return error
                     return {'ret': False,
-                            'msg': "%s action not found and PATCH not allowed"
-                            % '#VirtualMedia.InsertMedia'}
+                            'msg': "#VirtualMedia.InsertMedia action not found and PATCH not allowed"}
             return self.virtual_media_insert_via_patch(options, param_map,
                                                        uri, data)
 
@@ -3084,8 +3060,7 @@ class RedfishUtils(object):
                     if 'PATCH' not in methods:
                         # if Allow header present and PATCH missing, return error
                         return {'ret': False,
-                                'msg': "%s action not found and PATCH not allowed"
-                                       % '#VirtualMedia.EjectMedia'}
+                                'msg': "#VirtualMedia.EjectMedia action not found and PATCH not allowed"}
                 return self.virtual_media_eject_via_patch(uri)
             else:
                 # POST to the EjectMedia Action
@@ -3107,13 +3082,11 @@ class RedfishUtils(object):
         elif uri and not eject:
             # already ejected: return success but changed=False
             return {'ret': True, 'changed': False,
-                    'msg': "VirtualMedia image '%s' already ejected" %
-                           image_url}
+                    'msg': f"VirtualMedia image '{image_url}' already ejected"}
         else:
             # return failure (no resources matching image_url found)
             return {'ret': False, 'changed': False,
-                    'msg': "No VirtualMedia resource found with image '%s' "
-                           "inserted" % image_url}
+                    'msg': f"No VirtualMedia resource found with image '{image_url}' inserted"}
 
     def get_psu_inventory(self):
         result = {}
@@ -3144,7 +3117,7 @@ class RedfishUtils(object):
             data = response['data']
 
             if key not in data:
-                return {'ret': False, 'msg': "Key %s not found" % key}
+                return {'ret': False, 'msg': f"Key {key} not found"}
 
             psu_list = data[key]
             for psu in psu_list:
@@ -3232,7 +3205,7 @@ class RedfishUtils(object):
         payload = {}
         for service_name in manager_services.keys():
             if service_name not in protocol_services:
-                return {'ret': False, 'msg': "Service name %s is invalid" % service_name}
+                return {'ret': False, 'msg': f"Service name {service_name} is invalid"}
             payload[service_name] = {}
             for service_property in manager_services[service_name].keys():
                 value = manager_services[service_name][service_property]
@@ -3242,14 +3215,14 @@ class RedfishUtils(object):
                     elif value in protocol_state_offlist:
                         payload[service_name]['ProtocolEnabled'] = False
                     else:
-                        return {'ret': False, 'msg': "Value of property %s is invalid" % service_property}
+                        return {'ret': False, 'msg': f"Value of property {service_property} is invalid"}
                 elif service_property in ['port', 'Port']:
                     if isinstance(value, int):
                         payload[service_name]['Port'] = value
                     elif isinstance(value, str) and value.isdigit():
                         payload[service_name]['Port'] = int(value)
                     else:
-                        return {'ret': False, 'msg': "Value of property %s is invalid" % service_property}
+                        return {'ret': False, 'msg': f"Value of property {service_property} is invalid"}
                 else:
                     payload[service_name][service_property] = value
 
@@ -3271,7 +3244,7 @@ class RedfishUtils(object):
     @staticmethod
     def to_singular(resource_name):
         if resource_name.endswith('ies'):
-            resource_name = resource_name[:-3] + 'y'
+            resource_name = f"{resource_name[:-3]}y"
         elif resource_name.endswith('s'):
             resource_name = resource_name[:-1]
         return resource_name
@@ -3295,12 +3268,12 @@ class RedfishUtils(object):
                 if r.get('ret'):
                     p = r.get('data')
                     if p:
-                        e = {self.to_singular(subsystem.lower()) + '_uri': u,
+                        e = {f"{self.to_singular(subsystem.lower())}_uri": u,
                              status: p.get(status,
                                            "Status not available")}
                         health[subsystem].append(e)
         else:  # non-collections case
-            e = {self.to_singular(subsystem.lower()) + '_uri': uri,
+            e = {f"{self.to_singular(subsystem.lower())}_uri": uri,
                  status: d.get(status,
                                "Status not available")}
             health[subsystem].append(e)
@@ -3492,7 +3465,7 @@ class RedfishUtils(object):
         if hostinterface_id and matching_hostinterface_uris:
             hostinterface_uri = list.pop(matching_hostinterface_uris)
         elif hostinterface_id and not matching_hostinterface_uris:
-            return {'ret': False, 'msg': "HostInterface ID %s not present." % hostinterface_id}
+            return {'ret': False, 'msg': f"HostInterface ID {hostinterface_id} not present."}
         elif len(uris) == 1:
             hostinterface_uri = list.pop(uris)
         else:
@@ -3615,21 +3588,21 @@ class RedfishUtils(object):
                     manager = managers[0].rstrip('/').split('/')[-1]
                 else:
                     self.module.fail_json(msg=[
-                        "Multiple managers with ServiceIdentification were found: %s" % str(managers),
+                        f"Multiple managers with ServiceIdentification were found: {managers}",
                         "Please specify by using the 'manager' parameter in your playbook"])
             elif len(self.manager_uris) == 0:
                 self.module.fail_json(msg="No manager identities were found")
-        response = self.get_request(self.root_uri + '/redfish/v1/Managers/' + manager, override_headers=None)
+        response = self.get_request(f"{self.root_uri}/redfish/v1/Managers/{manager}", override_headers=None)
         try:
             result['service_identification'] = response['data']['ServiceIdentification']
         except Exception as e:
-            self.module.fail_json(msg="Service ID not found for manager %s" % manager)
+            self.module.fail_json(msg=f"Service ID not found for manager {manager}")
         result['ret'] = True
         return result
 
     def set_service_identification(self, service_id):
         data = {"ServiceIdentification": service_id}
-        resp = self.patch_request(self.root_uri + '/redfish/v1/Managers/' + self.resource_id, data, check_pyld=True)
+        resp = self.patch_request(f"{self.root_uri}/redfish/v1/Managers/{self.resource_id}", data, check_pyld=True)
         return resp
 
     def set_session_service(self, sessions_config):
@@ -3662,13 +3635,13 @@ class RedfishUtils(object):
         if wrong_param:
             return {
                 "ret": False,
-                "msg": "Wrong parameters are provided: %s" % wrong_param
+                "msg": f"Wrong parameters are provided: {wrong_param}"
             }
 
         if bios_dict:
             return {
                 "ret": False,
-                "msg": "BIOS parameters are not matching: %s" % bios_dict
+                "msg": f"BIOS parameters are not matching: {bios_dict}"
             }
 
         return {
@@ -3776,7 +3749,7 @@ class RedfishUtils(object):
         if not self.storage_subsystem_uri:
             return {
                 'ret': False,
-                'msg': "Provided Storage Subsystem ID %s does not exist on the server" % storage_subsystem_id}
+                'msg': f"Provided Storage Subsystem ID {storage_subsystem_id} does not exist on the server"}
 
         # Get Volume Collection
         response = self.get_request(self.root_uri + self.storage_subsystem_uri)
@@ -3804,7 +3777,7 @@ class RedfishUtils(object):
                     return response
 
         return {'ret': True, 'changed': True,
-                'msg': "The following volumes were deleted: %s" % str(volume_ids)}
+                'msg': f"The following volumes were deleted: {volume_ids}"}
 
     def create_volume(self, volume_details, storage_subsystem_id, storage_none_volume_deletion=False):
         # Find the Storage resource from the requested ComputerSystem resource
@@ -3838,7 +3811,7 @@ class RedfishUtils(object):
         if not self.storage_subsystem_uri:
             return {
                 'ret': False,
-                'msg': "Provided Storage Subsystem ID %s does not exist on the server" % storage_subsystem_id}
+                'msg': f"Provided Storage Subsystem ID {storage_subsystem_id} does not exist on the server"}
 
         # Validate input parameters
         required_parameters = ['RAIDType', 'Drives']
@@ -3849,7 +3822,7 @@ class RedfishUtils(object):
             if not volume_details.get(parameter):
                 return {
                     'ret': False,
-                    'msg': "%s are required parameter to create a volume" % str(required_parameters)}
+                    'msg': f"{required_parameters} are required parameter to create a volume"}
 
         # Navigate to the volume uri of the correct storage subsystem
         response = self.get_request(self.root_uri + self.storage_subsystem_uri)
@@ -3914,7 +3887,7 @@ class RedfishUtils(object):
         bios_data = bios_resp["data"]
         attribute_registry = bios_data["AttributeRegistry"]
 
-        reg_uri = self.root_uri + self.service_root + "Registries/" + attribute_registry
+        reg_uri = f"{self.root_uri}{self.service_root}Registries/{attribute_registry}"
         reg_resp = self.get_request(reg_uri)
         if not reg_resp["ret"]:
             return reg_resp
@@ -3933,7 +3906,7 @@ class RedfishUtils(object):
 
         if "RegistryEntries" not in rsp_data:
             return {
-                "msg": "'RegistryEntries' not present in %s response, %s" % (rsp_uri, str(rsp_data)),
+                "msg": f"'RegistryEntries' not present in {rsp_uri} response, {rsp_data}",
                 "ret": False
             }
 
