@@ -268,20 +268,19 @@ class CoprModule(object):
         """
         if not repo_content:
             repo_content = self._download_repo_info()
+            repo_content = repo_content.rstrip('\n')
         if self.ansible_module.params["includepkgs"]:
             includepkgs_value = ','.join(self.ansible_module.params['includepkgs'])
-            repo_content = f"{repo_content.rstrip('\n')}\nincludepkgs={includepkgs_value}\n"
+            repo_content = f"{repo_content}\nincludepkgs={includepkgs_value}\n"
         if self.ansible_module.params["excludepkgs"]:
             excludepkgs_value = ','.join(self.ansible_module.params['excludepkgs'])
-            repo_content = f"{repo_content.rstrip('\n')}\nexcludepkgs={excludepkgs_value}\n"
+            repo_content = f"{repo_content}\nexcludepkgs={excludepkgs_value}\n"
         if self._compare_repo_content(repo_filename_path, repo_content):
             return False
         if not self.check_mode:
             with open(repo_filename_path, "w+") as file:
                 file.write(repo_content)
-            os.chmod(
-                repo_filename_path, stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IROTH,
-            )
+            os.chmod(repo_filename_path, stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IROTH)
         return True
 
     def _get_repo_with_old_id(self):
