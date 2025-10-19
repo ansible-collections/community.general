@@ -56,6 +56,7 @@ options:
       - Host locality (for example V(Baltimore, MD)).
     aliases: ["locality"]
     type: str
+    version_added: 12.0.0
   ns_host_location:
     description:
       - Host location (for example V(Lab 2)).
