@@ -94,6 +94,16 @@ EXAMPLES = r"""
     token: TOKEN
   delegate_to: localhost
   no_log: true
+
+- name: Get a new Keycloak client secret, authentication with auth_client_id and auth_client_secret
+  community.general.keycloak_clientsecret_info:
+    id: '9d59aa76-2755-48c6-b1af-beb70a82c3cd'
+    realm: MyCustomRealm
+    auth_client_id: admin-cli
+    auth_client_secret: SECRET
+    auth_keycloak_url: https://auth.example.com/auth
+  delegate_to: localhost
+  no_log: true
 """
 
 RETURN = r"""
