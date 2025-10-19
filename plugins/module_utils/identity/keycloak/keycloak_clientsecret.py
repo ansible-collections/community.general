@@ -36,6 +36,7 @@ def keycloak_clientsecret_module():
                          ['token', 'auth_realm', 'auth_username', 'auth_password', 'auth_client_id', 'auth_client_secret']]),
         required_together=([['auth_username', 'auth_password']]),
         mutually_exclusive=[
+            ['token', 'auth_realm'],
             ['token', 'auth_username'],
             ['token', 'auth_password']
         ])
