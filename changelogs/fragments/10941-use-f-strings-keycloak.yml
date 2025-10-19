@@ -1,0 +1,2 @@
+minor_changes:
+  - keycloak module utils plugin - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10941).
