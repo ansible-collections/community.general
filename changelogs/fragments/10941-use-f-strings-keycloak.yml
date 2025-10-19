@@ -1,6 +1,6 @@
 minor_changes:
-  - hwc_utils module_utils plugin - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10942).
-  - manageiq module_utils plugin - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10942).
+  - hwc_utils module_utils plugin - adjust f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10942).
+  - manageiq module_utils plugin - adjust f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10942).
   - aerospike_migrations - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10942).
   - airbrake_deployment - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10942).
   - aix_devices - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10942).
