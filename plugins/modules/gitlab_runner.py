@@ -345,7 +345,10 @@ class GitLabRunner(object):
     '''
     def create_runner(self, arguments):
         if self._module.check_mode:
-            return True
+            class MockRunner:
+                def __init__(self):
+                    self._attrs = {}
+            return MockRunner()
 
         try:
             if arguments.get('token') is not None:
