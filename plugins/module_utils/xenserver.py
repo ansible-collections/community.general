@@ -288,29 +288,29 @@ def get_object_ref(module, name, uuid=None, obj_type="VM", fail=True, msg_prefix
         try:
             # Find object by UUID. If no object is found using given UUID,
             # an exception will be generated.
-            obj_ref = xapi_session.xenapi_request("%s.get_by_uuid" % real_obj_type, (uuid,))
+            obj_ref = xapi_session.xenapi_request(f"{real_obj_type}.get_by_uuid", (uuid,))
         except XenAPI.Failure as f:
             if fail:
-                module.fail_json(msg="%s%s with UUID '%s' not found!" % (msg_prefix, obj_type, uuid))
+                module.fail_json(msg=f"{msg_prefix}{obj_type} with UUID '{uuid}' not found!")
     elif name:
         try:
             # Find object by name (name_label).
-            obj_ref_list = xapi_session.xenapi_request("%s.get_by_name_label" % real_obj_type, (name,))
+            obj_ref_list = xapi_session.xenapi_request(f"{real_obj_type}.get_by_name_label", (name,))
         except XenAPI.Failure as f:
-            module.fail_json(msg="XAPI ERROR: %s" % f.details)
+            module.fail_json(msg=f"XAPI ERROR: {f.details}")
 
         # If obj_ref_list is empty.
         if not obj_ref_list:
             if fail:
-                module.fail_json(msg="%s%s with name '%s' not found!" % (msg_prefix, obj_type, name))
+                module.fail_json(msg=f"{msg_prefix}{obj_type} with name '{name}' not found!")
         # If obj_ref_list contains multiple object references.
         elif len(obj_ref_list) > 1:
-            module.fail_json(msg="%smultiple %ss with name '%s' found! Please use UUID." % (msg_prefix, obj_type, name))
+            module.fail_json(msg=f"{msg_prefix}multiple {obj_type}s with name '{name}' found! Please use UUID.")
         # The obj_ref_list contains only one object reference.
         else:
             obj_ref = obj_ref_list[0]
     else:
-        module.fail_json(msg="%sno valid name or UUID supplied for %s!" % (msg_prefix, obj_type))
+        module.fail_json(msg=f"{msg_prefix}no valid name or UUID supplied for {obj_type}!")
 
     return obj_ref
 
@@ -396,7 +396,7 @@ def gather_vm_params(module, vm_ref):
             vm_params['customization_agent'] = "custom"
 
     except XenAPI.Failure as f:
-        module.fail_json(msg="XAPI ERROR: %s" % f.details)
+        module.fail_json(msg=f"XAPI ERROR: {f.details}")
 
     return vm_params
 
@@ -472,12 +472,13 @@ def gather_vm_facts(module, vm_params):
             "mac": vm_vif_params['MAC'],
             "vif_device": vm_vif_params['device'],
             "mtu": vm_vif_params['MTU'],
-            "ip": vm_guest_metrics_networks.get("%s/ip" % vm_vif_params['device'], ''),
+            "ip": vm_guest_metrics_networks.get(f"{vm_vif_params['device']}/ip", ''),
             "prefix": "",
             "netmask": "",
             "gateway": "",
-            "ip6": [vm_guest_metrics_networks[ipv6] for ipv6 in sorted(vm_guest_metrics_networks.keys()) if ipv6.startswith("%s/ipv6/" %
-                                                                                                                            vm_vif_params['device'])],
+            "ip6": [vm_guest_metrics_networks[ipv6]
+                    for ipv6 in sorted(vm_guest_metrics_networks.keys())
+                    if ipv6.startswith(f"{vm_vif_params['device']}/ipv6/")],
             "prefix6": "",
             "gateway6": "",
         }
@@ -498,7 +499,7 @@ def gather_vm_facts(module, vm_params):
             vm_xenstore_data = vm_params['xenstore_data']
 
             for f in ['prefix', 'netmask', 'gateway', 'prefix6', 'gateway6']:
-                vm_network_params[f] = vm_xenstore_data.get("vm-data/networks/%s/%s" % (vm_vif_params['device'], f), "")
+                vm_network_params[f] = vm_xenstore_data.get(f"vm-data/networks/{vm_vif_params['device']}/{f}", "")
 
         vm_facts['networks'].append(vm_network_params)
 
@@ -565,14 +566,14 @@ def set_vm_power_state(module, vm_ref, power_state, timeout=300):
                     if not module.check_mode:
                         xapi_session.xenapi.VM.hard_reboot(vm_ref)
                 else:
-                    module.fail_json(msg="Cannot restart VM in state '%s'!" % vm_power_state_current)
+                    module.fail_json(msg=f"Cannot restart VM in state '{vm_power_state_current}'!")
             elif power_state == "suspended":
                 # running state is required for suspend.
                 if vm_power_state_current == "poweredon":
                     if not module.check_mode:
                         xapi_session.xenapi.VM.suspend(vm_ref)
                 else:
-                    module.fail_json(msg="Cannot suspend VM in state '%s'!" % vm_power_state_current)
+                    module.fail_json(msg=f"Cannot suspend VM in state '{vm_power_state_current}'!")
             elif power_state == "shutdownguest":
                 # running state is required for guest shutdown.
                 if vm_power_state_current == "poweredon":
@@ -584,9 +585,9 @@ def set_vm_power_state(module, vm_ref, power_state, timeout=300):
                             task_result = wait_for_task(module, task_ref, timeout)
 
                             if task_result:
-                                module.fail_json(msg="Guest shutdown task failed: '%s'!" % task_result)
+                                module.fail_json(msg=f"Guest shutdown task failed: '{task_result}'!")
                 else:
-                    module.fail_json(msg="Cannot shutdown guest when VM is in state '%s'!" % vm_power_state_current)
+                    module.fail_json(msg=f"Cannot shutdown guest when VM is in state '{vm_power_state_current}'!")
             elif power_state == "rebootguest":
                 # running state is required for guest reboot.
                 if vm_power_state_current == "poweredon":
@@ -598,15 +599,15 @@ def set_vm_power_state(module, vm_ref, power_state, timeout=300):
                             task_result = wait_for_task(module, task_ref, timeout)
 
                             if task_result:
-                                module.fail_json(msg="Guest reboot task failed: '%s'!" % task_result)
+                                module.fail_json(msg=f"Guest reboot task failed: '{task_result}'!")
                 else:
-                    module.fail_json(msg="Cannot reboot guest when VM is in state '%s'!" % vm_power_state_current)
+                    module.fail_json(msg=f"Cannot reboot guest when VM is in state '{vm_power_state_current}'!")
             else:
-                module.fail_json(msg="Requested VM power state '%s' is unsupported!" % power_state)
+                module.fail_json(msg=f"Requested VM power state '{power_state}' is unsupported!")
 
             state_changed = True
     except XenAPI.Failure as f:
-        module.fail_json(msg="XAPI ERROR: %s" % f.details)
+        module.fail_json(msg=f"XAPI ERROR: {f.details}")
 
     return (state_changed, vm_power_state_resulting)
 
@@ -665,7 +666,7 @@ def wait_for_task(module, task_ref, timeout=300):
 
         xapi_session.xenapi.task.destroy(task_ref)
     except XenAPI.Failure as f:
-        module.fail_json(msg="XAPI ERROR: %s" % f.details)
+        module.fail_json(msg=f"XAPI ERROR: {f.details}")
 
     return result
 
@@ -697,7 +698,7 @@ def wait_for_vm_ip_address(module, vm_ref, timeout=300):
         vm_power_state = xapi_to_module_vm_power_state(xapi_session.xenapi.VM.get_power_state(vm_ref).lower())
 
         if vm_power_state != 'poweredon':
-            module.fail_json(msg="Cannot wait for VM IP address when VM is in state '%s'!" % vm_power_state)
+            module.fail_json(msg=f"Cannot wait for VM IP address when VM is in state '{vm_power_state}'!")
 
         interval = 2
 
@@ -728,7 +729,7 @@ def wait_for_vm_ip_address(module, vm_ref, timeout=300):
             module.fail_json(msg="Timed out waiting for VM IP address!")
 
     except XenAPI.Failure as f:
-        module.fail_json(msg="XAPI ERROR: %s" % f.details)
+        module.fail_json(msg=f"XAPI ERROR: {f.details}")
 
     return vm_guest_metrics
 
@@ -791,7 +792,7 @@ class XAPI(object):
             # If scheme is not specified we default to http:// because https://
             # is problematic in most setups.
             if not hostname.startswith("http://") and not hostname.startswith("https://"):
-                hostname = "http://%s" % hostname
+                hostname = f"http://{hostname}"
 
             try:
                 # ignore_ssl is supported in XenAPI library from XenServer 7.2
@@ -810,7 +811,7 @@ class XAPI(object):
         try:
             cls._xapi_session.login_with_password(username, password, ANSIBLE_VERSION, 'Ansible')
         except XenAPI.Failure as f:
-            module.fail_json(msg="Unable to log on to XenServer at %s as %s: %s" % (hostname, username, f.details))
+            module.fail_json(msg=f"Unable to log on to XenServer at {hostname} as {username}: {f.details}")
 
         # Disabling atexit should be used in special cases only.
         if disconnect_atexit:
@@ -853,4 +854,4 @@ class XenServerObject(object):
             self.default_sr_ref = self.xapi_session.xenapi.pool.get_default_SR(self.pool_ref)
             self.xenserver_version = get_xenserver_version(module)
         except XenAPI.Failure as f:
-            self.module.fail_json(msg="XAPI ERROR: %s" % f.details)
+            self.module.fail_json(msg=f"XAPI ERROR: {f.details}")
