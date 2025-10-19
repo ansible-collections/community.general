@@ -1,2 +1,2 @@
 minor_changes:
-  - ipa_host - add ``userclass`` and ``locality`` parameters (https://github.com/ansible-collections/community.general/pull/10935)
+  - ipa_host - add ``userclass`` and ``locality`` parameters (https://github.com/ansible-collections/community.general/pull/10935).
