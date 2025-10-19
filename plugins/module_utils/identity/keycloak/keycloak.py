@@ -2156,7 +2156,7 @@ class KeycloakAPI(object):
                 method='PUT',
                 data=json.dumps(updatedExec))
         except HTTPError as e:
-            self.fail_request(e, msg=f"Unable to update execution '{flowAlias}': {e!r}: {f"{e.url};{e.msg};{e.code};{e.hdrs}"} {updatedExec}")
+            self.fail_request(e, msg=f"Unable to update execution '{flowAlias}': {e!r}: {e.url};{e.msg};{e.code};{e.hdrs} {updatedExec}")
         except Exception as e:
             self.module.fail_json(msg=f"Unable to update executions {updatedExec}: {e}")
 
@@ -2237,7 +2237,7 @@ class KeycloakAPI(object):
                 data=json.dumps(newExec))
         except HTTPError as e:
             self.fail_request(
-                e, msg=f"Unable to create new execution '{flowAlias}' {execution['providerId']}: {e!r}: {f"{e.url};{e.msg};{e.code};{e.hdrs}"} {newExec}"
+                e, msg=f"Unable to create new execution '{flowAlias}' {execution['providerId']}: {e!r}: {e.url};{e.msg};{e.code};{e.hdrs} {newExec}"
             )
         except Exception as e:
             self.module.fail_json(msg=f"Unable to create new execution '{flowAlias}' {execution['providerId']}: {e}")
