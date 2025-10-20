@@ -39,14 +39,14 @@ options:
     choices: [bcachefs, btrfs, ext2, ext3, ext4, ext4dev, f2fs, lvm, ocfs2, reiserfs, xfs, vfat, swap, ufs]
     description:
       - Filesystem type to be created. This option is required with O(state=present) (or if O(state) is omitted).
-      - Ufs support has been added in community.general 3.4.0.
-      - Bcachefs support has been added in community.general 8.6.0.
+      - V(ufs) support has been added in community.general 3.4.0.
+      - V(bcachefs) support has been added in community.general 8.6.0.
     type: str
     aliases: [type]
   dev:
     description:
       - Target path to block device (Linux) or character device (FreeBSD) or regular file (both).
-      - When setting Linux-specific filesystem types on FreeBSD, this module only works when applying to regular files, aka
+      - When setting Linux-specific filesystem types on FreeBSD, this module only works when applying to regular files, also known as
         disk images.
       - Currently V(lvm) (Linux-only) and V(ufs) (FreeBSD-only) do not support a regular file as their target O(dev).
       - Support for character devices on FreeBSD has been added in community.general 3.4.0.
@@ -61,8 +61,9 @@ options:
   resizefs:
     description:
       - If V(true), if the block device and filesystem size differ, grow the filesystem into the space.
-      - Supported for C(bcachefs), C(btrfs), C(ext2), C(ext3), C(ext4), C(ext4dev), C(f2fs), C(lvm), C(xfs), C(ufs) and C(vfat)
-        filesystems. Attempts to resize other filesystem types fail.
+      - >-
+        Supported when O(fstype) is one of: V(bcachefs), V(btrfs), V(ext2), V(ext3), V(ext4), V(ext4dev), V(f2fs), V(lvm), V(xfs), V(ufs) and V(vfat).
+        Attempts to resize other filesystem types fail.
       - XFS only grows if mounted. Currently, the module is based on commands from C(util-linux) package to perform operations,
         so resizing of XFS is not supported on FreeBSD systems.
       - VFAT is likely to fail if C(fatresize < 1.04).
@@ -79,7 +80,7 @@ options:
       - The UUID options specified in O(opts) take precedence over this value.
       - See xfs_admin(8) (C(xfs)), tune2fs(8) (C(ext2), C(ext3), C(ext4), C(ext4dev)) for possible values.
       - For O(fstype=lvm) the value is ignored, it resets the PV UUID if set.
-      - Supported for O(fstype) being one of C(bcachefs), C(ext2), C(ext3), C(ext4), C(ext4dev), C(lvm), or C(xfs).
+      - Supported for O(fstype) being one of V(bcachefs), V(ext2), V(ext3), V(ext4), V(ext4dev), V(lvm), or V(xfs).
       - This is B(not idempotent). Specifying this option always results in a change.
       - Mutually exclusive with O(resizefs).
     type: str
@@ -91,7 +92,7 @@ requirements:
   - On FreeBSD, either C(util-linux) or C(e2fsprogs) package is required.
 notes:
   - Potential filesystems on O(dev) are checked using C(blkid). In case C(blkid) is unable to detect a filesystem (and in
-    case C(fstyp) on FreeBSD is also unable to detect a filesystem), this filesystem is overwritten even if O(force) is V(false).
+    case C(fstyp) on FreeBSD is also unable to detect a filesystem), this filesystem is overwritten even if O(force=false).
   - On FreeBSD systems, both C(e2fsprogs) and C(util-linux) packages provide a C(blkid) command that is compatible with this
     module. However, these packages conflict with each other, and only the C(util-linux) package provides the command required
     to not fail when O(state=absent).
