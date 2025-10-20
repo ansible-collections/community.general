@@ -138,8 +138,7 @@ def discord_check_mode(module):
         'content-type': 'application/json'
     }
 
-    url = "https://discord.com/api/webhooks/%s/%s" % (
-        webhook_id, webhook_token)
+    url = f"https://discord.com/api/webhooks/{webhook_id}/{webhook_token}"
 
     response, info = fetch_url(module, url, method='GET', headers=headers)
     return response, info
@@ -159,8 +158,7 @@ def discord_text_msg(module):
         'content-type': 'application/json'
     }
 
-    url = "https://discord.com/api/webhooks/%s/%s" % (
-        webhook_id, webhook_token)
+    url = f"https://discord.com/api/webhooks/{webhook_id}/{webhook_token}"
 
     payload = {
         'content': content,

@@ -153,7 +153,6 @@ import re
 import stat
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
@@ -177,7 +176,7 @@ class Device(object):
         elif os.path.isfile(self.path):
             devsize_in_bytes = os.path.getsize(self.path)
         else:
-            self.module.fail_json(changed=False, msg="Target device not supported: %s" % self)
+            self.module.fail_json(changed=False, msg=f"Target device not supported: {self}")
 
         return devsize_in_bytes
 
@@ -270,20 +269,20 @@ class Filesystem(object):
         try:
             fssize_in_bytes = self.get_fs_size(dev)
         except NotImplementedError:
-            self.module.fail_json(msg="module does not support resizing %s filesystem yet" % self.fstype)
+            self.module.fail_json(msg=f"module does not support resizing {self.fstype} filesystem yet")
         except ValueError as err:
-            self.module.warn("unable to process %s output '%s'" % (self.INFO, to_native(err)))
-            self.module.fail_json(msg="unable to process %s output for %s" % (self.INFO, dev))
+            self.module.warn(f"unable to process {self.INFO} output '{err}'")
+            self.module.fail_json(msg=f"unable to process {self.INFO} output for {dev}")
 
         if not fssize_in_bytes < devsize_in_bytes:
-            self.module.exit_json(changed=False, msg="%s filesystem is using the whole device %s" % (self.fstype, dev))
+            self.module.exit_json(changed=False, msg=f"{self.fstype} filesystem is using the whole device {dev}")
         elif self.module.check_mode:
-            self.module.exit_json(changed=True, msg="resizing filesystem %s on device %s" % (self.fstype, dev))
+            self.module.exit_json(changed=True, msg=f"resizing filesystem {self.fstype} on device {dev}")
 
         if self.GROW_MOUNTPOINT_ONLY:
             mountpoint = dev.get_mountpoint()
             if not mountpoint:
-                self.module.fail_json(msg="%s needs to be mounted for %s operations" % (dev, self.fstype))
+                self.module.fail_json(msg=f"{dev} needs to be mounted for {self.fstype} operations")
             grow_target = mountpoint
         else:
             grow_target = str(dev)
@@ -303,7 +302,7 @@ class Filesystem(object):
     def change_uuid(self, new_uuid, dev):
         """Change filesystem UUID. Returns stdout of used command"""
         if self.module.check_mode:
-            self.module.exit_json(change=True, msg='Changing %s filesystem UUID on device %s' % (self.fstype, dev))
+            self.module.exit_json(change=True, msg=f'Changing {self.fstype} filesystem UUID on device {dev}')
 
         dummy, out, dummy = self.module.run_command(self.change_uuid_cmd(new_uuid=new_uuid, target=str(dev)), check_rc=True)
         return out
@@ -458,13 +457,13 @@ class Btrfs(Filesystem):
         else:
             # assume version is greater or equal to 3.12
             self.MKFS_FORCE_FLAGS = ['-f']
-            self.module.warn('Unable to identify mkfs.btrfs version (%r, %r)' % (stdout, stderr))
+            self.module.warn(f'Unable to identify mkfs.btrfs version ({stdout!r}, {stderr!r})')
 
     def get_fs_size(self, dev):
         """Return size in bytes of filesystem on device (integer)."""
         mountpoint = dev.get_mountpoint()
         if not mountpoint:
-            self.module.fail_json(msg="%s needs to be mounted for %s operations" % (dev, self.fstype))
+            self.module.fail_json(msg=f"{dev} needs to be mounted for {self.fstype} operations")
 
         dummy, stdout, dummy = self.module.run_command([self.module.get_bin_path(self.INFO),
                                                         'filesystem', 'usage', '-b', mountpoint], check_rc=True)
@@ -657,7 +656,7 @@ def main():
     changed = False
 
     if not os.path.exists(dev):
-        msg = "Device %s not found." % dev
+        msg = f"Device {dev} not found."
         if state == "present":
             module.fail_json(msg=msg)
         else:
@@ -683,12 +682,12 @@ def main():
         try:
             klass = FILESYSTEMS[fstype]
         except KeyError:
-            module.fail_json(changed=False, msg="module does not support this filesystem (%s) yet." % fstype)
+            module.fail_json(changed=False, msg=f"module does not support this filesystem ({fstype}) yet.")
 
         filesystem = klass(module)
 
         if uuid and not (filesystem.CHANGE_UUID or filesystem.MKFS_SET_UUID_OPTIONS):
-            module.fail_json(changed=False, msg="module does not support UUID option for this filesystem (%s) yet." % fstype)
+            module.fail_json(changed=False, msg=f"module does not support UUID option for this filesystem ({fstype}) yet.")
 
         same_fs = fs and FILESYSTEMS.get(fs) == FILESYSTEMS[fstype]
         if same_fs and not resizefs and not uuid and not force:
@@ -696,7 +695,7 @@ def main():
         elif same_fs:
             if resizefs:
                 if not filesystem.GROW:
-                    module.fail_json(changed=False, msg="module does not support resizing %s filesystem yet." % fstype)
+                    module.fail_json(changed=False, msg=f"module does not support resizing {fstype} filesystem yet.")
 
                 out = filesystem.grow(dev)
 
@@ -707,7 +706,7 @@ def main():
 
                 module.exit_json(changed=True, msg=out)
         elif fs and not force:
-            module.fail_json(msg="'%s' is already used as %s, use force=true to overwrite" % (dev, fs), rc=rc, err=err)
+            module.fail_json(msg=f"'{dev}' is already used as {fs}, use force=true to overwrite", rc=rc, err=err)
 
         # create fs
         filesystem.create(opts=mkfs_opts, dev=dev, uuid=uuid)

@@ -152,7 +152,7 @@ def get_repo_states(module):
 
 
 def set_repo_states(module, repo_ids, state):
-    module.run_command([DNF_BIN, 'config-manager', '--assumeyes', '--set-{0}'.format(state)] + repo_ids, check_rc=True)
+    module.run_command([DNF_BIN, 'config-manager', '--assumeyes', f'--set-{state}'] + repo_ids, check_rc=True)
 
 
 def pack_repo_states_for_return(states):
@@ -188,7 +188,7 @@ def main():
     module.run_command_environ_update = dict(LANGUAGE='C', LC_ALL='C')
 
     if not os.path.exists(DNF_BIN):
-        module.fail_json(msg="%s was not found" % DNF_BIN)
+        module.fail_json(msg=f"{DNF_BIN} was not found")
 
     repo_states = get_repo_states(module)
     result['repo_states_pre'] = pack_repo_states_for_return(repo_states)
@@ -199,7 +199,7 @@ def main():
     to_change = []
     for repo_id in names:
         if repo_id not in repo_states:
-            module.fail_json(msg="did not find repo with ID '{0}' in dnf repolist --all --verbose".format(repo_id))
+            module.fail_json(msg=f"did not find repo with ID '{repo_id}' in dnf repolist --all --verbose")
         if repo_states[repo_id] != desired_repo_state:
             to_change.append(repo_id)
     result['changed'] = len(to_change) > 0
@@ -216,7 +216,7 @@ def main():
 
     for repo_id in to_change:
         if repo_states_post[repo_id] != desired_repo_state:
-            module.fail_json(msg="dnf config-manager failed to make '{0}' {1}".format(repo_id, desired_repo_state))
+            module.fail_json(msg=f"dnf config-manager failed to make '{repo_id}' {desired_repo_state}")
 
     module.exit_json(**result)
 

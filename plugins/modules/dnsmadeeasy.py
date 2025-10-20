@@ -377,7 +377,7 @@ class DME2(object):
 
         if sandbox:
             self.baseurl = 'https://api.sandbox.dnsmadeeasy.com/V2.0/'
-            self.module.warn(warning="Sandbox is enabled. All actions are made against the URL %s" % self.baseurl)
+            self.module.warn(warning=f"Sandbox is enabled. All actions are made against the URL {self.baseurl}")
         else:
             self.baseurl = 'https://api.dnsmadeeasy.com/V2.0/'
 
@@ -392,7 +392,7 @@ class DME2(object):
         if not self.domain.isdigit():
             self.domain = self.getDomainByName(self.domain)['id']
 
-        self.record_url = 'dns/managed/' + str(self.domain) + '/records'
+        self.record_url = f"dns/managed/{self.domain}/records"
         self.monitor_url = 'monitor'
         self.contactList_url = 'contactList'
 
@@ -419,7 +419,7 @@ class DME2(object):
 
         response, info = fetch_url(self.module, url, data=data, method=method, headers=self._headers())
         if info['status'] not in (200, 201, 204):
-            self.module.fail_json(msg="%s returned %s, with body: %s" % (url, info['status'], info['msg']))
+            self.module.fail_json(msg=f"{url} returned {info['status']}, with body: {info['msg']}")
 
         try:
             return json.load(response)
@@ -468,7 +468,7 @@ class DME2(object):
                     value = record_value.split(" ")[1]
                 # Note that TXT records are surrounded by quotes in the API response.
                 elif record_type == "TXT":
-                    value = '"{0}"'.format(record_value)
+                    value = f'"{record_value}"'
                 elif record_type == "SRV":
                     value = record_value.split(" ")[3]
                 else:
@@ -488,14 +488,14 @@ class DME2(object):
         results = {}
 
         # iterate over e.g. self.getDomains() || self.getRecords()
-        for result in getattr(self, 'get' + type.title() + 's')():
+        for result in getattr(self, f"get{type.title()}s")():
 
             map[result['name']] = result['id']
             results[result['id']] = result
 
         # e.g. self.domain_map || self.record_map
-        setattr(self, type + '_map', map)
-        setattr(self, type + 's', results)  # e.g. self.domains || self.records
+        setattr(self, f"{type}_map", map)
+        setattr(self, f"{type}s", results)  # e.g. self.domains || self.records
 
     def prepareRecord(self, data):
         return json.dumps(data, separators=(',', ':'))
@@ -506,17 +506,17 @@ class DME2(object):
 
     def updateRecord(self, record_id, data):
         # @TODO update the cache w/ resultant record + id when implemented
-        return self.query(self.record_url + '/' + str(record_id), 'PUT', data)
+        return self.query(f"{self.record_url}/{record_id}", 'PUT', data)
 
     def deleteRecord(self, record_id):
         # @TODO remove record from the cache when implemented
-        return self.query(self.record_url + '/' + str(record_id), 'DELETE')
+        return self.query(f"{self.record_url}/{record_id}", 'DELETE')
 
     def getMonitor(self, record_id):
-        return self.query(self.monitor_url + '/' + str(record_id), 'GET')
+        return self.query(f"{self.monitor_url}/{record_id}", 'GET')
 
     def updateMonitor(self, record_id, data):
-        return self.query(self.monitor_url + '/' + str(record_id), 'PUT', data)
+        return self.query(f"{self.monitor_url}/{record_id}", 'PUT', data)
 
     def prepareMonitor(self, data):
         return json.dumps(data, separators=(',', ':'))
@@ -642,7 +642,7 @@ def main():
                 if not contact_list_id.isdigit() and contact_list_id != '':
                     contact_list = DME.getContactListByName(contact_list_id)
                     if not contact_list:
-                        module.fail_json(msg="Contact list {0} does not exist".format(contact_list_id))
+                        module.fail_json(msg=f"Contact list {contact_list_id} does not exist")
                     contact_list_id = contact_list.get('id', '')
                 new_monitor['contactListId'] = contact_list_id
             else:
@@ -671,7 +671,7 @@ def main():
         if "value" not in new_record:
             if not current_record:
                 module.fail_json(
-                    msg="A record with name '%s' does not exist for domain '%s.'" % (record_name, module.params['domain']))
+                    msg=f"A record with name '{record_name}' does not exist for domain '{module.params['domain']}.'")
             module.exit_json(changed=False, result=dict(record=current_record, monitor=current_monitor))
 
         # create record and monitor as the record does not exist
@@ -709,7 +709,7 @@ def main():
 
     else:
         module.fail_json(
-            msg="'%s' is an unknown value for the state argument" % state)
+            msg=f"'{state}' is an unknown value for the state argument")
 
 
 if __name__ == '__main__':

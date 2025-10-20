@@ -195,13 +195,11 @@ def run_module():
     try:
         etcd = etcd3.client(**client_params)
     except Exception as exp:
-        module.fail_json(msg='Cannot connect to etcd cluster: %s' % (to_native(exp)),
-                         exception=traceback.format_exc())
+        module.fail_json(msg=f'Cannot connect to etcd cluster: {exp}', exception=traceback.format_exc())
     try:
         cluster_value = etcd.get(module.params['key'])
     except Exception as exp:
-        module.fail_json(msg='Cannot reach data: %s' % (to_native(exp)),
-                         exception=traceback.format_exc())
+        module.fail_json(msg=f'Cannot reach data: {exp}', exception=traceback.format_exc())
 
     # Make the cluster_value[0] a string for string comparisons
     result['old_value'] = to_native(cluster_value[0])
@@ -214,8 +212,7 @@ def run_module():
                 try:
                     etcd.delete(module.params['key'])
                 except Exception as exp:
-                    module.fail_json(msg='Cannot delete %s: %s' % (module.params['key'], to_native(exp)),
-                                     exception=traceback.format_exc())
+                    module.fail_json(msg=f"Cannot delete {module.params['key']}: {exp}", exception=traceback.format_exc())
                 else:
                     result['changed'] = True
     elif module.params['state'] == 'present':
@@ -226,8 +223,7 @@ def run_module():
                 try:
                     etcd.put(module.params['key'], module.params['value'])
                 except Exception as exp:
-                    module.fail_json(msg='Cannot add or edit key %s: %s' % (module.params['key'], to_native(exp)),
-                                     exception=traceback.format_exc())
+                    module.fail_json(msg=f"Cannot add or edit key {module.params['key']}: {exp}", exception=traceback.format_exc())
                 else:
                     result['changed'] = True
     else:

@@ -115,7 +115,7 @@ def _get_easy_install(module, env=None, executable=None):
             opt_dirs = []
         else:
             # Try easy_install with the virtualenv directory first.
-            opt_dirs = ['%s/bin' % env]
+            opt_dirs = [f'{env}/bin']
         for basename in candidate_easy_inst_basenames:
             easy_install = module.get_bin_path(basename, False, opt_dirs)
             if easy_install is not None:
@@ -161,7 +161,7 @@ def main():
         if not os.path.exists(os.path.join(env, 'bin', 'activate')):
             if module.check_mode:
                 module.exit_json(changed=True)
-            command = '%s %s' % (virtualenv, env)
+            command = f'{virtualenv} {env}'
             if site_packages:
                 command += ' --system-site-packages'
             cwd = tempfile.gettempdir()

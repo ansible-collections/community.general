@@ -269,7 +269,6 @@ import time
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 
 class DeployHelper(object):
@@ -323,13 +322,13 @@ class DeployHelper(object):
             return False
 
         if not os.path.isdir(path):
-            self.module.fail_json(msg="%s exists but is not a directory" % path)
+            self.module.fail_json(msg=f"{path} exists but is not a directory")
 
         if not self.module.check_mode:
             try:
                 shutil.rmtree(path, ignore_errors=False)
             except Exception as e:
-                self.module.fail_json(msg="rmtree failed: %s" % to_native(e), exception=traceback.format_exc())
+                self.module.fail_json(msg=f"rmtree failed: {e}", exception=traceback.format_exc())
 
         return True
 
@@ -342,7 +341,7 @@ class DeployHelper(object):
                 os.makedirs(path)
 
         elif not os.path.isdir(path):
-            self.module.fail_json(msg="%s exists but is not a directory" % path)
+            self.module.fail_json(msg=f"{path} exists but is not a directory")
 
         changed += self.module.set_directory_attributes_if_different(self._get_file_args(path), changed)
 
@@ -351,7 +350,7 @@ class DeployHelper(object):
     def check_link(self, path):
         if os.path.lexists(path):
             if not os.path.islink(path):
-                self.module.fail_json(msg="%s exists but is not a symbolic link" % path)
+                self.module.fail_json(msg=f"{path} exists but is not a symbolic link")
 
     def create_link(self, source, link_name):
         if os.path.islink(link_name):
@@ -363,8 +362,8 @@ class DeployHelper(object):
                 changed = True
                 if not self.module.check_mode:
                     if not os.path.lexists(source):
-                        self.module.fail_json(msg="the symlink target %s doesn't exists" % source)
-                    tmp_link_name = link_name + '.' + self.unfinished_filename
+                        self.module.fail_json(msg=f"the symlink target {source} doesn't exists")
+                    tmp_link_name = f"{link_name}.{self.unfinished_filename}"
                     if os.path.islink(tmp_link_name):
                         os.unlink(tmp_link_name)
                     os.symlink(source, tmp_link_name)
@@ -404,7 +403,7 @@ class DeployHelper(object):
         if not self.release:
             return changed
 
-        tmp_link_name = os.path.join(path, self.release + '.' + self.unfinished_filename)
+        tmp_link_name = os.path.join(path, f"{self.release}.{self.unfinished_filename}")
         if not self.module.check_mode and os.path.exists(tmp_link_name):
             changed = True
             os.remove(tmp_link_name)
