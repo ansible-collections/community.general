@@ -262,7 +262,7 @@ def bytes_to_human(size, iec=False):
     if unit == 'KB':
         unit = 'kB'
 
-    return f'{hsize!s} {unit}'
+    return f'{hsize} {unit}'
 
 
 def smart_blocksize(size, unit, product, bsize):

@@ -439,7 +439,7 @@ def main():
         if DNSIMPLE_MAJOR_VERSION > 1:
             module.fail_json(msg=f"DNSimple exception: {e.message}")
         else:
-            module.fail_json(msg=f"DNSimple exception: {e.args[0]['message']!s}")
+            module.fail_json(msg=f"DNSimple exception: {e.args[0]['message']}")
     module.fail_json(msg="Unknown what you wanted me to do")
 
 

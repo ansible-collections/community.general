@@ -328,7 +328,7 @@ def _get_monitor(module):
     if module.params['id'] is not None:
         monitor = api.Monitor.get(module.params['id'])
         if 'errors' in monitor:
-            module.fail_json(msg=f"Failed to retrieve monitor with id {module.params['id']}, errors are {monitor['errors']!s}")
+            module.fail_json(msg=f"Failed to retrieve monitor with id {module.params['id']}, errors are {monitor['errors']}")
         return monitor
     else:
         monitors = api.Monitor.get_all()
