@@ -124,7 +124,7 @@ EXAMPLES = r"""
       - name: role_name2
         id: role_id2
   delegate_to: localhost
-  
+
 - name: Map a client role to a user, authentication with credentials
   community.general.keycloak_user_rolemapping:
     realm: MyCustomRealm
