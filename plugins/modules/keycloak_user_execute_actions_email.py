@@ -50,7 +50,7 @@ options:
       - List of required actions to include in the email. When omitted, C(["UPDATE_PASSWORD"]) is used.
     type: list
     elements: str
-    default: 
+    default:
       - UPDATE_PASSWORD
   client_id:
     description:
