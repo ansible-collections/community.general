@@ -346,6 +346,7 @@ user_created:
   description: Indicates if a user was created.
   returned: in success
   type: bool
+  version_added: 12.0.0
 """
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
@@ -498,7 +499,11 @@ def main():
                 result['diff'] = dict(before='', after=desired_user)
 
             if module.check_mode:
+                # Set user_created flag explicit for check_mode
+                # create_user could have failed, but we don't know for sure until we try to create the user.'
+                result['user_created'] = True
                 module.exit_json(**result)
+
             # Create the user
             after_user = kc.create_user(userrep=desired_user, realm=realm)
             result["msg"] = 'User %s created' % (desired_user['username'])
