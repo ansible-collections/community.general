@@ -12,7 +12,7 @@ module: keycloak_user_execute_actions_email
 
 short_description: Send a Keycloak execute-actions email to a user
 
-version_added: 12.1.0
+version_added: 12.0.0
 
 description:
   - Triggers the Keycloak endpoint C(execute-actions-email) for a user.
