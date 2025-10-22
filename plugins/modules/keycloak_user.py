@@ -342,6 +342,10 @@ end_state:
   description: Representation of the user after module execution.
   returned: on success
   type: dict
+user_created:
+  description: Indicates if a user was created.
+  returned: in success
+  type: bool
 """
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
@@ -457,6 +461,7 @@ def main():
 
     result['proposed'] = changeset
     result['existing'] = before_user
+    result['user_created'] = before_user is not None
 
     changed = False
 
