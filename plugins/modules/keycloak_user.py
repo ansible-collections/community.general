@@ -461,8 +461,8 @@ def main():
 
     result['proposed'] = changeset
     result['existing'] = before_user
-    result['user_created'] = before_user is not None
-
+    # Default values for user_created
+    result['user_created'] = False
     changed = False
 
     # Cater for when it doesn't exist (an empty dict)
@@ -504,6 +504,8 @@ def main():
             result["msg"] = 'User %s created' % (desired_user['username'])
             # Add user ID to new representation
             desired_user['id'] = after_user["id"]
+            # Set user_created flag
+            result['user_created'] = True
         else:
             excludes = [
                 "access",
