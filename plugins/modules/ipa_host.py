@@ -28,6 +28,11 @@ options:
     description:
       - A description of this host.
     type: str
+  userclass:
+    description:
+      - Host category (semantics placed on this attribute are for local interpretation).
+    type: str
+    version_added: 12.0.0
   force:
     description:
       - Force host name even if not in DNS.
@@ -46,6 +51,12 @@ options:
     aliases: ["macaddress"]
     type: list
     elements: str
+  l:
+    description:
+      - Host locality (for example V(Baltimore, MD)).
+    aliases: ["locality"]
+    type: str
+    version_added: 12.0.0
   ns_host_location:
     description:
       - Host location (for example V(Lab 2)).
@@ -101,7 +112,9 @@ EXAMPLES = r"""
   community.general.ipa_host:
     name: host01.example.com
     description: Example host
+    userclass: Server
     ip_address: 192.168.0.123
+    locality: Baltimore, MD
     ns_host_location: Lab
     ns_os_version: CentOS 7
     ns_hardware_platform: Lenovo T61
@@ -199,15 +212,19 @@ class HostIPAClient(IPAClient):
         return self._post_json(method='host_disable', name=name)
 
 
-def get_host_dict(description=None, force=None, ip_address=None, ns_host_location=None, ns_hardware_platform=None,
+def get_host_dict(description=None, userclass=None, force=None, ip_address=None, l=None, ns_host_location=None, ns_hardware_platform=None,
                   ns_os_version=None, user_certificate=None, mac_address=None, random_password=None):
     data = {}
     if description is not None:
         data['description'] = description
+    if userclass is not None:
+        data['userclass'] = userclass
     if force is not None:
         data['force'] = force
     if ip_address is not None:
         data['ip_address'] = ip_address
+    if l is not None:
+        data['l'] = l
     if ns_host_location is not None:
         data['nshostlocation'] = ns_host_location
     if ns_hardware_platform is not None:
@@ -241,8 +258,10 @@ def ensure(module, client):
 
     ipa_host = client.host_find(name=name)
     module_host = get_host_dict(description=module.params['description'],
+                                userclass=module.params['userclass'],
                                 force=module.params['force'],
                                 ip_address=module.params['ip_address'],
+                                l=module.params['l'],
                                 ns_host_location=module.params['ns_host_location'],
                                 ns_hardware_platform=module.params['ns_hardware_platform'],
                                 ns_os_version=module.params['ns_os_version'],
@@ -294,9 +313,11 @@ def main():
         fqdn=dict(type='str', required=True, aliases=['name']),
         force=dict(type='bool'),
         ip_address=dict(type='str'),
+        l=dict(type='str', aliases=['locality']),
         ns_host_location=dict(type='str', aliases=['nshostlocation']),
         ns_hardware_platform=dict(type='str', aliases=['nshardwareplatform']),
         ns_os_version=dict(type='str', aliases=['nsosversion']),
+        userclass=dict(type='str'),
         user_certificate=dict(type='list', aliases=['usercertificate'], elements='str'),
         mac_address=dict(type='list', aliases=['macaddress'], elements='str'),
         update_dns=dict(type='bool'),
