@@ -141,7 +141,7 @@ def main():
         realm=dict(type='str', default='master'),
         id=dict(type='str'),
         username=dict(type='str'),
-        actions=dict(type='list', elements='str'),
+        actions=dict(type='list', elements='str', default=['UPDATE_PASSWORD']),
         client_id=dict(type='str', aliases=['clientId']),
         redirect_uri=dict(type='str', aliases=['redirectUri']),
         lifespan=dict(type='int'),
@@ -165,7 +165,7 @@ def main():
     realm = module.params.get('realm')
     user_id = module.params.get('id')
     username = module.params.get('username')
-    actions = module.params.get('actions') or ['UPDATE_PASSWORD']
+    actions = module.params.get('actions')
     client_id = module.params.get('client_id')
     redirect_uri = module.params.get('redirect_uri')
     lifespan = module.params.get('lifespan')
