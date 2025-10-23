@@ -591,7 +591,7 @@ def main():
                     ret_out.append(f'{k}={{{process_complex_args(v)}}}')
                 elif isinstance(v, list):
                     ret_out.append(f"{k}={process_complex_args(v)}")
-                elif isinstance(v, (int, float, str, bool, type(None))):
+                elif isinstance(v, (int, float, str, bool)) or v is None:
                     ret_out.append(f'{k}={format_args(v)}')
                 else:
                     # only to handle anything unforeseen
