@@ -1,0 +1,2 @@
+bugfixes:
+ - terraform - Fix bug when `None` values inside complex vars are throwing error instead passed to terraform. now terraform can handle nulls in complex_vars itself
