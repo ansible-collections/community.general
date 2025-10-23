@@ -1,0 +1,2 @@
+bugfixes:
+  - "pritunl_user - improve resilience when comparing user parameters if remote fields are null or missing. List params (groups, mac_addresses) now safely default to empty lists for comparison and avoids KeyError issues. (https://github.com/ansible-collections/community.general/pull/10955)"
