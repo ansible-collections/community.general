@@ -269,9 +269,9 @@ def main():
         result = run_module(module.params, module.check_mode)
         module.exit_json(**result)
     except GithubException as e:
-        module.fail_json(msg="Github error. {0}".format(repr(e)))
+        module.fail_json(msg=f"Github error. {e}")
     except Exception as e:
-        module.fail_json(msg="Unexpected error. {0}".format(repr(e)))
+        module.fail_json(msg=f"Unexpected error. {e}")
 
 
 if __name__ == '__main__':

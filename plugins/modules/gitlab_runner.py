@@ -259,7 +259,6 @@ runner:
 
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
     auth_argument_spec, gitlab_authentication, gitlab, list_all_kwargs
@@ -328,12 +327,12 @@ class GitLabRunner(object):
             changed, runner = self.update_runner(self.runner_object, arguments)
             if changed:
                 if self._module.check_mode:
-                    self._module.exit_json(changed=True, msg="Successfully updated the runner %s" % description)
+                    self._module.exit_json(changed=True, msg=f"Successfully updated the runner {description}")
 
                 try:
                     runner.save()
                 except Exception as e:
-                    self._module.fail_json(msg="Failed to update runner: %s " % to_native(e))
+                    self._module.fail_json(msg=f"Failed to update runner: {e} ")
 
         self.runner_object = runner
         return changed
@@ -356,7 +355,7 @@ class GitLabRunner(object):
             else:
                 runner = self._gitlab.user.runners.create(arguments)
         except (gitlab.exceptions.GitlabCreateError) as e:
-            self._module.fail_json(msg="Failed to create runner: %s " % to_native(e))
+            self._module.fail_json(msg=f"Failed to create runner: {e}")
 
         return runner
 
@@ -486,12 +485,12 @@ def main():
         try:
             gitlab_project = gitlab_instance.projects.get(project)
         except gitlab.exceptions.GitlabGetError as e:
-            module.fail_json(msg='No such a project %s' % project, exception=to_native(e))
+            module.fail_json(msg=f'No such a project {project}', exception=e)
     elif group:
         try:
             gitlab_group = gitlab_instance.groups.get(group)
         except gitlab.exceptions.GitlabGetError as e:
-            module.fail_json(msg='No such a group %s' % group, exception=to_native(e))
+            module.fail_json(msg=f'No such a group {group}', exception=e)
 
     gitlab_runner = GitLabRunner(module, gitlab_instance, gitlab_group, gitlab_project)
     runner_exists = gitlab_runner.exists_runner(runner_description)
@@ -499,7 +498,7 @@ def main():
     if state == 'absent':
         if runner_exists:
             gitlab_runner.delete_runner()
-            module.exit_json(changed=True, msg="Successfully deleted runner %s" % runner_description)
+            module.exit_json(changed=True, msg=f"Successfully deleted runner {runner_description}")
         else:
             module.exit_json(changed=False, msg="Runner deleted or does not exists")
 
@@ -520,10 +519,10 @@ def main():
             runner_values["paused"] = runner_paused
         if gitlab_runner.create_or_update_runner(runner_description, runner_values):
             module.exit_json(changed=True, runner=gitlab_runner.runner_object._attrs,
-                             msg="Successfully created or updated the runner %s" % runner_description)
+                             msg=f"Successfully created or updated the runner {runner_description}")
         else:
             module.exit_json(changed=False, runner=gitlab_runner.runner_object._attrs,
-                             msg="No need to update the runner %s" % runner_description)
+                             msg=f"No need to update the runner {runner_description}")
 
 
 if __name__ == '__main__':

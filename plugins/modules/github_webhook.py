@@ -149,7 +149,6 @@ except ImportError:
     HAS_GITHUB = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 
 
 def _create_hook_config(module):
@@ -175,8 +174,7 @@ def create_hook(repo, module):
             events=module.params["events"],
             active=module.params["active"])
     except github.GithubException as err:
-        module.fail_json(msg="Unable to create hook for repository %s: %s" % (
-            repo.full_name, to_native(err)))
+        module.fail_json(msg=f"Unable to create hook for repository {repo.full_name}: {err}")
 
     data = {"hook_id": hook.id}
     return True, data
@@ -194,8 +192,7 @@ def update_hook(repo, hook, module):
 
         changed = hook.update()
     except github.GithubException as err:
-        module.fail_json(msg="Unable to modify hook for repository %s: %s" % (
-            repo.full_name, to_native(err)))
+        module.fail_json(msg=f"Unable to modify hook for repository {repo.full_name}: {err}")
 
     data = {"hook_id": hook.id}
     return changed, data
@@ -231,24 +228,18 @@ def main():
             module.params.get("password") or module.params.get("token"),
             base_url=module.params["github_url"])
     except github.GithubException as err:
-        module.fail_json(msg="Could not connect to GitHub at %s: %s" % (
-            module.params["github_url"], to_native(err)))
+        module.fail_json(msg=f"Could not connect to GitHub at {module.params['github_url']}: {err}")
 
     try:
         repo = github_conn.get_repo(module.params["repository"])
     except github.BadCredentialsException as err:
-        module.fail_json(msg="Could not authenticate to GitHub at %s: %s" % (
-            module.params["github_url"], to_native(err)))
+        module.fail_json(msg=f"Could not authenticate to GitHub at {module.params['github_url']}: {err}")
     except github.UnknownObjectException as err:
         module.fail_json(
-            msg="Could not find repository %s in GitHub at %s: %s" % (
-                module.params["repository"], module.params["github_url"],
-                to_native(err)))
+            msg=f"Could not find repository {module.params['repository']} in GitHub at {module.params['github_url']}: {err}")
     except Exception as err:
         module.fail_json(
-            msg="Could not fetch repository %s from GitHub at %s: %s" %
-            (module.params["repository"], module.params["github_url"],
-             to_native(err)),
+            msg=f"Could not fetch repository {module.params['repository']} from GitHub at {module.params['github_url']}: {err}",
             exception=traceback.format_exc())
 
     hook = None
@@ -259,8 +250,7 @@ def main():
         else:
             hook = None
     except github.GithubException as err:
-        module.fail_json(msg="Unable to get hooks from repository %s: %s" % (
-            module.params["repository"], to_native(err)))
+        module.fail_json(msg=f"Unable to get hooks from repository {module.params['repository']}: {err}")
 
     changed = False
     data = {}
@@ -271,8 +261,7 @@ def main():
             hook.delete()
         except github.GithubException as err:
             module.fail_json(
-                msg="Unable to delete hook from repository %s: %s" % (
-                    repo.full_name, to_native(err)))
+                msg=f"Unable to delete hook from repository {repo.full_name}: {err}")
         else:
             changed = True
     elif hook is not None and module.params["state"] == "present":

@@ -304,7 +304,7 @@ def main():
 
     # project doesn't exist
     if not gitlab_project_id:
-        module.fail_json(msg="project '%s' not found." % gitlab_project)
+        module.fail_json(msg=f"project '{gitlab_project}' not found.")
 
     members = []
     if module.params['gitlab_user'] is not None:
@@ -342,14 +342,14 @@ def main():
         # user doesn't exist
         if not gitlab_user_id:
             if state == 'absent':
-                changed_users.append("user '%s' not found, and thus also not part of the project" % gitlab_user['name'])
+                changed_users.append(f"user '{gitlab_user['name']}' not found, and thus also not part of the project")
                 changed_data.append({'gitlab_user': gitlab_user['name'], 'result': 'OK',
-                                     'msg': "user '%s' not found, and thus also not part of the project" % gitlab_user['name']})
+                                     'msg': f"user '{gitlab_user['name']}' not found, and thus also not part of the project"})
             else:
                 error = True
-                changed_users.append("user '%s' not found." % gitlab_user['name'])
+                changed_users.append(f"user '{gitlab_user['name']}' not found.")
                 changed_data.append({'gitlab_user': gitlab_user['name'], 'result': 'FAILED',
-                                     'msg': "user '%s' not found." % gitlab_user['name']})
+                                     'msg': f"user '{gitlab_user['name']}' not found."})
             continue
 
         is_user_a_member = project.is_user_a_member(members, gitlab_user_id)
@@ -362,56 +362,56 @@ def main():
                     if not module.check_mode:
                         project.add_member_to_project(gitlab_user_id, gitlab_project_id, gitlab_user['access_level'])
                     changed = True
-                    changed_users.append("Successfully added user '%s' to project" % gitlab_user['name'])
+                    changed_users.append(f"Successfully added user '{gitlab_user['name']}' to project")
                     changed_data.append({'gitlab_user': gitlab_user['name'], 'result': 'CHANGED',
-                                         'msg': "Successfully added user '%s' to project" % gitlab_user['name']})
+                                         'msg': f"Successfully added user '{gitlab_user['name']}' to project"})
                 except (gitlab.exceptions.GitlabCreateError) as e:
                     error = True
-                    changed_users.append("Failed to updated the access level for the user, '%s'" % gitlab_user['name'])
+                    changed_users.append(f"Failed to updated the access level for the user, '{gitlab_user['name']}'")
                     changed_data.append({'gitlab_user': gitlab_user['name'], 'result': 'FAILED',
-                                         'msg': "Not allowed to add the access level for the member, %s: %s" % (gitlab_user['name'], e)})
+                                         'msg': f"Not allowed to add the access level for the member, {gitlab_user['name']}: {e}"})
             # state as absent
             else:
-                changed_users.append("User, '%s', is not a member in the project. No change to report" % gitlab_user['name'])
+                changed_users.append(f"User, '{gitlab_user['name']}', is not a member in the project. No change to report")
                 changed_data.append({'gitlab_user': gitlab_user['name'], 'result': 'OK',
-                                     'msg': "User, '%s', is not a member in the project. No change to report" % gitlab_user['name']})
+                                     'msg': f"User, '{gitlab_user['name']}', is not a member in the project. No change to report"})
         # in case that a user is a member
         else:
             if state == 'present':
                 # compare the access level
                 user_access_level = project.get_user_access_level(members, gitlab_user_id)
                 if user_access_level == gitlab_user['access_level']:
-                    changed_users.append("User, '%s', is already a member in the project. No change to report" % gitlab_user['name'])
+                    changed_users.append(f"User, '{gitlab_user['name']}', is already a member in the project. No change to report")
                     changed_data.append({'gitlab_user': gitlab_user['name'], 'result': 'OK',
-                                         'msg': "User, '%s', is already a member in the project. No change to report" % gitlab_user['name']})
+                                         'msg': f"User, '{gitlab_user['name']}', is already a member in the project. No change to report"})
                 else:
                     # update the access level for the user
                     try:
                         if not module.check_mode:
                             project.update_user_access_level(members, gitlab_user_id, gitlab_user['access_level'])
                         changed = True
-                        changed_users.append("Successfully updated the access level for the user, '%s'" % gitlab_user['name'])
+                        changed_users.append(f"Successfully updated the access level for the user, '{gitlab_user['name']}'")
                         changed_data.append({'gitlab_user': gitlab_user['name'], 'result': 'CHANGED',
-                                             'msg': "Successfully updated the access level for the user, '%s'" % gitlab_user['name']})
+                                             'msg': f"Successfully updated the access level for the user, '{gitlab_user['name']}'"})
                     except (gitlab.exceptions.GitlabUpdateError) as e:
                         error = True
-                        changed_users.append("Failed to updated the access level for the user, '%s'" % gitlab_user['name'])
+                        changed_users.append(f"Failed to updated the access level for the user, '{gitlab_user['name']}'")
                         changed_data.append({'gitlab_user': gitlab_user['name'], 'result': 'FAILED',
-                                             'msg': "Not allowed to update the access level for the member, %s: %s" % (gitlab_user['name'], e)})
+                                             'msg': f"Not allowed to update the access level for the member, {gitlab_user['name']}: {e}"})
             else:
                 # remove the user from the project
                 try:
                     if not module.check_mode:
                         project.remove_user_from_project(gitlab_user_id, gitlab_project_id)
                     changed = True
-                    changed_users.append("Successfully removed user, '%s', from the project" % gitlab_user['name'])
+                    changed_users.append(f"Successfully removed user, '{gitlab_user['name']}', from the project")
                     changed_data.append({'gitlab_user': gitlab_user['name'], 'result': 'CHANGED',
-                                         'msg': "Successfully removed user, '%s', from the project" % gitlab_user['name']})
+                                         'msg': f"Successfully removed user, '{gitlab_user['name']}', from the project"})
                 except (gitlab.exceptions.GitlabDeleteError) as e:
                     error = True
-                    changed_users.append("Failed to removed user, '%s', from the project" % gitlab_user['name'])
+                    changed_users.append(f"Failed to removed user, '{gitlab_user['name']}', from the project")
                     changed_data.append({'gitlab_user': gitlab_user['name'], 'result': 'FAILED',
-                                         'msg': "Failed to remove user, '%s' from the project: %s" % (gitlab_user['name'], e)})
+                                         'msg': f"Failed to remove user, '{gitlab_user['name']}' from the project: {e}"})
 
     # if state = present and purge_users set delete users which are in members having give access level but not in gitlab_users
     if state == 'present' and purge_users:
@@ -425,18 +425,18 @@ def main():
                     if not module.check_mode:
                         project.remove_user_from_project(member.id, gitlab_project_id)
                     changed = True
-                    changed_users.append("Successfully removed user '%s', from project. Was not in given list" % member.username)
+                    changed_users.append(f"Successfully removed user '{member.username}', from project. Was not in given list")
                     changed_data.append({'gitlab_user': member.username, 'result': 'CHANGED',
-                                         'msg': "Successfully removed user '%s', from project. Was not in given list" % member.username})
+                                         'msg': f"Successfully removed user '{member.username}', from project. Was not in given list"})
                 except (gitlab.exceptions.GitlabDeleteError) as e:
                     error = True
-                    changed_users.append("Failed to removed user, '%s', from the project" % gitlab_user['name'])
+                    changed_users.append(f"Failed to removed user, '{gitlab_user['name']}', from the project")
                     changed_data.append({'gitlab_user': gitlab_user['name'], 'result': 'FAILED',
-                                         'msg': "Failed to remove user, '%s' from the project: %s" % (gitlab_user['name'], e)})
+                                         'msg': f"Failed to remove user, '{gitlab_user['name']}' from the project: {e}"})
 
     if len(gitlab_users_access) == 1 and error:
         # if single user given and an error occurred return error for list errors will be per user
-        module.fail_json(msg="FAILED: '%s '" % changed_users[0], result_data=changed_data)
+        module.fail_json(msg=f"FAILED: '{changed_users[0]} '", result_data=changed_data)
     elif error:
         module.fail_json(
             msg='FAILED: At least one given user/permission could not be set', result_data=changed_data)

@@ -88,7 +88,7 @@ def do_notify_grove(module, channel_token, service, message, url=None, icon_url=
     data = urlencode(my_data)
     response, info = fetch_url(module, my_url, data=data)
     if info['status'] != 200:
-        module.fail_json(msg="failed to send notification: %s" % info['msg'])
+        module.fail_json(msg=f"failed to send notification: {info['msg']}")
 
 # ==============================================================
 # main

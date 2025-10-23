@@ -130,7 +130,6 @@ except ImportError:
     HAS_GITHUB_API = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 
 
 def main():
@@ -196,18 +195,16 @@ def main():
         if password or (login_token and not any(login_token.startswith(prefix) for prefix in SKIPPED_TOKEN_PREFIXES)):
             gh_obj.me()
     except github3.exceptions.AuthenticationFailed as e:
-        module.fail_json(msg='Failed to connect to GitHub: %s' % to_native(e),
-                         details="Please check username and password or token "
-                                 "for repository %s" % repo)
+        module.fail_json(msg=f'Failed to connect to GitHub: {e}',
+                         details=f"Please check username and password or token for repository {repo}")
     except github3.exceptions.GitHubError as e:
-        module.fail_json(msg='GitHub API error: %s' % to_native(e),
-                         details="Please check username and password or token "
-                                 "for repository %s" % repo)
+        module.fail_json(msg=f'GitHub API error: {e}',
+                         details=f"Please check username and password or token for repository {repo}")
 
     repository = gh_obj.repository(user, repo)
 
     if not repository:
-        module.fail_json(msg="Repository %s/%s doesn't exist" % (user, repo))
+        module.fail_json(msg=f"Repository {user}/{repo} doesn't exist")
 
     if action == 'latest_release':
         release = repository.latest_release()
@@ -219,7 +216,7 @@ def main():
     if action == 'create_release':
         release_exists = repository.release_from_tag(tag)
         if release_exists:
-            module.exit_json(changed=False, msg="Release for tag %s already exists." % tag)
+            module.exit_json(changed=False, msg=f"Release for tag {tag} already exists.")
 
         release = repository.create_release(
             tag, target, name, body, draft, prerelease)

@@ -99,13 +99,13 @@ def main():
         'Accept': 'application/vnd.github.v3+json',
     }
 
-    url = "https://api.github.com/repos/%s/%s/issues/%s" % (organization, repo, issue)
+    url = f"https://api.github.com/repos/{organization}/{repo}/issues/{issue}"
 
     response, info = fetch_url(module, url, headers=headers)
     if not (200 <= info['status'] < 400):
         if info['status'] == 404:
-            module.fail_json(msg="Failed to find issue %s" % issue)
-        module.fail_json(msg="Failed to send request to %s: %s" % (url, info['msg']))
+            module.fail_json(msg=f"Failed to find issue {issue}")
+        module.fail_json(msg=f"Failed to send request to {url}: {info['msg']}")
 
     gh_obj = json.loads(response.read())
 

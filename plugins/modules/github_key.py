@@ -166,7 +166,7 @@ class GitHubSession(object):
 
     def request(self, method, url, data=None):
         headers = {
-            'Authorization': 'token %s' % self.token,
+            'Authorization': f'token {self.token}',
             'Content-Type': 'application/json',
             'Accept': 'application/vnd.github.v3+json',
         }
@@ -174,13 +174,12 @@ class GitHubSession(object):
             self.module, url, method=method, data=data, headers=headers)
         if not (200 <= info['status'] < 400):
             self.module.fail_json(
-                msg=(" failed to send request %s to %s: %s"
-                     % (method, url, info['msg'])))
+                msg=f" failed to send request {method} to {url}: {info['msg']}")
         return GitHubResponse(response, info)
 
 
 def get_all_keys(session):
-    url = session.api_url + '/user/keys'
+    url = f"{session.api_url}/user/keys"
     result = []
     while url:
         r = session.request('GET', url)
@@ -204,7 +203,7 @@ def create_key(session, name, pubkey, check_mode):
     else:
         return session.request(
             'POST',
-            session.api_url + '/user/keys',
+            f"{session.api_url}/user/keys",
             data=json.dumps({'title': name, 'key': pubkey})).json()
 
 
@@ -213,7 +212,7 @@ def delete_keys(session, to_delete, check_mode):
         return
 
     for key in to_delete:
-        session.request('DELETE', session.api_url + '/user/keys/%s' % key["id"])
+        session.request('DELETE', f"{session.api_url}/user/keys/{key['id']}")
 
 
 def ensure_key_absent(session, name, check_mode):
@@ -233,9 +232,7 @@ def ensure_key_present(module, session, name, pubkey, force, check_mode):
     for key in all_keys:
         existing_signature = key['key'].split(' ')[1]
         if new_signature == existing_signature and key['title'] != name:
-            module.fail_json(msg=(
-                "another key with the same content is already registered "
-                "under the name |{0}|").format(key['title']))
+            module.fail_json(msg=f"another key with the same content is already registered under the name |{key['title']}|")
 
     if matching_keys and force and matching_keys[0]['key'].split(' ')[1] != new_signature:
         delete_keys(session, matching_keys, check_mode=check_mode)

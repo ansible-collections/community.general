@@ -145,7 +145,7 @@ class GConftool(StateModuleHelper):
     def _make_process(self, fail_on_err):
         def process(rc, out, err):
             if err and fail_on_err:
-                self.do_raise('gconftool-2 failed with error:\n%s' % err.strip())
+                self.do_raise(f'gconftool-2 failed with error:\n{err.strip()}')
             out = out.rstrip()
             self.vars.value = None if out == "" else out
             return self.vars.value

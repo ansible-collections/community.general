@@ -154,7 +154,7 @@ def main():
 
 def build_args(module, name, path, scope):
     git_path = module.get_bin_path("git", True)
-    args = [git_path, "config", "--includes", "--null", "--" + scope]
+    args = [git_path, "config", "--includes", "--null", f"--{scope}"]
 
     if scope == "file":
         args.append(path)

@@ -139,7 +139,7 @@ issue:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.api import basic_auth_argument_spec
-from ansible.module_utils.common.text.converters import to_native, to_text
+from ansible.module_utils.common.text.converters import to_text
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
     auth_argument_spec, gitlab_authentication, gitlab, find_project, find_group
@@ -161,7 +161,7 @@ class GitlabIssue(object):
         try:
             milestones = group.milestones.list(search=milestone_id)
         except gitlab.exceptions.GitlabGetError as e:
-            self._module.fail_json(msg="Failed to list the Milestones: %s" % to_native(e))
+            self._module.fail_json(msg=f"Failed to list the Milestones: {e}")
 
         if len(milestones) > 1:
             self._module.fail_json(msg="Multiple Milestones matched search criteria.")
@@ -171,7 +171,7 @@ class GitlabIssue(object):
             try:
                 return group.milestones.get(id=milestones[0].id)
             except gitlab.exceptions.GitlabGetError as e:
-                self._module.fail_json(msg="Failed to get the Milestones: %s" % to_native(e))
+                self._module.fail_json(msg=f"Failed to get the Milestones: {e}")
 
     '''
     @param title Title of the Issue
@@ -182,7 +182,7 @@ class GitlabIssue(object):
         try:
             issues = self.project.issues.list(query_parameters={"search": title, "in": "title", "state": state_filter})
         except gitlab.exceptions.GitlabGetError as e:
-            self._module.fail_json(msg="Failed to list the Issues: %s" % to_native(e))
+            self._module.fail_json(msg=f"Failed to list the Issues: {e}")
 
         if len(issues) > 1:
             self._module.fail_json(msg="Multiple Issues matched search criteria.")
@@ -190,7 +190,7 @@ class GitlabIssue(object):
             try:
                 return self.project.issues.get(id=issues[0].iid)
             except gitlab.exceptions.GitlabGetError as e:
-                self._module.fail_json(msg="Failed to get the Issue: %s" % to_native(e))
+                self._module.fail_json(msg=f"Failed to get the Issue: {e}")
 
     '''
     @param username Name of the user
@@ -200,7 +200,7 @@ class GitlabIssue(object):
         try:
             users = [user for user in self.project.users.list(username=username, all=True) if user.username == username]
         except gitlab.exceptions.GitlabGetError as e:
-            self._module.fail_json(msg="Failed to list the users: %s" % to_native(e))
+            self._module.fail_json(msg=f"Failed to list the users: {e}")
 
         if len(users) > 1:
             self._module.fail_json(msg="Multiple Users matched search criteria.")
@@ -220,24 +220,24 @@ class GitlabIssue(object):
     '''
     def create_issue(self, options):
         if self._module.check_mode:
-            self._module.exit_json(changed=True, msg="Successfully created Issue '%s'." % options["title"])
+            self._module.exit_json(changed=True, msg=f"Successfully created Issue '{options['title']}'.")
 
         try:
             return self.project.issues.create(options)
         except gitlab.exceptions.GitlabCreateError as e:
-            self._module.fail_json(msg="Failed to create Issue: %s " % to_native(e))
+            self._module.fail_json(msg=f"Failed to create Issue: {e}")
 
     '''
     @param issue Issue object to delete
     '''
     def delete_issue(self, issue):
         if self._module.check_mode:
-            self._module.exit_json(changed=True, msg="Successfully deleted Issue '%s'." % issue["title"])
+            self._module.exit_json(changed=True, msg=f"Successfully deleted Issue '{issue['title']}'.")
 
         try:
             return issue.delete()
         except gitlab.exceptions.GitlabDeleteError as e:
-            self._module.fail_json(msg="Failed to delete Issue: '%s'." % to_native(e))
+            self._module.fail_json(msg=f"Failed to delete Issue: '{e}'.")
 
     '''
     @param issue Issue object to update
@@ -245,12 +245,12 @@ class GitlabIssue(object):
     '''
     def update_issue(self, issue, options):
         if self._module.check_mode:
-            self._module.exit_json(changed=True, msg="Successfully updated Issue '%s'." % issue["title"])
+            self._module.exit_json(changed=True, msg=f"Successfully updated Issue '{issue['title']}'.")
 
         try:
             return self.project.issues.update(issue.iid, options)
         except gitlab.exceptions.GitlabUpdateError as e:
-            self._module.fail_json(msg="Failed to update Issue %s." % to_native(e))
+            self._module.fail_json(msg=f"Failed to update Issue {e}.")
 
     '''
     @param issue Issue object to evaluate
@@ -332,14 +332,14 @@ def main():
 
     this_project = find_project(gitlab_instance, project)
     if this_project is None:
-        module.fail_json(msg="Failed to get the project: %s" % project)
+        module.fail_json(msg=f"Failed to get the project: {project}")
 
     this_gitlab = GitlabIssue(module=module, project=this_project, gitlab_instance=gitlab_instance)
 
     if milestone_id and milestone_group_id:
         this_group = find_group(gitlab_instance, milestone_group_id)
         if this_group is None:
-            module.fail_json(msg="Failed to get the group: %s" % milestone_group_id)
+            module.fail_json(msg=f"Failed to get the group: {milestone_group_id}")
 
         milestone_id = this_gitlab.get_milestone(milestone_id, this_group).id
 
@@ -351,7 +351,7 @@ def main():
                 with open(description_path, 'rb') as f:
                     description = to_text(f.read(), errors='surrogate_or_strict')
             except IOError as e:
-                module.fail_json(msg='Cannot open {0}: {1}'.format(description_path, e))
+                module.fail_json(msg=f'Cannot open {description_path}: {e}')
 
         # sorting necessary in order to properly detect changes, as we don't want to get false positive
         # results due to differences in ids ordering;
@@ -370,28 +370,28 @@ def main():
         if not this_issue:
             issue = this_gitlab.create_issue(options)
             module.exit_json(
-                changed=True, msg="Created Issue '{t}'.".format(t=title),
+                changed=True, msg=f"Created Issue '{title}'.",
                 issue=issue.asdict()
             )
         else:
             if this_gitlab.issue_has_changed(this_issue, options):
                 issue = this_gitlab.update_issue(this_issue, options)
                 module.exit_json(
-                    changed=True, msg="Updated Issue '{t}'.".format(t=title),
+                    changed=True, msg=f"Updated Issue '{title}'.",
                     issue=issue
                 )
             else:
                 module.exit_json(
-                    changed=False, msg="Issue '{t}' already exists".format(t=title),
+                    changed=False, msg=f"Issue '{title}' already exists",
                     issue=this_issue.asdict()
                 )
     elif state == "absent":
         if not this_issue:
-            module.exit_json(changed=False, msg="Issue '{t}' does not exist or has already been deleted.".format(t=title))
+            module.exit_json(changed=False, msg=f"Issue '{title}' does not exist or has already been deleted.")
         else:
             issue = this_gitlab.delete_issue(this_issue)
             module.exit_json(
-                changed=True, msg="Issue '{t}' deleted.".format(t=title),
+                changed=True, msg=f"Issue '{title}' deleted.",
                 issue=issue
             )
 

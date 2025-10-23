@@ -183,7 +183,7 @@ def main():
         base_args.append('-f')
         base_args.append(params['file'])
     elif scope:
-        base_args.append("--" + scope)
+        base_args.append(f"--{scope}")
 
     list_args = list(base_args)
 
@@ -210,7 +210,7 @@ def main():
         set_args.append("--unset-all")
         set_args.append(name)
     else:
-        set_args.append("--" + add_mode)
+        set_args.append(f"--{add_mode}")
         set_args.append(name)
         set_args.append(new_value)
 
@@ -248,7 +248,7 @@ def build_diff_value(value):
     if not value:
         return "\n"
     if len(value) == 1:
-        return value[0] + "\n"
+        return f"{value[0]}\n"
     return value
 
 
