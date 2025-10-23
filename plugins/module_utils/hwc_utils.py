@@ -41,7 +41,7 @@ class HwcClientException(Exception):
         self._message = message
 
     def __str__(self):
-        msg = f" code={self._code!s}," if self._code != 0 else ""
+        msg = f" code={self._code}," if self._code != 0 else ""
         return f"[HwcClientException]{msg} message={self._message}"
 
 

@@ -184,7 +184,7 @@ def _fs_exists(module, filesystem):
             return False
 
         else:
-            module.fail_json(msg="Failed to run lsfs. Error message: %s" % err)
+            module.fail_json(msg=f"Failed to run lsfs. Error message: {err}")
 
     else:
 
@@ -203,7 +203,7 @@ def _check_nfs_device(module, nfs_host, device):
     showmount_cmd = module.get_bin_path('showmount', True)
     rc, showmount_out, err = module.run_command([showmount_cmd, "-a", nfs_host])
     if rc != 0:
-        module.fail_json(msg="Failed to run showmount. Error message: %s" % err)
+        module.fail_json(msg=f"Failed to run showmount. Error message: {err}")
     else:
         showmount_data = showmount_out.splitlines()
         for line in showmount_data:
@@ -225,20 +225,20 @@ def _validate_vg(module, vg):
     lsvg_cmd = module.get_bin_path('lsvg', True)
     rc, current_active_vgs, err = module.run_command([lsvg_cmd, "-o"])
     if rc != 0:
-        module.fail_json(msg="Failed executing %s command." % lsvg_cmd)
+        module.fail_json(msg=f"Failed executing {lsvg_cmd} command.")
 
     rc, current_all_vgs, err = module.run_command([lsvg_cmd])
     if rc != 0:
-        module.fail_json(msg="Failed executing %s command." % lsvg_cmd)
+        module.fail_json(msg=f"Failed executing {lsvg_cmd} command.")
 
     if vg in current_all_vgs and vg not in current_active_vgs:
-        msg = "Volume group %s is in varyoff state." % vg
+        msg = f"Volume group {vg} is in varyoff state."
         return False, msg
     elif vg in current_active_vgs:
-        msg = "Volume group %s is in varyon state." % vg
+        msg = f"Volume group {vg} is in varyon state."
         return True, msg
     else:
-        msg = "Volume group %s does not exist." % vg
+        msg = f"Volume group {vg} does not exist."
         return None, msg
 
 
@@ -247,7 +247,7 @@ def resize_fs(module, filesystem, size):
 
     chfs_cmd = module.get_bin_path('chfs', True)
     if not module.check_mode:
-        rc, chfs_out, err = module.run_command([chfs_cmd, "-a", "size=%s" % size, filesystem])
+        rc, chfs_out, err = module.run_command([chfs_cmd, "-a", f"size={size}", filesystem])
 
         if rc == 28:
             changed = False
@@ -257,7 +257,7 @@ def resize_fs(module, filesystem, size):
                 changed = False
                 return changed, err
             else:
-                module.fail_json(msg="Failed to run chfs. Error message: %s" % err)
+                module.fail_json(msg=f"Failed to run chfs. Error message: {err}")
 
         else:
             if re.findall('The filesystem size is already', chfs_out):
@@ -301,19 +301,19 @@ def create_fs(
     if size is None:
         size = ''
     else:
-        size = "-a size=%s" % size
+        size = f"-a size={size}"
 
     if device is None:
         device = ''
     else:
-        device = "-d %s" % device
+        device = f"-d {device}"
 
     if vg is None:
         vg = ''
     else:
         vg_state, msg = _validate_vg(module, vg)
         if vg_state:
-            vg = "-g %s" % vg
+            vg = f"-g {vg}"
         else:
             changed = False
 
@@ -323,7 +323,7 @@ def create_fs(
         mount_group = ''
 
     else:
-        mount_group = "-u %s" % mount_group
+        mount_group = f"-u {mount_group}"
 
     auto_mount = auto_mount_opt[auto_mount]
     account_subsystem = account_subsys_opt[account_subsystem]
@@ -334,10 +334,10 @@ def create_fs(
         if not module.check_mode:
             rc, mknfsmnt_out, err = module.run_command([mknfsmnt_cmd, "-f", filesystem, device, "-h", nfs_server, "-t", permissions, auto_mount, "-w", "bg"])
             if rc != 0:
-                module.fail_json(msg="Failed to run mknfsmnt. Error message: %s" % err)
+                module.fail_json(msg=f"Failed to run mknfsmnt. Error message: {err}")
             else:
                 changed = True
-                msg = "NFS file system %s created." % filesystem
+                msg = f"NFS file system {filesystem} created."
 
                 return changed, msg
         else:
@@ -401,11 +401,10 @@ def create_fs(
 
             if rc == 10:
                 module.exit_json(
-                    msg="Using a existent previously defined logical volume, "
-                        "volume group needs to be empty. %s" % err)
+                    msg=f"Using a existent previously defined logical volume, volume group needs to be empty. {err}")
 
             elif rc != 0:
-                module.fail_json(msg="Failed to run %s. Error message: %s" % (cmd, err))
+                module.fail_json(msg=f"Failed to run {cmd}. Error message: {err}")
 
             else:
                 changed = True
@@ -433,12 +432,12 @@ def remove_fs(module, filesystem, rm_mount_point):
         cmd = [rmfs_cmd, "-r", rm_mount_point, filesystem]
         rc, rmfs_out, err = module.run_command(cmd)
         if rc != 0:
-            module.fail_json(msg="Failed to run %s. Error message: %s" % (cmd, err))
+            module.fail_json(msg=f"Failed to run {cmd}. Error message: {err}")
         else:
             changed = True
             msg = rmfs_out
             if not rmfs_out:
-                msg = "File system %s removed." % filesystem
+                msg = f"File system {filesystem} removed."
 
             return changed, msg
     else:
@@ -455,10 +454,10 @@ def mount_fs(module, filesystem):
     if not module.check_mode:
         rc, mount_out, err = module.run_command([mount_cmd, filesystem])
         if rc != 0:
-            module.fail_json(msg="Failed to run mount. Error message: %s" % err)
+            module.fail_json(msg=f"Failed to run mount. Error message: {err}")
         else:
             changed = True
-            msg = "File system %s mounted." % filesystem
+            msg = f"File system {filesystem} mounted."
 
             return changed, msg
     else:
@@ -475,10 +474,10 @@ def unmount_fs(module, filesystem):
     if not module.check_mode:
         rc, unmount_out, err = module.run_command([unmount_cmd, filesystem])
         if rc != 0:
-            module.fail_json(msg="Failed to run unmount. Error message: %s" % err)
+            module.fail_json(msg=f"Failed to run unmount. Error message: {err}")
         else:
             changed = True
-            msg = "File system %s unmounted." % filesystem
+            msg = f"File system {filesystem} unmounted."
 
             return changed, msg
     else:
@@ -533,7 +532,7 @@ def main():
 
         # Check if fs is mounted or exists.
         if fs_mounted or fs_exists:
-            result['msg'] = "File system %s already exists." % filesystem
+            result['msg'] = f"File system {filesystem} already exists."
             result['changed'] = False
 
             # If parameter size was passed, resize fs.
@@ -569,32 +568,32 @@ def main():
 
     elif state == 'absent':
         if ismount(filesystem):
-            result['msg'] = "File system %s mounted." % filesystem
+            result['msg'] = f"File system {filesystem} mounted."
 
         else:
             fs_status = _fs_exists(module, filesystem)
             if not fs_status:
-                result['msg'] = "File system %s does not exist." % filesystem
+                result['msg'] = f"File system {filesystem} does not exist."
             else:
                 result['changed'], result['msg'] = remove_fs(module, filesystem, rm_mount_point)
 
     elif state == 'mounted':
         if ismount(filesystem):
             result['changed'] = False
-            result['msg'] = "File system %s already mounted." % filesystem
+            result['msg'] = f"File system {filesystem} already mounted."
         else:
             result['changed'], result['msg'] = mount_fs(module, filesystem)
 
     elif state == 'unmounted':
         if not ismount(filesystem):
             result['changed'] = False
-            result['msg'] = "File system %s already unmounted." % filesystem
+            result['msg'] = f"File system {filesystem} already unmounted."
         else:
             result['changed'], result['msg'] = unmount_fs(module, filesystem)
 
     else:
         # Unreachable codeblock
-        result['msg'] = "Unexpected state %s." % state
+        result['msg'] = f"Unexpected state {state}."
         module.fail_json(**result)
 
     module.exit_json(**result)

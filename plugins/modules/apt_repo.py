@@ -85,7 +85,7 @@ def apt_repo(module, *args):
     rc, out, err = module.run_command([APT_REPO_PATH] + args)
 
     if rc != 0:
-        module.fail_json(msg="'%s' failed: %s" % (' '.join(['apt-repo'] + args), err))
+        module.fail_json(msg=f"'{' '.join(['apt-repo'] + args)}' failed: {err}")
 
     return out
 

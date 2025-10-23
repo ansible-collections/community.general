@@ -1,0 +1,22 @@
+minor_changes:
+  - hwc_utils module_utils plugin - adjust f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10942).
+  - manageiq module_utils plugin - adjust f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10942).
+  - aerospike_migrations - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10942).
+  - airbrake_deployment - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10942).
+  - aix_devices - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10942).
+  - aix_filesystem - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10942).
+  - aix_inittab - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10942).
+  - aix_lvg - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10942).
+  - aix_lvol - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10942).
+  - alerta_customer - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10942).
+  - ali_instance - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10942).
+  - alternatives - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10942).
+  - android_sdk - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10942).
+  - ansible_galaxy_install - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10942).
+  - apache2_mod_proxy - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10942).
+  - apache2_module - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10942).
+  - apk - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10942).
+  - apt_repo - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10942).
+  - apt_rpm - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10942).
+  - archive - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10942).
+  - awall - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10942).

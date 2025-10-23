@@ -251,12 +251,12 @@ def remove_packages(module, packages):
         rc, out, err = module.run_command([APT_PATH, "-y", "remove", package], environ_update={"LANG": "C"})
 
         if rc != 0:
-            module.fail_json(msg="failed to remove %s: %s" % (package, err))
+            module.fail_json(msg=f"failed to remove {package}: {err}")
 
         remove_c += 1
 
     if remove_c > 0:
-        return (True, "removed %s package(s)" % remove_c)
+        return (True, f"removed {remove_c} package(s)")
 
     return (False, "package(s) already absent")
 
@@ -282,9 +282,9 @@ def install_packages(module, pkgspec, allow_upgrade=False):
 
         # apt-rpm always have 0 for exit code if --force is used
         if rc or not installed:
-            module.fail_json(msg="'%s' failed: %s" % (" ".join(command), err))
+            module.fail_json(msg=f"'{' '.join(command)}' failed: {err}")
         else:
-            return (True, "%s present(s)" % packages)
+            return (True, f"{packages} present(s)")
     else:
         return (False, "Nothing to install")
 

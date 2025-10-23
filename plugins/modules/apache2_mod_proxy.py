@@ -267,12 +267,12 @@ class BalancerMember(object):
         resp, info = fetch_url(self.module, self.management_url, headers={'Referer': self.management_url})
 
         if info['status'] != 200:
-            raise ModuleHelperException("Could not get balancer_member_page, check for connectivity! {0}".format(info))
+            raise ModuleHelperException(f"Could not get balancer_member_page, check for connectivity! {info}")
 
         try:
             soup = BeautifulSoup(resp)
         except TypeError as exc:
-            raise ModuleHelperException("Cannot parse balancer_member_page HTML! {0}".format(exc)) from exc
+            raise ModuleHelperException(f"Cannot parse balancer_member_page HTML! {exc}") from exc
 
         subsoup = find_all(find_all(soup, 'table')[1], 'tr')
         keys = find_all(subsoup[0], 'th')
@@ -299,12 +299,12 @@ class BalancerMember(object):
                           'ignore_errors': '&w_status_I'}
 
         request_body = regexp_extraction(self.management_url, EXPRESSION, 1)
-        values_url = "".join("{0}={1}".format(url_param, 1 if values[mode] else 0) for mode, url_param in values_mapping.items())
-        request_body = "{0}{1}".format(request_body, values_url)
+        values_url = "".join(f"{url_param}={1 if values[mode] else 0}" for mode, url_param in values_mapping.items())
+        request_body = f"{request_body}{values_url}"
 
         response, info = fetch_url(self.module, self.management_url, data=request_body, headers={'Referer': self.management_url})
         if info['status'] != 200:
-            raise ModuleHelperException("Could not set the member status! {0} {1}".format(self.host, info['status']))
+            raise ModuleHelperException(f"Could not set the member status! {self.host} {info['status']}")
 
     attributes = property(get_member_attributes)
     status = property(get_member_status, set_member_status)
@@ -327,8 +327,8 @@ class Balancer(object):
 
     def __init__(self, module, host, suffix, tls=False):
         proto = "https" if tls else "http"
-        self.base_url = '{0}://{1}'.format(proto, host)
-        self.url = '{0}://{1}{2}'.format(proto, host, suffix)
+        self.base_url = f'{proto}://{host}'
+        self.url = f'{proto}://{host}{suffix}'
         self.module = module
         self.page = self.fetch_balancer_page()
 
@@ -336,7 +336,7 @@ class Balancer(object):
         """ Returns the balancer management html page as a string for later parsing."""
         resp, info = fetch_url(self.module, self.url)
         if info['status'] != 200:
-            raise ModuleHelperException("Could not get balancer page! HTTP status response: {0}".format(info['status']))
+            raise ModuleHelperException(f"Could not get balancer page! HTTP status response: {info['status']}")
 
         content = to_text(resp.read())
         apache_version = regexp_extraction(content.upper(), APACHE_VERSION_EXPRESSION, 1)
@@ -344,7 +344,7 @@ class Balancer(object):
             raise ModuleHelperException("Could not get the Apache server version from the balancer-manager")
 
         if not re.search(pattern=r"2\.4\.[\d]*", string=apache_version):
-            raise ModuleHelperException("This module only acts on an Apache2 2.4+ instance, current Apache2 version: {0}".format(apache_version))
+            raise ModuleHelperException(f"This module only acts on an Apache2 2.4+ instance, current Apache2 version: {apache_version}")
         return content
 
     def get_balancer_members(self):
@@ -352,7 +352,7 @@ class Balancer(object):
         try:
             soup = BeautifulSoup(self.page)
         except TypeError as e:
-            raise ModuleHelperException("Cannot parse balancer page HTML! {0}".format(self.page)) from e
+            raise ModuleHelperException(f"Cannot parse balancer page HTML! {self.page}") from e
 
         elements = find_all(soup, 'a')
         for element in elements[1::1]:
@@ -413,7 +413,7 @@ class ApacheModProxy(ModuleHelper):
                     self.vars.member = member.as_dict()
 
             if not member_exists:
-                self.do_raise(msg='{0} is not a member of the balancer {1}!'.format(self.vars.member_host, self.vars.balancer_vhost))
+                self.do_raise(msg=f'{self.vars.member_host} is not a member of the balancer {self.vars.balancer_vhost}!')
 
 
 def main():

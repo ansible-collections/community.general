@@ -245,7 +245,7 @@ class AnsibleGalaxyInstall(ModuleHelper):
             line = out.splitlines()[0]
             match = self._RE_GALAXY_VERSION.match(line)
             if not match:
-                self.do_raise("Unable to determine ansible-galaxy version from: {0}".format(line))
+                self.do_raise(f"Unable to determine ansible-galaxy version from: {line}")
             version = match.group("version")
             return version
 
