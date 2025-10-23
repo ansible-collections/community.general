@@ -572,7 +572,7 @@ def main():
         command.append(f"-parallelism={module.params.get('parallelism')}")
 
     def format_args(vars):
-        if isinstance(vars, type(None)):
+        if vars is None:
             return 'null'
         elif isinstance(vars, str):
             return '"{string}"'.format(string=vars.replace('\\', '\\\\').replace('"', '\\"')).replace('\n', '\\n')
