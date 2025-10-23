@@ -70,15 +70,17 @@ options:
   client_id:
     type: str
     description:
-      - Name of the client to be mapped (different than O(cid)).
+      - Name of the client (different than O(cid)) whose role is to be mapped.
       - This parameter is required if O(cid) is not provided (can be replaced by O(cid) to reduce the number of API calls
         that must be made).
+      - If neither O(cid) nor O(client_id) is specified, a B(realm) role is mapped instead.
   cid:
     type: str
     description:
-      - ID of the client to be mapped.
+      - ID of the client whose role is to be mapped.
       - This parameter is not required for updating or deleting the rolemapping but providing it reduces the number of API
         calls required.
+      - If neither O(cid) nor O(client_id) is specified, a B(realm) role is mapped instead.
   roles:
     description:
       - Roles to be mapped to the user.
@@ -106,6 +108,23 @@ author:
 """
 
 EXAMPLES = r"""
+- name: Map a realm role to a user, authentication with credentials
+  community.general.keycloak_user_rolemapping:
+    realm: MyCustomRealm
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://auth.example.com/auth
+    auth_realm: master
+    auth_username: USERNAME
+    auth_password: PASSWORD
+    state: present
+    user_id: user1Id
+    roles:
+      - name: role_name1
+        id: role_id1
+      - name: role_name2
+        id: role_id2
+  delegate_to: localhost
+
 - name: Map a client role to a user, authentication with credentials
   community.general.keycloak_user_rolemapping:
     realm: MyCustomRealm
