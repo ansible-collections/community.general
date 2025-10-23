@@ -1,2 +1,2 @@
 bugfixes:
- - terraform - Fix bug when `None` values inside complex vars are throwing error instead passed to terraform. now terraform can handle nulls in complex_vars itself
+ - terraform - fix bug when ``null`` values inside complex vars are throwing error instead of being passed to terraform. Now terraform can handle ``null``s in ``complex_vars`` itself (https://github.com/ansible-collections/community.general/pull/10961).
