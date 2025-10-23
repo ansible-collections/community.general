@@ -179,17 +179,15 @@ def match(entry, pattern):
         return False
     # indexing a match object with [] is a Python 3.6+ construct
     for name in (
-        '%s' % m["name"],
-        '%s.%s' % (m["name"], m["arch"]),
-        '%s-%s' % (m["name"], m["version"]),
-        '%s-%s-%s' % (m["name"], m["version"], m["release"]),
-        '%s-%s:%s' % (m["name"], m["epoch"], m["version"]),
-        '%s-%s-%s.%s' % (m["name"], m["version"], m["release"], m["arch"]),
-        '%s-%s:%s-%s' % (m["name"], m["epoch"], m["version"], m["release"]),
-        '%s:%s-%s-%s.%s' % (m["epoch"], m["name"], m["version"], m["release"],
-                            m["arch"]),
-        '%s-%s:%s-%s.%s' % (m["name"], m["epoch"], m["version"], m["release"],
-                            m["arch"])
+        f"{m['name']}",
+        f"{m['name']}.{m['arch']}",
+        f"{m['name']}-{m['version']}",
+        f"{m['name']}-{m['version']}-{m['release']}",
+        f"{m['name']}-{m['epoch']}:{m['version']}",
+        f"{m['name']}-{m['version']}-{m['release']}.{m['arch']}",
+        f"{m['name']}-{m['epoch']}:{m['version']}-{m['release']}",
+        f"{m['epoch']}:{m['name']}-{m['version']}-{m['release']}.{m['arch']}",
+        f"{m['name']}-{m['epoch']}:{m['version']}-{m['release']}.{m['arch']}"
     ):
         if fnmatch.fnmatch(name, pattern):
             return True
@@ -209,12 +207,10 @@ def get_packages(module, patterns, only_installed=False):
         m = NEVRA_RE.match(p)
         if not m:
             module.fail_json(
-                msg="failed to parse nevra for %s" % p,
+                msg=f"failed to parse nevra for {p}",
                 rc=rc, out=out, err=err)
 
-        evr = "%s:%s-%s" % (m["epoch"],
-                            m["version"],
-                            m["release"])
+        evr = f"{m['epoch']}:{m['version']}-{m['release']}"
 
         packages_available_map_name_evrs.setdefault(m["name"], set())
         packages_available_map_name_evrs[m["name"]].add(evr)
@@ -245,7 +241,7 @@ def get_package_list(module, package_mgr="dnf"):
                 dummy, name = line.split(":", 1)
                 name = name.strip()
                 pkg_name = get_packages(module, patterns=[name])
-                package_name = "%s-%s.*" % (name, pkg_name[name].pop())
+                package_name = f"{name}-{pkg_name[name].pop()}.*"
                 if package_name and package_name not in package_list:
                     package_list.append(package_name)
             if line.startswith("evr"):
@@ -286,7 +282,7 @@ def main():
     if state == "clean" and patterns:
         module.fail_json(msg="clean state is incompatible with a name list")
     if state != "clean" and not patterns:
-        module.fail_json(msg="name list is required for %s state" % state)
+        module.fail_json(msg=f"name list is required for {state} state")
 
     locklist_pre = get_package_list(module, package_mgr=package_mgr)
 
@@ -298,7 +294,7 @@ def main():
         if raw:
             # Add raw patterns as specs to add.
             for p in patterns:
-                if (p if state == "present" else "!" + p) not in locklist_pre:
+                if (p if state == "present" else f"!{p}") not in locklist_pre:
                     specs_toadd.append(p)
         else:
             # Get available packages that match the patterns.
@@ -320,9 +316,9 @@ def main():
             packages_map_name_evrs.update(packages_installed_map_name_evrs)
             for name in packages_map_name_evrs:
                 for evr in packages_map_name_evrs[name]:
-                    locklist_entry = "%s-%s.*" % (name, evr)
+                    locklist_entry = f"{name}-{evr}.*"
 
-                    if (locklist_entry if state == "present" else "!%s" % locklist_entry) not in locklist_pre:
+                    if (locklist_entry if state == "present" else f"!{locklist_entry}") not in locklist_pre:
                         specs_toadd.append(locklist_entry)
 
         if specs_toadd and not module.check_mode:

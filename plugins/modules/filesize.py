@@ -262,7 +262,7 @@ def bytes_to_human(size, iec=False):
     if unit == 'KB':
         unit = 'kB'
 
-    return '%s %s' % (str(hsize), unit)
+    return f'{hsize} {unit}'
 
 
 def smart_blocksize(size, unit, product, bsize):
@@ -312,8 +312,7 @@ def split_size_unit(string, isint=False):
         product = int(round(value))
     else:
         if unit not in SIZE_UNITS.keys():
-            raise AssertionError("invalid size unit (%s): unit must be one of %s, or none." %
-                                 (unit, ', '.join(sorted(SIZE_UNITS, key=SIZE_UNITS.get))))
+            raise AssertionError(f"invalid size unit ({unit}): unit must be one of {', '.join(sorted(SIZE_UNITS, key=SIZE_UNITS.get))}, or none.")
         product = int(round(value * SIZE_UNITS[unit]))
     return value, unit, product
 
@@ -323,7 +322,7 @@ def size_string(value):
        or a string itself.
     """
     if not isinstance(value, (int, float, str)):
-        raise AssertionError("invalid value type (%s): size must be integer, float or string" % type(value))
+        raise AssertionError(f"invalid value type ({type(value)}): size must be integer, float or string")
     return str(value)
 
 
@@ -354,7 +353,7 @@ def current_size(args):
     path = args['path']
     if os.path.exists(path):
         if not os.path.isfile(path):
-            raise AssertionError("%s exists but is not a regular file" % path)
+            raise AssertionError(f"{path} exists but is not a regular file")
         args['file_size'] = os.stat(path).st_size
     else:
         args['file_size'] = None
@@ -382,7 +381,7 @@ def complete_dd_cmdline(args, dd_cmd):
         seek = int(args['file_size'] / bs)
 
     count = args['size_spec']['blocks'] - seek
-    dd_cmd += ['bs=%s' % str(bs), 'seek=%s' % str(seek), 'count=%s' % str(count)]
+    dd_cmd += [f'bs={bs}', f'seek={seek}', f'count={count}']
 
     return dd_cmd
 
@@ -431,7 +430,7 @@ def main():
         filesize=size_descriptors)
 
     dd_bin = module.get_bin_path('dd', True)
-    dd_cmd = [dd_bin, 'if=%s' % args['source'], 'of=%s' % args['path']]
+    dd_cmd = [dd_bin, f"if={args['source']}", f"of={args['path']}"]
 
     if expected_filesize != initial_filesize or args['force']:
         result['cmd'] = ' '.join(complete_dd_cmdline(args, dd_cmd))
@@ -447,12 +446,11 @@ def main():
                 result['changed'] = result_filesize != initial_filesize
 
             if result['rc']:
-                msg = "dd error while creating file %s with size %s from source %s: see stderr for details" % (
-                    args['path'], args['size'], args['source'])
+                msg = f"dd error while creating file {args['path']} with size {args['size']} from source {args['source']}: see stderr for details"
                 module.fail_json(msg=msg, **result)
             if result_filesize != expected_filesize:
-                msg = "module error while creating file %s with size %s from source %s: file is %s bytes long" % (
-                    args['path'], args['size'], args['source'], result_filesize)
+                msg = (f"module error while creating file {args['path']} with size {args['size']} "
+                       f"from source {args['source']}: file is {result_filesize} bytes long")
                 module.fail_json(msg=msg, **result)
 
     # dd follows symlinks, and so does this module, while file module doesn't.

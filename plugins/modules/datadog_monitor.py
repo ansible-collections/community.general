@@ -306,7 +306,7 @@ def main():
     if isinstance(response, dict):
         msg = response.get('errors', None)
         if msg:
-            module.fail_json(msg="Failed to connect Datadog server using given app_key and api_key : {0}".format(msg[0]))
+            module.fail_json(msg=f"Failed to connect Datadog server using given app_key and api_key : {msg[0]}")
 
     if module.params['state'] == 'present':
         install_monitor(module)
@@ -328,7 +328,7 @@ def _get_monitor(module):
     if module.params['id'] is not None:
         monitor = api.Monitor.get(module.params['id'])
         if 'errors' in monitor:
-            module.fail_json(msg="Failed to retrieve monitor with id %s, errors are %s" % (module.params['id'], str(monitor['errors'])))
+            module.fail_json(msg=f"Failed to retrieve monitor with id {module.params['id']}, errors are {monitor['errors']}")
         return monitor
     else:
         monitors = api.Monitor.get_all()
@@ -430,7 +430,7 @@ def delete_monitor(module):
 def mute_monitor(module):
     monitor = _get_monitor(module)
     if not monitor:
-        module.fail_json(msg="Monitor %s not found!" % module.params['name'])
+        module.fail_json(msg=f"Monitor {module.params['name']} not found!")
     elif monitor['options']['silenced']:
         module.fail_json(msg="Monitor is already muted. Datadog does not allow to modify muted alerts, consider unmuting it first.")
     elif module.params['silenced'] is not None and len(set(monitor['options']['silenced']) ^ set(module.params['silenced'])) == 0:
@@ -448,7 +448,7 @@ def mute_monitor(module):
 def unmute_monitor(module):
     monitor = _get_monitor(module)
     if not monitor:
-        module.fail_json(msg="Monitor %s not found!" % module.params['name'])
+        module.fail_json(msg=f"Monitor {module.params['name']} not found!")
     elif not monitor['options']['silenced']:
         module.exit_json(changed=False)
     try:

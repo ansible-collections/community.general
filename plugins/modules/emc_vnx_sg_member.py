@@ -81,7 +81,6 @@ hluid:
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.general.plugins.module_utils.storage.emc.emc_vnx import emc_vnx_argument_spec
 
 LIB_IMP_ERR = None
@@ -141,8 +140,7 @@ def run_module():
                     except VNXAluAlreadyAttachedError:
                         result['hluid'] = sg.get_hlu(alu)
                     except (VNXAttachAluError, VNXStorageGroupError) as e:
-                        module.fail_json(msg='Error attaching {0}: '
-                                             '{1} '.format(alu, to_native(e)),
+                        module.fail_json(msg=f'Error attaching {alu}: {e} ',
                                          **result)
                 else:
                     result['hluid'] = sg.get_hlu(alu)
@@ -154,15 +152,13 @@ def run_module():
                     # being not attached when using absent is OK
                     pass
                 except VNXStorageGroupError as e:
-                    module.fail_json(msg='Error detaching alu {0}: '
-                                         '{1} '.format(alu, to_native(e)),
+                    module.fail_json(msg=f'Error detaching alu {alu}: {e} ',
                                      **result)
         else:
-            module.fail_json(msg='No such storage group named '
-                                 '{0}'.format(module.params['name']),
+            module.fail_json(msg=f"No such storage group named {module.params['name']}",
                                  **result)
     except VNXCredentialError as e:
-        module.fail_json(msg='{0}'.format(to_native(e)), **result)
+        module.fail_json(msg=f'{e}', **result)
 
     module.exit_json(**result)
 

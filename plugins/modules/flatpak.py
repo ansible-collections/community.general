@@ -190,7 +190,7 @@ def install_flat(module, binary, remote, names, method, no_dependencies):
             uri_names.append(name)
         else:
             id_names.append(name)
-    base_command = [binary, "install", "--{0}".format(method)]
+    base_command = [binary, "install", f"--{method}"]
     flatpak_version = _flatpak_version(module, binary)
     if LooseVersion(flatpak_version) < LooseVersion('1.1.3'):
         base_command += ["-y"]
@@ -214,7 +214,7 @@ def update_flat(module, binary, names, method, no_dependencies):
         _match_installed_flat_name(module, binary, name, method)
         for name in names
     ]
-    command = [binary, "update", "--{0}".format(method)]
+    command = [binary, "update", f"--{method}"]
     flatpak_version = _flatpak_version(module, binary)
     if LooseVersion(flatpak_version) < LooseVersion('1.1.3'):
         command += ["-y"]
@@ -242,14 +242,14 @@ def uninstall_flat(module, binary, names, method):
         command += ["-y"]
     else:
         command += ["--noninteractive"]
-    command += ["--{0}".format(method)] + installed_flat_names
+    command += [f"--{method}"] + installed_flat_names
     _flatpak_command(module, module.check_mode, command)
     result['changed'] = True
 
 
 def flatpak_exists(module, binary, names, method):
     """Check if the flatpaks are installed."""
-    command = [binary, "list", "--{0}".format(method)]
+    command = [binary, "list", f"--{method}"]
     output = _flatpak_command(module, False, command)
     installed = []
     not_installed = []
@@ -269,7 +269,7 @@ def _match_installed_flat_name(module, binary, name, method):
     global result  # pylint: disable=global-variable-not-assigned
     parsed_name = _parse_flatpak_name(name)
     # Try running flatpak list with columns feature
-    command = [binary, "list", "--{0}".format(method), "--app", "--columns=application"]
+    command = [binary, "list", f"--{method}", "--app", "--columns=application"]
     _flatpak_command(module, False, command, ignore_failure=True)
     if result['rc'] != 0 and OUTDATED_FLATPAK_VERSION_ERROR_MESSAGE in result['stderr']:
         # Probably flatpak before 1.2
@@ -283,15 +283,17 @@ def _match_installed_flat_name(module, binary, name, method):
     if matched_flatpak_name:
         return matched_flatpak_name
     else:
-        result['msg'] = "Flatpak removal failed: Could not match any installed flatpaks to " +\
-            "the name `{0}`. ".format(_parse_flatpak_name(name)) +\
+        result['msg'] = (
+            "Flatpak removal failed: Could not match any installed flatpaks to "
+            f"the name `{_parse_flatpak_name(name)}`. "
             "If you used a URL, try using the reverse DNS name of the flatpak"
+        )
         module.fail_json(**result)
 
 
 def _match_flat_using_outdated_flatpak_format(module, binary, parsed_name, method):
     global result  # pylint: disable=global-variable-not-assigned
-    command = [binary, "list", "--{0}".format(method), "--app", "--columns=application"]
+    command = [binary, "list", f"--{method}", "--app", "--columns=application"]
     output = _flatpak_command(module, False, command)
     for row in output.split('\n'):
         if parsed_name.lower() == row.lower():
@@ -300,7 +302,7 @@ def _match_flat_using_outdated_flatpak_format(module, binary, parsed_name, metho
 
 def _match_flat_using_flatpak_column_feature(module, binary, parsed_name, method):
     global result  # pylint: disable=global-variable-not-assigned
-    command = [binary, "list", "--{0}".format(method), "--app"]
+    command = [binary, "list", f"--{method}", "--app"]
     output = _flatpak_command(module, False, command)
     for row in output.split('\n'):
         if parsed_name.lower() in row.lower():
@@ -395,7 +397,7 @@ def main():
 
     # If the binary was not found, fail the operation
     if not binary:
-        module.fail_json(msg="Executable '%s' was not found on the system." % executable, **result)
+        module.fail_json(msg=f"Executable '{executable}' was not found on the system.", **result)
 
     module.run_command_environ_update = dict(LANGUAGE='C', LC_ALL='C')
 

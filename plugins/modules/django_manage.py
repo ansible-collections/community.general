@@ -191,9 +191,9 @@ from ansible.module_utils.basic import AnsibleModule
 def _fail(module, cmd, out, err, **kwargs):
     msg = ''
     if out:
-        msg += "stdout: %s" % (out, )
+        msg += f"stdout: {out}"
     if err:
-        msg += "\n:stderr: %s" % (err, )
+        msg += f"\n:stderr: {err}"
     module.fail_json(cmd=cmd, msg=msg, **kwargs)
 
 
@@ -207,9 +207,9 @@ def _ensure_virtualenv(module):
     activate = os.path.join(vbin, 'activate')
 
     if not os.path.exists(activate):
-        module.fail_json(msg='%s does not point to a valid virtual environment' % venv_param)
+        module.fail_json(msg=f'{venv_param} does not point to a valid virtual environment')
 
-    os.environ["PATH"] = "%s:%s" % (vbin, os.environ["PATH"])
+    os.environ["PATH"] = f"{vbin}:{os.environ['PATH']}"
     os.environ["VIRTUAL_ENV"] = venv_param
 
 
@@ -294,11 +294,11 @@ def main():
     for param in specific_params:
         value = module.params[param]
         if value and param not in command_allowed_param_map[command_bin]:
-            module.fail_json(msg='%s param is incompatible with command=%s' % (param, command_bin))
+            module.fail_json(msg=f'{param} param is incompatible with command={command_bin}')
 
     for param in command_required_param_map.get(command_bin, ()):
         if not module.params[param]:
-            module.fail_json(msg='%s param is required for command=%s' % (param, command_bin))
+            module.fail_json(msg=f'{param} param is required for command={command_bin}')
 
     _ensure_virtualenv(module)
 
@@ -309,11 +309,11 @@ def main():
 
     for param in general_params:
         if module.params[param]:
-            run_cmd_args.append('--%s=%s' % (param, module.params[param]))
+            run_cmd_args.append(f'--{param}={module.params[param]}')
 
     for param in specific_boolean_params:
         if module.params[param]:
-            run_cmd_args.append('--%s' % param)
+            run_cmd_args.append(f'--{param}')
 
     # these params always get tacked on the end of the command
     for param in end_of_command_params:
@@ -329,18 +329,18 @@ def main():
             out = 'already exists.'
         else:
             if "Unknown command:" in err:
-                _fail(module, run_cmd_args, err, "Unknown django command: %s" % command_bin)
+                _fail(module, run_cmd_args, err, f"Unknown django command: {command_bin}")
             _fail(module, run_cmd_args, out, err, path=os.environ["PATH"], syspath=sys.path)
 
     changed = False
 
     lines = out.split('\n')
-    filt = globals().get(command_bin + "_filter_output", None)
+    filt = globals().get(f"{command_bin}_filter_output", None)
     if filt:
         filtered_output = list(filter(filt, lines))
         if len(filtered_output):
             changed = True
-    check_changed = globals().get("{0}_check_changed".format(command_bin), None)
+    check_changed = globals().get(f"{command_bin}_check_changed", None)
     if check_changed:
         changed = check_changed(out)
 

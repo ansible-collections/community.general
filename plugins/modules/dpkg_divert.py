@@ -144,7 +144,7 @@ import re
 import os
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_bytes, to_native
+from ansible.module_utils.common.text.converters import to_bytes
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
@@ -224,7 +224,7 @@ def main():
             MAINCOMMAND.extend(['--divert', divert])
             target = divert
         else:
-            target = '%s.distrib' % path
+            target = f'{path}.distrib'
 
         MAINCOMMAND.extend(['--add', path])
         diversion_wanted['divert'] = target
@@ -282,7 +282,7 @@ def main():
                 b_remove = to_bytes(to_remove, errors='surrogate_or_strict')
                 os.unlink(b_remove)
             except OSError as e:
-                msg = 'Failed to remove %s: %s' % (to_remove, to_native(e))
+                msg = f'Failed to remove {to_remove}: {e}'
                 module.fail_json(changed=changed, cmd=maincommand, rc=rc, msg=msg,
                                  stderr=stderr, stdout=stdout, diversion=diversion)
             rc, stdout, stderr = module.run_command(MAINCOMMAND, check_rc=True)

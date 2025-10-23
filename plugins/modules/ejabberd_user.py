@@ -126,9 +126,9 @@ class EjabberdUser(object):
         if process is None:
             process = _proc
 
-        with self.runner("cmd " + options, output_process=process) as ctx:
+        with self.runner(f"cmd {options}", output_process=process) as ctx:
             res = ctx.run(cmd=cmd, host=self.host, user=self.user, pwd=self.pwd)
-            self.log('command: %s' % " ".join(ctx.run_info['cmd']))
+            self.log(f"command: {' '.join(ctx.run_info['cmd'])}")
         return res
 
     def update(self):

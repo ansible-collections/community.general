@@ -119,7 +119,7 @@ from ansible.module_utils.common.text.converters import to_bytes, to_native
 def add_remote(module, binary, name, flatpakrepo_url, method):
     """Add a new remote."""
     global result  # pylint: disable=global-variable-not-assigned
-    command = [binary, "remote-add", "--{0}".format(method), name, flatpakrepo_url]
+    command = [binary, "remote-add", f"--{method}", name, flatpakrepo_url]
     _flatpak_command(module, module.check_mode, command)
     result['changed'] = True
 
@@ -127,14 +127,14 @@ def add_remote(module, binary, name, flatpakrepo_url, method):
 def remove_remote(module, binary, name, method):
     """Remove an existing remote."""
     global result  # pylint: disable=global-variable-not-assigned
-    command = [binary, "remote-delete", "--{0}".format(method), "--force", name]
+    command = [binary, "remote-delete", f"--{method}", "--force", name]
     _flatpak_command(module, module.check_mode, command)
     result['changed'] = True
 
 
 def remote_exists(module, binary, name, method):
     """Check if the remote exists."""
-    command = [binary, "remote-list", "--show-disabled", "--{0}".format(method)]
+    command = [binary, "remote-list", "--show-disabled", f"--{method}"]
     # The query operation for the remote needs to be run even in check mode
     output = _flatpak_command(module, False, command)
     for line in output.splitlines():
@@ -149,7 +149,7 @@ def remote_exists(module, binary, name, method):
 def enable_remote(module, binary, name, method):
     """Enable a remote."""
     global result  # pylint: disable=global-variable-not-assigned
-    command = [binary, "remote-modify", "--enable", "--{0}".format(method), name]
+    command = [binary, "remote-modify", "--enable", f"--{method}", name]
     _flatpak_command(module, module.check_mode, command)
     result['changed'] = True
 
@@ -157,14 +157,14 @@ def enable_remote(module, binary, name, method):
 def disable_remote(module, binary, name, method):
     """Disable a remote."""
     global result  # pylint: disable=global-variable-not-assigned
-    command = [binary, "remote-modify", "--disable", "--{0}".format(method), name]
+    command = [binary, "remote-modify", "--disable", f"--{method}", name]
     _flatpak_command(module, module.check_mode, command)
     result['changed'] = True
 
 
 def remote_enabled(module, binary, name, method):
     """Check if the remote is enabled."""
-    command = [binary, "remote-list", "--show-disabled", "--{0}".format(method)]
+    command = [binary, "remote-list", "--show-disabled", f"--{method}"]
     # The query operation for the remote needs to be run even in check mode
     output = _flatpak_command(module, False, command)
     for line in output.splitlines():
@@ -223,7 +223,7 @@ def main():
 
     # If the binary was not found, fail the operation
     if not binary:
-        module.fail_json(msg="Executable '%s' was not found on the system." % executable, **result)
+        module.fail_json(msg=f"Executable '{executable}' was not found on the system.", **result)
 
     remote_already_exists = remote_exists(module, binary, to_bytes(name), method)
 

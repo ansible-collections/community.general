@@ -421,7 +421,7 @@ def main():
             if state == 'present':
                 difference = list(set(wanted_record_ids) - set(current_record_ids))
                 if difference:
-                    module.fail_json(msg="Missing the following records: %s" % difference)
+                    module.fail_json(msg=f"Missing the following records: {difference}")
                 else:
                     module.exit_json(changed=False)
             # state is absent
@@ -437,9 +437,9 @@ def main():
 
     except DNSimpleException as e:
         if DNSIMPLE_MAJOR_VERSION > 1:
-            module.fail_json(msg="DNSimple exception: %s" % e.message)
+            module.fail_json(msg=f"DNSimple exception: {e.message}")
         else:
-            module.fail_json(msg="DNSimple exception: %s" % str(e.args[0]['message']))
+            module.fail_json(msg=f"DNSimple exception: {e.args[0]['message']}")
     module.fail_json(msg="Unknown what you wanted me to do")
 
 

@@ -94,7 +94,7 @@ import shutil
 import tempfile
 
 from ansible_collections.community.general.plugins.module_utils.mh.module_helper import ModuleHelper
-from ansible.module_utils.common.text.converters import to_native, to_bytes
+from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.community.general.plugins.module_utils import deps
 
 with deps.declare("lzma"):
@@ -148,11 +148,11 @@ class Decompress(ModuleHelper):
             if self.vars.remove and os.path.exists(b_dest):
                 self.module.exit_json(changed=False)
             else:
-                self.do_raise(msg="Path does not exist: '%s'" % b_src)
+                self.do_raise(msg=f"Path does not exist: '{b_src}'")
         if os.path.isdir(b_src):
-            self.do_raise(msg="Cannot decompress directory '%s'" % b_src)
+            self.do_raise(msg=f"Cannot decompress directory '{b_src}'")
         if os.path.isdir(b_dest):
-            self.do_raise(msg="Destination is a directory, cannot decompress: '%s'" % b_dest)
+            self.do_raise(msg=f"Destination is a directory, cannot decompress: '{b_dest}'")
 
     def __run__(self):
         b_dest = to_bytes(self.vars.dest, errors='surrogate_or_strict')
@@ -166,7 +166,7 @@ class Decompress(ModuleHelper):
             b_temppath = to_bytes(temppath, errors='surrogate_or_strict')
             decompress(b_src, b_temppath, handler)
         except OSError as e:
-            self.do_raise(msg="Unable to create temporary file '%s'" % to_native(e))
+            self.do_raise(msg=f"Unable to create temporary file '{e}'")
 
         if os.path.exists(b_dest):
             self.changed = not filecmp.cmp(b_temppath, b_dest, shallow=False)
@@ -177,7 +177,7 @@ class Decompress(ModuleHelper):
             try:
                 self.module.atomic_move(b_temppath, b_dest)
             except OSError:
-                self.do_raise(msg="Unable to move temporary file '%s' to '%s'" % (b_temppath, self.vars.dest))
+                self.do_raise(msg=f"Unable to move temporary file '{b_temppath}' to '{self.vars.dest}'")
 
         if self.vars.remove and not self.check_mode:
             os.remove(b_src)
@@ -185,7 +185,7 @@ class Decompress(ModuleHelper):
 
     def get_destination_filename(self):
         src = self.vars.src
-        fmt_extension = ".%s" % self.vars.format
+        fmt_extension = f".{self.vars.format}"
         if src.endswith(fmt_extension) and len(src) > len(fmt_extension):
             filename = src[:-len(fmt_extension)]
         else:

@@ -236,9 +236,9 @@ with deps.declare("requests"):
 
 def build_url(account, key, is_sandbox):
     headers = {'Accept': 'application/json',
-               'Authorization': 'Bearer {0}'.format(key)}
+               'Authorization': f'Bearer {key}'}
     sandbox = '.sandbox' if is_sandbox else ''
-    url = 'https://api{sandbox}.dnsimple.com/v2/{account}'.format(sandbox=sandbox, account=account)
+    url = f'https://api{sandbox}.dnsimple.com/v2/{account}'
     req = Request(url=url, headers=headers)
     prepped_request = req.prepare()
     return prepped_request
@@ -256,7 +256,7 @@ def iterate_data(module, request_object):
 
     while page < total_pages:
         page = page + 1
-        request_object.url = '{url}&page={page}'.format(url=base_url, page=page)
+        request_object.url = f'{base_url}&page={page}'
         new_results = Session().send(request_object)
         data = data + new_results.json()['data']
 
@@ -264,17 +264,17 @@ def iterate_data(module, request_object):
 
 
 def record_info(dnsimple_mod, req_obj):
-    req_obj.url, req_obj.method = req_obj.url + '/zones/' + dnsimple_mod.params["name"] + '/records?name=' + dnsimple_mod.params["record"], 'GET'
+    req_obj.url, req_obj.method = f"{req_obj.url}/zones/{dnsimple_mod.params['name']}/records?name={dnsimple_mod.params['record']}", 'GET'
     return iterate_data(dnsimple_mod, req_obj)
 
 
 def domain_info(dnsimple_mod, req_obj):
-    req_obj.url, req_obj.method = req_obj.url + '/zones/' + dnsimple_mod.params["name"] + '/records?per_page=100', 'GET'
+    req_obj.url, req_obj.method = f"{req_obj.url}/zones/{dnsimple_mod.params['name']}/records?per_page=100", 'GET'
     return iterate_data(dnsimple_mod, req_obj)
 
 
 def account_info(dnsimple_mod, req_obj):
-    req_obj.url, req_obj.method = req_obj.url + '/zones/?per_page=100', 'GET'
+    req_obj.url, req_obj.method = f"{req_obj.url}/zones/?per_page=100", 'GET'
     return iterate_data(dnsimple_mod, req_obj)
 
 

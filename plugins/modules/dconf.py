@@ -193,7 +193,7 @@ class DBusWrapper(object):
         # Go through all the pids for this user, try to extract the D-Bus
         # session bus address from environment, and ensure it is possible to
         # connect to it.
-        self.module.debug("Trying to detect existing D-Bus user session for user: %d" % uid)
+        self.module.debug(f"Trying to detect existing D-Bus user session for user: {int(uid)}")
 
         for pid in psutil.pids():
             try:
@@ -201,13 +201,13 @@ class DBusWrapper(object):
                 process_real_uid, dummy, dummy = process.uids()
                 if process_real_uid == uid and 'DBUS_SESSION_BUS_ADDRESS' in process.environ():
                     dbus_session_bus_address_candidate = process.environ()['DBUS_SESSION_BUS_ADDRESS']
-                    self.module.debug("Found D-Bus user session candidate at address: %s" % dbus_session_bus_address_candidate)
+                    self.module.debug(f"Found D-Bus user session candidate at address: {dbus_session_bus_address_candidate}")
                     dbus_send_cmd = self.module.get_bin_path('dbus-send', required=True)
-                    command = [dbus_send_cmd, '--address=%s' % dbus_session_bus_address_candidate, '--type=signal', '/', 'com.example.test']
+                    command = [dbus_send_cmd, f'--address={dbus_session_bus_address_candidate}', '--type=signal', '/', 'com.example.test']
                     rc, dummy, dummy = self.module.run_command(command)
 
                     if rc == 0:
-                        self.module.debug("Verified D-Bus user session candidate as usable at address: %s" % dbus_session_bus_address_candidate)
+                        self.module.debug(f"Verified D-Bus user session candidate as usable at address: {dbus_session_bus_address_candidate}")
 
                         return dbus_session_bus_address_candidate
 
@@ -240,7 +240,7 @@ class DBusWrapper(object):
             rc, out, err = self.module.run_command(command)
 
             if self.dbus_session_bus_address is None and rc == 127:
-                self.module.fail_json(msg="Failed to run passed-in command, dbus-run-session faced an internal error: %s" % err)
+                self.module.fail_json(msg=f"Failed to run passed-in command, dbus-run-session faced an internal error: {err}")
         else:
             extra_environment = {'DBUS_SESSION_BUS_ADDRESS': self.dbus_session_bus_address}
             rc, out, err = self.module.run_command(command, environ_update=extra_environment)
@@ -302,7 +302,7 @@ class DconfPreference(object):
         rc, out, err = self.module.run_command(command)
 
         if rc != 0:
-            self.module.fail_json(msg='dconf failed while reading the value with error: %s' % err,
+            self.module.fail_json(msg=f'dconf failed while reading the value with error: {err}',
                                   out=out,
                                   err=err)
 
@@ -343,7 +343,7 @@ class DconfPreference(object):
         rc, out, err = dbus_wrapper.run_command(command)
 
         if rc != 0:
-            self.module.fail_json(msg='dconf failed while writing key %s, value %s with error: %s' % (key, value, err),
+            self.module.fail_json(msg=f'dconf failed while writing key {key}, value {value} with error: {err}',
                                   out=out,
                                   err=err)
 
@@ -381,7 +381,7 @@ class DconfPreference(object):
         rc, out, err = dbus_wrapper.run_command(command)
 
         if rc != 0:
-            self.module.fail_json(msg='dconf failed while resetting the value with error: %s' % err,
+            self.module.fail_json(msg=f'dconf failed while resetting the value with error: {err}',
                                   out=out,
                                   err=err)
 
@@ -416,8 +416,7 @@ def main():
         if has_respawned():
             # This shouldn't be possible; short-circuit early if it happens.
             module.fail_json(
-                msg="%s must be installed and visible from %s." %
-                (glib_module_name, sys.executable))
+                msg=f"{glib_module_name} must be installed and visible from {sys.executable}.")
 
         interpreters = ['/usr/bin/python3', '/usr/bin/python']
 

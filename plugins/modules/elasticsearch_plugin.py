@@ -171,14 +171,14 @@ def install_plugin(module, plugin_bin, plugin_name, version, src, url, proxy_hos
             cmd.append(timeout)
 
         if version:
-            plugin_name = plugin_name + '/' + version
+            plugin_name = f"{plugin_name}/{version}"
             cmd[2] = plugin_name
 
     if proxy_host and proxy_port:
-        java_opts = ["-Dhttp.proxyHost=%s" % proxy_host,
-                     "-Dhttp.proxyPort=%s" % proxy_port,
-                     "-Dhttps.proxyHost=%s" % proxy_host,
-                     "-Dhttps.proxyPort=%s" % proxy_port]
+        java_opts = [f"-Dhttp.proxyHost={proxy_host}",
+                     f"-Dhttp.proxyPort={proxy_port}",
+                     f"-Dhttps.proxyHost={proxy_host}",
+                     f"-Dhttps.proxyPort={proxy_port}"]
         module.run_command_environ_update = dict(CLI_JAVA_OPTS=" ".join(java_opts),  # Elasticsearch 8.x
                                                  ES_JAVA_OPTS=" ".join(java_opts))  # Older Elasticsearch versions
 
@@ -201,7 +201,7 @@ def install_plugin(module, plugin_bin, plugin_name, version, src, url, proxy_hos
 
     if rc != 0:
         reason = parse_error(out)
-        module.fail_json(msg="Installing plugin '%s' failed: %s" % (plugin_name, reason), err=err)
+        module.fail_json(msg=f"Installing plugin '{plugin_name}' failed: {reason}", err=err)
 
     return True, cmd, out, err
 
@@ -216,7 +216,7 @@ def remove_plugin(module, plugin_bin, plugin_name):
 
     if rc != 0:
         reason = parse_error(out)
-        module.fail_json(msg="Removing plugin '%s' failed: %s" % (plugin_name, reason), err=err)
+        module.fail_json(msg=f"Removing plugin '{plugin_name}' failed: {reason}", err=err)
 
     return True, cmd, out, err
 
@@ -247,7 +247,7 @@ def get_plugin_bin(module, plugin_bin=None):
                 break
 
     if not valid_plugin_bin:
-        module.fail_json(msg='%s does not exist and no other valid plugin installers were found. Make sure Elasticsearch is installed.' % plugin_bin)
+        module.fail_json(msg=f'{plugin_bin} does not exist and no other valid plugin installers were found. Make sure Elasticsearch is installed.')
 
     return valid_plugin_bin
 
