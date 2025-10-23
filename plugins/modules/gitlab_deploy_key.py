@@ -114,7 +114,6 @@ deploy_key:
 
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
     auth_argument_spec, find_project, gitlab_authentication, gitlab, list_all_kwargs
@@ -181,7 +180,7 @@ class GitLabDeployKey(object):
         try:
             deploy_key = project.keys.create(arguments)
         except (gitlab.exceptions.GitlabCreateError) as e:
-            self._module.fail_json(msg=f"Failed to create deploy key: {to_native(e)} ")
+            self._module.fail_json(msg=f"Failed to create deploy key: {e} ")
 
         return deploy_key
 
