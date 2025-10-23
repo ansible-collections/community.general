@@ -572,7 +572,9 @@ def main():
         command.append(f"-parallelism={module.params.get('parallelism')}")
 
     def format_args(vars):
-        if isinstance(vars, str):
+        if isinstance(vars, type(None)):
+            return 'null'
+        elif isinstance(vars, str):
             return '"{string}"'.format(string=vars.replace('\\', '\\\\').replace('"', '\\"')).replace('\n', '\\n')
         elif isinstance(vars, bool):
             if vars:
@@ -589,7 +591,7 @@ def main():
                     ret_out.append(f'{k}={{{process_complex_args(v)}}}')
                 elif isinstance(v, list):
                     ret_out.append(f"{k}={process_complex_args(v)}")
-                elif isinstance(v, (int, float, str, bool)):
+                elif isinstance(v, (int, float, str, bool, type(None))):
                     ret_out.append(f'{k}={format_args(v)}')
                 else:
                     # only to handle anything unforeseen
@@ -601,7 +603,7 @@ def main():
                     l_out.append(f"{{{process_complex_args(item)}}}")
                 elif isinstance(item, list):
                     l_out.append(f"{process_complex_args(item)}")
-                elif isinstance(item, (str, int, float, bool)):
+                elif isinstance(item, (str, int, float, bool, type(None))):
                     l_out.append(format_args(item))
                 else:
                     # only to handle anything unforeseen
