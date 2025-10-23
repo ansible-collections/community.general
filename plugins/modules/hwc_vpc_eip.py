@@ -271,8 +271,7 @@ def main():
         else:
             v = search_resource(config)
             if len(v) > 1:
-                raise Exception("Found more than one resource(%s)" % ", ".join([
-                                navigate_value(i, ["id"]) for i in v]))
+                raise Exception(f"Found more than one resource({', '.join([navigate_value(i, ['id']) for i in v])})")
 
             if len(v) == 1:
                 resource = v[0]
@@ -372,9 +371,7 @@ def delete(config):
     try:
         wait_to_finish(["Done"], ["Pending"], _refresh_status, timeout)
     except Exception as ex:
-        module.fail_json(msg="module(hwc_vpc_eip): error "
-                             "waiting for api(delete) to "
-                             "be done, error= %s" % str(ex))
+        module.fail_json(msg=f"module(hwc_vpc_eip): error waiting for api(delete) to be done, error= {ex}")
 
 
 def read_resource(config, exclude_output=False):
@@ -394,15 +391,15 @@ def _build_query_link(opts):
 
     v = navigate_value(opts, ["ip_version"])
     if v:
-        query_params.append("ip_version=" + str(v))
+        query_params.append(f"ip_version={v}")
 
     v = navigate_value(opts, ["enterprise_project_id"])
     if v:
-        query_params.append("enterprise_project_id=" + str(v))
+        query_params.append(f"enterprise_project_id={v}")
 
     query_link = "?marker={marker}&limit=10"
     if query_params:
-        query_link += "&" + "&".join(query_params)
+        query_link += f"&{'&'.join(query_params)}"
 
     return query_link
 
@@ -413,7 +410,7 @@ def search_resource(config):
     opts = user_input_parameters(module)
     identity_obj = _build_identity_object(opts)
     query_link = _build_query_link(opts)
-    link = "publicips" + query_link
+    link = f"publicips{query_link}"
 
     result = []
     p = {'marker': ''}
@@ -500,8 +497,7 @@ def send_create_request(module, params, client):
     try:
         r = client.post(url, params)
     except HwcClientException as ex:
-        msg = ("module(hwc_vpc_eip): error running "
-               "api(create), error: %s" % str(ex))
+        msg = f"module(hwc_vpc_eip): error running api(create), error: {ex}"
         module.fail_json(msg=msg)
 
     return r
@@ -536,9 +532,7 @@ def async_wait_create(config, result, client, timeout):
             None,
             _query_status, timeout)
     except Exception as ex:
-        module.fail_json(msg="module(hwc_vpc_eip): error "
-                             "waiting for api(create) to "
-                             "be done, error= %s" % str(ex))
+        module.fail_json(msg=f"module(hwc_vpc_eip): error waiting for api(create) to be done, error= {ex}")
 
 
 def build_update_parameters(opts):
@@ -566,8 +560,7 @@ def send_update_request(module, params, client):
     try:
         r = client.put(url, params)
     except HwcClientException as ex:
-        msg = ("module(hwc_vpc_eip): error running "
-               "api(update), error: %s" % str(ex))
+        msg = f"module(hwc_vpc_eip): error running api(update), error: {ex}"
         module.fail_json(msg=msg)
 
     return r
@@ -597,9 +590,7 @@ def async_wait_update(config, result, client, timeout):
             None,
             _query_status, timeout)
     except Exception as ex:
-        module.fail_json(msg="module(hwc_vpc_eip): error "
-                             "waiting for api(update) to "
-                             "be done, error= %s" % str(ex))
+        module.fail_json(msg=f"module(hwc_vpc_eip): error waiting for api(update) to be done, error= {ex}")
 
 
 def send_delete_request(module, params, client):
@@ -608,8 +599,7 @@ def send_delete_request(module, params, client):
     try:
         r = client.delete(url, params)
     except HwcClientException as ex:
-        msg = ("module(hwc_vpc_eip): error running "
-               "api(delete), error: %s" % str(ex))
+        msg = f"module(hwc_vpc_eip): error running api(delete), error: {ex}"
         module.fail_json(msg=msg)
 
     return r
@@ -622,8 +612,7 @@ def send_read_request(module, client):
     try:
         r = client.get(url)
     except HwcClientException as ex:
-        msg = ("module(hwc_vpc_eip): error running "
-               "api(read), error: %s" % str(ex))
+        msg = f"module(hwc_vpc_eip): error running api(read), error: {ex}"
         module.fail_json(msg=msg)
 
     return navigate_value(r, ["publicip"], None)
@@ -748,8 +737,7 @@ def send_list_request(module, client, url):
     try:
         r = client.get(url)
     except HwcClientException as ex:
-        msg = ("module(hwc_vpc_eip): error running "
-               "api(list), error: %s" % str(ex))
+        msg = f"module(hwc_vpc_eip): error running api(list), error: {ex}"
         module.fail_json(msg=msg)
 
     return navigate_value(r, ["publicips"], None)

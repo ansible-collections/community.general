@@ -637,7 +637,7 @@ def main():
                 module.fail_json(name=homectl.name, msg=stderr, rc=rc)
             homectl.result['changed'] = True
             homectl.result['rc'] = rc
-            homectl.result['msg'] = 'User %s removed!' % homectl.name
+            homectl.result['msg'] = f'User {homectl.name} removed!'
         else:
             homectl.result['changed'] = False
             homectl.result['msg'] = 'User does not exist!'
@@ -654,7 +654,7 @@ def main():
             rc, user_metadata, stderr = homectl.get_user_metadata()
             homectl.result['data'] = json.loads(user_metadata)
             homectl.result['rc'] = rc
-            homectl.result['msg'] = 'User %s created!' % homectl.name
+            homectl.result['msg'] = f'User {homectl.name} created!'
         else:
             if valid_pwhash:
                 # Run this to see if changed would be True or False which is useful for check_mode
@@ -677,7 +677,7 @@ def main():
             homectl.result['data'] = json.loads(user_metadata)
             homectl.result['rc'] = rc
             if homectl.result['changed']:
-                homectl.result['msg'] = 'User %s modified' % homectl.name
+                homectl.result['msg'] = f'User {homectl.name} modified'
 
     module.exit_json(**homectl.result)
 

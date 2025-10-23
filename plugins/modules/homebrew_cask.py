@@ -170,7 +170,7 @@ class HomebrewCaskException(Exception):
 def _create_regex_group_complement(s):
     lines = (line.strip() for line in s.split('\n') if line.strip())
     chars = [_f for _f in (line.split('#')[0].strip() for line in lines) if _f]
-    group = r'[^' + r''.join(chars) + r']'
+    group = rf"[^{''.join(chars)}]"
     return re.compile(group)
 # /utils ------------------------------------------------------------------ }}}
 
@@ -240,7 +240,7 @@ class HomebrewCask(object):
         if not self.valid_module(module):
             self._module = None
             self.failed = True
-            self.message = 'Invalid module: {0}.'.format(module)
+            self.message = f'Invalid module: {module}.'
             raise HomebrewCaskException(self.message)
 
         else:
@@ -256,7 +256,7 @@ class HomebrewCask(object):
         if not HomebrewValidate.valid_path(path):
             self._path = []
             self.failed = True
-            self.message = 'Invalid path: {0}.'.format(path)
+            self.message = f'Invalid path: {path}.'
             raise HomebrewCaskException(self.message)
 
         else:
@@ -276,7 +276,7 @@ class HomebrewCask(object):
         if not HomebrewValidate.valid_brew_path(brew_path):
             self._brew_path = None
             self.failed = True
-            self.message = 'Invalid brew_path: {0}.'.format(brew_path)
+            self.message = f'Invalid brew_path: {brew_path}.'
             raise HomebrewCaskException(self.message)
 
         else:
@@ -301,7 +301,7 @@ class HomebrewCask(object):
         if not self.valid_cask(cask):
             self._current_cask = None
             self.failed = True
-            self.message = 'Invalid cask: {0}.'.format(cask)
+            self.message = f'Invalid cask: {cask}.'
             raise HomebrewCaskException(self.message)
 
         else:
@@ -384,10 +384,7 @@ class HomebrewCask(object):
             pass
 
         if not self.failed and (self.changed_count + self.unchanged_count > 1):
-            self.message = "Changed: %d, Unchanged: %d" % (
-                self.changed_count,
-                self.unchanged_count,
-            )
+            self.message = f"Changed: {self.changed_count}, Unchanged: {self.unchanged_count}"
         (failed, changed, message) = self._status()
 
         return (failed, changed, message)
@@ -411,7 +408,7 @@ class HomebrewCask(object):
     def _current_cask_is_installed(self):
         if not self.valid_cask(self.current_cask):
             self.failed = True
-            self.message = 'Invalid cask: {0}.'.format(self.current_cask)
+            self.message = f'Invalid cask: {self.current_cask}.'
             raise HomebrewCaskException(self.message)
 
         if self._brew_cask_command_is_deprecated():
@@ -552,21 +549,17 @@ class HomebrewCask(object):
     def _install_current_cask(self):
         if not self.valid_cask(self.current_cask):
             self.failed = True
-            self.message = 'Invalid cask: {0}.'.format(self.current_cask)
+            self.message = f'Invalid cask: {self.current_cask}.'
             raise HomebrewCaskException(self.message)
 
         if '--force' not in self.install_options and self._current_cask_is_installed():
             self.unchanged_count += 1
-            self.message = 'Cask already installed: {0}'.format(
-                self.current_cask,
-            )
+            self.message = f'Cask already installed: {self.current_cask}'
             return True
 
         if self.module.check_mode:
             self.changed = True
-            self.message = 'Cask would be installed: {0}'.format(
-                self.current_cask
-            )
+            self.message = f'Cask would be installed: {self.current_cask}'
             raise HomebrewCaskException(self.message)
 
         if self._brew_cask_command_is_deprecated():
@@ -588,13 +581,11 @@ class HomebrewCask(object):
         if self._current_cask_is_installed():
             self.changed_count += 1
             self.changed = True
-            self.message = 'Cask installed: {0}'.format(self.current_cask)
+            self.message = f'Cask installed: {self.current_cask}'
             return True
         elif self.accept_external_apps and re.search(r"Error: It seems there is already an App at", err):
             self.unchanged_count += 1
-            self.message = 'Cask already installed: {0}'.format(
-                self.current_cask,
-            )
+            self.message = f'Cask already installed: {self.current_cask}'
             return True
         else:
             self.failed = True
@@ -615,24 +606,20 @@ class HomebrewCask(object):
 
         if not self.valid_cask(self.current_cask):
             self.failed = True
-            self.message = 'Invalid cask: {0}.'.format(self.current_cask)
+            self.message = f'Invalid cask: {self.current_cask}.'
             raise HomebrewCaskException(self.message)
 
         if not self._current_cask_is_installed():
             command = 'install'
 
         if self._current_cask_is_installed() and not self._current_cask_is_outdated():
-            self.message = 'Cask is already upgraded: {0}'.format(
-                self.current_cask,
-            )
+            self.message = f'Cask is already upgraded: {self.current_cask}'
             self.unchanged_count += 1
             return True
 
         if self.module.check_mode:
             self.changed = True
-            self.message = 'Cask would be upgraded: {0}'.format(
-                self.current_cask
-            )
+            self.message = f'Cask would be upgraded: {self.current_cask}'
             raise HomebrewCaskException(self.message)
 
         if self._brew_cask_command_is_deprecated():
@@ -654,7 +641,7 @@ class HomebrewCask(object):
         if self._current_cask_is_installed() and not self._current_cask_is_outdated():
             self.changed_count += 1
             self.changed = True
-            self.message = 'Cask upgraded: {0}'.format(self.current_cask)
+            self.message = f'Cask upgraded: {self.current_cask}'
             return True
         else:
             self.failed = True
@@ -673,21 +660,17 @@ class HomebrewCask(object):
     def _uninstall_current_cask(self):
         if not self.valid_cask(self.current_cask):
             self.failed = True
-            self.message = 'Invalid cask: {0}.'.format(self.current_cask)
+            self.message = f'Invalid cask: {self.current_cask}.'
             raise HomebrewCaskException(self.message)
 
         if not self._current_cask_is_installed():
             self.unchanged_count += 1
-            self.message = 'Cask already uninstalled: {0}'.format(
-                self.current_cask,
-            )
+            self.message = f'Cask already uninstalled: {self.current_cask}'
             return True
 
         if self.module.check_mode:
             self.changed = True
-            self.message = 'Cask would be uninstalled: {0}'.format(
-                self.current_cask
-            )
+            self.message = f'Cask would be uninstalled: {self.current_cask}'
             raise HomebrewCaskException(self.message)
 
         if self._brew_cask_command_is_deprecated():
@@ -709,7 +692,7 @@ class HomebrewCask(object):
         if not self._current_cask_is_installed():
             self.changed_count += 1
             self.changed = True
-            self.message = 'Cask uninstalled: {0}'.format(self.current_cask)
+            self.message = f'Cask uninstalled: {self.current_cask}'
             return True
         else:
             self.failed = True
@@ -803,7 +786,7 @@ def main():
     upgrade_all = p['upgrade_all']
     greedy = p['greedy']
     p['install_options'] = p['install_options'] or []
-    install_options = ['--{0}'.format(install_option)
+    install_options = [f'--{install_option}'
                        for install_option in p['install_options']]
 
     accept_external_apps = p['accept_external_apps']

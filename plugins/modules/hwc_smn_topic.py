@@ -180,8 +180,7 @@ def create(config):
     try:
         r = client.post(link, create_resource_opts(module))
     except HwcClientException as ex:
-        msg = ("module(hwc_smn_topic): error creating "
-               "resource, error: %s" % str(ex))
+        msg = f"module(hwc_smn_topic): error creating resource, error: {ex}"
         module.fail_json(msg=msg)
 
     return get_resource(config, r)
@@ -195,8 +194,7 @@ def update(config):
     try:
         client.put(link, update_resource_opts(module))
     except HwcClientException as ex:
-        msg = ("module(hwc_smn_topic): error updating "
-               "resource, error: %s" % str(ex))
+        msg = f"module(hwc_smn_topic): error updating resource, error: {ex}"
         module.fail_json(msg=msg)
 
     return fetch_resource(module, client, link)
@@ -210,8 +208,7 @@ def delete(config):
     try:
         client.delete(link)
     except HwcClientException as ex:
-        msg = ("module(hwc_smn_topic): error deleting "
-               "resource, error: %s" % str(ex))
+        msg = f"module(hwc_smn_topic): error deleting resource, error: {ex}"
         module.fail_json(msg=msg)
 
 
@@ -219,8 +216,7 @@ def fetch_resource(module, client, link):
     try:
         return client.get(link)
     except HwcClientException as ex:
-        msg = ("module(hwc_smn_topic): error fetching "
-               "resource, error: %s" % str(ex))
+        msg = f"module(hwc_smn_topic): error fetching resource, error: {ex}"
         module.fail_json(msg=msg)
 
 

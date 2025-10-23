@@ -264,7 +264,7 @@ class HAProxy(object):
         """
         self.client = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         self.client.connect(self.socket)
-        self.client.sendall(to_bytes('%s\n' % cmd))
+        self.client.sendall(to_bytes(f'{cmd}\n'))
 
         result = b''
         buf = b''
@@ -332,7 +332,7 @@ class HAProxy(object):
             state = self.get_state_for(backend, svname)
             if (self.fail_on_not_found) and state is None:
                 self.module.fail_json(
-                    msg="The specified backend '%s/%s' was not found!" % (backend, svname))
+                    msg=f"The specified backend '{backend}/{svname}' was not found!")
 
             if state is not None:
                 self.execute(Template(cmd).substitute(pxname=backend, svname=svname))
@@ -370,8 +370,7 @@ class HAProxy(object):
                     return True
             time.sleep(self.wait_interval)
 
-        self.module.fail_json(msg="server %s/%s not status '%s' after %d retries. Aborting." %
-                              (pxname, svname, status, self.wait_retries))
+        self.module.fail_json(msg=f"server {pxname}/{svname} not status '{status}' after {self.wait_retries} retries. Aborting.")
 
     def enabled(self, host, backend, weight):
         """
@@ -385,7 +384,7 @@ class HAProxy(object):
         if self.health:
             cmd += "; enable health $pxname/$svname"
         if weight:
-            cmd += "; set weight $pxname/$svname %s" % weight
+            cmd += f"; set weight $pxname/$svname {weight}"
         self.execute_for_backends(cmd, backend, host, 'UP')
 
     def disabled(self, host, backend, shutdown_sessions):
@@ -436,7 +435,7 @@ class HAProxy(object):
         elif self.state == 'drain':
             self.drain(self.host, self.backend)
         else:
-            self.module.fail_json(msg="unknown state specified: '%s'" % self.state)
+            self.module.fail_json(msg=f"unknown state specified: '{self.state}'")
 
         # Get the state after the run
         self.command_results['state_after'] = self.get_state_for(self.backend, self.host)

@@ -71,7 +71,6 @@ import traceback
 from urllib.parse import urlencode
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.urls import fetch_url
 
 
@@ -120,12 +119,12 @@ def main():
         data = urlencode(params)
         response, info = fetch_url(module, url, data=data)
     except Exception as e:
-        module.fail_json(msg='Unable to notify Honeybadger: %s' % to_native(e), exception=traceback.format_exc())
+        module.fail_json(msg=f'Unable to notify Honeybadger: {e}', exception=traceback.format_exc())
     else:
         if info['status'] == 201:
             module.exit_json(changed=True)
         else:
-            module.fail_json(msg="HTTP result code: %d connecting to %s" % (info['status'], url))
+            module.fail_json(msg=f"HTTP result code: {info['status']} connecting to {url}")
 
 
 if __name__ == '__main__':

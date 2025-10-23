@@ -130,7 +130,7 @@ def _brew_service_state(args, module):
     try:
         data = json.loads(stdout)[0]
     except json.JSONDecodeError:
-        module.fail_json(msg="Failed to parse JSON output:\n{0}".format(stdout))
+        module.fail_json(msg=f"Failed to parse JSON output:\n{stdout}")
 
     return HomebrewServiceState(running=data["status"] == "started", pid=data["pid"])
 
@@ -140,9 +140,7 @@ def _exit_with_state(args, module, changed=False, message=None):
     state = _brew_service_state(args, module)
     if message is None:
         message = (
-            "Running: {state.running}, Changed: {changed}, PID: {state.pid}".format(
-                state=state, changed=changed
-            )
+            f"Running: {state.running}, Changed: {changed}, PID: {state.pid}"
         )
     module.exit_json(msg=message, pid=state.pid, running=state.running, changed=changed)
 
@@ -152,11 +150,11 @@ def validate_and_load_arguments(module):
     """Reuse the Homebrew module's validation logic to validate these arguments."""
     package = module.params["name"]  # type: ignore
     if not HomebrewValidate.valid_package(package):
-        module.fail_json(msg="Invalid package name: {0}".format(package))
+        module.fail_json(msg=f"Invalid package name: {package}")
 
     state = module.params["state"]  # type: ignore
     if state not in ["present", "absent", "restarted"]:
-        module.fail_json(msg="Invalid state: {0}".format(state))
+        module.fail_json(msg=f"Invalid state: {state}")
 
     brew_path = parse_brew_path(module)
 

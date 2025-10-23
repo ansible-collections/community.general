@@ -582,10 +582,7 @@ def _init(config):
     v = search_resource(config)
     n = len(v)
     if n > 1:
-        raise Exception("Found more than one resource(%s)" % ", ".join([
-            navigate_value(i, ["id"])
-            for i in v
-        ]))
+        raise Exception(f"Found more than one resource({', '.join([navigate_value(i, ['id']) for i in v])})")
 
     if n == 1:
         module.params['id'] = navigate_value(v[0], ["id"])
@@ -750,16 +747,16 @@ def _build_query_link(opts):
     v = navigate_value(opts, ["enterprise_project_id"])
     if v or v in [False, 0]:
         query_params.append(
-            "enterprise_project_id=" + (str(v) if v else str(v).lower()))
+            f"enterprise_project_id={str(v) if v else str(v).lower()}")
 
     v = navigate_value(opts, ["name"])
     if v or v in [False, 0]:
         query_params.append(
-            "name=" + (str(v) if v else str(v).lower()))
+            f"name={str(v) if v else str(v).lower()}")
 
     query_link = "?limit=10&offset={offset}"
     if query_params:
-        query_link += "&" + "&".join(query_params)
+        query_link += f"&{'&'.join(query_params)}"
 
     return query_link
 
@@ -770,7 +767,7 @@ def search_resource(config):
     opts = user_input_parameters(module)
     identity_obj = _build_identity_object(opts)
     query_link = _build_query_link(opts)
-    link = "cloudservers/detail" + query_link
+    link = f"cloudservers/detail{query_link}"
 
     result = []
     p = {'offset': 1}
@@ -836,8 +833,7 @@ def send_delete_nics_request(module, params, client):
     try:
         r = client.post(url, params)
     except HwcClientException as ex:
-        msg = ("module(hwc_ecs_instance): error running "
-               "api(delete_nics), error: %s" % str(ex))
+        msg = f"module(hwc_ecs_instance): error running api(delete_nics), error: {ex}"
         module.fail_json(msg=msg)
 
     return r
@@ -864,8 +860,7 @@ def send_set_auto_recovery_request(module, params, client):
     try:
         r = client.put(url, params)
     except HwcClientException as ex:
-        msg = ("module(hwc_ecs_instance): error running "
-               "api(set_auto_recovery), error: %s" % str(ex))
+        msg = f"module(hwc_ecs_instance): error running api(set_auto_recovery), error: {ex}"
         module.fail_json(msg=msg)
 
     return r
@@ -1052,8 +1047,7 @@ def send_create_request(module, params, client):
     try:
         r = client.post(url, params)
     except HwcClientException as ex:
-        msg = ("module(hwc_ecs_instance): error running "
-               "api(create), error: %s" % str(ex))
+        msg = f"module(hwc_ecs_instance): error running api(create), error: {ex}"
         module.fail_json(msg=msg)
 
     return r
@@ -1105,8 +1099,7 @@ def send_attach_nics_request(module, params, client):
     try:
         r = client.post(url, params)
     except HwcClientException as ex:
-        msg = ("module(hwc_ecs_instance): error running "
-               "api(attach_nics), error: %s" % str(ex))
+        msg = f"module(hwc_ecs_instance): error running api(attach_nics), error: {ex}"
         module.fail_json(msg=msg)
 
     return r
@@ -1123,8 +1116,7 @@ def send_delete_volume_request(module, params, client, info):
     try:
         r = client.delete(url, params)
     except HwcClientException as ex:
-        msg = ("module(hwc_ecs_instance): error running "
-               "api(delete_volume), error: %s" % str(ex))
+        msg = f"module(hwc_ecs_instance): error running api(delete_volume), error: {ex}"
         module.fail_json(msg=msg)
 
     return r
@@ -1160,8 +1152,7 @@ def send_attach_data_disk_request(module, params, client):
     try:
         r = client.post(url, params)
     except HwcClientException as ex:
-        msg = ("module(hwc_ecs_instance): error running "
-               "api(attach_data_disk), error: %s" % str(ex))
+        msg = f"module(hwc_ecs_instance): error running api(attach_data_disk), error: {ex}"
         module.fail_json(msg=msg)
 
     return r
@@ -1211,8 +1202,7 @@ def send_delete_request(module, params, client):
     try:
         r = client.post(url, params)
     except HwcClientException as ex:
-        msg = ("module(hwc_ecs_instance): error running "
-               "api(delete), error: %s" % str(ex))
+        msg = f"module(hwc_ecs_instance): error running api(delete), error: {ex}"
         module.fail_json(msg=msg)
 
     return r
@@ -1242,8 +1232,7 @@ def async_wait(config, result, client, timeout):
             ["RUNNING", "INIT"],
             _query_status, timeout)
     except Exception as ex:
-        module.fail_json(msg="module(hwc_ecs_instance): error "
-                             "waiting to be done, error= %s" % str(ex))
+        module.fail_json(msg=f"module(hwc_ecs_instance): error waiting to be done, error= {ex}")
 
 
 def multi_invoke_delete_volume(config, opts, client, timeout):
@@ -1300,8 +1289,7 @@ def send_read_request(module, client):
     try:
         r = client.get(url)
     except HwcClientException as ex:
-        msg = ("module(hwc_ecs_instance): error running "
-               "api(read), error: %s" % str(ex))
+        msg = f"module(hwc_ecs_instance): error running api(read), error: {ex}"
         module.fail_json(msg=msg)
 
     return navigate_value(r, ["server"], None)
@@ -1457,8 +1445,7 @@ def send_read_auto_recovery_request(module, client):
     try:
         r = client.get(url)
     except HwcClientException as ex:
-        msg = ("module(hwc_ecs_instance): error running "
-               "api(read_auto_recovery), error: %s" % str(ex))
+        msg = f"module(hwc_ecs_instance): error running api(read_auto_recovery), error: {ex}"
         module.fail_json(msg=msg)
 
     return r
@@ -1878,8 +1865,7 @@ def send_list_request(module, client, url):
     try:
         r = client.get(url)
     except HwcClientException as ex:
-        msg = ("module(hwc_ecs_instance): error running "
-               "api(list), error: %s" % str(ex))
+        msg = f"module(hwc_ecs_instance): error running api(list), error: {ex}"
         module.fail_json(msg=msg)
 
     return navigate_value(r, ["servers"], None)
@@ -1978,7 +1964,7 @@ def expand_list_tags(d, array_index):
     if not v:
         return None
 
-    return [k + "=" + v1 for k, v1 in v.items()]
+    return [f"{k}={v1}" for k, v1 in v.items()]
 
 
 def fill_list_resp_body(body):

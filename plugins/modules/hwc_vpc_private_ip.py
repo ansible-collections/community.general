@@ -118,8 +118,7 @@ def main():
         else:
             v = search_resource(config)
             if len(v) > 1:
-                raise Exception("Found more than one resource(%s)" % ", ".join([
-                                navigate_value(i, ["id"]) for i in v]))
+                raise Exception(f"Found more than one resource({', '.join([navigate_value(i, ['id']) for i in v])})")
 
             if len(v) == 1:
                 resource = v[0]
@@ -137,8 +136,7 @@ def main():
             expect = user_input_parameters(module)
             if are_different_dicts(expect, current):
                 raise Exception(
-                    "Cannot change option from (%s) to (%s)of an"
-                    " existing resource.(%s)" % (current, expect, module.params.get('id')))
+                    f"Cannot change option from ({current}) to ({expect})of an existing resource.({module.params.get('id')})")
 
             result = read_resource(config)
             result['id'] = module.params.get('id')
@@ -252,8 +250,7 @@ def send_create_request(module, params, client):
     try:
         r = client.post(url, params)
     except HwcClientException as ex:
-        msg = ("module(hwc_vpc_private_ip): error running "
-               "api(create), error: %s" % str(ex))
+        msg = f"module(hwc_vpc_private_ip): error running api(create), error: {ex}"
         module.fail_json(msg=msg)
 
     return r
@@ -265,8 +262,7 @@ def send_delete_request(module, params, client):
     try:
         r = client.delete(url, params)
     except HwcClientException as ex:
-        msg = ("module(hwc_vpc_private_ip): error running "
-               "api(delete), error: %s" % str(ex))
+        msg = f"module(hwc_vpc_private_ip): error running api(delete), error: {ex}"
         module.fail_json(msg=msg)
 
     return r
@@ -279,8 +275,7 @@ def send_read_request(module, client):
     try:
         r = client.get(url)
     except HwcClientException as ex:
-        msg = ("module(hwc_vpc_private_ip): error running "
-               "api(read), error: %s" % str(ex))
+        msg = f"module(hwc_vpc_private_ip): error running api(read), error: {ex}"
         module.fail_json(msg=msg)
 
     return navigate_value(r, ["privateip"], None)
@@ -316,8 +311,7 @@ def send_list_request(module, client, url):
     try:
         r = client.get(url)
     except HwcClientException as ex:
-        msg = ("module(hwc_vpc_private_ip): error running "
-               "api(list), error: %s" % str(ex))
+        msg = f"module(hwc_vpc_private_ip): error running api(list), error: {ex}"
         module.fail_json(msg=msg)
 
     return navigate_value(r, ["privateips"], None)
