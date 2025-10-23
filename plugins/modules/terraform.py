@@ -612,7 +612,7 @@ def main():
                     l_out.append("{{{0}}}".format(process_complex_args(item)))
                 elif isinstance(item, list):
                     l_out.append("{0}".format(process_complex_args(item)))
-                elif isinstance(item, (str, int, float, bool, type(None))):
+                elif isinstance(item, (str, int, float, bool)) or item is None:
                     l_out.append(format_args(item))
                 else:
                     # only to handle anything unforeseen
