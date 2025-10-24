@@ -63,7 +63,8 @@ EXAMPLES = r"""
 
 - name: list all files under web/; exclude .git and .node_modules
   ansible.builtin.debug:
-    msg: "{{ lookup('community.general.filetree', 'web/', exclude='.*(.git|.node_modules).*') }}"
+    msg: >-
+      {{ lookup('community.general.filetree', 'web/', exclude='^(\.git|\.node_modules)$') }}
 """
 
 RETURN = r"""
