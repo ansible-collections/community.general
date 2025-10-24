@@ -109,7 +109,7 @@ def add_tap(module, brew_path, tap, url=None):
 
     if not a_valid_tap(tap):
         failed = True
-        msg = 'not a valid tap: %s' % tap
+        msg = f'not a valid tap: {tap}'
 
     elif not already_tapped(module, brew_path, tap):
         if module.check_mode:
@@ -123,13 +123,13 @@ def add_tap(module, brew_path, tap, url=None):
         ])
         if rc == 0:
             changed = True
-            msg = 'successfully tapped: %s' % tap
+            msg = f'successfully tapped: {tap}'
         else:
             failed = True
-            msg = 'failed to tap: %s due to %s' % (tap, err)
+            msg = f'failed to tap: {tap} due to {err}'
 
     else:
-        msg = 'already tapped: %s' % tap
+        msg = f'already tapped: {tap}'
 
     return (failed, changed, msg)
 
@@ -148,13 +148,13 @@ def add_taps(module, brew_path, taps):
             unchanged += 1
 
     if failed:
-        msg = 'added: %d, unchanged: %d, error: ' + msg
+        msg = f"added: %d, unchanged: %d, error: {msg}"
         msg = msg % (added, unchanged)
     elif added:
         changed = True
-        msg = 'added: %d, unchanged: %d' % (added, unchanged)
+        msg = f'added: {added}, unchanged: {unchanged}'
     else:
-        msg = 'added: %d, unchanged: %d' % (added, unchanged)
+        msg = f'added: {added}, unchanged: {unchanged}'
 
     return (failed, changed, msg)
 
@@ -165,7 +165,7 @@ def remove_tap(module, brew_path, tap):
 
     if not a_valid_tap(tap):
         failed = True
-        msg = 'not a valid tap: %s' % tap
+        msg = f'not a valid tap: {tap}'
 
     elif already_tapped(module, brew_path, tap):
         if module.check_mode:
@@ -178,13 +178,13 @@ def remove_tap(module, brew_path, tap):
         ])
         if not already_tapped(module, brew_path, tap):
             changed = True
-            msg = 'successfully untapped: %s' % tap
+            msg = f'successfully untapped: {tap}'
         else:
             failed = True
-            msg = 'failed to untap: %s due to %s' % (tap, err)
+            msg = f'failed to untap: {tap} due to {err}'
 
     else:
-        msg = 'already untapped: %s' % tap
+        msg = f'already untapped: {tap}'
 
     return (failed, changed, msg)
 
@@ -203,13 +203,13 @@ def remove_taps(module, brew_path, taps):
             unchanged += 1
 
     if failed:
-        msg = 'removed: %d, unchanged: %d, error: ' + msg
+        msg = f"removed: %d, unchanged: %d, error: {msg}"
         msg = msg % (removed, unchanged)
     elif removed:
         changed = True
-        msg = 'removed: %d, unchanged: %d' % (removed, unchanged)
+        msg = f'removed: {removed}, unchanged: {unchanged}'
     else:
-        msg = 'removed: %d, unchanged: %d' % (removed, unchanged)
+        msg = f'removed: {removed}, unchanged: {unchanged}'
 
     return (failed, changed, msg)
 

@@ -193,7 +193,7 @@ class HomebrewException(Exception):
 def _create_regex_group_complement(s):
     lines = (line.strip() for line in s.split('\n') if line.strip())
     chars = [_f for _f in (line.split('#')[0].strip() for line in lines) if _f]
-    group = r'[^' + r''.join(chars) + r']'
+    group = rf"[^{''.join(chars)}]"
     return re.compile(group)
 
 
@@ -252,7 +252,7 @@ class Homebrew(object):
         if not self.valid_module(module):
             self._module = None
             self.failed = True
-            self.message = 'Invalid module: {0}.'.format(module)
+            self.message = f'Invalid module: {module}.'
             raise HomebrewException(self.message)
 
         else:
@@ -268,7 +268,7 @@ class Homebrew(object):
         if not HomebrewValidate.valid_path(path):
             self._path = []
             self.failed = True
-            self.message = 'Invalid path: {0}.'.format(path)
+            self.message = f'Invalid path: {path}.'
             raise HomebrewException(self.message)
 
         else:
@@ -288,7 +288,7 @@ class Homebrew(object):
         if not HomebrewValidate.valid_brew_path(brew_path):
             self._brew_path = None
             self.failed = True
-            self.message = 'Invalid brew_path: {0}.'.format(brew_path)
+            self.message = f'Invalid brew_path: {brew_path}.'
             raise HomebrewException(self.message)
 
         else:
@@ -369,10 +369,7 @@ class Homebrew(object):
 
         if invalid_packages:
             self.failed = True
-            self.message = 'Invalid package{0}: {1}'.format(
-                "s" if len(invalid_packages) > 1 else "",
-                ", ".join(invalid_packages),
-            )
+            self.message = f"Invalid package{'s' if len(invalid_packages) > 1 else ''}: {', '.join(invalid_packages)}"
             raise HomebrewException(self.message)
 
     def _save_package_info(self, package_detail, package_name):
@@ -412,17 +409,14 @@ class Homebrew(object):
         package_names.update(package_detail.get("old_tokens", []))
         if package_detail['tap']:
             # names so far, with tap prefix added to each
-            tapped_names = {package_detail["tap"] + "/" + x for x in package_names}
+            tapped_names = {f"{package_detail['tap']}/{x}" for x in package_names}
             package_names.update(tapped_names)
 
         # Finally, identify which of all those package names was the one supplied by the user.
         package_names = package_names & set(self.packages)
         if len(package_names) != 1:
             self.failed = True
-            self.message = "Package names for {name} are missing or ambiguous: {packages}".format(
-                name=name,
-                packages=", ".join(str(p) for p in package_names),
-            )
+            self.message = f"Package names for {name} are missing or ambiguous: {', '.join((str(p) for p in package_names))}"
             raise HomebrewException(self.message)
 
         # Then make sure the user provided name resurface.
@@ -430,7 +424,7 @@ class Homebrew(object):
 
     def _get_packages_info(self):
         cmd = [
-            "{brew_path}".format(brew_path=self.brew_path),
+            f"{self.brew_path}",
             "info",
             "--json=v2",
         ]
@@ -441,7 +435,7 @@ class Homebrew(object):
         rc, out, err = self.module.run_command(cmd)
         if rc != 0:
             self.failed = True
-            self.message = err.strip() or ("Unknown failure with exit code %d" % rc)
+            self.message = err.strip() or (f"Unknown failure with exit code {rc}")
             raise HomebrewException(self.message)
 
         data = json.loads(out)
@@ -464,10 +458,7 @@ class Homebrew(object):
         changed_count = len(self.changed_pkgs)
         unchanged_count = len(self.unchanged_pkgs)
         if not self.failed and (changed_count + unchanged_count > 1):
-            self.message = "Changed: %d, Unchanged: %d" % (
-                changed_count,
-                unchanged_count,
-            )
+            self.message = f"Changed: {int(changed_count)}, Unchanged: {unchanged_count}"
         return (self.failed, self.changed, self.message)
 
     # commands ----------------------------------------------------- {{{
@@ -555,18 +546,12 @@ class Homebrew(object):
 
         if len(packages_to_install) == 0:
             self.unchanged_pkgs.extend(self.packages)
-            self.message = 'Package{0} already installed: {1}'.format(
-                "s" if len(self.packages) > 1 else "",
-                ", ".join(self.packages),
-            )
+            self.message = f"Package{'s' if len(self.packages) > 1 else ''} already installed: {', '.join(self.packages)}"
             return True
 
         if self.module.check_mode:
             self.changed = True
-            self.message = 'Package{0} would be installed: {1}'.format(
-                "s" if len(packages_to_install) > 1 else "",
-                ", ".join(packages_to_install)
-            )
+            self.message = f"Package{'s' if len(packages_to_install) > 1 else ''} would be installed: {', '.join(packages_to_install)}"
             raise HomebrewException(self.message)
 
         if self.state == 'head':
@@ -592,10 +577,7 @@ class Homebrew(object):
             self.changed_pkgs.extend(packages_to_install)
             self.unchanged_pkgs.extend(self.installed_packages)
             self.changed = True
-            self.message = 'Package{0} installed: {1}'.format(
-                "s" if len(packages_to_install) > 1 else "",
-                ", ".join(packages_to_install)
-            )
+            self.message = f"Package{'s' if len(packages_to_install) > 1 else ''} installed: {', '.join(packages_to_install)}"
             return True
         else:
             self.failed = True
@@ -635,18 +617,12 @@ class Homebrew(object):
 
             if len(packages_to_install_or_upgrade) == 0:
                 self.unchanged_pkgs.extend(self.packages)
-                self.message = 'Package{0} already upgraded: {1}'.format(
-                    "s" if len(self.packages) > 1 else "",
-                    ", ".join(self.packages),
-                )
+                self.message = f"Package{'s' if len(self.packages) > 1 else ''} already upgraded: {', '.join(self.packages)}"
                 return True
 
             if self.module.check_mode:
                 self.changed = True
-                self.message = 'Package{0} would be upgraded: {1}'.format(
-                    "s" if len(packages_to_install_or_upgrade) > 1 else "",
-                    ", ".join(packages_to_install_or_upgrade)
-                )
+                self.message = f"Package{'s' if len(packages_to_install_or_upgrade) > 1 else ''} would be upgraded: {', '.join(packages_to_install_or_upgrade)}"
                 raise HomebrewException(self.message)
 
             for command, packages in [
@@ -672,10 +648,7 @@ class Homebrew(object):
             self.changed_pkgs.extend(packages_to_install_or_upgrade)
             self.unchanged_pkgs.extend(set(self.packages) - packages_to_install_or_upgrade)
             self.changed = True
-            self.message = 'Package{0} upgraded: {1}'.format(
-                "s" if len(packages_to_install_or_upgrade) > 1 else "",
-                ", ".join(packages_to_install_or_upgrade),
-            )
+            self.message = f"Package{'s' if len(packages_to_install_or_upgrade) > 1 else ''} upgraded: {', '.join(packages_to_install_or_upgrade)}"
     # /upgraded ------------------------------ }}}
 
     # uninstalled ---------------------------- {{{
@@ -684,18 +657,12 @@ class Homebrew(object):
 
         if len(packages_to_uninstall) == 0:
             self.unchanged_pkgs.extend(self.packages)
-            self.message = 'Package{0} already uninstalled: {1}'.format(
-                "s" if len(self.packages) > 1 else "",
-                ", ".join(self.packages),
-            )
+            self.message = f"Package{'s' if len(self.packages) > 1 else ''} already uninstalled: {', '.join(self.packages)}"
             return True
 
         if self.module.check_mode:
             self.changed = True
-            self.message = 'Package{0} would be uninstalled: {1}'.format(
-                "s" if len(packages_to_uninstall) > 1 else "",
-                ", ".join(packages_to_uninstall)
-            )
+            self.message = f"Package{'s' if len(packages_to_uninstall) > 1 else ''} would be uninstalled: {', '.join(packages_to_uninstall)}"
             raise HomebrewException(self.message)
 
         opts = (
@@ -710,10 +677,7 @@ class Homebrew(object):
             self.changed_pkgs.extend(packages_to_uninstall)
             self.unchanged_pkgs.extend(set(self.packages) - self.installed_packages)
             self.changed = True
-            self.message = 'Package{0} uninstalled: {1}'.format(
-                "s" if len(packages_to_uninstall) > 1 else "",
-                ", ".join(packages_to_uninstall)
-            )
+            self.message = f"Package{'s' if len(packages_to_uninstall) > 1 else ''} uninstalled: {', '.join(packages_to_uninstall)}"
             return True
         else:
             self.failed = True
@@ -726,18 +690,12 @@ class Homebrew(object):
         missing_packages = set(self.packages) - self.installed_packages
         if missing_packages:
             self.failed = True
-            self.message = 'Package{0} not installed: {1}.'.format(
-                "s" if len(missing_packages) > 1 else "",
-                ", ".join(missing_packages),
-            )
+            self.message = f"Package{'s' if len(missing_packages) > 1 else ''} not installed: {', '.join(missing_packages)}."
             raise HomebrewException(self.message)
 
         if self.module.check_mode:
             self.changed = True
-            self.message = 'Package{0} would be linked: {1}'.format(
-                "s" if len(self.packages) > 1 else "",
-                ", ".join(self.packages)
-            )
+            self.message = f"Package{'s' if len(self.packages) > 1 else ''} would be linked: {', '.join(self.packages)}"
             raise HomebrewException(self.message)
 
         opts = (
@@ -751,17 +709,11 @@ class Homebrew(object):
         if rc == 0:
             self.changed_pkgs.extend(self.packages)
             self.changed = True
-            self.message = 'Package{0} linked: {1}'.format(
-                "s" if len(self.packages) > 1 else "",
-                ", ".join(self.packages)
-            )
+            self.message = f"Package{'s' if len(self.packages) > 1 else ''} linked: {', '.join(self.packages)}"
             return True
         else:
             self.failed = True
-            self.message = 'Package{0} could not be linked: {1}.'.format(
-                "s" if len(self.packages) > 1 else "",
-                ", ".join(self.packages)
-            )
+            self.message = f"Package{'s' if len(self.packages) > 1 else ''} could not be linked: {', '.join(self.packages)}."
             raise HomebrewException(self.message)
     # /linked -------------------------------- }}}
 
@@ -770,18 +722,12 @@ class Homebrew(object):
         missing_packages = set(self.packages) - self.installed_packages
         if missing_packages:
             self.failed = True
-            self.message = 'Package{0} not installed: {1}.'.format(
-                "s" if len(missing_packages) > 1 else "",
-                ", ".join(missing_packages),
-            )
+            self.message = f"Package{'s' if len(missing_packages) > 1 else ''} not installed: {', '.join(missing_packages)}."
             raise HomebrewException(self.message)
 
         if self.module.check_mode:
             self.changed = True
-            self.message = 'Package{0} would be unlinked: {1}'.format(
-                "s" if len(self.packages) > 1 else "",
-                ", ".join(self.packages)
-            )
+            self.message = f"Package{'s' if len(self.packages) > 1 else ''} would be unlinked: {', '.join(self.packages)}"
             raise HomebrewException(self.message)
 
         opts = (
@@ -795,17 +741,11 @@ class Homebrew(object):
         if rc == 0:
             self.changed_pkgs.extend(self.packages)
             self.changed = True
-            self.message = 'Package{0} unlinked: {1}'.format(
-                "s" if len(self.packages) > 1 else "",
-                ", ".join(self.packages)
-            )
+            self.message = f"Package{'s' if len(self.packages) > 1 else ''} unlinked: {', '.join(self.packages)}"
             return True
         else:
             self.failed = True
-            self.message = 'Package{0} could not be unlinked: {1}.'.format(
-                "s" if len(self.packages) > 1 else "",
-                ", ".join(self.packages)
-            )
+            self.message = f"Package{'s' if len(self.packages) > 1 else ''} could not be unlinked: {', '.join(self.packages)}."
             raise HomebrewException(self.message)
     # /unlinked ------------------------------ }}}
     # /commands ---------------------------------------------------- }}}
@@ -893,11 +833,11 @@ def main():
         )
     upgrade_all = p['upgrade_all']
     p['install_options'] = p['install_options'] or []
-    install_options = ['--{0}'.format(install_option)
+    install_options = [f'--{install_option}'
                        for install_option in p['install_options']]
 
     p['upgrade_options'] = p['upgrade_options'] or []
-    upgrade_options = ['--{0}'.format(upgrade_option)
+    upgrade_options = [f'--{upgrade_option}'
                        for upgrade_option in p['upgrade_options']]
     brew = Homebrew(module=module, path=path, packages=packages,
                     state=state, update_homebrew=update_homebrew,

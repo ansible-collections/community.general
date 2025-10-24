@@ -214,8 +214,7 @@ def create(config, link):
     try:
         r = client.post(link, resource_to_create(module))
     except HwcClientException as ex:
-        msg = ("module(hwc_network_vpc): error creating "
-               "resource, error: %s" % str(ex))
+        msg = f"module(hwc_network_vpc): error creating resource, error: {ex}"
         module.fail_json(msg=msg)
 
     wait_done = wait_for_operation(config, 'create', r)
@@ -237,8 +236,7 @@ def update(config, link):
     try:
         r = client.put(link, resource_to_update(module))
     except HwcClientException as ex:
-        msg = ("module(hwc_network_vpc): error updating "
-               "resource, error: %s" % str(ex))
+        msg = f"module(hwc_network_vpc): error updating resource, error: {ex}"
         module.fail_json(msg=msg)
 
     wait_for_operation(config, 'update', r)
@@ -253,8 +251,7 @@ def delete(config, link):
     try:
         client.delete(link)
     except HwcClientException as ex:
-        msg = ("module(hwc_network_vpc): error deleting "
-               "resource, error: %s" % str(ex))
+        msg = f"module(hwc_network_vpc): error deleting resource, error: {ex}"
         module.fail_json(msg=msg)
 
     wait_for_delete(module, client, link)
@@ -264,8 +261,7 @@ def fetch_resource(module, client, link):
     try:
         return client.get(link)
     except HwcClientException as ex:
-        msg = ("module(hwc_network_vpc): error fetching "
-               "resource, error: %s" % str(ex))
+        msg = f"module(hwc_network_vpc): error fetching resource, error: {ex}"
         module.fail_json(msg=msg)
 
 

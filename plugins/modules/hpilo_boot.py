@@ -158,7 +158,7 @@ def main():
     state = module.params['state']
     force = module.params['force']
     idempotent_boot_once = module.params['idempotent_boot_once']
-    ssl_version = getattr(hpilo.ssl, 'PROTOCOL_' + module.params.get('ssl_version').upper().replace('V', 'v'))
+    ssl_version = getattr(hpilo.ssl, f"PROTOCOL_{module.params.get('ssl_version').upper().replace('V', 'v')}")
 
     ilo = hpilo.Ilo(host, login=login, password=password, ssl_version=ssl_version)
     changed = False
@@ -201,7 +201,7 @@ def main():
                 #     version='11.0.0',
                 #     collection_name='community.general'
                 # )
-                module.fail_json(msg='HP iLO (%s) reports that the server is already powered on !' % host)
+                module.fail_json(msg=f'HP iLO ({host}) reports that the server is already powered on !')
             elif not force and idempotent_boot_once:
                 pass
             elif force:

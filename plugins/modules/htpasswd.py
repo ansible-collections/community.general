@@ -135,26 +135,26 @@ def present(dest, username, password, hash_scheme, create, check_mode):
         context = CryptContext(schemes=[hash_scheme] + apache_hashes)
     if not os.path.exists(dest):
         if not create:
-            raise ValueError('Destination %s does not exist' % dest)
+            raise ValueError(f'Destination {dest} does not exist')
         if check_mode:
-            return ("Create %s" % dest, True)
+            return (f"Create {dest}", True)
         create_missing_directories(dest)
         ht = HtpasswdFile(dest, new=True, default_scheme=hash_scheme, context=context)
         ht.set_password(username, password)
         ht.save()
-        return ("Created %s and added %s" % (dest, username), True)
+        return (f"Created {dest} and added {username}", True)
     else:
         ht = HtpasswdFile(dest, new=False, default_scheme=hash_scheme, context=context)
 
         found = ht.check_password(username, password)
 
         if found:
-            return ("%s already present" % username, False)
+            return (f"{username} already present", False)
         else:
             if not check_mode:
                 ht.set_password(username, password)
                 ht.save()
-            return ("Add/update %s" % username, True)
+            return (f"Add/update {username}", True)
 
 
 def absent(dest, username, check_mode):
@@ -164,12 +164,12 @@ def absent(dest, username, check_mode):
     ht = HtpasswdFile(dest, new=False)
 
     if username not in ht.users():
-        return ("%s not present" % username, False)
+        return (f"{username} not present", False)
     else:
         if not check_mode:
             ht.delete(username)
             ht.save()
-        return ("Remove %s" % username, True)
+        return (f"Remove {username}", True)
 
 
 def check_file_attrs(module, changed, message):
@@ -239,11 +239,11 @@ def main():
             (msg, changed) = present(path, username, password, hash_scheme, create, check_mode)
         elif state == 'absent':
             if not os.path.exists(path):
-                module.warn("%s does not exist" % path)
-                module.exit_json(msg="%s not present" % username, changed=False)
+                module.warn(f"{path} does not exist")
+                module.exit_json(msg=f"{username} not present", changed=False)
             (msg, changed) = absent(path, username, check_mode)
         else:
-            module.fail_json(msg="Invalid state: %s" % state)
+            module.fail_json(msg=f"Invalid state: {state}")
             return  # needed to make pylint happy
 
         (msg, changed) = check_file_attrs(module, changed, msg)

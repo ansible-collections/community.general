@@ -92,7 +92,7 @@ def add_or_delete_heroku_collaborator(module, client):
 
     for app in module.params['apps']:
         if app not in client.apps():
-            module.fail_json(msg='App {0} does not exist'.format(app))
+            module.fail_json(msg=f'App {app} does not exist')
 
         heroku_app = client.apps()[app]
 

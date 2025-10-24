@@ -148,7 +148,7 @@ warnings.simplefilter('ignore')
 
 def parse_flat_interface(entry, non_numeric='hw_eth_ilo'):
     try:
-        infoname = 'hw_eth' + str(int(entry['Port']) - 1)
+        infoname = f"hw_eth{int(entry['Port']) - 1}"
     except Exception:
         infoname = non_numeric
 
@@ -177,7 +177,7 @@ def main():
     host = module.params['host']
     login = module.params['login']
     password = module.params['password']
-    ssl_version = getattr(hpilo.ssl, 'PROTOCOL_' + module.params.get('ssl_version').upper().replace('V', 'v'))
+    ssl_version = getattr(hpilo.ssl, f"PROTOCOL_{module.params.get('ssl_version').upper().replace('V', 'v')}")
 
     ilo = hpilo.Ilo(host, login=login, password=password, ssl_version=ssl_version)
 
@@ -208,7 +208,7 @@ def main():
                 for (name, value) in [(e['name'], e['value']) for e in entry['fields']]:
                     if name.startswith('Port'):
                         try:
-                            infoname = 'hw_eth' + str(int(value) - 1)
+                            infoname = f"hw_eth{int(value) - 1}"
                         except Exception:
                             infoname = 'hw_eth_ilo'
                     elif name.startswith('MAC'):
@@ -223,7 +223,7 @@ def main():
             for (name, value) in [(e['name'], e['value']) for e in entry['fields']]:
                 if name.startswith('Port'):
                     try:
-                        infoname = 'hw_iscsi' + str(int(value) - 1)
+                        infoname = f"hw_iscsi{int(value) - 1}"
                     except Exception:
                         infoname = 'hw_iscsi_ilo'
                 elif name.startswith('MAC'):
@@ -253,7 +253,7 @@ def main():
                         info['hw_memory_total'] = info['hw_memory_total'] + int(ram.group(1))
 
         # reformat into a text friendly format
-        info['hw_memory_total'] = "{0} GB".format(info['hw_memory_total'])
+        info['hw_memory_total'] = f"{info['hw_memory_total']} GB"
 
     # Report host state
     info['host_power_status'] = power_state or 'UNKNOWN'

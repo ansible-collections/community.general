@@ -1,0 +1,24 @@
+minor_changes:
+  - haproxy - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10959).
+  - heroku_collaborator - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10959).
+  - homebrew - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10959).
+  - homebrew_cask - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10959).
+  - homebrew_services - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10959).
+  - homebrew_tap - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10959).
+  - homectl - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10959).
+  - honeybadger_deployment - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10959).
+  - hpilo_boot - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10959).
+  - hpilo_info - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10959).
+  - htpasswd - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10959).
+  - hwc_ecs_instance - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10959).
+  - hwc_evs_disk - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10959).
+  - hwc_network_vpc - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10959).
+  - hwc_smn_topic - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10959).
+  - hwc_vpc_eip - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10959).
+  - hwc_vpc_peering_connect - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10959).
+  - hwc_vpc_port - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10959).
+  - hwc_vpc_private_ip - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10959).
+  - hwc_vpc_route - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10959).
+  - hwc_vpc_security_group - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10959).
+  - hwc_vpc_security_group_rule - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10959).
+  - hwc_vpc_subnet - use f-strings for string templating (https://github.com/ansible-collections/community.general/pull/10959).

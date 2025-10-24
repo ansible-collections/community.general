@@ -152,15 +152,11 @@ def main():
                 opts = user_input_parameters(module)
                 if are_different_dicts(resource, opts):
                     raise Exception(
-                        "Cannot change option from (%s) to (%s) for an"
-                        " existing route.(%s)" % (resource, opts,
-                                                  config.module.params.get(
-                                                      'id')))
+                        f"Cannot change option from ({resource}) to ({opts}) for an existing route.({config.module.params['id']})")
         else:
             v = search_resource(config)
             if len(v) > 1:
-                raise Exception("Found more than one resource(%s)" % ", ".join([
-                                navigate_value(i, ["id"]) for i in v]))
+                raise Exception(f"Found more than one resource({', '.join([navigate_value(i, ['id']) for i in v])})")
 
             if len(v) == 1:
                 resource = update_properties(module, {"read": v[0]}, None)
@@ -237,19 +233,19 @@ def _build_query_link(opts):
 
     v = navigate_value(opts, ["type"])
     if v:
-        query_params.append("type=" + str(v))
+        query_params.append(f"type={v}")
 
     v = navigate_value(opts, ["destination"])
     if v:
-        query_params.append("destination=" + str(v))
+        query_params.append(f"destination={v}")
 
     v = navigate_value(opts, ["vpc_id"])
     if v:
-        query_params.append("vpc_id=" + str(v))
+        query_params.append(f"vpc_id={v}")
 
     query_link = "?marker={marker}&limit=10"
     if query_params:
-        query_link += "&" + "&".join(query_params)
+        query_link += f"&{'&'.join(query_params)}"
 
     return query_link
 
@@ -260,7 +256,7 @@ def search_resource(config):
     opts = user_input_parameters(module)
     identity_obj = _build_identity_object(opts)
     query_link = _build_query_link(opts)
-    link = "v2.0/vpc/routes" + query_link
+    link = f"v2.0/vpc/routes{query_link}"
 
     result = []
     p = {'marker': ''}
@@ -315,8 +311,7 @@ def send_create_request(module, params, client):
     try:
         r = client.post(url, params)
     except HwcClientException as ex:
-        msg = ("module(hwc_vpc_route): error running "
-               "api(create), error: %s" % str(ex))
+        msg = f"module(hwc_vpc_route): error running api(create), error: {ex}"
         module.fail_json(msg=msg)
 
     return r
@@ -328,8 +323,7 @@ def send_delete_request(module, params, client):
     try:
         r = client.delete(url, params)
     except HwcClientException as ex:
-        msg = ("module(hwc_vpc_route): error running "
-               "api(delete), error: %s" % str(ex))
+        msg = f"module(hwc_vpc_route): error running api(delete), error: {ex}"
         module.fail_json(msg=msg)
 
     return r
@@ -342,8 +336,7 @@ def send_read_request(module, client):
     try:
         r = client.get(url)
     except HwcClientException as ex:
-        msg = ("module(hwc_vpc_route): error running "
-               "api(read), error: %s" % str(ex))
+        msg = f"module(hwc_vpc_route): error running api(read), error: {ex}"
         module.fail_json(msg=msg)
 
     return navigate_value(r, ["route"], None)
@@ -392,8 +385,7 @@ def send_list_request(module, client, url):
     try:
         r = client.get(url)
     except HwcClientException as ex:
-        msg = ("module(hwc_vpc_route): error running "
-               "api(list), error: %s" % str(ex))
+        msg = f"module(hwc_vpc_route): error running api(list), error: {ex}"
         module.fail_json(msg=msg)
 
     return navigate_value(r, ["routes"], None)

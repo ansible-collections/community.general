@@ -179,8 +179,7 @@ def main():
         else:
             v = search_resource(config)
             if len(v) > 1:
-                raise Exception("Found more than one resource(%s)" % ", ".join([
-                                navigate_value(i, ["id"]) for i in v]))
+                raise Exception(f"Found more than one resource({', '.join([navigate_value(i, ['id']) for i in v])})")
 
             if len(v) == 1:
                 resource = update_properties(module, {"read": v[0]}, None)
@@ -230,9 +229,7 @@ def check_resource_option(resource, module):
 
     if are_different_dicts(resource, opts):
         raise Exception(
-            "Cannot change option from (%s) to (%s) for an"
-            " existing security group(%s)." % (resource, opts,
-                                               module.params.get('id')))
+            f"Cannot change option from ({resource}) to ({opts}) for an existing security group({module.params['id']}).")
 
 
 def create(config):
@@ -272,15 +269,15 @@ def _build_query_link(opts):
 
     v = navigate_value(opts, ["enterprise_project_id"])
     if v:
-        query_params.append("enterprise_project_id=" + str(v))
+        query_params.append(f"enterprise_project_id={v}")
 
     v = navigate_value(opts, ["vpc_id"])
     if v:
-        query_params.append("vpc_id=" + str(v))
+        query_params.append(f"vpc_id={v}")
 
     query_link = "?marker={marker}&limit=10"
     if query_params:
-        query_link += "&" + "&".join(query_params)
+        query_link += f"&{'&'.join(query_params)}"
 
     return query_link
 
@@ -291,7 +288,7 @@ def search_resource(config):
     opts = user_input_parameters(module)
     identity_obj = _build_identity_object(opts)
     query_link = _build_query_link(opts)
-    link = "security-groups" + query_link
+    link = f"security-groups{query_link}"
 
     result = []
     p = {'marker': ''}
@@ -342,8 +339,7 @@ def send_create_request(module, params, client):
     try:
         r = client.post(url, params)
     except HwcClientException as ex:
-        msg = ("module(hwc_vpc_security_group): error running "
-               "api(create), error: %s" % str(ex))
+        msg = f"module(hwc_vpc_security_group): error running api(create), error: {ex}"
         module.fail_json(msg=msg)
 
     return r
@@ -355,8 +351,7 @@ def send_delete_request(module, params, client):
     try:
         r = client.delete(url, params)
     except HwcClientException as ex:
-        msg = ("module(hwc_vpc_security_group): error running "
-               "api(delete), error: %s" % str(ex))
+        msg = f"module(hwc_vpc_security_group): error running api(delete), error: {ex}"
         module.fail_json(msg=msg)
 
     return r
@@ -369,8 +364,7 @@ def send_read_request(module, client):
     try:
         r = client.get(url)
     except HwcClientException as ex:
-        msg = ("module(hwc_vpc_security_group): error running "
-               "api(read), error: %s" % str(ex))
+        msg = f"module(hwc_vpc_security_group): error running api(read), error: {ex}"
         module.fail_json(msg=msg)
 
     return navigate_value(r, ["security_group"], None)
@@ -545,8 +539,7 @@ def send_list_request(module, client, url):
     try:
         r = client.get(url)
     except HwcClientException as ex:
-        msg = ("module(hwc_vpc_security_group): error running "
-               "api(list), error: %s" % str(ex))
+        msg = f"module(hwc_vpc_security_group): error running api(list), error: {ex}"
         module.fail_json(msg=msg)
 
     return navigate_value(r, ["security_groups"], None)

@@ -387,10 +387,7 @@ def _init(config):
     v = search_resource(config)
     n = len(v)
     if n > 1:
-        raise Exception("find more than one resources(%s)" % ", ".join([
-            navigate_value(i, ["id"])
-            for i in v
-        ]))
+        raise Exception(f"find more than one resources({', '.join([navigate_value(i, ['id']) for i in v])})")
 
     if n == 1:
         module.params['id'] = navigate_value(v[0], ["id"])
@@ -489,21 +486,21 @@ def _build_query_link(opts):
     v = navigate_value(opts, ["enable_share"])
     if v or v in [False, 0]:
         query_params.append(
-            "multiattach=" + (str(v) if v else str(v).lower()))
+            f"multiattach={str(v) if v else str(v).lower()}")
 
     v = navigate_value(opts, ["name"])
     if v or v in [False, 0]:
         query_params.append(
-            "name=" + (str(v) if v else str(v).lower()))
+            f"name={str(v) if v else str(v).lower()}")
 
     v = navigate_value(opts, ["availability_zone"])
     if v or v in [False, 0]:
         query_params.append(
-            "availability_zone=" + (str(v) if v else str(v).lower()))
+            f"availability_zone={str(v) if v else str(v).lower()}")
 
     query_link = "?limit=10&offset={start}"
     if query_params:
-        query_link += "&" + "&".join(query_params)
+        query_link += f"&{'&'.join(query_params)}"
 
     return query_link
 
@@ -514,7 +511,7 @@ def search_resource(config):
     opts = user_input_parameters(module)
     name = module.params.get("name")
     query_link = _build_query_link(opts)
-    link = "os-vendor-volumes/detail" + query_link
+    link = f"os-vendor-volumes/detail{query_link}"
 
     result = []
     p = {'start': 0}
@@ -635,8 +632,7 @@ def send_create_request(module, params, client):
     try:
         r = client.post(url, params)
     except HwcClientException as ex:
-        msg = ("module(hwc_evs_disk): error running "
-               "api(create), error: %s" % str(ex))
+        msg = f"module(hwc_evs_disk): error running api(create), error: {ex}"
         module.fail_json(msg=msg)
 
     return r
@@ -667,8 +663,7 @@ def send_update_request(module, params, client):
     try:
         r = client.put(url, params)
     except HwcClientException as ex:
-        msg = ("module(hwc_evs_disk): error running "
-               "api(update), error: %s" % str(ex))
+        msg = f"module(hwc_evs_disk): error running api(update), error: {ex}"
         module.fail_json(msg=msg)
 
     return r
@@ -680,8 +675,7 @@ def send_delete_request(module, params, client):
     try:
         r = client.delete(url, params)
     except HwcClientException as ex:
-        msg = ("module(hwc_evs_disk): error running "
-               "api(delete), error: %s" % str(ex))
+        msg = f"module(hwc_evs_disk): error running api(delete), error: {ex}"
         module.fail_json(msg=msg)
 
     return r
@@ -713,8 +707,7 @@ def send_extend_disk_request(module, params, client):
     try:
         r = client.post(url, params)
     except HwcClientException as ex:
-        msg = ("module(hwc_evs_disk): error running "
-               "api(extend_disk), error: %s" % str(ex))
+        msg = f"module(hwc_evs_disk): error running api(extend_disk), error: {ex}"
         module.fail_json(msg=msg)
 
     return r
@@ -749,8 +742,7 @@ def async_wait(config, result, client, timeout):
             ["RUNNING", "INIT"],
             _query_status, timeout)
     except Exception as ex:
-        module.fail_json(msg="module(hwc_evs_disk): error "
-                             "waiting to be done, error= %s" % str(ex))
+        module.fail_json(msg=f"module(hwc_evs_disk): error waiting to be done, error= {ex}")
 
 
 def send_read_request(module, client):
@@ -760,8 +752,7 @@ def send_read_request(module, client):
     try:
         r = client.get(url)
     except HwcClientException as ex:
-        msg = ("module(hwc_evs_disk): error running "
-               "api(read), error: %s" % str(ex))
+        msg = f"module(hwc_evs_disk): error running api(read), error: {ex}"
         module.fail_json(msg=msg)
 
     return navigate_value(r, ["volume"], None)
@@ -1028,8 +1019,7 @@ def send_list_request(module, client, url):
     try:
         r = client.get(url)
     except HwcClientException as ex:
-        msg = ("module(hwc_evs_disk): error running "
-               "api(list), error: %s" % str(ex))
+        msg = f"module(hwc_evs_disk): error running api(list), error: {ex}"
         module.fail_json(msg=msg)
 
     return navigate_value(r, ["volumes"], None)
