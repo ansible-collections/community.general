@@ -103,7 +103,7 @@ def gather_cloud_init_data_facts(module):
         filter = module.params.get('filter')
         if filter is None or filter == i:
             res['cloud_init_data_facts'][i] = dict()
-            json_file = os.path.join(CLOUD_INIT_PATH, i + '.json')
+            json_file = os.path.join(CLOUD_INIT_PATH, f"{i}.json")
 
             if os.path.exists(json_file):
                 with open(json_file, 'rb') as f:

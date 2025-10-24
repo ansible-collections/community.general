@@ -159,7 +159,7 @@ def main():
     msg = module.params["msg"]
     notify = module.params["notify"]
 
-    URI = "https://%s.campfirenow.com" % subscription
+    URI = f"https://{subscription}.campfirenow.com"
     NSTR = "<message><type>SoundMessage</type><body>%s</body></message>"
     MSTR = "<message><body>%s</body></message>"
     AGENT = "Ansible/1.2"
@@ -168,7 +168,7 @@ def main():
     module.params['url_username'] = token
     module.params['url_password'] = 'X'
 
-    target_url = '%s/room/%s/speak.xml' % (URI, room)
+    target_url = f'{URI}/room/{room}/speak.xml'
     headers = {'Content-Type': 'application/xml',
                'User-agent': AGENT}
 
@@ -176,16 +176,12 @@ def main():
     if notify:
         response, info = fetch_url(module, target_url, data=NSTR % html_escape(notify), headers=headers)
         if info['status'] not in [200, 201]:
-            module.fail_json(msg="unable to send msg: '%s', campfire api"
-                             " returned error code: '%s'" %
-                                 (notify, info['status']))
+            module.fail_json(msg=f"unable to send msg: '{notify}', campfire api returned error code: '{info['status']}'")
 
     # Send the message
     response, info = fetch_url(module, target_url, data=MSTR % html_escape(msg), headers=headers)
     if info['status'] not in [200, 201]:
-        module.fail_json(msg="unable to send msg: '%s', campfire api"
-                         " returned error code: '%s'" %
-                             (msg, info['status']))
+        module.fail_json(msg=f"unable to send msg: '{msg}', campfire api returned error code: '{info['status']}'")
 
     module.exit_json(changed=True, room=room, msg=msg, notify=notify)
 

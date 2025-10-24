@@ -105,7 +105,7 @@ def send(module, src, dest, msg, media, user_id, api_token, api_secret):
     Send the message
     """
     AGENT = "Ansible"
-    URI = "https://api.catapult.inetwork.com/v1/users/%s/messages" % user_id
+    URI = f"https://api.catapult.inetwork.com/v1/users/{user_id}/messages"
     data = {'from': src, 'to': dest, 'text': msg}
     if media:
         data['media'] = media

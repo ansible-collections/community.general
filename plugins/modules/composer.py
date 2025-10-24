@@ -238,7 +238,7 @@ def main():
 
     for option in default_options:
         if option in available_options:
-            option = "--%s" % option
+            option = f"--{option}"
             options.append(option)
 
     option_params = {
@@ -255,14 +255,14 @@ def main():
 
     for param, option in option_params.items():
         if module.params.get(param) and option in available_options:
-            option = "--%s" % option
+            option = f"--{option}"
             options.append(option)
 
     if module.check_mode:
         if 'dry-run' in available_options:
             options.append('--dry-run')
         else:
-            module.exit_json(skipped=True, msg="command '%s' does not support check mode, skipping" % command)
+            module.exit_json(skipped=True, msg=f"command '{command}' does not support check mode, skipping")
 
     rc, out, err = composer_command(module, [command], arguments, options)
 

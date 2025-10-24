@@ -116,13 +116,13 @@ class CapabilitiesModule(object):
         # If the file does not exist, the stderr will be (with rc == 0...):
         #   '/foo (No such file or directory)'
         if rc != 0 or stderr != "":
-            self.module.fail_json(msg="Unable to get capabilities of %s" % path, stdout=stdout.strip(), stderr=stderr)
+            self.module.fail_json(msg=f"Unable to get capabilities of {path}", stdout=stdout.strip(), stderr=stderr)
         if stdout.strip() != path:
             if ' =' in stdout:
                 # process output of an older version of libcap
                 caps = stdout.split(' =')[1].strip().split()
             elif stdout.strip().endswith(")"):  # '/foo (Error Message)'
-                self.module.fail_json(msg="Unable to get capabilities of %s" % path, stdout=stdout.strip(), stderr=stderr)
+                self.module.fail_json(msg=f"Unable to get capabilities of {path}", stdout=stdout.strip(), stderr=stderr)
             else:
                 # otherwise, we have a newer version here
                 # see original commit message of cap/v0.2.40-18-g177cd41 in libcap.git
@@ -145,7 +145,7 @@ class CapabilitiesModule(object):
         cmd = [self.setcap_cmd, caps, path]
         rc, stdout, stderr = self.module.run_command(cmd)
         if rc != 0:
-            self.module.fail_json(msg="Unable to set capabilities of %s" % path, stdout=stdout, stderr=stderr)
+            self.module.fail_json(msg=f"Unable to set capabilities of {path}", stdout=stdout, stderr=stderr)
         else:
             return stdout
 
@@ -158,7 +158,7 @@ class CapabilitiesModule(object):
                 i += 1
         except Exception:
             if op_required:
-                self.module.fail_json(msg="Couldn't find operator (one of: %s)" % str(OPS))
+                self.module.fail_json(msg=f"Couldn't find operator (one of: {OPS})")
             else:
                 return (cap, None, None)
         op = cap[opind]

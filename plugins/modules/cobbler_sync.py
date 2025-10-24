@@ -132,13 +132,13 @@ def main():
     except xmlrpc_client.Fault as e:
         module.fail_json(msg="Failed to log in to Cobbler '{url}' as '{username}'. {error}".format(url=url, error=to_text(e), **module.params))
     except Exception as e:
-        module.fail_json(msg="Connection to '{url}' failed. {error}".format(url=url, error=to_text(e)))
+        module.fail_json(msg=f"Connection to '{url}' failed. {e}")
 
     if not module.check_mode:
         try:
             conn.sync(token)
         except Exception as e:
-            module.fail_json(msg="Failed to sync Cobbler. {error}".format(error=to_text(e)))
+            module.fail_json(msg=f"Failed to sync Cobbler. {e}")
 
     elapsed = now() - start
     module.exit_json(elapsed=elapsed.seconds, **result)

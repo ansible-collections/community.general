@@ -329,7 +329,7 @@ def main():
                 (rc, out, err) = be.destroy_be()
 
                 if rc != 0:
-                    module.fail_json(msg='Error while destroying BE: "%s"' % err,
+                    module.fail_json(msg=f'Error while destroying BE: "{err}"',
                                      name=be.name,
                                      stderr=err,
                                      rc=rc)
@@ -344,7 +344,7 @@ def main():
             (rc, out, err) = be.create_be()
 
             if rc != 0:
-                module.fail_json(msg='Error while creating BE: "%s"' % err,
+                module.fail_json(msg=f'Error while creating BE: "{err}"',
                                  name=be.name,
                                  stderr=err,
                                  rc=rc)
@@ -363,7 +363,7 @@ def main():
             (rc, out, err) = be.activate_be()
 
             if rc != 0:
-                module.fail_json(msg='Error while activating BE: "%s"' % err,
+                module.fail_json(msg=f'Error while activating BE: "{err}"',
                                  name=be.name,
                                  stderr=err,
                                  rc=rc)
@@ -375,7 +375,7 @@ def main():
             (rc, out, err) = be.mount_be()
 
             if rc != 0:
-                module.fail_json(msg='Error while mounting BE: "%s"' % err,
+                module.fail_json(msg=f'Error while mounting BE: "{err}"',
                                  name=be.name,
                                  stderr=err,
                                  rc=rc)
@@ -388,7 +388,7 @@ def main():
             (rc, out, err) = be.unmount_be()
 
             if rc != 0:
-                module.fail_json(msg='Error while unmounting BE: "%s"' % err,
+                module.fail_json(msg=f'Error while unmounting BE: "{err}"',
                                  name=be.name,
                                  stderr=err,
                                  rc=rc)

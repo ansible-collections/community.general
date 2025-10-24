@@ -145,7 +145,7 @@ class Cargo(object):
     @path.setter
     def path(self, path):
         if path is not None and not os.path.isdir(path):
-            self.module.fail_json(msg="Path %s is not a directory" % path)
+            self.module.fail_json(msg=f"Path {path} is not a directory")
         self._path = path
 
     def _exec(
@@ -208,7 +208,7 @@ class Cargo(object):
         match = re.search(r'"(.+)"', data)
         if not match:
             self.module.fail_json(
-                msg="No published version for package %s found" % name
+                msg=f"No published version for package {name} found"
             )
         return match.group(1)
 
@@ -230,8 +230,7 @@ class Cargo(object):
         )
         if not package:
             self.module.fail_json(
-                msg="Package %s not defined in source, found: %s"
-                % (name, [x["name"] for x in manifest["packages"]])
+                msg=f"Package {name} not defined in source, found: {[x['name'] for x in manifest['packages']]}"
             )
         return package["version"]
 

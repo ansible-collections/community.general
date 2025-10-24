@@ -107,7 +107,7 @@ class Bower(object):
         self.version = kwargs['version']
 
         if kwargs['version']:
-            self.name_version = self.name + '#' + self.version
+            self.name_version = f"{self.name}#{self.version}"
         else:
             self.name_version = self.name
 
@@ -118,7 +118,7 @@ class Bower(object):
             if self.relative_execpath:
                 cmd.append(os.path.join(self.path, self.relative_execpath, "bower"))
                 if not os.path.isfile(cmd[-1]):
-                    self.module.fail_json(msg="bower not found at relative path %s" % self.relative_execpath)
+                    self.module.fail_json(msg=f"bower not found at relative path {self.relative_execpath}")
             else:
                 cmd.append("bower")
 
@@ -140,7 +140,7 @@ class Bower(object):
                 if not os.path.exists(self.path):
                     os.makedirs(self.path)
                 if not os.path.isdir(self.path):
-                    self.module.fail_json(msg="path %s is not a directory" % self.path)
+                    self.module.fail_json(msg=f"path {self.path} is not a directory")
                 cwd = self.path
 
             rc, out, err = self.module.run_command(cmd, check_rc=check_rc, cwd=cwd)

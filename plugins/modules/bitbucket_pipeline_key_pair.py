@@ -133,7 +133,7 @@ def update_ssh_key_pair(module, bitbucket):
         module.fail_json(msg=error_messages['invalid_params'])
 
     if info['status'] != 200:
-        module.fail_json(msg='Failed to create or update pipeline ssh key pair : {0}'.format(info))
+        module.fail_json(msg=f'Failed to create or update pipeline ssh key pair : {info}')
 
 
 def delete_ssh_key_pair(module, bitbucket):
@@ -149,7 +149,7 @@ def delete_ssh_key_pair(module, bitbucket):
         module.fail_json(msg=error_messages['invalid_params'])
 
     if info['status'] != 204:
-        module.fail_json(msg='Failed to delete pipeline ssh key pair: {0}'.format(info))
+        module.fail_json(msg=f'Failed to delete pipeline ssh key pair: {info}')
 
 
 def main():

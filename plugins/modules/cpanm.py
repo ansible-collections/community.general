@@ -223,7 +223,7 @@ class CPANMinus(ModuleHelper):
             line = out.split('\n')[0]
             match = re.search(r"version\s+([\d\.]+)\s+", line)
             if not match:
-                self.do_raise("Failed to determine version number. First line of output: {0}".format(line))
+                self.do_raise(f"Failed to determine version number. First line of output: {line}")
             self.vars.cpanm_version = match.group(1)
 
     def _is_package_installed(self, name, locallib, version):
@@ -232,12 +232,12 @@ class CPANMinus(ModuleHelper):
 
         if name is None or name.endswith('.tar.gz'):
             return False
-        version = "" if version is None else " " + version
+        version = "" if version is None else f" {version}"
 
-        env = {"PERL5LIB": "%s/lib/perl5" % locallib} if locallib else {}
+        env = {"PERL5LIB": f"{locallib}/lib/perl5"} if locallib else {}
         runner = CmdRunner(self.module, ["perl", "-le"], {"mod": cmd_runner_fmt.as_list()}, check_rc=False, environ_update=env)
         with runner("mod", output_process=process) as ctx:
-            return ctx.run(mod='use %s%s;' % (name, version))
+            return ctx.run(mod=f'use {name}{version};')
 
     def sanitize_pkg_spec_version(self, pkg_spec, version):
         if version is None:
@@ -249,9 +249,9 @@ class CPANMinus(ModuleHelper):
         if pkg_spec.endswith('.git'):
             if version.startswith('~'):
                 self.do_raise(msg="operator '~' not allowed in version parameter when installing from git repository")
-            version = version if version.startswith('@') else '@' + version
+            version = version if version.startswith('@') else f"@{version}"
         elif version[0] not in ('@', '~'):
-            version = '~' + version
+            version = f"~{version}"
         return pkg_spec + version
 
     def __run__(self):

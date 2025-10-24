@@ -202,9 +202,9 @@ class ConsulAgentCheckModule(_ConsulModule):
         if operation == OPERATION_READ:
             return "agent/checks"
         if operation in [OPERATION_CREATE, OPERATION_UPDATE]:
-            return "/".join([self.api_endpoint, "register"])
+            return f"{self.api_endpoint}/register"
         if operation == OPERATION_DELETE:
-            return "/".join([self.api_endpoint, "deregister", identifier])
+            return f"{self.api_endpoint}/deregister/{identifier}"
 
         return super(ConsulAgentCheckModule, self).endpoint_url(operation, identifier)
 
