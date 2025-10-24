@@ -24,6 +24,7 @@ options:
     description:
       - A regular expression string to exclude files. Applies to the base name of the file or directory.
     type: str
+    version_added: 12.0.0
 """
 
 EXAMPLES = r"""
