@@ -343,7 +343,7 @@ end_state:
   returned: on success
   type: dict
 user_created:
-  description: Indicates if a user was created.
+  description: Indicates whether a user was created.
   returned: in success
   type: bool
   version_added: 12.0.0
