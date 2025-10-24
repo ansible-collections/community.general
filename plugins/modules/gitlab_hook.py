@@ -227,12 +227,12 @@ class GitLabHook(object):
         self.hook_object = hook
         if changed:
             if self._module.check_mode:
-                self._module.exit_json(changed=True, msg="Successfully created or updated the hook %s" % hook_url)
+                self._module.exit_json(changed=True, msg=f"Successfully created or updated the hook {hook_url}")
 
             try:
                 hook.save()
             except Exception as e:
-                self._module.fail_json(msg="Failed to update hook: %s " % e)
+                self._module.fail_json(msg=f"Failed to update hook: {e} ")
 
         return changed
 
@@ -352,14 +352,14 @@ def main():
     project = find_project(gitlab_instance, project_identifier)
 
     if project is None:
-        module.fail_json(msg="Failed to create hook: project %s doesn't exists" % project_identifier)
+        module.fail_json(msg=f"Failed to create hook: project {project_identifier} doesn't exists")
 
     hook_exists = gitlab_hook.exists_hook(project, hook_url)
 
     if state == 'absent':
         if hook_exists:
             gitlab_hook.delete_hook()
-            module.exit_json(changed=True, msg="Successfully deleted hook %s" % hook_url)
+            module.exit_json(changed=True, msg=f"Successfully deleted hook {hook_url}")
         else:
             module.exit_json(changed=False, msg="Hook deleted or does not exists")
 
@@ -379,9 +379,9 @@ def main():
             "token": hook_token,
         }):
 
-            module.exit_json(changed=True, msg="Successfully created or updated the hook %s" % hook_url, hook=gitlab_hook.hook_object._attrs)
+            module.exit_json(changed=True, msg=f"Successfully created or updated the hook {hook_url}", hook=gitlab_hook.hook_object._attrs)
         else:
-            module.exit_json(changed=False, msg="No need to update the hook %s" % hook_url, hook=gitlab_hook.hook_object._attrs)
+            module.exit_json(changed=False, msg=f"No need to update the hook {hook_url}", hook=gitlab_hook.hook_object._attrs)
 
 
 if __name__ == '__main__':

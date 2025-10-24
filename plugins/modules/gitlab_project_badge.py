@@ -165,7 +165,7 @@ def core(module):
     project = find_project(gl, gitlab_project)
     # project doesn't exist
     if not project:
-        module.fail_json(msg="project '%s' not found." % gitlab_project)
+        module.fail_json(msg=f"project '{gitlab_project}' not found.")
 
     wished_badge = {
         "link_url": module.params["link_url"],

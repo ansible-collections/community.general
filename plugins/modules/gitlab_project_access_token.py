@@ -156,7 +156,6 @@ from datetime import datetime
 
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
     auth_argument_spec, find_project, gitlab_authentication, gitlab
@@ -184,7 +183,7 @@ class GitLabProjectAccessToken(object):
             self.access_token_object = project.access_tokens.create(arguments)
             changed = True
         except (gitlab.exceptions.GitlabCreateError) as e:
-            self._module.fail_json(msg="Failed to create access token: %s " % to_native(e))
+            self._module.fail_json(msg=f"Failed to create access token: {e}")
 
         return changed
 
@@ -209,7 +208,7 @@ class GitLabProjectAccessToken(object):
             self.access_token_object.delete()
             changed = True
         except (gitlab.exceptions.GitlabCreateError) as e:
-            self._module.fail_json(msg="Failed to revoke access token: %s " % to_native(e))
+            self._module.fail_json(msg=f"Failed to revoke access token: {e}")
 
         return changed
 
@@ -291,7 +290,7 @@ def main():
 
     project = find_project(gitlab_instance, project_identifier)
     if project is None:
-        module.fail_json(msg="Failed to create access token: project %s does not exists" % project_identifier)
+        module.fail_json(msg=f"Failed to create access token: project {project_identifier} does not exists")
 
     gitlab_access_token_exists = False
     gitlab_access_token.find_access_token(project, name)
@@ -301,7 +300,7 @@ def main():
     if state == 'absent':
         if gitlab_access_token_exists:
             gitlab_access_token.revoke_access_token()
-            module.exit_json(changed=True, msg="Successfully deleted access token %s" % name)
+            module.exit_json(changed=True, msg=f"Successfully deleted access token {name}")
         else:
             module.exit_json(changed=False, msg="Access token does not exists")
 

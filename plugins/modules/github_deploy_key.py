@@ -203,7 +203,7 @@ class GithubDeployKey(object):
     def url(self):
         owner = self.module.params['owner']
         repo = self.module.params['repo']
-        return "{0}/repos/{1}/{2}/keys".format(self.github_url, owner, repo)
+        return f"{self.github_url}/repos/{owner}/{repo}/keys"
 
     @property
     def headers(self):
@@ -214,7 +214,7 @@ class GithubDeployKey(object):
             if self.otp is not None:
                 return {"X-GitHub-OTP": self.otp}
         elif self.token is not None:
-            return {"Authorization": "token {0}".format(self.token)}
+            return {"Authorization": f"token {self.token}"}
         else:
             return None
 
@@ -267,7 +267,7 @@ class GithubDeployKey(object):
             self.handle_error(method="POST", info=info)
 
     def remove_existing_key(self, key_id):
-        resp, info = fetch_url(self.module, "{0}/{1}".format(self.url, key_id), headers=self.headers, method="DELETE")
+        resp, info = fetch_url(self.module, f"{self.url}/{key_id}", headers=self.headers, method="DELETE")
 
         status_code = info["status"]
 
@@ -286,7 +286,7 @@ class GithubDeployKey(object):
             err = None
 
         if status_code == 401:
-            self.module.fail_json(msg="Failed to connect to {0} due to invalid credentials".format(self.github_url), http_status_code=status_code, error=err)
+            self.module.fail_json(msg=f"Failed to connect to {self.github_url} due to invalid credentials", http_status_code=status_code, error=err)
         elif status_code == 404:
             self.module.fail_json(msg="GitHub repository does not exist", http_status_code=status_code, error=err)
         else:

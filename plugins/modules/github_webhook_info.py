@@ -98,7 +98,6 @@ except ImportError:
     HAS_GITHUB = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 
 
 def _munge_hook(hook_obj):
@@ -140,32 +139,25 @@ def main():
             module.params.get("password") or module.params.get("token"),
             base_url=module.params["github_url"])
     except github.GithubException as err:
-        module.fail_json(msg="Could not connect to GitHub at %s: %s" % (
-            module.params["github_url"], to_native(err)))
+        module.fail_json(msg=f"Could not connect to GitHub at {module.params['github_url']}: {err}")
 
     try:
         repo = github_conn.get_repo(module.params["repository"])
     except github.BadCredentialsException as err:
-        module.fail_json(msg="Could not authenticate to GitHub at %s: %s" % (
-            module.params["github_url"], to_native(err)))
+        module.fail_json(msg=f"Could not authenticate to GitHub at {module.params['github_url']}: {err}")
     except github.UnknownObjectException as err:
         module.fail_json(
-            msg="Could not find repository %s in GitHub at %s: %s" % (
-                module.params["repository"], module.params["github_url"],
-                to_native(err)))
+            msg=f"Could not find repository {module.params['repository']} in GitHub at {module.params['github_url']}: {err}")
     except Exception as err:
         module.fail_json(
-            msg="Could not fetch repository %s from GitHub at %s: %s" %
-            (module.params["repository"], module.params["github_url"],
-             to_native(err)),
+            msg=f"Could not fetch repository {module.params['repository']} from GitHub at {module.params['github_url']}: {err}",
             exception=traceback.format_exc())
 
     try:
         hooks = [_munge_hook(h) for h in repo.get_hooks()]
     except github.GithubException as err:
         module.fail_json(
-            msg="Unable to get hooks from repository %s: %s" %
-            (module.params["repository"], to_native(err)),
+            msg=f"Unable to get hooks from repository {module.params['repository']}: {err}",
             exception=traceback.format_exc())
 
     module.exit_json(changed=False, hooks=hooks)

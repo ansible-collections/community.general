@@ -272,13 +272,13 @@ class GitlabMilestones(object):
         if _found:
             return _found[0].id
         else:
-            self._module.fail_json(msg="milestone '%s' not found." % _title)
+            self._module.fail_json(msg=f"milestone '{_title}' not found.")
 
     def check_date(self, _date):
         try:
             datetime.strptime(_date, '%Y-%m-%d')
         except ValueError:
-            self._module.fail_json(msg="milestone's date '%s' not in correct format." % _date)
+            self._module.fail_json(msg=f"milestone's date '{_date}' not in correct format.")
         return _date
 
     def delete_milestone(self, var_obj):
@@ -460,9 +460,9 @@ def main():
     # if both not found, module must exist
     if not gitlab_project_id and not gitlab_group_id:
         if gitlab_project and not gitlab_project_id:
-            module.fail_json(msg="project '%s' not found." % gitlab_project)
+            module.fail_json(msg=f"project '{gitlab_project}' not found.")
         if gitlab_group and not gitlab_group_id:
-            module.fail_json(msg="group '%s' not found." % gitlab_group)
+            module.fail_json(msg=f"group '{gitlab_group}' not found.")
 
     this_gitlab = GitlabMilestones(module=module, gitlab_instance=gitlab_instance, group_id=gitlab_group_id,
                                    project_id=gitlab_project_id)

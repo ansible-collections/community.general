@@ -151,8 +151,10 @@ def main():
 
     gitlab_version = gitlab.__version__
     if LooseVersion(gitlab_version) < LooseVersion('2.3.0'):
-        module.fail_json(msg="community.general.gitlab_proteched_branch requires python-gitlab Python module >= 2.3.0 (installed version: [%s])."
-                             " Please upgrade python-gitlab to version 2.3.0 or above." % gitlab_version)
+        module.fail_json(
+            msg=f"community.general.gitlab_branch requires python-gitlab Python module >= 2.3.0 (installed version: [{gitlab_version}])."
+                " Please upgrade python-gitlab to version 2.3.0 or above."
+        )
 
     this_gitlab = GitlabBranch(module=module, project=project, gitlab_instance=gitlab_instance)
 
@@ -161,15 +163,15 @@ def main():
     if not this_branch and state == "present":
         r_branch = this_gitlab.get_branch(ref_branch)
         if not r_branch:
-            module.fail_json(msg="Ref branch {b} not exist.".format(b=ref_branch))
+            module.fail_json(msg=f"Ref branch {ref_branch} not exist.")
         this_gitlab.create_branch(branch, ref_branch)
-        module.exit_json(changed=True, msg="Created the branch {b}.".format(b=branch))
+        module.exit_json(changed=True, msg=f"Created the branch {branch}.")
     elif this_branch and state == "present":
-        module.exit_json(changed=False, msg="Branch {b} already exist".format(b=branch))
+        module.exit_json(changed=False, msg=f"Branch {branch} already exist")
     elif this_branch and state == "absent":
         try:
             this_gitlab.delete_branch(this_branch)
-            module.exit_json(changed=True, msg="Branch {b} deleted.".format(b=branch))
+            module.exit_json(changed=True, msg=f"Branch {branch} deleted.")
         except Exception as e:
             module.fail_json(msg="Error delete branch.", exception=traceback.format_exc())
     else:

@@ -114,7 +114,6 @@ deploy_key:
 
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
     auth_argument_spec, find_project, gitlab_authentication, gitlab, list_all_kwargs
@@ -160,12 +159,12 @@ class GitLabDeployKey(object):
         self.deploy_key_object = deploy_key
         if changed:
             if self._module.check_mode:
-                self._module.exit_json(changed=True, msg="Successfully created or updated the deploy key %s" % key_title)
+                self._module.exit_json(changed=True, msg=f"Successfully created or updated the deploy key {key_title}")
 
             try:
                 deploy_key.save()
             except Exception as e:
-                self._module.fail_json(msg="Failed to update deploy key: %s " % e)
+                self._module.fail_json(msg=f"Failed to update deploy key: {e} ")
             return True
         else:
             return False
@@ -181,7 +180,7 @@ class GitLabDeployKey(object):
         try:
             deploy_key = project.keys.create(arguments)
         except (gitlab.exceptions.GitlabCreateError) as e:
-            self._module.fail_json(msg="Failed to create deploy key: %s " % to_native(e))
+            self._module.fail_json(msg=f"Failed to create deploy key: {e} ")
 
         return deploy_key
 
@@ -271,24 +270,24 @@ def main():
     project = find_project(gitlab_instance, project_identifier)
 
     if project is None:
-        module.fail_json(msg="Failed to create deploy key: project %s doesn't exists" % project_identifier)
+        module.fail_json(msg=f"Failed to create deploy key: project {project_identifier} doesn't exists")
 
     deploy_key_exists = gitlab_deploy_key.exists_deploy_key(project, key_title)
 
     if state == 'absent':
         if deploy_key_exists:
             gitlab_deploy_key.delete_deploy_key()
-            module.exit_json(changed=True, msg="Successfully deleted deploy key %s" % key_title)
+            module.exit_json(changed=True, msg=f"Successfully deleted deploy key {key_title}")
         else:
             module.exit_json(changed=False, msg="Deploy key deleted or does not exists")
 
     if state == 'present':
         if gitlab_deploy_key.create_or_update_deploy_key(project, key_title, key_keyfile, {'can_push': key_can_push}):
 
-            module.exit_json(changed=True, msg="Successfully created or updated the deploy key %s" % key_title,
+            module.exit_json(changed=True, msg=f"Successfully created or updated the deploy key {key_title}",
                              deploy_key=gitlab_deploy_key.deploy_key_object._attrs)
         else:
-            module.exit_json(changed=False, msg="No need to update the deploy key %s" % key_title,
+            module.exit_json(changed=False, msg=f"No need to update the deploy key {key_title}",
                              deploy_key=gitlab_deploy_key.deploy_key_object._attrs)
 
 

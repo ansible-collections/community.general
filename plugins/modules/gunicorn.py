@@ -160,7 +160,7 @@ def main():
 
     # use venv path if exists
     if venv:
-        gunicorn_command = "/".join((venv, 'bin', 'gunicorn'))
+        gunicorn_command = f"{venv}/bin/gunicorn"
     else:
         gunicorn_command = module.get_bin_path('gunicorn')
 
@@ -207,7 +207,7 @@ def main():
         else:
             # if user defined own error log, check that
             if error_log:
-                error = 'Please check your {0}'.format(error_log.strip())
+                error = f'Please check your {error_log.strip()}'
             else:
                 if os.path.isfile(tmp_error_log):
                     with open(tmp_error_log, 'r') as f:
@@ -217,10 +217,10 @@ def main():
                 else:
                     error = "Log not found"
 
-            module.fail_json(msg='Failed to start gunicorn. {0}'.format(error), error=err)
+            module.fail_json(msg=f'Failed to start gunicorn. {error}', error=err)
 
     else:
-        module.fail_json(msg='Failed to start gunicorn {0}'.format(err), error=err)
+        module.fail_json(msg=f'Failed to start gunicorn {err}', error=err)
 
 
 if __name__ == '__main__':

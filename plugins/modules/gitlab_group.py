@@ -246,7 +246,6 @@ group:
 
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
     auth_argument_spec, find_group, gitlab_authentication, gitlab
@@ -314,7 +313,7 @@ class GitLabGroup(object):
                 try:
                     group.avatar = open(options['avatar_path'], 'rb')
                 except IOError as e:
-                    self._module.fail_json(msg='Cannot open {0}: {1}'.format(options['avatar_path'], e))
+                    self._module.fail_json(msg=f"Cannot open {options['avatar_path']}: {e}")
             changed = True
         else:
             changed, group = self.update_group(self.group_object, payload)
@@ -322,12 +321,12 @@ class GitLabGroup(object):
         self.group_object = group
         if changed:
             if self._module.check_mode:
-                self._module.exit_json(changed=True, msg="Successfully created or updated the group %s" % name)
+                self._module.exit_json(changed=True, msg=f"Successfully created or updated the group {name}")
 
             try:
                 group.save()
             except Exception as e:
-                self._module.fail_json(msg="Failed to update group: %s " % e)
+                self._module.fail_json(msg=f"Failed to update group: {e} ")
             return True
         else:
             return False
@@ -345,7 +344,7 @@ class GitLabGroup(object):
 
             group = self._gitlab.groups.create(filtered)
         except (gitlab.exceptions.GitlabCreateError) as e:
-            self._module.fail_json(msg="Failed to create group: %s " % to_native(e))
+            self._module.fail_json(msg=f"Failed to create group: {e} ")
 
         return group
 
@@ -383,7 +382,7 @@ class GitLabGroup(object):
             try:
                 group.delete()
             except Exception as e:
-                self._module.fail_json(msg="Failed to delete group: %s " % to_native(e))
+                self._module.fail_json(msg=f"Failed to delete group: {e} ")
 
     '''
     @param name Name of the group
@@ -488,14 +487,14 @@ def main():
         if not parent_group:
             module.fail_json(msg="Failed to create GitLab group: Parent group doesn't exist")
 
-        group_exists = gitlab_group.exists_group(parent_group.full_path + '/' + group_path)
+        group_exists = gitlab_group.exists_group(f"{parent_group.full_path}/{group_path}")
     else:
         group_exists = gitlab_group.exists_group(group_path)
 
     if state == 'absent':
         if group_exists:
             gitlab_group.delete_group(force=force_delete)
-            module.exit_json(changed=True, msg="Successfully deleted group %s" % group_name)
+            module.exit_json(changed=True, msg=f"Successfully deleted group {group_name}")
         else:
             module.exit_json(changed=False, msg="Group deleted or does not exist")
 
@@ -523,9 +522,9 @@ def main():
             "visibility": group_visibility,
             "wiki_access_level": wiki_access_level,
         }):
-            module.exit_json(changed=True, msg="Successfully created or updated the group %s" % group_name, group=gitlab_group.group_object._attrs)
+            module.exit_json(changed=True, msg=f"Successfully created or updated the group {group_name}", group=gitlab_group.group_object._attrs)
         else:
-            module.exit_json(changed=False, msg="No need to update the group %s" % group_name, group=gitlab_group.group_object._attrs)
+            module.exit_json(changed=False, msg=f"No need to update the group {group_name}", group=gitlab_group.group_object._attrs)
 
 
 if __name__ == '__main__':

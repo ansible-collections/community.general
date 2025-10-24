@@ -200,8 +200,10 @@ def main():
 
     gitlab_version = gitlab.__version__
     if LooseVersion(gitlab_version) < LooseVersion('2.3.0'):
-        module.fail_json(msg="community.general.gitlab_protected_branch requires python-gitlab Python module >= 2.3.0 (installed version: [%s])."
-                             " Please upgrade python-gitlab to version 2.3.0 or above." % gitlab_version)
+        module.fail_json(
+            msg=f"community.general.gitlab_protected_branch requires python-gitlab Python module >= 2.3.0 (installed version: [{gitlab_version}])."
+                " Please upgrade python-gitlab to version 2.3.0 or above."
+        )
 
     this_gitlab = GitlabProtectedBranch(module=module, project=project, gitlab_instance=gitlab_instance)
 

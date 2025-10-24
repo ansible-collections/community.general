@@ -460,9 +460,9 @@ def main():
     # if both not found, module must exist
     if not gitlab_project_id and not gitlab_group_id:
         if gitlab_project and not gitlab_project_id:
-            module.fail_json(msg="project '%s' not found." % gitlab_project)
+            module.fail_json(msg=f"project '{gitlab_project}' not found.")
         if gitlab_group and not gitlab_group_id:
-            module.fail_json(msg="group '%s' not found." % gitlab_group)
+            module.fail_json(msg=f"group '{gitlab_group}' not found.")
 
     this_gitlab = GitlabLabels(module=module, gitlab_instance=gitlab_instance, group_id=gitlab_group_id,
                                project_id=gitlab_project_id)

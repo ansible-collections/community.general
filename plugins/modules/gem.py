@@ -182,7 +182,7 @@ def get_installed_versions(module, remote=False):
         if module.params['repository']:
             cmd.extend(['--source', module.params['repository']])
     cmd.append('-n')
-    cmd.append('^%s$' % module.params['name'])
+    cmd.append(f"^{module.params['name']}$")
 
     environ = get_rubygems_environ(module)
     (rc, out, err) = module.run_command(cmd, environ_update=environ, check_rc=True)
@@ -337,10 +337,10 @@ def main():
                 rc, out, err = command_output
                 module.fail_json(
                     msg=(
-                        "Failed to uninstall gem '%s': it is still present after 'gem uninstall'. "
+                        f"Failed to uninstall gem '{module.params['name']}': it is still present after 'gem uninstall'. "
                         "This usually happens with default or system gems provided by the OS, "
                         "which cannot be removed with the gem command."
-                    ) % module.params['name'],
+                    ),
                     rc=rc,
                     stdout=out,
                     stderr=err

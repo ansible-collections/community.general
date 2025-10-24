@@ -144,7 +144,7 @@ mr:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.api import basic_auth_argument_spec
-from ansible.module_utils.common.text.converters import to_native, to_text
+from ansible.module_utils.common.text.converters import to_text
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
@@ -166,7 +166,7 @@ class GitlabMergeRequest(object):
         try:
             return self.project.branches.get(branch)
         except gitlab.exceptions.GitlabGetError as e:
-            self._module.fail_json(msg="Failed to get the branch: %s" % to_native(e))
+            self._module.fail_json(msg=f"Failed to get the branch: {e}")
 
     '''
     @param title Title of the Merge Request
@@ -179,7 +179,7 @@ class GitlabMergeRequest(object):
         try:
             mrs = self.project.mergerequests.list(search=title, source_branch=source_branch, target_branch=target_branch, state=state_filter)
         except gitlab.exceptions.GitlabGetError as e:
-            self._module.fail_json(msg="Failed to list the Merge Request: %s" % to_native(e))
+            self._module.fail_json(msg=f"Failed to list the Merge Request: {e}")
 
         if len(mrs) > 1:
             self._module.fail_json(msg="Multiple Merge Requests matched search criteria.")
@@ -187,7 +187,7 @@ class GitlabMergeRequest(object):
             try:
                 return self.project.mergerequests.get(id=mrs[0].iid)
             except gitlab.exceptions.GitlabGetError as e:
-                self._module.fail_json(msg="Failed to get the Merge Request: %s" % to_native(e))
+                self._module.fail_json(msg=f"Failed to get the Merge Request: {e}")
 
     '''
     @param username Name of the user
@@ -197,7 +197,7 @@ class GitlabMergeRequest(object):
         try:
             users = [user for user in self.project.users.list(username=username, all=True) if user.username == username]
         except gitlab.exceptions.GitlabGetError as e:
-            self._module.fail_json(msg="Failed to list the users: %s" % to_native(e))
+            self._module.fail_json(msg=f"Failed to list the users: {e}")
 
         if len(users) > 1:
             self._module.fail_json(msg="Multiple Users matched search criteria.")
@@ -217,36 +217,36 @@ class GitlabMergeRequest(object):
     '''
     def create_mr(self, options):
         if self._module.check_mode:
-            self._module.exit_json(changed=True, msg="Successfully created the Merge Request %s" % options["title"])
+            self._module.exit_json(changed=True, msg=f"Successfully created the Merge Request {options['title']}")
 
         try:
             return self.project.mergerequests.create(options)
         except gitlab.exceptions.GitlabCreateError as e:
-            self._module.fail_json(msg="Failed to create Merge Request: %s " % to_native(e))
+            self._module.fail_json(msg=f"Failed to create Merge Request: {e}")
 
     '''
     @param mr Merge Request object to delete
     '''
     def delete_mr(self, mr):
         if self._module.check_mode:
-            self._module.exit_json(changed=True, msg="Successfully deleted the Merge Request %s" % mr["title"])
+            self._module.exit_json(changed=True, msg=f"Successfully deleted the Merge Request {mr['title']}")
 
         try:
             return mr.delete()
         except gitlab.exceptions.GitlabDeleteError as e:
-            self._module.fail_json(msg="Failed to delete Merge Request: %s " % to_native(e))
+            self._module.fail_json(msg=f"Failed to delete Merge Request: {e}")
 
     '''
     @param mr Merge Request object to update
     '''
     def update_mr(self, mr, options):
         if self._module.check_mode:
-            self._module.exit_json(changed=True, msg="Successfully updated the Merge Request %s" % mr["title"])
+            self._module.exit_json(changed=True, msg=f"Successfully updated the Merge Request {mr['title']}")
 
         try:
             return self.project.mergerequests.update(mr.iid, options)
         except gitlab.exceptions.GitlabUpdateError as e:
-            self._module.fail_json(msg="Failed to update Merge Request: %s " % to_native(e))
+            self._module.fail_json(msg=f"Failed to update Merge Request: {e}")
 
     '''
     @param mr Merge Request object to evaluate
@@ -336,22 +336,24 @@ def main():
 
     gitlab_version = gitlab.__version__
     if LooseVersion(gitlab_version) < LooseVersion('2.3.0'):
-        module.fail_json(msg="community.general.gitlab_merge_request requires python-gitlab Python module >= 2.3.0 (installed version: [%s])."
-                             " Please upgrade python-gitlab to version 2.3.0 or above." % gitlab_version)
+        module.fail_json(
+            msg=f"community.general.gitlab_merge_request requires python-gitlab Python module >= 2.3.0 (installed version: [{gitlab_version}])."
+                " Please upgrade python-gitlab to version 2.3.0 or above."
+        )
 
     this_project = find_project(gitlab_instance, project)
     if this_project is None:
-        module.fail_json(msg="Failed to get the project: %s" % project)
+        module.fail_json(msg=f"Failed to get the project: {project}")
 
     this_gitlab = GitlabMergeRequest(module=module, project=this_project, gitlab_instance=gitlab_instance)
 
     r_source_branch = this_gitlab.get_branch(source_branch)
     if not r_source_branch:
-        module.fail_json(msg="Source branch {b} not exist.".format(b=r_source_branch))
+        module.fail_json(msg=f"Source branch {r_source_branch} not exist.")
 
     r_target_branch = this_gitlab.get_branch(target_branch)
     if not r_target_branch:
-        module.fail_json(msg="Destination branch {b} not exist.".format(b=r_target_branch))
+        module.fail_json(msg=f"Destination branch {r_target_branch} not exist.")
 
     this_mr = this_gitlab.get_mr(title, source_branch, target_branch, state_filter)
 
@@ -361,7 +363,7 @@ def main():
                 with open(description_path, 'rb') as f:
                     description = to_text(f.read(), errors='surrogate_or_strict')
             except IOError as e:
-                module.fail_json(msg='Cannot open {0}: {1}'.format(description_path, e))
+                module.fail_json(msg=f'Cannot open {description_path}: {e}')
 
         # sorting necessary in order to properly detect changes, as we don't want to get false positive
         # results due to differences in ids ordering; see `mr_has_changed()`
@@ -384,25 +386,25 @@ def main():
 
             mr = this_gitlab.create_mr(options)
             module.exit_json(
-                changed=True, msg="Created the Merge Request {t} from branch {s} to branch {d}.".format(t=title, d=target_branch, s=source_branch),
+                changed=True, msg=f"Created the Merge Request {title} from branch {source_branch} to branch {target_branch}.",
                 mr=mr.asdict()
             )
         else:
             if this_gitlab.mr_has_changed(this_mr, options):
                 mr = this_gitlab.update_mr(this_mr, options)
                 module.exit_json(
-                    changed=True, msg="Merge Request {t} from branch {s} to branch {d} updated.".format(t=title, d=target_branch, s=source_branch),
+                    changed=True, msg=f"Merge Request {title} from branch {source_branch} to branch {target_branch} updated.",
                     mr=mr
                 )
             else:
                 module.exit_json(
-                    changed=False, msg="Merge Request {t} from branch {s} to branch {d} already exist".format(t=title, d=target_branch, s=source_branch),
+                    changed=False, msg=f"Merge Request {title} from branch {source_branch} to branch {target_branch} already exist",
                     mr=this_mr.asdict()
                 )
     elif this_mr and state == "absent":
         mr = this_gitlab.delete_mr(this_mr)
         module.exit_json(
-            changed=True, msg="Merge Request {t} from branch {s} to branch {d} deleted.".format(t=title, d=target_branch, s=source_branch),
+            changed=True, msg=f"Merge Request {title} from branch {source_branch} to branch {target_branch} deleted.",
             mr=mr
         )
     else:

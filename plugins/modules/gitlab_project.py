@@ -409,7 +409,6 @@ project:
 
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
     auth_argument_spec, find_group, find_project, gitlab_authentication, gitlab
@@ -495,7 +494,7 @@ class GitLabProject(object):
                 try:
                     project.avatar = open(options['avatar_path'], 'rb')
                 except IOError as e:
-                    self._module.fail_json(msg='Cannot open {0}: {1}'.format(options['avatar_path'], e))
+                    self._module.fail_json(msg=f"Cannot open {options['avatar_path']}: {e}")
 
             changed = True
         else:
@@ -506,12 +505,12 @@ class GitLabProject(object):
         self.project_object = project
         if changed:
             if self._module.check_mode:
-                self._module.exit_json(changed=True, msg="Successfully created or updated the project %s" % project_name)
+                self._module.exit_json(changed=True, msg=f"Successfully created or updated the project {project_name}")
 
             try:
                 project.save()
             except Exception as e:
-                self._module.fail_json(msg="Failed to update project: %s " % e)
+                self._module.fail_json(msg=f"Failed to update project: {e} ")
             return True
         return False
 
@@ -529,7 +528,7 @@ class GitLabProject(object):
         try:
             project = self._gitlab.projects.create(arguments)
         except (gitlab.exceptions.GitlabCreateError) as e:
-            self._module.fail_json(msg="Failed to create project: %s " % to_native(e))
+            self._module.fail_json(msg=f"Failed to create project: {e} ")
 
         return project
 
@@ -582,7 +581,7 @@ class GitLabProject(object):
     '''
     def exists_project(self, namespace, path):
         # When project exists, object will be stored in self.project_object.
-        project = find_project(self._gitlab, namespace.full_path + '/' + path)
+        project = find_project(self._gitlab, f"{namespace.full_path}/{path}")
         if project:
             self.project_object = project
             return True
@@ -721,7 +720,7 @@ def main():
     if group_identifier:
         group = find_group(gitlab_instance, group_identifier)
         if group is None:
-            module.fail_json(msg="Failed to create project: group %s doesn't exist" % group_identifier)
+            module.fail_json(msg=f"Failed to create project: group {group_identifier} doesn't exist")
 
         namespace_id = group.id
     else:
@@ -737,7 +736,7 @@ def main():
     try:
         namespace = gitlab_instance.namespaces.get(namespace_id)
     except gitlab.exceptions.GitlabGetError as e:
-        module.fail_json(msg="Failed to find the namespace for the given user: %s" % to_native(e))
+        module.fail_json(msg=f"Failed to find the namespace for the given user: {e}")
 
     if not namespace:
         module.fail_json(msg="Failed to find the namespace for the project")
@@ -746,7 +745,7 @@ def main():
     if state == 'absent':
         if project_exists:
             gitlab_project.delete_project()
-            module.exit_json(changed=True, msg="Successfully deleted project %s" % project_name)
+            module.exit_json(changed=True, msg=f"Successfully deleted project {project_name}")
         module.exit_json(changed=False, msg="Project deleted or does not exist")
 
     if state == 'present':
@@ -792,8 +791,8 @@ def main():
             "wiki_enabled": wiki_enabled,
         }):
 
-            module.exit_json(changed=True, msg="Successfully created or updated the project %s" % project_name, project=gitlab_project.project_object._attrs)
-        module.exit_json(changed=False, msg="No need to update the project %s" % project_name, project=gitlab_project.project_object._attrs)
+            module.exit_json(changed=True, msg=f"Successfully created or updated the project {project_name}", project=gitlab_project.project_object._attrs)
+        module.exit_json(changed=False, msg=f"No need to update the project {project_name}", project=gitlab_project.project_object._attrs)
 
 
 if __name__ == '__main__':

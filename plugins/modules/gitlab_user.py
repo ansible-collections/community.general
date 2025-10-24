@@ -219,7 +219,6 @@ user:
 
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
     auth_argument_spec, find_group, gitlab_authentication, gitlab, list_all_kwargs
@@ -315,11 +314,11 @@ class GitLabUser(object):
             try:
                 user.save()
             except Exception as e:
-                self._module.fail_json(msg="Failed to update user: %s " % to_native(e))
+                self._module.fail_json(msg=f"Failed to update user: {e} ")
 
         if changed:
             if self._module.check_mode:
-                self._module.exit_json(changed=True, msg="Successfully created or updated the user %s" % username)
+                self._module.exit_json(changed=True, msg=f"Successfully created or updated the user {username}")
             return True
         else:
             return False
@@ -360,7 +359,7 @@ class GitLabUser(object):
                     parameter['expires_at'] = sshkey['expires_at']
                 user.keys.create(parameter)
             except gitlab.exceptions.GitlabCreateError as e:
-                self._module.fail_json(msg="Failed to assign sshkey to user: %s" % to_native(e))
+                self._module.fail_json(msg=f"Failed to assign sshkey to user: {e}")
             return True
         return False
 
@@ -420,7 +419,7 @@ class GitLabUser(object):
                     'user_id': self.get_user_id(user),
                     'access_level': self.ACCESS_LEVEL[access_level]})
             except gitlab.exceptions.GitlabCreateError as e:
-                self._module.fail_json(msg="Failed to assign user to group: %s" % to_native(e))
+                self._module.fail_json(msg=f"Failed to assign user to group: {e}")
             return True
         return False
 
@@ -468,7 +467,7 @@ class GitLabUser(object):
                 self.add_identities(user, identities)
 
         except (gitlab.exceptions.GitlabCreateError) as e:
-            self._module.fail_json(msg="Failed to create user: %s " % to_native(e))
+            self._module.fail_json(msg=f"Failed to create user: {e}")
 
         return user
 
@@ -639,21 +638,21 @@ def main():
     if state == 'absent':
         if user_exists:
             gitlab_user.delete_user()
-            module.exit_json(changed=True, msg="Successfully deleted user %s" % user_username)
+            module.exit_json(changed=True, msg=f"Successfully deleted user {user_username}")
         else:
             module.exit_json(changed=False, msg="User deleted or does not exists")
 
     if state == 'blocked':
         if user_exists and user_is_active:
             gitlab_user.block_user()
-            module.exit_json(changed=True, msg="Successfully blocked user %s" % user_username)
+            module.exit_json(changed=True, msg=f"Successfully blocked user {user_username}")
         else:
             module.exit_json(changed=False, msg="User already blocked or does not exists")
 
     if state == 'unblocked':
         if user_exists and not user_is_active:
             gitlab_user.unblock_user()
-            module.exit_json(changed=True, msg="Successfully unblocked user %s" % user_username)
+            module.exit_json(changed=True, msg=f"Successfully unblocked user {user_username}")
         else:
             module.exit_json(changed=False, msg="User is not blocked or does not exists")
 
@@ -674,9 +673,9 @@ def main():
             "identities": user_identities,
             "overwrite_identities": overwrite_identities,
         }):
-            module.exit_json(changed=True, msg="Successfully created or updated the user %s" % user_username, user=gitlab_user.user_object._attrs)
+            module.exit_json(changed=True, msg=f"Successfully created or updated the user {user_username}", user=gitlab_user.user_object._attrs)
         else:
-            module.exit_json(changed=False, msg="No need to update the user %s" % user_username, user=gitlab_user.user_object._attrs)
+            module.exit_json(changed=False, msg=f"No need to update the user {user_username}", user=gitlab_user.user_object._attrs)
 
 
 if __name__ == '__main__':
