@@ -268,13 +268,14 @@ class CoprModule(object):
         """
         if not repo_content:
             repo_content = self._download_repo_info()
-            repo_content = repo_content.rstrip('\n')
         if self.ansible_module.params["includepkgs"]:
             includepkgs_value = ','.join(self.ansible_module.params['includepkgs'])
-            repo_content = f"{repo_content}\nincludepkgs={includepkgs_value}\n"
+            repo_content_strip = repo_content.rstrip('\n')  # Python 3.11 does not allow backslash chars within f-string expressions
+            repo_content = f"{repo_content_strip}\nincludepkgs={includepkgs_value}\n"
         if self.ansible_module.params["excludepkgs"]:
             excludepkgs_value = ','.join(self.ansible_module.params['excludepkgs'])
-            repo_content = f"{repo_content}\nexcludepkgs={excludepkgs_value}\n"
+            repo_content_strip = repo_content.rstrip('\n')  # Python 3.11 does not allow backslash chars within f-string expressions
+            repo_content = f"{repo_content_strip}\nexcludepkgs={excludepkgs_value}\n"
         if self._compare_repo_content(repo_filename_path, repo_content):
             return False
         if not self.check_mode:
