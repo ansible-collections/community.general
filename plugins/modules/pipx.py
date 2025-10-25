@@ -221,7 +221,7 @@ from ansible.module_utils.facts.compat import ansible_facts
 
 
 def _make_name(name, suffix):
-    return name if suffix is None else "{0}{1}".format(name, suffix)
+    return name if suffix is None else f"{name}{suffix}"
 
 
 class PipX(StateModuleHelper):
@@ -344,7 +344,7 @@ class PipX(StateModuleHelper):
     def state_upgrade(self):
         name = _make_name(self.vars.name, self.vars.suffix)
         if not self.vars.application:
-            self.do_raise("Trying to upgrade a non-existent application: {0}".format(name))
+            self.do_raise(f"Trying to upgrade a non-existent application: {name}")
         if self.vars.force:
             self.changed = True
 
@@ -364,7 +364,7 @@ class PipX(StateModuleHelper):
     def state_reinstall(self):
         name = _make_name(self.vars.name, self.vars.suffix)
         if not self.vars.application:
-            self.do_raise("Trying to reinstall a non-existent application: {0}".format(name))
+            self.do_raise(f"Trying to reinstall a non-existent application: {name}")
         self.changed = True
         with self.runner('state global name python', check_mode_skip=True) as ctx:
             ctx.run(name=name)
@@ -373,7 +373,7 @@ class PipX(StateModuleHelper):
     def state_inject(self):
         name = _make_name(self.vars.name, self.vars.suffix)
         if not self.vars.application:
-            self.do_raise("Trying to inject packages into a non-existent application: {0}".format(name))
+            self.do_raise(f"Trying to inject packages into a non-existent application: {name}")
         if self.vars.force:
             self.changed = True
         with self.runner('state global index_url install_apps install_deps force editable pip_args name inject_packages', check_mode_skip=True) as ctx:
@@ -383,7 +383,7 @@ class PipX(StateModuleHelper):
     def state_uninject(self):
         name = _make_name(self.vars.name, self.vars.suffix)
         if not self.vars.application:
-            self.do_raise("Trying to uninject packages into a non-existent application: {0}".format(name))
+            self.do_raise(f"Trying to uninject packages into a non-existent application: {name}")
         with self.runner('state global name inject_packages', check_mode_skip=True) as ctx:
             ctx.run(name=name)
             self._capture_results(ctx)

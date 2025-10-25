@@ -138,7 +138,7 @@ def load_key_string(key_str):
         if len(cut_key) == 3:
             ret_dict['label'] = cut_key[2]
     else:
-        raise Exception("Public key %s is in wrong format" % key_str)
+        raise Exception(f"Public key {key_str} is in wrong format")
     return ret_dict
 
 
@@ -146,7 +146,7 @@ def get_sshkey_selector(module):
     key_id = module.params.get('id')
     if key_id:
         if not is_valid_uuid(key_id):
-            raise Exception("sshkey ID %s is not valid UUID" % key_id)
+            raise Exception(f"sshkey ID {key_id} is not valid UUID")
     selecting_fields = ['label', 'fingerprint', 'id', 'key']
     select_dict = {}
     for f in selecting_fields:
@@ -192,8 +192,7 @@ def act_on_sshkeys(target_state, module, packet_conn):
                 if param not in newkey:
                     _msg = ("If you want to ensure a key is present, you must "
                             "supply both a label and a key string, either in "
-                            "module params, or in a key file. %s is missing"
-                            % param)
+                            f"module params, or in a key file. {param} is missing")
                     raise Exception(_msg)
             matching_sshkeys = []
             new_key_response = packet_conn.create_ssh_key(
@@ -208,9 +207,7 @@ def act_on_sshkeys(target_state, module, packet_conn):
                 k.delete()
                 changed = True
             except Exception as e:
-                _msg = ("while trying to remove sshkey %s, id %s %s, "
-                        "got error: %s" %
-                        (k.label, k.id, target_state, e))
+                _msg = f"while trying to remove sshkey {k.label}, id {k.id} {target_state}, got error: {e}"
                 raise Exception(_msg)
 
     return {
@@ -245,9 +242,7 @@ def main():
         module.fail_json(msg='packet required for this module')
 
     if not module.params.get('auth_token'):
-        _fail_msg = ("if Packet API token is not in environment variable %s, "
-                     "the auth_token parameter is required" %
-                     PACKET_API_TOKEN_ENV_VAR)
+        _fail_msg = f"if Packet API token is not in environment variable {PACKET_API_TOKEN_ENV_VAR}, the auth_token parameter is required"
         module.fail_json(msg=_fail_msg)
 
     auth_token = module.params.get('auth_token')
@@ -260,9 +255,9 @@ def main():
         try:
             module.exit_json(**act_on_sshkeys(state, module, packet_conn))
         except Exception as e:
-            module.fail_json(msg='failed to set sshkey state: %s' % str(e))
+            module.fail_json(msg=f'failed to set sshkey state: {e}')
     else:
-        module.fail_json(msg='%s is not a valid state for this module' % state)
+        module.fail_json(msg=f'{state} is not a valid state for this module')
 
 
 if __name__ == '__main__':

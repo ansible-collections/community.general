@@ -162,7 +162,7 @@ class PacemakerStonith(StateModuleHelper):
     def _process_command_output(self, fail_on_err, ignore_err_msg=""):
         def process(rc, out, err):
             if fail_on_err and rc != 0 and err and ignore_err_msg not in err:
-                self.do_raise('pcs failed with error (rc={0}): {1}'.format(rc, err))
+                self.do_raise(f'pcs failed with error (rc={rc}): {err}')
             out = out.rstrip()
             return None if out == "" else out
         return process

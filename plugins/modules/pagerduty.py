@@ -171,7 +171,7 @@ class PagerDutyRequest(object):
 
         response, info = http_call(self.module, url, headers=headers)
         if info['status'] != 200:
-            self.module.fail_json(msg="failed to lookup the ongoing window: %s" % info['msg'])
+            self.module.fail_json(msg=f"failed to lookup the ongoing window: {info['msg']}")
 
         json_out = self._read_response(response)
 
@@ -194,7 +194,7 @@ class PagerDutyRequest(object):
         data = json.dumps(request_data)
         response, info = http_call(self.module, url, data=data, headers=headers, method='POST')
         if info['status'] != 201:
-            self.module.fail_json(msg="failed to create the window: %s" % info['msg'])
+            self.module.fail_json(msg=f"failed to create the window: {info['msg']}")
 
         json_out = self._read_response(response)
 
@@ -214,19 +214,19 @@ class PagerDutyRequest(object):
         return start, end
 
     def absent(self, window_id, http_call=fetch_url):
-        url = "https://api.pagerduty.com/maintenance_windows/" + window_id
+        url = f"https://api.pagerduty.com/maintenance_windows/{window_id}"
         headers = dict(self.headers)
 
         response, info = http_call(self.module, url, headers=headers, method='DELETE')
         if info['status'] != 204:
-            self.module.fail_json(msg="failed to delete the window: %s" % info['msg'])
+            self.module.fail_json(msg=f"failed to delete the window: {info['msg']}")
 
         json_out = self._read_response(response)
 
         return False, json_out, True
 
     def _auth_header(self):
-        return "Token token=%s" % self.token
+        return f"Token token={self.token}"
 
     def _read_response(self, response):
         try:

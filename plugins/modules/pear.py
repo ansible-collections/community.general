@@ -190,13 +190,13 @@ def remove_packages(module, packages):
         rc, stdout, stderr = module.run_command(cmd, check_rc=False)
 
         if rc != 0:
-            module.fail_json(msg="failed to remove %s: %s" % (package, to_text(stdout + stderr)))
+            module.fail_json(msg=f"failed to remove {package}: {to_text(stdout + stderr)}")
 
         remove_c += 1
 
     if remove_c > 0:
 
-        module.exit_json(changed=True, msg="removed %s package(s)" % remove_c)
+        module.exit_json(changed=True, msg=f"removed {remove_c} package(s)")
 
     module.exit_json(changed=False, msg="package(s) already absent")
 
@@ -213,11 +213,13 @@ def install_packages(module, state, packages, prompts):
         if nb_prompts > 0 and (nb_prompts != nb_packages):
             if nb_prompts > nb_packages:
                 diff = nb_prompts - nb_packages
-                msg = "%s packages to install but %s prompts to expect. %s prompts will be ignored" % (to_text(nb_packages), to_text(nb_prompts), to_text(diff))
+                msg = f"{to_text(nb_packages)} packages to install but {to_text(nb_prompts)} prompts to expect. {to_text(diff)} prompts will be ignored"
             else:
                 diff = nb_packages - nb_prompts
-                msg = "%s packages to install but only %s prompts to expect. %s packages won't be expected to have a prompt" \
-                    % (to_text(nb_packages), to_text(nb_prompts), to_text(diff))
+                msg = (
+                    f"{to_text(nb_packages)} packages to install but only {to_text(nb_prompts)} prompts to expect. "
+                    f"{to_text(diff)} packages won't be expected to have a prompt"
+                )
             module.warn(msg)
 
         # Preparing prompts answer according to item type
@@ -227,7 +229,7 @@ def install_packages(module, state, packages, prompts):
             # We also expect here that the dict only has ONE key and the first key will be taken
             if isinstance(_item, dict):
                 key = list(_item.keys())[0]
-                answer = _item[key] + "\n"
+                answer = f"{_item[key]}\n"
 
                 tmp_prompts.append((key, answer))
             elif not _item:
@@ -258,12 +260,12 @@ def install_packages(module, state, packages, prompts):
         cmd = [_get_pear_path(module), command, package]
         rc, stdout, stderr = module.run_command(cmd, check_rc=False, prompt_regex=prompt_regex, data=data, binary_data=True)
         if rc != 0:
-            module.fail_json(msg="failed to install %s: %s" % (package, to_text(stdout + stderr)))
+            module.fail_json(msg=f"failed to install {package}: {to_text(stdout + stderr)}")
 
         install_c += 1
 
     if install_c > 0:
-        module.exit_json(changed=True, msg="installed %s package(s)" % (install_c))
+        module.exit_json(changed=True, msg=f"installed {install_c} package(s)")
 
     module.exit_json(changed=False, msg="package(s) already installed")
 
@@ -279,10 +281,9 @@ def check_packages(module, packages, state):
     if would_be_changed:
         if state == "absent":
             state = "removed"
-        module.exit_json(changed=True, msg="%s package(s) would be %s" % (
-            len(would_be_changed), state))
+        module.exit_json(changed=True, msg=f"{len(would_be_changed)} package(s) would be {state}")
     else:
-        module.exit_json(change=False, msg="package(s) already %s" % state)
+        module.exit_json(change=False, msg=f"package(s) already {state}")
 
 
 def main():

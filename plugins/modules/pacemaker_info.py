@@ -85,7 +85,7 @@ class PacemakerInfo(ModuleHelper):
     def _process_command_output(self, cli_action=""):
         def process(rc, out, err):
             if rc != 0:
-                self.do_raise('pcs {0} config failed with error (rc={1}): {2}'.format(cli_action, rc, err))
+                self.do_raise(f'pcs {cli_action} config failed with error (rc={rc}): {err}')
             out = json.loads(out)
             return None if out == "" else out
         return process

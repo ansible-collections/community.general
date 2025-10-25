@@ -158,11 +158,10 @@ def remove_pritunl_organization(module):
         else:
             module.fail_json(
                 msg=(
-                    "Can not remove organization '%s' with %d attached users. "
+                    f"Can not remove organization '{org_name}' with {org['user_count']} attached users. "
                     "Either set 'force' option to true or remove active users "
                     "from the organization"
                 )
-                % (org_name, org["user_count"])
             )
 
     module.exit_json(**result)
