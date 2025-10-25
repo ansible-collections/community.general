@@ -1,0 +1,2 @@
+minor_changes:
+  - bitwarden lookup plugin - add availbility to get attachment file from bitwarden (https://github.com/ansible-collections/community.general/pull/10917).
