@@ -239,15 +239,14 @@ class IpbaseInfo(object):
             })
 
         if info['status'] != 200:
-            self.module.fail_json(msg='The API request to ipbase.com returned an error status code {0}'.format(info['status']))
+            self.module.fail_json(msg=f"The API request to ipbase.com returned an error status code {info['status']}")
         else:
             try:
                 content = response.read()
                 result = self.module.from_json(content.decode('utf8'))
             except ValueError:
                 self.module.fail_json(
-                    msg='Failed to parse the ipbase.com response: '
-                    '{0} {1}'.format(url, content))
+                    msg=f'Failed to parse the ipbase.com response: {url} {content}')
             else:
                 return result
 
@@ -274,7 +273,7 @@ class IpbaseInfo(object):
             params['language'] = language
 
         if params:
-            url += '?' + urlencode(params)
+            url += f"?{urlencode(params)}"
 
         return self._get_url_data(url)
 

@@ -104,7 +104,7 @@ class SubCAIPAClient(IPAClient):
         for change in diff:
             update_detail = dict()
             if item[change] is not None:
-                update_detail.update(setattr="{0}={1}".format(change, item[change]))
+                update_detail.update(setattr=f"{change}={item[change]}")
                 self._post_json(method='ca_mod', name=subca_name, item=update_detail)
 
     def subca_del(self, subca_name=None):

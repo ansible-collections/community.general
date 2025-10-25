@@ -218,7 +218,7 @@ def main():
                 try:
                     os.remove(path)
                 except OSError as e:
-                    module.fail_json(msg="Error deleting: %s - %s." % (e.filename, e.strerror))
+                    module.fail_json(msg=f"Error deleting: {e.filename} - {e.strerror}.")
                 keytab._exec()
                 changed = True
             if force and module.check_mode:
@@ -234,7 +234,7 @@ def main():
                 try:
                     os.remove(path)
                 except OSError as e:
-                    module.fail_json(msg="Error deleting: %s - %s." % (e.filename, e.strerror))
+                    module.fail_json(msg=f"Error deleting: {e.filename} - {e.strerror}.")
 
     module.exit_json(changed=changed)
 

@@ -214,7 +214,7 @@ def main():
         ipmi_cmd = command.Command(
             bmc=name, userid=user, password=password, port=port, kg=key
         )
-        module.debug('ipmi instantiated - name: "%s"' % name)
+        module.debug(f'ipmi instantiated - name: "{name}"')
 
         changed = False
         if machine is None:
